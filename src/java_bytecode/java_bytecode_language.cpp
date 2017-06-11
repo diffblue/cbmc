@@ -203,9 +203,9 @@ static void get_virtual_method_targets(
   assert(called_function.id()==ID_virtual_function);
 
   const auto &call_class=called_function.get(ID_C_class);
-  assert(call_class!=irep_idt());
+  assert(!call_class.empty());
   const auto &call_basename=called_function.get(ID_component_name);
-  assert(call_basename!=irep_idt());
+  assert(!call_basename.empty());
 
   auto old_size=needed_methods.size();
 
@@ -218,7 +218,7 @@ static void get_virtual_method_targets(
         call_basename,
         child_class,
         symbol_table);
-    if(child_method!=irep_idt())
+    if(!child_method.empty())
       needed_methods.push_back(child_method);
   }
 
@@ -231,7 +231,7 @@ static void get_virtual_method_targets(
         call_basename,
         parent_class_id,
         symbol_table);
-    if(parent_method!=irep_idt())
+    if(!parent_method.empty())
     {
       needed_methods.push_back(parent_method);
       break;

@@ -99,7 +99,7 @@ static bool sort_and_join(
   const struct saj_tablet &saj_entry,
   const irep_idt &type_id)
 {
-  for(unsigned i=0; saj_entry.type_ids[i]!=irep_idt(); i++)
+  for(unsigned i=0; !saj_entry.type_ids[i].empty(); i++)
     if(type_id==saj_entry.type_ids[i])
       return true;
 
@@ -112,7 +112,7 @@ static const struct saj_tablet &sort_and_join(
 {
   unsigned i=0;
 
-  for( ; saj_table[i].id!=irep_idt(); i++)
+  for( ; !saj_table[i].id.empty(); i++)
     if(id==saj_table[i].id &&
        sort_and_join(saj_table[i], type_id))
       return saj_table[i];
@@ -129,7 +129,7 @@ bool sort_and_join(exprt &expr)
 
   const struct saj_tablet &saj_entry=
     sort_and_join(expr.id(), expr.type().id());
-  if(saj_entry.id==irep_idt())
+  if(saj_entry.id.empty())
     return true;
 
   // check operand types

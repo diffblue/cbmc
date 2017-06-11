@@ -398,7 +398,7 @@ protected:
   {
     typet *p=&dest;
 
-    while(p->id()!=irep_idt() && p->is_not_nil())
+    while(!p->id().empty() && p->is_not_nil())
     {
       if(p->id()==ID_merged_type)
       {
@@ -2224,7 +2224,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     default: type_id=irep_idt();
     }
 
-    if(type_id!=irep_idt())
+    if(!type_id.empty())
     {
       cpp_tokent tk;
       typet kw;
@@ -3467,7 +3467,7 @@ bool Parser::rOperatorName(irept &name)
     return rCastOperatorName(name);
   }
 
-  assert(operator_id!=irep_idt());
+  assert(!operator_id.empty());
   lex.get_token(tk);
   name=irept(operator_id);
   set_location(name, tk);

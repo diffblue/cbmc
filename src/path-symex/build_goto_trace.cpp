@@ -105,7 +105,7 @@ void build_goto_trace(
     const irep_idt &comment=
       instruction.source_location.get_comment();
 
-    if(comment!=irep_idt())
+    if(!comment.empty())
       trace_step.comment=id2string(comment);
     else
       trace_step.comment="assertion";

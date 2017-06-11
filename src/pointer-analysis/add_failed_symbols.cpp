@@ -76,7 +76,7 @@ exprt get_failed_symbol(
   const symbolt &symbol=ns.lookup(expr);
   irep_idt failed_symbol_id=symbol.type.get(ID_C_failed_symbol);
 
-  if(failed_symbol_id==irep_idt())
+  if(failed_symbol_id.empty())
     return nil_exprt();
 
   const symbolt &failed_symbol=ns.lookup(failed_symbol_id);

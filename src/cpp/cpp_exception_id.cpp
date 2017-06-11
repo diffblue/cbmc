@@ -59,7 +59,7 @@ void cpp_exception_list_rec(
     // grab C/C++ type
     irep_idt c_type=src.get(ID_C_c_type);
 
-    if(c_type!=irep_idt())
+    if(!c_type.empty())
     {
       dest.push_back(id2string(c_type)+suffix);
       return;

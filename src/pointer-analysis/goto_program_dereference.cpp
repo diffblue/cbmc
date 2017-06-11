@@ -32,7 +32,7 @@ bool goto_program_dereferencet::has_failed_symbol(
     const irep_idt &failed_symbol=
       ptr_symbol.type.get("#failed_symbol");
 
-    if(failed_symbol==irep_idt())
+    if(failed_symbol.empty())
       return false;
 
     return !ns.lookup(failed_symbol, symbol);

@@ -602,7 +602,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           irep_idt base_name=arg.get_base_name();
 
-          if(base_name==irep_idt())
+          if(base_name.empty())
             base_name="arg"+std::to_string(i++);
 
           symbolt arg_symb;
@@ -769,7 +769,7 @@ void cpp_typecheckt::put_compound_into_scope(
   const irep_idt &name=compound.get_name();
 
   // nothing to do if no base_name (e.g., an anonymous bitfield)
-  if(base_name==irep_idt())
+  if(base_name.empty())
     return;
 
   if(compound.type().id()==ID_code)
@@ -983,7 +983,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         continue;
       }
 
-      if(declaration.type().id()==irep_idt()) // empty?
+      if(declaration.type().id().empty())
         continue;
 
       bool is_typedef=declaration.is_typedef();
@@ -1259,7 +1259,7 @@ void cpp_typecheckt::typecheck_member_function(
 
   if(component.get_bool(ID_is_static))
   {
-    if(method_qualifier.id()!=irep_idt())
+    if(!method_qualifier.id().empty())
     {
       error().source_location=component.source_location();
       error() << "method is static -- no qualifiers allowed" << eom;

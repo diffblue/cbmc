@@ -407,7 +407,7 @@ exprt path_symex_statet::read_symbol_member_index(
   else
   {
     // we do some SSA symbol
-    if(var_state.ssa_symbol.get_identifier()==irep_idt())
+    if(var_state.ssa_symbol.get_identifier().empty())
     {
       // produce one
       var_state.ssa_symbol=var_info.ssa_symbol();
