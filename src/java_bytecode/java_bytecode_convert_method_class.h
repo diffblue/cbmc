@@ -123,11 +123,6 @@ protected:
     INST_INDEX_CONST=3
   };
 
-  codet get_array_bounds_check(
-    const exprt &arraystruct,
-    const exprt &idx,
-    const source_locationt &original_sloc);
-
   // return corresponding reference of variable
   const variablet &find_variable_for_slot(
     size_t address,
