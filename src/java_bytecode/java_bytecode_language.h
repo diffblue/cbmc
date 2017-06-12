@@ -107,6 +107,7 @@ protected:
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
   character_refine_preprocesst character_preprocess;
+  bool throw_runtime_exceptions;
   std::string java_cp_include_files;
 };
 

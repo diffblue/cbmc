@@ -1072,6 +1072,7 @@ void cbmc_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-throw-runtime-exceptions Make implicit runtime exceptions explicit"
     " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"

@@ -527,39 +527,14 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
 
   const dereference_exprt obj_deref(pointer2, class_type);
 
-  return member_exprt(
+  member_exprt member_expr(
     obj_deref,
     fieldref.get(ID_component_name),
     fieldref.type());
-}
 
-codet java_bytecode_convert_methodt::get_array_bounds_check(
-  const exprt &arraystruct,
-  const exprt &idx,
-  const source_locationt &original_sloc)
-{
-  constant_exprt intzero=from_integer(0, java_int_type());
-  binary_relation_exprt gezero(idx, ID_ge, intzero);
-  const member_exprt length_field(arraystruct, "length", java_int_type());
-  binary_relation_exprt ltlength(idx, ID_lt, length_field);
-  code_blockt bounds_checks;
-
-  bounds_checks.add(code_assertt(gezero));
-  bounds_checks.operands().back().add_source_location()=original_sloc;
-  bounds_checks.operands().back().add_source_location()
-    .set_comment("Array index < 0");
-  bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-out-of-bounds-low");
-  bounds_checks.add(code_assertt(ltlength));
-
-  bounds_checks.operands().back().add_source_location()=original_sloc;
-  bounds_checks.operands().back().add_source_location()
-    .set_comment("Array index >= length");
-  bounds_checks.operands().back().add_source_location()
-    .set_property_class("array-index-out-of-bounds-high");
-
-  // TODO make this throw ArrayIndexOutOfBoundsException instead of asserting.
-  return bounds_checks;
+  // tag it so it's easy to identify during instrumentation
+  member_expr.set(ID_java_member_access, true);
+  return member_expr;
 }
 
 /// Find all goto statements in 'repl' that target 'old_label' and redirect them
@@ -1278,50 +1253,26 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="athrow")
     {
       assert(op.size()==1 && results.size()==1);
-      code_blockt block;
-      // TODO throw NullPointerException instead
-      const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
-      const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
-      const exprt not_equal_null(
-        binary_relation_exprt(lhs, ID_notequal, rhs));
-      code_assertt check(not_equal_null);
-      check.add_source_location()
-        .set_comment("Throw null");
-      check.add_source_location()
-        .set_property_class("null-pointer-exception");
-      block.move_to_operands(check);
 
       side_effect_expr_throwt throw_expr;
       throw_expr.add_source_location()=i_it->source_location;
       throw_expr.copy_to_operands(op[0]);
       c=code_expressiont(throw_expr);
       results[0]=op[0];
-
-      block.move_to_operands(c);
-      c=block;
     }
     else if(statement=="checkcast")
     {
       // checkcast throws an exception in case a cast of object
       // on stack to given type fails.
       // The stack isn't modified.
-      // TODO: convert assertions to exceptions.
       assert(op.size()==1 && results.size()==1);
       binary_predicate_exprt check(op[0], ID_java_instanceof, arg0);
       code_assertt assert_class(check);
       assert_class.add_source_location().set_comment("Dynamic cast check");
       assert_class.add_source_location().set_property_class("bad-dynamic-cast");
-      // checkcast passes when the operand is null.
-      empty_typet voidt;
-      pointer_typet voidptr(voidt);
-      exprt null_check_op=op[0];
-      if(null_check_op.type()!=voidptr)
-        null_check_op.make_typecast(voidptr);
-      code_ifthenelset conditional_check;
-      notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
-      conditional_check.cond()=std::move(op_not_null);
-      conditional_check.then_case()=std::move(assert_class);
-      c=std::move(conditional_check);
+      // we add this assert such that we can recognise it
+      // during the instrumentation phase
+      c=std::move(assert_class);
       results[0]=op[0];
     }
     else if(statement=="invokedynamic")
@@ -1548,6 +1499,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
         pointer_type(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+      // tag it so it's easy to identify during instrumentation
+      data_plus_offset.set(ID_java_array_access, true);
       typet element_type=data_ptr.type().subtype();
       const dereference_exprt element(data_plus_offset, element_type);
 
@@ -1613,11 +1566,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
         pointer_type(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
+      // tag it so it's easy to identify during instrumentation
+      data_plus_offset.set(ID_java_array_access, true);
       typet element_type=data_ptr.type().subtype();
       dereference_exprt element(data_plus_offset, element_type);
-
-      c=get_array_bounds_check(deref, op[1], i_it->source_location);
-      c.add_source_location()=i_it->source_location;
       results[0]=java_bytecode_promotion(element);
     }
     else if(statement==patternt("?load"))
@@ -2244,14 +2196,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
         java_new_array.add_source_location()=i_it->source_location;
 
       c=code_blockt();
-      // TODO make this throw NegativeArrayIndexException instead.
-      constant_exprt intzero=from_integer(0, java_int_type());
-      binary_relation_exprt gezero(op[0], ID_ge, intzero);
-      code_assertt check(gezero);
-      check.add_source_location().set_comment("Array size < 0");
-      check.add_source_location()
-        .set_property_class("array-create-negative-size");
-      c.move_to_operands(check);
 
       if(max_array_length!=0)
       {
@@ -2286,15 +2230,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(!i_it->source_location.get_line().empty())
         java_new_array.add_source_location()=i_it->source_location;
 
-      code_blockt checkandcreate;
-      // TODO make this throw NegativeArrayIndexException instead.
-      constant_exprt intzero=from_integer(0, java_int_type());
-      binary_relation_exprt gezero(op[0], ID_ge, intzero);
-      code_assertt check(gezero);
-      check.add_source_location().set_comment("Array size < 0");
-      check.add_source_location()
-        .set_property_class("array-create-negative-size");
-      checkandcreate.move_to_operands(check);
+      code_blockt create;
 
       if(max_array_length!=0)
       {
@@ -2302,11 +2238,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
           from_integer(max_array_length, java_int_type());
         binary_relation_exprt le_max_size(op[0], ID_le, size_limit);
         code_assumet assume_le_max_size(le_max_size);
-        checkandcreate.move_to_operands(assume_le_max_size);
+        create.move_to_operands(assume_le_max_size);
       }
 
       const exprt tmp=tmp_variable("newarray", ref_type);
-      c=code_assignt(tmp, java_new_array);
+      create.copy_to_operands(code_assignt(tmp, java_new_array));
+      c=std::move(create);
       results[0]=tmp;
     }
     else if(statement=="arraylength")

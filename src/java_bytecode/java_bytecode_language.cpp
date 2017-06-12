@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_internal_additions.h"
+#include "java_bytecode_instrument.h"
 #include "java_bytecode_typecheck.h"
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
@@ -36,7 +37,8 @@ Author: Daniel Kroening, kroening@kroening.com
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
-  string_refinement_enabled=cmd.isset("string-refine");
+  string_refinement_enabled=cmd.isset("refine-strings");
+  throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   if(cmd.isset("java-max-input-array-length"))
     max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
@@ -450,6 +452,12 @@ bool java_bytecode_languaget::typecheck(
     }
   }
   // Otherwise our caller is in charge of elaborating methods on demand.
+
+  // now instrument runtime exceptions
+  java_bytecode_instrument(
+    symbol_table,
+    throw_runtime_exceptions,
+    max_nondet_array_length);
 
   // now typecheck all
   if(java_bytecode_typecheck(
