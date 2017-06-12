@@ -48,40 +48,40 @@ void goto_inline(
 
   typedef goto_functionst::goto_functiont goto_functiont;
 
-    // find entry point
-    goto_functionst::function_mapt::iterator it=
+  // find entry point
+  goto_functionst::function_mapt::iterator it=
       goto_functions.function_map.find(goto_functionst::entry_point());
 
-    if(it==goto_functions.function_map.end())
-      return;
+  if(it==goto_functions.function_map.end())
+    return;
 
-    goto_functiont &goto_function=it->second;
-    assert(goto_function.body_available());
+  goto_functiont &goto_function=it->second;
+  assert(goto_function.body_available());
 
-    // gather all calls
-    // we use non-transitive inlining to avoid the goto program
-    // copying that goto_inlinet would do otherwise
-    goto_inlinet::inline_mapt inline_map;
+  // gather all calls
+  // we use non-transitive inlining to avoid the goto program
+  // copying that goto_inlinet would do otherwise
+  goto_inlinet::inline_mapt inline_map;
 
-    Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    goto_functiont &goto_function=f_it->second;
+
+    if(!goto_function.body_available())
+      continue;
+
+    goto_inlinet::call_listt &call_list=inline_map[f_it->first];
+
+    goto_programt &goto_program=goto_function.body;
+
+    Forall_goto_program_instructions(i_it, goto_program)
     {
-      goto_functiont &goto_function=f_it->second;
-
-      if(!goto_function.body_available())
+      if(!goto_inlinet::is_call(i_it))
         continue;
 
-      goto_inlinet::call_listt &call_list=inline_map[f_it->first];
-
-      goto_programt &goto_program=goto_function.body;
-
-      Forall_goto_program_instructions(i_it, goto_program)
-      {
-        if(!goto_inlinet::is_call(i_it))
-          continue;
-
-        call_list.push_back(goto_inlinet::callt(i_it, false));
-      }
+      call_list.push_back(goto_inlinet::callt(i_it, false));
     }
+  }
 
   goto_inline.goto_inline(
     goto_functionst::entry_point(), goto_function, inline_map, true);

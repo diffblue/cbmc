@@ -252,6 +252,8 @@ int goto_instrument_parse_optionst::doit()
                     << "\n\n";
         }
       }
+
+      return 0;
     }
 
     if(cmdline.isset("show-value-sets"))
@@ -949,7 +951,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    do_indirect_call_and_rtti_removal();
+    do_indirect_call_and_rtti_removal(/*force=*/true);
 
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -960,7 +962,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler);
+    goto_inline(goto_functions, ns, ui_message_handler, true);
   }
 
   if(cmdline.isset("show-custom-bitvector-analysis") ||
@@ -1075,27 +1077,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     status() << "Partial inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler, true);
+    goto_partial_inline(goto_functions, ns, ui_message_handler, 0, true);
 
     goto_functions.update();
     goto_functions.compute_loop_numbers();
-  }
-
-  // now do full inlining, if requested
-  if(cmdline.isset("inline"))
-  {
-    do_indirect_call_and_rtti_removal(/*force=*/true);
-
-    if(cmdline.isset("show-custom-bitvector-analysis") ||
-       cmdline.isset("custom-bitvector-analysis"))
-    {
-      do_remove_returns();
-      thread_exit_instrumentation(goto_functions);
-      mutex_init_instrumentation(symbol_table, goto_functions);
-    }
-
-    status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler, true);
   }
 
   if(cmdline.isset("constant-propagator"))
