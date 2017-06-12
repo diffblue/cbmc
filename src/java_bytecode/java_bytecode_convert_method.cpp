@@ -438,7 +438,8 @@ void java_bytecode_convert_methodt::convert(
 
   tmp_vars.clear();
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(m, code_type);
+    method_symbol.value=convert_instructions(
+      m, code_type, method_symbol.name);
 
   // Replace the existing stub symbol with the real deal:
   const auto s_it=symbol_table.symbols.find(method.get_name());
@@ -988,7 +989,8 @@ static unsigned get_bytecode_type_width(const typet &ty)
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
-  const code_typet &method_type)
+  const code_typet &method_type,
+  const irep_idt &method_name)
 {
   const instructionst &instructions=method.instructions;
 
@@ -1188,17 +1190,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
         stack.clear();
         auxiliary_symbolt new_symbol;
         new_symbol.is_static_lifetime=true;
-        int file_name_length=
-          id2string(method.source_location.get_file()).size();
-        // remove the file extension
-        const std::string &file_name=
-          id2string(method.source_location.get_file()).
-             substr(0, file_name_length-5);
         // generate the name of the exceptional return variable
         const std::string &exceptional_var_name=
-          "java::"+file_name+"."+
-          id2string(method.name)+":"+
-          id2string(method.signature)+
+          id2string(method_name)+
           EXC_SUFFIX;
         new_symbol.base_name=exceptional_var_name;
         new_symbol.name=exceptional_var_name;
@@ -2363,10 +2357,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==2 && results.size()==2);
       results[1]=op[0];
       results[0]=op[1];
-    }
-    else if(statement=="nop")
-    {
-      c=code_skipt();
     }
     else
     {

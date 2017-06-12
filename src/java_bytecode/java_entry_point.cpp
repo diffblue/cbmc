@@ -537,7 +537,7 @@ bool java_entry_point(
     // add the exceptional return value
     auxiliary_symbolt exc_symbol;
     exc_symbol.mode=ID_C;
-    exc_symbol.is_static_lifetime=false;
+    exc_symbol.is_static_lifetime=true;
     exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
     exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
     exc_symbol.type=java_reference_type(empty_typet());
