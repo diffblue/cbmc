@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 

@@ -79,7 +79,7 @@ void goto_inline(
 
     Forall_goto_program_instructions(i_it, goto_program)
     {
-      if(!i_it->is_function_call())
+      if(!goto_inlinet::is_call(i_it))
         continue;
 
       call_list.push_back(goto_inlinet::callt(i_it, false));
