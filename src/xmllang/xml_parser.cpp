@@ -14,18 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 xml_parsert xml_parser;
 
-/*******************************************************************\
-
-Function: parse_xml
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 // 'do it all' function
 bool parse_xml(
   std::istream &in,
@@ -48,18 +36,6 @@ bool parse_xml(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: parse_xml
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // 'do it all' function
 bool parse_xml(

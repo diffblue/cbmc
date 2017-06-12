@@ -10,18 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "identifier.h"
 
-/*******************************************************************\
-
-Function: identifiert::as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string identifiert::as_string() const
 {
   std::string result;
@@ -36,18 +24,6 @@ std::string identifiert::as_string() const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: identifiert::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void identifiert::parse(const std::string &s)
 {

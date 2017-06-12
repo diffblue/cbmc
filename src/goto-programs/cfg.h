@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Control Flow Graph
+
 #ifndef CPROVER_GOTO_PROGRAMS_CFG_H
 #define CPROVER_GOTO_PROGRAMS_CFG_H
 
@@ -13,14 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/graph.h>
 
 #include "goto_functions.h"
-
-/*******************************************************************\
-
-   Class: cfg_baset
-
- Purpose:
-
-\*******************************************************************/
 
 class empty_cfg_nodet
 {
@@ -136,14 +131,6 @@ public:
   bool nodes_empty(P &program) const { return program.instructions.empty(); }
 };
 
-/*******************************************************************\
-
-   Class: concurrent_cfg_baset
-
- Purpose:
-
-\*******************************************************************/
-
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
@@ -156,14 +143,6 @@ protected:
     goto_programt::const_targett next_PC,
     typename cfg_baset<T, P, I>::entryt &entry);
 };
-
-/*******************************************************************\
-
-   Class: procedure_local_cfg_baset
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T,
          typename P=const goto_programt,
@@ -179,14 +158,6 @@ protected:
     typename cfg_baset<T, P, I>::entryt &entry);
 };
 
-/*******************************************************************\
-
-   Class: procedure_local_concurrent_cfg_baset
-
- Purpose:
-
-\*******************************************************************/
-
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
@@ -195,18 +166,6 @@ class procedure_local_concurrent_cfg_baset:
   public procedure_local_cfg_baset<T, P, I>
 {
 };
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_goto(
@@ -223,18 +182,6 @@ void cfg_baset<T, P, I>::compute_edges_goto(
     if(t!=goto_program.instructions.end())
       this->add_edge(entry, entry_map[t]);
 }
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges_catch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_catch(
@@ -254,18 +201,6 @@ void cfg_baset<T, P, I>::compute_edges_catch(
       this->add_edge(entry, entry_map[t]);
 }
 
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges_throw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_throw(
   const goto_programt &goto_program,
@@ -275,18 +210,6 @@ void cfg_baset<T, P, I>::compute_edges_throw(
 {
   // no (trivial) successors
 }
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_start_thread(
@@ -298,18 +221,6 @@ void cfg_baset<T, P, I>::compute_edges_start_thread(
   if(next_PC!=goto_program.instructions.end())
     this->add_edge(entry, entry_map[next_PC]);
 }
-
-/*******************************************************************\
-
-Function: concurrent_cfg_baset::compute_edges_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
@@ -328,18 +239,6 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
     if(t!=goto_program.instructions.end())
       this->add_edge(entry, this->entry_map[t]);
 }
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges_function_call(
@@ -392,18 +291,6 @@ void cfg_baset<T, P, I>::compute_edges_function_call(
     this->add_edge(entry, entry_map[next_PC]);
 }
 
-/*******************************************************************\
-
-Function: procedure_local_cfg_baset::compute_edges_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class T, typename P, typename I>
 void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
   const goto_functionst &goto_functions,
@@ -421,18 +308,6 @@ void procedure_local_cfg_baset<T, P, I>::compute_edges_function_call(
   if(next_PC!=goto_program.instructions.end())
     this->add_edge(entry, this->entry_map[next_PC]);
 }
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges(
@@ -508,18 +383,6 @@ void cfg_baset<T, P, I>::compute_edges(
   }
 }
 
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges(
   const goto_functionst &goto_functions,
@@ -530,18 +393,6 @@ void cfg_baset<T, P, I>::compute_edges(
       ++it)
     compute_edges(goto_functions, goto_program, it);
 }
-
-/*******************************************************************\
-
-Function: cfg_baset::compute_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T, typename P, typename I>
 void cfg_baset<T, P, I>::compute_edges(

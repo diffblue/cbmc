@@ -21,18 +21,6 @@ extern "C"
 #error "Expected HAVE_LINGELING"
 #endif
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt satcheck_lingelingt::l_get(literalt a) const
 {
   if(a.is_constant())
@@ -54,34 +42,10 @@ tvt satcheck_lingelingt::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_lingelingt::solver_text()
 {
   return "Lingeling";
 }
-
-/*******************************************************************\
-
-Function: satcheck_lingelingt::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_lingelingt::lcnf(const bvt &bv)
 {
@@ -97,18 +61,6 @@ void satcheck_lingelingt::lcnf(const bvt &bv)
 
   clause_counter++;
 }
-
-/*******************************************************************\
-
-Function: satcheck_lingelingt::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt satcheck_lingelingt::prop_solve()
 {
@@ -146,69 +98,21 @@ propt::resultt satcheck_lingelingt::prop_solve()
   return P_UNSATISFIABLE;
 }
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::set_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void satcheck_lingelingt::set_assignment(literalt a, bool value)
 {
   assert(false);
 }
-
-/*******************************************************************\
-
-Function: satcheck_lingelingt::satcheck_lingelingt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 satcheck_lingelingt::satcheck_lingelingt() :
   solver(lglinit())
 {
 }
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::satcheck_lingelingt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_lingelingt::~satcheck_lingelingt()
 {
   lglrelease(solver);
   solver=0;
 }
-
-/*******************************************************************\
-
-Function: satcheck_lingelingt::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_lingelingt::set_assumptions(const bvt &bv)
 {
@@ -218,40 +122,16 @@ void satcheck_lingelingt::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::set_frozen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void satcheck_lingelingt::set_frozen(literalt a)
 {
   if(!a.is_constant())
     lglfreeze(solver, a.dimacs());
 }
 
-/*******************************************************************\
-
-Function: satcheck_lingelingt::is_in_conflict
-
-  Inputs:
-
- Outputs:
-
- Purpose: Returns true if an assumed literal is in conflict if the
- formula is UNSAT.
-
- NOTE: if the literal is not in the assumption it causes an
- assertion failure in lingeling.
-
-\*******************************************************************/
-
+/// Returns true if an assumed literal is in conflict if the formula is UNSAT.
+///
+/// NOTE: if the literal is not in the assumption it causes an
+/// assertion failure in lingeling.
 bool satcheck_lingelingt::is_in_conflict(literalt a) const
 {
   assert(!a.is_constant());

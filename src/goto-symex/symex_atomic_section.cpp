@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::symex_atomic_begin
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_atomic_begin(statet &state)
 {
@@ -39,18 +30,6 @@ void goto_symext::symex_atomic_begin(statet &state)
       atomic_section_counter,
       state.source);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::symex_atomic_end
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_atomic_end(statet &state)
 {

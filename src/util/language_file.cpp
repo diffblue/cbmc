@@ -11,18 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "language.h"
 #include "language_file.h"
 
-/*******************************************************************\
-
-Function: language_filet::language_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
   language(rhs.language==NULL?NULL:rhs.language->new_language()),
@@ -30,35 +18,11 @@ language_filet::language_filet(const language_filet &rhs):
 {
 }
 
-/*******************************************************************\
-
-Function: language_filet::~language_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 language_filet::~language_filet()
 {
   if(language!=NULL)
     delete language;
 }
-
-/*******************************************************************\
-
-Function: language_filet::get_modules
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void language_filet::get_modules()
 {
@@ -72,18 +36,6 @@ void language_filet::convert_lazy_method(
   language->convert_lazy_method(id, symbol_table);
 }
 
-/*******************************************************************\
-
-Function: language_filest::show_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void language_filest::show_parse(std::ostream &out)
 {
   for(file_mapt::iterator it=file_map.begin();
@@ -91,19 +43,8 @@ void language_filest::show_parse(std::ostream &out)
     it->second.language->show_parse(out);
 }
 
-/*******************************************************************\
-
-Function: language_filest::set_should_generate_opqaue_method_stubs
-
-  Inputs:
-          should_generate_stubs - Should stub generation be enabled
-
- Outputs:
-
- Purpose: Turn on or off stub generation for all the languages
-
-\*******************************************************************/
-
+/// Turn on or off stub generation for all the languages
+/// \param should_generate_stubs: Should stub generation be enabled
 void language_filest::set_should_generate_opaque_method_stubs(
   bool stubs_enabled)
 {
@@ -113,17 +54,6 @@ void language_filest::set_should_generate_opaque_method_stubs(
     language->set_should_generate_opaque_method_stubs(stubs_enabled);
   }
 }
-
-/*******************************************************************\
-Function: language_filest::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::parse()
 {
@@ -157,18 +87,6 @@ bool language_filest::parse()
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck(symbol_tablet &symbol_table)
 {
@@ -244,18 +162,6 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
   return false;
 }
 
-/*******************************************************************\
-
-Function: language_filest::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool language_filest::final(
   symbol_tablet &symbol_table)
 {
@@ -272,18 +178,6 @@ bool language_filest::final(
   return false;
 }
 
-/*******************************************************************\
-
-Function: language_filest::interfaces
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool language_filest::interfaces(
   symbol_tablet &symbol_table)
 {
@@ -296,18 +190,6 @@ bool language_filest::interfaces(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,
@@ -325,18 +207,6 @@ bool language_filest::typecheck_module(
 
   return typecheck_module(symbol_table, it->second);
 }
-
-/*******************************************************************\
-
-Function: language_filest::typecheck_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool language_filest::typecheck_module(
   symbol_tablet &symbol_table,

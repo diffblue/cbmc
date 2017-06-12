@@ -15,18 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "arith_tools.h"
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_member(exprt &expr)
 {
   if(expr.operands().size()!=1)

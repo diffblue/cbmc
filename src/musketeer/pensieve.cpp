@@ -16,18 +16,6 @@ Author: Vincent Nimal
 
 #include "pensieve.h"
 
-/*******************************************************************\
-
-Function: fencer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fence_pensieve(
   value_setst &value_sets,
   symbol_tablet &symbol_table,

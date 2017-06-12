@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C/C++ Language Conversion
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -16,18 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unescape_string.h"
 #include "convert_string_literal.h"
-
-/*******************************************************************\
-
-Function: convert_one_string_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::basic_string<unsigned int> convert_one_string_literal(
   const std::string &src)
@@ -78,18 +69,6 @@ std::basic_string<unsigned int> convert_one_string_literal(
     return value;
   }
 }
-
-/*******************************************************************\
-
-Function: convert_string_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt convert_string_literal(const std::string &src)
 {

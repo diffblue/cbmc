@@ -10,18 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_storage_spec.h"
 
-/*******************************************************************\
-
-Function: c_storage_spect::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_storage_spect::read(const typet &type)
 {
   if(type.id()==ID_merged_type ||

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set
+
 #ifndef CPROVER_ANALYSES_INVARIANT_SET_H
 #define CPROVER_ANALYSES_INVARIANT_SET_H
 

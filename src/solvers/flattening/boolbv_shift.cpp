@@ -12,18 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_shift(const binary_exprt &expr)
 {
   const irep_idt &type_id=expr.type().id();

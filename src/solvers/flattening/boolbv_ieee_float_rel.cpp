@@ -13,18 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_ieee_float_rel
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();

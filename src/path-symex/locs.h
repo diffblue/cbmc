@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CFG made of Program Locations, built from goto_functionst
+
 #ifndef CPROVER_PATH_SYMEX_LOCS_H
 #define CPROVER_PATH_SYMEX_LOCS_H
 

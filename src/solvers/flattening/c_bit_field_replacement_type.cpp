@@ -8,18 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_bit_field_replacement_type.h"
 
-/*******************************************************************\
-
-Function: c_bit_field_replacement_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 typet c_bit_field_replacement_type(
   const c_bit_field_typet &src,
   const namespacet &ns)

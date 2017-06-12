@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Inlining
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_H
 

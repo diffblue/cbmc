@@ -8,6 +8,9 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// abstract events
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_ABSTRACT_EVENT_H
 
@@ -15,10 +18,6 @@ Date: 2012
 #include <util/graph.h>
 
 #include "wmm.h"
-
-/*******************************************************************\
-                          abstract event
-\*******************************************************************/
 
 class abstract_eventt:public graph_nodet<empty_edget>
 {

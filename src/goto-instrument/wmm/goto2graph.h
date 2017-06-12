@@ -8,6 +8,9 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// Instrumenter
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
 

@@ -6,40 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C Language Type Checking
+
 #include <util/config.h>
 #include <linking/zero_initializer.h>
 
 #include "ansi_c_declaration.h"
 #include "c_typecheck_base.h"
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::start_typecheck_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::start_typecheck_code()
 {
   case_is_allowed=break_is_allowed=continue_is_allowed=false;
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_code(codet &code)
 {
@@ -152,18 +131,6 @@ void c_typecheck_baset::typecheck_code(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_asm
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_asm(codet &code)
 {
   const irep_idt flavor=to_code_asm(code).get_flavor();
@@ -197,18 +164,6 @@ void c_typecheck_baset::typecheck_asm(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_assign(codet &code)
 {
   if(code.operands().size()!=2)
@@ -224,18 +179,6 @@ void c_typecheck_baset::typecheck_assign(codet &code)
 
   implicit_typecast(code.op1(), code.op0().type());
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_block
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_block(codet &code)
 {
@@ -276,18 +219,6 @@ void c_typecheck_baset::typecheck_block(codet &code)
   code.operands().swap(new_ops.operands());
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_break
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_break(codet &code)
 {
   if(!break_is_allowed)
@@ -298,18 +229,6 @@ void c_typecheck_baset::typecheck_break(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_continue
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_continue(codet &code)
 {
   if(!continue_is_allowed)
@@ -319,18 +238,6 @@ void c_typecheck_baset::typecheck_continue(codet &code)
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_decl(codet &code)
 {
@@ -452,18 +359,6 @@ void c_typecheck_baset::typecheck_decl(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::is_complete_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool c_typecheck_baset::is_complete_type(const typet &type) const
 {
   if(type.id()==ID_incomplete_struct ||
@@ -494,18 +389,6 @@ bool c_typecheck_baset::is_complete_type(const typet &type) const
   return true;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_expression
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_expression(codet &code)
 {
   if(code.operands().size()!=1)
@@ -519,18 +402,6 @@ void c_typecheck_baset::typecheck_expression(codet &code)
   exprt &op=code.op0();
   typecheck_expr(op);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_for
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_for(codet &code)
 {
@@ -623,18 +494,6 @@ void c_typecheck_baset::typecheck_for(codet &code)
   typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_label
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_label(code_labelt &code)
 {
   // record the label
@@ -642,18 +501,6 @@ void c_typecheck_baset::typecheck_label(code_labelt &code)
 
   typecheck_code(code.code());
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_switch_case
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
 {
@@ -690,18 +537,6 @@ void c_typecheck_baset::typecheck_switch_case(code_switch_caset &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_gcc_switch_case_range
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
 {
   if(code.operands().size()!=3)
@@ -727,53 +562,17 @@ void c_typecheck_baset::typecheck_gcc_switch_case_range(codet &code)
   implicit_typecast(code.op1(), switch_op_type);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_gcc_local_label
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_gcc_local_label(codet &code)
 {
   // these are just declarations, e.g.,
   // __label__ here, there;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_goto(code_gotot &code)
 {
   // we record the label used
   labels_used[code.get_destination()]=code.source_location();
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_gcc_computed_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
 {
@@ -799,18 +598,6 @@ void c_typecheck_baset::typecheck_gcc_computed_goto(codet &code)
   typecheck_expr(dest.op0());
   dest.type()=empty_typet();
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_ifthenelse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
 {
@@ -861,18 +648,6 @@ void c_typecheck_baset::typecheck_ifthenelse(code_ifthenelset &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_start_thread(codet &code)
 {
   if(code.operands().size()!=1)
@@ -884,18 +659,6 @@ void c_typecheck_baset::typecheck_start_thread(codet &code)
 
   typecheck_code(to_code(code.op0()));
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_return
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_return(codet &code)
 {
@@ -941,18 +704,6 @@ void c_typecheck_baset::typecheck_return(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_switch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_switch(code_switcht &code)
 {
   if(code.operands().size()!=2)
@@ -983,18 +734,6 @@ void c_typecheck_baset::typecheck_switch(code_switcht &code)
   break_is_allowed=old_break_is_allowed;
   switch_op_type=old_switch_op_type;
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_while
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_while(code_whilet &code)
 {
@@ -1031,18 +770,6 @@ void c_typecheck_baset::typecheck_while(code_whilet &code)
   typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_dowhile
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 {
   if(code.operands().size()!=2)
@@ -1077,18 +804,6 @@ void c_typecheck_baset::typecheck_dowhile(code_dowhilet &code)
 
   typecheck_spec_expr(code, ID_C_spec_loop_invariant);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_spec_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_spec_expr(
   codet &code,

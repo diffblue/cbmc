@@ -13,18 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_abs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_abs(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as DOT Graph
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -62,19 +65,10 @@ protected:
                  std::set<goto_programt::const_targett> &);
 };
 
-/*******************************************************************\
-
-Function: dott::write_dot_subgraph
-
-  Inputs: output stream, name and goto program
-
- Outputs: true on error, false otherwise
-
- Purpose: writes the dot graph that corresponds to the goto program
-          to the output stream.
-
-\*******************************************************************/
-
+/// writes the dot graph that corresponds to the goto program to the output
+/// stream.
+/// \par parameters: output stream, name and goto program
+/// \return true on error, false otherwise
 void dott::write_dot_subgraph(
   std::ostream &out,
   const std::string &name,
@@ -226,18 +220,6 @@ void dott::write_dot_subgraph(
   subgraphscount++;
 }
 
-/*******************************************************************\
-
-Function: dott::do_dot_function_calls
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dott::do_dot_function_calls(
   std::ostream &out)
 {
@@ -277,18 +259,6 @@ void dott::do_dot_function_calls(
   }
 }
 
-/*******************************************************************\
-
-Function: dott::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dott::output(std::ostream &out)
 {
   out << "digraph G {" << std::endl;
@@ -305,19 +275,9 @@ void dott::output(std::ostream &out)
   out << "}" << std::endl;
 }
 
-/*******************************************************************\
-
-Function: dott::escape
-
-  Inputs: a string
-
- Outputs: the escaped string
-
- Purpose: escapes a string. beware, this might not work for all
-          kinds of strings.
-
-\*******************************************************************/
-
+/// escapes a string. beware, this might not work for all kinds of strings.
+/// \par parameters: a string
+/// \return the escaped string
 std::string &dott::escape(std::string &str)
 {
   for(std::string::size_type i=0; i<str.size(); i++)
@@ -343,19 +303,10 @@ std::string &dott::escape(std::string &str)
   return str;
 }
 
-/*******************************************************************\
-
-Function: dott::find_next
-
-  Inputs: instructions, instruction iterator, true results and
-          false results
-
- Outputs: none
-
- Purpose: finds an instructions successors (for goto graphs)
-
-\*******************************************************************/
-
+/// finds an instructions successors (for goto graphs)
+/// \par parameters: instructions, instruction iterator, true results and
+/// false results
+/// \return none
 void dott::find_next(
   const goto_programt::instructionst &instructions,
   const goto_programt::const_targett &it,
@@ -376,19 +327,10 @@ void dott::find_next(
     fres.insert(next);
 }
 
-/*******************************************************************\
-
-Function: dott::write_edge
-
-  Inputs: output stream, from, to and a label
-
- Outputs: none
-
- Purpose: writes an edge from the from node to the to node and with
-          the given label to the output stream (dot format)
-
-\*******************************************************************/
-
+/// writes an edge from the from node to the to node and with the given label to
+/// the output stream (dot format)
+/// \par parameters: output stream, from, to and a label
+/// \return none
 void dott::write_edge(
   std::ostream &out,
   const goto_programt::instructiont &from,
@@ -408,18 +350,6 @@ void dott::write_edge(
     }
   out << ";" << std::endl;
 }
-
-/*******************************************************************\
-
-Function: dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dot(
   const goto_functionst &src,

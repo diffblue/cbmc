@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Language Conversion
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -57,24 +60,14 @@ protected:
   const char *p;
 };
 
-/*******************************************************************\
-
-Function: assign_parameter_names
-
-  Inputs: `ftype`: Function type whose parameters should be named
-          `name_prefix`: Prefix for parameter names, typically the
-            parent function's name.
-          `symbol_table`: Global symbol table
-
- Outputs: Assigns parameter names (side-effects on `ftype`) to
-          function stub parameters, which are initially nameless
-          as method conversion hasn't happened.
-          Also creates symbols in `symbol_table`.
-
- Purpose: See above
-
-\*******************************************************************/
-
+/// See above
+/// \par parameters: `ftype`: Function type whose parameters should be named
+/// `name_prefix`: Prefix for parameter names, typically the parent function's
+///   name.
+/// `symbol_table`: Global symbol table
+/// \return Assigns parameter names (side-effects on `ftype`) to function stub
+///   parameters, which are initially nameless as method conversion hasn't
+///   happened. Also creates symbols in `symbol_table`.
 void assign_parameter_names(
   code_typet &ftype,
   const irep_idt &name_prefix,
@@ -160,18 +153,7 @@ exprt::operandst java_bytecode_convert_methodt::pop(std::size_t n)
   return operands;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::pop_residue
-
-Inputs:
-
-Outputs:
-
-Purpose: removes minimum(n, stack.size()) elements from the stack
-
-\*******************************************************************/
-
+/// removes minimum(n, stack.size()) elements from the stack
 void java_bytecode_convert_methodt::pop_residue(std::size_t n)
 {
   std::size_t residue_size=std::min(n, stack.size());
@@ -251,25 +233,14 @@ const exprt java_bytecode_convert_methodt::variable(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_method_lazy
-
-  Inputs: `class_symbol`: class this method belongs to
-          `method_identifier`: fully qualified method name, including
-            type signature (e.g. "x.y.z.f:(I)")
-          `m`: parsed method object to convert
-          `symbol_table`: global symbol table (will be modified)
-
- Outputs:
-
- Purpose: This creates a method symbol in the symtab, but doesn't
-          actually perform method conversion just yet. The caller
-          should call java_bytecode_convert_method later to give the
-          symbol/method a body.
-
-\*******************************************************************/
-
+/// This creates a method symbol in the symtab, but doesn't actually perform
+/// method conversion just yet. The caller should call
+/// java_bytecode_convert_method later to give the symbol/method a body.
+/// \par parameters: `class_symbol`: class this method belongs to
+/// `method_identifier`: fully qualified method name, including type signature
+///   (e.g. "x.y.z.f:(I)")
+/// `m`: parsed method object to convert
+/// `symbol_table`: global symbol table (will be modified)
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
   const irep_idt &method_identifier,
@@ -320,18 +291,6 @@ void java_bytecode_convert_method_lazy(
   method_symbol.type=member_type;
   symbol_table.add(method_symbol);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
@@ -483,18 +442,6 @@ void java_bytecode_convert_methodt::convert(
   symbol_table.add(method_symbol);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::get_bytecode_info
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
   const irep_idt &statement)
 {
@@ -569,20 +516,12 @@ codet java_bytecode_convert_methodt::get_array_bounds_check(
   return bounds_checks;
 }
 
-/*******************************************************************\
-
-Function: replace_goto_target
-
-  Inputs: 'repl', a block of code in which to perform replacement, and
-          an old_label that should be replaced throughout by new_label.
-
- Outputs: None (side-effects on repl)
-
- Purpose: Find all goto statements in 'repl' that target 'old_label'
-          and redirect them to 'new_label'.
-
-\*******************************************************************/
-
+/// Find all goto statements in 'repl' that target 'old_label' and redirect them
+/// to 'new_label'.
+/// \par parameters: 'repl', a block of code in which to perform replacement,
+///   and
+/// an old_label that should be replaced throughout by new_label.
+/// \return None (side-effects on repl)
 void java_bytecode_convert_methodt::replace_goto_target(
   codet &repl,
   const irep_idt &old_label,
@@ -603,27 +542,20 @@ void java_bytecode_convert_methodt::replace_goto_target(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::get_block_for_pcrange
-
-  Inputs: 'tree', a code block descriptor, and 'this_block', the corresponding
-          actual code_blockt. 'address_start' and 'address_limit', the Java
-          bytecode offsets searched for. 'next_block_start_address', the
-          bytecode offset of tree/this_block's successor sibling, or UINT_MAX
-          if none exists.
-
- Outputs: Returns the code_blockt most closely enclosing the given address range.
-
- Purpose: 'tree' describes a tree of code_blockt objects; this_block is the
-          corresponding block (thus they are both trees with the same shape).
-          The caller is looking for the single block in the tree that most
-          closely encloses bytecode address range [address_start,address_limit).
-          'next_block_start_address' is the start address of 'tree's successor
-          sibling and is used to determine when the range spans out of its bounds.
-
-\*******************************************************************/
-
+/// 'tree' describes a tree of code_blockt objects; this_block is the
+/// corresponding block (thus they are both trees with the same shape). The
+/// caller is looking for the single block in the tree that most closely
+/// encloses bytecode address range [address_start,address_limit).
+/// 'next_block_start_address' is the start address of 'tree's successor sibling
+/// and is used to determine when the range spans out of its bounds.
+/// \par parameters: 'tree', a code block descriptor, and 'this_block', the
+///   corresponding
+/// actual code_blockt. 'address_start' and 'address_limit', the Java
+/// bytecode offsets searched for. 'next_block_start_address', the
+/// bytecode offset of tree/this_block's successor sibling, or UINT_MAX
+/// if none exists.
+/// \return Returns the code_blockt most closely enclosing the given address
+///   range.
 code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,
@@ -642,29 +574,20 @@ code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
     false);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::get_or_create_block_for_pcrange
-
-  Inputs: See above, plus the bytecode address map 'amap' and 'allow_merge'
-          which is always true except when called from get_block_for_pcrange
-
- Outputs: See above, plus potential side-effects on 'tree' and 'this_block'
-          as descibed in 'Purpose'
-
- Purpose: As above, but this version can additionally create a new branch
-          in the block_tree-node and code_blockt trees to envelop the requested
-          address range. For example, if the tree was initially flat, with
-          nodes (1-10), (11-20), (21-30) and the caller asked for range 13-28,
-          this would build a surrounding tree node, leaving the tree of shape
-          (1-10), ^( (11-20), (21-30) )^, and return a reference to the
-          new branch highlighted with ^^.
-          'tree' and 'this_block' trees are always maintained with equal
-          shapes. ('this_block' may additionally contain code_declt children
-          which are ignored for this purpose)
-
-\*******************************************************************/
-
+/// As above, but this version can additionally create a new branch in the
+/// block_tree-node and code_blockt trees to envelop the requested address
+/// range. For example, if the tree was initially flat, with nodes (1-10),
+/// (11-20), (21-30) and the caller asked for range 13-28, this would build a
+/// surrounding tree node, leaving the tree of shape (1-10), ^( (11-20), (21-30)
+/// )^, and return a reference to the new branch highlighted with ^^. 'tree' and
+/// 'this_block' trees are always maintained with equal shapes. ('this_block'
+/// may additionally contain code_declt children which are ignored for this
+/// purpose)
+/// \par parameters: See above, plus the bytecode address map 'amap' and
+///   'allow_merge'
+/// which is always true except when called from get_block_for_pcrange
+/// \return See above, plus potential side-effects on 'tree' and 'this_block' as
+///   descibed in 'Purpose'
 code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,
@@ -882,20 +805,11 @@ static void gather_symbol_live_ranges(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::check_static_field_stub
-
-  Inputs: `se`: Symbol expression referring to a static field
-          `basename`: The static field's basename
-
- Outputs: Creates a symbol table entry for the static field if one
-          doesn't exist already.
-
- Purpose: See above
-
-\*******************************************************************/
-
+/// See above
+/// \par parameters: `se`: Symbol expression referring to a static field
+/// `basename`: The static field's basename
+/// \return Creates a symbol table entry for the static field if one doesn't
+///   exist already.
 void java_bytecode_convert_methodt::check_static_field_stub(
   const symbol_exprt &symbol_expr,
   const irep_idt &basename)
@@ -919,20 +833,11 @@ void java_bytecode_convert_methodt::check_static_field_stub(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::class_needs_clinit
-
-  Inputs: classname: Class name
-
- Outputs: Returns true if the given class or one of its parents
-          has a static initializer
-
- Purpose: Determine whether a `new` or static access against `classname`
-          should be prefixed with a static initialization check.
-
-\*******************************************************************/
-
+/// Determine whether a `new` or static access against `classname` should be
+/// prefixed with a static initialization check.
+/// \param classname: Class name
+/// \return Returns true if the given class or one of its parents has a static
+///   initializer
 bool java_bytecode_convert_methodt::class_needs_clinit(
   const irep_idt &classname)
 {
@@ -970,22 +875,13 @@ bool java_bytecode_convert_methodt::class_needs_clinit(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::get_or_create_clinit_wrapper
-
-  Inputs: classname: Class name
-
- Outputs: Returns a symbol_exprt pointing to the given class' clinit
-          wrapper if one is required, or nil otherwise.
-
- Purpose: Create a ::clinit_wrapper the first time a static initializer
-          might be called. The wrapper method checks whether static init
-          has already taken place, calls the actual <clinit> method if
-          not, and initializes super-classes and interfaces.
-
-\*******************************************************************/
-
+/// Create a ::clinit_wrapper the first time a static initializer might be
+/// called. The wrapper method checks whether static init has already taken
+/// place, calls the actual <clinit> method if not, and initializes super-
+/// classes and interfaces.
+/// \param classname: Class name
+/// \return Returns a symbol_exprt pointing to the given class' clinit wrapper
+///   if one is required, or nil otherwise.
 exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
   const irep_idt &classname)
 {
@@ -1061,21 +957,11 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
   return wrapper_method_symbol.symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::get_clinit_call
-
-  Inputs: classname: Class name
-
- Outputs: Returns a function call to the given class' static initializer
-          wrapper if one is needed, or a skip instruction otherwise.
-
- Purpose: Each static access to classname should be prefixed with a check
-          for necessary static init; this returns a call implementing
-          that check.
-
-\*******************************************************************/
-
+/// Each static access to classname should be prefixed with a check for
+/// necessary static init; this returns a call implementing that check.
+/// \param classname: Class name
+/// \return Returns a function call to the given class' static initializer
+///   wrapper if one is needed, or a skip instruction otherwise.
 codet java_bytecode_convert_methodt::get_clinit_call(
   const irep_idt &classname)
 {
@@ -1087,36 +973,12 @@ codet java_bytecode_convert_methodt::get_clinit_call(
   return ret;
 }
 
-/*******************************************************************\
-
-Function: get_bytecode_type_width
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static unsigned get_bytecode_type_width(const typet &ty)
 {
   if(ty.id()==ID_pointer)
     return 32;
   return ty.get_unsigned_int(ID_width);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_methodt::convert_instructions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
@@ -2751,18 +2613,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
   return code;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_method
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_method(
   const symbolt &class_symbol,

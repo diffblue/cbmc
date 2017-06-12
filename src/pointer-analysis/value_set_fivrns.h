@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set (Flow Insensitive, Validity Regions)
+
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_FIVRNS_H
 

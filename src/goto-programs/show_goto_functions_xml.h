@@ -6,6 +6,9 @@ Author: Thomas Kiley
 
 \*******************************************************************/
 
+/// \file
+/// Goto Program
+
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_XML_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_XML_H
 

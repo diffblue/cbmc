@@ -16,18 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_bv_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
 {
   const typet &expr_type=ns.follow(expr.type());
@@ -42,18 +30,6 @@ bvt boolbvt::convert_bv_typecast(const typecast_exprt &expr)
 
   return bv;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::type_conversion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool boolbvt::type_conversion(
   const typet &src_type, const bvt &src,
@@ -612,18 +588,7 @@ bool boolbvt::type_conversion(
   return true;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose: conversion from bitvector types to boolean
-
-\*******************************************************************/
-
+/// conversion from bitvector types to boolean
 literalt boolbvt::convert_typecast(const typecast_exprt &expr)
 {
   assert(expr.operands().size()==1);

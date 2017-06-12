@@ -6,24 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show Value Sets
+
 #include <iostream>
 
 #include <util/xml.h>
 
 #include "value_set_analysis.h"
 #include "show_value_sets.h"
-
-/*******************************************************************\
-
-Function: show_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_value_sets(
   ui_message_handlert::uit ui,
@@ -49,18 +40,6 @@ void show_value_sets(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: show_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_value_sets(
   ui_message_handlert::uit ui,

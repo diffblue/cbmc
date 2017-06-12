@@ -14,18 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
   if(expr.id()!=ID_index)
@@ -301,18 +289,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
   return bv;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_index
-
-  Inputs:
-
- Outputs:
-
- Purpose: index operator with constant index
-
-\*******************************************************************/
-
+/// index operator with constant index
 bvt boolbvt::convert_index(
   const exprt &array,
   const mp_integer &index)

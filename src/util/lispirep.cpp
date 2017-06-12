@@ -10,18 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep.h"
 #include "lispexpr.h"
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void lisp2irep(const lispexprt &src, irept &dest)
 {
   dest.make_nil();

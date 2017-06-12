@@ -9,23 +9,14 @@ Date: August 2013
 
 \*******************************************************************/
 
+/// \file
+/// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
+
 #include <cassert>
 
 #include "goto_rw.h"
 
 #include "dependence_graph.h"
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::merge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool dep_graph_domaint::merge(
   const dep_graph_domaint &src,
@@ -65,18 +56,6 @@ bool dep_graph_domaint::merge(
 
   return changed;
 }
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::control_dependencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dep_graph_domaint::control_dependencies(
   goto_programt::const_targett from,
@@ -144,18 +123,6 @@ void dep_graph_domaint::control_dependencies(
     dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, to);
 }
 
-/*******************************************************************\
-
-Function: may_be_def_use_pair
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool may_be_def_use_pair(
   const mp_integer &w_start,
   const mp_integer &w_end,
@@ -176,18 +143,6 @@ static bool may_be_def_use_pair(
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::data_depdendencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dep_graph_domaint::data_dependencies(
   goto_programt::const_targett from,
@@ -238,18 +193,6 @@ void dep_graph_domaint::data_dependencies(
   }
 }
 
-/*******************************************************************\
-
-Function: dep_graph_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dep_graph_domaint::transform(
   goto_programt::const_targett from,
   goto_programt::const_targett to,
@@ -297,18 +240,6 @@ void dep_graph_domaint::transform(
   data_dependencies(from, to, *dep_graph, ns);
 }
 
-/*******************************************************************\
-
-Function: dep_graph_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dep_graph_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -344,18 +275,6 @@ void dep_graph_domaint::output(
     out << std::endl;
   }
 }
-
-/*******************************************************************\
-
-Function: dependence_grapht::add_dep
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dependence_grapht::add_dep(
   dep_edget::kindt kind,

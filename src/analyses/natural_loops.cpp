@@ -6,21 +6,12 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 \*******************************************************************/
 
+/// \file
+/// Dominators
+
 #include <iostream>
 
 #include "natural_loops.h"
-
-/*******************************************************************\
-
-Function: show_natural_loops
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_natural_loops(const goto_functionst &goto_functions)
 {

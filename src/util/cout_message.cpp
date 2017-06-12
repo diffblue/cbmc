@@ -18,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unicode.h"
 #include "cout_message.h"
 
-/*******************************************************************\
-
-Function: cout_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cout_message_handlert::print(
   unsigned level,
   const std::string &message)
@@ -44,18 +32,6 @@ void cout_message_handlert::print(
   }
 }
 
-/*******************************************************************\
-
-Function: cerr_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cerr_message_handlert::print(
   unsigned level,
   const std::string &message)
@@ -63,18 +39,6 @@ void cerr_message_handlert::print(
   if(verbosity>=level)
     std::cerr << message << '\n' << std::flush;
 }
-
-/*******************************************************************\
-
-Function: consolte_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void console_message_handlert::print(
   unsigned level,
@@ -137,18 +101,6 @@ void console_message_handlert::print(
   #endif
 }
 
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void gcc_message_handlert::print(
   unsigned level,
   const std::string &message,
@@ -193,18 +145,6 @@ void gcc_message_handlert::print(
 
   print(level, dest);
 }
-
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void gcc_message_handlert::print(
   unsigned level,

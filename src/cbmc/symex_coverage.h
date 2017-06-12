@@ -8,6 +8,9 @@ Date: March 2016
 
 \*******************************************************************/
 
+/// \file
+/// Record and print code coverage of symbolic execution
+
 #ifndef CPROVER_CBMC_SYMEX_COVERAGE_H
 #define CPROVER_CBMC_SYMEX_COVERAGE_H
 

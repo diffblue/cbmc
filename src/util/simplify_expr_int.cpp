@@ -22,18 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "ieee_float.h"
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_bswap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_bswap(exprt &expr)
 {
   if(expr.type().id()==ID_unsignedbv &&
@@ -65,18 +53,6 @@ bool simplify_exprt::simplify_bswap(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_mult
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_mult(exprt &expr)
 {
@@ -182,18 +158,6 @@ bool simplify_exprt::simplify_mult(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_div
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_div(exprt &expr)
 {
@@ -315,18 +279,6 @@ bool simplify_exprt::simplify_div(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_mod
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_mod(exprt &expr)
 {
   if(!is_number(expr.type()))
@@ -375,18 +327,6 @@ bool simplify_exprt::simplify_mod(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_plus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_plus(exprt &expr)
 {
@@ -545,18 +485,6 @@ bool simplify_exprt::simplify_plus(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_minus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_minus(exprt &expr)
 {
   if(!is_number(expr.type()) &&
@@ -615,18 +543,6 @@ bool simplify_exprt::simplify_minus(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_bitwise
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_bitwise(exprt &expr)
 {
@@ -798,18 +714,6 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_extractbit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_extractbit(exprt &expr)
 {
   const typet &op0_type=expr.op0().type();
@@ -843,18 +747,6 @@ bool simplify_exprt::simplify_extractbit(exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_concatenation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_concatenation(exprt &expr)
 {
@@ -942,18 +834,6 @@ bool simplify_exprt::simplify_concatenation(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_shifts
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_shifts(exprt &expr)
 {
@@ -1067,18 +947,6 @@ bool simplify_exprt::simplify_shifts(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_power
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_power(exprt &expr)
 {
   if(!is_number(expr.type()))
@@ -1101,18 +969,7 @@ bool simplify_exprt::simplify_power(exprt &expr)
   return false;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_extractbits
-
-  Inputs:
-
- Outputs:
-
- Purpose: Simplifies extracting of bits from a constant.
-
-\*******************************************************************/
-
+/// Simplifies extracting of bits from a constant.
 bool simplify_exprt::simplify_extractbits(exprt &expr)
 {
   assert(expr.operands().size()==3);
@@ -1161,18 +1018,6 @@ bool simplify_exprt::simplify_extractbits(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_unary_plus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_unary_plus(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -1182,18 +1027,6 @@ bool simplify_exprt::simplify_unary_plus(exprt &expr)
   expr=expr.op0();
   return false;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_unary_minus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_unary_minus(exprt &expr)
 {
@@ -1272,18 +1105,6 @@ bool simplify_exprt::simplify_unary_minus(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_bitnot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_bitnot(exprt &expr)
 {
   if(!expr.has_operands())
@@ -1320,18 +1141,7 @@ bool simplify_exprt::simplify_bitnot(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_inequality
-
-  Inputs:
-
- Outputs:
-
- Purpose: simplifies inequalities !=, <=, <, >=, >, and also ==
-
-\*******************************************************************/
-
+/// simplifies inequalities !=, <=, <, >=, >, and also ==
 bool simplify_exprt::simplify_inequality(exprt &expr)
 {
   exprt::operandst &operands=expr.operands();
@@ -1548,18 +1358,6 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   return false;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::eliminate_common_addends
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::eliminate_common_addends(
   exprt &op0,
   exprt &op1)
@@ -1607,18 +1405,6 @@ bool simplify_exprt::eliminate_common_addends(
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_inequality_not_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
 {
@@ -1746,18 +1532,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_inequality_constant
-
-  Inputs: an inequality with a constant on the RHS
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: an inequality with a constant on the RHS
 bool simplify_exprt::simplify_inequality_constant(exprt &expr)
 {
   // the constant is always on the RHS

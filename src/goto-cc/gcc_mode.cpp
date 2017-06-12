@@ -6,6 +6,9 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+/// \file
+/// GCC Mode
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -30,18 +33,6 @@ Author: CM Wintersteiger, 2006
 
 #include "compile.h"
 #include "gcc_mode.h"
-
-/*******************************************************************\
-
-Function: compiler_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static std::string compiler_name(
   const cmdlinet &cmdline,
@@ -73,18 +64,6 @@ static std::string compiler_name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: linker_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static std::string linker_name(
   const cmdlinet &cmdline,
   const std::string &base_name)
@@ -105,18 +84,6 @@ static std::string linker_name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::gcc_modet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 gcc_modet::gcc_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
@@ -127,18 +94,6 @@ gcc_modet::gcc_modet(
             base_name.find("goto-ld")!=std::string::npos)
 {
 }
-
-/*******************************************************************\
-
-Function: gcc_modet::needs_preprocessing
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool gcc_modet::needs_preprocessing(const std::string &file)
 {
@@ -154,18 +109,7 @@ bool gcc_modet::needs_preprocessing(const std::string &file)
     return false;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: does it.
-
-\*******************************************************************/
-
+/// does it.
 int gcc_modet::doit()
 {
   if(cmdline.isset('?') ||
@@ -523,18 +467,7 @@ int gcc_modet::doit()
   return EX_OK;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose: call gcc for preprocessing
-
-\*******************************************************************/
-
+/// call gcc for preprocessing
 int gcc_modet::preprocess(
   const std::string &language,
   const std::string &src,
@@ -615,18 +548,7 @@ int gcc_modet::preprocess(
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::run_gcc
-
-  Inputs:
-
- Outputs:
-
- Purpose: run gcc or clang with original command line
-
-\*******************************************************************/
-
+/// run gcc or clang with original command line
 int gcc_modet::run_gcc()
 {
   assert(!cmdline.parsed_argv.empty());
@@ -649,18 +571,6 @@ int gcc_modet::run_gcc()
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
-
-/*******************************************************************\
-
-Function: gcc_modet::gcc_hybrid_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 int gcc_modet::gcc_hybrid_binary()
 {
@@ -801,18 +711,6 @@ int gcc_modet::gcc_hybrid_binary()
   return result;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::asm_output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 int gcc_modet::asm_output(
   bool act_as_bcc,
   const std::list<std::string> &preprocessed_source_files)
@@ -897,18 +795,7 @@ int gcc_modet::asm_output(
   return EX_OK;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::help_mode
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void gcc_modet::help_mode()
 {
   if(act_as_ld)

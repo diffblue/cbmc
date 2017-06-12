@@ -13,18 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "std_expr.h"
 
-/*******************************************************************\
-
-Function: format_constantt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string format_constantt::operator()(const exprt &expr)
 {
   if(expr.is_constant())

@@ -26,18 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "smt2_dec.h"
 #include "smt2irep.h"
 
-/*******************************************************************\
-
-Function: smt2_dect::decision_procedure_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string smt2_dect::decision_procedure_text() const
 {
   return "SMT2 "+logic+
@@ -54,18 +42,6 @@ std::string smt2_dect::decision_procedure_text() const
      "(unknown)");
 }
 
-/*******************************************************************\
-
-Function: smt2_temp_filet::smt2_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 smt2_temp_filet::smt2_temp_filet()
 {
   temp_out_filename=get_temporary_file("smt2_dec_out_", "");
@@ -74,18 +50,6 @@ smt2_temp_filet::smt2_temp_filet()
     temp_out_filename.c_str(),
     std::ios_base::out | std::ios_base::trunc);
 }
-
-/*******************************************************************\
-
-Function: smt2_temp_filet::~smt2_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 smt2_temp_filet::~smt2_temp_filet()
 {
@@ -97,18 +61,6 @@ smt2_temp_filet::~smt2_temp_filet()
   if(temp_result_filename!="")
     unlink(temp_result_filename.c_str());
 }
-
-/*******************************************************************\
-
-Function: smt2_dect::dec_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt2_dect::dec_solve()
 {
@@ -215,18 +167,6 @@ decision_proceduret::resultt smt2_dect::dec_solve()
 
   return read_result(in);
 }
-
-/*******************************************************************\
-
-Function: smt2_dect::read_result
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 {

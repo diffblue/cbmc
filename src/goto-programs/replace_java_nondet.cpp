@@ -6,6 +6,9 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Replace Java Nondet expressions
+
 #include "goto-programs/replace_java_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
@@ -16,15 +19,8 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <algorithm>
 #include <regex>
 
-/*******************************************************************\
-
-   Class: nondet_instruction_infot
-
- Purpose: Holds information about any discovered nondet methods,
-          with extreme type-safety.
-
-\*******************************************************************/
-
+/// Holds information about any discovered nondet methods, with extreme type-
+/// safety.
 class nondet_instruction_infot final
 {
 public:
@@ -51,22 +47,11 @@ private:
   is_nullablet is_nullable;
 };
 
-/*******************************************************************\
-
-Function: is_nondet_returning_object
-
-  Inputs:
-    function_call: The function call declaration to check.
-
-  Outputs: A structure detailing whether the function call appears to
-           be one of our nondet library methods, and if so, whether
-           or not it allows null results.
-
- Purpose: Checks whether the function call is one of our nondet
-          library functions.
-
-\*******************************************************************/
-
+/// Checks whether the function call is one of our nondet library functions.
+/// \param function_call: The function call declaration to check.
+/// \return A structure detailing whether the function call appears to be one of
+///   our nondet library methods, and if so, whether or not it allows null
+///   results.
 static nondet_instruction_infot is_nondet_returning_object(
   const code_function_callt &function_call)
 {
@@ -85,21 +70,10 @@ static nondet_instruction_infot is_nondet_returning_object(
     nondet_instruction_infot::is_nullablet(!match_results[1].matched));
 }
 
-/*******************************************************************\
-
-Function: get_nondet_instruction_info
-
-  Inputs:
-    instr: A goto-program instruction to check.
-
-  Outputs: A structure detailing the properties of the nondet method.
-
- Purpose: Check whether the instruction is a function call which
-          matches one of the recognised nondet library methods, and
-          return some information about it.
-
-\*******************************************************************/
-
+/// Check whether the instruction is a function call which matches one of the
+/// recognised nondet library methods, and return some information about it.
+/// \param instr: A goto-program instruction to check.
+/// \return A structure detailing the properties of the nondet method.
 static nondet_instruction_infot get_nondet_instruction_info(
   const goto_programt::const_targett &instr)
 {
@@ -116,43 +90,21 @@ static nondet_instruction_infot get_nondet_instruction_info(
   return is_nondet_returning_object(function_call);
 }
 
-/*******************************************************************\
-
-Function: is_symbol_with_id
-
-  Inputs:
-    expr: The expression which may be a symbol.
-    identifier: Some identifier.
-
- Outputs: True if the expression is a symbol with the specified identifier.
-
- Purpose: Return whether the expression is a symbol with the specified
-          identifier.
-
-\*******************************************************************/
-
+/// Return whether the expression is a symbol with the specified identifier.
+/// \param expr: The expression which may be a symbol.
+/// \param identifier: Some identifier.
+/// \return True if the expression is a symbol with the specified identifier.
 static bool is_symbol_with_id(const exprt& expr, const irep_idt& identifier)
 {
   return expr.id()==ID_symbol &&
          to_symbol_expr(expr).get_identifier()==identifier;
 }
 
-/*******************************************************************\
-
-Function: is_typecast_with_id
-
-  Inputs:
-    expr: The expression which may be a typecast.
-    identifier: Some identifier.
-
- Outputs: True if the expression is a typecast with one operand, and the
-          typecast's identifier matches the specified identifier.
-
- Purpose: Return whether the expression is a typecast with the specified
-          identifier.
-
-\*******************************************************************/
-
+/// Return whether the expression is a typecast with the specified identifier.
+/// \param expr: The expression which may be a typecast.
+/// \param identifier: Some identifier.
+/// \return True if the expression is a typecast with one operand, and the
+///   typecast's identifier matches the specified identifier.
 static bool is_typecast_with_id(const exprt& expr, const irep_idt& identifier)
 {
   if(!(expr.id()==ID_typecast && expr.operands().size()==1))
@@ -169,22 +121,12 @@ static bool is_typecast_with_id(const exprt& expr, const irep_idt& identifier)
   return op_symbol.get_identifier()==identifier;
 }
 
-/*******************************************************************\
-
-Function: is_assignment_from
-
-  Inputs:
-    instr: A goto program instruction.
-    identifier: Some identifier.
-
- Outputs: True if the expression is a typecast with one operand, and the
-          typecast's identifier matches the specified identifier.
-
- Purpose: Return whether the instruction is an assignment, and the rhs is a
-          symbol or typecast expression with the specified identifier.
-
-\*******************************************************************/
-
+/// Return whether the instruction is an assignment, and the rhs is a symbol or
+/// typecast expression with the specified identifier.
+/// \param instr: A goto program instruction.
+/// \param identifier: Some identifier.
+/// \return True if the expression is a typecast with one operand, and the
+///   typecast's identifier matches the specified identifier.
 static bool is_assignment_from(
   const goto_programt::instructiont &instr,
   const irep_idt &identifier)
@@ -199,23 +141,13 @@ static bool is_assignment_from(
          is_typecast_with_id(rhs, identifier);
 }
 
-/*******************************************************************\
-
-Function: check_and_replace_target
-
-  Inputs:
-    goto_program: The goto program to modify.
-    target: A single step of the goto program which may be erased and
-            replaced.
-
- Outputs: The next instruction to process, probably with this function.
-
- Purpose: Given an iterator into a list of instructions, modify the list to
-          replace 'nondet' library functions with CBMC-native nondet
-          expressions, and return an iterator to the next instruction to check.
-
-\*******************************************************************/
-
+/// Given an iterator into a list of instructions, modify the list to replace
+/// 'nondet' library functions with CBMC-native nondet expressions, and return
+/// an iterator to the next instruction to check.
+/// \param goto_program: The goto program to modify.
+/// \param target: A single step of the goto program which may be erased and
+///   replaced.
+/// \return The next instruction to process, probably with this function.
 static goto_programt::targett check_and_replace_target(
   goto_programt &goto_program,
   const goto_programt::targett &target)
@@ -287,20 +219,10 @@ static goto_programt::targett check_and_replace_target(
   return after_matching_assignment;
 }
 
-/*******************************************************************\
-
-Function: replace_java_nondet
-
-  Inputs:
-    goto_program: The goto program to modify.
-
- Purpose: Checks each instruction in the goto program to see whether
-          it is a method returning nondet.  If it is, replaces the
-          function call with an irep representing a nondet side
-          effect with an appropriate type.
-
-\*******************************************************************/
-
+/// Checks each instruction in the goto program to see whether it is a method
+/// returning nondet.  If it is, replaces the function call with an irep
+/// representing a nondet side effect with an appropriate type.
+/// \param goto_program: The goto program to modify.
 static void replace_java_nondet(goto_programt &goto_program)
 {
   for(auto instruction_iterator=goto_program.instructions.begin(),

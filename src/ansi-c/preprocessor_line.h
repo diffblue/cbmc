@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Conversion
+
 #ifndef CPROVER_ANSI_C_PREPROCESSOR_LINE_H
 #define CPROVER_ANSI_C_PREPROCESSOR_LINE_H
 

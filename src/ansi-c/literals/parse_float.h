@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Conversion / Type Checking
+
 #ifndef CPROVER_ANSI_C_LITERALS_PARSE_FLOAT_H
 #define CPROVER_ANSI_C_LITERALS_PARSE_FLOAT_H
 

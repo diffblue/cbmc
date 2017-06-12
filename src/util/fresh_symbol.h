@@ -6,6 +6,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Fresh auxiliary symbol creation
+
 #ifndef CPROVER_UTIL_FRESH_SYMBOL_H
 #define CPROVER_UTIL_FRESH_SYMBOL_H
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Loop IDs
+
 #ifndef CPROVER_GOTO_PROGRAMS_LOOP_IDS_H
 #define CPROVER_GOTO_PROGRAMS_LOOP_IDS_H
 

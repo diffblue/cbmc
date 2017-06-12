@@ -12,18 +12,6 @@ Author: Georg Weissenbacher, georg.weissenbacher@inf.ethz.ch
 
 #include "bv_minimize.h"
 
-/*******************************************************************\
-
-Function: bv_minimizet::add_objective
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_minimizet::add_objective(
   prop_minimizet &prop_minimize,
   const exprt &objective)
@@ -65,18 +53,6 @@ void bv_minimizet::add_objective(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: bv_minimizet::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_minimizet::operator()(const minimization_listt &symbols)
 {

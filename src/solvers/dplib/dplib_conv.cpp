@@ -21,18 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dplib_conv.h"
 
-/*******************************************************************\
-
-Function: dplib_convt::bin_zero
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string dplib_convt::bin_zero(unsigned bits)
 {
   assert(bits!=0);
@@ -41,18 +29,6 @@ std::string dplib_convt::bin_zero(unsigned bits)
   return result;
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::dplib_pointer_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string dplib_convt::dplib_pointer_type()
 {
   assert(config.ansi_c.pointer_width!=0);
@@ -60,34 +36,10 @@ std::string dplib_convt::dplib_pointer_type()
          std::to_string(config.ansi_c.pointer_width)+") #]";
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::array_index_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string dplib_convt::array_index_type()
 {
   return std::string("SIGNED [")+std::to_string(32)+"]";
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::gen_array_index_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet dplib_convt::gen_array_index_type()
 {
@@ -96,34 +48,10 @@ typet dplib_convt::gen_array_index_type()
   return t;
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::array_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string dplib_convt::array_index(unsigned i)
 {
   return "0bin"+integer2binary(i, config.ansi_c.int_width);
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::convert_array_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::convert_array_index(const exprt &expr)
 {
@@ -138,18 +66,6 @@ void dplib_convt::convert_array_index(const exprt &expr)
     convert_dplib_expr(tmp);
   }
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::convert_address_of_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::convert_address_of_rec(const exprt &expr)
 {
@@ -234,18 +150,6 @@ void dplib_convt::convert_address_of_rec(const exprt &expr)
     throw "don't know how to take address of: "+expr.id_string();
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::convert_rest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_convt::convert_rest(const exprt &expr)
 {
   // dplib_prop.out << "%% E: " << expr << std::endl;
@@ -267,18 +171,6 @@ literalt dplib_convt::convert_rest(const exprt &expr)
 
   return l;
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::convert_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::convert_identifier(const std::string &identifier)
 {
@@ -316,18 +208,6 @@ void dplib_convt::convert_identifier(const std::string &identifier)
   }
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::convert_as_bv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_convt::convert_as_bv(const exprt &expr)
 {
   if(expr.type().id()==ID_bool)
@@ -340,34 +220,10 @@ void dplib_convt::convert_as_bv(const exprt &expr)
     convert_dplib_expr(expr);
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::convert_array_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_convt::convert_array_value(const exprt &expr)
 {
   convert_as_bv(expr);
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::convert_dplib_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::convert_dplib_expr(const exprt &expr)
 {
@@ -1105,18 +961,6 @@ void dplib_convt::convert_dplib_expr(const exprt &expr)
     throw "convert_dplib_expr: "+expr.id_string()+" is unsupported";
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_convt::set_to(const exprt &expr, bool value)
 {
   if(value && expr.id()==ID_and)
@@ -1181,18 +1025,6 @@ void dplib_convt::set_to(const exprt &expr, bool value)
   dplib_prop.out << ";" << std::endl << std::endl;
 }
 
-/*******************************************************************\
-
-Function: dplib_convt::find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_convt::find_symbols(const exprt &expr)
 {
   find_symbols(expr.type());
@@ -1239,18 +1071,6 @@ void dplib_convt::find_symbols(const exprt &expr)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::convert_dplib_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::convert_dplib_type(const typet &type)
 {
@@ -1334,18 +1154,6 @@ void dplib_convt::convert_dplib_type(const typet &type)
   else
     throw "unsupported type: "+type.id_string();
 }
-
-/*******************************************************************\
-
-Function: dplib_convt::find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_convt::find_symbols(const typet &type)
 {

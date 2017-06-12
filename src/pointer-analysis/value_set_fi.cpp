@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set (Flow Insensitive, Sharing)
+
 #include <cassert>
 #include <ostream>
 
@@ -37,18 +40,6 @@ static const char *alloc_adapter_prefix="alloc_adaptor::";
   for(object_map_dt::iterator (it) = (map).begin(); \
   (it)!=(map).end(); \
   (it)++)
-
-/*******************************************************************\
-
-Function: value_set_fit::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::output(
   const namespacet &ns,
@@ -144,18 +135,6 @@ void value_set_fit::output(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::flatten
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::flatten(
   const entryt &e,
   object_mapt &dest) const
@@ -171,18 +150,6 @@ void value_set_fit::flatten(
   std::cout << "FLATTEN: Done." << std::endl;
   #endif
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::flatten_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::flatten_rec(
   const entryt &e,
@@ -255,18 +222,6 @@ void value_set_fit::flatten_rec(
   seen.erase(identifier + e.suffix);
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt value_set_fit::to_expr(object_map_dt::const_iterator it) const
 {
   const exprt &object=object_numbering[it->first];
@@ -286,18 +241,6 @@ exprt value_set_fit::to_expr(object_map_dt::const_iterator it) const
 
   return od;
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
 {
@@ -338,18 +281,6 @@ bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
   return result;
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fit::make_union(object_mapt &dest, const object_mapt &src) const
 {
   bool result=false;
@@ -362,18 +293,6 @@ bool value_set_fit::make_union(object_mapt &dest, const object_mapt &src) const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::get_value_set(
   const exprt &expr,
@@ -437,18 +356,6 @@ void value_set_fit::get_value_set(
   #endif
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::get_value_set(
   const exprt &expr,
   object_mapt &dest,
@@ -460,18 +367,6 @@ void value_set_fit::get_value_set(
   gvs_recursion_sett recset;
   get_value_set_rec(tmp, dest, "", tmp.type(), ns, recset);
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::get_value_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::get_value_set_rec(
   const exprt &expr,
@@ -790,18 +685,6 @@ void value_set_fit::get_value_set_rec(
   insert(dest, exprt(ID_unknown, original_type));
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::dereference_rec(
   const exprt &src,
   exprt &dest) const
@@ -819,18 +702,6 @@ void value_set_fit::dereference_rec(
   else
     dest=src;
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::get_reference_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::get_reference_set(
   const exprt &expr,
@@ -881,18 +752,6 @@ void value_set_fit::get_reference_set(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::get_reference_set_sharing
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::get_reference_set_sharing(
   const exprt &expr,
   expr_sett &dest,
@@ -904,18 +763,6 @@ void value_set_fit::get_reference_set_sharing(
   forall_objects(it, object_map.read())
     dest.insert(to_expr(it));
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::get_reference_set_sharing_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::get_reference_set_sharing_rec(
   const exprt &expr,
@@ -1115,18 +962,6 @@ void value_set_fit::get_reference_set_sharing_rec(
   insert(dest, exprt(ID_unknown, expr.type()));
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::assign(
   const exprt &lhs,
   const exprt &rhs,
@@ -1290,18 +1125,6 @@ void value_set_fit::assign(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::do_free
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::do_free(
   const exprt &op,
   const namespacet &ns)
@@ -1378,18 +1201,6 @@ void value_set_fit::do_free(
       v_it->second.object_map=new_object_map;
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::assign_rec(
   const exprt &lhs,
@@ -1541,18 +1352,6 @@ void value_set_fit::assign_rec(
     throw "assign NYI: `"+lhs.id_string()+"'";
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::do_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::do_function_call(
   const irep_idt &function,
   const exprt::operandst &arguments,
@@ -1602,18 +1401,6 @@ void value_set_fit::do_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fit::do_end_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fit::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
@@ -1626,18 +1413,6 @@ void value_set_fit::do_end_function(
 
   assign(lhs, rhs, ns);
 }
-
-/*******************************************************************\
-
-Function: value_set_fit::apply_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fit::apply_code(
   const exprt &code,
