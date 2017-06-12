@@ -1391,6 +1391,11 @@ void java_string_library_preprocesst::initialize_conversion_table()
                                                "java.lang.CharSequence",
                                                "java.lang.StringBuffer"};
 
+  // The following list of function is organized by libraries, with
+  // constructors first and then methods in alphabetic order.
+  // Methods that are not supported here should ultimately have Java models
+  // provided for them in the class-path.
+
   // String library
   conversion_table
     ["java::java.lang.String.<init>:(Ljava/lang/String;)V"]=
@@ -1577,9 +1582,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       ID_cprover_string_empty_string_func;
 
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(Z)Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_bool_func;
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(C)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_char_func;
   cprover_equivalent_to_java_assign_and_return_function
@@ -1587,21 +1589,23 @@ void java_string_library_preprocesst::initialize_conversion_table()
       "Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;II)"
-      "Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;)"
-      "Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_func;
-
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.append:(D)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_concat_double_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.append:(Ljava/lang/String;)"
-      "Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_concat_func;
+      ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;II)"
+        "Ljava/lang/StringBuilder;"]=
+        ID_cprover_string_concat_func;
+    cprover_equivalent_to_java_assign_and_return_function
+      ["java::java.lang.StringBuilder.append:(Ljava/lang/CharSequence;)"
+        "Ljava/lang/StringBuilder;"]=
+        ID_cprover_string_concat_func;
+    cprover_equivalent_to_java_assign_and_return_function
+      ["java::java.lang.StringBuilder.append:(Ljava/lang/String;)"
+        "Ljava/lang/StringBuilder;"]=
+        ID_cprover_string_concat_func;
+  cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuilder.append:(Z)Ljava/lang/StringBuilder;"]=
+      ID_cprover_string_concat_bool_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.appendCodePoint:(I)"
      "Ljava/lang/StringBuilder;"]=
@@ -1625,17 +1629,17 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuilder.deleteCharAt:(I)Ljava/lang/StringBuilder;"]=
     ID_cprover_string_delete_char_at_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.insert:(IZ)Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_insert_bool_func;
-  cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuilder.insert:(IC)Ljava/lang/StringBuilder;"]=
-      ID_cprover_string_insert_char_func;
+      ["java::java.lang.StringBuilder.insert:(IC)Ljava/lang/StringBuilder;"]=
+        ID_cprover_string_insert_char_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.insert:(I[C)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_insert_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.insert:(I[CII)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_insert_func;
+  cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuilder.insert:(IZ)Ljava/lang/StringBuilder;"]=
+      ID_cprover_string_insert_bool_func;
   cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuilder.insert:(II)Ljava/lang/StringBuilder;"]=
       ID_cprover_string_insert_int_func;
@@ -1648,7 +1652,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
       ID_cprover_string_insert_func;
   conversion_table
     ["java::java.lang.StringBuilder.length:()I"]=
-      conversion_table["java::java.lang.String.length:()I"];
+      std::bind(
+        &java_string_library_preprocesst::make_string_length_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_assign_function
     ["java::java.lang.StringBuilder.setCharAt:(IC)V"]=
       ID_cprover_string_char_set_func;
@@ -1684,9 +1693,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
       ID_cprover_string_empty_string_func;
 
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuffer.append:(Z)Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_concat_bool_func;
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.append:(C)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_char_func;
   cprover_equivalent_to_java_assign_and_return_function
@@ -1710,6 +1716,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
       "Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_func;
   cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuffer.append:(Z)Ljava/lang/StringBuffer;"]=
+      ID_cprover_string_concat_bool_func;
+  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.appendCodePoint:(I)"
      "Ljava/lang/StringBuffer;"]=
       ID_cprover_string_concat_code_point_func;
@@ -1732,9 +1741,6 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuffer.deleteCharAt:(I)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_delete_char_at_func;
   cprover_equivalent_to_java_assign_and_return_function
-    ["java::java.lang.StringBuffer.insert:(IZ)Ljava/lang/StringBuffer;"]=
-      ID_cprover_string_insert_bool_func;
-  cprover_equivalent_to_java_assign_and_return_function
     ["java::java.lang.StringBuffer.insert:(IC)Ljava/lang/StringBuffer;"]=
       ID_cprover_string_insert_char_func;
   cprover_equivalent_to_java_assign_and_return_function
@@ -1753,6 +1759,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuffer.insert:(ILjava/lang/String;)"
      "Ljava/lang/StringBuffer;"]=
       ID_cprover_string_insert_func;
+  cprover_equivalent_to_java_assign_and_return_function
+    ["java::java.lang.StringBuffer.insert:(IZ)Ljava/lang/StringBuffer;"]=
+      ID_cprover_string_insert_bool_func;
   conversion_table
     ["java::java.lang.StringBuffer.length:()I"]=
       conversion_table["java::java.lang.String.length:()I"];
@@ -1763,10 +1772,10 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.StringBuffer.setLength:(I)V"]=
     ID_cprover_string_set_length_func;
   cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.StringBuffer.substring:(II)Ljava/lang/String;"]=
+    ["java::java.lang.StringBuffer.substring:(I)Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
   cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.StringBuffer.substring:(I)Ljava/lang/String;"]=
+    ["java::java.lang.StringBuffer.substring:(II)Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
   conversion_table
     ["java::java.lang.StringBuffer.toString:()Ljava/lang/String;"]=
@@ -1802,12 +1811,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_1,
         std::placeholders::_2,
         std::placeholders::_3);
-  cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.Integer.toHexString:(I)Ljava/lang/String;"]=
-      ID_cprover_string_of_int_hex_func;
   cprover_equivalent_to_java_function
     ["java::java.lang.Integer.parseInt:(Ljava/lang/String;)I"]=
       ID_cprover_string_parse_int_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::java.lang.Integer.toHexString:(I)Ljava/lang/String;"]=
+      ID_cprover_string_of_int_hex_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toString:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_func;
