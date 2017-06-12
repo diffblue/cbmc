@@ -214,7 +214,8 @@ protected:
 
   codet convert_instructions(
     const methodt &,
-    const code_typet &);
+    const code_typet &,
+    const irep_idt &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
 

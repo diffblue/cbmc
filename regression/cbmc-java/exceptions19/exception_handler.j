@@ -17,7 +17,7 @@
         invokespecial java/lang/Exception.<init>()V
         athrow
       start:
-        nop
+        dup
       end:
         astore_1
         return
