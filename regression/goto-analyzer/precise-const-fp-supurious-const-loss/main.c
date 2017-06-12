@@ -23,6 +23,13 @@ void func()
   // Here we 'lose' const-ness except it is a copy so we shouldn't care
   int non_const_number=const_number;
   const void_fp fp = f2;
+
+
+  // Here also we lose const-ness except it is a copy of pointer so we
+  // shouldn't care
+  const void_fp * const p2fp = &f2;
+  const void_fp * p2fp_non_const = &p2fp;
+
   fp();
 }
 

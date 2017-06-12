@@ -16,24 +16,8 @@
 #include <util/std_types.h>
 #include <ansi-c/c_qualifiers.h>
 #include <goto-programs/goto_program.h>
+#include <analyses/does_remove_const/does_remove_const_util.h>
 
-// This class provides access to private members and functions of
-// does_remove_const
-class does_remove_const_testt
-{
-public:
-  does_remove_const_testt(does_remove_constt does_remove_const):
-    does_remove_const(does_remove_const)
-  {}
-  bool does_expr_lose_const(const exprt &expr) const
-  {
-    return does_remove_const.does_expr_lose_const(expr);
-  }
-
-private:
-  does_remove_constt does_remove_const;
-
-};
 
 SCENARIO("does_expr_lose_const",
   "[core][analyses][does_remove_const][does_expr_remove_const]")
@@ -78,14 +62,10 @@ SCENARIO("does_expr_lose_const",
     typet const_pointer_to_const_int_type=pointer_typet(const_primitive_type);
     const_qualifier.write(const_pointer_to_const_int_type);
 
-    // const int const_primitive;
     symbol_exprt const_primitive_symbol(
       "const_primitive", const_primitive_type);
-
-    // int non_const_primitive;
     symbol_exprt non_const_primitive_symbol(
       "non_const_primitive", non_const_primitive_type);
-
     symbol_exprt pointer_to_int_symbol(
       "pointer_to_int", pointer_to_int_type);
     symbol_exprt const_pointer_to_int_symbol(
