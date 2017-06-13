@@ -292,9 +292,9 @@ void remove_function_pointerst::remove_function_pointer(
   else
   {
     remove_const_function_pointerst fpr(
-    get_message_handler(), pointer, ns, symbol_table);
+    get_message_handler(), ns, symbol_table);
 
-    found_functions=fpr(functions);
+    found_functions=fpr(pointer, functions);
 
     // Either found_functions is true therefore the functions should not
     // be empty

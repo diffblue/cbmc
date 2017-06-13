@@ -9,11 +9,11 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 /// \file
 /// Goto Programs
 
+#include "remove_const_function_pointers.h"
+
 #include <ansi-c/c_qualifiers.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
-
-#include "remove_const_function_pointers.h"
 
 #define LOG(message, irep) \
   debug() << "Case " << __LINE__ << " : " << message << "\n" \
@@ -22,16 +22,13 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 /// To take a function call on a function pointer, and if possible resolve it to
 /// a small collection of possible values.
 /// \param message_handler: The message handler for messaget
-/// \param base_expression: The function call through a function pointer
 /// \param ns: The namespace to use to resolve types
 /// \param symbol_table: The symbol table to look up symbols in
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
-  const exprt &base_expression,
   const namespacet &ns,
   const symbol_tablet &symbol_table):
     messaget(message_handler),
-    original_expression(base_expression),
     ns(ns),
     symbol_table(symbol_table)
 {}
@@ -41,16 +38,18 @@ remove_const_function_pointerst::remove_const_function_pointerst(
 /// that are const and: - assigned directly to a function - assigned to a value
 /// in an array of functions - assigned to a const struct component Or
 /// variations within.
+/// \param base_expression: The function call through a function pointer
 /// \param out_functions: The functions that (symbols of type ID_code) the base
 /// expression could take.
 /// \return Returns true if it was able to resolve the call, false if not. If it
 ///   returns true, out_functions will be populated by all the possible values
 ///   the function pointer could be.
 bool remove_const_function_pointerst::operator()(
+  const exprt &base_expression,
   functionst &out_functions)
 {
   // Replace all const symbols with their values
-  exprt non_symbol_expression=replace_const_symbols(original_expression);
+  exprt non_symbol_expression=replace_const_symbols(base_expression);
   return try_resolve_function_call(non_symbol_expression, out_functions);
 }
 
