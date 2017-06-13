@@ -296,10 +296,11 @@ void remove_function_pointerst::remove_function_pointer(
 
     found_functions=fpr(pointer, functions);
 
-    // Either found_functions is true therefore the functions should not
-    // be empty
-    // Or found_functions is false therefore the functions should be empty
-    assert(found_functions != functions.empty());
+    // if found_functions is false, functions should be empty
+    // however, it is possible for found_functions to be true and functions
+    // to be empty (this happens if the pointer can only resolve to the null
+    // pointer)
+    assert(found_functions || functions.empty());
 
     if(functions.size()==1)
     {

@@ -164,6 +164,20 @@ bool remove_const_function_pointerst::try_resolve_function_call(
       resolved=false;
     }
   }
+  else if(simplified_expr.id()==ID_constant)
+  {
+    if(simplified_expr.is_zero())
+    {
+      // We have the null pointer - no need to throw everything away
+      // but we don't add any functions either
+      resolved=true;
+    }
+    else
+    {
+      LOG("Non-zero constant value found", simplified_expr);
+      resolved=false;
+    }
+  }
   else
   {
     LOG("Unrecognised expression", simplified_expr);
@@ -555,10 +569,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
 
             for(const exprt &resolved_array_entry : array_contents)
             {
-              if(!resolved_array_entry.is_zero())
-              {
-                out_expressions.push_back(resolved_array_entry);
-              }
+              out_expressions.push_back(resolved_array_entry);
             }
           }
         }

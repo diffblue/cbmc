@@ -5,6 +5,7 @@ main.c
 ^\s*IF fp == f2 THEN GOTO [0-9]$
 ^\s*IF fp == f3 THEN GOTO [0-9]$
 ^\s*IF fp == f4 THEN GOTO [0-9]$
+replacing function pointer by 3 possible targets
 ^SIGNAL=0$
 --
 ^warning: ignoring
