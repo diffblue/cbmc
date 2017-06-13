@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CBMC Command Line Option Processing
+
 #ifndef CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 #define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 

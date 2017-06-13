@@ -21,18 +21,6 @@ extern "C"
 #error "Expected HAVE_PICOSAT"
 #endif
 
-/*******************************************************************\
-
-Function: satcheck_picosatt::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt satcheck_picosatt::l_get(literalt a) const
 {
   if(a.is_constant())
@@ -54,34 +42,10 @@ tvt satcheck_picosatt::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_picosatt::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_picosatt::solver_text()
 {
   return "PicoSAT";
 }
-
-/*******************************************************************\
-
-Function: satcheck_picosatt::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_picosatt::lcnf(const bvt &bv)
 {
@@ -99,18 +63,6 @@ void satcheck_picosatt::lcnf(const bvt &bv)
 
   clause_counter++;
 }
-
-/*******************************************************************\
-
-Function: satcheck_picosatt::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt satcheck_picosatt::prop_solve()
 {
@@ -147,68 +99,20 @@ propt::resultt satcheck_picosatt::prop_solve()
   return P_UNSATISFIABLE;
 }
 
-/*******************************************************************\
-
-Function: satcheck_picosatt::set_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void satcheck_picosatt::set_assignment(literalt a, bool value)
 {
   assert(false);
 }
-
-/*******************************************************************\
-
-Function: satcheck_picosatt::satcheck_picosatt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 satcheck_picosatt::satcheck_picosatt()
 {
   picosat = picosat_init();
 }
 
-/*******************************************************************\
-
-Function: satcheck_picosatt::~satcheck_picosatt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_picosatt::~satcheck_picosatt()
 {
   picosat_reset(picosat);
 }
-
-/*******************************************************************\
-
-Function: satcheck_picosatt::is_in_conflict
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool satcheck_picosatt::is_in_conflict(literalt a) const
 {
@@ -216,18 +120,6 @@ bool satcheck_picosatt::is_in_conflict(literalt a) const
 
   return picosat_failed_assumption(picosat, a.dimacs())!=0;
 }
-
-/*******************************************************************\
-
-Function: satcheck_picosatt::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_picosatt::set_assumptions(const bvt &bv)
 {

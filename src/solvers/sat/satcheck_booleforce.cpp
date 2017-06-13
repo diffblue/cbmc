@@ -16,68 +16,20 @@ extern "C"
 #include "booleforce.h"
 }
 
-/*******************************************************************\
-
-Function: satcheck_booleforcet::satcheck_booleforcet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_booleforcet::satcheck_booleforcet()
 {
   booleforce_set_trace(false);
 }
-
-/*******************************************************************\
-
-Function: satcheck_booleforce_coret::satcheck_booleforce_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 satcheck_booleforce_coret::satcheck_booleforce_coret()
 {
   booleforce_set_trace(true);
 }
 
-/*******************************************************************\
-
-Function: satcheck_booleforce_baset::~satcheck_booleforce_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_booleforce_baset::~satcheck_booleforce_baset()
 {
   booleforce_reset();
 }
-
-/*******************************************************************\
-
-Function: satcheck_booleforce_baset::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt satcheck_booleforce_baset::l_get(literalt a) const
 {
@@ -108,34 +60,10 @@ tvt satcheck_booleforce_baset::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_booleforce_Baset::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_booleforce_baset::solver_text()
 {
   return std::string("Booleforce version ")+booleforce_version();
 }
-
-/*******************************************************************\
-
-Function: satcheck_booleforce_baset::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_booleforce_baset::lcnf(const bvt &bv)
 {
@@ -152,18 +80,6 @@ void satcheck_booleforce_baset::lcnf(const bvt &bv)
 
   clause_counter++;
 }
-
-/*******************************************************************\
-
-Function: satcheck_booleforce_baset::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt satcheck_booleforce_baset::prop_solve()
 {
@@ -208,18 +124,6 @@ propt::resultt satcheck_booleforce_baset::prop_solve()
 
   return P_ERROR;
 }
-
-/*******************************************************************\
-
-Function: satcheck_booleforce_coret::in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool satcheck_booleforce_coret::is_in_core(literalt l) const
 {

@@ -34,19 +34,8 @@ Author: Daniel Kroening
 
 #include "tempfile.h"
 
-/*******************************************************************\
-
-Function: my_mkstemps
-
-  Inputs:
-
- Outputs:
-
- Purpose: Substitute for mkstemps (OpenBSD standard) for Windows,
-          where it is unavailable.
-
-\*******************************************************************/
-
+/// Substitute for mkstemps (OpenBSD standard) for Windows, where it is
+/// unavailable.
 #ifdef _WIN32
 #define mkstemps my_mkstemps
 int my_mkstemps(char *template_str, int suffix_len)
@@ -91,18 +80,6 @@ int my_mkstemps(char *template_str, int suffix_len)
   return -1; // error
 }
 #endif
-
-/*******************************************************************\
-
-Function: get_temporary_file
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string get_temporary_file(
   const std::string &prefix,
@@ -149,18 +126,6 @@ std::string get_temporary_file(
   free(t_ptr);
   return result;
 }
-
-/*******************************************************************\
-
-Function: temporary_filet::~temporary_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 temporary_filet::~temporary_filet()
 {

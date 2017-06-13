@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set Propagation
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/xml_expr.h>
@@ -15,53 +18,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis.h"
 
-/*******************************************************************\
-
-Function: value_set_analysist::initialize
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_analysist::initialize(
   const goto_programt &goto_program)
 {
   baset::initialize(goto_program);
 }
 
-/*******************************************************************\
-
-Function: value_set_analysist::initialize
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_analysist::initialize(
   const goto_functionst &goto_functions)
 {
   baset::initialize(goto_functions);
 }
-
-/*******************************************************************\
-
-Function: value_set_analysist::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_analysist::convert(
   const goto_programt &goto_program,
@@ -114,18 +81,6 @@ void value_set_analysist::convert(
     }
   }
 }
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(
   const goto_functionst &goto_functions,
   const value_set_analysist &value_set_analysis,
@@ -143,18 +98,6 @@ void convert(
     value_set_analysis.convert(f_it->second.body, f_it->first, f);
   }
 }
-
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void convert(
   const goto_programt &goto_program,

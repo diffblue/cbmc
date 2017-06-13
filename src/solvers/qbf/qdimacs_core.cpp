@@ -11,18 +11,6 @@ Author: CM Wintersteiger
 
 #include "qdimacs_core.h"
 
-/*******************************************************************\
-
-Function: qdimacs_coret::simplify_extractbits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {
   if(expr.id()==ID_and)

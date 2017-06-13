@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto-Analyser Command Line Option Processing
+
 #include <cstdlib> // exit()
 #include <iostream>
 #include <fstream>
@@ -50,18 +53,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
 
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::goto_analyzer_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv):
@@ -71,18 +62,6 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
 {
 }
 
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::register_languages
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_analyzer_parse_optionst::register_languages()
 {
   register_language(new_ansi_c_language);
@@ -90,18 +69,6 @@ void goto_analyzer_parse_optionst::register_languages()
   register_language(new_java_bytecode_language);
   register_language(new_jsil_language);
 }
-
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::eval_verbosity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_analyzer_parse_optionst::eval_verbosity()
 {
@@ -117,18 +84,6 @@ void goto_analyzer_parse_optionst::eval_verbosity()
 
   ui_message_handler.set_verbosity(v);
 }
-
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::get_command_line_options
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 {
@@ -177,18 +132,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   #endif
 }
 
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int goto_analyzer_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -362,18 +306,6 @@ int goto_analyzer_parse_optionst::doit()
   return 6;
 }
 
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_analyzer_parse_optionst::set_properties()
 {
   try
@@ -401,18 +333,6 @@ bool goto_analyzer_parse_optionst::set_properties()
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::process_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_analyzer_parse_optionst::process_goto_program(
   const optionst &options)
@@ -501,18 +421,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
   return false;
 }
 
-/*******************************************************************\
-
-Function: goto_analyzer_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void goto_analyzer_parse_optionst::help()
 {
   std::cout <<

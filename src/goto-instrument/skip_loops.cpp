@@ -8,6 +8,9 @@ Date: January 2016
 
 \*******************************************************************/
 
+/// \file
+/// Skip over selected loops by adding gotos
+
 #include <util/message.h>
 #include <util/string2int.h>
 
@@ -17,18 +20,6 @@ Date: January 2016
 
 typedef std::set<unsigned> loop_idst;
 typedef std::map<irep_idt, loop_idst> loop_mapt;
-
-/*******************************************************************\
-
-Function: skip_loops
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static bool skip_loops(
   goto_programt &goto_program,
@@ -71,18 +62,6 @@ static bool skip_loops(
   return false;
 }
 
-/*******************************************************************\
-
-Function: skip_loops
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool parse_loop_ids(
   const std::string &loop_ids,
   loop_mapt &loop_map)
@@ -110,18 +89,6 @@ static bool parse_loop_ids(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: skip_loops
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool skip_loops(
   goto_functionst &goto_functions,

@@ -6,6 +6,9 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object for the gcc-like options
+
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -15,18 +18,9 @@ Author: CM Wintersteiger, 2006
 
 #include "gcc_cmdline.h"
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse
-
-  Inputs: argument count, argument strings
-
- Outputs: none
-
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
-
+/// parses the commandline options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 // non-gcc options
 const char *goto_cc_options_with_separated_argument[]=
 {
@@ -230,18 +224,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
   return result;
 }
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_arguments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool gcc_cmdlinet::parse_arguments(
   const argst &args,
   bool in_spec_file)
@@ -439,19 +421,7 @@ bool gcc_cmdlinet::parse_arguments(
   return false;
 }
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_specs_line
-
-  Inputs:
-
- Outputs:
-
- Purpose: Parse GCC spec files
-          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
-
-\*******************************************************************/
-
+/// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
 void gcc_cmdlinet::parse_specs_line(const std::string &line)
 {
   // initial whitespace has been stripped
@@ -471,19 +441,7 @@ void gcc_cmdlinet::parse_specs_line(const std::string &line)
   parse_arguments(args, true);
 }
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_specs
-
-  Inputs:
-
- Outputs:
-
- Purpose: Parse GCC spec files
-          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
-
-\*******************************************************************/
-
+/// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
 void gcc_cmdlinet::parse_specs()
 {
   const std::string &specs_file_name=get_value("specs");

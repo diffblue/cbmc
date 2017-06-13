@@ -33,18 +33,6 @@ Date: August 2012
 
 #include "run.h"
 
-/*******************************************************************\
-
-Function: run_shell
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 int run_shell(const std::string &command)
 {
   std::string shell="/bin/sh";
@@ -53,18 +41,6 @@ int run_shell(const std::string &command)
   argv.push_back(command);
   return run(shell, argv, "", "");
 }
-
-/*******************************************************************\
-
-Function: run
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 int run(
   const std::string &what,

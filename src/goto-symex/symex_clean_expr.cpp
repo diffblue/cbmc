@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::process_array_expr_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::process_array_expr_rec(
   exprt &expr,
@@ -82,18 +73,6 @@ void goto_symext::process_array_expr_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::process_array_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::process_array_expr(exprt &expr)
 {
   // This may change the type of the expression!
@@ -143,18 +122,6 @@ void goto_symext::process_array_expr(exprt &expr)
       process_array_expr(*it);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::replace_array_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::replace_array_equal(exprt &expr)
 {
   if(expr.id()==ID_array_equal)
@@ -179,18 +146,6 @@ void goto_symext::replace_array_equal(exprt &expr)
   Forall_operands(it, expr)
     replace_array_equal(*it);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::clean_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::clean_expr(
   exprt &expr,

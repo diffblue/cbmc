@@ -12,18 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 json_parsert json_parser;
 
-/*******************************************************************\
-
-Function: parse_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 // 'do it all' function
 bool parse_json(
   std::istream &in,
@@ -47,18 +35,6 @@ bool parse_json(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: parse_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // 'do it all' function
 bool parse_json(

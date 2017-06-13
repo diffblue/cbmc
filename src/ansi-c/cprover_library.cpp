@@ -21,18 +21,6 @@ struct cprover_library_entryt
 #include "cprover_library.inc"
 ; // NOLINT(whitespace/semicolon)
 
-/*******************************************************************\
-
-Function: get_cprover_library_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
   const symbol_tablet &symbol_table)
@@ -74,18 +62,6 @@ std::string get_cprover_library_text(
     return library_text.str();
 }
 
-/*******************************************************************\
-
-Function: add_cprover_library
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void add_cprover_library(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
@@ -100,18 +76,6 @@ void add_cprover_library(
 
   add_library(library_text, symbol_table, message_handler);
 }
-
-/*******************************************************************\
-
-Function: add_library
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void add_library(
   const std::string &src,

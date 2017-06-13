@@ -25,33 +25,9 @@ Date: April 2010
 
 #include "goto_rw.h"
 
-/*******************************************************************\
-
-Function: range_domain_baset::~range_domain_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 range_domain_baset::~range_domain_baset()
 {
 }
-
-/*******************************************************************\
-
-Function: range_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void range_domaint::output(
   const namespacet &ns, std::ostream &out) const
@@ -68,18 +44,6 @@ void range_domaint::output(
   out << "]";
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::~rw_range_sett
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rw_range_sett::~rw_range_sett()
 {
   for(rw_range_sett::objectst::iterator it=r_range_set.begin();
@@ -92,18 +56,6 @@ rw_range_sett::~rw_range_sett()
       ++it)
     delete it->second;
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::output(std::ostream &out) const
 {
@@ -126,18 +78,6 @@ void rw_range_sett::output(std::ostream &out) const
   }
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_complex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_complex(
   get_modet mode,
   const exprt &expr,
@@ -154,18 +94,6 @@ void rw_range_sett::get_objects_complex(
 
   get_objects_rec(mode, op, range_start+offset, size);
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_if(
   get_modet mode,
@@ -186,18 +114,6 @@ void rw_range_sett::get_objects_if(
   }
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_dereference(
   get_modet mode,
   const dereference_exprt &deref,
@@ -209,18 +125,6 @@ void rw_range_sett::get_objects_dereference(
   if(mode!=get_modet::READ)
     get_objects_rec(mode, pointer);
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_byte_extract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_byte_extract(
   get_modet mode,
@@ -248,18 +152,6 @@ void rw_range_sett::get_objects_byte_extract(
     get_objects_rec(mode, be.op(), offset, size);
   }
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_shift(
   get_modet mode,
@@ -309,18 +201,6 @@ void rw_range_sett::get_objects_shift(
   }
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_member(
   get_modet mode,
   const member_exprt &expr,
@@ -350,18 +230,6 @@ void rw_range_sett::get_objects_member(
 
   get_objects_rec(mode, expr.struct_op(), offset, size);
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_index(
   get_modet mode,
@@ -411,18 +279,6 @@ void rw_range_sett::get_objects_index(
       size);
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_array(
   get_modet mode,
   const array_exprt &expr,
@@ -462,18 +318,6 @@ void rw_range_sett::get_objects_array(
     offset+=sub_size;
   }
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_struct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_struct(
   get_modet mode,
@@ -535,18 +379,6 @@ void rw_range_sett::get_objects_struct(
   }
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_typecast(
   get_modet mode,
   const typecast_exprt &tc,
@@ -571,18 +403,6 @@ void rw_range_sett::get_objects_typecast(
 
   get_objects_rec(mode, op, range_start, new_size);
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_address_of(const exprt &object)
 {
@@ -634,18 +454,6 @@ void rw_range_sett::get_objects_address_of(const exprt &object)
     throw "rw_range_sett: address_of `"+object.id_string()+"' not handled";
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::add(
   get_modet mode,
   const irep_idt &identifier,
@@ -662,18 +470,6 @@ void rw_range_sett::add(
   static_cast<range_domaint*>(entry->second)->push_back(
     std::make_pair(range_start, range_end));
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_rec(
   get_modet mode,
@@ -766,36 +562,12 @@ void rw_range_sett::get_objects_rec(
     throw "rw_range_sett: assignment to `"+expr.id_string()+"' not handled";
 }
 
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_range_sett::get_objects_rec(get_modet mode, const exprt &expr)
 {
   range_spect size=
     to_range_spect(pointer_offset_bits(expr.type(), ns));
   get_objects_rec(mode, expr, 0, size);
 }
-
-/*******************************************************************\
-
-Function: rw_range_sett::get_objects_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_sett::get_objects_rec(const typet &type)
 {
@@ -806,18 +578,6 @@ void rw_range_sett::get_objects_rec(const typet &type)
     get_objects_rec(get_modet::READ, to_array_type(type).size());
   }
 }
-
-/*******************************************************************\
-
-Function: rw_range_set_value_sett::get_objects_dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_range_set_value_sett::get_objects_dereference(
   get_modet mode,
@@ -852,18 +612,6 @@ void rw_range_set_value_sett::get_objects_dereference(
     get_objects_rec(mode, object, range_start, new_size);
 }
 
-/*******************************************************************\
-
-Function: guarded_range_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void guarded_range_domaint::output(
   const namespacet &ns, std::ostream &out) const
 {
@@ -879,18 +627,6 @@ void guarded_range_domaint::output(
   }
   out << "]";
 }
-
-/*******************************************************************\
-
-Function: rw_guarded_range_set_value_sett::get_objects_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_guarded_range_set_value_sett::get_objects_if(
   get_modet mode,
@@ -918,18 +654,6 @@ void rw_guarded_range_set_value_sett::get_objects_if(
   }
 }
 
-/*******************************************************************\
-
-Function: rw_guarded_range_set_value_sett::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_guarded_range_set_value_sett::add(
   get_modet mode,
   const irep_idt &identifier,
@@ -948,18 +672,6 @@ void rw_guarded_range_set_value_sett::add(
                    std::make_pair(range_end, guard.as_expr())));
 }
 
-/*******************************************************************\
-
-Function: goto_rw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_rw(goto_programt::const_targett target,
              const code_assignt &assign,
              rw_range_sett &rw_set)
@@ -967,18 +679,6 @@ void goto_rw(goto_programt::const_targett target,
   rw_set.get_objects_rec(target, rw_range_sett::get_modet::LHS_W, assign.lhs());
   rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, assign.rhs());
 }
-
-/*******************************************************************\
-
-Function: goto_rw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_rw(goto_programt::const_targett target,
              const code_function_callt &function_call,
@@ -998,18 +698,6 @@ void goto_rw(goto_programt::const_targett target,
   forall_expr(it, function_call.arguments())
     rw_set.get_objects_rec(target, rw_range_sett::get_modet::READ, *it);
 }
-
-/*******************************************************************\
-
-Function: goto_rw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_rw(goto_programt::const_targett target,
              rw_range_sett &rw_set)
@@ -1088,35 +776,11 @@ void goto_rw(goto_programt::const_targett target,
   }
 }
 
-/*******************************************************************\
-
-Function: goto_rw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_rw(const goto_programt &goto_program, rw_range_sett &rw_set)
 {
   forall_goto_program_instructions(i_it, goto_program)
     goto_rw(i_it, rw_set);
 }
-
-/*******************************************************************\
-
-Function: goto_rw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_rw(const goto_functionst &goto_functions,
              const irep_idt &function,

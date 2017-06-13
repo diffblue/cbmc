@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Entering and Exiting
+
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -15,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/string_constant.h>
 
 #include "function.h"
-
-/*******************************************************************\
-
-Function: function_to_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 code_function_callt function_to_call(
   symbol_tablet &symbol_table,
@@ -87,18 +78,6 @@ code_function_callt function_to_call(
   return call;
 }
 
-/*******************************************************************\
-
-Function: function_enter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void function_enter(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -125,18 +104,6 @@ void function_enter(
     t->function=f_it->first;
   }
 }
-
-/*******************************************************************\
-
-Function: function_exit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void function_exit(
   symbol_tablet &symbol_table,

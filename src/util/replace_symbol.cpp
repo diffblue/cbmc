@@ -10,49 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "replace_symbol.h"
 
-/*******************************************************************\
-
-Function: replace_symbolt::replace_symbolt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 replace_symbolt::replace_symbolt()
 {
 }
 
-/*******************************************************************\
-
-Function: replace_symbolt::~replace_symbolt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 replace_symbolt::~replace_symbolt()
 {
 }
-
-/*******************************************************************\
-
-Function: replace_symbolt::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void replace_symbolt::insert(
   const symbol_exprt &old_expr,
@@ -61,18 +25,6 @@ void replace_symbolt::insert(
   expr_map.insert(std::pair<irep_idt, exprt>(
     old_expr.get_identifier(), new_expr));
 }
-
-/*******************************************************************\
-
-Function: replace_symbolt::replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool replace_symbolt::replace(exprt &dest) const
 {
@@ -120,18 +72,6 @@ bool replace_symbolt::replace(exprt &dest) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: replace_symbolt::have_to_replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool replace_symbolt::have_to_replace(const exprt &dest) const
 {
   // first look at type
@@ -162,18 +102,6 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: replace_symbolt::replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool replace_symbolt::replace(typet &dest) const
 {
@@ -235,18 +163,6 @@ bool replace_symbolt::replace(typet &dest) const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: replace_symbolt::have_to_replace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool replace_symbolt::have_to_replace(const typet &dest) const
 {

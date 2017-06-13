@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Dereferencing
+
 #ifndef CPROVER_POINTER_ANALYSIS_REWRITE_INDEX_H
 #define CPROVER_POINTER_ANALYSIS_REWRITE_INDEX_H
 

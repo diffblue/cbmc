@@ -14,49 +14,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv_width.h"
 
-/*******************************************************************\
-
-Function: boolbv_widtht::boolbv_widtht
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
 {
 }
 
-/*******************************************************************\
-
-Function: boolbv_widtht::~boolbv_widtht
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 boolbv_widtht::~boolbv_widtht()
 {
 }
-
-/*******************************************************************\
-
-Function: boolbv_widtht::get_entry
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 {
@@ -251,18 +215,6 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
 
   return entry;
 }
-
-/*******************************************************************\
-
-Function: boolbv_widtht::get_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const boolbv_widtht::membert &boolbv_widtht::get_member(
   const struct_typet &type,

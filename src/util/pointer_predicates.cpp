@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Various predicates over pointers in programs
+
 #include "cprover_prefix.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -17,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_predicates.h"
 
-/*******************************************************************\
-
-Function: pointer_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt pointer_object(const exprt &p)
 {
   return unary_exprt(
@@ -36,34 +27,10 @@ exprt pointer_object(const exprt &p)
     unsignedbv_typet(config.ansi_c.pointer_width));
 }
 
-/*******************************************************************\
-
-Function: same_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt same_object(const exprt &p1, const exprt &p2)
 {
   return equal_exprt(pointer_object(p1), pointer_object(p2));
 }
-
-/*******************************************************************\
-
-Function: object_size
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt object_size(const exprt &pointer)
 {
@@ -71,35 +38,11 @@ exprt object_size(const exprt &pointer)
   return unary_exprt(ID_object_size, pointer, type);
 }
 
-/*******************************************************************\
-
-Function: pointer_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt pointer_offset(const exprt &pointer)
 {
   typet type=signedbv_typet(config.ansi_c.pointer_width);
   return unary_exprt(ID_pointer_offset, pointer, type);
 }
-
-/*******************************************************************\
-
-Function: malloc_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt malloc_object(const exprt &pointer, const namespacet &ns)
 {
@@ -109,18 +52,6 @@ exprt malloc_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, malloc_object_symbol.symbol_expr());
 }
 
-/*******************************************************************\
-
-Function: deallocated
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt deallocated(const exprt &pointer, const namespacet &ns)
 {
   // we check __CPROVER_deallocated!
@@ -128,18 +59,6 @@ exprt deallocated(const exprt &pointer, const namespacet &ns)
 
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
-
-/*******************************************************************\
-
-Function: dead_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt dead_object(const exprt &pointer, const namespacet &ns)
 {
@@ -149,51 +68,15 @@ exprt dead_object(const exprt &pointer, const namespacet &ns)
   return same_object(pointer, deallocated_symbol.symbol_expr());
 }
 
-/*******************************************************************\
-
-Function: dynamic_size
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt dynamic_size(const namespacet &ns)
 {
   return ns.lookup(CPROVER_PREFIX "malloc_size").symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: pointer_object_has_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt pointer_object_has_type(const exprt &pointer, const typet &type)
 {
   return false_exprt();
 }
-
-/*******************************************************************\
-
-Function: dynamic_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt dynamic_object(const exprt &pointer)
 {
@@ -202,34 +85,10 @@ exprt dynamic_object(const exprt &pointer)
   return dynamic_expr;
 }
 
-/*******************************************************************\
-
-Function: good_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt good_pointer(const exprt &pointer)
 {
   return unary_exprt(ID_good_pointer, pointer, bool_typet());
 }
-
-/*******************************************************************\
-
-Function: good_pointer_def
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt good_pointer_def(
   const exprt &pointer,
@@ -287,35 +146,11 @@ exprt good_pointer_def(
     good_other);
 }
 
-/*******************************************************************\
-
-Function: null_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt null_object(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(null_pointer, pointer);
 }
-
-/*******************************************************************\
-
-Function: integer_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt integer_address(const exprt &pointer)
 {
@@ -324,52 +159,16 @@ exprt integer_address(const exprt &pointer)
                    notequal_exprt(null_pointer, pointer));
 }
 
-/*******************************************************************\
-
-Function: null_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt null_pointer(const exprt &pointer)
 {
   null_pointer_exprt null_pointer(to_pointer_type(pointer.type()));
   return same_object(pointer, null_pointer);
 }
 
-/*******************************************************************\
-
-Function: invalid_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt invalid_pointer(const exprt &pointer)
 {
   return unary_exprt(ID_invalid_pointer, pointer, bool_typet());
 }
-
-/*******************************************************************\
-
-Function: dynamic_object_lower_bound
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt dynamic_object_lower_bound(
   const exprt &pointer,
@@ -378,18 +177,6 @@ exprt dynamic_object_lower_bound(
 {
   return object_lower_bound(pointer, ns, offset);
 }
-
-/*******************************************************************\
-
-Function: dynamic_object_upper_bound
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt dynamic_object_upper_bound(
   const exprt &pointer,
@@ -421,18 +208,6 @@ exprt dynamic_object_upper_bound(
   return binary_relation_exprt(sum, op, malloc_size);
 }
 
-/*******************************************************************\
-
-Function: object_upper_bound
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt object_upper_bound(
   const exprt &pointer,
   const typet &dereference_type,
@@ -463,18 +238,6 @@ exprt object_upper_bound(
 
   return binary_relation_exprt(sum, op, object_size_expr);
 }
-
-/*******************************************************************\
-
-Function: object_lower_bound
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt object_lower_bound(
   const exprt &pointer,

@@ -8,6 +8,9 @@ Date: September 2011
 
 \*******************************************************************/
 
+/// \file
+/// Interrupt Instrumentation
+
 #include <util/cprover_prefix.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -23,18 +26,6 @@ Date: September 2011
 #include <analyses/local_may_alias.h>
 #endif
 
-/*******************************************************************\
-
-Function: poential_race_on_read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool potential_race_on_read(
   const rw_set_baset &code_rw_set,
   const rw_set_baset &isr_rw_set)
@@ -48,18 +39,6 @@ bool potential_race_on_read(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: poential_race_on_write
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool potential_race_on_write(
   const rw_set_baset &code_rw_set,
@@ -77,18 +56,6 @@ bool potential_race_on_write(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: interrupt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interrupt(
   value_setst &value_sets,
@@ -185,18 +152,6 @@ void interrupt(
   }
 }
 
-/*******************************************************************\
-
-Function: get_isr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 symbol_exprt get_isr(
   const symbol_tablet &symbol_table,
   const irep_idt &interrupt_handler)
@@ -230,18 +185,6 @@ symbol_exprt get_isr(
 
   return isr;
 }
-
-/*******************************************************************\
-
-Function: interrupt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interrupt(
   value_setst &value_sets,

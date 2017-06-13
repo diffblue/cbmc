@@ -14,18 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_add_sub
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_add_sub(const exprt &expr)
 {
   const typet &type=ns.follow(expr.type());

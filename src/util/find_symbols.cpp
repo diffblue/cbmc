@@ -13,36 +13,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
 
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_symbols(
   const exprt &src,
   find_symbols_sett &dest)
 {
   find_symbols(src, dest, true, true);
 }
-
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_symbols(
   const exprt &src,
@@ -59,18 +35,6 @@ void find_symbols(
       find_symbols(*it, dest, current, next);
   }
 }
-
-/*******************************************************************\
-
-Function: has_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool has_symbol(
   const exprt &src,
@@ -91,36 +55,12 @@ bool has_symbol(
   return false;
 }
 
-/*******************************************************************\
-
-Function: has_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool has_symbol(
   const exprt &src,
   const find_symbols_sett &symbols)
 {
   return has_symbol(src, symbols, true, true);
 }
-
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_symbols(
   const exprt &src,
@@ -135,18 +75,6 @@ void find_symbols(
   }
 }
 
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_symbols(
   const exprt &src,
   std::set<symbol_exprt> &dest)
@@ -159,18 +87,6 @@ void find_symbols(
       find_symbols(*it, dest);
   }
 }
-
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest);
 
@@ -196,18 +112,6 @@ void find_symbols(kindt kind, const exprt &src, find_symbols_sett &dest)
   if(va_arg_type.is_not_nil())
     find_symbols(kind, static_cast<const typet &>(va_arg_type), dest);
 }
-
-/*******************************************************************\
-
-Function: find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
 {
@@ -273,51 +177,15 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
   }
 }
 
-/*******************************************************************\
-
-Function: find_type_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_type_symbols(const exprt &src, find_symbols_sett &dest)
 {
   find_symbols(kindt::F_TYPE, src, dest);
 }
 
-/*******************************************************************\
-
-Function: find_type_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_type_symbols(const typet &src, find_symbols_sett &dest)
 {
   find_symbols(kindt::F_TYPE, src, dest);
 }
-
-/*******************************************************************\
-
-Function: find_non_pointer_type_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_non_pointer_type_symbols(
   const exprt &src,
@@ -326,18 +194,6 @@ void find_non_pointer_type_symbols(
   find_symbols(kindt::F_TYPE_NON_PTR, src, dest);
 }
 
-/*******************************************************************\
-
-Function: find_non_pointer_type_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_non_pointer_type_symbols(
   const typet &src,
   find_symbols_sett &dest)
@@ -345,34 +201,10 @@ void find_non_pointer_type_symbols(
   find_symbols(kindt::F_TYPE_NON_PTR, src, dest);
 }
 
-/*******************************************************************\
-
-Function: find_type_and_expr_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_type_and_expr_symbols(const exprt &src, find_symbols_sett &dest)
 {
   find_symbols(kindt::F_BOTH, src, dest);
 }
-
-/*******************************************************************\
-
-Function: find_type_and_expr_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_type_and_expr_symbols(const typet &src, find_symbols_sett &dest)
 {

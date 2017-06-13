@@ -10,18 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_case
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_case(const exprt &expr)
 {
   const std::vector<exprt> &operands=expr.operands();

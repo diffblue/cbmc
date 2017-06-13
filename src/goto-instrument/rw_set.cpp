@@ -8,6 +8,9 @@ Date: February 2006
 
 \*******************************************************************/
 
+/// \file
+/// Race Detection for Threaded Goto Programs
+
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/namespace.h>
@@ -17,18 +20,6 @@ Date: February 2006
 #include <pointer-analysis/goto_program_dereference.h>
 
 #include "rw_set.h"
-
-/*******************************************************************\
-
-Function: rw_set_baset::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_set_baset::output(std::ostream &out) const
 {
@@ -52,18 +43,6 @@ void rw_set_baset::output(std::ostream &out) const
         << from_expr(ns, "", it->second.guard) << std::endl;
   }
 }
-
-/*******************************************************************\
-
-Function: rw_set_loct::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void _rw_set_loct::compute()
 {
@@ -97,35 +76,11 @@ void _rw_set_loct::compute()
   }
 }
 
-/*******************************************************************\
-
-Function: rw_set_loct::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
   read_write_rec(lhs, false, true, "", guardt());
 }
-
-/*******************************************************************\
-
-Function: rw_set_loct::read_write_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void _rw_set_loct::read_write_rec(
   const exprt &expr,
@@ -239,18 +194,6 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard);
   }
 }
-
-/*******************************************************************\
-
-Function: rw_set_functiont::compute_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_set_functiont::compute_rec(const exprt &function)
 {

@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Base class for command line interpretation for CL
+
 #ifndef CPROVER_GOTO_CC_ARMCC_MODE_H
 #define CPROVER_GOTO_CC_ARMCC_MODE_H
 

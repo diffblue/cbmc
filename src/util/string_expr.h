@@ -6,6 +6,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// String expressions for the string solver
+
 #ifndef CPROVER_UTIL_STRING_EXPR_H
 #define CPROVER_UTIL_STRING_EXPR_H
 

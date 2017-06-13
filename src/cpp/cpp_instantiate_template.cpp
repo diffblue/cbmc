@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
@@ -13,18 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::template_suffix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
@@ -88,18 +79,6 @@ std::string cpp_typecheckt::template_suffix(
   return result;
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::show_instantiation_stack
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
 {
   for(instantiation_stackt::const_iterator
@@ -124,18 +103,6 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
     out << "> at " << s_it->source_location << std::endl;
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::class_template_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const symbolt &cpp_typecheckt::class_template_symbol(
   const source_locationt &source_location,
@@ -212,18 +179,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   return *s_ptr;
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::elaborate_class_template
-
-  Inputs:
-
- Outputs:
-
- Purpose: elaborate class template instances
-
-\*******************************************************************/
-
+/// elaborate class template instances
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
@@ -248,21 +204,10 @@ void cpp_typecheckt::elaborate_class_template(
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::instantiate_template
-
-  Inputs: location of the instantiation,
-          the identifier of the template symbol,
-          typechecked template arguments,
-          an (optional) specialization
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: location of the instantiation,
+/// the identifier of the template symbol,
+/// typechecked template arguments,
+/// an (optional) specialization
 #define MAX_DEPTH 50
 
 const symbolt &cpp_typecheckt::instantiate_template(

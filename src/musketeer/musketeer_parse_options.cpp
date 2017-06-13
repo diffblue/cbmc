@@ -6,6 +6,9 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// Main Module
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -46,18 +49,6 @@ Author:
 #include "replace_async.h"
 #include "infer_mode.h"
 
-/*******************************************************************\
-
-Function: goto_fence_inserter_parse_optionst::set_verbosity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_fence_inserter_parse_optionst::set_verbosity()
 {
   unsigned int v=8; // default
@@ -72,18 +63,7 @@ void goto_fence_inserter_parse_optionst::set_verbosity()
   ui_message_handler.set_verbosity(v);
 }
 
-/*******************************************************************\
-
-Function: goto_fence_inserter_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int goto_fence_inserter_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -150,18 +130,6 @@ int goto_fence_inserter_parse_optionst::doit()
   }
 }
 
-/*******************************************************************\
-
-Function: goto_fence_inserter_parse_optionst::get_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_fence_inserter_parse_optionst::get_goto_program(
   goto_functionst &goto_functions)
 {
@@ -173,18 +141,6 @@ void goto_fence_inserter_parse_optionst::get_goto_program(
 
   config.set_from_symbol_table(symbol_table);
 }
-
-/*******************************************************************\
-
-Function: goto_fence_inserter_parse_optionst::instrument_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_fence_inserter_parse_optionst::instrument_goto_program(
   goto_functionst &goto_functions)
@@ -435,18 +391,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
   label_properties(goto_functions);
 }
 
-/*******************************************************************\
-
-Function: goto_fence_inserter_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void goto_fence_inserter_parse_optionst::help()
 {
   std::cout <<

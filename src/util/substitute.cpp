@@ -10,18 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "substitute.h"
 
-/*******************************************************************\
-
-Function: substitute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void substitute(
   std::string &dest,
   const std::string &what,

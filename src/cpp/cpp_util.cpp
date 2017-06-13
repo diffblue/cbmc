@@ -11,18 +11,6 @@ Author:
 
 #include "cpp_util.h"
 
-/*******************************************************************\
-
-Function: cpp_symbol_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt cpp_symbol_expr(const symbolt &symbol)
 {
   exprt tmp(ID_symbol, symbol.type);

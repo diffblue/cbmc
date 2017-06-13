@@ -10,49 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "rename_symbol.h"
 
-/*******************************************************************\
-
-Function: rename_symbolt::rename_symbolt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rename_symbolt::rename_symbolt()
 {
 }
 
-/*******************************************************************\
-
-Function: rename_symbolt::~rename_symbolt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rename_symbolt::~rename_symbolt()
 {
 }
-
-/*******************************************************************\
-
-Function: rename_symbolt::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rename_symbolt::insert(
   const symbol_exprt &old_expr,
@@ -60,18 +24,6 @@ void rename_symbolt::insert(
 {
   insert_expr(old_expr.get_identifier(), new_expr.get_identifier());
 }
-
-/*******************************************************************\
-
-Function: rename_symbolt::rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool rename_symbolt::rename(exprt &dest) const
 {
@@ -119,18 +71,6 @@ bool rename_symbolt::rename(exprt &dest) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: rename_symbolt::have_to_rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool rename_symbolt::have_to_rename(const exprt &dest) const
 {
   if(expr_map.empty() && type_map.empty())
@@ -164,18 +104,6 @@ bool rename_symbolt::have_to_rename(const exprt &dest) const
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: rename_symbolt::rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool rename_symbolt::rename(typet &dest) const
 {
@@ -262,18 +190,6 @@ bool rename_symbolt::rename(typet &dest) const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: rename_symbolt::have_to_rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool rename_symbolt::have_to_rename(const typet &dest) const
 {

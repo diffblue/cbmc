@@ -10,49 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
-/*******************************************************************\
-
-Function: dimacs_cnft::dimacs_cnft
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 dimacs_cnft::dimacs_cnft():break_lines(false)
 {
 }
 
-/*******************************************************************\
-
-Function: dimacs_cnf_dumpt::dimacs_cnf_dumpt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 dimacs_cnf_dumpt::dimacs_cnf_dumpt(std::ostream &_out):out(_out)
 {
 }
-
-/*******************************************************************\
-
-Function: dimacs_cnft::write_dimacs_cnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dimacs_cnft::write_dimacs_cnf(std::ostream &out)
 {
@@ -60,36 +24,12 @@ void dimacs_cnft::write_dimacs_cnf(std::ostream &out)
   write_clauses(out);
 }
 
-/*******************************************************************\
-
-Function: dimacs_cnft::write_problem_line
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dimacs_cnft::write_problem_line(std::ostream &out)
 {
   // We start counting at 1, thus there is one variable fewer.
   out << "p cnf " << (no_variables()-1) << " "
       << clauses.size() << "\n";
 }
-
-/*******************************************************************\
-
-Function: write_dimacs_clause
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void write_dimacs_clause(
   const bvt &clause,
@@ -117,36 +57,12 @@ static void write_dimacs_clause(
   out << "0" << "\n";
 }
 
-/*******************************************************************\
-
-Function: dimacs_cnft::write_clauses
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dimacs_cnft::write_clauses(std::ostream &out)
 {
   for(clausest::const_iterator it=clauses.begin();
       it!=clauses.end(); it++)
     write_dimacs_clause(*it, out, break_lines);
 }
-
-/*******************************************************************\
-
-Function: dimacs_cnf_dumpt::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dimacs_cnf_dumpt::lcnf(const bvt &bv)
 {

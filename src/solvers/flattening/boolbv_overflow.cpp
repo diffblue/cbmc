@@ -13,18 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_overflow
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt boolbvt::convert_overflow(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();

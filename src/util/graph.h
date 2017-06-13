@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// A Template Class for Graphs
+
 #ifndef CPROVER_UTIL_GRAPH_H
 #define CPROVER_UTIL_GRAPH_H
 
@@ -255,18 +258,6 @@ protected:
     bool non_trivial) const;
 };
 
-/*******************************************************************\
-
-Function: grapht::add_undirected_edge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
 {
@@ -280,18 +271,6 @@ void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
   nb.add_in(a);
 }
 
-/*******************************************************************\
-
-Function: grapht::remove_undirected_edge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::remove_undirected_edge(node_indext a, node_indext b)
 {
@@ -302,18 +281,6 @@ void grapht<N>::remove_undirected_edge(node_indext a, node_indext b)
   na.in.erase(b);
   nb.in.erase(a);
 }
-
-/*******************************************************************\
-
-Function: grapht::remove_in_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::remove_in_edges(node_indext n)
@@ -330,18 +297,6 @@ void grapht<N>::remove_in_edges(node_indext n)
   node.in.clear();
 }
 
-/*******************************************************************\
-
-Function: grapht::remove_out_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::remove_out_edges(node_indext n)
 {
@@ -356,18 +311,6 @@ void grapht<N>::remove_out_edges(node_indext n)
 
   node.out.clear();
 }
-
-/*******************************************************************\
-
-Function: grapht::shortest_path
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::shortest_path(
@@ -460,18 +403,6 @@ void grapht<N>::shortest_path(
   }
 }
 
-/*******************************************************************\
-
-Function: grapht::visit_reachable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::visit_reachable(node_indext src)
 {
@@ -496,18 +427,6 @@ void grapht<N>::visit_reachable(node_indext src)
         s.push(it->first);
   }
 }
-
-/*******************************************************************\
-
-Function: grapht::connected_subgraphs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 std::size_t grapht<N>::connected_subgraphs(
@@ -554,18 +473,6 @@ std::size_t grapht<N>::connected_subgraphs(
   return nr;
 }
 
-/*******************************************************************\
-
-Function: grapht::tarjan
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::tarjan(tarjant &t, node_indext v)
 {
@@ -610,18 +517,6 @@ void grapht<N>::tarjan(tarjant &t, node_indext v)
   }
 }
 
-/*******************************************************************\
-
-Function: grapht::SCCs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 {
@@ -633,18 +528,6 @@ std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 
   return t.scc_count;
 }
-
-/*******************************************************************\
-
-Function: grapht::make_chordal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::make_chordal()
@@ -682,36 +565,12 @@ void grapht<N>::make_chordal()
   }
 }
 
-/*******************************************************************\
-
-Function: grapht::output_dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::output_dot(std::ostream &out) const
 {
   for(node_indext n=0; n<nodes.size(); n++)
     output_dot_node(out, n);
 }
-
-/*******************************************************************\
-
-Function: grapht::output_dot_node
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const

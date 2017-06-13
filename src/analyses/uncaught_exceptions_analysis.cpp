@@ -6,23 +6,15 @@ Author: Cristina David
 
 \*******************************************************************/
 
+/// \file
+/// Over-approximating uncaught exceptions analysis
+
 #ifdef DEBUG
 #include <iostream>
 #endif
 #include "uncaught_exceptions_analysis.h"
 
-/*******************************************************************\
-
-Function: get_exception_type
-
-  Inputs:
-
- Outputs:
-
- Purpose: Returns the compile type of an exception
-
-\*******************************************************************/
-
+/// Returns the compile type of an exception
 irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 {
   assert(type.id()==ID_pointer);
@@ -34,18 +26,7 @@ irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
   return ID_empty;
 }
 
-/*******************************************************************\
-
-Function: get_exception_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose: Returns the symbol corresponding to an exception
-
-\*******************************************************************/
-
+/// Returns the symbol corresponding to an exception
 exprt uncaught_exceptions_domaint::get_exception_symbol(const exprt &expr)
 {
   if(expr.id()!=ID_symbol && expr.has_operands())
@@ -54,18 +35,7 @@ exprt uncaught_exceptions_domaint::get_exception_symbol(const exprt &expr)
   return expr;
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_domaint::join
-
-  Inputs:
-
- Outputs:
-
- Purpose: The join operator for the uncaught exceptions domain
-
-\*******************************************************************/
-
+/// The join operator for the uncaught exceptions domain
 void uncaught_exceptions_domaint::join(
   const irep_idt &element)
 {
@@ -85,18 +55,7 @@ void uncaught_exceptions_domaint::join(
 }
 
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose: The transformer for the uncaught exceptions domain
-
-\*******************************************************************/
-
+/// The transformer for the uncaught exceptions domain
 void uncaught_exceptions_domaint::transform(
   const goto_programt::const_targett from,
   uncaught_exceptions_analysist &uea,
@@ -175,54 +134,20 @@ void uncaught_exceptions_domaint::transform(
   }
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_domaint::get_elements
-
-  Inputs:
-
- Outputs:
-
- Purpose: Returns the value of the private member thrown
-
-\*******************************************************************/
-
+/// Returns the value of the private member thrown
 const std::set<irep_idt> &uncaught_exceptions_domaint::get_elements() const
 {
   return thrown;
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_domaint::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Constructs the class hierarchy
-
-\*******************************************************************/
-
+/// Constructs the class hierarchy
 void uncaught_exceptions_domaint::operator()(
   const namespacet &ns)
 {
   class_hierarchy(ns.get_symbol_table());
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_analysist::collect_uncaught_exceptions
-
-  Inputs:
-
- Outputs:
-
- Purpose: Runs the uncaught exceptions analysis, which 
-          populates the exceptions map
-
-\*******************************************************************/
-
+/// Runs the uncaught exceptions analysis, which  populates the exceptions map
 void uncaught_exceptions_analysist::collect_uncaught_exceptions(
   const goto_functionst &goto_functions,
   const namespacet &ns)
@@ -256,19 +181,8 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
   }
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_analysist::output
-
-  Inputs:
-
- Outputs:
-
- Purpose: Prints the exceptions map that maps each method to the 
-          set of exceptions that may escape it
-
-\*******************************************************************/
-
+/// Prints the exceptions map that maps each method to the  set of exceptions
+/// that may escape it
 void uncaught_exceptions_analysist::output(
   const goto_functionst &goto_functions)
 {
@@ -288,19 +202,7 @@ void uncaught_exceptions_analysist::output(
 #endif
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions_analysist::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Applies the uncaught exceptions analysis and 
-          outputs the result
-
-\*******************************************************************/
-
+/// Applies the uncaught exceptions analysis and  outputs the result
 void uncaught_exceptions_analysist::operator()(
   const goto_functionst &goto_functions,
   const namespacet &ns,
@@ -312,19 +214,7 @@ void uncaught_exceptions_analysist::operator()(
   output(goto_functions);
 }
 
-/*******************************************************************\
-
-Function: uncaught_exceptions
-
-  Inputs:
-
- Outputs:
-
- Purpose: Applies the uncaught exceptions analysis and 
-          outputs the result
-
-\*******************************************************************/
-
+/// Applies the uncaught exceptions analysis and  outputs the result
 void uncaught_exceptions(
   const goto_functionst &goto_functions,
   const namespacet &ns,

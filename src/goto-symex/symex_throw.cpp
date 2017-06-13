@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::symex_throw
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_throw(statet &state)
 {

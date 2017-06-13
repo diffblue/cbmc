@@ -6,24 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Format vector of numbers into a compressed range
+
 #include <algorithm>
 #include <cassert>
 #include <string>
 
 #include "format_number_range.h"
 
-/*******************************************************************\
-
-Function: format_number_range::operator()
-
-  Inputs: vector of numbers
-
- Outputs: string of compressed number range representation
-
- Purpose: create shorter representation for output
-
-\*******************************************************************/
-
+/// create shorter representation for output
+/// \par parameters: vector of numbers
+/// \return string of compressed number range representation
 std::string format_number_ranget::operator()(std::vector<unsigned> &numbers)
 {
   std::string number_range;

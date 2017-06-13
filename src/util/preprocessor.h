@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Preprocessing Base Class
+
 #ifndef CPROVER_UTIL_PREPROCESSOR_H
 #define CPROVER_UTIL_PREPROCESSOR_H
 

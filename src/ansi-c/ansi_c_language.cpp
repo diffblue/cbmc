@@ -25,52 +25,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_internal_additions.h"
 #include "type2name.h"
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::extensions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<std::string> ansi_c_languaget::extensions() const
 {
   return { "c", "i" };
 }
-
-/*******************************************************************\
-
-Function: ansi_c_languaget::modules_provided
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 {
   modules.insert(get_base_name(parse_path, true));
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose: ANSI-C preprocessing
-
-\*******************************************************************/
-
+/// ANSI-C preprocessing
 bool ansi_c_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
@@ -82,18 +47,6 @@ bool ansi_c_languaget::preprocess(
 
   return c_preprocess(path, outstream, get_message_handler());
 }
-
-/*******************************************************************\
-
-Function: ansi_c_languaget::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_languaget::parse(
   std::istream &instream,
@@ -147,18 +100,6 @@ bool ansi_c_languaget::parse(
   return result;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
@@ -182,18 +123,6 @@ bool ansi_c_languaget::typecheck(
   return false;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
   generate_opaque_method_stubs(symbol_table);
@@ -204,51 +133,15 @@ bool ansi_c_languaget::final(symbol_tablet &symbol_table)
   return false;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::show_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void ansi_c_languaget::show_parse(std::ostream &out)
 {
   parse_tree.output(out);
 }
 
-/*******************************************************************\
-
-Function: new_ansi_c_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 languaget *new_ansi_c_language()
 {
   return new ansi_c_languaget;
 }
-
-/*******************************************************************\
-
-Function: ansi_c_languaget::from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_languaget::from_expr(
   const exprt &expr,
@@ -259,18 +152,6 @@ bool ansi_c_languaget::from_expr(
   return false;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_languaget::from_type(
   const typet &type,
   std::string &code,
@@ -280,18 +161,6 @@ bool ansi_c_languaget::from_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_languaget::type_to_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_languaget::type_to_name(
   const typet &type,
   std::string &name,
@@ -300,18 +169,6 @@ bool ansi_c_languaget::type_to_name(
   name=type2name(type, ns);
   return false;
 }
-
-/*******************************************************************\
-
-Function: ansi_c_languaget::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_languaget::to_expr(
   const std::string &code,
@@ -358,18 +215,6 @@ bool ansi_c_languaget::to_expr(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: ansi_c_languaget::~ansi_c_languaget
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 ansi_c_languaget::~ansi_c_languaget()
 {

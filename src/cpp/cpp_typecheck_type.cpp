@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <util/source_location.h>
 
 #include <ansi-c/c_qualifiers.h>
@@ -13,18 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "expr2cpp.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {

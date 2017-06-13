@@ -6,6 +6,9 @@ Author: Thomas Kiley
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_SYSTEM_LIBRARY_SYMBOLS_H
 #define CPROVER_GOTO_PROGRAMS_SYSTEM_LIBRARY_SYMBOLS_H
 

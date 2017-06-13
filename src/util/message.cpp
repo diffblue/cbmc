@@ -8,18 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message.h"
 
-/*******************************************************************\
-
-Function: message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void message_handlert::print(
   unsigned level,
   const std::string &message,
@@ -65,35 +53,11 @@ void message_handlert::print(
   print(level, dest);
 }
 
-/*******************************************************************\
-
-Function: messaget::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void messaget::print(unsigned level, const std::string &message)
 {
   if(message_handler!=NULL)
     message_handler->print(level, message);
 }
-
-/*******************************************************************\
-
-Function: messaget::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void messaget::print(
   unsigned level,
@@ -106,33 +70,9 @@ void messaget::print(
                            location);
 }
 
-/*******************************************************************\
-
-Function: message_clientt::~message_clientt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 message_clientt::~message_clientt()
 {
 }
-
-/*******************************************************************\
-
-Function: message_clientt::set_message_handler
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void message_clientt::set_message_handler(
   message_handlert &_message_handler)

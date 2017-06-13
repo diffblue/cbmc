@@ -11,6 +11,11 @@ Date:   April 2017
 
 \*******************************************************************/
 
+/// \file
+/// Java_string_libraries_preprocess, gives code for methods on strings of the
+///   java standard library. In particular methods from java.lang.String,
+///   java.lang.StringBuilder, java.lang.StringBuffer.
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -22,19 +27,8 @@ Date:   April 2017
 
 #include "java_string_library_preprocess.h"
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::java_type_matches_tag
-
-  Inputs:
-    type - a type
-    tag - a string
-
-  Output: Boolean telling whether the type is a struct with the given
-          tag or a symbolic type with the tag prefixed by "java::"
-
-\*******************************************************************/
-
+/// \param type: a type
+/// \param tag: a string
 bool java_string_library_preprocesst::java_type_matches_tag(
   const typet &type, const std::string &tag)
 {
@@ -51,16 +45,7 @@ bool java_string_library_preprocesst::java_type_matches_tag(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_pointer_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java string pointer
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_pointer_type(
   const typet &type)
 {
@@ -73,49 +58,21 @@ bool java_string_library_preprocesst::is_java_string_pointer_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java string
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_type(
   const typet &type)
 {
   return java_type_matches_tag(type, "java.lang.String");
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_builder_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java StringBuilder
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_builder_type(
   const typet &type)
 {
   return java_type_matches_tag(type, "java.lang.StringBuilder");
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_builder_pointer_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java StringBuilder
-          pointers
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_builder_pointer_type(
   const typet &type)
 {
@@ -128,33 +85,14 @@ bool java_string_library_preprocesst::is_java_string_builder_pointer_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_buffer_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java StringBuffer
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_buffer_type(
   const typet &type)
 {
   return java_type_matches_tag(type, "java.lang.StringBuffer");
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_string_buffer_pointer_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java StringBuffer
-          pointers
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_string_buffer_pointer_type(
   const typet &type)
 {
@@ -167,33 +105,14 @@ bool java_string_library_preprocesst::is_java_string_buffer_pointer_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_char_sequence_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java char sequence
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_char_sequence_type(
   const typet &type)
 {
   return java_type_matches_tag(type, "java.lang.CharSequence");
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_char_sequence_pointer_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of a pointer
-          to a java char sequence
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_char_sequence_pointer_type(
   const typet &type)
 {
@@ -206,33 +125,16 @@ bool java_string_library_preprocesst::is_java_char_sequence_pointer_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_char_array_type
-
-  Inputs: a type
-
-  Output: Boolean telling whether the type is that of java char array
-
-\*******************************************************************/
-
+/// \par parameters: a type
 bool java_string_library_preprocesst::is_java_char_array_type(
   const typet &type)
 {
   return java_type_matches_tag(type, "array[char]");
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_java_char_array_pointer_type
-
-  Inputs: a type
-
- Outputs: Boolean telling whether the type is that of a pointer
-          to a java char array
-
-\*******************************************************************/
-
+/// \par parameters: a type
+/// \return Boolean telling whether the type is that of a pointer to a java char
+///   array
 bool java_string_library_preprocesst::is_java_char_array_pointer_type(
   const typet &type)
 {
@@ -245,17 +147,7 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::string_data_type
-
-  Inputs:
-    symbol_table - a symbol_table containing an entry for java Strings
-
-  Output: the type of data fields in java Strings.
-
-\*******************************************************************/
-
+/// \param symbol_table: a symbol_table containing an entry for java Strings
 typet string_data_type(symbol_tablet symbol_table)
 {
   symbolt sym=symbol_table.lookup("java::java.lang.String");
@@ -266,32 +158,15 @@ typet string_data_type(symbol_tablet symbol_table)
   return data_type;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::string_length_type
-
- Outputs: the type of the length field in java Strings.
-
-\*******************************************************************/
-
+/// \return the type of the length field in java Strings.
 typet string_length_type()
 {
   return java_int_type();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::add_string_type
-
-  Inputs:
-    class_name - a name for the class such as "java.lang.String"
-    symbol_table - symbol table to which the class will be added
-
- Purpose: Add to the symbol table type declaration for a String-like
-          Java class.
-
-\*******************************************************************/
-
+/// Add to the symbol table type declaration for a String-like Java class.
+/// \param class_name: a name for the class such as "java.lang.String"
+/// \param symbol_table: symbol table to which the class will be added
 void java_string_library_preprocesst::add_string_type(
   const irep_idt &class_name, symbol_tablet &symbol_table)
 {
@@ -323,22 +198,11 @@ void java_string_library_preprocesst::add_string_type(
   string_symbol->is_type=true;
 }
 
-/*******************************************************************\
-
-Function: fresh_array
-
-  Inputs:
-    type - an array type
-    location - a location in the program
-    symbol_table - symbol table
-
-  Output: a new symbol
-
- Purpose: add a symbol in the table with static lifetime and name
-          containing `cprover_string_array` and given type
-
-\*******************************************************************/
-
+/// add a symbol in the table with static lifetime and name containing
+/// `cprover_string_array` and given type
+/// \param type: an array type
+/// \param location: a location in the program
+/// \param symbol_table: symbol table
 symbol_exprt java_string_library_preprocesst::fresh_array(
   const typet &type,
   const source_locationt &location,
@@ -355,19 +219,10 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
   return array_symbol.symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::declare_function
-
-  Inputs:
-    function_name - a name
-    type - a type
-    symbol_table - symbol table
-
- Purpose: declare a function with the given name and type
-
-\*******************************************************************/
-
+/// declare a function with the given name and type
+/// \param function_name: a name
+/// \param type: a type
+/// \param symbol_table: symbol table
 void java_string_library_preprocesst::declare_function(
   irep_idt function_name, const typet &type, symbol_tablet &symbol_table)
 {
@@ -381,24 +236,12 @@ void java_string_library_preprocesst::declare_function(
   symbol_table.add(func_symbol);
 }
 
-/*******************************************************************\
-
-Function: string_refine_preprocesst::process_arguments
-
-  Inputs:
-    params - a list of function parameters
-    loc - location in the source
-    symbol_table - symbol table
-    init_code - code block, in which declaration of some arguments
-                may be added
-
-  Output: a list of expressions
-
- Purpose: calls string_refine_preprocesst::process_operands with a
-          list of parameters.
-
-\*******************************************************************/
-
+/// calls string_refine_preprocesst::process_operands with a list of parameters.
+/// \param params: a list of function parameters
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \param init_code: code block, in which declaration of some arguments may be
+///   added
 exprt::operandst java_string_library_preprocesst::process_parameters(
   const code_typet::parameterst &params,
   const source_locationt &loc,
@@ -414,23 +257,13 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
   return process_operands(ops, loc, symbol_table, init_code);
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::process_single_operand
-
-  Inputs:
-    processed_ops - the list of processed operands to populate
-    op_to_process - a list of expressions
-    loc - location in the source
-    symbol_table - symbol table
-    init_code - code block, in which declaration of some arguments
-                may be added
-
- Purpose: Creates a string_exprt from the input exprt and adds it to
-          processed_ops
-
-\*******************************************************************/
-
+/// Creates a string_exprt from the input exprt and adds it to processed_ops
+/// \param processed_ops: the list of processed operands to populate
+/// \param op_to_process: a list of expressions
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \param init_code: code block, in which declaration of some arguments may be
+///   added
 void java_string_library_preprocesst::process_single_operand(
   exprt::operandst &processed_ops,
   const exprt &op_to_process,
@@ -452,28 +285,16 @@ void java_string_library_preprocesst::process_single_operand(
   processed_ops.push_back(string_expr);
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::process_operands
-
-  Inputs:
-    operands - a list of expressions
-    loc - location in the source
-    symbol_table - symbol table
-    init_code - code block, in which declaration of some arguments
-                may be added
-
-  Output: a list of expressions
-
- Purpose: for each expression that is of a type implementing strings,
-          we declare a new `cprover_string` whose contents is deduced
-          from the expression and replace the
-          expression by this cprover_string in the output list;
-          in the other case the expression is kept as is for the output list.
-          Also does the same thing for char array references.
-
-\*******************************************************************/
-
+/// for each expression that is of a type implementing strings, we declare a new
+/// `cprover_string` whose contents is deduced from the expression and replace
+/// the expression by this cprover_string in the output list; in the other case
+/// the expression is kept as is for the output list. Also does the same thing
+/// for char array references.
+/// \param operands: a list of expressions
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \param init_code: code block, in which declaration of some arguments may be
+///   added
 exprt::operandst java_string_library_preprocesst::process_operands(
   const exprt::operandst &operands,
   const source_locationt &loc,
@@ -500,25 +321,14 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   return ops;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::process_equals_function_operands
-
-  Inputs:
-    operands - a list of expressions
-    loc - location in the source
-    symbol_table - symbol table
-    init_code - code block, in which declaration of some arguments
-                may be added
-
-  Output: a list of expressions
-
- Purpose: Converts the operands of the equals function to string
-          expressions and outputs these conversions. As a side effect
-          of the conversions it adds some code to init_code.
-
-\*******************************************************************/
-
+/// Converts the operands of the equals function to string expressions and
+/// outputs these conversions. As a side effect of the conversions it adds some
+/// code to init_code.
+/// \param operands: a list of expressions
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \param init_code: code block, in which declaration of some arguments may be
+///   added
 exprt::operandst
   java_string_library_preprocesst::process_equals_function_operands(
   const exprt::operandst &operands,
@@ -544,20 +354,9 @@ exprt::operandst
   return ops;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::get_data_type
-
-  Inputs:
-    type - a type containing a "data" component
-    symbol_table - symbol table
-
-  Output: type of the "data" component
-
- Purpose: Finds the type of the data component
-
-\*******************************************************************/
-
+/// Finds the type of the data component
+/// \param type: a type containing a "data" component
+/// \param symbol_table: symbol table
 typet java_string_library_preprocesst::get_data_type(
   const typet &type, const symbol_tablet &symbol_table)
 {
@@ -578,20 +377,9 @@ typet java_string_library_preprocesst::get_data_type(
   }
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::get_length_type
-
-  Inputs:
-    type - a type containing a "length" component
-    symbol_table - symbol table
-
-  Output: type of the "length" component
-
- Purpose: Finds the type of the length component
-
-\*******************************************************************/
-
+/// Finds the type of the length component
+/// \param type: a type containing a "length" component
+/// \param symbol_table: symbol table
 typet java_string_library_preprocesst::get_length_type(
   const typet &type, const symbol_tablet &symbol_table)
 {
@@ -612,20 +400,9 @@ typet java_string_library_preprocesst::get_length_type(
   }
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::get_length
-
-  Inputs:
-    expr - an expression of structured type with length component
-    symbol_table - symbol table
-
-  Output: expression representing the "length" member
-
- Purpose: access length member
-
-\*******************************************************************/
-
+/// access length member
+/// \param expr: an expression of structured type with length component
+/// \param symbol_table: symbol table
 exprt java_string_library_preprocesst::get_length(
   const exprt &expr, const symbol_tablet &symbol_table)
 {
@@ -633,43 +410,21 @@ exprt java_string_library_preprocesst::get_length(
     expr, "length", get_length_type(expr.type(), symbol_table));
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::get_data
-
-  Inputs:
-    expr - an expression of structured type with length component
-    symbol_table - symbol table
-
-  Output: expression representing the "data" member
-
- Purpose: access data member
-
-\*******************************************************************/
-
+/// access data member
+/// \param expr: an expression of structured type with length component
+/// \param symbol_table: symbol table
 exprt java_string_library_preprocesst::get_data(
   const exprt &expr, const symbol_tablet &symbol_table)
 {
   return member_exprt(expr, "data", get_data_type(expr.type(), symbol_table));
 }
 
-/*******************************************************************\
-
-Function: string_refine_preprocesst::replace_char_array
-
-  Inputs:
-    array_pointer - an expression of type char array pointer
-    loc - location in the source
-    symbol_table - symbol table
-    code - code block, in which some assignments will be added
-
-  Output: a string expression
-
- Purpose: we declare a new `cprover_string` whose contents is deduced
-          from the char array.
-
-\*******************************************************************/
-
+/// we declare a new `cprover_string` whose contents is deduced from the char
+/// array.
+/// \param array_pointer: an expression of type char array pointer
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \param code: code block, in which some assignments will be added
 string_exprt java_string_library_preprocesst::replace_char_array(
   const exprt &array_pointer,
   const source_locationt &loc,
@@ -704,22 +459,11 @@ string_exprt java_string_library_preprocesst::replace_char_array(
   return string_expr;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::fresh_string
-
-  Inputs:
-    type - a type for refined strings
-    loc - a location in the program
-    symbol_table - symbol table
-
-  Output: a new symbol
-
- Purpose: add a symbol with static lifetime and name containing
-          `cprover_string` and given type
-
-\*******************************************************************/
-
+/// add a symbol with static lifetime and name containing `cprover_string` and
+/// given type
+/// \param type: a type for refined strings
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
 symbol_exprt java_string_library_preprocesst::fresh_string(
   const typet &type, const source_locationt &loc, symbol_tablet &symbol_table)
 {
@@ -729,22 +473,11 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
   return string_symbol.symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::fresh_string_expr
-
-  Inputs:
-    loc - a location in the program
-    symbol_table - symbol table
-    code - code block to which allocation instruction will be added
-
-  Output: a new string_expr
-
- Purpose: add symbols with prefix cprover_string_length and
-          cprover_string_data and construct a string_expr from them.
-
-\*******************************************************************/
-
+/// add symbols with prefix cprover_string_length and cprover_string_data and
+/// construct a string_expr from them.
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
+/// \param code: code block to which allocation instruction will be added
 string_exprt java_string_library_preprocesst::fresh_string_expr(
   const source_locationt &loc, symbol_tablet &symbol_table, code_blockt &code)
 {
@@ -765,22 +498,11 @@ string_exprt java_string_library_preprocesst::fresh_string_expr(
   return str;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::fresh_string_expr_symbol
-
-  Inputs:
-    loc - a location in the program
-    symbol_table - symbol table
-    code - code block to which allocation instruction will be added
-
-  Output: a new expression of refined string type
-
- Purpose: add symbols with prefix cprover_string_length and
-          cprover_string_data and construct a string_expr from them.
-
-\*******************************************************************/
-
+/// add symbols with prefix cprover_string_length and cprover_string_data and
+/// construct a string_expr from them.
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
+/// \param code: code block to which allocation instruction will be added
 exprt java_string_library_preprocesst::fresh_string_expr_symbol(
   const source_locationt &loc, symbol_tablet &symbol_table, code_blockt &code)
 {
@@ -795,22 +517,11 @@ exprt java_string_library_preprocesst::fresh_string_expr_symbol(
   return sym.symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::allocate_fresh_string
-
-  Inputs:
-    type - a type for string
-    loc - a location in the program
-    symbol_table - symbol table
-    code - code block to which allocation instruction will be added
-
-  Output: a new string
-
- Purpose: declare a new String and allocate it
-
-\*******************************************************************/
-
+/// declare a new String and allocate it
+/// \param type: a type for string
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
+/// \param code: code block to which allocation instruction will be added
 exprt java_string_library_preprocesst::allocate_fresh_string(
   const typet &type,
   const source_locationt &loc,
@@ -824,22 +535,11 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
   return str;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::allocate_fresh_array
-
-  Inputs:
-    type - a type for string
-    loc - a location in the program
-    symbol_table - symbol table
-    code - code block to which allocation instruction will be added
-
-  Output: a new array
-
- Purpose: declare a new character array and allocate it
-
-\*******************************************************************/
-
+/// declare a new character array and allocate it
+/// \param type: a type for string
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
+/// \param code: code block to which allocation instruction will be added
 exprt java_string_library_preprocesst::allocate_fresh_array(
   const typet &type,
   const source_locationt &loc,
@@ -853,20 +553,10 @@ exprt java_string_library_preprocesst::allocate_fresh_array(
   return array;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_function_application
-
-  Inputs:
-    function_name - the name of the function
-    arguments - a list of arguments
-    type - return type of the function
-    symbol_table - a symbol table
-
-  Output: a function application representing: function_name(arguments)
-
-\*******************************************************************/
-
+/// \param function_name: the name of the function
+/// \param arguments: a list of arguments
+/// \param type: return type of the function
+/// \param symbol_table: a symbol table
 exprt java_string_library_preprocesst::make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -885,23 +575,11 @@ exprt java_string_library_preprocesst::make_function_application(
   return call;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::code_assign_function_application
-
-  Inputs:
-    lhs - an expression
-    function_name - the name of the function
-    arguments - a list of arguments
-    symbol_table - a symbol table
-
-  Output: the following code:
-          > lhs=function_name_length(arguments)
-
-  Purpose: assign the result of a function call
-
-\*******************************************************************/
-
+/// assign the result of a function call
+/// \param lhs: an expression
+/// \param function_name: the name of the function
+/// \param arguments: a list of arguments
+/// \param symbol_table: a symbol table
 codet java_string_library_preprocesst::code_assign_function_application(
   const exprt &lhs,
   const irep_idt &function_name,
@@ -913,23 +591,11 @@ codet java_string_library_preprocesst::code_assign_function_application(
   return code_assignt(lhs, fun_app);
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::code_return_function_application
-
-  Inputs:
-    function_name - the name of the function
-    arguments - a list of arguments
-    type - the return type
-    symbol_table - a symbol table
-
-  Output: the following code:
-          > return function_name_length(arguments)
-
-  Purpose: return the result of a function call
-
-\*******************************************************************/
-
+/// return the result of a function call
+/// \param function_name: the name of the function
+/// \param arguments: a list of arguments
+/// \param type: the return type
+/// \param symbol_table: a symbol table
 codet java_string_library_preprocesst::code_return_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -941,22 +607,10 @@ codet java_string_library_preprocesst::code_return_function_application(
   return code_returnt(fun_app);
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::code_assign_function_to_string_expr
-
-  Inputs:
-    string_expr - a string expression
-    function_name - the name of the function
-    arguments - arguments of the function
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > str.length <- function_name_length(arguments)
-          > str.data <- function_name_data(arguments)
-
-\*******************************************************************/
-
+/// \param string_expr: a string expression
+/// \param function_name: the name of the function
+/// \param arguments: arguments of the function
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::code_assign_function_to_string_expr(
   const string_exprt &string_expr,
   const irep_idt &function_name,
@@ -976,24 +630,11 @@ codet java_string_library_preprocesst::code_assign_function_to_string_expr(
   return code_blockt({assign_fun_length, assign_fun_data});
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::string_expr_of_function_application
-
-  Inputs:
-    function_name - the name of the function
-    arguments - arguments of the function
-    loc - a location in the program
-    symbol_table - symbol table
-    code - code block in which we add instructions
-
-  Output: return a string expr str and add the following code:
-          > array str.data
-          > str.length <- function_name_length(arguments)
-          > str.data <- function_name_data(arguments)
-
-\*******************************************************************/
-
+/// \param function_name: the name of the function
+/// \param arguments: arguments of the function
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
+/// \param code: code block in which we add instructions
 string_exprt java_string_library_preprocesst::
   string_expr_of_function_application(
     const irep_idt &function_name,
@@ -1008,25 +649,12 @@ string_exprt java_string_library_preprocesst::
   return string_expr;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            code_assign_components_to_java_string
-
-  Inputs:
-    lhs - expression representing the java string to assign to
-    rhs_array - pointer to the array to assign
-    rhs_length - length of the array to assign
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > lhs = { {Object}, length=rhs_length, data=rhs_array }
-
- Purpose: Produce code for an assignemnrt of a string expr to a
-          Java string, component-wise.
-
-\*******************************************************************/
-
+/// Produce code for an assignemnrt of a string expr to a Java string,
+/// component-wise.
+/// \param lhs: expression representing the java string to assign to
+/// \param rhs_array: pointer to the array to assign
+/// \param rhs_length: length of the array to assign
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::code_assign_components_to_java_string(
   const exprt &lhs,
   const exprt &rhs_array,
@@ -1056,24 +684,10 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            code_assign_string_expr_to_java_string
-
-  Inputs:
-    lhs - an expression representing a java string
-    rhs - a string expression
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > lhs = { {Object}, length=rhs.length, data=rhs.data }
-
- Purpose: Produce code for an assignemnt of a string expr to a Java
-          string.
-
-\*******************************************************************/
-
+/// Produce code for an assignemnt of a string expr to a Java string.
+/// \param lhs: an expression representing a java string
+/// \param rhs: a string expression
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
   const exprt &lhs,
   const string_exprt &rhs,
@@ -1083,26 +697,11 @@ codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
     lhs, address_of_exprt(rhs.content()), rhs.length(), symbol_table);
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            code_assign_string_expr_to_new_java_string
-
-  Inputs:
-    lhs - an expression representing a java string
-    rhs - a string expression
-    loc - a location in the program
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > data = new array[];
-          > *data = rhs.data;
-          > lhs = { {Object} , length=rhs.length, data=data}
-
- Purpose: Produce code for an assignment of a string from a string expr.
-
-\*******************************************************************/
-
+/// Produce code for an assignment of a string from a string expr.
+/// \param lhs: an expression representing a java string
+/// \param rhs: a string expression
+/// \param loc: a location in the program
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::
   code_assign_string_expr_to_new_java_string(
     const exprt &lhs,
@@ -1125,22 +724,9 @@ codet java_string_library_preprocesst::
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            code_assign_java_string_to_string_expr
-
-  Inputs:
-    lhs - a string expression
-    rhs - an expression representing a java string
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > lhs.length=rhs->length
-          > lhs.data=*(rhs->data)
-
-\*******************************************************************/
-
+/// \param lhs: a string expression
+/// \param rhs: an expression representing a java string
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   const string_exprt &lhs, const exprt &rhs, symbol_tablet &symbol_table)
 {
@@ -1167,23 +753,10 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            code_assign_string_literal_to_string_expr
-
-  Inputs:
-    lhs - an expression representing a java string
-    tmp_string - a temporary string to hold the literal
-    s - the literal to be assigned
-    symbol_table - symbol table
-
-  Output: return the following code:
-          > tmp_string = "s"
-          > lhs = (string_expr) tmp_string
-
-\*******************************************************************/
-
+/// \param lhs: an expression representing a java string
+/// \param tmp_string: a temporary string to hold the literal
+/// \param s: the literal to be assigned
+/// \param symbol_table: symbol table
 codet java_string_library_preprocesst::
   code_assign_string_literal_to_string_expr(
     const string_exprt &lhs,
@@ -1198,25 +771,13 @@ codet java_string_library_preprocesst::
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-    make_string_builder_append_object_code
-
-  Inputs:
-    type - type of the function called
-    loc - location in the program
-    symbol_table - symbol table
-
- Outputs: code for the StringBuilder.append(Object) function:
-          > string1 = arguments[1].toString()
-          > string_expr1 = string_to_string_expr(string1)
-          > string_expr2 = concat(this, string_expr1)
-          > this = string_expr_to_string(string_expr2)
-          > return this
-
-\*******************************************************************/
-
+/// \param type: type of the function called
+/// \param loc: location in the program
+/// \param symbol_table: symbol table
+/// \return code for the StringBuilder.append(Object) function: > string1 =
+///   arguments[1].toString() > string_expr1 = string_to_string_expr(string1) >
+///   string_expr2 = concat(this, string_expr1) > this =
+///   string_expr_to_string(string_expr2) > return this
 codet java_string_library_preprocesst::make_string_builder_append_object_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1269,24 +830,13 @@ codet java_string_library_preprocesst::make_string_builder_append_object_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_equals_code
-
-  Inputs:
-    type - type of the function call
-    loc - location in the program_invocation_name
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-    > string_expr1 = {this->length; *this->data}
-    > string_expr2 = {arg->length; *arg->data}
-    > return cprover_string_equal(string_expr1, string_expr2)
-
-  Purpose: Used to provide code for the Java String.equals(Object) function.
-
-\*******************************************************************/
-
+/// Used to provide code for the Java String.equals(Object) function.
+/// \param type: type of the function call
+/// \param loc: location in the program_invocation_name
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string_expr1 = {this->length; *this->data}
+///   > string_expr2 = {arg->length; *arg->data} > return
+///   cprover_string_equal(string_expr1, string_expr2)
 codet java_string_library_preprocesst::make_equals_function_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1307,28 +857,14 @@ codet java_string_library_preprocesst::make_equals_function_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-    make_string_builder_append_float_code
-
-  Inputs:
-    type - type of the function call
-    loc - location in the program_invocation_name
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-          > string1 = arguments[1].toString()
-          > string_expr1 = string_to_string_expr(string1)
-          > string_expr2 = concat(this, string_expr1)
-          > this = string_expr_to_string(string_expr2)
-          > return this
-
-  Purpose: Used to provide code for the Java StringBuilder.append(F)
-           function.
-
-\*******************************************************************/
-
+/// Used to provide code for the Java StringBuilder.append(F) function.
+/// \param type: type of the function call
+/// \param loc: location in the program_invocation_name
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string1 = arguments[1].toString() >
+///   string_expr1 = string_to_string_expr(string1) > string_expr2 =
+///   concat(this, string_expr1) > this = string_expr_to_string(string_expr2) >
+///   return this
 codet java_string_library_preprocesst::make_string_builder_append_float_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1386,20 +922,10 @@ codet java_string_library_preprocesst::make_string_builder_append_float_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::string_literal
-
-  Inputs:
-    s - a string
-
- Outputs: an expression representing a Java string literal with the
-          given content.
-
- Purpose: construct a Java string literal from a constant string value
-
-\*******************************************************************/
-
+/// construct a Java string literal from a constant string value
+/// \param s: a string
+/// \return an expression representing a Java string literal with the given
+///   content.
 exprt java_string_library_preprocesst::string_literal(const std::string &s)
 {
   exprt string_literal(ID_java_string_literal);
@@ -1407,37 +933,20 @@ exprt java_string_library_preprocesst::string_literal(const std::string &s)
   return string_literal;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_float_to_string_code
-
-  Inputs:
-    type - type of the function call
-    loc - location in the program_invocation_name
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-          > String * str;
-          > str = MALLOC(String);
-          > String * tmp_string;
-          > int string_expr_length;
-          > char[] string_expr_content;
-          > CPROVER_string string_expr_sym;
-          > if arguments[1]==NaN
-          > then {tmp_string="NaN"; string_expr=(string_expr)tmp_string}
-          > if arguments[1]==Infinity
-          > then {tmp_string="Infinity"; string_expr=(string_expr)tmp_string}
-          > if 1e-3<arguments[1]<1e6
-          > then string_expr=cprover_float_to_string(arguments[1])
-          > else string_expr=cprover_float_to_scientific_notation_string(arg[1])
-          > string_expr_sym=string_expr;
-          > str=(String*) string_expr;
-          > return str;
-
-  Purpose: Provide code for the Float.toString(F) function.
-
-\*******************************************************************/
-
+/// Provide code for the Float.toString(F) function.
+/// \param type: type of the function call
+/// \param loc: location in the program_invocation_name
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > String * str; > str = MALLOC(String); >
+///   String * tmp_string; > int string_expr_length; > char[]
+///   string_expr_content; > CPROVER_string string_expr_sym; > if
+///   arguments[1]==NaN > then {tmp_string="NaN";
+///   string_expr=(string_expr)tmp_string} > if arguments[1]==Infinity > then
+///   {tmp_string="Infinity"; string_expr=(string_expr)tmp_string} > if
+///   1e-3<arguments[1]<1e6 > then
+///   string_expr=cprover_float_to_string(arguments[1]) > else
+///   string_expr=cprover_float_to_scientific_notation_string(arg[1]) >
+///   string_expr_sym=string_expr; > str=(String*) string_expr; > return str;
 codet java_string_library_preprocesst::make_float_to_string_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1536,30 +1045,18 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_init_function_from_call
-
-  Inputs:
-    function_name - name of the function to be called
-    type - the type of the function call
-    loc - location in program
-    symbol_table - the symbol table to populate
-    ignore_first_arg - boolean flag telling that the first argument
-                       should not be part of the arguments of the call
-                       (but only used to be assigned the result)
-
- Outputs: code for the String.<init>(args) function:
-          > cprover_string_length = fun(arg).length;
-          > cprover_string_array = fun(arg).data;
-          > this->length = cprover_string_length;
-          > this->data = cprover_string_array;
-          > cprover_string = {.=cprover_string_length, .=cprover_string_array};
-
-  Purpose: Generate the goto code for string initialization.
-
-\*******************************************************************/
-
+/// Generate the goto code for string initialization.
+/// \param function_name: name of the function to be called
+/// \param type: the type of the function call
+/// \param loc: location in program
+/// \param symbol_table: the symbol table to populate
+/// \param ignore_first_arg: boolean flag telling that the first argument should
+///   not be part of the arguments of the call (but only used to be assigned the
+///   result)
+/// \return code for the String.<init>(args) function: > cprover_string_length =
+///   fun(arg).length; > cprover_string_array = fun(arg).data; > this->length =
+///   cprover_string_length; > this->data = cprover_string_array; >
+///   cprover_string = {.=cprover_string_length, .=cprover_string_array};
 codet java_string_library_preprocesst::make_init_function_from_call(
   const irep_idt &function_name,
   const code_typet &type,
@@ -1596,24 +1093,13 @@ codet java_string_library_preprocesst::make_init_function_from_call(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::
-            make_assign_and_return_function_from_call
-
-  Inputs:
-    function_name - name of the function to be called
-    type - the type of the function call
-    loc - location in program
-    symbol_table - the symbol table to populate
-
-  Outputs: Code calling function with the given function name.
-
-  Purpose: Call a cprover internal function, assign the result to
-           object `this` and return it.
-
-\*******************************************************************/
-
+/// Call a cprover internal function, assign the result to object `this` and
+/// return it.
+/// \param function_name: name of the function to be called
+/// \param type: the type of the function call
+/// \param loc: location in program
+/// \param symbol_table: the symbol table to populate
+/// \return Code calling function with the given function name.
 codet java_string_library_preprocesst::
   make_assign_and_return_function_from_call(
     const irep_idt &function_name,
@@ -1632,24 +1118,13 @@ codet java_string_library_preprocesst::
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_assign_function_from_call
-
-  Inputs:
-    function_name - name of the function to be called
-    type - the type of the function call
-    loc - location in program
-    symbol_table - the symbol table to populate
-
-  Outputs: Code assigning result of a call to the function with given
-           function name.
-
-  Purpose: Call a cprover internal function and assign the result to
-           object `this`.
-
-\*******************************************************************/
-
+/// Call a cprover internal function and assign the result to object `this`.
+/// \param function_name: name of the function to be called
+/// \param type: the type of the function call
+/// \param loc: location in program
+/// \param symbol_table: the symbol table to populate
+/// \return Code assigning result of a call to the function with given function
+///   name.
 codet java_string_library_preprocesst::make_assign_function_from_call(
     const irep_idt &function_name,
     const code_typet &type,
@@ -1663,25 +1138,13 @@ codet java_string_library_preprocesst::make_assign_function_from_call(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_string_to_char_array_code
-
-  Inputs:
-    type - type of the function called
-    loc - location in the source
-    symbol_table - the symbol table
-
-  Outputs: Code corresponding to
-          > return_tmp0 = malloc(array[char]);
-          > return_tmp0->data=&((s->data)[0])
-          > return_tmp0->length=s->length
-
-  Purpose: Used to provide our own implementation of the
-           java.lang.String.toCharArray:()[C function.
-
-\*******************************************************************/
-
+/// Used to provide our own implementation of the
+/// java.lang.String.toCharArray:()[C function.
+/// \param type: type of the function called
+/// \param loc: location in the source
+/// \param symbol_table: the symbol table
+/// \return Code corresponding to > return_tmp0 = malloc(array[char]); >
+///   return_tmp0->data=&((s->data)[0]) > return_tmp0->length=s->length
 codet java_string_library_preprocesst::make_string_to_char_array_code(
     const code_typet &type,
     const source_locationt &loc,
@@ -1721,24 +1184,13 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_function_from_call
-
-  Inputs:
-    function_name - name of the function to be called
-    type - type of the function
-    loc - location in the source
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-           > return function_name(args);
-
-  Purpose: Provide code for a function that calls a function from the
-           solver and simply returns it.
-
-\*******************************************************************/
-
+/// Provide code for a function that calls a function from the solver and simply
+/// returns it.
+/// \param function_name: name of the function to be called
+/// \param type: type of the function
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > return function_name(args);
 codet java_string_library_preprocesst::make_function_from_call(
   const irep_idt &function_name,
   const code_typet &type,
@@ -1753,28 +1205,14 @@ codet java_string_library_preprocesst::make_function_from_call(
   return code;
 }
 
-/*******************************************************************\
-
-Function:
-    java_string_library_preprocesst::make_string_returning_function_from_call
-
-  Inputs:
-    function_name - name of the function to be called
-    type - type of the function
-    loc - location in the source
-    symbol_table - symbol table
-
-  Outputs: Code corresponding to:
-          > string_expr = function_name(args)
-          > string = new String
-          > string = string_expr_to_string(string)
-          > return string
-
-  Purpose: Provide code for a function that calls a function from the
-           solver and return the string_expr result as a Java string.
-
-\*******************************************************************/
-
+/// Provide code for a function that calls a function from the solver and return
+/// the string_expr result as a Java string.
+/// \param function_name: name of the function to be called
+/// \param type: type of the function
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string_expr = function_name(args) > string
+///   = new String > string = string_expr_to_string(string) > return string
 codet java_string_library_preprocesst::
   make_string_returning_function_from_call(
     const irep_idt &function_name,
@@ -1807,28 +1245,14 @@ codet java_string_library_preprocesst::
   return code;
 }
 
-/*******************************************************************\
-
-Function:
-    java_string_library_preprocesst::make_copy_string_code
-
-  Inputs:
-    type - type of the function
-    loc - location in the source
-    symbol_table - symbol table
-
- Outputs: Code corresponding to:
-          > string_expr = string_to_string_expr(arg0)
-          > string_expr_sym = { string_expr.length; string_expr.content }
-          > str = new String
-          > str = string_expr_to_string(string_expr)
-          > return str
-
- Purpose: Generates code for a function which copies a string object to a new
-          string object.
-
-\*******************************************************************/
-
+/// Generates code for a function which copies a string object to a new string
+/// object.
+/// \param type: type of the function
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string_expr = string_to_string_expr(arg0) >
+///   string_expr_sym = { string_expr.length; string_expr.content } > str = new
+///   String > str = string_expr_to_string(string_expr) > return str
 codet java_string_library_preprocesst::make_copy_string_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1860,26 +1284,14 @@ codet java_string_library_preprocesst::make_copy_string_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function:
-    java_string_library_preprocesst::make_copy_constructor_code
-
-  Inputs:
-    type - type of the function
-    loc - location in the source
-    symbol_table - symbol table
-
- Outputs: Code corresponding to:
-           > string_expr = java_string_to_string_expr(arg1)
-           > string_expr_sym = { string_expr.length; string_expr.content }
-           > this = string_expr_to_java_string(string_expr)
-
- Purpose: Generates code for a constructor of a string object from another
-          string object.
-
-\*******************************************************************/
-
+/// Generates code for a constructor of a string object from another string
+/// object.
+/// \param type: type of the function
+/// \param loc: location in the source
+/// \param symbol_table: symbol table
+/// \return Code corresponding to: > string_expr =
+///   java_string_to_string_expr(arg1) > string_expr_sym = { string_expr.length;
+///   string_expr.content } > this = string_expr_to_java_string(string_expr)
 codet java_string_library_preprocesst::make_copy_constructor_code(
   const code_typet &type,
   const source_locationt &loc,
@@ -1909,25 +1321,14 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::code_for_function
-
-  Inputs:
-    function_id - name of the function
-    type - its type
-    loc - location in the program
-    symbol_table - a symbol table
-
-  Outputs: Code for the body of the String functions if they are part
-           of the supported String functions, nil_exprt otherwise.
-
-  Purpose: Should be called to provide code for string functions that
-           are used in the code but for which no implementation is
-           provided.
-
-\*******************************************************************/
-
+/// Should be called to provide code for string functions that are used in the
+/// code but for which no implementation is provided.
+/// \param function_id: name of the function
+/// \param type: its type
+/// \param loc: location in the program
+/// \param symbol_table: a symbol table
+/// \return Code for the body of the String functions if they are part of the
+///   supported String functions, nil_exprt otherwise.
 exprt java_string_library_preprocesst::code_for_function(
   const irep_idt &function_id,
   const code_typet &type,
@@ -1965,35 +1366,17 @@ exprt java_string_library_preprocesst::code_for_function(
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::is_known_string_type
-
-  Inputs:
-    class_name - name of the class
-
- Outputs: True if the type is one that is known to our preprocessing,
-          false otherwise
-
- Purpose: Check whether a class name is known as a string type.
-
-\*******************************************************************/
-
+/// Check whether a class name is known as a string type.
+/// \param class_name: name of the class
+/// \return True if the type is one that is known to our preprocessing, false
+///   otherwise
 bool java_string_library_preprocesst::is_known_string_type(
   irep_idt class_name)
 {
   return string_types.find(class_name)!=string_types.end();
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::initialize_conversion_table
-
- Purpose: fill maps with correspondence from java method names to
-          conversion functions
-
-\*******************************************************************/
-
+/// fill maps with correspondence from java method names to conversion functions
 void java_string_library_preprocesst::initialize_conversion_table()
 {
   character_preprocess.initialize_conversion_table();

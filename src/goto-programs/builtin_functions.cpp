@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Program Transformation
+
 #include <cassert>
 
 #include <util/rational.h>
@@ -29,18 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 #include "format_strings.h"
-
-/*******************************************************************\
-
-Function: goto_convertt::do_prob_uniform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,
@@ -120,18 +111,6 @@ void goto_convertt::do_prob_uniform(
   copy(assignment, ASSIGN, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_prob_coin
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_prob_coin(
   const exprt &lhs,
   const exprt &function,
@@ -209,18 +188,6 @@ void goto_convertt::do_prob_coin(
   copy(assignment, ASSIGN, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_printf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_printf(
   const exprt &lhs,
   const exprt &function,
@@ -255,18 +222,6 @@ void goto_convertt::do_printf(
   else
     assert(false);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_scanf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_scanf(
   const exprt &lhs,
@@ -371,18 +326,6 @@ void goto_convertt::do_scanf(
     assert(false);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_input
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_input(
   const exprt &lhs,
   const exprt &function,
@@ -404,18 +347,6 @@ void goto_convertt::do_input(
   copy(input_code, OTHER, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_output(
   const exprt &lhs,
   const exprt &function,
@@ -436,18 +367,6 @@ void goto_convertt::do_output(
 
   copy(output_code, OTHER, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_atomic_begin
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_atomic_begin(
   const exprt &lhs,
@@ -473,18 +392,6 @@ void goto_convertt::do_atomic_begin(
   t->source_location=function.source_location();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_atomic_end
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_atomic_end(
   const exprt &lhs,
   const exprt &function,
@@ -508,18 +415,6 @@ void goto_convertt::do_atomic_end(
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
   t->source_location=function.source_location();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_cpp_new
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_cpp_new(
   const exprt &lhs,
@@ -641,18 +536,6 @@ void goto_convertt::do_cpp_new(
   dest.destructive_append(tmp_initializer);
 }
 
-/*******************************************************************\
-
-Function: set_class_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
@@ -677,18 +560,6 @@ void set_class_identifier(
     set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_java_new
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_java_new(
   const exprt &lhs,
@@ -744,18 +615,6 @@ void goto_convertt::do_java_new(
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_java_new_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_java_new_array(
   const exprt &lhs,
@@ -936,19 +795,7 @@ void goto_convertt::do_java_new_array(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::cpp_new_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose: builds a goto program for object initialization
-          after new
-
-\*******************************************************************/
-
+/// builds a goto program for object initialization after new
 void goto_convertt::cpp_new_initializer(
   const exprt &lhs,
   const side_effect_exprt &rhs,
@@ -976,18 +823,6 @@ void goto_convertt::cpp_new_initializer(
       assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::get_array_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt goto_convertt::get_array_argument(const exprt &src)
 {
@@ -1025,18 +860,6 @@ exprt goto_convertt::get_array_argument(const exprt &src)
   return src.op0().op0();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_array_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_array_set(
   const exprt &lhs,
   const exprt &function,
@@ -1057,18 +880,6 @@ void goto_convertt::do_array_set(
   copy(array_set_statement, OTHER, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_array_copy
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_array_copy(
   const exprt &lhs,
   const exprt &function,
@@ -1088,18 +899,6 @@ void goto_convertt::do_array_copy(
 
   copy(array_copy_statement, OTHER, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_array_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_array_equal(
   const exprt &lhs,
@@ -1144,18 +943,6 @@ void goto_convertt::do_array_equal(
   }
 }
 
-/*******************************************************************\
-
-Function: is_lvalue
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool is_lvalue(const exprt &expr)
 {
   if(expr.id()==ID_index)
@@ -1169,18 +956,6 @@ bool is_lvalue(const exprt &expr)
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: make_va_list
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt make_va_list(const exprt &expr)
 {
@@ -1197,19 +972,7 @@ exprt make_va_list(const exprt &expr)
   return expr;
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_function_call_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose: add function calls to function queue for later
-          processing
-
-\*******************************************************************/
-
+/// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
   const symbol_exprt &function,

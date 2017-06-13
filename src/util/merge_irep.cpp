@@ -9,18 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep_hash.h"
 #include "merge_irep.h"
 
-/*******************************************************************\
-
-Function: to_be_merged_irept::hash
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::size_t to_be_merged_irept::hash() const
 {
   std::size_t result=hash_string(id());
@@ -43,18 +31,6 @@ std::size_t to_be_merged_irept::hash() const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: to_be_merged_irept::operator==
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
 {
@@ -94,18 +70,6 @@ bool to_be_merged_irept::operator == (const to_be_merged_irept &other) const
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: merged_irepst::merged
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const merged_irept &merged_irepst::merged(const irept &irep)
 {
@@ -149,18 +113,6 @@ const merged_irept &merged_irepst::merged(const irept &irep)
       static_cast<const irept &>(*result.first));
 }
 
-/*******************************************************************\
-
-Function: merge_irept::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void merge_irept::operator()(irept &irep)
 {
   // only useful if there is sharing
@@ -168,18 +120,6 @@ void merge_irept::operator()(irept &irep)
   irep=merged(irep);
   #endif
 }
-
-/*******************************************************************\
-
-Function: merge_irept::merged
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const irept &merge_irept::merged(const irept &irep)
 {
@@ -221,18 +161,6 @@ const irept &merge_irept::merged(const irept &irep)
   return *irep_store.insert(new_irep).first;
 }
 
-/*******************************************************************\
-
-Function: merge_full_irept::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void merge_full_irept::operator()(irept &irep)
 {
   // only useful if there is sharing
@@ -240,18 +168,6 @@ void merge_full_irept::operator()(irept &irep)
   irep=merged(irep);
   #endif
 }
-
-/*******************************************************************\
-
-Function: merge_full_irept::merged
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const irept &merge_full_irept::merged(const irept &irep)
 {

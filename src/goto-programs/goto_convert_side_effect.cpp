@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Program Transformation
+
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -16,18 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "goto_convert_class.h"
-
-/*******************************************************************\
-
-Function: goto_convertt::has_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_convertt::has_function_call(const exprt &expr)
 {
@@ -41,18 +32,6 @@ bool goto_convertt::has_function_call(const exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_assignment(
   side_effect_exprt &expr,
@@ -157,18 +136,6 @@ void goto_convertt::remove_assignment(
     expr.make_nil();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::remove_pre
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::remove_pre(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -255,18 +222,6 @@ void goto_convertt::remove_pre(
   else
     expr.make_nil();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_post
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_post(
   side_effect_exprt &expr,
@@ -374,18 +329,6 @@ void goto_convertt::remove_post(
   dest.destructive_append(tmp2);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::remove_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::remove_function_call(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -466,18 +409,6 @@ void goto_convertt::remove_function_call(
   static_cast<exprt &>(expr)=new_symbol.symbol_expr();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::replace_new_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::replace_new_object(
   const exprt &object,
   exprt &dest)
@@ -488,18 +419,6 @@ void goto_convertt::replace_new_object(
     Forall_operands(it, dest)
       replace_new_object(object, *it);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_cpp_new
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_cpp_new(
   side_effect_exprt &expr,
@@ -531,18 +450,6 @@ void goto_convertt::remove_cpp_new(
   convert(call, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::remove_cpp_delete
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::remove_cpp_delete(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -561,18 +468,6 @@ void goto_convertt::remove_cpp_delete(
 
   expr.make_nil();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_malloc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_malloc(
   side_effect_exprt &expr,
@@ -610,18 +505,6 @@ void goto_convertt::remove_malloc(
 
   convert(call, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_temporary_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_temporary_object(
   side_effect_exprt &expr,
@@ -662,18 +545,6 @@ void goto_convertt::remove_temporary_object(
 
   static_cast<exprt &>(expr)=new_symbol.symbol_expr();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_statement_expression
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_statement_expression(
   side_effect_exprt &expr,
@@ -765,18 +636,6 @@ void goto_convertt::remove_statement_expression(
   static_cast<exprt &>(expr)=tmp_symbol_expr;
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::remove_push_catch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::remove_push_catch(
   side_effect_exprt &expr,
   goto_programt &dest)
@@ -787,18 +646,6 @@ void goto_convertt::remove_push_catch(
   // the result can't be used, these are void
   expr.make_nil();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::remove_side_effect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,

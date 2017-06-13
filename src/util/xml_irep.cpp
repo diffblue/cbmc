@@ -15,18 +15,6 @@ Author: Daniel Kroening
 #include "irep.h"
 #include "xml.h"
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(
   const irept &irep,
   xmlt &xml)
@@ -54,18 +42,6 @@ void convert(
     convert(it->second, x_com);
   }
 }
-
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void convert(
   const xmlt &xml,

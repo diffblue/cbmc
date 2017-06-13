@@ -12,18 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "source_location.h"
 #include "std_expr.h"
 
-/*******************************************************************\
-
-Function: symbolt::show
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symbolt::show(std::ostream &out) const
 {
   out << "  " << name << '\n';
@@ -77,36 +65,12 @@ void symbolt::show(std::ostream &out) const
   out << '\n';
 }
 
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::ostream &operator<<(std::ostream &out,
                          const symbolt &symbol)
 {
   symbol.show(out);
   return out;
 }
-
-/*******************************************************************\
-
-Function: symbolt::to_irep
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 irept symbolt::to_irep() const
 {
@@ -158,18 +122,6 @@ irept symbolt::to_irep() const
   return dest;
 }
 
-/*******************************************************************\
-
-Function: symbolt::from_irep
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symbolt::from_irep(const irept &src)
 {
   type=static_cast<const typet &>(src.find(ID_type));
@@ -199,18 +151,6 @@ void symbolt::from_irep(const irept &src)
   is_extern=src.get_bool("is_extern");
   is_volatile=src.get_bool("is_volatile");
 }
-
-/*******************************************************************\
-
-Function: symbolt::swap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symbolt::swap(symbolt &b)
 {
@@ -245,18 +185,8 @@ void symbolt::swap(symbolt &b)
   SYM_SWAP2(is_volatile);
 }
 
-/*******************************************************************\
-
-Function: symbolt::symbol_expr
-
-  Inputs: symbol
-
- Outputs: symbol_exprt
-
- Purpose: produces a symbol_exprt for a symbol
-
-\*******************************************************************/
-
+/// produces a symbol_exprt for a symbol
+/// \return symbol_exprt
 symbol_exprt symbolt::symbol_expr() const
 {
   return symbol_exprt(name, type);

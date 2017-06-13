@@ -10,6 +10,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 \*******************************************************************/
 
+/// \file
+/// String support via creating string constraints and progressively
+///   instantiating the universal constraints as needed. The procedure is
+///   described in the PASS paper at HVC'13: "PASS: String Solving with
+///   Parameterized Array and Interval Automaton" by Guodong Li and Indradeep
+///   Ghosh.
+
 #include <sstream>
 #include <iomanip>
 #include <ansi-c/string_constant.h>
@@ -22,19 +29,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
-/*******************************************************************\
-
-Constructor: string_refinementt
-
-     Inputs:
-       _ns - a namespace
-       _prop - a decision procedure
-       refinement_bound - a bound on the number of refinements
-
-    Purpose: refinement_bound is a bound on the number of refinement allowed.
-
-\*******************************************************************/
-
 string_refinementt::string_refinementt(
   const namespacet &_ns,
   propt &_prop,
@@ -46,62 +40,31 @@ string_refinementt::string_refinementt(
   non_empty_string(false)
 { }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_max_string_length
-
-  Inputs:
-    i - maximum length which is allowed for strings.
-        by default the strings length has no other limit
-        than the maximal integer according to the type of their
-        length, for instance 2^31-1 for Java.
-
- Purpose: Add constraints on the size of strings used in the
-          program.
-
-\*******************************************************************/
-
+/// Add constraints on the size of strings used in the program.
+/// \param i: maximum length which is allowed for strings.
+/// by default the strings length has no other limit
+/// than the maximal integer according to the type of their
+/// length, for instance 2^31-1 for Java.
 void string_refinementt::set_max_string_length(size_t i)
 {
   generator.max_string_length=i;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_max_string_length
-
- Purpose: Add constraints on the size of nondet character arrays
-          to ensure they have length at least 1
-
-\*******************************************************************/
-
+/// Add constraints on the size of nondet character arrays to ensure they have
+/// length at least 1
 void string_refinementt::enforce_non_empty_string()
 {
   non_empty_string=true;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::enforce_printable_characters
-
- Purpose: Add constraints on characters used in the program
-          to ensure they are printable
-
-\*******************************************************************/
-
+/// Add constraints on characters used in the program to ensure they are
+/// printable
 void string_refinementt::enforce_printable_characters()
 {
   generator.force_printable_characters=true;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::display_index_set
-
- Purpose: display the current index set, for debugging
-
-\*******************************************************************/
-
+/// display the current index set, for debugging
 void string_refinementt::display_index_set()
 {
   std::size_t count=0;
@@ -127,15 +90,8 @@ void string_refinementt::display_index_set()
           << " newly added)" << eom;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_instantiations
-
- Purpose: compute the index set for all formulas, instantiate the formulas
-          with the found indexes, and add them as lemmas.
-
-\*******************************************************************/
-
+/// compute the index set for all formulas, instantiate the formulas with the
+/// found indexes, and add them as lemmas.
 void string_refinementt::add_instantiations()
 {
   debug() << "string_constraint_generatort::add_instantiations: "
@@ -162,19 +118,10 @@ void string_refinementt::add_instantiations()
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_symbol_to_symbol_map()
-
-  Inputs:
-    lhs - a symbol expression
-    rhs - an expression to map it to
-
- Purpose: keeps a map of symbols to expressions, such as none of the
-          mapped values exist as a key
-
-\*******************************************************************/
-
+/// keeps a map of symbols to expressions, such as none of the mapped values
+/// exist as a key
+/// \param lhs: a symbol expression
+/// \param rhs: an expression to map it to
 void string_refinementt::add_symbol_to_symbol_map(
   const exprt &lhs, const exprt &rhs)
 {
@@ -196,16 +143,8 @@ void string_refinementt::add_symbol_to_symbol_map(
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_char_array_equality()
-
-  Inputs: the rhs and lhs of an equality over character arrays
-
- Purpose: add axioms if the rhs is a character array
-
-\*******************************************************************/
-
+/// add axioms if the rhs is a character array
+/// \par parameters: the rhs and lhs of an equality over character arrays
 void string_refinementt::set_char_array_equality(
   const exprt &lhs, const exprt &rhs)
 {
@@ -230,19 +169,9 @@ void string_refinementt::set_char_array_equality(
   // equality. Note that this might not be the case for other languages.
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::substitute_function_applications()
-
-  Inputs: an expression containing function applications
-
- Outputs: an epression containing no function application
-
- Purpose: remove functions applications and create the necessary
-          axioms
-
-\*******************************************************************/
-
+/// remove functions applications and create the necessary axioms
+/// \par parameters: an expression containing function applications
+/// \return an epression containing no function application
 exprt string_refinementt::substitute_function_applications(exprt expr)
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
@@ -261,21 +190,11 @@ exprt string_refinementt::substitute_function_applications(exprt expr)
   return expr;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::is_char_array
-
-  Inputs:
-    type - a type
-
- Outputs: true if the given type is an array of java characters
-
- Purpose: distinguish char array from other types
-
- TODO: this is only for java char array and does not work for other languages
-
-\*******************************************************************/
-
+/// distinguish char array from other types
+///
+/// TODO: this is only for java char array and does not work for other languages
+/// \param type: a type
+/// \return true if the given type is an array of java characters
 bool string_refinementt::is_char_array(const typet &type) const
 {
   if(type.id()==ID_symbol)
@@ -284,20 +203,10 @@ bool string_refinementt::is_char_array(const typet &type) const
   return (type.id()==ID_array && type.subtype()==java_char_type());
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_axioms_for_string_assigns
-
-  Inputs:
-    lhs - left hand side of an equality expression
-    rhs - right and side of the equality
-
- Outputs: false if the lemmas were added successfully, true otherwise
-
- Purpose: add lemmas to the solver corresponding to the given equation
-
-\*******************************************************************/
-
+/// add lemmas to the solver corresponding to the given equation
+/// \param lhs: left hand side of an equality expression
+/// \param rhs: right and side of the equality
+/// \return false if the lemmas were added successfully, true otherwise
 bool string_refinementt::add_axioms_for_string_assigns(
   const exprt &lhs, const exprt &rhs)
 {
@@ -332,28 +241,17 @@ bool string_refinementt::add_axioms_for_string_assigns(
   return true;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::concretize_string
-
-  Input:
-    expr - an expression
-
- Purpose: If the expression is of type string, then adds constants
-          to the index set to force the solver to pick concrete values
-          for each character, and fill the maps `found_length` and
-          `found_content`.
-
-          The way this is done is by looking for the length of the string,
-          then for each `i` in the index set, look at the value found by
-          the solver and put it in the `result` table.
-          For indexes that are not present in the index set, we put the
-          same value as the next index that is present in the index set.
-          We do so by traversing the array backward, remembering the
-          last value that has been initialized.
-
-\*******************************************************************/
-
+/// If the expression is of type string, then adds constants to the index set to
+/// force the solver to pick concrete values for each character, and fill the
+/// maps `found_length` and `found_content`.
+///
+///          The way this is done is by looking for the length of the string,
+///          then for each `i` in the index set, look at the value found by
+///          the solver and put it in the `result` table.
+///          For indexes that are not present in the index set, we put the
+///          same value as the next index that is present in the index set.
+///          We do so by traversing the array backward, remembering the
+///          last value that has been initialized.
 void string_refinementt::concretize_string(const exprt &expr)
 {
   if(refined_string_typet::is_refined_string_type(expr.type()))
@@ -420,16 +318,9 @@ void string_refinementt::concretize_string(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::concretize_results
-
- Purpose: For each string whose length has been solved, add constants
-          to the index set to force the solver to pick concrete values
-          for each character, and fill the map `found_length`
-
-\*******************************************************************/
-
+/// For each string whose length has been solved, add constants to the index set
+/// to force the solver to pick concrete values for each character, and fill the
+/// map `found_length`
 void string_refinementt::concretize_results()
 {
   for(const auto &it : symbol_resolve)
@@ -439,15 +330,8 @@ void string_refinementt::concretize_results()
   add_instantiations();
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::concretize_lengths
-
- Purpose: For each string whose length has been solved, add constants
-          to the map `found_length`
-
-\*******************************************************************/
-
+/// For each string whose length has been solved, add constants to the map
+/// `found_length`
 void string_refinementt::concretize_lengths()
 {
   for(const auto &it : symbol_resolve)
@@ -474,17 +358,8 @@ void string_refinementt::concretize_lengths()
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::set_to
-
-  Inputs: an expression and the value to set it to
-
- Purpose: add lemmas representing the setting of an expression to a
-          given value
-
-\*******************************************************************/
-
+/// add lemmas representing the setting of an expression to a given value
+/// \par parameters: an expression and the value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   assert(equality_propagation);
@@ -563,17 +438,9 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     non_string_axioms.push_back(std::make_pair(expr, value));
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::dec_solve
-
- Outputs: result of the decision procedure
-
- Purpose: use a refinement loop to instantiate universal axioms,
-          call the sat solver, and instantiate more indexes if needed.
-
-\*******************************************************************/
-
+/// use a refinement loop to instantiate universal axioms, call the sat solver,
+/// and instantiate more indexes if needed.
+/// \return result of the decision procedure
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
   // Substitute all symbols to char arrays in the axioms to give to
@@ -699,19 +566,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   return resultt::D_ERROR;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::convert_bool_bv
-
-  Inputs: a Boolean and a expression with the desired type
-
- Outputs: a bit vector
-
- Purpose: fills as many 0 as necessary in the bit vectors to have the
-          right width
-
-\*******************************************************************/
-
+/// fills as many 0 as necessary in the bit vectors to have the right width
+/// \par parameters: a Boolean and a expression with the desired type
+/// \return a bit vector
 bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 {
   bvt ret;
@@ -721,17 +578,9 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
   return ret;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_lemma
-
-  Inputs: a lemma and Boolean value stating whether the lemma should
-          be added to the index set.
-
- Purpose: add the given lemma to the solver
-
-\*******************************************************************/
-
+/// add the given lemma to the solver
+/// \par parameters: a lemma and Boolean value stating whether the lemma should
+/// be added to the index set.
 void string_refinementt::add_lemma(
   const exprt &lemma, bool _simplify, bool add_to_index_set)
 {
@@ -758,21 +607,11 @@ void string_refinementt::add_lemma(
   prop.l_set_to_true(convert(simple_lemma));
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::get_array
-
-  Inputs: an expression representing an array and an expression
-          representing an integer
-
- Outputs: an array expression or an array_of_exprt
-
- Purpose: get a model of an array and put it in a certain form.
-          If the size cannot be obtained or if it is too big, return an
-          empty array.
-
-\*******************************************************************/
-
+/// get a model of an array and put it in a certain form. If the size cannot be
+/// obtained or if it is too big, return an empty array.
+/// \par parameters: an expression representing an array and an expression
+/// representing an integer
+/// \return an array expression or an array_of_exprt
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 {
   exprt arr_val=get_array(arr);
@@ -876,19 +715,9 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 }
 
 
-/*******************************************************************\
-
-Function: string_refinementt::get_array
-
-  Inputs: an expression representing an array
-
- Outputs: an expression
-
- Purpose: get a model of an array of unknown size and infer the size if
-          possible
-
-\*******************************************************************/
-
+/// get a model of an array of unknown size and infer the size if possible
+/// \par parameters: an expression representing an array
+/// \return an expression
 exprt string_refinementt::get_array(const exprt &arr) const
 {
   exprt arr_model=supert::get(arr);
@@ -901,19 +730,10 @@ exprt string_refinementt::get_array(const exprt &arr) const
   return arr_model;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::string_of_array
-
-  Inputs: a constant array expression and a integer expression
-
- Outputs: a string
-
- Purpose: convert the content of a string to a more readable representation.
-          This should only be used for debbuging.
-
-\*******************************************************************/
-
+/// convert the content of a string to a more readable representation. This
+/// should only be used for debbuging.
+/// \par parameters: a constant array expression and a integer expression
+/// \return a string
 std::string string_refinementt::string_of_array(const array_exprt &arr)
 {
   unsigned n;
@@ -947,15 +767,8 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
   return result.str();
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::fill_model
-
- Purpose: Fill in `current_model` by mapping the variables created by
-          the solver to constant expressions given by the current model
-
-\*******************************************************************/
-
+/// Fill in `current_model` by mapping the variables created by the solver to
+/// constant expressions given by the current model
 void string_refinementt::fill_model()
 {
   for(auto it : symbol_resolve)
@@ -1014,26 +827,14 @@ void string_refinementt::fill_model()
 }
 
 
-/*******************************************************************\
-
-Function: string_refinementt::substitute_array_with_expr()
-
-  Inputs:
-    expr - A (possibly nested) 'with' expression on an `array_of`
-           expression
-    index - An index with which to build the equality condition
-
- Outputs: An expression containing no 'with' expression
-
- Purpose: Create a new expression where 'with' expressions on arrays
-          are replaced by 'if' expressions.
-          e.g. for an array access arr[x], where:
-               `arr := array_of(12) with {0:=24} with {2:=42}`
-               the constructed expression will be:
-               `index==0 ? 24 : index==2 ? 42 : 12`
-
-\*******************************************************************/
-
+/// Create a new expression where 'with' expressions on arrays are replaced by
+/// 'if' expressions. e.g. for an array access arr[x], where: `arr :=
+/// array_of(12) with {0:=24} with {2:=42}` the constructed expression will be:
+/// `index==0 ? 24 : index==2 ? 42 : 12`
+/// \param expr: A (possibly nested) 'with' expression on an `array_of`
+///   expression
+/// \param index: An index with which to build the equality condition
+/// \return An expression containing no 'with' expression
 exprt string_refinementt::substitute_array_with_expr(
   const exprt &expr, const exprt &index) const
 {
@@ -1055,24 +856,12 @@ exprt string_refinementt::substitute_array_with_expr(
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::substitute_array_access()
-
-  Inputs:
-    expr - an expression containing array accesses
-
- Outputs: an expression containing no array access
-
- Purpose: create an equivalent expression where array accesses and
-          'with' expressions are replaced by 'if' expressions.
-          e.g. for an array access arr[x], where:
-               `arr := {12, 24, 48}`
-               the constructed expression will be:
-               `index==0 ? 12 : index==1 ? 24 : 48`
-
-\*******************************************************************/
-
+/// create an equivalent expression where array accesses and 'with' expressions
+/// are replaced by 'if' expressions. e.g. for an array access arr[x], where:
+/// `arr := {12, 24, 48}` the constructed expression will be: `index==0 ? 12 :
+/// index==1 ? 24 : 48`
+/// \param expr: an expression containing array accesses
+/// \return an expression containing no array access
 void string_refinementt::substitute_array_access(exprt &expr) const
 {
   for(auto &op : expr.operands())
@@ -1134,21 +923,11 @@ void string_refinementt::substitute_array_access(exprt &expr) const
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::add_negation_of_constraint_to_solver
-
-  Inputs: a string constraint and a solver for non string expressions
-
- Purpose: negates the constraint and add it to the solver.
-          the intended usage is to find an assignement of the universal
-          variable that would violate the axiom,
-          to avoid false positives the symbols other than the universal
-          variable should have been replaced by there valuation in the
-          current model
-
-\*******************************************************************/
-
+/// negates the constraint and add it to the solver. the intended usage is to
+/// find an assignement of the universal variable that would violate the axiom,
+/// to avoid false positives the symbols other than the universal variable
+/// should have been replaced by there valuation in the current model
+/// \par parameters: a string constraint and a solver for non string expressions
 void string_refinementt::add_negation_of_constraint_to_solver(
   const string_constraintt &axiom, supert &solver)
 {
@@ -1182,16 +961,8 @@ void string_refinementt::add_negation_of_constraint_to_solver(
   solver << negaxiom;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::check_axioms
-
- Outputs: a Boolean
-
- Purpose: return true if the current model satisfies all the axioms
-
-\*******************************************************************/
-
+/// return true if the current model satisfies all the axioms
+/// \return a Boolean
 bool string_refinementt::check_axioms()
 {
   debug() << "string_refinementt::check_axioms: ==============="
@@ -1285,18 +1056,10 @@ bool string_refinementt::check_axioms()
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::map_representation_of_sum
-
-  Inputs: an expression with only addition and substraction
-
- Outputs: a map where each leaf of the input is mapped to the number of times
-          it is added. For instance, expression $x + x - y$ would give the map
-          x -> 2, y -> -1.
-
-\*******************************************************************/
-
+/// \par parameters: an expression with only addition and substraction
+/// \return a map where each leaf of the input is mapped to the number of times
+///   it is added. For instance, expression $x + x - y$ would give the map x ->
+///   2, y -> -1.
 std::map<exprt, int> string_refinementt::map_representation_of_sum(
   const exprt &f) const
 {
@@ -1336,18 +1099,10 @@ std::map<exprt, int> string_refinementt::map_representation_of_sum(
   return elems;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::sum_over_map
-
-  Inputs: a map from expressions to integers
-
- Outputs: a expression for the sum of each element in the map a number of
-          times given by the corresponding integer in the map.
-          For a map x -> 2, y -> -1 would give an expression $x + x - y$.
-
-\*******************************************************************/
-
+/// \par parameters: a map from expressions to integers
+/// \return a expression for the sum of each element in the map a number of
+///   times given by the corresponding integer in the map. For a map x -> 2, y
+///   -> -1 would give an expression $x + x - y$.
 exprt string_refinementt::sum_over_map(
   std::map<exprt, int> &m, const typet &type, bool negated) const
 {
@@ -1417,37 +1172,21 @@ exprt string_refinementt::sum_over_map(
     return index_const;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::simplify_sum
-
-  Inputs: an expression with only plus and minus expr
-
- Outputs: an equivalent expression in a cannonical form
-
-\*******************************************************************/
-
+/// \par parameters: an expression with only plus and minus expr
+/// \return an equivalent expression in a cannonical form
 exprt string_refinementt::simplify_sum(const exprt &f) const
 {
   std::map<exprt, int> map=map_representation_of_sum(f);
   return sum_over_map(map, f.type());
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::compute_inverse_function
-
-  Inputs: a symbol qvar, an expression val, an expression f containing + and −
-          operations in which qvar should appear exactly once.
-
- Outputs: an expression corresponding of $f^{−1}(val)$ where $f$ is seen as a
-          function of $qvar$, i.e. the value that is necessary for qvar for f
-          to be equal to val. For instance, if `f` corresponds to the expression
-          $q + x$, `compute_inverse_function(q,v,f)` returns an expression for
-          $v - x$.
-
-\*******************************************************************/
-
+/// \par parameters: a symbol qvar, an expression val, an expression f
+///   containing + and −
+/// operations in which qvar should appear exactly once.
+/// \return an expression corresponding of $f^{−1}(val)$ where $f$ is seen as
+///   a function of $qvar$, i.e. the value that is necessary for qvar for f to
+///   be equal to val. For instance, if `f` corresponds to the expression $q +
+///   x$, `compute_inverse_function(q,v,f)` returns an expression for $v - x$.
 exprt string_refinementt::compute_inverse_function(
   const exprt &qvar, const exprt &val, const exprt &f)
 {
@@ -1497,18 +1236,9 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function: find_qvar
-
-  Inputs: an index expression and a symbol qvar
-
- Outputs: a Boolean
-
- Purpose: look for the symbol and return true if it is found
-
-\*******************************************************************/
-
+/// look for the symbol and return true if it is found
+/// \par parameters: an index expression and a symbol qvar
+/// \return a Boolean
 static bool find_qvar(const exprt index, const symbol_exprt &qvar)
 {
   find_qvar_visitort v2(qvar);
@@ -1516,17 +1246,9 @@ static bool find_qvar(const exprt index, const symbol_exprt &qvar)
   return v2.found;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::initial_index_set
-
-  Inputs: a list of string constraints
-
- Purpose: add to the index set all the indices that appear in the formulas
-          and the upper bound minus one
-
-\*******************************************************************/
-
+/// add to the index set all the indices that appear in the formulas and the
+/// upper bound minus one
+/// \par parameters: a list of string constraints
 void string_refinementt::initial_index_set(
   const std::vector<string_constraintt>  &string_axioms)
 {
@@ -1534,32 +1256,17 @@ void string_refinementt::initial_index_set(
     initial_index_set(axiom);
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::update_index_set
-
-  Inputs: a list of string constraints
-
- Purpose: add to the index set all the indices that appear in the formulas
-
-\*******************************************************************/
-
+/// add to the index set all the indices that appear in the formulas
+/// \par parameters: a list of string constraints
 void string_refinementt::update_index_set(const std::vector<exprt> &cur)
 {
   for(const auto &axiom : cur)
     update_index_set(axiom);
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::initial_index_set
-
-  Inputs: a string constraint
-
- Purpose: add to the index set all the indices that appear in the formula
-          and the upper bound minus one
-
-\*******************************************************************/
+/// add to the index set all the indices that appear in the formula and the
+/// upper bound minus one
+/// \par parameters: a string constraint
 void string_refinementt::add_to_index_set(const exprt &s, exprt i)
 {
   simplify(i, ns);
@@ -1620,16 +1327,8 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
   }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::update_index_set
-
-  Inputs: a string constraint
-
- Purpose: add to the index set all the indices that appear in the formula
-
-\*******************************************************************/
-
+/// add to the index set all the indices that appear in the formula
+/// \par parameters: a string constraint
 void string_refinementt::update_index_set(const exprt &formula)
 {
   std::list<exprt> to_process;
@@ -1677,20 +1376,10 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function: string_refinementt::update_index_set
-
-  Inputs: a formula expr and a char array str
-
- Outputs: an index expression
-
- Purpose: find an index used in the expression for str, for instance
-          with arguments (str[k] == 'a') and str, the function should
-          return k
-
-\*******************************************************************/
-
+/// find an index used in the expression for str, for instance with arguments
+/// (str[k] == 'a') and str, the function should return k
+/// \par parameters: a formula expr and a char array str
+/// \return an index expression
 exprt find_index(const exprt &expr, const exprt &str)
 {
   find_index_visitort v1(str);
@@ -1702,21 +1391,13 @@ exprt find_index(const exprt &expr, const exprt &str)
   catch (exprt i) { return i; }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::instantiate
-
-  Inputs: a universally quantified formula `axiom`, an array of char
-          variable `str`, and an index expression `val`.
-
- Outputs: substitute `qvar` the universally quantified variable of `axiom`, by
-          an index `val`, in `axiom`, so that the index used for `str` equals
-          `val`. For instance, if `axiom` corresponds to
-          $\forall q. s[q+x]='a' && t[q]='b'$, `instantiate(axom,s,v)`
-          would return an expression for $s[v]='a' && t[v-x]='b'$.
-
-\*******************************************************************/
-
+/// \par parameters: a universally quantified formula `axiom`, an array of char
+/// variable `str`, and an index expression `val`.
+/// \return substitute `qvar` the universally quantified variable of `axiom`, by
+///   an index `val`, in `axiom`, so that the index used for `str` equals `val`.
+///   For instance, if `axiom` corresponds to $\forall q. s[q+x]='a' &&
+///   t[q]='b'$, `instantiate(axom,s,v)` would return an expression for
+///   $s[v]='a' && t[v-x]='b'$.
 exprt string_refinementt::instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val)
 {
@@ -1738,18 +1419,10 @@ exprt string_refinementt::instantiate(
   return implies_exprt(bounds, instance);
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::instantiate_not_contains
-
-  Inputs: a quantified formula representing `not_contains`, and a
-          list to which to add the created lemmas to
-
- Purpose: instantiate a quantified formula representing `not_contains`
-          by substituting the quantifiers and generating axioms
-
-\*******************************************************************/
-
+/// instantiate a quantified formula representing `not_contains` by substituting
+/// the quantifiers and generating axioms
+/// \par parameters: a quantified formula representing `not_contains`, and a
+/// list to which to add the created lemmas to
 void string_refinementt::instantiate_not_contains(
   const string_not_contains_constraintt &axiom, std::list<exprt> &new_lemmas)
 {
@@ -1801,18 +1474,9 @@ void string_refinementt::instantiate_not_contains(
     }
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::substitute_array_lists()
-
-  Inputs: an expression containing array-list expressions
-
- Outputs: an epression containing no array-list
-
- Purpose: replace array-lists by 'with' expressions
-
-\*******************************************************************/
-
+/// replace array-lists by 'with' expressions
+/// \par parameters: an expression containing array-list expressions
+/// \return an epression containing no array-list
 exprt string_refinementt::substitute_array_lists(exprt expr) const
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
@@ -1846,18 +1510,9 @@ exprt string_refinementt::substitute_array_lists(exprt expr) const
   return expr;
 }
 
-/*******************************************************************\
-
-Function: string_refinementt::get
-
-  Inputs: an expression
-
- Outputs: an expression
-
- Purpose: evaluation of the expression in the current model
-
-\*******************************************************************/
-
+/// evaluation of the expression in the current model
+/// \par parameters: an expression
+/// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
   exprt ecopy(expr);

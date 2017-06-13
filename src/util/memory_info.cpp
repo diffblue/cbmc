@@ -25,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "memory_info.h"
 
-/*******************************************************************\
-
-Function: memory_info
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void memory_info(std::ostream &out)
 {
   #if defined(__linux__) && defined(__GLIBC__)

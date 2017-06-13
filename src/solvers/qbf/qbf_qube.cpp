@@ -12,51 +12,15 @@ Author: CM Wintersteiger
 
 #include "qbf_qube.h"
 
-/*******************************************************************\
-
-Function: qbf_qubet::qbf_qubet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qubet::qbf_qubet()
 {
   // skizzo crashes on broken lines
   break_lines=false;
 }
 
-/*******************************************************************\
-
-Function: qbf_qubet::~qbf_qubet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qubet::~qbf_qubet()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_qubet::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt qbf_qubet::l_get(literalt a) const
 {
@@ -64,34 +28,10 @@ tvt qbf_qubet::l_get(literalt a) const
   return tvt(false);
 }
 
-/*******************************************************************\
-
-Function: qbf_qubet::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string qbf_qubet::solver_text()
 {
   return "QuBE";
 }
-
-/*******************************************************************\
-
-Function: qbf_qubet::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt qbf_qubet::prop_solve()
 {

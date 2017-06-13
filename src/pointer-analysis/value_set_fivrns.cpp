@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
+/// \file
+/// Value Set (Flow Insensitive, Validity Regions)
+
 #include <cassert>
 #include <ostream>
 
@@ -51,18 +54,6 @@ static const char *alloc_adapter_prefix="alloc_adaptor::";
       (it)++) \
     if((map).is_valid_at((it)->first, from_function, from_target_index)) /* NOLINT(*) */
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::output(
   const namespacet &ns,
   std::ostream &out) const
@@ -73,18 +64,6 @@ void value_set_fivrnst::output(
       v_it++)
     output_entry(v_it->second, ns, out);
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::output_entry
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::output_entry(
   const entryt &e,
@@ -220,18 +199,6 @@ void value_set_fivrnst::output_entry(
   out << " } \n";
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt value_set_fivrnst::to_expr(object_map_dt::const_iterator it) const
 {
   const exprt &object=object_numbering[it->first];
@@ -252,18 +219,6 @@ exprt value_set_fivrnst::to_expr(object_map_dt::const_iterator it) const
   return od;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::make_union(
   object_mapt &dest,
   const object_mapt &src) const
@@ -278,18 +233,6 @@ bool value_set_fivrnst::make_union(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::make_valid_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fivrnst::make_valid_union(
   object_mapt &dest,
@@ -306,18 +249,6 @@ bool value_set_fivrnst::make_valid_union(
   return result;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::copy_objects
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::copy_objects(
   object_mapt &dest,
   const object_mapt &src) const
@@ -331,18 +262,6 @@ void value_set_fivrnst::copy_objects(
                                      from_target_index));
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::get_value_set(
   const exprt &expr,
@@ -362,18 +281,6 @@ void value_set_fivrnst::get_value_set(
   #endif
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::get_value_set(
   const exprt &expr,
   object_mapt &dest,
@@ -384,18 +291,6 @@ void value_set_fivrnst::get_value_set(
 
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::get_value_set_rec(
   const exprt &expr,
@@ -690,18 +585,6 @@ void value_set_fivrnst::get_value_set_rec(
   insert_from(dest, exprt(ID_unknown, original_type));
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::dereference_rec(
   const exprt &src,
   exprt &dest) const
@@ -720,18 +603,6 @@ void value_set_fivrnst::dereference_rec(
     dest=src;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_reference_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::get_reference_set(
   const exprt &expr,
   expr_sett &dest,
@@ -743,18 +614,6 @@ void value_set_fivrnst::get_reference_set(
   forall_objects(it, object_map.read())
     dest.insert(to_expr(it));
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_reference_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::get_reference_set_rec(
   const exprt &expr,
@@ -905,18 +764,6 @@ void value_set_fivrnst::get_reference_set_rec(
 
   insert_from(dest, exprt(ID_unknown, expr.type()));
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::assign(
   const exprt &lhs,
@@ -1076,18 +923,6 @@ void value_set_fivrnst::assign(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_free
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::do_free(
   const exprt &op,
   const namespacet &ns)
@@ -1165,18 +1000,6 @@ void value_set_fivrnst::do_free(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::assign_rec(
   const exprt &lhs,
@@ -1320,18 +1143,6 @@ void value_set_fivrnst::assign_rec(
     throw "assign NYI: `"+lhs.id_string()+"'";
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::do_function_call(
   const irep_idt &function,
   const exprt::operandst &arguments,
@@ -1399,18 +1210,6 @@ void value_set_fivrnst::do_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_end_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
@@ -1425,18 +1224,6 @@ void value_set_fivrnst::do_end_function(
 
   assign(lhs, rhs, ns);
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::apply_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::apply_code(
   const exprt &code,
@@ -1537,18 +1324,6 @@ void value_set_fivrnst::apply_code(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::insert_to(
   object_mapt &dest,
   unsigned n,
@@ -1590,18 +1365,6 @@ bool value_set_fivrnst::insert_to(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::insert_from(
   object_mapt &dest,
   unsigned n,
@@ -1642,18 +1405,6 @@ bool value_set_fivrnst::insert_from(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::object_map_dt::set_valid_at
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fivrnst::object_map_dt::set_valid_at(
   unsigned inx,
@@ -1726,18 +1477,6 @@ bool value_set_fivrnst::object_map_dt::set_valid_at(
   return true;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::object_map_dt::is_valid_at
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::object_map_dt::is_valid_at(
   unsigned inx,
   unsigned f,
@@ -1768,18 +1507,6 @@ bool value_set_fivrnst::object_map_dt::is_valid_at(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::handover
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fivrnst::handover(void)
 {

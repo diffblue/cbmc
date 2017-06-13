@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Find module symbol using name
+
 #ifndef CPROVER_UTIL_GET_MODULE_H
 #define CPROVER_UTIL_GET_MODULE_H
 

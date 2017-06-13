@@ -11,18 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_parser.h"
 
-/*******************************************************************\
-
-Function: smt2_parsert::is_simple_symbol_character
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool smt2_parsert::is_simple_symbol_character(char ch)
 {
   // any non-empty sequence of letters, digits and the characters
@@ -35,18 +23,6 @@ bool smt2_parsert::is_simple_symbol_character(char ch)
      ch=='+' || ch=='=' || ch=='<' || ch=='>' || ch=='.' ||
      ch=='?' || ch=='/';
 }
-
-/*******************************************************************\
-
-Function: smt2_parsert::get_simple_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_parsert::get_simple_symbol()
 {
@@ -73,18 +49,6 @@ void smt2_parsert::get_simple_symbol()
   // eof -- this is ok here
 }
 
-/*******************************************************************\
-
-Function: smt2_parsert::get_decimal_numeral
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_parsert::get_decimal_numeral()
 {
   // we accept any sequence of digits and dots
@@ -107,18 +71,6 @@ void smt2_parsert::get_decimal_numeral()
 
   // eof -- this is ok here
 }
-
-/*******************************************************************\
-
-Function: smt2_parsert::get_bin_numeral
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_parsert::get_bin_numeral()
 {
@@ -145,18 +97,6 @@ void smt2_parsert::get_bin_numeral()
   // eof -- this is ok here
 }
 
-/*******************************************************************\
-
-Function: smt2_parsert::get_hex_numeral
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_parsert::get_hex_numeral()
 {
   // we accept any sequence of '0'-'9', 'a'-'f', 'A'-'F'
@@ -182,18 +122,6 @@ void smt2_parsert::get_hex_numeral()
   // eof -- this is ok here
 }
 
-/*******************************************************************\
-
-Function: smt2_parsert::get_quoted_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_parsert::get_quoted_symbol()
 {
   // any sequence of printable ASCII characters (including space,
@@ -213,18 +141,6 @@ void smt2_parsert::get_quoted_symbol()
 
   // Hmpf. Eof before end of quoted string. This is an error.
 }
-
-/*******************************************************************\
-
-Function: smt2_parsert::get_string_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_parsert::get_string_literal()
 {
@@ -256,18 +172,6 @@ void smt2_parsert::get_string_literal()
   // Hmpf. Eof before end of string literal. This is an error.
   error("EOF within string literal");
 }
-
-/*******************************************************************\
-
-Function: smt2_parsert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_parsert::operator()()
 {

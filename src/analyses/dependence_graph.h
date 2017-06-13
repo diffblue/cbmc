@@ -9,6 +9,9 @@ Date: August 2013
 
 \*******************************************************************/
 
+/// \file
+/// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
+
 #ifndef CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 #define CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 

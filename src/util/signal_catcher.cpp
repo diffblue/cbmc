@@ -28,18 +28,6 @@ Date:
 std::vector<pid_t> pids_of_children;
 #endif
 
-/*******************************************************************\
-
-Function: install_signal_catcher
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void install_signal_catcher()
 {
   #if defined(_WIN32)
@@ -57,18 +45,6 @@ void install_signal_catcher()
   #endif
 }
 
-/*******************************************************************\
-
-Function: remove_signal_catcher
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_signal_catcher()
 {
   #if defined(_WIN32)
@@ -84,18 +60,6 @@ void remove_signal_catcher()
   sigaction(SIGTERM, &act, NULL);
   #endif
 }
-
-/*******************************************************************\
-
-Function: signal_catcher
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void signal_catcher(int sig)
 {

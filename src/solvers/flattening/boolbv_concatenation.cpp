@@ -8,18 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_concatenation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_concatenation(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());

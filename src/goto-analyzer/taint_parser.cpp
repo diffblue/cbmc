@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Taint Parser
+
 #include <ostream>
 
 #include <util/string2int.h>
@@ -13,18 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <json/json_parser.h>
 
 #include "taint_parser.h"
-
-/*******************************************************************\
-
-Function: taint_parser
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool taint_parser(
   const std::string &file_name,
@@ -131,18 +122,6 @@ bool taint_parser(
   return false;
 }
 
-/*******************************************************************\
-
-Function: taint_parse_treet::rulet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void taint_parse_treet::rulet::output(std::ostream &out) const
 {
   if(!id.empty())
@@ -167,18 +146,6 @@ void taint_parse_treet::rulet::output(std::ostream &out) const
 
   out << '\n';
 }
-
-/*******************************************************************\
-
-Function: taint_parse_treet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void taint_parse_treet::output(std::ostream &out) const
 {

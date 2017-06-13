@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
@@ -17,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <langapi/language_util.h>
 #endif
-
-/*******************************************************************\
-
-Function: path_symex_statet::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
@@ -54,18 +45,6 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
 
   return tmp5;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::expand_structs_and_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 {
@@ -180,18 +159,6 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
   return src;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::array_theory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
 {
   // top-level constant-sized arrays only right now
@@ -243,18 +210,6 @@ exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
 
   return src;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
@@ -347,18 +302,6 @@ exprt path_symex_statet::instantiate_rec(
 
   return src2;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::read_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::read_symbol_member_index(
   const exprt &src,
@@ -474,18 +417,6 @@ exprt path_symex_statet::read_symbol_member_index(
   }
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::is_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool path_symex_statet::is_symbol_member_index(const exprt &src) const
 {
   const typet final_type=src.type();
@@ -539,18 +470,6 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
   }
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::array_index_as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string path_symex_statet::array_index_as_string(const exprt &src) const
 {
   exprt tmp=simplify_expr(src, var_map.ns);
@@ -561,18 +480,6 @@ std::string path_symex_statet::array_index_as_string(const exprt &src) const
   else
     return "[*]";
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::dereference_rec(
   const exprt &src,
@@ -609,18 +516,6 @@ exprt path_symex_statet::dereference_rec(
 
   return src2;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::instantiate_rec_address(
   const exprt &src,

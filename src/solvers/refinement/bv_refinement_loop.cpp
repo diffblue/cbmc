@@ -12,18 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_refinement.h"
 
-/*******************************************************************\
-
-Function: bv_refinementt::bv_refinementt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bv_refinementt::bv_refinementt(
   const namespacet &_ns, propt &_prop):
   bv_pointerst(_ns, _prop),
@@ -37,33 +25,9 @@ bv_refinementt::bv_refinementt(
   assert(prop.has_is_in_conflict());
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::~bv_refinementt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bv_refinementt::~bv_refinementt()
 {
 }
-
-/*******************************************************************\
-
-Function: bv_refinementt::dec_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt bv_refinementt::dec_solve()
 {
@@ -125,18 +89,6 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 decision_proceduret::resultt bv_refinementt::prop_solve()
 {
   // this puts the underapproximations into effect
@@ -167,18 +119,6 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::check_SAT
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_refinementt::check_SAT()
 {
   progress=false;
@@ -192,18 +132,6 @@ void bv_refinementt::check_SAT()
     check_SAT(*a_it);
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::check_UNSAT
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_refinementt::check_UNSAT()
 {
   progress=false;
@@ -214,18 +142,6 @@ void bv_refinementt::check_UNSAT()
       a_it++)
     check_UNSAT(*a_it);
 }
-
-/*******************************************************************\
-
-Function: bv_refinementt::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_refinementt::set_to(const exprt &expr, bool value)
 {
@@ -244,18 +160,6 @@ void bv_refinementt::set_to(const exprt &expr, bool value)
   SUB::set_to(expr, value);
   #endif
 }
-
-/*******************************************************************\
-
-Function: bv_refinementt::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_refinementt::set_assumptions(const bvt &_assumptions)
 {

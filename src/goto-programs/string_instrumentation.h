@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// String Abstraction
+
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_INSTRUMENTATION_H
 
