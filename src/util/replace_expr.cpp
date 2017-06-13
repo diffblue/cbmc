@@ -8,6 +8,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "replace_expr.h"
 
+/*******************************************************************\
+
+Function: replace_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool replace_expr(const exprt &what, const exprt &by, exprt &dest)
 {
   if(dest==what)
@@ -23,6 +35,18 @@ bool replace_expr(const exprt &what, const exprt &by, exprt &dest)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: replace_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool replace_expr(const replace_mapt &what, exprt &dest)
 {

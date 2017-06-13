@@ -13,6 +13,18 @@ Revisions: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 
 #include "smt1_prop.h"
 
+/*******************************************************************\
+
+Function: smt1_propt::smt1_propt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 smt1_propt::smt1_propt(
   const std::string &benchmark,
   const std::string &source,
@@ -26,9 +38,33 @@ smt1_propt::smt1_propt(
   _no_variables=0;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::~smt1_propt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 smt1_propt::~smt1_propt()
 {
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void smt1_propt::finalize()
 {
@@ -36,6 +72,18 @@ void smt1_propt::finalize()
   out << ":formula true" << "\n";
   out << ") ; benchmark" << "\n";
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::land
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt1_propt::land(const bvt &bv)
 {
@@ -54,6 +102,18 @@ literalt smt1_propt::land(const bvt &bv)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::lor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::lor(const bvt &bv)
 {
   out << "\n";
@@ -70,6 +130,18 @@ literalt smt1_propt::lor(const bvt &bv)
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::lxor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt1_propt::lxor(const bvt &bv)
 {
@@ -92,6 +164,18 @@ literalt smt1_propt::lxor(const bvt &bv)
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::land
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt1_propt::land(literalt a, literalt b)
 {
@@ -119,6 +203,18 @@ literalt smt1_propt::land(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::lor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::lor(literalt a, literalt b)
 {
   if(a==const_literal(false))
@@ -145,6 +241,18 @@ literalt smt1_propt::lor(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::lxor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false))
@@ -169,25 +277,85 @@ literalt smt1_propt::lxor(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::lnand
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::lnand(literalt a, literalt b)
 {
   return !land(a, b);
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::lnor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt1_propt::lnor(literalt a, literalt b)
 {
   return !lor(a, b);
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::lequal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::lequal(literalt a, literalt b)
 {
   return !lxor(a, b);
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::limplies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::limplies(literalt a, literalt b)
 {
   return lor(!a, b);
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::lselect
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt1_propt::lselect(literalt a, literalt b, literalt c)
 {
@@ -219,6 +387,18 @@ literalt smt1_propt::lselect(literalt a, literalt b, literalt c)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::new_variable
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt1_propt::new_variable()
 {
   literalt l;
@@ -229,6 +409,18 @@ literalt smt1_propt::new_variable()
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void smt1_propt::lcnf(const bvt &bv)
 {
@@ -253,6 +445,18 @@ void smt1_propt::lcnf(const bvt &bv)
   out << "\n";
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::smt1_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string smt1_propt::smt1_literal(literalt l)
 {
   if(l==const_literal(false))
@@ -268,6 +472,18 @@ std::string smt1_propt::smt1_literal(literalt l)
   return v;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 tvt smt1_propt::l_get(literalt literal) const
 {
   if(literal.is_true())
@@ -282,6 +498,18 @@ tvt smt1_propt::l_get(literalt literal) const
   return literal.sign()?!r:r;
 }
 
+/*******************************************************************\
+
+Function: smt1_propt::set_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void smt1_propt::set_assignment(literalt literal, bool value)
 {
   if(literal.is_true() || literal.is_false())
@@ -291,6 +519,18 @@ void smt1_propt::set_assignment(literalt literal, bool value)
   assert(v<assignment.size());
   assignment[v]=tvt(value);
 }
+
+/*******************************************************************\
+
+Function: smt1_propt::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt smt1_propt::prop_solve()
 {

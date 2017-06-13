@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// GOTO-DIFF Main Module
-
 #include <util/unicode.h>
 
 #ifdef IREP_HASH_STATS
@@ -16,6 +13,18 @@ Author: Peter Schrammel
 #endif
 
 #include "goto_diff_parse_options.h"
+
+/*******************************************************************\
+
+Function: main / wmain
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #ifdef IREP_HASH_STATS
 extern unsigned long long irep_hash_cnt;

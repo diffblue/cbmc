@@ -6,16 +6,24 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <util/arith_tools.h>
 
 #include <ansi-c/c_types.h>
 
 #include "cpp_typecheck.h"
 
-/// \return typechecked code
+/*******************************************************************\
+
+Function: cpp_typecheckt::cpp_destructor
+
+  Inputs:
+
+ Outputs: typechecked code
+
+ Purpose:
+
+\*******************************************************************/
+
 codet cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const typet &type,

@@ -8,9 +8,6 @@ Date: September 2011
 
 \*******************************************************************/
 
-/// \file
-/// Memory-mapped I/O Instrumentation for Goto Programs
-
 #ifndef CPROVER_GOTO_INSTRUMENT_CALL_SEQUENCES_H
 #define CPROVER_GOTO_INSTRUMENT_CALL_SEQUENCES_H
 

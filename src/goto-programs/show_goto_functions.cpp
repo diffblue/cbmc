@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// Show goto functions
-
 #include <iostream>
 
 #include <util/xml.h>
@@ -25,6 +22,18 @@ Author: Peter Schrammel
 #include "show_goto_functions.h"
 #include "goto_functions.h"
 #include "goto_model.h"
+
+/*******************************************************************\
+
+Function: cbmc_parseoptionst::show_goto_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void show_goto_functions(
   const namespacet &ns,
@@ -52,6 +61,18 @@ void show_goto_functions(
     break;
   }
 }
+
+/*******************************************************************\
+
+Function: show_goto_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void show_goto_functions(
   const goto_modelt &goto_model,

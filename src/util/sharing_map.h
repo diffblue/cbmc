@@ -6,9 +6,6 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
-/// \file
-/// Sharing map
-
 #ifndef CPROVER_UTIL_SHARING_MAP_H
 #define CPROVER_UTIL_SHARING_MAP_H
 
@@ -214,6 +211,18 @@ protected:
   void gather_all(const node_type &n, delta_viewt &delta_view) const;
 };
 
+/*******************************************************************\
+
+Function: get_view
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT(void)::get_view(viewt &view) const
 {
   assert(view.empty());
@@ -250,6 +259,18 @@ SHARING_MAPT(void)::get_view(viewt &view) const
   while(!stack.empty());
 }
 
+/*******************************************************************\
+
+Function: gather_all
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT(void)::gather_all(const node_type &n, delta_viewt &delta_view)
   const
 {
@@ -285,6 +306,18 @@ SHARING_MAPT(void)::gather_all(const node_type &n, delta_viewt &delta_view)
   }
   while(!stack.empty());
 }
+
+/*******************************************************************\
+
+Function: get_delta_view
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT(void)::get_delta_view(
   const self_type &other,
@@ -392,6 +425,18 @@ SHARING_MAPT(void)::get_delta_view(
   while(!stack.empty());
 }
 
+/*******************************************************************\
+
+Function: get_container_node
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(, node_type *)::get_container_node(const key_type &k)
 {
   size_t key=hash()(k);
@@ -407,6 +452,18 @@ SHARING_MAPT2(, node_type *)::get_container_node(const key_type &k)
 
   return p;
 }
+
+/*******************************************************************\
+
+Function: get_container_node
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(const, node_type *)::get_container_node(const key_type &k) const
 {
@@ -428,6 +485,18 @@ SHARING_MAPT2(const, node_type *)::get_container_node(const key_type &k) const
   return p;
 }
 
+/*******************************************************************\
+
+Function: get_leaf_node
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(const, node_type *)::get_leaf_node(const key_type &k) const
 {
   const node_type *p=get_container_node(k);
@@ -438,6 +507,18 @@ SHARING_MAPT2(const, node_type *)::get_leaf_node(const key_type &k) const
 
   return p;
 }
+
+/*******************************************************************\
+
+Function: erase
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, size_type)::erase(
   const key_type &k,
@@ -491,6 +572,18 @@ SHARING_MAPT2(, size_type)::erase(
   return 1;
 }
 
+/*******************************************************************\
+
+Function: erase_all
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(, size_type)::erase_all(
   const keyst &ks,
   const tvt &key_exists)
@@ -504,6 +597,18 @@ SHARING_MAPT2(, size_type)::erase_all(
 
   return cnt;
 }
+
+/*******************************************************************\
+
+Function: insert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, const_find_type)::insert(
   const key_type &k,
@@ -528,12 +633,36 @@ SHARING_MAPT2(, const_find_type)::insert(
   return const_find_type(as_const(p)->get_value(), true);
 }
 
+/*******************************************************************\
+
+Function: insert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(, const_find_type)::insert(
   const value_type &p,
   const tvt &key_exists)
 {
   return insert(p.first, p.second, key_exists);
 }
+
+/*******************************************************************\
+
+Function: place
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, find_type)::place(
   const key_type &k,
@@ -553,11 +682,35 @@ SHARING_MAPT2(, find_type)::place(
   return find_type(p->get_value(), true);
 }
 
+/*******************************************************************\
+
+Function: place
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(, find_type)::place(
   const value_type &p)
 {
   return place(p.first, p.second);
 }
+
+/*******************************************************************\
+
+Function: find
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, find_type)::find(
   const key_type &k,
@@ -578,6 +731,18 @@ SHARING_MAPT2(, find_type)::find(
 
 }
 
+/*******************************************************************\
+
+Function: find
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(, const_find_type)::find(const key_type &k) const
 {
   const node_type *p=get_leaf_node(k);
@@ -587,6 +752,18 @@ SHARING_MAPT2(, const_find_type)::find(const key_type &k) const
 
   return const_find_type(p->get_value(), true);
 }
+
+/*******************************************************************\
+
+Function: at
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, mapped_type &)::at(
   const key_type &k,
@@ -600,6 +777,18 @@ SHARING_MAPT2(, mapped_type &)::at(
   return r.first;
 }
 
+/*******************************************************************\
+
+Function: at
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 SHARING_MAPT2(const, mapped_type &)::at(const key_type &k) const
 {
   const_find_type r=find(k);
@@ -608,6 +797,18 @@ SHARING_MAPT2(const, mapped_type &)::at(const key_type &k) const
 
   return r.first;
 }
+
+/*******************************************************************\
+
+Function: operator[]
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 SHARING_MAPT2(, mapped_type &)::operator[](const key_type &k)
 {

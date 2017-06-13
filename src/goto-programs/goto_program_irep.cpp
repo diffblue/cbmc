@@ -8,14 +8,23 @@ Date: May 2007
 
 \*******************************************************************/
 
-/// \file
-/// goto_programt -> irep conversion
-
 #include <iostream>
 
 #include <util/string2int.h>
 
 #include "goto_program_irep.h"
+
+/*******************************************************************\
+
+Function: convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void convert(const goto_programt::instructiont &instruction, irept &irep)
 {
@@ -53,6 +62,18 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
   }
 }
 
+/*******************************************************************\
+
+Function: convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void convert(
   const irept &irep,
   goto_programt::instructiont &instruction)
@@ -73,6 +94,18 @@ void convert(
     instruction.labels.push_back(lsub.id());
 }
 
+/*******************************************************************\
+
+Function: convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void convert(const goto_programt &program, irept &irep)
 {
   irep.id("goto-program");
@@ -83,6 +116,18 @@ void convert(const goto_programt &program, irept &irep)
     convert(*it, irep.get_sub().back());
   }
 }
+
+/*******************************************************************\
+
+Function: convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void convert(const irept &irep, goto_programt &program)
 {

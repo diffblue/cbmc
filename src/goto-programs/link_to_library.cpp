@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Library Linking
-
 #include <util/config.h>
 
 #include <ansi-c/cprover_library.h>
@@ -16,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "link_to_library.h"
 #include "compute_called_functions.h"
 #include "goto_convert_functions.h"
+
+/*******************************************************************\
+
+Function: link_to_library
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void link_to_library(
   goto_modelt &goto_model,
@@ -26,6 +35,18 @@ void link_to_library(
     goto_model.goto_functions,
     message_handler);
 }
+
+/*******************************************************************\
+
+Function: link_to_library
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void link_to_library(
   symbol_tablet &symbol_table,

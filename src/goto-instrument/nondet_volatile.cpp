@@ -8,13 +8,22 @@ Date: September 2011
 
 \*******************************************************************/
 
-/// \file
-/// Volatile Variables
-
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include "nondet_volatile.h"
+
+/*******************************************************************\
+
+Function: is_volatile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool is_volatile(
   const symbol_tablet &symbol_table,
@@ -33,6 +42,18 @@ bool is_volatile(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: nondet_volatile_rhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
 {
@@ -53,6 +74,18 @@ void nondet_volatile_rhs(const symbol_tablet &symbol_table, exprt &expr)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: nondet_volatile_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr)
 {
@@ -76,6 +109,18 @@ void nondet_volatile_lhs(const symbol_tablet &symbol_table, exprt &expr)
     nondet_volatile_rhs(symbol_table, to_dereference_expr(expr).pointer());
   }
 }
+
+/*******************************************************************\
+
+Function: nondet_volatile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void nondet_volatile(
   symbol_tablet &symbol_table,
@@ -118,6 +163,18 @@ void nondet_volatile(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: nondet_volatile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void nondet_volatile(
   symbol_tablet &symbol_table,

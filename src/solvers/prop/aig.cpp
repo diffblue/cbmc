@@ -12,21 +12,69 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "aig.h"
 
+/*******************************************************************\
+
+Function: aigt::label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string aigt::label(nodest::size_type v) const
 {
   return "var("+std::to_string(v)+")";
 }
+
+/*******************************************************************\
+
+Function: aigt::dot_label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string aigt::dot_label(nodest::size_type v) const
 {
   return "var("+std::to_string(v)+")";
 }
 
+/*******************************************************************\
+
+Function: aigt::get_terminals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void aigt::get_terminals(terminalst &terminals) const
 {
   for(nodest::size_type n=0; n<nodes.size(); n++)
     get_terminals_rec(n, terminals);
 }
+
+/*******************************************************************\
+
+Function: aigt::get_terminals_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const aigt::terminal_sett &aigt::get_terminals_rec(
   literalt::var_not n,
@@ -65,6 +113,18 @@ const aigt::terminal_sett &aigt::get_terminals_rec(
 
   return t;
 }
+
+/*******************************************************************\
+
+Function: aigt::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void aigt::print(
   std::ostream &out,
@@ -111,6 +171,18 @@ void aigt::print(
   }
 }
 
+/*******************************************************************\
+
+Function: aigt::output_dot_node
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void aigt::output_dot_node(
   std::ostream &out,
   nodest::size_type v) const
@@ -129,6 +201,18 @@ void aigt::output_dot_node(
         << ",shape=box]" << "\n";
   }
 }
+
+/*******************************************************************\
+
+Function: aigt::output_dot_edge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void aigt::output_dot_edge(
   std::ostream &out,
@@ -154,6 +238,18 @@ void aigt::output_dot_edge(
   out << "\n";
 }
 
+/*******************************************************************\
+
+Function: aigt::output_dot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void aigt::output_dot(std::ostream &out) const
 {
   // constant TRUE
@@ -163,6 +259,18 @@ void aigt::output_dot(std::ostream &out) const
   for(nodest::size_type n=0; n<number_of_nodes(); n++)
     output_dot_node(out, n);
 }
+
+/*******************************************************************\
+
+Function: aigt::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void aigt::print(std::ostream &out) const
 {
@@ -175,6 +283,18 @@ void aigt::print(std::ostream &out) const
     out << "\n";
   }
 }
+
+/*******************************************************************\
+
+Function: operator <<
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::ostream &operator << (std::ostream &out, const aigt &aig)
 {

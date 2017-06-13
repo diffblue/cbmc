@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <util/fresh_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/c_types.h>
 
 #include "goto_convert_class.h"
+
+/*******************************************************************\
+
+Function: goto_convertt::make_compound_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,
@@ -59,6 +68,18 @@ symbol_exprt goto_convertt::make_compound_literal(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::needs_cleaning
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool goto_convertt::needs_cleaning(const exprt &expr)
 {
@@ -104,7 +125,18 @@ bool goto_convertt::needs_cleaning(const exprt &expr)
   return false;
 }
 
-/// re-write boolean operators into ?:
+/*******************************************************************\
+
+Function: goto_convertt::rewrite_boolean
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: re-write boolean operators into ?:
+
+\*******************************************************************/
+
 void goto_convertt::rewrite_boolean(exprt &expr)
 {
   assert(expr.id()==ID_and || expr.id()==ID_or);
@@ -159,6 +191,18 @@ void goto_convertt::rewrite_boolean(exprt &expr)
 
   expr.swap(tmp);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::clean_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::clean_expr(
   exprt &expr,
@@ -437,6 +481,18 @@ void goto_convertt::clean_expr(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::clean_expr_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::clean_expr_address_of(
   exprt &expr,
   goto_programt &dest)
@@ -499,6 +555,18 @@ void goto_convertt::clean_expr_address_of(
     Forall_operands(it, expr)
       clean_expr_address_of(*it, dest);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::remove_gcc_conditional_expression
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::remove_gcc_conditional_expression(
   exprt &expr,

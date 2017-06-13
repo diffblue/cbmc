@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive may-alias analysis
-
 #ifndef CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 #define CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 
@@ -20,6 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "locals.h"
 #include "dirty.h"
 #include "local_cfg.h"
+
+/*******************************************************************\
+
+   Class: local_may_aliast
+
+ Purpose:
+
+\*******************************************************************/
 
 class local_may_aliast
 {

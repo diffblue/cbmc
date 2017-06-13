@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Bounded Model Checking for ANSI-C
-
 #ifndef CPROVER_CBMC_SYMEX_BMC_H
 #define CPROVER_CBMC_SYMEX_BMC_H
 

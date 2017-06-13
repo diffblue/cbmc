@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Format vector of numbers into a compressed range
-
 #ifndef CPROVER_UTIL_FORMAT_NUMBER_RANGE_H
 #define CPROVER_UTIL_FORMAT_NUMBER_RANGE_H
 

@@ -14,6 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "std_expr.h"
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_boolean
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_boolean(exprt &expr)
 {
   if(!expr.has_operands())
@@ -186,6 +198,18 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_not
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_not(exprt &expr)
 {

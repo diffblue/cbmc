@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Property Checker Interface
-
 #include "property_checker.h"
+
+/*******************************************************************\
+
+Function: property_checkert::as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string property_checkert::as_string(resultt result)
 {
@@ -24,11 +33,35 @@ std::string property_checkert::as_string(resultt result)
   return "";
 }
 
+/*******************************************************************\
+
+Function: property_checkert::property_checkert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 property_checkert::property_checkert(
   message_handlert &_message_handler):
   messaget(_message_handler)
 {
 }
+
+/*******************************************************************\
+
+Function: property_checkert::initialize_property_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void property_checkert::initialize_property_map(
   const goto_functionst &goto_functions)

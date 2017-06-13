@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <cstdlib>
 
 #include <util/config.h>
@@ -22,26 +19,35 @@ Author:
 
 #include "cpp_typecheck.h"
 
-/// Lvalue-to-rvalue conversion
-///
-///  An lvalue (3.10) of a non-function, non-array type T can be
-///  converted to an rvalue. If T is an incomplete type, a program
-///  that necessitates this conversion is ill-formed. If the object
-///  to which the lvalue refers is not an object of type T and is
-///  not an object of a type derived from T, or if the object is
-///  uninitialized, a program that necessitates this conversion has
-///  undefined behavior. If T is a non-class type, the type of the
-///  rvalue is the cv-unqualified version of T. Otherwise, the type of
-///  the rvalue is T.
-///
-///  The value contained in the object indicated by the lvalue
-///  is the rvalue result. When an lvalue-to-rvalue conversion
-///  occurs within the operand of sizeof (5.3.3) the value contained
-///  in the referenced object is not accessed, since that operator
-///  does not evaluate its operand.
-/// \par parameters: A typechecked  lvalue expression
-/// \return True iff the lvalue-to-rvalue conversion is possible. 'new_type'
-///   contains the result of the conversion.
+/*******************************************************************\
+
+Function: standard_conversion_lvalue_to_rvalue
+
+  Inputs: A typechecked  lvalue expression
+
+  Outputs: True iff the lvalue-to-rvalue conversion is possible.
+           'new_type' contains the result of the conversion.
+
+  Purpose: Lvalue-to-rvalue conversion
+
+  An lvalue (3.10) of a non-function, non-array type T can be
+  converted to an rvalue. If T is an incomplete type, a program
+  that necessitates this conversion is ill-formed. If the object
+  to which the lvalue refers is not an object of type T and is
+  not an object of a type derived from T, or if the object is
+  uninitialized, a program that necessitates this conversion has
+  undefined behavior. If T is a non-class type, the type of the
+  rvalue is the cv-unqualified version of T. Otherwise, the type of
+  the rvalue is T.
+
+  The value contained in the object indicated by the lvalue
+  is the rvalue result. When an lvalue-to-rvalue conversion
+  occurs within the operand of sizeof (5.3.3) the value contained
+  in the referenced object is not accessed, since that operator
+  does not evaluate its operand.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
   const exprt &expr,
   exprt &new_expr) const
@@ -59,14 +65,23 @@ bool cpp_typecheckt::standard_conversion_lvalue_to_rvalue(
   return true;
 }
 
-/// Array-to-pointer conversion
-///
-/// An lvalue or rvalue of type "array of N T" or "array of unknown
-/// bound of T" can be converted to an rvalue of type "pointer to T."
-/// The result is a pointer to the first element of the array.
-/// \par parameters: An array expression
-/// \return True iff the array-to-pointer conversion is possible. The result of
-///   the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_array_to_pointer
+
+  Inputs: An array expression
+
+  Outputs: True iff the array-to-pointer conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Array-to-pointer conversion
+
+  An lvalue or rvalue of type "array of N T" or "array of unknown
+  bound of T" can be converted to an rvalue of type "pointer to T."
+  The result is a pointer to the first element of the array.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_array_to_pointer(
   const exprt &expr,
   exprt &new_expr) const
@@ -86,13 +101,23 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
   return true;
 }
 
-/// Function-to-pointer conversion
-///
-/// An lvalue of function type T can be converted to an rvalue of type
-/// "pointer to T." The result is a pointer to the function.50)
-/// \par parameters: A function expression
-/// \return True iff the array-to-pointer conversion is possible. The result of
-///   the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_function_to_pointer
+
+  Inputs: A function expression
+
+  Outputs: True iff the array-to-pointer conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+
+  Purpose:  Function-to-pointer conversion
+
+  An lvalue of function type T can be converted to an rvalue of type
+  "pointer to T." The result is a pointer to the function.50)
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_function_to_pointer(
   const exprt &expr, exprt &new_expr) const
 {
@@ -111,11 +136,20 @@ bool cpp_typecheckt::standard_conversion_function_to_pointer(
   return true;
 }
 
-/// Qualification conversion
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'
-/// \return True iff the qualification conversion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_qualification
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'
+
+ Outputs: True iff the qualification conversion is possible.
+          The result of the conversion is stored in 'new_expr'.
+
+ Purpose: Qualification conversion
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_qualification(
   const exprt &expr,
   const typet &type,
@@ -169,31 +203,40 @@ bool cpp_typecheckt::standard_conversion_qualification(
   return false;
 }
 
-/// Integral-promotion conversion
-///
-/// An rvalue of type char, signed char, unsigned char, short int,
-/// or unsigned short int can be converted to an rvalue of type int
-/// if int can represent all the values of the source type; otherwise,
-/// the source rvalue can be converted to an rvalue of type unsigned int.
-///
-/// An rvalue of type wchar_t (3.9.1) or an enumeration type (7.2) can
-/// be converted to an rvalue of the first of the following types that
-/// can represent all the values of its underlying type: int, unsigned int,
-/// long, or unsigned long.
-///
-/// An rvalue for an integral bit-field (9.6) can be converted
-/// to an rvalue of type int if int can represent all the values of the
-/// bit-field; otherwise, it can be converted to unsigned int if
-/// unsigned int can represent all the values of the bit-field.
-/// If the bit-field is larger yet, no integral promotion applies to
-/// it. If the bit-field has an enumerated type, it is treated as
-/// any other value of that type for promotion purposes.
-///
-/// An rvalue of type bool can be converted to an rvalue of type int,
-/// with false becoming zero and true becoming one.
-/// \par parameters: A typechecked expression 'expr'
-/// \return True iff the integral pormotion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_integral_promotion
+
+  Inputs: A typechecked expression 'expr'
+
+  Outputs: True iff the integral pormotion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Integral-promotion conversion
+
+  An rvalue of type char, signed char, unsigned char, short int,
+  or unsigned short int can be converted to an rvalue of type int
+  if int can represent all the values of the source type; otherwise,
+  the source rvalue can be converted to an rvalue of type unsigned int.
+
+  An rvalue of type wchar_t (3.9.1) or an enumeration type (7.2) can
+  be converted to an rvalue of the first of the following types that
+  can represent all the values of its underlying type: int, unsigned int,
+  long, or unsigned long.
+
+  An rvalue for an integral bit-field (9.6) can be converted
+  to an rvalue of type int if int can represent all the values of the
+  bit-field; otherwise, it can be converted to unsigned int if
+  unsigned int can represent all the values of the bit-field.
+  If the bit-field is larger yet, no integral promotion applies to
+  it. If the bit-field has an enumerated type, it is treated as
+  any other value of that type for promotion purposes.
+
+  An rvalue of type bool can be converted to an rvalue of type int,
+  with false becoming zero and true becoming one.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_integral_promotion(
   const exprt &expr,
   exprt &new_expr) const
@@ -239,13 +282,22 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   return false;
 }
 
-/// Floating-point-promotion conversion
-///
-/// An rvalue of type float can be converted to an rvalue of type
-/// double. The value is unchanged.
-/// \par parameters: A typechecked expression 'expr'
-/// \return True iff the integral promotion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_floating_point_promotion
+
+  Inputs: A typechecked expression 'expr'
+
+  Outputs: True iff the integral promotion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Floating-point-promotion conversion
+
+  An rvalue of type float can be converted to an rvalue of type
+  double. The value is unchanged.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_floating_point_promotion(
   const exprt &expr,
   exprt &new_expr) const
@@ -273,34 +325,43 @@ bool cpp_typecheckt::standard_conversion_floating_point_promotion(
   return true;
 }
 
-/// Integral conversion
-///
-/// An rvalue of type char, signed char, unsigned char, short int,
-/// An rvalue of an integer type can be converted to an rvalue of
-/// another integer type. An rvalue of an enumeration type can be
-/// converted to an rvalue of an integer type.
-///
-/// If the destination type is unsigned, the resulting value is the
-/// least unsigned integer congruent to the source integer (modulo
-/// 2n where n is the number of bits used to represent the unsigned
-/// type). [Note: In a two's complement representation, this
-/// conversion is conceptual and there is no change in the bit
-/// pattern (if there is no truncation). ]
-///
-/// If the destination type is signed, the value is unchanged if it
-/// can be represented in the destination type (and bit-field width);
-/// otherwise, the value is implementation-defined.
-///
-/// If the destination type is bool, see 4.12. If the source type is
-/// bool, the value false is converted to zero and the value true is
-/// converted to one.
-///
-/// The conversions allowed as integral promotions are excluded from
-/// the set of integral conversions.
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'
-/// \return True iff the integral pormotion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_integral_conversion
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'
+
+  Outputs: True iff the integral pormotion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Integral conversion
+
+  An rvalue of type char, signed char, unsigned char, short int,
+  An rvalue of an integer type can be converted to an rvalue of
+  another integer type. An rvalue of an enumeration type can be
+  converted to an rvalue of an integer type.
+
+  If the destination type is unsigned, the resulting value is the
+  least unsigned integer congruent to the source integer (modulo
+  2n where n is the number of bits used to represent the unsigned
+  type). [Note: In a two's complement representation, this
+  conversion is conceptual and there is no change in the bit
+  pattern (if there is no truncation). ]
+
+  If the destination type is signed, the value is unchanged if it
+  can be represented in the destination type (and bit-field width);
+  otherwise, the value is implementation-defined.
+
+  If the destination type is bool, see 4.12. If the source type is
+  bool, the value false is converted to zero and the value true is
+  converted to one.
+
+  The conversions allowed as integral promotions are excluded from
+  the set of integral conversions.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_integral_conversion(
   const exprt &expr,
   const typet &type,
@@ -328,25 +389,34 @@ bool cpp_typecheckt::standard_conversion_integral_conversion(
   return true;
 }
 
-/// Floating-integral conversion
-///
-/// An rvalue of a floating point type can be converted to an rvalue
-/// of an integer type. The conversion truncates; that is, the
-/// fractional part is discarded. The behavior is undefined if the
-/// truncated value cannot be represented in the destination type.
-/// [Note: If the destination type is bool, see 4.12. ]
-///
-/// An rvalue of an integer type or of an enumeration type can be
-/// converted to an rvalue of a floating point type. The result is
-/// exact if possible. Otherwise, it is an implementation-defined
-/// choice of either the next lower or higher representable value.
-/// [Note: loss of precision occurs if the integral value cannot be
-/// represented exactly as a value of the floating type. ] If the
-/// source type is bool, the value false is converted to zero and the
-/// value true is converted to one.
-/// \par parameters: A typechecked expression 'expr'
-/// \return True iff the conversion is possible. The result of the conversion is
-///   stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_floating_integral_conversion
+
+  Inputs: A typechecked expression 'expr'
+
+  Outputs: True iff the conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Floating-integral conversion
+
+  An rvalue of a floating point type can be converted to an rvalue
+  of an integer type. The conversion truncates; that is, the
+  fractional part is discarded. The behavior is undefined if the
+  truncated value cannot be represented in the destination type.
+  [Note: If the destination type is bool, see 4.12. ]
+
+  An rvalue of an integer type or of an enumeration type can be
+  converted to an rvalue of a floating point type. The result is
+  exact if possible. Otherwise, it is an implementation-defined
+  choice of either the next lower or higher representable value.
+  [Note: loss of precision occurs if the integral value cannot be
+  represented exactly as a value of the floating type. ] If the
+  source type is bool, the value false is converted to zero and the
+  value true is converted to one.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
   const exprt &expr,
   const typet &type,
@@ -383,22 +453,31 @@ bool cpp_typecheckt::standard_conversion_floating_integral_conversion(
 }
 
 
-/// Floating-point conversion
-///
-/// An rvalue of floating point type can be converted to an rvalue
-/// of another floating point type. If the source value can be exactly
-/// represented in the destination type, the result of the conversion
-/// is that exact representation. If the source value is between two
-/// adjacent destination values, the result of the conversion is an
-/// implementation-defined choice of either of those values. Otherwise,
-/// the behavior is undefined.
-///
-/// The conversions allowed as floating point promotions are excluded
-/// from the set of floating point conversions.
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'
-/// \return True iff the floating-point conversion is possible. The result of
-///   the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_floating_point_conversion
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'
+
+  Outputs: True iff the floating-point conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Floating-point conversion
+
+  An rvalue of floating point type can be converted to an rvalue
+  of another floating point type. If the source value can be exactly
+  represented in the destination type, the result of the conversion
+  is that exact representation. If the source value is between two
+  adjacent destination values, the result of the conversion is an
+  implementation-defined choice of either of those values. Otherwise,
+  the behavior is undefined.
+
+  The conversions allowed as floating point promotions are excluded
+  from the set of floating point conversions.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_floating_point_conversion(
   const exprt &expr,
   const typet &type,
@@ -425,38 +504,47 @@ bool cpp_typecheckt::standard_conversion_floating_point_conversion(
   return true;
 }
 
-/// Pointer conversion
-///
-/// A null pointer constant is an integral constant expression
-/// (5.19) rvalue of integer type that evaluates to zero. A null
-/// pointer constant can be converted to a pointer type; the result
-/// is the null pointer value of that type and is distinguishable
-/// from every other value of pointer to object or pointer to
-/// function type. Two null pointer values of the same type shall
-/// compare equal. The conversion of a null pointer constant to a
-/// pointer to cv-qualified type is a single conversion, and not the
-/// sequence of a pointer conversion followed by a qualification
-/// conversion (4.4).
-///
-/// An rvalue of type "pointer to cv T," where T is an object type,
-/// can be converted to an rvalue of type "pointer to cv void." The
-/// result of converting a "pointer to cv T" to a "pointer to cv
-/// void" points to the start of the storage location where the
-/// object of type T resides, as if the object is a most derived
-/// object (1.8) of type T (that is, not a base class subobject).
-///
-/// An rvalue of type "pointer to cv D," where D is a class type,
-/// can be converted to an rvalue of type "pointer to cv B," where
-/// B is a base class (clause 10) of D. If B is an inaccessible
-/// (clause 11) or ambiguous (10.2) base class of D, a program that
-/// necessitates this conversion is ill-formed. The result of the
-/// conversion is a pointer to the base class sub-object of the
-/// derived class object. The null pointer value is converted to
-/// the null pointer value of the destination type.
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'
-/// \return True iff the pointer conversion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_pointer
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'
+
+  Outputs: True iff the pointer conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  Pointer conversion
+
+  A null pointer constant is an integral constant expression
+  (5.19) rvalue of integer type that evaluates to zero. A null
+  pointer constant can be converted to a pointer type; the result
+  is the null pointer value of that type and is distinguishable
+  from every other value of pointer to object or pointer to
+  function type. Two null pointer values of the same type shall
+  compare equal. The conversion of a null pointer constant to a
+  pointer to cv-qualified type is a single conversion, and not the
+  sequence of a pointer conversion followed by a qualification
+  conversion (4.4).
+
+  An rvalue of type "pointer to cv T," where T is an object type,
+  can be converted to an rvalue of type "pointer to cv void." The
+  result of converting a "pointer to cv T" to a "pointer to cv
+  void" points to the start of the storage location where the
+  object of type T resides, as if the object is a most derived
+  object (1.8) of type T (that is, not a base class subobject).
+
+  An rvalue of type "pointer to cv D," where D is a class type,
+  can be converted to an rvalue of type "pointer to cv B," where
+  B is a base class (clause 10) of D. If B is an inaccessible
+  (clause 11) or ambiguous (10.2) base class of D, a program that
+  necessitates this conversion is ill-formed. The result of the
+  conversion is a pointer to the base class sub-object of the
+  derived class object. The null pointer value is converted to
+  the null pointer value of the destination type.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_pointer(
   const exprt &expr,
   const typet &type,
@@ -523,36 +611,46 @@ bool cpp_typecheckt::standard_conversion_pointer(
   return false;
 }
 
-/// Pointer-to-member conversion
-///
-/// A null pointer constant (4.10) can be converted to a pointer to
-/// member type; the result is the null member pointer value of that
-/// type and is distinguishable from any pointer to member not created
-/// from a null pointer constant. Two null member pointer values of
-/// the same type shall compare equal. The conversion of a null pointer
-/// constant to a pointer to member of cv-qualified type is a single
-/// conversion, and not the sequence of a pointer to member conversion
-/// followed by a qualification conversion (4.4).
-///
-/// An rvalue of type "pointer to member of B of type cv T," where B
-/// is a class type, can be converted to an rvalue of type "pointer
-/// to member of D of type cv T," where D is a derived class
-/// (clause 10) of B. If B is an inaccessible (clause 11), ambiguous
-/// (10.2) or virtual (10.1) base class of D, a program that
-/// necessitates this conversion is ill-formed. The result of the
-/// conversion refers to the same member as the pointer to member
-/// before the conversion took place, but it refers to the base class
-/// member as if it were a member of the derived class. The result
-/// refers to the member in D"s instance of B. Since the result has
-/// type "pointer to member of D of type cv T," it can be dereferenced
-/// with a D object. The result is the same as if the pointer to
-/// member of B were dereferenced with the B sub-object of D. The null
-/// member pointer value is converted to the null member pointer value
-/// of the destination type.52)
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'
-/// \return True iff the pointer-to-member conversion is possible. The result of
-///   the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_pointer_to_member
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'
+
+  Outputs: True iff the pointer-to-member conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+
+  Purpose:  Pointer-to-member conversion
+
+  A null pointer constant (4.10) can be converted to a pointer to
+  member type; the result is the null member pointer value of that
+  type and is distinguishable from any pointer to member not created
+  from a null pointer constant. Two null member pointer values of
+  the same type shall compare equal. The conversion of a null pointer
+  constant to a pointer to member of cv-qualified type is a single
+  conversion, and not the sequence of a pointer to member conversion
+  followed by a qualification conversion (4.4).
+
+  An rvalue of type "pointer to member of B of type cv T," where B
+  is a class type, can be converted to an rvalue of type "pointer
+  to member of D of type cv T," where D is a derived class
+  (clause 10) of B. If B is an inaccessible (clause 11), ambiguous
+  (10.2) or virtual (10.1) base class of D, a program that
+  necessitates this conversion is ill-formed. The result of the
+  conversion refers to the same member as the pointer to member
+  before the conversion took place, but it refers to the base class
+  member as if it were a member of the derived class. The result
+  refers to the member in D"s instance of B. Since the result has
+  type "pointer to member of D of type cv T," it can be dereferenced
+  with a D object. The result is the same as if the pointer to
+  member of B were dereferenced with the B sub-object of D. The null
+  member pointer value is converted to the null member pointer value
+  of the destination type.52)
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_pointer_to_member(
   const exprt &expr,
   const typet &type,
@@ -626,15 +724,25 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   return false;
 }
 
-/// Boolean conversion
-///
-/// An rvalue of arithmetic, enumeration, pointer, or pointer to
-/// member type can be converted to an rvalue of type bool.
-/// A zero value, null pointer value, or null member pointer value is
-/// converted to false; any other value is converted to true.
-/// \par parameters: A typechecked expression 'expr'
-/// \return True iff the boolean conversion is possible. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: standard_conversion_boolean
+
+  Inputs: A typechecked expression 'expr'
+
+  Outputs: True iff the boolean conversion is possible.
+           The result of the conversion is stored in 'new_expr'.
+
+
+  Purpose:  Boolean conversion
+
+  An rvalue of arithmetic, enumeration, pointer, or pointer to
+  member type can be converted to an rvalue of type bool.
+  A zero value, null pointer value, or null member pointer value is
+  converted to false; any other value is converted to true.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_boolean(
   const exprt &expr, exprt &new_expr) const
 {
@@ -658,26 +766,37 @@ bool cpp_typecheckt::standard_conversion_boolean(
   return true;
 }
 
-/// Standard Conversion Sequence
-///
-/// A standard conversion sequence is a sequence of standard conversions
-/// in the following order:
-///
-/// * Zero or one conversion from the following set: lvalue-to-rvalue
-///   conversion, array-to-pointer conversion, and function-to-pointer
-///   conversion.
-///
-/// * Zero or one conversion from the following set: integral
-///   promotions, floating point promotion, integral conversions,
-///   floating point conversions, floating-integral conversions,
-///   pointer conversions, pointer to member conversions, and boolean
-///   conversions.
-///
-/// * Zero or one qualification conversion.
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'.
-/// \return True iff a standard conversion sequence exists. The result of the
-///   conversion is stored in 'new_expr'. The reference 'rank' is incremented.
+/*******************************************************************\
+
+Function: standard_conversion_sequence
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'.
+
+  Outputs: True iff a standard conversion sequence exists.
+           The result of the conversion is stored in 'new_expr'.
+           The reference 'rank' is incremented.
+
+
+  Purpose:  Standard Conversion Sequence
+
+  A standard conversion sequence is a sequence of standard conversions
+  in the following order:
+
+  * Zero or one conversion from the following set: lvalue-to-rvalue
+    conversion, array-to-pointer conversion, and function-to-pointer
+    conversion.
+
+  * Zero or one conversion from the following set: integral
+    promotions, floating point promotion, integral conversions,
+    floating point conversions, floating-integral conversions,
+    pointer conversions, pointer to member conversions, and boolean
+    conversions.
+
+  * Zero or one qualification conversion.
+
+\*******************************************************************/
+
 bool cpp_typecheckt::standard_conversion_sequence(
   const exprt &expr,
   const typet &type,
@@ -843,11 +962,20 @@ bool cpp_typecheckt::standard_conversion_sequence(
   return true;
 }
 
-/// User-defined conversion sequence
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'.
-/// \return True iff a user-defined conversion sequence exists. The result of
-///   the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: user_defined_conversion_sequence
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'.
+
+  Outputs: True iff a user-defined conversion sequence exists.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  User-defined conversion sequence
+
+\*******************************************************************/
+
 bool cpp_typecheckt::user_defined_conversion_sequence(
   const exprt &expr,
   const typet &type,
@@ -1154,10 +1282,20 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   return new_expr.is_not_nil();
 }
 
-/// Reference-related
-/// \par parameters: A typechecked expression 'expr',
-/// a reference 'type'.
-/// \return True iff an the reference 'type' is reference-related to 'expr'.
+/*******************************************************************\
+
+Function: reference_related
+
+  Inputs: A typechecked expression 'expr',
+          a reference 'type'.
+
+  Outputs: True iff an the reference 'type' is reference-related
+           to 'expr'.
+
+  Purpose:  Reference-related
+
+\*******************************************************************/
+
 bool cpp_typecheckt::reference_related(
   const exprt &expr,
   const typet &type) const
@@ -1191,10 +1329,20 @@ bool cpp_typecheckt::reference_related(
   return false;
 }
 
-/// Reference-compatible
-/// \par parameters: A typechecked expression 'expr', a
-/// reference 'type'.
-/// \return True iff an the reference 'type' is reference-compatible to 'expr'.
+/*******************************************************************\
+
+Function: reference_compatible
+
+  Inputs: A typechecked expression 'expr', a
+          reference 'type'.
+
+  Outputs: True iff an the reference 'type' is reference-compatible
+           to 'expr'.
+
+  Purpose:  Reference-compatible
+
+\*******************************************************************/
+
 bool cpp_typecheckt::reference_compatible(
   const exprt &expr,
   const typet &type,
@@ -1224,40 +1372,50 @@ bool cpp_typecheckt::reference_compatible(
   return false;
 }
 
-/// Reference binding
-///
-/// When a parameter of reference type binds directly (8.5.3) to an
-/// argument expression, the implicit conversion sequence is the
-/// identity conversion, unless the argument expression has a type
-/// that is a derived class of the parameter type, in which case the
-/// implicit conversion sequence is a derived-to-base Conversion
-/// (13.3.3.1).
-///
-/// If the parameter binds directly to the result of applying a
-/// conversion function to the argument expression, the implicit
-/// conversion sequence is a user-defined conversion sequence
-/// (13.3.3.1.2), with the second standard conversion sequence
-/// either an identity conversion or, if the conversion function
-/// returns an entity of a type that is a derived class of the
-/// parameter type, a derived-to-base Conversion.
-///
-/// When a parameter of reference type is not bound directly to
-/// an argument expression, the conversion sequence is the one
-/// required to convert the argument expression to the underlying
-/// type of the reference according to 13.3.3.1. Conceptually, this
-/// conversion sequence corresponds to copy-initializing a temporary
-/// of the underlying type with the argument expression. Any
-/// difference in top-level cv-qualification is subsumed by the
-/// initialization itself and does not constitute a conversion.
-///
-/// A standard conversion sequence cannot be formed if it requires
-/// binding a reference to non-const to an rvalue (except when
-/// binding an implicit object parameter; see the special rules
-/// for that case in 13.3.1).
-/// \par parameters: A typechecked expression 'expr', a
-/// reference 'type'.
-/// \return True iff an the reference can be bound to the expression. The result
-///   of the conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: reference_binding
+
+  Inputs: A typechecked expression 'expr', a
+          reference 'type'.
+
+  Outputs: True iff an the reference can be bound to the expression.
+           The result of the conversion is stored in 'new_expr'.
+
+
+  Purpose:  Reference binding
+
+  When a parameter of reference type binds directly (8.5.3) to an
+  argument expression, the implicit conversion sequence is the
+  identity conversion, unless the argument expression has a type
+  that is a derived class of the parameter type, in which case the
+  implicit conversion sequence is a derived-to-base Conversion
+  (13.3.3.1).
+
+  If the parameter binds directly to the result of applying a
+  conversion function to the argument expression, the implicit
+  conversion sequence is a user-defined conversion sequence
+  (13.3.3.1.2), with the second standard conversion sequence
+  either an identity conversion or, if the conversion function
+  returns an entity of a type that is a derived class of the
+  parameter type, a derived-to-base Conversion.
+
+  When a parameter of reference type is not bound directly to
+  an argument expression, the conversion sequence is the one
+  required to convert the argument expression to the underlying
+  type of the reference according to 13.3.3.1. Conceptually, this
+  conversion sequence corresponds to copy-initializing a temporary
+  of the underlying type with the argument expression. Any
+  difference in top-level cv-qualification is subsumed by the
+  initialization itself and does not constitute a conversion.
+
+  A standard conversion sequence cannot be formed if it requires
+  binding a reference to non-const to an rvalue (except when
+  binding an implicit object parameter; see the special rules
+  for that case in 13.3.1).
+
+\*******************************************************************/
+
 bool cpp_typecheckt::reference_binding(
   exprt expr,
   const typet &type,
@@ -1461,12 +1619,21 @@ bool cpp_typecheckt::reference_binding(
   return false;
 }
 
-/// implicit conversion sequence
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'.
-/// \return True iff an implicit conversion sequence exists. The result of the
-///   conversion is stored in 'new_expr'. The rank of the sequence is stored in
-///   'rank'
+/*******************************************************************\
+
+Function: implicit_conversion_sequence
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'.
+
+  Outputs: True iff an implicit conversion sequence exists.
+           The result of the conversion is stored in 'new_expr'.
+           The rank of the sequence is stored in 'rank'
+
+  Purpose:  implicit conversion sequence
+
+\*******************************************************************/
+
 bool cpp_typecheckt::implicit_conversion_sequence(
   const exprt &expr,
   const typet &type,
@@ -1504,11 +1671,20 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   return true;
 }
 
-/// implicit conversion sequence
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'.
-/// \return True iff an implicit conversion sequence exists. The result of the
-///   conversion is stored in 'new_expr'.
+/*******************************************************************\
+
+Function: implicit_conversion_sequence
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'.
+
+  Outputs: True iff an implicit conversion sequence exists.
+           The result of the conversion is stored in 'new_expr'.
+
+  Purpose:  implicit conversion sequence
+
+\*******************************************************************/
+
 bool cpp_typecheckt::implicit_conversion_sequence(
   const exprt &expr,
   const typet &type,
@@ -1518,11 +1694,22 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
-/// implicit conversion sequence
-/// \par parameters: A typechecked expression 'expr', a destination
-/// type 'type'.
-/// \return True iff an implicit conversion sequence exists. The rank of the
-///   sequence is stored in 'rank'
+/*******************************************************************\
+
+Function: implicit_conversion_sequence
+
+  Inputs: A typechecked expression 'expr', a destination
+          type 'type'.
+
+  Outputs: True iff an implicit conversion sequence exists.
+           The rank of the sequence is stored in 'rank'
+
+
+  Purpose:  implicit conversion sequence
+
+
+\*******************************************************************/
+
 bool cpp_typecheckt::implicit_conversion_sequence(
   const exprt &expr,
   const typet &type,
@@ -1531,6 +1718,18 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   exprt new_expr;
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheck_baset::implicit_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
@@ -1551,48 +1750,61 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   }
 }
 
-/// A reference to type "cv1 T1" is initialized by an expression of
-/// type "cv2 T2" as follows:
-///
-/// - If the initializer expression
-///   - is an lvalue (but is not a bit-field), and "cv1 T1" is
-///     reference-compatible with "cv2 T2," or
-///   - has a class type (i.e., T2 is a class type) and can be
-///     implicitly converted to an lvalue of type "cv3 T3," where
-///     "cv1 T1" is reference-compatible with "cv3 T3" 92) (this
-///     conversion is selected by enumerating the applicable conversion
-///     functions (13.3.1.6) and choosing the best one through overload
-///     resolution (13.3)),
-///
-///   then the reference is bound directly to the initializer
-///   expression lvalue in the first case, and the reference is
-///   bound to the lvalue result of the conversion in the second
-///   case. In these cases the reference is said to bind directly
-///   to the initializer expression.
-///
-/// - Otherwise, the reference shall be to a non-volatile const type
-///   - If the initializer expression is an rvalue, with T2 a class
-///     type, and "cv1 T1" is reference-compatible with "cv2 T2," the
-///     reference is bound in one of the following ways (the choice is
-///     implementation-defined):
-///
-///     - The reference is bound to the object represented by the
-///       rvalue (see 3.10) or to a sub-object within that object.
-///
-///     - A temporary of type "cv1 T2" [sic] is created, and a
-///       constructor is called to copy the entire rvalue object into
-///       the temporary. The reference is bound to the temporary or
-///       to a sub-object within the temporary.
-///
-///     The constructor that would be used to make the copy shall be
-///     callable whether or not the copy is actually done.
-///
-///     Otherwise, a temporary of type "cv1 T1" is created and
-///     initialized from the initializer expression using the rules for
-///     a non-reference copy initialization (8.5). The reference is then
-///     bound to the temporary. If T1 is reference-related to T2, cv1
-///     must be the same cv-qualification as, or greater cvqualification
-///     than, cv2; otherwise, the program is ill-formed.
+/*******************************************************************\
+
+Function: cpp_typecheck_baset::reference_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+ A reference to type "cv1 T1" is initialized by an expression of
+ type "cv2 T2" as follows:
+
+ - If the initializer expression
+   - is an lvalue (but is not a bit-field), and "cv1 T1" is
+     reference-compatible with "cv2 T2," or
+   - has a class type (i.e., T2 is a class type) and can be
+     implicitly converted to an lvalue of type "cv3 T3," where
+     "cv1 T1" is reference-compatible with "cv3 T3" 92) (this
+     conversion is selected by enumerating the applicable conversion
+     functions (13.3.1.6) and choosing the best one through overload
+     resolution (13.3)),
+
+   then the reference is bound directly to the initializer
+   expression lvalue in the first case, and the reference is
+   bound to the lvalue result of the conversion in the second
+   case. In these cases the reference is said to bind directly
+   to the initializer expression.
+
+ - Otherwise, the reference shall be to a non-volatile const type
+   - If the initializer expression is an rvalue, with T2 a class
+     type, and "cv1 T1" is reference-compatible with "cv2 T2," the
+     reference is bound in one of the following ways (the choice is
+     implementation-defined):
+
+     - The reference is bound to the object represented by the
+       rvalue (see 3.10) or to a sub-object within that object.
+
+     - A temporary of type "cv1 T2" [sic] is created, and a
+       constructor is called to copy the entire rvalue object into
+       the temporary. The reference is bound to the temporary or
+       to a sub-object within the temporary.
+
+     The constructor that would be used to make the copy shall be
+     callable whether or not the copy is actually done.
+
+     Otherwise, a temporary of type "cv1 T1" is created and
+     initialized from the initializer expression using the rules for
+     a non-reference copy initialization (8.5). The reference is then
+     bound to the temporary. If T1 is reference-related to T2, cv1
+     must be the same cv-qualification as, or greater cvqualification
+     than, cv2; otherwise, the program is ill-formed.
+
+\*******************************************************************/
+
 void cpp_typecheckt::reference_initializer(
   exprt &expr,
   const typet &type)
@@ -1612,6 +1824,19 @@ void cpp_typecheckt::reference_initializer(
   error() << "bad reference initializer" << eom;
   throw 0;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::cast_away_constness
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+
+\*******************************************************************/
 
 bool cpp_typecheckt::cast_away_constness(
   const typet &t1,
@@ -1676,6 +1901,18 @@ bool cpp_typecheckt::cast_away_constness(
   return !standard_conversion_qualification(e1, snt2.back(), e2);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::const_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool cpp_typecheckt::const_typecast(
   const exprt &expr,
   const typet &type,
@@ -1735,6 +1972,18 @@ bool cpp_typecheckt::const_typecast(
   return false;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::dynamic_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool cpp_typecheckt::dynamic_typecast(
   const exprt &expr,
   const typet &type,
@@ -1786,6 +2035,18 @@ bool cpp_typecheckt::dynamic_typecast(
 
   return static_typecast(e, type, new_expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::reinterpret_typecastcast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cpp_typecheckt::reinterpret_typecast(
   const exprt &expr,
@@ -1890,6 +2151,18 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::static_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cpp_typecheckt::static_typecast(
   const exprt &expr, // source expression

@@ -8,9 +8,6 @@ Date:   September 2009
 
 \*******************************************************************/
 
-/// \file
-/// Remove function returns
-
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H
 

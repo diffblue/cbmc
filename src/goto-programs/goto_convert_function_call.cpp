@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <cassert>
 
 #include <util/replace_expr.h>
@@ -21,6 +18,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
+/*******************************************************************\
+
+Function: goto_convertt::convert_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::convert_function_call(
   const code_function_callt &function_call,
   goto_programt &dest)
@@ -31,6 +40,18 @@ void goto_convertt::convert_function_call(
     function_call.arguments(),
     dest);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_function_call(
   const exprt &lhs,
@@ -87,6 +108,18 @@ void goto_convertt::do_function_call(
     throw 0;
   }
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_function_call_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_function_call_if(
   const exprt &lhs,
@@ -151,6 +184,18 @@ void goto_convertt::do_function_call_if(
   dest.destructive_append(tmp_y);
   dest.destructive_append(tmp_z);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::do_function_call_other
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::do_function_call_other(
   const exprt &lhs,

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// mmcc Command Line Option Processing
-
 #ifndef CPROVER_MEMORY_MODELS_MMCC_PARSE_OPTIONS_H
 #define CPROVER_MEMORY_MODELS_MMCC_PARSE_OPTIONS_H
 

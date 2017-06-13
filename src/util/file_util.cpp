@@ -8,9 +8,6 @@ Date: January 2012
 
 \*******************************************************************/
 
-/// \file
-/// File Utilities
-
 #include <cerrno>
 
 #if defined(__linux__) || \
@@ -40,7 +37,18 @@ Date: January 2012
 
 #include "file_util.h"
 
-/// \return current working directory
+/*******************************************************************\
+
+Function: get_current_working_directory
+
+  Inputs: none
+
+ Outputs: current working directory
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string get_current_working_directory()
 {
   unsigned bsize=50;
@@ -63,7 +71,18 @@ std::string get_current_working_directory()
   return working_directory;
 }
 
-/// deletes all files in 'path' and then the directory itself
+/*******************************************************************\
+
+Function: delete_directory
+
+  Inputs: path
+
+ Outputs:
+
+ Purpose: deletes all files in 'path' and then the directory itself
+
+\*******************************************************************/
+
 #ifdef _WIN32
 
 void delete_directory_utf16(const std::wstring &path)
@@ -123,8 +142,19 @@ void delete_directory(const std::string &path)
 #endif
 }
 
-/// \par parameters: directory name and file name
-/// \return concatenation of directory and file, if the file path is relative
+/*******************************************************************\
+
+Function: concat_dir_file
+
+  Inputs: directory name and file name
+
+ Outputs: concatenation of directory and file, if the file path is
+          relative
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string concat_dir_file(
   const std::string &directory,
   const std::string &file_name)

@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// Fault Localization
-
 #ifndef CPROVER_CBMC_FAULT_LOCALIZATION_H
 #define CPROVER_CBMC_FAULT_LOCALIZATION_H
 

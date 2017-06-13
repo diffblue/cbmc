@@ -10,13 +10,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Generates string constraints to link results from string functions with
-///   their arguments. This is inspired by the PASS paper at HVC'13: "PASS:
-///   String Solving with Parameterized Array and Interval Automaton" by Guodong
-///   Li and Indradeep Ghosh, which gives examples of constraints for several
-///   functions.
-
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 

@@ -6,9 +6,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language Conversion
-
 #ifndef CPROVER_JSIL_JSIL_CONVERT_H
 #define CPROVER_JSIL_JSIL_CONVERT_H
 

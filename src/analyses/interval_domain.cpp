@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Interval Domain
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include "interval_domain.h"
+
+/*******************************************************************\
+
+Function: interval_domaint::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interval_domaint::output(
   std::ostream &out,
@@ -54,6 +63,18 @@ void interval_domaint::output(
     out << "\n";
   }
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::transform
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interval_domaint::transform(
   locationt from,
@@ -105,6 +126,18 @@ void interval_domaint::transform(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool interval_domaint::merge(
   const interval_domaint &b,
@@ -166,11 +199,35 @@ bool interval_domaint::merge(
   return result;
 }
 
+/*******************************************************************\
+
+Function: interval_domaint::assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void interval_domaint::assign(const code_assignt &code_assign)
 {
   havoc_rec(code_assign.lhs());
   assume_rec(code_assign.lhs(), ID_equal, code_assign.rhs());
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::havoc_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interval_domaint::havoc_rec(const exprt &lhs)
 {
@@ -193,6 +250,18 @@ void interval_domaint::havoc_rec(const exprt &lhs)
     havoc_rec(to_typecast_expr(lhs).op());
   }
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::assume_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &lhs, irep_idt id, const exprt &rhs)
@@ -308,12 +377,36 @@ void interval_domaint::assume_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: interval_domaint::assume_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void interval_domaint::assume(
   const exprt &cond,
   const namespacet &ns)
 {
   assume_rec(simplify_expr(cond, ns), false);
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::assume_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &cond,
@@ -360,6 +453,18 @@ void interval_domaint::assume_rec(
         assume_rec(*it, true);
   }
 }
+
+/*******************************************************************\
+
+Function: interval_domaint::make_expression
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt interval_domaint::make_expression(const symbol_exprt &src) const
 {

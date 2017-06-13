@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// GOTO-DIFF Base Class
-
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_H
 

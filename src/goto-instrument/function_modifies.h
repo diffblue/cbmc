@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Modifies
-
 #ifndef CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
 #define CPROVER_GOTO_INSTRUMENT_FUNCTION_MODIFIES_H
 

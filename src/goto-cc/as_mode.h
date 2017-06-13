@@ -8,9 +8,6 @@ Date: July 2016
 
 \*******************************************************************/
 
-/// \file
-/// Assembler Mode
-
 #ifndef CPROVER_GOTO_CC_AS_MODE_H
 #define CPROVER_GOTO_CC_AS_MODE_H
 

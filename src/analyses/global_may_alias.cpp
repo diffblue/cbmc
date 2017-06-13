@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive gobal may alias analysis
-
 #include "global_may_alias.h"
+
+/*******************************************************************\
+
+Function: global_may_alias_domaint::assign_lhs_aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void global_may_alias_domaint::assign_lhs_aliases(
   const exprt &lhs,
@@ -27,6 +36,18 @@ void global_may_alias_domaint::assign_lhs_aliases(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: global_may_alias_domaint::get_rhs_aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void global_may_alias_domaint::get_rhs_aliases(
   const exprt &rhs,
@@ -56,6 +77,18 @@ void global_may_alias_domaint::get_rhs_aliases(
   }
 }
 
+/*******************************************************************\
+
+Function: global_may_alias_domaint::get_rhs_aliases_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void global_may_alias_domaint::get_rhs_aliases_address_of(
   const exprt &rhs,
   std::set<irep_idt> &alias_set)
@@ -74,6 +107,18 @@ void global_may_alias_domaint::get_rhs_aliases_address_of(
   {
   }
 }
+
+/*******************************************************************\
+
+Function: global_may_alias_domaint::transform
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void global_may_alias_domaint::transform(
   locationt from,
@@ -118,6 +163,18 @@ void global_may_alias_domaint::transform(
   }
 }
 
+/*******************************************************************\
+
+Function: global_may_alias_domaint::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void global_may_alias_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -155,6 +212,18 @@ void global_may_alias_domaint::output(
       out << '\n';
   }
 }
+
+/*******************************************************************\
+
+Function: global_may_alias_domaint::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool global_may_alias_domaint::merge(
   const global_may_alias_domaint &b,

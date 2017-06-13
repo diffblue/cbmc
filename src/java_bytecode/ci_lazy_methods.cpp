@@ -6,28 +6,42 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Context-insensitive lazy methods container
-
 #include <string>
 
 #include "ci_lazy_methods.h"
 
-/// Notes `method_symbol_name` is referenced from some reachable function, and
-/// should therefore be elaborated.
-/// \par parameters: `method_symbol_name`: method name; must exist in symbol
-///   table.
+/*******************************************************************\
+
+Function: ci_lazy_methodst::add_needed_method
+
+  Inputs: `method_symbol_name`: method name; must exist in symbol table.
+
+ Outputs:
+
+ Purpose: Notes `method_symbol_name` is referenced from some reachable
+          function, and should therefore be elaborated.
+
+\*******************************************************************/
+
 void ci_lazy_methodst::add_needed_method(const irep_idt &method_symbol_name)
 {
   needed_methods.push_back(method_symbol_name);
 }
 
-/// Notes class `class_symbol_name` will be instantiated, or a static field
-/// belonging to it will be accessed. Also notes that its static initializer is
-/// therefore reachable.
-/// \par parameters: `class_symbol_name`: class name; must exist in symbol
-///   table.
-/// \return Returns true if `class_symbol_name` is new (not seen before).
+/*******************************************************************\
+
+Function: java_bytecode_parsert::parse
+
+  Inputs: `class_symbol_name`: class name; must exist in symbol table.
+
+ Outputs: Returns true if `class_symbol_name` is new (not seen before).
+
+ Purpose: Notes class `class_symbol_name` will be instantiated, or
+          a static field belonging to it will be accessed. Also notes
+          that its static initializer is therefore reachable.
+
+\*******************************************************************/
+
 bool ci_lazy_methodst::add_needed_class(const irep_idt &class_symbol_name)
 {
   if(!needed_classes.insert(class_symbol_name).second)

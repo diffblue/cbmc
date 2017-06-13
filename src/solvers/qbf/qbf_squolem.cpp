@@ -7,30 +7,87 @@ Author: CM Wintersteiger
 \*******************************************************************/
 
 
-/// \file
-/// Squolem Backend
-
 #include "qbf_squolem.h"
+
+/*******************************************************************\
+
+Function: qbf_squolemt::qbf_squolemt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 qbf_squolemt::qbf_squolemt():
   early_decision(false)
 {
 }
 
+/*******************************************************************\
+
+Function: qbf_squolemt::~qbf_squolemt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 qbf_squolemt::~qbf_squolemt()
 {
   squolem.reset();
 }
+
+/*******************************************************************\
+
+Function: qbf_squolemt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 tvt qbf_squolemt::l_get(literalt a) const
 {
   assert(false);
 }
 
+/*******************************************************************\
+
+Function: qbf_squolemt::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string qbf_squolemt::solver_text()
 {
   return "Squolem";
 }
+
+/*******************************************************************\
+
+Function: qbf_squolemt::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt qbf_squolemt::prop_solve()
 {
@@ -69,6 +126,18 @@ propt::resultt qbf_squolemt::prop_solve()
   return P_ERROR;
 }
 
+/*******************************************************************\
+
+Function: qbf_squolemt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void qbf_squolemt::lcnf(const bvt &bv)
 {
   if(early_decision)
@@ -98,6 +167,18 @@ void qbf_squolemt::lcnf(const bvt &bv)
     early_decision=true;
 }
 
+/*******************************************************************\
+
+Function: qbf_squolemt::add_quantifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void qbf_squolemt::add_quantifier(const quantifiert &quantifier)
 {
   squolem.quantifyVariableInner(
@@ -107,11 +188,35 @@ void qbf_squolemt::add_quantifier(const quantifiert &quantifier)
   qdimacs_cnft::add_quantifier(quantifier); // necessary?
 }
 
+/*******************************************************************\
+
+Function: qbf_squolemt::set_no_variables
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void qbf_squolemt::set_no_variables(unsigned no)
 {
   squolem.setLastVariable(no+1);
   cnft::set_no_variables(no);
 }
+
+/*******************************************************************\
+
+Function: qbf_squolemt::set_quantifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void qbf_squolemt::set_quantifier(
   const quantifiert::typet type,

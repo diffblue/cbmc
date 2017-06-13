@@ -8,6 +8,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_power
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_power(const binary_exprt &expr)
 {
   const typet &type=ns.follow(expr.type());

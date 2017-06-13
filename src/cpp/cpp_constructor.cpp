@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
@@ -17,8 +14,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
-/// \param non:typchecked object, non-typechecked operands
-/// \return typechecked code
+/*******************************************************************\
+
+Function: cpp_typecheckt::cpp_constructor
+
+  Inputs: non-typchecked object, non-typechecked operands
+
+ Outputs: typechecked code
+
+ Purpose:
+
+\*******************************************************************/
+
 codet cpp_typecheckt::cpp_constructor(
   const source_locationt &source_location,
   const exprt &object,
@@ -308,6 +315,18 @@ codet cpp_typecheckt::cpp_constructor(
   return nil;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::new_temporary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::new_temporary(
   const source_locationt &source_location,
   const typet &type,
@@ -339,6 +358,18 @@ void cpp_typecheckt::new_temporary(
 
   temporary.swap(tmp_object_expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::new_temporary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::new_temporary(
   const source_locationt &source_location,

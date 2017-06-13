@@ -6,12 +6,21 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// Memory model for partial order concurrency
-
 #include <util/std_expr.h>
 
 #include "memory_model_sc.h"
+
+/*******************************************************************\
+
+Function: memory_model_sct::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void memory_model_sct::operator()(symex_target_equationt &equation)
 {
@@ -26,11 +35,35 @@ void memory_model_sct::operator()(symex_target_equationt &equation)
   from_read(equation);
 }
 
+/*******************************************************************\
+
+Function: memory_model_sct::before
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt memory_model_sct::before(event_it e1, event_it e2)
 {
   return partial_order_concurrencyt::before(
     e1, e2, AX_PROPAGATION);
 }
+
+/*******************************************************************\
+
+Function: memory_model_sct::program_order_is_relaxed
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool memory_model_sct::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
@@ -41,6 +74,18 @@ bool memory_model_sct::program_order_is_relaxed(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: memory_model_sct::build_per_thread_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void memory_model_sct::build_per_thread_map(
   const symex_target_equationt &equation,
@@ -62,6 +107,18 @@ void memory_model_sct::build_per_thread_map(
     dest[e_it->source.thread_nr].push_back(e_it);
   }
 }
+
+/*******************************************************************\
+
+Function: memory_model_sct::thread_spawn
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void memory_model_sct::thread_spawn(
   symex_target_equationt &equation,
@@ -146,6 +203,18 @@ void memory_model_sct::thread_spawn(
 }
 #endif
 
+/*******************************************************************\
+
+Function: memory_model_sct::program_order
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void memory_model_sct::program_order(
   symex_target_equationt &equation)
 {
@@ -192,6 +261,18 @@ void memory_model_sct::program_order(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: memory_model_sct::write_serialization_external
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void memory_model_sct::write_serialization_external(
   symex_target_equationt &equation)
@@ -244,6 +325,18 @@ void memory_model_sct::write_serialization_external(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: memory_model_sct::from_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void memory_model_sct::from_read(symex_target_equationt &equation)
 {

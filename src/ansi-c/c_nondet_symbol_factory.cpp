@@ -6,9 +6,6 @@ Author: DiffBlue Limited. All rights reserved.
 
 \*******************************************************************/
 
-/// \file
-/// C Nondet Symbol Factory
-
 #include <set>
 #include <sstream>
 
@@ -30,13 +27,23 @@ Author: DiffBlue Limited. All rights reserved.
 
 #include "c_nondet_symbol_factory.h"
 
-/// Create a new temporary static symbol
-/// \param symbol_table: The symbol table to create the symbol in
-/// \param loc: The location to assign to the symbol
-/// \param type: The type of symbol to create
-/// \param static_lifetime: Whether the symbol should have a static lifetime
-/// \param prefix: The prefix to use for the symbol's basename
-/// \return Returns a reference to the new symbol
+/*******************************************************************\
+
+Function: declare_new_tmp_symbol
+
+ Inputs:
+  symbol_table - The symbol table to create the symbol in
+  loc - The location to assign to the symbol
+  type - The type of symbol to create
+  static_lifetime - Whether the symbol should have a static lifetime
+  prefix - The prefix to use for the symbol's basename
+
+ Outputs: Returns a reference to the new symbol
+
+ Purpose: Create a new temporary static symbol
+
+\*******************************************************************/
+
 static const symbolt &c_new_tmp_symbol(
   symbol_tablet &symbol_table,
   const source_locationt &loc,
@@ -51,8 +58,19 @@ static const symbolt &c_new_tmp_symbol(
   return tmp_symbol;
 }
 
-/// \param type: Desired type (C_bool or plain bool)
-/// \return nondet expr of that type
+/*******************************************************************\
+
+Function: c_get_nondet_bool
+
+ Inputs:
+  type - Desired type (C_bool or plain bool)
+
+ Outputs: nondet expr of that type
+
+ Purpose:
+
+\*******************************************************************/
+
 static exprt c_get_nondet_bool(const typet &type)
 {
   // We force this to 0 and 1 and won't consider other values
@@ -89,14 +107,23 @@ public:
   void gen_nondet_init(code_blockt &assignments, const exprt &expr);
 };
 
-/// Create a symbol for a pointer to point to
-/// \param assignments: The code block to add code to
-/// \param target_expr: The expression which we are allocating a symbol for
-/// \param allocate_type: The type to use for the symbol. If this doesn't match
-///   target_expr then a cast will be used for the assignment
-/// \param static_lifetime: Whether the symbol created should have static
-///   lifetime
-/// \return Returns the address of the allocated symbol
+/*******************************************************************\
+
+Function: symbol_factoryt::allocate_object
+
+ Inputs:
+  assignments - The code block to add code to
+  target_expr - The expression which we are allocating a symbol for
+  allocate_type - The type to use for the symbol. If this doesn't match
+                  target_expr then a cast will be used for the assignment
+  static_lifetime - Whether the symbol created should have static lifetime
+
+ Outputs: Returns the address of the allocated symbol
+
+ Purpose: Create a symbol for a pointer to point to
+
+\*******************************************************************/
+
 exprt symbol_factoryt::allocate_object(
   code_blockt &assignments,
   const exprt &target_expr,
@@ -130,11 +157,21 @@ exprt symbol_factoryt::allocate_object(
   return aoe;
 }
 
-/// Creates a nondet for expr, including calling itself recursively to make
-/// appropriate symbols to point to if expr is a pointer.
-/// \param assignments: The code block to add code to
-/// \param expr: The expression which we are generating a non-determinate value
-///   for
+/*******************************************************************\
+
+Function: symbol_factoryt::gen_nondet_init
+
+ Inputs:
+  assignments - The code block to add code to
+  expr - The expression which we are generating a non-determinate value for
+
+ Outputs:
+
+ Purpose: Creates a nondet for expr, including calling itself recursively to
+          make appropriate symbols to point to if expr is a pointer.
+
+\*******************************************************************/
+
 void symbol_factoryt::gen_nondet_init(
   code_blockt &assignments,
   const exprt &expr)
@@ -206,16 +243,26 @@ void symbol_factoryt::gen_nondet_init(
   }
 }
 
-/// Creates a symbol and generates code so that it can vary over all possible
-/// values for its type. For pointers this involves allocating symbols which it
-/// can point to.
-/// \param init_code: The code block to add generated code to
-/// \param symbol_table: The symbol table
-/// \param base_name: The name to use for the symbol created
-/// \param type: The type for the symbol created
-/// \param loc: The location to assign to generated code
-/// \param allow_null: Whether to allow a null value when type is a pointer
-/// \return Returns the symbol_exprt for the symbol created
+/*******************************************************************\
+
+Function: c_nondet_symbol_factory
+
+ Inputs:
+  init_code - The code block to add generated code to
+  symbol_table - The symbol table
+  base_name - The name to use for the symbol created
+  type - The type for the symbol created
+  loc - The location to assign to generated code
+  allow_null - Whether to allow a null value when type is a pointer
+
+ Outputs: Returns the symbol_exprt for the symbol created
+
+ Purpose: Creates a symbol and generates code so that it can vary
+          over all possible values for its type. For pointers this
+          involves allocating symbols which it can point to.
+
+\*******************************************************************/
+
 exprt c_nondet_symbol_factory(
   code_blockt &init_code,
   symbol_tablet &symbol_table,

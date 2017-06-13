@@ -6,9 +6,6 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
-/// \file
-/// Visual Studio CL Mode
-
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -30,7 +27,18 @@ Author: CM Wintersteiger, 2006
 #include "ms_cl_mode.h"
 #include "compile.h"
 
-/// does it.
+/*******************************************************************\
+
+Function: ms_cl_modet::doit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: does it.
+
+\*******************************************************************/
+
 static bool is_directory(const std::string &s)
 {
   if(s.empty())
@@ -171,7 +179,18 @@ int ms_cl_modet::doit()
   return compiler.doit() ? EX_USAGE : EX_OK;
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: ms_cl_modet::help_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void ms_cl_modet::help_mode()
 {
   std::cout << "goto-cl understands the options of CL plus the following.\n\n";

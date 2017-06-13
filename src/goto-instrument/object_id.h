@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Object Identifiers
-
 #ifndef CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 #define CPROVER_GOTO_INSTRUMENT_OBJECT_ID_H
 

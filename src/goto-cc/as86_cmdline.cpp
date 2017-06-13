@@ -6,15 +6,24 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-/// \file
-/// A special command line object for as86 (of Bruce's C Compiler)
-
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
 
 #include "as86_cmdline.h"
+
+/*******************************************************************\
+ 
+Function: as86_cmdlinet::parse
+ 
+  Inputs: argument count, argument strings
+ 
+ Outputs: none
+ 
+ Purpose: parses the commandline options into a cmdlinet
+
+\*******************************************************************/
 
 // non-as86 options
 const char *goto_as86_options_with_argument[]=

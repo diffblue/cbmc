@@ -8,9 +8,6 @@ Date:   September 2015
 
 \*******************************************************************/
 
-/// \file
-/// Add parameter assignments
-
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -35,7 +32,18 @@ protected:
     goto_programt &goto_program);
 };
 
-/// turns x=f(...) into f(...); lhs=f#return_value;
+/*******************************************************************\
+
+Function: parameter_assignmentst::do_function_calls
+
+Inputs:
+
+Outputs:
+
+Purpose: turns x=f(...) into f(...); lhs=f#return_value;
+
+\*******************************************************************/
+
 void parameter_assignmentst::do_function_calls(
   goto_functionst &goto_functions,
   goto_programt &goto_program)
@@ -90,13 +98,36 @@ void parameter_assignmentst::do_function_calls(
   }
 }
 
+/*******************************************************************\
+
+Function: parameter_assignmentst::operator()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void parameter_assignmentst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     do_function_calls(goto_functions, it->second.body);
 }
 
-/// removes returns
+/*******************************************************************\
+
+Function: parameter_assignments
+
+Inputs:
+
+Outputs:
+
+Purpose: removes returns
+
+\*******************************************************************/
+
 void parameter_assignments(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -105,7 +136,18 @@ void parameter_assignments(
   rr(goto_functions);
 }
 
-/// removes returns
+/*******************************************************************\
+
+Function: parameter_assignments
+
+Inputs:
+
+Outputs:
+
+Purpose: removes returns
+
+\*******************************************************************/
+
 void parameter_assignments(goto_modelt &goto_model)
 {
   parameter_assignmentst rr(goto_model.symbol_table);

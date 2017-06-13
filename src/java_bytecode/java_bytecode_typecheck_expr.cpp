@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// JAVA Bytecode Conversion / Type Checking
-
 #include <iomanip>
 
 #include <util/std_expr.h>
@@ -21,6 +18,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_typecheck.h"
 #include "java_pointer_casts.h"
 #include "java_types.h"
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -50,12 +59,36 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_member(to_member_expr(expr));
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_java_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 {
   assert(expr.operands().empty());
   typet &type=expr.type();
   typecheck_type(type);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_java_new_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   side_effect_exprt &expr)
@@ -84,9 +117,18 @@ static std::string escape_non_alnum(const std::string &toescape)
   return escaped.str();
 }
 
-/// Convert UCS-2 or UTF-16 to an array expression.
-/// \par parameters: `in`: wide string to convert
-/// \return Returns a Java char array containing the same wchars.
+/*******************************************************************\
+
+Function: utf16_to_array
+
+  Inputs: `in`: wide string to convert
+
+ Outputs: Returns a Java char array containing the same wchars.
+
+ Purpose: Convert UCS-2 or UTF-16 to an array expression.
+
+\*******************************************************************/
+
 static array_exprt utf16_to_array(const std::wstring &in)
 {
   const auto jchar=java_char_type();
@@ -95,6 +137,18 @@ static array_exprt utf16_to_array(const std::wstring &in)
     ret.copy_to_operands(from_integer(c, jchar));
   return ret;
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_java_string_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
 {
@@ -210,6 +264,18 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   expr=address_of_exprt(new_symbol.symbol_expr());
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 {
   irep_idt identifier=expr.get_identifier();
@@ -257,6 +323,18 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
     expr.type()=symbol.type;
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_expr_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
 {

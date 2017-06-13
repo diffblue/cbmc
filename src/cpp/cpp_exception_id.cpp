@@ -6,12 +6,20 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include "cpp_exception_id.h"
 
-/// turns a type into a list of relevant exception IDs
+/*******************************************************************\
+
+Function: cpp_exception_list_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: turns a type into a list of relevant exception IDs
+
+\*******************************************************************/
+
 void cpp_exception_list_rec(
   const typet &src,
   const namespacet &ns,
@@ -67,7 +75,18 @@ void cpp_exception_list_rec(
   }
 }
 
-/// turns a type into a list of relevant exception IDs
+/*******************************************************************\
+
+Function: cpp_exception_list
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: turns a type into a list of relevant exception IDs
+
+\*******************************************************************/
+
 irept cpp_exception_list(
   const typet &src,
   const namespacet &ns)
@@ -84,7 +103,18 @@ irept cpp_exception_list(
   return result;
 }
 
-/// turns a type into an exception ID
+/*******************************************************************\
+
+Function: cpp_exception_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: turns a type into an exception ID
+
+\*******************************************************************/
+
 irep_idt cpp_exception_id(
   const typet &src,
   const namespacet &ns)

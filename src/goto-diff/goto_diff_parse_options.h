@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// GOTO-DIFF Command Line Option Processing
-
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_PARSE_OPTIONS_H
 

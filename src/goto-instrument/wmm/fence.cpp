@@ -8,9 +8,6 @@ Date: February 2012
 
 \*******************************************************************/
 
-/// \file
-/// Fences for instrumentation
-
 #include <util/namespace.h>
 
 #include "fence.h"

@@ -10,6 +10,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_extractbits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());

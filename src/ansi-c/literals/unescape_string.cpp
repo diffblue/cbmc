@@ -6,14 +6,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Conversion
-
 #include <cassert>
 #include <cctype>
 #include <cstdio>
 
 #include "unescape_string.h"
+
+/*******************************************************************\
+
+Function: unescape_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string unescape_string(const std::string &src)
 {
@@ -125,6 +134,18 @@ std::string unescape_string(const std::string &src)
   return dest;
 }
 
+/*******************************************************************\
+
+Function: unescape_wide_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::basic_string<unsigned int> unescape_wide_string(
   const std::string &src)
 {
@@ -235,6 +256,18 @@ std::basic_string<unsigned int> unescape_wide_string(
   return dest;
 }
 
+/*******************************************************************\
+
+Function: hex_to_unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 {
   unsigned value=0;
@@ -256,6 +289,18 @@ unsigned hex_to_unsigned(const char *hex, std::size_t digits)
 
   return value;
 }
+
+/*******************************************************************\
+
+Function: octal_to_unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned octal_to_unsigned(const char *octal, std::size_t digits)
 {

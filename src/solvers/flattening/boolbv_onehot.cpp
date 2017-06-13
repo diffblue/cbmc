@@ -8,6 +8,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_onehot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt boolbvt::convert_onehot(const unary_exprt &expr)
 {
   bvt op=convert_bv(expr.op());

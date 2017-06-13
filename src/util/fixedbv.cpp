@@ -11,16 +11,52 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "fixedbv.h"
 #include "arith_tools.h"
 
+/*******************************************************************\
+
+Function: fixedbv_spect::fixedbv_spect
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 fixedbv_spect::fixedbv_spect(const fixedbv_typet &type)
 {
   integer_bits=type.get_integer_bits();
   width=type.get_width();
 }
 
+/*******************************************************************\
+
+Function: fixedbvt::fixedbvt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 fixedbvt::fixedbvt(const constant_exprt &expr)
 {
   from_expr(expr);
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::from_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fixedbvt::from_expr(const constant_exprt &expr)
 {
@@ -28,16 +64,52 @@ void fixedbvt::from_expr(const constant_exprt &expr)
   v=binary2integer(id2string(expr.get_value()), true);
 }
 
+/*******************************************************************\
+
+Function: fixedbvt::from_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void fixedbvt::from_integer(const mp_integer &i)
 {
   v=i*power(2, spec.get_fraction_bits());
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer fixedbvt::to_integer() const
 {
   // this rounds to zero, i.e., we just divide
   return v/power(2, spec.get_fraction_bits());
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::to_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_exprt fixedbvt::to_expr() const
 {
@@ -49,6 +121,18 @@ constant_exprt fixedbvt::to_expr() const
   expr.set_value(integer2binary(v, spec.width));
   return expr;
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::round
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fixedbvt::round(const fixedbv_spect &dest_spec)
 {
@@ -83,10 +167,34 @@ void fixedbvt::round(const fixedbv_spect &dest_spec)
   spec=dest_spec;
 }
 
+/*******************************************************************\
+
+Function: fixedbvt::negate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void fixedbvt::negate()
 {
   v=-v;
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::operator*
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 fixedbvt &fixedbvt::operator*=(const fixedbvt &o)
 {
@@ -102,6 +210,18 @@ fixedbvt &fixedbvt::operator*=(const fixedbvt &o)
   return *this;
 }
 
+/*******************************************************************\
+
+Function: fixedbvt::operator/=
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 fixedbvt &fixedbvt::operator/=(const fixedbvt &o)
 {
   v*=power(2, o.spec.get_fraction_bits());
@@ -110,10 +230,34 @@ fixedbvt &fixedbvt::operator/=(const fixedbvt &o)
   return *this;
 }
 
+/*******************************************************************\
+
+Function: fixedbvt::operator==
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool fixedbvt::operator==(int i) const
 {
   return v==power(2, spec.get_fraction_bits())*i;
 }
+
+/*******************************************************************\
+
+Function: fixedbvt::format
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string fixedbvt::format(
   const format_spect &format_spec) const

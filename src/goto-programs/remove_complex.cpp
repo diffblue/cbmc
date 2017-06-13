@@ -8,12 +8,21 @@ Date:   September 2014
 
 \*******************************************************************/
 
-/// \file
-/// Remove 'complex' data type
-
 #include <util/arith_tools.h>
 
 #include "remove_complex.h"
+
+/*******************************************************************\
+
+Function: complex_member
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 static exprt complex_member(const exprt &expr, irep_idt id)
 {
@@ -35,6 +44,18 @@ static exprt complex_member(const exprt &expr, irep_idt id)
     return member_exprt(expr, id, struct_type.components().front().type());
   }
 }
+
+/*******************************************************************\
+
+Function: have_to_remove_complex
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static bool have_to_remove_complex(const typet &type);
 
@@ -73,6 +94,18 @@ static bool have_to_remove_complex(const exprt &expr)
   return false;
 }
 
+/*******************************************************************\
+
+Function: have_to_remove_complex
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static bool have_to_remove_complex(const typet &type)
 {
   if(type.id()==ID_struct || type.id()==ID_union)
@@ -96,7 +129,18 @@ static bool have_to_remove_complex(const typet &type)
   return false;
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 static void remove_complex(typet &);
 
 static void remove_complex(exprt &expr)
@@ -230,7 +274,18 @@ static void remove_complex(exprt &expr)
   remove_complex(expr.type());
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 static void remove_complex(typet &type)
 {
   if(!have_to_remove_complex(type))
@@ -272,21 +327,54 @@ static void remove_complex(typet &type)
   }
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 static void remove_complex(symbolt &symbol)
 {
   remove_complex(symbol.value);
   remove_complex(symbol.type);
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 void remove_complex(symbol_tablet &symbol_table)
 {
   Forall_symbols(it, symbol_table.symbols)
     remove_complex(it->second);
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 static void remove_complex(
   goto_functionst::goto_functiont &goto_function)
 {
@@ -299,14 +387,36 @@ static void remove_complex(
   }
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 static void remove_complex(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     remove_complex(it->second);
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 void remove_complex(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -315,7 +425,18 @@ void remove_complex(
   remove_complex(goto_functions);
 }
 
-/// removes complex data type
+/*******************************************************************\
+
+Function: remove_complex
+
+Inputs:
+
+Outputs:
+
+Purpose: removes complex data type
+
+\*******************************************************************/
+
 void remove_complex(goto_modelt &goto_model)
 {
   remove_complex(goto_model.symbol_table, goto_model.goto_functions);

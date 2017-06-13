@@ -9,9 +9,6 @@ Date: November 2011
 
 \*******************************************************************/
 
-/// \file
-/// Nondeterministic initialization of certain global scope variables
-
 #ifndef CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
 #define CPROVER_GOTO_INSTRUMENT_NONDET_STATIC_H
 

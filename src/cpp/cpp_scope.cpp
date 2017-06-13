@@ -6,11 +6,20 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include "cpp_typecheck.h"
 #include "cpp_scope.h"
+
+/*******************************************************************\
+
+Function: cpp_scopet::operator <<
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 {
@@ -24,6 +33,18 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 
   return out;
 }
+
+/*******************************************************************\
+
+Function: cpp_scopet::lookup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_scopet::lookup(
   const irep_idt &base_name,
@@ -87,6 +108,18 @@ void cpp_scopet::lookup(
   if(!is_root_scope())
     get_parent().lookup(base_name, kind, id_set);
 }
+
+/*******************************************************************\
+
+Function: cpp_scopet::lookup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_scopet::lookup(
   const irep_idt &base_name,
@@ -168,6 +201,18 @@ void cpp_scopet::lookup(
     get_parent().lookup(base_name, kind, id_class, id_set);
 }
 
+/*******************************************************************\
+
+Function: cpp_scopet::lookup_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cpp_scopet::lookup_identifier(
   const irep_idt &identifier,
   cpp_idt::id_classt id_class,
@@ -196,6 +241,18 @@ void cpp_scopet::lookup_identifier(
   #endif
 }
 
+/*******************************************************************\
+
+Function: cpp_scopet::new_scope
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
 {
   cpp_idt &id=insert(new_scope_name);
@@ -207,6 +264,18 @@ cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
   return (cpp_scopet &)id;
 }
 
+
+/*******************************************************************\
+
+Function: cpp_scopet::contains
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cpp_scopet::contains(const irep_idt &base_name)
 {

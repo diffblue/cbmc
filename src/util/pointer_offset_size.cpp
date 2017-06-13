@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Pointer Logic
-
 #include <cassert>
 
 #include "expr.h"
@@ -59,6 +56,18 @@ member_offset_iterator &member_offset_iterator::operator++()
   return *this;
 }
 
+/*******************************************************************\
+
+Function: member_offset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer member_offset(
   const struct_typet &type,
   const irep_idt &member,
@@ -79,6 +88,18 @@ mp_integer member_offset(
   return offsets->second;
 }
 
+/*******************************************************************\
+
+Function: pointer_offset_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer pointer_offset_size(
   const typet &type,
   const namespacet &ns)
@@ -88,6 +109,18 @@ mp_integer pointer_offset_size(
     return -1;
   return bits/8+(((bits%8)==0)?0:1);
 }
+
+/*******************************************************************\
+
+Function: pointer_offset_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer pointer_offset_bits(
   const typet &type,
@@ -218,6 +251,18 @@ mp_integer pointer_offset_bits(
     return mp_integer(-1);
 }
 
+/*******************************************************************\
+
+Function: member_offset_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt member_offset_expr(
   const member_exprt &member_expr,
   const namespacet &ns)
@@ -232,6 +277,18 @@ exprt member_offset_expr(
   else
     return nil_exprt();
 }
+
+/*******************************************************************\
+
+Function: member_offset_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt member_offset_expr(
   const struct_typet &type,
@@ -273,6 +330,18 @@ exprt member_offset_expr(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: size_of_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt size_of_expr(
   const typet &type,
@@ -457,6 +526,18 @@ exprt size_of_expr(
     return nil_exprt();
 }
 
+/*******************************************************************\
+
+Function: compute_pointer_offset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer compute_pointer_offset(
   const exprt &expr,
   const namespacet &ns)
@@ -515,6 +596,18 @@ mp_integer compute_pointer_offset(
 
   return -1; // don't know
 }
+
+/*******************************************************************\
+
+Function: build_sizeof_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt build_sizeof_expr(
   const constant_exprt &expr,

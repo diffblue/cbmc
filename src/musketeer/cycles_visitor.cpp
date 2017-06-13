@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// cycles visitor for computing edges involved for fencing
-
 #include <list>
 #include <map>
 
@@ -19,6 +16,18 @@ class instrumentert;
 
 /* implemented: BTWN1, BTWN4 */
 #define BTWN1
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /* po^+ /\ U{C_1, ..., C_n} \/ delays */
 void cycles_visitort::po_edges(std::set<event_idt> &edges)
@@ -244,6 +253,18 @@ void cycles_visitort::po_edges(std::set<event_idt> &edges)
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* C_j /\ po^+ /\ poWR */
 void cycles_visitort::powr_constraint(
   const event_grapht::critical_cyclet &C_j,
@@ -263,6 +284,18 @@ void cycles_visitort::powr_constraint(
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /* C_j /\ po^+ /\ poWW */
 void cycles_visitort::poww_constraint(
@@ -284,6 +317,18 @@ void cycles_visitort::poww_constraint(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* C_j /\ po^+ /\ poRW */
 void cycles_visitort::porw_constraint(
   const event_grapht::critical_cyclet &C_j,
@@ -304,6 +349,18 @@ void cycles_visitort::porw_constraint(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 /* C_j /\ po^+ /\ poRR */
 void cycles_visitort::porr_constraint(
   const event_grapht::critical_cyclet &C_j,
@@ -323,6 +380,18 @@ void cycles_visitort::porr_constraint(
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /* C_j /\ comWR */
 void cycles_visitort::com_constraint(

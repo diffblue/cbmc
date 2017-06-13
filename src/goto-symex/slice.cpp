@@ -6,13 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Slicer for symex traces
-
 #include <util/std_expr.h>
 
 #include "slice.h"
 #include "symex_slice_class.h"
+
+/*******************************************************************\
+
+Function: symex_slicet::get_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_slicet::get_symbols(const exprt &expr)
 {
@@ -25,10 +34,34 @@ void symex_slicet::get_symbols(const exprt &expr)
     depends.insert(to_symbol_expr(expr).get_identifier());
 }
 
+/*******************************************************************\
+
+Function: symex_slicet::get_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_slicet::get_symbols(const typet &type)
 {
   // TODO
 }
+
+/*******************************************************************\
+
+Function: symex_slicet::slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_slicet::slice(
   symex_target_equationt &equation,
@@ -41,6 +74,18 @@ void symex_slicet::slice(
   slice(equation);
 }
 
+/*******************************************************************\
+
+Function: symex_slicet::slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_slicet::slice(symex_target_equationt &equation)
 {
   for(symex_target_equationt::SSA_stepst::reverse_iterator
@@ -49,6 +94,18 @@ void symex_slicet::slice(symex_target_equationt &equation)
       it++)
     slice(*it);
 }
+
+/*******************************************************************\
+
+Function: symex_slicet::slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
@@ -108,6 +165,18 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
   }
 }
 
+/*******************************************************************\
+
+Function: symex_slicet::slice_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_slicet::slice_assignment(
   symex_target_equationt::SSA_stept &SSA_step)
 {
@@ -123,6 +192,18 @@ void symex_slicet::slice_assignment(
     get_symbols(SSA_step.ssa_rhs);
 }
 
+/*******************************************************************\
+
+Function: symex_slicet::slice_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_slicet::slice_decl(
   symex_target_equationt::SSA_stept &SSA_step)
 {
@@ -136,11 +217,20 @@ void symex_slicet::slice_decl(
   }
 }
 
-/// Collect the open variables, i.e., variables that are used in RHS but never
-/// written in LHS
-/// \param equation: symex trace
-/// \param open_variables: target set
-/// \return None. But open_variables is modified as a side-effect.
+/*******************************************************************\
+
+Function: symex_slice_classt::collect_open_variables
+
+  Inputs: equation - symex trace
+          open_variables - target set
+
+ Outputs: None. But open_variables is modified as a side-effect.
+
+ Purpose: Collect the open variables, i.e., variables that are used
+          in RHS but never written in LHS
+
+\*******************************************************************/
+
 void symex_slicet::collect_open_variables(
   const symex_target_equationt &equation,
   symbol_sett &open_variables)
@@ -205,17 +295,38 @@ void symex_slicet::collect_open_variables(
   open_variables.erase(lhs.begin(), lhs.end());
 }
 
+/*******************************************************************\
+
+Function: slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void slice(symex_target_equationt &equation)
 {
   symex_slicet symex_slice;
   symex_slice.slice(equation);
 }
 
-/// Collect the open variables, i.e. variables that are used in RHS but never
-/// written in LHS
-/// \param equation: symex trace
-/// \param open_variables: target set
-/// \return None. But open_variables is modified as a side-effect.
+/*******************************************************************\
+
+Function: collect_open_variables
+
+  Inputs: equation - symex trace
+          open_variables - target set
+
+ Outputs: None. But open_variables is modified as a side-effect.
+
+ Purpose: Collect the open variables, i.e. variables that are used
+          in RHS but never written in LHS
+
+\*******************************************************************/
+
 void collect_open_variables(
   const symex_target_equationt &equation,
   symbol_sett &open_variables)
@@ -224,16 +335,37 @@ void collect_open_variables(
   symex_slice.collect_open_variables(equation, open_variables);
 }
 
-/// Slice the symex trace with respect to a list of expressions
-/// \param equation: symex trace to be sliced
-/// \param expression: list of expressions, targets for slicing
-/// \return None. But equation is modified as a side-effect.
+/*******************************************************************\
+
+Function: slice
+
+  Inputs: equation - symex trace to be sliced
+          expression - list of expressions, targets for slicing
+
+ Outputs: None. But equation is modified as a side-effect.
+
+ Purpose: Slice the symex trace with respect to a list of expressions
+
+\*******************************************************************/
+
 void slice(symex_target_equationt &equation,
            const expr_listt &expressions)
 {
   symex_slicet symex_slice;
   symex_slice.slice(equation, expressions);
 }
+
+/*******************************************************************\
+
+Function: simple_slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void simple_slice(symex_target_equationt &equation)
 {

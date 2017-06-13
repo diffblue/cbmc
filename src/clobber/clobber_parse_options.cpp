@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symex Command Line Options Processing
-
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -40,12 +37,36 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "clobber_parse_options.h"
 // #include "clobber_instrumenter.h"
 
+/*******************************************************************\
+
+Function: clobber_parse_optionst::clobber_parse_optionst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   parse_options_baset(CLOBBER_OPTIONS, argc, argv),
   language_uit(cmdline, ui_message_handler),
   ui_message_handler(cmdline, "CLOBBER " CBMC_VERSION)
 {
 }
+
+/*******************************************************************\
+
+Function: clobber_parse_optionst::eval_verbosity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void clobber_parse_optionst::eval_verbosity()
 {
@@ -63,6 +84,18 @@ void clobber_parse_optionst::eval_verbosity()
 
   ui_message_handler.set_verbosity(v);
 }
+
+/*******************************************************************\
+
+Function: clobber_parse_optionst::get_command_line_options
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void clobber_parse_optionst::get_command_line_options(optionst &options)
 {
@@ -98,7 +131,18 @@ void clobber_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_value("error-label"));
 }
 
-/// invoke main modules
+/*******************************************************************\
+
+Function: clobber_parse_optionst::doit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: invoke main modules
+
+\*******************************************************************/
+
 int clobber_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -180,6 +224,18 @@ int clobber_parse_optionst::doit()
   #endif
 }
 
+/*******************************************************************\
+
+Function: clobber_parse_optionst::set_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   if(cmdline.isset("property"))
@@ -187,6 +243,18 @@ bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: clobber_parse_optionst::get_goto_program
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool clobber_parse_optionst::get_goto_program(
   const optionst &options,
@@ -310,6 +378,18 @@ bool clobber_parse_optionst::get_goto_program(
   return false;
 }
 
+/*******************************************************************\
+
+Function: clobber_parse_optionst::process_goto_program
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool clobber_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
@@ -354,6 +434,18 @@ bool clobber_parse_optionst::process_goto_program(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: clobber_parse_optionst::report_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #if 0
 void clobber_parse_optionst::report_properties(
@@ -414,6 +506,18 @@ void clobber_parse_optionst::report_properties(
 }
 #endif
 
+/*******************************************************************\
+
+Function: clobber_parse_optionst::report_success
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void clobber_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
@@ -436,6 +540,18 @@ void clobber_parse_optionst::report_success()
     assert(false);
   }
 }
+
+/*******************************************************************\
+
+Function: clobber_parse_optionst::show_counterexample
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void clobber_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
@@ -462,6 +578,18 @@ void clobber_parse_optionst::show_counterexample(
   }
 }
 
+/*******************************************************************\
+
+Function: clobber_parse_optionst::report_failure
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void clobber_parse_optionst::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
@@ -485,7 +613,18 @@ void clobber_parse_optionst::report_failure()
   }
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: clobber_parse_optionst::help
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void clobber_parse_optionst::help()
 {
   std::cout <<

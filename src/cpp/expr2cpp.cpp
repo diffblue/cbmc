@@ -47,6 +47,18 @@ protected:
   typedef std::unordered_set<std::string, string_hash> id_sett;
 };
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_struct
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_struct(
   const exprt &src,
   unsigned &precedence)
@@ -111,6 +123,18 @@ std::string expr2cppt::convert_struct(
   return dest;
 }
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_constant(
   const constant_exprt &src,
   unsigned &precedence)
@@ -126,6 +150,18 @@ std::string expr2cppt::convert_constant(
 
   return expr2ct::convert_constant(src, precedence);
 }
+
+/*******************************************************************\
+
+Function: expr2cppt::convert_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string expr2cppt::convert_rec(
   const typet &src,
@@ -385,12 +421,36 @@ std::string expr2cppt::convert_rec(
     return expr2ct::convert_rec(src, qualifiers, declarator);
 }
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_cpp_this
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_cpp_this(
   const exprt &src,
   unsigned precedence)
 {
   return "this";
 }
+
+/*******************************************************************\
+
+Function: expr2cppt::convert_cpp_new
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string expr2cppt::convert_cpp_new(
   const exprt &src,
@@ -417,6 +477,18 @@ std::string expr2cppt::convert_cpp_new(
   return dest;
 }
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_code_cpp_delete
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_code_cpp_delete(
   const exprt &src,
   unsigned indent)
@@ -435,6 +507,18 @@ std::string expr2cppt::convert_code_cpp_delete(
 
   return dest;
 }
+
+/*******************************************************************\
+
+Function: expr2cppt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string expr2cppt::convert_with_precedence(
   const exprt &src,
@@ -467,6 +551,18 @@ std::string expr2cppt::convert_with_precedence(
     return expr2ct::convert_with_precedence(src, precedence);
 }
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_code(
   const codet &src,
   unsigned indent)
@@ -484,6 +580,18 @@ std::string expr2cppt::convert_code(
   return expr2ct::convert_code(src, indent);
 }
 
+/*******************************************************************\
+
+Function: expr2cppt::convert_extractbit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cppt::convert_extractbit(
   const exprt &src,
   unsigned precedence)
@@ -491,6 +599,18 @@ std::string expr2cppt::convert_extractbit(
   assert(src.operands().size()==2);
   return convert(src.op0())+"["+convert(src.op1())+"]";
 }
+
+/*******************************************************************\
+
+Function: expr2cppt::convert_extractbits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string expr2cppt::convert_extractbits(
   const exprt &src,
@@ -502,12 +622,36 @@ std::string expr2cppt::convert_extractbits(
     convert(src.op2())+")";
 }
 
+/*******************************************************************\
+
+Function: expr2cpp
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string expr2cpp(const exprt &expr, const namespacet &ns)
 {
   expr2cppt expr2cpp(ns);
   expr2cpp.get_shorthands(expr);
   return expr2cpp.convert(expr);
 }
+
+/*******************************************************************\
+
+Function: type2cpp
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string type2cpp(const typet &type, const namespacet &ns)
 {

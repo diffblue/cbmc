@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_extractbit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt boolbvt::convert_extractbit(const extractbit_exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();

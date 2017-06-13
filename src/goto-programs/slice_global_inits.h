@@ -8,9 +8,6 @@ Date:   December 2016
 
 \*******************************************************************/
 
-/// \file
-/// Remove initializations of unused global variables
-
 #ifndef CPROVER_GOTO_PROGRAMS_SLICE_GLOBAL_INITS_H
 #define CPROVER_GOTO_PROGRAMS_SLICE_GLOBAL_INITS_H
 

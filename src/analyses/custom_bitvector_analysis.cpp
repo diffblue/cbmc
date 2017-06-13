@@ -6,15 +6,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive bitvector analysis
-
 #include <util/xml_expr.h>
 #include <util/simplify_expr.h>
 
 #include "custom_bitvector_analysis.h"
 
 #include <iostream>
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::set_bit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void custom_bitvector_domaint::set_bit(
   const irep_idt &identifier,
@@ -41,6 +50,18 @@ void custom_bitvector_domaint::set_bit(
   }
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::set_bit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void custom_bitvector_domaint::set_bit(
   const exprt &lhs,
   unsigned bit_nr,
@@ -50,6 +71,18 @@ void custom_bitvector_domaint::set_bit(
   if(!id.empty())
     set_bit(id, bit_nr, mode);
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::object2id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 irep_idt custom_bitvector_domaint::object2id(const exprt &src)
 {
@@ -84,6 +117,18 @@ irep_idt custom_bitvector_domaint::object2id(const exprt &src)
     return irep_idt();
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::assign_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void custom_bitvector_domaint::assign_lhs(
   const exprt &lhs,
   const vectorst &vectors)
@@ -92,6 +137,18 @@ void custom_bitvector_domaint::assign_lhs(
   if(!id.empty())
     assign_lhs(id, vectors);
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::assign_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void custom_bitvector_domaint::assign_lhs(
   const irep_idt &identifier,
@@ -110,6 +167,18 @@ void custom_bitvector_domaint::assign_lhs(
     may_bits[identifier]=vectors.may_bits;
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::get_rhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 custom_bitvector_domaint::vectorst
   custom_bitvector_domaint::get_rhs(const irep_idt &identifier) const
 {
@@ -125,6 +194,18 @@ custom_bitvector_domaint::vectorst
 
   return vectors;
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::get_rhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 custom_bitvector_domaint::vectorst
   custom_bitvector_domaint::get_rhs(const exprt &rhs) const
@@ -150,6 +231,18 @@ custom_bitvector_domaint::vectorst
   return vectorst();
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_analysist::get_bit_nr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned custom_bitvector_analysist::get_bit_nr(
   const exprt &string_expr)
 {
@@ -167,6 +260,18 @@ unsigned custom_bitvector_analysist::get_bit_nr(
   else
     return bits("(unknown)");
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::set<exprt> custom_bitvector_analysist::aliases(
   const exprt &src,
@@ -203,6 +308,18 @@ std::set<exprt> custom_bitvector_analysist::aliases(
   else
     return std::set<exprt>();
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::transform
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void custom_bitvector_domaint::transform(
   locationt from,
@@ -432,6 +549,18 @@ void custom_bitvector_domaint::transform(
   }
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void custom_bitvector_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -478,6 +607,18 @@ void custom_bitvector_domaint::output(
     out << '\n';
   }
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool custom_bitvector_domaint::merge(
   const custom_bitvector_domaint &b,
@@ -532,7 +673,18 @@ bool custom_bitvector_domaint::merge(
   return changed;
 }
 
-/// erase blank bitvectors
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::erase_blank_vectors
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: erase blank bitvectors
+
+\*******************************************************************/
+
 void custom_bitvector_domaint::erase_blank_vectors(bitst &bits)
 {
   for(bitst::iterator a_it=bits.begin();
@@ -546,6 +698,18 @@ void custom_bitvector_domaint::erase_blank_vectors(bitst &bits)
   }
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::has_get_must_or_may
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool custom_bitvector_domaint::has_get_must_or_may(const exprt &src)
 {
   if(src.id()=="get_must" ||
@@ -558,6 +722,18 @@ bool custom_bitvector_domaint::has_get_must_or_may(const exprt &src)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_domaint::eval
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt custom_bitvector_domaint::eval(
   const exprt &src,
@@ -621,9 +797,33 @@ exprt custom_bitvector_domaint::eval(
   }
 }
 
+/*******************************************************************\
+
+Function: custom_bitvector_analysist::instrument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void custom_bitvector_analysist::instrument(goto_functionst &)
 {
 }
+
+/*******************************************************************\
+
+Function: custom_bitvector_analysist::check
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void custom_bitvector_analysist::check(
   const namespacet &ns,

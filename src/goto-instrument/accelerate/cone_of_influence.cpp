@@ -6,9 +6,6 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-/// \file
-/// Loop Acceleration
-
 #include <iostream>
 
 #include <ansi-c/expr2c.h>

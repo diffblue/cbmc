@@ -11,14 +11,36 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../rw_set.h"
 
-/// returns a unique id (for fresh variables)
+/*******************************************************************\
+
+Function: shared_buffert::unique
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: returns a unique id (for fresh variables)
+
+\*******************************************************************/
+
 std::string shared_bufferst::unique(void)
 {
   message.debug()<<"$fresh#"+std::to_string(uniq)<<messaget::eom;
   return "$fresh#"+std::to_string(uniq++);
 }
 
-/// instruments the variable
+/*******************************************************************\
+
+Function: shared_bufferst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: instruments the variable
+
+\*******************************************************************/
+
 const shared_bufferst::varst &shared_bufferst::operator()(
   const irep_idt &object)
 {
@@ -73,9 +95,18 @@ const shared_bufferst::varst &shared_bufferst::operator()(
   return vars;
 }
 
-/// add a new var for instrumenting the input var
-/// \par parameters: var, suffix, type of the var, added as an instrumentation
-/// \return identifier of the new var
+/*******************************************************************\
+
+Function: shared_bufferst::add
+
+  Inputs: var, suffix, type of the var, added as an instrumentation
+
+ Outputs: identifier of the new var
+
+ Purpose: add a new var for instrumenting the input var
+
+\*******************************************************************/
+
 irep_idt shared_bufferst::add(
   const irep_idt &object,
   const irep_idt &base_name,
@@ -99,6 +130,18 @@ irep_idt shared_bufferst::add(
   symbol_table.move(new_symbol, symbol_ptr);
   return identifier;
 }
+
+/*******************************************************************\
+
+Function: shared_bufferst::add_initialization
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void shared_bufferst::add_initialization(goto_programt &goto_program)
 {
@@ -129,6 +172,18 @@ void shared_bufferst::add_initialization(goto_programt &goto_program)
   }
 }
 
+/*******************************************************************\
+
+Function: shared_bufferst::add_initialization_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void shared_bufferst::add_initialization_code(
   goto_functionst &goto_functions)
 {
@@ -143,7 +198,18 @@ void shared_bufferst::add_initialization_code(
   add_initialization(main);
 }
 
-/// add an assignment in the goto-program
+/*******************************************************************\
+
+Function: shared_bufferst::assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: add an assignment in the goto-program
+
+\*******************************************************************/
+
 void shared_bufferst::assignment(
   goto_programt &goto_program,
   goto_programt::targett &t,
@@ -182,7 +248,18 @@ void shared_bufferst::assignment(
   }
 }
 
-/// delays a read (POWER)
+/*******************************************************************\
+
+Function: shared_bufferst::delay_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: delays a read (POWER)
+
+\*******************************************************************/
+
 void shared_bufferst::delay_read(
   goto_programt &goto_program,
   goto_programt::targett &target,
@@ -231,7 +308,18 @@ void shared_bufferst::delay_read(
     address_of_exprt(read_object_expr));
 }
 
-/// flushes read (POWER)
+/*******************************************************************\
+
+Function: shared_bufferst::flush_read
+
+  Inputs:
+
+ Outputs:
+
+Purpose: flushes read (POWER)
+
+\*******************************************************************/
+
 void shared_bufferst::flush_read(
   goto_programt &goto_program,
   goto_programt::targett &target,
@@ -267,7 +355,18 @@ void shared_bufferst::flush_read(
 /* do nothing */
 }
 
-/// instruments write
+/*******************************************************************\
+
+Function: shared_bufferst::write
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: instruments write
+
+\*******************************************************************/
+
 void shared_bufferst::write(
   goto_programt &goto_program,
   goto_programt::targett &target,
@@ -330,7 +429,18 @@ void shared_bufferst::write(
     true_exprt());
 }
 
-/// flush buffers (instruments fence)
+/*******************************************************************\
+
+Function: shared_bufferst::det_flush
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: flush buffers (instruments fence)
+
+\*******************************************************************/
+
 void shared_bufferst::det_flush(
   goto_programt &goto_program,
   goto_programt::targett &target,
@@ -436,7 +546,18 @@ void shared_bufferst::det_flush(
       buff1_thd_expr));
 }
 
-/// instruments read
+/*******************************************************************\
+
+Function: shared_bufferst::nondet_flush
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: instruments read
+
+\*******************************************************************/
+
 void shared_bufferst::nondet_flush(
   goto_programt &goto_program,
   goto_programt::targett &target,
@@ -934,6 +1055,18 @@ void shared_bufferst::nondet_flush(
   }
 }
 
+/*******************************************************************\
+
+Function: is_buffered
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool shared_bufferst::is_buffered(
   const namespacet &ns,
   const symbol_exprt &symbol_expr,
@@ -1008,9 +1141,21 @@ bool shared_bufferst::is_buffered_in_general(
   return false;
 }
 
-/// analysis over the goto-program which computes in affected_by_delay_set the
-/// variables (non necessarily shared themselves) whose value could be changed
-/// as effect of a read delay
+/*******************************************************************\
+
+Function: affected_by_delay
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: analysis over the goto-program which computes in
+          affected_by_delay_set the variables (non necessarily
+          shared themselves) whose value could be changed as
+          effect of a read delay
+
+\*******************************************************************/
+
 void shared_bufferst::affected_by_delay(
   symbol_tablet &symbol_table,
   value_setst &value_sets,
@@ -1045,7 +1190,19 @@ void shared_bufferst::affected_by_delay(
   }
 }
 
-/// instruments the program for the pairs detected through the CFG
+/*******************************************************************\
+
+Function: weak_memory_cfg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: instruments the program for the pairs detected through the
+          CFG
+
+\*******************************************************************/
+
 void shared_bufferst::cfg_visitort::weak_memory(
   value_setst &value_sets,
   const irep_idt &function,

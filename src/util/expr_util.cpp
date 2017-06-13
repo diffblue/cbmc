@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "arith_tools.h"
 
+/*******************************************************************\
+
+Function: make_next_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void make_next_state(exprt &expr)
 {
   Forall_operands(it, expr)
@@ -23,6 +35,18 @@ void make_next_state(exprt &expr)
   if(expr.id()==ID_symbol)
     expr.id(ID_next_symbol);
 }
+
+/*******************************************************************\
+
+Function: make_binary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt make_binary(const exprt &expr)
 {
@@ -55,6 +79,18 @@ exprt make_binary(const exprt &expr)
   return previous;
 }
 
+/*******************************************************************\
+
+Function: make_with_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 with_exprt make_with_expr(const update_exprt &src)
 {
   const exprt::operandst &designator=src.designator();
@@ -86,6 +122,18 @@ with_exprt make_with_expr(const update_exprt &src)
   return result;
 }
 
+/*******************************************************************\
+
+Function: is_not_zero
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt is_not_zero(
   const exprt &src,
   const namespacet &ns)
@@ -115,6 +163,18 @@ exprt is_not_zero(
   return comparison;
 }
 
+/*******************************************************************\
+
+Function: boolean_negate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt boolean_negate(const exprt &src)
 {
   if(src.id()==ID_not && src.operands().size()==1)
@@ -127,6 +187,18 @@ exprt boolean_negate(const exprt &src)
     return not_exprt(src);
 }
 
+/*******************************************************************\
+
+Function: has_subexpr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool has_subexpr(const exprt &src, const irep_idt &id)
 {
   if(src.id()==id)
@@ -138,6 +210,18 @@ bool has_subexpr(const exprt &src, const irep_idt &id)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: lift_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 if_exprt lift_if(const exprt &src, std::size_t operand_number)
 {

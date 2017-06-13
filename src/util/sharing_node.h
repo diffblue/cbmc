@@ -6,9 +6,6 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
-/// \file
-/// Sharing node
-
 #ifndef CPROVER_UTIL_SHARING_NODE_H
 #define CPROVER_UTIL_SHARING_NODE_H
 

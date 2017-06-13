@@ -8,9 +8,6 @@ Date: May 2006
 
 \*******************************************************************/
 
-/// \file
-/// GOTO-CC Main Module
-
 #include <algorithm>
 #include <iostream>
 
@@ -31,12 +28,36 @@ Date: May 2006
 #include "armcc_mode.h"
 #include "as_mode.h"
 
+/*******************************************************************\
+
+Function: to_lower_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string to_lower_string(const std::string &s)
 {
   std::string result=s;
   transform(result.begin(), result.end(), result.begin(), tolower);
   return result;
 }
+
+/*******************************************************************\
+
+Function: main
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)

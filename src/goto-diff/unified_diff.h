@@ -8,9 +8,6 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Unified diff (using LCSS) of goto functions
-
 #ifndef CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
 #define CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
 

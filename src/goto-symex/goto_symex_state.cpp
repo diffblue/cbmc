@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution
-
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
@@ -20,6 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex_state.h"
 
+/*******************************************************************\
+
+Function: goto_symex_statet::goto_symex_statet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 goto_symex_statet::goto_symex_statet():
   depth(0),
   symex_target(NULL),
@@ -30,6 +39,18 @@ goto_symex_statet::goto_symex_statet():
   threads.resize(1);
   new_frame();
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 {
@@ -45,6 +66,18 @@ void goto_symex_statet::initialize(const goto_functionst &goto_functions)
   top().end_of_function=--body.instructions.end();
   top().calling_location.pc=top().end_of_function;
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::level0t::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::level0t::operator()(
   ssa_exprt &ssa_expr,
@@ -78,6 +111,18 @@ void goto_symex_statet::level0t::operator()(
   ssa_expr.set_level_0(thread_nr);
 }
 
+/*******************************************************************\
+
+Function: goto_symex_statet::level1t::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
 {
   // already renamed?
@@ -94,8 +139,19 @@ void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
   ssa_expr.set_level_1(it->second.second);
 }
 
-/// This function determines what expressions are to be propagated as
-/// "constants"
+/*******************************************************************\
+
+Function: goto_symex_statet::constant_propagation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: This function determines what expressions are to
+          be propagated as "constants"
+
+\*******************************************************************/
+
 bool goto_symex_statet::constant_propagation(const exprt &expr) const
 {
   if(expr.is_constant())
@@ -184,7 +240,19 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
   return false;
 }
 
-/// this function determines which reference-typed expressions are constant
+/*******************************************************************\
+
+Function: goto_symex_statet::constant_propagation_reference
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: this function determines which reference-typed
+          expressions are constant
+
+\*******************************************************************/
+
 bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
 {
   if(expr.id()==ID_symbol)
@@ -209,7 +277,18 @@ bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
   return false;
 }
 
-/// write to a variable
+/*******************************************************************\
+
+Function: goto_symex_statet::assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: write to a variable
+
+\*******************************************************************/
+
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
@@ -382,6 +461,18 @@ void goto_symex_statet::assignment(
   #endif
 }
 
+/*******************************************************************\
+
+Function: goto_symex_statet::propagationt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symex_statet::propagationt::operator()(exprt &expr)
 {
   if(expr.id()==ID_symbol)
@@ -402,6 +493,18 @@ void goto_symex_statet::propagationt::operator()(exprt &expr)
       operator()(*it);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::set_ssa_indices
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::set_ssa_indices(
   ssa_exprt &ssa_expr,
@@ -435,6 +538,18 @@ void goto_symex_statet::set_ssa_indices(
     assert(false);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::rename(
   exprt &expr,
@@ -527,7 +642,18 @@ void goto_symex_statet::rename(
   }
 }
 
-/// thread encoding
+/*******************************************************************\
+
+Function: goto_symex_statet::l2_thread_read_encoding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: thread encoding
+
+\*******************************************************************/
+
 bool goto_symex_statet::l2_thread_read_encoding(
   ssa_exprt &expr,
   const namespacet &ns)
@@ -672,7 +798,18 @@ bool goto_symex_statet::l2_thread_read_encoding(
   return true;
 }
 
-/// thread encoding
+/*******************************************************************\
+
+Function: goto_symex_statet::l2_thread_write_encoding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: thread encoding
+
+\*******************************************************************/
+
 bool goto_symex_statet::l2_thread_write_encoding(
   const ssa_exprt &expr,
   const namespacet &ns)
@@ -708,6 +845,18 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // do we have threads?
   return threads.size()>1;
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::rename_address
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::rename_address(
   exprt &expr,
@@ -786,6 +935,18 @@ void goto_symex_statet::rename_address(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_symex_statet::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
@@ -857,6 +1018,18 @@ void goto_symex_statet::rename(
     l1_type_entry.first->second=type;
 }
 
+/*******************************************************************\
+
+Function: goto_symex_statet::get_original_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symex_statet::get_original_name(exprt &expr) const
 {
   get_original_name(expr.type());
@@ -868,6 +1041,18 @@ void goto_symex_statet::get_original_name(exprt &expr) const
     Forall_operands(it, expr)
       get_original_name(*it);
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::get_original_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::get_original_name(typet &type) const
 {
@@ -897,6 +1082,18 @@ void goto_symex_statet::get_original_name(typet &type) const
   }
 }
 
+/*******************************************************************\
+
+Function: goto_symex_statet::get_l1_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symex_statet::get_l1_name(exprt &expr) const
 {
   // do not reset the type !
@@ -908,6 +1105,18 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
     Forall_operands(it, expr)
       get_l1_name(*it);
 }
+
+/*******************************************************************\
+
+Function: goto_symex_statet::switch_to_thread
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symex_statet::switch_to_thread(unsigned t)
 {

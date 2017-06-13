@@ -16,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "pointer_offset_size.h"
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_index
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_index(exprt &expr)
 {
   bool result=true;

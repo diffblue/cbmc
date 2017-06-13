@@ -6,9 +6,6 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-/// \file
-/// Unused function removal
-
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_UNUSED_FUNCTIONS_H
 

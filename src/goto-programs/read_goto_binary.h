@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Read Goto Programs
-
 #ifndef CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H
 #define CPROVER_GOTO_PROGRAMS_READ_GOTO_BINARY_H
 

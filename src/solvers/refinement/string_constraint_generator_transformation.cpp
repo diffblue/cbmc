@@ -7,20 +7,25 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Generates string constraints for string transformations, that is, functions
-///   taking one string and returning another
-
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms to say that the returned string expression has length given by
-/// the second argument and whose characters are equal to those of the first
-/// argument for the positions which are defined in both strings
-/// \par parameters: function application with two arguments, the first of which
-///   is
-/// a string and the second an integer which should have same type has
-/// return by get_index_type()
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_set_length
+
+  Inputs: function application with two arguments, the first of which is
+          a string and the second an integer which should have same type has
+          return by get_index_type()
+
+ Outputs: a new string expression
+
+ Purpose: add axioms to say that the returned string expression has length
+          given by the second argument and whose characters are equal to
+          those of the first argument for the positions which are defined in
+          both strings
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
 {
@@ -58,13 +63,21 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
 }
 
 
-/// add axioms corresponding to the String.substring java function Warning: the
-/// specification may not be correct for the case where the string is shorter
-/// than the end index
-/// \par parameters: function application with one string argument, one start
-///   index
-/// argument and an optional end index argument
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_substring
+
+  Inputs: function application with one string argument, one start index
+          argument and an optional end index argument
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the String.substring java function
+          Warning: the specification may not be correct for the case where the
+          string is shorter than the end index
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_substring(
   const function_application_exprt &f)
 {
@@ -85,12 +98,20 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   return add_axioms_for_substring(str, i, j);
 }
 
-/// add axioms stating that the returned string expression is equal to the input
-/// one starting at `start` and ending before `end`
-/// \par parameters: a string expression, an expression for the start index, and
-///   an
-/// expression for the end index
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_substring
+
+  Inputs: a string expression, an expression for the start index, and an
+          expression for the end index
+
+ Outputs: a new string expression
+
+ Purpose: add axioms stating that the returned string expression is equal
+          to the input one starting at `start` and ending before `end`
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_substring(
   const string_exprt &str, const exprt &start, const exprt &end)
 {
@@ -127,9 +148,18 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   return res;
 }
 
-/// add axioms corresponding to the String.trim java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_trim
+
+  Inputs: function application with one string argument
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the String.trim java function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &expr)
 {
@@ -203,9 +233,18 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   return res;
 }
 
-/// add axioms corresponding to the String.toLowerCase java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_to_lower_case
+
+  Inputs: function application with one string argument
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the String.toLowerCase java function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const function_application_exprt &expr)
 {
@@ -247,9 +286,18 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   return res;
 }
 
-/// add axioms corresponding to the String.toUpperCase java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_to_upper_case
+
+  Inputs: function application with one string argument
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the String.toUpperCase java function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const function_application_exprt &expr)
 {
@@ -290,13 +338,22 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 }
 
 
-/// add axioms corresponding stating that the result is similar to that of the
-/// StringBuilder.setCharAt java function Warning: this may be underspecified in
-/// the case wher the index exceed the length of the string
-/// \par parameters: function application with three arguments, the first is a
-///   string
-/// the second an index and the third a character
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_char_set
+
+  Inputs: function application with three arguments, the first is a string
+          the second an index and the third a character
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding stating that the result is similar to
+          that of the StringBuilder.setCharAt java function
+          Warning: this may be underspecified in the case wher the index exceed
+          the length of the string
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
@@ -317,11 +374,19 @@ string_exprt string_constraint_generatort::add_axioms_for_char_set(
   return res;
 }
 
-/// add axioms corresponding to the String.replace java function
-/// \par parameters: function application with three arguments, the first is a
-///   string,
-/// the second and the third are characters
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_replace
+
+  Inputs: function application with three arguments, the first is a string,
+          the second and the third are characters
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the String.replace java function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
 {
@@ -351,11 +416,20 @@ string_exprt string_constraint_generatort::add_axioms_for_replace(
   return res;
 }
 
-/// add axioms corresponding to the StringBuilder.deleteCharAt java function
-/// \par parameters: function application with two arguments, the first is a
-///   string
-/// and the second is an index
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_delete_char_at
+
+  Inputs: function application with two arguments, the first is a string
+          and the second is an index
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the StringBuilder.deleteCharAt java
+          function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_delete_char_at(
   const function_application_exprt &f)
 {
@@ -367,11 +441,20 @@ string_exprt string_constraint_generatort::add_axioms_for_delete_char_at(
     plus_exprt_with_overflow_check(args(f, 2)[1], index_one));
 }
 
-/// add axioms stating that the returned string corresponds to the input one
-/// where we removed characters between the positions start (included) and end
-/// (not included)
-/// \par parameters: a string expression, a start index and an end index
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_delete
+
+  Inputs: a string expression, a start index and an end index
+
+ Outputs: a new string expression
+
+ Purpose: add axioms stating that the returned string corresponds to the input
+          one where we removed characters between the positions
+          start (included) and end (not included)
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_delete(
   const string_exprt &str, const exprt &start, const exprt &end)
 {
@@ -383,10 +466,19 @@ string_exprt string_constraint_generatort::add_axioms_for_delete(
   return add_axioms_for_concat(str1, str2);
 }
 
-/// add axioms corresponding to the StringBuilder.delete java function
-/// \par parameters: function application with three arguments: a string
-/// expression, a start index and an end index
-/// \return a new string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_delete
+
+  Inputs: function application with three arguments: a string
+          expression, a start index and an end index
+
+ Outputs: a new string expression
+
+ Purpose: add axioms corresponding to the StringBuilder.delete java function
+
+\*******************************************************************/
+
 string_exprt string_constraint_generatort::add_axioms_for_delete(
   const function_application_exprt &f)
 {

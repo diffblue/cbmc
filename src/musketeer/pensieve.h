@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// Fence insertion following criteria of Pensieve (PPoPP'05)
-
 #ifndef CPROVER_MUSKETEER_PENSIEVE_H
 #define CPROVER_MUSKETEER_PENSIEVE_H
 

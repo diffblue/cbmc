@@ -6,9 +6,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Remove Instance-of Operators
-
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 #include "remove_instanceof.h"
@@ -57,10 +54,19 @@ protected:
   bool contains_instanceof(const exprt &);
 };
 
-/// Avoid breaking sharing by checking for instanceof before calling
-/// lower_instanceof.
-/// \par parameters: Expression `expr`
-/// \return Returns true if `expr` contains any instanceof ops
+/*******************************************************************\
+
+Function: remove_instanceoft::contains_instanceof
+
+  Inputs: Expression `expr`
+
+ Outputs: Returns true if `expr` contains any instanceof ops
+
+ Purpose: Avoid breaking sharing by checking for instanceof
+          before calling lower_instanceof.
+
+\*******************************************************************/
+
 bool remove_instanceoft::contains_instanceof(
   const exprt &expr)
 {
@@ -72,12 +78,24 @@ bool remove_instanceoft::contains_instanceof(
   return false;
 }
 
-/// Replaces an expression like e instanceof A with e.@class_identifier == "A"
-/// Or a big-or of similar expressions if we know of subtypes that also satisfy
-/// the given test.
-/// \par parameters: Expression to lower `expr` and the `goto_program` and
-/// instruction `this_inst` it belongs to.
-/// \return Side-effect on `expr` replacing it with an explicit clsid test
+/*******************************************************************\
+
+Function: remove_instanceoft::lower_instanceof
+
+  Inputs: Expression to lower `expr` and the `goto_program` and
+          instruction `this_inst` it belongs to.
+
+ Outputs: Side-effect on `expr` replacing it with an explicit clsid test
+
+ Purpose: Replaces an expression like
+          e instanceof A
+          with
+          e.@class_identifier == "A"
+          Or a big-or of similar expressions if we know of subtypes
+          that also satisfy the given test.
+
+\*******************************************************************/
+
 void remove_instanceoft::lower_instanceof(
   exprt &expr,
   goto_programt &goto_program,
@@ -146,12 +164,20 @@ void remove_instanceoft::lower_instanceof(
   }
 }
 
-/// See function above
-/// \par parameters: GOTO program instruction `target` whose instanceof
-///   expressions,
-/// if any, should be replaced with explicit tests, and the
-/// `goto_program` it is part of.
-/// \return Side-effect on `target` as above.
+/*******************************************************************\
+
+Function: remove_instanceoft::lower_instanceof
+
+  Inputs: GOTO program instruction `target` whose instanceof expressions,
+          if any, should be replaced with explicit tests, and the
+          `goto_program` it is part of.
+
+ Outputs: Side-effect on `target` as above.
+
+ Purpose: See function above
+
+\*******************************************************************/
+
 void remove_instanceoft::lower_instanceof(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -172,10 +198,18 @@ void remove_instanceoft::lower_instanceof(
     lower_instanceof(target->guard, goto_program, target, inst_switch);
 }
 
-/// See function above
-/// \par parameters: `goto_program`, all of whose instanceof expressions will
-/// be replaced by explicit class-identifier tests.
-/// \return Side-effect on `goto_program` as above.
+/*******************************************************************\
+
+Function: remove_instanceoft::lower_instanceof
+
+  Inputs: `goto_program`, all of whose instanceof expressions will
+          be replaced by explicit class-identifier tests.
+
+ Outputs: Side-effect on `goto_program` as above.
+
+ Purpose: See function above
+
+\*******************************************************************/
 bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
 {
   instanceof_instt inst_switch;
@@ -196,9 +230,19 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
     return false;
 }
 
-/// See function above
-/// \return Side-effects on this->goto_functions, replacing every instanceof in
-///   every function with an explicit test.
+/*******************************************************************\
+
+Function: remove_instanceoft::lower_instanceof
+
+  Inputs: None
+
+ Outputs: Side-effects on this->goto_functions, replacing every
+          instanceof in every function with an explicit test.
+
+ Purpose: See function above
+
+\*******************************************************************/
+
 void remove_instanceoft::lower_instanceof()
 {
   bool changed=false;
@@ -208,12 +252,22 @@ void remove_instanceoft::lower_instanceof()
     goto_functions.compute_location_numbers();
 }
 
-/// See function above
-/// \par parameters: `goto_functions`, a function map, and the corresponding
-/// `symbol_table`.
-/// \return Side-effects on goto_functions, replacing every instanceof in every
-///   function with an explicit test. Extra auxiliary variables may be
-///   introduced into `symbol_table`.
+/*******************************************************************\
+
+Function: remove_instanceof
+
+  Inputs: `goto_functions`, a function map, and the corresponding
+          `symbol_table`.
+
+ Outputs: Side-effects on goto_functions, replacing every
+          instanceof in every function with an explicit test.
+          Extra auxiliary variables may be introduced into
+          `symbol_table`.
+
+ Purpose: See function above
+
+\*******************************************************************/
+
 void remove_instanceof(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)

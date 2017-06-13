@@ -8,9 +8,6 @@ Date: September 2011
 
 \*******************************************************************/
 
-/// \file
-/// Memory-mapped I/O Instrumentation for Goto Programs
-
 #include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_program.h>
@@ -32,6 +29,18 @@ Date: September 2011
 #endif
 
 #include "mmio.h"
+
+/*******************************************************************\
+
+Function: mmio
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void mmio(
   value_setst &value_sets,
@@ -161,6 +170,18 @@ void mmio(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: mmio
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void mmio(
   value_setst &value_sets,

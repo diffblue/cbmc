@@ -6,9 +6,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// String infix shorthand
-
 #ifndef CPROVER_UTIL_INFIX_H
 #define CPROVER_UTIL_INFIX_H
 

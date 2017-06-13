@@ -8,15 +8,24 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Class Hierarchy
-
 #include <ostream>
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
 #include "class_hierarchy.h"
+
+/*******************************************************************\
+
+Function: class_hierarchyt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 {
@@ -43,6 +52,18 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
   }
 }
 
+/*******************************************************************\
+
+Function: class_hierarchyt::get_children_trans_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void class_hierarchyt::get_children_trans_rec(
   const irep_idt &c,
   idst &dest) const
@@ -60,6 +81,18 @@ void class_hierarchyt::get_children_trans_rec(
     get_children_trans_rec(child, dest);
 }
 
+/*******************************************************************\
+
+Function: class_hierarchyt::get_parents_trans_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void class_hierarchyt::get_parents_trans_rec(
   const irep_idt &c,
   idst &dest) const
@@ -76,6 +109,18 @@ void class_hierarchyt::get_parents_trans_rec(
   for(const auto &child : entry.parents)
     get_parents_trans_rec(child, dest);
 }
+
+/*******************************************************************\
+
+Function: class_hierarchyt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void class_hierarchyt::output(std::ostream &out) const
 {

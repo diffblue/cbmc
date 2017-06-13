@@ -8,9 +8,6 @@ Date: 2012
 
 \*******************************************************************/
 
-/// \file
-/// graph of abstract events
-
 #include "event_graph.h"
 
 #include <util/message.h>
@@ -24,6 +21,18 @@ static const char *colour_map[NB_COLOURS]=
   "orange", "blueviolet", "cyan", "cadetblue", "magenta", "palegreen",
   "deeppink", "indigo", "olivedrab"};
 #define print_colour(u) colour_map[u%NB_COLOURS]
+
+/*******************************************************************\
+
+Function: event_grapht::print_rec_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void event_grapht::print_rec_graph(std::ofstream &file, event_idt node_id,
   std::set<event_idt> &visited)
@@ -53,6 +62,18 @@ void event_grapht::print_rec_graph(std::ofstream &file, event_idt node_id,
   }
 }
 
+/*******************************************************************\
+
+Function: event_grapht::print_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void event_grapht::print_graph()
 {
   assert(po_order.size()>0);
@@ -66,9 +87,19 @@ void event_grapht::print_graph()
   file << "}" << std::endl;
 }
 
-/// copies the segment
-/// \param begin: top of the subgraph
-/// \param end: bottom of the subgraph
+/*******************************************************************\
+
+Function: event_grapht::copy_segment
+
+  Inputs: begin: top of the subgraph
+          end: bottom of the subgraph
+
+ Outputs:
+
+ Purpose: copies the segment
+
+\*******************************************************************/
+
 void event_grapht::explore_copy_segment(std::set<event_idt> &explored,
   event_idt begin, event_idt end) const
 {
@@ -183,6 +214,18 @@ event_idt event_grapht::copy_segment(event_idt begin, event_idt end)
   return orig2copy[end];
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::check_AC
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool event_grapht::critical_cyclet::check_AC(
   const_iterator s_it,
   const abstract_eventt &first,
@@ -223,6 +266,18 @@ bool event_grapht::critical_cyclet::check_AC(
 
   return AC;
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::check_BC
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool event_grapht::critical_cyclet::check_BC(
   const_iterator it,
@@ -276,6 +331,18 @@ bool event_grapht::critical_cyclet::check_BC(
 
   return BC;
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::is_unsafe
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
 {
@@ -558,7 +625,18 @@ bool event_grapht::critical_cyclet::is_unsafe(memory_modelt model, bool fast)
   return unsafe_met;
 }
 
-/// same as is_unsafe, but with ASM fences
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::is_unsafe_asm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: same as is_unsafe, but with ASM fences
+
+\*******************************************************************/
+
 bool event_grapht::critical_cyclet::is_unsafe_asm(
   memory_modelt model,
   bool fast)
@@ -892,6 +970,18 @@ bool event_grapht::critical_cyclet::is_unsafe_asm(
   return unsafe_met;
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::is_not_uniproc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool event_grapht::critical_cyclet::is_not_uniproc() const
 {
   const_iterator it=begin();
@@ -930,6 +1020,18 @@ bool event_grapht::critical_cyclet::is_not_uniproc() const
   return (it!=end());
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::is_not_weak_uniproc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool event_grapht::critical_cyclet::is_not_weak_uniproc() const
 {
   const_iterator it=begin();
@@ -966,6 +1068,18 @@ bool event_grapht::critical_cyclet::is_not_weak_uniproc() const
 
   return (it!=end());
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::is_not_thin_air
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool event_grapht::critical_cyclet::is_not_thin_air() const
 {
@@ -1015,6 +1129,18 @@ bool event_grapht::critical_cyclet::is_not_thin_air() const
   return true;
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string event_grapht::critical_cyclet::print() const
 {
   std::string cycle="Cycle: ";
@@ -1022,6 +1148,18 @@ std::string event_grapht::critical_cyclet::print() const
     cycle += std::to_string(egraph[*it].id) + "; ";
   return cycle + " End of cycle.";
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_unsafes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string event_grapht::critical_cyclet::print_unsafes() const
 {
@@ -1070,6 +1208,18 @@ std::string event_grapht::critical_cyclet::print_unsafes() const
   return name;
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_events
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string event_grapht::critical_cyclet::print_events() const
 {
   std::string cycle="Cycle: ";
@@ -1081,6 +1231,18 @@ std::string event_grapht::critical_cyclet::print_events() const
   }
   return cycle+" End of cycle.";
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string event_grapht::critical_cyclet::print_output() const
 {
@@ -1094,6 +1256,18 @@ std::string event_grapht::critical_cyclet::print_output() const
   }
   return cycle;
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_detail
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string event_grapht::critical_cyclet::print_detail(
   const critical_cyclet &reduced,
@@ -1124,6 +1298,18 @@ std::string event_grapht::critical_cyclet::print_detail(
   return cycle;
 }
 
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_all
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string event_grapht::critical_cyclet::print_all(
   memory_modelt model,
   std::map<std::string, std::string> &map_id2var,
@@ -1153,6 +1339,18 @@ std::string event_grapht::critical_cyclet::print_all(
 
   return cycle;
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::hide_internals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void event_grapht::critical_cyclet::hide_internals(
   critical_cyclet &reduced)  const
@@ -1229,6 +1427,18 @@ void event_grapht::critical_cyclet::hide_internals(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string event_grapht::critical_cyclet::print_name(
   const critical_cyclet &reduced,
@@ -1534,6 +1744,18 @@ std::string event_grapht::critical_cyclet::print_name(
 
   return name;
 }
+
+/*******************************************************************\
+
+Function: event_grapht::critical_cyclet::print_dot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void event_grapht::critical_cyclet::print_dot(
   std::ostream &str,

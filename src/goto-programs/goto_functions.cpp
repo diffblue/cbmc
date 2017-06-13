@@ -8,10 +8,19 @@ Date: June 2003
 
 \*******************************************************************/
 
-/// \file
-/// Goto Programs with Functions
-
 #include "goto_functions.h"
+
+/*******************************************************************\
+
+Function: get_local_identifiers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void get_local_identifiers(
   const goto_function_templatet<goto_programt> &goto_function,

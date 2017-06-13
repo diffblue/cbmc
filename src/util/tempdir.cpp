@@ -28,6 +28,18 @@ Author: CM Wintersteiger
 #include "tempdir.h"
 #include "file_util.h"
 
+/*******************************************************************\
+
+Function: get_temporary_directory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string get_temporary_directory(const std::string &name_template)
 {
   std::string result;
@@ -74,25 +86,85 @@ std::string get_temporary_directory(const std::string &name_template)
   return result;
 }
 
+/*******************************************************************\
+
+Function: temp_dirt::temp_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 temp_dirt::temp_dirt(const std::string &name_template)
 {
   path=get_temporary_directory(name_template);
 }
+
+/*******************************************************************\
+
+Function: temp_dirt::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string temp_dirt::operator()(const std::string &file)
 {
   return concat_dir_file(path, file);
 }
 
+/*******************************************************************\
+
+Function: temp_dirt::~temp_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void temp_dirt::clear()
 {
   delete_directory(path);
 }
 
+/*******************************************************************\
+
+Function: temp_dirt::~temp_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 temp_dirt::~temp_dirt()
 {
   clear();
 }
+
+/*******************************************************************\
+
+Function: temp_working_dirt::temp_working_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 temp_working_dirt::temp_working_dirt(const std::string &name_template):
   temp_dirt(name_template)
@@ -101,6 +173,18 @@ temp_working_dirt::temp_working_dirt(const std::string &name_template):
   if(chdir(path.c_str())!=0)
     assert(false);
 }
+
+/*******************************************************************\
+
+Function: temp_working_dirt::~temp_working_dirt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 temp_working_dirt::~temp_working_dirt()
 {

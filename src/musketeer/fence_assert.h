@@ -7,9 +7,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// ILP construction for cycles affecting user-assertions and resolution
-
 #ifndef CPROVER_MUSKETEER_FENCE_ASSERT_H
 #define CPROVER_MUSKETEER_FENCE_ASSERT_H
 

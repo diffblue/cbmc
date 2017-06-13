@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <satsolvercore.h>
 #include <interpolator.h>
 
+/*******************************************************************\
+
+Function: satcheck_smvsatt::satcheck_smvsatt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_smvsatt::satcheck_smvsatt()
 {
   satsolver=
@@ -24,13 +36,49 @@ satcheck_smvsatt::satcheck_smvsatt()
   init_const();
 }
 
+/*******************************************************************\
+
+Function: satcheck_smvsat_coret::satcheck_smvsat_coret
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_smvsat_coret::satcheck_smvsat_coret()
 {
 }
 
+/*******************************************************************\
+
+Function: satcheck_smvsatt::~satcheck_smvsatt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_smvsatt::~satcheck_smvsatt()
 {
 }
+
+/*******************************************************************\
+
+Function: satcheck_smvsatt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 tvt satcheck_smvsatt::l_get(literalt a) const
 {
@@ -57,10 +105,34 @@ tvt satcheck_smvsatt::l_get(literalt a) const
   return result;
 }
 
+/*******************************************************************\
+
+Function: satcheck_smvsatt::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_smvsatt::solver_text()
 {
   return std::string("SMVSAT");
 }
+
+/*******************************************************************\
+
+Function: satcheck_smvsatt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_smvsatt::lcnf(const bvt &bv)
 {
@@ -83,6 +155,18 @@ void satcheck_smvsatt::lcnf(const bvt &bv)
 
   delete[] lits;
 }
+
+/*******************************************************************\
+
+Function: satcheck_smvsatt::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt satcheck_smvsatt::prop_solve()
 {
@@ -126,6 +210,18 @@ propt::resultt satcheck_smvsatt::prop_solve()
   return P_ERROR;
 }
 
+/*******************************************************************\
+
+Function: satcheck_smvsat_coret::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 propt::resultt satcheck_smvsat_coret::prop_solve()
 {
   propt::resultt result=satcheck_smvsatt::prop_solve();
@@ -137,6 +233,18 @@ propt::resultt satcheck_smvsat_coret::prop_solve()
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: satcheck_smvsat_interpolatort::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
 {
@@ -163,6 +271,18 @@ void satcheck_smvsat_interpolatort::lcnf(const bvt &bv)
   delete[] lits;
 }
 
+/*******************************************************************\
+
+Function: satcheck_smvsat_interpolatort::interpolate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void satcheck_smvsat_interpolatort::interpolate(exprt &dest)
 {
   // crate instance
@@ -186,6 +306,18 @@ void satcheck_smvsat_interpolatort::interpolate(exprt &dest)
 
   delete interpolator_satsolver;
 }
+
+/*******************************************************************\
+
+Function: satcheck_smvsat_interpolatort::build_aig
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_smvsat_interpolatort::build_aig(
   // NOLINTNEXTLINE(readability/identifiers)

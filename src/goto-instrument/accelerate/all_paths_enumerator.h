@@ -6,9 +6,6 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-/// \file
-/// Loop Acceleration
-
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ALL_PATHS_ENUMERATOR_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ALL_PATHS_ENUMERATOR_H
 

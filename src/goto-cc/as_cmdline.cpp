@@ -6,15 +6,24 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-/// \file
-/// A special command line object for GNU Assembler
-
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
 
 #include "as_cmdline.h"
+
+/*******************************************************************\
+ 
+Function: as_cmdlinet::parse
+ 
+  Inputs: argument count, argument strings
+ 
+ Outputs: none
+ 
+ Purpose: parses the commandline options into a cmdlinet
+
+\*******************************************************************/
 
 // non-as options
 const char *goto_as_options_with_argument[]=

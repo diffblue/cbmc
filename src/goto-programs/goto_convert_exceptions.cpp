@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <util/std_expr.h>
 
 #include "goto_convert_class.h"
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_try_finally
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::convert_msc_try_finally(
   const codet &code,
@@ -51,6 +60,18 @@ void goto_convertt::convert_msc_try_finally(
   dest.destructive_append(tmp);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_try_except
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::convert_msc_try_except(
   const codet &code,
   goto_programt &dest)
@@ -66,6 +87,18 @@ void goto_convertt::convert_msc_try_except(
 
   // todo: generate exception tracking
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_msc_leave
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::convert_msc_leave(
   const codet &code,
@@ -92,6 +125,18 @@ void goto_convertt::convert_msc_leave(
   t->make_goto(targets.leave_target);
   t->source_location=code.source_location();
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_java_try_catch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::convert_java_try_catch(
   const codet &code,
@@ -148,6 +193,18 @@ void goto_convertt::convert_java_try_catch(
   dest.destructive_append(end);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::convert_try_catch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::convert_try_catch(
   const codet &code,
   goto_programt &dest)
@@ -201,6 +258,18 @@ void goto_convertt::convert_try_catch(
   dest.destructive_append(end);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::convert_CPROVER_try_catch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::convert_CPROVER_try_catch(
   const codet &code,
   goto_programt &dest)
@@ -237,6 +306,18 @@ void goto_convertt::convert_CPROVER_try_catch(
   // add 'throw' target
   dest.destructive_append(tmp);
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_CPROVER_throw
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::convert_CPROVER_throw(
   const codet &code,
@@ -275,6 +356,18 @@ void goto_convertt::convert_CPROVER_throw(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::convert_CPROVER_try_finally
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_convertt::convert_CPROVER_try_finally(
   const codet &code,
   goto_programt &dest)
@@ -299,6 +392,18 @@ void goto_convertt::convert_CPROVER_try_finally(
   convert(to_code(code.op1()), dest);
 }
 
+/*******************************************************************\
+
+Function: goto_convertt::exception_flag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 symbol_exprt goto_convertt::exception_flag()
 {
   irep_idt id="$exception_flag";
@@ -320,6 +425,18 @@ symbol_exprt goto_convertt::exception_flag()
 
   return symbol_exprt(id, bool_typet());
 }
+
+/*******************************************************************\
+
+Function: goto_convertt::unwind_destructor_stack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::unwind_destructor_stack(
   const source_locationt &source_location,

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Conversion
-
 #ifndef CPROVER_ANSI_C_LITERALS_UNESCAPE_STRING_H
 #define CPROVER_ANSI_C_LITERALS_UNESCAPE_STRING_H
 

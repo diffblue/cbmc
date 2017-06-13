@@ -18,22 +18,69 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prop_conv.h"
 #include "literal_expr.h"
 
-/// determine whether a variable is in the final conflict
+/*******************************************************************\
+
+Function: prop_convt::is_in_conflict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: determine whether a variable is in the final conflict
+
+\*******************************************************************/
+
 bool prop_convt::is_in_conflict(literalt l) const
 {
   assert(false);
   return false;
 }
 
+/*******************************************************************\
+
+Function: prop_convt::set_assumptions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void prop_convt::set_assumptions(const bvt &)
 {
   assert(false);
 }
 
+/*******************************************************************\
+
+Function: prop_convt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void prop_convt::set_frozen(const literalt)
 {
   assert(false);
 }
+
+/*******************************************************************\
+
+Function: prop_convt::set_frozen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void prop_convt::set_frozen(const bvt &bv)
 {
@@ -41,6 +88,18 @@ void prop_convt::set_frozen(const bvt &bv)
     if(!bv[i].is_constant())
       set_frozen(bv[i]);
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 {
@@ -62,6 +121,18 @@ bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
   throw "found no literal for expression";
 }
 
+/*******************************************************************\
+
+Function: prop_conv_solvert::get_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
   std::pair<symbolst::iterator, bool> result=
@@ -82,7 +153,18 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
   return literal;
 }
 
-/// get a boolean value from counter example if not valid
+/*******************************************************************\
+
+Function: prop_conv_solvert::get_bool
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get a boolean value from counter example if not valid
+
+\*******************************************************************/
+
 bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
 {
   // trivial cases
@@ -171,6 +253,18 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
   return false;
 }
 
+/*******************************************************************\
+
+Function: prop_conv_solvert::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt prop_conv_solvert::convert(const exprt &expr)
 {
   if(!use_cache ||
@@ -204,6 +298,18 @@ literalt prop_conv_solvert::convert(const exprt &expr)
 
   return literal;
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::convert_bool
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
@@ -333,12 +439,36 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   return convert_rest(expr);
 }
 
+/*******************************************************************\
+
+Function: prop_conv_solvert::convert_rest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt prop_conv_solvert::convert_rest(const exprt &expr)
 {
   // fall through
   ignoring(expr);
   return prop.new_variable();
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::set_equality_to_true
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
@@ -366,6 +496,18 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::set_to
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
@@ -466,6 +608,18 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
   prop.l_set_to(convert(expr), value);
 }
 
+/*******************************************************************\
+
+Function: prop_conv_solvert::ignoring
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void prop_conv_solvert::ignoring(const exprt &expr)
 {
   // fall through
@@ -475,9 +629,33 @@ void prop_conv_solvert::ignoring(const exprt &expr)
   print(2, msg);
 }
 
+/*******************************************************************\
+
+Function: prop_conv_solvert::post_process
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void prop_conv_solvert::post_process()
 {
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 decision_proceduret::resultt prop_conv_solvert::dec_solve()
 {
@@ -502,6 +680,18 @@ decision_proceduret::resultt prop_conv_solvert::dec_solve()
 
   return resultt::D_ERROR;
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt prop_conv_solvert::get(const exprt &expr) const
 {
@@ -528,6 +718,18 @@ exprt prop_conv_solvert::get(const exprt &expr) const
 
   return tmp;
 }
+
+/*******************************************************************\
+
+Function: prop_conv_solvert::print_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void prop_conv_solvert::print_assignment(std::ostream &out) const
 {

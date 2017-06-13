@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution of ANSI-C
-
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -26,6 +23,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
+/*******************************************************************\
+
+Function: goto_symext::get_unwind_recursion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,
   const unsigned thread_nr,
@@ -33,6 +42,18 @@ bool goto_symext::get_unwind_recursion(
 {
   return false;
 }
+
+/*******************************************************************\
+
+Function: goto_symext::parameter_assignments
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::parameter_assignments(
   const irep_idt function_identifier,
@@ -169,6 +190,18 @@ void goto_symext::parameter_assignments(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_symext::symex_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symext::symex_function_call(
   const goto_functionst &goto_functions,
   statet &state,
@@ -185,6 +218,18 @@ void goto_symext::symex_function_call(
   else
     throw "unexpected function for symex_function_call: "+function.id_string();
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_function_call_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_function_call_symbol(
   const goto_functionst &goto_functions,
@@ -214,7 +259,18 @@ void goto_symext::symex_function_call_symbol(
     symex_function_call_code(goto_functions, state, code);
 }
 
-/// do function call by inlining
+/*******************************************************************\
+
+Function: goto_symext::symex_function_call_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: do function call by inlining
+
+\*******************************************************************/
+
 void goto_symext::symex_function_call_code(
   const goto_functionst &goto_functions,
   statet &state,
@@ -317,7 +373,18 @@ void goto_symext::symex_function_call_code(
   state.source.pc=goto_function.body.instructions.begin();
 }
 
-/// pop one call frame
+/*******************************************************************\
+
+Function: goto_symext::pop_frame
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: pop one call frame
+
+\*******************************************************************/
+
 void goto_symext::pop_frame(statet &state)
 {
   assert(!state.call_stack().empty());
@@ -357,7 +424,18 @@ void goto_symext::pop_frame(statet &state)
   state.pop_frame();
 }
 
-/// do function call by inlining
+/*******************************************************************\
+
+Function: goto_symext::symex_end_of_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: do function call by inlining
+
+\*******************************************************************/
+
 void goto_symext::symex_end_of_function(statet &state)
 {
   // first record the return
@@ -368,8 +446,20 @@ void goto_symext::symex_end_of_function(statet &state)
   pop_frame(state);
 }
 
-/// preserves locality of local variables of a given function by applying L1
-/// renaming to the local identifiers
+/*******************************************************************\
+
+Function: goto_symext::locality
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: preserves locality of local variables of a given
+          function by applying L1 renaming to the local
+          identifiers
+
+\*******************************************************************/
+
 void goto_symext::locality(
   const irep_idt function_identifier,
   statet &state,
@@ -426,6 +516,18 @@ void goto_symext::locality(
     state.l1_history.insert(l1_name);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_symext::return_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::return_assignment(statet &state)
 {

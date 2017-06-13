@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Bounded Model Checking for ANSI-C + HDL
-
 #ifndef CPROVER_CBMC_CBMC_SOLVERS_H
 #define CPROVER_CBMC_CBMC_SOLVERS_H
 
@@ -29,6 +26,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/symex_target_equation.h>
 
 #include "bv_cbmc.h"
+
+/*******************************************************************\
+
+Solver factory
+
+\*******************************************************************/
 
 class cbmc_solverst:public messaget
 {

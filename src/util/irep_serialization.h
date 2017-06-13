@@ -8,9 +8,6 @@ Date: May 2007
 
 \*******************************************************************/
 
-/// \file
-/// binary irep conversions with hashing
-
 #ifndef CPROVER_UTIL_IREP_SERIALIZATION_H
 #define CPROVER_UTIL_IREP_SERIALIZATION_H
 

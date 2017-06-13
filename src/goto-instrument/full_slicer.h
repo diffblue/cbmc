@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Slicing
-
 #ifndef CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 #define CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 

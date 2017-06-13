@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Floating Point with under/over-approximation
-
 #ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_APPROXIMATION_H
 #define CPROVER_SOLVERS_FLOATBV_FLOAT_APPROXIMATION_H
 

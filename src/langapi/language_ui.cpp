@@ -18,7 +18,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "language_ui.h"
 #include "mode.h"
 
-/// Constructor
+/*******************************************************************\
+
+Function: language_uit::language_uit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Constructor
+
+\*******************************************************************/
+
 language_uit::language_uit(
   const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
@@ -28,10 +39,33 @@ language_uit::language_uit(
   set_message_handler(ui_message_handler);
 }
 
-/// Destructor
+/*******************************************************************\
+
+Function: language_uit::~language_uit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Destructor
+
+\*******************************************************************/
+
 language_uit::~language_uit()
 {
 }
+
+/*******************************************************************\
+
+Function: language_uit::parse()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool language_uit::parse()
 {
@@ -43,6 +77,18 @@ bool language_uit::parse()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: language_uit::parse()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool language_uit::parse(const std::string &filename)
 {
@@ -92,6 +138,18 @@ bool language_uit::parse(const std::string &filename)
   return false;
 }
 
+/*******************************************************************\
+
+Function: language_uit::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool language_uit::typecheck()
 {
   status() << "Converting" << eom;
@@ -106,6 +164,18 @@ bool language_uit::typecheck()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: language_uit::final
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool language_uit::final()
 {
@@ -124,6 +194,18 @@ bool language_uit::final()
   return false;
 }
 
+/*******************************************************************\
+
+Function: language_uit::show_symbol_table
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void language_uit::show_symbol_table(bool brief)
 {
   switch(get_ui())
@@ -141,10 +223,34 @@ void language_uit::show_symbol_table(bool brief)
   }
 }
 
+/*******************************************************************\
+
+Function: language_uit::show_symbol_table_xml_ui
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void language_uit::show_symbol_table_xml_ui(bool brief)
 {
   error() << "cannot show symbol table in this format" << eom;
 }
+
+/*******************************************************************\
+
+Function: language_uit::show_symbol_table_plain
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void language_uit::show_symbol_table_plain(
   std::ostream &out,

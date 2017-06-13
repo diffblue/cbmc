@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Show the symbol table
-
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_SYMBOL_TABLE_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_SYMBOL_TABLE_H
 

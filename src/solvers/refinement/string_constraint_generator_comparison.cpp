@@ -7,18 +7,23 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Generates string constraints for function comparing strings, such as:
-///   equals, equalsIgnoreCase, compareTo, hashCode, intern
-
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms stating that the result is true exactly when the strings
-/// represented by the arguments are equal. the variable ending in
-/// `witness_unequal` is -1 if the length differs or an index at which the
-/// strings are different
-/// \par parameters: function application with two string arguments
-/// \return a expression of Boolean type
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_equals
+
+  Inputs: function application with two string arguments
+
+ Outputs: a expression of Boolean type
+
+ Purpose: add axioms stating that the result is true exactly when the strings
+          represented by the arguments are equal.
+          the variable ending in `witness_unequal` is -1 if the length differs
+          or an index at which the strings are different
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
 {
@@ -60,12 +65,20 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   return tc_eq;
 }
 
-/// returns an expression which is true when the two given characters are equal
-/// when ignoring case for ASCII
-/// \par parameters: two character expressions and constant character
-///   expressions
-/// representing 'a', 'A' and 'Z'
-/// \return a expression of Boolean type
+/*******************************************************************\
+
+Function: string_constraint_generatort::character_equals_ignore_case
+
+  Inputs: two character expressions and constant character expressions
+          representing 'a', 'A' and 'Z'
+
+ Outputs: a expression of Boolean type
+
+ Purpose: returns an expression which is true when the two given
+          characters are equal when ignoring case for ASCII
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::character_equals_ignore_case(
   exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z)
 {
@@ -92,9 +105,18 @@ exprt string_constraint_generatort::character_equals_ignore_case(
   return or_exprt(or_exprt(p1, p2), p3);
 }
 
-/// add axioms corresponding to the String.equalsIgnoreCase java function
-/// \par parameters: function application with two string arguments
-/// \return a Boolean expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_equals_ignore_case
+
+  Inputs: function application with two string arguments
+
+ Outputs: a Boolean expression
+
+ Purpose: add axioms corresponding to the String.equalsIgnoreCase java function
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
 {
@@ -144,10 +166,19 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   return tc_eq;
 }
 
-/// add axioms stating that if two strings are equal then their hash codes are
-/// equals
-/// \par parameters: function application with a string argument
-/// \return a integer expression corresponding to the hash code of the string
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_hash_code
+
+  Inputs: function application with a string argument
+
+ Outputs: a integer expression corresponding to the hash code of the string
+
+ Purpose: add axioms stating that if two strings are equal then their hash
+          codes are equals
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_hash_code(
   const function_application_exprt &f)
 {
@@ -182,9 +213,18 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   return hash;
 }
 
-/// add axioms corresponding to the String.compareTo java function
-/// \par parameters: function application with two string arguments
-/// \return a integer expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_compare_to
+
+  Inputs: function application with two string arguments
+
+ Outputs: a integer expression
+
+ Purpose: add axioms corresponding to the String.compareTo java function
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
 {
@@ -256,10 +296,19 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   return res;
 }
 
-/// add axioms stating that the return value for two equal string should be the
-/// same
-/// \par parameters: function application with one string argument
-/// \return a string expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_intern
+
+  Inputs: function application with one string argument
+
+ Outputs: a string expression
+
+ Purpose: add axioms stating that the return value for two equal string
+          should be the same
+
+\*******************************************************************/
+
 symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)
 {

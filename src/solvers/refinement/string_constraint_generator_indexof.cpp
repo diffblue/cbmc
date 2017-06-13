@@ -7,19 +7,25 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Generates string constraints for the family of indexOf and lastIndexOf java
-///   functions
-
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// Add axioms stating that the returned value is the index within str of the
-/// first occurence of c starting the search at from_index, or -1 if no such
-/// character occurs at or after position from_index.
-/// \param str: a string expression
-/// \param c: an expression representing a character
-/// \param from_index: an expression representing an index in the string
-/// \return a integer expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_index_of
+
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
+
+ Outputs: a integer expression
+
+ Purpose: Add axioms stating that the returned value is the index within
+          str of the first occurence of c starting the search at from_index,
+          or -1 if no such character occurs at or after position from_index.
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
 {
@@ -67,14 +73,25 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   return index;
 }
 
-/// Add axioms stating that the returned value is the index within haystack of
-/// the first occurence of needle starting the search at from_index, or -1 if
-/// needle does not occur at or after position from_index.
-/// \param haystack: a string expression
-/// \param needle: a string expression
-/// \param from_index: an expression representing an index in strings
-/// \return an integer expression representing the first index of needle in
-///   haystack after from_index, or -1 if there is none
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_index_of_string
+
+  Inputs:
+    haystack - a string expression
+    needle - a string expression
+    from_index - an expression representing an index in strings
+
+ Outputs: an integer expression representing the first index of needle in
+          haystack after from_index, or -1 if there is none
+
+ Purpose: Add axioms stating that the returned value is the index within
+          haystack of the first occurence of needle starting the search at
+          from_index, or -1 if needle does not occur at or after position
+          from_index.
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const string_exprt &haystack,
   const string_exprt &needle,
@@ -174,15 +191,25 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   return offset;
 }
 
-/// Add axioms stating that the returned value is the index within haystack of
-/// the last occurence of needle starting the search backward at from_index (ie
-/// the index is smaller or equal to from_index), or -1 if needle does not occur
-/// before from_index.
-/// \param haystack: a string expression
-/// \param needle: a string expression
-/// \param from_index: an expression representing an index in strings
-/// \return an integer expression representing the last index of needle in
-///   haystack before or at from_index, or -1 if there is none
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of_string
+
+  Inputs:
+    haystack - a string expression
+    needle - a string expression
+    from_index - an expression representing an index in strings
+
+ Outputs: an integer expression representing the last index of needle in
+          haystack before or at from_index, or -1 if there is none
+
+ Purpose: Add axioms stating that the returned value is the index within
+          haystack of the last occurence of needle starting the search
+          backward at from_index (ie the index is smaller or equal to
+          from_index), or -1 if needle does not occur before from_index.
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const string_exprt &haystack,
   const string_exprt &needle,
@@ -285,10 +312,20 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   return offset;
 }
 
-/// add axioms corresponding to the String.indexOf:(C), String.indexOf:(CI),
-/// String.indexOf:(String), and String.indexOf:(String,I) java functions
-/// \par parameters: function application with 2 or 3 arguments
-/// \return a integer expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_index_of
+
+  Inputs: function application with 2 or 3 arguments
+
+ Outputs: a integer expression
+
+ Purpose: add axioms corresponding to the String.indexOf:(C),
+          String.indexOf:(CI), String.indexOf:(String), and
+          String.indexOf:(String,I) java functions
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
@@ -319,14 +356,25 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   }
 }
 
-/// Add axioms stating that the returned value is the index within str of the
-/// last occurence of c starting the search backward at from_index, or -1 if no
-/// such character occurs at or before position from_index.
-/// \param str: a string expression
-/// \param c: an expression representing a character
-/// \param from_index: an expression representing an index in the string
-/// \return an integer expression representing the last index of c in str before
-///   or at from_index, or -1 if there is none
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of
+
+  Inputs:
+    str - a string expression
+    c - an expression representing a character
+    from_index - an expression representing an index in the string
+
+ Outputs: an integer expression representing the last index of c in
+          str before or at from_index, or -1 if there is none
+
+ Purpose: Add axioms stating that the returned value is the index within
+          str of the last occurence of c starting the search backward at
+          from_index, or -1 if no such character occurs at or before
+          position from_index.
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
 {
@@ -380,11 +428,20 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   return index;
 }
 
-/// add axioms corresponding to the String.lastIndexOf:(C),
-/// String.lastIndexOf:(CI), String.lastIndexOf:(String), and
-/// String.lastIndexOf:(String,I) java functions
-/// \par parameters: function application with 2 or 3 arguments
-/// \return a integer expression
+/*******************************************************************\
+
+Function: string_constraint_generatort::add_axioms_for_last_index_of
+
+  Inputs: function application with 2 or 3 arguments
+
+ Outputs: a integer expression
+
+ Purpose: add axioms corresponding to the String.lastIndexOf:(C),
+          String.lastIndexOf:(CI), String.lastIndexOf:(String), and
+          String.lastIndexOf:(String,I) java functions
+
+\*******************************************************************/
+
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {

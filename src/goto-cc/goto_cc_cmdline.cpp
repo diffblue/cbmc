@@ -8,9 +8,6 @@ Date:   April 2010
 
 \*******************************************************************/
 
-/// \file
-/// Command line interpretation for goto-cc
-
 #include <cstring>
 #include <cassert>
 #include <iostream>
@@ -21,11 +18,35 @@ Date:   April 2010
 
 #include "goto_cc_cmdline.h"
 
+/*******************************************************************\
+
+Function: goto_cc_cmdlinet::~goto_cc_cmdlinet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 goto_cc_cmdlinet::~goto_cc_cmdlinet()
 {
   if(!stdin_file.empty())
     remove(stdin_file.c_str());
 }
+
+/*******************************************************************\
+
+Function: goto_cc_cmdlinet::in_list
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
 {
@@ -37,6 +58,18 @@ bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: goto_cc_cmdlinet::prefix_in_list
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool goto_cc_cmdlinet::prefix_in_list(
   const char *option,
@@ -54,6 +87,18 @@ bool goto_cc_cmdlinet::prefix_in_list(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: goto_cc_cmdlinet::get_optnr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 {
@@ -107,6 +152,18 @@ std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
 
   return optnr;
 }
+
+/*******************************************************************\
+
+Function: goto_cc_cmdlinet::add_infile_arg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_cc_cmdlinet::add_infile_arg(const std::string &arg)
 {

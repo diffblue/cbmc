@@ -11,6 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_types.h"
 #include "std_expr.h"
 
+/*******************************************************************\
+
+Function: fixedbv_typet::get_integer_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::size_t fixedbv_typet::get_integer_bits() const
 {
   const irep_idt integer_bits=get(ID_integer_bits);
@@ -18,12 +30,36 @@ std::size_t fixedbv_typet::get_integer_bits() const
   return unsafe_string2unsigned(id2string(integer_bits));
 }
 
+/*******************************************************************\
+
+Function: floatbv_typet::get_f
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::size_t floatbv_typet::get_f() const
 {
   const irep_idt &f=get(ID_f);
   assert(f!=irep_idt());
   return unsafe_string2unsigned(id2string(f));
 }
+
+/*******************************************************************\
+
+Function: struct_union_typet::component_number
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::size_t struct_union_typet::component_number(
   const irep_idt &component_name) const
@@ -47,6 +83,18 @@ std::size_t struct_union_typet::component_number(
   return 0;
 }
 
+/*******************************************************************\
+
+Function: struct_union_typet::get_component
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const struct_union_typet::componentt &struct_union_typet::get_component(
   const irep_idt &component_name) const
 {
@@ -64,6 +112,18 @@ const struct_union_typet::componentt &struct_union_typet::get_component(
   return static_cast<const componentt &>(get_nil_irep());
 }
 
+/*******************************************************************\
+
+Function: struct_union_typet::component_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet struct_union_typet::component_type(
   const irep_idt &component_name) const
 {
@@ -71,6 +131,18 @@ typet struct_union_typet::component_type(
   assert(c.is_not_nil());
   return c.type();
 }
+
+/*******************************************************************\
+
+Function: struct_typet::is_prefix_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool struct_typet::is_prefix_of(const struct_typet &other) const
 {
@@ -101,11 +173,35 @@ bool struct_typet::is_prefix_of(const struct_typet &other) const
   return true; // ok, *this is a prefix of ot
 }
 
+/*******************************************************************\
+
+Function: is_reference
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool is_reference(const typet &type)
 {
   return type.id()==ID_pointer &&
          type.get_bool(ID_C_reference);
 }
+
+/*******************************************************************\
+
+Function: is_rvalue_reference
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool is_rvalue_reference(const typet &type)
 {
@@ -113,70 +209,238 @@ bool is_rvalue_reference(const typet &type)
          type.get_bool(ID_C_rvalue_reference);
 }
 
+/*******************************************************************\
+
+Function: range_typet::set_from
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void range_typet::set_from(const mp_integer &from)
 {
   set(ID_from, integer2string(from));
 }
+
+/*******************************************************************\
+
+Function: range_typet::set_to
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void range_typet::set_to(const mp_integer &to)
 {
   set(ID_to, integer2string(to));
 }
 
+/*******************************************************************\
+
+Function: range_typet::get_from
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer range_typet::get_from() const
 {
   return string2integer(get_string(ID_from));
 }
+
+/*******************************************************************\
+
+Function: range_typet::get_to
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer range_typet::get_to() const
 {
   return string2integer(get_string(ID_to));
 }
 
+/*******************************************************************\
+
+Function: signedbv_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer signedbv_typet::smallest() const
 {
   return -power(2, get_width()-1);
 }
+
+/*******************************************************************\
+
+Function: signedbv_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer signedbv_typet::largest() const
 {
   return power(2, get_width()-1)-1;
 }
 
+/*******************************************************************\
+
+Function: signedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 constant_exprt signedbv_typet::zero_expr() const
 {
   return to_constant_expr(from_integer(0, *this));
 }
+
+/*******************************************************************\
+
+Function: signedbv_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_exprt signedbv_typet::smallest_expr() const
 {
   return to_constant_expr(from_integer(smallest(), *this));
 }
 
+/*******************************************************************\
+
+Function: signedbv_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 constant_exprt signedbv_typet::largest_expr() const
 {
   return to_constant_expr(from_integer(largest(), *this));
 }
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer unsignedbv_typet::smallest() const
 {
   return 0;
 }
 
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 mp_integer unsignedbv_typet::largest() const
 {
   return power(2, get_width())-1;
 }
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::zero_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_exprt unsignedbv_typet::zero_expr() const
 {
   return to_constant_expr(from_integer(0, *this));
 }
 
+/*******************************************************************\
+
+Function: unsignedbv_typet::smallest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 constant_exprt unsignedbv_typet::smallest_expr() const
 {
   return to_constant_expr(from_integer(smallest(), *this));
 }
+
+/*******************************************************************\
+
+Function: unsignedbv_typet::largest_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_exprt unsignedbv_typet::largest_expr() const
 {

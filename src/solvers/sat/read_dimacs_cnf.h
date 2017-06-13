@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Reading DIMACS CNF
-
 #ifndef CPROVER_SOLVERS_SAT_READ_DIMACS_CNF_H
 #define CPROVER_SOLVERS_SAT_READ_DIMACS_CNF_H
 

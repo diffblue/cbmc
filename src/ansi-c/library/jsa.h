@@ -7,9 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Counterexample-Guided Inductive Synthesis
-
 /* FUNCTION: __CPROVER_jsa_synthesise */
 
 #ifndef CPROVER_ANSI_C_LIBRARY_JSA_H

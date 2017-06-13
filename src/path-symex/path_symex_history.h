@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// History for path-based symbolic simulator
-
 #ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_HISTORY_H
 #define CPROVER_PATH_SYMEX_PATH_SYMEX_HISTORY_H
 

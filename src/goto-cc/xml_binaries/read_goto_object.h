@@ -8,9 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-/// \file
-/// Read goto object files.
-
 #ifndef CPROVER_GOTO_CC_XML_BINARIES_READ_GOTO_OBJECT_H
 #define CPROVER_GOTO_CC_XML_BINARIES_READ_GOTO_OBJECT_H
 

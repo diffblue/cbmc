@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_byte_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {
   if(expr.operands().size()!=3)

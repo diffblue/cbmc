@@ -6,9 +6,6 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-/// \file
-/// Loop Acceleration
-
 #include <analyses/natural_loops.h>
 
 #include <goto-programs/goto_functions.h>

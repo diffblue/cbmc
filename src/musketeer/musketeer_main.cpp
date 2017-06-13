@@ -6,10 +6,19 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// Main Module
-
 #include "musketeer_parse_options.h"
+
+/*******************************************************************\
+
+Function: main
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 int main(int argc, const char **argv)
 {

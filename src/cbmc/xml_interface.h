@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// XML Interface
-
 #ifndef CPROVER_CBMC_XML_INTERFACE_H
 #define CPROVER_CBMC_XML_INTERFACE_H
 

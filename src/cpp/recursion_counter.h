@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #ifndef CPROVER_CPP_RECURSION_COUNTER_H
 #define CPROVER_CPP_RECURSION_COUNTER_H
 

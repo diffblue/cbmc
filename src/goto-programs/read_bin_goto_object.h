@@ -8,9 +8,6 @@ Date: May 2007
 
 \*******************************************************************/
 
-/// \file
-/// Read goto object files.
-
 #ifndef CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H
 #define CPROVER_GOTO_PROGRAMS_READ_BIN_GOTO_OBJECT_H
 

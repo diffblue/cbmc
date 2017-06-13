@@ -6,12 +6,21 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Read ELF
-
 #include <istream>
 
 #include "elf_reader.h"
+
+/*******************************************************************\
+
+Function: elf_readert::elf_readert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 elf_readert::elf_readert(std::istream &_in):in(_in)
 {
@@ -121,6 +130,18 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
   }
 }
 
+/*******************************************************************\
+
+Function: elf_readert::get_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string elf_readert::get_string(std::streampos index) const
 {
   in.seekg(string_table_offset+index);
@@ -138,6 +159,18 @@ std::string elf_readert::get_string(std::streampos index) const
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: elf_readert::has_section
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool elf_readert::has_section(const std::string &name) const
 {

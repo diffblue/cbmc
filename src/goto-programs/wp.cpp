@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Weakest Preconditions
-
 // #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
@@ -16,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 
 #include "wp.h"
+
+/*******************************************************************\
+
+Function: has_nondet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool has_nondet(const exprt &dest)
 {
@@ -35,6 +44,18 @@ bool has_nondet(const exprt &dest)
   return false;
 }
 
+/*******************************************************************\
+
+Function: approximate_nondet_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void approximate_nondet_rec(exprt &dest, unsigned &count)
 {
   if(dest.id()==ID_side_effect &&
@@ -50,13 +71,36 @@ void approximate_nondet_rec(exprt &dest, unsigned &count)
     approximate_nondet_rec(*it, count);
 }
 
+/*******************************************************************\
+
+Function: approximate_nondet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void approximate_nondet(exprt &dest)
 {
   static unsigned count=0; // not proper, should be quantified
   approximate_nondet_rec(dest, count);
 }
 
-/// consider possible aliasing
+/*******************************************************************\
+
+Function: aliasing
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: consider possible aliasing
+
+\*******************************************************************/
+
 enum class aliasingt { A_MAY, A_MUST, A_MUSTNOT };
 
 aliasingt aliasing(
@@ -111,7 +155,19 @@ aliasingt aliasing(
   return aliasingt::A_MAY;
 }
 
-/// replace 'what' by 'by' in 'dest', considering possible aliasing
+/*******************************************************************\
+
+Function: substitute_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: replace 'what' by 'by' in 'dest',
+          considering possible aliasing
+
+\*******************************************************************/
+
 void substitute_rec(
   exprt &dest,
   const exprt &what,
@@ -161,6 +217,18 @@ void substitute_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: rewrite_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void rewrite_assignment(exprt &lhs, exprt &rhs)
 {
   if(lhs.id()==ID_member) // turn s.x:=e into s:=(s with .x=e)
@@ -199,6 +267,18 @@ void rewrite_assignment(exprt &lhs, exprt &rhs)
   }
 }
 
+/*******************************************************************\
+
+Function: wp_assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt wp_assign(
   const code_assignt &code,
   const exprt &post,
@@ -220,6 +300,18 @@ exprt wp_assign(
   return pre;
 }
 
+/*******************************************************************\
+
+Function: wp_assume
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt wp_assume(
   const code_assumet &code,
   const exprt &post,
@@ -227,6 +319,18 @@ exprt wp_assume(
 {
   return implies_exprt(code.assumption(), post);
 }
+
+/*******************************************************************\
+
+Function: wp_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt wp_decl(
   const code_declt &code,
@@ -240,6 +344,18 @@ exprt wp_decl(
 
   return wp_assign(assignment, post, ns);
 }
+
+/*******************************************************************\
+
+Function: wp
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt wp(
   const codet &code,

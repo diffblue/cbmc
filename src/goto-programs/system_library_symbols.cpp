@@ -6,9 +6,6 @@ Author: Thomas Kiley
 
 \*******************************************************************/
 
-/// \file
-/// Goto Programs
-
 #include "system_library_symbols.h"
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
@@ -20,9 +17,20 @@ system_library_symbolst::system_library_symbolst()
   init_system_library_map();
 }
 
-/// To generate a map of header file names -> list of symbols The symbol names
-/// are reserved as the header and source files will be compiled in to the goto
-/// program.
+/*******************************************************************\
+
+Function: system_library_symbolst::init_system_library_map
+
+Inputs:
+
+Outputs:
+
+Purpose: To generate a map of header file names -> list of symbols
+         The symbol names are reserved as the header and source files
+         will be compiled in to the goto program.
+
+\*******************************************************************/
+
 void system_library_symbolst::init_system_library_map()
 {
   // ctype.h
@@ -232,10 +240,22 @@ void system_library_symbolst::init_system_library_map()
   add_to_system_library("sys/wait.h", sys_wait_syms);
 }
 
-/// To add the symbols from a specific header file to the system library map.
-/// The symbol is used as the key so that we can easily look up symbols.
-/// \param header_file: the name of the header file the symbol came from
-/// \param symbols: a list of the names of the symbols in the header file
+/*******************************************************************\
+
+Function: system_library_symbolst::add_to_system_library
+
+Inputs:
+ header_file - the name of the header file the symbol came from
+ symbols - a list of the names of the symbols in the header file
+
+Outputs:
+
+Purpose: To add the symbols from a specific header file to the
+         system library map. The symbol is used as the key so that
+         we can easily look up symbols.
+
+\*******************************************************************/
+
 void system_library_symbolst::add_to_system_library(
   irep_idt header_file,
   std::list<irep_idt> symbols)
@@ -247,10 +267,21 @@ void system_library_symbolst::add_to_system_library(
 }
 
 
-/// To find out if a symbol is an internal symbol.
-/// \param symbol: the symbol to check
-/// \return True if the symbol is an internal symbol. If specific system headers
-///   need to be included, the out_system_headers will contain the headers.
+/*******************************************************************\
+
+Function: system_library_symbolst::is_symbol_internal_symbol
+
+Inputs:
+ symbol - the symbol to check
+
+Outputs: True if the symbol is an internal symbol. If specific system
+         headers need to be included, the out_system_headers will contain
+         the headers.
+
+Purpose: To find out if a symbol is an internal symbol.
+
+\*******************************************************************/
+
 bool system_library_symbolst::is_symbol_internal_symbol(
   const symbolt &symbol,
   std::set<std::string> &out_system_headers) const

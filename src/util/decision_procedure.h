@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Decision Procedure Interface
-
 #ifndef CPROVER_UTIL_DECISION_PROCEDURE_H
 #define CPROVER_UTIL_DECISION_PROCEDURE_H
 

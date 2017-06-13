@@ -178,9 +178,20 @@ public:
   {}
 };
 
-/// we can determine whether an access is volatile just by looking at the type
-/// of the variables involved in the expression. We assume that the program is
-/// correctly typed (i.e., volatile-marked)
+/*******************************************************************\
+
+Function: is_volatile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: we can determine whether an access is volatile just by looking at
+   the type of the variables involved in the expression. We assume that the
+   program is correctly typed (i.e., volatile-marked)
+
+\*******************************************************************/
+
 bool fence_volatilet::is_volatile(const typet &src) const
 {
   if(src.get_bool(ID_C_volatile))
@@ -221,6 +232,18 @@ bool fence_volatilet::is_volatile(const typet &src) const
 
   return false;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_volatilet::compute()
 {
@@ -294,6 +317,18 @@ void fence_volatilet::compute()
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_all_sharedt::compute()
 {
@@ -411,6 +446,18 @@ void fence_all_sharedt::compute()
     }
   }
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_all_shared_aegt::compute()
 {
@@ -562,6 +609,18 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
   }
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void fence_all_shared(
   message_handlert &message_handler,
   value_setst &value_sets,
@@ -574,6 +633,18 @@ void fence_all_shared(
   instrumenter.do_it();
 }
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void fence_all_shared_aeg(
   message_handlert &message_handler,
   value_setst &value_sets,
@@ -585,6 +656,18 @@ void fence_all_shared_aeg(
     goto_functions);
   instrumenter.do_it();
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_volatile(
   message_handlert &message_handler,

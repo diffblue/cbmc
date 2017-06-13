@@ -6,12 +6,21 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language
-
 #include <algorithm>
 
 #include "jsil_types.h"
+
+/*******************************************************************\
+
+Function: jsil_any_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_any_type()
 {
@@ -22,6 +31,18 @@ typet jsil_any_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_value_or_empty_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_value_or_empty_type()
 {
   return jsil_union_typet({ // NOLINT(whitespace/braces)
@@ -30,6 +51,18 @@ typet jsil_value_or_empty_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_value_or_reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_value_or_reference_type()
 {
   return jsil_union_typet({ // NOLINT(whitespace/braces)
@@ -37,6 +70,18 @@ typet jsil_value_or_reference_type()
                           jsil_reference_type()
                           });
 }
+
+/*******************************************************************\
+
+Function: jsil_value_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_value_type()
 {
@@ -48,6 +93,18 @@ typet jsil_value_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_prim_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_prim_type()
 {
   return jsil_union_typet({ // NOLINT(whitespace/braces)
@@ -57,6 +114,18 @@ typet jsil_prim_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_reference_type()
 {
   return jsil_union_typet({ // NOLINT(whitespace/braces)
@@ -65,15 +134,51 @@ typet jsil_reference_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_member_reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_member_reference_type()
 {
   return typet("jsil_member_reference_type");
 }
 
+/*******************************************************************\
+
+Function: jsil_variable_reference_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_variable_reference_type()
 {
   return typet("jsil_variable_reference_type");
 }
+
+/*******************************************************************\
+
+Function: jsil_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_object_type()
 {
@@ -83,35 +188,119 @@ typet jsil_object_type()
                           });
 }
 
+/*******************************************************************\
+
+Function: jsil_user_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_user_object_type()
 {
   return typet("jsil_user_object_type");
 }
+
+/*******************************************************************\
+
+Function: jsil_builtin_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_builtin_object_type()
 {
   return typet("jsil_builtin_object_type");
 }
 
+/*******************************************************************\
+
+Function: jsil_null_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_null_type()
 {
   return typet("jsil_null_type");
 }
+
+/*******************************************************************\
+
+Function: jsil_undefined_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_undefined_type()
 {
   return typet("jsil_undefined_type");
 }
 
+/*******************************************************************\
+
+Function: jsil_kind
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_kind()
 {
   return typet("jsil_kind");
 }
 
+/*******************************************************************\
+
+Function: jsil_empty_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 typet jsil_empty_type()
 {
   return typet("jsil_empty_type");
 }
+
+/*******************************************************************\
+
+Function: jsil_is_subtype
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool jsil_is_subtype(const typet &type1, const typet &type2)
 {
@@ -128,11 +317,35 @@ bool jsil_is_subtype(const typet &type1, const typet &type2)
     return type1.id()==type2.id();
 }
 
+/*******************************************************************\
+
+Function: jsil_incompatible_types
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool jsil_incompatible_types(const typet &type1, const typet &type2)
 {
   return jsil_union_typet(type1).intersect_with(
     jsil_union_typet(type2)).components().empty();
 }
+
+/*******************************************************************\
+
+Function: jsil_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet jsil_union(const typet &type1, const typet &type2)
 {
@@ -140,12 +353,36 @@ typet jsil_union(const typet &type1, const typet &type2)
     .union_with(jsil_union_typet(type2)).to_type();
 }
 
+/*******************************************************************\
+
+Function: compare_components
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool compare_components(
   const union_typet::componentt &comp1,
   const union_typet::componentt &comp2)
 {
   return comp1.type().id()<comp2.type().id();
 }
+
+/*******************************************************************\
+
+Function: jsil_union_typet::jsil_union_typet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 jsil_union_typet::jsil_union_typet(const std::vector<typet> &types):
     union_typet()
@@ -165,6 +402,18 @@ jsil_union_typet::jsil_union_typet(const std::vector<typet> &types):
   std::sort(elements.begin(), elements.end(), compare_components);
 }
 
+/*******************************************************************\
+
+Function: jsil_union_typet::union_with
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 jsil_union_typet jsil_union_typet::union_with(
     const jsil_union_typet &other) const
 {
@@ -182,6 +431,17 @@ jsil_union_typet jsil_union_typet::union_with(
   return result;
 }
 
+/*******************************************************************\
+
+Function: jsil_union_typet::intersect_with
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 jsil_union_typet jsil_union_typet::intersect_with(
     const jsil_union_typet &other) const
 {
@@ -198,6 +458,18 @@ jsil_union_typet jsil_union_typet::intersect_with(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: jsil_union_typet::is_subtype
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool jsil_union_typet::is_subtype(const jsil_union_typet &other) const
 {
@@ -231,6 +503,18 @@ bool jsil_union_typet::is_subtype(const jsil_union_typet &other) const
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: jsil_union_typet::to_type()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const typet &jsil_union_typet::to_type() const
 {

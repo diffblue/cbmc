@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Linking: Zero Initialization
-
 #include <sstream>
 
 #include <util/namespace.h>
@@ -58,6 +55,18 @@ protected:
     const typet &type,
     const source_locationt &source_location);
 };
+
+/*******************************************************************\
+
+Function: zero_initializert::zero_initializer_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt zero_initializert::zero_initializer_rec(
   const typet &type,
@@ -310,6 +319,18 @@ exprt zero_initializert::zero_initializer_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: zero_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt zero_initializer(
   const typet &type,
   const source_locationt &source_location,
@@ -319,6 +340,18 @@ exprt zero_initializer(
   zero_initializert z_i(ns, message_handler);
   return z_i(type, source_location);
 }
+
+/*******************************************************************\
+
+Function: zero_initializer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt zero_initializer(
   const typet &type,

@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive escape analysis
-
 #include <util/simplify_expr.h>
 
 #include "escape_analysis.h"
+
+/*******************************************************************\
+
+Function: escape_domaint::is_tracked
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {
@@ -24,6 +33,18 @@ bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::get_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 irep_idt escape_domaint::get_function(const exprt &lhs)
 {
@@ -39,6 +60,18 @@ irep_idt escape_domaint::get_function(const exprt &lhs)
 
   return irep_idt();
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::assign_lhs_cleanup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_domaint::assign_lhs_cleanup(
   const exprt &lhs,
@@ -58,6 +91,18 @@ void escape_domaint::assign_lhs_cleanup(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::assign_lhs_aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_domaint::assign_lhs_aliases(
   const exprt &lhs,
@@ -79,6 +124,18 @@ void escape_domaint::assign_lhs_aliases(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_cleanup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_domaint::get_rhs_cleanup(
   const exprt &rhs,
@@ -109,6 +166,18 @@ void escape_domaint::get_rhs_cleanup(
     get_rhs_cleanup(to_typecast_expr(rhs).op(), cleanup_functions);
   }
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_domaint::get_rhs_aliases(
   const exprt &rhs,
@@ -142,6 +211,18 @@ void escape_domaint::get_rhs_aliases(
   }
 }
 
+/*******************************************************************\
+
+Function: escape_domaint::get_rhs_aliases_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void escape_domaint::get_rhs_aliases_address_of(
   const exprt &rhs,
   std::set<irep_idt> &alias_set)
@@ -160,6 +241,18 @@ void escape_domaint::get_rhs_aliases_address_of(
   {
   }
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::transform
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_domaint::transform(
   locationt from,
@@ -253,6 +346,18 @@ void escape_domaint::transform(
   }
 }
 
+/*******************************************************************\
+
+Function: escape_domaint::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void escape_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -298,6 +403,18 @@ void escape_domaint::output(
       out << '\n';
   }
 }
+
+/*******************************************************************\
+
+Function: escape_domaint::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool escape_domaint::merge(
   const escape_domaint &b,
@@ -363,6 +480,18 @@ bool escape_domaint::merge(
   return changed;
 }
 
+/*******************************************************************\
+
+Function: escape_domaint::check_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void escape_domaint::check_lhs(
   const exprt &lhs,
   std::set<irep_idt> &cleanup_functions)
@@ -397,6 +526,18 @@ void escape_domaint::check_lhs(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: escape_analysist::insert_cleanup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_analysist::insert_cleanup(
   goto_functionst::goto_functiont &goto_function,
@@ -434,6 +575,18 @@ void escape_analysist::insert_cleanup(
     location->source_location=source_location;
   }
 }
+
+/*******************************************************************\
+
+Function: escape_analysist::instrument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void escape_analysist::instrument(
   goto_functionst &goto_functions,

@@ -200,6 +200,18 @@ protected:
 #define VTYPE_INFO_OBJECT      7
 #define VTYPE_INFO_UNINIT      8
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool java_bytecode_parsert::parse()
 {
   try
@@ -227,6 +239,18 @@ bool java_bytecode_parsert::parse()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rClassFile
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #define ACC_PUBLIC       0x0001
 #define ACC_PRIVATE      0x0002
@@ -305,6 +329,18 @@ void java_bytecode_parsert::rClassFile()
   parse_tree.loading_successful=true;
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::get_class_refs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::get_class_refs()
 {
   // Get the class references for the benefit of a dependency
@@ -347,6 +383,18 @@ void java_bytecode_parsert::get_class_refs()
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::get_class_refs_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::get_class_refs_rec(const typet &src)
 {
   if(src.id()==ID_code)
@@ -378,6 +426,18 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   else if(src.id()==ID_pointer)
     get_class_refs_rec(src.subtype());
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rconstant_pool
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_parsert::rconstant_pool()
 {
@@ -598,6 +658,18 @@ void java_bytecode_parsert::rconstant_pool()
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rinterfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rinterfaces(classt &parsed_class)
 {
   u2 interfaces_count=read_u2();
@@ -606,6 +678,18 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
     parsed_class.implements
       .push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rfields
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_parsert::rfields(classt &parsed_class)
 {
@@ -637,6 +721,18 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
       rfield_attribute(field);
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rbytecode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #define T_BOOLEAN 4
 #define T_CHAR    5
@@ -879,6 +975,18 @@ void java_bytecode_parsert::rbytecode(
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rmethod_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rmethod_attribute(methodt &method)
 {
   u2 attribute_name_index=read_u2();
@@ -947,6 +1055,18 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     skip_bytes(attribute_length);
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rfield_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rfield_attribute(fieldt &field)
 {
   u2 attribute_name_index=read_u2();
@@ -962,6 +1082,18 @@ void java_bytecode_parsert::rfield_attribute(fieldt &field)
   else
     skip_bytes(attribute_length);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rcode_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_parsert::rcode_attribute(methodt &method)
 {
@@ -1167,6 +1299,18 @@ void java_bytecode_parsert::read_verification_type_info(
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rRuntimeAnnotation_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rRuntimeAnnotation_attribute(
   annotationst &annotations)
 {
@@ -1180,6 +1324,18 @@ void java_bytecode_parsert::rRuntimeAnnotation_attribute(
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rRuntimeAnnotation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rRuntimeAnnotation(
   annotationt &annotation)
 {
@@ -1187,6 +1343,18 @@ void java_bytecode_parsert::rRuntimeAnnotation(
   annotation.type=type_entry(type_index);
   relement_value_pairs(annotation.element_value_pairs);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::relement_value_pairs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_parsert::relement_value_pairs(
   annotationt::element_value_pairst &element_value_pairs)
@@ -1202,6 +1370,18 @@ void java_bytecode_parsert::relement_value_pairs(
     relement_value_pair(element_value_pair);
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::relement_value_pair
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_parsert::relement_value_pair(
   annotationt::element_value_pairt &element_value_pair)
@@ -1262,6 +1442,18 @@ void java_bytecode_parsert::relement_value_pair(
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rclass_attribute
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 {
   u2 attribute_name_index=read_u2();
@@ -1310,6 +1502,18 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     skip_bytes(attribute_length);
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rmethods
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_parsert::rmethods(classt &parsed_class)
 {
   u2 methods_count=read_u2();
@@ -1317,6 +1521,18 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
   for(std::size_t j=0; j<methods_count; j++)
     rmethod(parsed_class);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parsert::rmethod
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #define ACC_PUBLIC     0x0001
 #define ACC_PRIVATE    0x0002
@@ -1362,6 +1578,18 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
     rmethod_attribute(method);
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool java_bytecode_parse(
   std::istream &istream,
   java_bytecode_parse_treet &parse_tree,
@@ -1377,6 +1605,18 @@ bool java_bytecode_parse(
 
   return parser_result;
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool java_bytecode_parse(
   const std::string &file,

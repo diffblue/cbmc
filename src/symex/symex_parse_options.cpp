@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symex Command Line Options Processing
-
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -54,12 +51,36 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "path_search.h"
 #include "symex_parse_options.h"
 
+/*******************************************************************\
+
+Function: symex_parse_optionst::symex_parse_optionst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
   language_uit(cmdline, ui_message_handler),
   ui_message_handler(cmdline, "Symex " CBMC_VERSION)
 {
 }
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::eval_verbosity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_parse_optionst::eval_verbosity()
 {
@@ -77,6 +98,18 @@ void symex_parse_optionst::eval_verbosity()
 
   ui_message_handler.set_verbosity(v);
 }
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::get_command_line_options
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_parse_optionst::get_command_line_options(optionst &options)
 {
@@ -112,7 +145,18 @@ void symex_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 }
 
-/// invoke main modules
+/*******************************************************************\
+
+Function: symex_parse_optionst::doit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: invoke main modules
+
+\*******************************************************************/
+
 int symex_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
@@ -252,6 +296,18 @@ int symex_parse_optionst::doit()
   #endif
 }
 
+/*******************************************************************\
+
+Function: symex_parse_optionst::set_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool symex_parse_optionst::set_properties()
 {
   try
@@ -280,6 +336,18 @@ bool symex_parse_optionst::set_properties()
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::process_goto_program
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool symex_parse_optionst::process_goto_program(const optionst &options)
 {
@@ -395,6 +463,18 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
   return false;
 }
 
+/*******************************************************************\
+
+Function: symex_parse_optionst::report_properties
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
@@ -462,6 +542,18 @@ void symex_parse_optionst::report_properties(
   }
 }
 
+/*******************************************************************\
+
+Function: symex_parse_optionst::report_success
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
@@ -484,6 +576,18 @@ void symex_parse_optionst::report_success()
     assert(false);
   }
 }
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::show_counterexample
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
@@ -510,6 +614,18 @@ void symex_parse_optionst::show_counterexample(
   }
 }
 
+/*******************************************************************\
+
+Function: symex_parse_optionst::report_failure
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_parse_optionst::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
@@ -533,7 +649,18 @@ void symex_parse_optionst::report_failure()
   }
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: symex_parse_optionst::help
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void symex_parse_optionst::help()
 {
   std::cout <<

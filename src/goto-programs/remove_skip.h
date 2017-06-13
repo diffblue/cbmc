@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H
 

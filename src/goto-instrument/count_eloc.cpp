@@ -8,9 +8,6 @@ Date: December 2012
 
 \*******************************************************************/
 
-/// \file
-/// Count effective lines of code
-
 #include <iostream>
 #include <unordered_set>
 
@@ -24,6 +21,18 @@ Date: December 2012
 typedef std::unordered_set<irep_idt, irep_id_hash> linest;
 typedef std::unordered_map<irep_idt, linest, irep_id_hash> filest;
 typedef std::unordered_map<irep_idt, filest, irep_id_hash> working_dirst;
+
+/*******************************************************************\
+
+Function: collect_eloc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static void collect_eloc(
   const goto_functionst &goto_functions,
@@ -43,6 +52,18 @@ static void collect_eloc(
   }
 }
 
+/*******************************************************************\
+
+Function: count_eloc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void count_eloc(const goto_functionst &goto_functions)
 {
   std::size_t eloc=0;
@@ -56,6 +77,18 @@ void count_eloc(const goto_functionst &goto_functions)
 
   std::cout << "Effective lines of code: " << eloc << '\n';
 }
+
+/*******************************************************************\
+
+Function: list_eloc
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void list_eloc(const goto_functionst &goto_functions)
 {
@@ -73,6 +106,18 @@ void list_eloc(const goto_functionst &goto_functions)
         std::cout << file << ':' << line << '\n';
     }
 }
+
+/*******************************************************************\
+
+Function: print_path_lengths
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void print_path_lengths(const goto_functionst &goto_functions)
 {

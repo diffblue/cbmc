@@ -20,6 +20,18 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #define precosat_lit(a) ((a).var_no()*2 + !(a).sign())
 
+/*******************************************************************\
+
+Function: satcheck_precosatt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 tvt satcheck_precosatt::l_get(literalt a) const
 {
   if(a.is_constant())
@@ -41,10 +53,34 @@ tvt satcheck_precosatt::l_get(literalt a) const
   return result;
 }
 
+/*******************************************************************\
+
+Function: satcheck_precosatt::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_precosatt::solver_text()
 {
   return "PrecoSAT";
 }
+
+/*******************************************************************\
+
+Function: satcheck_precosatt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_precosatt::lcnf(const bvt &bv)
 {
@@ -60,6 +96,18 @@ void satcheck_precosatt::lcnf(const bvt &bv)
 
   clause_counter++;
 }
+
+/*******************************************************************\
+
+Function: satcheck_precosatt::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt satcheck_precosatt::prop_solve()
 {
@@ -94,10 +142,34 @@ propt::resultt satcheck_precosatt::prop_solve()
   return P_UNSATISFIABLE;
 }
 
+/*******************************************************************\
+
+Function: satcheck_precosatt::set_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void satcheck_precosatt::set_assignment(literalt a, bool value)
 {
   assert(false);
 }
+
+/*******************************************************************\
+
+Function: satcheck_precosatt::satcheck_precosatt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 satcheck_precosatt::satcheck_precosatt() :
   solver(new PrecoSat::Solver())
@@ -105,10 +177,34 @@ satcheck_precosatt::satcheck_precosatt() :
   solver->init();
 }
 
+/*******************************************************************\
+
+Function: satcheck_precosatt::~satcheck_precosatt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_precosatt::~satcheck_precosatt()
 {
   delete solver;
 }
+
+/*******************************************************************\
+
+Function: satcheck_precosatt::set_assumptions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 /*
 void satcheck_precosatt::set_assumptions(const bvt &bv)

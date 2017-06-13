@@ -13,6 +13,18 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "string2int.h"
 
+/*******************************************************************\
+
+Function: str2number
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 template <typename T>
 inline T str2number(const char *str, int base, bool safe)
 {
@@ -48,30 +60,102 @@ inline T str2number(const char *str, int base, bool safe)
   return (T)val;
 }
 
+/*******************************************************************\
+
+Function: safe_string2unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned safe_string2unsigned(const std::string &str, int base)
 {
   return str2number<unsigned>(str.c_str(), base, true);
 }
+
+/*******************************************************************\
+
+Function: safe_string2size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::size_t safe_string2size_t(const std::string &str, int base)
 {
   return str2number<std::size_t>(str.c_str(), base, true);
 }
 
+/*******************************************************************\
+
+Function: unsafe_string2int
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 int unsafe_string2int(const std::string &str, int base)
 {
   return str2number<int>(str.c_str(), base, false);
 }
+
+/*******************************************************************\
+
+Function: unsafe_string2unsigned
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned unsafe_string2unsigned(const std::string &str, int base)
 {
   return str2number<unsigned>(str.c_str(), base, false);
 }
 
+/*******************************************************************\
+
+Function: unsafe_string2size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::size_t unsafe_string2size_t(const std::string &str, int base)
 {
   return str2number<std::size_t>(str.c_str(), base, false);
 }
+
+/*******************************************************************\
+
+Function: unsafe_string2signedlonglong
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 signed long long int unsafe_string2signedlonglong(
   const std::string &str,
@@ -79,6 +163,18 @@ signed long long int unsafe_string2signedlonglong(
 {
   return str2number<signed long long int>(str.c_str(), base, false);
 }
+
+/*******************************************************************\
+
+Function: unsafe_string2unsignedlonglong
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned long long int unsafe_string2unsignedlonglong(
   const std::string &str,

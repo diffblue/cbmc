@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// A stdin/stdout pipe as STL stream
-
 #ifndef CPROVER_UTIL_PIPE_STREAM_H
 #define CPROVER_UTIL_PIPE_STREAM_H
 

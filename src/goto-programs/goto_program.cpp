@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <ostream>
 
 #include <util/std_expr.h>
@@ -17,13 +14,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_program.h"
 
-/// See below.
-/// \param ns: the namespace to resolve the expressions in
-/// \param identifier: the identifier used to find a symbol to identify the
-///   source language
-/// \param out: the stream to write the goto string to
-/// \param it: an iterator pointing to the instruction to convert
-/// \return See below.
+/*******************************************************************\
+
+Function: goto_programt::output_instruction
+
+  Inputs:
+   ns - the namespace to resolve the expressions in
+   identifier - the identifier used to find a symbol to identify the
+                source language
+   out - the stream to write the goto string to
+   it - an iterator pointing to the instruction to convert
+
+ Outputs: See below.
+
+ Purpose: See below.
+
+\*******************************************************************/
+
 std::ostream &goto_programt::output_instruction(
   const class namespacet &ns,
   const irep_idt &identifier,
@@ -33,15 +40,26 @@ std::ostream &goto_programt::output_instruction(
   return output_instruction(ns, identifier, out, *it);
 }
 
-/// Writes to out a two line string representation of the specific instruction.
-/// It is of the format: // {location} file {source file} line {line in source
-/// file} {representation of the instruction}
-/// \param ns: the namespace to resolve the expressions in
-/// \param identifier: the identifier used to find a symbol to identify the
-///   source language
-/// \param out: the stream to write the goto string to
-/// \param instruction: the instruction to convert
-/// \return Appends to out a two line representation of the instruction
+/*******************************************************************\
+
+Function: goto_programt::output_instruction
+
+  Inputs:
+   ns - the namespace to resolve the expressions in
+   identifier - the identifier used to find a symbol to identify the
+                source language
+   out - the stream to write the goto string to
+   instruction - the instruction to convert
+
+ Outputs: Appends to out a two line representation of the instruction
+
+ Purpose: Writes to out a two line string representation of the specific
+          instruction. It is of the format:
+          // {location} file {source file} line {line in source file}
+          {representation of the instruction}
+
+\*******************************************************************/
+
 std::ostream &goto_programt::output_instruction(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -211,6 +229,18 @@ std::ostream &goto_programt::output_instruction(
   return out;
 }
 
+/*******************************************************************\
+
+Function: goto_programt::get_decl_identifiers
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_programt::get_decl_identifiers(
   decl_identifierst &decl_identifiers) const
 {
@@ -225,6 +255,18 @@ void goto_programt::get_decl_identifiers(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: parse_lhs_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void parse_lhs_read(const exprt &src, std::list<exprt> &dest)
 {
@@ -252,6 +294,18 @@ void parse_lhs_read(const exprt &src, std::list<exprt> &dest)
     parse_lhs_read(src.op2(), dest);
   }
 }
+
+/*******************************************************************\
+
+Function: expressions_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::list<exprt> expressions_read(
   const goto_programt::instructiont &instruction)
@@ -298,6 +352,18 @@ std::list<exprt> expressions_read(
   return dest;
 }
 
+/*******************************************************************\
+
+Function: expressions_written
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::list<exprt> expressions_written(
   const goto_programt::instructiont &instruction)
 {
@@ -326,6 +392,18 @@ std::list<exprt> expressions_written(
   return dest;
 }
 
+/*******************************************************************\
+
+Function: get_objects_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void objects_read(
   const exprt &src,
   std::list<exprt> &dest)
@@ -350,6 +428,18 @@ void objects_read(
   }
 }
 
+/*******************************************************************\
+
+Function: objects_read
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::list<exprt> objects_read(
   const goto_programt::instructiont &instruction)
 {
@@ -362,6 +452,18 @@ std::list<exprt> objects_read(
 
   return dest;
 }
+
+/*******************************************************************\
+
+Function: objects_written
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void objects_written(
   const exprt &src,
@@ -377,6 +479,18 @@ void objects_written(
     dest.push_back(src);
 }
 
+/*******************************************************************\
+
+Function: objects_written
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::list<exprt> objects_written(
   const goto_programt::instructiont &instruction)
 {
@@ -389,6 +503,18 @@ std::list<exprt> objects_written(
 
   return dest;
 }
+
+/*******************************************************************\
+
+Function: as_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string as_string(
   const class namespacet &ns,

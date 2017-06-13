@@ -8,6 +8,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_constant(const constant_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// limit class path loading
-
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_LIMIT_H
 #define CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_LIMIT_H
 

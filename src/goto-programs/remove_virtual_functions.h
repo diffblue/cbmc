@@ -8,9 +8,6 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Remove Virtual Function (Method) Calls
-
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
 

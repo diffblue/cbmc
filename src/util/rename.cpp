@@ -13,17 +13,35 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "namespace.h"
 
-/// automated variable renaming
-/// \par parameters: symbol to be renamed, namespace
-/// \return new symbol
+/*******************************************************************\
+
+Function: get_new_name
+
+  Inputs: symbol to be renamed, namespace
+
+ Outputs: new symbol
+
+ Purpose: automated variable renaming
+
+\*******************************************************************/
+
 void get_new_name(symbolt &symbol, const namespacet &ns)
 {
   get_new_name(symbol.name, ns);
 }
 
-/// automated variable renaming
-/// \par parameters: symbol to be renamed, namespace
-/// \return new symbol
+/*******************************************************************\
+
+Function: get_new_name
+
+  Inputs: symbol to be renamed, namespace
+
+ Outputs: new symbol
+
+ Purpose: automated variable renaming
+
+\*******************************************************************/
+
 void get_new_name(irep_idt &new_name, const namespacet &ns)
 {
   const symbolt *symbol;
@@ -35,9 +53,19 @@ void get_new_name(irep_idt &new_name, const namespacet &ns)
   new_name=prefix+std::to_string(ns.get_max(prefix)+1);
 }
 
-/// automated variable renaming
-/// \par parameters: expression, old name, new name
-/// \return modifies the expression returns false iff something was renamed
+/*******************************************************************\
+
+Function: rename
+
+  Inputs: expression, old name, new name
+
+ Outputs: modifies the expression
+          returns false iff something was renamed
+
+ Purpose: automated variable renaming
+
+\*******************************************************************/
+
 bool rename(exprt &expr, const irep_idt &old_name,
             const irep_idt &new_name)
 {

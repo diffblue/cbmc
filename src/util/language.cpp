@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Abstract interface to support a programming language
-
 #include "language.h"
 #include "expr.h"
 #include <util/symbol.h>
@@ -17,21 +14,69 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
 
+/*******************************************************************\
+
+Function: languaget::final
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool languaget::final(symbol_tablet &symbol_table)
 {
   return false;
 }
+
+/*******************************************************************\
+
+Function: languaget::interfaces
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool languaget::interfaces(symbol_tablet &symbol_table)
 {
   return false;
 }
 
+/*******************************************************************\
+
+Function: languaget::dependencies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void languaget::dependencies(
   const std::string &module,
   std::set<std::string> &modules)
 {
 }
+
+/*******************************************************************\
+
+Function: languaget::from_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool languaget::from_expr(
   const exprt &expr,
@@ -42,6 +87,18 @@ bool languaget::from_expr(
   return false;
 }
 
+/*******************************************************************\
+
+Function: languaget::from_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool languaget::from_type(
   const typet &type,
   std::string &code,
@@ -50,6 +107,18 @@ bool languaget::from_type(
   code=type.pretty();
   return false;
 }
+
+/*******************************************************************\
+
+Function: languaget::type_to_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool languaget::type_to_name(
   const typet &type,
@@ -62,19 +131,41 @@ bool languaget::type_to_name(
   return false;
 }
 
-/// Turn on or off stub generation.
-/// \param should_generate_stubs: Should stub generation be enabled
+/*******************************************************************\
+
+Function: languaget::set_should_generate_opaque_method_stubs
+
+  Inputs:
+          should_generate_stubs - Should stub generation be enabled
+
+ Outputs:
+
+ Purpose: Turn on or off stub generation.
+
+\*******************************************************************/
 void languaget::set_should_generate_opaque_method_stubs(
   bool should_generate_stubs)
 {
   generate_opaque_stubs=should_generate_stubs;
 }
 
-/// When there are opaque methods (e.g. ones where we don't have a body), we
-/// create a stub function in the goto program and mark it as opaque so the
-/// interpreter fills in appropriate values for it. This will only happen if
-/// generate_opaque_stubs is enabled.
-/// \param symbol_table: the symbol table for the program
+/*******************************************************************\
+
+Function: languaget::generate_opaque_method_stubs
+
+  Inputs:
+          symbol_table - the symbol table for the program
+
+ Outputs:
+
+ Purpose: When there are opaque methods (e.g. ones where we don't
+          have a body), we create a stub function in the goto
+          program and mark it as opaque so the interpreter fills in
+          appropriate values for it. This will only happen if
+          generate_opaque_stubs is enabled.
+
+\*******************************************************************/
+
 void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
 {
   if(generate_opaque_stubs)
@@ -102,13 +193,24 @@ void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
   }
 }
 
-/// To generate the stub function for the opaque function in question. The
-/// identifier is used in the flag to the interpreter that the function is
-/// opaque. This function should be implemented in the languages.
-/// \param symbol: the function symbol which is opaque
-/// \param symbol_table: the symbol table
-/// \return The identifier of the return variable. ID_nil if the function
-///   doesn't return anything.
+/*******************************************************************\
+
+Function: languaget::generate_opaque_stub_body
+
+  Inputs:
+          symbol - the function symbol which is opaque
+          symbol_table - the symbol table
+
+ Outputs: The identifier of the return variable. ID_nil if the function
+          doesn't return anything.
+
+ Purpose: To generate the stub function for the opaque function in
+          question. The identifier is used in the flag to the interpreter
+          that the function is opaque. This function should be implemented
+          in the languages.
+
+\*******************************************************************/
+
 irep_idt languaget::generate_opaque_stub_body(
   symbolt &symbol,
   symbol_tablet &symbol_table)
@@ -116,14 +218,24 @@ irep_idt languaget::generate_opaque_stub_body(
   return ID_nil;
 }
 
-/// To build the parameter symbol and choose its name. This should be
-/// implemented in each language.
-/// \param function_symbol: the symbol of an opaque function
-/// \param parameter_index: the index of the parameter within the the parameter
-///   list
-/// \param parameter_type: the type of the parameter
-/// \return A named symbol to be added to the symbol table representing one of
-///   the parameters in this opaque function.
+/*******************************************************************\
+
+Function: languaget::build_stub_parameter_symbol
+
+  Inputs:
+          function_symbol - the symbol of an opaque function
+          parameter_index - the index of the parameter within the
+                            the parameter list
+          parameter_type - the type of the parameter
+
+ Outputs: A named symbol to be added to the symbol table representing
+          one of the parameters in this opaque function.
+
+ Purpose: To build the parameter symbol and choose its name. This should
+          be implemented in each language.
+
+\*******************************************************************/
+
 parameter_symbolt languaget::build_stub_parameter_symbol(
   const symbolt &function_symbol,
   size_t parameter_index,
@@ -136,11 +248,21 @@ parameter_symbolt languaget::build_stub_parameter_symbol(
   return parameter_symbolt();
 }
 
-/// To get the name of the symbol to be used for the return value of the
-/// function. Generates a name like to_return_function_name
-/// \param function_id: the function that has a return value
-/// \return the identifier to use for the symbol that will store the return
-///   value of this function.
+/*******************************************************************\
+
+Function: languaget::get_stub_return_symbol_name
+
+  Inputs:
+          function_id - the function that has a return value
+
+ Outputs: the identifier to use for the symbol that will store the
+          return value of this function.
+
+ Purpose: To get the name of the symbol to be used for the return value
+          of the function. Generates a name like to_return_function_name
+
+\*******************************************************************/
+
 irep_idt languaget::get_stub_return_symbol_name(const irep_idt &function_id)
 {
   std::ostringstream return_symbol_name_builder;
@@ -149,11 +271,22 @@ irep_idt languaget::get_stub_return_symbol_name(const irep_idt &function_id)
 }
 
 
-/// To identify if a given symbol is an opaque function and hence needs to be
-/// stubbed. We explicitly exclude CPROVER functions, if they have no body it is
-/// because we haven't generated it yet.
-/// \param symbol: the symbol to be checked
-/// \return True if the symbol is an opaque (e.g. non-bodied) function
+/*******************************************************************\
+
+Function: languaget::is_symbol_opaque_function
+
+  Inputs:
+          symbol - the symbol to be checked
+
+ Outputs: True if the symbol is an opaque (e.g. non-bodied) function
+
+ Purpose: To identify if a given symbol is an opaque function and
+          hence needs to be stubbed. We explicitly exclude CPROVER
+          functions, if they have no body it is because we haven't
+          generated it yet.
+
+\*******************************************************************/
+
 bool languaget::is_symbol_opaque_function(const symbolt &symbol)
 {
   std::set<std::string> headers;
@@ -168,10 +301,23 @@ bool languaget::is_symbol_opaque_function(const symbolt &symbol)
     !is_internal;
 }
 
-/// To create stub parameter symbols for each parameter the function has and
-/// assign their IDs into the parameters identifier.
-/// \param function_symbol: the symbol of an opaque function
-/// \param symbol_table: the symbol table to add the new parameter symbols into
+/*******************************************************************\
+
+Function: languaget::generate_opaque_parameter_symbols
+
+  Inputs:
+          function_symbol - the symbol of an opaque function
+          symbol_table - the symbol table to add the new parameter
+                         symbols into
+
+ Outputs:
+
+ Purpose: To create stub parameter symbols for each parameter the
+          function has and assign their IDs into the parameters
+          identifier.
+
+\*******************************************************************/
+
 void languaget::generate_opaque_parameter_symbols(
   symbolt &function_symbol,
   symbol_tablet &symbol_table)

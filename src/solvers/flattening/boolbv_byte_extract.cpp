@@ -16,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 #include "flatten_byte_operators.h"
 
+/*******************************************************************\
+
+Function: map_bv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
   assert(map.number_of_bits()==src.size());
@@ -32,6 +44,18 @@ bvt map_bv(const endianness_mapt &map, const bvt &src)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_byte_extract
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {

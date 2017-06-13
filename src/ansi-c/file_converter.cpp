@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Convert file contents to C strings
-
 #include <iostream>
 #include <string>
 

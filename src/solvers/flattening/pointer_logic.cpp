@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Pointer Logic
-
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -17,6 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 
 #include "pointer_logic.h"
+
+/*******************************************************************\
+
+Function: pointer_logict::is_dynamic_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool pointer_logict::is_dynamic_object(const exprt &expr) const
 {
@@ -31,6 +40,18 @@ bool pointer_logict::is_dynamic_object(const exprt &expr) const
   return false;
 }
 
+/*******************************************************************\
+
+Function: pointer_logict::get_dynamic_objects
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
 {
   o.clear();
@@ -43,6 +64,18 @@ void pointer_logict::get_dynamic_objects(std::vector<std::size_t> &o) const
     if(is_dynamic_object(*it))
       o.push_back(nr);
 }
+
+/*******************************************************************\
+
+Function: pointer_logict::add_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::size_t pointer_logict::add_object(const exprt &expr)
 {
@@ -62,6 +95,18 @@ std::size_t pointer_logict::add_object(const exprt &expr)
   return objects.number(expr);
 }
 
+/*******************************************************************\
+
+Function: pointer_logict::pointer_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt pointer_logict::pointer_expr(
   std::size_t object,
   const typet &type) const
@@ -69,6 +114,18 @@ exprt pointer_logict::pointer_expr(
   pointert pointer(object, 0);
   return pointer_expr(pointer, type);
 }
+
+/*******************************************************************\
+
+Function: pointer_logict::pointer_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt pointer_logict::pointer_expr(
   const pointert &pointer,
@@ -120,6 +177,18 @@ exprt pointer_logict::pointer_expr(
   result.copy_to_operands(deep_object);
   return result;
 }
+
+/*******************************************************************\
+
+Function: pointer_logict::object_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt pointer_logict::object_rec(
   const mp_integer &offset,
@@ -191,6 +260,18 @@ exprt pointer_logict::object_rec(
   return src;
 }
 
+/*******************************************************************\
+
+Function: pointer_logict::pointer_logict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
 {
   // add NULL
@@ -200,6 +281,18 @@ pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
   // add INVALID
   invalid_object=objects.number(exprt("INVALID"));
 }
+
+/*******************************************************************\
+
+Function: pointer_logict::~pointer_logict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 pointer_logict::~pointer_logict()
 {

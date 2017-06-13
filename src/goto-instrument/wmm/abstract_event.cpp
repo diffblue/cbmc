@@ -8,10 +8,19 @@ Date: 2012
 
 \*******************************************************************/
 
-/// \file
-/// abstract events
-
 #include "abstract_event.h"
+
+/*******************************************************************\
+
+Function: abstract_eventt::unsafe_pair_lwfence_param
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt &next,
   memory_modelt model,
@@ -97,6 +106,18 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt &next,
   /* unknown memory model */
   return true;
 }
+
+/*******************************************************************\
+
+Function: abstract_eventt::unsafe_pair_asm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool abstract_eventt::unsafe_pair_asm(const abstract_eventt &next,
   memory_modelt model,

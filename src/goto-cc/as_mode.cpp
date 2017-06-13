@@ -6,9 +6,6 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
-/// \file
-/// Assembler Mode
-
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -33,6 +30,18 @@ Author: Michael Tautschnig
 
 #include "as_mode.h"
 
+/*******************************************************************\
+
+Function: assembler_name
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static std::string assembler_name(
   const cmdlinet &cmdline,
   const std::string &base_name)
@@ -55,6 +64,18 @@ static std::string assembler_name(
   return result;
 }
 
+/*******************************************************************\
+
+Function: as_modet::as_modet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 as_modet::as_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
@@ -65,7 +86,18 @@ as_modet::as_modet(
 {
 }
 
-/// does it.
+/*******************************************************************\
+
+Function: as_modet::doit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: does it.
+
+\*******************************************************************/
+
 int as_modet::doit()
 {
   if(cmdline.isset('?') ||
@@ -252,7 +284,18 @@ int as_modet::doit()
   return EX_OK;
 }
 
-/// run as or as86 with original command line
+/*******************************************************************\
+
+Function: as_modet::run_as
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: run as or as86 with original command line
+
+\*******************************************************************/
+
 int as_modet::run_as()
 {
   assert(!cmdline.parsed_argv.empty());
@@ -275,6 +318,18 @@ int as_modet::run_as()
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
+
+/*******************************************************************\
+
+Function: as_modet::as_hybrid_binary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 int as_modet::as_hybrid_binary()
 {
@@ -360,7 +415,18 @@ int as_modet::as_hybrid_binary()
   return result;
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: as_modet::help_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void as_modet::help_mode()
 {
   std::cout << "goto-as understands the options of as plus the following.\n\n";

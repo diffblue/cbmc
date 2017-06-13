@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symex Test Suite Generation
-
 #include <iostream>
 
 #include <util/json_expr.h>
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/json_goto_trace.h>
 
 #include "symex_parse_options.h"
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::get_test
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string symex_parse_optionst::get_test(const goto_tracet &goto_trace)
 {
@@ -42,6 +51,18 @@ std::string symex_parse_optionst::get_test(const goto_tracet &goto_trace)
   }
   return test;
 }
+
+/*******************************************************************\
+
+Function: symex_parse_optionst::report_cover
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_parse_optionst::report_cover(
   const path_searcht::property_mapt &property_map)

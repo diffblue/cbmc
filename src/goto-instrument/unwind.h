@@ -7,9 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Loop unwinding
-
 #ifndef CPROVER_GOTO_INSTRUMENT_UNWIND_H
 #define CPROVER_GOTO_INSTRUMENT_UNWIND_H
 

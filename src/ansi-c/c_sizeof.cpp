@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Conversion of sizeof Expressions
-
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
@@ -17,6 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_sizeof.h"
 #include "c_typecast.h"
 #include "c_types.h"
+
+/*******************************************************************\
+
+Function: c_sizeoft::sizeof_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt c_sizeoft::sizeof_rec(const typet &type)
 {
@@ -249,6 +258,18 @@ exprt c_sizeoft::sizeof_rec(const typet &type)
   return dest;
 }
 
+/*******************************************************************\
+
+Function: c_sizeoft::c_offsetof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt c_sizeoft::c_offsetof(
   const struct_typet &type,
   const irep_idt &component_name)
@@ -299,6 +320,18 @@ exprt c_sizeoft::c_offsetof(
   return nil_exprt();
 }
 
+/*******************************************************************\
+
+Function: c_sizeof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt c_sizeof(const typet &src, const namespacet &ns)
 {
   c_sizeoft c_sizeof_inst(ns);
@@ -306,6 +339,18 @@ exprt c_sizeof(const typet &src, const namespacet &ns)
   simplify(tmp, ns);
   return tmp;
 }
+
+/*******************************************************************\
+
+Function: c_offsetof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt c_offsetof(
   const struct_typet &src,

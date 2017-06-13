@@ -6,19 +6,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Cover a set of goals incrementally
-
 #include <util/threeval.h>
 
 #include "literal_expr.h"
 #include "cover_goals.h"
 
+/*******************************************************************\
+
+Function: cover_goalst::~cover_goalst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 cover_goalst::~cover_goalst()
 {
 }
 
-/// Mark goals that are covered
+/*******************************************************************\
+
+Function: cover_goalst::mark
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Mark goals that are covered
+
+\*******************************************************************/
+
 void cover_goalst::mark()
 {
   // notify observers
@@ -38,7 +58,18 @@ void cover_goalst::mark()
     }
 }
 
-/// Build clause
+/*******************************************************************\
+
+Function: cover_goalst::constaint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Build clause
+
+\*******************************************************************/
+
 void cover_goalst::constraint()
 {
   exprt::operandst disjuncts;
@@ -57,7 +88,18 @@ void cover_goalst::constraint()
   prop_conv.set_to_true(disjunction(disjuncts));
 }
 
-/// Build clause
+/*******************************************************************\
+
+Function: cover_goalst::freeze_goal_variables
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Build clause
+
+\*******************************************************************/
+
 void cover_goalst::freeze_goal_variables()
 {
   for(std::list<goalt>::const_iterator
@@ -68,7 +110,18 @@ void cover_goalst::freeze_goal_variables()
       prop_conv.set_frozen(g_it->condition);
 }
 
-/// Try to cover all goals
+/*******************************************************************\
+
+Function: cover_goalst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Try to cover all goals
+
+\*******************************************************************/
+
 decision_proceduret::resultt cover_goalst::operator()()
 {
   _iterations=_number_covered=0;

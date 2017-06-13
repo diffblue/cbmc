@@ -6,14 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Query Called Functions
-
 #include <util/std_expr.h>
 
 #include "compute_called_functions.h"
 
-/// get all functions whose address is taken
+/*******************************************************************\
+
+Function: compute_address_taken_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get all functions whose address is taken
+
+\*******************************************************************/
+
 void compute_address_taken_functions(
   const exprt &src,
   std::set<irep_idt> &address_taken)
@@ -32,7 +40,18 @@ void compute_address_taken_functions(
   }
 }
 
-/// get all functions in the expression
+/*******************************************************************\
+
+Function: compute_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get all functions in the expression
+
+\*******************************************************************/
+
 void compute_functions(
   const exprt &src,
   std::set<irep_idt> &address_taken)
@@ -45,7 +64,18 @@ void compute_functions(
     address_taken.insert(to_symbol_expr(src).get_identifier());
 }
 
-/// get all functions whose address is taken
+/*******************************************************************\
+
+Function: compute_address_taken_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get all functions whose address is taken
+
+\*******************************************************************/
+
 void compute_address_taken_functions(
   const goto_programt &goto_program,
   std::set<irep_idt> &address_taken)
@@ -57,7 +87,18 @@ void compute_address_taken_functions(
   }
 }
 
-/// get all functions whose address is taken
+/*******************************************************************\
+
+Function: compute_address_taken_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: get all functions whose address is taken
+
+\*******************************************************************/
+
 void compute_address_taken_functions(
   const goto_functionst &goto_functions,
   std::set<irep_idt> &address_taken)
@@ -66,7 +107,18 @@ void compute_address_taken_functions(
     compute_address_taken_functions(it->second.body, address_taken);
 }
 
-/// computes the functions that are (potentially) called
+/*******************************************************************\
+
+Function: compute_called_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: computes the functions that are (potentially) called
+
+\*******************************************************************/
+
 void compute_called_functions(
   const goto_functionst &goto_functions,
   std::set<irep_idt> &functions)
@@ -111,7 +163,18 @@ void compute_called_functions(
   }
 }
 
-/// computes the functions that are (potentially) called
+/*******************************************************************\
+
+Function: compute_called_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: computes the functions that are (potentially) called
+
+\*******************************************************************/
+
 void compute_called_functions(
   const goto_modelt &goto_model,
   std::set<irep_idt> &functions)

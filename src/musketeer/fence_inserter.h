@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// ILP construction for all cycles and resolution
-
 #ifndef CPROVER_MUSKETEER_FENCE_INSERTER_H
 #define CPROVER_MUSKETEER_FENCE_INSERTER_H
 

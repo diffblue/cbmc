@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Slicer
-
 #include <stack>
 
 
@@ -19,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "full_slicer_class.h"
 #include "reachability_slicer.h"
 #include "reachability_slicer_class.h"
+
+/*******************************************************************\
+
+Function: reachability_slicert::fixedpoint_assertions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void reachability_slicert::fixedpoint_assertions(
   const is_threadedt &is_threaded,
@@ -55,6 +64,18 @@ void reachability_slicert::fixedpoint_assertions(
   }
 }
 
+/*******************************************************************\
+
+Function: reachability_slicert::slice
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void reachability_slicert::slice(goto_functionst &goto_functions)
 {
   // now replace those instructions that do not reach any assertions
@@ -80,12 +101,36 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
   goto_functions.update();
 }
 
+/*******************************************************************\
+
+Function: reachability_slicer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void reachability_slicer(goto_functionst &goto_functions)
 {
   reachability_slicert s;
   assert_criteriont a;
   s(goto_functions, a);
 }
+
+/*******************************************************************\
+
+Function: reachability_slicer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void reachability_slicer(
   goto_functionst &goto_functions,

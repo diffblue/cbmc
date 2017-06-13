@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Type Checking
-
 #include <ostream>
 
 #include "designator.h"
+
+/*******************************************************************\
+
+Function: designatort::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void designatort::print(std::ostream &out) const
 {

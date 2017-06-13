@@ -6,9 +6,6 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-/// \file
-/// Loop Acceleration
-
 #include <iostream>
 
 #include "enumerating_loop_acceleration.h"

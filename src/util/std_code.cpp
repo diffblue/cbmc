@@ -9,15 +9,51 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_code.h"
 #include "std_expr.h"
 
+/*******************************************************************\
+
+Function: code_declt::get_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const irep_idt &code_declt::get_identifier() const
 {
   return to_symbol_expr(symbol()).get_identifier();
 }
 
+/*******************************************************************\
+
+Function: code_deadt::get_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const irep_idt &code_deadt::get_identifier() const
 {
   return to_symbol_expr(symbol()).get_identifier();
 }
+
+/*******************************************************************\
+
+Function: codet::make_block
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 code_blockt &codet::make_block()
 {
@@ -34,6 +70,18 @@ code_blockt &codet::make_block()
   return static_cast<code_blockt &>(*this);
 }
 
+/*******************************************************************\
+
+Function: codet::first_statement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 codet &codet::first_statement()
 {
   const irep_idt &statement=get_statement();
@@ -48,6 +96,18 @@ codet &codet::first_statement()
 
   return *this;
 }
+
+/*******************************************************************\
+
+Function: first_statement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const codet &codet::first_statement() const
 {
@@ -64,6 +124,18 @@ const codet &codet::first_statement() const
   return *this;
 }
 
+/*******************************************************************\
+
+Function: codet::last_statement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 codet &codet::last_statement()
 {
   const irep_idt &statement=get_statement();
@@ -78,6 +150,18 @@ codet &codet::last_statement()
 
   return *this;
 }
+
+/*******************************************************************\
+
+Function: codet::last_statement
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const codet &codet::last_statement() const
 {
@@ -94,8 +178,20 @@ const codet &codet::last_statement() const
   return *this;
 }
 
-/// Add all the codets from extra_block to the current code_blockt
-/// \param extra_block: The input code_blockt
+/*******************************************************************\
+
+Function: code_blockt::append
+
+ Inputs:
+  extra_block - The input code_blockt
+
+ Outputs:
+
+ Purpose: Add all the codets from extra_block to the current
+          code_blockt
+
+\*******************************************************************/
+
 void code_blockt::append(const code_blockt &extra_block)
 {
   operands().reserve(operands().size()+extra_block.operands().size());

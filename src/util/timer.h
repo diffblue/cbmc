@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Time Stopping
-
 #ifndef CPROVER_UTIL_TIMER_H
 #define CPROVER_UTIL_TIMER_H
 

@@ -6,9 +6,6 @@ Author: Cristina David
 
 \*******************************************************************/
 
-/// \file
-/// Over-approximative uncaught exceptions analysis
-
 #ifndef CPROVER_ANALYSES_UNCAUGHT_EXCEPTIONS_ANALYSIS_H
 #define CPROVER_ANALYSES_UNCAUGHT_EXCEPTIONS_ANALYSIS_H
 
@@ -18,7 +15,15 @@ Author: Cristina David
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/class_hierarchy.h>
 
-/// defines the domain used by the uncaught  exceptions analysis
+/*******************************************************************\
+
+ Class: uncaught_exceptions_domaint
+
+ Purpose: defines the domain used by the uncaught 
+          exceptions analysis
+
+\*******************************************************************/
+
 class uncaught_exceptions_analysist;
 
 class uncaught_exceptions_domaint
@@ -53,8 +58,15 @@ class uncaught_exceptions_domaint
   class_hierarchyt class_hierarchy;
 };
 
-/// computes in exceptions_map an overapproximation of the  exceptions thrown by
-/// each method
+/*******************************************************************\
+
+ Class: uncaught_exceptions_analysist
+
+ Purpose: computes in exceptions_map an overapproximation of the 
+          exceptions thrown by each method
+
+\*******************************************************************/
+
 class uncaught_exceptions_analysist
 {
 public:

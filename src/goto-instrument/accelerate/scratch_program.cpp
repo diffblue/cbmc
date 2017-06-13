@@ -6,9 +6,6 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-/// \file
-/// Loop Acceleration
-
 #include <util/fixedbv.h>
 #include <util/decision_procedure.h>
 

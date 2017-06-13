@@ -13,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "symbol.h"
 
+/*******************************************************************\
+
+Function: find_macros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void find_macros(
   const exprt &src,
   const namespacet &ns,

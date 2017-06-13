@@ -12,17 +12,53 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "string_constant.h"
 #include "c_types.h"
 
+/*******************************************************************\
+
+Function: string_constantt::string_constantt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 string_constantt::string_constantt():
   exprt(ID_string_constant)
 {
   set_value(irep_idt());
 }
 
+/*******************************************************************\
+
+Function: string_constantt::string_constantt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 string_constantt::string_constantt(const irep_idt &_value):
   exprt(ID_string_constant)
 {
   set_value(_value);
 }
+
+/*******************************************************************\
+
+Function: string_constantt::set_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void string_constantt::set_value(const irep_idt &value)
 {
@@ -31,7 +67,18 @@ void string_constantt::set_value(const irep_idt &value)
   set(ID_value, value);
 }
 
-/// convert string into array constant
+/*******************************************************************\
+
+Function: string_constantt:to_array_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: convert string into array constant
+
+\*******************************************************************/
+
 array_exprt string_constantt::to_array_expr() const
 {
   const std::string &str=get_string(ID_value);
@@ -72,8 +119,18 @@ array_exprt string_constantt::to_array_expr() const
   return dest;
 }
 
-/// convert array constant into string
-/// \return true on error
+/*******************************************************************\
+
+Function: string_constantt:from_array_expr
+
+  Inputs:
+
+ Outputs: true on error
+
+ Purpose: convert array constant into string
+
+\*******************************************************************/
+
 bool string_constantt::from_array_expr(const array_exprt &src)
 {
   id(ID_string_constant);

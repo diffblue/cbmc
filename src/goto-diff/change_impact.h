@@ -8,9 +8,6 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Data and control-dependencies of syntactic diff
-
 #ifndef CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
 #define CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
 

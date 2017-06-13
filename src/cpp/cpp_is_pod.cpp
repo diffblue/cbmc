@@ -6,10 +6,40 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include "cpp_typecheck.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::cpp_is_pod
+
+  Inputs:
+
+ Outputs:
+
+ Standard:
+  "Arithmetic types (3.9.1), enumeration types, pointer types, and
+  pointer to member types (3.9.2), and cvqualified versions of
+  these types (3.9.3) are collectively called scalar types. Scalar
+  types, POD-struct types, POD-union types (clause 9), arrays of
+  such types and cv-qualified versions of these types (3.9.3) are
+  collectively called POD types."
+
+  "A POD-struct is an aggregate class that has no non-static data
+  members of type non-POD-struct, non-POD-union (or array of such
+  types) or reference, and has no user-defined copy assignment
+  operator and no user-defined destructor. Similarly, a POD-union
+  is an aggregate union that has no non-static data members of type
+  non-POD-struct, non-POD-union (or array of such types) or reference,
+  and has no userdefined copy assignment operator and no user-defined
+  destructor. A POD class is a class that is either a POD-struct or
+  a POD-union."
+
+  "An aggregate is an array or a class (clause 9) with no
+  user-declared constructors (12.1), no private or protected
+  non-static data members (clause 11), no base classes (clause 10),
+  and no virtual functions (10.3)."
+
+\*******************************************************************/
 
 bool cpp_typecheckt::cpp_is_pod(const typet &type) const
 {

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Reference Counting
-
 #ifndef CPROVER_UTIL_REFERENCE_COUNTING_H
 #define CPROVER_UTIL_REFERENCE_COUNTING_H
 

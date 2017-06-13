@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution of ANSI-C
-
 #include <util/symbol_table.h>
 
 #include "symex_dereference_state.h"
+
+/*******************************************************************\
+
+Function: symex_dereference_statet::dereference_failure
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_dereference_statet::dereference_failure(
   const std::string &property,
@@ -19,6 +28,18 @@ void symex_dereference_statet::dereference_failure(
   const guardt &guard)
 {
 }
+
+/*******************************************************************\
+
+Function: symex_dereference_statet::has_failed_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool symex_dereference_statet::has_failed_symbol(
   const exprt &expr,
@@ -76,6 +97,18 @@ bool symex_dereference_statet::has_failed_symbol(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: symex_dereference_statet::get_value_set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_dereference_statet::get_value_set(
   const exprt &expr,

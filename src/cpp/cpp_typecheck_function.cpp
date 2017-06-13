@@ -6,15 +6,24 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"
 #include "cpp_type2name.h"
 #include "cpp_util.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_parameter
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert_parameter(
   const irep_idt &mode,
@@ -60,6 +69,18 @@ void cpp_typecheckt::convert_parameter(
   cpp_scopes.put_into_scope(*new_symbol);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_parameters
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::convert_parameters(
   const irep_idt &mode,
   code_typet &function_type)
@@ -73,6 +94,18 @@ void cpp_typecheckt::convert_parameters(
       it++)
     convert_parameter(mode, *it);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
@@ -138,7 +171,18 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   return_type = old_return_type;
 }
 
-/// for function overloading
+/*******************************************************************\
+
+Function: cpp_typecheckt::function_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: for function overloading
+
+\*******************************************************************/
+
 irep_idt cpp_typecheckt::function_identifier(const typet &type)
 {
   const code_typet &function_type=

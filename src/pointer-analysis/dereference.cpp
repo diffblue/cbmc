@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution of ANSI-C
-
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -25,8 +22,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dereference.h"
 
-/// \par parameters: expression, to be dereferenced
-/// \return returns object after dereferencing
+/*******************************************************************\
+
+Function: dereferencet::operator()
+
+  Inputs: expression, to be dereferenced
+
+ Outputs: returns object after dereferencing
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt dereferencet::operator()(const exprt &pointer)
 {
   if(pointer.type().id()!=ID_pointer)
@@ -45,6 +52,18 @@ exprt dereferencet::operator()(const exprt &pointer)
     from_integer(0, index_type()), // offset
     type);
 }
+
+/*******************************************************************\
+
+Function: dereferencet::read_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt dereferencet::read_object(
   const exprt &object,
@@ -150,6 +169,18 @@ exprt dereferencet::read_object(
   return binary_exprt(object, byte_extract_id(), simplified_offset, dest_type);
 }
 
+/*******************************************************************\
+
+Function: dereferencet::dereference_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt dereferencet::dereference_rec(
   const exprt &address,
   const exprt &offset,
@@ -204,6 +235,18 @@ exprt dereferencet::dereference_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: dereferencet::dereference_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt dereferencet::dereference_if(
   const if_exprt &expr,
   const exprt &offset,
@@ -215,6 +258,18 @@ exprt dereferencet::dereference_if(
 
   return if_exprt(expr.cond(), true_case, false_case);
 }
+
+/*******************************************************************\
+
+Function: dereferencet::dereference_plus
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt dereferencet::dereference_plus(
   const exprt &expr,
@@ -251,6 +306,18 @@ exprt dereferencet::dereference_plus(
   return dereference_rec(pointer, new_offset, type);
 }
 
+/*******************************************************************\
+
+Function: dereferencet::dereference_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt dereferencet::dereference_typecast(
   const typecast_exprt &expr,
   const exprt &offset,
@@ -282,6 +349,18 @@ exprt dereferencet::dereference_typecast(
   else
     throw "dereferencet: unexpected cast";
 }
+
+/*******************************************************************\
+
+Function: dereferencet::type_compatible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool dereferencet::type_compatible(
   const typet &object_type,

@@ -10,9 +10,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "simplify_utils.h"
 
-/// sort operands of an expression according to ordering defined by operator<
-/// \par parameters: operand list
-/// \return modifies operand list returns true iff nothing was changed
+/*******************************************************************\
+
+Function: simplify_exprt::sort_operands
+
+  Inputs: operand list
+
+ Outputs: modifies operand list
+          returns true iff nothing was changed
+
+ Purpose: sort operands of an expression according to ordering
+          defined by operator<
+
+\*******************************************************************/
+
 bool sort_operands(exprt::operandst &operands)
 {
   bool do_sort=false;
@@ -37,7 +48,19 @@ bool sort_operands(exprt::operandst &operands)
   return false;
 }
 
-/// produce canonical ordering for associative and commutative binary operators
+/*******************************************************************\
+
+Function: sort_and_join
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: produce canonical ordering for associative and commutative
+          binary operators
+
+\*******************************************************************/
+
 // The entries
 //  { ID_plus,   ID_floatbv  },
 //  { ID_mult,   ID_floatbv  },
@@ -118,6 +141,18 @@ static const struct saj_tablet &sort_and_join(
 
   return saj_table[i];
 }
+
+/*******************************************************************\
+
+Function: sort_and_join
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool sort_and_join(exprt &expr)
 {

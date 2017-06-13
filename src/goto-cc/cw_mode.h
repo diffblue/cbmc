@@ -8,9 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-/// \file
-/// Base class for command line interpretation
-
 #ifndef CPROVER_GOTO_CC_CW_MODE_H
 #define CPROVER_GOTO_CC_CW_MODE_H
 

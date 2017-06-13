@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Uninterpreted Functions
-
 #ifndef CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
 #define CPROVER_SOLVERS_FLATTENING_FUNCTIONS_H
 

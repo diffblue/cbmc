@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution
-
 #include <util/byte_operators.h>
 #include <util/cprover_prefix.h>
 
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex_state.h"
 
 // #define USE_UPDATE
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign_rec(
   statet &state,
@@ -30,6 +39,18 @@ void goto_symext::symex_assign_rec(
 
   symex_assign(state, deref_code);
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign(
   statet &state,
@@ -93,6 +114,18 @@ void goto_symext::symex_assign(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_symext::add_to_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt goto_symext::add_to_lhs(
   const exprt &lhs,
   const exprt &what)
@@ -122,6 +155,18 @@ exprt goto_symext::add_to_lhs(
   *p=tmp_what;
   return new_lhs;
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign_rec(
   statet &state,
@@ -201,6 +246,18 @@ void goto_symext::symex_assign_rec(
     throw "assignment to `"+lhs.id_string()+"' not handled";
 }
 
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symext::symex_assign_symbol(
   statet &state,
   const ssa_exprt &lhs, // L1
@@ -257,6 +314,18 @@ void goto_symext::symex_assign_symbol(
     assignment_type);
 }
 
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symext::symex_assign_typecast(
   statet &state,
   const typecast_exprt &lhs,
@@ -277,6 +346,18 @@ void goto_symext::symex_assign_typecast(
   symex_assign_rec(
     state, lhs.op0(), new_full_lhs, rhs_typecasted, guard, assignment_type);
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign_array(
   statet &state,
@@ -333,6 +414,18 @@ void goto_symext::symex_assign_array(
     state, lhs_array, new_full_lhs, new_rhs, guard, assignment_type);
   #endif
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_struct_member
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign_struct_member(
   statet &state,
@@ -408,6 +501,18 @@ void goto_symext::symex_assign_struct_member(
   #endif
 }
 
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_symext::symex_assign_if(
   statet &state,
   const if_exprt &lhs,
@@ -440,6 +545,18 @@ void goto_symext::symex_assign_if(
     guard.swap(old_guard);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_symext::symex_assign_byte_extract
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_symext::symex_assign_byte_extract(
   statet &state,

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Container for C-Strings
-
 #ifndef CPROVER_UTIL_DSTRING_H
 #define CPROVER_UTIL_DSTRING_H
 

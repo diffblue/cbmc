@@ -8,9 +8,6 @@ Date: February 2006
 
 \*******************************************************************/
 
-/// \file
-/// Race Detection for Threaded Goto Programs
-
 #ifndef CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 #define CPROVER_GOTO_INSTRUMENT_RACE_CHECK_H
 

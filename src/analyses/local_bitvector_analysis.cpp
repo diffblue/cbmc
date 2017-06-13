@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive may-alias analysis
-
 #include <iterator>
 #include <algorithm>
 
@@ -20,6 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "local_bitvector_analysis.h"
+
+/*******************************************************************\
+
+Function: local_bitvector_analysist::flagst::print
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {
@@ -41,6 +50,18 @@ void local_bitvector_analysist::flagst::print(std::ostream &out) const
     out << "+integer_address";
 }
 
+/*******************************************************************\
+
+Function: local_bitvector_analysist::loc_infot::merge
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool local_bitvector_analysist::loc_infot::merge(const loc_infot &src)
 {
   bool result=false;
@@ -57,7 +78,19 @@ bool local_bitvector_analysist::loc_infot::merge(const loc_infot &src)
   return result;
 }
 
-/// \return return 'true' iff we track the object with given identifier
+/*******************************************************************\
+
+Function: local_bitvector_analysist::is_tracked
+
+  Inputs:
+
+ Outputs: return 'true' iff we track the object with given
+          identifier
+
+ Purpose:
+
+\*******************************************************************/
+
 bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 {
   localst::locals_mapt::const_iterator it=locals.locals_map.find(identifier);
@@ -68,6 +101,18 @@ bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: local_bitvector_analysist::assign_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_bitvector_analysist::assign_lhs(
   const exprt &lhs,
@@ -109,6 +154,18 @@ void local_bitvector_analysist::assign_lhs(
   }
 }
 
+/*******************************************************************\
+
+Function: local_bitvector_analysist::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 local_bitvector_analysist::flagst local_bitvector_analysist::get(
   const goto_programt::const_targett t,
   const exprt &rhs)
@@ -121,6 +178,18 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get(
 
   return get_rec(rhs, loc_info_src);
 }
+
+/*******************************************************************\
+
+Function: local_bitvector_analysist::get_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
@@ -243,6 +312,18 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     return flagst::mk_unknown();
 }
 
+/*******************************************************************\
+
+Function: local_bitvector_analysist::build
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void local_bitvector_analysist::build(const goto_functiont &goto_function)
 {
   if(cfg.nodes.empty())
@@ -324,6 +405,18 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: local_bitvector_analysist::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_bitvector_analysist::output(
   std::ostream &out,

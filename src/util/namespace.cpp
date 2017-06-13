@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Namespace
-
 #include <algorithm>
 
 #include <cassert>
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prefix.h"
 #include "std_types.h"
 #include "namespace.h"
+
+/*******************************************************************\
+
+Function: get_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned get_max(
   const std::string &prefix,
@@ -35,9 +44,33 @@ unsigned get_max(
   return max_nr;
 }
 
+/*******************************************************************\
+
+Function: namespace_baset::~namespace_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 namespace_baset::~namespace_baset()
 {
 }
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void namespace_baset::follow_symbol(irept &irep) const
 {
@@ -62,6 +95,18 @@ void namespace_baset::follow_symbol(irept &irep) const
   }
 }
 
+/*******************************************************************\
+
+Function: namespace_baset::follow
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const typet &namespace_baset::follow(const typet &src) const
 {
   if(src.id()!=ID_symbol)
@@ -79,6 +124,18 @@ const typet &namespace_baset::follow(const typet &src) const
   }
 }
 
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
@@ -86,6 +143,18 @@ const typet &namespace_baset::follow_tag(const union_tag_typet &src) const
   assert(symbol.type.id()==ID_union || symbol.type.id()==ID_incomplete_union);
   return symbol.type;
 }
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
 {
@@ -95,6 +164,18 @@ const typet &namespace_baset::follow_tag(const struct_tag_typet &src) const
   return symbol.type;
 }
 
+/*******************************************************************\
+
+Function: namespace_baset::follow_tag
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
 {
   const symbolt &symbol=lookup(src.get_identifier());
@@ -102,6 +183,18 @@ const typet &namespace_baset::follow_tag(const c_enum_tag_typet &src) const
   assert(symbol.type.id()==ID_c_enum || symbol.type.id()==ID_incomplete_c_enum);
   return symbol.type;
 }
+
+/*******************************************************************\
+
+Function: namespace_baset::follow_macros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void namespace_baset::follow_macros(exprt &expr) const
 {
@@ -122,6 +215,18 @@ void namespace_baset::follow_macros(exprt &expr) const
     follow_macros(*it);
 }
 
+/*******************************************************************\
+
+Function: namespace_baset::get_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
@@ -134,6 +239,18 @@ unsigned namespacet::get_max(const std::string &prefix) const
 
   return m;
 }
+
+/*******************************************************************\
+
+Function: namespacet::lookup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool namespacet::lookup(
   const irep_idt &name,
@@ -166,6 +283,18 @@ bool namespacet::lookup(
   return true;
 }
 
+/*******************************************************************\
+
+Function: multi_namespacet::get_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned multi_namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
@@ -178,6 +307,18 @@ unsigned multi_namespacet::get_max(const std::string &prefix) const
 
   return m;
 }
+
+/*******************************************************************\
+
+Function: multi_namespacet::lookup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool multi_namespacet::lookup(
   const irep_idt &name,

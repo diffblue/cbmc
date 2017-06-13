@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// k-induction
-
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
@@ -51,6 +48,18 @@ protected:
     const goto_programt::targett loop_head,
     const loopt &);
 };
+
+/*******************************************************************\
+
+Function: k_inductiont::process_loop
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void k_inductiont::process_loop(
   const goto_programt::targett loop_head,
@@ -137,6 +146,18 @@ void k_inductiont::process_loop(
   remove_skip(goto_function.body);
 }
 
+/*******************************************************************\
+
+Function: k_inductiont::k_induction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void k_inductiont::k_induction()
 {
   // iterate over the (natural) loops in the function
@@ -147,6 +168,18 @@ void k_inductiont::k_induction()
       l_it++)
     process_loop(l_it->first, l_it->second);
 }
+
+/*******************************************************************\
+
+Function: k_induction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void k_induction(
   goto_functionst &goto_functions,

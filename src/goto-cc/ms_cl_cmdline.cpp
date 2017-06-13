@@ -6,9 +6,6 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-/// \file
-/// A special command line object for the CL options
-
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
@@ -19,9 +16,18 @@ Author: Daniel Kroening
 
 #include "ms_cl_cmdline.h"
 
-/// parses the commandline options into a cmdlinet
-/// \par parameters: argument count, argument strings
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::parse
+
+  Inputs: argument count, argument strings
+
+ Outputs: none
+
+ Purpose: parses the commandline options into a cmdlinet
+
+\*******************************************************************/
+
 const char *non_ms_cl_options[]=
 {
   "--show-symbol-table",
@@ -94,7 +100,18 @@ bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
   return false;
 }
 
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::parse_env
+
+  Inputs:
+
+ Outputs: none
+
+ Purpose:
+
+\*******************************************************************/
+
 void ms_cl_cmdlinet::parse_env()
 {
   // first do environment
@@ -116,9 +133,18 @@ void ms_cl_cmdlinet::parse_env()
   #endif
 }
 
-/// parses the commandline options into a cmdlinet
-/// \par parameters: argument count, argument strings
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::parse
+
+  Inputs: argument count, argument strings
+
+ Outputs: none
+
+ Purpose: parses the commandline options into a cmdlinet
+
+\*******************************************************************/
+
 bool ms_cl_cmdlinet::parse(int argc, const char **argv)
 {
   // should really use "wide" argv from wmain()
@@ -131,6 +157,18 @@ bool ms_cl_cmdlinet::parse(int argc, const char **argv)
 
   return parse(options);
 }
+
+/*******************************************************************\
+
+Function: my_wgetline
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
 {
@@ -167,7 +205,18 @@ static std::istream &my_wgetline(std::istream &in, std::wstring &dest)
   return in;
 }
 
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::process_response_file
+
+  Inputs:
+
+ Outputs: none
+
+ Purpose:
+
+\*******************************************************************/
+
 void ms_cl_cmdlinet::process_response_file(const std::string &file)
 {
   std::ifstream infile(file);
@@ -229,7 +278,18 @@ void ms_cl_cmdlinet::process_response_file(const std::string &file)
   }
 }
 
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::process_response_file_line
+
+  Inputs:
+
+ Outputs: none
+
+ Purpose:
+
+\*******************************************************************/
+
 void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
 {
   // In a response file, multiple compiler options and source-code files can
@@ -269,7 +329,18 @@ void ms_cl_cmdlinet::process_response_file_line(const std::string &line)
   parse(options);
 }
 
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::process_non_cl_option
+
+  Inputs:
+
+ Outputs: none
+
+ Purpose:
+
+\*******************************************************************/
+
 void ms_cl_cmdlinet::process_non_cl_option(
   const std::string &s)
 {
@@ -284,7 +355,18 @@ void ms_cl_cmdlinet::process_non_cl_option(
             << s << "'" << std::endl;
 }
 
-/// \return none
+/*******************************************************************\
+
+Function: ms_cl_cmdlinet::process_cl_option
+
+  Inputs:
+
+ Outputs: none
+
+ Purpose:
+
+\*******************************************************************/
+
 const char *ms_cl_flags[]=
 {
   "c", // compile only

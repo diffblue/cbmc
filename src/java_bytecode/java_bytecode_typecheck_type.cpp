@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// JAVA Bytecode Conversion / Type Checking
-
 #include <util/std_types.h>
 
 #include "java_bytecode_typecheck.h"
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_type(typet &type)
 {
@@ -52,6 +61,18 @@ void java_bytecode_typecheckt::typecheck_type(typet &type)
       typecheck_type(it->type());
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_type_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_type_symbol(symbolt &symbol)
 {

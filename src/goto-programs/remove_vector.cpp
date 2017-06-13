@@ -8,12 +8,21 @@ Date:   September 2014
 
 \*******************************************************************/
 
-/// \file
-/// Remove 'vector' data type
-
 #include <util/arith_tools.h>
 
 #include "remove_vector.h"
+
+/*******************************************************************\
+
+Function: have_to_remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 static bool have_to_remove_vector(const typet &type);
 
@@ -42,6 +51,18 @@ static bool have_to_remove_vector(const exprt &expr)
   return false;
 }
 
+/*******************************************************************\
+
+Function: have_to_remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 static bool have_to_remove_vector(const typet &type)
 {
   if(type.id()==ID_struct || type.id()==ID_union)
@@ -66,7 +87,18 @@ static bool have_to_remove_vector(const typet &type)
   return false;
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 static void remove_vector(typet &);
 
 static void remove_vector(exprt &expr)
@@ -142,7 +174,18 @@ static void remove_vector(exprt &expr)
   remove_vector(expr.type());
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 static void remove_vector(typet &type)
 {
   if(!have_to_remove_vector(type))
@@ -180,21 +223,54 @@ static void remove_vector(typet &type)
   }
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 static void remove_vector(symbolt &symbol)
 {
   remove_vector(symbol.value);
   remove_vector(symbol.type);
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 static void remove_vector(symbol_tablet &symbol_table)
 {
   Forall_symbols(it, symbol_table.symbols)
     remove_vector(it->second);
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 void remove_vector(goto_functionst::goto_functiont &goto_function)
 {
   remove_vector(goto_function.type);
@@ -206,14 +282,36 @@ void remove_vector(goto_functionst::goto_functiont &goto_function)
   }
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 static void remove_vector(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     remove_vector(it->second);
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 void remove_vector(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -222,7 +320,18 @@ void remove_vector(
   remove_vector(goto_functions);
 }
 
-/// removes vector data type
+/*******************************************************************\
+
+Function: remove_vector
+
+Inputs:
+
+Outputs:
+
+Purpose: removes vector data type
+
+\*******************************************************************/
+
 void remove_vector(goto_modelt &goto_model)
 {
   remove_vector(goto_model.symbol_table, goto_model.goto_functions);

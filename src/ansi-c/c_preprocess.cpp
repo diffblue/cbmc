@@ -96,7 +96,18 @@ Author: Daniel Kroening, kroening@kroening.com
   " -D__INTPTR_TYPE__=\"long long int\""\
   " -D__UINTPTR_TYPE__=\"long long unsigned int\""
 
-/// produce a string with the maximum value of a given type
+/*******************************************************************\
+
+Function: type_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: produce a string with the maximum value of a given type
+
+\*******************************************************************/
+
 static std::string type_max(const typet &src)
 {
   if(src.id()==ID_signedbv)
@@ -109,7 +120,18 @@ static std::string type_max(const typet &src)
     assert(false);
 }
 
-/// quote a string for bash and CMD
+/*******************************************************************\
+
+Function: shell_quote
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: quote a string for bash and CMD
+
+\*******************************************************************/
+
 static std::string shell_quote(const std::string &src)
 {
   #ifdef _WIN32
@@ -182,6 +204,18 @@ static std::string shell_quote(const std::string &src)
   return result;
   #endif
 }
+
+/*******************************************************************\
+
+Function: error_parse_line
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static void error_parse_line(
   const std::string &line,
@@ -303,6 +337,18 @@ static void error_parse_line(
   m << error_msg << messaget::eom;
 }
 
+/*******************************************************************\
+
+Function: error_parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static void error_parse(
   std::istream &errors,
   bool warning_only,
@@ -314,7 +360,18 @@ static void error_parse(
     error_parse_line(line, warning_only, message);
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess(
   std::istream &instream,
   std::ostream &outstream,
@@ -340,7 +397,18 @@ bool c_preprocess(
   return result;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: is_dot_i_file
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 static bool is_dot_i_file(const std::string &path)
 {
   const char *ext=strrchr(path.c_str(), '.');
@@ -352,7 +420,18 @@ static bool is_dot_i_file(const std::string &path)
   return false;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_codewarrior(
   const std::string &, std::ostream &, message_handlert &);
 bool c_preprocess_arm(
@@ -401,7 +480,18 @@ bool c_preprocess(
   return true;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess_visual_studio
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_visual_studio(
   const std::string &file,
   std::ostream &outstream,
@@ -508,7 +598,18 @@ bool c_preprocess_visual_studio(
   return false;
 }
 
-/// post-processing specifically for CodeWarrior
+/*******************************************************************\
+
+Function: postprocess_codewarrior
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: post-processing specifically for CodeWarrior
+
+\*******************************************************************/
+
 void postprocess_codewarrior(
   std::istream &instream,
   std::ostream &outstream)
@@ -544,7 +645,18 @@ void postprocess_codewarrior(
   }
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess_codewarrior
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_codewarrior(
   const std::string &file,
   std::ostream &outstream,
@@ -617,7 +729,18 @@ bool c_preprocess_codewarrior(
   return false;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess_gcc_clang
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_gcc_clang(
   const std::string &file,
   std::ostream &outstream,
@@ -921,7 +1044,18 @@ bool c_preprocess_gcc_clang(
   return false;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess_arm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_arm(
   const std::string &file,
   std::ostream &outstream,
@@ -1043,7 +1177,18 @@ bool c_preprocess_arm(
   return false;
 }
 
-/// ANSI-C preprocessing
+/*******************************************************************\
+
+Function: c_preprocess_none
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ANSI-C preprocessing
+
+\*******************************************************************/
+
 bool c_preprocess_none(
   const std::string &file,
   std::ostream &outstream,
@@ -1078,7 +1223,18 @@ bool c_preprocess_none(
   return false;
 }
 
-/// tests ANSI-C preprocessing
+/*******************************************************************\
+
+Function: test_c_preprocessor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: tests ANSI-C preprocessing
+
+\*******************************************************************/
+
 const char c_test_program[]=
   "#include <stdlib.h>\n"
   "\n"

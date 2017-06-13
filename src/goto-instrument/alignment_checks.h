@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Alignment Checks
-
 #ifndef CPROVER_GOTO_INSTRUMENT_ALIGNMENT_CHECKS_H
 #define CPROVER_GOTO_INSTRUMENT_ALIGNMENT_CHECKS_H
 

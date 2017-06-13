@@ -6,13 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// CNF Generation
-
 #include <cassert>
 #include <ostream>
 
 #include "cnf_clause_list.h"
+
+/*******************************************************************\
+
+Function: cnf_clause_listt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cnf_clause_listt::lcnf(const bvt &bv)
 {
@@ -24,11 +33,35 @@ void cnf_clause_listt::lcnf(const bvt &bv)
   clauses.push_back(new_bv);
 }
 
+/*******************************************************************\
+
+Function: cnf_clause_list_assignmentt::print_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cnf_clause_list_assignmentt::print_assignment(std::ostream &out) const
 {
   for(unsigned v=1; v<assignment.size(); v++)
     out << "v" << v << "=" << assignment[v] << "\n";
 }
+
+/*******************************************************************\
+
+Function: cnf_clause_list_assignmentt::copy_assignment_from
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cnf_clause_list_assignmentt::copy_assignment_from(const propt &prop)
 {

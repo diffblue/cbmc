@@ -6,13 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Type Checking
-
 #include <util/std_types.h>
 #include <util/std_expr.h>
 
 #include "anonymous_member.h"
+
+/*******************************************************************\
+
+Function: make_member_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static exprt make_member_expr(
   const exprt &struct_union,
@@ -36,6 +45,18 @@ static exprt make_member_expr(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: get_component_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt get_component_rec(
   const exprt &struct_union,
@@ -68,6 +89,18 @@ exprt get_component_rec(
 
   return nil_exprt();
 }
+
+/*******************************************************************\
+
+Function: has_component_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool has_component_rec(
   const typet &type,

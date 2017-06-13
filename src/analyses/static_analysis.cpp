@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Value Set Propagation
-
 #include <cassert>
 #include <memory>
 
@@ -19,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define USE_DEPRECATED_STATIC_ANALYSIS_H
 #include "static_analysis.h"
+
+/*******************************************************************\
+
+Function: static_analysis_baset::get_guard
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt static_analysis_baset::get_guard(
   locationt from,
@@ -40,6 +49,18 @@ exprt static_analysis_baset::get_guard(
   return from->guard;
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::get_return_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt static_analysis_baset::get_return_lhs(locationt to)
 {
   // get predecessor of "to"
@@ -58,12 +79,36 @@ exprt static_analysis_baset::get_return_lhs(locationt to)
   return code.lhs();
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void static_analysis_baset::operator()(
   const goto_functionst &goto_functions)
 {
   initialize(goto_functions);
   fixedpoint(goto_functions);
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::operator()(
   const goto_programt &goto_program)
@@ -72,6 +117,18 @@ void static_analysis_baset::operator()(
   goto_functionst goto_functions;
   fixedpoint(goto_program, goto_functions);
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::output(
   const goto_functionst &goto_functions,
@@ -90,6 +147,18 @@ void static_analysis_baset::output(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::output(
   const goto_programt &goto_program,
@@ -110,12 +179,36 @@ void static_analysis_baset::output(
   }
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::generate_states
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void static_analysis_baset::generate_states(
   const goto_functionst &goto_functions)
 {
   forall_goto_functions(f_it, goto_functions)
     generate_states(f_it->second.body);
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::generate_states
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::generate_states(
   const goto_programt &goto_program)
@@ -124,12 +217,36 @@ void static_analysis_baset::generate_states(
     generate_state(i_it);
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void static_analysis_baset::update(
   const goto_functionst &goto_functions)
 {
   forall_goto_functions(f_it, goto_functions)
     update(f_it->second.body);
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::generate_states
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::update(
   const goto_programt &goto_program)
@@ -153,6 +270,18 @@ void static_analysis_baset::update(
   }
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::get_next
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static_analysis_baset::locationt static_analysis_baset::get_next(
   working_sett &working_set)
 {
@@ -164,6 +293,18 @@ static_analysis_baset::locationt static_analysis_baset::get_next(
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool static_analysis_baset::fixedpoint(
   const goto_programt &goto_program,
@@ -190,6 +331,18 @@ bool static_analysis_baset::fixedpoint(
 
   return new_data;
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::visit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool static_analysis_baset::visit(
   locationt l,
@@ -243,6 +396,18 @@ bool static_analysis_baset::visit(
 
   return new_data;
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::do_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::do_function_call(
   locationt l_call, locationt l_return,
@@ -314,6 +479,18 @@ void static_analysis_baset::do_function_call(
     new_state.transform(ns, l_call, l_return);
   }
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::do_function_call_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::do_function_call_rec(
   locationt l_call, locationt l_return,
@@ -417,6 +594,18 @@ void static_analysis_baset::do_function_call_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: static_analysis_baset::sequential_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void static_analysis_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions)
 {
@@ -426,6 +615,18 @@ void static_analysis_baset::sequential_fixedpoint(
     if(functions_done.insert(it->first).second)
       fixedpoint(it->second.body, goto_functions);
 }
+
+/*******************************************************************\
+
+Function: static_analysis_baset::concurrent_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void static_analysis_baset::concurrent_fixedpoint(
   const goto_functionst &goto_functions)

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// SpecC Language Conversion
-
 #include <cassert>
 
 #include <util/namespace.h>
@@ -19,12 +16,36 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_convert_type.h"
 
+/*******************************************************************\
+
+Function: ansi_c_convert_typet::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ansi_c_convert_typet::read(const typet &type)
 {
   clear();
   source_location=type.source_location();
   read_rec(type);
 }
+
+/*******************************************************************\
+
+Function: ansi_c_convert_typet::read_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ansi_c_convert_typet::read_rec(const typet &type)
 {
@@ -218,6 +239,18 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   else
     other.push_back(type);
 }
+
+/*******************************************************************\
+
+Function: ansi_c_convert_typet::write
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ansi_c_convert_typet::write(typet &type)
 {

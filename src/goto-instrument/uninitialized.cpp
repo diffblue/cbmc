@@ -8,9 +8,6 @@ Date: January 2010
 
 \*******************************************************************/
 
-/// \file
-/// Detection for Uninitialized Local Variables
-
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -18,6 +15,14 @@ Date: January 2010
 #include <analyses/uninitialized_domain.h>
 
 #include "uninitialized.h"
+
+/*******************************************************************\
+
+   Class: uninitializedt
+
+ Purpose:
+
+\*******************************************************************/
 
 class uninitializedt
 {
@@ -42,7 +47,19 @@ protected:
   void get_tracking(goto_programt::const_targett i_it);
 };
 
-/// which variables need tracking, i.e., are uninitialized and may be read?
+/*******************************************************************\
+
+Function: uninitializedt::get_tracking
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: which variables need tracking,
+          i.e., are uninitialized and may be read?
+
+\*******************************************************************/
+
 void uninitializedt::get_tracking(goto_programt::const_targett i_it)
 {
   std::list<exprt> objects=objects_read(*i_it);
@@ -62,6 +79,18 @@ void uninitializedt::get_tracking(goto_programt::const_targett i_it)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: uninitializedt::add_assertions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void uninitializedt::add_assertions(goto_programt &goto_program)
 {
@@ -194,6 +223,18 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
   }
 }
 
+/*******************************************************************\
+
+Function: add_uninitialized_locals_assertions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void add_uninitialized_locals_assertions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -205,6 +246,18 @@ void add_uninitialized_locals_assertions(
     uninitialized.add_assertions(f_it->second.body);
   }
 }
+
+/*******************************************************************\
+
+Function: show_uninitialized
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void show_uninitialized(
   const class symbol_tablet &symbol_table,

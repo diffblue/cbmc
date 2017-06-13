@@ -8,9 +8,6 @@ Date: September 2011
 
 \*******************************************************************/
 
-/// \file
-/// Weak Memory Instrumentation for Threaded Goto Programs
-
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_WEAK_MEMORY_H
 

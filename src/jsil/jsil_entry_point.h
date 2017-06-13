@@ -6,9 +6,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language
-
 #ifndef CPROVER_JSIL_JSIL_ENTRY_POINT_H
 #define CPROVER_JSIL_JSIL_ENTRY_POINT_H
 

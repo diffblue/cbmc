@@ -6,9 +6,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// Read/write graphs as GraphML
-
 #include <cassert>
 #include <set>
 
@@ -23,6 +20,18 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 typedef std::map<std::string, graphmlt::node_indext> name_mapt;
 
+/*******************************************************************\
+
+Function: add_node
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static graphmlt::node_indext add_node(
   const std::string &name,
   name_mapt &name_to_node,
@@ -35,6 +44,18 @@ static graphmlt::node_indext add_node(
 
   return entry.first->second;
 }
+
+/*******************************************************************\
+
+Function: build_graph_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static bool build_graph_rec(
   const xmlt &xml,
@@ -147,6 +168,18 @@ static bool build_graph_rec(
   return false;
 }
 
+/*******************************************************************\
+
+Function: build_graph
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static bool build_graph(
   const xmlt &xml,
   graphmlt &dest,
@@ -181,6 +214,18 @@ static bool build_graph(
   return err;
 }
 
+/*******************************************************************\
+
+Function: read_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool read_graphml(
   std::istream &is,
   graphmlt &dest,
@@ -195,6 +240,18 @@ bool read_graphml(
   return build_graph(xml, dest, entry);
 }
 
+/*******************************************************************\
+
+Function: read_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool read_graphml(
   const std::string &filename,
   graphmlt &dest,
@@ -208,6 +265,18 @@ bool read_graphml(
 
   return build_graph(xml, dest, entry);
 }
+
+/*******************************************************************\
+
+Function: write_graphml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool write_graphml(const graphmlt &src, std::ostream &os)
 {

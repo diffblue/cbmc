@@ -7,9 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Value Set Propagation (Flow Insensitive)
-
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/xml_irep.h>
@@ -19,6 +16,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set_analysis_fi.h"
 
+/*******************************************************************\
+
+Function: value_set_analysis_fit::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_analysis_fit::initialize(
   const goto_programt &goto_program)
 {
@@ -26,12 +35,36 @@ void value_set_analysis_fit::initialize(
   add_vars(goto_program);
 }
 
+/*******************************************************************\
+
+Function: value_set_analysis_fit::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_analysis_fit::initialize(
   const goto_functionst &goto_functions)
 {
   baset::initialize(goto_functions);
   add_vars(goto_functions);
 }
+
+/*******************************************************************\
+
+Function: value_set_analysis_fit::add_vars
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_analysis_fit::add_vars(
   const goto_programt &goto_program)
@@ -81,12 +114,36 @@ void value_set_analysis_fit::add_vars(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_analysis_fit::get_entries
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_analysis_fit::get_entries(
   const symbolt &symbol,
   std::list<value_set_fit::entryt> &dest)
 {
   get_entries_rec(symbol.name, "", symbol.type, dest);
 }
+
+/*******************************************************************\
+
+Function: value_set_analysis_fit::get_entries
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_analysis_fit::get_entries_rec(
   const irep_idt &identifier,
@@ -125,6 +182,18 @@ void value_set_analysis_fit::get_entries_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_analysis_fit::add_vars
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_analysis_fit::add_vars(
   const goto_functionst &goto_functions)
 {
@@ -152,6 +221,18 @@ void value_set_analysis_fit::add_vars(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_analysis_fit::get_globals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_analysis_fit::get_globals(
   std::list<value_set_fit::entryt> &dest)
 {
@@ -161,6 +242,18 @@ void value_set_analysis_fit::get_globals(
        it->second.is_static_lifetime)
       get_entries(it->second, dest);
 }
+
+/*******************************************************************\
+
+Function: value_set_analysis_fit::check_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_analysis_fit::check_type(const typet &type)
 {

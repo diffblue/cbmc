@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Parser utilities
-
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 

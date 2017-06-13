@@ -6,12 +6,21 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// GOTO-DIFF Base Class
-
 #include <util/json_expr.h>
 
 #include "goto_diff.h"
+
+/*******************************************************************\
+
+Function: goto_difft::output_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
 {
@@ -76,6 +85,18 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
   return out;
 }
 
+/*******************************************************************\
+
+Function: goto_difft::convert_function_group
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_difft::convert_function_group(
   json_arrayt &result,
   const irep_id_sett &function_group) const
@@ -86,6 +107,18 @@ void goto_difft::convert_function_group(
     convert_function(result.push_back(jsont()).make_object(), *it);
   }
 }
+
+/*******************************************************************\
+
+Function: goto_difft::convert_functions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_difft::convert_function(
   json_objectt &result,

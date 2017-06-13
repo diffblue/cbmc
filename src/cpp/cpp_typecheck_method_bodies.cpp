@@ -7,10 +7,19 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 \*******************************************************************/
 
 
-/// \file
-/// C++ Language Type Checking
-
 #include "cpp_typecheck.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_method_bodies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_method_bodies(
   method_bodiest &bodies)

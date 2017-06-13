@@ -6,9 +6,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// Read/write graphs as GraphML
-
 #ifndef CPROVER_XMLLANG_GRAPHML_H
 #define CPROVER_XMLLANG_GRAPHML_H
 

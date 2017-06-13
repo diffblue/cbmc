@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Options
-
 #ifndef CPROVER_UTIL_OPTIONS_H
 #define CPROVER_UTIL_OPTIONS_H
 

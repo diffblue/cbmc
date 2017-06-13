@@ -6,9 +6,6 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// irep hash functions
-
 #ifndef CPROVER_UTIL_IREP_HASH_H
 #define CPROVER_UTIL_IREP_HASH_H
 
@@ -77,6 +74,18 @@ std::size_t basic_hash_combine(
   std::size_t h1,
   std::size_t h2);
 
+/*******************************************************************\
+
+Function: basic_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 template<>
 inline std::size_t basic_hash_combine<32>(
   std::size_t h1,
@@ -84,6 +93,18 @@ inline std::size_t basic_hash_combine<32>(
 {
   return ROTL32(h1, 7)^h2;
 }
+
+/*******************************************************************\
+
+Function: basic_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 template<>
 inline std::size_t basic_hash_combine<64>(
@@ -105,6 +126,18 @@ inline std::size_t basic_hash_combine<64>(
   return ROTL64(h1, 7)^h2;
   #endif
 }
+
+/*******************************************************************\
+
+Function: basic_hash_finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 inline std::size_t basic_hash_finalize(
   std::size_t h1,
@@ -142,6 +175,18 @@ std::size_t murmurhash2a_hash_finalize(
   std::size_t h1,
   std::size_t len);
 
+/*******************************************************************\
+
+Function: murmurhash2a_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static FORCE_INLINE uint32_t mmix32(uint32_t h1, uint32_t h2)
 {
   const int r=24;
@@ -164,7 +209,18 @@ inline std::size_t murmurhash2a_hash_combine<32>(
   return mmix32(h1, h2);
 }
 
-/// force all bits of a hash block to avalanche
+/*******************************************************************\
+
+Function: murmurhash2a_hash_finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: force all bits of a hash block to avalanche
+
+\*******************************************************************/
+
 template<>
 inline std::size_t murmurhash2a_hash_finalize<32>(
   std::size_t h1,
@@ -180,6 +236,18 @@ inline std::size_t murmurhash2a_hash_finalize<32>(
 
   return h1;
 }
+
+/*******************************************************************\
+
+Function: murmurhash2a_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static FORCE_INLINE uint64_t mmix64(uint64_t h1, uint64_t h2)
 {
@@ -205,7 +273,18 @@ inline std::size_t murmurhash2a_hash_combine<64>(
   return mmix64(h1, h2);
 }
 
-/// force all bits of a hash block to avalanche
+/*******************************************************************\
+
+Function: murmurhash2a_hash_finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: force all bits of a hash block to avalanche
+
+\*******************************************************************/
+
 template<>
 inline std::size_t murmurhash2a_hash_finalize<64>(
   std::size_t h1,
@@ -249,6 +328,18 @@ std::size_t murmurhash3_hash_finalize(
   std::size_t h1,
   std::size_t len);
 
+/*******************************************************************\
+
+Function: murmurhash3_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 template<>
 inline std::size_t murmurhash3_hash_combine<32>(
   std::size_t h1,
@@ -268,7 +359,18 @@ inline std::size_t murmurhash3_hash_combine<32>(
   return h1;
 }
 
-/// force all bits of a hash block to avalanche
+/*******************************************************************\
+
+Function: murmurhash3_hash_finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: force all bits of a hash block to avalanche
+
+\*******************************************************************/
+
 static FORCE_INLINE uint32_t fmix32(uint32_t h)
 {
   h^=h>>16;
@@ -289,6 +391,18 @@ inline std::size_t murmurhash3_hash_finalize<32>(
 
   return fmix32(h1);
 }
+
+/*******************************************************************\
+
+Function: murmurhash3_hash_combine
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 template<>
 inline std::size_t murmurhash3_hash_combine<64>(
@@ -315,7 +429,18 @@ inline std::size_t murmurhash3_hash_combine<64>(
   return h1;
 }
 
-/// force all bits of a hash block to avalanche
+/*******************************************************************\
+
+Function: murmurhash3_hash_finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: force all bits of a hash block to avalanche
+
+\*******************************************************************/
+
 static FORCE_INLINE uint64_t fmix64(uint64_t h)
 {
   // a brief experiment with supposedly better constants from

@@ -8,9 +8,6 @@ Date:   March 2017
 
 \*******************************************************************/
 
-/// \file
-/// Produce code for simple implementation of String Java libraries
-
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 

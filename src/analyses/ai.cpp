@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Abstract Interpretation
-
 #include <cassert>
 #include <memory>
 
@@ -18,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "is_threaded.h"
 
 #include "ai.h"
+
+/*******************************************************************\
+
+Function: ai_baset::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ai_baset::output(
   const namespacet &ns,
@@ -37,6 +46,18 @@ void ai_baset::output(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: ai_baset::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ai_baset::output(
   const namespacet &ns,
@@ -58,9 +79,18 @@ void ai_baset::output(
   }
 }
 
-/// Output the domains for the whole program as JSON
-/// \par parameters: The namespace and goto_functions
-/// \return The JSON object
+/*******************************************************************\
+
+Function: ai_baset::output_json
+
+  Inputs: The namespace and goto_functions
+
+ Outputs: The JSON object
+
+ Purpose: Output the domains for the whole program as JSON
+
+\*******************************************************************/
+
 jsont ai_baset::output_json(
   const namespacet &ns,
   const goto_functionst &goto_functions) const
@@ -83,9 +113,18 @@ jsont ai_baset::output_json(
   return result;
 }
 
-/// Output the domains for a single function as JSON
-/// \par parameters: The namespace, goto_program and it's identifier
-/// \return The JSON object
+/*******************************************************************\
+
+Function: ai_baset::output_json
+
+  Inputs: The namespace, goto_program and it's identifier
+
+ Outputs: The JSON object
+
+ Purpose: Output the domains for a single function as JSON
+
+\*******************************************************************/
+
 jsont ai_baset::output_json(
   const namespacet &ns,
   const goto_programt &goto_program,
@@ -113,9 +152,18 @@ jsont ai_baset::output_json(
   return contents;
 }
 
-/// Output the domains for the whole program as XML
-/// \par parameters: The namespace and goto_functions
-/// \return The XML object
+/*******************************************************************\
+
+Function: ai_baset::output_xml
+
+  Inputs: The namespace and goto_functions
+
+ Outputs: The XML object
+
+ Purpose: Output the domains for the whole program as XML
+
+\*******************************************************************/
+
 xmlt ai_baset::output_xml(
   const namespacet &ns,
   const goto_functionst &goto_functions) const
@@ -141,9 +189,18 @@ xmlt ai_baset::output_xml(
   return program;
 }
 
-/// Output the domains for a single function as XML
-/// \par parameters: The namespace, goto_program and it's identifier
-/// \return The XML object
+/*******************************************************************\
+
+Function: ai_baset::output_xml
+
+  Inputs: The namespace, goto_program and it's identifier
+
+ Outputs: The XML object
+
+ Purpose: Output the domains for a single function as XML
+
+\*******************************************************************/
+
 xmlt ai_baset::output_xml(
   const namespacet &ns,
   const goto_programt &goto_program,
@@ -174,6 +231,18 @@ xmlt ai_baset::output_xml(
   return function_body;
 }
 
+/*******************************************************************\
+
+Function: ai_baset::entry_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ai_baset::entry_state(const goto_functionst &goto_functions)
 {
   // find the 'entry function'
@@ -185,16 +254,52 @@ void ai_baset::entry_state(const goto_functionst &goto_functions)
     entry_state(f_it->second.body);
 }
 
+/*******************************************************************\
+
+Function: ai_baset::entry_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ai_baset::entry_state(const goto_programt &goto_program)
 {
   // The first instruction of 'goto_program' is the entry point
   get_state(goto_program.instructions.begin()).make_entry();
 }
 
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ai_baset::initialize(const goto_functionst::goto_functiont &goto_function)
 {
   initialize(goto_function.body);
 }
+
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ai_baset::initialize(const goto_programt &goto_program)
 {
@@ -204,11 +309,35 @@ void ai_baset::initialize(const goto_programt &goto_program)
     get_state(i_it).make_bottom();
 }
 
+/*******************************************************************\
+
+Function: ai_baset::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ai_baset::initialize(const goto_functionst &goto_functions)
 {
   forall_goto_functions(it, goto_functions)
     initialize(it->second);
 }
+
+/*******************************************************************\
+
+Function: ai_baset::get_next
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 ai_baset::locationt ai_baset::get_next(
   working_sett &working_set)
@@ -221,6 +350,18 @@ ai_baset::locationt ai_baset::get_next(
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: ai_baset::fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool ai_baset::fixedpoint(
   const goto_programt &goto_program,
@@ -247,6 +388,18 @@ bool ai_baset::fixedpoint(
 
   return new_data;
 }
+
+/*******************************************************************\
+
+Function: ai_baset::visit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool ai_baset::visit(
   locationt l,
@@ -305,6 +458,18 @@ bool ai_baset::visit(
 
   return new_data;
 }
+
+/*******************************************************************\
+
+Function: ai_baset::do_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool ai_baset::do_function_call(
   locationt l_call, locationt l_return,
@@ -368,6 +533,18 @@ bool ai_baset::do_function_call(
     return merge(*tmp_state, l_end, l_return);
   }
 }
+
+/*******************************************************************\
+
+Function: ai_baset::do_function_call_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool ai_baset::do_function_call_rec(
   locationt l_call, locationt l_return,
@@ -453,6 +630,18 @@ bool ai_baset::do_function_call_rec(
   return new_data;
 }
 
+/*******************************************************************\
+
+Function: ai_baset::sequential_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ai_baset::sequential_fixedpoint(
   const goto_functionst &goto_functions,
   const namespacet &ns)
@@ -463,6 +652,18 @@ void ai_baset::sequential_fixedpoint(
   if(f_it!=goto_functions.function_map.end())
     fixedpoint(f_it->second.body, goto_functions, ns);
 }
+
+/*******************************************************************\
+
+Function: ai_baset::concurrent_fixedpoint
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ai_baset::concurrent_fixedpoint(
   const goto_functionst &goto_functions,

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Helper functions for k-induction and loop invariants
-
 #ifndef CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H
 #define CPROVER_GOTO_INSTRUMENT_LOOP_UTILS_H
 

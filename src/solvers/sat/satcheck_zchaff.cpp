@@ -13,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <zchaff_solver.h>
 
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::satcheck_zchaff_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_zchaff_baset::satcheck_zchaff_baset(CSolver *_solver):solver(_solver)
 {
   status=INIT;
@@ -20,9 +32,33 @@ satcheck_zchaff_baset::satcheck_zchaff_baset(CSolver *_solver):solver(_solver)
   solver->set_variable_number(0);
 }
 
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::~satcheck_zchaff_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_zchaff_baset::~satcheck_zchaff_baset()
 {
 }
+
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 tvt satcheck_zchaff_baset::l_get(literalt a) const
 {
@@ -50,10 +86,34 @@ tvt satcheck_zchaff_baset::l_get(literalt a) const
   return result;
 }
 
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_zchaff_baset::solver_text()
 {
   return solver->version();
 }
+
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::copy_cnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_zchaff_baset::copy_cnf()
 {
@@ -68,6 +128,18 @@ void satcheck_zchaff_baset::copy_cnf()
     solver->add_orig_clause(
       reinterpret_cast<int*>(&((*it)[0])), it->size());
 }
+
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt satcheck_zchaff_baset::prop_solve()
 {
@@ -155,6 +227,18 @@ propt::resultt satcheck_zchaff_baset::prop_solve()
   return P_ERROR;
 }
 
+/*******************************************************************\
+
+Function: satcheck_zchaff_baset::set_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void satcheck_zchaff_baset::set_assignment(literalt a, bool value)
 {
   unsigned v=a.var_no();
@@ -163,10 +247,34 @@ void satcheck_zchaff_baset::set_assignment(literalt a, bool value)
   solver->variables()[v].set_value(value);
 }
 
+/*******************************************************************\
+
+Function: satcheck_zchafft::satcheck_zchafft
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_zchafft::satcheck_zchafft():
   satcheck_zchaff_baset(new CSolver)
 {
 }
+
+/*******************************************************************\
+
+Function: satcheck_zchafft::~satcheck_zchafft
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 satcheck_zchafft::~satcheck_zchafft()
 {

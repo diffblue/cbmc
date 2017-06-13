@@ -6,13 +6,22 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <ostream>
 #include <cassert>
 
 #include "cpp_declarator.h"
+
+/*******************************************************************\
+
+Function: cpp_declaratort::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_declaratort::output(std::ostream &out) const
 {
@@ -22,6 +31,18 @@ void cpp_declaratort::output(std::ostream &out) const
   out << "  init_args: " << init_args().pretty() << "\n";
   out << "  method_qualifier: " << method_qualifier().pretty() << "\n";
 }
+
+/*******************************************************************\
+
+Function: cpp_declaratort::merge_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 typet cpp_declaratort::merge_type(const typet &declaration_type) const
 {

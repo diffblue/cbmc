@@ -11,6 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_struct
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type=to_struct_type(ns.follow(expr.type()));

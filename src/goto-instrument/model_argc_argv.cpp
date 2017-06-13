@@ -8,9 +8,6 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Initialize command line arguments
-
 #include <sstream>
 
 #include <util/cprover_prefix.h>
@@ -28,6 +25,18 @@ Date: April 2016
 #include <goto-programs/remove_skip.h>
 
 #include "model_argc_argv.h"
+
+/*******************************************************************\
+
+Function: model_argc_argv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool model_argc_argv(
   symbol_tablet &symbol_table,

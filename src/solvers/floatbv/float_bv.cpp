@@ -14,6 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "float_bv.h"
 
+/*******************************************************************\
+
+Function: float_bvt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::convert(const exprt &expr)
 {
   if(expr.id()==ID_abs)
@@ -95,11 +107,35 @@ exprt float_bvt::convert(const exprt &expr)
   return nil_exprt();
 }
 
+/*******************************************************************\
+
+Function: float_bvt::get_spec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 ieee_float_spect float_bvt::get_spec(const exprt &expr)
 {
   const floatbv_typet &type=to_floatbv_type(expr.type());
   return ieee_float_spect(type);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::abs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 {
@@ -112,6 +148,18 @@ exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
   return bitand_exprt(op, mask);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::negation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::negation(const exprt &op, const ieee_float_spect &spec)
 {
   // we flip the sign bit with an xor
@@ -122,6 +170,18 @@ exprt float_bvt::negation(const exprt &op, const ieee_float_spect &spec)
 
   return bitxor_exprt(op, mask);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::is_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::is_equal(
   const exprt &src0,
@@ -145,6 +205,18 @@ exprt float_bvt::is_equal(
     not_exprt(nan));
 }
 
+/*******************************************************************\
+
+Function: float_bvt::is_zero
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::is_zero(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -164,6 +236,18 @@ exprt float_bvt::is_zero(
   return equal_exprt(bitand_exprt(src, mask), z.to_expr());
 }
 
+/*******************************************************************\
+
+Function: float_bvt::exponent_all_ones
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::exponent_all_ones(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -172,6 +256,18 @@ exprt float_bvt::exponent_all_ones(
   exprt all_ones=to_unsignedbv_type(exponent.type()).largest_expr();
   return equal_exprt(exponent, all_ones);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::exponent_all_zeros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::exponent_all_zeros(
   const exprt &src,
@@ -182,6 +278,18 @@ exprt float_bvt::exponent_all_zeros(
   return equal_exprt(exponent, all_zeros);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::fraction_all_zeros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::fraction_all_zeros(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -191,6 +299,18 @@ exprt float_bvt::fraction_all_zeros(
   exprt all_zeros=to_unsignedbv_type(fraction.type()).zero_expr();
   return equal_exprt(fraction, all_zeros);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::rounding_mode_bitst::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void float_bvt::rounding_mode_bitst::get(const exprt &rm)
 {
@@ -207,12 +327,36 @@ void float_bvt::rounding_mode_bitst::get(const exprt &rm)
   round_to_zero=equal_exprt(rm, round_to_zero_const);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::sign_bit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::sign_bit(const exprt &op)
 {
   const bitvector_typet &bv_type=to_bitvector_type(op.type());
   std::size_t width=bv_type.get_width();
   return extractbit_exprt(op, width-1);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::from_signed_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::from_signed_integer(
   const exprt &src,
@@ -238,6 +382,18 @@ exprt float_bvt::from_signed_integer(
   return rounder(result, rm, spec);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::from_unsigned_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::from_unsigned_integer(
   const exprt &src,
   const exprt &rm,
@@ -260,6 +416,18 @@ exprt float_bvt::from_unsigned_integer(
   return rounder(result, rm, spec);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::to_signed_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::to_signed_integer(
   const exprt &src,
   std::size_t dest_width,
@@ -269,6 +437,18 @@ exprt float_bvt::to_signed_integer(
   return to_integer(src, dest_width, true, rm, spec);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::to_unsigned_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::to_unsigned_integer(
   const exprt &src,
   std::size_t dest_width,
@@ -277,6 +457,18 @@ exprt float_bvt::to_unsigned_integer(
 {
   return to_integer(src, dest_width, false, rm, spec);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::to_integer(
   const exprt &src,
@@ -325,6 +517,18 @@ exprt float_bvt::to_integer(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_bvt::conversion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::conversion(
   const exprt &src,
@@ -391,6 +595,18 @@ exprt float_bvt::conversion(
   }
 }
 
+/*******************************************************************\
+
+Function: float_bvt::isnormal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::isnormal(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -400,7 +616,18 @@ exprt float_bvt::isnormal(
            not_exprt(exponent_all_ones(src, spec)));
 }
 
-/// Subtracts the exponents
+/*******************************************************************\
+
+Function: float_bvt::subtract_exponents
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Subtracts the exponents
+
+\*******************************************************************/
+
 exprt float_bvt::subtract_exponents(
   const unbiased_floatt &src1,
   const unbiased_floatt &src2)
@@ -420,6 +647,18 @@ exprt float_bvt::subtract_exponents(
   // compute shift distance (here is the subtraction)
   return minus_exprt(extended_exponent1, extended_exponent2);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::add_sub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::add_sub(
   bool subtract,
@@ -568,7 +807,18 @@ exprt float_bvt::add_sub(
   return rounder(result, rm, spec);
 }
 
-/// Limits the shift distance
+/*******************************************************************\
+
+Function: float_bvt::limit_distance
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Limits the shift distance
+
+\*******************************************************************/
+
 exprt float_bvt::limit_distance(
   const exprt &dist,
   mp_integer limit)
@@ -594,6 +844,18 @@ exprt float_bvt::limit_distance(
     lower_bits,
     unsignedbv_typet(nb_bits).largest_expr());
 }
+
+/*******************************************************************\
+
+Function: float_bvt::mul
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::mul(
   const exprt &src1,
@@ -649,6 +911,18 @@ exprt float_bvt::mul(
 
   return rounder(result, rm, spec);
 }
+
+/*******************************************************************\
+
+Function: float_bvt::div
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::div(
   const exprt &src1,
@@ -742,6 +1016,18 @@ exprt float_bvt::div(
   return rounder(result, rm, spec);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::relation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::relation(
   const exprt &src1,
   relt rel,
@@ -833,6 +1119,18 @@ exprt float_bvt::relation(
   return false_exprt();
 }
 
+/*******************************************************************\
+
+Function: float_bvt::isinf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::isinf(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -842,6 +1140,18 @@ exprt float_bvt::isinf(
     fraction_all_zeros(src, spec));
 }
 
+/*******************************************************************\
+
+Function: float_bvt::isfinite
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::isfinite(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -849,7 +1159,18 @@ exprt float_bvt::isfinite(
   return not_exprt(or_exprt(isinf(src, spec), isnan(src, spec)));
 }
 
-/// Gets the unbiased exponent in a floating-point bit-vector
+/*******************************************************************\
+
+Function: float_bvt::get_exponent
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Gets the unbiased exponent in a floating-point bit-vector
+
+\*******************************************************************/
+
 exprt float_bvt::get_exponent(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -859,7 +1180,19 @@ exprt float_bvt::get_exponent(
     unsignedbv_typet(spec.e));
 }
 
-/// Gets the fraction without hidden bit in a floating-point bit-vector src
+/*******************************************************************\
+
+Function: float_bvt::get_fraction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Gets the fraction without hidden bit in a floating-point
+          bit-vector src
+
+\*******************************************************************/
+
 exprt float_bvt::get_fraction(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -869,6 +1202,18 @@ exprt float_bvt::get_fraction(
     unsignedbv_typet(spec.f));
 }
 
+/*******************************************************************\
+
+Function: float_bvt::isnan
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::isnan(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -877,7 +1222,19 @@ exprt float_bvt::isnan(
                    not_exprt(fraction_all_zeros(src, spec)));
 }
 
-/// normalize fraction/exponent pair returns 'zero' if fraction is zero
+/*******************************************************************\
+
+Function: float_bvt::normalization_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: normalize fraction/exponent pair
+          returns 'zero' if fraction is zero
+
+\*******************************************************************/
+
 void float_bvt::normalization_shift(
   exprt &fraction,
   exprt &exponent)
@@ -926,7 +1283,19 @@ void float_bvt::normalization_shift(
   exponent=minus_exprt(exponent, exponent_delta);
 }
 
-/// make sure exponent is not too small; the exponent is unbiased
+/*******************************************************************\
+
+Function: float_bvt::denormalization_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: make sure exponent is not too small;
+          the exponent is unbiased
+
+\*******************************************************************/
+
 void float_bvt::denormalization_shift(
   exprt &fraction,
   exprt &exponent,
@@ -1006,6 +1375,18 @@ void float_bvt::denormalization_shift(
       exponent);
 }
 
+/*******************************************************************\
+
+Function: float_bvt::rounder
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::rounder(
   const unbiased_floatt &src,
   const exprt &rm,
@@ -1050,7 +1431,18 @@ exprt float_bvt::rounder(
   return pack(bias(result, spec), spec);
 }
 
-/// rounding decision for fraction using sticky bit
+/*******************************************************************\
+
+Function: float_bvt::fraction_rounding_decision
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: rounding decision for fraction using sticky bit
+
+\*******************************************************************/
+
 exprt float_bvt::fraction_rounding_decision(
   const std::size_t dest_bits,
   const exprt sign,
@@ -1113,6 +1505,18 @@ exprt float_bvt::fraction_rounding_decision(
          if_exprt(rounding_mode_bits.round_to_zero, round_to_zero,
            false_exprt())))); // otherwise zero
 }
+
+/*******************************************************************\
+
+Function: float_bvt::round_fraction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void float_bvt::round_fraction(
   unbiased_floatt &result,
@@ -1224,6 +1628,18 @@ void float_bvt::round_fraction(
   }
 }
 
+/*******************************************************************\
+
+Function: float_bvt::round_exponent
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void float_bvt::round_exponent(
   unbiased_floatt &result,
   const rounding_mode_bitst &rounding_mode_bits,
@@ -1298,7 +1714,18 @@ void float_bvt::round_exponent(
   }
 }
 
-/// takes an unbiased float, and applies the bias
+/*******************************************************************\
+
+Function: float_bvt::bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: takes an unbiased float, and applies the bias
+
+\*******************************************************************/
+
 float_bvt::biased_floatt float_bvt::bias(
   const unbiased_floatt &src,
   const ieee_float_spect &spec)
@@ -1332,6 +1759,18 @@ float_bvt::biased_floatt float_bvt::bias(
   return result;
 }
 
+/*******************************************************************\
+
+Function: float_bvt::add_bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::add_bias(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -1342,6 +1781,18 @@ exprt float_bvt::add_bias(
     from_integer(spec.bias(), t));
 }
 
+/*******************************************************************\
+
+Function: float_bvt::sub_bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt float_bvt::sub_bias(
   const exprt &src,
   const ieee_float_spect &spec)
@@ -1351,6 +1802,18 @@ exprt float_bvt::sub_bias(
     typecast_exprt(src, t),
     from_integer(spec.bias(), t));
 }
+
+/*******************************************************************\
+
+Function: float_bvt::unpack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 float_bvt::unbiased_floatt float_bvt::unpack(
   const exprt &src,
@@ -1384,6 +1847,18 @@ float_bvt::unbiased_floatt float_bvt::unpack(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_bvt::pack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::pack(
   const biased_floatt &src,
@@ -1419,6 +1894,18 @@ exprt float_bvt::pack(
       unsignedbv_typet(spec.e+spec.f)),
     spec.to_type());
 }
+
+/*******************************************************************\
+
+Function: float_bvt::sticky_right_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt float_bvt::sticky_right_shift(
   const exprt &op,

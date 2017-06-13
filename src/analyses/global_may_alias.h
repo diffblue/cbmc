@@ -7,9 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive, over-approximative escape analysis
-
 #ifndef CPROVER_ANALYSES_GLOBAL_MAY_ALIAS_H
 #define CPROVER_ANALYSES_GLOBAL_MAY_ALIAS_H
 
@@ -18,6 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/union_find.h>
 
 #include "ai.h"
+
+/*******************************************************************\
+
+   Class: global_may_alias_domaint
+
+ Purpose:
+
+\*******************************************************************/
 
 class global_may_alias_analysist;
 

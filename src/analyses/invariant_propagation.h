@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Invariant Propagation
-
 #ifndef CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
 #define CPROVER_ANALYSES_INVARIANT_PROPAGATION_H
 

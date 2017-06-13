@@ -12,20 +12,68 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cmdline.h"
 
+/*******************************************************************\
+
+Function: cmdlinet::cmdlinet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 cmdlinet::cmdlinet()
 {
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::~cmdlinet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 cmdlinet::~cmdlinet()
 {
   clear();
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::clear
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cmdlinet::clear()
 {
   options.clear();
   args.clear();
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::isset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cmdlinet::isset(char option) const
 {
@@ -35,6 +83,18 @@ bool cmdlinet::isset(char option) const
   return options[i].isset;
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::isset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool cmdlinet::isset(const char *option) const
 {
   int i=getoptnr(option);
@@ -42,6 +102,18 @@ bool cmdlinet::isset(const char *option) const
     return false;
   return options[i].isset;
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::get_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string cmdlinet::get_value(char option) const
 {
@@ -53,6 +125,18 @@ std::string cmdlinet::get_value(char option) const
   return options[i].values.front();
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cmdlinet::set(const std::string &option)
 {
   int i=getoptnr(option);
@@ -60,6 +144,18 @@ void cmdlinet::set(const std::string &option)
     return; // ignore
   options[i].isset=true;
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cmdlinet::set(const std::string &option, const std::string &value)
 {
@@ -70,12 +166,36 @@ void cmdlinet::set(const std::string &option, const std::string &value)
   options[i].values.push_back(value);
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::get_values
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::list<std::string> &cmdlinet::get_values(char option) const
 {
   int i=getoptnr(option);
   assert(i>=0);
   return options[i].values;
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::get_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string cmdlinet::get_value(const char *option) const
 {
@@ -87,6 +207,18 @@ std::string cmdlinet::get_value(const char *option) const
   return options[i].values.front();
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::get_values
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::list<std::string> &cmdlinet::get_values(
   const std::string &option) const
 {
@@ -94,6 +226,18 @@ const std::list<std::string> &cmdlinet::get_values(
   assert(i>=0);
   return options[i].values;
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::getoptnr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 int cmdlinet::getoptnr(char option) const
 {
@@ -104,6 +248,18 @@ int cmdlinet::getoptnr(char option) const
   return -1;
 }
 
+/*******************************************************************\
+
+Function: cmdlinet::getoptnr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 int cmdlinet::getoptnr(const std::string &option) const
 {
   for(unsigned i=0; i<options.size(); i++)
@@ -112,6 +268,18 @@ int cmdlinet::getoptnr(const std::string &option) const
 
   return -1;
 }
+
+/*******************************************************************\
+
+Function: cmdlinet::parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 {

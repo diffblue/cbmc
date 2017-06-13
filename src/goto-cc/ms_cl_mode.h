@@ -8,9 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-/// \file
-/// Visual Studio CL Mode
-
 #ifndef CPROVER_GOTO_CC_MS_CL_MODE_H
 #define CPROVER_GOTO_CC_MS_CL_MODE_H
 

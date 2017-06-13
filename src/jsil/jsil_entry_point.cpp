@@ -6,9 +6,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language
-
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
@@ -21,6 +18,18 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include "jsil_entry_point.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
+
+/*******************************************************************\
+
+Function: create_initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static void create_initialize(symbol_tablet &symbol_table)
 {
@@ -48,6 +57,18 @@ static void create_initialize(symbol_tablet &symbol_table)
   if(symbol_table.add(initialize))
     throw "failed to add " CPROVER_PREFIX "initialize";
 }
+
+/*******************************************************************\
+
+Function: jsil_entry_point
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool jsil_entry_point(
   symbol_tablet &symbol_table,

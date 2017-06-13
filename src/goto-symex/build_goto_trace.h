@@ -8,9 +8,6 @@ Date: July 2005
 
 \*******************************************************************/
 
-/// \file
-/// Traces of GOTO Programs
-
 #ifndef CPROVER_GOTO_SYMEX_BUILD_GOTO_TRACE_H
 #define CPROVER_GOTO_SYMEX_BUILD_GOTO_TRACE_H
 

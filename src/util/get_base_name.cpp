@@ -10,9 +10,18 @@ Date:
 
 #include "get_base_name.h"
 
-/// cleans a filename from path and extension
-/// \par parameters: a string
-/// \return a new string
+/*******************************************************************\
+
+Function: get_base_name
+
+  Inputs: a string
+
+ Outputs: a new string
+
+ Purpose: cleans a filename from path and extension
+
+\*******************************************************************/
+
 std::string get_base_name(const std::string &in, bool strip_suffix)
 {
   size_t r=std::string::npos;

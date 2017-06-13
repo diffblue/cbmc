@@ -18,13 +18,35 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <windows.h>
 #endif
 
-/// Determine endianness of the architecture
-/// \return True if the architecture is little_endian
+/*******************************************************************\
+
+Function: is_little_endian_arch
+
+  Inputs:
+
+ Outputs: True if the architecture is little_endian
+
+ Purpose: Determine endianness of the architecture
+
+\*******************************************************************/
+
 bool is_little_endian_arch()
 {
   uint32_t i=1;
   return reinterpret_cast<uint8_t &>(i);
 }
+
+/*******************************************************************\
+
+Function: narrow
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #define BUFSIZE 100
 
@@ -53,6 +75,18 @@ std::string narrow(const wchar_t *s)
   #endif
 }
 
+/*******************************************************************\
+
+Function: widen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::wstring widen(const char *s)
 {
   #ifdef _WIN32
@@ -78,6 +112,18 @@ std::wstring widen(const char *s)
   #endif
 }
 
+/*******************************************************************\
+
+Function: narrow
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string narrow(const std::wstring &s)
 {
   #ifdef _WIN32
@@ -94,6 +140,18 @@ std::string narrow(const std::wstring &s)
   return std::string(s.begin(), s.end());
   #endif
 }
+
+/*******************************************************************\
+
+Function: widen
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::wstring widen(const std::string &s)
 {
@@ -112,8 +170,18 @@ std::wstring widen(const std::string &s)
   #endif
 }
 
-/// Appends a unicode character to a utf8-encoded string
-/// \par parameters: character to append, string to append to
+/*******************************************************************\
+
+Function: utf8_append_code
+
+  Inputs: character to append, string to append to
+
+ Outputs:
+
+ Purpose: Appends a unicode character to a utf8-encoded string
+
+\*******************************************************************/
+
 static void utf8_append_code(unsigned int c, std::string &result)
 {
   if(c<=0x7f)
@@ -138,8 +206,19 @@ static void utf8_append_code(unsigned int c, std::string &result)
   }
 }
 
-/// \param utf32:encoded wide string
-/// \return utf8-encoded string with the same unicode characters as the input.
+/*******************************************************************\
+
+Function: utf32_to_utf8
+
+  Inputs: utf32-encoded wide string
+
+ Outputs: utf8-encoded string with the same unicode characters
+          as the input.
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
 {
   std::string result;
@@ -151,6 +230,18 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: narrow_argv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const char **narrow_argv(int argc, const wchar_t **argv_wide)
 {
@@ -167,9 +258,18 @@ const char **narrow_argv(int argc, const wchar_t **argv_wide)
   return argv_narrow;
 }
 
-/// A helper function for dealing with different UTF16 endians
-/// \par parameters: A 16-bit integer
-/// \return A 16-bit integer with bytes swapped
+/*******************************************************************\
+
+Function: do_swap_bytes
+
+  Inputs: A 16-bit integer
+
+ Outputs: A 16-bit integer with bytes swapped
+
+ Purpose: A helper function for dealing with different UTF16 endians
+
+\*******************************************************************/
+
 uint16_t do_swap_bytes(uint16_t x)
 {
   uint16_t b1=x & 0xFF;
@@ -207,10 +307,19 @@ void utf16_append_code(unsigned int code, bool swap_bytes, std::wstring &result)
 }
 
 
-/// \par parameters: String in UTF-8 format, bool value indicating whether the
-/// endianness should be different from the architecture one.
-/// \return String in UTF-16 format. The encoding follows the endianness of the
-///   architecture iff swap_bytes is true.
+/*******************************************************************\
+
+Function: utf8_to_utf16
+
+  Inputs: String in UTF-8 format, bool value indicating whether the
+          endianness should be different from the architecture one.
+
+ Outputs: String in UTF-16 format. The encoding follows the
+          endianness of the architecture iff swap_bytes is true.
+
+ Purpose:
+
+\*******************************************************************/
 std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
 {
     std::wstring result;
@@ -270,24 +379,55 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
     return result;
 }
 
-/// \par parameters: String in UTF-8 format
-/// \return String in UTF-16BE format
+/*******************************************************************\
+
+Function: utf8_to_utf16_big_endian
+
+  Inputs: String in UTF-8 format
+
+ Outputs: String in UTF-16BE format
+
+ Purpose:
+
+\*******************************************************************/
+
 std::wstring utf8_to_utf16_big_endian(const std::string& in)
 {
   bool swap_bytes=is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
 }
 
-/// \par parameters: String in UTF-8 format
-/// \return String in UTF-16LE format
+/*******************************************************************\
+
+Function: utf8_to_utf16_little_endian
+
+  Inputs: String in UTF-8 format
+
+ Outputs: String in UTF-16LE format
+
+ Purpose:
+
+\*******************************************************************/
+
 std::wstring utf8_to_utf16_little_endian(const std::string& in)
 {
   bool swap_bytes=!is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
 }
 
-/// \par parameters: String in UTF-16LE format
-/// \return String in US-ASCII format, with \uxxxx escapes for other characters
+/*******************************************************************\
+
+Function: utf16_little_endian_to_ascii
+
+  Inputs: String in UTF-16LE format
+
+ Outputs: String in US-ASCII format, with \uxxxx escapes for other
+          characters
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string utf16_little_endian_to_ascii(const std::wstring& in)
 {
   std::ostringstream result;

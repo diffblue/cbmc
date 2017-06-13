@@ -11,6 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_prop.h"
 
+/*******************************************************************\
+
+Function: smt2_propt::smt2_propt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 smt2_propt::smt2_propt(
   const std::string &benchmark,
   const std::string &source,
@@ -35,9 +47,33 @@ smt2_propt::smt2_propt(
   _no_variables=0;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::~smt2_propt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 smt2_propt::~smt2_propt()
 {
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::finalize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void smt2_propt::finalize()
 {
@@ -59,6 +95,18 @@ void smt2_propt::finalize()
   out << "; end of SMT2 file" << "\n";
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::land
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::land(const bvt &bv)
 {
   out << "\n";
@@ -76,6 +124,18 @@ literalt smt2_propt::land(const bvt &bv)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::lor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::lor(const bvt &bv)
 {
   out << "\n";
@@ -92,6 +152,18 @@ literalt smt2_propt::lor(const bvt &bv)
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::lxor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt2_propt::lxor(const bvt &bv)
 {
@@ -114,6 +186,18 @@ literalt smt2_propt::lxor(const bvt &bv)
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::land
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt2_propt::land(literalt a, literalt b)
 {
@@ -141,6 +225,18 @@ literalt smt2_propt::land(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::lor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::lor(literalt a, literalt b)
 {
   if(a==const_literal(false))
@@ -167,6 +263,18 @@ literalt smt2_propt::lor(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::lxor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::lxor(literalt a, literalt b)
 {
   if(a==const_literal(false))
@@ -191,25 +299,85 @@ literalt smt2_propt::lxor(literalt a, literalt b)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::lnand
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::lnand(literalt a, literalt b)
 {
   return !land(a, b);
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::lnor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt2_propt::lnor(literalt a, literalt b)
 {
   return !lor(a, b);
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::lequal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::lequal(literalt a, literalt b)
 {
   return !lxor(a, b);
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::limplies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::limplies(literalt a, literalt b)
 {
   return lor(!a, b);
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::lselect
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
 {
@@ -241,6 +409,18 @@ literalt smt2_propt::lselect(literalt a, literalt b, literalt c)
   return l;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::new_variable
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt smt2_propt::new_variable()
 {
   literalt l;
@@ -251,6 +431,18 @@ literalt smt2_propt::new_variable()
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::define_new_variable
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt smt2_propt::define_new_variable()
 {
@@ -264,6 +456,18 @@ literalt smt2_propt::define_new_variable()
 
   return l;
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void smt2_propt::lcnf(const bvt &bv)
 {
@@ -288,6 +492,18 @@ void smt2_propt::lcnf(const bvt &bv)
   out << ")" <<  "\n";
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::smt2_literal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string smt2_propt::smt2_literal(literalt l)
 {
   if(l==const_literal(false))
@@ -305,6 +521,18 @@ std::string smt2_propt::smt2_literal(literalt l)
   return v;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 tvt smt2_propt::l_get(literalt literal) const
 {
   if(literal.is_true())
@@ -319,6 +547,18 @@ tvt smt2_propt::l_get(literalt literal) const
   return literal.sign()?!r:r;
 }
 
+/*******************************************************************\
+
+Function: smt2_propt::set_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void smt2_propt::set_assignment(literalt literal, bool value)
 {
   if(literal.is_true() || literal.is_false())
@@ -328,6 +568,18 @@ void smt2_propt::set_assignment(literalt literal, bool value)
   assert(v<assignment.size());
   assignment[v]=tvt(value);
 }
+
+/*******************************************************************\
+
+Function: smt2_propt::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt smt2_propt::prop_solve()
 {

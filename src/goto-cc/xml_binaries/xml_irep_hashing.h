@@ -8,9 +8,6 @@ Date: July 2006
 
 \*******************************************************************/
 
-/// \file
-/// XML-irep conversions with hashing
-
 #ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_IREP_HASHING_H
 #define CPROVER_GOTO_CC_XML_BINARIES_XML_IREP_HASHING_H
 

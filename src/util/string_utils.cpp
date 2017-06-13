@@ -12,6 +12,18 @@ Author: Daniel Poetzl
 
 #include "string_utils.h"
 
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string strip_string(const std::string &s)
 {
   auto pred=[](char c){ return std::isspace(c); };
@@ -29,6 +41,18 @@ std::string strip_string(const std::string &s)
 
   return s.substr(i, (j-i+1));
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void split_string(
   const std::string &s,
@@ -79,6 +103,18 @@ void split_string(
   if(result.empty())
     result.push_back("");
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void split_string(
   const std::string &s,

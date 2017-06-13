@@ -8,9 +8,6 @@ Date:   September 2009
 
 \*******************************************************************/
 
-/// \file
-/// Remove function return values
-
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
@@ -48,7 +45,18 @@ protected:
     goto_programt &goto_program);
 };
 
-/// turns 'return x' into an assignment to fkt#return_value
+/*******************************************************************\
+
+Function: remove_returnst::replace_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: turns 'return x' into an assignment to fkt#return_value
+
+\*******************************************************************/
+
 void remove_returnst::replace_returns(
   goto_functionst::function_mapt::iterator f_it)
 {
@@ -113,7 +121,18 @@ void remove_returnst::replace_returns(
   }
 }
 
-/// turns x=f(...) into f(...); lhs=f#return_value;
+/*******************************************************************\
+
+Function: remove_returnst::do_function_calls
+
+Inputs:
+
+Outputs:
+
+Purpose: turns x=f(...) into f(...); lhs=f#return_value;
+
+\*******************************************************************/
+
 void remove_returnst::do_function_calls(
   goto_functionst &goto_functions,
   goto_programt &goto_program)
@@ -189,6 +208,18 @@ void remove_returnst::do_function_calls(
   }
 }
 
+/*******************************************************************\
+
+Function: remove_returnst::operator()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void remove_returnst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
@@ -198,7 +229,18 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
   }
 }
 
-/// removes returns
+/*******************************************************************\
+
+Function: remove_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: removes returns
+
+\*******************************************************************/
+
 void remove_returns(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -207,12 +249,35 @@ void remove_returns(
   rr(goto_functions);
 }
 
-/// removes returns
+/*******************************************************************\
+
+Function: remove_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: removes returns
+
+\*******************************************************************/
+
 void remove_returns(goto_modelt &goto_model)
 {
   remove_returnst rr(goto_model.symbol_table);
   rr(goto_model.goto_functions);
 }
+
+/*******************************************************************\
+
+Function: original_return_type
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 code_typet original_return_type(
   const symbol_tablet &symbol_table,
@@ -242,7 +307,18 @@ code_typet original_return_type(
   return type;
 }
 
-/// turns 'return x' into an assignment to fkt#return_value
+/*******************************************************************\
+
+Function: remove_returnst::restore_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: turns 'return x' into an assignment to fkt#return_value
+
+\*******************************************************************/
+
 bool remove_returnst::restore_returns(
   goto_functionst::function_mapt::iterator f_it)
 {
@@ -315,7 +391,18 @@ bool remove_returnst::restore_returns(
   return false;
 }
 
-/// turns f(...); lhs=f#return_value; into x=f(...)
+/*******************************************************************\
+
+Function: remove_returnst::undo_function_calls
+
+Inputs:
+
+Outputs:
+
+Purpose: turns f(...); lhs=f#return_value; into x=f(...)
+
+\*******************************************************************/
+
 void remove_returnst::undo_function_calls(
   goto_functionst &goto_functions,
   goto_programt &goto_program)
@@ -374,6 +461,18 @@ void remove_returnst::undo_function_calls(
   }
 }
 
+/*******************************************************************\
+
+Function: remove_returnst::restore()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void remove_returnst::restore(goto_functionst &goto_functions)
 {
   // restore all types first
@@ -388,7 +487,18 @@ void remove_returnst::restore(goto_functionst &goto_functions)
   }
 }
 
-/// restores return statements
+/*******************************************************************\
+
+Function: restore_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: restores return statements
+
+\*******************************************************************/
+
 void restore_returns(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)

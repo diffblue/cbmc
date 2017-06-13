@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// ILP structure
-
 #ifdef HAVE_GLPK
 #include <glpk.h>
 #endif

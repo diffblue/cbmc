@@ -6,15 +6,24 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// Conversion between exprt and miniBDD
-
 #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
 #include <util/expr_util.h>
 
 #include "bdd_expr.h"
+
+/*******************************************************************\
+
+Function: bdd_exprt::from_expr_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {
@@ -94,10 +103,34 @@ mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: bdd_exprt::from_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void bdd_exprt::from_expr(const exprt &expr)
 {
   root=from_expr_rec(expr);
 }
+
+/*******************************************************************\
+
+Function: bdd_exprt::as_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt bdd_exprt::as_expr(const mini_bddt &r) const
 {
@@ -134,6 +167,18 @@ exprt bdd_exprt::as_expr(const mini_bddt &r) const
   else
     return if_exprt(n_expr, as_expr(r.high()), as_expr(r.low()));
 }
+
+/*******************************************************************\
+
+Function: bdd_exprt::as_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt bdd_exprt::as_expr() const
 {

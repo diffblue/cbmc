@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <set>
 
 #include "cpp_typecheck.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typcheck_compound_bases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
@@ -116,6 +125,18 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     to_struct_type(type).components().push_back(most_derived);
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::add_base_components
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::add_base_components(
   const struct_typet &from,

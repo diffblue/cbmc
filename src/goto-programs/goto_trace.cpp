@@ -8,9 +8,6 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-/// \file
-/// Traces of GOTO Programs
-
 #include <cassert>
 #include <ostream>
 
@@ -22,6 +19,18 @@ Author: Daniel Kroening
 
 #include "goto_trace.h"
 
+/*******************************************************************\
+
+Function: goto_tracet::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_tracet::output(
   const class namespacet &ns,
   std::ostream &out) const
@@ -29,6 +38,18 @@ void goto_tracet::output(
   for(const auto &step : steps)
     step.output(ns, out);
 }
+
+/*******************************************************************\
+
+Function: goto_tracet::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_trace_stept::output(
   const namespacet &ns,
@@ -116,6 +137,18 @@ void goto_trace_stept::output(
   out << "\n";
 }
 
+/*******************************************************************\
+
+Function: trace_value_binary
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string trace_value_binary(
   const exprt &expr,
   const namespacet &ns)
@@ -179,6 +212,18 @@ std::string trace_value_binary(
   return "?";
 }
 
+/*******************************************************************\
+
+Function: trace_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void trace_value(
   std::ostream &out,
   const namespacet &ns,
@@ -209,6 +254,18 @@ void trace_value(
       << "\n";
 }
 
+/*******************************************************************\
+
+Function: show_state_header
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void show_state_header(
   std::ostream &out,
   const goto_trace_stept &state,
@@ -227,6 +284,18 @@ void show_state_header(
   out << "----------------------------------------------------" << "\n";
 }
 
+/*******************************************************************\
+
+Function: is_index_member_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool is_index_member_symbol(const exprt &src)
 {
   if(src.id()==ID_index)
@@ -238,6 +307,18 @@ bool is_index_member_symbol(const exprt &src)
   else
     return false;
 }
+
+/*******************************************************************\
+
+Function: show_goto_trace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void show_goto_trace(
   std::ostream &out,

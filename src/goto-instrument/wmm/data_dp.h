@@ -8,9 +8,6 @@ Date: 2012
 
 \*******************************************************************/
 
-/// \file
-/// data dependencies
-
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_DATA_DP_H
 
@@ -20,6 +17,10 @@ Date: 2012
 
 class abstract_eventt;
 class messaget;
+
+/*******************************************************************\
+                          data dependencies
+\*******************************************************************/
 
 struct datat
 {

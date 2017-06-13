@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Assembler -> Goto
-
 #include "goto_convert_class.h"
+
+/*******************************************************************\
+
+Function: goto_convertt::convert_asm
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_convertt::convert_asm(
   const code_asmt &code,

@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "arith_tools.h"
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isinf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_isinf(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -33,6 +45,18 @@ bool simplify_exprt::simplify_isinf(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isnan
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_isnan(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -48,6 +72,18 @@ bool simplify_exprt::simplify_isnan(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_isnormal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_isnormal(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -62,6 +98,18 @@ bool simplify_exprt::simplify_isnormal(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_abs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #if 0
 bool simplify_exprt::simplify_abs(exprt &expr)
@@ -105,6 +153,18 @@ bool simplify_exprt::simplify_abs(exprt &expr)
 }
 #endif
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_sign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 #if 0
 bool simplify_exprt::simplify_sign(exprt &expr)
 {
@@ -136,6 +196,18 @@ bool simplify_exprt::simplify_sign(exprt &expr)
   return true;
 }
 #endif
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_floatbv_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
 {
@@ -266,6 +338,18 @@ bool simplify_exprt::simplify_floatbv_typecast(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_floatbv_op
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
@@ -328,6 +412,18 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_ieee_float_relation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
 {

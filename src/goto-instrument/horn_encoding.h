@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Horn-clause Encoding
-
 #ifndef CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H
 #define CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H
 

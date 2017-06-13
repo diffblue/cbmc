@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Command Line Parsing
-
 #ifndef CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H
 #define CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H
 

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Variable Numbering
-
 #include <ostream>
 
 #include <util/symbol.h>
@@ -16,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 
 #include "var_map.h"
+
+/*******************************************************************\
+
+Function: var_mapt::var_infot::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 var_mapt::var_infot &var_mapt::operator()(
   const irep_idt &symbol,
@@ -44,6 +53,18 @@ var_mapt::var_infot &var_mapt::operator()(
   return result.first->second;
 }
 
+/*******************************************************************\
+
+Function: var_mapt::var_infot::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void var_mapt::var_infot::output(std::ostream &out) const
 {
   out << "full_identifier: " << full_identifier << "\n";
@@ -67,6 +88,18 @@ void var_mapt::var_infot::output(std::ostream &out) const
 
   out << "\n";
 }
+
+/*******************************************************************\
+
+Function: var_mapt::init
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void var_mapt::init(var_infot &var_info)
 {
@@ -108,11 +141,35 @@ void var_mapt::init(var_infot &var_info)
     var_info.number=local_count++;
 }
 
+/*******************************************************************\
+
+Function: var_mapt::var_infot::ssa_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 irep_idt var_mapt::var_infot::ssa_identifier() const
 {
   return id2string(full_identifier)+
          "#"+std::to_string(ssa_counter);
 }
+
+/*******************************************************************\
+
+Function: var_mapt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void var_mapt::output(std::ostream &out) const
 {

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Taint Analysis
-
 #include <iostream>
 #include <fstream>
 
@@ -24,6 +21,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "taint_analysis.h"
 #include "taint_parser.h"
+
+/*******************************************************************\
+
+   Class: taint_analysist
+
+ Purpose:
+
+\*******************************************************************/
 
 class taint_analysist:public messaget
 {
@@ -47,6 +52,18 @@ protected:
   void instrument(const namespacet &, goto_functionst::goto_functiont &);
 };
 
+/*******************************************************************\
+
+Function: taint_analysist::instrument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void taint_analysist::instrument(
   const namespacet &ns,
   goto_functionst &goto_functions)
@@ -54,6 +71,18 @@ void taint_analysist::instrument(
   for(auto &function : goto_functions.function_map)
     instrument(ns, function.second);
 }
+
+/*******************************************************************\
+
+Function: taint_analysist::instrument
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void taint_analysist::instrument(
   const namespacet &ns,
@@ -215,6 +244,18 @@ void taint_analysist::instrument(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: taint_analysist::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool taint_analysist::operator()(
   const std::string &taint_file_name,
@@ -402,6 +443,18 @@ bool taint_analysist::operator()(
     return true;
   }
 }
+
+/*******************************************************************\
+
+Function: taint_analysis
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool taint_analysis(
   goto_modelt &goto_model,

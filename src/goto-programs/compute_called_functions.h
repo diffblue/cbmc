@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Query Called Functions
-
 #ifndef CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_COMPUTE_CALLED_FUNCTIONS_H
 

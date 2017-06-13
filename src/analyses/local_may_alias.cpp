@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Field-insensitive, location-sensitive may-alias analysis
-
 #include <iterator>
 #include <algorithm>
 
@@ -21,7 +18,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "local_may_alias.h"
 
-/// \return return 'true' iff changed
+/*******************************************************************\
+
+Function: local_may_aliast::loc_infot::merge
+
+  Inputs:
+
+ Outputs: return 'true' iff changed
+
+ Purpose:
+
+\*******************************************************************/
+
 bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 {
   bool changed=false;
@@ -40,6 +48,18 @@ bool local_may_aliast::loc_infot::merge(const loc_infot &src)
 
   return changed;
 }
+
+/*******************************************************************\
+
+Function: local_may_aliast::assign_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_may_aliast::assign_lhs(
   const exprt &lhs,
@@ -112,6 +132,18 @@ void local_may_aliast::assign_lhs(
   }
 }
 
+/*******************************************************************\
+
+Function: local_may_aliast::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::set<exprt> local_may_aliast::get(
   const goto_programt::const_targett t,
   const exprt &rhs) const
@@ -137,6 +169,18 @@ std::set<exprt> local_may_aliast::get(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: local_may_aliast::aliases
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool local_may_aliast::aliases(
   const goto_programt::const_targett t,
@@ -165,6 +209,18 @@ bool local_may_aliast::aliases(
 
   return !result.empty();
 }
+
+/*******************************************************************\
+
+Function: local_may_aliast::get_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_may_aliast::get_rec(
   object_sett &dest,
@@ -313,6 +369,18 @@ void local_may_aliast::get_rec(
     dest.insert(unknown_object);
 }
 
+/*******************************************************************\
+
+Function: local_may_aliast::build
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void local_may_aliast::build(const goto_functiont &goto_function)
 {
   if(cfg.nodes.empty())
@@ -433,6 +501,18 @@ void local_may_aliast::build(const goto_functiont &goto_function)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: local_may_aliast::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void local_may_aliast::output(
   std::ostream &out,

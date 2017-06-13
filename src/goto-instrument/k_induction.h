@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// k-induction
-
 #ifndef CPROVER_GOTO_INSTRUMENT_K_INDUCTION_H
 #define CPROVER_GOTO_INSTRUMENT_K_INDUCTION_H
 

@@ -6,9 +6,6 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-/// \file
-/// Context-insensitive lazy methods container
-
 #ifndef CPROVER_JAVA_BYTECODE_CI_LAZY_METHODS_H
 #define CPROVER_JAVA_BYTECODE_CI_LAZY_METHODS_H
 

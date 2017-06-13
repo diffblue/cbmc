@@ -20,6 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #error "Expected HAVE_MINISAT"
 #endif
 
+/*******************************************************************\
+
+Function: convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void convert(const bvt &bv, vec<Lit> &dest)
 {
   dest.growTo(bv.size());
@@ -27,6 +39,14 @@ void convert(const bvt &bv, vec<Lit> &dest)
   for(unsigned i=0; i<bv.size(); i++)
     dest[i]=Lit(bv[i].var_no(), bv[i].sign());
 }
+
+/*******************************************************************\
+
+   Class: minisat_prooft
+
+ Purpose:
+
+\*******************************************************************/
 
 class minisat_prooft:public ProofTraverser
 {
@@ -56,6 +76,18 @@ public:
   simple_prooft resolution_proof;
 };
 
+/*******************************************************************\
+
+Function: minisat_prooft::chain
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void minisat_prooft::chain(const vec<ClauseId> &cs, const vec<Var> &xs)
 {
   assert(cs.size()==xs.size()+1);
@@ -79,6 +111,18 @@ void minisat_prooft::chain(const vec<ClauseId> &cs, const vec<Var> &xs)
     c.steps[i].pivot_var_no=xs[i];
   }
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::l_get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 tvt satcheck_minisat1_baset::l_get(literalt a) const
 {
@@ -105,16 +149,52 @@ tvt satcheck_minisat1_baset::l_get(literalt a) const
   return result;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_minisat1_baset::solver_text()
 {
   return "MiniSAT 1.14p";
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::add_variables
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_minisat1_baset::add_variables()
 {
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::lcnf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void satcheck_minisat1_baset::lcnf(const bvt &bv)
 {
@@ -142,6 +222,18 @@ void satcheck_minisat1_baset::lcnf(const bvt &bv)
 
   clause_counter++;
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt satcheck_minisat1_baset::prop_solve()
 {
@@ -188,6 +280,18 @@ propt::resultt satcheck_minisat1_baset::prop_solve()
   return P_UNSATISFIABLE;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::set_assignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void satcheck_minisat1_baset::set_assignment(literalt a, bool value)
 {
   unsigned v=a.var_no();
@@ -196,6 +300,18 @@ void satcheck_minisat1_baset::set_assignment(literalt a, bool value)
   value^=sign;
   solver->model[v]=lbool(value);
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::is_in_conflict
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool satcheck_minisat1_baset::is_in_conflict(literalt a) const
 {
@@ -210,6 +326,18 @@ bool satcheck_minisat1_baset::is_in_conflict(literalt a) const
   return false;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::set_assumptions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void satcheck_minisat1_baset::set_assumptions(const bvt &bv)
 {
   assumptions=bv;
@@ -220,11 +348,35 @@ void satcheck_minisat1_baset::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1t::satcheck_minisat1t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_minisat1t::satcheck_minisat1t()
 {
   empty_clause_added=false;
   solver=new Solver;
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_prooft::satcheck_minisat1_prooft
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 satcheck_minisat1_prooft::satcheck_minisat1_prooft():satcheck_minisat1t()
 {
@@ -234,29 +386,101 @@ satcheck_minisat1_prooft::satcheck_minisat1_prooft():satcheck_minisat1t()
   solver->proof=proof;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_prooft::~satcheck_minisat1_prooft
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_minisat1_prooft::~satcheck_minisat1_prooft()
 {
   delete proof;
   delete minisat_proof;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_coret::satcheck_minisat1_coret
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_minisat1_coret::satcheck_minisat1_coret()
 {
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_coret::~satcheck_minisat1_coret
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 satcheck_minisat1_coret::~satcheck_minisat1_coret()
 {
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_baset::~satcheck_minisat1_baset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 satcheck_minisat1_baset::~satcheck_minisat1_baset()
 {
   delete solver;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_prooft::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_minisat1_prooft::solver_text()
 {
   return "MiniSAT + Proof";
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_coret::prop_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 propt::resultt satcheck_minisat1_coret::prop_solve()
 {
@@ -273,10 +497,34 @@ propt::resultt satcheck_minisat1_coret::prop_solve()
   return r;
 }
 
+/*******************************************************************\
+
+Function: satcheck_minisat1_coret::solver_text
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const std::string satcheck_minisat1_coret::solver_text()
 {
   return "MiniSAT + Core";
 }
+
+/*******************************************************************\
+
+Function: satcheck_minisat1_prooft::get_resolution_proof
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 simple_prooft &satcheck_minisat1_prooft::get_resolution_proof()
 {

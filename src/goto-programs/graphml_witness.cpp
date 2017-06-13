@@ -6,9 +6,6 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
-/// \file
-/// Witnesses for Traces and Proofs
-
 #include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/config.h>
@@ -17,6 +14,18 @@ Author: Daniel Kroening
 #include <util/ssa_expr.h>
 
 #include "graphml_witness.h"
+
+/*******************************************************************\
+
+Function: graphml_witnesst::remove_l0_l1
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
@@ -43,6 +52,18 @@ void graphml_witnesst::remove_l0_l1(exprt &expr)
   Forall_operands(it, expr)
     remove_l0_l1(*it);
 }
+
+/*******************************************************************\
+
+Function: graphml_witnesst::convert_assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string graphml_witnesst::convert_assign_rec(
   const irep_idt &identifier,
@@ -135,6 +156,18 @@ std::string graphml_witnesst::convert_assign_rec(
   return result;
 }
 
+/*******************************************************************\
+
+Function: filter_out
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static bool filter_out(
   const goto_tracet &goto_trace,
   const goto_tracet::stepst::const_iterator &prev_it,
@@ -170,7 +203,18 @@ static bool filter_out(
   return false;
 }
 
-/// counterexample witness
+/*******************************************************************\
+
+Function: graphml_witnesst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: counterexample witness
+
+\*******************************************************************/
+
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
   graphml.key_values["sourcecodelang"]="C";
@@ -354,7 +398,18 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   }
 }
 
-/// proof witness
+/*******************************************************************\
+
+Function: graphml_witnesst::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: proof witness
+
+\*******************************************************************/
+
 void graphml_witnesst::operator()(const symex_target_equationt &equation)
 {
   graphml.key_values["sourcecodelang"]="C";

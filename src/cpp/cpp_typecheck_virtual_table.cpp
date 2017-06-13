@@ -6,13 +6,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <util/std_types.h>
 #include <util/std_expr.h>
 
 #include "cpp_typecheck.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::do_virtual_table
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {

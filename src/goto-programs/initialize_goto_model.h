@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Initialize a Goto Program
-
 #ifndef CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H
 #define CPROVER_GOTO_PROGRAMS_INITIALIZE_GOTO_MODEL_H
 

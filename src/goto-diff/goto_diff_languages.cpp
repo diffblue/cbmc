@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Language Registration
-
 #include <langapi/mode.h>
 
 #include <ansi-c/ansi_c_language.h>
@@ -23,6 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "goto_diff_languages.h"
+
+/*******************************************************************\
+
+Function: goto_diff_languagest::register_languages
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void goto_diff_languagest::register_languages()
 {

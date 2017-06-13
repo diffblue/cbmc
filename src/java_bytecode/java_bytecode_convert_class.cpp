@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// JAVA Bytecode Language Conversion
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -76,6 +73,18 @@ protected:
   void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
 };
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_classt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_convert_classt::convert(const classt &c)
 {
@@ -162,6 +171,18 @@ void java_bytecode_convert_classt::convert(const classt &c)
     java_root_class(*class_symbol);
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_convert_classt::generate_class_stub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void java_bytecode_convert_classt::generate_class_stub(
   const irep_idt &class_name)
 {
@@ -195,6 +216,18 @@ void java_bytecode_convert_classt::generate_class_stub(
     java_root_class(*class_symbol);
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_classt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
@@ -256,6 +289,18 @@ void java_bytecode_convert_classt::convert(
       component.set_access(ID_default);
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_classt::add_array_types
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void java_bytecode_convert_classt::add_array_types()
 {
@@ -413,6 +458,18 @@ void java_bytecode_convert_classt::add_array_types()
     symbol_table.add(clone_symbol);
   }
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_convert_class
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,

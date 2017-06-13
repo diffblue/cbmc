@@ -9,9 +9,6 @@ Date: July 2006
 
 \*******************************************************************/
 
-/// \file
-/// Convert goto programs into xml structures and back (with irep hashing)
-
 #ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_HASHING_H
 #define CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_HASHING_H
 

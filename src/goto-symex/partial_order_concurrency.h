@@ -6,9 +6,6 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-/// \file
-/// Add constraints to equation encoding partial orders on events
-
 #ifndef CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 #define CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 

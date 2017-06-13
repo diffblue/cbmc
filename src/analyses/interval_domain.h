@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Interval Domain
-
 #ifndef CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 #define CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 

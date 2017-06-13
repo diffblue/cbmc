@@ -8,9 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-/// \file
-/// A special command line object for the gcc-like options
-
 #ifndef CPROVER_GOTO_CC_MS_CL_CMDLINE_H
 #define CPROVER_GOTO_CC_MS_CL_CMDLINE_H
 

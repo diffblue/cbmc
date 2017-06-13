@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Havoc Loops
-
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
@@ -62,6 +59,18 @@ protected:
   goto_programt::targett get_loop_exit(const loopt &);
 };
 
+/*******************************************************************\
+
+Function: havoc_loopst::get_loop_exit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
 {
   assert(!loop.empty());
@@ -79,6 +88,18 @@ goto_programt::targett havoc_loopst::get_loop_exit(const loopt &loop)
 
   return ++last;
 }
+
+/*******************************************************************\
+
+Function: havoc_loopst::build_havoc_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void havoc_loopst::build_havoc_code(
   const goto_programt::targett loop_head,
@@ -100,6 +121,18 @@ void havoc_loopst::build_havoc_code(
     t->code.add_source_location()=loop_head->source_location;
   }
 }
+
+/*******************************************************************\
+
+Function: havoc_loopst::havoc_loop
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void havoc_loopst::havoc_loop(
   const goto_programt::targett loop_head,
@@ -145,6 +178,18 @@ void havoc_loopst::havoc_loop(
   remove_skip(goto_function.body);
 }
 
+/*******************************************************************\
+
+Function: havoc_loopst::get_modifies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void havoc_loopst::get_modifies(
   const loopt &loop,
   modifiest &modifies)
@@ -175,6 +220,18 @@ void havoc_loopst::get_modifies(
   }
 }
 
+/*******************************************************************\
+
+Function: havoc_loopst::havoc_loops
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void havoc_loopst::havoc_loops()
 {
   // iterate over the (natural) loops in the function
@@ -182,6 +239,18 @@ void havoc_loopst::havoc_loops()
   for(const auto &loop : natural_loops.loop_map)
     havoc_loop(loop.first, loop.second);
 }
+
+/*******************************************************************\
+
+Function: havoc_loops
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void havoc_loops(goto_functionst &goto_functions)
 {

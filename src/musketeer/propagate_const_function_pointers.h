@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// Constant Function Pointer Propagation
-
 #ifndef CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
 #define CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
 

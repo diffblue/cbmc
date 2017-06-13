@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Internal Representation
-
 #include <cassert>
 #include <ostream>
 
@@ -31,6 +28,18 @@ irept nil_rep_storage;
 irept::dt irept::empty_d;
 #endif
 
+/*******************************************************************\
+
+Function: named_subt_lower_bound
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 #ifdef SUB_IS_LIST
 static inline bool named_subt_order(
   const std::pair<irep_namet, irept> &a,
@@ -52,12 +61,36 @@ static inline irept::named_subt::iterator named_subt_lower_bound(
 }
 #endif
 
+/*******************************************************************\
+
+Function: get_nil_irep
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 const irept &get_nil_irep()
 {
   if(nil_rep_storage.id().empty()) // initialized?
     nil_rep_storage.id(ID_nil);
   return nil_rep_storage;
 }
+
+/*******************************************************************\
+
+Function: irept::detach
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #ifdef SHARING
 void irept::detach()
@@ -94,6 +127,18 @@ void irept::detach()
   #endif
 }
 #endif
+
+/*******************************************************************\
+
+Function: irept::remove_ref
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #ifdef SHARING
 void irept::remove_ref(dt *old_data)
@@ -133,8 +178,19 @@ void irept::remove_ref(dt *old_data)
 }
 #endif
 
-/// Does the same as remove_ref, but using an explicit stack instead of
-/// recursion.
+/*******************************************************************\
+
+Function: irept::nonrecursive_destructor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Does the same as remove_ref, but
+          using an explicit stack instead of recursion.
+
+\*******************************************************************/
+
 #ifdef SHARING
 void irept::nonrecursive_destructor(dt *old_data)
 {
@@ -191,6 +247,18 @@ void irept::nonrecursive_destructor(dt *old_data)
 }
 #endif
 
+/*******************************************************************\
+
+Function: irept::move_to_named_sub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void irept::move_to_named_sub(const irep_namet &name, irept &irep)
 {
   #ifdef SHARING
@@ -200,6 +268,18 @@ void irept::move_to_named_sub(const irep_namet &name, irept &irep)
   irep.clear();
 }
 
+/*******************************************************************\
+
+Function: irept::move_to_sub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void irept::move_to_sub(irept &irep)
 {
   #ifdef SHARING
@@ -208,6 +288,18 @@ void irept::move_to_sub(irept &irep)
   get_sub().push_back(get_nil_irep());
   get_sub().back().swap(irep);
 }
+
+/*******************************************************************\
+
+Function: irept::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const irep_idt &irept::get(const irep_namet &name) const
 {
@@ -236,35 +328,119 @@ const irep_idt &irept::get(const irep_namet &name) const
   return it->second.id();
 }
 
+/*******************************************************************\
+
+Function: irept::get_bool
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool irept::get_bool(const irep_namet &name) const
 {
   return get(name)==ID_1;
 }
+
+/*******************************************************************\
+
+Function: irept::get_int
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 int irept::get_int(const irep_namet &name) const
 {
   return unsafe_string2int(get_string(name));
 }
 
+/*******************************************************************\
+
+Function: irept::get_unsigned_int
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 unsigned int irept::get_unsigned_int(const irep_namet &name) const
 {
   return unsafe_string2unsigned(get_string(name));
 }
+
+/*******************************************************************\
+
+Function: irept::get_size_t
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::size_t irept::get_size_t(const irep_namet &name) const
 {
   return unsafe_string2size_t(get_string(name));
 }
 
+/*******************************************************************\
+
+Function: irept::get_long_long
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 long long irept::get_long_long(const irep_namet &name) const
 {
   return unsafe_string2signedlonglong(get_string(name));
 }
 
+/*******************************************************************\
+
+Function: irept::set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void irept::set(const irep_namet &name, const long long value)
 {
   add(name).id(std::to_string(value));
 }
+
+/*******************************************************************\
+
+Function: irept::remove
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void irept::remove(const irep_namet &name)
 {
@@ -280,6 +456,18 @@ void irept::remove(const irep_namet &name)
   s.erase(name);
   #endif
 }
+
+/*******************************************************************\
+
+Function: irept::find
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 const irept &irept::find(const irep_namet &name) const
 {
@@ -302,6 +490,18 @@ const irept &irept::find(const irep_namet &name) const
   return it->second;
 }
 
+/*******************************************************************\
+
+Function: irept::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 irept &irept::add(const irep_namet &name)
 {
   named_subt &s=
@@ -319,6 +519,18 @@ irept &irept::add(const irep_namet &name)
   return s[name];
   #endif
 }
+
+/*******************************************************************\
+
+Function: irept::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 irept &irept::add(const irep_namet &name, const irept &irep)
 {
@@ -345,6 +557,18 @@ irept &irept::add(const irep_namet &name, const irept &irep)
   return entry.first->second;
   #endif
 }
+
+/*******************************************************************\
+
+Function: irept::operator==
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #ifdef IREP_HASH_STATS
 unsigned long long irep_cmp_cnt=0;
@@ -375,6 +599,18 @@ bool irept::operator==(const irept &other) const
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: irept::full_eq
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool irept::full_eq(const irept &other) const
 {
@@ -425,7 +661,18 @@ bool irept::full_eq(const irept &other) const
   return true;
 }
 
-/// defines ordering on the internal represenation
+/*******************************************************************\
+
+Function: irept::ordering
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: defines ordering on the internal represenation
+
+\*******************************************************************/
+
 bool irept::ordering(const irept &other) const
 {
   return compare(other)<0;
@@ -491,7 +738,18 @@ bool irept::ordering(const irept &other) const
   #endif
 }
 
-/// defines ordering on the internal represenation
+/*******************************************************************\
+
+Function: irept::compare
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: defines ordering on the internal represenation
+
+\*******************************************************************/
+
 int irept::compare(const irept &i) const
 {
   int r;
@@ -557,11 +815,35 @@ int irept::compare(const irept &i) const
   return 0;
 }
 
-/// defines ordering on the internal represenation
+/*******************************************************************\
+
+Function: irept::operator<
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: defines ordering on the internal represenation
+
+\*******************************************************************/
+
 bool irept::operator<(const irept &other) const
 {
   return ordering(other);
 }
+
+/*******************************************************************\
+
+Function: irept::hash
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 
 #ifdef IREP_HASH_STATS
 unsigned long long irep_hash_cnt=0;
@@ -598,6 +880,18 @@ std::size_t irept::hash() const
   return result;
 }
 
+/*******************************************************************\
+
+Function: irept::full_hash
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::size_t irept::full_hash() const
 {
   const irept::subt &sub=get_sub();
@@ -627,11 +921,35 @@ std::size_t irept::full_hash() const
   return result;
 }
 
+/*******************************************************************\
+
+Function: indent
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static void indent_str(std::string &s, unsigned indent)
 {
   for(unsigned i=0; i<indent; i++)
     s+=' ';
 }
+
+/*******************************************************************\
+
+Function: irept::pretty
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string irept::pretty(unsigned indent, unsigned max_indent) const
 {

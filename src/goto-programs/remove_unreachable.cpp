@@ -6,15 +6,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include <set>
 #include <stack>
 
 #include "remove_unreachable.h"
 
-/// remove unreachable code
+/*******************************************************************\
+
+Function: remove_unreachable
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: remove unreachable code
+
+\*******************************************************************/
+
 void remove_unreachable(goto_programt &goto_program)
 {
   std::set<goto_programt::targett> reachable;

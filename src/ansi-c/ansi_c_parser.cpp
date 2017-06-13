@@ -13,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 ansi_c_parsert ansi_c_parser;
 
+/*******************************************************************\
+
+Function: ansi_c_parsert::lookup
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 ansi_c_id_classt ansi_c_parsert::lookup(
   const irep_idt &base_name,
   irep_idt &identifier, // output
@@ -58,6 +70,18 @@ ansi_c_id_classt ansi_c_parsert::lookup(
   return ansi_c_id_classt::ANSI_C_UNKNOWN;
 }
 
+/*******************************************************************\
+
+Function: ansi_c_parsert::add_tag_with_body
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void ansi_c_parsert::add_tag_with_body(irept &tag)
 {
   const std::string scope_name=
@@ -76,6 +100,18 @@ void ansi_c_parsert::add_tag_with_body(irept &tag)
   }
 }
 
+/*******************************************************************\
+
+Function: yyansi_cerror
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 extern char *yyansi_ctext;
 
 int yyansi_cerror(const std::string &error)
@@ -83,6 +119,18 @@ int yyansi_cerror(const std::string &error)
   ansi_c_parser.parse_error(error, yyansi_ctext);
   return 0;
 }
+
+/*******************************************************************\
+
+Function: ansi_c_parsert::add_declarator
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ansi_c_parsert::add_declarator(
   exprt &declaration,
@@ -153,6 +201,18 @@ void ansi_c_parsert::add_declarator(
 
   ansi_c_declaration.declarators().push_back(new_declarator);
 }
+
+/*******************************************************************\
+
+Function: ansi_c_parsert::get_class
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 ansi_c_id_classt ansi_c_parsert::get_class(const typet &type)
 {

@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include "cpp_typecheck.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert(cpp_linkage_spect &linkage_spec)
 {

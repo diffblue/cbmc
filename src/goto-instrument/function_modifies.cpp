@@ -6,12 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Modifies
-
 #include <util/std_expr.h>
 
 #include "function_modifies.h"
+
+/*******************************************************************\
+
+Function: function_modifiest::get_modifies_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void function_modifiest::get_modifies_lhs(
   const local_may_aliast &local_may_alias,
@@ -42,6 +51,18 @@ void function_modifiest::get_modifies_lhs(
   }
 }
 
+/*******************************************************************\
+
+Function: function_modifiest::get_modifies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void function_modifiest::get_modifies(
   const local_may_aliast &local_may_alias,
   const goto_programt::const_targett i_it,
@@ -68,6 +89,18 @@ void function_modifiest::get_modifies(
       code_function_call.function(), modifies);
   }
 }
+
+/*******************************************************************\
+
+Function: function_modifiest::get_modifies_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void function_modifiest::get_modifies_function(
   const exprt &function,

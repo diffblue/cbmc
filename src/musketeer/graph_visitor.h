@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// graph visitor for computing edges involved for fencing
-
 #ifndef CPROVER_MUSKETEER_GRAPH_VISITOR_H
 #define CPROVER_MUSKETEER_GRAPH_VISITOR_H
 

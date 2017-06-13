@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_with
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_with(const exprt &expr)
 {
   if(expr.operands().size()<3)
@@ -65,6 +77,18 @@ bvt boolbvt::convert_with(const exprt &expr)
   return bv;
 }
 
+/*******************************************************************\
+
+Function: boolbvt::convert_with
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void boolbvt::convert_with(
   const typet &type,
   const exprt &op1,
@@ -94,6 +118,18 @@ void boolbvt::convert_with(
   error() << "unexpected with type: " << type.id();
   throw 0;
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_with_array
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void boolbvt::convert_with_array(
   const array_typet &type,
@@ -164,6 +200,18 @@ void boolbvt::convert_with_array(
   }
 }
 
+/*******************************************************************\
+
+Function: boolbvt::convert_with_bv
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void boolbvt::convert_with_bv(
   const typet &type,
   const exprt &op1,
@@ -195,6 +243,18 @@ void boolbvt::convert_with_bv(
     next_bv[i]=prop.lselect(eq_lit, l, prev_bv[i]);
   }
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_with
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void boolbvt::convert_with_struct(
   const struct_typet &type,
@@ -251,6 +311,18 @@ void boolbvt::convert_with_struct(
     offset+=sub_width;
   }
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_with_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void boolbvt::convert_with_union(
   const union_typet &type,

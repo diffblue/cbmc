@@ -20,6 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "prefix.h"
 #include "pointer_predicates.h"
 
+/*******************************************************************\
+
+Function: is_dereference_integer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static bool is_dereference_integer_object(
   const exprt &expr,
   mp_integer &address)
@@ -48,6 +60,18 @@ static bool is_dereference_integer_object(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_address_of_arg
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_address_of_arg(exprt &expr)
 {
@@ -168,6 +192,18 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_address_of(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -209,6 +245,18 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_pointer_offset
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 {
@@ -387,6 +435,18 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_inequality_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
@@ -428,6 +488,18 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   return true;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_inequality_pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
@@ -460,6 +532,18 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
   return false;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_pointer_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_pointer_object(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -487,6 +571,18 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_dynamic_object
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_dynamic_object(exprt &expr)
 {
@@ -544,6 +640,18 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
   return result;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_invalid_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -573,6 +681,18 @@ bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
   return result;
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::objects_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
 {
   if(a==b)
@@ -597,6 +717,18 @@ tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
   return tvt::unknown();
 }
 
+/*******************************************************************\
+
+Function: simplify_exprt::objects_equal_address_of
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 {
   if(a==b)
@@ -620,6 +752,18 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 
   return tvt::unknown();
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_object_size
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_object_size(exprt &expr)
 {
@@ -666,6 +810,18 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: simplify_exprt::simplify_good_pointer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool simplify_exprt::simplify_good_pointer(exprt &expr)
 {

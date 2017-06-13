@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Language Conversion
-
 #include <cctype>
 
 #include <util/string2int.h>
@@ -16,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "literals/unescape_string.h"
 #include "preprocessor_line.h"
+
+/*******************************************************************\
+
+Function: preprocessor_line
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void preprocessor_line(
   const char *text,

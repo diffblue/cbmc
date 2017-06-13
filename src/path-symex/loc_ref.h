@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Locations
-
 #ifndef CPROVER_PATH_SYMEX_LOC_REF_H
 #define CPROVER_PATH_SYMEX_LOC_REF_H
 

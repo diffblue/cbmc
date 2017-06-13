@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Value Set Propagation
-
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SETS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SETS_H
 

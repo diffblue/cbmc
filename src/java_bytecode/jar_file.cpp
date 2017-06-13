@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "jar_file.h"
 
+/*******************************************************************\
+
+Function: jar_filet::open
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jar_filet::open(
   java_class_loader_limitt &class_loader_limit,
   const std::string &filename)
@@ -56,6 +68,18 @@ void jar_filet::open(
   }
 }
 
+/*******************************************************************\
+
+Function: jar_filet::~jar_filet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 jar_filet::~jar_filet()
 {
   if(mz_ok)
@@ -64,6 +88,18 @@ jar_filet::~jar_filet()
     mz_ok=false;
   }
 }
+
+/*******************************************************************\
+
+Function: jar_filet::get_entry
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string jar_filet::get_entry(const irep_idt &name)
 {
@@ -93,6 +129,18 @@ std::string jar_filet::get_entry(const irep_idt &name)
 
   return dest;
 }
+
+/*******************************************************************\
+
+Function: jar_filet::get_manifest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 jar_filet::manifestt jar_filet::get_manifest()
 {

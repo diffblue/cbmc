@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Read OS X Fat Binaries
-
 #ifndef CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
 #define CPROVER_GOTO_PROGRAMS_OSX_FAT_READER_H
 

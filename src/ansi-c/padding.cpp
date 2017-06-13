@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <algorithm>
 
 #include <util/config.h>
@@ -17,6 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include "padding.h"
+
+/*******************************************************************\
+
+Function: alignment
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 mp_integer alignment(const typet &type, const namespacet &ns)
 {
@@ -104,6 +113,18 @@ mp_integer alignment(const typet &type, const namespacet &ns)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: add_padding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void add_padding(struct_typet &type, const namespacet &ns)
 {
@@ -300,6 +321,18 @@ void add_padding(struct_typet &type, const namespacet &ns)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: add_padding
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void add_padding(union_typet &type, const namespacet &ns)
 {

@@ -8,9 +8,6 @@ Date: February 2004
 
 \*******************************************************************/
 
-/// \file
-/// Time Stopping
-
 #ifndef CPROVER_UTIL_TIME_STOPPING_H
 #define CPROVER_UTIL_TIME_STOPPING_H
 

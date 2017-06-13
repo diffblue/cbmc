@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Show the properties
-
 #ifndef CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
 #define CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H
 

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Volatile Variables
-
 #ifndef CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 #define CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 

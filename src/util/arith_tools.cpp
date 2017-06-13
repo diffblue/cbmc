@@ -15,12 +15,36 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 
+/*******************************************************************\
+
+Function: to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool to_integer(const exprt &expr, mp_integer &int_value)
 {
   if(!expr.is_constant())
     return true;
   return to_integer(to_constant_expr(expr), int_value);
 }
+
+/*******************************************************************\
+
+Function: to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool to_integer(const constant_exprt &expr, mp_integer &int_value)
 {
@@ -89,9 +113,18 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
   return true;
 }
 
-/// convert a positive integer expression to an unsigned int
-/// \par parameters: a constant expression and a reference to an unsigned int
-/// \return an error flag
+/*******************************************************************\
+
+Function: to_unsigned_integer
+
+  Inputs: a constant expression and a reference to an unsigned int
+
+ Outputs: an error flag
+
+ Purpose: convert a positive integer expression to an unsigned int
+
+\*******************************************************************/
+
 bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value)
 {
   mp_integer i;
@@ -105,6 +138,18 @@ bool to_unsigned_integer(const constant_exprt &expr, unsigned &uint_value)
     return false;
   }
 }
+
+/*******************************************************************\
+
+Function: from_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 constant_exprt from_integer(
   const mp_integer &int_value,
@@ -206,7 +251,18 @@ constant_exprt from_integer(
   }
 }
 
-/// ceil(log2(size))
+/*******************************************************************\
+
+Function: address_bits
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: ceil(log2(size))
+
+\*******************************************************************/
+
 mp_integer address_bits(const mp_integer &size)
 {
   mp_integer result, x=2;
@@ -216,9 +272,18 @@ mp_integer address_bits(const mp_integer &size)
   return result;
 }
 
-/// A multi-precision implementation of the power operator.
-/// \par parameters: Two mp_integers, base and exponent
-/// \return One mp_integer with the value base^{exponent}
+/*******************************************************************\
+
+Function: power
+
+  Inputs: Two mp_integers, base and exponent
+
+ Outputs: One mp_integer with the value base^{exponent}
+
+ Purpose: A multi-precision implementation of the power operator.
+
+\*******************************************************************/
+
 mp_integer power(const mp_integer &base,
                  const mp_integer &exponent)
 {
@@ -270,11 +335,35 @@ mp_integer power(const mp_integer &base,
   return result;
 }
 
+/*******************************************************************\
+
+Function: mp_min
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void mp_min(mp_integer &a, const mp_integer &b)
 {
   if(b<a)
     a=b;
 }
+
+/*******************************************************************\
+
+Function: mp_max
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void mp_max(mp_integer &a, const mp_integer &b)
 {

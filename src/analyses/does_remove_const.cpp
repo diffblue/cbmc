@@ -6,9 +6,6 @@
 
 \*******************************************************************/
 
-/// \file
-/// Analyses
-
 #include <goto-programs/goto_program.h>
 #include <util/type.h>
 #include <util/expr.h>
@@ -18,10 +15,21 @@
 
 #include "does_remove_const.h"
 
-/// A naive analysis to look for casts that remove const-ness from pointers.
-/// \param goto_program: the goto program to check
-/// \param ns: the namespace of the goto program (used for checking type
-///   equality)
+/*******************************************************************\
+
+Function: does_remove_constt::does_remove_constt
+
+  Inputs:
+   goto_program - the goto program to check
+   ns - the namespace of the goto program (used for checking type equality)
+
+ Outputs:
+
+ Purpose: A naive analysis to look for casts that remove const-ness from
+          pointers.
+
+\*******************************************************************/
+
 does_remove_constt::does_remove_constt(
   const goto_programt &goto_program,
   const namespacet &ns):
@@ -29,8 +37,19 @@ does_remove_constt::does_remove_constt(
     ns(ns)
 {}
 
-/// A naive analysis to look for casts that remove const-ness from pointers.
-/// \return Returns true if the program contains a const-removing cast
+/*******************************************************************\
+
+Function: does_remove_constt::operator()
+
+  Inputs:
+
+ Outputs: Returns true if the program contains a const-removing cast
+
+ Purpose: A naive analysis to look for casts that remove const-ness from
+          pointers.
+
+\*******************************************************************/
+
 bool does_remove_constt::operator()() const
 {
   for(const goto_programt::instructiont &instruction :
@@ -61,12 +80,22 @@ bool does_remove_constt::operator()() const
   return false;
 }
 
-/// Search the expression tree to look for any children that have the same base
-/// type, but a less strict const qualification. If one is found, we return
-/// true.
-/// \param expr: The expression to check
-/// \return Returns true if somewhere in the passed expression tree the const-
-///   ness is lost.
+/*******************************************************************\
+
+Function: does_remove_constt::does_expr_lose_const()
+
+  Inputs:
+   expr - The expression to check
+
+ Outputs: Returns true if somewhere in the passed expression tree the const-ness
+          is lost.
+
+ Purpose: Search the expression tree to look for any children that have the
+          same base type, but a less strict const qualification.
+          If one is found, we return true.
+
+\*******************************************************************/
+
 bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
 {
   const typet &root_type=expr.type();
@@ -93,20 +122,29 @@ bool does_remove_constt::does_expr_lose_const(const exprt &expr) const
   return false;
 }
 
-/// A recursive check to check the type_more_const is at least as const as type
-/// compare.
-///
-///          type_more_const | type_compare || result
-///          ----------------------------------------
-///          const int *     | const int *  -> true
-///          int *           | const int *  -> false
-///          const int *     | int *        -> true
-///          int *           | int * const  -> false
-/// \param type_more_const: the type we are expecting to be at least as const
-///   qualified
-/// \param type_compare: the type we are comparing against which may be less
-///   const qualified
-/// \return Returns true if type_more_const is at least as const as type_compare
+/*******************************************************************\
+
+Function: does_remove_constt::is_type_at_least_as_const_as
+
+  Inputs:
+   type_more_const - the type we are expecting to be at least as const qualified
+   type_compare - the type we are comparing against which may be less const
+                  qualified
+
+ Outputs: Returns true if type_more_const is at least as const as type_compare
+
+ Purpose: A recursive check to check the type_more_const is at least as const
+          as type compare.
+
+          type_more_const | type_compare || result
+          ----------------------------------------
+          const int *     | const int *  -> true
+          int *           | const int *  -> false
+          const int *     | int *        -> true
+          int *           | int * const  -> false
+
+\*******************************************************************/
+
 bool does_remove_constt::is_type_at_least_as_const_as(
   const typet *type_more_const, const typet *type_compare) const
 {

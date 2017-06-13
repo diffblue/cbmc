@@ -8,9 +8,6 @@ Date: April 2016
 
 \*******************************************************************/
 
-/// \file
-/// Initialize command line arguments
-
 #ifndef CPROVER_GOTO_INSTRUMENT_MODEL_ARGC_ARGV_H
 #define CPROVER_GOTO_INSTRUMENT_MODEL_ARGC_ARGV_H
 

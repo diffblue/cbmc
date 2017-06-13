@@ -6,18 +6,39 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Container for C-Strings
-
 #include <cstring>
 
 #include "string_container.h"
 
 string_containert string_container;
 
+/*******************************************************************\
+
+Function: string_ptrt::string_ptrt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 string_ptrt::string_ptrt(const char *_s):s(_s), len(strlen(_s))
 {
 }
+
+/*******************************************************************\
+
+Function: string_ptrt::operator==
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool string_ptrt::operator==(const string_ptrt &other) const
 {
@@ -26,6 +47,18 @@ bool string_ptrt::operator==(const string_ptrt &other) const
 
   return len==0 || memcmp(s, other.s, len)==0;
 }
+
+/*******************************************************************\
+
+Function: string_containert::string_containert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void initialize_string_container();
 
@@ -38,9 +71,33 @@ string_containert::string_containert()
   initialize_string_container();
 }
 
+/*******************************************************************\
+
+Function: string_containert::~string_containert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 string_containert::~string_containert()
 {
 }
+
+/*******************************************************************\
+
+Function: string_containert::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned string_containert::get(const char *s)
 {
@@ -64,6 +121,18 @@ unsigned string_containert::get(const char *s)
 
   return r;
 }
+
+/*******************************************************************\
+
+Function: string_containert::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 unsigned string_containert::get(const std::string &s)
 {

@@ -58,6 +58,18 @@ const char clang_builtin_headers[]=
 #include "clang_builtin_headers.inc"
 ; // NOLINT(whitespace/semicolon)
 
+/*******************************************************************\
+
+Function: architecture_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static std::string architecture_string(const std::string &value, const char *s)
 {
   return std::string("const char *__CPROVER_architecture_")+
@@ -65,12 +77,36 @@ static std::string architecture_string(const std::string &value, const char *s)
          "=\""+value+"\";\n";
 }
 
+/*******************************************************************\
+
+Function: architecture_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static std::string architecture_string(int value, const char *s)
 {
   return std::string("const int __CPROVER_architecture_")+
          std::string(s)+
          "="+std::to_string(value)+";\n";
 }
+
+/*******************************************************************\
+
+Function: ansi_c_internal_additions
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ansi_c_internal_additions(std::string &code)
 {
@@ -273,6 +309,18 @@ void ansi_c_internal_additions(std::string &code)
   // Architecture strings
   ansi_c_architecture_strings(code);
 }
+
+/*******************************************************************\
+
+Function: architecture_strings
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void ansi_c_architecture_strings(std::string &code)
 {

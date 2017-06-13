@@ -7,10 +7,19 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// ILP construction for cycles affecting user-assertions and resolution
-
 #include "fence_assert.h"
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool fence_assert_insertert::find_assert(
   const event_grapht::critical_cyclet &cycle) const
@@ -18,6 +27,18 @@ bool fence_assert_insertert::find_assert(
   /* TODO */
   return true;
 }
+
+/*******************************************************************\
+
+Function:
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_assert_insertert::process_cycles_selection()
 {

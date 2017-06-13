@@ -6,15 +6,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Bounded Model Checking for ANSI-C
-
 #include <limits>
 
 #include <util/source_location.h>
 #include <util/simplify_expr.h>
 
 #include "symex_bmc.h"
+
+/*******************************************************************\
+
+Function: symex_bmct::symex_bmct
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 symex_bmct::symex_bmct(
   const namespacet &_ns,
@@ -27,7 +36,18 @@ symex_bmct::symex_bmct(
 {
 }
 
-/// show progress
+/*******************************************************************\
+
+Function: symex_bmct::symex_step
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: show progress
+
+\*******************************************************************/
+
 void symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
@@ -76,6 +96,18 @@ void symex_bmct::symex_step(
     symex_coverage.covered(cur_pc, state.source.pc);
 }
 
+/*******************************************************************\
+
+Function: symex_bmct::merge_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_bmct::merge_goto(
   const statet::goto_statet &goto_state,
   statet &state)
@@ -94,6 +126,18 @@ void symex_bmct::merge_goto(
      !prev_pc->guard.is_true())
     symex_coverage.covered(prev_pc, state.source.pc);
 }
+
+/*******************************************************************\
+
+Function: symex_bmct::get_unwind
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
@@ -135,6 +179,18 @@ bool symex_bmct::get_unwind(
 
   return abort;
 }
+
+/*******************************************************************\
+
+Function: symex_bmct::get_unwind_recursion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool symex_bmct::get_unwind_recursion(
   const irep_idt &id,
@@ -180,6 +236,18 @@ bool symex_bmct::get_unwind_recursion(
 
   return abort;
 }
+
+/*******************************************************************\
+
+Function: symex_bmct::no_body
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void symex_bmct::no_body(const irep_idt &identifier)
 {

@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// string hashing
-
 #ifndef CPROVER_UTIL_STRING_HASH_H
 #define CPROVER_UTIL_STRING_HASH_H
 

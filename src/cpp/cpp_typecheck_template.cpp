@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"
@@ -17,6 +14,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 #include "cpp_convert_type.h"
 #include "cpp_template_args.h"
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::salvage_default_arguments
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
@@ -38,6 +47,18 @@ void cpp_typecheckt::salvage_default_arguments(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_class_template
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_class_template(
   cpp_declarationt &declaration)
@@ -202,7 +223,18 @@ void cpp_typecheckt::typecheck_class_template(
          cpp_idt::id_classt::TEMPLATE_SCOPE);
 }
 
-/// typecheck function templates
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_function_template
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: typecheck function templates
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_function_template(
   cpp_declarationt &declaration)
 {
@@ -305,7 +337,19 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
-/// typecheck class tempalte members; these can be methods or static members
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_class_template_member
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: typecheck class tempalte members;
+          these can be methods or static members
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
@@ -418,6 +462,18 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::class_template_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string cpp_typecheckt::class_template_identifier(
   const irep_idt &base_name,
   const template_typet &template_type,
@@ -477,6 +533,18 @@ std::string cpp_typecheckt::class_template_identifier(
   return identifier;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::function_template_identifier
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string cpp_typecheckt::function_template_identifier(
   const irep_idt &base_name,
   const template_typet &template_type,
@@ -493,6 +561,18 @@ std::string cpp_typecheckt::function_template_identifier(
 
   return identifier;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_class_template_specialization
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert_class_template_specialization(
   cpp_declarationt &declaration)
@@ -615,6 +695,18 @@ void cpp_typecheckt::convert_class_template_specialization(
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_template_function_or_member_specialization
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::convert_template_function_or_member_specialization(
   cpp_declarationt &declaration)
 {
@@ -715,6 +807,18 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     convert_non_template_declaration(new_declaration);
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_template_parameters
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   template_typet &type)
@@ -847,8 +951,18 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
   return template_scope;
 }
 
-/// \par parameters: location, non-typechecked template arguments
-/// \return typechecked template arguments
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_template_args
+
+  Inputs: location, non-typechecked template arguments
+
+ Outputs: typechecked template arguments
+
+ Purpose:
+
+\*******************************************************************/
+
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -985,6 +1099,18 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_template_declaration
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert_template_declaration(
   cpp_declarationt &declaration)

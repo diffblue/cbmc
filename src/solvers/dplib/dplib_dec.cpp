@@ -28,6 +28,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dplib_dec.h"
 
+/*******************************************************************\
+
+Function: dplib_temp_filet::dplib_temp_filet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 dplib_temp_filet::dplib_temp_filet()
 {
   temp_out_filename="dplib_dec_out_"+std::to_string(getpid())+".tmp";
@@ -36,6 +48,18 @@ dplib_temp_filet::dplib_temp_filet()
     temp_out_filename.c_str(),
     std::ios_base::out | std::ios_base::trunc);
 }
+
+/*******************************************************************\
+
+Function: dplib_temp_filet::~dplib_temp_filet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 dplib_temp_filet::~dplib_temp_filet()
 {
@@ -47,6 +71,18 @@ dplib_temp_filet::~dplib_temp_filet()
   if(temp_result_filename!="")
     unlink(temp_result_filename.c_str());
 }
+
+/*******************************************************************\
+
+Function: dplib_dect::dec_solve
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 decision_proceduret::resultt dplib_dect::dec_solve()
 {
@@ -70,6 +106,18 @@ decision_proceduret::resultt dplib_dect::dec_solve()
 
   return read_dplib_result();
 }
+
+/*******************************************************************\
+
+Function: dplib_dect::read_assert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void dplib_dect::read_assert(std::istream &in, std::string &line)
 {
@@ -129,6 +177,18 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     }
   }
 }
+
+/*******************************************************************\
+
+Function: dplib_dect::read_dplib_result
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 decision_proceduret::resultt dplib_dect::read_dplib_result()
 {

@@ -17,6 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "boolbv.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_update
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_update(const exprt &expr)
 {
   const exprt::operandst &ops=expr.operands();
@@ -40,6 +52,18 @@ bvt boolbvt::convert_update(const exprt &expr)
 
   return bv;
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_update_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void boolbvt::convert_update_rec(
   const exprt::operandst &designators,

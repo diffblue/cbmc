@@ -8,9 +8,6 @@ Date:   December 2016
 
 \*******************************************************************/
 
-/// \file
-/// Remove exception handling
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -69,8 +66,19 @@ protected:
     const goto_functionst::function_mapt::iterator &);
 };
 
-/// adds exceptional return variables for every function that may escape
-/// exceptions
+/*******************************************************************\
+
+Function: remove_exceptionst::add_exceptional_returns
+
+Inputs:
+
+Outputs:
+
+Purpose: adds exceptional return variables for every function that
+         may escape exceptions
+
+\*******************************************************************/
+
 void remove_exceptionst::add_exceptional_returns(
   const goto_functionst::function_mapt::iterator &func_it)
 {
@@ -171,8 +179,19 @@ void remove_exceptionst::add_exceptional_returns(
   }
 }
 
-/// at the beginning of each handler in function f  adds exc=f#exception_value;
-/// f#exception_value=NULL;
+/*******************************************************************\
+
+Function: remove_exceptionst::instrument_exception_handler
+
+Inputs:
+
+Outputs:
+
+Purpose: at the beginning of each handler in function f 
+         adds exc=f#exception_value; f#exception_value=NULL;
+
+\*******************************************************************/
+
 void remove_exceptionst::instrument_exception_handler(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it)
@@ -216,8 +235,19 @@ void remove_exceptionst::instrument_exception_handler(
   instr_it->make_skip();
 }
 
-/// finds the instruction where the exceptional output is set or the end of the
-/// function if no such output exists
+/*******************************************************************\
+
+Function: get_exceptional_output
+
+Inputs:
+
+Outputs:
+
+Purpose: finds the instruction where the exceptional output is set
+         or the end of the function if no such output exists
+
+\*******************************************************************/
+
 static goto_programt::targett get_exceptional_output(
   goto_programt &goto_program)
 {
@@ -238,8 +268,19 @@ static goto_programt::targett get_exceptional_output(
   return goto_program.get_end_function();
 }
 
-/// instruments each throw with conditional GOTOS to the  corresponding
-/// exception handlers
+/*******************************************************************\
+
+Function: remove_exceptionst::instrument_throw
+
+Inputs:
+
+Outputs:
+
+Purpose: instruments each throw with conditional GOTOS to the 
+         corresponding exception handlers
+
+\*******************************************************************/
+
 void remove_exceptionst::instrument_throw(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
@@ -326,8 +367,19 @@ void remove_exceptionst::instrument_throw(
   instr_it->code=assignment;
 }
 
-/// instruments each function call that may escape exceptions with conditional
-/// GOTOS to the corresponding exception handlers
+/*******************************************************************\
+
+Function: remove_exceptionst::instrument_function_call
+
+Inputs:
+
+Outputs:
+
+Purpose: instruments each function call that may escape exceptions
+         with conditional GOTOS to the corresponding exception handlers
+
+\*******************************************************************/
+
 void remove_exceptionst::instrument_function_call(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
@@ -424,9 +476,20 @@ void remove_exceptionst::instrument_function_call(
   }
 }
 
-/// instruments throws, function calls that may escape exceptions and exception
-/// handlers. Additionally, it re-computes the live-range of local variables in
-/// order to add DEAD instructions.
+/*******************************************************************\
+
+Function: remove_exceptionst::instrument_exceptions
+
+Inputs:
+
+Outputs:
+
+Purpose: instruments throws, function calls that may escape exceptions
+         and exception handlers. Additionally, it re-computes
+         the live-range of local variables in order to add DEAD instructions.
+
+\*******************************************************************/
+
 void remove_exceptionst::instrument_exceptions(
   const goto_functionst::function_mapt::iterator &func_it)
 {
@@ -509,6 +572,18 @@ void remove_exceptionst::instrument_exceptions(
   }
 }
 
+/*******************************************************************\
+
+Function: remove_exceptionst::operator()
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void remove_exceptionst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
@@ -517,7 +592,18 @@ void remove_exceptionst::operator()(goto_functionst &goto_functions)
     instrument_exceptions(it);
 }
 
-/// removes throws/CATCH-POP/CATCH-PUSH
+/*******************************************************************\
+
+Function: remove_exceptions
+
+Inputs:
+
+Outputs:
+
+Purpose: removes throws/CATCH-POP/CATCH-PUSH
+
+\*******************************************************************/
+
 void remove_exceptions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -529,7 +615,18 @@ void remove_exceptions(
   remove_exceptions(goto_functions);
 }
 
-/// removes throws/CATCH-POP/CATCH-PUSH
+/*******************************************************************\
+
+Function: remove_exceptions
+
+Inputs:
+
+Outputs:
+
+Purpose: removes throws/CATCH-POP/CATCH-PUSH
+
+\*******************************************************************/
+
 void remove_exceptions(goto_modelt &goto_model)
 {
   std::map<irep_idt, std::set<irep_idt>> exceptions_map;

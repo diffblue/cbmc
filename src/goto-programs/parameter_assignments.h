@@ -8,9 +8,6 @@ Date:   September 2015
 
 \*******************************************************************/
 
-/// \file
-/// Add parameter assignments
-
 #ifndef CPROVER_GOTO_PROGRAMS_PARAMETER_ASSIGNMENTS_H
 #define CPROVER_GOTO_PROGRAMS_PARAMETER_ASSIGNMENTS_H
 

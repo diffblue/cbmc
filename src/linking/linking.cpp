@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// ANSI-C Linking
-
 #include <cassert>
 #include <stack>
 
@@ -25,6 +22,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "linking.h"
 #include "linking_class.h"
 
+/*******************************************************************\
+
+Function: linkingt::expr_to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string linkingt::expr_to_string(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -33,6 +42,18 @@ std::string linkingt::expr_to_string(
   return from_expr(ns, identifier, expr);
 }
 
+/*******************************************************************\
+
+Function: linkingt::type_to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string linkingt::type_to_string(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -40,6 +61,18 @@ std::string linkingt::type_to_string(
 {
   return from_type(ns, identifier, type);
 }
+
+/*******************************************************************\
+
+Function: follow_tags_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static const typet &follow_tags_symbols(
   const namespacet &ns,
@@ -56,6 +89,18 @@ static const typet &follow_tags_symbols(
   else
     return type;
 }
+
+/*******************************************************************\
+
+Function: linkingt::type_to_string_verbose
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string linkingt::type_to_string_verbose(
   const namespacet &ns,
@@ -110,6 +155,18 @@ std::string linkingt::type_to_string_verbose(
 
   return type_to_string(ns, symbol.name, type);
 }
+
+/*******************************************************************\
+
+Function: linkingt::detailed_conflict_report
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::detailed_conflict_report_rec(
   const symbolt &old_symbol,
@@ -365,6 +422,18 @@ void linkingt::detailed_conflict_report_rec(
   #endif
 }
 
+/*******************************************************************\
+
+Function: linkingt::link_error
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void linkingt::link_error(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
@@ -385,6 +454,18 @@ void linkingt::link_error(
   throw 0;
 }
 
+/*******************************************************************\
+
+Function: linkingt::link_warning
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void linkingt::link_warning(
     const symbolt &old_symbol,
     const symbolt &new_symbol,
@@ -402,6 +483,18 @@ void linkingt::link_warning(
             << " " << new_symbol.location << '\n'
             << type_to_string_verbose(ns, new_symbol) << eom;
 }
+
+/*******************************************************************\
+
+Function: linkingt::rename
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 irep_idt linkingt::rename(const irep_idt id)
 {
@@ -427,6 +520,18 @@ irep_idt linkingt::rename(const irep_idt id)
   }
 }
 
+/*******************************************************************\
+
+Function: linkingt::needs_renaming_non_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool linkingt::needs_renaming_non_type(
   const symbolt &old_symbol,
   const symbolt &new_symbol)
@@ -440,6 +545,18 @@ bool linkingt::needs_renaming_non_type(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: linkingt::duplicate_code_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::duplicate_code_symbol(
   symbolt &old_symbol,
@@ -736,6 +853,18 @@ void linkingt::duplicate_code_symbol(
   }
 }
 
+/*******************************************************************\
+
+Function: linkingt::adjust_object_type_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool linkingt::adjust_object_type_rec(
   const typet &t1,
   const typet &t2,
@@ -890,6 +1019,18 @@ bool linkingt::adjust_object_type_rec(
   return true;
 }
 
+/*******************************************************************\
+
+Function: linkingt::adjust_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool linkingt::adjust_object_type(
   const symbolt &old_symbol,
   const symbolt &new_symbol,
@@ -904,6 +1045,18 @@ bool linkingt::adjust_object_type(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: linkingt::duplicate_object_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::duplicate_object_symbol(
   symbolt &old_symbol,
@@ -989,6 +1142,18 @@ void linkingt::duplicate_object_symbol(
   }
 }
 
+/*******************************************************************\
+
+Function: linkingt::duplicate_non_type_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void linkingt::duplicate_non_type_symbol(
   symbolt &old_symbol,
   symbolt &new_symbol)
@@ -1017,6 +1182,18 @@ void linkingt::duplicate_non_type_symbol(
   // it's enough that one isn't extern for the final one not to be
   old_symbol.is_extern=old_symbol.is_extern && new_symbol.is_extern;
 }
+
+/*******************************************************************\
+
+Function: linkingt::duplicate_type_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
@@ -1095,6 +1272,18 @@ void linkingt::duplicate_type_symbol(
     "unexpected difference between type symbols");
 }
 
+/*******************************************************************\
+
+Function: linkingt::needs_renaming_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool linkingt::needs_renaming_type(
   const symbolt &old_symbol,
   const symbolt &new_symbol)
@@ -1138,6 +1327,18 @@ bool linkingt::needs_renaming_type(
 
   return true; // different
 }
+
+/*******************************************************************\
+
+Function: linkingt::do_type_dependencies
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
 {
@@ -1194,6 +1395,18 @@ void linkingt::do_type_dependencies(id_sett &needs_to_be_renamed)
   }
 }
 
+/*******************************************************************\
+
+Function: linkingt::rename_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
 {
   namespacet src_ns(src_symbol_table);
@@ -1225,6 +1438,18 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
       rename_symbol.insert_expr(*it, new_identifier);
   }
 }
+
+/*******************************************************************\
+
+Function: linkingt::copy_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void linkingt::copy_symbols()
 {
@@ -1278,6 +1503,18 @@ void linkingt::copy_symbols()
   }
 }
 
+/*******************************************************************\
+
+Function: linkingt::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void linkingt::typecheck()
 {
   // We do this in three phases. We first figure out which symbols need to
@@ -1313,6 +1550,18 @@ void linkingt::typecheck()
   // PHASE 3: copy new symbols to main table
   copy_symbols();
 }
+
+/*******************************************************************\
+
+Function: linking
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool linking(
   symbol_tablet &dest_symbol_table,

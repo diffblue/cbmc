@@ -8,9 +8,6 @@ Date: June 2006
 
 \*******************************************************************/
 
-/// \file
-/// Converts symbols to xml structures and back.
-
 #ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_SYMBOL_H
 #define CPROVER_GOTO_CC_XML_BINARIES_XML_SYMBOL_H
 

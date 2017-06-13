@@ -6,9 +6,6 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
-/// \file
-/// Command line option container
-
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -27,7 +24,18 @@ Author: CM Wintersteiger, 2006
 #include "cw_mode.h"
 #include "compile.h"
 
-/// does it.
+/*******************************************************************\
+
+Function: cw_modet::doit
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: does it.
+
+\*******************************************************************/
+
 int cw_modet::doit()
 {
   if(cmdline.isset('?') || cmdline.isset("help"))
@@ -178,7 +186,18 @@ int cw_modet::doit()
   return compiler.doit() ? EX_USAGE : EX_OK;
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: cw_modet::help_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void cw_modet::help_mode()
 {
   std::cout << "goto-cw understands the options of "

@@ -6,9 +6,6 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-/// \file
-/// Fence inference: Main
-
 #include <util/cprover_prefix.h>
 #include <util/message.h>
 
@@ -20,6 +17,18 @@ Author: Vincent Nimal
 #include "fence_user_def.h"
 #include "fence_assert.h"
 #include "fencer.h"
+
+/*******************************************************************\
+
+Function: fencer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void fence_weak_memory(
   memory_modelt model,

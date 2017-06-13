@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <cstdlib>
 
 #include <util/std_types.h>
@@ -30,6 +27,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_exception_id.h"
 #include "expr2cpp.h"
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::find_parent
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
   const irep_idt &base_name,
@@ -47,7 +56,18 @@ bool cpp_typecheckt::find_parent(
   return false;
 }
 
-/// Called after the operands are done
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_main
+
+Inputs:
+
+Outputs:
+
+Purpose: Called after the operands are done
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
   if(expr.id()==ID_cpp_name)
@@ -135,6 +155,18 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else
     c_typecheck_baset::typecheck_expr_main(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_trinary
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 {
@@ -297,12 +329,36 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
   return;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_member
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 {
   typecheck_expr_member(
     expr,
     cpp_typecheck_fargst());
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_sizeof
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 {
@@ -359,10 +415,34 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
   c_typecheck_baset::typecheck_expr_sizeof(expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_ptrmember
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_ptrmember(exprt &expr)
 {
   typecheck_expr_ptrmember(expr, cpp_typecheck_fargst());
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_function_expr
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_function_expr(
   exprt &expr,
@@ -420,6 +500,18 @@ void cpp_typecheckt::typecheck_function_expr(
     typecheck_expr(expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::overloadable
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 bool cpp_typecheckt::overloadable(const exprt &expr)
 {
   // at least one argument must have class or enumerated type
@@ -439,6 +531,18 @@ bool cpp_typecheckt::overloadable(const exprt &expr)
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::operator_is_overloaded
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 struct operator_entryt
 {
@@ -698,6 +802,18 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   return false;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_address_of
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -759,6 +875,18 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     expr.type()=reference_typet(expr.type().subtype());
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_throw
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
 {
   // these are of type void
@@ -784,6 +912,18 @@ void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
              cpp_exception_list(exception_type, *this));
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_new
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 {
@@ -861,6 +1001,18 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   sizeof_expr=c_sizeof(expr.type().subtype(), *this);
   sizeof_expr.add("#c_sizeof_type")=expr.type().subtype();
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_explicit_typecast
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 static exprt collect_comma_expression(const exprt &src)
 {
@@ -964,6 +1116,18 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_explicit_constructor_call
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 {
   typecheck_type(expr.type());
@@ -986,6 +1150,18 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_this
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_this(exprt &expr)
 {
   if(cpp_scopes.current_scope().class_identifier.empty())
@@ -1004,6 +1180,18 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
   expr=this_expr;
   expr.add_source_location()=source_location;
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_delete
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
 {
@@ -1062,6 +1250,18 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   expr.set(ID_destructor, destructor_code);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_typecast
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_typecast(exprt &expr)
 {
   // should not be called
@@ -1070,6 +1270,18 @@ void cpp_typecheckt::typecheck_expr_typecast(exprt &expr)
   assert(0);
   #endif
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_member
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_member(
   exprt &expr,
@@ -1252,6 +1464,18 @@ void cpp_typecheckt::typecheck_expr_member(
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_ptrmember
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_ptrmember(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
@@ -1289,6 +1513,18 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   expr.id(ID_member);
   typecheck_expr_member(expr, fargs);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_cast_expr
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 {
@@ -1398,6 +1634,18 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
 
   expr.swap(new_expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_cpp_name
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_cpp_name(
   exprt &expr,
@@ -1899,6 +2147,18 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   add_implicit_dereference(expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::add_implicit_dereference
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::add_implicit_dereference(exprt &expr)
 {
   if(is_reference(expr.type()))
@@ -1912,6 +2172,18 @@ void cpp_typecheckt::add_implicit_dereference(exprt &expr)
     expr.swap(tmp);
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_side_effect_function_call
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
@@ -2277,8 +2549,18 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.swap(tmp);
 }
 
-/// \param type:checked arguments, type-checked function
-/// \return type-adjusted function arguments
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_function_call_arguments
+
+  Inputs: type-checked arguments, type-checked function
+
+ Outputs: type-adjusted function arguments
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {
@@ -2332,6 +2614,18 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   c_typecheck_baset::typecheck_function_call_arguments(expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_side_effect
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_side_effect(
   side_effect_exprt &expr)
 {
@@ -2365,6 +2659,18 @@ void cpp_typecheckt::typecheck_expr_side_effect(
   else
     c_typecheck_baset::typecheck_expr_side_effect(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_method_application
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_method_application(
   side_effect_expr_function_callt &expr)
@@ -2425,6 +2731,18 @@ void cpp_typecheckt::typecheck_method_application(
     symbol_table.symbols[symbol.name].value.set("is_used", true);
   }
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_side_effect_assignment
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
@@ -2513,6 +2831,18 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   expr=new_expr;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_side_effect_inc_dec
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_side_effect_inc_dec(
   side_effect_exprt &expr)
 {
@@ -2589,6 +2919,18 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(
   expr.swap(new_expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_dereference
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -2612,6 +2954,18 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 
   c_typecheck_baset::typecheck_expr_dereference(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::convert_pmop
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::convert_pmop(exprt &expr)
 {
@@ -2683,6 +3037,18 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
   return;
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_function_identifier
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 {
   if(expr.id()==ID_symbol)
@@ -2701,6 +3067,18 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -2723,6 +3101,18 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   if(override_constantness)
     expr.type().set(ID_C_constant, false);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::explict_typecast_ambiguity
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
 {
@@ -2779,6 +3169,18 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_binary_arithmetic
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -2795,10 +3197,34 @@ void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
   c_typecheck_baset::typecheck_expr_binary_arithmetic(expr);
 }
 
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_index
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
+
 void cpp_typecheckt::typecheck_expr_index(exprt &expr)
 {
   c_typecheck_baset::typecheck_expr_index(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_comma
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 {
@@ -2816,6 +3242,18 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 
   c_typecheck_baset::typecheck_expr_comma(expr);
 }
+
+/*******************************************************************\
+
+Function: cpp_typecheckt::typecheck_expr_rel
+
+Inputs:
+
+Outputs:
+
+Purpose:
+
+\*******************************************************************/
 
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {

@@ -6,9 +6,6 @@ Author: DiffBlue Limited. All rights reserved.
 
 \*******************************************************************/
 
-/// \file
-/// C Nondet Symbol Factory
-
 #ifndef CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 #define CPROVER_ANSI_C_C_NONDET_SYMBOL_FACTORY_H
 

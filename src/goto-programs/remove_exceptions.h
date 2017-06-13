@@ -8,9 +8,6 @@ Date:   December 2016
 
 \*******************************************************************/
 
-/// \file
-/// Remove function exceptional returns
-
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_EXCEPTIONS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_EXCEPTIONS_H
 

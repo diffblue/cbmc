@@ -12,8 +12,6 @@ src/goto-analyzer/taint_driver_scripts/.idea/*
 /*.files
 /*.includes
 
-*.pyc
-
 # compilation files
 *.lo
 *.od
@@ -70,10 +68,6 @@ src/xmllang/xml_lex.yy.cpp
 src/xmllang/xml_y.output
 src/xmllang/xml_y.tab.cpp
 src/xmllang/xml_y.tab.h
-src/memory-models/mm_lex.yy.cpp
-src/memory-models/mm_y.output
-src/memory-models/mm_y.tab.cpp
-src/memory-models/mm_y.tab.h
 
 # binaries
 src/cbmc/cbmc

@@ -6,9 +6,6 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
-/// \file
-/// Command line option container
-
 #include <cstdio>
 #include <iostream>
 
@@ -24,7 +21,18 @@ Author: CM Wintersteiger, 2006
 
 #include "goto_cc_mode.h"
 
-/// constructor
+/*******************************************************************\
+
+Function: goto_cc_modet::goto_cc_modet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: constructor
+
+\*******************************************************************/
+
 goto_cc_modet::goto_cc_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
@@ -36,12 +44,34 @@ goto_cc_modet::goto_cc_modet(
   register_languages();
 }
 
-/// constructor
+/*******************************************************************\
+
+Function: goto_cc_modet::~goto_cc_modet
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: constructor
+
+\*******************************************************************/
+
 goto_cc_modet::~goto_cc_modet()
 {
 }
 
-/// display command line help
+/*******************************************************************\
+
+Function: goto_cc_modet::help
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: display command line help
+
+\*******************************************************************/
+
 void goto_cc_modet::help()
 {
   std::cout <<
@@ -67,8 +97,18 @@ void goto_cc_modet::help()
   "\n";
 }
 
-/// starts the compiler
-/// \return error code
+/*******************************************************************\
+
+Function: goto_cc_modet::main
+
+  Inputs: argc/argv
+
+ Outputs: error code
+
+ Purpose: starts the compiler
+
+\*******************************************************************/
+
 int goto_cc_modet::main(int argc, const char **argv)
 {
   if(cmdline.parse(argc, argv))
@@ -106,8 +146,18 @@ int goto_cc_modet::main(int argc, const char **argv)
   }
 }
 
-/// prints a message informing the user about incorrect options
-/// \return none
+/*******************************************************************\
+
+Function: goto_cc_modet::usage_error
+
+  Inputs: none
+
+ Outputs: none
+
+ Purpose: prints a message informing the user about incorrect options
+
+\*******************************************************************/
+
 void goto_cc_modet::usage_error()
 {
   std::cerr << "Usage error!\n\n";

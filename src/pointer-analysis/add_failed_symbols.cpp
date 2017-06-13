@@ -6,19 +6,40 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Pointer Dereferencing
-
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
 #include "add_failed_symbols.h"
 
+/*******************************************************************\
+
+Function: failed_symbol_id
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 irep_idt failed_symbol_id(const irep_idt &id)
 {
   return id2string(id)+"$object";
 }
+
+/*******************************************************************\
+
+Function: add_failed_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
@@ -49,6 +70,18 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
   }
 }
 
+/*******************************************************************\
+
+Function: add_failed_symbols
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void add_failed_symbols(symbol_tablet &symbol_table)
 {
   // the symbol table iterators are not stable, and
@@ -68,6 +101,18 @@ void add_failed_symbols(symbol_tablet &symbol_table)
     add_failed_symbol(**it, symbol_table);
   }
 }
+
+/*******************************************************************\
+
+Function: get_failed_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 exprt get_failed_symbol(
   const symbol_exprt &expr,

@@ -8,9 +8,6 @@ Date: June 2003
 
 \*******************************************************************/
 
-/// \file
-/// Goto Programs with Functions
-
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_CONVERT_FUNCTIONS_H
 

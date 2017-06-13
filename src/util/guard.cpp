@@ -6,14 +6,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution
-
 #include <ostream>
 
 #include "std_expr.h"
 #include "simplify_utils.h"
 #include "guard.h"
+
+/*******************************************************************\
+
+Function: guardt::as_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void guardt::guard_expr(exprt &dest) const
 {
@@ -39,6 +48,18 @@ void guardt::guard_expr(exprt &dest) const
 }
 
 #if 0
+/*******************************************************************\
+
+Function: guardt::as_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt guardt::as_expr(guard_listt::const_iterator it) const
 {
   if(it==guard_list.end())
@@ -59,6 +80,18 @@ exprt guardt::as_expr(guard_listt::const_iterator it) const
   return dest;
 }
 #endif
+
+/*******************************************************************\
+
+Function: guardt::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void guardt::add(const exprt &expr)
 {
@@ -89,6 +122,18 @@ void guardt::add(const exprt &expr)
     op.push_back(expr);
 }
 
+/*******************************************************************\
+
+Function: operator -=
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 guardt &operator -= (guardt &g1, const guardt &g2)
 {
   if(g1.id()!=ID_and || g2.id()!=ID_and)
@@ -117,6 +162,18 @@ guardt &operator -= (guardt &g1, const guardt &g2)
 
   return g1;
 }
+
+/*******************************************************************\
+
+Function: operator |=
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 guardt &operator |= (guardt &g1, const guardt &g2)
 {
@@ -203,12 +260,36 @@ guardt &operator |= (guardt &g1, const guardt &g2)
 }
 
 #if 0
+/*******************************************************************\
+
+Function: operator <<
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::ostream &operator << (std::ostream &out, const guardt &g)
 {
   forall_expr_list(it, g.guard_list)
     out << "*** " << it->pretty() << std::endl;
   return out;
 }
+
+/*******************************************************************\
+
+Function: guardt::is_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 #define forall_guard(it, guard_list) \
   for(guardt::guard_listt::const_iterator it=(guard_list).begin(); \
@@ -222,6 +303,18 @@ bool guardt::is_false() const
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: guardt::make_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void guardt::make_false()
 {

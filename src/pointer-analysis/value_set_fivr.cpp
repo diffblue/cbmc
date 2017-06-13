@@ -7,9 +7,6 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
-/// \file
-/// Value Set (Flow Insensitive, Sharing, Validity Regions)
-
 #include <cassert>
 #include <ostream>
 
@@ -53,6 +50,18 @@ static const char *alloc_adapter_prefix="alloc_adaptor::";
       (it)!=(map).end(); \
       (it)++) \
     if((map).is_valid_at((it)->first, from_function, from_target_index)) /* NOLINT(*) */
+
+/*******************************************************************\
+
+Function: value_set_fivrt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::output(
   const namespacet &ns,
@@ -212,6 +221,18 @@ void value_set_fivrt::output(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::flatten
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::flatten(
         const entryt &e,
         object_mapt &dest) const
@@ -227,6 +248,18 @@ void value_set_fivrt::flatten(
   std::cout << "FLATTEN: Done." << std::endl;
   #endif
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::flatten_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::flatten_rec(
   const entryt &e,
@@ -343,6 +376,18 @@ void value_set_fivrt::flatten_rec(
   seen.erase(identifier + e.suffix);
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::to_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt value_set_fivrt::to_expr(object_map_dt::const_iterator it) const
 {
   const exprt &object=object_numbering[it->first];
@@ -363,6 +408,18 @@ exprt value_set_fivrt::to_expr(object_map_dt::const_iterator it) const
   return od;
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::make_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_fivrt::make_union(
   object_mapt &dest,
   const object_mapt &src) const
@@ -377,6 +434,18 @@ bool value_set_fivrt::make_union(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrnst::make_valid_union
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_fivrt::make_valid_union(
   object_mapt &dest,
@@ -393,6 +462,18 @@ bool value_set_fivrt::make_valid_union(
   return result;
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::copy_objects
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::copy_objects(
   object_mapt &dest,
   const object_mapt &src) const
@@ -406,6 +487,18 @@ void value_set_fivrt::copy_objects(
                                      from_target_index));
   }
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::get_value_set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::get_value_set(
   const exprt &expr,
@@ -471,6 +564,18 @@ void value_set_fivrt::get_value_set(
   #endif
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::get_value_set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::get_value_set(
   const exprt &expr,
   object_mapt &dest,
@@ -482,6 +587,18 @@ void value_set_fivrt::get_value_set(
   gvs_recursion_sett recset;
   get_value_set_rec(tmp, dest, "", tmp.type(), ns, recset);
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::get_value_set_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::get_value_set_rec(
   const exprt &expr,
@@ -799,6 +916,18 @@ void value_set_fivrt::get_value_set_rec(
   insert_from(dest, exprt(ID_unknown, original_type));
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::dereference_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::dereference_rec(
   const exprt &src,
   exprt &dest) const
@@ -816,6 +945,18 @@ void value_set_fivrt::dereference_rec(
   else
     dest=src;
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::get_reference_set
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::get_reference_set(
   const exprt &expr,
@@ -866,6 +1007,18 @@ void value_set_fivrt::get_reference_set(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::get_reference_set_sharing
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::get_reference_set_sharing(
   const exprt &expr,
   expr_sett &dest,
@@ -877,6 +1030,18 @@ void value_set_fivrt::get_reference_set_sharing(
   forall_objects(it, object_map.read())
     dest.insert(to_expr(it));
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::get_reference_set_sharing_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::get_reference_set_sharing_rec(
   const exprt &expr,
@@ -1078,6 +1243,18 @@ void value_set_fivrt::get_reference_set_sharing_rec(
   insert_from(dest, exprt(ID_unknown, expr.type()));
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::assign(
   const exprt &lhs,
   const exprt &rhs,
@@ -1237,6 +1414,18 @@ void value_set_fivrt::assign(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::do_free
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::do_free(
   const exprt &op,
   const namespacet &ns)
@@ -1317,6 +1506,18 @@ void value_set_fivrt::do_free(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::assign_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::assign_rec(
   const exprt &lhs,
@@ -1492,6 +1693,18 @@ void value_set_fivrt::assign_rec(
     throw "assign NYI: `"+lhs.id_string()+"'";
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::do_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::do_function_call(
   const irep_idt &function,
   const exprt::operandst &arguments,
@@ -1559,6 +1772,18 @@ void value_set_fivrt::do_function_call(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::do_end_function
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void value_set_fivrt::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
@@ -1571,6 +1796,18 @@ void value_set_fivrt::do_end_function(
 
   assign(lhs, rhs, ns);
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::apply_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void value_set_fivrt::apply_code(
   const exprt &code,
@@ -1668,6 +1905,18 @@ void value_set_fivrt::apply_code(
       "value_set_fivrt: unexpected statement: "+id2string(statement);
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::insert_to
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_fivrt::insert_to(
   object_mapt &dest,
   unsigned n,
@@ -1708,6 +1957,18 @@ bool value_set_fivrt::insert_to(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::insert_from
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_fivrt::insert_from(
   object_mapt &dest,
@@ -1750,6 +2011,18 @@ bool value_set_fivrt::insert_from(
   }
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::object_map_dt::set_valid_at
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_fivrt::object_map_dt::set_valid_at(
   unsigned inx,
   const validity_ranget &vr)
@@ -1762,6 +2035,18 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
 
   return res;
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::object_map_dt::set_valid_at
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_fivrt::object_map_dt::set_valid_at(
   unsigned inx,
@@ -1834,6 +2119,18 @@ bool value_set_fivrt::object_map_dt::set_valid_at(
   return true;
 }
 
+/*******************************************************************\
+
+Function: value_set_fivrt::object_map_dt::is_valid_at
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool value_set_fivrt::object_map_dt::is_valid_at(
   unsigned inx,
   unsigned f,
@@ -1863,6 +2160,18 @@ bool value_set_fivrt::object_map_dt::is_valid_at(
   }
   return false;
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::recursive_find
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_fivrt::recursive_find(
   const irep_idt &ident,
@@ -1902,6 +2211,18 @@ bool value_set_fivrt::recursive_find(
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: value_set_fivrt::handover
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool value_set_fivrt::handover(void)
 {

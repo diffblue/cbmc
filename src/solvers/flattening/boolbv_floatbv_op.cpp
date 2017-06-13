@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_floatbv_typecast
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
   const exprt &op0=expr.op(); // number to convert
@@ -71,6 +83,18 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   else
     return conversion_failed(expr);
 }
+
+/*******************************************************************\
+
+Function: boolbvt::convert_floatbv_op
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt boolbvt::convert_floatbv_op(const exprt &expr)
 {

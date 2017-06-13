@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Concrete Goto Program
-
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 

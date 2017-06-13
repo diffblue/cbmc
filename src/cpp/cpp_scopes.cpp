@@ -6,19 +6,40 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #include <ostream>
 
 
 #include "cpp_scopes.h"
+
+/*******************************************************************\
+
+Function: cpp_scopest::new_block_scope
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 cpp_scopet &cpp_scopest::new_block_scope()
 {
   unsigned prefix=++current_scope().compound_counter;
   return new_scope(std::to_string(prefix), cpp_idt::id_classt::BLOCK_SCOPE);
 }
+
+/*******************************************************************\
+
+Function: cpp_scopest::put_into_scope
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 cpp_idt &cpp_scopest::put_into_scope(
   const symbolt &symbol,
@@ -69,7 +90,17 @@ cpp_idt &cpp_scopest::put_into_scope(
   }
 }
 
-/// \return Purpose:
+/*******************************************************************\
+
+Function: cpp_scopest::print_current
+
+  Inputs:
+
+ Outputs:
+ Purpose:
+
+\*******************************************************************/
+
 void cpp_scopest::print_current(std::ostream &out) const
 {
   const cpp_scopet *scope=current_scope_ptr;

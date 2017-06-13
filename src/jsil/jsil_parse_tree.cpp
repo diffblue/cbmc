@@ -6,14 +6,23 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language
-
 #include <util/symbol.h>
 
 #include "jsil_types.h"
 
 #include "jsil_parse_tree.h"
+
+/*******************************************************************\
+
+Function: insert_at_label
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static bool insert_at_label(
   const codet &code,
@@ -39,6 +48,18 @@ static bool insert_at_label(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: jsil_declarationt::to_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_declarationt::to_symbol(symbolt &symbol) const
 {
@@ -80,6 +101,18 @@ void jsil_declarationt::to_symbol(symbolt &symbol) const
   symbol.value.swap(code);
 }
 
+/*******************************************************************\
+
+Function: jsil_declarationt::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_declarationt::output(std::ostream &out) const
 {
   out << "Declarator: " << find(ID_declarator).pretty() << "\n";
@@ -87,6 +120,18 @@ void jsil_declarationt::output(std::ostream &out) const
   out << "Throws: " << find(ID_throw).pretty() << "\n";
   out << "Value: " << find(ID_value).pretty() << "\n";
 }
+
+/*******************************************************************\
+
+Function: jsil_parse_treet::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_parse_treet::output(std::ostream &out) const
 {

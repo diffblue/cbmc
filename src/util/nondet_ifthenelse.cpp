@@ -6,9 +6,6 @@ Author: Chris Smowton, chris@smowton.net
 
 \*******************************************************************/
 
-/// \file
-/// Nondeterministic if-then-else
-
 #include "nondet_ifthenelse.h"
 
 #include <sstream>
@@ -42,14 +39,31 @@ static symbolt &new_tmp_symbol(
   return *symbol_ptr;
 }
 
-/// Emits instructions and defines labels for the beginning of a
-/// nondeterministic if-else diamond. Code is emitted to the `result_code`
-/// member of this object's associated `java_object_factoryt` instance `state`.
-/// The caller should use the following pattern (where *this is an instance of
-/// java_object_factoryt): ``` nondet_ifthenelset diamond(*this, "name");
-/// diamond.begin_if(); result_code.copy_to_operands(Some if-branch code)
-/// diamond.begin_else(); result_code.copy_to_operands(Some else-branch code)
-/// diamond.finish(); ```
+/*******************************************************************\
+
+Function: nondet_ifthenelset::begin_if
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Emits instructions and defines labels for the beginning of
+          a nondeterministic if-else diamond. Code is emitted to the
+          `result_code` member of this object's associated
+          `java_object_factoryt` instance `state`.
+          The caller should use the following pattern (where *this
+          is an instance of java_object_factoryt):
+          ```
+          nondet_ifthenelset diamond(*this, "name");
+          diamond.begin_if();
+          result_code.copy_to_operands(Some if-branch code)
+          diamond.begin_else();
+          result_code.copy_to_operands(Some else-branch code)
+          diamond.finish();
+          ```
+
+\*******************************************************************/
+
 void nondet_ifthenelset::begin_if()
 {
   static size_t nondet_ifthenelse_count=0;
@@ -82,15 +96,38 @@ void nondet_ifthenelset::begin_if()
   result_code.move_to_operands(test);
 }
 
-/// Terminates the if-block and begins the else-block of a nondet if-then-else
-/// diamond. See ::begin_if for detail.
+/*******************************************************************\
+
+Function: nondet_ifthenelset::begin_else
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Terminates the if-block and begins the else-block of a
+          nondet if-then-else diamond. See ::begin_if for detail.
+
+\*******************************************************************/
+
 void nondet_ifthenelset::begin_else()
 {
   result_code.copy_to_operands(code_gotot(join_label.get_label()));
   result_code.copy_to_operands(else_label);
 }
 
-/// Concludes a nondet if-then-else diamond. See ::begin_if for detail.
+/*******************************************************************\
+
+Function: nondet_ifthenelset::finish
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Concludes a nondet if-then-else diamond.
+          See ::begin_if for detail.
+
+\*******************************************************************/
+
 void nondet_ifthenelset::finish()
 {
   result_code.move_to_operands(join_label);

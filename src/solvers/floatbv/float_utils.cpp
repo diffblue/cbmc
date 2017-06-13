@@ -13,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "float_utils.h"
 
+/*******************************************************************\
+
+Function: float_utilst::set_rounding_mode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void float_utilst::set_rounding_mode(const bvt &src)
 {
   bvt round_to_even=
@@ -29,6 +41,18 @@ void float_utilst::set_rounding_mode(const bvt &src)
   rounding_mode_bits.round_to_minus_inf=bv_utils.equal(src, round_to_minus_inf);
   rounding_mode_bits.round_to_zero=bv_utils.equal(src, round_to_zero);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::from_signed_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::from_signed_integer(const bvt &src)
 {
@@ -48,6 +72,18 @@ bvt float_utilst::from_signed_integer(const bvt &src)
   return rounder(result);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::from_unsigned_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::from_unsigned_integer(const bvt &src)
 {
   unbiased_floatt result;
@@ -65,6 +101,18 @@ bvt float_utilst::from_unsigned_integer(const bvt &src)
   return rounder(result);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::to_signed_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::to_signed_integer(
   const bvt &src,
   std::size_t dest_width)
@@ -72,12 +120,36 @@ bvt float_utilst::to_signed_integer(
   return to_integer(src, dest_width, true);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::to_unsigned_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::to_unsigned_integer(
   const bvt &src,
   std::size_t dest_width)
 {
   return to_integer(src, dest_width, false);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::to_integer
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::to_integer(
   const bvt &src,
@@ -138,6 +210,18 @@ bvt float_utilst::to_integer(
     throw "unsupported rounding mode";
 }
 
+/*******************************************************************\
+
+Function: float_utilst::build_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::build_constant(const ieee_floatt &src)
 {
   unbiased_floatt result;
@@ -150,6 +234,18 @@ bvt float_utilst::build_constant(const ieee_floatt &src)
 
   return pack(bias(result));
 }
+
+/*******************************************************************\
+
+Function: float_utilst::conversion
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::conversion(
   const bvt &src,
@@ -218,6 +314,18 @@ bvt float_utilst::conversion(
   }
 }
 
+/*******************************************************************\
+
+Function: float_utilst::is_normal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::is_normal(const bvt &src)
 {
   return prop.land(
@@ -225,7 +333,18 @@ literalt float_utilst::is_normal(const bvt &src)
            !exponent_all_ones(src));
 }
 
-/// Subtracts the exponents
+/*******************************************************************\
+
+Function: float_utilst::subtract_exponents
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Subtracts the exponents
+
+\*******************************************************************/
+
 bvt float_utilst::subtract_exponents(
   const unbiased_floatt &src1,
   const unbiased_floatt &src2)
@@ -241,6 +360,18 @@ bvt float_utilst::subtract_exponents(
   // compute shift distance (here is the subtraction)
   return bv_utils.sub(extended_exponent1, extended_exponent2);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::add_sub
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::add_sub(
   const bvt &src1,
@@ -383,7 +514,18 @@ bvt float_utilst::add_sub(
   return rounder(result);
 }
 
-/// Limits the shift distance
+/*******************************************************************\
+
+Function: float_utilst::limit_distance
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Limits the shift distance
+
+\*******************************************************************/
+
 bvt float_utilst::limit_distance(
   const bvt &dist,
   mp_integer limit)
@@ -406,6 +548,18 @@ bvt float_utilst::limit_distance(
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_utilst::mul
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::mul(const bvt &src1, const bvt &src2)
 {
@@ -458,6 +612,18 @@ bvt float_utilst::mul(const bvt &src1, const bvt &src2)
 
   return rounder(result);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::div
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::div(const bvt &src1, const bvt &src2)
 {
@@ -538,6 +704,18 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
   return rounder(result);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::rem
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
   /* The semantics of floating-point remainder implemented as below
@@ -553,6 +731,18 @@ bvt float_utilst::rem(const bvt &src1, const bvt &src2)
   return sub(src1, mul(div(src1, src2), src2));
 }
 
+/*******************************************************************\
+
+Function: float_utilst::negate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::negate(const bvt &src)
 {
   bvt result=src;
@@ -562,6 +752,18 @@ bvt float_utilst::negate(const bvt &src)
   return result;
 }
 
+/*******************************************************************\
+
+Function: float_utilst::abs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::abs(const bvt &src)
 {
   bvt result=src;
@@ -569,6 +771,18 @@ bvt float_utilst::abs(const bvt &src)
   result[result.size()-1]=const_literal(false);
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_utilst::relation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt float_utilst::relation(
   const bvt &src1,
@@ -652,6 +866,18 @@ literalt float_utilst::relation(
   return const_literal(false);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::is_zero
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::is_zero(const bvt &src)
 {
   assert(!src.empty());
@@ -660,6 +886,18 @@ literalt float_utilst::is_zero(const bvt &src)
   all_but_sign.resize(all_but_sign.size()-1);
   return bv_utils.is_zero(all_but_sign);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::is_plus_inf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt float_utilst::is_plus_inf(const bvt &src)
 {
@@ -670,6 +908,18 @@ literalt float_utilst::is_plus_inf(const bvt &src)
   return prop.land(and_bv);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::infinity
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::is_infinity(const bvt &src)
 {
   return prop.land(
@@ -677,17 +927,52 @@ literalt float_utilst::is_infinity(const bvt &src)
     fraction_all_zeros(src));
 }
 
-/// Gets the unbiased exponent in a floating-point bit-vector
+/*******************************************************************\
+
+Function: float_utilst::get_exponent
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Gets the unbiased exponent in a floating-point bit-vector
+
+\*******************************************************************/
+
 bvt float_utilst::get_exponent(const bvt &src)
 {
   return bv_utils.extract(src, spec.f, spec.f+spec.e-1);
 }
 
-/// Gets the fraction without hidden bit in a floating-point bit-vector src
+/*******************************************************************\
+
+Function: float_utilst::get_fraction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Gets the fraction without hidden bit in a floating-point
+          bit-vector src
+
+\*******************************************************************/
+
 bvt float_utilst::get_fraction(const bvt &src)
 {
   return bv_utils.extract(src, 0, spec.f-1);
 }
+
+/*******************************************************************\
+
+Function: float_utilst::is_minus_inf
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt float_utilst::is_minus_inf(const bvt &src)
 {
@@ -698,11 +983,35 @@ literalt float_utilst::is_minus_inf(const bvt &src)
   return prop.land(and_bv);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::is_NaN
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::is_NaN(const bvt &src)
 {
   return prop.land(exponent_all_ones(src),
                    !fraction_all_zeros(src));
 }
+
+/*******************************************************************\
+
+Function: float_utilst::exponent_all_ones
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 literalt float_utilst::exponent_all_ones(const bvt &src)
 {
@@ -717,6 +1026,18 @@ literalt float_utilst::exponent_all_ones(const bvt &src)
   return bv_utils.is_all_ones(exponent);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::exponent_all_zeros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::exponent_all_zeros(const bvt &src)
 {
   bvt exponent=src;
@@ -730,6 +1051,18 @@ literalt float_utilst::exponent_all_zeros(const bvt &src)
   return bv_utils.is_zero(exponent);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::fraction_all_zeros
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt float_utilst::fraction_all_zeros(const bvt &src)
 {
   // does not include hidden bit
@@ -739,7 +1072,19 @@ literalt float_utilst::fraction_all_zeros(const bvt &src)
   return bv_utils.is_zero(tmp);
 }
 
-/// normalize fraction/exponent pair returns 'zero' if fraction is zero
+/*******************************************************************\
+
+Function: float_utilst::normalization_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: normalize fraction/exponent pair
+          returns 'zero' if fraction is zero
+
+\*******************************************************************/
+
 void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
 {
   #if 0
@@ -824,7 +1169,19 @@ void float_utilst::normalization_shift(bvt &fraction, bvt &exponent)
   #endif
 }
 
-/// make sure exponent is not too small; the exponent is unbiased
+/*******************************************************************\
+
+Function: float_utilst::denormalization_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: make sure exponent is not too small;
+          the exponent is unbiased
+
+\*******************************************************************/
+
 void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
 {
   mp_integer bias=spec.bias();
@@ -893,6 +1250,18 @@ void float_utilst::denormalization_shift(bvt &fraction, bvt &exponent)
       exponent);
 }
 
+/*******************************************************************\
+
+Function: float_utilst::rounder
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::rounder(const unbiased_floatt &src)
 {
   // incoming: some fraction (with explicit 1),
@@ -933,7 +1302,18 @@ bvt float_utilst::rounder(const unbiased_floatt &src)
   return pack(bias(result));
 }
 
-/// rounding decision for fraction using sticky bit
+/*******************************************************************\
+
+Function: float_utilst::fraction_rounding_decision
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: rounding decision for fraction using sticky bit
+
+\*******************************************************************/
+
 literalt float_utilst::fraction_rounding_decision(
   const std::size_t dest_bits,
   const literalt sign,
@@ -990,6 +1370,18 @@ literalt float_utilst::fraction_rounding_decision(
          prop.lselect(rounding_mode_bits.round_to_zero, round_to_zero,
            prop.new_variable())))); // otherwise non-det
 }
+
+/*******************************************************************\
+
+Function: float_utilst::round_fraction
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void float_utilst::round_fraction(unbiased_floatt &result)
 {
@@ -1083,6 +1475,18 @@ void float_utilst::round_fraction(unbiased_floatt &result)
   }
 }
 
+/*******************************************************************\
+
+Function: float_utilst::round_exponent
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void float_utilst::round_exponent(unbiased_floatt &result)
 {
   // do we need to enlarge the exponent?
@@ -1148,7 +1552,18 @@ void float_utilst::round_exponent(unbiased_floatt &result)
   }
 }
 
-/// takes an unbiased float, and applies the bias
+/*******************************************************************\
+
+Function: float_utilst::bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: takes an unbiased float, and applies the bias
+
+\*******************************************************************/
+
 float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
 {
   biased_floatt result;
@@ -1178,6 +1593,18 @@ float_utilst::biased_floatt float_utilst::bias(const unbiased_floatt &src)
   return result;
 }
 
+/*******************************************************************\
+
+Function: float_utilst::add_bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::add_bias(const bvt &src)
 {
   assert(src.size()==spec.e);
@@ -1187,6 +1614,18 @@ bvt float_utilst::add_bias(const bvt &src)
     bv_utils.build_constant(spec.bias(), spec.e));
 }
 
+/*******************************************************************\
+
+Function: float_utilst::sub_bias
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::sub_bias(const bvt &src)
 {
   assert(src.size()==spec.e);
@@ -1195,6 +1634,18 @@ bvt float_utilst::sub_bias(const bvt &src)
     src,
     bv_utils.build_constant(spec.bias(), spec.e));
 }
+
+/*******************************************************************\
+
+Function: float_utilst::unpack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
 {
@@ -1224,6 +1675,18 @@ float_utilst::unbiased_floatt float_utilst::unpack(const bvt &src)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_utilst::pack
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::pack(const biased_floatt &src)
 {
@@ -1256,6 +1719,18 @@ bvt float_utilst::pack(const biased_floatt &src)
   return result;
 }
 
+/*******************************************************************\
+
+Function: float_utilst::get
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 ieee_floatt float_utilst::get(const bvt &src) const
 {
   mp_integer int_value=0;
@@ -1269,6 +1744,18 @@ ieee_floatt float_utilst::get(const bvt &src) const
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: float_utilst::sticky_right_shift
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::sticky_right_shift(
   const bvt &op,
@@ -1305,12 +1792,36 @@ bvt float_utilst::sticky_right_shift(
   return result;
 }
 
+/*******************************************************************\
+
+Function: float_utilst::debug1
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt float_utilst::debug1(
   const bvt &src1,
   const bvt &src2)
 {
   return src1;
 }
+
+/*******************************************************************\
+
+Function: float_utilst::debug1
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt float_utilst::debug2(
   const bvt &op0,

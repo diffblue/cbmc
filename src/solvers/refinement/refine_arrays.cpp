@@ -17,7 +17,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_refinement.h"
 #include <solvers/sat/satcheck.h>
 
-/// generate array constraints
+/*******************************************************************\
+
+Function: bv_refinementt::post_process_arrays
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: generate array constraints
+
+\*******************************************************************/
+
 void bv_refinementt::post_process_arrays()
 {
   collect_indices();
@@ -32,7 +43,18 @@ void bv_refinementt::post_process_arrays()
   freeze_lazy_constraints();
 }
 
-/// check whether counterexample is spurious
+/*******************************************************************\
+
+Function: bv_refinementt::arrays_overapproximated
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: check whether counterexample is spurious
+
+\*******************************************************************/
+
 void bv_refinementt::arrays_overapproximated()
 {
   if(!do_array_refinement)
@@ -103,7 +125,18 @@ void bv_refinementt::arrays_overapproximated()
 }
 
 
-/// freeze symbols for incremental solving
+/*******************************************************************\
+
+Function: bv_refinementt::freeze_lazy_constraints
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: freeze symbols for incremental solving
+
+\*******************************************************************/
+
 void bv_refinementt::freeze_lazy_constraints()
 {
   if(!lazy_arrays)

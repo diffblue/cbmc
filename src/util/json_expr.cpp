@@ -6,9 +6,6 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-/// \file
-/// Expressions in JSON
-
 #include "namespace.h"
 #include "expr.h"
 #include "json.h"
@@ -22,6 +19,18 @@ Author: Peter Schrammel
 #include <langapi/mode.h>
 
 #include "json_expr.h"
+
+/*******************************************************************\
+
+Function: simplify_json_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static exprt simplify_json_expr(
   const exprt &src,
@@ -66,6 +75,18 @@ static exprt simplify_json_expr(
   return src;
 }
 
+/*******************************************************************\
+
+Function: json
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 json_objectt json(const source_locationt &location)
 {
   json_objectt result;
@@ -89,13 +110,24 @@ json_objectt json(const source_locationt &location)
   return result;
 }
 
-/// Output a CBMC type in json.
-/// The `mode` argument is used to correctly report types.
-/// \param type: a type
-/// \param ns: a namespace
-/// \param mode: language in which the code was written; for now ID_C and
-///   ID_java are supported
-/// \return a json object
+/*******************************************************************\
+
+Function: json
+
+  Inputs:
+    type - a type
+    ns - a namespace
+    mode - language in which the code was written;
+           for now ID_C and ID_java are supported
+
+ Outputs: a json object
+
+ Purpose:
+    Output a CBMC type in json.
+    The `mode` argument is used to correctly report types.
+
+\*******************************************************************/
+
 json_objectt json(
   const typet &type,
   const namespacet &ns,
@@ -198,13 +230,24 @@ json_objectt json(
   return result;
 }
 
-/// Output a CBMC expression in json.
-/// The mode is used to correctly report types.
-/// \param expr: an expression
-/// \param ns: a namespace
-/// \param mode: language in which the code was written; for now ID_C and
-///   ID_java are supported
-/// \return a json object
+/*******************************************************************\
+
+Function: json
+
+  Inputs:
+    expr - an expression
+    ns - a namespace
+    mode - language in which the code was written;
+           for now ID_C and ID_java are supported
+
+ Outputs: a json object
+
+ Purpose:
+    Output a CBMC expression in json.
+    The mode is used to correctly report types.
+
+\*******************************************************************/
+
 json_objectt json(
   const exprt &expr,
   const namespacet &ns,

@@ -8,9 +8,6 @@ Date: March 2016
 
 \*******************************************************************/
 
-/// \file
-/// Record and print code coverage of symbolic execution
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -94,6 +91,18 @@ protected:
     coverage_lines_mapt &dest);
 };
 
+/*******************************************************************\
+
+Function: rate
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 static std::string rate(
   std::size_t covered,
   std::size_t total,
@@ -119,6 +128,18 @@ static std::string rate(
 
   return oss.str();
 }
+
+/*******************************************************************\
+
+Function: goto_program_coverage_recordt::goto_program_coverage_recordt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 goto_program_coverage_recordt::goto_program_coverage_recordt(
   const namespacet &ns,
@@ -206,6 +227,18 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
   }
 }
 
+/*******************************************************************\
+
+Function: goto_program_coverage_recordt::compute_coverage_lines
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void goto_program_coverage_recordt::compute_coverage_lines(
     const goto_programt &goto_program,
     const irep_idt &file_name,
@@ -288,6 +321,18 @@ void goto_program_coverage_recordt::compute_coverage_lines(
   }
 }
 
+/*******************************************************************\
+
+Function: symex_coveraget::compute_overall_coverage
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_coveraget::compute_overall_coverage(
   const goto_functionst &goto_functions,
   coverage_recordt &dest) const
@@ -364,6 +409,18 @@ void symex_coveraget::compute_overall_coverage(
   }
 }
 
+/*******************************************************************\
+
+Function: symex_coveraget::build_cobertura
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void symex_coveraget::build_cobertura(
   const goto_functionst &goto_functions,
   xmlt &xml_coverage) const
@@ -405,6 +462,18 @@ void symex_coveraget::build_cobertura(
   package.set_attribute("complexity", "0.0");
 }
 
+/*******************************************************************\
+
+Function: symex_coveraget::output_report
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool symex_coveraget::output_report(
   const goto_functionst &goto_functions,
   std::ostream &os) const
@@ -419,6 +488,18 @@ bool symex_coveraget::output_report(
 
   return !os.good();
 }
+
+/*******************************************************************\
+
+Function: symex_coveraget::output_report
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool symex_coveraget::generate_report(
   const goto_functionst &goto_functions,

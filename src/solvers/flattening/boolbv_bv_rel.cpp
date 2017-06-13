@@ -13,6 +13,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "../floatbv/float_utils.h"
 
+/*******************************************************************\
+
+Function: boolbvt::convert_bv_rel
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt boolbvt::convert_bv_rel(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();

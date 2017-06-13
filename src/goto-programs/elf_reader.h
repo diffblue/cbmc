@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Read ELF
-
 #ifndef CPROVER_GOTO_PROGRAMS_ELF_READER_H
 #define CPROVER_GOTO_PROGRAMS_ELF_READER_H
 

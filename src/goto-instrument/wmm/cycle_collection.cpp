@@ -8,15 +8,22 @@ Date: 2012
 
 \*******************************************************************/
 
-/// \file
-/// collection of cycles in graph of abstract events
-
 #include <util/message.h>
 
 #include "event_graph.h"
 
-/// after the collection, eliminates the executions forbidden by an indirect
-/// thin-air
+/*******************************************************************\
+
+Function: event_grapht::graph_explorert::filter_thin_air
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: after the collection, eliminates the executions forbidden
+          by an indirect thin-air
+
+\*******************************************************************/
 void event_grapht::graph_explorert::filter_thin_air(
   std::set<critical_cyclet> &set_of_cycles)
 {
@@ -47,7 +54,18 @@ void event_grapht::graph_explorert::filter_thin_air(
 #endif
 }
 
-/// Tarjan 1972 adapted and modified for events
+/*******************************************************************\
+
+Function: event_grapht::graph_explorert::collect_cycles
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Tarjan 1972 adapted and modified for events
+
+\*******************************************************************/
+
 void event_grapht::graph_explorert::collect_cycles(
   std::set<critical_cyclet> &set_of_cycles,
   memory_modelt model)
@@ -105,8 +123,20 @@ void event_grapht::graph_explorert::collect_cycles(
     filter_thin_air(set_of_cycles);
 }
 
-/// extracts a (whole, unreduced) cycle from the stack. Note: it may not be a
-/// real cycle yet -- we cannot check the size before a call to this function.
+/*******************************************************************\
+
+Function: event_grapht::graph_explorert::extract_cycle
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: extracts a (whole, unreduced) cycle from the stack.
+          Note: it may not be a real cycle yet -- we cannot check
+          the size before a call to this function.
+
+\*******************************************************************/
+
 event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
   event_idt vertex,
   event_idt source,
@@ -146,8 +176,18 @@ event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
   return new_cycle;
 }
 
-/// see event_grapht::collect_cycles
-/// \param get_po_only: used for po-transitivity
+/*******************************************************************\
+
+Function: event_grapht::graph_explorert::backtrack
+
+  Inputs: get_po_only: used for po-transitivity
+
+ Outputs:
+
+ Purpose: see event_grapht::collect_cycles
+
+\*******************************************************************/
+
 bool event_grapht::graph_explorert::backtrack(
   std::set<critical_cyclet> &set_of_cycles,
   event_idt source,

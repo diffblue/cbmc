@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Program Transformation
-
 #include "remove_skip.h"
+
+/*******************************************************************\
+
+Function: is_skip
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 static bool is_skip(goto_programt::instructionst::iterator it)
 {
@@ -67,7 +76,18 @@ static bool is_skip(goto_programt::instructionst::iterator it)
   return false;
 }
 
-/// remove unnecessary skip statements
+/*******************************************************************\
+
+Function: remove_skip
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: remove unnecessary skip statements
+
+\*******************************************************************/
+
 void remove_skip(goto_programt &goto_program)
 {
   // This needs to be a fixed-point, as
@@ -154,7 +174,18 @@ void remove_skip(goto_programt &goto_program)
   while(goto_program.instructions.size()<old_size);
 }
 
-/// remove unnecessary skip statements
+/*******************************************************************\
+
+Function: remove_skip
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: remove unnecessary skip statements
+
+\*******************************************************************/
+
 void remove_skip(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)

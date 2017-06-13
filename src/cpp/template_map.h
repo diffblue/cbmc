@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Language Type Checking
-
 #ifndef CPROVER_CPP_TEMPLATE_MAP_H
 #define CPROVER_CPP_TEMPLATE_MAP_H
 

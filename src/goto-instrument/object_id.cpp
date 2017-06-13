@@ -6,10 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Object Identifiers
-
 #include "object_id.h"
+
+/*******************************************************************\
+
+Function: get_objects_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 enum class get_modet { LHS_R, LHS_W, READ };
 
@@ -69,10 +78,34 @@ void get_objects_rec(
   }
 }
 
+/*******************************************************************\
+
+Function: get_objects
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void get_objects(const exprt &expr, object_id_sett &dest)
 {
   get_objects_rec(get_modet::READ, expr, dest, "");
 }
+
+/*******************************************************************\
+
+Function: get_objects_r
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void get_objects_r(const code_assignt &assign, object_id_sett &dest)
 {
@@ -80,15 +113,51 @@ void get_objects_r(const code_assignt &assign, object_id_sett &dest)
   get_objects_rec(get_modet::READ, assign.rhs(), dest, "");
 }
 
+/*******************************************************************\
+
+Function: get_objects_w
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void get_objects_w(const code_assignt &assign, object_id_sett &dest)
 {
   get_objects_rec(get_modet::LHS_W, assign.lhs(), dest, "");
 }
 
+/*******************************************************************\
+
+Function: get_objects_w_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void get_objects_w(const exprt &lhs, object_id_sett &dest)
 {
   get_objects_rec(get_modet::LHS_W, lhs, dest, "");
 }
+
+/*******************************************************************\
+
+Function: get_objects_r_lhs
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void get_objects_r_lhs(const exprt &lhs, object_id_sett &dest)
 {

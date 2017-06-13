@@ -6,9 +6,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
-/// \file
-/// Jsil Language
-
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
@@ -18,21 +15,68 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 #include "jsil_typecheck.h"
 
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string jsil_typecheckt::to_string(const exprt &expr)
 {
   return expr2jsil(expr, ns);
 }
+
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::to_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 std::string jsil_typecheckt::to_string(const typet &type)
 {
   return type2jsil(type, ns);
 }
 
-/// Prefix parameters and variables with a procedure name
+/*******************************************************************\
+
+Function: jsil_typecheckt::add_prefix
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Prefix parameters and variables with a procedure name
+
+\*******************************************************************/
+
 irep_idt jsil_typecheckt::add_prefix(const irep_idt &ds)
 {
   return id2string(proc_name) + "::" + id2string(ds);
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::update_expr_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
 {
@@ -55,6 +99,18 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
       s.type=jsil_union(s.type, type);
   }
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::make_type_compatible
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::make_type_compatible(
     exprt &expr,
@@ -95,6 +151,18 @@ void jsil_typecheckt::make_type_compatible(
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_type(typet &type)
 {
   if(type.id()==ID_code)
@@ -133,6 +201,18 @@ void jsil_typecheckt::typecheck_type(typet &type)
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr(exprt &expr)
 {
   // first do sub-nodes
@@ -142,11 +222,35 @@ void jsil_typecheckt::typecheck_expr(exprt &expr)
   typecheck_expr_main(expr);
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_expr_operands
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_operands(exprt &expr)
 {
   Forall_operands(it, expr)
     typecheck_expr(*it);
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_expr_main
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_main(exprt &expr)
 {
@@ -265,6 +369,18 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_expr_side_effect_throw
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_side_effect_throw(
   side_effect_expr_throwt &expr)
 {
@@ -273,6 +389,18 @@ void jsil_typecheckt::typecheck_expr_side_effect_throw(
   symbol_exprt &s=static_cast<symbol_exprt &>(excep_list);
   typecheck_symbol_expr(s);
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_expr_constant
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_constant(exprt &expr)
 {
@@ -283,6 +411,18 @@ void jsil_typecheckt::typecheck_expr_constant(exprt &expr)
   else if(expr.id()==ID_empty)
     expr.type()=jsil_empty_type();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_proto_field
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_proto_field(exprt &expr)
 {
@@ -300,6 +440,18 @@ void jsil_typecheckt::typecheck_expr_proto_field(exprt &expr)
   expr.type()=jsil_value_or_empty_type();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_proto_field
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_proto_obj(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -316,6 +468,18 @@ void jsil_typecheckt::typecheck_expr_proto_obj(exprt &expr)
   expr.type()=bool_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_delete
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_delete(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -331,6 +495,18 @@ void jsil_typecheckt::typecheck_expr_delete(exprt &expr)
 
   expr.type()=bool_typet();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_hasfield
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_index(exprt &expr)
 {
@@ -352,6 +528,18 @@ void jsil_typecheckt::typecheck_expr_index(exprt &expr)
     expr.type()=jsil_value_type();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_hasfield
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_has_field(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -368,6 +556,18 @@ void jsil_typecheckt::typecheck_expr_has_field(exprt &expr)
   expr.type()=bool_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_field
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_field(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -383,6 +583,18 @@ void jsil_typecheckt::typecheck_expr_field(exprt &expr)
   expr.type()=string_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_base
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_base(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -397,6 +609,18 @@ void jsil_typecheckt::typecheck_expr_base(exprt &expr)
 
   expr.type()=jsil_value_type();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_ref
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_ref(exprt &expr)
 {
@@ -428,6 +652,18 @@ void jsil_typecheckt::typecheck_expr_ref(exprt &expr)
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_concatenation
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_concatenation(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -443,6 +679,18 @@ void jsil_typecheckt::typecheck_expr_concatenation(exprt &expr)
 
   expr.type()=string_typet();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_subtype
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_subtype(exprt &expr)
 {
@@ -460,6 +708,18 @@ void jsil_typecheckt::typecheck_expr_subtype(exprt &expr)
   expr.type()=bool_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_binary_boolean
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_binary_boolean(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -475,6 +735,18 @@ void jsil_typecheckt::typecheck_expr_binary_boolean(exprt &expr)
 
   expr.type()=bool_typet();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_binary_arith
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_binary_arith(exprt &expr)
 {
@@ -493,6 +765,18 @@ void jsil_typecheckt::typecheck_expr_binary_arith(exprt &expr)
   expr.type()=floatbv_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_exp_binary_equal
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_exp_binary_equal(exprt &expr)
 {
   if(expr.operands().size()!=2)
@@ -507,6 +791,18 @@ void jsil_typecheckt::typecheck_exp_binary_equal(exprt &expr)
 
   expr.type()=bool_typet();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_binary_compare
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_binary_compare(exprt &expr)
 {
@@ -524,6 +820,18 @@ void jsil_typecheckt::typecheck_expr_binary_compare(exprt &expr)
   expr.type()=bool_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_unary_boolean
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_unary_boolean(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -538,6 +846,18 @@ void jsil_typecheckt::typecheck_expr_unary_boolean(exprt &expr)
 
   expr.type()=bool_typet();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_unary_string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_expr_unary_string(exprt &expr)
 {
@@ -554,6 +874,18 @@ void jsil_typecheckt::typecheck_expr_unary_string(exprt &expr)
   expr.type()=floatbv_typet();
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck_baset::typecheck_expr_unary_num
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_expr_unary_num(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -566,6 +898,18 @@ void jsil_typecheckt::typecheck_expr_unary_num(exprt &expr)
 
   make_type_compatible(expr.op0(), floatbv_typet(), true);
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_symbol_expr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
 {
@@ -645,6 +989,18 @@ void jsil_typecheckt::typecheck_symbol_expr(symbol_exprt &symbol_expr)
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_code
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_code(codet &code)
 {
   const irep_idt &statement=code.get_statement();
@@ -693,17 +1049,53 @@ void jsil_typecheckt::typecheck_code(codet &code)
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_return
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_return(code_returnt &code)
 {
   if(code.has_return_value())
     typecheck_expr(code.return_value());
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_block
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_block(codet &code)
 {
   Forall_operands(it, code)
     typecheck_code(to_code(*it));
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_try_catch
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_try_catch(code_try_catcht &code)
 {
@@ -722,6 +1114,18 @@ void jsil_typecheckt::typecheck_try_catch(code_try_catcht &code)
 
   typecheck_code(code.get_catch_code(0));
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void jsil_typecheckt::typecheck_function_call(
   code_function_callt &call)
@@ -825,6 +1229,18 @@ void jsil_typecheckt::typecheck_function_call(
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_ifthenelse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 {
   exprt &cond=code.cond();
@@ -837,6 +1253,18 @@ void jsil_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     typecheck_code(to_code(code.else_case()));
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheckt::typecheck_assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_assign(code_assignt &code)
 {
   typecheck_expr(code.op0());
@@ -845,9 +1273,20 @@ void jsil_typecheckt::typecheck_assign(code_assignt &code)
   make_type_compatible(code.op0(), code.op1().type(), false);
 }
 
-/// typecheking procedure declaration; any other symbols should have been
-/// typechecked during typecheking of procedure declaration
-/// \par parameters: any symbol
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck_non_type_symbol
+
+  Inputs: any symbol
+
+ Outputs:
+
+ Purpose: typecheking procedure declaration; any other symbols
+  should have been typechecked during typecheking of procedure
+  declaration
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
   assert(!symbol.is_type);
@@ -880,6 +1319,18 @@ void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
   }
 }
 
+/*******************************************************************\
+
+Function: java_bytecode_typecheckt::typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void jsil_typecheckt::typecheck()
 {
   // The hash table iterators are not stable,
@@ -910,6 +1361,18 @@ void jsil_typecheckt::typecheck()
   }
 }
 
+/*******************************************************************\
+
+Function: jsil_typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool jsil_typecheck(
   symbol_tablet &symbol_table,
   message_handlert &message_handler)
@@ -917,6 +1380,18 @@ bool jsil_typecheck(
   jsil_typecheckt jsil_typecheck(symbol_table, message_handler);
   return jsil_typecheck.typecheck_main();
 }
+
+/*******************************************************************\
+
+Function: jsil_typecheck
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool jsil_typecheck(
   exprt &expr,

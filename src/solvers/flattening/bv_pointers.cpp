@@ -15,6 +15,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_pointers.h"
 
+/*******************************************************************\
+
+Function: bv_pointerst::convert_rest
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
   if(expr.type().id()!=ID_bool)
@@ -88,6 +100,18 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
   return SUB::convert_rest(expr);
 }
 
+/*******************************************************************\
+
+Function: bv_pointerst::bv_pointerst
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bv_pointerst::bv_pointerst(
   const namespacet &_ns,
   propt &_prop):
@@ -98,6 +122,18 @@ bv_pointerst::bv_pointerst(
   offset_bits=config.ansi_c.pointer_width-object_bits;
   bits=config.ansi_c.pointer_width;
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::convert_address_of_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool bv_pointerst::convert_address_of_rec(
   const exprt &expr,
@@ -210,6 +246,18 @@ bool bv_pointerst::convert_address_of_rec(
 
   return true;
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::convert_pointer_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 {
@@ -430,6 +478,18 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   return conversion_failed(expr);
 }
 
+/*******************************************************************\
+
+Function: bv_pointerst::convert_bitvector
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt bv_pointerst::convert_bitvector(const exprt &expr)
 {
   if(is_ptr(expr.type()))
@@ -543,6 +603,18 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   return SUB::convert_bitvector(expr);
 }
 
+/*******************************************************************\
+
+Function: bv_pointerst::bv_get_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 exprt bv_pointerst::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
@@ -597,6 +669,18 @@ exprt bv_pointerst::bv_get_rec(
   return result;
 }
 
+/*******************************************************************\
+
+Function: bv_pointerst::encode
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void bv_pointerst::encode(std::size_t addr, bvt &bv)
 {
   bv.resize(bits);
@@ -609,6 +693,18 @@ void bv_pointerst::encode(std::size_t addr, bvt &bv)
   for(std::size_t i=0; i<object_bits; i++)
     bv[offset_bits+i]=const_literal((addr&(std::size_t(1)<<i))!=0);
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::offset_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
 {
@@ -623,6 +719,18 @@ void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
   for(std::size_t i=0; i<offset_bits; i++)
     bv[i]=tmp[i];
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::offset_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void bv_pointerst::offset_arithmetic(
   bvt &bv,
@@ -639,6 +747,18 @@ void bv_pointerst::offset_arithmetic(
 
   offset_arithmetic(bv, factor, bv_index);
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::offset_arithmetic
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void bv_pointerst::offset_arithmetic(
   bvt &bv,
@@ -664,6 +784,18 @@ void bv_pointerst::offset_arithmetic(
     bv[i]=bv_tmp[i];
 }
 
+/*******************************************************************\
+
+Function: bv_pointerst::add_addr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 {
   std::size_t a=pointer_logic.add_object(expr);
@@ -673,6 +805,18 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 
   encode(a, bv);
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::do_postponed
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
@@ -769,6 +913,18 @@ void bv_pointerst::do_postponed(
   else
     assert(false);
 }
+
+/*******************************************************************\
+
+Function: bv_pointerst::post_process
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void bv_pointerst::post_process()
 {

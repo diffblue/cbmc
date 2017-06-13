@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Symbolic Execution
-
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 

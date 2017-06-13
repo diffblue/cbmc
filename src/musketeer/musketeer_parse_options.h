@@ -6,9 +6,6 @@ Author:
 
 \*******************************************************************/
 
-/// \file
-/// Command Line Parsing
-
 #ifndef CPROVER_MUSKETEER_MUSKETEER_PARSE_OPTIONS_H
 #define CPROVER_MUSKETEER_MUSKETEER_PARSE_OPTIONS_H
 

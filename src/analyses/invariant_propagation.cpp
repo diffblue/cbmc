@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Invariant Propagation
-
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/symbol_table.h>
@@ -16,17 +13,53 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant_propagation.h"
 
+/*******************************************************************\
+
+Function: invariant_propagationt::make_all_true
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::make_all_true()
 {
   for(auto &state : state_map)
     state.second.invariant_set.make_true();
 }
 
+/*******************************************************************\
+
+Function: invariant_propagationt::make_all_false
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::make_all_false()
 {
   for(auto &state : state_map)
     state.second.invariant_set.make_false();
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::add_objects
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void invariant_propagationt::add_objects(
   const goto_programt &goto_program)
@@ -75,6 +108,18 @@ void invariant_propagationt::add_objects(
   }
 }
 
+/*******************************************************************\
+
+Function: invariant_propagationt::get_objects
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::get_objects(
   const symbolt &symbol,
   object_listt &dest)
@@ -86,6 +131,18 @@ void invariant_propagationt::get_objects(
   for(const auto &expr : object_list)
     dest.push_back(object_store.add(expr));
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::get_objects_rec
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void invariant_propagationt::get_objects_rec(
   const exprt &src,
@@ -121,6 +178,18 @@ void invariant_propagationt::get_objects_rec(
     dest.push_back(src);
   }
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::add_vars
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void invariant_propagationt::add_objects(
   const goto_functionst &goto_functions)
@@ -174,6 +243,18 @@ void invariant_propagationt::add_objects(
   }
 }
 
+/*******************************************************************\
+
+Function: invariant_propagationt::get_globals
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::get_globals(
   object_listt &dest)
 {
@@ -183,6 +264,18 @@ void invariant_propagationt::get_globals(
        it->second.is_static_lifetime)
       get_objects(it->second, dest);
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::check_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool invariant_propagationt::check_type(const typet &type) const
 {
@@ -203,6 +296,18 @@ bool invariant_propagationt::check_type(const typet &type) const
 
   return false;
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void invariant_propagationt::initialize(const goto_programt &goto_program)
 {
@@ -225,6 +330,18 @@ void invariant_propagationt::initialize(const goto_programt &goto_program)
   add_objects(goto_program);
 }
 
+/*******************************************************************\
+
+Function: invariant_propagationt::initialize
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::initialize(const goto_functionst &goto_functions)
 {
   baset::initialize(goto_functions);
@@ -233,11 +350,35 @@ void invariant_propagationt::initialize(const goto_functionst &goto_functions)
     initialize(f_it->second.body);
 }
 
+/*******************************************************************\
+
+Function: invariant_propagationt::simplify
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void invariant_propagationt::simplify(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
     simplify(it->second.body);
 }
+
+/*******************************************************************\
+
+Function: invariant_propagationt::simplify
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void invariant_propagationt::simplify(goto_programt &goto_program)
 {

@@ -10,6 +10,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "lispexpr.h"
 
+/*******************************************************************\
+
+Function: lispexprt::expr2string
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string lispexprt::expr2string() const
 {
   std::string result;
@@ -49,11 +61,35 @@ std::string lispexprt::expr2string() const
   return result;
 }
 
+/*******************************************************************\
+
+Function: lispexprt::parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bool lispexprt::parse(const std::string &s)
 {
   std::string::size_type ptr=0;
   return parse(s, ptr);
 }
+
+/*******************************************************************\
+
+Function: lispexprt::parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool lispexprt::parse(
   const std::string &s,
@@ -147,6 +183,18 @@ bool lispexprt::parse(
   return false;
 }
 
+/*******************************************************************\
+
+Function: escape
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 std::string escape(const std::string &s)
 {
   std::string result;
@@ -161,6 +209,18 @@ std::string escape(const std::string &s)
 
   return result;
 }
+
+/*******************************************************************\
+
+Function: test_lispexpr
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 int test_lispexpr()
 {

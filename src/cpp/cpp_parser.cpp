@@ -6,14 +6,23 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-/// \file
-/// C++ Parser
-
 #include <util/config.h>
 
 #include "cpp_parser.h"
 
 cpp_parsert cpp_parser;
+
+/*******************************************************************\
+
+Function: cpp_parsert::parse
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bool cpp_parse();
 

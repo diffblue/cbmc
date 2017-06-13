@@ -8,9 +8,6 @@ Date: November 2011
 
 \*******************************************************************/
 
-/// \file
-/// Stack depth checks
-
 #ifndef CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
 #define CPROVER_GOTO_INSTRUMENT_STACK_DEPTH_H
 

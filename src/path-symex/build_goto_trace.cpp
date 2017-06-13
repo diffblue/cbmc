@@ -6,12 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Build Goto Trace from State History
-
 #include "build_goto_trace.h"
 
-/// follow state history to build a goto trace
+/*******************************************************************\
+
+Function: build_goto_trace
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: follow state history to build a goto trace
+
+\*******************************************************************/
+
 void build_goto_trace(
   const path_symex_statet &state,
   const decision_proceduret &decision_procedure,

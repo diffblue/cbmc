@@ -6,9 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Interpreter for GOTO Programs
-
 #include <cctype>
 #include <cstdio>
 #include <iostream>
@@ -29,6 +26,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_returns.h"
 
 const size_t interpretert::npos=std::numeric_limits<size_t>::max();
+
+/*******************************************************************\
+
+Function: interpretert::operator()
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interpretert::operator()()
 {
@@ -52,8 +61,20 @@ void interpretert::operator()()
     command();
 }
 
-/// Initializes the memory map of the interpreter and [optionally] runs up to
-/// the entry point (thus doing the cprover initialization)
+/*******************************************************************\
+
+Function: interpretert::initialize
+
+ Inputs:
+
+ Outputs:
+
+ Purpose: Initializes the memory map of the interpreter and
+          [optionally] runs up to the entry point (thus doing
+          the cprover initialization)
+
+\*******************************************************************/
+
 void interpretert::initialize(bool init)
 {
   build_memory_map();
@@ -94,7 +115,19 @@ void interpretert::initialize(bool init)
   }
 }
 
-/// displays the current position of the pc and corresponding code
+/*******************************************************************\
+
+Function: interpretert::show_state
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: displays the current position of the pc and corresponding
+          code
+
+\*******************************************************************/
+
 void interpretert::show_state()
 {
   if(!show)
@@ -117,7 +150,18 @@ void interpretert::show_state()
   status() << eom;
 }
 
-/// reads a user command and executes it.
+/*******************************************************************\
+
+Function: interpretert::command
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: reads a user command and executes it.
+
+\*******************************************************************/
+
 void interpretert::command()
 {
   #define BUFSIZE 100
@@ -222,7 +266,18 @@ void interpretert::command()
   show_state();
 }
 
-/// executes a single step and updates the program counter
+/*******************************************************************\
+
+Function: interpretert::step
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: executes a single step and updates the program counter
+
+\*******************************************************************/
+
 void interpretert::step()
 {
   total_steps++;
@@ -358,7 +413,18 @@ void interpretert::step()
   pc=next_pc;
 }
 
-/// executes a goto instruction
+/*******************************************************************\
+
+Function: interpretert::execute_goto
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: executes a goto instruction
+
+\*******************************************************************/
+
 void interpretert::execute_goto()
 {
   if(evaluate_boolean(pc->guard))
@@ -373,7 +439,18 @@ void interpretert::execute_goto()
   }
 }
 
-/// executes side effects of 'other' instructions
+/*******************************************************************\
+
+Function: interpretert::execute_other
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: executes side effects of 'other' instructions
+
+\*******************************************************************/
+
 void interpretert::execute_other()
 {
   const irep_idt &statement=pc->code.get_statement();
@@ -406,13 +483,35 @@ void interpretert::execute_other()
     throw "unexpected OTHER statement: "+id2string(statement);
 }
 
+/*******************************************************************\
+
+Function: interpretert::execute_decl
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void interpretert::execute_decl()
 {
   assert(pc->code.get_statement()==ID_decl);
 }
 
-/// retrieves the member at offset
-/// \par parameters: an object and a memory offset
+/*******************************************************************\
+
+Function: interpretert::get_component_id
+
+  Inputs: an object and a memory offset
+
+ Outputs:
+
+ Purpose: retrieves the member at offset
+
+\*******************************************************************/
+
 irep_idt interpretert::get_component_id(
   const irep_idt &object,
   unsigned offset)
@@ -435,7 +534,18 @@ irep_idt interpretert::get_component_id(
   return object;
 }
 
-/// returns the type object corresponding to id
+/*******************************************************************\
+
+Function: interpretert::get_type
+
+ Inputs:
+
+ Outputs:
+
+ Purpose: returns the type object corresponding to id
+
+\*******************************************************************/
+
 typet interpretert::get_type(const irep_idt &id) const
 {
   dynamic_typest::const_iterator it=dynamic_types.find(id);
@@ -444,8 +554,19 @@ typet interpretert::get_type(const irep_idt &id) const
   return it->second;
 }
 
-/// retrives the constant value at memory location offset as an object of type
-/// type
+/*******************************************************************\
+
+Function: interpretert::get_value
+
+ Inputs:
+
+ Outputs:
+
+ Purpose: retrives the constant value at memory location offset
+          as an object of type type
+
+\*******************************************************************/
+
 exprt interpretert::get_value(
   const typet &type,
   std::size_t offset,
@@ -506,8 +627,19 @@ exprt interpretert::get_value(
   return get_value(type, rhs);
 }
 
-/// returns the value at offset in the form of type given a memory buffer rhs
-/// which is typically a structured type
+/*******************************************************************\
+
+ Function: interpretert::get_value
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: returns the value at offset in the form of type given a
+          memory buffer rhs which is typically a structured type
+
+\*******************************************************************/
+
 exprt interpretert::get_value(
   const typet &type,
   mp_vectort &rhs,
@@ -633,7 +765,18 @@ exprt interpretert::get_value(
   return from_integer(rhs[offset], type);
 }
 
-/// executes the assign statement at the current pc value
+/*******************************************************************\
+
+Function: interpretert::execute_assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: executes the assign statement at the current pc value
+
+\*******************************************************************/
+
 void interpretert::execute_assign()
 {
   const code_assignt &code_assign=
@@ -683,7 +826,19 @@ void interpretert::execute_assign()
   }
 }
 
-/// sets the memory at address with the given rhs value (up to sizeof(rhs))
+/*******************************************************************\
+
+Function: interpretert::assign
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: sets the memory at address with the given rhs value
+          (up to sizeof(rhs))
+
+\*******************************************************************/
+
 void interpretert::assign(
   mp_integer address,
   const mp_vectort &rhs)
@@ -708,11 +863,35 @@ void interpretert::assign(
   }
 }
 
+/*******************************************************************\
+
+Function: interpretert::execute_assume
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void interpretert::execute_assume()
 {
   if(!evaluate_boolean(pc->guard))
     throw "assumption failed";
 }
+
+/*******************************************************************\
+
+Function: interpretert::execute_assert
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interpretert::execute_assert()
 {
@@ -725,6 +904,18 @@ void interpretert::execute_assert()
               << "\n" << eom;
   }
 }
+
+/*******************************************************************\
+
+Function: interpretert::execute_function_call
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interpretert::execute_function_call()
 {
@@ -836,7 +1027,18 @@ void interpretert::execute_function_call()
   }
 }
 
-/// Creates a memory map of all static symbols in the program
+/*******************************************************************\
+
+Function: interpretert::build_memory_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Creates a memory map of all static symbols in the program
+
+\*******************************************************************/
+
 void interpretert::build_memory_map()
 {
   // put in a dummy for NULL
@@ -853,6 +1055,18 @@ void interpretert::build_memory_map()
   // for the locals
   stack_pointer=memory.size();
 }
+
+/*******************************************************************\
+
+Function: interpretert::build_memory_map
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void interpretert::build_memory_map(const symbolt &symbol)
 {
@@ -876,7 +1090,18 @@ void interpretert::build_memory_map(const symbolt &symbol)
   }
 }
 
-/// turns a variable length array type into a fixed array type
+/*******************************************************************\
+
+Function: interpretert::concretize_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: turns a variable length array type into a fixed array type
+
+\*******************************************************************/
+
 typet interpretert::concretize_type(const typet &type)
 {
   if(type.id()==ID_array)
@@ -901,8 +1126,19 @@ typet interpretert::concretize_type(const typet &type)
   return type;
 }
 
-/// Populates dynamic entries of the memory map
-/// \return Updates the memory map to include variable id if it does not exist
+/*******************************************************************\
+
+Function: interpretert::build_memory_map
+
+  Inputs:
+
+ Outputs: Updates the memory map to include variable id if it does
+          not exist
+
+ Purpose: Populates dynamic entries of the memory map
+
+\*******************************************************************/
+
 mp_integer interpretert::build_memory_map(
   const irep_idt &id,
   const typet &type)
@@ -954,10 +1190,21 @@ bool interpretert::unbounded_size(const typet &type)
   return false;
 }
 
-/// Retrieves the actual size of the provided structured type. Unbounded objects
-/// get allocated 2^32 address space each (of a 2^64 sized space).
-/// \param type: a structured type
-/// \return Size of the given type
+/*******************************************************************\
+
+Function: interpretert::get_size
+
+  Inputs:
+    type - a structured type
+
+ Outputs: Size of the given type
+
+ Purpose: Retrieves the actual size of the provided structured type.
+          Unbounded objects get allocated 2^32 address space each
+          (of a 2^64 sized space).
+
+\*******************************************************************/
+
 size_t interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
@@ -1053,6 +1300,18 @@ exprt interpretert::get_value(const irep_idt &id)
   return get_value(get_type, integer2size_t(whole_lhs_object_address));
 }
 
+/*******************************************************************\
+
+Function: interpreter
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void interpreter(
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
@@ -1065,8 +1324,19 @@ void interpreter(
   interpreter();
 }
 
-/// Prints the current state of the memory map Since messaget mdofifies class
-/// members, print functions are nonconst
+/*******************************************************************\
+
+Function: interpretert::print_memory
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Prints the current state of the memory map
+          Since messaget mdofifies class members, print functions are nonconst
+
+\*******************************************************************/
+
 void interpretert::print_memory(bool input_flags)
 {
   for(const auto &cell_address : memory)

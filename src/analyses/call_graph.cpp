@@ -6,17 +6,38 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-/// \file
-/// Function Call Graphs
-
 #include <util/std_expr.h>
 #include <util/xml.h>
 
 #include "call_graph.h"
 
+/*******************************************************************\
+
+Function: call_grapht::call_grapht
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 call_grapht::call_grapht()
 {
 }
+
+/*******************************************************************\
+
+Function: call_grapht::call_grapht
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 call_grapht::call_grapht(const goto_functionst &goto_functions)
 {
@@ -26,6 +47,18 @@ call_grapht::call_grapht(const goto_functionst &goto_functions)
     add(f_it->first, body);
   }
 }
+
+/*******************************************************************\
+
+Function: call_grapht::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void call_grapht::add(
   const irep_idt &function,
@@ -42,12 +75,36 @@ void call_grapht::add(
   }
 }
 
+/*******************************************************************\
+
+Function: call_grapht::add
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void call_grapht::add(
   const irep_idt &caller,
   const irep_idt &callee)
 {
   graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
 }
+
+/*******************************************************************\
+
+Function: call_grapht::output_dot
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void call_grapht::output_dot(std::ostream &out) const
 {
@@ -64,6 +121,18 @@ void call_grapht::output_dot(std::ostream &out) const
   out << "}\n";
 }
 
+/*******************************************************************\
+
+Function: call_grapht::output
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 void call_grapht::output(std::ostream &out) const
 {
   for(const auto &edge : graph)
@@ -71,6 +140,18 @@ void call_grapht::output(std::ostream &out) const
     out << edge.first << " -> " << edge.second << "\n";
   }
 }
+
+/*******************************************************************\
+
+Function: call_grapht::output_xml
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 void call_grapht::output_xml(std::ostream &out) const
 {

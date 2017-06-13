@@ -11,6 +11,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_cbmc.h"
 
+/*******************************************************************\
+
+Function: bv_cbmct::convert_waitfor
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {
   if(expr.operands().size()!=4)
@@ -132,6 +144,18 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
   return convert_bitvector(new_cycle);
 }
 
+/*******************************************************************\
+
+Function: bv_cbmct::convert_waitfor_symbol
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
 bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -154,6 +178,18 @@ bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 
   return convert_bitvector(result);
 }
+
+/*******************************************************************\
+
+Function: bv_cbmct::convert_bitvector
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
 
 bvt bv_cbmct::convert_bitvector(const exprt &expr)
 {
