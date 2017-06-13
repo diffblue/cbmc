@@ -5,3 +5,4 @@ main.c
 ^\s*f2\(\);
 --
 ^warning: ignoring
+function \w+: replacing function pointer by 9 possible targets
