@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_INLINE_CLASS_H
 
@@ -168,13 +169,6 @@ protected:
     goto_programt &dest,
     goto_programt::targett target,
     const exprt &lhs,
-    const symbol_exprt &function,
-    const exprt::operandst &arguments);
-
-  void insert_function_nobody(
-    goto_programt &dest,
-    const exprt &lhs,
-    goto_programt::targett target,
     const symbol_exprt &function,
     const exprt::operandst &arguments);
 

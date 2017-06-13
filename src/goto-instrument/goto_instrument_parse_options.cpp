@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/class_hierarchy.h>
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/remove_calls_no_body.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
@@ -729,6 +730,10 @@ int goto_instrument_parse_optionst::doit()
       status() << "Performing full inlining" << eom;
       goto_inline(goto_model, get_message_handler());
 
+      status() << "Removing calls to functions without a body" << eom;
+      remove_calls_no_bodyt remove_calls_no_body;
+      remove_calls_no_body(goto_model.goto_functions);
+
       status() << "Accelerating" << eom;
       accelerate_functions(
         goto_model, get_message_handler(), cmdline.isset("z3"));
@@ -992,7 +997,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    do_indirect_call_and_rtti_removal(/*force=*/true);
+    do_indirect_call_and_rtti_removal(true);
 
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -1113,10 +1118,21 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     status() << "Partial inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler, 0, true);
+    goto_partial_inline(goto_model, ui_message_handler, 0, true);
 
-    goto_functions.update();
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.update();
+    goto_model.goto_functions.compute_loop_numbers();
+  }
+
+  if(cmdline.isset("remove-calls-no-body"))
+  {
+    status() << "Removing calls to functions without a body" << eom;
+
+    remove_calls_no_bodyt remove_calls_no_body;
+    remove_calls_no_body(goto_model.goto_functions);
+
+    goto_model.goto_functions.update();
+    goto_model.goto_functions.compute_loop_numbers();
   }
 
   if(cmdline.isset("constant-propagator"))
@@ -1545,6 +1561,7 @@ void goto_instrument_parse_optionst::help()
     " --no-caching                 disable caching of intermediate results during transitive function inlining\n" // NOLINT(*)
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
+    HELP_REMOVE_CALLS_NO_BODY
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"

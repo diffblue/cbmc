@@ -1,0 +1,12 @@
+CORE
+main.c
+--inline
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+func1\(\)
+ret.*=.*func2\(\)
+no body for function.*func1
+no body for function.*func2
+--
+^warning: ignoring
