@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <ansi-c/c_qualifiers.h>
 #include <analyses/does_remove_const.h>
+#include <util/invariant.h>
 
 #include <util/c_types.h>
 
@@ -300,7 +301,7 @@ void remove_function_pointerst::remove_function_pointer(
     // however, it is possible for found_functions to be true and functions
     // to be empty (this happens if the pointer can only resolve to the null
     // pointer)
-    assert(found_functions || functions.empty());
+    CHECK_RETURN(found_functions || functions.empty());
 
     if(functions.size()==1)
     {
