@@ -22,6 +22,7 @@ class cover_goalst:public messaget
 {
 public:
   explicit cover_goalst(prop_convt &_prop_conv):
+    activation_literal(const_literal(false)),
     prop_conv(_prop_conv)
   {
   }
