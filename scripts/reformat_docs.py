@@ -206,9 +206,7 @@ def replace_block(
     if header_formatter.is_block_valid(block):
         converted = header_formatter.convert(header_from_block(block))
         if header_formatter.needs_new_header(file_contents) and converted:
-            return '%s%s' % (
-                    block_contents.group(0),
-                    header_formatter.convert(header_from_block(block)) + '\n')
+            return block_contents.group(0) + converted + '\n'
         return block_contents.group(0)
 
     if class_formatter.is_block_valid(block):
