@@ -6,7 +6,6 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
-       goto-instrument-unwind \
        cbmc-incr-oneloop \
        cbmc-incr \
        cbmc-with-incr \
