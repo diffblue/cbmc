@@ -177,7 +177,7 @@ protected:
     const exprt::operandst &arguments,
     const exprt &constrain);
 
-  void insert_function_nobody(
+  void handle_function_nobody(
     goto_programt &dest,
     const exprt &lhs,
     goto_programt::targett target,

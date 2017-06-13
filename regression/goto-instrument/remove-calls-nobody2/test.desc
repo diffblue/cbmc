@@ -1,0 +1,15 @@
+CORE
+main.c
+--remove-calls-nobody
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+func3\(\)
+func4\(\)
+567;
+285;
+ret1.*=.*NONDET
+--
+func1\(.*\)
+func2\(.*\)
+^warning: ignoring

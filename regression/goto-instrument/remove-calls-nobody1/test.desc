@@ -1,12 +1,12 @@
 CORE
 main.c
---inline --remove-calls-nobody
+--remove-calls-nobody
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\s*x;$
-^\s*c;$
-^\s*a;$
-no body.*[`]f
+func3\(\)
+func4\(\)
 --
+func1\(\)
+func2\(\)
 ^warning: ignoring
