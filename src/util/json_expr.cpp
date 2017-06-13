@@ -11,6 +11,8 @@ Author: Peter Schrammel
 
 #include "json_expr.h"
 
+#include <memory>
+
 #include "namespace.h"
 #include "expr.h"
 #include "json.h"
@@ -231,14 +233,14 @@ json_objectt json(
         type.id()==ID_c_bit_field?type.subtype():
         type;
 
-      languaget *lang;
+      std::unique_ptr<languaget> lang;
       if(mode==ID_unknown)
-        lang=get_default_language();
+        lang=std::unique_ptr<languaget>(get_default_language());
       else
       {
-        lang=get_language_from_mode(mode);
+        lang=std::unique_ptr<languaget>(get_language_from_mode(mode));
         if(!lang)
-          lang=get_default_language();
+          lang=std::unique_ptr<languaget>(get_default_language());
       }
 
       std::string type_string;
