@@ -95,6 +95,10 @@ class HeaderFormatter(GenericFormatter):
     def convert_sections(self, block):
         return [self.format_module(block)]
 
+    def needs_new_header(self, file_contents):
+        return (re.search(r'^\/\/\/ \\file$', file_contents, flags=re.MULTILINE)
+                is None)
+
 
 class FunctionFormatter(GenericFormatter):
     def __init__(self, doc_width):
@@ -188,6 +192,7 @@ class ClassFormatter(GenericFormatter):
 
 def replace_block(
         block_contents,
+        file_contents,
         file,
         header_formatter,
         class_formatter,
@@ -200,7 +205,7 @@ def replace_block(
 
     if header_formatter.is_block_valid(block):
         converted = header_formatter.convert(header_from_block(block))
-        if converted:
+        if header_formatter.needs_new_header(file_contents) and converted:
             return '%s%s' % (
                     block_contents.group(0),
                     header_formatter.convert(header_from_block(block)) + '\n')
@@ -234,6 +239,7 @@ def convert_file(file, inplace):
     new_contents = block_re.sub(
             lambda match: replace_block(
                 match,
+                contents,
                 file,
                 header_formatter,
                 class_formatter,
