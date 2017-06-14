@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  assert(type.id()!=irep_idt());
+  assert(!type.id().empty());
   assert(type.is_not_nil());
 
   try

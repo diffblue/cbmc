@@ -1417,9 +1417,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       full_slicer(goto_functions, ns);
   }
 
-  // label the assertions
-  label_properties(goto_functions);
-
   // recalculate numbers, etc.
   goto_functions.update();
 }

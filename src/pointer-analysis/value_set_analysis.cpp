@@ -44,7 +44,7 @@ void value_set_analysist::convert(
     if(location==previous_location)
       continue;
 
-    if(location.is_nil() || location.get_file()==irep_idt())
+    if(location.is_nil() || location.get_file().empty())
       continue;
 
     // find value set

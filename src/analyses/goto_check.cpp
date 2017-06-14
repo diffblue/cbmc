@@ -1689,17 +1689,17 @@ void goto_checkt::goto_check(
       {
         i_it->source_location.id(irep_idt());
 
-        if(it->source_location.get_file()!=irep_idt())
+        if(!it->source_location.get_file().empty())
           i_it->source_location.set_file(it->source_location.get_file());
 
-        if(it->source_location.get_line()!=irep_idt())
+        if(!it->source_location.get_line().empty())
           i_it->source_location.set_line(it->source_location.get_line());
 
-        if(it->source_location.get_function()!=irep_idt())
+        if(!it->source_location.get_function().empty())
           i_it->source_location.set_function(
             it->source_location.get_function());
 
-        if(it->source_location.get_column()!=irep_idt())
+        if(!it->source_location.get_column().empty())
           i_it->source_location.set_column(it->source_location.get_column());
 
         if(it->source_location.get_java_bytecode_index()!=irep_idt())
@@ -1707,7 +1707,7 @@ void goto_checkt::goto_check(
             it->source_location.get_java_bytecode_index());
       }
 
-      if(i_it->function==irep_idt())
+      if(i_it->function.empty())
         i_it->function=it->function;
     }
 

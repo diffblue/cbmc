@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Internal Representation
 
-#include <cassert>
 #include <ostream>
+
+#include "invariant.h"
 
 #include "string2int.h"
 #include "irep.h"
@@ -87,7 +88,7 @@ void irept::detach()
     remove_ref(old_data);
   }
 
-  assert(data->ref_count==1);
+  POSTCONDITION(data->ref_count==1);
 
   #ifdef IREP_DEBUG
   std::cout << "DETACH2: " << data << '\n';
@@ -105,7 +106,7 @@ void irept::remove_ref(dt *old_data)
   nonrecursive_destructor(old_data);
   #else
 
-  assert(old_data->ref_count!=0);
+  PRECONDITION(old_data->ref_count!=0);
 
   #ifdef IREP_DEBUG
   std::cout << "R: " << old_data << " " << old_data->ref_count << '\n';
@@ -147,7 +148,7 @@ void irept::nonrecursive_destructor(dt *old_data)
     if(d==&empty_d)
       continue;
 
-    assert(d->ref_count!=0);
+    INVARIANT(d->ref_count!=0, "All contents of the stack must be in use");
     d->ref_count--;
 
     if(d->ref_count==0)
@@ -456,7 +457,8 @@ bool irept::ordering(const irept &other) const
         return false;
     }
 
-    assert(it1==X.sub.end() && it2==Y.sub.end());
+    INVARIANT(it1==X.sub.end() && it2==Y.sub.end(),
+              "Unequal lengths will return before this");
   }
 
   if(X.named_sub.size()<Y.named_sub.size())
@@ -484,7 +486,8 @@ bool irept::ordering(const irept &other) const
         return false;
     }
 
-    assert(it1==X.named_sub.end() && it2==Y.named_sub.end());
+    INVARIANT(it1==X.named_sub.end() && it2==Y.named_sub.end(),
+              "Unequal lengths will return before this");
   }
 
   return false;
@@ -521,7 +524,8 @@ int irept::compare(const irept &i) const
         return r;
     }
 
-    assert(it1==get_sub().end() && it2==i.get_sub().end());
+    INVARIANT(it1==get_sub().end() && it2==i.get_sub().end(),
+              "Unequal lengths will return before this");
   }
 
   const named_subt::size_type n_size=get_named_sub().size(),
@@ -549,8 +553,9 @@ int irept::compare(const irept &i) const
         return r;
     }
 
-    assert(it1==get_named_sub().end() &&
-           it2==i.get_named_sub().end());
+    INVARIANT(it1==get_named_sub().end() &&
+              it2==i.get_named_sub().end(),
+              "Unequal lengths will return before this");
   }
 
   // equal

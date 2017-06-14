@@ -9,14 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Expression Representation
 
-#include <cassert>
-
 #include <stack>
 
 #include "string2int.h"
 #include "mp_arith.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
+#include "invariant.h"
 #include "expr.h"
 #include "rational.h"
 #include "rational_tools.h"
@@ -203,7 +202,7 @@ void exprt::negate()
       else
       {
         make_nil();
-        assert(false);
+        UNREACHABLE;
       }
     }
     else
@@ -211,7 +210,8 @@ void exprt::negate()
       if(id()==ID_unary_minus)
       {
         exprt tmp;
-        assert(operands().size()==1);
+        DATA_INVARIANT(operands().size()==1,
+                       "Unary minus must have one operand");
         tmp.swap(op0());
         swap(tmp);
       }
@@ -245,7 +245,7 @@ bool exprt::is_zero() const
     {
       rationalt rat_value;
       if(to_rational(*this, rat_value))
-        assert(false);
+        CHECK_RETURN(false);
       return rat_value.is_zero();
     }
     else if(type_id==ID_unsignedbv ||
@@ -291,7 +291,7 @@ bool exprt::is_one() const
     {
       rationalt rat_value;
       if(to_rational(*this, rat_value))
-        assert(false);
+        CHECK_RETURN(false);
       return rat_value.is_one();
     }
     else if(type_id==ID_unsignedbv || type_id==ID_signedbv)

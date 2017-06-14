@@ -539,7 +539,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
       p_it++)
   {
     // may be anonymous
-    if(p_it->get_base_name()==irep_idt())
+    if(p_it->get_base_name().empty())
     {
       irep_idt base_name="#anon"+std::to_string(anon_counter++);
       p_it->set_base_name(base_name);

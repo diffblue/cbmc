@@ -150,7 +150,7 @@ std::string expr2cppt::convert_rec(
   {
     return q+convert(src.subtype())+" &&"+d;
   }
-  else if(src.get(ID_C_c_type)!=irep_idt())
+  else if(!src.get(ID_C_c_type).empty())
   {
     const irep_idt c_type=src.get(ID_C_c_type);
 
@@ -208,7 +208,7 @@ std::string expr2cppt::convert_rec(
       else
         dest+="struct";
 
-      if(symbol.pretty_name!=irep_idt())
+      if(!symbol.pretty_name.empty())
         dest+=" "+id2string(symbol.pretty_name);
 
       dest+=d;
@@ -221,7 +221,7 @@ std::string expr2cppt::convert_rec(
 
       dest+="enum";
 
-      if(symbol.pretty_name!=irep_idt())
+      if(!symbol.pretty_name.empty())
         dest+=" "+id2string(symbol.pretty_name);
 
       dest+=d;

@@ -36,14 +36,14 @@ exprt make_binary(const exprt &expr)
   const typet &type=expr.type();
 
   exprt previous=operands.front();
-  assert(previous.type()==type);
+  PRECONDITION(previous.type()==type);
 
   for(exprt::operandst::const_iterator
       it=++operands.begin();
       it!=operands.end();
       ++it)
   {
-    assert(it->type()==type);
+    PRECONDITION(it->type()==type);
 
     exprt tmp=expr;
     tmp.operands().clear();
@@ -59,7 +59,7 @@ exprt make_binary(const exprt &expr)
 with_exprt make_with_expr(const update_exprt &src)
 {
   const exprt::operandst &designator=src.designator();
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   with_exprt result;
   exprt *dest=&result;
@@ -78,7 +78,7 @@ with_exprt make_with_expr(const update_exprt &src)
       //  to_member_designator(*it).get_component_name();
     }
     else
-      assert(false);
+      UNREACHABLE;
 
     *dest=tmp;
     dest=&to_with_expr(*dest).new_value();
@@ -108,7 +108,7 @@ exprt is_not_zero(
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
   exprt zero=from_integer(0, src_type);
-  assert(zero.is_not_nil());
+  CHECK_RETURN(zero.is_not_nil());
 
   binary_exprt comparison(src, id, zero, bool_typet());
   comparison.add_source_location()=src.source_location();
@@ -142,8 +142,8 @@ bool has_subexpr(const exprt &src, const irep_idt &id)
 
 if_exprt lift_if(const exprt &src, std::size_t operand_number)
 {
-  assert(operand_number<src.operands().size());
-  assert(src.operands()[operand_number].id()==ID_if);
+  PRECONDITION(operand_number<src.operands().size());
+  PRECONDITION(src.operands()[operand_number].id()==ID_if);
 
   const if_exprt if_expr=to_if_expr(src.operands()[operand_number]);
   const exprt true_case=if_expr.true_case();

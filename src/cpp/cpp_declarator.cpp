@@ -49,7 +49,7 @@ typet cpp_declaratort::merge_type(const typet &declaration_type) const
     }
     else
     {
-      assert(t.id()!=irep_idt());
+      assert(!t.id().empty());
       p=&t.subtype();
     }
   }

@@ -485,7 +485,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     bool is_static=new_decl.storage_spec().is_static();
     irep_idt access = new_decl.get(ID_C_access);
 
-    assert(access != irep_idt());
+    assert(!access.empty());
     assert(symb.type.id()==ID_struct);
 
     typecheck_compound_declarator(

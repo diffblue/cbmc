@@ -119,7 +119,7 @@ std::string cpp_type2name(const typet &type)
     // we try to use #c_type
     const irep_idt c_type=type.get(ID_C_c_type);
 
-    if(c_type!=irep_idt())
+    if(!c_type.empty())
       result+=id2string(c_type);
     else if(type.id()==ID_unsignedbv)
       result+="unsigned_int";
@@ -131,7 +131,7 @@ std::string cpp_type2name(const typet &type)
     // we try to use #c_type
     const irep_idt c_type=type.get(ID_C_c_type);
 
-    if(c_type!=irep_idt())
+    if(!c_type.empty())
       result+=id2string(c_type);
     else
       result+="double";

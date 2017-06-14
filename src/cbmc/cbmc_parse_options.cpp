@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 #include <util/unicode.h>
 #include <util/memory_info.h>
+#include <util/invariant.h>
 
 #include <ansi-c/c_preprocess.h>
 
@@ -106,6 +107,27 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
+  }
+
+  // Test only; do not use for input validation
+  if(cmdline.isset("test-invariant-failure"))
+  {
+    // Have to catch this as the default handling of uncaught exceptions
+    // on windows appears to be silent termination.
+    try
+    {
+      INVARIANT(0, "Test invariant failure");
+    }
+    catch (const invariant_failedt &e)
+    {
+      std::cerr << e.what();
+      exit(0); // should contemplate EX_OK from sysexits.h
+    }
+    catch (...)
+    {
+      error() << "Unexpected exception type\n";
+    }
+    exit(1);
   }
 
   if(cmdline.isset("program-only"))
@@ -470,8 +492,6 @@ int cbmc_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
-  label_properties(goto_functions);
-
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
@@ -829,13 +849,6 @@ bool cbmc_parse_optionst::process_goto_program(
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
 
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      full_slicer(goto_functions, ns);
-    }
-
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_functions, ns);
 
@@ -883,6 +896,23 @@ bool cbmc_parse_optionst::process_goto_program(
            goto_functions,
            get_message_handler()))
         return true;
+    }
+
+    // label the assertions
+    // This must be done after adding assertions and
+    // before using the argument of the "property" option.
+    // Do not re-label after using the property slicer because
+    // this would cause the property identifiers to change.
+    label_properties(goto_functions);
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      if(cmdline.isset("property"))
+        property_slicer(goto_functions, ns, cmdline.get_values("property"));
+      else
+        full_slicer(goto_functions, ns);
     }
 
     // remove skips
