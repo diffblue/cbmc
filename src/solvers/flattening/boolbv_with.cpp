@@ -37,7 +37,13 @@ bvt boolbvt::convert_with(const exprt &expr)
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr);
+  {
+    // A zero-length array is acceptable:
+    if(expr.type().id()==ID_array && boolbv_width(expr.type().subtype())!=0)
+      return bvt();
+    else
+      return conversion_failed(expr);
+  }
 
   if(bv.size()!=width)
   {
