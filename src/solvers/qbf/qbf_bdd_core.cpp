@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <fstream>
 
@@ -21,18 +22,6 @@ Author: CM Wintersteiger
 /*! \cond */
 // FIX FOR THE CUDD LIBRARY
 
-/*******************************************************************\
-
-Function: DD::getNode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 inline DdNode *DD::getNode() const
 {
     return node;
@@ -42,34 +31,10 @@ inline DdNode *DD::getNode() const
 
 #include "qbf_bdd_core.h"
 
-/*******************************************************************\
-
-Function: qbf_bdd_certificatet::qbf_bdd_certificatet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_bdd_certificatet::qbf_bdd_certificatet(void) : qdimacs_coret()
 {
   bdd_manager=new Cudd(0, 0);
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_certificatet::~qbf_bdd_certificatet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qbf_bdd_certificatet::~qbf_bdd_certificatet(void)
 {
@@ -84,18 +49,6 @@ qbf_bdd_certificatet::~qbf_bdd_certificatet(void)
   bdd_manager=NULL;
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_certificatet::new_variable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt qbf_bdd_certificatet::new_variable(void)
 {
   literalt l=qdimacs_coret::new_variable();
@@ -106,35 +59,11 @@ literalt qbf_bdd_certificatet::new_variable(void)
   return l;
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::qbf_bdd_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_bdd_coret::qbf_bdd_coret() : qbf_bdd_certificatet()
 {
   matrix=new BDD();
   *matrix=bdd_manager->bddOne();
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_coret::~qbf_bdd_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qbf_bdd_coret::~qbf_bdd_coret()
 {
@@ -152,52 +81,16 @@ qbf_bdd_coret::~qbf_bdd_coret()
   }
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt qbf_bdd_coret::l_get(literalt a) const
 {
   assert(false);
   return tvt(false);
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string qbf_bdd_coret::solver_text()
 {
   return "QBF/BDD/CORE";
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_coret::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt qbf_bdd_coret::prop_solve()
 {
@@ -259,51 +152,15 @@ propt::resultt qbf_bdd_coret::prop_solve()
     return P_ERROR;
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool qbf_bdd_coret::is_in_core(literalt l) const
 {
   throw "nyi";
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::m_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qdimacs_coret::modeltypet qbf_bdd_coret::m_get(literalt a) const
 {
   throw "nyi";
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_coret::new_variable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt qbf_bdd_coret::new_variable()
 {
@@ -316,18 +173,6 @@ literalt qbf_bdd_coret::new_variable()
 
   return res;
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_coret::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void qbf_bdd_coret::lcnf(const bvt &bv)
 {
@@ -351,18 +196,6 @@ void qbf_bdd_coret::lcnf(const bvt &bv)
   *matrix&=clause;
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt qbf_bdd_coret::lor(literalt a, literalt b)
 {
   literalt nl=new_variable();
@@ -379,18 +212,6 @@ literalt qbf_bdd_coret::lor(literalt a, literalt b)
 
   return nl;
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_coret::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt qbf_bdd_coret::lor(const bvt &bv)
 {
@@ -419,18 +240,6 @@ literalt qbf_bdd_coret::lor(const bvt &bv)
   return nl;
 }
 
-/*******************************************************************\
-
-Function: qbf_bdd_coret::compress_certificate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void qbf_bdd_coret::compress_certificate(void)
 {
   status() << "Compressing Certificate" << eom;
@@ -458,18 +267,6 @@ void qbf_bdd_coret::compress_certificate(void)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_certificatet::f_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const exprt qbf_bdd_certificatet::f_get(literalt l)
 {
@@ -591,18 +388,6 @@ const exprt qbf_bdd_certificatet::f_get(literalt l)
       return final;
   }
 }
-
-/*******************************************************************\
-
-Function: qbf_bdd_certificatet::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt qbf_bdd_certificatet::l_get(literalt a) const
 {

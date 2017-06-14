@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Expression Representation
+
 #include <cassert>
 
 #include <stack>
@@ -20,36 +23,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "std_expr.h"
 
-/*******************************************************************\
-
-Function: exprt::move_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void exprt::move_to_operands(exprt &expr)
 {
   operandst &op=operands();
   op.push_back(static_cast<const exprt &>(get_nil_irep()));
   op.back().swap(expr);
 }
-
-/*******************************************************************\
-
-Function: exprt::move_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::move_to_operands(exprt &e1, exprt &e2)
 {
@@ -62,18 +41,6 @@ void exprt::move_to_operands(exprt &e1, exprt &e2)
   op.push_back(static_cast<const exprt &>(get_nil_irep()));
   op.back().swap(e2);
 }
-
-/*******************************************************************\
-
-Function: exprt::move_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
 {
@@ -89,34 +56,10 @@ void exprt::move_to_operands(exprt &e1, exprt &e2, exprt &e3)
   op.back().swap(e3);
 }
 
-/*******************************************************************\
-
-Function: exprt::copy_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void exprt::copy_to_operands(const exprt &expr)
 {
   operands().push_back(expr);
 }
-
-/*******************************************************************\
-
-Function: exprt::copy_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
 {
@@ -127,18 +70,6 @@ void exprt::copy_to_operands(const exprt &e1, const exprt &e2)
   op.push_back(e1);
   op.push_back(e2);
 }
-
-/*******************************************************************\
-
-Function: exprt::copy_to_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::copy_to_operands(
   const exprt &e1,
@@ -154,18 +85,6 @@ void exprt::copy_to_operands(
   op.push_back(e3);
 }
 
-/*******************************************************************\
-
-Function: exprt::make_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void exprt::make_typecast(const typet &_type)
 {
   exprt new_expr(ID_typecast);
@@ -175,18 +94,6 @@ void exprt::make_typecast(const typet &_type)
 
   swap(new_expr);
 }
-
-/*******************************************************************\
-
-Function: exprt::make_not
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::make_not()
 {
@@ -216,34 +123,10 @@ void exprt::make_not()
   swap(new_expr);
 }
 
-/*******************************************************************\
-
-Function: exprt::is_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::is_constant() const
 {
   return id()==ID_constant;
 }
-
-/*******************************************************************\
-
-Function: exprt::is_true
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool exprt::is_true() const
 {
@@ -252,18 +135,6 @@ bool exprt::is_true() const
          get(ID_value)!=ID_false;
 }
 
-/*******************************************************************\
-
-Function: exprt::is_false
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::is_false() const
 {
   return is_constant() &&
@@ -271,35 +142,11 @@ bool exprt::is_false() const
          get(ID_value)==ID_false;
 }
 
-/*******************************************************************\
-
-Function: exprt::make_bool
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void exprt::make_bool(bool value)
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, value?ID_true:ID_false);
 }
-
-/*******************************************************************\
-
-Function: exprt::make_true
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::make_true()
 {
@@ -307,35 +154,11 @@ void exprt::make_true()
   set(ID_value, ID_true);
 }
 
-/*******************************************************************\
-
-Function: exprt::make_false
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void exprt::make_false()
 {
   *this=exprt(ID_constant, typet(ID_bool));
   set(ID_value, ID_false);
 }
-
-/*******************************************************************\
-
-Function: exprt::negate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::negate()
 {
@@ -402,34 +225,10 @@ void exprt::negate()
   }
 }
 
-/*******************************************************************\
-
-Function: exprt::is_boolean
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::is_boolean() const
 {
   return type().id()==ID_bool;
 }
-
-/*******************************************************************\
-
-Function: exprt::is_zero
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool exprt::is_zero() const
 {
@@ -475,18 +274,6 @@ bool exprt::is_zero() const
   return false;
 }
 
-/*******************************************************************\
-
-Function: exprt::is_one
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::is_one() const
 {
   if(is_constant())
@@ -527,18 +314,6 @@ bool exprt::is_one() const
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: exprt::sum
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool exprt::sum(const exprt &expr)
 {
@@ -593,18 +368,6 @@ bool exprt::sum(const exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: exprt::mul
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::mul(const exprt &expr)
 {
   if(!is_constant() || !expr.is_constant())
@@ -658,18 +421,6 @@ bool exprt::mul(const exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: exprt::subtract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool exprt::subtract(const exprt &expr)
 {
   if(!is_constant() || !expr.is_constant())
@@ -709,18 +460,6 @@ bool exprt::subtract(const exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: exprt::find_source_location
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const source_locationt &exprt::find_source_location() const
 {
   const source_locationt &l=source_location();
@@ -737,18 +476,6 @@ const source_locationt &exprt::find_source_location() const
 
   return static_cast<const source_locationt &>(get_nil_irep());
 }
-
-/*******************************************************************\
-
-Function: exprt::visit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::visit(expr_visitort &visitor)
 {
@@ -767,18 +494,6 @@ void exprt::visit(expr_visitort &visitor)
       stack.push(&(*it));
   }
 }
-
-/*******************************************************************\
-
-Function: exprt::visit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void exprt::visit(const_expr_visitort &visitor) const
 {

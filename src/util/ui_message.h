@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_UI_MESSAGE_H
 #define CPROVER_UTIL_UI_MESSAGE_H
 

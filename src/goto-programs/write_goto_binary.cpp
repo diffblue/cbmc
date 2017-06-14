@@ -6,6 +6,9 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+/// \file
+/// Write GOTO binaries
+
 #include <fstream>
 
 #include <util/message.h>
@@ -14,18 +17,7 @@ Author: CM Wintersteiger
 
 #include "write_goto_binary.h"
 
-/*******************************************************************\
-
-Function: goto_programt::write_goto_binary_v3
-
-  Inputs:
-
- Outputs:
-
- Purpose: Writes a goto program to disc, using goto binary format ver 2
-
-\*******************************************************************/
-
+/// Writes a goto program to disc, using goto binary format ver 2
 bool write_goto_binary_v3(
   std::ostream &out,
   const symbol_tablet &lsymbol_table,
@@ -127,18 +119,7 @@ bool write_goto_binary_v3(
   return false;
 }
 
-/*******************************************************************\
-
-Function: goto_programt::write_goto_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose: Writes a goto program to disc
-
-\*******************************************************************/
-
+/// Writes a goto program to disc
 bool write_goto_binary(
   std::ostream &out,
   const symbol_tablet &lsymbol_table,
@@ -172,18 +153,7 @@ bool write_goto_binary(
   return false;
 }
 
-/*******************************************************************\
-
-Function: goto_programt::write_goto_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose: Writes a goto program to disc
-
-\*******************************************************************/
-
+/// Writes a goto program to disc
 bool write_goto_binary(
   const std::string &filename,
   const symbol_tablet &symbol_table,

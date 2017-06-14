@@ -6,6 +6,9 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 \*******************************************************************/
 
+/// \file
+/// Compute natural loops in a goto_function
+
 #ifndef CPROVER_ANALYSES_NATURAL_LOOPS_H
 #define CPROVER_ANALYSES_NATURAL_LOOPS_H
 
@@ -69,18 +72,7 @@ typedef natural_loops_templatet<goto_programt, goto_programt::targett>
 
 void show_natural_loops(const goto_functionst &goto_functions);
 
-/*******************************************************************\
-
-Function: natural_loops_templatet::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose: Finds all back-edges and computes the natural loops
-
-\*******************************************************************/
-
+/// Finds all back-edges and computes the natural loops
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -123,19 +115,7 @@ void natural_loops_templatet<P, T>::compute(P &program)
   }
 }
 
-/*******************************************************************\
-
-Function: natural_loops_templatet::compute_natural_loop
-
-  Inputs:
-
- Outputs:
-
- Purpose: Computes the natural loop for a given back-edge
-          (see Muchnick section 7.4)
-
-\*******************************************************************/
-
+/// Computes the natural loop for a given back-edge (see Muchnick section 7.4)
 template<class P, class T>
 void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
 {
@@ -170,18 +150,7 @@ void natural_loops_templatet<P, T>::compute_natural_loop(T m, T n)
   }
 }
 
-/*******************************************************************\
-
-Function: natural_loops_templatet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose: Print all natural loops that were found
-
-\*******************************************************************/
-
+/// Print all natural loops that were found
 template<class P, class T>
 void natural_loops_templatet<P, T>::output(std::ostream &out) const
 {

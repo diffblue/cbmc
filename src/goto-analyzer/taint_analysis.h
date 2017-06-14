@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Taint Analysis
+
 #ifndef CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
 #define CPROVER_GOTO_ANALYZER_TAINT_ANALYSIS_H
 

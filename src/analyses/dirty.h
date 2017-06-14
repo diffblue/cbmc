@@ -8,6 +8,9 @@ Date: March 2013
 
 \*******************************************************************/
 
+/// \file
+/// Variables whose address is taken
+
 #ifndef CPROVER_ANALYSES_DIRTY_H
 #define CPROVER_ANALYSES_DIRTY_H
 

@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_QBF_QBF_QUBE_H
 #define CPROVER_SOLVERS_QBF_QBF_QUBE_H
 

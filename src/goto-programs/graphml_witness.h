@@ -6,6 +6,9 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Witnesses for Traces and Proofs
+
 #ifndef CPROVER_GOTO_PROGRAMS_GRAPHML_WITNESS_H
 #define CPROVER_GOTO_PROGRAMS_GRAPHML_WITNESS_H
 

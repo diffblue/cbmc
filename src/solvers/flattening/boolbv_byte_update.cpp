@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 #include <cassert>
 
@@ -14,18 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/endianness_map.h>
 
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_byte_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
 {

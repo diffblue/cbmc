@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_CPP_CPP_NAME_H
 #define CPROVER_CPP_CPP_NAME_H
 

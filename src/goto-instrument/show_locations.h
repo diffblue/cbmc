@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show program locations
+
 #ifndef CPROVER_GOTO_INSTRUMENT_SHOW_LOCATIONS_H
 #define CPROVER_GOTO_INSTRUMENT_SHOW_LOCATIONS_H
 

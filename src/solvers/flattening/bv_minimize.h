@@ -11,6 +11,9 @@ Purpose: Find a satisfying assignment that minimizes a given set
 
 \*******************************************************************/
 
+/// \file
+/// SAT-optimizer for minimizing expressions
+
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H
 #define CPROVER_SOLVERS_FLATTENING_BV_MINIMIZE_H
 

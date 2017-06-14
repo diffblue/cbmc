@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show the symbol table
+
 #include <iostream>
 #include <memory>
 
@@ -15,33 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_model.h"
 #include "show_symbol_table.h"
 
-/*******************************************************************\
-
-Function: show_symbol_table_xml_ui
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_symbol_table_xml_ui()
 {
 }
-
-/*******************************************************************\
-
-Function: show_symbol_table_plain
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_symbol_table_plain(
   const goto_modelt &goto_model,
@@ -129,18 +108,6 @@ void show_symbol_table_plain(
     out << '\n' << std::flush;
   }
 }
-
-/*******************************************************************\
-
-Function: show_symbol_table
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_symbol_table(
   const goto_modelt &goto_model,

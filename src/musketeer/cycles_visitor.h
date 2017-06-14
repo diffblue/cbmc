@@ -6,6 +6,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// cycles visitor for computing edges involved for fencing
+
 #ifndef CPROVER_MUSKETEER_CYCLES_VISITOR_H
 #define CPROVER_MUSKETEER_CYCLES_VISITOR_H
 

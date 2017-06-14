@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Convert goto programs into xml structures and back
+
 #ifndef CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_H
 #define CPROVER_GOTO_CC_XML_BINARIES_XML_GOTO_PROGRAM_H
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Unwind loops in static initializers
+
 #include <goto-programs/goto_functions.h>
 
 #include <util/options.h>

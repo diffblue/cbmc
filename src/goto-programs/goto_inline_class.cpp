@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Inlining
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -22,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_inline.h"
 #include "goto_inline_class.h"
-
-/*******************************************************************\
-
-Function: goto_inlinet::parameter_assignments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,
@@ -167,18 +158,6 @@ void goto_inlinet::parameter_assignments(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_inlinet::parameter_destruction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_inlinet::parameter_destruction(
   const goto_programt::targett target,
   const irep_idt &function_name, // name of called function
@@ -222,18 +201,6 @@ void goto_inlinet::parameter_destruction(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_inlinet::replace_return
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::replace_return(
   goto_programt &dest, // inlining this
@@ -348,18 +315,6 @@ void goto_inlinet::replace_return(
   }
 }
 
-/*******************************************************************\
-
-Function: replace_location
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void replace_location(
   source_locationt &dest,
   const source_locationt &new_location)
@@ -383,18 +338,6 @@ void replace_location(
     dest.set_property_id(property_id);
 }
 
-/*******************************************************************\
-
-Function: replace_location
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void replace_location(
   exprt &dest,
   const source_locationt &new_location)
@@ -405,18 +348,6 @@ void replace_location(
   if(dest.find(ID_C_source_location).is_not_nil())
     replace_location(dest.add_source_location(), new_location);
 }
-
-/*******************************************************************\
-
-Function: goto_inlinet::insert_function_body
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::insert_function_body(
   const goto_functiont &goto_function,
@@ -519,18 +450,6 @@ void goto_inlinet::insert_function_body(
   dest.destructive_insert(target, tmp);
 }
 
-/*******************************************************************\
-
-Function: goto_inlinet::insert_function_nobody
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_inlinet::insert_function_nobody(
   goto_programt &dest,
   const exprt &lhs,
@@ -583,18 +502,6 @@ void goto_inlinet::insert_function_nobody(
 
   dest.destructive_insert(target, tmp);
 }
-
-/*******************************************************************\
-
-Function: goto_inlinet::expand_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::expand_function_call(
   goto_programt &dest,
@@ -721,18 +628,6 @@ void goto_inlinet::expand_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_inlinet::get_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_inlinet::get_call(
   goto_programt::const_targett it,
   exprt &lhs,
@@ -762,34 +657,10 @@ void goto_inlinet::get_call(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_inlinet::is_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_inlinet::is_call(goto_programt::const_targett it)
 {
   return it->is_function_call() || is_bp_call(it);
 }
-
-/*******************************************************************\
-
-Function: goto_inlinet::is_bp_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_inlinet::is_bp_call(goto_programt::const_targett it)
 {
@@ -801,18 +672,6 @@ bool goto_inlinet::is_bp_call(goto_programt::const_targett it)
     it->code.op0().operands().size()==2 &&
     it->code.op0().op1().get(ID_statement)==ID_function_call;
 }
-
-/*******************************************************************\
-
-Function: goto_inline
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::goto_inline(
   const inline_mapt &inline_map,
@@ -833,18 +692,6 @@ void goto_inlinet::goto_inline(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_inline
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_inlinet::goto_inline(
   const irep_idt identifier,
   goto_functiont &goto_function,
@@ -859,18 +706,6 @@ void goto_inlinet::goto_inline(
     inline_map,
     force_full);
 }
-
-/*******************************************************************\
-
-Function: goto_inline
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::goto_inline_nontransitive(
   const irep_idt identifier,
@@ -925,18 +760,6 @@ void goto_inlinet::goto_inline_nontransitive(
 
   finished_set.insert(identifier);
 }
-
-/*******************************************************************\
-
-Function: goto_inline_transitive
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
   const irep_idt identifier,
@@ -999,18 +822,6 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
   return cached;
 }
 
-/*******************************************************************\
-
-Function: is_ignored
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_inlinet::is_ignored(const irep_idt id) const
 {
   return
@@ -1021,18 +832,6 @@ bool goto_inlinet::is_ignored(const irep_idt id) const
     id=="__CPROVER_clear_may" ||
     id=="__CPROVER_cover";
 }
-
-/*******************************************************************\
-
-Function: check_inline_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_inlinet::check_inline_map(
   const irep_idt identifier,
@@ -1080,18 +879,6 @@ bool goto_inlinet::check_inline_map(
   return true;
 }
 
-/*******************************************************************\
-
-Function: check_inline_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_inlinet::check_inline_map(const inline_mapt &inline_map) const
 {
   forall_goto_functions(f_it, goto_functions)
@@ -1102,18 +889,6 @@ bool goto_inlinet::check_inline_map(const inline_mapt &inline_map) const
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: output_inline_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::output_inline_map(
   std::ostream &out,
@@ -1161,18 +936,6 @@ void goto_inlinet::output_inline_map(
   }
 }
 
-/*******************************************************************\
-
-Function: output_cache
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_inlinet::output_cache(std::ostream &out) const
 {
   for(auto it=cache.begin(); it!=cache.end(); it++)
@@ -1184,18 +947,6 @@ void goto_inlinet::output_cache(std::ostream &out) const
   }
 }
 
-/*******************************************************************\
-
-Function: cleanup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 // remove segment that refer to the given goto program
 void goto_inlinet::goto_inline_logt::cleanup(
   const goto_programt &goto_program)
@@ -1203,18 +954,6 @@ void goto_inlinet::goto_inline_logt::cleanup(
   forall_goto_program_instructions(it, goto_program)
     log_map.erase(it);
 }
-
-/*******************************************************************\
-
-Function: cleanup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::goto_inline_logt::cleanup(
   const goto_functionst::function_mapt &function_map)
@@ -1230,18 +969,6 @@ void goto_inlinet::goto_inline_logt::cleanup(
     cleanup(goto_function.body);
   }
 }
-
-/*******************************************************************\
-
-Function: add_segment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::goto_inline_logt::add_segment(
   const goto_programt &goto_program,
@@ -1269,18 +996,6 @@ void goto_inlinet::goto_inline_logt::add_segment(
 
   log_map[start]=info;
 }
-
-/*******************************************************************\
-
-Function: copy_from
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inlinet::goto_inline_logt::copy_from(
   const goto_programt &from,
@@ -1320,18 +1035,6 @@ void goto_inlinet::goto_inline_logt::copy_from(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: output_inline_log_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // call after goto_functions.update()!
 jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const

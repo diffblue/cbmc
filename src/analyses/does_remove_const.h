@@ -5,6 +5,9 @@
  Author: DiffBlue Limited. All rights reserved.
 
 \*******************************************************************/
+/// \file
+/// Analyses
+
 #ifndef CPROVER_ANALYSES_DOES_REMOVE_CONST_H
 #define CPROVER_ANALYSES_DOES_REMOVE_CONST_H
 

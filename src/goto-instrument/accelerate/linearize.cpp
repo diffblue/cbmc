@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include "linearize.h"
 
 #include <goto-symex/symex_target_equation.h>

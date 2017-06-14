@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "message.h"
-
-/*******************************************************************\
-
-Function: message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void message_handlert::print(
   unsigned level,
@@ -65,18 +54,6 @@ void message_handlert::print(
   print(level, dest);
 }
 
-/*******************************************************************\
-
-Function: message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void message_handlert::print(
   unsigned level,
   const std::string &message)
@@ -85,18 +62,6 @@ void message_handlert::print(
     message_count.resize(level+1, 0);
   ++message_count[level];
 }
-
-/*******************************************************************\
-
-Function: messaget::~messaget
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 messaget::~messaget()
 {

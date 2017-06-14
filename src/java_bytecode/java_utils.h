@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <util/type.h>
 
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

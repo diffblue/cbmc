@@ -6,55 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
 
 #include "qbf_quantor.h"
 
-/*******************************************************************\
-
-Function: qbf_quantort::qbf_quantort
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_quantort::qbf_quantort()
 {
 }
 
-/*******************************************************************\
-
-Function: qbf_quantort::~qbf_quantort
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_quantort::~qbf_quantort()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_quantort::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt qbf_quantort::l_get(literalt a) const
 {
@@ -62,34 +27,10 @@ tvt qbf_quantort::l_get(literalt a) const
   return tvt::unknown();
 }
 
-/*******************************************************************\
-
-Function: qbf_quantort::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string qbf_quantort::solver_text()
 {
   return "Quantor";
 }
-
-/*******************************************************************\
-
-Function: qbf_quantort::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt qbf_quantort::prop_solve()
 {

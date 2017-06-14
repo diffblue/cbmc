@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <util/c_types.h>
 #include <ansi-c/string_constant.h>
 
 #include "thread_instrumentation.h"
-
-/*******************************************************************\
-
-Function: has_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static bool has_start_thread(const goto_programt &goto_program)
 {
@@ -31,18 +20,6 @@ static bool has_start_thread(const goto_programt &goto_program)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: thread_exit_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void thread_exit_instrumentation(goto_programt &goto_program)
 {
@@ -77,18 +54,6 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   end->function=function;
 }
 
-/*******************************************************************\
-
-Function: thread_exit_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void thread_exit_instrumentation(goto_functionst &goto_functions)
 {
   // we'll look for START THREAD
@@ -117,18 +82,6 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
     thread_exit_instrumentation(goto_functions.function_map[fkt].body);
   }
 }
-
-/*******************************************************************\
-
-Function: mutex_init_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void mutex_init_instrumentation(
   const symbol_tablet &symbol_table,
@@ -165,18 +118,6 @@ void mutex_init_instrumentation(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: mutex_init_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void mutex_init_instrumentation(
   const symbol_tablet &symbol_table,

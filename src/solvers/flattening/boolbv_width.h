@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_WIDTH_H
 

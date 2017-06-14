@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// GOTO Programs
+
 #include <algorithm>
 
 #include <util/simplify_expr.h>
@@ -142,18 +145,6 @@ protected:
   allocationst allocations;
 };
 
-/*******************************************************************\
-
-Function: goto_checkt::collect_allocations
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::collect_allocations(
   const goto_functionst &goto_functions)
 {
@@ -185,18 +176,6 @@ void goto_checkt::collect_allocations(
       allocations.push_back({args[0], args[1]});
     }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::invalidate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::invalidate(const exprt &lhs)
 {
@@ -232,18 +211,6 @@ void goto_checkt::invalidate(const exprt &lhs)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::div_by_zero_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::div_by_zero_check(
   const div_exprt &expr,
   const guardt &guard)
@@ -269,18 +236,6 @@ void goto_checkt::div_by_zero_check(
     expr,
     guard);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::undefined_shift_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::undefined_shift_check(
   const shift_exprt &expr,
@@ -333,18 +288,6 @@ void goto_checkt::undefined_shift_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::mod_by_zero_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::mod_by_zero_check(
   const mod_exprt &expr,
   const guardt &guard)
@@ -370,18 +313,6 @@ void goto_checkt::mod_by_zero_check(
     expr,
     guard);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::conversion_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::conversion_check(
   const exprt &expr,
@@ -562,18 +493,6 @@ void goto_checkt::conversion_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::integer_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
@@ -694,18 +613,6 @@ void goto_checkt::integer_overflow_check(
       guard);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::float_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::float_overflow_check(
   const exprt &expr,
@@ -829,18 +736,6 @@ void goto_checkt::float_overflow_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::nan_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::nan_check(
   const exprt &expr,
   const guardt &guard)
@@ -950,18 +845,6 @@ void goto_checkt::nan_check(
     guard);
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::pointer_rel_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::pointer_rel_check(
   const exprt &expr,
   const guardt &guard)
@@ -992,18 +875,6 @@ void goto_checkt::pointer_rel_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::pointer_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::pointer_overflow_check(
   const exprt &expr,
   const guardt &guard)
@@ -1029,18 +900,6 @@ void goto_checkt::pointer_overflow_check(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::pointer_validity_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
@@ -1213,34 +1072,10 @@ void goto_checkt::pointer_validity_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::array_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string goto_checkt::array_name(const exprt &expr)
 {
   return ::array_name(ns, expr);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::bounds_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::bounds_check(
   const index_exprt &expr,
@@ -1397,18 +1232,6 @@ void goto_checkt::bounds_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::add_guarded_claim
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::add_guarded_claim(
   const exprt &_expr,
   const std::string &comment,
@@ -1455,18 +1278,6 @@ void goto_checkt::add_guarded_claim(
     t->source_location.set_property_class(property_class);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::check_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::check_rec(
   const exprt &expr,
@@ -1648,35 +1459,11 @@ void goto_checkt::check_rec(
       mode);
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::check(const exprt &expr, const irep_idt &mode)
 {
   guardt guard;
   check_rec(expr, guard, false, mode);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::goto_check(
   goto_functiont &goto_function,
@@ -1935,18 +1722,6 @@ void goto_checkt::goto_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_check(
   const namespacet &ns,
   const optionst &options,
@@ -1955,18 +1730,6 @@ void goto_check(
   goto_checkt goto_check(ns, options);
   goto_check.goto_check(goto_function, irep_idt());
 }
-
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_check(
   const namespacet &ns,
@@ -1983,18 +1746,6 @@ void goto_check(
     goto_check.goto_check(it->second, mode);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_check(
   const optionst &options,

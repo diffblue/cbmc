@@ -8,6 +8,9 @@ Date:   April 2017
 
 \*******************************************************************/
 
+/// \file
+/// Perform Memory-mapped I/O instrumentation
+
 #ifndef CPROVER_GOTO_PROGRAMS_MM_IO_H
 #define CPROVER_GOTO_PROGRAMS_MM_IO_H
 

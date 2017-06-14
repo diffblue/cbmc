@@ -8,6 +8,9 @@ Date:   December 2016
 
 \*******************************************************************/
 
+/// \file
+/// Remove initializations of unused global variables
+
 #include <unordered_set>
 
 #include <analyses/call_graph.h>
@@ -21,18 +24,6 @@ Date:   December 2016
 #include <goto-programs/remove_skip.h>
 
 #include "slice_global_inits.h"
-
-/*******************************************************************\
-
-Function: slice_global_inits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void slice_global_inits(
   const namespacet &ns,

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+
 #include <list>
 #include <memory>
 #include <set>
@@ -28,18 +29,6 @@ struct language_entryt
 typedef std::list<language_entryt> languagest;
 languagest languages;
 
-/*******************************************************************\
-
-Function: register_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
@@ -48,18 +37,6 @@ void register_language(language_factoryt factory)
   languages.back().extensions=l->extensions();
   languages.back().mode=l->id();
 }
-
-/*******************************************************************\
-
-Function: get_language_from_mode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 languaget *get_language_from_mode(const irep_idt &mode)
 {
@@ -71,18 +48,6 @@ languaget *get_language_from_mode(const irep_idt &mode)
 
   return NULL;
 }
-
-/*******************************************************************\
-
-Function: get_language_from_filename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 languaget *get_language_from_filename(const std::string &filename)
 {
@@ -117,18 +82,6 @@ languaget *get_language_from_filename(const std::string &filename)
 
   return NULL;
 }
-
-/*******************************************************************\
-
-Function: get_default_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 languaget *get_default_language()
 {

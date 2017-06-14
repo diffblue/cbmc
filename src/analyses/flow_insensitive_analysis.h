@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Flow Insensitive Static Analysis
+
 #ifndef CPROVER_ANALYSES_FLOW_INSENSITIVE_ANALYSIS_H
 #define CPROVER_ANALYSES_FLOW_INSENSITIVE_ANALYSIS_H
 

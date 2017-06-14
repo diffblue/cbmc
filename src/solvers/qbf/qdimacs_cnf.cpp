@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 #include <cassert>
 
 #include "qdimacs_cnf.h"
-
-/*******************************************************************\
-
-Function: qdimacs_cnft::write_qdimacs_cnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void qdimacs_cnft::write_qdimacs_cnf(std::ostream &out)
 {
@@ -29,18 +18,6 @@ void qdimacs_cnft::write_qdimacs_cnf(std::ostream &out)
   write_prefix(out);
   write_clauses(out);
 }
-
-/*******************************************************************\
-
-Function: qdimacs_cnft::write_prefix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void qdimacs_cnft::write_prefix(std::ostream &out) const
 {
@@ -85,34 +62,10 @@ void qdimacs_cnft::write_prefix(std::ostream &out) const
       out << "e " << i << " 0\n";
 }
 
-/*******************************************************************\
-
-Function: qdimacs_cnft::operator==
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool qdimacs_cnft::operator==(const qdimacs_cnft &other) const
 {
   return quantifiers==other.quantifiers && clauses==other.clauses;
 }
-
-/*******************************************************************\
-
-Function: qdimacs_cnft::set_quantifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void qdimacs_cnft::set_quantifier(
   const quantifiert::typet type,
@@ -131,18 +84,6 @@ void qdimacs_cnft::set_quantifier(
   add_quantifier(type, l);
 }
 
-/*******************************************************************\
-
-Function: qdimacs_cnft::copy_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void qdimacs_cnft::copy_to(qdimacs_cnft &cnf) const
 {
   cnf.set_no_variables(_no_variables);
@@ -160,18 +101,6 @@ void qdimacs_cnft::copy_to(qdimacs_cnft &cnf) const
     cnf.lcnf(*it);
 }
 
-/*******************************************************************\
-
-Function: qdimacs_cnft::hash
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 size_t qdimacs_cnft::hash() const
 {
   size_t result=0;
@@ -184,18 +113,6 @@ size_t qdimacs_cnft::hash() const
   return result^cnf_clause_listt::hash();
 }
 
-/*******************************************************************\
-
-Function: qdimacs_cnft::is_quantified
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool qdimacs_cnft::is_quantified(const literalt l) const
 {
   for(quantifierst::const_iterator it=quantifiers.begin();
@@ -206,18 +123,6 @@ bool qdimacs_cnft::is_quantified(const literalt l) const
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: qdimacs_cnft::find_quantifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool qdimacs_cnft::find_quantifier(const literalt l, quantifiert &q) const
 {

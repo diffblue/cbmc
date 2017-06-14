@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Path-based Symbolic Execution
+
 #include <util/simplify_expr.h>
 #include <util/time_stopping.h>
 
@@ -16,18 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/build_goto_trace.h>
 
 #include "path_search.h"
-
-/*******************************************************************\
-
-Function: path_searcht::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 path_searcht::resultt path_searcht::operator()(
   const goto_functionst &goto_functions)
@@ -159,18 +150,6 @@ path_searcht::resultt path_searcht::operator()(
   return number_of_failed_properties==0?resultt::SAFE:resultt::UNSAFE;
 }
 
-/*******************************************************************\
-
-Function: path_searcht::report_statistics
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_searcht::report_statistics()
 {
   std::size_t number_of_visited_locations=0;
@@ -208,18 +187,6 @@ void path_searcht::report_statistics()
            << sat_time << "s SAT" << messaget::eom;
 }
 
-/*******************************************************************\
-
-Function: path_searcht::pick_state
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_searcht::pick_state()
 {
   switch(search_heuristic)
@@ -239,18 +206,6 @@ void path_searcht::pick_state()
     return;
   }
 }
-
-/*******************************************************************\
-
-Function: path_searcht::do_show_vcc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_searcht::do_show_vcc(statet &state)
 {
@@ -304,18 +259,7 @@ void path_searcht::do_show_vcc(statet &state)
   out << eom;
 }
 
-/*******************************************************************\
-
-Function: path_searcht::drop_state
-
-  Inputs:
-
- Outputs:
-
- Purpose: decide whether to drop a state
-
-\*******************************************************************/
-
+/// decide whether to drop a state
 bool path_searcht::drop_state(const statet &state)
 {
   goto_programt::const_targett pc=state.get_instruction();
@@ -367,18 +311,6 @@ bool path_searcht::drop_state(const statet &state)
   return false;
 }
 
-/*******************************************************************\
-
-Function: path_searcht::check_assertion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_searcht::check_assertion(statet &state)
 {
   // keep statistics
@@ -426,18 +358,6 @@ void path_searcht::check_assertion(statet &state)
   sat_time+=current_time()-sat_start_time;
 }
 
-/*******************************************************************\
-
-Function: path_searcht::is_feasible
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool path_searcht::is_feasible(statet &state)
 {
   status() << "Feasibility check" << eom;
@@ -457,18 +377,6 @@ bool path_searcht::is_feasible(statet &state)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: path_searcht::initialize_property_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_searcht::initialize_property_map(
   const goto_functionst &goto_functions)

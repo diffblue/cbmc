@@ -6,6 +6,9 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 \*******************************************************************/
 
+/// \file
+/// Compute dominators for CFG of goto_function
+
 #ifndef CPROVER_ANALYSES_CFG_DOMINATORS_H
 #define CPROVER_ANALYSES_CFG_DOMINATORS_H
 
@@ -44,18 +47,7 @@ protected:
   void fixedpoint(P &program);
 };
 
-/*******************************************************************\
-
-Function: operator <<
-
-  Inputs:
-
- Outputs:
-
- Purpose: Print the result of the dominator computation
-
-\*******************************************************************/
-
+/// Print the result of the dominator computation
 template <class P, class T, bool post_dom>
 std::ostream &operator << (
   std::ostream &out,
@@ -65,18 +57,7 @@ std::ostream &operator << (
   return out;
 }
 
-/*******************************************************************\
-
-Function: operator ()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Compute dominators
-
-\*******************************************************************/
-
+/// Compute dominators
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::operator()(P &program)
 {
@@ -84,36 +65,14 @@ void cfg_dominators_templatet<P, T, post_dom>::operator()(P &program)
   fixedpoint(program);
 }
 
-/*******************************************************************\
-
-Function: cfg_dominators_templatet::initialise
-
-  Inputs:
-
- Outputs:
-
- Purpose: Initialises the elements of the fixed point analysis
-
-\*******************************************************************/
-
+/// Initialises the elements of the fixed point analysis
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::initialise(P &program)
 {
   cfg(program);
 }
 
-/*******************************************************************\
-
-Function: cfg_dominators_templatet::fixedpoint
-
-  Inputs:
-
- Outputs:
-
- Purpose: Computes the MOP for the dominator analysis
-
-\*******************************************************************/
-
+/// Computes the MOP for the dominator analysis
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
 {
@@ -205,19 +164,9 @@ void cfg_dominators_templatet<P, T, post_dom>::fixedpoint(P &program)
   }
 }
 
-/*******************************************************************\
-
-Function: dominators_pretty_print_node
-
-  Inputs: `node` to print and stream `out` to pretty-print it to
-
- Outputs:
-
- Purpose: Pretty-print a single node in the dominator tree.
-          Supply a specialisation if operator<< is not sufficient.
-
-\*******************************************************************/
-
+/// Pretty-print a single node in the dominator tree. Supply a specialisation if
+/// operator<< is not sufficient.
+/// \par parameters: `node` to print and stream `out` to pretty-print it to
 template <class T>
 void dominators_pretty_print_node(const T &node, std::ostream &out)
 {
@@ -231,18 +180,7 @@ inline void dominators_pretty_print_node(
   out << target->code.pretty();
 }
 
-/*******************************************************************\
-
-Function: cfg_dominators_templatet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose: Print the result of the dominator computation
-
-\*******************************************************************/
-
+/// Print the result of the dominator computation
 template <class P, class T, bool post_dom>
 void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
 {

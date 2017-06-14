@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Set the properties to check
+
 #ifndef CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 #define CPROVER_GOTO_PROGRAMS_SET_PROPERTIES_H
 

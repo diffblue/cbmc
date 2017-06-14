@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <string>
 
 #include <util/symbol_table.h>
@@ -28,18 +29,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr2java.h"
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::get_language_options
-
-  Inputs: Command-line options
-
- Outputs: None
-
- Purpose: Consume options that are java bytecode specific.
-
-\*******************************************************************/
-
+/// Consume options that are java bytecode specific.
+/// \param Command:line options
+/// \return None
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
@@ -87,52 +79,17 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     java_cp_include_files=".*";
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::extensions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<std::string> java_bytecode_languaget::extensions() const
 {
   return { "class", "jar" };
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::modules_provided
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
 {
   // modules.insert(translation_unit(parse_path));
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose: ANSI-C preprocessing
-
-\*******************************************************************/
-
+/// ANSI-C preprocessing
 bool java_bytecode_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
@@ -141,18 +98,6 @@ bool java_bytecode_languaget::preprocess(
   // there is no preprocessing!
   return true;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_languaget::parse(
   std::istream &instream,
@@ -208,27 +153,18 @@ bool java_bytecode_languaget::parse(
   return false;
 }
 
-/*******************************************************************\
-
-Function: get_virtual_method_target
-
-  Inputs: `needed_classes`: set of classes that can be instantiated.
-            Any potential callee not in this set will be ignored.
-          `call_basename`: unqualified function name with type
-            signature (e.g. "f:(I)")
-          `classname`: class name that may define or override a
-            function named `call_basename`.
-          `symbol_table`: global symtab
-
- Outputs: Returns the fully qualified name of `classname`'s definition
-          of `call_basename` if found and `classname` is present in
-          `needed_classes`, or irep_idt() otherwise.
-
- Purpose: Find a virtual callee, if one is defined and the callee type
-          is known to exist.
-
-\*******************************************************************/
-
+/// Find a virtual callee, if one is defined and the callee type is known to
+/// exist.
+/// \par parameters: `needed_classes`: set of classes that can be instantiated.
+///   Any potential callee not in this set will be ignored.
+/// `call_basename`: unqualified function name with type signature (e.g.
+///   "f:(I)")
+/// `classname`: class name that may define or override a function named
+///   `call_basename`.
+/// `symbol_table`: global symtab
+/// \return Returns the fully qualified name of `classname`'s definition of
+///   `call_basename` if found and `classname` is present in `needed_classes`,
+///   or irep_idt() otherwise.
 static irep_idt get_virtual_method_target(
   const std::set<irep_idt> &needed_classes,
   const irep_idt &call_basename,
@@ -245,27 +181,17 @@ static irep_idt get_virtual_method_target(
     return irep_idt();
 }
 
-/*******************************************************************\
-
-Function: get_virtual_method_target
-
-  Inputs: `c`: function call whose potential target functions should
-            be determined.
-          `needed_classes`: set of classes that can be instantiated.
-            Any potential callee not in this set will be ignored.
-          `symbol_table`: global symtab
-          `class_hierarchy`: global class hierarchy
-
- Outputs: Populates `needed_methods` with all possible `c` callees,
-          taking `needed_classes` into account (virtual function
-          overrides defined on classes that are not 'needed' are
-          ignored)
-
- Purpose: Find possible callees, excluding types that are not known
-          to be instantiated.
-
-\*******************************************************************/
-
+/// Find possible callees, excluding types that are not known to be
+/// instantiated.
+/// \par parameters: `c`: function call whose potential target functions should
+///   be determined.
+/// `needed_classes`: set of classes that can be instantiated. Any potential
+///   callee not in this set will be ignored.
+/// `symbol_table`: global symtab
+/// `class_hierarchy`: global class hierarchy
+/// \return Populates `needed_methods` with all possible `c` callees, taking
+///   `needed_classes` into account (virtual function overrides defined on
+///   classes that are not 'needed' are ignored)
 static void get_virtual_method_targets(
   const code_function_callt &c,
   const std::set<irep_idt> &needed_classes,
@@ -340,19 +266,10 @@ static void get_virtual_method_targets(
   }
 }
 
-/*******************************************************************\
-
-Function: gather_virtual_callsites
-
-  Inputs: `e`: expression tree to search
-
- Outputs: Populates `result` with pointers to each function call
-            within e that calls a virtual function.
-
- Purpose: See output
-
-\*******************************************************************/
-
+/// See output
+/// \par parameters: `e`: expression tree to search
+/// \return Populates `result` with pointers to each function call within e that
+///   calls a virtual function.
 static void gather_virtual_callsites(
   const exprt &e,
   std::vector<const code_function_callt *> &result)
@@ -368,20 +285,11 @@ static void gather_virtual_callsites(
       gather_virtual_callsites(*it, result);
 }
 
-/*******************************************************************\
-
-Function: gather_needed_globals
-
-  Inputs: `e`: expression tree to search
-          `symbol_table`: global symtab
-
- Outputs: Populates `needed` with global variable symbols referenced
-          from `e` or its children.
-
- Purpose: See output
-
-\*******************************************************************/
-
+/// See output
+/// \par parameters: `e`: expression tree to search
+/// `symbol_table`: global symtab
+/// \return Populates `needed` with global variable symbols referenced from `e`
+///   or its children.
 static void gather_needed_globals(
   const exprt &e,
   const symbol_tablet &symbol_table,
@@ -405,22 +313,13 @@ static void gather_needed_globals(
       gather_needed_globals(*opit, symbol_table, needed);
 }
 
-/*******************************************************************\
-
-Function: gather_field_types
-
-  Inputs: `class_type`: root of class tree to search
-          `ns`: global namespace
-
- Outputs: Populates `lazy_methods` with all Java reference types
-            reachable starting at `class_type`. For example if
-            `class_type` is `symbol_typet("java::A")` and A has a B
-            field, then `B` (but not `A`) will noted as a needed class.
-
- Purpose: See output
-
-\*******************************************************************/
-
+/// See output
+/// \par parameters: `class_type`: root of class tree to search
+/// `ns`: global namespace
+/// \return Populates `lazy_methods` with all Java reference types reachable
+///   starting at `class_type`. For example if `class_type` is
+///   `symbol_typet("java::A")` and A has a B field, then `B` (but not `A`) will
+///   noted as a needed class.
 static void gather_field_types(
   const typet &class_type,
   const namespacet &ns,
@@ -444,23 +343,14 @@ static void gather_field_types(
   }
 }
 
-/*******************************************************************\
-
-Function: initialize_needed_classes
-
-  Inputs: `entry_points`: list of fully-qualified function names that
-            we should assume are reachable
-          `ns`: global namespace
-          `ch`: global class hierarchy
-
- Outputs: Populates `lazy_methods` with all Java reference types
-            whose references may be passed, directly or indirectly,
-            to any of the functions in `entry_points`.
-
- Purpose: See output
-
-\*******************************************************************/
-
+/// See output
+/// \par parameters: `entry_points`: list of fully-qualified function names that
+///   we should assume are reachable
+/// `ns`: global namespace
+/// `ch`: global class hierarchy
+/// \return Populates `lazy_methods` with all Java reference types whose
+///   references may be passed, directly or indirectly, to any of the functions
+///   in `entry_points`.
 static void initialize_needed_classes(
   const std::vector<irep_idt> &entry_points,
   const namespacet &ns,
@@ -494,18 +384,6 @@ static void initialize_needed_classes(
   lazy_methods.add_needed_class("java::java.lang.Class");
   lazy_methods.add_needed_class("java::java.lang.Object");
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
@@ -568,32 +446,19 @@ bool java_bytecode_languaget::typecheck(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::do_ci_lazy_method_conversion
-
-  Inputs: `symbol_table`: global symbol table
-          `lazy_methods`: map from method names to relevant symbol
-                          and parsed-method objects.
-
- Outputs: Elaborates lazily-converted methods that may be reachable
-          starting from the main entry point (usually provided with
-          the --function command-line option) (side-effect on the
-          symbol_table). Returns false on success.
-
- Purpose: Uses a simple context-insensitive ('ci') analysis to
-          determine which methods may be reachable from the main
-          entry point. In brief, static methods are reachable if we
-          find a callsite in another reachable site, while virtual
-          methods are reachable if we find a virtual callsite
-          targeting a compatible type *and* a constructor callsite
-          indicating an object of that type may be instantiated (or
-          evidence that an object of that type exists before the
-          main function is entered, such as being passed as a
-          parameter).
-
-\*******************************************************************/
-
+/// Uses a simple context-insensitive ('ci') analysis to determine which methods
+/// may be reachable from the main entry point. In brief, static methods are
+/// reachable if we find a callsite in another reachable site, while virtual
+/// methods are reachable if we find a virtual callsite targeting a compatible
+/// type *and* a constructor callsite indicating an object of that type may be
+/// instantiated (or evidence that an object of that type exists before the main
+/// function is entered, such as being passed as a parameter).
+/// \par parameters: `symbol_table`: global symbol table
+/// `lazy_methods`: map from method names to relevant symbol and parsed-method
+///   objects.
+/// \return Elaborates lazily-converted methods that may be reachable starting
+///   from the main entry point (usually provided with the --function command-
+///   line option) (side-effect on the symbol_table). Returns false on success.
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
   lazy_methodst &lazy_methods)
@@ -740,22 +605,11 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::lazy_methods_provided
-
-  Inputs: None
-
- Outputs: Populates `methods` with the complete list of lazy methods
-          that are available to convert (those which are valid
-          parameters for `convert_lazy_method`)
-
- Purpose: Provide feedback to `language_filest` so that when asked
-          for a lazy method, it can delegate to this instance of
-          java_bytecode_languaget.
-
-\*******************************************************************/
-
+/// Provide feedback to `language_filest` so that when asked for a lazy method,
+/// it can delegate to this instance of java_bytecode_languaget.
+/// \return Populates `methods` with the complete list of lazy methods that are
+///   available to convert (those which are valid parameters for
+///   `convert_lazy_method`)
 void java_bytecode_languaget::lazy_methods_provided(
   std::set<irep_idt> &methods) const
 {
@@ -763,26 +617,15 @@ void java_bytecode_languaget::lazy_methods_provided(
     methods.insert(kv.first);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::convert_lazy_method
-
-  Inputs: `id`: method ID to convert
-          `symtab`: global symbol table
-
- Outputs: Amends the symbol table entry for function `id`, which
-          should be a lazy method provided by this instance of
-          `java_bytecode_languaget`. It should initially have a nil
-          value. After this method completes, it will have a value
-          representing the method body, identical to that produced
-          using eager method conversion.
-
- Purpose: Promote a lazy-converted method (one whose type is known
-          but whose body hasn't been converted) into a fully-
-          elaborated one.
-
-\*******************************************************************/
-
+/// Promote a lazy-converted method (one whose type is known but whose body
+/// hasn't been converted) into a fully- elaborated one.
+/// \par parameters: `id`: method ID to convert
+/// `symtab`: global symbol table
+/// \return Amends the symbol table entry for function `id`, which should be a
+///   lazy method provided by this instance of `java_bytecode_languaget`. It
+///   should initially have a nil value. After this method completes, it will
+///   have a value representing the method body, identical to that produced
+///   using eager method conversion.
 void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &id,
   symbol_tablet &symtab)
@@ -797,18 +640,9 @@ void java_bytecode_languaget::convert_lazy_method(
     string_preprocess);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::replace_string_methods
-
-  Inputs:
-    context - a symbol table
-
- Purpose: Replace methods of the String library that are in the symbol table
-          by code generated by string_preprocess.
-
-\*******************************************************************/
-
+/// Replace methods of the String library that are in the symbol table by code
+/// generated by string_preprocess.
+/// \param context: a symbol table
 void java_bytecode_languaget::replace_string_methods(
   symbol_tablet &context)
 {
@@ -833,18 +667,6 @@ void java_bytecode_languaget::replace_string_methods(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 {
@@ -872,51 +694,15 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
       max_nondet_array_length));
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::show_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_languaget::show_parse(std::ostream &out)
 {
   java_class_loader(main_class).output(out);
 }
 
-/*******************************************************************\
-
-Function: new_java_bytecode_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 languaget *new_java_bytecode_language()
 {
   return new java_bytecode_languaget;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_languaget::from_expr(
   const exprt &expr,
@@ -927,18 +713,6 @@ bool java_bytecode_languaget::from_expr(
   return false;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_languaget::from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool java_bytecode_languaget::from_type(
   const typet &type,
   std::string &code,
@@ -947,18 +721,6 @@ bool java_bytecode_languaget::from_type(
   code=type2java(type, ns);
   return false;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_languaget::to_expr(
   const std::string &code,
@@ -1006,18 +768,6 @@ bool java_bytecode_languaget::to_expr(
 
   return true; // fail for now
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_languaget::~java_bytecode_languaget
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 java_bytecode_languaget::~java_bytecode_languaget()
 {

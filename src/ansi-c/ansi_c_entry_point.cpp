@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <cstdlib>
 
@@ -25,18 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_entry_point.h"
 #include "c_nondet_symbol_factory.h"
-
-/*******************************************************************\
-
-Function: build_function_environment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
@@ -67,18 +56,6 @@ exprt::operandst build_function_environment(
 
   return main_arguments;
 }
-
-/*******************************************************************\
-
-Function: record_function_outputs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void record_function_outputs(
   const symbolt &function,
@@ -140,18 +117,6 @@ void record_function_outputs(
   }
   #endif
 }
-
-/*******************************************************************\
-
-Function: ansi_c_entry_point
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,

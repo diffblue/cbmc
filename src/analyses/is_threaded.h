@@ -8,6 +8,9 @@ Date: October 2012
 
 \*******************************************************************/
 
+/// \file
+/// Over-approximate Concurrency for Threaded Goto Programs
+
 #ifndef CPROVER_ANALYSES_IS_THREADED_H
 #define CPROVER_ANALYSES_IS_THREADED_H
 

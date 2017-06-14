@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cstdlib>
 
 #if defined(__linux__) || \
@@ -26,18 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt1_dec.h"
 
-/*******************************************************************\
-
-Function: smt1_dect::decision_procedure_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string smt1_dect::decision_procedure_text() const
 {
   return "SMT1 "+logic+" using "+
@@ -52,18 +41,6 @@ std::string smt1_dect::decision_procedure_text() const
      "(unknown)");
 }
 
-/*******************************************************************\
-
-Function: smt1_temp_filet::smt1_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 smt1_temp_filet::smt1_temp_filet()
 {
   temp_out_filename=get_temporary_file("smt1_dec_out_", "");
@@ -72,18 +49,6 @@ smt1_temp_filet::smt1_temp_filet()
     temp_out_filename.c_str(),
     std::ios_base::out | std::ios_base::trunc);
 }
-
-/*******************************************************************\
-
-Function: smt1_temp_filet::~smt1_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 smt1_temp_filet::~smt1_temp_filet()
 {
@@ -95,18 +60,6 @@ smt1_temp_filet::~smt1_temp_filet()
   if(temp_result_filename!="")
     unlink(temp_result_filename.c_str());
 }
-
-/*******************************************************************\
-
-Function: smt1_dect::dec_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt1_dect::dec_solve()
 {
@@ -226,18 +179,7 @@ decision_proceduret::resultt smt1_dect::dec_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: smt1_dect::read_result_boolector
-
-  Inputs:
-
- Outputs:
-
- Purpose: read model produced by Boolector
-
-\*******************************************************************/
-
+/// read model produced by Boolector
 decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
 {
   std::string line;
@@ -321,34 +263,10 @@ decision_proceduret::resultt smt1_dect::read_result_boolector(std::istream &in)
   return resultt::D_ERROR;
 }
 
-/*******************************************************************\
-
-Function: smt1_dect::read_result_opensmt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 decision_proceduret::resultt smt1_dect::read_result_opensmt(std::istream &in)
 {
   return resultt::D_ERROR;
 }
-
-/*******************************************************************\
-
-Function: smt1_dect::read_result_yices
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
 {
@@ -370,18 +288,6 @@ decision_proceduret::resultt smt1_dect::read_result_yices(std::istream &in)
   return resultt::D_ERROR;
 }
 
-/*******************************************************************\
-
-Function: smt1_dect::mathsat_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string smt1_dect::mathsat_value(const std::string &src)
 {
   std::size_t pos=src.find('[');
@@ -398,18 +304,6 @@ std::string smt1_dect::mathsat_value(const std::string &src)
 
   return "";
 }
-
-/*******************************************************************\
-
-Function: smt1_dect::read_result_mathsat
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
 {
@@ -481,18 +375,6 @@ decision_proceduret::resultt smt1_dect::read_result_mathsat(std::istream &in)
   return res;
 }
 
-/*******************************************************************\
-
-Function: smt1_dect::read_result_z3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
 {
   std::string line;
@@ -548,18 +430,6 @@ decision_proceduret::resultt smt1_dect::read_result_z3(std::istream &in)
 
   return res;
 }
-
-/*******************************************************************\
-
-Function: smt1_dect::string_to_expr_z3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool smt1_dect::string_to_expr_z3(
   const typet &type,
@@ -676,18 +546,6 @@ bool smt1_dect::string_to_expr_z3(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: smt1_dect::read_result_cvc3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt smt1_dect::read_result_cvc3(std::istream &in)
 {

@@ -8,6 +8,9 @@ Date: March 2013
 
 \*******************************************************************/
 
+/// \file
+/// Local variables whose address is taken
+
 #ifndef CPROVER_ANALYSES_LOCALS_H
 #define CPROVER_ANALYSES_LOCALS_H
 

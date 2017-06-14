@@ -8,6 +8,9 @@ Date: May 2016
 
 \*******************************************************************/
 
+/// \file
+/// Coverage Instrumentation
+
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
@@ -101,18 +104,6 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function: coverage_goalst::get_coverage
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool coverage_goalst::get_coverage_goals(
   const std::string &coverage_file,
   message_handlert &message_handler,
@@ -165,34 +156,10 @@ bool coverage_goalst::get_coverage_goals(
   return false;
 }
 
-/*******************************************************************\
-
-Function: coverage_goalst::add_goal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void coverage_goalst::add_goal(source_locationt goal)
 {
   existing_goals.push_back(goal);
 }
-
-/*******************************************************************\
-
-Function: coverage_goalst::is_existing_goal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool coverage_goalst::is_existing_goal(source_locationt source_location) const
 {
@@ -205,18 +172,6 @@ bool coverage_goalst::is_existing_goal(source_locationt source_location) const
   }
   return false;
 }
-
-/*******************************************************************\
-
-Function: as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const char *as_string(coverage_criteriont c)
 {
@@ -234,18 +189,6 @@ const char *as_string(coverage_criteriont c)
   }
 }
 
-/*******************************************************************\
-
-Function: is_condition
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool is_condition(const exprt &src)
 {
   if(src.type().id()!=ID_bool)
@@ -258,18 +201,6 @@ bool is_condition(const exprt &src)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: collect_conditions_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
 {
@@ -285,36 +216,12 @@ void collect_conditions_rec(const exprt &src, std::set<exprt> &dest)
     dest.insert(src);
 }
 
-/*******************************************************************\
-
-Function: collect_conditions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<exprt> collect_conditions(const exprt &src)
 {
   std::set<exprt> result;
   collect_conditions_rec(src, result);
   return result;
 }
-
-/*******************************************************************\
-
-Function: collect_conditions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::set<exprt> collect_conditions(const goto_programt::const_targett t)
 {
@@ -336,18 +243,6 @@ std::set<exprt> collect_conditions(const goto_programt::const_targett t)
   return std::set<exprt>();
 }
 
-/*******************************************************************\
-
-Function: collect_operands
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void collect_operands(const exprt &src, std::vector<exprt> &dest)
 {
   for(const exprt &op : src.operands())
@@ -359,19 +254,7 @@ void collect_operands(const exprt &src, std::vector<exprt> &dest)
   }
 }
 
-/*******************************************************************\
-
-Function: collect_mcdc_controlling_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: To recursively collect controlling exprs for
-          for mcdc coverage.
-
-\*******************************************************************/
-
+/// To recursively collect controlling exprs for for mcdc coverage.
 void collect_mcdc_controlling_rec(
   const exprt &src,
   const std::vector<exprt> &conditions,
@@ -482,18 +365,6 @@ void collect_mcdc_controlling_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: collect_mcdc_controlling
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<exprt> collect_mcdc_controlling(
   const std::set<exprt> &decisions)
 {
@@ -505,19 +376,8 @@ std::set<exprt> collect_mcdc_controlling(
   return result;
 }
 
-/*******************************************************************\
-
-Function: replacement_conjunction
-
-  Inputs:
-
- Outputs:
-
- Purpose: To replace the i-th expr of ''operands'' with each
-          expr inside ''replacement_exprs''.
-
-\*******************************************************************/
-
+/// To replace the i-th expr of ''operands'' with each expr inside
+/// ''replacement_exprs''.
 std::set<exprt> replacement_conjunction(
   const std::set<exprt> &replacement_exprs,
   const std::vector<exprt> &operands,
@@ -538,20 +398,8 @@ std::set<exprt> replacement_conjunction(
   return result;
 }
 
-/*******************************************************************\
-
-Function: collect_mcdc_controlling_nested
-
-  Inputs:
-
- Outputs:
-
- Purpose: This nested method iteratively applies
-          ''collect_mcdc_controlling'' to every non-atomic expr
-          within a decision
-
-\*******************************************************************/
-
+/// This nested method iteratively applies ''collect_mcdc_controlling'' to every
+/// non-atomic expr within a decision
 std::set<exprt> collect_mcdc_controlling_nested(
   const std::set<exprt> &decisions)
 {
@@ -645,20 +493,10 @@ std::set<exprt> collect_mcdc_controlling_nested(
   return result;
 }
 
-/*******************************************************************\
-
-Function: sign_of_expr
-
-  Inputs: E should be the pre-processed output by
-          ''collect_mcdc_controlling_nested''
-
- Outputs: +1 : not negated
-          -1 : negated
-
- Purpose: The sign of expr ''e'' within the super-expr ''E''
-
-\*******************************************************************/
-
+/// The sign of expr ''e'' within the super-expr ''E''
+/// \par parameters: E should be the pre-processed output by
+/// ''collect_mcdc_controlling_nested''
+/// \return +1 : not negated -1 : negated
 std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
 {
   std::set<signed> signs;
@@ -713,21 +551,9 @@ std::set<signed> sign_of_expr(const exprt &e, const exprt &E)
   return signs;
 }
 
-/*******************************************************************\
-
-Function: remove_repetition
-
-  Inputs:
-
- Outputs:
-
- Purpose: After the ''collect_mcdc_controlling_nested'', there
-          can be the recurrence of the same expr in the resulted
-          set of exprs, and this method will remove the
-          repetitive ones.
-
-\*******************************************************************/
-
+/// After the ''collect_mcdc_controlling_nested'', there can be the recurrence
+/// of the same expr in the resulted set of exprs, and this method will remove
+/// the repetitive ones.
 void remove_repetition(std::set<exprt> &exprs)
 {
   // to obtain the set of atomic conditions
@@ -814,19 +640,7 @@ void remove_repetition(std::set<exprt> &exprs)
   exprs=new_exprs;
 }
 
-/*******************************************************************\
-
-Function: eval_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose: To evaluate the value of expr ''src'', according to
-          the atomic expr values
-
-\*******************************************************************/
-
+/// To evaluate the value of expr ''src'', according to the atomic expr values
 bool eval_expr(
   const std::map<exprt, signed> &atomic_exprs,
   const exprt &src)
@@ -873,18 +687,7 @@ bool eval_expr(
   }
 }
 
-/*******************************************************************\
-
-Function: values_of_atomic_exprs
-
-  Inputs:
-
- Outputs:
-
- Purpose: To obtain values of atomic exprs within the super expr
-
-\*******************************************************************/
-
+/// To obtain values of atomic exprs within the super expr
 std::map<exprt, signed> values_of_atomic_exprs(
   const exprt &e,
   const std::set<exprt> &conditions)
@@ -909,22 +712,10 @@ std::map<exprt, signed> values_of_atomic_exprs(
   return atomic_exprs;
 }
 
-/*******************************************************************\
-
-Function: is_mcdc_pair
-
-  Inputs:
-
- Outputs:
-
- Purpose: To check if the two input controlling exprs are mcdc
-          pairs regarding an atomic expr ''c''. A mcdc pair of
-          (e1, e2) regarding ''c'' means that ''e1'' and ''e2''
-          result in different ''decision'' values, and this is
-          caused by the different choice of ''c'' value.
-
-\*******************************************************************/
-
+/// To check if the two input controlling exprs are mcdc pairs regarding an
+/// atomic expr ''c''. A mcdc pair of (e1, e2) regarding ''c'' means that ''e1''
+/// and ''e2'' result in different ''decision'' values, and this is caused by
+/// the different choice of ''c'' value.
 bool is_mcdc_pair(
   const exprt &e1,
   const exprt &e2,
@@ -985,19 +776,8 @@ bool is_mcdc_pair(
     return false;
 }
 
-/*******************************************************************\
-
-Function: has_mcdc_pair
-
-  Inputs:
-
- Outputs:
-
- Purpose: To check if we can find the mcdc pair of the
-          input ''expr_set'' regarding the atomic expr ''c''
-
-\*******************************************************************/
-
+/// To check if we can find the mcdc pair of the input ''expr_set'' regarding
+/// the atomic expr ''c''
 bool has_mcdc_pair(
   const exprt &c,
   const std::set<exprt> &expr_set,
@@ -1017,24 +797,12 @@ bool has_mcdc_pair(
   return false;
 }
 
-/*******************************************************************\
-
-Function: minimize_mcdc_controlling
-
-  Inputs: The input ''controlling'' should have been processed by
-          ''collect_mcdc_controlling_nested''
-                  and
-          ''remove_repetition''
-
- Outputs:
-
- Purpose: This method minimizes the controlling conditions for
-          mcdc coverage. The minimum is in a sense that by deleting
-          any controlling condition in the set, the mcdc coverage
-          for the decision will be not complete.
-
-\*******************************************************************/
-
+/// This method minimizes the controlling conditions for mcdc coverage. The
+/// minimum is in a sense that by deleting any controlling condition in the set,
+/// the mcdc coverage for the decision will be not complete.
+/// \par parameters: The input ''controlling'' should have been processed by
+/// ''collect_mcdc_controlling_nested'' and
+/// ''remove_repetition''
 void minimize_mcdc_controlling(
   std::set<exprt> &controlling,
   const exprt &decision)
@@ -1112,18 +880,6 @@ void minimize_mcdc_controlling(
   }
 }
 
-/*******************************************************************\
-
-Function: collect_decisions_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
 {
   if(src.id()==ID_address_of)
@@ -1153,36 +909,12 @@ void collect_decisions_rec(const exprt &src, std::set<exprt> &dest)
   }
 }
 
-/*******************************************************************\
-
-Function: collect_decisions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<exprt> collect_decisions(const exprt &src)
 {
   std::set<exprt> result;
   collect_decisions_rec(src, result);
   return result;
 }
-
-/*******************************************************************\
-
-Function: collect_decisions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::set<exprt> collect_decisions(const goto_programt::const_targett t)
 {
@@ -1204,18 +936,6 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
   return std::set<exprt>();
 }
 
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
@@ -1232,21 +952,10 @@ void instrument_cover_goals(
     false);
 }
 
-/*******************************************************************\
-
-Function: program_is_trivial
-
-  Inputs: Program `goto_program`
-
- Outputs: Returns true if trivial
-
- Purpose: Call a goto_program trivial unless it has:
-          * Any declarations
-          * At least 2 branches
-          * At least 5 assignments
-
-\*******************************************************************/
-
+/// Call a goto_program trivial unless it has: * Any declarations * At least 2
+/// branches * At least 5 assignments
+/// \par parameters: Program `goto_program`
+/// \return Returns true if trivial
 bool program_is_trivial(const goto_programt &goto_program)
 {
   unsigned long count_assignments=0, count_goto=0;
@@ -1268,18 +977,6 @@ bool program_is_trivial(const goto_programt &goto_program)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
@@ -1625,18 +1322,6 @@ void instrument_cover_goals(
   }
 }
 
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -1662,18 +1347,6 @@ void instrument_cover_goals(
   }
 }
 
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -1690,18 +1363,6 @@ void instrument_cover_goals(
     function_only,
     false);
 }
-
-/*******************************************************************\
-
-Function: instrument_cover_goals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool instrument_cover_goals(
   const cmdlinet &cmdline,

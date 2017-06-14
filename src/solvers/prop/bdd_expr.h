@@ -6,6 +6,9 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 
 \*******************************************************************/
 
+/// \file
+/// Conversion between exprt and miniBDD
+
 #ifndef CPROVER_SOLVERS_PROP_BDD_EXPR_H
 #define CPROVER_SOLVERS_PROP_BDD_EXPR_H
 

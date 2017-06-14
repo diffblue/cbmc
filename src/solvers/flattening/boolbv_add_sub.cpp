@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #include <util/std_types.h>
@@ -13,18 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "boolbv.h"
 
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_add_sub
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_add_sub(const exprt &expr)
 {

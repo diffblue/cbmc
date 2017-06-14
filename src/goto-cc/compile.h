@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Compile and link source and object files.
+
 #ifndef CPROVER_GOTO_CC_COMPILE_H
 #define CPROVER_GOTO_CC_COMPILE_H
 

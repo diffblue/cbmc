@@ -8,30 +8,21 @@ Date: April 2017
 
 \*******************************************************************/
 
+/// \file
+/// Remove function definition
+
 #include "remove_function.h"
 
 #include <util/message.h>
 
 #include <goto-programs/goto_functions.h>
 
-/*******************************************************************\
-
-Function: remove_function
-
-  Inputs:
-    symbol_table  Input symbol table to be modified
-    goto_functions  Input functions to be modified
-    identifier  Function to be removed
-    message_handler  Error/status output
-
- Outputs:
-
- Purpose: Remove the body of function "identifier" such that an
-          analysis will treat it as a side-effect free function with
-          non-deterministic return value.
-
-\*******************************************************************/
-
+/// Remove the body of function "identifier" such that an analysis will treat it
+/// as a side-effect free function with non-deterministic return value.
+/// \par parameters: symbol_table  Input symbol table to be modified
+/// goto_functions  Input functions to be modified
+/// identifier  Function to be removed
+/// message_handler  Error/status output
 void remove_function(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -65,24 +56,13 @@ void remove_function(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_functions
-
-  Inputs:
-    symbol_table  Input symbol table to be modified
-    goto_functions  Input functions to be modified
-    names  List of functions to be removed
-    message_handler  Error/status output
-
- Outputs:
-
- Purpose: Remove the body of all functions listed in "names" such that
-          an analysis will treat it as a side-effect free function with
-          non-deterministic return value.
-
-\*******************************************************************/
-
+/// Remove the body of all functions listed in "names" such that an analysis
+/// will treat it as a side-effect free function with non-deterministic return
+/// value.
+/// \par parameters: symbol_table  Input symbol table to be modified
+/// goto_functions  Input functions to be modified
+/// names  List of functions to be removed
+/// message_handler  Error/status output
 void remove_functions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_PARSE_TREE_H
 
