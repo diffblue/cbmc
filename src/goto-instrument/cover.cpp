@@ -54,6 +54,33 @@ public:
 #else
         it->is_goto() || it->is_function_call();
 #endif
+      // does the basic block contain user code or just our instrumentation?
+      goto_programt::instructionst::const_iterator it_inner=it;
+      if(it_inner!=_goto_program.instructions.end())
+        it_inner++;
+      bool instrumentation=true;
+      while(!it_inner->is_target() &&
+            !it_inner->is_goto() &&
+            !it_inner->is_function_call() &&
+            it_inner!=_goto_program.instructions.end())
+      {
+        if(it_inner->source_location.get(ID_instrumentation).empty() ||
+           !it_inner->source_location.get_bool(ID_instrumentation))
+        {
+          instrumentation=false;
+          break;
+        }
+        it_inner++;
+      }
+      // also check the last instruction from the basic block
+      if(instrumentation &&
+         it_inner!=_goto_program.instructions.end())
+        instrumentation=
+          !it_inner->source_location.get("instrumentation").empty() &&
+          it_inner->source_location.get_bool("instrumentation");
+
+      // we are only interested in basic blocks containing user code
+      next_is_target&=!instrumentation;
     }
 
     // create list of covered lines as CSV string and set as property of source

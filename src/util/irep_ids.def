@@ -812,6 +812,7 @@ IREP_ID_ONE(cprover_string_value_of_func)
 IREP_ID_ONE(skip_initialize)
 IREP_ID_ONE(basic_block_covered_lines)
 IREP_ID_ONE(is_nondet_nullable)
+IREP_ID_ONE(instrumentation)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
