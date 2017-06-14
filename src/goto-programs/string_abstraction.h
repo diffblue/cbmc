@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// String Abstraction
+
 #ifndef CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 #define CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
 
@@ -15,14 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 
 #include "goto_functions.h"
-
-/*******************************************************************\
-
-   Class: string_abstractiont
-
- Purpose:
-
-\*******************************************************************/
 
 class string_abstractiont:public messaget
 {

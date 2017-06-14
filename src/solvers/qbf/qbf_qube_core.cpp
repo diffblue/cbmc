@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
@@ -14,68 +15,20 @@ Author: CM Wintersteiger
 
 #include "qbf_qube_core.h"
 
-/*******************************************************************\
-
-Function: qbf_qube_coret::qbf_qube_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
 {
   break_lines=false;
   qbf_tmp_file="qube.qdimacs";
 }
 
-/*******************************************************************\
-
-Function: qbf_qube_coret::~qbf_qube_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qube_coret::~qbf_qube_coret()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const std::string qbf_qube_coret::solver_text()
 {
   return "QuBE w/ toplevel assignments";
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt qbf_qube_coret::prop_solve()
 {
@@ -165,34 +118,10 @@ propt::resultt qbf_qube_coret::prop_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: qbf_qube_coret::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool qbf_qube_coret::is_in_core(literalt l) const
 {
   throw "not supported";
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::m_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt a) const
 {

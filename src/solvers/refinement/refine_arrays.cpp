@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -17,18 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_refinement.h"
 #include <solvers/sat/satcheck.h>
 
-/*******************************************************************\
-
-Function: bv_refinementt::post_process_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose: generate array constraints
-
-\*******************************************************************/
-
+/// generate array constraints
 void bv_refinementt::post_process_arrays()
 {
   collect_indices();
@@ -43,18 +33,7 @@ void bv_refinementt::post_process_arrays()
   freeze_lazy_constraints();
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::arrays_overapproximated
-
-  Inputs:
-
- Outputs:
-
- Purpose: check whether counterexample is spurious
-
-\*******************************************************************/
-
+/// check whether counterexample is spurious
 void bv_refinementt::arrays_overapproximated()
 {
   if(!do_array_refinement)
@@ -125,18 +104,7 @@ void bv_refinementt::arrays_overapproximated()
 }
 
 
-/*******************************************************************\
-
-Function: bv_refinementt::freeze_lazy_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose: freeze symbols for incremental solving
-
-\*******************************************************************/
-
+/// freeze symbols for incremental solving
 void bv_refinementt::freeze_lazy_constraints()
 {
   if(!lazy_arrays)

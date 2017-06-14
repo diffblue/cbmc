@@ -6,40 +6,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Dereferencing
+
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
 #include "add_failed_symbols.h"
 
-/*******************************************************************\
-
-Function: failed_symbol_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 irep_idt failed_symbol_id(const irep_idt &id)
 {
   return id2string(id)+"$object";
 }
-
-/*******************************************************************\
-
-Function: add_failed_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
@@ -70,18 +49,6 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
   }
 }
 
-/*******************************************************************\
-
-Function: add_failed_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void add_failed_symbols(symbol_tablet &symbol_table)
 {
   // the symbol table iterators are not stable, and
@@ -102,18 +69,6 @@ void add_failed_symbols(symbol_tablet &symbol_table)
   }
 }
 
-/*******************************************************************\
-
-Function: get_failed_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt get_failed_symbol(
   const symbol_exprt &expr,
   const namespacet &ns)
@@ -121,7 +76,7 @@ exprt get_failed_symbol(
   const symbolt &symbol=ns.lookup(expr);
   irep_idt failed_symbol_id=symbol.type.get(ID_C_failed_symbol);
 
-  if(failed_symbol_id==irep_idt())
+  if(failed_symbol_id.empty())
     return nil_exprt();
 
   const symbolt &failed_symbol=ns.lookup(failed_symbol_id);

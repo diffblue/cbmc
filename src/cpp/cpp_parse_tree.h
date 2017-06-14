@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Parser
+
 #ifndef CPROVER_CPP_CPP_PARSE_TREE_H
 #define CPROVER_CPP_CPP_PARSE_TREE_H
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Invariant Set
+
 #include <iostream>
 
 #include <util/symbol_table.h>
@@ -16,40 +19,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/std_types.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <langapi/language_util.h>
 
 #include "invariant_set.h"
 
-/*******************************************************************\
-
-Function: inv_object_storet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void inv_object_storet::output(std::ostream &out) const
 {
   for(unsigned i=0; i<entries.size(); i++)
-    out << "STORE " << i << ": " << to_string(i, "") << std::endl;
+    out << "STORE " << i << ": " << to_string(i, "") << '\n';
 }
-
-/*******************************************************************\
-
-Function: inv_object_storet::get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool inv_object_storet::get(const exprt &expr, unsigned &n)
 {
@@ -75,18 +54,6 @@ bool inv_object_storet::get(const exprt &expr, unsigned &n)
   return map.get_number(s, n);
 }
 
-/*******************************************************************\
-
-Function: inv_object_storet::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 unsigned inv_object_storet::add(const exprt &expr)
 {
   std::string s=build_string(expr);
@@ -105,53 +72,17 @@ unsigned inv_object_storet::add(const exprt &expr)
   return n;
 }
 
-/*******************************************************************\
-
-Function: inv_object_storet::is_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool inv_object_storet::is_constant(unsigned n) const
 {
   assert(n<entries.size());
   return entries[n].is_constant;
 }
 
-/*******************************************************************\
-
-Function: inv_object_storet::is_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool inv_object_storet::is_constant(const exprt &expr) const
 {
   return expr.is_constant() ||
          is_constant_address(expr);
 }
-
-/*******************************************************************\
-
-Function: inv_object_storet::build_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string inv_object_storet::build_string(const exprt &expr) const
 {
@@ -209,18 +140,6 @@ std::string inv_object_storet::build_string(const exprt &expr) const
   return "";
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::get_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool invariant_sett::get_object(
   const exprt &expr,
   unsigned &n) const
@@ -228,18 +147,6 @@ bool invariant_sett::get_object(
   assert(object_store!=NULL);
   return object_store->get(expr, n);
 }
-
-/*******************************************************************\
-
-Function: inv_object_storet::is_constant_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool inv_object_storet::is_constant_address(const exprt &expr)
 {
@@ -249,18 +156,6 @@ bool inv_object_storet::is_constant_address(const exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: inv_object_storet::is_constant_address_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool inv_object_storet::is_constant_address_rec(const exprt &expr)
 {
@@ -280,18 +175,6 @@ bool inv_object_storet::is_constant_address_rec(const exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::add(
   const std::pair<unsigned, unsigned> &p,
@@ -314,18 +197,6 @@ void invariant_sett::add(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::add_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
 {
@@ -363,18 +234,6 @@ void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
   for(const auto &ne : ne_set)
     add_eq(ne_set, p, ne);
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::add_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::add_eq(
   ineq_sett &dest,
@@ -414,18 +273,6 @@ void invariant_sett::add_eq(
   }
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::is_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt invariant_sett::is_eq(std::pair<unsigned, unsigned> p) const
 {
   std::pair<unsigned, unsigned> s=p;
@@ -439,18 +286,6 @@ tvt invariant_sett::is_eq(std::pair<unsigned, unsigned> p) const
 
   return tvt::unknown();
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::is_le
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt invariant_sett::is_le(std::pair<unsigned, unsigned> p) const
 {
@@ -470,25 +305,13 @@ tvt invariant_sett::is_le(std::pair<unsigned, unsigned> p) const
   return tvt::unknown();
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::output(
   const irep_idt &identifier,
   std::ostream &out) const
 {
   if(is_false)
   {
-    out << "FALSE" << std::endl;
+    out << "FALSE\n";
     return;
   }
 
@@ -510,42 +333,30 @@ void invariant_sett::output(
           out << to_string(j, identifier);
         }
 
-      out << std::endl;
+      out << '\n';
     }
 
   for(const auto &bounds : bounds_map)
   {
     out << to_string(bounds.first, identifier)
         << " in " << bounds.second
-        << std::endl;
+        << '\n';
   }
 
   for(const auto &le : le_set)
   {
     out << to_string(le.first, identifier)
         << " <= " << to_string(le.second, identifier)
-        << std::endl;
+        << '\n';
   }
 
   for(const auto &ne : ne_set)
   {
     out << to_string(ne.first, identifier)
         << " != " << to_string(ne.second, identifier)
-        << std::endl;
+        << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::strengthen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
 {
@@ -567,18 +378,6 @@ void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::strengthen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::strengthen(const exprt &expr)
 {
   exprt tmp(expr);
@@ -586,25 +385,13 @@ void invariant_sett::strengthen(const exprt &expr)
   strengthen_rec(tmp);
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::strengthen_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::strengthen_rec(const exprt &expr)
 {
   if(expr.type().id()!=ID_bool)
     throw "non-Boolean argument to strengthen()";
 
   #if 0
-  std::cout << "S: " << from_expr(*ns, "", expr) << std::endl;
+  std::cout << "S: " << from_expr(*ns, "", expr) << '\n';
   #endif
 
   if(is_false)
@@ -799,18 +586,6 @@ void invariant_sett::strengthen_rec(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::implies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt invariant_sett::implies(const exprt &expr) const
 {
   exprt tmp(expr);
@@ -818,25 +593,13 @@ tvt invariant_sett::implies(const exprt &expr) const
   return implies_rec(tmp);
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::implies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt invariant_sett::implies_rec(const exprt &expr) const
 {
   if(expr.type().id()!=ID_bool)
     throw "implies: non-Boolean expression";
 
   #if 0
-  std::cout << "I: " << from_expr(*ns, "", expr) << std::endl;
+  std::cout << "I: " << from_expr(*ns, "", expr) << '\n';
   #endif
 
   if(is_false) // can't get any stronger
@@ -914,18 +677,6 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
   return tvt::unknown();
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::get_bounds
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
 {
   // unbounded
@@ -949,18 +700,6 @@ void invariant_sett::get_bounds(unsigned a, boundst &bounds) const
   if(it!=bounds_map.end())
     bounds=it->second;
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::nnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::nnf(exprt &expr, bool negate)
 {
@@ -1075,18 +814,6 @@ void invariant_sett::nnf(exprt &expr, bool negate)
   }
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::simplify
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::simplify(
   exprt &expr) const
 {
@@ -1104,18 +831,6 @@ void invariant_sett::simplify(
       expr.swap(tmp);
   }
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::get_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt invariant_sett::get_constant(const exprt &expr) const
 {
@@ -1172,18 +887,6 @@ exprt invariant_sett::get_constant(const exprt &expr) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-/*******************************************************************\
-
-Function: inv_object_storet::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string inv_object_storet::to_string(
   unsigned a,
   const irep_idt &identifier) const
@@ -1192,18 +895,6 @@ std::string inv_object_storet::to_string(
   return id2string(map[a]);
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string invariant_sett::to_string(
   unsigned a,
   const irep_idt &identifier) const
@@ -1211,18 +902,6 @@ std::string invariant_sett::to_string(
   assert(object_store!=NULL);
   return object_store->to_string(a, identifier);
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool invariant_sett::make_union(const invariant_sett &other)
 {
@@ -1275,18 +954,6 @@ bool invariant_sett::make_union(const invariant_sett &other)
   return false; // no change
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::make_union_bounds_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool invariant_sett::make_union_bounds_map(const bounds_mapt &other)
 {
   bool changed=false;
@@ -1319,18 +986,6 @@ bool invariant_sett::make_union_bounds_map(const bounds_mapt &other)
   return changed;
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::modifies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::modifies(unsigned a)
 {
   eq_set.isolate(a);
@@ -1338,18 +993,6 @@ void invariant_sett::modifies(unsigned a)
   remove(le_set, a);
   bounds_map.erase(a);
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::modifies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::modifies(const exprt &lhs)
 {
@@ -1411,18 +1054,6 @@ void invariant_sett::modifies(const exprt &lhs)
     throw "modifies: unexpected lhs: "+lhs.id_string();
 }
 
-/*******************************************************************\
-
-Function: invariant_sett::assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void invariant_sett::assignment(
   const exprt &lhs,
   const exprt &rhs)
@@ -1441,18 +1072,6 @@ void invariant_sett::assignment(
   // and put it back
   strengthen(equality);
 }
-
-/*******************************************************************\
-
-Function: invariant_sett::apply_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void invariant_sett::apply_code(const codet &code)
 {
@@ -1508,7 +1127,7 @@ void invariant_sett::apply_code(const codet &code)
   }
   else
   {
-    std::cerr << code.pretty() << std::endl;
+    std::cerr << code.pretty() << '\n';
     throw "invariant_sett: unexpected statement: "+id2string(statement);
   }
 }

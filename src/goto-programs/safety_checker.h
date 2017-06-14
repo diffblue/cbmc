@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Safety Checker Interface
+
 #ifndef CPROVER_GOTO_PROGRAMS_SAFETY_CHECKER_H
 #define CPROVER_GOTO_PROGRAMS_SAFETY_CHECKER_H
 

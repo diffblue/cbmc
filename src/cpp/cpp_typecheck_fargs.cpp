@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <cassert>
 
 #include <util/std_types.h>
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_fargs.h"
 #include "cpp_typecheck.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheck_fargst::has_class_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool cpp_typecheck_fargst::has_class_type() const
 {
@@ -40,18 +31,6 @@ bool cpp_typecheck_fargst::has_class_type() const
   return false;
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheck_fargst::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheck_fargst::build(
   const side_effect_expr_function_callt &function_call)
 {
@@ -63,18 +42,6 @@ void cpp_typecheck_fargst::build(
   for(std::size_t i=0; i<function_call.op1().operands().size(); i++)
     operands.push_back(function_call.op1().operands()[i]);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheck_fargst::exact_match
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool cpp_typecheck_fargst::match(
   const code_typet &code_type,
@@ -129,7 +96,7 @@ bool cpp_typecheck_fargst::match(
     #if 0
     // unclear, todo
     if(is_reference(operand.type()))
-      std::cout << "O: " << operand.pretty() << std::endl;
+      std::cout << "O: " << operand.pretty() << '\n';
 
     assert(!is_reference(operand.type()));
     #endif
@@ -148,7 +115,7 @@ bool cpp_typecheck_fargst::match(
     #if 0
     std::cout << "C: " << cpp_typecheck.to_string(operand.type())
               << " -> " << cpp_typecheck.to_string(parameter.type())
-              << std::endl;
+              << '\n';
     #endif
 
     // can we do the standard conversion sequence?
@@ -158,13 +125,13 @@ bool cpp_typecheck_fargst::match(
       // ok
       distance+=rank;
       #if 0
-      std::cout << "OK " << rank << std::endl;
+      std::cout << "OK " << rank << '\n';
       #endif
     }
     else
     {
       #if 0
-      std::cout << "NOT OK" << std::endl;
+      std::cout << "NOT OK\n";
       #endif
       return false; // no conversion possible
     }

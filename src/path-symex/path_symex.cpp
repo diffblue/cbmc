@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Concrete Symbolic Transformer
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
@@ -13,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
 #include <util/prefix.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 
@@ -25,18 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-/*******************************************************************\
-
-Function: path_symext::propagate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool path_symext::propagate(const exprt &src)
 {
@@ -97,18 +88,6 @@ bool path_symext::propagate(const exprt &src)
   }
 }
 
-/*******************************************************************\
-
-Function: path_symext::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::assign(
   path_symex_statet &state,
   const exprt &lhs,
@@ -151,18 +130,6 @@ void path_symext::assign(
   exprt::operandst _guard; // start with empty guard
   assign_rec(state, _guard, ssa_lhs, ssa_rhs);
 }
-
-/*******************************************************************\
-
-Function: path_symext::symex_malloc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 inline static typet c_sizeof_type_rec(const exprt &expr)
 {
@@ -300,18 +267,6 @@ void path_symext::symex_malloc(
 }
 
 
-/*******************************************************************\
-
-Function: get_old_va_symb
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static irep_idt get_old_va_symbol(
     const path_symex_statet &state,
     const exprt &src)
@@ -328,18 +283,6 @@ static irep_idt get_old_va_symbol(
 
   return irep_idt();
 }
-
-/*******************************************************************\
-
-Function: path_symext::symex_va_arg_next
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symext::symex_va_arg_next(
     path_symex_statet &state,
@@ -400,18 +343,6 @@ void path_symext::symex_va_arg_next(
   assign(state, lhs, rhs);
 }
 
-/*******************************************************************\
-
-Function: path_symext::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::assign_rec(
   path_symex_statet &state,
   exprt::operandst &guard,
@@ -421,8 +352,8 @@ void path_symext::assign_rec(
   // const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
 
   #ifdef DEBUG
-  std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
-  // std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
+  std::cout << "assign_rec: " << ssa_lhs.pretty() << '\n';
+  // std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << '\n';
   #endif
 
   if(ssa_lhs.id()==ID_symbol)
@@ -435,8 +366,8 @@ void path_symext::assign_rec(
 
     #ifdef DEBUG
     const irep_idt &ssa_identifier=symbol_expr.get_identifier();
-    std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
-    std::cout << "full identifier: " << full_identifier << std::endl;
+    std::cout << "SSA symbol identifier: " << ssa_identifier << '\n';
+    std::cout << "full identifier: " << full_identifier << '\n';
     #endif
 
     var_mapt::var_infot &var_info=state.var_map[full_identifier];
@@ -447,7 +378,7 @@ void path_symext::assign_rec(
     symbol_exprt new_lhs=var_info.ssa_symbol();
 
     #ifdef DEBUG
-    std::cout << "new_lhs: " << new_lhs.get_identifier() << std::endl;
+    std::cout << "new_lhs: " << new_lhs.get_identifier() << '\n';
     #endif
 
     // record new state of lhs
@@ -469,8 +400,8 @@ void path_symext::assign_rec(
       if(!base_type_eq(ssa_rhs.type(), new_lhs.type(), state.var_map.ns))
       {
         #ifdef DEBUG
-        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
-        std::cout << "new_lhs: " << new_lhs.pretty() << std::endl;
+        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << '\n';
+        std::cout << "new_lhs: " << new_lhs.pretty() << '\n';
         #endif
         throw "assign_rec got different types";
       }
@@ -493,7 +424,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_member)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_member" << std::endl;
+    std::cout << "assign_rec ID_member\n";
     #endif
 
     const member_exprt &ssa_lhs_member_expr=to_member_expr(ssa_lhs);
@@ -532,7 +463,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_index)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_index" << std::endl;
+    std::cout << "assign_rec ID_index\n";
     #endif
 
     throw "unexpected array index on lhs";
@@ -540,7 +471,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_dereference)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_dereference" << std::endl;
+    std::cout << "assign_rec ID_dereference\n";
     #endif
 
     throw "unexpected dereference on lhs";
@@ -548,7 +479,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_if)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_if" << std::endl;
+    std::cout << "assign_rec ID_if\n";
     #endif
 
     const if_exprt &lhs_if_expr=to_if_expr(ssa_lhs);
@@ -568,7 +499,7 @@ void path_symext::assign_rec(
           ssa_lhs.id()==ID_byte_extract_big_endian)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_byte_extract" << std::endl;
+    std::cout << "assign_rec ID_byte_extract\n";
     #endif
 
     const byte_extract_exprt &byte_extract_expr=
@@ -679,18 +610,6 @@ void path_symext::assign_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: path_symext::function_call_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::function_call_rec(
   path_symex_statet &state,
   const code_function_callt &call,
@@ -698,7 +617,7 @@ void path_symext::function_call_rec(
   std::list<path_symex_statet> &further_states)
 {
   #ifdef DEBUG
-  std::cout << "function_call_rec: " << function.pretty() << std::endl;
+  std::cout << "function_call_rec: " << function.pretty() << '\n';
   #endif
 
   if(function.id()==ID_symbol)
@@ -780,7 +699,7 @@ void path_symext::function_call_rec(
         const code_typet::parametert &function_parameter=function_parameters[i];
         irep_idt identifier=function_parameter.get_identifier();
 
-        if(identifier==irep_idt())
+        if(identifier.empty())
           throw "function_call " + id2string(function_identifier)
               + " no identifier for function parameter";
 
@@ -874,18 +793,6 @@ void path_symext::function_call_rec(
     throw "TODO: function_call "+function.id_string();
 }
 
-/*******************************************************************\
-
-Function: path_symext::return_from_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::return_from_function(path_symex_statet &state)
 {
   path_symex_statet::threadt &thread=state.threads[state.get_current_thread()];
@@ -921,18 +828,6 @@ void path_symext::return_from_function(path_symex_statet &state)
   }
 }
 
-/*******************************************************************\
-
-Function: path_symext::set_return_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::set_return_value(
   path_symex_statet &state,
   const exprt &v)
@@ -944,18 +839,6 @@ void path_symext::set_return_value(
   if(!thread.call_stack.empty())
     thread.call_stack.back().return_rhs=v;
 }
-
-/*******************************************************************\
-
-Function: path_symext::do_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symext::do_goto(
   path_symex_statet &state,
@@ -1002,18 +885,6 @@ void path_symext::do_goto(
   state.history->guard=negated_guard;
 }
 
-/*******************************************************************\
-
-Function: path_symext::do_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::do_goto(
   path_symex_statet &state,
   bool taken)
@@ -1050,18 +921,6 @@ void path_symext::do_goto(
   }
 }
 
-/*******************************************************************\
-
-Function: path_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::operator()(
   path_symex_statet &state,
   std::list<path_symex_statet> &further_states)
@@ -1073,7 +932,7 @@ void path_symext::operator()(
   std::cout << "path_symext::operator(): "
             << state.pc() << " "
             << instruction.type
-            << std::endl;
+            << '\n';
   #endif
 
   switch(instruction.type)
@@ -1224,18 +1083,6 @@ void path_symext::operator()(
   }
 }
 
-/*******************************************************************\
-
-Function: path_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symext::operator()(path_symex_statet &state)
 {
   std::list<path_symex_statet> further_states;
@@ -1243,18 +1090,6 @@ void path_symext::operator()(path_symex_statet &state)
   if(!further_states.empty())
     throw "path_symext got unexpected further states";
 }
-
-/*******************************************************************\
-
-Function: path_symex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symex(
   path_symex_statet &state,
@@ -1264,35 +1099,11 @@ void path_symex(
   path_symex(state, further_states);
 }
 
-/*******************************************************************\
-
-Function: path_symex
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symex(path_symex_statet &state)
 {
   path_symext path_symex;
   path_symex(state);
 }
-
-/*******************************************************************\
-
-Function: path_symex_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symex_goto(
   path_symex_statet &state,
@@ -1301,18 +1112,6 @@ void path_symex_goto(
   path_symext path_symex;
   path_symex.do_goto(state, taken);
 }
-
-/*******************************************************************\
-
-Function: path_symex_assert_fail
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symex_assert_fail(path_symex_statet &state)
 {

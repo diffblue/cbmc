@@ -6,22 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <stack>
 
 #include "resolution_proof.h"
-
-/*******************************************************************\
-
-Function: resolution_prooft::build_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class T>
 void resolution_prooft<T>::build_core(std::vector<bool> &in_core)

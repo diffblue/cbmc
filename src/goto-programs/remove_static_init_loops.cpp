@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Unwind loops in static initializers
+
 #include <algorithm>
 
 #include <util/message.h>
@@ -29,19 +32,10 @@ protected:
   const symbol_tablet &symbol_table;
 };
 
-/*******************************************************************\
-
-Function: unwind_enum_static
-
-  Inputs: goto_functions and options
-
- Outputs: side effect is adding <clinit> loops to unwindset
-
- Purpose: unwind static initialization loops of Java enums as far as
-          the enum has elements, thus flattening them completely
-
-\*******************************************************************/
-
+/// unwind static initialization loops of Java enums as far as the enum has
+/// elements, thus flattening them completely
+/// \par parameters: goto_functions and options
+/// \return side effect is adding <clinit> loops to unwindset
 void remove_static_init_loopst::unwind_enum_static(
   const goto_functionst &goto_functions,
   optionst &options)
@@ -95,19 +89,10 @@ void remove_static_init_loopst::unwind_enum_static(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_static_init_loops
-
-  Inputs: symbol table, goto_functions and options
-
- Outputs: side effect is adding <clinit> loops to unwindset
-
- Purpose: this is the entry point for the removal of loops in static
-          initialization code of Java enums
-
-\*******************************************************************/
-
+/// this is the entry point for the removal of loops in static initialization
+/// code of Java enums
+/// \par parameters: symbol table, goto_functions and options
+/// \return side effect is adding <clinit> loops to unwindset
 void remove_static_init_loops(
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,

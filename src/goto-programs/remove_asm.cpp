@@ -9,6 +9,9 @@ Date:   December 2014
 
 \*******************************************************************/
 
+/// \file
+/// Remove 'asm' statements by compiling into suitable standard code
+
 #include <sstream>
 
 #include <util/std_expr.h>
@@ -47,18 +50,6 @@ protected:
     const codet &code,
     goto_programt &dest);
 };
-
-/*******************************************************************\
-
-Function: remove_asmt::gcc_asm_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_asmt::gcc_asm_function_call(
   const irep_idt &function_base_name,
@@ -118,18 +109,7 @@ void remove_asmt::gcc_asm_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_asmt::process_instruction
-
-Inputs:
-
-Outputs:
-
-Purpose: removes assembler
-
-\*******************************************************************/
-
+/// removes assembler
 void remove_asmt::process_instruction(
   goto_programt::instructiont &instruction,
   goto_programt &dest)
@@ -143,7 +123,7 @@ void remove_asmt::process_instruction(
     const irep_idt &i_str=
       to_string_constant(code.op0()).get_value();
 
-    // std::cout << "DOING " << i_str << std::endl;
+    // std::cout << "DOING " << i_str << '\n';
 
     std::istringstream str(id2string(i_str));
     assembler_parser.clear();
@@ -163,7 +143,7 @@ void remove_asmt::process_instruction(
       std::cout << "A ********************\n";
       for(const auto &ins : instruction)
       {
-        std::cout << "XX: " << ins.pretty() << std::endl;
+        std::cout << "XX: " << ins.pretty() << '\n';
       }
 
       std::cout << "B ********************\n";
@@ -302,18 +282,7 @@ void remove_asmt::process_instruction(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_asmt::process_function
-
-Inputs:
-
-Outputs:
-
-Purpose: removes assembler
-
-\*******************************************************************/
-
+/// removes assembler
 void remove_asmt::process_function(
   goto_functionst::goto_functiont &goto_function)
 {
@@ -333,18 +302,7 @@ void remove_asmt::process_function(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_asmt:operator()
-
-Inputs:
-
-Outputs:
-
-Purpose: removes assembler
-
-\*******************************************************************/
-
+/// removes assembler
 void remove_asmt::operator()()
 {
   Forall_goto_functions(it, goto_functions)
@@ -353,18 +311,7 @@ void remove_asmt::operator()()
   }
 }
 
-/*******************************************************************\
-
-Function: remove_asm
-
-Inputs:
-
-Outputs:
-
-Purpose: removes assembler
-
-\*******************************************************************/
-
+/// removes assembler
 void remove_asm(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -372,18 +319,7 @@ void remove_asm(
   remove_asmt(symbol_table, goto_functions)();
 }
 
-/*******************************************************************\
-
-Function: remove_asm
-
-Inputs:
-
-Outputs:
-
-Purpose: removes assembler
-
-\*******************************************************************/
-
+/// removes assembler
 void remove_asm(goto_modelt &goto_model)
 {
   remove_asmt(goto_model.symbol_table, goto_model.goto_functions)();

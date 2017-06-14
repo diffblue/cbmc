@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// XML Interface
+
 #include <iostream>
 
 #include <util/message.h>
@@ -14,18 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "xml_interface.h"
 
-/*******************************************************************\
-
-Function: xml_interfacet::get_xml_options
-
-  Inputs:
-
- Outputs:
-
- Purpose: XML User Interface
-
-\*******************************************************************/
-
+/// XML User Interface
 void xml_interfacet::get_xml_options(cmdlinet &cmdline)
 {
   if(cmdline.isset("xml-interface"))
@@ -41,18 +33,7 @@ void xml_interfacet::get_xml_options(cmdlinet &cmdline)
   }
 }
 
-/*******************************************************************\
-
-Function: xml_interfacet::get_xml_options
-
-  Inputs:
-
- Outputs:
-
- Purpose: XML User Interface
-
-\*******************************************************************/
-
+/// XML User Interface
 void xml_interfacet::get_xml_options(
   const xmlt &xml,
   cmdlinet &cmdline)

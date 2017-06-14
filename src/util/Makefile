@@ -3,6 +3,7 @@ SRC = arith_tools.cpp \
       base_type.cpp \
       bv_arithmetic.cpp \
       byte_operators.cpp \
+      c_types.cpp \
       cmdline.cpp \
       config.cpp \
       cout_message.cpp \
@@ -24,6 +25,7 @@ SRC = arith_tools.cpp \
       guard.cpp \
       identifier.cpp \
       ieee_float.cpp \
+      invariant.cpp \
       irep.cpp \
       irep_hash.cpp \
       irep_hash_container.cpp \

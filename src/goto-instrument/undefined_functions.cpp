@@ -8,23 +8,14 @@ Date: July 2016
 
 \*******************************************************************/
 
+/// \file
+/// Handling of functions without body
+
 #include <ostream>
 
 #include <goto-programs/goto_functions.h>
 
 #include "undefined_functions.h"
-
-/*******************************************************************\
-
-Function: list_undefined_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void list_undefined_functions(
   const goto_functionst &goto_functions,
@@ -34,20 +25,8 @@ void list_undefined_functions(
   forall_goto_functions(it, goto_functions)
     if(!ns.lookup(it->first).is_macro &&
        !it->second.body_available())
-      os << it->first << std::endl;
+      os << it->first << '\n';
 }
-
-/*******************************************************************\
-
-Function: undefined_function_abort_path
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void undefined_function_abort_path(goto_functionst &goto_functions)
 {

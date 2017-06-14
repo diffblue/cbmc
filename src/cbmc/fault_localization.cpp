@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// Fault Localization
+
 #include <util/threeval.h>
 #include <util/arith_tools.h>
 #include <util/symbol.h>
@@ -21,18 +24,6 @@ Author: Peter Schrammel
 #include "fault_localization.h"
 #include "counterexample_beautification.h"
 
-/*******************************************************************\
-
-Function: fault_localizationt::freeze_guards
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fault_localizationt::freeze_guards()
 {
   for(const auto &step : bmc.equation.SSA_steps)
@@ -44,18 +35,6 @@ void fault_localizationt::freeze_guards()
       bmc.prop_conv.set_frozen(step.cond_literal);
   }
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::collect_guards
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fault_localizationt::collect_guards(lpointst &lpoints)
 {
@@ -80,18 +59,6 @@ void fault_localizationt::collect_guards(lpointst &lpoints)
   }
 }
 
-/*******************************************************************\
-
-Function: fault_localizationt::get_failed_property
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 symex_target_equationt::SSA_stepst::const_iterator
 fault_localizationt::get_failed_property()
 {
@@ -106,18 +73,6 @@ fault_localizationt::get_failed_property()
   assert(false);
   return bmc.equation.SSA_steps.end();
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool fault_localizationt::check(const lpointst &lpoints,
                                 const lpoints_valuet &value)
@@ -145,18 +100,6 @@ bool fault_localizationt::check(const lpointst &lpoints,
   return true;
 }
 
-/*******************************************************************\
-
-Function: fault_localizationt::update_scores
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fault_localizationt::update_scores(lpointst &lpoints,
                                         const lpoints_valuet &value)
 {
@@ -173,18 +116,6 @@ void fault_localizationt::update_scores(lpointst &lpoints,
     }
   }
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::localize_linear
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fault_localizationt::localize_linear(lpointst &lpoints)
 {
@@ -203,18 +134,6 @@ void fault_localizationt::localize_linear(lpointst &lpoints)
     v[i]=tvt(tvt::tv_enumt::TV_UNKNOWN);
   }
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::run
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fault_localizationt::run(irep_idt goal_id)
 {
@@ -242,18 +161,6 @@ void fault_localizationt::run(irep_idt goal_id)
   bvt assumptions;
   bmc.prop_conv.set_assumptions(assumptions);
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::report()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fault_localizationt::report(irep_idt goal_id)
 {
@@ -284,18 +191,6 @@ void fault_localizationt::report(irep_idt goal_id)
                    << eom;
 }
 
-/*******************************************************************\
-
-Function: fault_localizationt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 safety_checkert::resultt fault_localizationt::operator()()
 {
   if(options.get_bool_option("stop-on-fail"))
@@ -303,18 +198,6 @@ safety_checkert::resultt fault_localizationt::operator()()
   else
     return bmc_all_propertiest::operator()();
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::run_decision_procedure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt
 fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
@@ -345,18 +228,6 @@ fault_localizationt::run_decision_procedure(prop_convt &prop_conv)
 
   return dec_result;
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::stop_on_fail
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt fault_localizationt::stop_on_fail()
 {
@@ -391,18 +262,6 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
   }
 }
 
-/*******************************************************************\
-
-Function: fault_localizationt::goal_covered
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fault_localizationt::goal_covered(
   const cover_goalst::goalt &)
 {
@@ -433,18 +292,6 @@ void fault_localizationt::goal_covered(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: fault_localizationt::report
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fault_localizationt::report(
   const cover_goalst &cover_goals)

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
 #define CPROVER_ASSEMBLER_ASSEMBLER_PARSER_H
 

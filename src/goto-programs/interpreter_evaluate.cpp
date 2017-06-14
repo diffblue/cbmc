@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interpreter for GOTO Programs
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
@@ -18,19 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interpreter_class.h"
 
-/*******************************************************************\
-
-Function: interpretert::read
-
-  Inputs:
-
- Outputs:
-
- Purpose: reads a memory address and loads it into the dest variable
-          marks cell as read before written if cell has never been written
-
-\*******************************************************************/
-
+/// reads a memory address and loads it into the dest variable marks cell as
+/// read before written if cell has never been written
 void interpretert::read(
   mp_integer address,
   mp_vectort &dest) const
@@ -82,18 +74,7 @@ void interpretert::read_unbounded(
   }
 }
 
-/*******************************************************************\
-
-Function: interpretert::allocate
-
-  Inputs:
-
- Outputs:
-
- Purpose: reserves memory block of size at address
-
-\*******************************************************************/
-
+/// reserves memory block of size at address
 void interpretert::allocate(
   mp_integer address,
   size_t size)
@@ -110,18 +91,7 @@ void interpretert::allocate(
   }
 }
 
-/*******************************************************************\
-
-Function: interpretert::clear_input_flags
-
-  Inputs:
-
- Outputs:
-
- Purpose: Clears memoy r/w flag initialization
-
-\*******************************************************************/
-
+/// Clears memoy r/w flag initialization
 void interpretert::clear_input_flags()
 {
   for(auto &cell : memory)
@@ -131,18 +101,7 @@ void interpretert::clear_input_flags()
   }
 }
 
-/*******************************************************************\
-
-Function: interpretert::count_type_leaves
-
-  Inputs: Type
-
- Outputs: Number of leaf primitive types; returns true on error
-
- Purpose:
-
-\*******************************************************************/
-
+/// \return Number of leaf primitive types; returns true on error
 bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
 {
   if(ty.id()==ID_struct)
@@ -177,25 +136,15 @@ bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
   }
 }
 
-/*******************************************************************\
-
-Function: interpretert::byte_offset_to_memory_offset
-
-  Inputs: 'source_type', 'offset' (unit: bytes),
-
- Outputs: Offset into a vector of interpreter values; returns true on error
-
- Purpose: Supposing the caller has an mp_vector representing
-          a value with type 'source_type', this yields the offset into that
-          vector at which to find a value at *byte* address 'offset'.
-          We need this because the interpreter's memory map uses unlabelled
-          variable-width values -- for example, a C value { { 1, 2 }, 3, 4 }
-          of type struct { int x[2]; char y; unsigned long z; }
-          would be represented [1,2,3,4], with the source type needed alongside
-          to figure out which member is targeted by a byte-extract operation.
-
-\*******************************************************************/
-
+/// Supposing the caller has an mp_vector representing a value with type
+/// 'source_type', this yields the offset into that vector at which to find a
+/// value at *byte* address 'offset'. We need this because the interpreter's
+/// memory map uses unlabelled variable-width values -- for example, a C value {
+/// { 1, 2 }, 3, 4 } of type struct { int x[2]; char y; unsigned long z; } would
+/// be represented [1,2,3,4], with the source type needed alongside to figure
+/// out which member is targeted by a byte-extract operation.
+/// \par parameters: 'source_type', 'offset' (unit: bytes),
+/// \return Offset into a vector of interpreter values; returns true on error
 bool interpretert::byte_offset_to_memory_offset(
   const typet &source_type,
   mp_integer offset,
@@ -270,21 +219,12 @@ bool interpretert::byte_offset_to_memory_offset(
   }
 }
 
-/*******************************************************************\
-
-Function: interpretert::memory_offset_to_byte_offset
-
-  Inputs: An interpreter memory offset and the type to interpret that memory
-
- Outputs: The corresponding byte offset. Returns true on error
-
- Purpose: Similarly to the above, the interpreter's memory objects contain
-          mp_integers that represent variable-sized struct members. This
-          counts the size of type leaves to determine the byte offset
-          corresponding to a memory offset.
-
-\*******************************************************************/
-
+/// Similarly to the above, the interpreter's memory objects contain mp_integers
+/// that represent variable-sized struct members. This counts the size of type
+/// leaves to determine the byte offset corresponding to a memory offset.
+/// \par parameters: An interpreter memory offset and the type to interpret that
+///   memory
+/// \return The corresponding byte offset. Returns true on error
 bool interpretert::memory_offset_to_byte_offset(
   const typet &source_type,
   mp_integer cell_offset,
@@ -355,18 +295,6 @@ bool interpretert::memory_offset_to_byte_offset(
     return cell_offset!=0;
   }
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interpretert::evaluate(
   const exprt &expr,
@@ -1135,18 +1063,6 @@ void interpretert::evaluate(
           << expr.id() << "[" << expr.type().id() << "]"
           << eom;
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer interpretert::evaluate_address(
   const exprt &expr,

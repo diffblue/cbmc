@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <iostream>
 
 #include "all_paths_enumerator.h"
@@ -36,7 +39,7 @@ bool all_paths_enumeratort::next(patht &path)
   do
   {
 #ifdef DEBUG
-    std::cout << "Enumerating next path..." << std::endl;
+    std::cout << "Enumerating next path...\n";
 #endif
 
     int decision=backtrack(last_path);
@@ -86,7 +89,7 @@ int all_paths_enumeratort::backtrack(patht &path)
     // We can take the next branch here...
 
 #ifdef DEBUG
-    std::cout << "Backtracked to a path of size " << path.size() << std::endl;
+    std::cout << "Backtracked to a path of size " << path.size() << '\n';
 #endif
 
     return ret+1;

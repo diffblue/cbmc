@@ -10,6 +10,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 \*******************************************************************/
 
+/// \file
+/// String support via creating string constraints and progressively
+///   instantiating the universal constraints as needed. The procedure is
+///   described in the PASS paper at HVC'13: "PASS: String Solving with
+///   Parameterized Array and Interval Automaton" by Guodong Li and Indradeep
+///   Ghosh
+
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
@@ -159,22 +166,12 @@ private:
   std::string string_of_array(const array_exprt &arr);
 };
 
-/*******************************************************************\
-
-Function: string_refinementt::pad_vector
-
-  Inputs:
-    concrete_array - the vector to populate
-    initialized - the vector containing the indices of the
-                  concretized values
-    last_concretized - initial value of the last concretized index
-
- Purpose: Utility function for concretization of strings. Copies
-          concretized values to the left to initialize the
-          unconcretized indices of concrete_array.
-
-\*******************************************************************/
-
+/// Utility function for concretization of strings. Copies concretized values to
+/// the left to initialize the unconcretized indices of concrete_array.
+/// \param concrete_array: the vector to populate
+/// \param initialized: the vector containing the indices of the concretized
+///   values
+/// \param last_concretized: initial value of the last concretized index
 template <typename T1, typename T2>
 void string_refinementt::pad_vector(
   std::vector<T1> &concrete_array,

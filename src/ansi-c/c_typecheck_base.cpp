@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Conversion / Type Checking
+
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
@@ -15,51 +18,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "type2name.h"
 #include "c_storage_spec.h"
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string c_typecheck_baset::to_string(const exprt &expr)
 {
   return expr2c(expr, *this);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string c_typecheck_baset::to_string(const typet &type)
 {
   return type2c(type, *this);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::move_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
 {
@@ -74,18 +41,6 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
@@ -173,18 +128,6 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_new_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
 {
   if(symbol.is_parameter)
@@ -210,43 +153,10 @@ void c_typecheck_baset::typecheck_new_symbol(symbolt &symbol)
   }
   else
   {
-    if(symbol.type.id()==ID_array &&
-       to_array_type(symbol.type).size().is_nil() &&
-       !symbol.is_type)
-    {
-      // Insert a new type symbol for the array.
-      // We do this because we want a convenient way
-      // of adjusting the size of the type later on.
-
-      type_symbolt new_symbol(symbol.type);
-      new_symbol.name=id2string(symbol.name)+"$type";
-      new_symbol.base_name=id2string(symbol.base_name)+"$type";
-      new_symbol.location=symbol.location;
-      new_symbol.mode=symbol.mode;
-      new_symbol.module=symbol.module;
-
-      symbol.type=symbol_typet(new_symbol.name);
-
-      symbolt *new_sp;
-      symbol_table.move(new_symbol, new_sp);
-    }
-
     // check the initializer
     do_initializer(symbol);
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_redefinition_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_redefinition_type(
   symbolt &old_symbol,
@@ -330,18 +240,6 @@ void c_typecheck_baset::typecheck_redefinition_type(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_redefinition_non_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_redefinition_non_type(
   symbolt &old_symbol,
@@ -615,18 +513,6 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   // mismatch.
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_function_body
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 {
   code_typet &code_type=to_code_type(symbol.type);
@@ -653,7 +539,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
       p_it++)
   {
     // may be anonymous
-    if(p_it->get_base_name()==irep_idt())
+    if(p_it->get_base_name().empty())
     {
       irep_idt base_name="#anon"+std::to_string(anon_counter++);
       p_it->set_base_name(base_name);
@@ -696,18 +582,6 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::apply_asm_label
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::apply_asm_label(
   const irep_idt &asm_label,
@@ -776,18 +650,6 @@ void c_typecheck_baset::apply_asm_label(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_declaration
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_declaration(
   ansi_c_declarationt &declaration)

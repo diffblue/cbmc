@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <util/std_types.h>
 
 #include "boolbv.h"
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_abs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_abs(const exprt &expr)
 {

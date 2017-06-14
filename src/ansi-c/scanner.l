@@ -21,7 +21,6 @@ static int isatty(int) { return 0; }
 
 #include <util/unicode.h>
 
-#include "c_types.h"
 #include "preprocessor_line.h"
 #include "string_constant.h"
 

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANSI_C_STRING_CONSTANT_H
 #define CPROVER_ANSI_C_STRING_CONSTANT_H
 

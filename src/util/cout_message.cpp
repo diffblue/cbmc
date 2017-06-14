@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #ifdef _WIN32
@@ -18,68 +19,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unicode.h"
 #include "cout_message.h"
 
-/*******************************************************************\
-
-Function: cout_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void cout_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+cout_message_handlert::cout_message_handlert():
+  stream_message_handlert(std::cout)
 {
-  if(verbosity>=level)
-  {
-    std::cout << message << '\n';
-
-    // We flush for level 6 or below.
-    if(level<=6)
-      std::cout << std::flush;
-  }
 }
 
-/*******************************************************************\
-
-Function: cerr_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void cerr_message_handlert::print(
-  unsigned level,
-  const std::string &message)
+cerr_message_handlert::cerr_message_handlert():
+  stream_message_handlert(std::cerr)
 {
-  if(verbosity>=level)
-    std::cerr << message << '\n' << std::flush;
 }
-
-/*******************************************************************\
-
-Function: consolte_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void console_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
+  message_handlert::print(level, message);
+
   if(verbosity<level)
     return;
 
@@ -111,43 +66,36 @@ void console_message_handlert::print(
     if(level>=4)
     {
       std::cout << message << '\n';
-
-      if(level<=6)
-        std::cout << std::flush;
     }
     else
-      std::cerr << message << '\n' << std::flush;
+      std::cerr << message << '\n';
   }
   #else
-  // We flush after messages of level 6 or lower.
-  // We don't for messages of level 7 or higher to improve performance,
-  // in particular when writing to NFS.
   // Messages level 3 or lower go to cerr, messages level 4 or
   // above go to cout.
 
   if(level>=4)
   {
     std::cout << message << '\n';
+  }
+  else
+    std::cerr << message << '\n';
+  #endif
+}
 
+void console_message_handlert::flush(unsigned level)
+{
+  // We flush after messages of level 6 or lower.
+  // We don't for messages of level 7 or higher to improve performance,
+  // in particular when writing to NFS.
+  if(level>=4)
+  {
     if(level<=6)
       std::cout << std::flush;
   }
   else
-    std::cerr << message << '\n' << std::flush;
-  #endif
+    std::cerr << std::flush;
 }
-
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void gcc_message_handlert::print(
   unsigned level,
@@ -183,9 +131,9 @@ void gcc_message_handlert::print(
     else
       dest+=id2string(column)+": ";
 
-    if(level==message_clientt::M_ERROR)
+    if(level==messaget::M_ERROR)
       dest+="error: ";
-    else if(level==message_clientt::M_WARNING)
+    else if(level==messaget::M_WARNING)
       dest+="warning: ";
   }
 
@@ -194,22 +142,12 @@ void gcc_message_handlert::print(
   print(level, dest);
 }
 
-/*******************************************************************\
-
-Function: gcc_message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void gcc_message_handlert::print(
   unsigned level,
   const std::string &message)
 {
+  message_handlert::print(level, message);
+
   // gcc appears to send everything to cerr
   if(verbosity>=level)
     std::cerr << message << '\n' << std::flush;

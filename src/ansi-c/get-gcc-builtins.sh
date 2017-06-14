@@ -10,10 +10,11 @@ fi
 builtin_defs=" \
   builtin-types.def builtins.def sync-builtins.def \
   omp-builtins.def gtm-builtins.def cilk-builtins.def cilkplus.def \
-  sanitizer.def chkp-builtins.def hsa-builtins.def"
+  sanitizer.def chkp-builtins.def hsa-builtins.def brig-builtins.def \
+  config/i386/i386-builtin.def config/i386/i386-builtin-types.def"
 
 for f in $builtin_defs ; do
-  [ ! -s $f ] || continue
+  [ ! -s `basename $f` ] || continue
   echo Downloading http://gcc.gnu.org/svn/gcc/trunk/gcc/$f
   svn export http://gcc.gnu.org/svn/gcc/trunk/gcc/$f > /dev/null
 done
@@ -24,6 +25,31 @@ cat > gcc-builtins.h <<EOF
 #include <unistd.h>
 #include <stdio.h>
 #include <wctype.h>
+
+typedef   char   __gcc_v8qi  __attribute__ ((__vector_size__ (8)));
+typedef   char   __gcc_v16qi __attribute__ ((__vector_size__ (16)));
+typedef   char   __gcc_v32qi __attribute__ ((__vector_size__ (32)));
+typedef   char   __gcc_v64qi __attribute__ ((__vector_size__ (64)));
+typedef   int    __gcc_v2si  __attribute__ ((__vector_size__ (8)));
+typedef   int    __gcc_v4si  __attribute__ ((__vector_size__ (16)));
+typedef   int    __gcc_v8si  __attribute__ ((__vector_size__ (32)));
+typedef   int    __gcc_v16si  __attribute__ ((__vector_size__ (64)));
+typedef   short  __gcc_v4hi  __attribute__ ((__vector_size__ (8)));
+typedef   short  __gcc_v8hi  __attribute__ ((__vector_size__ (16)));
+typedef   short  __gcc_v16hi __attribute__ ((__vector_size__ (32)));
+typedef   short  __gcc_v32hi __attribute__ ((__vector_size__ (64)));
+typedef   float  __gcc_v2sf  __attribute__ ((__vector_size__ (8)));
+typedef   float  __gcc_v4sf  __attribute__ ((__vector_size__ (16)));
+typedef   float  __gcc_v8sf  __attribute__ ((__vector_size__ (32)));
+typedef   float  __gcc_v16sf  __attribute__ ((__vector_size__ (64)));
+typedef   double __gcc_v2df  __attribute__ ((__vector_size__ (16)));
+typedef   double __gcc_v4df  __attribute__ ((__vector_size__ (32)));
+typedef   double __gcc_v8df  __attribute__ ((__vector_size__ (64)));
+typedef   long long __gcc_v1di __attribute__ ((__vector_size__ (8)));
+typedef   long long __gcc_v2di __attribute__ ((__vector_size__ (16)));
+typedef   long long __gcc_v4di __attribute__ ((__vector_size__ (32)));
+typedef   long long __gcc_v8di __attribute__ ((__vector_size__ (64)));
+typedef   unsigned long long __gcc_di;
 
 EOF
 
@@ -63,6 +89,15 @@ cat > builtins.h <<EOF
 #define uint64_type_node uint64_t
 #define pid_type_node pid_t
 #define const_tm_ptr_type_node const struct tm*
+#define char_type_node char
+#define intSI_type_node int
+#define intHI_type_node short
+#define unsigned_intSI_type_node unsigned
+#define unsigned_intHI_type_node unsigned short
+#define unsigned_intQI_type_node unsigned char
+#define short_unsigned_type_node unsigned short
+#define short_integer_type_node short
+#define unsigned_char_type_node unsigned char
 
 // some newer versions of GCC apparently support __floatXYZ
 #define dfloat32_type_node __float32
@@ -121,25 +156,64 @@ NEXTDEF ENUM(name) RETURN name(ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7, ...)
 #define DEF_POINTER_TYPE(ENUM, TYPE) \
 NEXTDEF ENUM TYPE*
 
+#define DEF_POINTER_TYPE_CONST(ENUM, TYPE, C) \
+NEXTDEF ENUM const TYPE*
+
 #include "builtin-types.def"
 
 NEXTDEF DEF_BUILTIN(ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, \
                   FALLBACK_P, NONANSI_P, ATTRS, IMPLICIT, COND) \
 TYPE(MANGLE(NAME));
+
+#include "i386-builtin-types-expanded.def"
+
+NEXTDEF BDESC(mask, icode, name, code, comparison, flag) \
+flag(MANGLEi386(name));
+NEXTDEF BDESC_FIRST(kind, KIND, mask, icode, name, code, comparison, flag) \
+flag(MANGLEi386(name));
 EOF
 
-gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | cat - builtins.def | \
+grep '^DEF_VECTOR_TYPE' i386-builtin-types.def | \
+  awk -F '[,() \t]' '{ print "#define " $3 " __gcc_" tolower($3) }' \
+  > i386-builtin-types-expanded.def
+
+grep -v '^DEF_FUNCTION_TYPE[[:space:]]' i386-builtin-types.def | \
+  grep '^DEF_P' | \
+  sed '/^DEF_POINTER_TYPE[^,]*, [^,]*, [^,]*$/ s/_TYPE/_TYPE_CONST/' \
+  >> i386-builtin-types-expanded.def
+
+cat i386-builtin-types.def | \
+  sed '/^DEF_FUNCTION_TYPE[[:space:]]/! s/.*//' | \
+  sed 's/^DEF_FUNCTION_TYPE[[:space:]]*(\([^,]*\))/\1_FTYPE_VOID/' | \
+  sed 's/^DEF_FUNCTION_TYPE[[:space:]]*(\([^,]*\), \(.*\))/\1_FTYPE_\2/' | \
+  sed 's/, /_/g' > i386-type-names.def
+cat i386-builtin-types.def | tr -c -d ',\n' | awk '{ print length }' | \
+  paste - i386-type-names.def i386-builtin-types.def | grep -v '#' | \
+  sed 's/^\([0-9]\)[[:space:]]*\([^[:space:]]*\)[[:space:]]*DEF_FUNCTION_TYPE[[:space:]]*(/DEF_FUNCTION_TYPE_\1(\2, /' | \
+  grep ^DEF_FUNCTION_TYPE >> i386-builtin-types-expanded.def
+
+gcc -E builtins.h | sed 's/^NEXTDEF/#define/' | \
+  cat - builtins.def i386-builtin.def | \
   gcc -E -P - | \
   sed 's/MANGLE("__builtin_" "\(.*\)")/__builtin_\1/' | \
+  sed 's/MANGLEi386("__builtin_\(.*\)")/__builtin_\1/' | \
+  sed 's/^(int) //' | \
   sed '/^;$/d' >> gcc-builtins.h
 
-rm $builtin_defs builtins.h
+for f in $builtin_defs builtins.h i386-builtin-types-expanded.def i386-type-names.def ; do
+  rm `basename $f`
+done
+
+sed_is_gnu_sed=0
+if sed --version >/dev/null 2>&1 ; then
+  # GNU sed
+  sed_is_gnu_sed=1
+fi
 
 # for some we don't know how to handle them - removing symbols should be safe
 remove_line() {
   local pattern="$1"
-  if sed --version >/dev/null 2>&1 ; then
-    # GNU sed
+  if [ $sed_is_gnu_sed -eq 1 ] ; then
     sed -i "/$pattern/d" gcc-builtins.h
   else
     sed -i '' "/$pattern/d" gcc-builtins.h
@@ -152,9 +226,50 @@ remove_line BT_FN
 remove_line lang_hooks.types.type_for_mode
 remove_line __float
 remove_line pointer_bounds_type_node
+remove_line BT_LAST
+remove_line BDESC_END
+remove_line error_mark_node
+remove_line '^0('
+remove_line 'CC.mode('
+remove_line FTYPE
+remove_line MULTI_ARG
+
+ifs=$IFS
+IFS='
+'
+
+while read line ; do
+  if [ $sed_is_gnu_sed -eq 1 ] ; then
+    line=`echo "$line" | sed 's/\<size_t/__CPROVER_size_t/g'`
+    line=`echo "$line" | sed 's/\<complex\>\([^\.]\)/_Complex\1/g'`
+  else
+    line=`echo "$line" | sed 's/[[:<:]]size_t/__CPROVER_size_t/g'`
+    line=`echo "$line" | sed 's/[[:<:]]complex[[:>:]]\([^\.]\)/_Complex\1/g'`
+  fi
+
+  if grep -q -F "$line" gcc_builtin_headers_*.h ; then
+    continue
+  fi
+
+  bi=`echo "$line" | cut -f1 -d'(' | sed 's/.* //'`
+
+  if [[ $bi =~ __builtin_ia32 ]] ; then
+    if grep -wq $bi gcc_builtin_headers_ia32*.h ; then
+      if [ $sed_is_gnu_sed -eq 1 ] ; then
+        sed -i "/^[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
+      else
+        sed -i '' "/^[^/].*$bi(/ s/.*/$line/" gcc_builtin_headers_ia32*.h
+      fi
+      continue
+    fi
+  fi
+
+  echo "$line" >> _gcc-builtins.h
+done < gcc-builtins.h
+mv _gcc-builtins.h gcc-builtins.h
 
 cat gcc-builtins.h | sed 's/__builtin/XX__builtin/' | \
-  gcc -c -fno-builtin -x c - -o gcc-builtins.o
+  gcc -D__CPROVER_size_t=size_t -c -fno-builtin -x c - -o gcc-builtins.o
 rm gcc-builtins.o
 
 echo "Successfully built gcc-builtins.h"

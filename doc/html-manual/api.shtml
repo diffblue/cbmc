@@ -299,17 +299,17 @@ extern unsigned char __CPROVER_memory[];
 This array models the contents of integer-addressed memory.
 </p>
 
-<h4>__CPROVER::unsignedbv<N> (C++ only)</h4>
+<h4>__CPROVER::unsignedbv&lt;N&gt; (C++ only)</h4>
 
 <p class="justified">This type is the equivalent of <b>unsigned __CPROVER_bitvector[N]</b> in the C++ front-end.
 </p>
 
-<h4>__CPROVER::signedbv<N> (C++ only)</h4>
+<h4>__CPROVER::signedbv&lt;N&gt; (C++ only)</h4>
 
 <p class="justified">This type is the equivalent of <b>signed __CPROVER_bitvector[N]</b> in the C++ front-end.
 </p>
 
-<h4>__CPROVER::fixedbv<N> (C++ only)</h4>
+<h4>__CPROVER::fixedbv&lt;N&gt; (C++ only)</h4>
 
 <p class="justified">This type is the equivalent of <b>__CPROVER_fixedbv[N,m]</b> in the C++ front-end.
 </p>

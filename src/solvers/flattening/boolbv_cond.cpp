@@ -6,21 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_cond
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_cond(const exprt &expr)
 {
@@ -66,10 +55,9 @@ bvt boolbvt::convert_cond(const exprt &expr)
         if(bv.size()!=op.size())
         {
           std::cerr << "result size: " << bv.size()
-                    << std::endl
-                    << "operand: " << op.size() << std::endl
+                    << "\noperand: " << op.size() << '\n'
                     << it->pretty()
-                    << std::endl;
+                    << '\n';
 
           throw "size of value operand does not match";
         }

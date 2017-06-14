@@ -6,6 +6,9 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Remove symbols that are internal only
+
 #ifndef CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H
 #define CPROVER_LINKING_REMOVE_INTERNAL_SYMBOLS_H
 

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 
 #include <set>
@@ -13,179 +14,71 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "dplib_prop.h"
 
-/*******************************************************************\
-
-Function: dplib_propt::dplib_propt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 dplib_propt::dplib_propt(std::ostream &_out):out(_out)
 {
   // we skip index 0
   _no_variables=1;
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::land
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_propt::land(literalt a, literalt b, literalt o)
 {
-  out << "// land" << std::endl;
+  out << "// land\n";
   out << "AXIOM (" << dplib_literal(a) << " & "
       << dplib_literal(b) << ") <=> " << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lor(literalt a, literalt b, literalt o)
 {
-  out << "// lor" << std::endl;
+  out << "// lor\n";
   out << "AXIOM (" << dplib_literal(a) << " | "
       << dplib_literal(b) << ") <=> " << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lxor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lxor(literalt a, literalt b, literalt o)
 {
-  out << "// lxor" << std::endl;
+  out << "// lxor\n";
   out << "AXIOM (" << dplib_literal(a) << " <=> "
       << dplib_literal(b) << ") <=> !" << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lnand
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lnand(literalt a, literalt b, literalt o)
 {
-  out << "// lnand" << std::endl;
+  out << "// lnand\n";
   out << "AXIOM (" << dplib_literal(a) << " & "
       << dplib_literal(b) << ") <=> !" << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lnor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lnor(literalt a, literalt b, literalt o)
 {
-  out << "// lnor" << std::endl;
+  out << "// lnor\n";
   out << "AXIOM (" << dplib_literal(a) << " | "
       << dplib_literal(b) << ") <=> !" << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lequal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lequal(literalt a, literalt b, literalt o)
 {
-  out << "// lequal" << std::endl;
+  out << "// lequal\n";
   out << "AXIOM (" << dplib_literal(a) << " <=> "
       << dplib_literal(b) << ") <=> " << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::limplies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::limplies(literalt a, literalt b, literalt o)
 {
-  out << "// limplies" << std::endl;
+  out << "// limplies\n";
   out << "AXIOM (" << dplib_literal(a) << " => "
       << dplib_literal(b) << ") <=> " << dplib_literal(o)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::land
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::land(const bvt &bv)
 {
-  out << "// land" << std::endl;
+  out << "// land\n";
 
   literalt literal=def_dplib_literal();
 
@@ -196,26 +89,14 @@ literalt dplib_propt::land(const bvt &bv)
     out << dplib_literal(*it);
   }
 
-  out << std::endl << std::endl;
+  out << "\n\n";
 
   return literal;
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_propt::lor(const bvt &bv)
 {
-  out << "// lor" << std::endl;
+  out << "// lor\n";
 
   literalt literal=def_dplib_literal();
 
@@ -226,22 +107,10 @@ literalt dplib_propt::lor(const bvt &bv)
     out << dplib_literal(*it);
   }
 
-  out << std::endl << std::endl;
+  out << "\n\n";
 
   return literal;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lxor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lxor(const bvt &bv)
 {
@@ -260,18 +129,6 @@ literalt dplib_propt::lxor(const bvt &bv)
   return literal;
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::land
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_propt::land(literalt a, literalt b)
 {
   if(a==const_literal(true))
@@ -287,22 +144,10 @@ literalt dplib_propt::land(literalt a, literalt b)
 
   literalt o=def_dplib_literal();
   out << dplib_literal(a) << " & " << dplib_literal(b)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 
   return o;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lor(literalt a, literalt b)
 {
@@ -319,22 +164,10 @@ literalt dplib_propt::lor(literalt a, literalt b)
 
   literalt o=def_dplib_literal();
   out << dplib_literal(a) << " | " << dplib_literal(b)
-      << ";" << std::endl << std::endl;
+      << ";\n\n";
 
   return o;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lxor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lxor(literalt a, literalt b)
 {
@@ -349,90 +182,30 @@ literalt dplib_propt::lxor(literalt a, literalt b)
 
   literalt o=def_dplib_literal();
   out << "!(" << dplib_literal(a) << " <-> " << dplib_literal(b)
-      << ");" << std::endl << std::endl;
+      << ");\n\n";
 
   return o;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lnand
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lnand(literalt a, literalt b)
 {
   return !land(a, b);
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::lnor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_propt::lnor(literalt a, literalt b)
 {
   return !lor(a, b);
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lequal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lequal(literalt a, literalt b)
 {
   return !lxor(a, b);
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::limplies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_propt::limplies(literalt a, literalt b)
 {
   return lor(!a, b);
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lselect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::lselect(literalt a, literalt b, literalt c)
 {
@@ -443,50 +216,25 @@ literalt dplib_propt::lselect(literalt a, literalt b, literalt c)
   if(b==c)
     return b;
 
-  out << "// lselect" << std::endl;
+  out << "// lselect\n";
 
   literalt o=def_dplib_literal();
 
   out << "IF " << dplib_literal(a) << " THEN "
       << dplib_literal(b) << " ELSE "
-      << dplib_literal(c) << " ENDIF;"
-      << std::endl << std::endl;
+      << dplib_literal(c) << " ENDIF;\n\n";
 
   return o;
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::new_variable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt dplib_propt::new_variable()
 {
   _no_variables++;
-  out << "l" << _no_variables << ": boolean;" << std::endl;
+  out << "l" << _no_variables << ": boolean;\n";
   literalt l;
   l.set(_no_variables, false);
   return l;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::def_dplib_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt dplib_propt::def_dplib_literal()
 {
@@ -496,18 +244,6 @@ literalt dplib_propt::def_dplib_literal()
   l.set(_no_variables, false);
   return l;
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_propt::lcnf(const bvt &bv)
 {
@@ -532,7 +268,7 @@ void dplib_propt::lcnf(const bvt &bv)
 
   assert(!new_bv.empty());
 
-  out << "// lcnf" << std::endl;
+  out << "// lcnf\n";
   out << "AXIOM ";
 
   for(bvt::const_iterator it=new_bv.begin(); it!=new_bv.end(); it++)
@@ -542,20 +278,8 @@ void dplib_propt::lcnf(const bvt &bv)
     out << dplib_literal(*it);
   }
 
-  out << ";" << std::endl << std::endl;
+  out << ";\n\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::dplib_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string dplib_propt::dplib_literal(literalt l)
 {
@@ -570,35 +294,11 @@ std::string dplib_propt::dplib_literal(literalt l)
   return "l"+std::to_string(l.var_no());
 }
 
-/*******************************************************************\
-
-Function: dplib_propt::finish
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dplib_propt::finish()
 {
   // we want satisfiability
-  out << "THEOREM false;" << std::endl;
+  out << "THEOREM false;\n";
 }
-
-/*******************************************************************\
-
-Function: dplib_propt::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt dplib_propt::prop_solve()
 {

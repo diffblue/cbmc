@@ -6,23 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <fstream>
 
 #include "json_parser.h"
 
 json_parsert json_parser;
-
-/*******************************************************************\
-
-Function: parse_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // 'do it all' function
 bool parse_json(
@@ -47,18 +36,6 @@ bool parse_json(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: parse_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // 'do it all' function
 bool parse_json(

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Misc Utilities
+
 #ifndef CPROVER_UTIL_ARRAY_NAME_H
 #define CPROVER_UTIL_ARRAY_NAME_H
 

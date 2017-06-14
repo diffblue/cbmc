@@ -6,20 +6,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \********************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include "cpp_typecheck.h"
 #include "cpp_declarator_converter.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::convert(cpp_declarationt &declaration)
 {
@@ -43,18 +34,6 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   typecheck_method_bodies(b);
   method_bodies.swap(old_method_bodies);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert_anonymous_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::convert_anonymous_union(
   cpp_declarationt &declaration,
@@ -129,18 +108,6 @@ void cpp_typecheckt::convert_anonymous_union(
 
   code.swap(new_code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert_non_template_declaration
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::convert_non_template_declaration(
   cpp_declarationt &declaration)

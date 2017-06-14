@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <algorithm>
 
+#include "c_types.h"
 #include "rational.h"
 #include "simplify_expr_class.h"
 #include "simplify_expr.h"
@@ -63,18 +65,6 @@ public:
 simplify_expr_cachet simplify_expr_cache;
 #endif
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_abs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_abs(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -115,18 +105,6 @@ bool simplify_exprt::simplify_abs(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_sign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_sign(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -156,18 +134,6 @@ bool simplify_exprt::simplify_sign(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_popcount
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_popcount(exprt &expr)
 {
@@ -199,18 +165,6 @@ bool simplify_exprt::simplify_popcount(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_typecast(exprt &expr)
 {
@@ -334,7 +288,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().operands().size()==1 &&
      op_type.id()==ID_pointer)
   {
-    expr.op0().type()=unsignedbv_typet(config.ansi_c.pointer_width);
+    expr.op0().type()=size_type();
     simplify_typecast(expr.op0()); // rec. call
     simplify_typecast(expr); // rec. call
     return false;
@@ -351,17 +305,15 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().op0().op0().is_zero() &&
      op_type.id()==ID_pointer)
   {
-    unsignedbv_typet size_type(config.ansi_c.pointer_width);
-
     mp_integer sub_size=pointer_offset_size(op_type.subtype(), ns);
     if(sub_size!=-1)
     {
       // void*
       if(sub_size==0 || sub_size==1)
-        expr.op0()=typecast_exprt(expr.op0().op1(), size_type);
+        expr.op0()=typecast_exprt(expr.op0().op1(), size_type());
       else
-        expr.op0()=mult_exprt(from_integer(sub_size, size_type),
-                              typecast_exprt(expr.op0().op1(), size_type));
+        expr.op0()=mult_exprt(from_integer(sub_size, size_type()),
+                              typecast_exprt(expr.op0().op1(), size_type()));
 
       simplify_rec(expr.op0());
       simplify_typecast(expr); // rec. call
@@ -428,7 +380,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     if(step>0)
     {
-      const unsignedbv_typet size_t_type(config.ansi_c.pointer_width);
+      const typet size_t_type(size_type());
       expr.op0().type()=size_t_type;
 
       for(auto &op : expr.op0().operands())
@@ -759,18 +711,6 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_dereference(exprt &expr)
 {
   const exprt &pointer=to_dereference_expr(expr).pointer();
@@ -828,18 +768,6 @@ bool simplify_exprt::simplify_dereference(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_implies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_if_implies(
   exprt &expr,
@@ -932,18 +860,6 @@ bool simplify_exprt::simplify_if_implies(
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_recursive
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_if_recursive(
   exprt &expr,
   const exprt &cond,
@@ -976,18 +892,6 @@ bool simplify_exprt::simplify_if_recursive(
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_conj
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_if_conj(
   exprt &expr,
   const exprt &cond)
@@ -1009,18 +913,6 @@ bool simplify_exprt::simplify_if_conj(
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_disj
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_if_disj(
   exprt &expr,
   const exprt &cond)
@@ -1041,18 +933,6 @@ bool simplify_exprt::simplify_if_disj(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_branch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_if_branch(
   exprt &trueexpr,
@@ -1085,18 +965,6 @@ bool simplify_exprt::simplify_if_branch(
 
   return tresult && fresult;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_cond
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_if_cond(exprt &expr)
 {
@@ -1133,18 +1001,6 @@ bool simplify_exprt::simplify_if_cond(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if_preorder
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
 {
@@ -1230,18 +1086,6 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_if(if_exprt &expr)
 {
@@ -1351,18 +1195,6 @@ bool simplify_exprt::simplify_if(if_exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::get_values
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::get_values(
   const exprt &expr,
   value_listt &value_list)
@@ -1389,36 +1221,12 @@ bool simplify_exprt::get_values(
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_lambda
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_lambda(exprt &expr)
 {
   bool result=true;
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_with
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_with(exprt &expr)
 {
@@ -1493,18 +1301,6 @@ bool simplify_exprt::simplify_with(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_update(exprt &expr)
 {
   if(expr.operands().size()!=3)
@@ -1561,18 +1357,6 @@ bool simplify_exprt::simplify_update(exprt &expr)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_object(exprt &expr)
 {
@@ -1664,18 +1448,6 @@ bool simplify_exprt::simplify_object(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::bits2expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt simplify_exprt::bits2expr(
   const std::string &bits,
@@ -1791,18 +1563,6 @@ exprt simplify_exprt::bits2expr(
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::expr2bits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string simplify_exprt::expr2bits(
   const exprt &expr,
   bool little_endian)
@@ -1862,18 +1622,6 @@ std::string simplify_exprt::expr2bits(
 
   return "";
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_byte_extract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 {
@@ -2046,7 +1794,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       assert(el_size%8==0);
       mp_integer el_bytes=el_size/8;
 
-      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
+      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns) ||
+         (expr.type().id()==ID_pointer &&
+          op_type_ptr->subtype().id()==ID_pointer))
       {
         if(offset%el_bytes==0)
         {
@@ -2056,6 +1806,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
             index_exprt(
               result,
               from_integer(offset, expr.offset().type()));
+
+          if(!base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
+             result.make_typecast(expr.type());
 
           expr.swap(result);
           simplify_rec(expr);
@@ -2124,18 +1877,6 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_byte_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
 {
@@ -2409,18 +2150,6 @@ bool simplify_exprt::simplify_byte_update(byte_update_exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_node_preorder
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_node_preorder(exprt &expr)
 {
   bool result=true;
@@ -2445,18 +2174,6 @@ bool simplify_exprt::simplify_node_preorder(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_node
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_node(exprt &expr)
 {
@@ -2591,19 +2308,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_rec
-
-  Inputs:
-
- Outputs: returns true if expression unchanged;
-          returns false if changed
-
- Purpose:
-
-\*******************************************************************/
-
+/// \return returns true if expression unchanged; returns false if changed
 bool simplify_exprt::simplify_rec(exprt &expr)
 {
   // look up in cache
@@ -2617,7 +2322,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   {
     const exprt &new_expr=cache_result.first->second;
 
-    if(new_expr.id()==irep_idt())
+    if(new_expr.id().empty())
       return true; // no change
 
     expr=new_expr;
@@ -2663,18 +2368,6 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify(exprt &expr)
 {
 #ifdef DEBUG_ON_DEMAND
@@ -2689,34 +2382,10 @@ bool simplify_exprt::simplify(exprt &expr)
   return res;
 }
 
-/*******************************************************************\
-
-Function: simplify
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify(exprt &expr, const namespacet &ns)
 {
   return simplify_exprt(ns).simplify(expr);
 }
-
-/*******************************************************************\
-
-Function: simplify_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt simplify_expr(const exprt &src, const namespacet &ns)
 {

@@ -9,6 +9,10 @@ Date: February 2013
 
 \*******************************************************************/
 
+/// \file
+/// Range-based reaching definitions analysis (following Field- Sensitive
+///   Program Dependence Analysis, Litvak et al., FSE 2010)
+
 #ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 

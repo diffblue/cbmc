@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <set>
 
 #include "cpp_typecheck.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typcheck_compound_bases
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
@@ -80,7 +71,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     bool virtual_base = base_it->get_bool(ID_virtual);
     irep_idt class_access = base_it->get(ID_protection);
 
-    if(class_access==irep_idt())
+    if(class_access.empty())
       class_access = default_class_access;
 
     base_symbol_expr.id(ID_base);
@@ -125,18 +116,6 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     to_struct_type(type).components().push_back(most_derived);
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::add_base_components
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::add_base_components(
   const struct_typet &from,

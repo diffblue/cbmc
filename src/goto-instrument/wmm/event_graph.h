@@ -8,6 +8,9 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// graph of abstract events
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_EVENT_GRAPH_H
 
@@ -24,10 +27,6 @@ Date: 2012
 
 class messaget;
 class namespacet;
-
-/*******************************************************************\
-                     graph of abstract events
-\*******************************************************************/
 
 typedef grapht<abstract_eventt> wmm_grapht;
 typedef wmm_grapht::node_indext event_idt;

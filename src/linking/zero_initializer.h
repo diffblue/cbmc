@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Linking: Zero Initialization
+
 #ifndef CPROVER_LINKING_ZERO_INITIALIZER_H
 #define CPROVER_LINKING_ZERO_INITIALIZER_H
 

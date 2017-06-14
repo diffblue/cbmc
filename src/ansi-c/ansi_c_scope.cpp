@@ -6,21 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <ostream>
 
 #include "ansi_c_scope.h"
-
-/*******************************************************************\
-
-Function: ansi_c_scopet::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_scopet::print(std::ostream &out) const
 {

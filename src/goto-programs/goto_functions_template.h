@@ -8,6 +8,9 @@ Date: June 2003
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs with Functions
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H
 
@@ -158,18 +161,6 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function: goto_functions_templatet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template <class bodyT>
 void goto_functions_templatet<bodyT>::output(
   const namespacet &ns,
@@ -190,18 +181,6 @@ void goto_functions_templatet<bodyT>::output(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_functions_templatet::compute_location_numbers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_location_numbers()
 {
@@ -214,18 +193,6 @@ void goto_functions_templatet<bodyT>::compute_location_numbers()
     it->second.body.compute_location_numbers(nr);
 }
 
-/*******************************************************************\
-
-Function: goto_functions_templatet::compute_incoming_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_incoming_edges()
 {
@@ -236,18 +203,6 @@ void goto_functions_templatet<bodyT>::compute_incoming_edges()
     it->second.body.compute_incoming_edges();
 }
 
-/*******************************************************************\
-
-Function: goto_functions_templatet::compute_target_numbers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_target_numbers()
 {
@@ -257,18 +212,6 @@ void goto_functions_templatet<bodyT>::compute_target_numbers()
       it++)
     it->second.body.compute_target_numbers();
 }
-
-/*******************************************************************\
-
-Function: goto_functions_templatet::compute_loop_numbers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_loop_numbers()

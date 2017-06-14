@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_constraint_select_one
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_constraint_select_one(const exprt &expr)
 {

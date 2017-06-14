@@ -6,24 +6,18 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generates string constraints for constant strings
+
 #include <ansi-c/string_constant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 #include <util/prefix.h>
 #include <util/unicode.h>
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_constant
-
-  Inputs: a string constant
-
- Outputs: a string expression
-
- Purpose: add axioms saying the returned string expression should be equal
-          to the string constant
-
-\*******************************************************************/
-
+/// add axioms saying the returned string expression should be equal to the
+/// string constant
+/// \par parameters: a string constant
+/// \return a string expression
 string_exprt string_constraint_generatort::add_axioms_for_constant(
   irep_idt sval, const refined_string_typet &ref_type)
 {
@@ -54,18 +48,9 @@ string_exprt string_constraint_generatort::add_axioms_for_constant(
   return res;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_empty_string
-
-  Inputs: function application without argument
-
- Outputs: string expression
-
- Purpose: add axioms to say that the returned string expression is empty
-
-\*******************************************************************/
-
+/// add axioms to say that the returned string expression is empty
+/// \par parameters: function application without argument
+/// \return string expression
 string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   const function_application_exprt &f)
 {
@@ -80,21 +65,11 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   return res;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_from_literal
-
-  Inputs:
-    f - function application with an argument which is a string literal
-        that is a constant with a string value.
-
- Outputs: string expression
-
- Purpose: add axioms to say that the returned string expression is equal to
-          the string literal
-
-\*******************************************************************/
-
+/// add axioms to say that the returned string expression is equal to the string
+/// literal
+/// \param f: function application with an argument which is a string literal
+/// that is a constant with a string value.
+/// \return string expression
 string_exprt string_constraint_generatort::add_axioms_from_literal(
   const function_application_exprt &f)
 {

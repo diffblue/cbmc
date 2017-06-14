@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <iostream>
 #include <algorithm>
 
@@ -115,6 +118,6 @@ typet join_types(const typet &t1, const typet &t2)
 
   std::cerr << "Tried to join types: "
             << t1.pretty() << " and " << t2.pretty()
-            << std::endl;
+            << '\n';
   assert(!"Couldn't join types");
 }

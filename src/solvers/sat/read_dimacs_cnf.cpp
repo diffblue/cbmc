@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Reading DIMACS CNF
+
 #include <istream>
 #include <cstdlib> // for abs()
 
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "read_dimacs_cnf.h"
 
 // #define VERBOSE
-
-/*******************************************************************\
-
-Function: cnft::read_dimacs_cnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void read_dimacs_cnf(std::istream &in, cnft &dest)
 {
@@ -45,11 +36,11 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         break;
 
       #ifdef VERBOSE
-      std::cout << "begin line " << line << std::endl;
+      std::cout << "begin line " << line << '\n';
       #endif
       size_t pos = line.find_first_of(DELIMITERS, 0);
       #ifdef VERBOSE
-      std::cout << "pos " << pos << std::endl;
+      std::cout << "pos " << pos << '\n';
       #endif
       size_t pos_char = line.find_first_of(CHAR_DELIMITERS, 0);
 
@@ -59,13 +50,13 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         line.erase(0, pos+1);
         #ifdef VERBOSE
         std::cout << "i am here\n";
-        std::cout << decision << std::endl;
-        std::cout << "line" << line << std::endl;
+        std::cout << decision << '\n';
+        std::cout << "line" << line << '\n';
         #endif
         if(!decision.compare(std::string("c")))
         {
           #ifdef VERBOSE
-          std::cout << "c " << std::endl;
+          std::cout << "c \n";
           #endif
           break;
         }
@@ -73,7 +64,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         if(!decision.compare(std::string("p")))
         {
           #ifdef VERBOSE
-          std::cout << "p " << std::endl;
+          std::cout << "p \n";
           #endif
           break;
         }
@@ -82,13 +73,13 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
         {
           int parsed_lit = unsafe_string2int(decision);
           #ifdef VERBOSE
-          std::cout << "parsed_lit " << parsed_lit << " " << std::endl;
+          std::cout << "parsed_lit " << parsed_lit << " \n";
           #endif
           if(parsed_lit == 0)
           {
             bvt no_dup=cnft::eliminate_duplicates(new_bv);
             #ifdef VERBOSE
-            std::cout << "calling lcnf " << new_bv.size() << std::endl;
+            std::cout << "calling lcnf " << new_bv.size() << '\n';
             #endif
             dest.lcnf(no_dup);
             new_bv.clear();
@@ -101,7 +92,7 @@ void read_dimacs_cnf(std::istream &in, cnft &dest)
             bool sign = (parsed_lit > 0) ? false : true;
             l.set(var, sign);
             #ifdef VERBOSE
-            std::cout << "setting l to " << l.get() << std::endl;
+            std::cout << "setting l to " << l.get() << '\n';
             #endif
             new_bv.push_back(l);
             if(dest.no_variables() <= var)

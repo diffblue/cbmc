@@ -6,24 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show Value Sets
+
 #include <iostream>
 
 #include <util/xml.h>
 
 #include "value_set_analysis.h"
 #include "show_value_sets.h"
-
-/*******************************************************************\
-
-Function: show_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_value_sets(
   ui_message_handlert::uit ui,
@@ -36,7 +27,7 @@ void show_value_sets(
     {
       xmlt xml;
       convert(goto_functions, value_set_analysis, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 
@@ -50,18 +41,6 @@ void show_value_sets(
   }
 }
 
-/*******************************************************************\
-
-Function: show_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_value_sets(
   ui_message_handlert::uit ui,
   const goto_programt &goto_program,
@@ -73,7 +52,7 @@ void show_value_sets(
     {
       xmlt xml;
       convert(goto_program, value_set_analysis, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 

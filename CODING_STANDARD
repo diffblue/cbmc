@@ -158,6 +158,9 @@ C++ features:
 - Use the auto keyword if and only if one of the following
   - The type is explictly repeated on the RHS (e.g. a constructor call)
   - Adding the type will increase confusion (e.g. iterators, function pointers)
+- Avoid assert, if the condition is an actual invariant, use INVARIANT,
+  PRECONDITION, POSTCONDITION, CHECK_RETURN, UNREACHABLE or DATA_INVARIANT.
+  If there are possible reasons why it might fail, throw an exception.
 
 Architecture-specific code:
 - Avoid if possible.

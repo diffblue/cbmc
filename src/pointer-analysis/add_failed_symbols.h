@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Dereferencing
+
 #ifndef CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 #define CPROVER_POINTER_ANALYSIS_ADD_FAILED_SYMBOLS_H
 

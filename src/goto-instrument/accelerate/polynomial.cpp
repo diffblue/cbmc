@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <vector>
 #include <algorithm>
 

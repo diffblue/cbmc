@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Library Linking
+
 #ifndef CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 #define CPROVER_GOTO_PROGRAMS_LINK_TO_LIBRARY_H
 

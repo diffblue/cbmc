@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include <util/simplify_expr.h>
 
 #include "goto_symex.h"
@@ -13,35 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 unsigned goto_symext::nondet_count=0;
 unsigned goto_symext::dynamic_counter=0;
 
-/*******************************************************************\
-
-Function: goto_symext::do_simplify
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::do_simplify(exprt &expr)
 {
   if(options.get_bool_option("simplify"))
     simplify(expr, ns);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::replace_nondet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::replace_nondet(exprt &expr)
 {

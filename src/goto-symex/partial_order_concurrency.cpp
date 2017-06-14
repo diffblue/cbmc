@@ -6,6 +6,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+/// \file
+/// Add constraints to equation encoding partial orders on events
+
 #include <limits>
 
 #include <util/arith_tools.h>
@@ -13,50 +16,14 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "partial_order_concurrency.h"
 
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::~partial_order_concurrencyt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 partial_order_concurrencyt::partial_order_concurrencyt(
   const namespacet &_ns):ns(_ns)
 {
 }
 
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::~partial_order_concurrencyt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 partial_order_concurrencyt::~partial_order_concurrencyt()
 {
 }
-
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::add_init_writes
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void partial_order_concurrencyt::add_init_writes(
   symex_target_equationt &equation)
@@ -106,18 +73,6 @@ void partial_order_concurrencyt::add_init_writes(
 
   equation.SSA_steps.splice(equation.SSA_steps.begin(), init_steps);
 }
-
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::build_event_lists
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void partial_order_concurrencyt::build_event_lists(
   symex_target_equationt &equation)
@@ -169,18 +124,6 @@ void partial_order_concurrencyt::build_event_lists(
   }
 }
 
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::rw_clock_id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 irep_idt partial_order_concurrencyt::rw_clock_id(
   event_it event,
   axiomt axiom)
@@ -194,18 +137,6 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
 
   return "";
 }
-
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::clock
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symbol_exprt partial_order_concurrencyt::clock(
   event_it event,
@@ -230,18 +161,6 @@ symbol_exprt partial_order_concurrencyt::clock(
   return symbol_exprt(identifier, clock_type);
 }
 
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::build_clock_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void partial_order_concurrencyt::build_clock_type(
   const symex_target_equationt &equation)
 {
@@ -251,18 +170,6 @@ void partial_order_concurrencyt::build_clock_type(
   assert(width<std::numeric_limits<unsigned>::max());
   clock_type=unsignedbv_typet(integer2unsigned(width));
 }
-
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::before
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt partial_order_concurrencyt::before(
   event_it e1, event_it e2, unsigned axioms)
@@ -297,18 +204,6 @@ exprt partial_order_concurrencyt::before(
 
   return conjunction(ops);
 }
-
-/*******************************************************************\
-
-Function: partial_order_concurrencyt::add_constraint
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void partial_order_concurrencyt::add_constraint(
   symex_target_equationt &equation,

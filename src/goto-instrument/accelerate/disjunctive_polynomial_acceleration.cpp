@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <iostream>
 #include <map>
 #include <set>
@@ -52,7 +55,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   accelerator.clear();
 
 #ifdef DEBUG
-  std::cout << "Polynomial accelerating program:" << std::endl;
+  std::cout << "Polynomial accelerating program:\n";
 
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -65,13 +68,13 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     }
   }
 
-  std::cout << "Modified:" << std::endl;
+  std::cout << "Modified:\n";
 
   for(expr_sett::iterator it=modified.begin();
       it!=modified.end();
       ++it)
   {
-    std::cout << expr2c(*it, ns) << std::endl;
+    std::cout << expr2c(*it, ns) << '\n';
   }
 #endif
 
@@ -121,7 +124,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       {
 #ifdef DEBUG
         std::cout << "Fitted a polynomial for " << expr2c(target, ns)
-                  << std::endl;
+                  << '\n';
 #endif
         polynomials[target]=poly;
         accelerator.changed_vars.insert(target);
@@ -158,7 +161,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       ++it)
   {
 #ifdef DEBUG
-    std::cout << "Trying to accelerate " << expr2c(*it, ns) << std::endl;
+    std::cout << "Trying to accelerate " << expr2c(*it, ns) << '\n';
 #endif
 
     if(it->type().id()==ID_bool)
@@ -166,7 +169,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
       // Hack: don't try to accelerate booleans.
       accelerator.dirty_vars.insert(*it);
 #ifdef DEBUG
-      std::cout << "Ignoring boolean" << std::endl;
+      std::cout << "Ignoring boolean\n";
 #endif
       continue;
     }
@@ -175,7 +178,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
        it->id()==ID_dereference)
     {
 #ifdef DEBUG
-      std::cout << "Ignoring array reference" << std::endl;
+      std::cout << "Ignoring array reference\n";
 #endif
       continue;
     }
@@ -184,7 +187,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     {
       // We've accelerated variable this already.
 #ifdef DEBUG
-      std::cout << "We've accelerated it already" << std::endl;
+      std::cout << "We've accelerated it already\n";
 #endif
       continue;
     }
@@ -195,7 +198,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     if(depends_on_array(*it, array_rhs))
     {
 #ifdef DEBUG
-      std::cout << "Ignoring because it depends on an array" << std::endl;
+      std::cout << "Ignoring because it depends on an array\n";
 #endif
       continue;
     }
@@ -218,7 +221,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
     }
 
 #ifdef DEBUG
-    std::cout << "Failed to accelerate " << expr2c(*it, ns) << std::endl;
+    std::cout << "Failed to accelerate " << expr2c(*it, ns) << '\n';
 #endif
 
     // We weren't able to accelerate this target...
@@ -247,7 +250,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   catch(std::string s)
   {
     // Couldn't do WP.
-    std::cout << "Assumptions error: " << s << std::endl;
+    std::cout << "Assumptions error: " << s << '\n';
     return false;
   }
 
@@ -377,7 +380,7 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path)
     if(program.check_sat())
     {
 #ifdef DEBUG
-      std::cout << "Found a path" << std::endl;
+      std::cout << "Found a path\n";
 #endif
       build_path(program, path);
       record_path(program);
@@ -387,11 +390,11 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path)
   }
   catch(std::string s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
   catch(const char *s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
 
   return false;
@@ -413,13 +416,13 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns)
-            << ", which depends on:" << std::endl;
+            << ", which depends on:\n";
 
   for(expr_sett::iterator it=influence.begin();
       it!=influence.end();
       ++it)
   {
-    std::cout << expr2c(*it, ns) << std::endl;
+    std::cout << expr2c(*it, ns) << '\n';
   }
 #endif
 
@@ -623,7 +626,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
     if(program.check_sat())
     {
 #ifdef DEBUG
-      std::cout << "Found a polynomial" << std::endl;
+      std::cout << "Found a polynomial\n";
 #endif
 
       utils.extract_polynomial(program, coefficients, polynomial);
@@ -635,11 +638,11 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   }
   catch(std::string s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
   catch(const char *s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
 
   return false;

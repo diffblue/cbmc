@@ -8,6 +8,9 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
 #include <cassert>
 
 #include <util/threeval.h>
@@ -20,18 +23,6 @@ Author: Daniel Kroening
 #include "partial_order_concurrency.h"
 
 #include "build_goto_trace.h"
-
-/*******************************************************************\
-
-Function: build_full_lhs_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
@@ -110,18 +101,6 @@ exprt build_full_lhs_rec(
   return src_original;
 }
 
-/*******************************************************************\
-
-Function: adjust_lhs_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt adjust_lhs_object(
   const prop_convt &prop_conv,
   const namespacet &ns,
@@ -130,19 +109,8 @@ exprt adjust_lhs_object(
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: set_internal_dynamic_object
-
-  Inputs:
-
- Outputs:
-
- Purpose: set internal field for variable assignment related to
-          dynamic_object[0-9] and dynamic_[0-9]_array.
-
-\*******************************************************************/
-
+/// set internal field for variable assignment related to dynamic_object[0-9]
+/// and dynamic_[0-9]_array.
 void set_internal_dynamic_object(
   const exprt &expr,
   goto_trace_stept &goto_trace_step,
@@ -166,20 +134,8 @@ void set_internal_dynamic_object(
   }
 }
 
-/*******************************************************************\
-
-Function: update_internal_field
-
-  Inputs:
-
- Outputs:
-
- Purpose: set internal for variables assignments related to
-          dynamic_object and CPROVER internal functions
-          (e.g., __CPROVER_initialize)
-
-\*******************************************************************/
-
+/// set internal for variables assignments related to dynamic_object and CPROVER
+/// internal functions (e.g., __CPROVER_initialize)
 void update_internal_field(
   const symex_target_equationt::SSA_stept &SSA_step,
   goto_trace_stept &goto_trace_step,
@@ -213,18 +169,6 @@ void update_internal_field(
       goto_trace_step.internal=true;
   }
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,
@@ -402,18 +346,6 @@ void build_goto_trace(
   for(auto &s_it : goto_trace.steps)
     s_it.step_nr=++step_nr;
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,

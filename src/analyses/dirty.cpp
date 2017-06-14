@@ -8,21 +8,12 @@ Date: March 2013
 
 \*******************************************************************/
 
+/// \file
+/// Local variables whose address is taken
+
 #include <util/std_expr.h>
 
 #include "dirty.h"
-
-/*******************************************************************\
-
-Function: dirtyt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dirtyt::build(const goto_functiont &goto_function)
 {
@@ -32,18 +23,6 @@ void dirtyt::build(const goto_functiont &goto_function)
     find_dirty(it->guard);
   }
 }
-
-/*******************************************************************\
-
-Function: dirtyt::find_dirty
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dirtyt::find_dirty(const exprt &expr)
 {
@@ -57,18 +36,6 @@ void dirtyt::find_dirty(const exprt &expr)
   forall_operands(it, expr)
     find_dirty(*it);
 }
-
-/*******************************************************************\
-
-Function: dirtyt::find_dirty_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dirtyt::find_dirty_address_of(const exprt &expr)
 {
@@ -100,20 +67,8 @@ void dirtyt::find_dirty_address_of(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: dirtyt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dirtyt::output(std::ostream &out) const
 {
   for(const auto &d : dirty)
-    out << d << std::endl;
+    out << d << '\n';
 }

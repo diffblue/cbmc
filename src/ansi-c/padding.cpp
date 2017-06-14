@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <algorithm>
 
 #include <util/config.h>
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include "padding.h"
-
-/*******************************************************************\
-
-Function: alignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer alignment(const typet &type, const namespacet &ns)
 {
@@ -113,18 +104,6 @@ mp_integer alignment(const typet &type, const namespacet &ns)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: add_padding
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void add_padding(struct_typet &type, const namespacet &ns)
 {
@@ -322,22 +301,13 @@ void add_padding(struct_typet &type, const namespacet &ns)
   }
 }
 
-/*******************************************************************\
-
-Function: add_padding
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void add_padding(union_typet &type, const namespacet &ns)
 {
   mp_integer max_alignment=alignment(type, ns)*8;
   mp_integer size_bits=pointer_offset_bits(type, ns);
+
+  if(size_bits<0)
+    throw "type of unknown size:\n"+type.pretty();
 
   union_typet::componentst &components=type.components();
 

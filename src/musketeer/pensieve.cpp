@@ -6,6 +6,7 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+
 #include <util/cprover_prefix.h>
 #include <util/namespace.h>
 #include <util/message.h>
@@ -15,18 +16,6 @@ Author: Vincent Nimal
 #include <goto-instrument/wmm/instrumenter_pensieve.h>
 
 #include "pensieve.h"
-
-/*******************************************************************\
-
-Function: fencer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fence_pensieve(
   value_setst &value_sets,

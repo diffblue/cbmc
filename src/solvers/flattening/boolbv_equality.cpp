@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #include <util/std_expr.h>
@@ -16,24 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "flatten_byte_operators.h"
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_equality
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
   if(!base_type_eq(expr.lhs().type(), expr.rhs().type(), ns))
   {
-    std::cout << "######### lhs: " << expr.lhs().pretty() << std::endl;
-    std::cout << "######### rhs: " << expr.rhs().pretty() << std::endl;
+    std::cout << "######### lhs: " << expr.lhs().pretty() << '\n';
+    std::cout << "######### rhs: " << expr.rhs().pretty() << '\n';
     throw "equality without matching types";
   }
 
@@ -56,10 +45,10 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
 
   if(bv0.size()!=bv1.size())
   {
-    std::cerr << "lhs: " << expr.lhs().pretty() << std::endl;
-    std::cerr << "lhs size: " << bv0.size() << std::endl;
-    std::cerr << "rhs: " << expr.rhs().pretty() << std::endl;
-    std::cerr << "rhs size: " << bv1.size() << std::endl;
+    std::cerr << "lhs: " << expr.lhs().pretty() << '\n';
+    std::cerr << "lhs size: " << bv0.size() << '\n';
+    std::cerr << "rhs: " << expr.rhs().pretty() << '\n';
+    std::cerr << "rhs size: " << bv1.size() << '\n';
     throw "unexpected size mismatch on equality";
   }
 
@@ -73,18 +62,6 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
   return bv_utils.equal(bv0, bv1);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_verilog_case_equality
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt boolbvt::convert_verilog_case_equality(
   const binary_relation_exprt &expr)
 {
@@ -93,8 +70,8 @@ literalt boolbvt::convert_verilog_case_equality(
 
   if(!base_type_eq(expr.lhs().type(), expr.rhs().type(), ns))
   {
-    std::cout << "######### lhs: " << expr.lhs().pretty() << std::endl;
-    std::cout << "######### rhs: " << expr.rhs().pretty() << std::endl;
+    std::cout << "######### lhs: " << expr.lhs().pretty() << '\n';
+    std::cout << "######### rhs: " << expr.rhs().pretty() << '\n';
     throw "verilog_case_equality without matching types";
   }
 
@@ -103,10 +80,10 @@ literalt boolbvt::convert_verilog_case_equality(
 
   if(bv0.size()!=bv1.size())
   {
-    std::cerr << "lhs: " << expr.lhs().pretty() << std::endl;
-    std::cerr << "lhs size: " << bv0.size() << std::endl;
-    std::cerr << "rhs: " << expr.rhs().pretty() << std::endl;
-    std::cerr << "rhs size: " << bv1.size() << std::endl;
+    std::cerr << "lhs: " << expr.lhs().pretty() << '\n';
+    std::cerr << "lhs size: " << bv0.size() << '\n';
+    std::cerr << "rhs: " << expr.rhs().pretty() << '\n';
+    std::cerr << "rhs size: " << bv1.size() << '\n';
     throw "unexpected size mismatch on verilog_case_equality";
   }
 

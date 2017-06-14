@@ -7,6 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// A minimalistic BDD library, following Bryant's original paper and Andersen's
+///   lecture notes
+
 #ifndef CPROVER_SOLVERS_MINIBDD_MINIBDD_H
 #define CPROVER_SOLVERS_MINIBDD_MINIBDD_H
 

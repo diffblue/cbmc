@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show program locations
+
 #include <iostream>
 
 #include <util/xml.h>
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "show_locations.h"
-
-/*******************************************************************\
-
-Function: show_locations
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_locations(
   ui_message_handlert::uit ui,
@@ -55,14 +46,14 @@ void show_locations(
         l.new_element("function").data=
           id2string(source_location.get_function());
 
-        std::cout << xml << std::endl;
+        std::cout << xml << '\n';
       }
       break;
 
     case ui_message_handlert::uit::PLAIN:
       std::cout << function_id << " "
                 << it->location_number << " "
-                << it->source_location << std::endl;
+                << it->source_location << '\n';
       break;
 
     default:
@@ -70,18 +61,6 @@ void show_locations(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: show_locations
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_locations(
   ui_message_handlert::uit ui,

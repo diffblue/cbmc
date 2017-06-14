@@ -6,26 +6,17 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Witnesses for Traces and Proofs
+
 #include <util/base_type.h>
 #include <util/byte_operators.h>
-#include <util/config.h>
+#include <util/c_types.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 
 #include "graphml_witness.h"
-
-/*******************************************************************\
-
-Function: graphml_witnesst::remove_l0_l1
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
@@ -53,18 +44,6 @@ void graphml_witnesst::remove_l0_l1(exprt &expr)
     remove_l0_l1(*it);
 }
 
-/*******************************************************************\
-
-Function: graphml_witnesst::convert_assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string graphml_witnesst::convert_assign_rec(
   const irep_idt &identifier,
   const code_assignt &assign)
@@ -81,7 +60,7 @@ std::string graphml_witnesst::convert_assign_rec(
     {
       index_exprt index(
         assign.lhs(),
-        from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+        from_integer(i++, index_type()),
         type.subtype());
       if(!result.empty())
         result+=' ';
@@ -156,18 +135,6 @@ std::string graphml_witnesst::convert_assign_rec(
   return result;
 }
 
-/*******************************************************************\
-
-Function: filter_out
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool filter_out(
   const goto_tracet &goto_trace,
   const goto_tracet::stepst::const_iterator &prev_it,
@@ -203,18 +170,7 @@ static bool filter_out(
   return false;
 }
 
-/*******************************************************************\
-
-Function: graphml_witnesst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: counterexample witness
-
-\*******************************************************************/
-
+/// counterexample witness
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
   graphml.key_values["sourcecodelang"]="C";
@@ -398,18 +354,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   }
 }
 
-/*******************************************************************\
-
-Function: graphml_witnesst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: proof witness
-
-\*******************************************************************/
-
+/// proof witness
 void graphml_witnesst::operator()(const symex_target_equationt &equation)
 {
   graphml.key_values["sourcecodelang"]="C";
