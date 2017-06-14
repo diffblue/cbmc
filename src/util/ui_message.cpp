@@ -191,6 +191,8 @@ void ui_message_handlert::print(
   int sequence_number,
   const source_locationt &location)
 {
+  message_handlert::print(level, message);
+
   if(verbosity>=level)
   {
     switch(get_ui())
@@ -282,7 +284,7 @@ void ui_message_handlert::xml_ui_msg(
   result.set_attribute("type", type);
 
   std::cout << result;
-  std::cout << std::endl;
+  std::cout << '\n';
 }
 
 /*******************************************************************\
@@ -318,4 +320,36 @@ void ui_message_handlert::json_ui_msg(
   // The first entry is generated in the constructor and does not have
   //  a trailing comma.
   std::cout << ",\n" << result;
+}
+
+/*******************************************************************\
+
+Function: ui_message_handlert::flush
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+void ui_message_handlert::flush(unsigned level)
+{
+  switch(get_ui())
+  {
+  case uit::PLAIN:
+  {
+    console_message_handlert console_message_handler;
+    console_message_handler.flush(level);
+  }
+  break;
+
+  case uit::XML_UI:
+  case uit::JSON_UI:
+  {
+    std::cout << std::flush;
+  }
+  break;
+  }
 }

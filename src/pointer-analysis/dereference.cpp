@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "dereference.h"
 
@@ -44,7 +44,7 @@ exprt dereferencet::operator()(const exprt &pointer)
   const typet &type=pointer.type().subtype();
 
   #ifdef DEBUG
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
   #endif
 
   return dereference_rec(

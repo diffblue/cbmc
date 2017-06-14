@@ -291,7 +291,7 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
 
     if(optstring[0]==':')
     {
-      std::cerr << "cmdlinet::parse: Invalid option string" << std::endl;
+      std::cerr << "cmdlinet::parse: Invalid option string\n";
       abort();
     }
 

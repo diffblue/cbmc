@@ -472,13 +472,13 @@ int main(int argc, char** argv)
   if(process.run() < 0)
     return -1;
 
-  process << "xxx\n" << std::endl;
+  process << "xxx\n\n";
 
   char token;
   for(int i=0; i<3; ++i)
   {
     process >> token;
-    std::cout << "Answer: " << token << std::endl;
+    std::cout << "Answer: " << token << '\n';
   }
 
   return process.wait();

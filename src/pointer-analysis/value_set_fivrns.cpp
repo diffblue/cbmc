@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com,
 #include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "value_set_fivrns.h"
 
@@ -182,7 +182,7 @@ void value_set_fivrnst::output_entry(
     if(vr != object_map.read().validity_ranges.end())
     {
       if(vr->second.empty())
-        std::cout << "        Empty validity record" << std::endl;
+        std::cout << "        Empty validity record\n";
       else
       {
         for(object_map_dt::vrange_listt::const_iterator vit =
@@ -196,13 +196,13 @@ void value_set_fivrnst::output_entry(
               from_target_index>=vit->from &&
               from_target_index<=vit->to)
             out << " (*)";
-          out << std::endl;
+          out << '\n';
         }
       }
     }
     else
     {
-      out << "        No validity information" << std::endl;
+      out << "        No validity information\n";
     }
     #endif
 
@@ -358,7 +358,7 @@ void value_set_fivrnst::get_value_set(
   #if 0
   for(std::list<exprt>::const_iterator it=value_set.begin();
       it!=value_set.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
   #endif
 }
 
@@ -405,9 +405,9 @@ void value_set_fivrnst::get_value_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << expr << std::endl;
-  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
-  std::cout << std::endl;
+  std::cout << "GET_VALUE_SET_REC EXPR: " << expr << '\n';
+  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
+  std::cout << '\n';
   #endif
 
   if(expr.id()==ID_unknown || expr.id()==ID_invalid)
@@ -763,7 +763,7 @@ void value_set_fivrnst::get_reference_set_rec(
 {
   #if 0
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
+            << '\n';
   #endif
 
   if(expr.id()==ID_symbol ||
@@ -788,7 +788,7 @@ void value_set_fivrnst::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
     #endif
 
     return;
@@ -925,9 +925,9 @@ void value_set_fivrnst::assign(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << lhs << std::endl;
-  std::cout << "ASSIGN LTYPE: " << ns.follow(lhs.type()) << std::endl;
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;
+  std::cout << "ASSIGN LHS: " << lhs << '\n';
+  std::cout << "ASSIGN LTYPE: " << ns.follow(lhs.type()) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
   #endif
 
   if(rhs.id()==ID_if)
@@ -1036,7 +1036,7 @@ void value_set_fivrnst::assign(
       if(rhs.id()==ID_array_of)
       {
         assert(rhs.operands().size()==1);
-//        std::cout << "AOF: " << rhs.op0() << std::endl;
+//        std::cout << "AOF: " << rhs.op0() << '\n';
         assign(lhs_index, rhs.op0(), ns, add_to_sets);
       }
       else if(rhs.id()==ID_array ||
@@ -1186,12 +1186,12 @@ void value_set_fivrnst::assign_rec(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << lhs << std::endl;
-  std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "ASSIGN_REC LHS: " << lhs << '\n';
+  std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();
       it!=values_rhs.read().end(); it++)
-    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << std::endl;
+    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << '\n';
   #endif
 
   if(lhs.id()==ID_symbol)
@@ -1360,7 +1360,7 @@ void value_set_fivrnst::do_function_call(
                                  "argument$"+std::to_string(i);
     add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-//    std::cout << arguments[i] << std::endl;
+//    std::cout << arguments[i] << '\n';
 
     assign(dummy_lhs, arguments[i], ns, true);
 
@@ -1557,7 +1557,7 @@ bool value_set_fivrnst::insert_to(
   object_map_dt &map = dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
+//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
     map[n]=object;
     map.set_valid_at(n, to_function, to_target_index);
@@ -1565,7 +1565,7 @@ bool value_set_fivrnst::insert_to(
   }
   else
   {
-//    std::cout << "UPD " << n << std::endl;
+//    std::cout << "UPD " << n << '\n';
     objectt &old=map[n];
 
     bool res = map.set_valid_at(n, to_function, to_target_index);
@@ -1610,7 +1610,7 @@ bool value_set_fivrnst::insert_from(
   object_map_dt &map = dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
+//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
     map[n]=object;
     map.set_valid_at(n, from_function, from_target_index);
@@ -1618,7 +1618,7 @@ bool value_set_fivrnst::insert_from(
   }
   else
   {
-//    std::cout << "UPD " << n << std::endl;
+//    std::cout << "UPD " << n << '\n';
     objectt &old=map[n];
 
     bool res = map.set_valid_at(n, from_function, from_target_index);
@@ -1745,7 +1745,7 @@ bool value_set_fivrnst::object_map_dt::is_valid_at(
 {
   #if 0
     std::cout << "IS_VALID_AT: " << inx << ", " << f << ", line " << line <<
-      std::endl;
+      '\n';
   #endif
 
   validity_rangest::const_iterator vrs = validity_ranges.find(inx);
@@ -1797,10 +1797,10 @@ bool value_set_fivrnst::handover(void)
 
     if(t_it==temporary_values.end())
     {
-//      std::cout << "OLD VALUES FOR: " << ident << std::endl;
+//      std::cout << "OLD VALUES FOR: " << ident << '\n';
       Forall_valid_objects(o_it, state_map.write())
       {
-//        std::cout << "STILL VALID: " << to_expr(o_it) << std::endl;
+//        std::cout << "STILL VALID: " << to_expr(o_it) << '\n';
         if(state_map.write().set_valid_at(o_it->first,
                                           to_function, to_target_index))
           changed = true;
@@ -1808,7 +1808,7 @@ bool value_set_fivrnst::handover(void)
     }
     else
     {
-//      std::cout << "NEW VALUES FOR: " << ident << std::endl;
+//      std::cout << "NEW VALUES FOR: " << ident << '\n';
       if(make_union(state_map, t_it->second.object_map))
         changed = true;
     }

@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/std_types.h>
 #include <util/prefix.h>
@@ -19,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
 
-#include "c_types.h"
 #include "c_typecast.h"
 #include "c_typecheck_base.h"
 #include "c_sizeof.h"
@@ -458,6 +458,11 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_gcc_asm_output ||
           expr.id()==ID_gcc_asm_clobbered_register)
   {
+  }
+  else if(expr.id()==ID_lshr || expr.id()==ID_ashr ||
+          expr.id()==ID_assign_lshr || expr.id()==ID_assign_ashr)
+  {
+    // already type checked
   }
   else
   {
@@ -1318,8 +1323,8 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // an integer/float of the same size
     if((expr_type.id()==ID_signedbv ||
         expr_type.id()==ID_unsignedbv) &&
-       pointer_offset_size(expr_type, *this)==
-       pointer_offset_size(op_vector_type, *this))
+       pointer_offset_bits(expr_type, *this)==
+       pointer_offset_bits(op_vector_type, *this))
     {
     }
     else
@@ -2473,9 +2478,11 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt pointer_offset_expr=exprt(ID_pointer_offset, expr.type());
-    pointer_offset_expr.operands()=expr.arguments();
+    exprt pointer_offset_expr=pointer_offset(expr.arguments().front());
     pointer_offset_expr.add_source_location()=source_location;
+
+    if(expr.type()!=pointer_offset_expr.type())
+      pointer_offset_expr.make_typecast(expr.type());
 
     return pointer_offset_expr;
   }

@@ -90,6 +90,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwind.h"
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
+#include "remove_function.h"
 
 /*******************************************************************\
 
@@ -133,7 +134,7 @@ int goto_instrument_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -244,7 +245,7 @@ int goto_instrument_parse_optionst::doit()
           }
           else
           {
-            std::cout << result << std::endl;
+            std::cout << result << '\n';
           }
         }
       }
@@ -258,10 +259,9 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        std::cout << "////" << std::endl;
-        std::cout << "//// Function: " << f_it->first << std::endl;
-        std::cout << "////" << std::endl;
-        std::cout << std::endl;
+        std::cout << "////\n";
+        std::cout << "//// Function: " << f_it->first << '\n';
+        std::cout << "////\n\n";
 
         const goto_programt &goto_program=f_it->second.body;
 
@@ -269,8 +269,7 @@ int goto_instrument_parse_optionst::doit()
         {
           goto_program.output_instruction(ns, "", std::cout, i_it);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
-                    << std::endl;
-          std::cout << std::endl;
+                    << "\n\n";
         }
       }
     }
@@ -324,11 +323,11 @@ int goto_instrument_parse_optionst::doit()
       forall_goto_functions(it, goto_functions)
       {
         local_bitvector_analysist local_bitvector_analysis(it->second);
-        std::cout << ">>>>" << std::endl;
-        std::cout << ">>>> " << it->first << std::endl;
-        std::cout << ">>>>" << std::endl;
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
         local_bitvector_analysis.output(std::cout, it->second, ns);
-        std::cout << std::endl;
+        std::cout << '\n';
       }
 
       return 0;
@@ -508,17 +507,7 @@ int goto_instrument_parse_optionst::doit()
       reaching_definitions_analysist rd_analysis(ns);
       rd_analysis(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          rd_analysis.output(ns, f_it->second.body, std::cout);
-        }
-      }
+      rd_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
     }
@@ -531,18 +520,7 @@ int goto_instrument_parse_optionst::doit()
       dependence_grapht dependence_graph(ns);
       dependence_graph(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          dependence_graph.output(ns, f_it->second.body, std::cout);
-        }
-      }
-
+      dependence_graph.output(ns, goto_functions, std::cout);
       dependence_graph.output_dot(std::cout);
 
       return 0;
@@ -1038,6 +1016,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
+  if(cmdline.isset("remove-function-body"))
+  {
+    remove_functions(
+      symbol_table,
+      goto_functions,
+      cmdline.get_values("remove-function-body"),
+      get_message_handler());
+  }
+
   // we add the library in some cases, as some analyses benefit
 
   if(cmdline.isset("add-library") ||
@@ -1167,7 +1154,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       }
       else
       {
-        std::cout << result << std::endl;
+        std::cout << result << '\n';
       }
     }
 
@@ -1638,6 +1625,8 @@ void goto_instrument_parse_optionst::help()
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)

@@ -316,7 +316,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     else
     { // unrecognized option
       std::cout << "Warning: uninterpreted armcc option '"
-                << argv[i] << "'" << std::endl;
+                << argv[i] << "'\n";
     }
   }
 

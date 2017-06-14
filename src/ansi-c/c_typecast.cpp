@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -19,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 
 #include "c_typecast.h"
-#include "c_types.h"
 #include "c_qualifiers.h"
 
 /*******************************************************************\

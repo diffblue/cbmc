@@ -8,7 +8,7 @@ Author: Daniel Kroening
 
 #include <util/base_type.h>
 #include <util/byte_operators.h>
-#include <util/config.h>
+#include <util/c_types.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
@@ -81,7 +81,7 @@ std::string graphml_witnesst::convert_assign_rec(
     {
       index_exprt index(
         assign.lhs(),
-        from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+        from_integer(i++, index_type()),
         type.subtype());
       if(!result.empty())
         result+=' ';

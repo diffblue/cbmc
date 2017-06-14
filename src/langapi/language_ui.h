@@ -48,10 +48,9 @@ public:
     return ui_message_handler.get_ui();
   }
 
-  ui_message_handlert &ui_message_handler;
-
 protected:
   const cmdlinet &_cmdline;
+  ui_message_handlert &ui_message_handler;
 };
 
 #endif // CPROVER_LANGAPI_LANGUAGE_UI_H

@@ -235,6 +235,7 @@ _ERROR_CATEGORIES = [
     'readability/function_comment'
     'runtime/arrays',
     'runtime/casting',
+    'runtime/endl',
     'runtime/explicit',
     'runtime/int',
     'runtime/init',
@@ -6198,6 +6199,12 @@ def CheckNamespaceOrUsing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'readability/namespace', 4,
           'Do not use using')
 
+def CheckForEndl(filename, clean_lines, linenum, error):
+  """Check that the line does not contain std::endl."""
+  line = clean_lines.elided[linenum]
+  if Match(r'[^a-zA-Z0-9_]*std::endl[^a-zA-Z0-9_]*', line):
+    error(filename, linenum, 'runtime/endl', 4, 'Do not use std::endl')
+
 def ProcessLine(filename, file_extension, clean_lines, line,
                 include_state, function_state, nesting_state, error,
                 extra_check_functions=[]):
@@ -6239,6 +6246,7 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
   CheckNamespaceOrUsing(filename, clean_lines, line, error)
+  CheckForEndl(filename, clean_lines, line, error)
   for check_fn in extra_check_functions:
     check_fn(filename, clean_lines, line, error)
 
@@ -6463,7 +6471,10 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   _BackupFilters()
 
 #exclude these files:
-  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp|builtin_headers)$', filename):
+  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp)$', filename):
+    return
+
+  if Search(r'_builtin_headers_[a-z0-9_-]+\.h$', filename):
     return
 
   if not ProcessConfigOverrides(filename):

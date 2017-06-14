@@ -76,18 +76,18 @@ more subtle. Try the following program with <code>--big-endian</code>
 and <code>--little-endian</code>:</p>
 
 <hr>
-<code>
+<pre><code>
 #include &lt;stdio.h&gt;<br>
 #include &lt;assert.h&gt;<br>
 <br>
 int main() {<br>
 &nbsp;&nbsp;int i=0x01020304;<br>
-&nbsp;&nbsp;char *p=(char *)&i;<br>
+&nbsp;&nbsp;char *p=(char *)&amp;i;<br>
 &nbsp;&nbsp;printf("Bytes of i: %d, %d, %d, %d\n",<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;p[0], p[1], p[2], p[3]);<br>
 &nbsp;&nbsp;assert(0);<br>
 }
-</code>
+</code></pre>
 <hr>
 
 <!--#include virtual="footer.inc" -->

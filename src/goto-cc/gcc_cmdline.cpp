@@ -96,6 +96,9 @@ const char *gcc_options_with_separated_argument[]=
   "-isysroot",
   "-imultilib",
   "-imultiarch",
+  "-mcpu",
+  "-mtune",
+  "-march",
   "-Xpreprocessor",
   "-Xassembler",
   "-Xlinker",
@@ -188,6 +191,9 @@ const char *gcc_options_without_argument[]=
   "-MP",
   "-MD",
   "-MMD",
+  "-mno-unaligned-access",
+  "-mthumb",
+  "-mthumb-interwork",
   "-nostdinc",
   "-P",
   "-remap",
@@ -431,7 +437,7 @@ bool gcc_cmdlinet::parse_arguments(
       {
         // unrecognized option
         std::cerr << "Warning: uninterpreted gcc option '" << argv_i
-                  << "'" << std::endl;
+                  << "'\n";
       }
     }
   }

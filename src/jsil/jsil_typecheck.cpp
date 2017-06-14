@@ -1398,6 +1398,9 @@ bool jsil_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   symbol_tablet symbol_table;
 
   jsil_typecheckt jsil_typecheck(
@@ -1424,5 +1427,5 @@ bool jsil_typecheck(
     jsil_typecheck.error() << e << messaget::eom;
   }
 
-  return jsil_typecheck.get_error_found();
+  return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
 }

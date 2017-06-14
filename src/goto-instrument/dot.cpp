@@ -84,8 +84,8 @@ void dott::write_dot_subgraph(
   clusters.back().set("name", name);
   clusters.back().set("nr", subgraphscount);
 
-  out << "subgraph \"cluster_" << name << "\" {" << std::endl;
-  out << "label=\"" << name << "\";" << std::endl;
+  out << "subgraph \"cluster_" << name << "\" {\n";
+  out << "label=\"" << name << "\";\n";
 
   const goto_programt::instructionst &instructions =
     goto_program.instructions;
@@ -93,7 +93,7 @@ void dott::write_dot_subgraph(
   if(instructions.empty())
   {
     out << "Node_" << subgraphscount << "_0 " <<
-      "[shape=Mrecord,fontsize=22,label=\"?\"];" << std::endl;
+      "[shape=Mrecord,fontsize=22,label=\"?\"];\n";
   }
   else
   {
@@ -191,7 +191,7 @@ void dott::write_dot_subgraph(
         out <<"Mrecord";
       out << ",fontsize=22,label=\"";
       out << tmp.str();
-      out << "\"];" << std::endl;
+      out << "\"];\n";
 
       std::set<goto_programt::const_targett> tres;
       std::set<goto_programt::const_targett> fres;
@@ -222,7 +222,7 @@ void dott::write_dot_subgraph(
     }
   }
 
-  out << "}" << std::endl;
+  out << "}\n";
   subgraphscount++;
 }
 
@@ -253,25 +253,24 @@ void dott::do_dot_function_calls(
       out << expr.op0().id() <<
         " -> " "Node_" << cit->get("nr") << "_0" <<
         " [lhead=\"cluster_" << expr.op1().get(ID_identifier) << "\"," <<
-        "color=blue];" << std::endl;
+        "color=blue];\n";
     }
     else
     {
       out << "subgraph \"cluster_" << expr.op1().get(ID_identifier) <<
-        "\" {" << std::endl;
-      out << "rank=sink;"<<std::endl;
-      out << "label=\"" << expr.op1().get(ID_identifier) << "\";" << std::endl;
+        "\" {\n";
+      out << "rank=sink;\n";
+      out << "label=\"" << expr.op1().get(ID_identifier) << "\";\n";
       out << "Node_" << subgraphscount << "_0 " <<
-        "[shape=Mrecord,fontsize=22,label=\"?\"];"
-          << std::endl;
-      out << "}" << std::endl;
+        "[shape=Mrecord,fontsize=22,label=\"?\"];\n";
+      out << "}\n";
       clusters.push_back(exprt("cluster"));
       clusters.back().set("name", expr.op1().get(ID_identifier));
       clusters.back().set("nr", subgraphscount);
       out << expr.op0().id() <<
         " -> " "Node_" << subgraphscount << "_0" <<
         " [lhead=\"cluster_" << expr.op1().get("identifier") << "\"," <<
-        "color=blue];" << std::endl;
+        "color=blue];\n";
       subgraphscount++;
     }
   }
@@ -291,8 +290,8 @@ Function: dott::output
 
 void dott::output(std::ostream &out)
 {
-  out << "digraph G {" << std::endl;
-  out << DOTGRAPHSETTINGS << std::endl;
+  out << "digraph G {\n";
+  out << DOTGRAPHSETTINGS << '\n';
 
   std::list<exprt> clusters;
 
@@ -302,7 +301,7 @@ void dott::output(std::ostream &out)
 
   do_dot_function_calls(out);
 
-  out << "}" << std::endl;
+  out << "}\n";
 }
 
 /*******************************************************************\
@@ -406,7 +405,7 @@ void dott::write_edge(
         out << ",color=red";
       out << "]";
     }
-  out << ";" << std::endl;
+  out << ";\n";
 }
 
 /*******************************************************************\

@@ -339,6 +339,9 @@ void add_padding(union_typet &type, const namespacet &ns)
   mp_integer max_alignment=alignment(type, ns)*8;
   mp_integer size_bits=pointer_offset_bits(type, ns);
 
+  if(size_bits<0)
+    throw "type of unknown size:\n"+type.pretty();
+
   union_typet::componentst &components=type.components();
 
   // Is the union packed?

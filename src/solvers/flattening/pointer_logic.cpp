@@ -200,7 +200,7 @@ exprt pointer_logict::object_rec(
     mp_integer size=
       pointer_offset_size(src.type().subtype(), ns);
 
-    if(size==0)
+    if(size<=0)
       return src;
 
     mp_integer index=offset/size;
@@ -234,6 +234,7 @@ exprt pointer_logict::object_rec(
       const typet &subtype=it->type();
 
       mp_integer sub_size=pointer_offset_size(subtype, ns);
+      assert(sub_size>0);
       mp_integer new_offset=current_offset+sub_size;
 
       if(new_offset>offset)

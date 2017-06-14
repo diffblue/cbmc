@@ -15,12 +15,43 @@ const char gcc_builtin_headers_generic[]=
 #include "gcc_builtin_headers_generic.inc"
 ; // NOLINT(whitespace/semicolon)
 
+const char gcc_builtin_headers_math[]=
+"# 1 \"gcc_builtin_headers_math.h\"\n"
+#include "gcc_builtin_headers_math.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_mem_string[]=
+"# 1 \"gcc_builtin_headers_mem_string.h\"\n"
+#include "gcc_builtin_headers_mem_string.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_omp[]=
+"# 1 \"gcc_builtin_headers_omp.h\"\n"
+#include "gcc_builtin_headers_omp.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_tm[]=
+"# 1 \"gcc_builtin_headers_tm.h\"\n"
+#include "gcc_builtin_headers_tm.inc"
+; // NOLINT(whitespace/semicolon)
+
+const char gcc_builtin_headers_ubsan[]=
+"# 1 \"gcc_builtin_headers_ubsan.h\"\n"
+#include "gcc_builtin_headers_ubsan.inc"
+; // NOLINT(whitespace/semicolon)
+
 const char gcc_builtin_headers_ia32[]=
 "# 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "gcc_builtin_headers_ia32.inc"
 ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_2[]=
 #include "gcc_builtin_headers_ia32-2.inc"
+; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_3[]=
+#include "gcc_builtin_headers_ia32-3.inc"
+; // NOLINT(whitespace/semicolon)
+const char gcc_builtin_headers_ia32_4[]=
+#include "gcc_builtin_headers_ia32-4.inc"
 ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[]=
@@ -158,6 +189,8 @@ void ansi_c_internal_additions(std::string &code)
     "signed __CPROVER_POINTER_OFFSET(const void *p);\n"
     "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);\n"
 
     // malloc
     "void *__CPROVER_malloc(__CPROVER_size_t size);\n"
@@ -211,7 +244,11 @@ void ansi_c_internal_additions(std::string &code)
     // arrays
     // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
+    // overwrite all of *dest (possibly using nondet values), even
+    // if *src is smaller
     "void __CPROVER_array_copy(const void *dest, const void *src);\n"
+    // replace at most size-of-*src bytes in *dest
+    "void __CPROVER_array_replace(const void *dest, const void *src);\n"
     "void __CPROVER_array_set(const void *dest, ...);\n"
 
     // k-induction
@@ -242,6 +279,11 @@ void ansi_c_internal_additions(std::string &code)
      config.ansi_c.mode==configt::ansi_ct::flavourt::ARM)
   {
     code+=gcc_builtin_headers_generic;
+    code+=gcc_builtin_headers_math;
+    code+=gcc_builtin_headers_mem_string;
+    code+=gcc_builtin_headers_omp;
+    code+=gcc_builtin_headers_tm;
+    code+=gcc_builtin_headers_ubsan;
     code+=clang_builtin_headers;
 
     // there are many more, e.g., look at
@@ -256,6 +298,8 @@ void ansi_c_internal_additions(std::string &code)
 
       code+=gcc_builtin_headers_ia32;
       code+=gcc_builtin_headers_ia32_2;
+      code+=gcc_builtin_headers_ia32_3;
+      code+=gcc_builtin_headers_ia32_4;
     }
     else if(config.ansi_c.arch=="arm64" ||
             config.ansi_c.arch=="armel" ||

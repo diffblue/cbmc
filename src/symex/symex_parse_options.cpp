@@ -161,7 +161,7 @@ int symex_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -568,7 +568,7 @@ void symex_parse_optionst::report_success()
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -640,7 +640,7 @@ void symex_parse_optionst::report_failure()
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 

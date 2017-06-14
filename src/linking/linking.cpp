@@ -593,10 +593,16 @@ void linkingt::duplicate_code_symbol(
     }
     // handle (incomplete) function prototypes
     else if(base_type_eq(old_t.return_type(), new_t.return_type(), ns) &&
-            ((old_t.parameters().empty() && old_t.has_ellipsis()) ||
-             (new_t.parameters().empty() && new_t.has_ellipsis())))
+            ((old_t.parameters().empty() &&
+              old_t.has_ellipsis() &&
+              old_symbol.value.is_nil()) ||
+             (new_t.parameters().empty() &&
+              new_t.has_ellipsis() &&
+              new_symbol.value.is_nil())))
     {
-      if(old_t.parameters().empty() && old_t.has_ellipsis())
+      if(old_t.parameters().empty() &&
+         old_t.has_ellipsis() &&
+         old_symbol.value.is_nil())
       {
         old_symbol.type=new_symbol.type;
         old_symbol.location=new_symbol.location;
@@ -830,6 +836,7 @@ void linkingt::duplicate_code_symbol(
       old_symbol.value=new_symbol.value;
       old_symbol.type=new_symbol.type; // for parameter identifiers
       old_symbol.is_weak=new_symbol.is_weak;
+      old_symbol.location=new_symbol.location;
       old_symbol.is_macro=new_symbol.is_macro;
     }
     else if(to_code_type(old_symbol.type).get_inlined())
@@ -1093,6 +1100,8 @@ void linkingt::duplicate_object_symbol(
     }
     else if(set_to_new)
       old_symbol.type=new_symbol.type;
+
+    object_type_updates.insert(old_symbol.name, old_symbol.symbol_expr());
   }
 
   // care about initializers
@@ -1500,6 +1509,15 @@ void linkingt::copy_symbols()
       duplicate_type_symbol(old_symbol, new_symbol);
     else
       duplicate_non_type_symbol(old_symbol, new_symbol);
+  }
+
+  // Apply type updates to initializers
+  Forall_symbols(s_it, main_symbol_table.symbols)
+  {
+    if(!s_it->second.is_type &&
+       !s_it->second.is_macro &&
+       s_it->second.value.is_not_nil())
+      object_type_updates(s_it->second.value);
   }
 }
 

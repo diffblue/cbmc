@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/rename.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_convert.h"
 #include "goto_convert_class.h"
@@ -215,17 +215,19 @@ void goto_convertt::finish_gotos(goto_programt &dest)
 
       if(!stack_is_prefix)
       {
-        warning() << "Encountered goto (" << goto_label <<
-          ") that enters one or more lexical blocks;" <<
-          "omitting constructors and destructors." << eom;
+          debug().source_location=i.code.find_source_location();
+          debug() << "encountered goto `" << goto_label
+                  << "' that enters one or more lexical blocks; "
+                  << "omitting constructors and destructors" << eom;
       }
       else
       {
         auto unwind_to_size=label_stack.size();
         if(unwind_to_size<goto_stack.size())
         {
-          status() << "Adding goto-destructor code on jump to " <<
-            goto_label << eom;
+          debug().source_location=i.code.find_source_location();
+          debug() << "adding goto-destructor code on jump to `"
+                  << goto_label << "'" << eom;
           goto_programt destructor_code;
           unwind_destructor_stack(
             i.code.add_source_location(),
@@ -2866,6 +2868,9 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convertt goto_convert(symbol_table, message_handler);
 
   try
@@ -2876,20 +2881,20 @@ void goto_convert(
   catch(int)
   {
     goto_convert.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }
 
 /*******************************************************************\

@@ -22,6 +22,7 @@ Author: Matt Lewis
 
 #include <ansi-c/expr2c.h>
 
+#include <util/c_types.h>
 #include <util/symbol_table.h>
 #include <util/options.h>
 #include <util/std_expr.h>
@@ -61,7 +62,7 @@ bool polynomial_acceleratort::accelerate(
   utils.find_modified(body, targets);
 
 #ifdef DEBUG
-  std::cout << "Polynomial accelerating program:" << std::endl;
+  std::cout << "Polynomial accelerating program:\n";
 
   for(goto_programt::instructionst::iterator it=body.begin();
       it!=body.end();
@@ -70,13 +71,13 @@ bool polynomial_acceleratort::accelerate(
     program.output_instruction(ns, "scratch", std::cout, it);
   }
 
-  std::cout << "Modified:" << std::endl;
+  std::cout << "Modified:\n";
 
   for(expr_sett::iterator it=targets.begin();
       it!=targets.end();
       ++it)
   {
-    std::cout << expr2c(*it, ns) << std::endl;
+    std::cout << expr2c(*it, ns) << '\n';
   }
 #endif
 
@@ -118,7 +119,7 @@ bool polynomial_acceleratort::accelerate(
     {
 #ifdef DEBUG
       std::cout << "Found nonrecursive expression: "
-                << expr2c(target, ns) << std::endl;
+                << expr2c(target, ns) << '\n';
 #endif
 
       nonrecursive.insert(target);
@@ -147,7 +148,7 @@ bool polynomial_acceleratort::accelerate(
     {
 #ifdef DEBUG
       std::cout << "Failed to fit a polynomial for "
-                << expr2c(target, ns) << std::endl;
+                << expr2c(target, ns) << '\n';
 #endif
       accelerator.dirty_vars.insert(*it);
     }
@@ -180,7 +181,7 @@ bool polynomial_acceleratort::accelerate(
   catch (std::string s)
   {
     // Couldn't do WP.
-    std::cout << "Assumptions error: " << s << std::endl;
+    std::cout << "Assumptions error: " << s << '\n';
     return false;
   }
 
@@ -256,7 +257,7 @@ bool polynomial_acceleratort::accelerate(
     // We couldn't model some of the array assignments with polynomials...
     // Unfortunately that means we just have to bail out.
 #ifdef DEBUG
-    std::cout << "Failed to accelerate a nonrecursive expression" << std::endl;
+    std::cout << "Failed to accelerate a nonrecursive expression\n";
 #endif
     return false;
   }
@@ -291,13 +292,13 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
 
 #ifdef DEBUG
   std::cout << "Fitting a polynomial for " << expr2c(var, ns)
-            << ", which depends on:" << std::endl;
+            << ", which depends on:\n";
 
   for(expr_sett::iterator it=influence.begin();
       it!=influence.end();
       ++it)
   {
-    std::cout << expr2c(*it, ns) << std::endl;
+    std::cout << expr2c(*it, ns) << '\n';
   }
 #endif
 
@@ -374,7 +375,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
 
 #ifdef DEBUG
   std::cout << "Fitting polynomial over " << values.size()
-            << " variables" << std::endl;
+            << " variables\n";
 #endif
 
   for(int n=0; n<=2; n++)
@@ -403,7 +404,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   assert_for_values(program, values, coefficients, 2, body, var, overflow);
 
 #ifdef DEBUG
-  std::cout << "Fitting polynomial with program:" << std::endl;
+  std::cout << "Fitting polynomial with program:\n";
   program.output(ns, "", std::cout);
 #endif
 
@@ -424,11 +425,11 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   }
   catch(std::string s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
   catch(const char *s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
 
   return false;
@@ -465,7 +466,7 @@ bool polynomial_acceleratort::fit_const(
     {
 #ifdef DEBUG
       std::cout << "Fitting constant, eval'd to: "
-                << expr2c(program.eval(target), ns) << std::endl;
+                << expr2c(program.eval(target), ns) << '\n';
 #endif
       constant_exprt val=to_constant_expr(program.eval(target));
       mp_integer mp=binary2integer(val.get_value().c_str(), true);
@@ -484,11 +485,11 @@ bool polynomial_acceleratort::fit_const(
   }
   catch(std::string s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
   catch(const char *s)
   {
-    std::cout << "Error in fitting polynomial SAT check: " << s << std::endl;
+    std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
 
   return false;
@@ -514,9 +515,9 @@ void polynomial_acceleratort::assert_for_values(
     if(this_type.id()==ID_pointer)
     {
 #ifdef DEBUG
-      std::cout << "Overriding pointer type" << std::endl;
+      std::cout << "Overriding pointer type\n";
 #endif
-      this_type=unsignedbv_typet(config.ansi_c.pointer_width);
+      this_type=size_type();
     }
 
     if(expr_type==nil_typet())
@@ -696,7 +697,7 @@ bool polynomial_acceleratort::check_inductive(
   }
 
 #ifdef DEBUG
-  std::cout << "Checking following program for inductiveness:" << std::endl;
+  std::cout << "Checking following program for inductiveness:\n";
   program.output(ns, "", std::cout);
 #endif
 
@@ -706,7 +707,7 @@ bool polynomial_acceleratort::check_inductive(
     {
       // We found a counterexample to inductiveness... :-(
   #ifdef DEBUG
-      std::cout << "Not inductive!" << std::endl;
+      std::cout << "Not inductive!\n";
   #endif
     return false;
     }
@@ -717,12 +718,12 @@ bool polynomial_acceleratort::check_inductive(
   }
   catch(std::string s)
   {
-    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
+    std::cout << "Error in inductiveness SAT check: " << s << '\n';
     return false;
   }
   catch(const  char *s)
   {
-    std::cout << "Error in inductiveness SAT check: " << s << std::endl;
+    std::cout << "Error in inductiveness SAT check: " << s << '\n';
     return false;
   }
 }

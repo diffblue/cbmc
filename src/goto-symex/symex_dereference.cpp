@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_symex.h"
 #include "symex_dereference_state.h"
@@ -297,7 +297,7 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode);
 
-    // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
+    // std::cout << "**** " << from_expr(ns, "", tmp1) << '\n';
     exprt tmp2=
       dereference.dereference(
         tmp1,
@@ -305,7 +305,7 @@ void goto_symext::dereference_rec(
         write?
           value_set_dereferencet::modet::WRITE:
           value_set_dereferencet::modet::READ);
-    // std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
+    // std::cout << "**** " << from_expr(ns, "", tmp2) << '\n';
 
     expr.swap(tmp2);
 

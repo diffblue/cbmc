@@ -159,8 +159,7 @@ int as_modet::doit()
   config.set(cmdline);
 
   // determine actions to be undertaken
-  compilet compiler(cmdline);
-  compiler.ui_message_handler.set_verbosity(verbosity);
+  compilet compiler(cmdline, message_handler, cmdline.isset("fatal-warnings"));
 
   if(cmdline.isset('b')) // as86 only
   {
@@ -313,7 +312,7 @@ int as_modet::run_as()
   std::cout << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     std::cout << " " << new_argv[i];
-  std::cout << std::endl;
+  std::cout << '\n';
   #endif
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");

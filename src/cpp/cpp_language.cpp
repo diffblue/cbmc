@@ -252,7 +252,7 @@ void cpp_languaget::show_parse(
       item.get_linkage_spec();
 
     out << "LINKAGE " << linkage_spec.linkage().get("value")
-        << ":" << std::endl;
+        << ":\n";
 
     for(cpp_linkage_spect::itemst::const_iterator
         it=linkage_spec.items().begin();
@@ -260,7 +260,7 @@ void cpp_languaget::show_parse(
         it++)
       show_parse(out, *it);
 
-    out << std::endl;
+    out << '\n';
   }
   else if(item.is_namespace_spec())
   {
@@ -268,7 +268,7 @@ void cpp_languaget::show_parse(
       item.get_namespace_spec();
 
     out << "NAMESPACE " << namespace_spec.get_namespace()
-        << ":" << std::endl;
+        << ":\n";
 
     for(cpp_namespace_spect::itemst::const_iterator
         it=namespace_spec.items().begin();
@@ -276,7 +276,7 @@ void cpp_languaget::show_parse(
         it++)
       show_parse(out, *it);
 
-    out << std::endl;
+    out << '\n';
   }
   else if(item.is_using())
   {
@@ -285,15 +285,15 @@ void cpp_languaget::show_parse(
     out << "USING ";
     if(cpp_using.get_namespace())
       out << "NAMESPACE ";
-    out << cpp_using.name().pretty() << std::endl;
-    out << std::endl;
+    out << cpp_using.name().pretty() << '\n';
+    out << '\n';
   }
   else if(item.is_declaration())
   {
     item.get_declaration().output(out);
   }
   else
-    out << "UNKNOWN: " << item.pretty() << std::endl;
+    out << "UNKNOWN: " << item.pretty() << '\n';
 }
 
 /*******************************************************************\

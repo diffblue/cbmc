@@ -84,7 +84,7 @@ literalt arrayst::record_array_equality(
   // check types
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
-    std::cout << equality.pretty() << std::endl;
+    std::cout << equality.pretty() << '\n';
     throw "record_array_equality got equality without matching types";
   }
 
@@ -174,7 +174,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'with' without matching types";
     }
 
@@ -196,7 +196,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'update' without matching types";
     }
 
@@ -220,14 +220,14 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op1().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
     // check types
     if(!base_type_eq(array_type, a.op2().type(), ns))
     {
-      std::cout << a.pretty() << std::endl;
+      std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
@@ -390,7 +390,7 @@ void arrayst::add_array_Ackermann_constraints()
   // this is quadratic!
 
 #if 0
-  std::cout << "arrays.size(): " << arrays.size() << std::endl;
+  std::cout << "arrays.size(): " << arrays.size() << '\n';
 #endif
 
   // iterate over arrays
@@ -399,7 +399,7 @@ void arrayst::add_array_Ackermann_constraints()
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
 #if 0
-    std::cout << "index_set.size(): " << index_set.size() << std::endl;
+    std::cout << "index_set.size(): " << index_set.size() << '\n';
 #endif
 
     // iterate over indices, 2x!
@@ -516,8 +516,8 @@ void arrayst::update_index_map(bool update_all)
                 << arrays.find_number(i1->first) << " = "
                 << from_expr(ns, "", arrays[arrays.find_number(i1->first)])
                 << "): "
-                << from_expr(ns, "", *i2) << std::endl;
-  std::cout << "-----" << std::endl;
+                << from_expr(ns, "", *i2) << '\n';
+  std::cout << "-----\n";
 #endif
 }
 
@@ -678,7 +678,7 @@ void arrayst::add_array_constraints_with(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << std::endl;
+      std::cout << expr.pretty() << '\n';
       assert(false);
     }
 
@@ -774,7 +774,7 @@ void arrayst::add_array_constraints_update(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << std::endl;
+      std::cout << expr.pretty() << '\n';
       assert(false);
     }
 

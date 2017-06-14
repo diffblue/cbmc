@@ -178,6 +178,9 @@ bool cpp_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   symbol_tablet symbol_table;
   cpp_parse_treet cpp_parse_tree;
 
@@ -204,7 +207,7 @@ bool cpp_typecheck(
     cpp_typecheck.error() << e << messaget::eom;
   }
 
-  return cpp_typecheck.get_error_found();
+  return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
 }
 
 /*******************************************************************\

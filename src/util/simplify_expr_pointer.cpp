@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "c_types.h"
 #include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
@@ -100,11 +101,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
         {
-          unsignedbv_typet int_type(config.ansi_c.pointer_width);
           pointer_typet pointer_type;
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
-            from_integer(step_size*index+address, int_type), pointer_type);
+            from_integer(step_size*index+address, index_type()), pointer_type);
           exprt new_expr=dereference_exprt(typecast_expr, expr.type());
           expr=new_expr;
           result=true;
@@ -137,11 +137,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
-            unsignedbv_typet int_type(config.ansi_c.pointer_width);
             pointer_typet pointer_type;
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
-              from_integer(address+offset, int_type), pointer_type);
+              from_integer(address+offset, index_type()), pointer_type);
             exprt new_expr=dereference_exprt(typecast_expr, expr.type());
             expr=new_expr;
             result=true;
@@ -384,18 +383,19 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr_expr.size()!=1 || int_expr.empty())
       return true;
 
-    typet pointer_type=ptr_expr.front().type();
+    typet pointer_sub_type=ptr_expr.front().type().subtype();
+    if(pointer_sub_type.id()==ID_empty)
+      pointer_sub_type=char_type();
 
     mp_integer element_size=
-      pointer_offset_size(pointer_type.subtype(), ns);
+      pointer_offset_size(pointer_sub_type, ns);
 
-    if(element_size==0)
+    if(element_size<0)
       return true;
 
     // this might change the type of the pointer!
-    exprt pointer_offset(ID_pointer_offset, expr.type());
-    pointer_offset.copy_to_operands(ptr_expr.front());
-    simplify_node(pointer_offset);
+    exprt pointer_offset_expr=pointer_offset(ptr_expr.front());
+    simplify_node(pointer_offset_expr);
 
     exprt sum;
 
@@ -416,7 +416,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     simplify_node(product);
 
-    expr=binary_exprt(pointer_offset, ID_plus, product, expr.type());
+    expr=binary_exprt(pointer_offset_expr, ID_plus, product, expr.type());
 
     simplify_node(expr);
 

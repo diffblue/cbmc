@@ -1431,6 +1431,31 @@ public:
   }
 };
 
+/*! \brief Cast a generic typet to a \ref reference_typet
+ *
+ * This is an unchecked conversion. \a type must be known to be \ref
+ * reference_typet.
+ *
+ * \param type Source type
+ * \return Object of type \ref reference_typet
+ *
+ * \ingroup gr_std_types
+*/
+inline const reference_typet &to_reference_type(const typet &type)
+{
+  assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  return static_cast<const reference_typet &>(type);
+}
+
+/*! \copydoc to_reference_type(const typet &)
+ * \ingroup gr_std_types
+*/
+inline reference_typet &to_reference_type(typet &type)
+{
+  assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  return static_cast<reference_typet &>(type);
+}
+
 /*! \brief TO_BE_DOCUMENTED
 */
 bool is_reference(const typet &type);

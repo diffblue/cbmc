@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <algorithm>
 
+#include "c_types.h"
 #include "rational.h"
 #include "simplify_expr_class.h"
 #include "simplify_expr.h"
@@ -334,7 +335,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().operands().size()==1 &&
      op_type.id()==ID_pointer)
   {
-    expr.op0().type()=unsignedbv_typet(config.ansi_c.pointer_width);
+    expr.op0().type()=size_type();
     simplify_typecast(expr.op0()); // rec. call
     simplify_typecast(expr); // rec. call
     return false;
@@ -351,17 +352,15 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().op0().op0().is_zero() &&
      op_type.id()==ID_pointer)
   {
-    unsignedbv_typet size_type(config.ansi_c.pointer_width);
-
     mp_integer sub_size=pointer_offset_size(op_type.subtype(), ns);
     if(sub_size!=-1)
     {
       // void*
       if(sub_size==0 || sub_size==1)
-        expr.op0()=typecast_exprt(expr.op0().op1(), size_type);
+        expr.op0()=typecast_exprt(expr.op0().op1(), size_type());
       else
-        expr.op0()=mult_exprt(from_integer(sub_size, size_type),
-                              typecast_exprt(expr.op0().op1(), size_type));
+        expr.op0()=mult_exprt(from_integer(sub_size, size_type()),
+                              typecast_exprt(expr.op0().op1(), size_type()));
 
       simplify_rec(expr.op0());
       simplify_typecast(expr); // rec. call
@@ -428,7 +427,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
     if(step>0)
     {
-      const unsignedbv_typet size_t_type(config.ansi_c.pointer_width);
+      const typet size_t_type(size_type());
       expr.op0().type()=size_t_type;
 
       for(auto &op : expr.op0().operands())
@@ -2046,7 +2045,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
       assert(el_size%8==0);
       mp_integer el_bytes=el_size/8;
 
-      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
+      if(base_type_eq(expr.type(), op_type_ptr->subtype(), ns) ||
+         (expr.type().id()==ID_pointer &&
+          op_type_ptr->subtype().id()==ID_pointer))
       {
         if(offset%el_bytes==0)
         {
@@ -2056,6 +2057,9 @@ bool simplify_exprt::simplify_byte_extract(byte_extract_exprt &expr)
             index_exprt(
               result,
               from_integer(offset, expr.offset().type()));
+
+          if(!base_type_eq(expr.type(), op_type_ptr->subtype(), ns))
+             result.make_typecast(expr.type());
 
           expr.swap(result);
           simplify_rec(expr);

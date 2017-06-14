@@ -147,7 +147,7 @@ int clobber_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -326,7 +326,7 @@ bool clobber_parse_optionst::get_goto_program(
 
       language->set_message_handler(get_message_handler());
 
-      status("Parsing", filename);
+      status() << "Parsing " << filename << eom;
 
       if(language->parse(infile, filename))
       {
@@ -532,7 +532,7 @@ void clobber_parse_optionst::report_success()
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -561,7 +561,7 @@ void clobber_parse_optionst::show_counterexample(
   switch(get_ui())
   {
   case ui_message_handlert::uit::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+    std::cout << "\nCounterexample:\n";
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
@@ -569,7 +569,7 @@ void clobber_parse_optionst::show_counterexample(
     {
       xmlt xml;
       convert(ns, error_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 
@@ -604,7 +604,7 @@ void clobber_parse_optionst::report_failure()
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 

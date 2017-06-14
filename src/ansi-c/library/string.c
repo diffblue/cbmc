@@ -11,6 +11,8 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strcpy src/dst overlap");
   __CPROVER_size_t i=0;
   char ch;
   do
@@ -44,6 +46,8 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strcat src/dst overlap");
   __CPROVER_size_t i=0;
   while(dst[i]!=0) i++;
 
@@ -84,6 +88,8 @@ __inline char *__builtin___strncat_chk(
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strncat src/dst overlap");
   (void)*dst;
   (void)*src;
   (void)n;
@@ -111,6 +117,8 @@ inline char *strcpy(char *dst, const char *src)
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strcpy src/dst overlap");
   __CPROVER_size_t i=0;
   char ch;
   do
@@ -142,6 +150,8 @@ inline char *strncpy(char *dst, const char *src, size_t n)
   __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strncpy src/dst overlap");
   __CPROVER_size_t i=0;
   char ch;
   _Bool end;
@@ -175,6 +185,8 @@ inline char *__builtin___strncpy_chk(char *dst, const char *src, size_t n, size_
   __CPROVER_is_zero_string(dst)=__CPROVER_zero_string_length(src)<n;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strncpy src/dst overlap");
   __CPROVER_size_t i=0;
   char ch;
   _Bool end;
@@ -218,6 +230,8 @@ inline char *strcat(char *dst, const char *src)
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strcat src/dst overlap");
   __CPROVER_size_t i=0;
   while(dst[i]!=0) i++;
 
@@ -263,6 +277,8 @@ inline char *strncat(char *dst, const char *src, size_t n)
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=new_size;
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "strncat src/dst overlap");
   (void)*dst;
   (void)*src;
   (void)n;
@@ -500,7 +516,7 @@ inline char *strdup(const char *str)
 
 #undef memcpy
 
-inline void *memcpy(void *dst, const void *src, size_t n)
+void *memcpy(void *dst, const void *src, size_t n)
 {
   __CPROVER_HIDE:
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -517,7 +533,12 @@ inline void *memcpy(void *dst, const void *src, size_t n)
             n <= __CPROVER_zero_string_length(dst)))
     __CPROVER_is_zero_string(dst)=0;
   #else
-  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
+  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dst, src_n);
   #endif
   return dst;
 }
@@ -542,8 +563,13 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
             n <= __CPROVER_zero_string_length(dst)))
     __CPROVER_is_zero_string(dst)=0;
   #else
+  __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
+                   __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
   (void)size;
-  for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dst, src_n);
   #endif
   return dst;
 }
@@ -557,7 +583,7 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
 
 #undef memset
 
-inline void *memset(void *s, int c, size_t n)
+void *memset(void *s, int c, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -576,8 +602,11 @@ inline void *memset(void *s, int c, size_t n)
   else
     __CPROVER_is_zero_string(s)=0;
   #else
-  char *sp=s;
-  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  //char *sp=s;
+  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  unsigned char s_n[n];
+  __CPROVER_array_set(s_n, (unsigned char)c);
+  __CPROVER_array_replace((unsigned char*)s, s_n);
   #endif
   return s;
 }
@@ -605,8 +634,11 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
     __CPROVER_is_zero_string(s)=0;
   #else
   (void)size;
-  char *sp=s;
-  for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  //char *sp=s;
+  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  unsigned char s_n[n];
+  __CPROVER_array_set(s_n, (unsigned char)c);
+  __CPROVER_array_replace((unsigned char*)s, s_n);
   #endif
   return s;
 }
@@ -620,7 +652,7 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
 
 #undef memmove
 
-inline void *memmove(void *dest, const void *src, size_t n)
+void *memmove(void *dest, const void *src, size_t n)
 {
   __CPROVER_HIDE:;
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -635,14 +667,42 @@ inline void *memmove(void *dest, const void *src, size_t n)
   else
     __CPROVER_is_zero_string(dest)=0;
   #else
-  if((const char *)dest>=(const char *)src+n)
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dest, src_n);
+  #endif
+  return dest;
+}
+
+/* FUNCTION: __builtin___memmove_chk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#include <string.h>
+#define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef memmove
+
+void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_size_t size)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_buffer_size(src)>=n, "memmove buffer overflow");
+  __CPROVER_assert(__CPROVER_buffer_size(dest)==size, "builtin object size");
+  // dst = src (with overlap allowed)
+  if(__CPROVER_is_zero_string(src) &&
+     n > __CPROVER_zero_string_length(src))
   {
-    for(__CPROVER_size_t i=0; i<n; i++) ((char *)dest)[i]=((const char *)src)[i];
+    __CPROVER_is_zero_string(src)=1;
+    __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
   }
   else
-  {
-    for(__CPROVER_size_t i=n; i>0; i--) ((char *)dest)[i-1]=((const char *)src)[i-1];
-  }
+    __CPROVER_is_zero_string(dest)=0;
+  #else
+  (void)size;
+  char src_n[n];
+  __CPROVER_array_copy(src_n, (char*)src);
+  __CPROVER_array_replace((char*)dest, src_n);
   #endif
   return dest;
 }

@@ -12,14 +12,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
-#include <util/config.h>
 #include <util/type_eq.h>
 #include <util/message.h>
 #include <util/base_type.h>
 #include <ansi-c/c_qualifiers.h>
 #include <analyses/does_remove_const.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "remove_skip.h"
 #include "remove_function_pointers.h"

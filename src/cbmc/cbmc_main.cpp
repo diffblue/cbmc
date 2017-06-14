@@ -53,9 +53,9 @@ int main(int argc, const char **argv)
   int res=parse_options.main();
 
   #ifdef IREP_HASH_STATS
-  std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << std::endl;
-  std::cout << "IREP_CMP_CNT=" << irep_cmp_cnt << std::endl;
-  std::cout << "IREP_CMP_NE_CNT=" << irep_cmp_ne_cnt << std::endl;
+  std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << '\n';
+  std::cout << "IREP_CMP_CNT=" << irep_cmp_cnt << '\n';
+  std::cout << "IREP_CMP_NE_CNT=" << irep_cmp_ne_cnt << '\n';
   #endif
 
   return res;

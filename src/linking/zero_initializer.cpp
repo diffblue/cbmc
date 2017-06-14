@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/expr2c.h>
 
 #include "zero_initializer.h"

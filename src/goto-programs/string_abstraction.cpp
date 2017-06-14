@@ -8,13 +8,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 
+#include <util/pointer_predicates.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "pointer_arithmetic.h"
 #include "string_abstraction.h"
@@ -891,11 +892,8 @@ exprt string_abstractiont::build(
   if(what==whatt::LENGTH || what==whatt::SIZE)
   {
     // adjust for offset
-    exprt pointer_offset(ID_pointer_offset, size_type());
-    pointer_offset.copy_to_operands(pointer);
-    if(pointer_offset.is_not_nil() &&
-        !pointer_offset.is_zero())
-      result=minus_exprt(result, pointer_offset);
+    result=minus_exprt(result, pointer_offset(pointer));
+    result.op0().make_typecast(result.op1().type());
   }
 
   return result;

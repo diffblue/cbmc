@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/decision_procedure.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <pointer-analysis/dereference.h>
 
@@ -82,14 +82,14 @@ Function: path_symex_statet::output
 
 void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
-  out << "  PC: " << thread.pc << std::endl;
+  out << "  PC: " << thread.pc << '\n';
   out << "  Call stack:";
   for(call_stackt::const_iterator
       it=thread.call_stack.begin();
       it!=thread.call_stack.end();
       it++)
-    out << " " << it->return_location << std::endl;
-  out << std::endl;
+    out << " " << it->return_location << '\n';
+  out << '\n';
 }
 
 /*******************************************************************\
@@ -108,9 +108,9 @@ void path_symex_statet::output(std::ostream &out) const
 {
   for(unsigned t=0; t<threads.size(); t++)
   {
-    out << "*** Thread " << t << std::endl;
+    out << "*** Thread " << t << '\n';
     output(threads[t], out);
-    out << std::endl;
+    out << '\n';
   }
 }
 

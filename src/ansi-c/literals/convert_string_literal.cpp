@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/unicode.h>
 
 #include "../string_constant.h"
-#include "../c_types.h"
 
 #include "unescape_string.h"
 #include "convert_string_literal.h"
@@ -47,7 +47,7 @@ std::basic_string<unsigned int> convert_one_string_literal(
 
     // pad into wide string
     value.resize(utf8_value.size());
-    for(unsigned i=0; i<utf8_value.size(); i++)
+    for(std::size_t i=0; i<utf8_value.size(); i++)
       value[i]=utf8_value[i];
 
     return value;
@@ -64,16 +64,14 @@ std::basic_string<unsigned int> convert_one_string_literal(
     assert(src[0]=='"');
     assert(src[src.size()-1]=='"');
 
-    std::basic_string<unsigned int> value=
-      unescape_wide_string(std::string(src, 1, src.size()-2));
-
-    // turn into utf-8
-    std::string utf8_value=utf32_to_utf8(value);
+    std::string char_value=
+      unescape_string(std::string(src, 1, src.size()-2));
 
     // pad into wide string
-    value.resize(utf8_value.size());
-    for(unsigned i=0; i<utf8_value.size(); i++)
-      value[i]=utf8_value[i];
+    std::basic_string<unsigned int> value;
+    value.resize(char_value.size());
+    for(std::size_t i=0; i<char_value.size(); i++)
+      value[i]=char_value[i];
 
     return value;
   }
@@ -101,7 +99,7 @@ exprt convert_string_literal(const std::string &src)
 
   char wide=0;
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(std::size_t i=0; i<src.size(); i++)
   {
     char ch=src[i];
 
@@ -115,27 +113,24 @@ exprt convert_string_literal(const std::string &src)
       wide=ch;
 
     // find start of sequence
-    unsigned j=i;
-    while(j<src.size() && src[j]!='"') j++;
+    std::size_t j=src.find('"', i);
+    if(j==std::string::npos)
+      throw "invalid string constant `"+src+"'";
 
     // find end of sequence, considering escaping
-    j++;
-    while(j<src.size() && src[j]!='"')
-    {
-      if(src[j]=='\\')
-        j+=2;
-      else
-        j++;
-    }
+    for(++j; j<src.size() && src[j]!='"'; ++j)
+      if(src[j]=='\\') // skip next character
+        ++j;
 
-    if(j<src.size())
-    {
-      std::string tmp_src=std::string(src, i, j-i+1);
-      std::basic_string<unsigned int> tmp_value=
-        convert_one_string_literal(tmp_src);
-      value.append(tmp_value);
-      i=j;
-    }
+    assert(j<=src.size());
+    if(j==src.size())
+      throw "non-terminated string constant `"+src+"'";
+
+    std::string tmp_src=std::string(src, i, j-i+1);
+    std::basic_string<unsigned int> tmp_value=
+      convert_one_string_literal(tmp_src);
+    value.append(tmp_value);
+    i=j;
   }
 
   if(wide!=0)
@@ -161,7 +156,7 @@ exprt convert_string_literal(const std::string &src)
     result.type().set(ID_size, from_integer(value.size(), index_type()));
 
     result.operands().resize(value.size());
-    for(unsigned i=0; i<value.size(); i++)
+    for(std::size_t i=0; i<value.size(); i++)
       result.operands()[i]=from_integer(value[i], subtype);
 
     return result;
@@ -172,7 +167,7 @@ exprt convert_string_literal(const std::string &src)
 
     char_value.resize(value.size());
 
-    for(unsigned i=0; i<value.size(); i++)
+    for(std::size_t i=0; i<value.size(); i++)
     {
       // Loss of data here if value[i]>255.
       // gcc issues a warning in this case.

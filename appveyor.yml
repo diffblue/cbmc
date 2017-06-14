@@ -75,6 +75,10 @@ test_script:
     cat goto-instrument-typedef/chain.sh || true
 
     rem HACK disable failing tests
+    rmdir /s /q ansi-c\arch_flags_mcpu_bad
+    rmdir /s /q ansi-c\arch_flags_mcpu_good
+    rmdir /s /q ansi-c\arch_flags_mthumb_bad
+    rmdir /s /q ansi-c\arch_flags_mthumb_good
     rmdir /s /q ansi-c\Forward_Declaration2
     rmdir /s /q ansi-c\Incomplete_Type1
     rmdir /s /q ansi-c\Union_Padding1

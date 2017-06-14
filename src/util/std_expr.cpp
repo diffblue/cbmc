@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
+#include "c_types.h"
 #include "config.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
@@ -114,8 +115,6 @@ static void build_object_descriptor_rec(
   const exprt &expr,
   object_descriptor_exprt &dest)
 {
-  const signedbv_typet index_type(config.ansi_c.pointer_width);
-
   if(expr.id()==ID_index)
   {
     const index_exprt &index=to_index_expr(expr);
@@ -127,8 +126,8 @@ static void build_object_descriptor_rec(
 
     dest.offset()=
       plus_exprt(dest.offset(),
-                 mult_exprt(typecast_exprt(index.index(), index_type),
-                            typecast_exprt(sub_size, index_type)));
+                 mult_exprt(typecast_exprt(index.index(), index_type()),
+                            typecast_exprt(sub_size, index_type())));
   }
   else if(expr.id()==ID_member)
   {
@@ -142,7 +141,7 @@ static void build_object_descriptor_rec(
 
     dest.offset()=
       plus_exprt(dest.offset(),
-                 typecast_exprt(offset, index_type));
+                 typecast_exprt(offset, index_type()));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -156,7 +155,7 @@ static void build_object_descriptor_rec(
     dest.offset()=
       plus_exprt(dest.offset(),
                  typecast_exprt(to_byte_extract_expr(expr).offset(),
-                                index_type));
+                                index_type()));
   }
   else if(expr.id()==ID_typecast)
   {
@@ -188,7 +187,7 @@ void object_descriptor_exprt::build(
   object()=expr;
 
   if(offset().id()==ID_unknown)
-    offset()=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+    offset()=from_integer(0, index_type());
 
   build_object_descriptor_rec(ns, expr, *this);
 

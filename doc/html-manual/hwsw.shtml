@@ -36,7 +36,7 @@ the consistency of the HDL implementation is highly desirable.
 <p class="justified">
 This motivates the verification problem: we want to verify the consistency
 of the HDL implementation, i.e., the product,
-<a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=936243&userType=inst">
+<a href="http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&amp;arnumber=936243&amp;userType=inst">
 using the ANSI-C implementation as a reference</a>. Es&shy;ta&shy;bli&shy;shing the consistency
 does not re&shy;quire a formal specification. However, formal methods to verify
 either the hardware or software design are still desirable.
@@ -90,13 +90,12 @@ methodology allows arbitrary loop constructs.
 tutorial</a> and a description on <a href="hwsw-inputs.shtml">
 how to synchronize inputs between the C model and the Verilog model</a>.
 There is also a collection of <a href="http://www.cprover.org/hardware/sequential-equivalence/">
-benchmark problems</a> available.</a>
+benchmark problems</a> available.
 </p>
 
 <div class="box1">
 <div class="caption">Further Reading</div>
 
-<p>
 <ul>
 <li><a target=_top href="http://www-2.cs.cmu.edu/~svc/papers/view-publications-ck03.html">
     Hardware Verification using ANSI-C Programs as a Reference</a></li>
@@ -111,7 +110,7 @@ href="http://www.kroening.com/publications/view-publications-kc2004.html">Checki
 Consistency of C and Verilog using Predicate Abstraction and Induction</a></li>
 
 </ul>
-</p>
+</div> <!-- box1 -->
 
 <!--#include virtual="footer.inc" -->
 

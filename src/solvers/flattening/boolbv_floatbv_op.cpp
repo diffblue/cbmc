@@ -115,7 +115,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
 
   if(op0.type()!=type || op1.type()!=type)
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     throw "float op with mixed types";
   }
 

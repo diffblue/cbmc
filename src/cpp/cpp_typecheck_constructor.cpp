@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
@@ -553,7 +553,7 @@ void cpp_typecheckt::default_assignop_value(
       if(size_expr.id()==ID_infinity)
       {
         // error().source_location=object);
-        // err << "cannot copy array of infinite size" << std::endl;
+        // err << "cannot copy array of infinite size\n";
         // throw 0;
         continue;
       }

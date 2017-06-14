@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -156,7 +156,6 @@ bool static_lifetime_init(
 
   // call designated "initialization" functions
 
-  #if 0
   for(const std::string &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
@@ -170,7 +169,6 @@ bool static_lifetime_init(
       dest.move_to_operands(function_call);
     }
   }
-  #endif
 
   return false;
 }

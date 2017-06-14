@@ -1674,8 +1674,7 @@ bool cpp_typecheckt::get_component(
           error().source_location=source_location;
           str << "error: member `" << component_name
               << "' is not accessible (" << component.get(ID_access) << ")";
-          str << std::endl
-              << "struct name: " << final_type.get(ID_name);
+          str << "\nstruct name: " << final_type.get(ID_name);
           throw 0;
           #endif
         }

@@ -88,7 +88,7 @@ int goto_fence_inserter_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << MUSKETEER_VERSION << std::endl;
+    std::cout << MUSKETEER_VERSION << '\n';
     return 0;
   }
 

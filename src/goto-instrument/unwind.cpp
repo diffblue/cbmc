@@ -458,7 +458,7 @@ void goto_unwindt::operator()(
       continue;
 
 #ifdef DEBUG
-    std::cout << "Function: " << it->first << std::endl;
+    std::cout << "Function: " << it->first << '\n';
 #endif
 
     goto_programt &goto_program=goto_function.body;

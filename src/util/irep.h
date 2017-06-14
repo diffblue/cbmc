@@ -102,7 +102,10 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
-  explicit irept(const irep_idt &_id):data(&empty_d)
+  explicit irept(const irep_idt &_id)
+#ifdef SHARING
+    :data(&empty_d)
+#endif
   {
     id(_id);
   }
@@ -121,7 +124,7 @@ public:
       assert(data->ref_count!=0);
       data->ref_count++;
       #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << std::endl;
+      std::cout << "COPY " << data << " " << data->ref_count << '\n';
       #endif
     }
   }

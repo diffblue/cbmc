@@ -190,7 +190,8 @@ bool pbs_dimacs_cnft::pbs_solve()
           // print(line);
           if(strstr(line.c_str(), "time out")!=NULL)
             {
-              print(6, "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT.\n");
+              status() << "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT."
+                       << eom;
               return satisfied;
             }
           sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);

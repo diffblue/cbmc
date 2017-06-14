@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <langapi/language_util.h>
 
 #include "local_bitvector_analysis.h"
@@ -400,6 +400,7 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
 
     for(const auto &succ : node.successors)
     {
+      assert(succ<loc_infos.size());
       if(loc_infos[succ].merge(loc_info_dest))
         work_queue.push(succ);
     }

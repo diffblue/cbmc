@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/prefix.h>
 #include <util/std_types.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/ieee_float.h>
 
@@ -186,7 +187,24 @@ Function: java_reference_type
 
 reference_typet java_reference_type(const typet &subtype)
 {
-  return reference_typet(subtype);
+  return to_reference_type(reference_type(subtype));
+}
+
+/*******************************************************************\
+
+Function: java_lang_object_type
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+reference_typet java_lang_object_type()
+{
+  return java_reference_type(symbol_typet("java::java.lang.Object"));
 }
 
 /*******************************************************************\
@@ -201,7 +219,7 @@ Function: java_array_type
 
 \*******************************************************************/
 
-pointer_typet java_array_type(const char subtype)
+reference_typet java_array_type(const char subtype)
 {
   std::string subtype_str;
 
@@ -227,7 +245,7 @@ pointer_typet java_array_type(const char subtype)
   symbol_type.set(ID_C_base_name, class_name);
   symbol_type.set(ID_C_element_type, java_type_from_char(subtype));
 
-  return pointer_typet(symbol_type);
+  return java_reference_type(symbol_type);
 }
 
 /*******************************************************************\

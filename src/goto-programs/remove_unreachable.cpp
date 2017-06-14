@@ -55,3 +55,22 @@ void remove_unreachable(goto_programt &goto_program)
       it->make_skip();
   }
 }
+
+/*******************************************************************\
+
+Function: remove_unreachable
+
+  Inputs: The goto functions from which the unreachable functions are
+          to be removed.
+
+ Outputs: None.
+
+ Purpose: Removes unreachable instructions from all functions.
+
+\*******************************************************************/
+
+void remove_unreachable(goto_functionst &goto_functions)
+{
+  Forall_goto_functions(f_it, goto_functions)
+    remove_unreachable(f_it->second.body);
+}

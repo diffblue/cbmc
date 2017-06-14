@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_static_init_loops.h>
+#include <goto-programs/mm_io.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -472,7 +473,7 @@ int cbmc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
@@ -517,29 +518,10 @@ int cbmc_parse_optionst::doit()
 
   goto_functionst goto_functions;
 
-  // get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
-
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-
-  try
-  {
-    cbmc_solver=cbmc_solvers.get_solver();
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return 1; // should contemplate EX_SOFTWARE from sysexits.h
-  }
-
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
-
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
+  expr_listt bmc_constraints;
 
   int get_goto_program_ret=
-    get_goto_program(options, bmc, goto_functions);
+    get_goto_program(options, bmc_constraints, goto_functions);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -561,6 +543,27 @@ int cbmc_parse_optionst::doit()
   // side effect: add this as explicit unwind to unwind set
   if(options.get_bool_option("java-unwind-enum-static"))
     remove_static_init_loops(symbol_table, goto_functions, options);
+
+  // get solver
+  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
+  cbmc_solvers.set_ui(get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+
+  try
+  {
+    cbmc_solver=cbmc_solvers.get_solver();
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 1; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  prop_convt &prop_conv=cbmc_solver->prop_conv();
+
+  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
 
   // do actual BMC
   return do_bmc(bmc, goto_functions);
@@ -623,7 +626,7 @@ Function: cbmc_parse_optionst::get_goto_program
 
 int cbmc_parse_optionst::get_goto_program(
   const optionst &options,
-  bmct &bmc, // for get_modules
+  expr_listt &bmc_constraints, // for get_modules
   goto_functionst &goto_functions)
 {
   if(cmdline.args.empty())
@@ -669,7 +672,7 @@ int cbmc_parse_optionst::get_goto_program(
 
       language->set_message_handler(get_message_handler());
 
-      status("Parsing", filename);
+      status() << "Parsing " << filename << eom;
 
       if(language->parse(infile, filename))
       {
@@ -705,7 +708,7 @@ int cbmc_parse_optionst::get_goto_program(
         return 6;
       if(typecheck())
         return 6;
-      int get_modules_ret=get_modules(bmc);
+      int get_modules_ret=get_modules(bmc_constraints);
       if(get_modules_ret!=-1)
         return get_modules_ret;
       if(binaries.empty() && final())
@@ -900,6 +903,8 @@ bool cbmc_parse_optionst::process_goto_program(
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
 
+    mm_io(symbol_table, goto_functions);
+
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_functions, ns, ui_message_handler);
@@ -1073,7 +1078,7 @@ void cbmc_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2016 ";
+    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 

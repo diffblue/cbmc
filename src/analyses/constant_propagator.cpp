@@ -93,7 +93,7 @@ void constant_propagator_domaint::assign_rec(
 
 #ifdef DEBUG
   std::cout << "assign: " << from_expr(ns, "", lhs)
-            << " := " << from_type(ns, "", rhs_type) << std::endl;
+            << " := " << from_type(ns, "", rhs_type) << '\n';
 #endif
 
   if(lhs.id()==ID_symbol && rhs.id()==ID_if)
@@ -329,6 +329,29 @@ void constant_propagator_domaint::assign(
   values.replace_const(rhs);
   rhs = simplify_expr(rhs, ns);
   dest.set_to(lhs, rhs);
+}
+
+/*******************************************************************\
+
+Function: constant_propagator_domaint::ai_simplify
+
+  Inputs: The condition to simplify and its namespace.
+
+ Outputs: The simplified condition.
+
+ Purpose: Simplify the condition given context-sensitive knowledge
+          from the abstract state.
+
+\*******************************************************************/
+
+bool constant_propagator_domaint::ai_simplify(
+  exprt &condition,
+  const namespacet &ns) const
+{
+  bool b=values.replace_const.replace(condition);
+  b&=simplify(condition, ns);
+
+  return b;
 }
 
 /*******************************************************************\

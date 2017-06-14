@@ -650,7 +650,7 @@ Function: rd_range_domaint::output
 
 void rd_range_domaint::output(std::ostream &out) const
 {
-  out << "Reaching definitions:" << std::endl;
+  out << "Reaching definitions:\n";
 
   if(has_values.is_known())
   {
@@ -681,7 +681,7 @@ void rd_range_domaint::output(std::ostream &out) const
         out << "@" << itl->first->location_number;
       }
 
-    out << "]" << std::endl;
+    out << "]\n";
 
     clear_cache(identifier);
   }

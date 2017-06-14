@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_convert_type.h"
 #include "cpp_declaration.h"
@@ -66,7 +66,7 @@ void cpp_convert_typet::read(const typet &type)
   other.clear();
 
   #if 0
-  std::cout << "cpp_convert_typet::read: " << type.pretty() << std::endl;
+  std::cout << "cpp_convert_typet::read: " << type.pretty() << '\n';
   #endif
 
   read_rec(type);
@@ -88,7 +88,7 @@ void cpp_convert_typet::read_rec(const typet &type)
 {
   #if 0
   std::cout << "cpp_convert_typet::read_rec: "
-            << type.pretty() << std::endl;
+            << type.pretty() << '\n';
   #endif
 
   if(type.id()==ID_merged_type)

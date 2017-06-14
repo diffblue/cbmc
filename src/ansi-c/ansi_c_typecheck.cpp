@@ -72,6 +72,9 @@ bool ansi_c_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   symbol_tablet symbol_table;
   ansi_c_parse_treet ansi_c_parse_tree;
 
@@ -99,5 +102,5 @@ bool ansi_c_typecheck(
     ansi_c_typecheck.error() << e << messaget::eom;
   }
 
-  return ansi_c_typecheck.get_error_found();
+  return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
 }

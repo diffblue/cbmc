@@ -46,7 +46,7 @@ int cw_modet::doit()
 
   unsigned int verbosity=1;
 
-  compilet compiler(cmdline);
+  compilet compiler(cmdline, message_handler, cmdline.isset("Werror"));
 
   #if 0
   bool act_as_ld=
@@ -141,7 +141,7 @@ int cw_modet::doit()
         it!=config.ansi_c.defines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Undefines:\n";
@@ -149,7 +149,7 @@ int cw_modet::doit()
         it!=config.ansi_c.undefines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Preprocessor Options:\n";
@@ -157,7 +157,7 @@ int cw_modet::doit()
         it!=config.ansi_c.preprocessor_options.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Include Paths:\n";
@@ -165,7 +165,7 @@ int cw_modet::doit()
         it!=config.ansi_c.include_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Library Paths:\n";
@@ -173,13 +173,13 @@ int cw_modet::doit()
         it!=compiler.library_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Output file (object): "
-              << compiler.output_file_object << std::endl;
+              << compiler.output_file_object << '\n';
     std::cout << "Output file (executable): "
-              << compiler.output_file_executable << std::endl;
+              << compiler.output_file_executable << '\n';
   }
 
   // Parse input program, convert to goto program, write output

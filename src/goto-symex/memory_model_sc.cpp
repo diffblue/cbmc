@@ -24,7 +24,7 @@ Function: memory_model_sct::operator()
 
 void memory_model_sct::operator()(symex_target_equationt &equation)
 {
-  print(8, "Adding SC constraints");
+  statistics() << "Adding SC constraints" << eom;
 
   build_event_lists(equation);
   build_clock_type(equation);

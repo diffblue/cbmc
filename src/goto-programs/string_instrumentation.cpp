@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "string_instrumentation.h"
 

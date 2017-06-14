@@ -53,7 +53,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
 
   if(op0.type()!=type)
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     throw "add/sub with mixed types";
   }
 
@@ -83,7 +83,7 @@ bvt boolbvt::convert_add_sub(const exprt &expr)
   {
     if(it->type()!=type)
     {
-      std::cerr << expr.pretty() << std::endl;
+      std::cerr << expr.pretty() << '\n';
       throw "add/sub with mixed types";
     }
 

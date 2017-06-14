@@ -150,7 +150,7 @@ bool as86_cmdlinet::parse(int argc, const char **argv)
     {
       // unrecognized option
       std::cerr << "Warning: uninterpreted as86 option '" << argv_i
-                << "'" << std::endl;
+                << "'\n";
     }
   }
 

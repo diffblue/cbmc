@@ -28,8 +28,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/byte_operators.h>
 #include <util/ssa_expr.h>
+#include <util/c_types.h>
 
-#include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>
@@ -122,7 +122,7 @@ exprt value_set_dereferencet::dereference(
   const typet &type=pointer.type().subtype();
 
   #if 0
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
   #endif
 
   // collect objects the pointer may point to
@@ -135,7 +135,7 @@ exprt value_set_dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "P: " << from_expr(ns, "", *it) << '\n';
   #endif
 
   // get the values of these
@@ -151,7 +151,7 @@ exprt value_set_dereferencet::dereference(
 
     #if 0
     std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
-    std::cout << from_expr(ns, "", value.value) << std::endl;
+    std::cout << from_expr(ns, "", value.value) << '\n';
     #endif
 
     values.push_back(value);
@@ -235,8 +235,7 @@ exprt value_set_dereferencet::dereference(
   }
 
   #if 0
-  std::cout << "R: " << from_expr(ns, "", value) << std::endl
-            << std::endl;
+  std::cout << "R: " << from_expr(ns, "", value) << "\n\n";
   #endif
 
   return value;
@@ -280,6 +279,15 @@ bool value_set_dereferencet::dereference_type_compare(
   // we are generous about code pointers
   if(dereference_type.id()==ID_code &&
      object_type.id()==ID_code)
+    return true;
+
+  // bitvectors of same width are ok
+  if((dereference_type.id()==ID_signedbv ||
+      dereference_type.id()==ID_unsignedbv) &&
+     (object_type.id()==ID_signedbv ||
+      object_type.id()==ID_unsignedbv) &&
+     to_bitvector_type(dereference_type).get_width()==
+     to_bitvector_type(object_type).get_width())
     return true;
 
   // really different
@@ -353,7 +361,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &object=o.object();
 
   #if 0
-  std::cout << "O: " << from_expr(ns, "", root_object) << std::endl;
+  std::cout << "O: " << from_expr(ns, "", root_object) << '\n';
   #endif
 
   valuet result;
@@ -468,9 +476,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
-    exprt pointer_offset=unary_exprt(
-      ID_pointer_offset, pointer_expr, index_type());
-
     if(base_type_eq(
          ns.follow(memory_symbol.type).subtype(),
          dereference_type, ns))
@@ -478,9 +483,17 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Types match already, what a coincidence!
       // We can use an index expression.
 
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=index_expr;
+    }
+    else if(dereference_type_compare(
+              ns.follow(memory_symbol.type).subtype(),
+              dereference_type))
+    {
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
+      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      result.value=typecast_exprt(index_expr, dereference_type);
     }
     else
     {
@@ -493,7 +506,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
       {
         exprt byte_extract(byte_extract_id(), dereference_type);
-        byte_extract.copy_to_operands(symbol_expr, pointer_offset);
+        byte_extract.copy_to_operands(
+          symbol_expr, pointer_offset(pointer_expr));
         result.value=byte_extract;
       }
     }
@@ -554,18 +568,24 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(o.offset().is_constant())
         offset=o.offset();
       else
-        offset=unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+        offset=pointer_offset(pointer_expr);
 
       exprt adjusted_offset;
 
       // are we doing a byte?
       mp_integer element_size=
+        dereference_type.id()==ID_empty?
+        pointer_offset_size(char_type(), ns):
         pointer_offset_size(dereference_type, ns);
 
       if(element_size==1)
       {
         // no need to adjust offset
         adjusted_offset=offset;
+      }
+      else if(element_size<=0)
+      {
+        throw "unknown or invalid type size of:\n"+dereference_type.pretty();
       }
       else
       {
@@ -604,8 +624,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=o.root_object();
 
       // this is relative to the root object
-      const exprt offset=
-        unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+      const exprt offset=pointer_offset(pointer_expr);
 
       if(memory_model(result.value, dereference_type, tmp_guard, offset))
       {
@@ -966,7 +985,13 @@ bool value_set_dereferencet::memory_model_bytes(
     // upper bound
     {
       mp_integer from_width=pointer_offset_size(from_type, ns);
-      mp_integer to_width=pointer_offset_size(to_type, ns);
+      if(from_width<=0)
+        throw "unknown or invalid type size:\n"+from_type.pretty();
+
+      mp_integer to_width=
+        to_type.id()==ID_empty?0: pointer_offset_size(to_type, ns);
+      if(to_width<0)
+        throw "unknown or invalid type size:\n"+to_type.pretty();
 
       exprt bound=from_integer(from_width-to_width, offset.type());
 

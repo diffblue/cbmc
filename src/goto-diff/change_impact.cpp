@@ -867,7 +867,7 @@ void change_impactt::output_instruction(char prefix,
     const irep_idt &line=target->source_location.get_line();
     if(!file.empty() && !line.empty())
       std::cout << prefix << " " << id2string(file)
-                << " " << id2string(line) << std::endl;
+                << " " << id2string(line) << '\n';
   }
   else
   {

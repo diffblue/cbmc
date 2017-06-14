@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <analyses/dirty.h>
 

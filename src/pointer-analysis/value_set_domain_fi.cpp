@@ -35,7 +35,7 @@ bool value_set_domain_fit::transform(
 
 //  std::cout << "transforming: " <<
 //      from_l->function << " " << from_l->location_number << " to " <<
-//      to_l->function << " " << to_l->location_number << std::endl;
+//      to_l->function << " " << to_l->location_number << '\n';
 
   switch(from_l->type)
   {

@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
 #include <ansi-c/anonymous_member.h>
 
@@ -348,7 +348,7 @@ exprt cpp_typecheck_resolvet::convert_identifier(
       std::cout << "I: " << identifier.class_identifier
                 << " "
                 << cpp_typecheck.cpp_scopes.current_scope().
-                    this_class_identifier << std::endl;
+                    this_class_identifier << '\n';
       #endif
 
       const exprt &this_expr=
@@ -1070,9 +1070,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
         // std::cout << "S: "
         //           << cpp_typecheck.cpp_scopes.current_scope().identifier
-        //           << std::endl;
+        //           << '\n';
         // cpp_typecheck.cpp_scopes.current_scope().print(std::cout);
-        // std::cout << "X: " << id_set.size() <<std::endl;
+        // std::cout << "X: " << id_set.size() << '\n';
 
         symbol_typet instance=
           disambiguate_template_classes(final_base_name, id_set, template_args);
@@ -1353,10 +1353,10 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       m_it++)
   {
     std::cout << "M: " << m_it->cost
-              << " " << m_it->id << std::endl;
+              << " " << m_it->id << '\n';
   }
 
-  std::cout << std::endl;
+  std::cout << '\n';
   #endif
 
   const matcht &match=*matches.begin();
@@ -1564,7 +1564,7 @@ void cpp_typecheck_resolvet::show_identifiers(
       }
     }
 
-    out << std::endl;
+    out << '\n';
   }
 }
 
@@ -1823,16 +1823,16 @@ exprt cpp_typecheck_resolvet::resolve(
       #if 0
       exprt e1=*new_identifiers.begin();
       exprt e2=*(++new_identifiers.begin());
-      cpp_typecheck.str << "e1==e2: " << (e1==e2) << std::endl;
+      cpp_typecheck.str << "e1==e2: " << (e1==e2) << '\n';
       cpp_typecheck.str << "e1.type==e2.type: " << (e1.type()==e2.type())
-                        << std::endl;
+                        << '\n';
       cpp_typecheck.str << "e1.id()==e2.id(): " << (e1.id()==e2.id())
-                        << std::endl;
+                        << '\n';
       cpp_typecheck.str << "e1.iden==e2.iden: "
                         << (e1.get(ID_identifier)==e2.get(ID_identifier))
-                        << std::endl;
-      cpp_typecheck.str << "e1.iden:: " << e1.get(ID_identifier) << std::endl;
-      cpp_typecheck.str << "e2.iden:: " << e2.get(ID_identifier) << std::endl;
+                        << '\n';
+      cpp_typecheck.str << "e1.iden:: " << e1.get(ID_identifier) << '\n';
+      cpp_typecheck.str << "e2.iden:: " << e2.get(ID_identifier) << '\n';
       #endif
     }
 
@@ -2022,8 +2022,8 @@ void cpp_typecheck_resolvet::guess_template_args(
   // TT<C>
 
   #if 0
-  std::cout << "TT: " << template_type.pretty() << std::endl;
-  std::cout << "DT: " << desired_type.pretty() << std::endl;
+  std::cout << "TT: " << template_type.pretty() << '\n';
+  std::cout << "DT: " << desired_type.pretty() << '\n';
   #endif
 
   if(template_type.id()==ID_cpp_name)
@@ -2075,7 +2075,7 @@ void cpp_typecheck_resolvet::guess_template_args(
               t.remove(ID_C_volatile);
               #if 0
               std::cout << "ASSIGN " << id.identifier << " := "
-                        << cpp_typecheck.to_string(desired_type) << std::endl;
+                        << cpp_typecheck.to_string(desired_type) << '\n';
               #endif
             }
           }
@@ -2571,12 +2571,12 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
       #if 0
       cpp_typecheck.template_map.print(std::cout);
       std::cout << "S: " << cpp_typecheck.cpp_scopes.current_scope().identifier
-                << std::endl;
+                << '\n';
       std::cout << "P: "
                 << cpp_typecheck.cpp_scopes.current_scope().get_parent()
-                << std::endl;
-      std::cout << "I: " << id.identifier << std::endl;
-      std::cout << "E: " << e.pretty() << std::endl;
+                << '\n';
+      std::cout << "I: " << id.identifier << '\n';
+      std::cout << "E: " << e.pretty() << '\n';
       #endif
 
       if(e.id()!=ID_type)

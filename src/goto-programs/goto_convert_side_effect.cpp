@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/symbol.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_convert_class.h"
 

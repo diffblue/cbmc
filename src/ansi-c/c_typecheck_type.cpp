@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
@@ -15,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 
 #include "c_typecheck_base.h"
-#include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"
@@ -134,39 +134,74 @@ void c_typecheck_baset::typecheck_type(typet &type)
       typet result;
 
       if(mode=="__QI__") // 8 bits
-        result=is_signed?signed_char_type():unsigned_char_type();
+        if(is_signed)
+          result=signed_char_type();
+        else
+          result=unsigned_char_type();
       else if(mode=="__byte__") // 8 bits
-        result=is_signed?signed_char_type():unsigned_char_type();
+        if(is_signed)
+          result=signed_char_type();
+        else
+          result=unsigned_char_type();
       else if(mode=="__HI__") // 16 bits
-        result=is_signed?signed_short_int_type():unsigned_short_int_type();
+        if(is_signed)
+          result=signed_short_int_type();
+        else
+          result=unsigned_short_int_type();
       else if(mode=="__SI__") // 32 bits
-        result=is_signed?signed_int_type():unsigned_int_type();
+        if(is_signed)
+          result=signed_int_type();
+        else
+          result=unsigned_int_type();
       else if(mode=="__word__") // long int, we think
-        result=is_signed?signed_long_int_type():unsigned_long_int_type();
+        if(is_signed)
+          result=signed_long_int_type();
+        else
+          result=unsigned_long_int_type();
       else if(mode=="__pointer__") // we think this is size_t/ssize_t
-        result=is_signed?signed_size_type():size_type();
+        if(is_signed)
+          result=signed_size_type();
+        else
+          result=size_type();
       else if(mode=="__DI__") // 64 bits
       {
         if(config.ansi_c.long_int_width==64)
-          result=is_signed?signed_long_int_type():unsigned_long_int_type();
+          if(is_signed)
+            result=signed_long_int_type();
+          else
+            result=unsigned_long_int_type();
         else
         {
           assert(config.ansi_c.long_long_int_width==64);
-          result=
-            is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+
+          if(is_signed)
+            result=signed_long_long_int_type();
+          else
+            result=unsigned_long_long_int_type();
         }
       }
       else if(mode=="__TI__") // 128 bits
-        result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+        if(is_signed)
+          result=gcc_signed_int128_type();
+        else
+          result=gcc_unsigned_int128_type();
       else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
-        result=
-          vector_typet(
-            is_signed?signed_int_type():unsigned_int_type(),
+        if(is_signed)
+          result=vector_typet(
+            signed_int_type(),
+            from_integer(2, size_type()));
+        else
+          result=vector_typet(
+            unsigned_int_type(),
             from_integer(2, size_type()));
       else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
-        result=
-          vector_typet(
-            is_signed?signed_int_type():unsigned_int_type(),
+        if(is_signed)
+          result=vector_typet(
+            signed_int_type(),
+            from_integer(4, size_type()));
+        else
+          result=vector_typet(
+            unsigned_int_type(),
             from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();

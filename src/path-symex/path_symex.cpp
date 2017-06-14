@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/base_type.h>
 #include <util/prefix.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 
@@ -421,8 +421,8 @@ void path_symext::assign_rec(
   // const typet &ssa_lhs_type=state.var_map.ns.follow(ssa_lhs.type());
 
   #ifdef DEBUG
-  std::cout << "assign_rec: " << ssa_lhs.pretty() << std::endl;
-  // std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << std::endl;
+  std::cout << "assign_rec: " << ssa_lhs.pretty() << '\n';
+  // std::cout << "ssa_lhs_type: " << ssa_lhs_type.id() << '\n';
   #endif
 
   if(ssa_lhs.id()==ID_symbol)
@@ -435,8 +435,8 @@ void path_symext::assign_rec(
 
     #ifdef DEBUG
     const irep_idt &ssa_identifier=symbol_expr.get_identifier();
-    std::cout << "SSA symbol identifier: " << ssa_identifier << std::endl;
-    std::cout << "full identifier: " << full_identifier << std::endl;
+    std::cout << "SSA symbol identifier: " << ssa_identifier << '\n';
+    std::cout << "full identifier: " << full_identifier << '\n';
     #endif
 
     var_mapt::var_infot &var_info=state.var_map[full_identifier];
@@ -447,7 +447,7 @@ void path_symext::assign_rec(
     symbol_exprt new_lhs=var_info.ssa_symbol();
 
     #ifdef DEBUG
-    std::cout << "new_lhs: " << new_lhs.get_identifier() << std::endl;
+    std::cout << "new_lhs: " << new_lhs.get_identifier() << '\n';
     #endif
 
     // record new state of lhs
@@ -469,8 +469,8 @@ void path_symext::assign_rec(
       if(!base_type_eq(ssa_rhs.type(), new_lhs.type(), state.var_map.ns))
       {
         #ifdef DEBUG
-        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << std::endl;
-        std::cout << "new_lhs: " << new_lhs.pretty() << std::endl;
+        std::cout << "ssa_rhs: " << ssa_rhs.pretty() << '\n';
+        std::cout << "new_lhs: " << new_lhs.pretty() << '\n';
         #endif
         throw "assign_rec got different types";
       }
@@ -493,7 +493,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_member)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_member" << std::endl;
+    std::cout << "assign_rec ID_member\n";
     #endif
 
     const member_exprt &ssa_lhs_member_expr=to_member_expr(ssa_lhs);
@@ -532,7 +532,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_index)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_index" << std::endl;
+    std::cout << "assign_rec ID_index\n";
     #endif
 
     throw "unexpected array index on lhs";
@@ -540,7 +540,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_dereference)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_dereference" << std::endl;
+    std::cout << "assign_rec ID_dereference\n";
     #endif
 
     throw "unexpected dereference on lhs";
@@ -548,7 +548,7 @@ void path_symext::assign_rec(
   else if(ssa_lhs.id()==ID_if)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_if" << std::endl;
+    std::cout << "assign_rec ID_if\n";
     #endif
 
     const if_exprt &lhs_if_expr=to_if_expr(ssa_lhs);
@@ -568,7 +568,7 @@ void path_symext::assign_rec(
           ssa_lhs.id()==ID_byte_extract_big_endian)
   {
     #ifdef DEBUG
-    std::cout << "assign_rec ID_byte_extract" << std::endl;
+    std::cout << "assign_rec ID_byte_extract\n";
     #endif
 
     const byte_extract_exprt &byte_extract_expr=
@@ -698,7 +698,7 @@ void path_symext::function_call_rec(
   std::list<path_symex_statet> &further_states)
 {
   #ifdef DEBUG
-  std::cout << "function_call_rec: " << function.pretty() << std::endl;
+  std::cout << "function_call_rec: " << function.pretty() << '\n';
   #endif
 
   if(function.id()==ID_symbol)
@@ -1073,7 +1073,7 @@ void path_symext::operator()(
   std::cout << "path_symext::operator(): "
             << state.pc() << " "
             << instruction.type
-            << std::endl;
+            << '\n';
   #endif
 
   switch(instruction.type)

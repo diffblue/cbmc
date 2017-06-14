@@ -2315,7 +2315,7 @@ public:
     const exprt &_lower,
     const typet &_type):exprt(ID_extractbits, _type)
   {
-    copy_to_operands(_src, _lower, _upper);
+    copy_to_operands(_src, _upper, _lower);
   }
 
   extractbits_exprt(

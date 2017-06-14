@@ -647,7 +647,7 @@ bool cnft::process_clause(const bvt &bv, bvt &dest)
 
     if(l.var_no()>=_no_variables)
       std::cout << "l.var_no()=" << l.var_no()
-                << " _no_variables=" << _no_variables << std::endl;
+                << " _no_variables=" << _no_variables << '\n';
 
     assert(l.var_no()<_no_variables);
   }

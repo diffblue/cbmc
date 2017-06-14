@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
@@ -185,6 +186,7 @@ bool bv_pointerst::convert_address_of_rec(
     // get size
     mp_integer size=
       pointer_offset_size(array_type.subtype(), ns);
+    assert(size>0);
 
     offset_arithmetic(bv, size, index);
     assert(bv.size()==bits);
@@ -205,6 +207,7 @@ bool bv_pointerst::convert_address_of_rec(
       mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
         member_expr.get_component_name(), ns);
+      assert(offset>=0);
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -263,6 +266,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 {
   if(!is_ptr(expr.type()))
     throw "convert_pointer_type got non-pointer type";
+
+  // make sure the config hasn't been changed
+  assert(bits==config.ansi_c.pointer_width);
 
   if(expr.id()==ID_symbol)
   {
@@ -375,7 +381,12 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         count++;
         bv=convert_bv(*it);
         assert(bv.size()==bits);
-        size=pointer_offset_size(it->type().subtype(), ns);
+
+        typet pointer_sub_type=it->type().subtype();
+        if(pointer_sub_type.id()==ID_empty)
+          pointer_sub_type=char_type();
+        size=pointer_offset_size(pointer_sub_type, ns);
+        assert(size>0);
       }
     }
 
@@ -449,6 +460,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
+    assert(element_size>0);
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -517,6 +529,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
+    assert(element_size>0);
 
     if(element_size!=1)
     {

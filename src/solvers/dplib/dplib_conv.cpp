@@ -218,6 +218,7 @@ void dplib_convt::convert_address_of_rec(const exprt &expr)
 
     mp_integer offset=member_offset(ns,
       to_struct_type(struct_op.type()), component_name);
+    assert(offset>=0);
 
     typet index_type(ID_unsignedbv);
     index_type.set(ID_width, config.ansi_c.pointer_width);
@@ -248,7 +249,7 @@ Function: dplib_convt::convert_rest
 
 literalt dplib_convt::convert_rest(const exprt &expr)
 {
-  // dplib_prop.out << "%% E: " << expr << std::endl;
+  // dplib_prop.out << "%% E: " << expr << '\n';
 
   literalt l=prop.new_variable();
 
@@ -262,7 +263,7 @@ literalt dplib_convt::convert_rest(const exprt &expr)
     convert_dplib_expr(expr.op0());
     dplib_prop.out << ((expr.id()==ID_equal)?"=":"/=");
     convert_dplib_expr(expr.op1());
-    dplib_prop.out << ");" << std::endl;
+    dplib_prop.out << ");\n";
   }
 
   return l;
@@ -1129,7 +1130,7 @@ void dplib_convt::set_to(const exprt &expr, bool value)
   if(value && expr.is_true())
     return;
 
-  dplib_prop.out << "// set_to " << (value?"true":"false") << std::endl;
+  dplib_prop.out << "// set_to " << (value?"true":"false") << '\n';
 
   if(expr.id()==ID_equal && value)
   {
@@ -1159,7 +1160,7 @@ void dplib_convt::set_to(const exprt &expr, bool value)
           dplib_prop.out << " = ";
           convert_dplib_expr(expr.op1());
 
-          dplib_prop.out << ";" << std::endl << std::endl;
+          dplib_prop.out << ";\n\n";
           return;
         }
       }
@@ -1178,7 +1179,7 @@ void dplib_convt::set_to(const exprt &expr, bool value)
   if(!value)
     dplib_prop.out << ")";
 
-  dplib_prop.out << ";" << std::endl << std::endl;
+  dplib_prop.out << ";\n\n";
 }
 
 /*******************************************************************\
@@ -1216,7 +1217,7 @@ void dplib_convt::find_symbols(const exprt &expr)
       convert_identifier(id2string(identifier));
       dplib_prop.out << ": ";
       convert_dplib_type(expr.type());
-      dplib_prop.out << ";" << std::endl;
+      dplib_prop.out << ";\n";
     }
   }
   else if(expr.id()==ID_nondet_symbol)
@@ -1235,7 +1236,7 @@ void dplib_convt::find_symbols(const exprt &expr)
       convert_identifier(id2string(identifier));
       dplib_prop.out << ": ";
       convert_dplib_type(expr.type());
-      dplib_prop.out << ";" << std::endl;
+      dplib_prop.out << ";\n";
     }
   }
 }

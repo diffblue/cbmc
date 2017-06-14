@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
 #include <util/config.h>
@@ -271,6 +272,15 @@ void ansi_c_convert_typet::write(typet &type)
       throw 0;
     }
 
+    // asm blocks (cf. regression/ansi-c/asm1) - ignore the asm
+    if(other.size()==2)
+    {
+      if(other.front().id()==ID_asm && other.back().id()==ID_empty)
+        other.pop_front();
+      else if(other.front().id()==ID_empty && other.back().id()==ID_asm)
+        other.pop_back();
+    }
+
     if(other.size()!=1)
     {
       error().source_location=source_location;
@@ -463,14 +473,25 @@ void ansi_c_convert_typet::write(typet &type)
       }
 
       if(int8_cnt)
-        type=is_signed?signed_char_type():unsigned_char_type();
+        if(is_signed)
+          type=signed_char_type();
+        else
+          type=unsigned_char_type();
       else if(int16_cnt)
-        type=is_signed?signed_short_int_type():unsigned_short_int_type();
+        if(is_signed)
+          type=signed_short_int_type();
+        else
+          type=unsigned_short_int_type();
       else if(int32_cnt)
-        type=is_signed?signed_int_type():unsigned_int_type();
+        if(is_signed)
+          type=signed_int_type();
+        else
+          type=unsigned_int_type();
       else if(int64_cnt) // Visual Studio: equivalent to long long int
-        type=
-          is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+        if(is_signed)
+          type=signed_long_long_int_type();
+        else
+          type=unsigned_long_long_int_type();
       else
         assert(false);
     }
@@ -508,19 +529,31 @@ void ansi_c_convert_typet::write(typet &type)
         throw 0;
       }
 
-      type=is_signed?signed_short_int_type():unsigned_short_int_type();
+      if(is_signed)
+        type=signed_short_int_type();
+      else
+        type=unsigned_short_int_type();
     }
     else if(long_cnt==0)
     {
-      type=is_signed?signed_int_type():unsigned_int_type();
+      if(is_signed)
+        type=signed_int_type();
+      else
+        type=unsigned_int_type();
     }
     else if(long_cnt==1)
     {
-      type=is_signed?signed_long_int_type():unsigned_long_int_type();
+      if(is_signed)
+        type=signed_long_int_type();
+      else
+        type=unsigned_long_int_type();
     }
     else if(long_cnt==2)
     {
-      type=is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+      if(is_signed)
+        type=signed_long_long_int_type();
+      else
+        type=unsigned_long_long_int_type();
     }
     else
     {

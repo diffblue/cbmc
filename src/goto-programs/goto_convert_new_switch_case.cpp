@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/rename.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_convert.h"
 #include "goto_convert_class.h"

@@ -15,7 +15,7 @@ Author:
 #include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_typecheck.h"
 
@@ -1743,8 +1743,8 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
             << to_string(e.type()) << "' to `"
             << to_string(type) << "'" << eom;
     #if 0
-    str << "\n " << follow(e.type()).pretty() << std::endl;
-    str << "\n " << type.pretty() << std::endl;
+    str << "\n " << follow(e.type()).pretty() << '\n';
+    str << "\n " << type.pretty() << '\n';
     #endif
     throw 0;
   }

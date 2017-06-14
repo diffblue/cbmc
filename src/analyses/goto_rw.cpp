@@ -107,22 +107,22 @@ Function: rw_range_sett::output
 
 void rw_range_sett::output(std::ostream &out) const
 {
-  out << "READ:" << std::endl;
+  out << "READ:\n";
   forall_rw_range_set_r_objects(it, *this)
   {
     out << "  " << it->first;
     it->second->output(ns, out);
-    out << std::endl;
+    out << '\n';
   }
 
-  out << std::endl;
+  out << '\n';
 
-  out << "WRITE:" << std::endl;
+  out << "WRITE:\n";
   forall_rw_range_set_w_objects(it, *this)
   {
     out << "  " << it->first;
     it->second->output(ns, out);
-    out << std::endl;
+    out << '\n';
   }
 }
 
@@ -149,6 +149,7 @@ void rw_range_sett::get_objects_complex(
 
   range_spect sub_size=
     to_range_spect(pointer_offset_bits(op.type().subtype(), ns));
+  assert(sub_size>0);
   range_spect offset=
     (range_start==-1 || expr.id()==ID_complex_real) ? 0 : sub_size;
 

@@ -42,6 +42,7 @@ SRC = accelerate/accelerate.cpp \
       points_to.cpp \
       race_check.cpp \
       reachability_slicer.cpp \
+      remove_function.cpp \
       rw_set.cpp \
       show_locations.cpp \
       skip_loops.cpp \

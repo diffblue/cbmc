@@ -106,8 +106,7 @@ void xml_irep_convertt::convert(
     else
     {
       // Should not happen
-      std::cout << "Unknown sub found (" << it->name << "); malformed xml?";
-      std::cout << std::endl;
+      std::cout << "Unknown sub found (" << it->name << "); malformed xml?\n";
     }
   }
 }
@@ -213,7 +212,7 @@ void xml_irep_convertt::resolve_references(const irept &cur)
     if(itr==ireps_container.id_container.end())
     {
       std::cout << "Warning: can't resolve irep reference (sub "
-                << cur.get("REF") << ")" << std::endl;
+                << cur.get("REF") << ")\n";
     }
     else
     {

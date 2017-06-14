@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <fstream>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/message.h>
 #include <util/tempfile.h>
@@ -29,7 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/prefix.h>
 
-#include "c_types.h"
 #include "c_preprocess.h"
 
 #define GCC_DEFINES_16 \

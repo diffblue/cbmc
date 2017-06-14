@@ -33,8 +33,8 @@ Function: language_uit::language_uit
 language_uit::language_uit(
   const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
-  ui_message_handler(_ui_message_handler),
-  _cmdline(cmdline)
+  _cmdline(cmdline),
+  ui_message_handler(_ui_message_handler)
 {
   set_message_handler(ui_message_handler);
 }
@@ -115,7 +115,10 @@ bool language_uit::parse(const std::string &filename)
 
   if(lf.language==NULL)
   {
-    error("failed to figure out type of file", filename);
+    source_locationt location;
+    location.set_file(filename);
+    error().source_location=location;
+    error() << "failed to figure out type of file" << eom;
     return true;
   }
 
@@ -128,7 +131,7 @@ bool language_uit::parse(const std::string &filename)
   if(language.parse(infile, filename))
   {
     if(get_ui()==ui_message_handlert::uit::PLAIN)
-      std::cerr << "PARSING ERROR" << std::endl;
+      std::cerr << "PARSING ERROR\n";
 
     return true;
   }
@@ -257,7 +260,7 @@ void language_uit::show_symbol_table_plain(
   bool brief)
 {
   if(!brief)
-    out << '\n' << "Symbols:" << '\n' << std::endl;
+    out << "\nSymbols:\n\n";
 
   // we want to sort alphabetically
   std::set<std::string> symbols;
@@ -293,7 +296,7 @@ void language_uit::show_symbol_table_plain(
 
     if(brief)
     {
-      out << symbol.name << " " << type_str << std::endl;
+      out << symbol.name << " " << type_str << '\n';
       continue;
     }
 

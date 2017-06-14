@@ -306,8 +306,8 @@ void unified_difft::lcss(
   }
 
   #if 0
-  std::cerr << "old_count=" << old_count << std::endl;
-  std::cerr << "new_count=" << new_count << std::endl;
+  std::cerr << "old_count=" << old_count << '\n';
+  std::cerr << "new_count=" << new_count << '\n';
   for(i=0; i<=old_count; ++i)
   {
     for(j=0; j<=new_count; ++j)
@@ -317,7 +317,7 @@ void unified_difft::lcss(
         std::cerr << " ";
       std::cerr << lcss_matrix[i][j];
     }
-    std::cerr << std::endl;
+    std::cerr << '\n';
   }
   #endif
 

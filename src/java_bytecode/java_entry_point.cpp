@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/suffix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/remove_exceptions.h>

@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/base_type.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_symex.h"
 
@@ -58,6 +58,14 @@ void goto_symext::process_array_expr_rec(
     expr.swap(tmp);
     process_array_expr_rec(expr, type);
   }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    // pick the root object
+    exprt tmp=to_byte_extract_expr(expr).op();
+    expr.swap(tmp);
+    process_array_expr_rec(expr, type);
+  }
   else if(expr.id()==ID_symbol &&
           expr.get_bool(ID_C_SSA_symbol) &&
           to_ssa_expr(expr).get_original_expr().id()==ID_index)
@@ -69,7 +77,10 @@ void goto_symext::process_array_expr_rec(
   }
   else
     Forall_operands(it, expr)
-      process_array_expr_rec(*it, it->type());
+    {
+      typet t=it->type();
+      process_array_expr_rec(*it, t);
+    }
 
   if(!base_type_eq(expr.type(), type, ns))
   {
@@ -126,6 +137,14 @@ void goto_symext::process_array_expr(exprt &expr)
   {
     // strip
     exprt tmp=to_address_of_expr(expr).op0();
+    expr.swap(tmp);
+    process_array_expr(expr);
+  }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    // pick the root object
+    exprt tmp=to_byte_extract_expr(expr).op();
     expr.swap(tmp);
     process_array_expr(expr);
   }

@@ -163,7 +163,7 @@ void cpp_typecheckt::typecheck_class_template(
       std::cout << "*****\n";
       std::cout << *cpp_scopes.id_map[symbol_name];
       std::cout << "*****\n";
-      std::cout << "II: " << symbol_name << std::endl;
+      std::cout << "II: " << symbol_name << '\n';
       #endif
 
       // We also replace the template scope (the old one could be deleted).
@@ -413,7 +413,7 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
   else if((*(id_set.begin()))->id_class!=cpp_idt::id_classt::TEMPLATE)
   {
-    // std::cerr << *(*id_set.begin()) << std::endl;
+    // std::cerr << *(*id_set.begin()) << '\n';
     error().source_location=cpp_name.source_location();
     error() << "class template `"
             << cpp_name.get_sub().front().get(ID_identifier)

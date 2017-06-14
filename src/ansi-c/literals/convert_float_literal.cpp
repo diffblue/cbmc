@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/ieee_float.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/string2int.h>
 
-#include "../c_types.h"
 #include "parse_float.h"
 #include "convert_float_literal.h"
 

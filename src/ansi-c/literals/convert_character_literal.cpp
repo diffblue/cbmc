@@ -9,9 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
-
-#include "../c_types.h"
 
 #include "unescape_string.h"
 #include "convert_character_literal.h"

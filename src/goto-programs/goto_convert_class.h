@@ -537,7 +537,8 @@ protected:
     const exprt &rhs,
     const exprt::operandst &arguments,
     goto_programt &dest);
-  void do_array_copy(
+  void do_array_op(
+    const irep_idt &id,
     const exprt &lhs,
     const exprt &rhs,
     const exprt::operandst &arguments,
