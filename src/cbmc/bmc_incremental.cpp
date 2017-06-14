@@ -97,8 +97,6 @@ safety_checkert::resultt bmc_incrementalt::step(
     error() << "Out of memory" << eom;
     return safety_checkert::resultt::ERROR;
   }
-
-  assert(false);
 }
 
 /*******************************************************************\

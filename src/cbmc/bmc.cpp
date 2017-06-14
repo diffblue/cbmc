@@ -479,8 +479,8 @@ safety_checkert::resultt bmct::step(const goto_functionst &goto_functions)
 
     if(options.get_bool_option("program-only"))
     {
-    	show_program();
-    	return safety_checkert::resultt::SAFE;
+      show_program();
+      return safety_checkert::resultt::SAFE;
     }
 
   // do all properties

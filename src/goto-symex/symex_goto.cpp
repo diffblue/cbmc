@@ -95,7 +95,7 @@ bool goto_symext::symex_goto(statet &state)
     }
 
     goto_symex_statet::framet::loop_infot &loop_info=
-    	frame.loop_iterations[loop_id];
+      frame.loop_iterations[loop_id];
     unsigned &unwind=loop_info.count;
 
     unwind++;

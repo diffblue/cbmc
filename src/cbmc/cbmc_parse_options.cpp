@@ -1153,8 +1153,6 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --refine-arrays              use refinement procedure for arrays (experimental)\n"// NOLINT(*)
-    " --refine-arithmetic          use refinement procedure for arithmetic (experimental)\n"// NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
