@@ -17,7 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_language.h"
-#include "character_refine_preprocess.h"
 
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
