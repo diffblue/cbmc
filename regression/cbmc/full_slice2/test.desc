@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --full-slice --property main.assertion.2 --unwind 1
 ^EXIT=10$
