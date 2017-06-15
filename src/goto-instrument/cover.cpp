@@ -1461,6 +1461,33 @@ bool instrument_cover_goals(
       cmdline.isset("no-trivial-tests"));
   }
 
+  if(cmdline.isset("cover-traces-must-terminate"))
+  {
+    // instrument an additional goal in CPROVER_START. This will rephrase
+    // the reachability problem  by asking BMC to provide a solution that
+    // satisfies a goal while getting to the end of the program-under-test.
+    const auto sf_it=
+      goto_functions.function_map.find(goto_functions.entry_point());
+    if(sf_it==goto_functions.function_map.end())
+    {
+      msg.error() << "cover-traces-must-terminate: invalid entry point ["
+        << goto_functions.entry_point() << "]"
+        << messaget::eom;
+      return true;
+    }
+    auto if_it=sf_it->second.body.instructions.end();
+    while(!if_it->is_function_call())
+      if_it--;
+    if_it++;
+    const std::string &comment=
+      "additional goal to ensure complete trace coverage.";
+    sf_it->second.body.insert_before_swap(if_it);
+    if_it->make_assertion(false_exprt());
+    if_it->source_location.set_comment(comment);
+    if_it->source_location.set_property_class("reachability_constraint");
+    if_it->source_location.set_function(if_it->function);
+  }
+
   goto_functions.update();
   return false;
 }
