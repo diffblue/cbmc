@@ -12,8 +12,10 @@ Date: April 2016
 
 #include <util/message.h>
 #include <util/simplify_expr.h>
+#include <analyses/variable-sensitivity/pointer_abstract_object.h>
 
 #include "variable_sensitivity_domain.h"
+#include <util/cprover_prefix.h>
 
 #ifdef DEBUG
 #include <iostream>
@@ -106,12 +108,30 @@ void variable_sensitivity_domaint::transform(
     break;
 
   case FUNCTION_CALL:
-    // FIXME : Ignore as not yet interprocedural
+  {
+    transform_function_call(from, to, ai, ns);
     break;
+  }
 
   case END_FUNCTION:
-    // FIXME : Ignore as not yet interprocedural
+  {
+    // erase parameters
+
+    const irep_idt id=from->function;
+    const symbolt &symbol=ns.lookup(id);
+
+    const code_typet &type=to_code_type(symbol.type);
+
+    for(const auto &param : type.parameters())
+    {
+      // Bottom the arguments to the function
+      abstract_state.assign(
+        symbol_exprt(param.get_identifier(), param.type()),
+        abstract_state.abstract_object_factory(param.type(), ns, true, false),
+        ns);
+    }
     break;
+  }
 
     /***************************************************************/
 
@@ -383,4 +403,166 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   }
   else
     return true;
+}
+
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::transform_function_call
+
+  Inputs:
+   from - the location to transform from which is a function call
+   to - the destination of the transform (potentially inside the function call)
+   ai - the abstract interpreter
+   ns - the namespace of the current state
+
+ Outputs:
+
+ Purpose: Used by variable_sensitivity_domaint::transform to handle
+          FUNCTION_CALL transforms. This is copying the values of the arguments
+          into new symbols corresponding to the declared parameter names.
+
+          If the function call is opaque we currently top the return value
+          and the value of any things whose address is passed into the function.
+
+\*******************************************************************/
+
+void variable_sensitivity_domaint::transform_function_call(
+  locationt from, locationt to, ai_baset &ai, const namespacet &ns)
+{
+  assert(from->type==FUNCTION_CALL);
+
+  const code_function_callt &function_call=to_code_function_call(from->code);
+  const exprt &function=function_call.function();
+
+  const locationt next=std::next(from);
+
+  if(function.id()==ID_symbol)
+  {
+    // called function identifier
+    const symbol_exprt &symbol_expr=to_symbol_expr(function);
+    const irep_idt function_id=symbol_expr.get_identifier();
+
+    const code_function_callt::argumentst &called_arguments=
+      function_call.arguments();
+
+    if(to==next)
+    {
+      if(ignore_function_call_transform(function_id))
+      {
+        return;
+      }
+
+      if(0) // Sound on opaque function calls
+      {
+        abstract_state.havoc("opaque function call");
+      }
+      else
+      {
+        // For any parameter that is a pointer, top the value it is pointing
+        // at.
+        for(const exprt &called_arg : called_arguments)
+        {
+          if(called_arg.type().id()==ID_pointer)
+          {
+            sharing_ptrt<pointer_abstract_objectt> pointer_value=
+              std::dynamic_pointer_cast<const pointer_abstract_objectt>(
+                abstract_state.eval(called_arg, ns));
+
+            assert(pointer_value);
+
+            // Write top to the pointer
+            pointer_value->write_dereference(
+              abstract_state,
+              ns,
+              std::stack<exprt>(),
+              abstract_state.abstract_object_factory(
+                called_arg.type().subtype(), ns, true), false);
+          }
+        }
+
+        // Top any global values
+        for(const auto &symbol : ns.get_symbol_table().symbols)
+        {
+          if(!symbol.second.is_procedure_local())
+          {
+            abstract_state.assign(
+              symbol_exprt(symbol.first, symbol.second.type),
+              abstract_state.abstract_object_factory(symbol.second.type, ns, true),
+              ns);
+          }
+        }
+      }
+    }
+    else
+    {
+      // we have an actual call
+      const symbolt &symbol=ns.lookup(function_id);
+      const code_typet &code_type=to_code_type(symbol.type);
+      const code_typet::parameterst &declaration_parameters=
+        code_type.parameters();
+
+      code_typet::parameterst::const_iterator parameter_it=
+        declaration_parameters.begin();
+
+      for(const exprt &called_arg : called_arguments)
+      {
+        if(parameter_it==declaration_parameters.end())
+        {
+          assert(code_type.has_ellipsis());
+          break;
+        }
+
+        // Evaluate the expression that is being
+        // passed into the function call (called_arg)
+        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns);
+
+        // Assign the evaluated value to the symbol associated with the
+        // parameter of the function
+        const symbol_exprt parameter_expr(
+          parameter_it->get_identifier(), called_arg.type());
+        abstract_state.assign(parameter_expr, param_val, ns);
+
+        ++parameter_it;
+      }
+
+      // Too few arguments so invalid code
+      assert(parameter_it==declaration_parameters.end());
+    }
+  }
+  else
+  {
+    assert(to==next);
+    abstract_state.havoc("unknown opaque function call");
+  }
+}
+
+/*******************************************************************\
+
+Function: variable_sensitivity_domaint::ignore_function_call_transform
+
+  Inputs:
+   function_id - the name of the function being called
+
+ Outputs: Returns true if the function should be ignored
+
+ Purpose: Used to specify which CPROVER internal functions should be skipped
+          over when doing function call transforms
+
+\*******************************************************************/
+
+bool variable_sensitivity_domaint::ignore_function_call_transform(
+  const irep_idt &function_id) const
+{
+  static const std::set<irep_idt> ignored_internal_function={
+    CPROVER_PREFIX "set_must",
+    CPROVER_PREFIX "get_must",
+    CPROVER_PREFIX "set_may",
+    CPROVER_PREFIX "get_may",
+    CPROVER_PREFIX "cleanup",
+    CPROVER_PREFIX "clear_may",
+    CPROVER_PREFIX "clear_must"
+  };
+
+  return ignored_internal_function.find(function_id)!=
+    ignored_internal_function.cend();
 }

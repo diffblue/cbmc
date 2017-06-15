@@ -309,9 +309,6 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  typedef std::set<irep_idt> recursion_sett;
-  recursion_sett recursion_set;
-
   // function calls
   bool do_function_call_rec(
     locationt l_call, locationt l_return,
