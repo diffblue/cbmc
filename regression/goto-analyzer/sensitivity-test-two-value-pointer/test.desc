@@ -1,21 +1,21 @@
-FUTURE
+CORE
 sensitivity_test_two_value_pointer.c
 --variable --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion x==&a: Unknown$
-^\[main.assertion.2\] .* assertion x==&b: Unknown$
-^\[main.assertion.3\] .* assertion x==x2: Unknown$
-^\[main.assertion.4\] .* assertion x==y: Unknown$
-^\[main.assertion.5\] .* assertion \*x==0: Unknown$
-^\[main.assertion.6\] .* assertion \*x==1: Unknown$
-^\[main.assertion.7\] .* assertion \*x==1: Unknown$
-^\[main.assertion.8\] .* assertion \*x==0: Unknown$
-^\[main.assertion.9\] .* assertion a==2: Unknown$
-^\[main.assertion.10\] .* assertion a==0: Unknown$
-^\[main.assertion.11\] .* assertion x==&a: Unknown$
-^\[main.assertion.12\] .* assertion \*x==0: Unknown$
-^\[main.assertion.13\] .* assertion x==&a: Unknown$
-^\[main.assertion.14\] .* assertion x==&b: Unknown$
+^\[main.assertion.1\] .* x==&a: Unknown$
+^\[main.assertion.2\] .* x==&b: Unknown$
+^\[main.assertion.3\] .* x==x2: Unknown$
+^\[main.assertion.4\] .* x==y: Unknown$
+^\[main.assertion.5\] .* \*x==0: Unknown$
+^\[main.assertion.6\] .* \*x==1: Unknown$
+^\[main.assertion.7\] .* \*x==1: Unknown$
+^\[main.assertion.8\] .* \*x==0: Unknown$
+^\[main.assertion.9\] .* a==2: Unknown$
+^\[main.assertion.10\] .* a==0: Unknown$
+^\[main.assertion.11\] .* x==&a: Unknown$
+^\[main.assertion.12\] .* \*x==0: Unknown$
+^\[main.assertion.13\] .* x==&a: Unknown$
+^\[main.assertion.14\] .* x==&b: Unknown$
 --
 ^warning: ignoring

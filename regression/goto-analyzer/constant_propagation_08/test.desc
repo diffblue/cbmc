@@ -1,10 +1,9 @@
-FUTURE
-constant_propagation_08.c
---intervals --verify
+KNOWNBUG
+main.c
+--variable --arrays --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_08.c line 12 function main, assertion i<50: UNKNOWN$
-^\[main.assertion.2\] file constant_propagation_08.c line 13 function main, assertion i<51: UNKNOWN$
-^\[main.assertion.3\] file constant_propagation_08.c line 14 function main, assertion i<52: SUCCESS$
+^Simplified:  assert: 1, assume: 0, goto: 2, assigns: 5, function calls: 0$
+^Unmodified:  assert: 0, assume: 0, goto: 4, assigns: 13, function calls: 2$
 --
 ^warning: ignoring

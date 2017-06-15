@@ -22,9 +22,20 @@ SRC = ai.cpp \
       locals.cpp \
       natural_loops.cpp \
       reaching_definitions.cpp \
-      replace_symbol_ext.cpp \
       static_analysis.cpp \
       uninitialized_domain.cpp \
+      variable-sensitivity/abstract_object.cpp \
+      variable-sensitivity/abstract_enviroment.cpp \
+      variable-sensitivity/abstract_value.cpp \
+      variable-sensitivity/array_abstract_object.cpp \
+      variable-sensitivity/constant_abstract_value.cpp \
+      variable-sensitivity/constant_pointer_abstract_object.cpp \
+      variable-sensitivity/pointer_abstract_object.cpp \
+      variable-sensitivity/struct_abstract_object.cpp \
+      variable-sensitivity/variable_sensitivity_domain.cpp \
+      variable-sensitivity/variable_sensitivity_object_factory.cpp \
+      variable-sensitivity/full_struct_abstract_object.cpp \
+      variable-sensitivity/constant_array_abstract_object.cpp \
       # Empty last line
 
 INCLUDES= -I ..

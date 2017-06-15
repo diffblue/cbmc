@@ -1,9 +1,8 @@
-FUTURE
-constant_propagation_15.c
---constants --simplify out.goto
+CORE
+main.c
+--variable --arrays --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^SIMPLIFIED:  assert: 1, assume: 0, goto: 1, assigns: 4, function calls: 0$
-^UNMODIFIED:  assert: 0, assume: 0, goto: 2, assigns: 11, function calls: 2$
+^\[main\.assertion\.1\] .* a\[0\]==2: Failure \(if reachable\)$
 --
 ^warning: ignoring

@@ -1,21 +1,29 @@
-FUTURE
+CORE
 sensitivity_test_constants_pointer_to_two_value_array.c
 --variable --pointers --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* assertion p==&a\[0\]: Success$
-^\[main.assertion.2\] .* assertion \*p==1: Unknown$
-^\[main.assertion.3\] .* assertion q==p\+1: Unknown$
-^\[main.assertion.4\] .* assertion \*q==2: Unknown$
-^\[main.assertion.5\] .* assertion q-p==x: Unknown$
-^\[main.assertion.6\] .* assertion a\[1\]==4: Unknown$
-^\[main.assertion.7\] .* assertion \*r==2: Unknown$
-^\[main.assertion.8\] .* assertion \*r==1: Unknown$
-^\[main.assertion.9\] .* assertion \*s==0: Unknown$
-^\[main.assertion.10\] .* assertion \*s==1: Unknown$
-^\[main.assertion.11\] .* assertion t==p\+i: Unknown$
-^\[main.assertion.12\] .* assertion t-p==y: Unknown$
-^\[main.assertion.13\] .* assertion a\[i\]==5: Unknown$
-^\[main.assertion.14\] .* assertion a\[1\]==5: Unknown$
+^\[main.assertion.1\] .* p==&a\[0\]: Success$
+^\[main.assertion.2\] .* \*p==1: Unknown$
+^\[main\.assertion\.3\] .* p\[1\]==2: Unknown$
+^\[main\.assertion\.4\] .* 1\[p\]==2: Unknown$
+^\[main\.assertion\.5\] .* \*\(p\+1\)==2: Unknown$
+^\[main\.assertion\.6\] .* \*\(1\+p\)==2: Unknown$
+^\[main\.assertion\.7\] .* \*\(p-1\)==1: Unknown$
+^\[main.assertion.8\] .* q==p\+1: Unknown$
+^\[main.assertion.9\] .* \*q==2: Unknown$
+^\[main.assertion.10\] .* q-p==x: Unknown$
+^\[main.assertion.11\] .* a\[1\]==4: Unknown$
+^\[main.assertion.12\] .* a\[1\]==5: Unknown$
+^\[main\.assertion\.13\] .* a\[1\]==6: Unknown$
+^\[main\.assertion\.14\] .* a\[1\]==7: Unknown$
+^\[main.assertion.15\] .* \*r==2: Unknown$
+^\[main.assertion.16\] .* \*r==1: Unknown$
+^\[main.assertion.17\] .* \*s==0: Unknown$
+^\[main.assertion.18\] .* \*s==1: Unknown$
+^\[main.assertion.19\] .* t==p\+i: Unknown$
+^\[main.assertion.20\] .* t-p==y: Unknown$
+^\[main.assertion.21\] .* a\[i\]==5: Unknown$
+^\[main.assertion.22\] .* a\[1\]==5: Unknown$
 --
 ^warning: ignoring

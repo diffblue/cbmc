@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --variable
+^\[main\.assertion\.1\] .* 0: Success \(unreachable\)$
+^\[main\.assertion\.2\] .* 1: Success \(unreachable\)$
+^\[main\.assertion\.3\] .* x == y: Success \(unreachable\)$
+^\[main\.assertion\.4\] .* !\(x == y\) || \(x + 1 + a == b + y\): Success \(unreachable\)$
+^\[main\.assertion\.5\] .* !\(!\(x == y\) || \(x + 1 + a == b + y\)\): Success \(unreachable\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

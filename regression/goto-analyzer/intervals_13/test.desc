@@ -1,0 +1,15 @@
+CORE
+main.c
+--intervals --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* i\s*>=\s*10: Success$
+^\[main\.assertion\.2\] .* i\s*!=\s*30: Success$
+^\[main\.assertion\.3\] .* i\s*!=\s*15: Unknown$
+^\[main\.assertion\.4\] .* 0: Success$
+^\[main\.assertion\.5\] .* j\s*>=\s*10: Success$
+^\[main\.assertion\.6\] .* i\s*>=\s*j: Unknown$
+^\[main\.assertion\.7\] .* i\s*>=\s*11: Success$
+^\[main\.assertion\.8\] .* j\s*<\s*100: Success$
+--
+^warning: ignoring

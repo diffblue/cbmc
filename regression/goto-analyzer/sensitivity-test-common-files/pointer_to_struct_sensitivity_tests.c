@@ -12,17 +12,17 @@ int main(int argc, char *argv[])
   x.a=0;
   x.b=1.0;
   struct int_float *p=&x;
-  assert((*p).a==0);
-  assert((*p).a==1);
+  __CPROVER_assert((*p).a==0, "(*p).a==0");
+  __CPROVER_assert((*p).a==1, "(*p).a==1");
 
   // Test alternative syntax
-  assert(p->a==0);
-  assert(p->a==1);
+  __CPROVER_assert(p->a==0, "p->a==0");
+  __CPROVER_assert(p->a==1, "p->a==1");
 
   // Test writing to the struct through the pointer
   p->b=2.0;
-  assert(p->b==2.0);
-  assert(p->b==1.0);
+  __CPROVER_assert(p->b==2.0, "p->b==2.0");
+  __CPROVER_assert(p->b==1.0, "p->b==1.0");
 
   return 0;
 }
