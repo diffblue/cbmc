@@ -31,40 +31,19 @@ void slice_global_inits(
 {
   // gather all functions reachable from the entry point
 
-  call_grapht call_graph(goto_functions);
-  const call_grapht::grapht &graph=call_graph.graph;
-
-  std::list<irep_idt> worklist;
-  std::unordered_set<irep_idt, irep_id_hash> functions_reached;
-
   const irep_idt entry_point=goto_functionst::entry_point();
 
-  goto_functionst::function_mapt::const_iterator e_it;
-  e_it=goto_functions.function_map.find(entry_point);
+  const goto_functionst::function_mapt::const_iterator e_it=
+    goto_functions.function_map.find(entry_point);
 
   if(e_it==goto_functions.function_map.end())
     throw "entry point not found";
 
-  worklist.push_back(entry_point);
+  call_grapht call_graph(goto_functions);
+  call_graph();
 
-  do
-  {
-    const irep_idt id=worklist.front();
-    worklist.pop_front();
-
-    functions_reached.insert(id);
-
-    const auto &p=graph.equal_range(id);
-
-    for(auto it=p.first; it!=p.second; it++)
-    {
-      const irep_idt callee=it->second;
-
-      if(functions_reached.find(callee)==functions_reached.end())
-        worklist.push_back(callee);
-    }
-  }
-  while(!worklist.empty());
+  std::unordered_set<irep_idt, irep_id_hash> functions_reached;
+  call_graph.compute_reachable(entry_point, functions_reached);
 
   const irep_idt initialize=CPROVER_PREFIX "initialize";
   functions_reached.erase(initialize);

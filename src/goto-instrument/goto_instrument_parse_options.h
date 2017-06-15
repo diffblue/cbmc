@@ -58,7 +58,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-struct-alignment)(interval-analysis)(show-intervals)" \
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
-  "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
+  "(remove-unreachable-functions)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(remove-function-pointers)" \
   "(show-claims)(show-properties)(property):" \
