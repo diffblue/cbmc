@@ -583,7 +583,6 @@ void rw_range_sett::get_objects_rec(
     get_objects_address_of(to_address_of_expr(expr).object(), expr);
   else if(mode==get_modet::READ)
   {
-    get_objects_address_of(to_address_of_expr(expr).object(), expr);
     {
       // possibly affects the full object size, even if range_start/size
       // are only a subset of the bytes (e.g., when using the result of
