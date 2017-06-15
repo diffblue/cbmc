@@ -1,12 +1,9 @@
 CORE
 main.c
---inline --remove-calls-nobody
+--function-inline func1
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\s*x;$
-^\s*c;$
-^\s*a;$
-no body.*[`]f
+func2\(\)
 --
 ^warning: ignoring

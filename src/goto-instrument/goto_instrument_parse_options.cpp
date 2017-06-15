@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_asm.h>
+#include <goto-programs/remove_calls_nobody.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
 #include <goto-programs/slice_global_inits.h>
@@ -251,6 +252,8 @@ int goto_instrument_parse_optionst::doit()
                     << "\n\n";
         }
       }
+
+      return 0;
     }
 
     if(cmdline.isset("show-value-sets"))
@@ -684,6 +687,10 @@ int goto_instrument_parse_optionst::doit()
       status() << "Performing full inlining" << eom;
       goto_inline(goto_functions, ns, ui_message_handler);
 
+      status() << "Removing calls to functions without a body" << eom;
+      remove_calls_nobodyt rcn;
+      rcn.remove_calls_nobody(goto_functions);
+
       status() << "Accelerating" << eom;
       accelerate_functions(goto_functions, symbol_table, cmdline.isset("z3"));
       remove_skip(goto_functions);
@@ -950,7 +957,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // now do full inlining, if requested
   if(cmdline.isset("inline"))
   {
-    do_indirect_call_and_rtti_removal();
+    do_indirect_call_and_rtti_removal(/*force=*/true);
 
     if(cmdline.isset("show-custom-bitvector-analysis") ||
        cmdline.isset("custom-bitvector-analysis"))
@@ -961,7 +968,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     }
 
     status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler);
+    goto_inline(goto_functions, ns, ui_message_handler, true);
   }
 
   if(cmdline.isset("show-custom-bitvector-analysis") ||
@@ -1076,27 +1083,21 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     do_indirect_call_and_rtti_removal();
 
     status() << "Partial inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler, true);
+    goto_partial_inline(goto_functions, ns, ui_message_handler, 0, true);
 
     goto_functions.update();
     goto_functions.compute_loop_numbers();
   }
 
-  // now do full inlining, if requested
-  if(cmdline.isset("inline"))
+  if(cmdline.isset("remove-calls-nobody"))
   {
-    do_indirect_call_and_rtti_removal(/*force=*/true);
+    status() << "Removing calls to functions without a body" << eom;
 
-    if(cmdline.isset("show-custom-bitvector-analysis") ||
-       cmdline.isset("custom-bitvector-analysis"))
-    {
-      do_remove_returns();
-      thread_exit_instrumentation(goto_functions);
-      mutex_init_instrumentation(symbol_table, goto_functions);
-    }
+    remove_calls_nobodyt rcn;
+    rcn.remove_calls_nobody(goto_functions);
 
-    status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler, true);
+    goto_functions.update();
+    goto_functions.compute_loop_numbers();
   }
 
   if(cmdline.isset("constant-propagator"))

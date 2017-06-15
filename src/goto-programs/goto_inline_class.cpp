@@ -450,7 +450,7 @@ void goto_inlinet::insert_function_body(
   dest.destructive_insert(target, tmp);
 }
 
-void goto_inlinet::insert_function_nobody(
+void goto_inlinet::handle_function_nobody(
   goto_programt &dest,
   const exprt &lhs,
   goto_programt::targett target,
@@ -467,40 +467,6 @@ void goto_inlinet::insert_function_nobody(
     warning().source_location=function.find_source_location();
     warning() << "no body for function `" << identifier << "'" << eom;
   }
-
-  goto_programt tmp;
-
-  // evaluate function arguments -- they might have
-  // pointer dereferencing or the like
-  forall_expr(it, arguments)
-  {
-    goto_programt::targett t=tmp.add_instruction();
-    t->make_other(code_expressiont(*it));
-    t->source_location=target->source_location;
-    t->function=target->function;
-  }
-
-  // return value
-  if(lhs.is_not_nil())
-  {
-    side_effect_expr_nondett rhs(lhs.type());
-    rhs.add_source_location()=target->source_location;
-
-    code_assignt code(lhs, rhs);
-    code.add_source_location()=target->source_location;
-
-    goto_programt::targett t=tmp.add_instruction(ASSIGN);
-    t->source_location=target->source_location;
-    t->function=target->function;
-    t->code.swap(code);
-  }
-
-  // kill call
-  target->type=LOCATION;
-  target->code.clear();
-  target++;
-
-  dest.destructive_insert(target, tmp);
 }
 
 void goto_inlinet::expand_function_call(
@@ -624,7 +590,7 @@ void goto_inlinet::expand_function_call(
   }
   else // no body available
   {
-    insert_function_nobody(dest, lhs, target, function, arguments);
+    handle_function_nobody(dest, lhs, target, function, arguments);
   }
 }
 
