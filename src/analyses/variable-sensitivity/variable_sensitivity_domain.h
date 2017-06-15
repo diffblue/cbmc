@@ -99,17 +99,16 @@ public:
 
   bool ai_simplify(
     exprt &condition,
-    const namespacet &ns,
-    const bool lhs=false) const override;
+    const namespacet &ns) const override;
 
   bool is_bottom() const override;
   bool is_top() const override;
 
-private:
   bool ai_simplify_lhs(
     exprt &condition,
-    const namespacet &ns) const;
+    const namespacet &ns) const override;
 
+private:
   abstract_environmentt abstract_state;
 };
 

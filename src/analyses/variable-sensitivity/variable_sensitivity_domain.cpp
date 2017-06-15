@@ -270,25 +270,18 @@ Function: variable_sensitivity_domaint::ai_simplify
 \*******************************************************************/
 
 bool variable_sensitivity_domaint::ai_simplify(
-  exprt &condition, const namespacet &ns, const bool lhs) const
+  exprt &condition, const namespacet &ns) const
 {
-  if(lhs)
-  {
-    return ai_simplify_lhs(condition, ns);
-  }
+  sharing_ptrt<abstract_objectt> res=abstract_state.eval(condition, ns);
+  exprt c=res->to_constant();
+
+  if(c.id()==ID_nil)  // TODO : simplification within an expression
+    return true;
   else
   {
-    sharing_ptrt<abstract_objectt> res=abstract_state.eval(condition, ns);
-    exprt c=res->to_constant();
-
-    if(c.id()==ID_nil)  // TODO : simplification within an expression
-      return true;
-    else
-    {
-      bool condition_changed=(condition!=c);
-      condition=c;
-      return !condition_changed;
-    }
+    bool condition_changed=(condition!=c);
+    condition=c;
+    return !condition_changed;
   }
 }
 
@@ -351,7 +344,7 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   {
     index_exprt ie = to_index_expr(condition);
     exprt index = ie.index();
-    bool changed = ai_simplify(index, ns, false);
+    bool changed = ai_simplify(index, ns);
     if(changed)
     {
       ie.index() = index;
@@ -364,7 +357,7 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   {
     dereference_exprt de = to_dereference_expr(condition);
     exprt pointer = de.pointer();
-    bool changed = ai_simplify(pointer, ns, false);
+    bool changed = ai_simplify(pointer, ns);
     if(changed)
     {
       de.pointer() = pointer;
@@ -379,7 +372,7 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
     exprt compound = me.compound();
     // Carry on the RHS since we still require an addressable object for the
     // struct
-    bool changed = ai_simplify(compound, ns, true);
+    bool changed = ai_simplify_lhs(compound, ns);
     if(changed)
     {
       me.compound() = compound;
