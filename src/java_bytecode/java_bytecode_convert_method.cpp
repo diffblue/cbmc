@@ -1417,11 +1417,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?ipush"))
     {
       assert(results.size()==1);
-      namespacet ns(symbol_table);
-      // Force a simplify here in case we have --no-simplify
-      // because the simplifier is the only pass that knows how to
-      // deal with this cast from integer_typet:
-      results[0]=simplify_expr(typecast_exprt(arg0, java_int_type()), ns);
+      mp_integer int_value;
+      bool ret=to_integer(to_constant_expr(arg0), int_value);
+      INVARIANT(!ret, "?ipush argument should be an integer");
+      results[0]=from_integer(int_value, java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
