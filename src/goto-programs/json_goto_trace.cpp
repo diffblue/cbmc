@@ -20,18 +20,9 @@ Author: Daniel Kroening
 
 #include <langapi/language_util.h>
 
-/*******************************************************************\
-
-Function: remove_pointer_offsets
-
-  Inputs:
-    src - an expression
-
- Purpose: Replaces in src, expressions of the form pointer_offset(constant)
-          by that constant.
-
-\*******************************************************************/
-
+/// Replaces in src, expressions of the form pointer_offset(constant) by that
+/// constant.
+/// \param src: an expression
 void remove_pointer_offsets(exprt &src)
 {
   if(src.id()==ID_pointer_offset && src.op0().id()==ID_constant)
@@ -41,20 +32,10 @@ void remove_pointer_offsets(exprt &src)
       remove_pointer_offsets(op);
 }
 
-/*******************************************************************\
-
-Function: remove_pointer_offsets
-
-  Inputs:
-    src - an expression
-    array_symbol - a symbol expression representing an array
-
- Purpose: Replaces in src, expressions of the form
-          pointer_offset(array_symbol) by a constant value of 0.
-          This is meant to simplify array expressions.
-
-\*******************************************************************/
-
+/// Replaces in src, expressions of the form pointer_offset(array_symbol) by a
+/// constant value of 0. This is meant to simplify array expressions.
+/// \param src: an expression
+/// \param array_symbol: a symbol expression representing an array
 void remove_pointer_offsets(exprt &src, const symbol_exprt &array_symbol)
 {
   if(src.id()==ID_pointer_offset &&
@@ -74,23 +55,13 @@ void remove_pointer_offsets(exprt &src, const symbol_exprt &array_symbol)
       remove_pointer_offsets(op, array_symbol);
 }
 
-/*******************************************************************\
-
-Function: simplify_index
-
-  Inputs:
-    idx - an expression representing an index in an array
-    out - a reference to an unsigned value of type size_t, which will
-          hold the result of the simplification if it is successful
-
- Outputs: Boolean flag that is true if the `idx` expression could not be
-          simplified into a unsigned constant value.
-
- Purpose: Simplify the expression in index as much as possible to try
-          to get an unsigned constant.
-
-\*******************************************************************/
-
+/// Simplify the expression in index as much as possible to try to get an
+/// unsigned constant.
+/// \param idx: an expression representing an index in an array
+/// \param out: a reference to an unsigned value of type size_t, which will hold
+///   the result of the simplification if it is successful
+/// \return Boolean flag that is true if the `idx` expression could not be
+///   simplified into a unsigned constant value.
 bool simplify_index(const exprt &idx, std::size_t &out)
 {
   if(idx.id()==ID_constant)
@@ -115,20 +86,10 @@ bool simplify_index(const exprt &idx, std::size_t &out)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_array_access
-
-  Inputs:
-    src - an expression potentialy containing array accesses (index_expr)
-
- Outputs: an expression similar in meaning to src but where array accesses
-          have been simplified
-
- Purpose: Simplify an expression before putting it in the json format
-
-\*******************************************************************/
-
+/// Simplify an expression before putting it in the json format
+/// \param src: an expression potentialy containing array accesses (index_expr)
+/// \return an expression similar in meaning to src but where array accesses
+///   have been simplified
 exprt simplify_array_access(const exprt &src)
 {
   if(src.id()==ID_index && to_index_expr(src).array().id()==ID_symbol)
@@ -154,22 +115,11 @@ exprt simplify_array_access(const exprt &src)
   return src;
 }
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-    ns - a namespace
-    goto_trace - a trace in a goto program
-    dest - referecence to a json object in which the goto trace will
-           be added
-
- Outputs: none
-
- Purpose: Produce a json representation of a trace.
-
-\*******************************************************************/
-
+/// Produce a json representation of a trace.
+/// \param ns: a namespace
+/// \param goto_trace: a trace in a goto program
+/// \param dest: referecence to a json object in which the goto trace will be
+///   added
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
