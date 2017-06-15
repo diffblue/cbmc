@@ -283,11 +283,8 @@ private:
 
   codet code_assign_string_literal_to_string_expr(
     const string_exprt &lhs,
-    const exprt &tmp_string,
     const std::string &s,
     symbol_tablet &symbol_table);
-
-  exprt string_literal(const std::string &s);
 
   codet make_function_from_call(
     const irep_idt &function_name,
