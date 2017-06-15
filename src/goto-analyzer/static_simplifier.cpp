@@ -172,10 +172,10 @@ void static_simplifiert<analyzerT>::simplify_program()
         // should simplify to i=1, not to 0=1.
 
         bool unchanged_lhs=
-          domain[i_it].ai_simplify(assign.lhs(), ns, true);
+          domain[i_it].ai_simplify_lhs(assign.lhs(), ns);
 
         bool unchanged_rhs=
-          domain[i_it].ai_simplify(assign.rhs(), ns, false);
+          domain[i_it].ai_simplify(assign.rhs(), ns);
 
         if(unchanged_lhs && unchanged_rhs)
           unmodified.assigns++;
