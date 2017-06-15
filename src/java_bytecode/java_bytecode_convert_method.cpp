@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/simplify_expr.h>
 
 #include <linking/zero_initializer.h>
 
@@ -1416,7 +1417,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?ipush"))
     {
       assert(results.size()==1);
-      results[0]=typecast_exprt(arg0, java_int_type());
+      namespacet ns(symbol_table);
+      // Force a simplify here in case we have --no-simplify
+      // because the simplifier is the only pass that knows how to
+      // deal with this cast from integer_typet:
+      results[0]=simplify_expr(typecast_exprt(arg0, java_int_type()), ns);
     }
     else if(statement==patternt("if_?cmp??"))
     {
