@@ -94,7 +94,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
-
 void goto_instrument_parse_optionst::eval_verbosity()
 {
   unsigned int v=8;
@@ -482,6 +481,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-reaching-definitions"))
     {
       do_indirect_call_and_rtti_removal();
+
+      status() << "Reaching definitions analysis" << eom;
 
       const namespacet ns(symbol_table);
       reaching_definitions_analysist rd_analysis(ns);

@@ -1,11 +1,12 @@
 /*******************************************************************\
 
 Module: Range-based reaching definitions analysis (following Field-
-        Sensitive Program Dependence Analysis, Litvak et al., FSE 2010)
+        Sensitive Program Dependence Analysis, Litvak et al.,
+        FSE 2010)
 
 Author: Michael Tautschnig
 
-Date: February 2013
+  Date: February 2013
 
 \*******************************************************************/
 
@@ -23,18 +24,24 @@ Date: February 2013
 
 #include "reaching_definitions.h"
 
+//#define WITH_SCOPING
 void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 {
   assert(bv_container);
 
-  valuest::const_iterator v_entry=values.find(identifier);
-  if(v_entry==values.end() ||
-     v_entry->second.empty())
+  auto &r=values.find(identifier);
+
+  if(!r.second)
+    return;
+
+  const values_innert &inner=r.first;
+
+  if(inner.empty())
     return;
 
   ranges_at_loct &export_entry=export_cache[identifier];
 
-  for(const auto &id : v_entry->second)
+  for(const auto &id : inner)
   {
     const reaching_definitiont &v=bv_container->get(id);
 
@@ -116,19 +123,17 @@ void rd_range_domaint::transform_dead(
   const irep_idt &identifier=
     to_symbol_expr(to_code_dead(from->code).symbol()).get_identifier();
 
-  valuest::iterator entry=values.find(identifier);
-
-  if(entry!=values.end())
-  {
-    values.erase(entry);
-    export_cache.erase(identifier);
-  }
+  values.erase(identifier);
+  //export_cache.erase(identifier);
 }
 
 void rd_range_domaint::transform_start_thread(
   const namespacet &ns,
   reaching_definitions_analysist &rd)
 {
+  assert(false);
+
+#if 0
   for(valuest::iterator it=values.begin();
       it!=values.end();
       ) // no ++it
@@ -148,6 +153,7 @@ void rd_range_domaint::transform_start_thread(
     else
       ++it;
   }
+#endif
 }
 
 void rd_range_domaint::transform_function_call(
@@ -164,28 +170,24 @@ void rd_range_domaint::transform_function_call(
   // only if there is an actual call, i.e., we have a body
   if(next!=to)
   {
-    for(valuest::iterator it=values.begin();
-        it!=values.end();
-       ) // no ++it
-    {
-      const irep_idt &identifier=it->first;
+#ifdef WITH_SCOPING
+    valuest::viewt view;
+    values.get_view(view);
 
-      // dereferencing may introduce extra symbols
+    for(const auto &p : view)
+    {
+      const irep_idt &identifier=p.first;
+
       const symbolt *sym;
+
       if((ns.lookup(identifier, sym) ||
-          !sym->is_shared()) &&
+         !sym->is_shared()) &&
          !rd.get_is_dirty()(identifier))
       {
-        export_cache.erase(identifier);
-
-        valuest::iterator next=it;
-        ++next;
-        values.erase(it);
-        it=next;
+        values.erase(identifier);
       }
-      else
-        ++it;
     }
+#endif
 
     const symbol_exprt &fn_symbol_expr=to_symbol_expr(code.function());
     const code_typet &code_type=
@@ -223,11 +225,15 @@ void rd_range_domaint::transform_end_function(
   --call;
   const code_function_callt &code=to_code_function_call(call->code);
 
+#ifdef WITH_SCOPING
   valuest new_values;
   new_values.swap(values);
   values=rd[call].values;
 
-  for(const auto &new_value : new_values)
+  valuest::viewt view;
+  new_values.get_view(view);
+
+  for(const auto &new_value : view)
   {
     const irep_idt &identifier=new_value.first;
 
@@ -248,6 +254,7 @@ void rd_range_domaint::transform_end_function(
       gen(v.definition_at, v.identifier, v.bit_begin, v.bit_end);
     }
   }
+#endif
 
   const code_typet &code_type=
     to_code_type(ns.lookup(from->function).type);
@@ -259,13 +266,8 @@ void rd_range_domaint::transform_end_function(
     if(identifier.empty())
       continue;
 
-    valuest::iterator entry=values.find(identifier);
-
-    if(entry!=values.end())
-    {
-      values.erase(entry);
-      export_cache.erase(identifier);
-    }
+    values.erase(identifier);
+    //export_cache.erase(identifier);
   }
 
   // handle return values
@@ -277,7 +279,7 @@ void rd_range_domaint::transform_end_function(
     assert(rd_state!=0);
     rd_state->
 #endif
-      transform_assign(ns, from, call, rd);
+    transform_assign(ns, from, call, rd);
   }
 }
 
@@ -304,8 +306,8 @@ void rd_range_domaint::transform_assign(
 
     if(is_must_alias &&
        (!rd.get_is_threaded()(from) ||
-        (!symbol_ptr->is_shared() &&
-         !rd.get_is_dirty()(identifier))))
+       (!symbol_ptr->is_shared() &&
+       !rd.get_is_dirty()(identifier))))
       for(const auto &range : ranges)
         kill(identifier, range.first, range.second);
 
@@ -329,47 +331,49 @@ void rd_range_domaint::kill(
 
   assert(range_end>range_start);
 
-  valuest::iterator entry=values.find(identifier);
-  if(entry==values.end())
+  auto &r=values.find(identifier);
+  if(!r.second)
     return;
 
-  bool clear_export_cache=false;
+  //bool clear_export_cache=false;
+
+  values_innert &current_values=r.first;
   values_innert new_values;
 
   for(values_innert::iterator
-      it=entry->second.begin();
-      it!=entry->second.end();
+      it=current_values.begin();
+      it!=current_values.end();
      ) // no ++it
   {
     const reaching_definitiont &v=bv_container->get(*it);
 
-    if(v.bit_begin >= range_end)
+    if(v.bit_begin>=range_end)
       ++it;
     else if(v.bit_end!=-1 &&
-            v.bit_end <= range_start)
+            v.bit_end<=range_start)
       ++it;
-    else if(v.bit_begin >= range_start &&
+    else if(v.bit_begin>=range_start &&
             v.bit_end!=-1 &&
-            v.bit_end <= range_end) // rs <= a < b <= re
+            v.bit_end<=range_end) // rs <= a < b <= re
     {
-      clear_export_cache=true;
+      //clear_export_cache=true;
 
-      entry->second.erase(it++);
+      current_values.erase(it++);
     }
     else if(v.bit_begin >= range_start) // rs <= a <= re < b
     {
-      clear_export_cache=true;
+      //clear_export_cache=true;
 
       reaching_definitiont v_new=v;
       v_new.bit_begin=range_end;
       new_values.insert(bv_container->add(v_new));
 
-      entry->second.erase(it++);
+      current_values.erase(it++);
     }
     else if(v.bit_end==-1 ||
-            v.bit_end > range_end) // a <= rs < re < b
+            v.bit_end>range_end) // a <= rs < re < b
     {
-      clear_export_cache=true;
+      //clear_export_cache=true;
 
       reaching_definitiont v_new=v;
       v_new.bit_end=range_start;
@@ -380,38 +384,24 @@ void rd_range_domaint::kill(
       new_values.insert(bv_container->add(v_new));
       new_values.insert(bv_container->add(v_new2));
 
-      entry->second.erase(it++);
+      current_values.erase(it++);
     }
     else // a <= rs < b <= re
     {
-      clear_export_cache=true;
+      //clear_export_cache=true;
 
       reaching_definitiont v_new=v;
       v_new.bit_end=range_start;
       new_values.insert(bv_container->add(v_new));
 
-      entry->second.erase(it++);
+      current_values.erase(it++);
     }
   }
 
-  if(clear_export_cache)
-    export_cache.erase(identifier);
+  //if(clear_export_cache)
+  //  export_cache.erase(identifier);
 
-  values_innert::iterator it=entry->second.begin();
-  for(const auto &id : new_values)
-  {
-    while(it!=entry->second.end() && *it<id)
-      ++it;
-    if(it==entry->second.end() || id<*it)
-    {
-      entry->second.insert(it, id);
-    }
-    else if(it!=entry->second.end())
-    {
-      assert(*it==id);
-      ++it;
-    }
-  }
+  current_values.insert(new_values.begin(), new_values.end());
 }
 
 void rd_range_domaint::kill_inf(
@@ -424,8 +414,6 @@ void rd_range_domaint::kill_inf(
   valuest::iterator entry=values.find(identifier);
   if(entry==values.end())
     return;
-
-  XXX export_cache_available=false;
 
   // makes the analysis underapproximating
   rangest &ranges=entry->second;
@@ -469,10 +457,13 @@ bool rd_range_domaint::gen(
   v.bit_begin=range_start;
   v.bit_end=range_end;
 
-  if(!values[identifier].insert(bv_container->add(v)).second)
+  size_t id=bv_container->add(v);
+
+  const auto &r=values[identifier].insert(id);
+  if(!r.second)
     return false;
 
-  export_cache.erase(identifier);
+  //export_cache.erase(identifier);
 
 #if 0
   range_spect merged_range_end=range_end;
@@ -530,7 +521,10 @@ void rd_range_domaint::output(std::ostream &out) const
     return;
   }
 
-  for(const auto &value : values)
+  valuest::viewt view;
+  values.get_view(view);
+
+  for(const auto &value : view)
   {
     const irep_idt &identifier=value.first;
 
@@ -541,6 +535,7 @@ void rd_range_domaint::output(std::ostream &out) const
     for(ranges_at_loct::const_iterator itl=ranges.begin();
         itl!=ranges.end();
         ++itl)
+    {
       for(rangest::const_iterator itr=itl->second.begin();
           itr!=itl->second.end();
           ++itr)
@@ -552,6 +547,7 @@ void rd_range_domaint::output(std::ostream &out) const
         out << itr->first << ":" << itr->second;
         out << "@" << itl->first->location_number;
       }
+    }
 
     out << "]\n";
 
@@ -560,86 +556,57 @@ void rd_range_domaint::output(std::ostream &out) const
 }
 
 /// \return returns true iff there is s.th. new
-bool rd_range_domaint::merge_inner(
-  values_innert &dest,
-  const values_innert &other)
-{
-  bool more=false;
-
-#if 0
-  ranges_at_loct::iterator itr=it->second.begin();
-  for(const auto &o : ito->second)
-  {
-    while(itr!=it->second.end() && itr->first<o.first)
-      ++itr;
-    if(itr==it->second.end() || o.first<itr->first)
-    {
-      it->second.insert(o);
-      more=true;
-    }
-    else if(itr!=it->second.end())
-    {
-      assert(itr->first==o.first);
-
-      for(const auto &o_range : o.second)
-        more=gen(itr->second, o_range.first, o_range.second) ||
-          more;
-
-      ++itr;
-    }
-  }
-#else
-  values_innert::iterator itr=dest.begin();
-  for(const auto &id : other)
-  {
-    while(itr!=dest.end() && *itr<id)
-      ++itr;
-    if(itr==dest.end() || id<*itr)
-    {
-      dest.insert(itr, id);
-      more=true;
-    }
-    else if(itr!=dest.end())
-    {
-      assert(*itr==id);
-      ++itr;
-    }
-  }
-#endif
-
-  return more;
-}
-
-/// \return returns true iff there is s.th. new
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
   locationt from,
   locationt to)
 {
-  bool changed=has_values.is_false();
-  has_values=tvt::unknown();
+  bool changed=false;
 
-  valuest::iterator it=values.begin();
-  for(const auto &value : other.values)
+  if(other.has_values.is_false())
   {
-    while(it!=values.end() && it->first<value.first)
-      ++it;
-    if(it==values.end() || value.first<it->first)
+    assert(other.values.empty());
+    return false;
+  }
+
+  if(has_values.is_false())
+  {
+    assert(values.empty());
+    values=other.values;
+    assert(!other.has_values.is_true());
+    has_values=other.has_values;
+    return true;
+  }
+  rd_range_domaint &o=const_cast<rd_range_domaint &>(other);
+  values.swap(o.values);
+  valuest::delta_viewt delta_view;
+  o.values.get_delta_view(values, delta_view);
+  for(const auto &element : delta_view)
+  {
+    bool in_both=element.in_both;
+    const irep_idt &k=element.k;
+    const values_innert &inner_other=element.m; // in other
+    const values_innert &inner=element.other_m; // in this
+
+    if(!in_both)
     {
-      values.insert(value);
+      values.insert(k, inner_other);
       changed=true;
     }
-    else if(it!=values.end())
+    else
     {
-      assert(it->first==value.first);
-
-      if(merge_inner(it->second, value.second))
+      if(inner!=inner_other)
       {
-        changed=true;
-        export_cache.erase(it->first);
-      }
+        auto &v=values.find(k);
+        assert(v.second);
 
-      ++it;
+        values_innert &inner=v.first;
+
+        size_t n=inner.size();
+        inner.insert(inner_other.begin(), inner_other.end());
+        if(inner.size()!=n)
+          changed=true;
+      }
     }
   }
 
@@ -653,6 +620,10 @@ bool rd_range_domaint::merge_shared(
   goto_programt::const_targett to,
   const namespacet &ns)
 {
+  assert(false);
+  return false;
+
+#if 0
   // TODO: dirty vars
 #if 0
   reaching_definitions_analysist *rd=
@@ -694,6 +665,7 @@ bool rd_range_domaint::merge_shared(
   }
 
   return changed;
+#endif
 }
 
 const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
@@ -715,8 +687,10 @@ reaching_definitions_analysist::~reaching_definitions_analysist()
 {
   if(is_dirty)
     delete is_dirty;
+
   if(is_threaded)
     delete is_threaded;
+
   if(value_sets)
     delete value_sets;
 }
@@ -729,7 +703,6 @@ void reaching_definitions_analysist::initialize(
   value_sets=value_sets_;
 
   is_threaded=new is_threadedt(goto_functions);
-
   is_dirty=new dirtyt(goto_functions);
 
   concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions);

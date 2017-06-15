@@ -1,11 +1,12 @@
 /*******************************************************************\
 
 Module: Range-based reaching definitions analysis (following Field-
-        Sensitive Program Dependence Analysis, Litvak et al., FSE 2010)
+        Sensitive Program Dependence Analysis, Litvak et al., FSE
+        2010)
 
 Author: Michael Tautschnig
 
-Date: February 2013
+  Date: February 2013
 
 \*******************************************************************/
 
@@ -16,6 +17,7 @@ Date: February 2013
 #ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
+#include <util/sharing_map.h>
 #include <util/threeval.h>
 
 #include "ai.h"
@@ -129,22 +131,31 @@ public:
   void make_top() final
   {
     values.clear();
+
     if(bv_container)
       bv_container->clear();
+
     has_values=tvt(true);
   }
 
   void make_bottom() final
   {
     values.clear();
+
     if(bv_container)
       bv_container->clear();
+
     has_values=tvt(false);
   }
 
   void make_entry() final
   {
-    make_top();
+    values.clear();
+
+    if(bv_container)
+      bv_container->clear();
+
+    has_values=tvt::unknown();
   }
 
   // returns true iff there is s.th. new
@@ -164,6 +175,7 @@ public:
   typedef std::map<locationt, rangest> ranges_at_loct;
 
   const ranges_at_loct &get(const irep_idt &identifier) const;
+
   void clear_cache(const irep_idt &identifier) const
   {
     export_cache[identifier].clear();
@@ -175,11 +187,7 @@ private:
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
 
   typedef std::set<std::size_t> values_innert;
-  #ifdef USE_DSTRING
-  typedef std::map<irep_idt, values_innert> valuest;
-  #else
-  typedef std::unordered_map<irep_idt, values_innert, irep_id_hash> valuest;
-  #endif
+  typedef sharing_mapt<irep_idt, values_innert, irep_id_hash> valuest;
   valuest values;
 
   #ifdef USE_DSTRING
@@ -228,10 +236,6 @@ private:
     const range_spect &range_end);
 
   void output(std::ostream &out) const;
-
-  bool merge_inner(
-    values_innert &dest,
-    const values_innert &other);
 };
 
 class reaching_definitions_analysist:
@@ -286,9 +290,9 @@ public:
 
 protected:
   const namespacet &ns;
-  value_setst * value_sets;
-  is_threadedt * is_threaded;
-  dirtyt * is_dirty;
+  value_setst *value_sets;
+  is_threadedt *is_threaded;
+  dirtyt *is_dirty;
 };
 
 #endif // CPROVER_ANALYSES_REACHING_DEFINITIONS_H
