@@ -122,7 +122,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   string_constraintt a4(idx,
                         res.length(),
                         equal_exprt(res[idx],
-                        str[plus_exprt_with_overflow_check(start, idx)]));
+                        str[plus_exprt(start, idx)]));
   axioms.push_back(a4);
   return res;
 }
