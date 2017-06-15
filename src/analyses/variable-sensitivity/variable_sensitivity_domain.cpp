@@ -275,8 +275,18 @@ bool variable_sensitivity_domaint::ai_simplify(
   sharing_ptrt<abstract_objectt> res=abstract_state.eval(condition, ns);
   exprt c=res->to_constant();
 
-  if(c.id()==ID_nil)  // TODO : simplification within an expression
-    return true;
+  if(c.id()==ID_nil)
+  {
+    bool no_simplification=true;
+
+    // Try to simplify recursively any child operations
+    for(exprt &op : condition.operands())
+    {
+      no_simplification&=ai_simplify(op, ns);
+    }
+
+    return no_simplification;
+  }
   else
   {
     bool condition_changed=(condition!=c);
