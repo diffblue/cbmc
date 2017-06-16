@@ -230,16 +230,22 @@ template<class T>
 std::ostream &operator << (std::ostream &out, const interval_templatet<T> &i)
 {
   if(i.lower_set)
-    out << '[' << i.lower;
+  {
+    out << dstringt("[");
+    out << i.lower;
+  }
   else
-    out << ")-INF";
+    out << dstringt(")-INF");
 
-  out << ',';
+  out << dstringt(",");
 
   if(i.upper_set)
-    out << i.upper << ']';
+  {
+    out << i.upper;
+    out << dstringt("]");
+  }
   else
-    out << "+INF(";
+    out << dstringt("+INF(");
 
   return out;
 }
