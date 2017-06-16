@@ -17,7 +17,7 @@ Author: Cristina David
 /// Returns the compile type of an exception
 irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 {
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id()==ID_pointer);
 
   if(type.subtype().id()==ID_symbol)
   {
@@ -122,7 +122,9 @@ void uncaught_exceptions_domaint::transform(
   {
     const exprt &function_expr=
       to_code_function_call(instruction.code).function();
-    assert(function_expr.id()==ID_symbol);
+    DATA_INVARIANT(
+      function_expr.id()==ID_symbol,
+      "identifier expected to be a symbol");
     const irep_idt &function_name=
       to_symbol_expr(function_expr).get_identifier();
     // use the current information about the callee
@@ -193,7 +195,9 @@ void uncaught_exceptions_analysist::output(
     {
       std::cout << "Uncaught exceptions in function " <<
         it->first << ": " << std::endl;
-      assert(exceptions_map.find(it->first)!=exceptions_map.end());
+      INVARIANT(
+        exceptions_map.find(it->first)!=exceptions_map.end(),
+        "each function expected to be recorded in `exceptions_map`");
       for(auto exc_id : exceptions_map[it->first])
         std::cout << id2string(exc_id) << " ";
       std::cout << std::endl;
