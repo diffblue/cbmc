@@ -49,6 +49,8 @@ SRC = ai.cpp \
       variable-sensitivity/write_stack_entry.cpp \
       variable-sensitivity/data_dependency_context.cpp \
       variable-sensitivity/variable_sensitivity_dependence_graph.cpp \
+      interval.cpp \
+      interval_helpers.cpp \
       # Empty last line
 
 INCLUDES= -I ..
