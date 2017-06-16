@@ -79,7 +79,9 @@ void remove_exceptionst::add_exceptional_returns(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  assert(symbol_table.has_symbol(function_id));
+  INVARIANT(
+    symbol_table.has_symbol(function_id),
+    "functions should be recorded in the symbol table");
   const symbolt &function_symbol=symbol_table.lookup(function_id);
 
   // for now only add exceptional returns for Java
@@ -118,7 +120,9 @@ void remove_exceptionst::add_exceptional_returns(
     {
       const exprt &function_expr=
         to_code_function_call(instr_it->code).function();
-      assert(function_expr.id()==ID_symbol);
+      DATA_INVARIANT(
+        function_expr.id()==ID_symbol,
+        "identifier expected to be a symbol");
       const irep_idt &function_name=
         to_symbol_expr(function_expr).get_identifier();
       has_uncaught_exceptions=!exceptions_map[function_name].empty();
@@ -144,7 +148,9 @@ void remove_exceptionst::add_exceptional_returns(
       symbol_tablet::symbolst::iterator s_it=
         symbol_table.symbols.find(function_id);
 
-      assert(s_it!=symbol_table.symbols.end());
+      INVARIANT(
+        s_it!=symbol_table.symbols.end(),
+        "functions should be recorded in the symbol table");
 
       auxiliary_symbolt new_symbol;
       new_symbol.is_static_lifetime=true;
@@ -182,7 +188,7 @@ void remove_exceptionst::instrument_exception_handler(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  assert(instr_it->type==CATCH && instr_it->code.has_operands());
+  PRECONDITION(instr_it->type==CATCH && instr_it->code.has_operands());
 
   // retrieve the exception variable
   const exprt &exception=instr_it->code.op0();
@@ -228,9 +234,13 @@ static goto_programt::targett get_exceptional_output(
     const irep_idt &statement=it->code.get_statement();
     if(statement==ID_output)
     {
-      assert(it->code.operands().size()>=2);
+      DATA_INVARIANT(
+        it->code.operands().size()>=2,
+        "output expected to have at least 2 operands");
       const exprt &expr=it->code.op1();
-      assert(expr.id()==ID_symbol);
+      DATA_INVARIANT(
+        expr.id()==ID_symbol,
+        "identifier expected to be a symbol");
       const symbol_exprt &symbol=to_symbol_expr(expr);
       if(id2string(symbol.get_identifier()).find(EXC_SUFFIX)
          !=std::string::npos)
@@ -248,7 +258,7 @@ void remove_exceptionst::instrument_throw(
   const remove_exceptionst::stack_catcht &stack_catch,
   std::vector<exprt> &locals)
 {
-  assert(instr_it->type==THROW);
+  PRECONDITION(instr_it->type==THROW);
 
   const exprt &exc_expr=
     uncaught_exceptions_domaint::get_exception_symbol(instr_it->code);
@@ -264,8 +274,6 @@ void remove_exceptionst::instrument_throw(
 
   goto_programt &goto_program=func_it->second.body;
   const irep_idt &function_id=func_it->first;
-
-  assert(instr_it->code.operands().size()==1);
 
   // find the end of the function
   goto_programt::targett exceptional_output=
@@ -336,7 +344,7 @@ void remove_exceptionst::instrument_function_call(
   const stack_catcht &stack_catch,
   std::vector<exprt> &locals)
 {
-  assert(instr_it->type==FUNCTION_CALL);
+  PRECONDITION(instr_it->type==FUNCTION_CALL);
 
   goto_programt &goto_program=func_it->second.body;
   const irep_idt &function_id=func_it->first;
@@ -346,7 +354,9 @@ void remove_exceptionst::instrument_function_call(
   next_it++;
 
   code_function_callt &function_call=to_code_function_call(instr_it->code);
-  assert(function_call.function().id()==ID_symbol);
+  DATA_INVARIANT(
+    function_call.function().id()==ID_symbol,
+    "identified expected to be a symbol");
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
@@ -482,7 +492,9 @@ void remove_exceptionst::instrument_exceptions(
         // copy targets
         const irept::subt &exception_list=
           instr_it->code.find(ID_exception_list).get_sub();
-        assert(exception_list.size()==instr_it->targets.size());
+        INVARIANT(
+          exception_list.size()==instr_it->targets.size(),
+          "`exception_list` should contain current instruction's targets");
 
         // Fill the map with the catch type and the target
         unsigned i=0;

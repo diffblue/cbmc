@@ -17,57 +17,7 @@ Author: Cristina David
 /// Returns the compile type of an exception
 irep_idt uncaught_exceptions_domaint::get_exception_type(const typet &type)
 {
-  irep_idt candidate;
-  bool new_subtype=true;
-  const symbol_tablet &symbol_table=ns.get_symbol_table();
-
-  // as we don't know the order types have been recorded,
-  // we need to iterate over the symbol table until there are no more
-  // new subtypes found
-  while(new_subtype)
-  {
-    new_subtype=false;
-    // iterate over the symbol_table in order to find subtypes of type
-    forall_symbols(it, symbol_table.symbols)
-    {
-      // we only look at type entries
-      if(it->second.is_type)
-      {
-        // every type is a potential candidate
-        candidate=it->second.name;
-        // current candidate is already in subtypes
-        if(find(subtypes.begin(),
-                subtypes.end(),
-                candidate)!=subtypes.end())
-          continue;
-        // get its base class
-        const class_typet::basest &bases=
-          to_class_type((it->second).type).bases();
-        if(bases.size()>0)
-        {
-          const class_typet::baset &base = bases[0];
-          const irept &base_type=base.find(ID_type);
-          assert(base_type.id()==ID_symbol);
-
-          // is it derived from type?
-          // i.e. does it have type or one of its subtypes as a base?
-          if(base_type.get(ID_identifier)==type ||
-             find(subtypes.begin(), subtypes.end(),
-                  base_type.get(ID_identifier))!=subtypes.end())
-          {
-            subtypes.insert(candidate);
-            new_subtype=true;
-          }
-        }
-      }
-    }
-  }
-}
-
-/// Returns the symbol corresponding to an exception
-irep_idt uncaught_exceptions_domaint::get_static_type(const typet &type)
-{
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id()==ID_pointer);
 
   if(type.subtype().id()==ID_symbol)
   {
@@ -172,7 +122,9 @@ void uncaught_exceptions_domaint::transform(
   {
     const exprt &function_expr=
       to_code_function_call(instruction.code).function();
-    assert(function_expr.id()==ID_symbol);
+    DATA_INVARIANT(
+      function_expr.id()==ID_symbol,
+      "identifier expected to be a symbol");
     const irep_idt &function_name=
       to_symbol_expr(function_expr).get_identifier();
     // use the current information about the callee
@@ -243,7 +195,9 @@ void uncaught_exceptions_analysist::output(
     {
       std::cout << "Uncaught exceptions in function " <<
         it->first << ": " << std::endl;
-      assert(exceptions_map.find(it->first)!=exceptions_map.end());
+      INVARIANT(
+        exceptions_map.find(it->first)!=exceptions_map.end(),
+        "each function expected to be recorded in `exceptions_map`");
       for(auto exc_id : exceptions_map[it->first])
         std::cout << id2string(exc_id) << " ";
       std::cout << std::endl;
