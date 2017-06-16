@@ -155,11 +155,6 @@ matrix:
           eval ${PRE_COMMAND} ${COMMAND}
         - COMMAND="make -C src CXX=$COMPILER CXXFLAGS=\"--coverage\" LINKFLAGS=\"--coverage\" -j2" &&
           eval ${PRE_COMMAND} ${COMMAND}
-      script:
-        - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-          COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
-          eval ${PRE_COMMAND} ${COMMAND}
-        - COMMAND="make -C unit test" && eval ${PRE_COMMAND} ${COMMAND}
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
