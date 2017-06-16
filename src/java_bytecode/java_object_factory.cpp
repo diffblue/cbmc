@@ -118,6 +118,14 @@ private:
     const irep_idt &class_identifier,
     bool create_dynamic_objects,
     const pointer_typet &pointer_type);
+
+  void gen_nondet_struct_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    bool is_sub,
+    irep_idt class_identifier,
+    bool create_dynamic_objects,
+    const struct_typet &struct_type);
 };
 
 /// \param assignments: The code block to add code to
@@ -326,6 +334,77 @@ void java_object_factoryt::gen_nondet_pointer_init(
   }
 }
 
+/// Initialises an object tree rooted at `expr`, allocating child objects as
+/// necessary and nondet-initialising their members.
+/// \param assignments: The code block to append the new
+///   instructions to
+/// \param expr: pointer-typed lvalue expression to initialise
+/// \param is_sub: If true, `expr` is a substructure of a larger object, which
+///   in Java necessarily means a base class. not match *expr (for example, expr
+///   might be void*)
+/// \param class_identifier: clsid to initialise @java.lang.Object.
+///   @class_identifier
+/// \param create_dynamic_objects: if true, use malloc to allocate objects;
+///   otherwise generate fresh static symbols.
+/// \param struct_type - The type of the struct we are initalising
+void java_object_factoryt::gen_nondet_struct_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  bool is_sub,
+  irep_idt class_identifier,
+  bool create_dynamic_objects,
+  const struct_typet &struct_type)
+{
+  typedef struct_typet::componentst componentst;
+
+  const irep_idt struct_tag=struct_type.get_tag();
+
+  const componentst &components=struct_type.components();
+
+  if(!is_sub)
+    class_identifier=struct_tag;
+
+  recursion_set.insert(struct_tag);
+  assert(!recursion_set.empty());
+
+  for(const auto &component : components)
+  {
+    const typet &component_type=component.type();
+    irep_idt name=component.get_name();
+
+    member_exprt me(expr, name, component_type);
+
+    if(name=="@class_identifier")
+    {
+      irep_idt qualified_clsid="java::"+as_string(class_identifier);
+      constant_exprt ci(qualified_clsid, string_typet());
+      code_assignt code(me, ci);
+      code.add_source_location()=loc;
+      assignments.copy_to_operands(code);
+    }
+    else if(name=="@lock")
+    {
+      code_assignt code(me, from_integer(0, me.type()));
+      code.add_source_location()=loc;
+      assignments.copy_to_operands(code);
+    }
+    else
+    {
+      assert(!name.empty());
+
+      bool _is_sub=name[0]=='@';
+
+      gen_nondet_init(
+        assignments,
+        me,
+        _is_sub,
+        class_identifier,
+        create_dynamic_objects);
+    }
+  }
+  recursion_set.erase(struct_tag);
+}
+
 /// Creates a nondet for expr, including calling itself recursively to make
 /// appropriate symbols to point to if expr is a pointer or struct
 /// \param expr: The expression which we are generating a non-determinate value
@@ -362,59 +441,14 @@ void java_object_factoryt::gen_nondet_init(
   }
   else if(type.id()==ID_struct)
   {
-    typedef struct_typet::componentst componentst;
-
     const struct_typet &struct_type=to_struct_type(type);
-    const irep_idt struct_tag=struct_type.get_tag();
-
-    const componentst &components=struct_type.components();
-
-    if(!is_sub)
-      class_identifier=struct_tag;
-
-    recursion_set.insert(struct_tag);
-    assert(!recursion_set.empty());
-
-    for(const auto &component : components)
-    {
-      const typet &component_type=component.type();
-      irep_idt name=component.get_name();
-
-      member_exprt me(expr, name, component_type);
-
-      if(name=="@class_identifier")
-      {
-        irep_idt qualified_clsid="java::"+as_string(class_identifier);
-        constant_exprt ci(qualified_clsid, string_typet());
-        code_assignt code(me, ci);
-        code.add_source_location()=loc;
-        assignments.copy_to_operands(code);
-      }
-      else if(name=="@lock")
-      {
-        code_assignt code(me, from_integer(0, me.type()));
-        code.add_source_location()=loc;
-        assignments.copy_to_operands(code);
-      }
-      else
-      {
-        assert(!name.empty());
-
-        bool _is_sub=name[0]=='@';
-#if 0
-        irep_idt _class_identifier=
-          _is_sub?(class_identifier.empty()?struct_tag:class_identifier):"";
-#endif
-
-        gen_nondet_init(
-          assignments,
-          me,
-          _is_sub,
-          class_identifier,
-          create_dynamic_objects);
-      }
-    }
-    recursion_set.erase(struct_tag);
+    gen_nondet_struct_init(
+      assignments,
+      expr,
+      is_sub,
+      class_identifier,
+      create_dynamic_objects,
+      struct_type);
   }
   else
   {
