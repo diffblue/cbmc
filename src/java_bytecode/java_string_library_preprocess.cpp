@@ -1591,25 +1591,21 @@ codet java_string_library_preprocesst::make_assign_function_from_call(
   return code;
 }
 
-/*******************************************************************\
-
-Function: java_string_library_preprocesst::make_string_to_char_array_code
-
-  Inputs:
-    type - type of the function called
-    loc - location in the source
-    symbol_table - the symbol table
-
-  Outputs: Code corresponding to
-          > return_tmp0 = malloc(array[char]);
-          > return_tmp0->data=&((s->data)[0])
-          > return_tmp0->length=s->length
-
-  Purpose: Used to provide our own implementation of the
-           java.lang.String.toCharArray:()[C function.
-
-\*******************************************************************/
-
+/// Used to provide our own implementation of the
+/// `java.lang.String.toCharArray:()[C` function.
+/// \param type: type of the function called
+/// \param loc: location in the source
+/// \param symbol_table: the symbol table
+/// \return Code corresponding to
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// lhs = new java::array[char]
+/// string_expr = {length=this->length, content=*(this->data)}
+/// data = new char[]
+/// *data = string_expr.content
+/// lhs->data = &data[0]
+/// lhs->length = string_expr.length
+/// return lhs
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 codet java_string_library_preprocesst::make_string_to_char_array_code(
     const code_typet &type,
     const source_locationt &loc,
@@ -1620,29 +1616,37 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
   const code_typet::parametert &p=type.parameters()[0];
   symbol_exprt string_argument(p.get_identifier(), p.type());
   assert(implements_java_char_sequence(string_argument.type()));
-  dereference_exprt deref(string_argument, string_argument.type().subtype());
 
-  // lhs <- malloc(array[char])
-  exprt lhs=fresh_array(type.return_type(), loc, symbol_table);
-  allocate_dynamic_object_with_decl(
-    lhs, lhs.type().subtype(), symbol_table, loc, code);
+  // lhs = new java::array[char]
+  exprt lhs=allocate_fresh_array(
+    type.return_type(), loc, symbol_table, code);
 
-  // first_element_address is `&((string_argument->data)[0])`
-  exprt data=get_data(deref, symbol_table);
+  // string_expr = {this->length, this->data}
+  string_exprt string_expr=fresh_string_expr(loc, symbol_table, code);
+  code.add(code_assign_java_string_to_string_expr(
+    string_expr, string_argument, symbol_table));
+  exprt string_expr_sym=fresh_string_expr_symbol(
+    loc, symbol_table, code);
+  code.add(code_assignt(string_expr_sym, string_expr));
+
+  // data = new char[]
+  exprt data=allocate_fresh_array(
+    pointer_typet(string_expr.content().type()), loc, symbol_table, code);
+
+  // *data = string_expr.content
   dereference_exprt deref_data(data, data.type().subtype());
-  exprt first_index=from_integer(0, string_length_type());
-  index_exprt first_element(deref_data, first_index, java_char_type());
-  address_of_exprt first_element_address(first_element);
+  code.add(code_assignt(deref_data, string_expr.content()));
 
-  // lhs->data <- &((string_argument->data)[0])
+  // lhs->data = &data[0]
   dereference_exprt deref_lhs(lhs, lhs.type().subtype());
   exprt lhs_data=get_data(deref_lhs, symbol_table);
-  code.add(code_assignt(lhs_data, first_element_address));
+  index_exprt first_elt(
+    deref_data, from_integer(0, java_int_type()), java_char_type());
+  code.add(code_assignt(lhs_data, address_of_exprt(first_elt)));
 
-  // lhs->length <- s->length
-  exprt rhs_length=get_length(deref, symbol_table);
+  // lhs->length = string_expr.length
   exprt lhs_length=get_length(deref_lhs, symbol_table);
-  code.add(code_assignt(lhs_length, rhs_length));
+  code.add(code_assignt(lhs_length, string_expr.length()));
 
   // return lhs
   code.add(code_returnt(lhs));
