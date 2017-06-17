@@ -81,7 +81,7 @@ public:
 
   cpp_idt &get_parent() const
   {
-    assert(parent!=NULL);
+    assert(parent!=nullptr);
     return *parent;
   }
 

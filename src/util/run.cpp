@@ -118,13 +118,13 @@ int run(
     {
       // resume signals
       remove_signal_catcher();
-      sigprocmask(SIG_SETMASK, &old_mask, NULL);
+      sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
       char **_argv=new char * [argv.size()+1];
       for(std::size_t i=0; i<argv.size(); i++)
         _argv[i]=strdup(argv[i].c_str());
 
-      _argv[argv.size()]=NULL;
+      _argv[argv.size()]=nullptr;
 
       if(stdin_fd!=STDIN_FILENO)
         dup2(stdin_fd, STDIN_FILENO);
@@ -138,7 +138,7 @@ int run(
     else /* fork() returns new pid to the parent process */
     {
       // resume signals
-      sigprocmask(SIG_SETMASK, &old_mask, NULL);
+      sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
       int status;     /* parent process: child's exit status */
 
@@ -167,7 +167,7 @@ int run(
   else /* fork returns -1 on failure */
   {
     // resume signals
-    sigprocmask(SIG_SETMASK, &old_mask, NULL);
+    sigprocmask(SIG_SETMASK, &old_mask, nullptr);
 
     if(stdin_fd!=STDIN_FILENO)
       close(stdin_fd);

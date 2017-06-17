@@ -35,7 +35,7 @@ public:
   }
 
   path_symex_step_reft():
-    index(std::numeric_limits<std::size_t>::max()), history(0)
+    index(std::numeric_limits<std::size_t>::max()), history(nullptr)
   {
   }
 
@@ -46,7 +46,7 @@ public:
 
   path_symex_historyt &get_history() const
   {
-    assert(history!=0);
+    assert(history!=nullptr);
     return *history;
   }
 
@@ -154,7 +154,7 @@ public:
 
 inline void path_symex_step_reft::generate_successor()
 {
-  assert(history!=0);
+  assert(history!=nullptr);
   path_symex_step_reft old=*this;
   index=history->step_container.size();
   history->step_container.push_back(path_symex_stept());
@@ -169,7 +169,7 @@ inline path_symex_step_reft &path_symex_step_reft::operator--()
 
 inline path_symex_stept &path_symex_step_reft::get() const
 {
-  assert(history!=0);
+  assert(history!=nullptr);
   assert(!is_nil());
   return history->step_container[index];
 }

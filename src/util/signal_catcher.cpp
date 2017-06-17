@@ -42,7 +42,7 @@ void install_signal_catcher()
   sigfillset(&(act.sa_mask));
 
   // install signal handler
-  sigaction(SIGTERM, &act, NULL);
+  sigaction(SIGTERM, &act, nullptr);
   #endif
 }
 
@@ -58,7 +58,7 @@ void remove_signal_catcher()
   act.sa_flags=0;
   sigfillset(&(act.sa_mask));
 
-  sigaction(SIGTERM, &act, NULL);
+  sigaction(SIGTERM, &act, nullptr);
   #endif
 }
 

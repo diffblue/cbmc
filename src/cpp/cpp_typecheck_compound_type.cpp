@@ -108,7 +108,7 @@ void cpp_typecheckt::typecheck_compound_type(
   // get the tag name
   bool has_tag=type.find(ID_tag).is_not_nil();
   irep_idt base_name;
-  cpp_scopet *dest_scope=NULL;
+  cpp_scopet *dest_scope=nullptr;
   bool has_body=type.find(ID_body).is_not_nil();
   bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
 

@@ -80,7 +80,7 @@ bool initialize_goto_model(
         lf.filename=filename;
         lf.language=get_language_from_filename(filename);
 
-        if(lf.language==NULL)
+        if(lf.language==nullptr)
         {
           source_locationt location;
           location.set_file(filename);

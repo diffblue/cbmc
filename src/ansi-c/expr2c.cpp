@@ -2666,7 +2666,7 @@ std::string expr2ct::convert_code_decl(
 
   std::string dest=indent_str(indent);
 
-  const symbolt *symbol=0;
+  const symbolt *symbol=nullptr;
   if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
   {
     if(symbol->is_file_local &&

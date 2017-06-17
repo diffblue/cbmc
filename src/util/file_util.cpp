@@ -51,7 +51,7 @@ std::string get_current_working_directory()
 
   errno=0;
 
-  while(buf && getcwd(buf, bsize-1)==NULL && errno==ERANGE)
+  while(buf && getcwd(buf, bsize-1)==nullptr && errno==ERANGE)
   {
     bsize*=2;
     buf=reinterpret_cast<char*>(realloc(buf, sizeof(char)*bsize));
@@ -98,10 +98,10 @@ void delete_directory(const std::string &path)
   delete_directory_utf16(utf8_to_utf16_little_endian(path));
 #else
   DIR *dir=opendir(path.c_str());
-  if(dir!=NULL)
+  if(dir!=nullptr)
   {
     struct dirent *ent;
-    while((ent=readdir(dir))!=NULL)
+    while((ent=readdir(dir))!=nullptr)
     {
       // Needed for Alpine Linux
       if(strcmp(ent->d_name, ".")==0 || strcmp(ent->d_name, "..")==0)
