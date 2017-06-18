@@ -221,6 +221,19 @@ protected:
     const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+
+  enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
+  void save_stack_entries(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    const bytecode_write_typet,
+    const irep_idt &);
+  void create_stack_tmp_var(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    exprt &);
 };
 
 #endif
