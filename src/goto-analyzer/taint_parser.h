@@ -56,7 +56,7 @@ public:
     }
   };
 
-  typedef std::list<rulet> rulest;
+  using rulest = std::list<rulet>;
   rulest rules;
 
   void output(std::ostream &) const;

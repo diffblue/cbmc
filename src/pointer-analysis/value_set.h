@@ -37,7 +37,7 @@ public:
   unsigned location_number;
   static object_numberingt object_numbering;
 
-  typedef irep_idt idt;
+  using idt = irep_idt;
 
   class objectt
   {
@@ -67,7 +67,7 @@ public:
 
   exprt to_expr(object_map_dt::const_iterator it) const;
 
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<value_sett::object_map_dt>;
 
   void set(object_mapt &dest, object_map_dt::const_iterator it) const
   {
@@ -116,9 +116,9 @@ public:
     }
   };
 
-  typedef std::set<exprt> expr_sett;
+  using expr_sett = std::set<exprt>;
 
-  typedef std::set<unsigned int> dynamic_object_id_sett;
+  using dynamic_object_id_sett = std::set<unsigned int>;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;

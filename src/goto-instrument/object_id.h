@@ -54,7 +54,7 @@ inline std::ostream &operator<<(
   return out << object_id.get_id();
 }
 
-typedef std::set<object_idt> object_id_sett;
+using object_id_sett = std::set<object_idt>;
 
 void get_objects(const exprt &expr, object_id_sett &dest);
 void get_objects_r(const code_assignt &assign, object_id_sett &);

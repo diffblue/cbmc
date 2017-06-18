@@ -99,11 +99,11 @@ public:
   property_mapt property_map;
 
 protected:
-  typedef path_symex_statet statet;
+  using statet = path_symex_statet;
 
   // State queue. Iterators are stable.
   // The states most recently executed are at the head.
-  typedef std::list<statet> queuet;
+  using queuet = std::list<statet>;
   queuet queue;
 
   // search heuristic

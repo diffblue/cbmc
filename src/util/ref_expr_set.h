@@ -31,7 +31,7 @@ struct ref_expr_set_dt
 class ref_expr_sett:public reference_counting<ref_expr_set_dt>
 {
 public:
-  typedef ref_expr_set_dt::expr_sett expr_sett;
+  using expr_sett = ref_expr_set_dt::expr_sett;
 
   bool empty() const
   {

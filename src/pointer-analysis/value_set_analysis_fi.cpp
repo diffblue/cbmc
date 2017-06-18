@@ -36,7 +36,7 @@ void value_set_analysis_fit::initialize(
 void value_set_analysis_fit::add_vars(
   const goto_programt &goto_program)
 {
-  typedef std::list<value_set_fit::entryt> entry_listt;
+  using entry_listt = std::list<value_set_fit::entryt>;
 
   // get the globals
   entry_listt globals;

@@ -18,7 +18,7 @@ Date: January 2016
 
 #include "skip_loops.h"
 
-typedef std::set<unsigned> loop_idst;
+using loop_idst = std::set<unsigned int>;
 typedef std::map<irep_idt, loop_idst> loop_mapt;
 
 static bool skip_loops(

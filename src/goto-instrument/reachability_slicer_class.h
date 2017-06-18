@@ -42,10 +42,10 @@ protected:
     bool reaches_assertion;
   };
 
-  typedef cfg_baset<slicer_entryt> cfgt;
+  using cfgt = cfg_baset<reachability_slicert::slicer_entryt>;
   cfgt cfg;
 
-  typedef std::stack<cfgt::entryt> queuet;
+  using queuet = std::stack<cfgt::entryt>;
 
   void fixedpoint_assertions(
     const is_threadedt &is_threaded,

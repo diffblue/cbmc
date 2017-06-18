@@ -46,7 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt:public irept
 {
 public:
-  typedef std::vector<exprt> operandst;
+  using operandst = std::vector<exprt>;
 
   // constructors
   exprt() { }
@@ -163,7 +163,7 @@ public:
   void visit(class const_expr_visitort &visitor) const;
 };
 
-typedef std::list<exprt> expr_listt;
+using expr_listt = std::list<exprt>;
 
 class expr_visitort
 {

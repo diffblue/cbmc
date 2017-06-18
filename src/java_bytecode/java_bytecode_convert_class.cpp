@@ -59,8 +59,8 @@ public:
       generate_class_stub(parse_tree.parsed_class.name);
   }
 
-  typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::fieldt fieldt;
+  using classt = java_bytecode_parse_treet::classt;
+  using fieldt = java_bytecode_parse_treet::fieldt;
 
 protected:
   symbol_tablet &symbol_table;

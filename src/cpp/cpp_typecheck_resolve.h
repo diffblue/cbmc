@@ -44,7 +44,7 @@ protected:
   source_locationt source_location;
   cpp_scopet *original_scope;
 
-  typedef std::vector<exprt> resolve_identifierst;
+  using resolve_identifierst = std::vector<exprt>;
 
   void convert_identifiers(
     const cpp_scopest::id_sett &id_set,

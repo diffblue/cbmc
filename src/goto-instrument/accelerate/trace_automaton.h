@@ -21,8 +21,8 @@ Author: Matt Lewis
 #include <set>
 #include <iosfwd>
 
-typedef unsigned int statet;
-typedef std::set<statet> state_sett;
+using statet = unsigned int;
+using state_sett = std::set<statet>;
 
 class automatont
 {
@@ -73,7 +73,7 @@ class automatont
   typedef std::multimap<goto_programt::targett, statet> transitionst;
   typedef std::pair<transitionst::iterator, transitionst::iterator>
     transition_ranget;
-  typedef std::vector<transitionst> transition_tablet;
+  using transition_tablet = std::vector<transitionst>;
 
   statet init_state;
   statet accept_state;
@@ -120,7 +120,7 @@ class trace_automatont
     return dta.num_states;
   }
 
-  typedef std::set<goto_programt::targett> alphabett;
+  using alphabett = std::set<goto_programt::targett>;
   alphabett alphabet;
 
  protected:

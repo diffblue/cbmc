@@ -35,7 +35,7 @@ public:
 class language_filet
 {
 public:
-  typedef std::set<std::string> modulest;
+  using modulest = std::set<std::string>;
   modulest modules;
 
   languaget *language;

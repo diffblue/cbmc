@@ -16,7 +16,7 @@ void basic_blocks(goto_programt &goto_program,
                   unsigned max_block_size)
 {
   // get the targets
-  typedef std::set<goto_programt::const_targett> targetst;
+  using targetst = std::set<goto_programt::const_targett>;
 
   targetst targets;
 

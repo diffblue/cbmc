@@ -27,21 +27,21 @@ public:
 
  protected:
   const namespacet &ns;
-  typedef std::set<irep_idt> alphabett;
+  using alphabett = std::set<irep_idt>;
   alphabett alphabet;
   bool alphabet_parity;
   std::string semantics;
 
   typedef std::pair<std::set<irep_idt>, bool> event_sett;
-  typedef std::vector<event_sett> event_tracet;
+  using event_tracet = std::vector<event_sett>;
 
   event_tracet sigma;
 
-  typedef std::vector<std::vector<irep_idt> > value_tracet;
+  using value_tracet = std::vector<std::vector<irep_idt> >;
 
   value_tracet sigma_vals;
 
-  typedef std::vector<exprt> trace_conditionst;
+  using trace_conditionst = std::vector<exprt>;
 
   trace_conditionst t;
 

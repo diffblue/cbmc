@@ -30,7 +30,7 @@ class filedescriptor_streambuft:public std::streambuf
 public:
   #ifndef _WIN32
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef int HANDLE;
+  using HANDLE = int;
   #endif
 
   filedescriptor_streambuft();

@@ -22,7 +22,7 @@ class numbering:public std::vector<T>
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef std::size_t number_type;
+  using number_type = std::size_t;
 
   number_type number(const T &a)
   {
@@ -63,7 +63,7 @@ public:
   }
 
 protected:
-  typedef std::vector<T> subt;
+  using subt = std::vector<T>;
 
   typedef std::map<T, number_type> numberst;
   numberst numbers;
@@ -75,7 +75,7 @@ class hash_numbering:public std::vector<T>
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef unsigned int number_type;
+  using number_type = unsigned int;
 
   number_type number(const T &a)
   {
@@ -111,7 +111,7 @@ public:
   }
 
 protected:
-  typedef std::vector<T> subt;
+  using subt = std::vector<T>;
 
   typedef std::unordered_map<T, number_type, hash_fkt> numberst;
   numberst numbers;

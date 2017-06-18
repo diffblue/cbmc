@@ -25,7 +25,7 @@ public:
   {
   }
 
-  typedef exprt::operandst argumentst;
+  using argumentst = exprt::operandst;
 
   argumentst &arguments()
   {

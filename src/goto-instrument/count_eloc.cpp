@@ -96,7 +96,7 @@ void print_path_lengths(const goto_functionst &goto_functions)
     }
   };
 
-  typedef cfg_baset<visited_cfg_nodet> cfgt;
+  using cfgt = cfg_baset<visited_cfg_nodet>;
   cfgt cfg;
   cfg(goto_functions);
 

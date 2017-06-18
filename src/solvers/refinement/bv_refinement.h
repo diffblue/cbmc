@@ -32,7 +32,7 @@ public:
   }
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef bv_pointerst SUB;
+  using SUB = bv_pointerst;
 
   // maximal number of times we refine a formula node
   unsigned max_node_refinement;
@@ -79,7 +79,7 @@ protected:
     std::size_t id_nr;
   };
 
-  typedef std::list<approximationt> approximationst;
+  using approximationst = std::list<approximationt>;
   approximationst approximations;
 
   approximationt &add_approximation(const exprt &expr, bvt &bv);

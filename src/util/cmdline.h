@@ -31,7 +31,7 @@ public:
   virtual void set(const std::string &option, const std::string &value);
   virtual void clear();
 
-  typedef std::vector<std::string> argst;
+  using argst = std::vector<std::string>;
   argst args;
 
   cmdlinet();

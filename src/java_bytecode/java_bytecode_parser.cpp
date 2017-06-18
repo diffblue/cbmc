@@ -39,15 +39,15 @@ public:
 
   virtual bool parse();
 
-  typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::classt::fieldst fieldst;
-  typedef java_bytecode_parse_treet::classt::methodst methodst;
-  typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::fieldt fieldt;
-  typedef java_bytecode_parse_treet::methodt::instructionst instructionst;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef java_bytecode_parse_treet::annotationt annotationt;
-  typedef java_bytecode_parse_treet::annotationst annotationst;
+  using classt = java_bytecode_parse_treet::classt;
+  using fieldst = java_bytecode_parse_treet::classt::fieldst;
+  using methodst = java_bytecode_parse_treet::classt::methodst;
+  using methodt = java_bytecode_parse_treet::methodt;
+  using fieldt = java_bytecode_parse_treet::fieldt;
+  using instructionst = java_bytecode_parse_treet::methodt::instructionst;
+  using instructiont = java_bytecode_parse_treet::instructiont;
+  using annotationt = java_bytecode_parse_treet::annotationt;
+  using annotationst = java_bytecode_parse_treet::annotationst;
 
   java_bytecode_parse_treet parse_tree;
 
@@ -61,7 +61,7 @@ public:
     pool_entryt():tag(0), ref1(0), ref2(0), number(0) { }
   };
 
-  typedef std::vector<pool_entryt> constant_poolt;
+  using constant_poolt = std::vector<pool_entryt>;
   constant_poolt constant_pool;
 
 protected:

@@ -60,6 +60,6 @@ public:
   int coeff(const exprt &expr);
 };
 
-typedef std::vector<polynomialt> polynomialst;
+using polynomialst = std::vector<polynomialt>;
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_H

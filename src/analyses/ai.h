@@ -39,7 +39,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   // how function calls are treated:
   // a) there is an edge from each call site to the function head
@@ -108,8 +108,8 @@ public:
 class ai_baset
 {
 public:
-  typedef ai_domain_baset statet;
-  typedef goto_programt::const_targett locationt;
+  using statet = ai_domain_baset;
+  using locationt = goto_programt::const_targett;
 
   ai_baset()
   {
@@ -268,7 +268,7 @@ protected:
 
 
   // the work-queue is sorted by location number
-  typedef std::map<unsigned, locationt> working_sett;
+  using working_sett = std::map<unsigned, locationt>;
 
   locationt get_next(working_sett &working_set);
 
@@ -305,7 +305,7 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  typedef std::set<irep_idt> recursion_sett;
+  using recursion_sett = std::set<irep_idt>;
   recursion_sett recursion_set;
 
   // function calls
@@ -347,7 +347,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   domainT &operator[](locationt l)
   {
@@ -374,7 +374,7 @@ public:
   }
 
 protected:
-  typedef std::unordered_map<locationt, domainT, const_target_hash> state_mapt;
+  using state_mapt = std::unordered_map<locationt, domainT, const_target_hash>;
   state_mapt state_map;
 
   // this one creates states, if need be
@@ -431,7 +431,7 @@ template<typename domainT>
 class concurrency_aware_ait:public ait<domainT>
 {
 public:
-  typedef typename ait<domainT>::statet statet;
+  using statet = typename ait<domainT>::statet;
 
   // constructor
   concurrency_aware_ait():ait<domainT>()

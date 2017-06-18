@@ -38,7 +38,7 @@ public:
     typedef std::map<unsigned, size_t> ireps_on_writet;
     ireps_on_writet ireps_on_write;
 
-    typedef std::vector<bool> string_mapt;
+    using string_mapt = std::vector<bool>;
     string_mapt string_map;
 
     typedef std::vector<std::pair<bool, irep_idt> > string_rev_mapt;

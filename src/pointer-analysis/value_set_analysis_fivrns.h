@@ -34,7 +34,7 @@ public:
   {
   }
 
-  typedef flow_insensitive_analysist<value_set_domain_fivrnst> baset;
+  using baset = flow_insensitive_analysist<value_set_domain_fivrnst>;
 
   virtual void initialize(const goto_programt &goto_program);
   virtual void initialize(const goto_functionst &goto_functions);

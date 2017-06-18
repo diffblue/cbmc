@@ -61,7 +61,7 @@ protected:
 
   unsigned cost(const event_grapht::critical_cyclet::delayt &e);
 
-  typedef std::set<event_grapht::critical_cyclet> set_of_cyclest;
+  using set_of_cyclest = std::set<event_grapht::critical_cyclet>;
   void inline instrument_all_inserter(
     const set_of_cyclest &set);
   void inline instrument_one_event_per_cycle_inserter(
@@ -85,7 +85,7 @@ protected:
     memory_modelt model,
     bool hide_internals);
 
-  typedef std::set<goto_programt::instructiont::targett> target_sett;
+  using target_sett = std::set<goto_programt::instructiont::targett>;
 
   class cfg_visitort
   {

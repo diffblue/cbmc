@@ -63,7 +63,7 @@ public:
     make_top();
   }
 
-  typedef union_find<irep_idt> aliasest;
+  using aliasest = union_find<irep_idt>;
   aliasest aliases;
 
   struct cleanupt

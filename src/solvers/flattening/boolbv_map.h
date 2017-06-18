@@ -38,7 +38,7 @@ public:
     literalt l;
   };
 
-  typedef std::vector<map_bitt> literal_mapt;
+  using literal_mapt = std::vector<map_bitt>;
 
   class map_entryt
   {

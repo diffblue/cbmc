@@ -28,7 +28,7 @@ class remove_exceptionst
 {
   typedef std::vector<std::pair<
     irep_idt, goto_programt::targett>> catch_handlerst;
-  typedef std::vector<catch_handlerst> stack_catcht;
+  using stack_catcht = std::vector<catch_handlerst>;
 
 public:
   explicit remove_exceptionst(

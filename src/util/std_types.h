@@ -237,7 +237,7 @@ public:
     }
   };
 
-  typedef std::vector<componentt> componentst;
+  using componentst = std::vector<componentt>;
 
   const componentst &components() const
   {
@@ -339,8 +339,8 @@ public:
     set(ID_C_class, true);
   }
 
-  typedef componentt methodt;
-  typedef componentst methodst;
+  using methodt = struct_union_typet::componentt;
+  using methodst = componentst;
 
   const methodst &methods() const
   {
@@ -374,7 +374,7 @@ public:
     }
   };
 
-  typedef std::vector<baset> basest;
+  using basest = std::vector<baset>;
 
   const basest &bases() const
   {
@@ -668,7 +668,7 @@ public:
     }
   };
 
-  typedef std::vector<c_enum_membert> memberst;
+  using memberst = std::vector<c_enum_membert>;
 
   const memberst &members() const
   {
@@ -835,7 +835,7 @@ public:
     add(ID_parameters).remove(ID_ellipsis);
   }
 
-  typedef std::vector<parametert> parameterst;
+  using parameterst = std::vector<parametert>;
 
   const typet &return_type() const
   {

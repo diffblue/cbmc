@@ -50,9 +50,9 @@ public:
   };
 
   // A list of such assignments.
-  typedef std::vector<function_assignmentt> function_assignmentst;
+  using function_assignmentst = std::vector<function_assignmentt>;
 
-  typedef std::vector<mp_integer> mp_vectort;
+  using mp_vectort = std::vector<mp_integer>;
 
   // Maps an assignment id to the name of the parameter being assigned
   typedef std::pair<irep_idt, irep_idt> assignment_idt;
@@ -85,8 +85,7 @@ public:
 
   // list_input_varst maps function identifiers onto a vector of [name = value]
   // assignments per call to that function.
-  typedef std::list<function_assignments_contextt>
-          function_assignments_contextst;
+  using function_assignments_contextst = std::list<function_assignments_contextt>;
   typedef std::map<irep_idt, std::list<function_assignments_contextt> >
           list_input_varst;
 
@@ -166,7 +165,7 @@ protected:
     mutable char initialized;
   };
 
-  typedef sparse_vectort<memory_cellt> memoryt;
+  using memoryt = sparse_vectort<interpretert::memory_cellt>;
   typedef std::map<std::string, const irep_idt &> parameter_sett;
   // mapping <structure, field> -> value
   typedef std::pair<const irep_idt, const irep_idt> struct_member_idt;
@@ -234,7 +233,7 @@ protected:
     unsigned old_stack_pointer;
   };
 
-  typedef std::stack<stack_framet> call_stackt;
+  using call_stackt = std::stack<stack_framet>;
 
   call_stackt call_stack;
   input_valuest input_vars;

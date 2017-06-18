@@ -112,18 +112,18 @@ protected:
     patht &body,
     exprt &guard);
 
-  typedef std::pair<exprt, exprt> expr_pairt;
-  typedef std::vector<expr_pairt> expr_pairst;
+  using expr_pairt = std::pair<exprt, exprt>;
+  using expr_pairst = std::vector<expr_pairt>;
 
-  typedef struct polynomial_array_assignment
+  struct polynomial_array_assignmentt
   {
     exprt array;
     polynomialt index;
     polynomialt value;
-  } polynomial_array_assignmentt;
+  };
 
-  typedef std::vector<polynomial_array_assignmentt>
-    polynomial_array_assignmentst;
+  using polynomial_array_assignmentst =
+    std::vector<polynomial_array_assignmentt>;
 
   bool do_arrays(
     goto_programt::instructionst &loop_body,

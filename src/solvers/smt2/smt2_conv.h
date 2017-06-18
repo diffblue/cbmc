@@ -295,7 +295,7 @@ protected:
 
   defined_expressionst object_sizes;
 
-  typedef std::set<std::string> smt2_identifierst;
+  using smt2_identifierst = std::set<std::string>;
   smt2_identifierst smt2_identifiers;
 
   // Boolean part

@@ -103,7 +103,7 @@ protected:
   virtual bool boolbv_set_equality_to_true(const equal_exprt &expr);
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef arrayst SUB;
+  using SUB = arrayst;
 
   void conversion_failed(const exprt &expr, bvt &bv)
   {
@@ -242,12 +242,12 @@ protected:
     literalt l;
   };
 
-  typedef std::list<quantifiert> quantifier_listt;
+  using quantifier_listt = std::list<quantifiert>;
   quantifier_listt quantifier_list;
 
   void post_process_quantifiers();
 
-  typedef std::vector<std::size_t> offset_mapt;
+  using offset_mapt = std::vector<std::size_t>;
   void build_offset_map(const struct_typet &src, offset_mapt &dest);
 
   // strings

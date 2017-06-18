@@ -30,7 +30,7 @@ public:
   {
   }
 
-  typedef static_analysist<value_set_domaint> baset;
+  using baset = static_analysist<value_set_domaint>;
 
   // overloading
   virtual void initialize(const goto_programt &goto_program);

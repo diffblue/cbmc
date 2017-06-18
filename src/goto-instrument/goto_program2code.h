@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class goto_program2codet
 {
-  typedef std::list<irep_idt> id_listt;
+  using id_listt = std::list<irep_idt>;
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
   typedef std::map<goto_programt::const_targett, goto_programt::const_targett>
     loopt;
@@ -42,7 +42,7 @@ class goto_program2codet
     {
     }
   };
-  typedef std::list<caset> cases_listt;
+  using cases_listt = std::list<caset>;
 
 public:
   goto_program2codet(

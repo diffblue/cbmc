@@ -49,7 +49,7 @@ public:
   virtual void output(const namespacet &ns, std::ostream &out) const=0;
 };
 
-typedef int range_spect;
+using range_spect = int;
 
 inline range_spect to_range_spect(const mp_integer &size)
 {

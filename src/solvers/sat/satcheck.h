@@ -46,8 +46,8 @@ typedef satcheck_minisat1t satcheck_no_simplifiert;
 
 #include "satcheck_minisat2.h"
 
-typedef satcheck_minisat_simplifiert satcheckt;
-typedef satcheck_minisat_no_simplifiert satcheck_no_simplifiert;
+using satcheckt = satcheck_minisat_simplifiert;
+using satcheck_no_simplifiert = satcheck_minisat_no_simplifiert;
 
 #elif defined SATCHECK_PRECOSAT
 

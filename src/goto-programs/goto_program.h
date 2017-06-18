@@ -62,7 +62,7 @@ public:
   }
 
   // get the variables in decl statements
-  typedef std::set<irep_idt> decl_identifierst;
+  using decl_identifierst = std::set<irep_idt>;
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
 };
 

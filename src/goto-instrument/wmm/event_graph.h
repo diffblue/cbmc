@@ -28,8 +28,8 @@ Date: 2012
 class messaget;
 class namespacet;
 
-typedef grapht<abstract_eventt> wmm_grapht;
-typedef wmm_grapht::node_indext event_idt;
+using wmm_grapht = grapht<abstract_eventt>;
+using event_idt = wmm_grapht::node_indext;
 
 class event_grapht
 {

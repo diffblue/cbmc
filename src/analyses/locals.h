@@ -19,7 +19,7 @@ Date: March 2013
 class localst
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   explicit localst(const goto_functiont &goto_function)
   {

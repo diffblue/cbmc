@@ -35,7 +35,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   // will go away,
   // to be replaced by a factory class option to static_analysist
@@ -94,8 +94,8 @@ protected:
 class static_analysis_baset
 {
 public:
-  typedef domain_baset statet;
-  typedef goto_programt::const_targett locationt;
+  using statet = domain_baset;
+  using locationt = goto_programt::const_targett;
 
   explicit static_analysis_baset(const namespacet &_ns):
     ns(_ns),
@@ -218,10 +218,10 @@ protected:
   // for concurrent fixedpoint
   virtual bool merge_shared(statet &a, const statet &b, locationt to)=0;
 
-  typedef std::set<irep_idt> functions_donet;
+  using functions_donet = std::set<irep_idt>;
   functions_donet functions_done;
 
-  typedef std::set<irep_idt> recursion_sett;
+  using recursion_sett = std::set<irep_idt>;
   recursion_sett recursion_set;
 
   void generate_states(
@@ -254,7 +254,7 @@ protected:
   virtual const statet &get_state(locationt l) const=0;
   virtual statet* make_temporary_state(statet &s)=0;
 
-  typedef domain_baset::expr_sett expr_sett;
+  using expr_sett = domain_baset::expr_sett;
 
   virtual void get_reference_set(
     locationt l,
@@ -273,7 +273,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   T &operator[](locationt l)
   {

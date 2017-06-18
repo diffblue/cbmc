@@ -88,7 +88,7 @@ public:
   ineq_sett ne_set;
 
   // bounds
-  typedef interval_template<mp_integer> boundst;
+  using boundst = interval_template<mp_integer>;
   typedef std::map<unsigned, boundst> bounds_mapt;
   bounds_mapt bounds_map;
 

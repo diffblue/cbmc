@@ -47,7 +47,7 @@ public:
     to_target_index = inx;
   }
 
-  typedef irep_idt idt;
+  using idt = irep_idt;
 
   class objectt
   {
@@ -77,7 +77,7 @@ public:
 
   exprt to_expr(object_map_dt::const_iterator it) const;
 
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<value_set_fit::object_map_dt>;
 
   void set(object_mapt &dest, object_map_dt::const_iterator it) const
   {
@@ -158,11 +158,11 @@ public:
 
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  using dynamic_object_id_sett = std::unordered_set<unsigned int>;
 
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
-  typedef std::set<idt> flatten_seent;
+  using flatten_seent = std::set<idt>;
   typedef std::unordered_set<idt, irep_id_hash> gvs_recursion_sett;
   typedef std::unordered_set<idt, irep_id_hash> recfind_recursion_sett;
   typedef std::unordered_set<idt, irep_id_hash> assign_recursion_sett;

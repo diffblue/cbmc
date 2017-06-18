@@ -23,7 +23,7 @@ class unsigned_union_find
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef std::size_t size_type;
+  using size_type = std::size_t;
 
 protected:
   struct nodet
@@ -134,7 +134,7 @@ class union_find:public numbering<T>
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering<T>::size_type size_type;
+  using size_type = typename numbering<T>::size_type;
 
   // true == already in same set
   bool make_union(const T &a, const T &b)
@@ -158,7 +158,7 @@ public:
   // are 'a' and 'b' in the same set?
   bool same_set(const T &a, const T &b) const
   {
-    typedef typename subt::number_type subt_number_typet;
+    using subt_number_typet = typename subt::number_type;
     subt_number_typet na=subt_number_typet(), nb=subt_number_typet();
     bool have_na=!subt::get_number(a, na),
          have_nb=!subt::get_number(b, nb);
@@ -253,7 +253,7 @@ public:
 
 protected:
   unsigned_union_find uuf;
-  typedef numbering<T> subt;
+  using subt = numbering<T>;
 };
 
 #endif // CPROVER_UTIL_UNION_FIND_H

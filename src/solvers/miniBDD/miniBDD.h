@@ -109,11 +109,11 @@ public:
     explicit var_table_entryt(const std::string &_label);
   };
 
-  typedef std::vector<var_table_entryt> var_tablet;
+  using var_tablet = std::vector<var_table_entryt>;
   var_tablet var_table;
 
 protected:
-  typedef std::list<mini_bdd_nodet> nodest;
+  using nodest = std::list<mini_bdd_nodet>;
   nodest nodes;
   mini_bddt true_bdd, false_bdd;
 
@@ -130,7 +130,7 @@ protected:
   typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;
   reverse_mapt reverse_map;
 
-  typedef std::stack<mini_bdd_nodet *> freet;
+  using freet = std::stack<mini_bdd_nodet *>;
   freet free;
 };
 

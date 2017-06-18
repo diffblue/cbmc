@@ -27,7 +27,7 @@ struct procedure_local_cfg_baset<
   unsigned> :
   public grapht<cfg_base_nodet<T, unsigned> >
 {
-  typedef java_bytecode_convert_methodt::method_with_amapt method_with_amapt;
+  using method_with_amapt = java_bytecode_convert_methodt::method_with_amapt;
   typedef std::map<unsigned, unsigned> entry_mapt;
   entry_mapt entry_map;
 
@@ -92,16 +92,11 @@ struct procedure_local_cfg_baset<
 };
 
 // Grab some class typdefs for brevity:
-typedef java_bytecode_convert_methodt::holet
-  holet;
-typedef java_bytecode_convert_methodt::local_variable_with_holest
-  local_variable_with_holest;
-typedef java_bytecode_convert_methodt::local_variable_table_with_holest
-  local_variable_table_with_holest;
-typedef java_bytecode_convert_methodt::address_mapt
-  address_mapt;
-typedef java_bytecode_convert_methodt::java_cfg_dominatorst
-  java_cfg_dominatorst;
+using holet = java_bytecode_convert_methodt::holet;
+using local_variable_with_holest = java_bytecode_convert_methodt::local_variable_with_holest;
+using local_variable_table_with_holest = java_bytecode_convert_methodt::local_variable_table_with_holest;
+using address_mapt = java_bytecode_convert_methodt::address_mapt;
+using java_cfg_dominatorst = java_bytecode_convert_methodt::java_cfg_dominatorst;
 
 // Comparators for local variables:
 

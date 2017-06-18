@@ -50,8 +50,8 @@ public:
     _size=new_size;
   }
 
-  typedef typename underlyingt::iterator iteratort;
-  typedef typename underlyingt::const_iterator const_iteratort;
+  using iteratort = typename underlyingt::iterator;
+  using const_iteratort = typename underlyingt::const_iterator;
 
   iteratort begin() { return underlying.begin(); }
   const_iteratort begin() const { return underlying.begin(); }

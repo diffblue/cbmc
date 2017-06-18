@@ -29,7 +29,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   virtual void initialize(const namespacet &ns)=0;
 
@@ -76,8 +76,8 @@ protected:
 class flow_insensitive_analysis_baset
 {
 public:
-  typedef flow_insensitive_abstract_domain_baset statet;
-  typedef goto_programt::const_targett locationt;
+  using statet = flow_insensitive_abstract_domain_baset;
+  using locationt = goto_programt::const_targett;
 
   std::set<locationt> seen_locations;
 
@@ -150,7 +150,7 @@ protected:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  typedef std::priority_queue<locationt> working_sett;
+  using working_sett = std::priority_queue<locationt>;
 
   locationt get_next(working_sett &working_set);
 
@@ -186,10 +186,10 @@ protected:
     return l;
   }
 
-  typedef std::set<irep_idt> functions_donet;
+  using functions_donet = std::set<irep_idt>;
   functions_donet functions_done;
 
-  typedef std::set<irep_idt> recursion_sett;
+  using recursion_sett = std::set<irep_idt>;
   recursion_sett recursion_set;
 
   bool initialized;
@@ -214,7 +214,7 @@ protected:
   virtual statet &get_state()=0;
   virtual const statet &get_state() const=0;
 
-  typedef flow_insensitive_abstract_domain_baset::expr_sett expr_sett;
+  using expr_sett = flow_insensitive_abstract_domain_baset::expr_sett;
 
   virtual void get_reference_set(
     const exprt &expr,
@@ -232,7 +232,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   virtual void clear()
   {

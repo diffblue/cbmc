@@ -174,7 +174,7 @@ private:
 
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
 
-  typedef std::set<std::size_t> values_innert;
+  using values_innert = std::set<std::size_t>;
   #ifdef USE_DSTRING
   typedef std::map<irep_idt, values_innert> valuest;
   #else

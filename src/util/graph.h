@@ -28,9 +28,9 @@ template<class E=empty_edget>
 class graph_nodet
 {
 public:
-  typedef std::size_t node_indext;
+  using node_indext = std::size_t;
 
-  typedef E edget;
+  using edget = E;
   typedef std::map<node_indext, edget> edgest;
 
   edgest in, out;
@@ -61,8 +61,8 @@ template<class E>
 class visited_nodet:public graph_nodet<E>
 {
 public:
-  typedef typename graph_nodet<E>::edget edget;
-  typedef typename graph_nodet<E>::edgest edgest;
+  using edget = typename graph_nodet<E>::edget;
+  using edgest = typename graph_nodet<E>::edgest;
 
   bool visited;
 
@@ -103,11 +103,11 @@ template<class N=graph_nodet<empty_edget> >
 class grapht
 {
 public:
-  typedef N nodet;
-  typedef typename nodet::edgest edgest;
-  typedef std::vector<nodet> nodest;
-  typedef typename nodet::edget edget;
-  typedef typename nodet::node_indext node_indext;
+  using nodet = N;
+  using edgest = typename nodet::edgest;
+  using nodest = std::vector<nodet>;
+  using edget = typename nodet::edget;
+  using node_indext = typename nodet::node_indext;
 
 protected:
   nodest nodes;
@@ -193,7 +193,7 @@ public:
     nodes.clear();
   }
 
-  typedef std::list<node_indext> patht;
+  using patht = std::list<node_indext>;
 
   void shortest_path(
     node_indext src,

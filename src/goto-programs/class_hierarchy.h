@@ -22,7 +22,7 @@ Date: April 2016
 class class_hierarchyt
 {
 public:
-  typedef std::vector<irep_idt> idst;
+  using idst = std::vector<irep_idt>;
 
   class entryt
   {

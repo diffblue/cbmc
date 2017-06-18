@@ -58,7 +58,7 @@ public:
     locationt from,
     locationt to);
 
-  typedef unsigned long long bit_vectort;
+  using bit_vectort = unsigned long long;
 
   typedef std::map<irep_idt, bit_vectort> bitst;
 
@@ -139,7 +139,7 @@ public:
 
   unsigned get_bit_nr(const exprt &);
 
-  typedef numbering<irep_idt> bitst;
+  using bitst = numbering<irep_idt>;
   bitst bits;
 
 protected:

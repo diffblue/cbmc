@@ -46,7 +46,7 @@ void goto_inline(
     message_handler,
     adjust_function);
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
     // find entry point
     goto_functionst::function_mapt::iterator it=
@@ -141,7 +141,7 @@ void goto_partial_inline(
     message_handler,
     adjust_function);
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   // gather all calls
   goto_inlinet::inline_mapt inline_map;

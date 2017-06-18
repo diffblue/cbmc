@@ -25,8 +25,8 @@ class empty_cfg_nodet
 template<class T, typename I>
 struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
 {
-  typedef typename graph_nodet<empty_edget>::edget edget;
-  typedef typename graph_nodet<empty_edget>::edgest edgest;
+  using edget = typename graph_nodet<empty_edget>::edget;
+  using edgest = typename graph_nodet<empty_edget>::edgest;
 
   I PC;
 };
@@ -37,7 +37,7 @@ template<class T,
 class cfg_baset:public grapht< cfg_base_nodet<T, I> >
 {
 public:
-  typedef std::size_t entryt;
+  using entryt = std::size_t;
 
   struct entry_mapt:
     public std::map<goto_programt::const_targett, entryt>
