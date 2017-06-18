@@ -71,7 +71,7 @@ protected:
   void freeze_guards();
 
   // specify an lpoint combination to check
-  typedef std::vector<tvt> lpoints_valuet;
+  using lpoints_valuet = std::vector<tvt>;
   bool check(const lpointst &lpoints, const lpoints_valuet &value);
   void update_scores(lpointst &lpoints,
                      const lpoints_valuet &value);

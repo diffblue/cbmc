@@ -30,7 +30,7 @@ public:
     unsigned clause_id;
   };
 
-  typedef std::vector<stept> stepst;
+  using stepst = std::vector<stept>;
   stepst steps;
 };
 
@@ -38,12 +38,12 @@ template<class T=clauset>
 class resolution_prooft
 {
 public:
-  typedef std::vector<T> clausest;
+  using clausest = std::vector<T>;
   clausest clauses;
 
   void build_core(std::vector<bool> &in_core);
 };
 
-typedef resolution_prooft<clauset> simple_prooft;
+using simple_prooft = resolution_prooft<clauset>;
 
 #endif // CPROVER_SOLVERS_SAT_RESOLUTION_PROOF_H

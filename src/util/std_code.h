@@ -684,7 +684,7 @@ public:
     return op1();
   }
 
-  typedef exprt::operandst argumentst;
+  using argumentst = exprt::operandst;
 
   argumentst &arguments()
   {

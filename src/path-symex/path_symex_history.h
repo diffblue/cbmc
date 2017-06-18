@@ -142,7 +142,7 @@ inline decision_proceduret &operator<<(
 class path_symex_historyt
 {
 public:
-  typedef std::vector<path_symex_stept> step_containert;
+  using step_containert = std::vector<path_symex_stept>;
   step_containert step_container;
 
   // TODO: consider typedefing path_symex_historyt

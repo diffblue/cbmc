@@ -39,7 +39,7 @@ public:
 class locst
 {
 public:
-  typedef std::vector<loct> loc_vectort;
+  using loc_vectort = std::vector<loct>;
   loc_vectort loc_vector;
   loc_reft entry_loc;
 

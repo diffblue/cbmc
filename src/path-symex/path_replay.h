@@ -30,7 +30,7 @@ public:
 
 protected:
   // TODO: consider something even denser, say something like a bitset
-  typedef std::vector<bool> branchest;
+  using branchest = std::vector<bool>;
   branchest branches;
 
   void get_branches(const path_symex_step_reft history);

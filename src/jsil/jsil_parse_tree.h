@@ -101,7 +101,7 @@ public:
 class jsil_parse_treet
 {
 public:
-  typedef std::list<jsil_declarationt> itemst;
+  using itemst = std::list<jsil_declarationt>;
   itemst items;
 
   void swap(jsil_parse_treet &other)

@@ -26,14 +26,14 @@ template <class P, class T, bool post_dom>
 class cfg_dominators_templatet
 {
 public:
-  typedef std::set<T> target_sett;
+  using target_sett = std::set<T>;
 
   struct nodet
   {
     target_sett dominators;
   };
 
-  typedef procedure_local_cfg_baset<nodet, P, T> cfgt;
+  using cfgt = procedure_local_cfg_baset<nodet, P, T>;
   cfgt cfg;
 
   void operator()(P &program);
@@ -205,13 +205,11 @@ void cfg_dominators_templatet<P, T, post_dom>::output(std::ostream &out) const
   }
 }
 
-typedef cfg_dominators_templatet<
-          const goto_programt, goto_programt::const_targett, false>
-        cfg_dominatorst;
+using cfg_dominatorst = cfg_dominators_templatet<
+          const goto_programt, goto_programt::const_targett, false>;
 
-typedef cfg_dominators_templatet<
-          const goto_programt, goto_programt::const_targett, true>
-        cfg_post_dominatorst;
+using cfg_post_dominatorst = cfg_dominators_templatet<
+          const goto_programt, goto_programt::const_targett, true>;
 
 template<>
 inline void dominators_pretty_print_node(

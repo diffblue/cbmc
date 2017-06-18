@@ -3826,7 +3826,7 @@ public:
     return op0();
   }
 
-  typedef exprt::operandst argumentst;
+  using argumentst = exprt::operandst;
 
   argumentst &arguments()
   {

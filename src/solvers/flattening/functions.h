@@ -39,7 +39,7 @@ public:
 protected:
   prop_convt &prop_conv;
 
-  typedef std::set<function_application_exprt> applicationst;
+  using applicationst = std::set<function_application_exprt>;
 
   struct function_infot
   {

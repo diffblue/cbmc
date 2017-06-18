@@ -22,9 +22,9 @@ public:
   explicit partial_order_concurrencyt(const namespacet &_ns);
   virtual ~partial_order_concurrencyt();
 
-  typedef symex_target_equationt::SSA_stept eventt;
-  typedef symex_target_equationt::SSA_stepst eventst;
-  typedef eventst::const_iterator event_it;
+  using eventt = symex_target_equationt::SSA_stept;
+  using eventst = symex_target_equationt::SSA_stepst;
+  using event_it = eventst::const_iterator;
 
   // the name of a clock variable for a shared read/write
   enum axiomt
@@ -42,7 +42,7 @@ public:
 protected:
   const namespacet &ns;
 
-  typedef std::vector<event_it> event_listt;
+  using event_listt = std::vector<event_it>;
 
   // lists of reads and writes per address
   struct a_rect

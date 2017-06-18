@@ -37,7 +37,7 @@ public:
   }
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef equalityt SUB;
+  using SUB = equalityt;
 
   literalt record_array_equality(const equal_exprt &expr);
   void record_array_index(const index_exprt &expr);
@@ -57,14 +57,14 @@ protected:
   // the list of all equalities between arrays
   // references to objects in this container need to be stable as
   // elements are added while references are held
-  typedef std::list<array_equalityt> array_equalitiest;
+  using array_equalitiest = std::list<array_equalityt>;
   array_equalitiest array_equalities;
 
   // this is used to find the clusters of arrays being compared
   union_find<exprt> arrays;
 
   // this tracks the array indicies for each array
-  typedef std::set<exprt> index_sett;
+  using index_sett = std::set<exprt>;
   // references to values in this container need to be stable as
   // elements are added while references are held
   typedef std::map<std::size_t, index_sett> index_mapt;

@@ -34,7 +34,7 @@ public:
   {
   }
 
-  typedef path_symex_stept stept;
+  using stept = path_symex_stept;
 
   // These are tied to a particular var_map
   // and a particular program.
@@ -49,7 +49,7 @@ public:
     symbol_exprt ssa_symbol;
 
     // for uninterpreted functions or arrays we maintain an index set
-    typedef std::set<exprt> index_sett;
+    using index_sett = std::set<exprt>;
     index_sett index_set;
 
     var_statet():
@@ -60,7 +60,7 @@ public:
   };
 
   // the values of the shared variables
-  typedef std::vector<var_statet> var_valt;
+  using var_valt = std::vector<var_statet>;
   var_valt shared_vars;
 
   // save+restore procedure-local variables
@@ -77,7 +77,7 @@ public:
   };
 
   // call stack
-  typedef std::vector<framet> call_stackt;
+  using call_stackt = std::vector<framet>;
 
   // the state of a thread
   struct threadt
@@ -93,7 +93,7 @@ public:
     }
   };
 
-  typedef std::vector<threadt> threadst;
+  using threadst = std::vector<threadt>;
   threadst threads;
 
   // warning: reference is not stable

@@ -57,7 +57,7 @@ protected:
   virtual bool base_type_eq_rec(const exprt &expr1, const exprt &expr2);
 
   // for loop avoidance
-  typedef union_find<irep_idt> identifierst;
+  using identifierst = union_find<irep_idt>;
   identifierst identifiers;
 };
 

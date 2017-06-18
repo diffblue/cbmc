@@ -42,7 +42,7 @@ public:
     state.history->guard=guard;
   }
 
-  typedef path_symex_stept stept;
+  using stept = path_symex_stept;
 
 protected:
   void do_goto(

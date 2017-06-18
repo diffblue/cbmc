@@ -104,7 +104,7 @@ protected:
   cpp_id_mapt sub;
 
   // These are used for base classes and 'using' clauses.
-  typedef std::vector<cpp_idt *> scope_listt;
+  using scope_listt = std::vector<cpp_idt *>;
   scope_listt using_scopes, secondary_scopes;
   cpp_idt *parent;
 };

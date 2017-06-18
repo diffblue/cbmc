@@ -21,7 +21,7 @@ class fence_insertert;
 class cycles_visitort
 {
 protected:
-  typedef event_grapht::critical_cyclet::delayt edget;
+  using edget = event_grapht::critical_cyclet::delayt;
 
   fence_insertert &fence_inserter;
 

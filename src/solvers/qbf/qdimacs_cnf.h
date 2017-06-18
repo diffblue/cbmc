@@ -57,7 +57,7 @@ public:
   };
 
   // quantifiers
-  typedef std::vector<quantifiert> quantifierst;
+  using quantifierst = std::vector<quantifiert>;
   quantifierst quantifiers;
 
   virtual void add_quantifier(const quantifiert &quantifier)

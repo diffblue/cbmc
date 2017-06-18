@@ -260,7 +260,7 @@ protected:
   // exceptions
   //
 
-  typedef std::vector<codet> destructor_stackt;
+  using destructor_stackt = std::vector<codet>;
 
   symbol_exprt exception_flag();
   void unwind_destructor_stack(
@@ -286,8 +286,8 @@ protected:
     labelst;
   typedef std::list<std::pair<goto_programt::targett, destructor_stackt>>
     gotost;
-  typedef std::list<goto_programt::targett> computed_gotost;
-  typedef exprt::operandst caset;
+  using computed_gotost = std::list<goto_programt::targett>;
+  using caset = exprt::operandst;
   typedef std::list<std::pair<goto_programt::targett, caset> > casest;
   typedef std::map<goto_programt::targett, casest::iterator> cases_mapt;
 
@@ -471,7 +471,7 @@ protected:
     goto_programt::targett gotoiter;
     exprt guard;
   };
-  typedef std::list<guarded_gotot> guarded_gotost;
+  using guarded_gotost = std::list<guarded_gotot>;
   guarded_gotost guarded_gotos;
 
   exprt case_guard(

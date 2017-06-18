@@ -30,7 +30,7 @@ public:
   }
 
 protected:
-  typedef std::vector<T> subt;
+  using subt = std::vector<T>;
 
   // make the vector large enough to contain 'n'
   void check_index(typename std::vector<T>::size_type n)

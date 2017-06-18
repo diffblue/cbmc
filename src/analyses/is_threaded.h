@@ -38,7 +38,7 @@ public:
   }
 
 protected:
-  typedef std::set<goto_programt::const_targett> is_threaded_sett;
+  using is_threaded_sett = std::set<goto_programt::const_targett>;
   is_threaded_sett is_threaded_set;
 
   void compute(

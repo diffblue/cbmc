@@ -27,8 +27,8 @@ public:
     current_scope_ptr=&root_scope;
   }
 
-  typedef std::set<cpp_scopet *> scope_sett;
-  typedef std::set<cpp_idt *> id_sett;
+  using scope_sett = std::set<cpp_scopet *>;
+  using id_sett = std::set<cpp_idt *>;
 
   cpp_scopet &current_scope()
   {

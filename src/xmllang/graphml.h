@@ -27,8 +27,8 @@ struct xml_edget
 
 struct xml_graph_nodet:public graph_nodet<xml_edget>
 {
-  typedef graph_nodet<xml_edget>::edget edget;
-  typedef graph_nodet<xml_edget>::edgest edgest;
+  using edget = graph_nodet<xml_edget>::edget;
+  using edgest = graph_nodet<xml_edget>::edgest;
 
   std::string node_name;
   irep_idt file;

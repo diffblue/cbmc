@@ -57,8 +57,8 @@ public:
   exprt get(const exprt &expr) const override;
 
 protected:
-  typedef std::set<exprt> expr_sett;
-  typedef std::list<exprt> exprt_listt;
+  using expr_sett = std::set<exprt>;
+  using exprt_listt = std::list<exprt>;
 
   decision_proceduret::resultt dec_solve() override;
 
@@ -66,7 +66,7 @@ protected:
 
 private:
   // Base class
-  typedef bv_refinementt supert;
+  using supert = bv_refinementt;
 
   unsigned initial_loop_bound;
 

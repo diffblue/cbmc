@@ -53,7 +53,7 @@ public:
       literalt condition;
     };
 
-    typedef std::vector<instancet> instancest;
+    using instancest = std::vector<instancet>;
     instancest instances;
 
     void add_instance(
@@ -109,7 +109,7 @@ public:
 
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
-  typedef std::vector<testt> testst;
+  using testst = std::vector<testt>;
   testst tests;
 
   std::string get_test(const goto_tracet &goto_trace) const

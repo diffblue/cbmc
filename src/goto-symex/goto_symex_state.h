@@ -46,7 +46,7 @@ public:
   typedef std::map<irep_idt, irep_idt> original_identifierst;
 
   // we remember all L1 renamings
-  typedef std::set<irep_idt> l1_historyt;
+  using l1_historyt = std::set<irep_idt>;
   l1_historyt l1_history;
 
   struct renaming_levelt
@@ -227,7 +227,7 @@ public:
   };
 
   // gotos
-  typedef std::list<goto_statet> goto_state_listt;
+  using goto_state_listt = std::list<goto_statet>;
   typedef std::map<goto_programt::const_targett, goto_state_listt>
     goto_state_mapt;
 
@@ -247,7 +247,7 @@ public:
 
     renaming_levelt::current_namest old_level1;
 
-    typedef std::set<irep_idt> local_objectst;
+    using local_objectst = std::set<irep_idt>;
     local_objectst local_objects;
 
     framet():
@@ -277,7 +277,7 @@ public:
     loop_iterationst loop_iterations;
   };
 
-  typedef std::vector<framet> call_stackt;
+  using call_stackt = std::vector<framet>;
 
   call_stackt &call_stack()
   {
@@ -312,7 +312,7 @@ public:
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
   typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>
     read_in_atomic_sectiont;
-  typedef std::list<guardt> a_s_w_entryt;
+  using a_s_w_entryt = std::list<guardt>;
   typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
     written_in_atomic_sectiont;
   read_in_atomic_sectiont read_in_atomic_section;
@@ -333,7 +333,7 @@ public:
     }
   };
 
-  typedef std::vector<threadt> threadst;
+  using threadst = std::vector<threadt>;
   threadst threads;
 
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);

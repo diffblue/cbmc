@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 #include "symbol_table.h"
 
-typedef std::list<const symbolt *> symbolptr_listt;
+using symbolptr_listt = std::list<const symbolt *>;
 
 #define forall_symbolptr_list(it, list) \
   for(symbolptr_listt::const_iterator it=(list).begin(); \

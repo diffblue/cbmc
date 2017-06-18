@@ -35,7 +35,7 @@ public:
   {
   }
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   // call that should be inlined
   // false:    inline non-transitively
@@ -43,7 +43,7 @@ public:
   typedef std::pair<goto_programt::targett, bool> callt;
 
   // list of calls that should be inlined
-  typedef std::list<callt> call_listt;
+  using call_listt = std::list<callt>;
 
   // list of calls per function that should be inlined
   typedef std::map<irep_idt, call_listt> inline_mapt;
@@ -204,7 +204,7 @@ protected:
     goto_programt &dest);
 
   // goto functions that were already inlined transitively
-  typedef goto_functionst::function_mapt cachet;
+  using cachet = goto_functionst::function_mapt;
   cachet cache;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> finished_sett;

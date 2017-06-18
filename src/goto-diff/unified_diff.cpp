@@ -221,7 +221,7 @@ void unified_difft::lcss(
     return;
 
   // apply longest common subsequence (LCSS)
-  typedef std::vector<std::vector<std::size_t> > lcss_matrixt;
+  using lcss_matrixt = std::vector<std::vector<std::size_t> >;
   lcss_matrixt lcss_matrix(
     old_count+1,
     std::vector<size_t>(new_count+1, 0));

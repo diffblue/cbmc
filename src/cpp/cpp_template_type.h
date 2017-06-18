@@ -22,7 +22,7 @@ public:
   {
   }
 
-  typedef std::vector<template_parametert> template_parameterst;
+  using template_parameterst = std::vector<template_parametert>;
 
   template_parameterst &template_parameters()
   {

@@ -31,7 +31,7 @@ class ilpt;
 // (not a set though)
 struct mip_vart
 {
-  typedef event_grapht::critical_cyclet::delayt edget;
+  using edget = event_grapht::critical_cyclet::delayt;
 
   unsigned unique;
 
@@ -60,7 +60,7 @@ struct mip_vart
 class fence_insertert
 {
 public:
-  typedef event_grapht::critical_cyclet::delayt edget;
+  using edget = event_grapht::critical_cyclet::delayt;
 
   instrumentert &instrumenter;
 

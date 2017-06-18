@@ -199,7 +199,7 @@ void dott::write_dot_subgraph(
         flabel="";
       }
 
-      typedef std::set<goto_programt::const_targett> t;
+      using t = std::set<goto_programt::const_targett>;
 
       for(t::iterator trit=tres.begin();
            trit!=tres.end();

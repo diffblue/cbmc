@@ -488,7 +488,7 @@ void java_object_factoryt::gen_nondet_init(
   }
   else if(type.id()==ID_struct)
   {
-    typedef struct_typet::componentst componentst;
+    using componentst = struct_typet::componentst;
 
     const struct_typet &struct_type=to_struct_type(type);
     const irep_idt struct_tag=struct_type.get_tag();

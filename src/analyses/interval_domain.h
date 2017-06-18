@@ -18,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ai.h"
 #include "interval_template.h"
 
-typedef interval_template<mp_integer> integer_intervalt;
-typedef interval_template<ieee_floatt> ieee_float_intervalt;
+using integer_intervalt = interval_template<mp_integer>;
+using ieee_float_intervalt = interval_template<ieee_floatt>;
 
 class interval_domaint:public ai_domain_baset
 {

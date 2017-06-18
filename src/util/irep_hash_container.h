@@ -53,7 +53,7 @@ protected:
 
   // this is the second level: content
 
-  typedef std::vector<size_t> packedt;
+  using packedt = std::vector<size_t>;
 
   struct vector_hasht
   {

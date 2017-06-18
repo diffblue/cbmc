@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class optionst
 {
 public:
-  typedef std::list<std::string> value_listt;
+  using value_listt = std::list<std::string>;
   typedef std::map<std::string, value_listt> option_mapt;
 
   const std::string get_option(const std::string &option) const;

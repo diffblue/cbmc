@@ -75,7 +75,7 @@ class acceleration_utilst
                       exprt &guard);
 
   typedef std::pair<exprt, exprt> expr_pairt;
-  typedef std::vector<expr_pairt> expr_pairst;
+  using expr_pairst = std::vector<expr_pairt>;
 
   struct polynomial_array_assignmentt
   {
@@ -84,8 +84,7 @@ class acceleration_utilst
     polynomialt value;
   };
 
-  typedef std::vector<polynomial_array_assignmentt>
-    polynomial_array_assignmentst;
+  using polynomial_array_assignmentst = std::vector<polynomial_array_assignmentt>;
 
   bool do_arrays(goto_programt::instructionst &loop_body,
                  std::map<exprt, polynomialt> &polynomials,

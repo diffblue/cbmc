@@ -29,10 +29,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #ifdef USE_DSTRING
-typedef dstringt irep_idt;
-typedef dstringt irep_namet;
+using irep_idt = dstringt;
+using irep_namet = dstringt;
 // NOLINTNEXTLINE(readability/identifiers)
-typedef dstring_hash irep_id_hash;
+using irep_id_hash = dstring_hash;
 #else
 #include "string_hash.h"
 typedef std::string irep_idt;
@@ -88,7 +88,7 @@ class irept
 {
 public:
   // These are not stable.
-  typedef std::vector<irept> subt;
+  using subt = std::vector<irept>;
 
   // named_subt has to provide stable references; with C++11 we could
   // use std::forward_list or std::vector< unique_ptr<T> > to save

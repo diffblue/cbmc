@@ -45,7 +45,7 @@ public:
   void simplify(goto_programt &goto_program);
   void simplify(goto_functionst &goto_functions);
 
-  typedef ait<invariant_set_domaint> baset;
+  using baset = ait<invariant_set_domaint>;
 
 protected:
   const namespacet &ns;
@@ -53,7 +53,7 @@ protected:
 
   inv_object_storet object_store;
 
-  typedef std::list<unsigned> object_listt;
+  using object_listt = std::list<unsigned int>;
 
   void add_objects(const goto_programt &goto_program);
   void add_objects(const goto_functionst &goto_functions);

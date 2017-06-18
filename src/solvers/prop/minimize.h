@@ -50,7 +50,7 @@ public:
 
   // managing the objectives
 
-  typedef long long signed int weightt;
+  using weightt = long long;
 
   // adds an objective with given weight
   void objective(

@@ -57,7 +57,7 @@ protected:
   const goto_functionst &new_goto_functions;
   const namespacet ns_new;
 
-  typedef std::vector<differencet> differencest;
+  using differencest = std::vector<differencet>;
   typedef std::map<irep_idt, differencest> differences_mapt;
 
   differences_mapt differences_map;

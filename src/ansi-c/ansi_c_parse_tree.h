@@ -16,7 +16,7 @@ class ansi_c_parse_treet
 {
 public:
   // the declarations
-  typedef std::list<ansi_c_declarationt> itemst;
+  using itemst = std::list<ansi_c_declarationt>;
   itemst items;
 
   void swap(ansi_c_parse_treet &other);

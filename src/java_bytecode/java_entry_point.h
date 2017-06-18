@@ -21,12 +21,12 @@ bool java_entry_point(
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length);
 
-typedef struct
+struct main_function_resultt
 {
   symbolt main_function;
   bool error_found;
   bool stop_convert;
-} main_function_resultt;
+};
 
 main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,

@@ -54,7 +54,7 @@ public:
 
 protected:
   // a list of indices into arrays or structs
-  typedef std::vector<entryt> index_listt;
+  using index_listt = std::vector<entryt>;
   index_listt index_list;
 };
 

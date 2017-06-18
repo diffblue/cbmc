@@ -47,7 +47,7 @@ class uncaught_exceptions_domaint
   void operator()(const namespacet &ns);
 
  private:
-  typedef std::vector<std::set<irep_idt>> stack_caughtt;
+  using stack_caughtt = std::vector<std::set<irep_idt> >;
   stack_caughtt stack_caught;
   std::set<irep_idt> thrown;
   class_hierarchyt class_hierarchy;

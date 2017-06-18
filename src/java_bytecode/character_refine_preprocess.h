@@ -30,8 +30,8 @@ public:
   codet replace_character_call(const code_function_callt &call) const;
 
 private:
-  typedef const code_function_callt &conversion_inputt;
-  typedef codet (*conversion_functiont)(conversion_inputt &target);
+  using conversion_inputt = const code_function_callt &;
+  using conversion_functiont = codet (*)(conversion_inputt &);
   // A table tells us what method to call for each java method signature
   std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>
     conversion_table;

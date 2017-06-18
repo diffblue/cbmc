@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_may_aliast
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   explicit local_may_aliast(
     const goto_functiont &_goto_function):
@@ -57,11 +57,11 @@ public:
 protected:
   void build(const goto_functiont &goto_function);
 
-  typedef std::stack<local_cfgt::node_nrt> work_queuet;
+  using work_queuet = std::stack<local_cfgt::node_nrt>;
 
   mutable numbering<exprt> objects;
 
-  typedef unsigned_union_find alias_sett;
+  using alias_sett = unsigned_union_find;
 
   // the information tracked per program location
   class loc_infot
@@ -72,7 +72,7 @@ protected:
     bool merge(const loc_infot &src);
   };
 
-  typedef std::vector<loc_infot> loc_infost;
+  using loc_infost = std::vector<loc_infot>;
   loc_infost loc_infos;
 
   void assign_lhs(
@@ -81,7 +81,7 @@ protected:
     const loc_infot &loc_info_src,
     loc_infot &loc_info_dest);
 
-  typedef std::set<unsigned> object_sett;
+  using object_sett = std::set<unsigned int>;
 
   void get_rec(
     object_sett &dest,

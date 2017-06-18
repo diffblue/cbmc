@@ -23,7 +23,7 @@ class dirtyt
 {
 public:
   typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   explicit dirtyt(const goto_functiont &goto_function)
   {

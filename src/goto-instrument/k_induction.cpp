@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class k_inductiont
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   k_inductiont(
     goto_functiont &_goto_function,

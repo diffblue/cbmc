@@ -25,7 +25,7 @@ template<class P, class T>
 class natural_loops_templatet
 {
 public:
-  typedef std::set<T> natural_loopt;
+  using natural_loopt = std::set<T>;
 
   // map loop headers to loops
   typedef std::map<T, natural_loopt> loop_mapt;
