@@ -20,52 +20,52 @@ Author: Michael Tautschnig, tautschn@amazon.com
 class jsil_languaget:public languaget
 {
 public:
-  bool preprocess(
+  virtual bool preprocess(
     std::istream &instream,
     const std::string &path,
-    std::ostream &outstream) override;
+    std::ostream &outstream);
 
-  bool parse(
+  virtual bool parse(
     std::istream &instream,
-    const std::string &path) override;
+    const std::string &path);
 
-  bool typecheck(
+  virtual bool typecheck(
     symbol_tablet &context,
-    const std::string &module) override;
+    const std::string &module);
 
-  bool final(symbol_tablet &context) override;
+  virtual bool final(symbol_tablet &context);
 
-  void show_parse(std::ostream &out) override;
+  virtual void show_parse(std::ostream &out);
 
+  virtual ~jsil_languaget();
   jsil_languaget() { }
-  ~jsil_languaget();
 
-  bool from_expr(
+  virtual bool from_expr(
     const exprt &expr,
     std::string &code,
-    const namespacet &ns) override;
+    const namespacet &ns);
 
-  bool from_type(
+  virtual bool from_type(
     const typet &type,
     std::string &code,
-    const namespacet &ns) override;
+    const namespacet &ns);
 
-  bool to_expr(
+  virtual bool to_expr(
     const std::string &code,
     const std::string &module,
     exprt &expr,
-    const namespacet &ns) override;
+    const namespacet &ns);
 
-  std::unique_ptr<languaget> new_language() override
+  virtual std::unique_ptr<languaget> new_language()
   { return util_make_unique<jsil_languaget>(); }
 
-  std::string id() const override { return "jsil"; }
-  std::string description() const override
+  virtual std::string id() const { return "jsil"; }
+  virtual std::string description() const
   { return "Javascript Intermediate Language"; }
-  std::set<std::string> extensions() const override;
+  virtual std::set<std::string> extensions() const;
 
-  void modules_provided(std::set<std::string> &modules) override;
-  bool interfaces(symbol_tablet &symbol_table) override;
+  virtual void modules_provided(std::set<std::string> &modules);
+  virtual bool interfaces(symbol_tablet &symbol_table);
 
 protected:
   jsil_parse_treet parse_tree;

@@ -242,7 +242,7 @@ public:
   // constructor
   explicit reaching_definitions_analysist(const namespacet &_ns);
 
-  ~reaching_definitions_analysist();
+  virtual ~reaching_definitions_analysist();
 
   virtual void initialize(
     const goto_functionst &goto_functions);
