@@ -9,8 +9,8 @@ Author: Peter Schrammel
 /// \file
 /// GOTO-DIFF Command Line Option Processing
 
-#include <fstream>
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 

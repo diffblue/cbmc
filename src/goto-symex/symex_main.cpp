@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Symbolic Execution
 
 #include <cassert>
+#include <memory>
 
 #include <util/std_expr.h>
 #include <util/rename.h>

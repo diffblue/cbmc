@@ -9,8 +9,9 @@ Date: April 2010
 \*******************************************************************/
 
 
-#include <limits>
 #include <algorithm>
+#include <limits>
+#include <memory>
 
 #include <util/std_code.h>
 #include <util/std_expr.h>

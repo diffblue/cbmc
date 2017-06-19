@@ -12,6 +12,8 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_ENUMERATING_LOOP_ACCELERATION_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_ENUMERATING_LOOP_ACCELERATION_H
 
+#include <memory>
+
 #include <util/make_unique.h>
 
 #include <goto-programs/goto_program.h>

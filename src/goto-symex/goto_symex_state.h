@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
 #include <cassert>
+#include <memory>
 #include <unordered_set>
 
 #include <util/guard.h>

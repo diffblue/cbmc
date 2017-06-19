@@ -16,8 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #error Deprecated, use ai.h instead
 #endif
 
-#include <map>
 #include <iosfwd>
+#include <map>
+#include <memory>
 #include <unordered_set>
 
 #include <util/make_unique.h>

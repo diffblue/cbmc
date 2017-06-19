@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*! \defgroup gr_cpp C++ front-end */
 
+#include <memory>
+
 #include <util/language.h>
 #include <util/make_unique.h> // unique_ptr
 

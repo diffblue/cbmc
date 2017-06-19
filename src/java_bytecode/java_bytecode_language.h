@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include <memory>
+
 #include <util/language.h>
 #include <util/cmdline.h>
 #include <util/make_unique.h>

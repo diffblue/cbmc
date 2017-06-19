@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \defgroup gr_ansi_c ANSI-C front-end */
 
+#include <memory>
+
 #include <util/language.h>
 #include <util/make_unique.h>
 

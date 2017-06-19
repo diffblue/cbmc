@@ -12,8 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_AI_H
 #define CPROVER_ANALYSES_AI_H
 
-#include <map>
 #include <iosfwd>
+#include <map>
+#include <memory>
 
 #include <util/json.h>
 #include <util/xml.h>

@@ -12,6 +12,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #ifndef CPROVER_JSIL_JSIL_LANGUAGE_H
 #define CPROVER_JSIL_JSIL_LANGUAGE_H
 
+#include <memory>
+
 #include <util/language.h>
 #include <util/make_unique.h>
 

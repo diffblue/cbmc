@@ -13,6 +13,8 @@ Date: February 2013
 /// Range-based reaching definitions analysis (following Field- Sensitive
 ///   Program Dependence Analysis, Litvak et al., FSE 2010)
 
+#include <memory>
+
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 #include <util/make_unique.h>

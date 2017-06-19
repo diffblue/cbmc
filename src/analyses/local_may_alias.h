@@ -12,8 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 #define CPROVER_ANALYSES_LOCAL_MAY_ALIAS_H
 
-#include <stack>
 #include <memory>
+#include <stack>
 
 #include <util/union_find.h>
 #include <util/make_unique.h>

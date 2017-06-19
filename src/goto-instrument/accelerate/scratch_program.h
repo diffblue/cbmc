@@ -12,6 +12,7 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 
+#include <memory>
 #include <string>
 
 #include <util/make_unique.h>
