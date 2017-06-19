@@ -365,7 +365,6 @@ void java_object_factoryt::gen_nondet_struct_init(
     class_identifier=struct_tag;
 
   recursion_set.insert(struct_tag);
-  assert(!recursion_set.empty());
 
   for(const auto &component : components)
   {
@@ -390,7 +389,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
     else
     {
-      assert(!name.empty());
+      INVARIANT(!name.empty(), "Each component of a struct must have a name");
 
       bool _is_sub=name[0]=='@';
 
