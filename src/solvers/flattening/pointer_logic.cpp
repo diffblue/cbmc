@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 #include <util/pointer_offset_size.h>
@@ -87,7 +88,7 @@ exprt pointer_logict::pointer_expr(
       constant_exprt null(type);
       null.set_value(ID_NULL);
       return plus_exprt(null,
-        from_integer(pointer.offset, integer_typet()));
+        from_integer(pointer.offset, pointer_diff_type()));
     }
   }
   else if(pointer.object==invalid_object) // INVALID?

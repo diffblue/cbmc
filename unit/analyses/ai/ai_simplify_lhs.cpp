@@ -16,6 +16,7 @@
 #include <ansi-c/ansi_c_language.h>
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/namespace.h>
 #include <util/ui_message.h>
@@ -73,7 +74,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
 
     const unsigned int array_size=5;
     array_typet array_type(
-      signedbv_typet(32), constant_exprt::integer_constant(array_size));
+      signedbv_typet(32), from_integer(array_size, size_type()));
 
     // Verify the results of the setup
     REQUIRE_FALSE(compile_failed);\
@@ -137,7 +138,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
       {
         REQUIRE(constant_array.operands().size()==i);
         constant_array.operands().push_back(
-          constant_exprt::integer_constant(i));
+          from_integer(i, signedbv_typet(32)));
       }
 
       const index_exprt &index_expr=
