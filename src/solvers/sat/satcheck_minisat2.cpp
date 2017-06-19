@@ -155,7 +155,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         {
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
-          assert(!solver->model.empty());
+          CHECK_RETURN(solver->model.size()>0);
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }
