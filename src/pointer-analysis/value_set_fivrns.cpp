@@ -1508,7 +1508,7 @@ bool value_set_fivrnst::object_map_dt::is_valid_at(
   return false;
 }
 
-bool value_set_fivrnst::handover(void)
+bool value_set_fivrnst::handover()
 {
   bool changed=false;
 
