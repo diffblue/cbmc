@@ -12,7 +12,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <cstdlib>
 #include <utility>
 
-struct freert final
+struct freert
 {
   template <typename T>
   void operator()(T &&t) const
