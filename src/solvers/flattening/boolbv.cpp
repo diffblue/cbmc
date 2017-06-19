@@ -501,7 +501,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     const bvt &bv=convert_bv(operands[0]);
 
-    if(bv.size()<1)
+    if(bv.empty())
       throw "sign operator takes one non-empty operand";
 
     if(operands[0].type().id()==ID_signedbv)

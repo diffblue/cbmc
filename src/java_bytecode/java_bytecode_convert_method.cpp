@@ -1772,7 +1772,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putfield")
     {
-      assert(op.size()==2 && results.size()==0);
+      assert(op.size()==2 && results.empty());
       code_blockt block;
       save_stack_entries(
         "stack_field",
@@ -1948,7 +1948,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="tableswitch" ||
             statement=="lookupswitch")
     {
-      assert(op.size()==1 && results.size()==0);
+      assert(op.size()==1 && results.empty());
 
       // we turn into switch-case
       code_switcht code_switch;
@@ -2298,7 +2298,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_labelt newlabel(label(std::to_string(address)), code_blockt());
       root_block.move_to_operands(newlabel);
       root.branch.push_back(block_tree_nodet::get_leaf());
-      assert((root.branch_addresses.size()==0 ||
+      assert((root.branch_addresses.empty() ||
               root.branch_addresses.back()<address) &&
              "Block addresses should be unique and increasing");
       root.branch_addresses.push_back(address);

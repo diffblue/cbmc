@@ -15,7 +15,7 @@ void lisp2irep(const lispexprt &src, irept &dest)
 {
   dest.make_nil();
 
-  if(src.type!=lispexprt::List || src.size()<1)
+  if(src.type!=lispexprt::List || src.empty())
     return;
 
   dest.id(src[0].value);

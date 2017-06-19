@@ -111,7 +111,7 @@ void fence_weak_memory(
       << " cycles found" << messaget::eom;
 
     /* if no cycle, no need to instrument */
-    if(instrumenter.set_of_cycles.size() == 0)
+    if(instrumenter.set_of_cycles.empty())
     {
       message.result()
         << "program safe -- no need to place additional fences"

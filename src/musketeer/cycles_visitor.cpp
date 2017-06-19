@@ -347,7 +347,7 @@ void cycles_visitort::com_constraint(
 
   std::list<event_idt>::const_iterator e_it=C_j.begin();
   std::list<event_idt>::const_iterator next_it=e_it;
-  assert(C_j.size()>0);
+  assert(!C_j.empty());
   ++next_it;
   for(;  next_it!=C_j.end() && e_it!=C_j.end(); ++e_it, ++next_it)
   {

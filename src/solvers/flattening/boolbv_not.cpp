@@ -13,7 +13,7 @@ bvt boolbvt::convert_not(const not_exprt &expr)
 {
   const bvt &op_bv=convert_bv(expr.op());
 
-  if(op_bv.size()<1)
+  if(op_bv.empty())
     throw "not operator takes one non-empty operand";
 
   const typet &op_type=expr.op().type();

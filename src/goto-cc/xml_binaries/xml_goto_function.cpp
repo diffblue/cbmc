@@ -33,6 +33,5 @@ void convert(const xmlt &xml, goto_functionst::goto_functiont &function)
 {
   function.body.clear();
   convert(xml, function.body);
-  function.body_available = function.body.instructions.size()>0;
   // don't forget to fix the functions type via the symbol table!
 }

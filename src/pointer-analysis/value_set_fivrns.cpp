@@ -95,7 +95,7 @@ void value_set_fivrnst::output_entry(
   const object_mapt &object_map=e.object_map;
 
   out << display_name << " = { ";
-  if(object_map.read().size()!=0)
+  if(!object_map.read().empty())
     out << "\n      ";
 
   std::size_t width=0;
