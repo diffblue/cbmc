@@ -998,8 +998,8 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   {
     code_ifthenelset ife;
     ife.cond()=condition_list[i];
-    ife.then_case()=code_assign_string_expr_to_java_string(
-      str, string_expr_list[i], symbol_table);
+    ife.then_case()=code_assign_string_expr_to_new_java_string(
+      str, string_expr_list[i], loc, symbol_table);
     ife.else_case()=tmp_code;
     tmp_code=ife;
   }
