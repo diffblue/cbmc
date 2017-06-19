@@ -132,7 +132,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_dimacs()
 
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
 {
-  auto prop=[this]() -> std::unique_ptr<propt>
+  std::unique_ptr<propt> prop=[this]() -> std::unique_ptr<propt>
   {
     // We offer the option to disable the SAT preprocessor
     if(options.get_bool_option("sat-preprocessor"))
@@ -140,8 +140,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
       no_beautification();
       return util_make_unique<satcheckt>();
     }
-    else
-      return util_make_unique<satcheck_no_simplifiert>();
+    return util_make_unique<satcheck_no_simplifiert>();
   }();
 
   prop->set_message_handler(get_message_handler());

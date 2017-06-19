@@ -247,9 +247,9 @@ bool clobber_parse_optionst::get_goto_program(
         return true;
       }
 
-      auto language=get_language_from_filename(filename);
+      std::unique_ptr<languaget> language=get_language_from_filename(filename);
 
-      if(language==nullptr)
+      if(!language)
       {
         error() << "failed to figure out type of file `" <<  filename << "'"
                 << eom;

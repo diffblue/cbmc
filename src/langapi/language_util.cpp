@@ -28,9 +28,9 @@ static std::unique_ptr<languaget> get_language(
      symbol->mode=="")
     return get_default_language();
 
-  auto ptr=get_language_from_mode(symbol->mode);
+  std::unique_ptr<languaget> ptr=get_language_from_mode(symbol->mode);
 
-  if(ptr==nullptr)
+  if(!ptr)
     throw "symbol `"+id2string(symbol->name)+
       "' has unknown mode '"+id2string(symbol->mode)+"'";
 

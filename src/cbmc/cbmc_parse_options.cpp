@@ -601,7 +601,7 @@ int cbmc_parse_optionst::get_goto_program(
         return 6;
       }
 
-      auto language=get_language_from_filename(filename);
+      std::unique_ptr<languaget> language=get_language_from_filename(filename);
 
       if(!language)
       {
@@ -750,7 +750,7 @@ void cbmc_parse_optionst::preprocessing()
       return;
     }
 
-    auto ptr=get_language_from_filename(filename);
+    std::unique_ptr<languaget> ptr=get_language_from_filename(filename);
 
     if(!ptr)
     {
