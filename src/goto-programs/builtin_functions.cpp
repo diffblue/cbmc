@@ -1767,6 +1767,77 @@ void goto_convertt::do_function_call_symbol(
 
     // void __sync_lock_release (type *ptr, ...)
   }
+  else if(identifier=="__builtin_isgreater" ||
+          identifier=="__builtin_isgreater" ||
+          identifier=="__builtin_isgreaterequal" ||
+          identifier=="__builtin_isless" ||
+          identifier=="__builtin_islessequal" ||
+          identifier=="__builtin_islessgreater" ||
+          identifier=="__builtin_isunordered")
+  {
+    // these support two double or two float arguments; we call the
+    // appropriate internal version
+    if(arguments.size()!=2 ||
+       (arguments[0].type()!=double_type() &&
+        arguments[0].type()!=float_type()) ||
+       (arguments[1].type()!=double_type() &&
+        arguments[1].type()!=float_type()))
+    {
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier
+              << "' expected to have two float/double arguments"
+              << eom;
+      throw 0;
+    }
+
+    exprt::operandst new_arguments=arguments;
+
+    bool use_double=arguments[0].type()==double_type();
+    if(arguments[0].type()!=arguments[1].type())
+    {
+      if(use_double)
+        new_arguments[1].make_typecast(arguments[0].type());
+      else
+      {
+        new_arguments[0].make_typecast(arguments[1].type());
+        use_double=true;
+      }
+    }
+
+    code_typet f_type=to_code_type(function.type());
+    f_type.remove_ellipsis();
+    const typet &a_t=new_arguments[0].type();
+    f_type.parameters()=
+      code_typet::parameterst(2, code_typet::parametert(a_t));
+
+    // replace __builtin_ by CPROVER_PREFIX
+    std::string name=CPROVER_PREFIX+id2string(identifier).substr(10);
+    // append d or f for double/float
+    name+=use_double?'d':'f';
+
+    symbol_exprt new_function=function;
+    new_function.set_identifier(name);
+    new_function.type()=f_type;
+
+    code_function_callt function_call;
+    function_call.lhs()=lhs;
+    function_call.function()=new_function;
+    function_call.arguments()=new_arguments;
+    function_call.add_source_location()=function.source_location();
+
+    if(!symbol_table.has_symbol(name))
+    {
+      code_typet();
+      symbolt new_symbol;
+      new_symbol.base_name=name;
+      new_symbol.name=name;
+      new_symbol.type=f_type;
+      new_symbol.location=function.source_location();
+      symbol_table.add(new_symbol);
+    }
+
+    copy(function_call, FUNCTION_CALL, dest);
+  }
   else
   {
     do_function_call_symbol(*symbol);
