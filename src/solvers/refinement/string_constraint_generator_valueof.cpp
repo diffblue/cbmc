@@ -208,21 +208,12 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   return res;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_from_int
-
-  Inputs: a signed integer expression, and a maximal size for the string
-          representation
-
- Outputs: a string expression
-
- Purpose: add axioms to say the string corresponds to the result of
-          String.valueOf(I) or String.valueOf(J) java functions applied on the
-          integer expression
-
-\*******************************************************************/
-
+/// add axioms to say the string corresponds to the result of String.valueOf(I)
+/// or String.valueOf(J) java functions applied on the integer expression
+/// \param i: a signed integer expression
+/// \param max_size: a maximal size for the string representation
+/// \param ref_type: type for refined strings
+/// \return a string expression
 string_exprt string_constraint_generatort::add_axioms_from_int(
   const exprt &i, size_t max_size, const refined_string_typet &ref_type)
 {
@@ -309,10 +300,10 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
       sum=new_sum;
     }
 
-    exprt a5=conjunction(digit_constraints);
-    axioms.push_back(a5);
-
     equal_exprt premise=res.axiom_for_has_length(size);
+    exprt a5=conjunction(digit_constraints);
+    axioms.push_back(implies_exprt(premise, a5));
+
     implies_exprt a6(
       and_exprt(premise, starts_with_digit), equal_exprt(i, sum));
     axioms.push_back(a6);
