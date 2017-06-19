@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/threeval.h>
+#include <util/invariant.h>
 
 #include "satcheck_minisat2.h"
 
