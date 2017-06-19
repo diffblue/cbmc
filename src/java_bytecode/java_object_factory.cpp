@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/nondet_ifthenelse.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
+#include <util/invariant.h>
 
 #include <linking/zero_initializer.h>
 
@@ -403,7 +404,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
   }
   else
   {
-    assert(update_in_place==MAY_UPDATE_IN_PLACE);
+    INVARIANT(update_in_place==MAY_UPDATE_IN_PLACE,
+      "No update and must update should have already been resolved");
 
     code_ifthenelset update_check;
     update_check.cond()=side_effect_expr_nondett(bool_typet());
@@ -481,7 +483,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
     else
     {
-      assert(!name.empty());
+      INVARIANT(!name.empty(), "Each component of a struct must have a name");
 
       bool _is_sub=name[0]=='@';
 
