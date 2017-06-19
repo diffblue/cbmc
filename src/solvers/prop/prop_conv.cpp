@@ -415,7 +415,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
           // Special case for a CNF-clause,
           // i.e., a constraint that's a disjunction.
 
-          if(expr.operands().size()>0)
+          if(!expr.operands().empty())
           {
             bvt bv;
             bv.reserve(expr.operands().size());

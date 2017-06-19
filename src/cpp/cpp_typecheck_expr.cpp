@@ -1431,7 +1431,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
 
       // adjust return type of function to match pointer subtype
-      if(fargs.operands.size()<1)
+      if(fargs.operands.empty())
       {
         error().source_location=source_location;
         error() << "__sync_* primitives take as least one argument"

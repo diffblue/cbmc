@@ -54,7 +54,7 @@ void convert(const symbolt &sym, xmlt &root)
   flags.new_element("base_name").data=id2string(sym.base_name);
   flags.new_element("module").data=id2string(sym.module);
 
-  if(sym.pretty_name.size()>0)
+  if(!sym.pretty_name.empty())
     flags.new_element("pretty_name").data=id2string(sym.pretty_name);
 
   xmlt &xmlloc = xmlsym.new_element("location");

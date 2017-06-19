@@ -233,7 +233,7 @@ void goto_convertt::do_scanf(
 
   if(f_id==CPROVER_PREFIX "scanf")
   {
-    if(arguments.size()<1)
+    if(arguments.empty())
     {
       error().source_location=function.find_source_location();
       error() << "scanf takes at least one argument" << eom;
@@ -1328,7 +1328,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier==CPROVER_PREFIX "fence")
   {
-    if(arguments.size()<1)
+    if(arguments.empty())
     {
       error().source_location=function.find_source_location();
       error() << "`" << identifier

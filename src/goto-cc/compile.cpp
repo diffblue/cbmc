@@ -102,13 +102,13 @@ bool compilet::doit()
     return true;
   }
 
-  if(mode==LINK_LIBRARY && source_files.size()>0)
+  if(mode==LINK_LIBRARY && !source_files.empty())
   {
     error() << "cannot link source files" << eom;
     return true;
   }
 
-  if(mode==PREPROCESS_ONLY && object_files.size()>0)
+  if(mode==PREPROCESS_ONLY && !object_files.empty())
   {
     error() << "cannot preprocess object files" << eom;
     return true;
@@ -117,7 +117,7 @@ bool compilet::doit()
   const unsigned warnings_before=
     get_message_handler().get_message_count(messaget::M_WARNING);
 
-  if(source_files.size()>0)
+  if(!source_files.empty())
     if(compile())
       return true;
 
@@ -346,7 +346,7 @@ bool compilet::link()
   convert_symbols(compiled_functions);
 
   // parse object files
-  while(object_files.size()>0)
+  while(!object_files.empty())
   {
     std::string file_name=object_files.front();
     object_files.pop_front();

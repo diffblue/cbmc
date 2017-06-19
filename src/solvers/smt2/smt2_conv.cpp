@@ -2833,7 +2833,7 @@ void smt2_convt::convert_relation(const exprt &expr)
 
 void smt2_convt::convert_plus(const plus_exprt &expr)
 {
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     INVALIDEXPR("No operands to plus");
   }

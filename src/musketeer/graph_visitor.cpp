@@ -35,7 +35,7 @@ void const_graph_visitort::graph_explore(
       edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
   }
-  else if(egraph.po_out(next).size()==0)
+  else if(egraph.po_out(next).empty())
   {
     /* this path is not connecting a to b => return */
   }
@@ -76,7 +76,7 @@ void const_graph_visitort::const_graph_explore(
       fence_inserter.add_edge(edget(*it, *next_it));
     }
   }
-  else if(egraph.po_out(next).size()==0)
+  else if(egraph.po_out(next).empty())
   {
     /* this path is not connecting a to b => return */
   }
@@ -106,7 +106,7 @@ void const_graph_visitort::graph_explore_BC(
   bool porw)
 {
   /* TODO: restricts to C_1 U ... U C_n for perf improvement */
-  assert(old_path.size()>0);
+  assert(!old_path.empty());
 
   fence_inserter.instrumenter.message.debug() << "(BC) explore "
                                               << old_path.front()
@@ -129,7 +129,7 @@ void const_graph_visitort::graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos)
+  if(egraph.po_out(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -184,7 +184,7 @@ void const_graph_visitort::const_graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos)
+  if(egraph.po_out(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -244,7 +244,7 @@ void const_graph_visitort::graph_explore_AC(
       break;
     }
 
-  if(egraph.po_in(next).size()==0 || no_other_pos)
+  if(egraph.po_in(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -300,7 +300,7 @@ void const_graph_visitort::const_graph_explore_AC(
     }
 
   /* if beginning of the thread */
-  if(egraph.po_in(next).size()==0 || no_other_pos)
+  if(egraph.po_in(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();

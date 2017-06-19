@@ -302,7 +302,7 @@ std::string ieee_floatt::to_string_scientific(std::size_t precision) const
     std::string exponent_str=
       integer2string(base10_digits(_fraction)+_exponent-1);
 
-    if(exponent_str.size()>0 && exponent_str[0]!='-')
+    if(!exponent_str.empty() && exponent_str[0]!='-')
       result+='+';
 
     result+=exponent_str;

@@ -178,7 +178,7 @@ public:
       {
         critical_cyclet reduced(egraph, id);
         this->hide_internals(reduced);
-        assert(reduced.size()>0);
+        assert(!reduced.empty());
         return print_name(reduced, model);
       }
       else

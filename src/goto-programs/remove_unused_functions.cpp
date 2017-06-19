@@ -33,7 +33,7 @@ void remove_unused_functions(
 
   messaget message(message_handler);
 
-  if(unused_functions.size()>0)
+  if(!unused_functions.empty())
   {
     message.statistics()
       << "Dropping " << unused_functions.size() << " of " <<

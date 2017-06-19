@@ -144,7 +144,7 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_or)
   {
-    if(expr.operands().size()<1)
+    if(expr.operands().empty())
       throw id2string(expr.id())+" expects at least one operand";
 
     bool result=false;
@@ -188,7 +188,7 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_and)
   {
-    if(expr.operands().size()<1)
+    if(expr.operands().empty())
       throw id2string(expr.id())+" expects at least one operand";
 
     bool result=true;

@@ -366,7 +366,7 @@ void automatont::reverse(goto_programt::targett epsilon)
     transitions.push_back(transitionst());
   }
 
-  if(accept_states.size()==0)
+  if(accept_states.empty())
   {
     num_states=0;
     return;
