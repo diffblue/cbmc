@@ -1,0 +1,6 @@
+CORE
+test.class
+--lazy-methods --function test.main
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
