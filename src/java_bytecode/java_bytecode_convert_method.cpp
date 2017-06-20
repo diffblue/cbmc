@@ -1428,7 +1428,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
         if(lazy_methods)
+        {
           lazy_methods->add_needed_method(arg0.get(ID_identifier));
+          // Calling a static method causes static initialization:
+          lazy_methods->add_needed_class(arg0.get(ID_C_class));
+        }
       }
 
       call.function().add_source_location()=loc;
