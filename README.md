@@ -1,4 +1,4 @@
-[![Build Status][travis_img]][travis] [![Build Status][appveyor_img]][appveyor]
+[![Build Status][travis_img]][travis]
 
 [CProver Wiki](http://www.cprover.org/wiki)
 
@@ -20,6 +20,4 @@ License
 4-clause BSD license, see `LICENSE` file.
 
 [travis]: https://travis-ci.org/diffblue/cbmc
-[travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=master
-[appveyor]: https://ci.appveyor.com/project/diffblue/cbmc/
-[appveyor_img]: https://ci.appveyor.com/api/projects/status/github/diffblue/cbmc?svg=true&branch=master
+[travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=test-gen-support
