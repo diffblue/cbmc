@@ -131,13 +131,13 @@ matrix:
 
     - env: NAME="CPP-LINT"
       install:
-      script: scripts/travis_lint.sh
+      script: scripts/travis_lint.sh test-gen-support
       before_cache:
 
   allow_failures:
     - env: NAME="CPP-LINT"
       install:
-      script: scripts/travis_lint.sh
+      script: scripts/travis_lint.sh test-gen-support
       before_cache:
 
 install:
