@@ -750,17 +750,17 @@ void cbmc_parse_optionst::preprocessing()
       return;
     }
 
-    std::unique_ptr<languaget> ptr=get_language_from_filename(filename);
+    std::unique_ptr<languaget> language=get_language_from_filename(filename);
 
-    if(!ptr)
+    if(!language)
     {
       error() << "failed to figure out type of file" << eom;
       return;
     }
 
-    ptr->set_message_handler(get_message_handler());
+    language->set_message_handler(get_message_handler());
 
-    if(ptr->preprocess(infile, filename, std::cout))
+    if(language->preprocess(infile, filename, std::cout))
       error() << "PREPROCESSING ERROR" << eom;
   }
 
