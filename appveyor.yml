@@ -5,6 +5,9 @@ environment:
   BUILD_ENV: MSVC
   PATH: C:\projects\cbmc\deps\bin;%PATH%
   INCLUDE: C:\projects\cbmc\deps\include
+branches:
+  except:
+    - test-gen-support
 install:
 - ps: |
     #check if dependencies were copied from cache, if not, download them.
