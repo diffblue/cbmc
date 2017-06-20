@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // decision procedure wrapper for boolean propositional logics
 
+#include <stdint.h>
+
 #include <util/message.h>
 #include <util/threeval.h>
 
