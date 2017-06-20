@@ -895,8 +895,7 @@ typet interpretert::concretize_type(const typet &type)
     }
     else
     {
-      error() << "Failed to concretize variable array"
-              << eom;
+      warning() << "Failed to concretize variable array" << eom;
     }
   }
   return type;
