@@ -138,6 +138,128 @@ private:
     const update_in_placet &update_in_place);
 };
 
+/*******************************************************************\
+
+Function: allocate_dynamic_object
+
+  Inputs:
+    target_expr - expression to which the necessary memory will be allocated
+    allocate_type - type of the object allocated
+    symbol_table - symbol table
+    loc - location in the source
+    output_code - code block to which the necessary code is added
+    symbols_created - created symbols to be declared by the caller
+    cast_needed - Boolean flags saying where we need to cast the malloc site
+
+  Outputs: Expression representing the malloc site allocated.
+
+  Purpose: Generates code for allocating a dynamic object.
+           This is used in allocate_object and for allocating strings
+           in the library preprocessing.
+
+\*******************************************************************/
+
+exprt allocate_dynamic_object(
+  const exprt &target_expr,
+  const typet &allocate_type,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &output_code,
+  std::vector<const symbolt *> &symbols_created,
+  bool cast_needed)
+{
+  // build size expression
+  exprt object_size=size_of_expr(allocate_type, namespacet(symbol_table));
+
+  if(allocate_type.id()!=ID_empty)
+  {
+    assert(!object_size.is_nil() && "size of Java objects should be known");
+    // malloc expression
+    exprt malloc_expr=side_effect_exprt(ID_malloc);
+    malloc_expr.copy_to_operands(object_size);
+    typet result_type=pointer_typet(allocate_type);
+    malloc_expr.type()=result_type;
+    // Create a symbol for the malloc expression so we can initialize
+    // without having to do it potentially through a double-deref, which
+    // breaks the to-SSA phase.
+    symbolt &malloc_sym=new_tmp_symbol(
+      symbol_table,
+      loc,
+      pointer_typet(allocate_type),
+      "malloc_site");
+    symbols_created.push_back(&malloc_sym);
+    code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
+    assign.add_source_location()=loc;
+    output_code.copy_to_operands(assign);
+    malloc_expr=malloc_sym.symbol_expr();
+    if(cast_needed)
+      malloc_expr=typecast_exprt(malloc_expr, target_expr.type());
+    code_assignt code(target_expr, malloc_expr);
+    code.add_source_location()=loc;
+    output_code.copy_to_operands(code);
+    return malloc_sym.symbol_expr();
+  }
+  else
+  {
+    // make null
+    null_pointer_exprt null_pointer_expr(to_pointer_type(target_expr.type()));
+    code_assignt code(target_expr, null_pointer_expr);
+    code.add_source_location()=loc;
+    output_code.copy_to_operands(code);
+    return exprt();
+  }
+}
+
+/// Generates code for allocating a dynamic object. This is a static version of
+/// allocate_dynamic_object that can be called from outside java_object_factory
+/// and which takes care of creating the associated declarations.
+/// \param target_expr: expression to which the necessary memory will be
+///   allocated
+/// \param allocate_type: type of the object allocated
+/// \param symbol_table: symbol table
+/// \param loc: location in the source
+/// \param output_code: code block to which the necessary code is added
+/// \param cast_needed: Boolean flags saying where we need to cast the malloc
+///   site
+/// \return Expression representing the malloc site allocated.
+exprt allocate_dynamic_object_with_decl(
+  const exprt &target_expr,
+  const typet &allocate_type,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &output_code,
+  bool cast_needed)
+{
+  std::vector<const symbolt *> symbols_created;
+
+  code_blockt tmp_block;
+  exprt result=allocate_dynamic_object(
+    target_expr,
+    allocate_type,
+    symbol_table,
+    loc,
+    tmp_block,
+    symbols_created,
+    cast_needed);
+
+  // Add the following code to output_code for each symbol that's been created:
+  //   <type> <identifier>;
+  for(const symbolt * const symbol_ptr : symbols_created)
+  {
+    code_declt decl(symbol_ptr->symbol_expr());
+    decl.add_source_location()=loc;
+    output_code.add(decl);
+  }
+
+  for(const exprt &code : tmp_block.operands())
+    output_code.add(to_code(code));
+
+  return result;
+}
+
+/// Returns false if we can't figure out the size of allocate_type.
+/// allocate_type may differ from target_expr, e.g. for target_expr having type
+/// int* and allocate_type being an int[10].
 /// \param assignments: The code block to add code to
 /// \param target_expr: The expression which we are allocating a symbol for
 /// \param allocate_type:
