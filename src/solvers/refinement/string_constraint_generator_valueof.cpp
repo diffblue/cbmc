@@ -289,7 +289,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
         binary_relation_exprt(res[j], ID_le, nine_char));
       digit_constraints.push_back(is_number);
 
-      if(j>=max_size-1)
+      if(j>=max_size-2)
       {
         // check for overflows if the size is big
         and_exprt no_overflow(
