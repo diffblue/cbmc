@@ -1054,7 +1054,7 @@ void interpretert::evaluate(
   {
     if(expr.type().id()==ID_signedbv)
     {
-      error() << "Infinite size arrays not supported" << eom;
+      warning() << "Infinite size arrays not supported" << eom;
       return;
     }
   }
