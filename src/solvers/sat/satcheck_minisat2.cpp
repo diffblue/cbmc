@@ -116,12 +116,16 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   clause_counter++;
 }
 
+#ifndef _WIN32
+
 static Minisat::Solver *solver_to_interrupt=nullptr;
 
 static void interrupt_solver(int signum)
 {
   solver_to_interrupt->interrupt();
 }
+
+#endif
 
 template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
@@ -162,6 +166,10 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         Minisat::vec<Minisat::Lit> solver_assumptions;
         convert(assumptions, solver_assumptions);
 
+        using Minisat::lbool;
+
+#ifndef _WIN32
+
         void (*old_handler)(int)=SIG_ERR;
 
         if(time_limit_seconds!=0)
@@ -174,7 +182,6 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
             alarm(time_limit_seconds);
         }
 
-        using Minisat::lbool;
         lbool solver_result=solver->solveLimited(solver_assumptions);
 
         if(old_handler!=SIG_ERR)
@@ -183,6 +190,19 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           signal(SIGALRM, old_handler);
           solver_to_interrupt=solver;
         }
+
+#else // _WIN32
+
+        if(time_limit_seconds!=0)
+        {
+          messaget::warning() <<
+            "Time limit ignored (not supported on Win32 yet)" << messaget::eom;
+        }
+
+        lbool solver_result=
+          solver->solve(solver_assumptions) ? l_True : l_False;
+
+#endif
 
         if(solver_result==l_True)
         {
