@@ -544,7 +544,12 @@ exprt string_constraint_generatort::add_axioms_for_char_pointer(
 {
   exprt char_pointer=args(fun, 1)[0];
   if(char_pointer.id()==ID_index)
-    return char_pointer.op0();
+    return typecast_exprt(char_pointer.op0(), fun.type());
+  // TODO: It seems reasonable that the result of the function application
+  //       should match the return type of the function. However it is not
+  //       clear whether this typecast is properly handled in the string
+  //       refinement. We need regression tests that use that function.
+
   // TODO: we do not know what to do in the other cases
   assert(false);
   return exprt();
