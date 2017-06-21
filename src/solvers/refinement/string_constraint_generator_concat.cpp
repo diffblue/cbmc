@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// Add axioms to say that the returned string expression is equal to the
+/// Add axioms enforcing that the returned string expression is equal to the
 /// concatenation of s1 with the substring of s2 starting at index start_index
 /// and ending at index end_index.
 ///
@@ -77,7 +77,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
   return add_axioms_for_concat_substr(s1, s2, index_zero, s2.length());
 }
 
-/// Add axioms to say that the returned string expression is equal to the
+/// Add axioms enforcing that the returned string expression is equal to the
 /// concatenation of the two string arguments of the function application.
 ///
 /// In case 4 arguments instead of 2 are given the last two arguments are
@@ -85,7 +85,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
 /// of the second argument: this is similar to the Java
 /// StringBuilder.append(CharSequence s, int start, int end) method.
 ///
-/// \param f: function application with two arguments which are strings
+/// \param f: function application with two string arguments
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat(
   const function_application_exprt &f)
@@ -151,12 +151,11 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   return add_axioms_for_concat_char(s1, args(f, 2)[1]);
 }
 
-/// Add axioms corresponding adding the character char at the end of
+/// Add axioms corresponding to adding the character char at the end of
 /// string_expr.
 /// \param string_expr: a string expression
 /// \param char' a character expression
 /// \return a new string expression
-
 string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   const string_exprt &string_expr, const exprt &char_expr)
 {
