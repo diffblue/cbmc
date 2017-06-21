@@ -102,10 +102,9 @@ public:
     void operator()(const critical_cyclet &cyc)
     {
       data.clear();
-      for(
-        auto it=cyc.data.cbegin();
-        it!=cyc.data.cend();
-        ++it)
+      for(auto it=cyc.data.cbegin();
+          it!=cyc.data.cend();
+          ++it)
         data.push_back(*it);
       has_user_defined_fence=cyc.has_user_defined_fence;
     }
