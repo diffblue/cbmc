@@ -3,16 +3,22 @@ DIRS = ansi-c \
        cpp \
        cbmc-java \
        goto-analyzer \
+       goto-diff \
+       goto-gcc \
        goto-instrument \
        goto-instrument-typedef \
-       goto-diff \
        invariants \
        test-script \
        # Empty last line
 
-
+# Check for the existence of $dir. Tests under goto-gcc cannot be run on
+# Windows, so appveyor.yml unlinks the entire directory under Windows.
 test:
-	$(foreach var,$(DIRS), $(MAKE) -C $(var) test || exit 1;)
+	@for dir in $(DIRS); do \
+	  if [ -d "$$dir" ]; then \
+	    $(MAKE) -C "$$dir" test || exit 1; \
+	  fi; \
+	done;
 
 clean:
 	@for dir in *; do \
