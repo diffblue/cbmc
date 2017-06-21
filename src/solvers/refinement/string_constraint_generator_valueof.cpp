@@ -89,8 +89,9 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   return res;
 }
 
-/// Add axioms to say the string corresponds to the result of String.valueOf(I)
-/// or String.valueOf(J) java functions applied on the integer expression.
+/// Add axioms enforcing that the string corresponds to the result
+/// of String.valueOf(I) or String.valueOf(J) Java functions applied
+/// on the integer expression.
 /// \param i: a signed integer expression
 /// \param max_size: and a maximal size for the string representation
 /// \param ref_type: type of refined string expressions
