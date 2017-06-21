@@ -150,11 +150,11 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 /// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
 /// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_float(
+string_exprt string_constraint_generatort::add_axioms_for_string_of_float(
   const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_float(args(f, 1)[0], ref_type);
+  return add_axioms_for_string_of_float(
+    args(f, 1)[0], to_refined_string_type(f.type()));
 }
 
 /// Add axioms corresponding to the String.valueOf(D) java function
@@ -163,8 +163,8 @@ string_exprt string_constraint_generatort::add_axioms_from_float(
 string_exprt string_constraint_generatort::add_axioms_from_double(
   const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_float(args(f, 1)[0], ref_type);
+  return add_axioms_for_string_of_float(
+    args(f, 1)[0], to_refined_string_type(f.type()));
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
@@ -176,7 +176,7 @@ string_exprt string_constraint_generatort::add_axioms_from_double(
 /// \param f: expression representing a float
 /// \param ref_type: refined type for strings
 /// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_float(
+string_exprt string_constraint_generatort::add_axioms_for_string_of_float(
   const exprt &f, const refined_string_typet &ref_type)
 {
   const floatbv_typet &type=to_floatbv_type(f.type());

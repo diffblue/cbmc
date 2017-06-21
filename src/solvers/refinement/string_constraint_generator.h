@@ -236,8 +236,9 @@ private:
   // and minus infinity the string are "Infinity" and "-Infinity respectively
   // otherwise the string contains only characters in [0123456789.] and '-' at
   // the start for negative number
-  string_exprt add_axioms_from_float(const function_application_exprt &f);
-  string_exprt add_axioms_from_float(
+  string_exprt add_axioms_for_string_of_float(
+    const function_application_exprt &f);
+  string_exprt add_axioms_for_string_of_float(
     const exprt &f, const refined_string_typet &ref_type);
 
   string_exprt add_axioms_for_fractional_part(
