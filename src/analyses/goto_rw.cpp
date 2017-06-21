@@ -475,7 +475,7 @@ void rw_range_sett::add(
     entry->second=util_make_unique<range_domaint>();
 
   static_cast<range_domaint&>(*entry->second).push_back(
-    std::make_pair(range_start, range_end));
+    {range_start, range_end});
 }
 
 void rw_range_sett::get_objects_rec(
@@ -678,7 +678,7 @@ void rw_guarded_range_set_value_sett::add(
     entry->second=util_make_unique<guarded_range_domaint>();
 
   static_cast<guarded_range_domaint&>(*entry->second).insert(
-    std::make_pair(range_start, std::make_pair(range_end, guard.as_expr())));
+    {range_start, {range_end, guard.as_expr()}});
 }
 
 void goto_rw(goto_programt::const_targett target,

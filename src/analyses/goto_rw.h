@@ -109,7 +109,7 @@ public:
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<range_domaint*>(it->second.get()));
+    PRECONDITION(dynamic_cast<range_domaint*>(it->second.get())!=nullptr);
     return static_cast<const range_domaint &>(*it->second);
   }
 
@@ -278,7 +278,8 @@ public:
 
   const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
+    PRECONDITION(
+      dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
     return static_cast<const guarded_range_domaint &>(*it->second);
   }
 
