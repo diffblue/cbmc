@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_map>
 #include <vector>
 
+#include <util/invariant.h>
 
 template <typename T>
 // NOLINTNEXTLINE(readability/identifiers)
@@ -48,7 +49,7 @@ public:
     if(result.second) // inserted?
     {
       data.push_back(a);
-      assert(data.size()==numbers.size());
+      INVARIANT(data.size()==numbers.size(), "vector sizes must match");
     }
 
     return (result.first)->second;

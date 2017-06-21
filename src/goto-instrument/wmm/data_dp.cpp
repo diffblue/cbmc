@@ -13,6 +13,7 @@ Date: 2012
 
 #include "data_dp.h"
 
+#include <util/invariant.h>
 #include <util/message.h>
 
 #include "abstract_event.h"
@@ -151,7 +152,7 @@ void data_dpt::dp_merge()
       it3->eq_class=to;
 
   /* strictly monotonous => converges */
-  assert(initial_size>data.size());
+  INVARIANT(initial_size>data.size(), "strictly monotonous => converges");
 
   /* repeat until classes are disjunct */
   dp_merge();

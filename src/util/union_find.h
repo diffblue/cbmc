@@ -238,7 +238,7 @@ public:
     if(n>=uuf.size())
       uuf.resize(numbers.size());
 
-    assert(uuf.size()==numbers.size());
+    INVARIANT(uuf.size()==numbers.size(), "container sizes must match");
 
     return n;
   }

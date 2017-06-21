@@ -20,6 +20,7 @@ Date: 2012
 #include <iosfwd>
 
 #include <util/graph.h>
+#include <util/invariant.h>
 
 #include "abstract_event.h"
 #include "data_dp.h"
@@ -213,7 +214,7 @@ public:
       {
         critical_cyclet reduced(egraph, id);
         this->hide_internals(reduced);
-        assert(!reduced.data.empty());
+        INVARIANT(!reduced.data.empty(), "reduced must not be empty");
         return print_name(reduced, model);
       }
       else
