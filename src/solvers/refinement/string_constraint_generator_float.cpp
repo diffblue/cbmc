@@ -21,15 +21,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// TODO: factorize with float_bv.cpp float_utils.h
 /// \param src: a floating point expression
 /// \param spec: specification for floating points
-/// \return A 32 bit integer representing the exponent. Note that 32 bits are
-///   sufficient for the exponent even in octuple precision.
+/// \return A new 32 bit integer expression representing the exponent.
+///   Note that 32 bits are sufficient for the exponent even
+///   in octuple precision.
 exprt get_exponent(
   const exprt &src, const ieee_float_spect &spec)
 {
   exprt exp_bits=extractbits_exprt(
     src, spec.f+spec.e-1, spec.f, unsignedbv_typet(spec.e));
 
-  // Exponent is in biased from (numbers form -128 to 127 are encoded with
+  // Exponent is in biased from (numbers from -128 to 127 are encoded with
   // integer from 0 to 255) we have to remove the bias.
   return minus_exprt(
     typecast_exprt(exp_bits, signedbv_typet(32)),
@@ -45,7 +46,10 @@ exprt get_magnitude(const exprt &src, const ieee_float_spect &spec)
   return extractbits_exprt(src, spec.f-1, 0, unsignedbv_typet(spec.f));
 }
 
-/// Gets the significand as a java integer, looking for the hidden bit
+/// Gets the significand as a java integer, looking for the hidden bit.
+/// Since the most significant bit is 1 for normalized number, it is not part
+/// of the encoding of the significand and is 0 only if all the bits of the
+/// exponent are 0, that is why it is called the hidden bit.
 /// \param src: a floating point expression
 /// \param spec: specification for floating points
 /// \param type: type of the output, should be unsigned with width greater than
@@ -65,6 +69,7 @@ exprt get_significand(
   return if_exprt(all_zeros, magnitude, with_hidden_bit);
 }
 
+/// Create an expression to represent a float or double value.
 /// \param f: a floating point value in double precision
 /// \return an expression representing this floating point
 exprt constant_float(const double f, const ieee_float_spect &float_spec)
@@ -109,7 +114,7 @@ exprt floatbv_mult(const exprt &f, const exprt &g)
 /// other values that are in floating point representation.
 /// \param i: an expression representing an integer
 /// \param spec: specification for floating point numbers
-/// \return An expression representing representing the value of the input
+/// \return An expression representing the value of the input
 ///   integer as a float.
 exprt floatbv_of_int_expr(const exprt &i, const ieee_float_spect &spec)
 {
@@ -119,14 +124,14 @@ exprt floatbv_of_int_expr(const exprt &i, const ieee_float_spect &spec)
 
 /// Estimate the decimal exponent that should be used to represent a given
 /// floating point value in decimal.
-/// We are looking for d such that n * 10^d = m * 10^e, so:
+/// We are looking for d such that n * 10^d = m * 2^e, so:
 /// d = log_10(m) + log_10(2) * e - log_10(n)
 /// m -- the magnitude -- should be between 1 and 2 so log_10(m)
 /// in [0,log_10(2)].
 /// n -- the magnitude in base 10 -- should be between 1 and 10 so
 /// log_10(n) in [0, 1].
 /// So the estimate is given by:
-/// d ~=~  floor( log_10(2) * e)
+/// d ~=~  floor(log_10(2) * e)
 /// \param f: a floating point expression
 /// \param spec: specification for floating point
 exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
@@ -136,13 +141,13 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
   exprt float_bin_exp=floatbv_of_int_expr(bin_exp, spec);
   exprt dec_exp=floatbv_mult(float_bin_exp, log_10_of_2);
   binary_relation_exprt negative_exp(dec_exp, ID_lt, constant_float(0.0, spec));
-  // Rounding to zero is not correct for negative number, so we remove 1.
+  // Rounding to zero is not correct for negative numbers, so we substract 1.
   minus_exprt dec_minus_one(dec_exp, constant_float(1.0, spec));
   if_exprt adjust_for_neg(negative_exp, dec_minus_one, dec_exp);
   return round_expr_to_zero(adjust_for_neg);
 }
 
-/// add axioms corresponding to the String.valueOf(F) java function
+/// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_from_float(
@@ -152,7 +157,7 @@ string_exprt string_constraint_generatort::add_axioms_from_float(
   return add_axioms_from_float(args(f, 1)[0], ref_type);
 }
 
-/// add axioms corresponding to the String.valueOf(D) java function
+/// Add axioms corresponding to the String.valueOf(D) java function
 /// \param f: function application with one double argument
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_from_double(
@@ -162,7 +167,7 @@ string_exprt string_constraint_generatort::add_axioms_from_double(
   return add_axioms_from_float(args(f, 1)[0], ref_type);
 }
 
-/// add axioms corresponding to the integer part of m, in decimal form with no
+/// Add axioms corresponding to the integer part of m, in decimal form with no
 /// leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal
 /// digits representing the fractional part of m.
 ///
