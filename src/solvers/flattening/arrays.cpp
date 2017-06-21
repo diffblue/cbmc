@@ -8,7 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arrays.h"
 
-#include <cassert>
 #include <iostream>
 
 #include <langapi/language_util.h>
@@ -49,10 +48,14 @@ literalt arrayst::record_array_equality(
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
     prop.error() << equality.pretty() << messaget::eom;
-    throw "record_array_equality got equality without matching types";
+    DATA_INVARIANT(
+      false,
+      "record_array_equality got equality without matching types");
   }
 
-  assert(ns.follow(op0.type()).id()==ID_array);
+  DATA_INVARIANT(
+    ns.follow(op0.type()).id()==ID_array,
+    "record_array_equality parameter should be array-typed");
 
   array_equalities.push_back(array_equalityt());
 
@@ -114,7 +117,7 @@ void arrayst::collect_arrays(const exprt &a)
     if(!base_type_eq(array_type, with_expr.old().type(), ns))
     {
       prop.error() << a.pretty() << messaget::eom;
-      throw "collect_arrays got 'with' without matching types";
+      DATA_INVARIANT(false, "collect_arrays got 'with' without matching types");
     }
 
     arrays.make_union(a, with_expr.old());
@@ -132,7 +135,9 @@ void arrayst::collect_arrays(const exprt &a)
     if(!base_type_eq(array_type, update_expr.old().type(), ns))
     {
       prop.error() << a.pretty() << messaget::eom;
-      throw "collect_arrays got 'update' without matching types";
+      DATA_INVARIANT(
+        false,
+        "collect_arrays got 'update' without matching types");
     }
 
     arrays.make_union(a, update_expr.old());
@@ -152,14 +157,14 @@ void arrayst::collect_arrays(const exprt &a)
     if(!base_type_eq(array_type, if_expr.true_case().type(), ns))
     {
       prop.error() << a.pretty() << messaget::eom;
-      throw "collect_arrays got if without matching types";
+      DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
     // check types
     if(!base_type_eq(array_type, if_expr.false_case().type(), ns))
     {
       prop.error() << a.pretty() << messaget::eom;
-      throw "collect_arrays got if without matching types";
+      DATA_INVARIANT(false, "collect_arrays got if without matching types");
     }
 
     arrays.make_union(a, if_expr.true_case());
@@ -175,9 +180,10 @@ void arrayst::collect_arrays(const exprt &a)
   }
   else if(a.id()==ID_member)
   {
-    if(to_member_expr(a).struct_op().id()!=ID_symbol)
-      throw
-        "unexpected array expression: member with `"+a.op0().id_string()+"'";
+    DATA_INVARIANT(
+      to_member_expr(a).struct_op().id()==ID_symbol,
+      ("unexpected array expression: member with `"+
+       a.op0().id_string()+"'").c_str());
   }
   else if(a.id()==ID_constant ||
           a.id()==ID_array ||
@@ -190,20 +196,24 @@ void arrayst::collect_arrays(const exprt &a)
   else if(a.id()==ID_byte_update_little_endian ||
           a.id()==ID_byte_update_big_endian)
   {
-    assert(0);
+    DATA_INVARIANT(
+      false,
+      "byte_update should be removed before collect_arrays");
   }
   else if(a.id()==ID_typecast)
   {
     // cast between array types?
-    assert(a.operands().size()==1);
+    DATA_INVARIANT(
+      a.operands().size()==1,
+      "typecast must have one operand");
 
-    if(a.op0().type().id()==ID_array)
-    {
-      arrays.make_union(a, a.op0());
-      collect_arrays(a.op0());
-    }
-    else
-      throw "unexpected array type cast from "+a.op0().type().id_string();
+    DATA_INVARIANT(
+      a.op0().type().id()==ID_array,
+      ("unexpected array type cast from "+
+       a.op0().type().id_string()).c_str());
+
+    arrays.make_union(a, a.op0());
+    collect_arrays(a.op0());
   }
   else if(a.id()==ID_index)
   {
@@ -212,7 +222,12 @@ void arrayst::collect_arrays(const exprt &a)
     collect_arrays(a.op0());
   }
   else
-    throw "unexpected array expression (collect_arrays): `"+a.id_string()+"'";
+  {
+    DATA_INVARIANT(
+      false,
+      ("unexpected array expression (collect_arrays): `"+
+       a.id_string()+"'").c_str());
+  }
 }
 
 /// adds array constraints (refine=true...lazily for the refinement loop)
@@ -349,7 +364,7 @@ void arrayst::update_index_map(std::size_t i)
     return;
 
   std::size_t root_number=arrays.find_number(i);
-  assert(root_number!=i);
+  INVARIANT(root_number!=i, "is_root_number incorrect?");
 
   index_sett &root_index_set=index_map[root_number];
   index_sett &index_set=index_map[i];
@@ -407,7 +422,9 @@ void arrayst::add_array_constraints_equality(
     const typet &subtype2=ns.follow(array_equality.f2.type()).subtype();
     index_exprt index_expr2(array_equality.f2, index, subtype2);
 
-    assert(index_expr1.type()==index_expr2.type());
+    DATA_INVARIANT(
+      index_expr1.type()==index_expr2.type(),
+      "array elements should all have same type");
 
     array_equalityt equal;
     equal.f1 = index_expr1;
@@ -449,12 +466,14 @@ void arrayst::add_array_constraints(
   else if(expr.id()==ID_byte_update_little_endian ||
           expr.id()==ID_byte_update_big_endian)
   {
-    assert(0);
+    INVARIANT(false, "byte_update should be removed before arrayst");
   }
   else if(expr.id()==ID_typecast)
   {
     // we got a=(type[])b
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size()==1,
+      "typecast should have one operand");
 
     // add a[i]=b[i]
     for(const auto &index : index_set)
@@ -463,7 +482,9 @@ void arrayst::add_array_constraints(
       index_exprt index_expr1(expr, index, subtype);
       index_exprt index_expr2(expr.op0(), index, subtype);
 
-      assert(index_expr1.type()==index_expr2.type());
+      DATA_INVARIANT(
+        index_expr1.type()==index_expr2.type(),
+        "array elements should all have same type");
 
       // add constraint
       lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
@@ -475,9 +496,12 @@ void arrayst::add_array_constraints(
   {
   }
   else
-    throw
-      "unexpected array expression (add_array_constraints): `"+
-        expr.id_string()+"'";
+  {
+    DATA_INVARIANT(
+      false,
+      ("unexpected array expression (add_array_constraints): `"+
+       expr.id_string()+"'").c_str());
+  }
 }
 
 void arrayst::add_array_constraints_with(
@@ -496,7 +520,9 @@ void arrayst::add_array_constraints_with(
     if(index_expr.type()!=value.type())
     {
       prop.error() << expr.pretty() << messaget::eom;
-      throw "index_expr and value types should match";
+      DATA_INVARIANT(
+        false,
+        "with-expression operand should match array element type");
     }
 
     lazy_constraintt lazy(
@@ -564,7 +590,9 @@ void arrayst::add_array_constraints_update(
     if(index_expr.type()!=value.type())
     {
       prop.error() << expr.pretty() << messaget::eom;
-      throw "index_expr and value types should match";
+      DATA_INVARIANT(
+        false,
+        "update operand should match array element type");
     }
 
     set_to_true(equal_exprt(index_expr, value));
@@ -619,7 +647,9 @@ void arrayst::add_array_constraints_array_of(
     const typet &subtype=ns.follow(expr.type()).subtype();
     index_exprt index_expr(expr, index, subtype);
 
-    assert(base_type_eq(index_expr.type(), expr.op0().type(), ns));
+    DATA_INVARIANT(
+      base_type_eq(index_expr.type(), expr.op0().type(), ns),
+      "array_of operand type should match array element type");
 
     // add constraint
     lazy_constraintt lazy(
