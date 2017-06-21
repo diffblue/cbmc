@@ -55,8 +55,8 @@ exprt get_magnitude(const exprt &src, const ieee_float_spect &spec)
 exprt get_significand(
   const exprt &src, const ieee_float_spect &spec, const typet &type)
 {
-  assert(type.id()==ID_unsignedbv);
-  assert(to_unsignedbv_type(type).get_width()>spec.f);
+  PRECONDITION(type.id()==ID_unsignedbv);
+  PRECONDITION(to_unsignedbv_type(type).get_width()>spec.f);
   typecast_exprt magnitude(get_magnitude(src, spec), type);
   exprt exponent=get_exponent(src, spec);
   equal_exprt all_zeros(exponent, from_integer(0, exponent.type()));
@@ -71,14 +71,11 @@ exprt constant_float(const double f, const ieee_float_spect &float_spec)
 {
   ieee_floatt fl(float_spec);
   if(float_spec==ieee_float_spect::single_precision())
-  {
     fl.from_float(f);
-  }
-  else
-  {
-    assert(float_spec==ieee_float_spect::double_precision());
+  else if(float_spec==ieee_float_spect::double_precision())
     fl.from_double(f);
-  }
+  else
+    UNREACHABLE;
   return fl.to_expr();
 }
 
@@ -99,8 +96,8 @@ exprt round_expr_to_zero(const exprt &f)
 /// \return An expression representing floating point multiplication.
 exprt floatbv_mult(const exprt &f, const exprt &g)
 {
+  PRECONDITION(f.type()==g.type());
   ieee_floatt::rounding_modet rounding=ieee_floatt::ROUND_TO_EVEN;
-  assert(f.type()==g.type());
   exprt mult(ID_floatbv_mult, f.type());
   mult.copy_to_operands(f);
   mult.copy_to_operands(g);
@@ -209,9 +206,9 @@ string_exprt string_constraint_generatort::add_axioms_from_float(
 string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
     const exprt &i, size_t max_size, const refined_string_typet &ref_type)
 {
-  string_exprt res=fresh_string(ref_type);
+  PRECONDITION(i.type().id()==ID_signedbv);
   const typet &type=i.type();
-  assert(type.id()==ID_signedbv);
+  string_exprt res=fresh_string(ref_type);
   exprt ten=from_integer(10, type);
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
