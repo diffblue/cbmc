@@ -53,7 +53,7 @@ Comments:
   Note that the `\file` tag must be immediately followed by a newline in
   order for Doxygen to relate the comment to the current file.
   
-- Each function should be preceeded by a Doxygen comment describing
+- Each function should be preceded by a Doxygen comment describing
   that function. The format should match the
   [LLVM guidelines](http://llvm.org/docs/CodingStandards.html#doxygen-use-in-documentation-comments),
   with one extension: `\param` and `\return` comments longer than a
@@ -64,18 +64,24 @@ Comments:
   /// This sentence, until the first dot followed by whitespace, becomes
   /// the brief description. More detailed text follows. Feel free to
   /// break this into paragraphs to aid readability.
-  /// \param arg_name: This argument doesn't need much description
-  /// \param long_arg_name: This argument requires a lot of explanation,
-  ///   which means that this line is indented an extra couple of spaces,
-  ///   as is this one.
-  /// \return The return value is literally value returned by the
-  ///   function. For out-parameters, use \param [out].
-  return_typet my_function(argt arg_name, argt long_arg_name);
+  /// \param arg_name: This parameter doesn't need much description
+  /// \param [out] long_arg_name: This parameter is mutated by the function.
+  ///   Extra info about the parameter gets indented an extra two columns,
+  ///   like this.
+  /// \return The return value is literally the value returned by the
+  ///   function. For out-parameters, use "\param [out]".
+  return_typet my_function(argt arg_name, argt &long_arg_name);
   ```
   
 - The priority of documentation is readability. Therefore, feel free
   to use Doxygen features, or to add whitespace for multi-paragraph
   comment blocks if necessary.
+  
+- Prefer to place documentation in headers. This makes it easier for
+  clients of your code to understand your interfaces, without having
+  to cross-reference between the header and source file. Entities which
+  are not declared in any header should still be documented where they
+  are defined.
   
 - The documentation block must *immediately* precede the entity it
   documents. Don't insert empty lines between docs and functions,
