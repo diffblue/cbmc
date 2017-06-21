@@ -145,6 +145,11 @@ private:
   string_exprt add_axioms_for_copy(const function_application_exprt &f);
   string_exprt add_axioms_for_concat(
     const string_exprt &s1, const string_exprt &s2);
+  string_exprt add_axioms_for_concat_substr(
+    const string_exprt &s1,
+    const string_exprt &s2,
+    const exprt &start_index,
+    const exprt &end_index);
   string_exprt add_axioms_for_concat(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_int(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_long(const function_application_exprt &f);
