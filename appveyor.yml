@@ -109,6 +109,7 @@ test_script:
     rmdir /s /q cbmc-java\classpath1
     rmdir /s /q cbmc-java\jar-file3
     rmdir /s /q cbmc-java\tableswitch2
+    rmdir /s /q goto-gcc
     rmdir /s /q goto-instrument\slice08
 
     make test

@@ -45,13 +45,15 @@ protected:
     const std::string &dest,
     bool act_as_bcc);
 
-  int run_gcc(); // call gcc with original command line
+  /// \brief call gcc with original command line
+  int run_gcc(const symbol_tablet &symbol_table);
 
-  int gcc_hybrid_binary();
+  int gcc_hybrid_binary(const symbol_tablet &symbol_table);
 
   int asm_output(
     bool act_as_bcc,
-    const std::list<std::string> &preprocessed_source_files);
+    const std::list<std::string> &preprocessed_source_files,
+    const symbol_tablet &symbol_table);
 
   static bool needs_preprocessing(const std::string &);
 };
