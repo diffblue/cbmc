@@ -18,6 +18,8 @@ Date: June 2006
 
 #include "goto_cc_mode.h"
 
+class compilet;
+
 class gcc_modet:public goto_cc_modet
 {
 public:
@@ -45,13 +47,15 @@ protected:
     const std::string &dest,
     bool act_as_bcc);
 
-  int run_gcc(); // call gcc with original command line
+  /// \brief call gcc with original command line
+  int run_gcc(const compilet &compiler);
 
-  int gcc_hybrid_binary();
+  int gcc_hybrid_binary(const compilet &compiler);
 
   int asm_output(
     bool act_as_bcc,
-    const std::list<std::string> &preprocessed_source_files);
+    const std::list<std::string> &preprocessed_source_files,
+    const compilet &compiler);
 
   static bool needs_preprocessing(const std::string &);
 };
