@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Generate Equation using Symbolic Execution
+
 #ifndef CPROVER_GOTO_SYMEX_POSTCONDITION_H
 #define CPROVER_GOTO_SYMEX_POSTCONDITION_H
 

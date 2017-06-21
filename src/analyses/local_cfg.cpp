@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CFG for One Function
+
 #if 0
 #include <iterator>
 #include <algorithm>
@@ -14,24 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/expr_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <langapi/language_util.h>
 
 #endif
 
 #include "local_cfg.h"
-
-/*******************************************************************\
-
-Function: local_cfgt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void local_cfgt::build(const goto_programt &goto_program)
 {

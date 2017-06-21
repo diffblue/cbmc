@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Misc Utilities
+
 #include <cstdio>
 
 #ifdef _WIN32
@@ -15,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "c_misc.h"
-
-/*******************************************************************\
-
-Function: MetaChar
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void MetaChar(std::string &out, char c, bool inString)
 {
@@ -102,18 +93,6 @@ static void MetaChar(std::string &out, char c, bool inString)
 }
 
 #if 0
-/*******************************************************************\
-
-Function: MetaChar
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static std::string MetaChar(char c)
 {
   std::string result;
@@ -121,18 +100,6 @@ static std::string MetaChar(char c)
   return result;
 }
 #endif
-
-/*******************************************************************\
-
-Function: MetaString
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string MetaString(const std::string &in)
 {

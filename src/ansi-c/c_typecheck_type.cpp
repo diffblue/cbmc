@@ -6,8 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <unordered_set>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
@@ -15,25 +19,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 
 #include "c_typecheck_base.h"
-#include "c_types.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"
 #include "padding.h"
 #include "type2name.h"
 #include "ansi_c_convert_type.h"
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_type(typet &type)
 {
@@ -134,39 +125,74 @@ void c_typecheck_baset::typecheck_type(typet &type)
       typet result;
 
       if(mode=="__QI__") // 8 bits
-        result=is_signed?signed_char_type():unsigned_char_type();
+        if(is_signed)
+          result=signed_char_type();
+        else
+          result=unsigned_char_type();
       else if(mode=="__byte__") // 8 bits
-        result=is_signed?signed_char_type():unsigned_char_type();
+        if(is_signed)
+          result=signed_char_type();
+        else
+          result=unsigned_char_type();
       else if(mode=="__HI__") // 16 bits
-        result=is_signed?signed_short_int_type():unsigned_short_int_type();
+        if(is_signed)
+          result=signed_short_int_type();
+        else
+          result=unsigned_short_int_type();
       else if(mode=="__SI__") // 32 bits
-        result=is_signed?signed_int_type():unsigned_int_type();
+        if(is_signed)
+          result=signed_int_type();
+        else
+          result=unsigned_int_type();
       else if(mode=="__word__") // long int, we think
-        result=is_signed?signed_long_int_type():unsigned_long_int_type();
+        if(is_signed)
+          result=signed_long_int_type();
+        else
+          result=unsigned_long_int_type();
       else if(mode=="__pointer__") // we think this is size_t/ssize_t
-        result=is_signed?signed_size_type():size_type();
+        if(is_signed)
+          result=signed_size_type();
+        else
+          result=size_type();
       else if(mode=="__DI__") // 64 bits
       {
         if(config.ansi_c.long_int_width==64)
-          result=is_signed?signed_long_int_type():unsigned_long_int_type();
+          if(is_signed)
+            result=signed_long_int_type();
+          else
+            result=unsigned_long_int_type();
         else
         {
           assert(config.ansi_c.long_long_int_width==64);
-          result=
-            is_signed?signed_long_long_int_type():unsigned_long_long_int_type();
+
+          if(is_signed)
+            result=signed_long_long_int_type();
+          else
+            result=unsigned_long_long_int_type();
         }
       }
       else if(mode=="__TI__") // 128 bits
-        result=is_signed?gcc_signed_int128_type():gcc_unsigned_int128_type();
+        if(is_signed)
+          result=gcc_signed_int128_type();
+        else
+          result=gcc_unsigned_int128_type();
       else if(mode=="__V2SI__") // vector of 2 ints, deprecated by gcc
-        result=
-          vector_typet(
-            is_signed?signed_int_type():unsigned_int_type(),
+        if(is_signed)
+          result=vector_typet(
+            signed_int_type(),
+            from_integer(2, size_type()));
+        else
+          result=vector_typet(
+            unsigned_int_type(),
             from_integer(2, size_type()));
       else if(mode=="__V4SI__") // vector of 4 ints, deprecated by gcc
-        result=
-          vector_typet(
-            is_signed?signed_int_type():unsigned_int_type(),
+        if(is_signed)
+          result=vector_typet(
+            signed_int_type(),
+            from_integer(4, size_type()));
+        else
+          result=vector_typet(
+            unsigned_int_type(),
             from_integer(4, size_type()));
       else // give up, just use subtype
         result=type.subtype();
@@ -254,18 +280,6 @@ void c_typecheck_baset::typecheck_type(typet &type)
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_custom_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_custom_type(typet &type)
 {
@@ -367,18 +381,6 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     assert(false);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_code_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
 {
   // the return type is still 'subtype()'
@@ -426,7 +428,7 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
         irep_idt identifier=declaration.declarator().get_name();
 
         // abstract or not?
-        if(identifier==irep_idt())
+        if(identifier.empty())
         {
           // abstract
           parameter.add_source_location()=declaration.type().source_location();
@@ -477,18 +479,6 @@ void c_typecheck_baset::typecheck_code_type(code_typet &type)
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_array_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_array_type(array_typet &type)
 {
@@ -560,7 +550,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     {
       // not a constant and not infinity
 
-      assert(current_symbol_id!=irep_idt());
+      assert(!current_symbol_id.empty());
 
       const symbolt &base_symbol=lookup(current_symbol_id);
 
@@ -615,18 +605,6 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_vector_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 {
@@ -708,18 +686,6 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
 
   type.size()=from_integer(s, signed_size_type());
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_compound_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 {
@@ -833,18 +799,6 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   original_qualifiers.write(type);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_compound_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_compound_body(
   struct_union_typet &type)
 {
@@ -908,7 +862,7 @@ void c_typecheck_baset::typecheck_compound_body(
   // scan for anonymous members, and name them
   for(auto &member : components)
   {
-    if(member.get_name()!=irep_idt())
+    if(!member.get_name().empty())
       continue;
 
     member.set_name("$anon"+std::to_string(anon_member_counter++));
@@ -1021,18 +975,6 @@ void c_typecheck_baset::typecheck_compound_body(
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::enum_constant_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 typet c_typecheck_baset::enum_constant_type(
   const mp_integer &min_value,
   const mp_integer &max_value) const
@@ -1064,18 +1006,6 @@ typet c_typecheck_baset::enum_constant_type(
       return signed_long_long_int_type();
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::enum_underlying_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet c_typecheck_baset::enum_underlying_type(
   const mp_integer &min_value,
@@ -1134,18 +1064,6 @@ typet c_typecheck_baset::enum_underlying_type(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_enum_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_c_enum_type(typet &type)
 {
@@ -1330,18 +1248,6 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
   type.set(ID_identifier, identifier);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_enum_tag_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
 {
   // It's just a tag.
@@ -1400,18 +1306,6 @@ void c_typecheck_baset::typecheck_c_enum_tag_type(c_enum_tag_typet &type)
   type.remove(ID_tag);
   type.set_identifier(identifier);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_c_bit_field_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
 {
@@ -1493,18 +1387,6 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_typeof_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
   // save location
@@ -1541,18 +1423,6 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   type.add_source_location()=source_location;
   c_qualifiers.write(type);
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::typecheck_symbol_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::typecheck_symbol_type(typet &type)
 {
@@ -1607,18 +1477,6 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
     type=integer_typet();
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::adjust_function_parameter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {

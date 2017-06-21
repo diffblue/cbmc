@@ -18,18 +18,6 @@ Date: June 2003
 #include "goto_convert_functions.h"
 #include "goto_inline.h"
 
-/*******************************************************************\
-
-Function: goto_convert_functionst::goto_convert_functionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_convert_functionst::goto_convert_functionst(
   symbol_tablet &_symbol_table,
   goto_functionst &_functions,
@@ -39,33 +27,9 @@ goto_convert_functionst::goto_convert_functionst(
 {
 }
 
-/*******************************************************************\
-
-Function: goto_convert_functionst::~goto_convert_functionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_convert_functionst::~goto_convert_functionst()
 {
 }
-
-/*******************************************************************\
-
-Function: goto_convert_functionst::goto_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convert_functionst::goto_convert()
 {
@@ -105,18 +69,6 @@ void goto_convert_functionst::goto_convert()
   #endif
 }
 
-/*******************************************************************\
-
-Function: goto_convert_functionst::hide
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_convert_functionst::hide(const goto_programt &goto_program)
 {
   forall_goto_program_instructions(i_it, goto_program)
@@ -128,18 +80,6 @@ bool goto_convert_functionst::hide(const goto_programt &goto_program)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_convert_functionst::add_return
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convert_functionst::add_return(
   goto_functionst::goto_functiont &f,
@@ -193,18 +133,6 @@ void goto_convert_functionst::add_return(
   t->code=code_returnt(rhs);
   t->source_location=source_location;
 }
-
-/*******************************************************************\
-
-Function: goto_convert_functionst::convert_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convert_functionst::convert_function(const irep_idt &identifier)
 {
@@ -292,18 +220,6 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
     f.make_hidden();
 }
 
-/*******************************************************************\
-
-Function: goto_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convert(
   symbol_tablet &symbol_table,
   goto_modelt &goto_model,
@@ -313,23 +229,14 @@ void goto_convert(
   goto_model.symbol_table.swap(symbol_table);
 }
 
-/*******************************************************************\
-
-Function: goto_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convert(
   symbol_tablet &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
 
@@ -341,33 +248,21 @@ void goto_convert(
   catch(int)
   {
     goto_convert_functions.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }
-
-/*******************************************************************\
-
-Function: goto_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convert(
   const irep_idt &identifier,
@@ -375,6 +270,9 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &message_handler)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   goto_convert_functionst goto_convert_functions(
     symbol_table, functions, message_handler);
 
@@ -386,18 +284,18 @@ void goto_convert(
   catch(int)
   {
     goto_convert_functions.error();
-    throw 0;
   }
 
   catch(const char *e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
 
   catch(const std::string &e)
   {
     goto_convert_functions.error() << e << messaget::eom;
-    throw 0;
   }
+
+  if(message_handler.get_message_count(messaget::M_ERROR)!=errors_before)
+    throw 0;
 }

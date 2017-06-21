@@ -9,23 +9,17 @@ Date: August 2013
 
 \*******************************************************************/
 
+/// \file
+/// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
+
 #include <cassert>
+
+#include <util/json.h>
+#include <util/json_expr.h>
 
 #include "goto_rw.h"
 
 #include "dependence_graph.h"
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::merge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool dep_graph_domaint::merge(
   const dep_graph_domaint &src,
@@ -65,18 +59,6 @@ bool dep_graph_domaint::merge(
 
   return changed;
 }
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::control_dependencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dep_graph_domaint::control_dependencies(
   goto_programt::const_targett from,
@@ -144,18 +126,6 @@ void dep_graph_domaint::control_dependencies(
     dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, to);
 }
 
-/*******************************************************************\
-
-Function: may_be_def_use_pair
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool may_be_def_use_pair(
   const mp_integer &w_start,
   const mp_integer &w_end,
@@ -176,18 +146,6 @@ static bool may_be_def_use_pair(
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: dep_graph_domaint::data_depdendencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dep_graph_domaint::data_dependencies(
   goto_programt::const_targett from,
@@ -238,18 +196,6 @@ void dep_graph_domaint::data_dependencies(
   }
 }
 
-/*******************************************************************\
-
-Function: dep_graph_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dep_graph_domaint::transform(
   goto_programt::const_targett from,
   goto_programt::const_targett to,
@@ -297,18 +243,6 @@ void dep_graph_domaint::transform(
   data_dependencies(from, to, *dep_graph, ns);
 }
 
-/*******************************************************************\
-
-Function: dep_graph_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dep_graph_domaint::output(
   std::ostream &out,
   const ai_baset &ai,
@@ -326,7 +260,7 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 
   if(!data_deps.empty())
@@ -341,21 +275,40 @@ void dep_graph_domaint::output(
         out << ",";
       out << (*it)->location_number;
     }
-    out << std::endl;
+    out << '\n';
   }
 }
 
-/*******************************************************************\
+/// Outputs the current value of the domain.
+/// \par parameters: The abstract interpreter and the namespace.
+/// \return The domain, formatted as a JSON object.
+jsont dep_graph_domaint::output_json(
+  const ai_baset &ai,
+  const namespacet &ns) const
+{
+  json_arrayt graph;
 
-Function: dependence_grapht::add_dep
+  for(const auto &cd : control_deps)
+  {
+    json_objectt &link=graph.push_back().make_object();
+    link["locationNumber"]=
+      json_numbert(std::to_string(cd->location_number));
+    link["sourceLocation"]=json(cd->source_location);
+    link["type"]=json_stringt("control");
+  }
 
-  Inputs:
+  for(const auto &dd : data_deps)
+  {
+    json_objectt &link=graph.push_back().make_object();
+    link["locationNumber"]=
+      json_numbert(std::to_string(dd->location_number));
+    link["sourceLocation"]=json(dd->source_location);
+      json_stringt(dd->source_location.as_string());
+    link["type"]=json_stringt("data");
+  }
 
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+  return graph;
+}
 
 void dependence_grapht::add_dep(
   dep_edget::kindt kind,

@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_reduction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt boolbvt::convert_reduction(const unary_exprt &expr)
 {
@@ -59,18 +48,6 @@ literalt boolbvt::convert_reduction(const unary_exprt &expr)
 
   return l;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_bv_reduction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_bv_reduction(const unary_exprt &expr)
 {

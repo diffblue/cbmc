@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set
+
 #ifndef CPROVER_UTIL_REF_EXPR_SET_H
 #define CPROVER_UTIL_REF_EXPR_SET_H
 

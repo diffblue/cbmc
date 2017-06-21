@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_REPLACE_SYMBOL_H
 #define CPROVER_UTIL_REPLACE_SYMBOL_H
 
@@ -54,6 +55,11 @@ public:
   {
     expr_map.clear();
     type_map.clear();
+  }
+
+  bool empty() const
+  {
+    return expr_map.empty() && type_map.empty();
   }
 
   replace_symbolt();

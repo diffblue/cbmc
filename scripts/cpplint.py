@@ -235,6 +235,7 @@ _ERROR_CATEGORIES = [
     'readability/function_comment'
     'runtime/arrays',
     'runtime/casting',
+    'runtime/endl',
     'runtime/explicit',
     'runtime/int',
     'runtime/init',
@@ -4628,6 +4629,27 @@ def CheckAltTokens(filename, clean_lines, linenum, error):
               _ALT_TOKEN_REPLACEMENT[match.group(1)], match.group(1)))
 
 
+def CheckAssert(filename, clean_lines, linenum, error):
+  """Check for uses of assert.
+
+  Args:
+    filename: The name of the current file.
+    clean_lines: A CleansedLines instance containing the file.
+    linenum: The number of the line to check.
+    error: The function to call with any errors found.
+  """
+  line = clean_lines.elided[linenum]
+  match = Match(r'.*\s+assert\(.*\).*', line)
+  if match:
+    if Match(r'.*\s+assert\((0|false)\).*', line):
+      error(filename, linenum, 'build/deprecated', 4,
+            'assert is deprecated, use UNREACHABLE instead')
+    else:
+      error(filename, linenum, 'build/deprecated', 4,
+            'assert is deprecated, use INVARIANT, PRECONDITION, CHECK_RETURN, etc. instead')
+
+
+
 def GetLineWidth(line):
   """Determines the width of the line in column positions.
 
@@ -4852,6 +4874,7 @@ def CheckStyle(filename, clean_lines, linenum, file_extension, nesting_state,
   CheckSpacingForFunctionCall(filename, clean_lines, linenum, error)
   CheckCheck(filename, clean_lines, linenum, error)
   CheckAltTokens(filename, clean_lines, linenum, error)
+  CheckAssert(filename, clean_lines, linenum, error)
   classinfo = nesting_state.InnermostClass()
   if classinfo:
     CheckSectionSpacing(filename, clean_lines, classinfo, linenum, error)
@@ -6198,6 +6221,12 @@ def CheckNamespaceOrUsing(filename, clean_lines, linenum, error):
     error(filename, linenum, 'readability/namespace', 4,
           'Do not use using')
 
+def CheckForEndl(filename, clean_lines, linenum, error):
+  """Check that the line does not contain std::endl."""
+  line = clean_lines.elided[linenum]
+  if Match(r'[^a-zA-Z0-9_]*std::endl[^a-zA-Z0-9_]*', line):
+    error(filename, linenum, 'runtime/endl', 4, 'Do not use std::endl')
+
 def ProcessLine(filename, file_extension, clean_lines, line,
                 include_state, function_state, nesting_state, error,
                 extra_check_functions=[]):
@@ -6239,6 +6268,7 @@ def ProcessLine(filename, file_extension, clean_lines, line,
   CheckMakePairUsesDeduction(filename, clean_lines, line, error)
   CheckRedundantVirtual(filename, clean_lines, line, error)
   CheckNamespaceOrUsing(filename, clean_lines, line, error)
+  CheckForEndl(filename, clean_lines, line, error)
   for check_fn in extra_check_functions:
     check_fn(filename, clean_lines, line, error)
 
@@ -6463,7 +6493,10 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   _BackupFilters()
 
 #exclude these files:
-  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp|builtin_headers)$', filename):
+  if Search(r'(\.l|\.y|\.inc|\.d|\.o|y\.tab\.cpp|\.tab\.h|\.yy\.cpp)$', filename):
+    return
+
+  if Search(r'_builtin_headers_[a-z0-9_-]+\.h$', filename):
     return
 
   if not ProcessConfigOverrides(filename):

@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <ostream>
 
 #include "template_map.h"
-
-/*******************************************************************\
-
-Function: template_mapt::apply
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void template_mapt::apply(typet &type) const
 {
@@ -74,18 +65,6 @@ void template_mapt::apply(typet &type) const
   }
 }
 
-/*******************************************************************\
-
-Function: template_mapt::apply
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void template_mapt::apply(exprt &expr) const
 {
   apply(expr.type());
@@ -105,18 +84,6 @@ void template_mapt::apply(exprt &expr) const
   Forall_operands(it, expr)
     apply(*it);
 }
-
-/*******************************************************************\
-
-Function: template_mapt::lookup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt template_mapt::lookup(const irep_idt &identifier) const
 {
@@ -139,18 +106,6 @@ exprt template_mapt::lookup(const irep_idt &identifier) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-/*******************************************************************\
-
-Function: template_mapt::lookup_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 typet template_mapt::lookup_type(const irep_idt &identifier) const
 {
   type_mapt::const_iterator t_it=
@@ -161,18 +116,6 @@ typet template_mapt::lookup_type(const irep_idt &identifier) const
 
   return static_cast<const typet &>(get_nil_irep());
 }
-
-/*******************************************************************\
-
-Function: template_mapt::lookup_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt template_mapt::lookup_expr(const irep_idt &identifier) const
 {
@@ -185,42 +128,18 @@ exprt template_mapt::lookup_expr(const irep_idt &identifier) const
   return static_cast<const exprt &>(get_nil_irep());
 }
 
-/*******************************************************************\
-
-Function: template_mapt::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void template_mapt::print(std::ostream &out) const
 {
   for(type_mapt::const_iterator it=type_map.begin();
       it!=type_map.end();
       it++)
-    out << it->first << " = " << it->second.pretty() << std::endl;
+    out << it->first << " = " << it->second.pretty() << '\n';
 
   for(expr_mapt::const_iterator it=expr_map.begin();
       it!=expr_map.end();
       it++)
-    out << it->first << " = " << it->second.pretty() << std::endl;
+    out << it->first << " = " << it->second.pretty() << '\n';
 }
-
-/*******************************************************************\
-
-Function: template_mapt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void template_mapt::build(
   const template_typet &template_type,
@@ -264,18 +183,6 @@ void template_mapt::build(
   }
 }
 
-/*******************************************************************\
-
-Function: template_mapt::set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void template_mapt::set(
   const template_parametert &parameter,
   const exprt &value)
@@ -301,18 +208,6 @@ void template_mapt::set(
     expr_map[identifier]=value;
   }
 }
-
-/*******************************************************************\
-
-Function: template_mapt::build_unassigned
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void template_mapt::build_unassigned(
   const template_typet &template_type)
@@ -343,18 +238,6 @@ void template_mapt::build_unassigned(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: template_mapt::build_template_args
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 cpp_template_args_tct template_mapt::build_template_args(
   const template_typet &template_type) const

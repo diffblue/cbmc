@@ -1,3 +1,14 @@
+/*******************************************************************\
+
+Module:
+
+Author: Daniel Kroening, kroening@kroening.com
+
+\*******************************************************************/
+
+#ifndef CPROVER_ANSI_C_LIBRARY_CPROVER_H
+#define CPROVER_ANSI_C_LIBRARY_CPROVER_H
+
 typedef __typeof__(sizeof(int)) __CPROVER_size_t;
 void *__CPROVER_malloc(__CPROVER_size_t size);
 extern const void *__CPROVER_deallocated;
@@ -41,11 +52,13 @@ void CBMC_trace(int lvl, const char *event, ...);
 #endif
 
 // pointers
-//unsigned __CPROVER_POINTER_OBJECT(const void *p);
+unsigned __CPROVER_POINTER_OBJECT(const void *p);
 signed __CPROVER_POINTER_OFFSET(const void *p);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 #if 0
 extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];
+void __CPROVER_allocated_memory(
+  __CPROVER_size_t address, __CPROVER_size_t extent);
 
 // this is ANSI-C
 extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];
@@ -91,7 +104,8 @@ float __CPROVER_fabsf(float);
 // arrays
 //__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);
 void __CPROVER_array_copy(const void *dest, const void *src);
-//void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_set(const void *dest, ...);
+void __CPROVER_array_replace(const void *dest, const void *src);
 
 #if 0
 // k-induction
@@ -130,3 +144,5 @@ __CPROVER_bool __CPROVER_get_may(const void *, const char *);
 #define __CPROVER_danger_max_solution_size 1
 #define __CPROVER_danger_number_of_vars 1
 #define __CPROVER_danger_number_of_consts 1
+
+#endif // CPROVER_ANSI_C_LIBRARY_CPROVER_H

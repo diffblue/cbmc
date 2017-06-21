@@ -6,9 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef _MSC_VER
 #include <inttypes.h>
 #endif
+
+#include <signal.h>
+#include <unistd.h>
 
 #include <cassert>
 #include <stack>
@@ -24,18 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #error "Expected HAVE_MINISAT2"
 #endif
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
 {
   dest.capacity(bv.size());
@@ -44,18 +36,6 @@ void convert(const bvt &bv, Minisat::vec<Minisat::Lit> &dest)
     if(!it->is_false())
       dest.push(Minisat::mkLit(it->var_no(), it->sign()));
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
@@ -85,18 +65,6 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::set_polarity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
 {
@@ -105,51 +73,15 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   solver->setPolarity(a.var_no(), value);
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat_no_simplifiert::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_minisat_no_simplifiert::solver_text()
 {
   return "MiniSAT 2.2.1 without simplifier";
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat_simplifiert::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_minisat_simplifiert::solver_text()
 {
   return "MiniSAT 2.2.1 with simplifier";
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::add_variables
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 void satcheck_minisat2_baset<T>::add_variables()
@@ -157,18 +89,6 @@ void satcheck_minisat2_baset<T>::add_variables()
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
@@ -195,17 +115,16 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   clause_counter++;
 }
 
-/*******************************************************************\
+#ifndef _WIN32
 
-Function: satcheck_minisat2_baset::prop_solve
+static Minisat::Solver *solver_to_interrupt=nullptr;
 
-  Inputs:
+static void interrupt_solver(int signum)
+{
+  solver_to_interrupt->interrupt();
+}
 
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#endif
 
 template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
@@ -246,7 +165,45 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         Minisat::vec<Minisat::Lit> solver_assumptions;
         convert(assumptions, solver_assumptions);
 
-        if(solver->solve(solver_assumptions))
+        using Minisat::lbool;
+
+#ifndef _WIN32
+
+        void (*old_handler)(int)=SIG_ERR;
+
+        if(time_limit_seconds!=0)
+        {
+          solver_to_interrupt=solver;
+          old_handler=signal(SIGALRM, interrupt_solver);
+          if(old_handler==SIG_ERR)
+            warning() << "Failed to set solver time limit" << eom;
+          else
+            alarm(time_limit_seconds);
+        }
+
+        lbool solver_result=solver->solveLimited(solver_assumptions);
+
+        if(old_handler!=SIG_ERR)
+        {
+          alarm(0);
+          signal(SIGALRM, old_handler);
+          solver_to_interrupt=solver;
+        }
+
+#else // _WIN32
+
+        if(time_limit_seconds!=0)
+        {
+          messaget::warning() <<
+            "Time limit ignored (not supported on Win32 yet)" << messaget::eom;
+        }
+
+        lbool solver_result=
+          solver->solve(solver_assumptions) ? l_True : l_False;
+
+#endif
+
+        if(solver_result==l_True)
         {
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
@@ -254,10 +211,17 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }
-        else
+        else if(solver_result==l_False)
         {
           messaget::status() <<
             "SAT checker: instance is UNSATISFIABLE" << eom;
+        }
+        else
+        {
+          messaget::status() <<
+            "SAT checker: timed out or other error" << eom;
+          status=statust::ERROR;
+          return resultt::P_ERROR;
         }
       }
     }
@@ -274,18 +238,6 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::set_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 {
@@ -300,35 +252,11 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
   solver->model[v]=Minisat::lbool(value);
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::satcheck_minisat2_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 satcheck_minisat2_baset<T>::satcheck_minisat2_baset(T *_solver):
-  solver(_solver)
+  solver(_solver), time_limit_seconds(0)
 {
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::~satcheck_minisat2_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<>
 satcheck_minisat2_baset<Minisat::Solver>::~satcheck_minisat2_baset()
@@ -342,18 +270,6 @@ satcheck_minisat2_baset<Minisat::SimpSolver>::~satcheck_minisat2_baset()
   delete solver;
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::is_in_conflict
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 {
@@ -365,18 +281,6 @@ bool satcheck_minisat2_baset<T>::is_in_conflict(literalt a) const
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat2_baset::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
@@ -391,51 +295,15 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
     }
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():
   satcheck_minisat2_baset<Minisat::Solver>(new Minisat::Solver)
 {
 }
 
-/*******************************************************************\
-
-Function: satcheck_minisat_simplifiert::satcheck_minisat_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_minisat_simplifiert::satcheck_minisat_simplifiert():
   satcheck_minisat2_baset<Minisat::SimpSolver>(new Minisat::SimpSolver)
 {
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat_simplifiert::set_frozen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)
 {
@@ -445,18 +313,6 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
     solver->setFrozen(a.var_no(), true);
   }
 }
-
-/*******************************************************************\
-
-Function: satcheck_minisat_simplifiert::is_eliminated
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 {

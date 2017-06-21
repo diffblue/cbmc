@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Language Conversion
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -74,18 +77,6 @@ protected:
   void add_array_types();
 };
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_convert_classt::convert(const classt &c)
 {
   std::string qualified_classname="java::"+id2string(c.name);
@@ -95,7 +86,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
     return;
   }
 
-  class_typet class_type;
+  java_class_typet class_type;
 
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
@@ -106,6 +97,15 @@ void java_bytecode_convert_classt::convert(const classt &c)
       std::to_string(c.enum_elements+1));
     class_type.set(ID_enumeration, true);
   }
+
+  if(c.is_public)
+    class_type.set_access(ID_public);
+  else if(c.is_protected)
+    class_type.set_access(ID_protected);
+  else if(c.is_private)
+    class_type.set_access(ID_private);
+  else
+    class_type.set_access(ID_default);
 
   if(!c.extends.empty())
   {
@@ -171,18 +171,6 @@ void java_bytecode_convert_classt::convert(const classt &c)
     java_root_class(*class_symbol);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::generate_class_stub
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_convert_classt::generate_class_stub(
   const irep_idt &class_name)
 {
@@ -216,18 +204,6 @@ void java_bytecode_convert_classt::generate_class_stub(
     java_root_class(*class_symbol);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
@@ -289,18 +265,6 @@ void java_bytecode_convert_classt::convert(
       component.set_access(ID_default);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::add_array_types
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_classt::add_array_types()
 {
@@ -458,18 +422,6 @@ void java_bytecode_convert_classt::add_array_types()
     symbol_table.add(clone_symbol);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_class
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,

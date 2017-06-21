@@ -185,7 +185,6 @@ we can obtain a counterexample trace for the NULL-pointer dereference:
 checks:
 </p>
 
-<p>
 <table>
 <tr><td><code>--no-assertions</code></td>           <td>ignore user assertions</td>
 <tr><td><code>--bounds-check</code></td>            <td>add array bounds checks</td></tr>
@@ -198,15 +197,12 @@ checks:
 <tr><td><code>--uninitialized-check</code></td>     <td>add checks for uninitialized locals (experimental)</td></tr>
 <tr><td><code>--error-label <i>label</i></code></td><td>check that given label is unreachable</td></tr>
 </table>
-</p>
 
 <div class="box1">
 <div class="caption">Further Reading</div>
-<p>
 <ul>
-<li><a href="goto-cc.shtml">Integration into Build Systems with goto-cc</li>
+<li><a href="goto-cc.shtml">Integration into Build Systems with goto-cc</a></li>
 </ul>
-</p>
 </div>
 
 <!--#include virtual="footer.inc" -->

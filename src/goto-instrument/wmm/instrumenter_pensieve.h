@@ -6,6 +6,9 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// Instrumenter
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_INSTRUMENTER_PENSIEVE_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_INSTRUMENTER_PENSIEVE_H
 

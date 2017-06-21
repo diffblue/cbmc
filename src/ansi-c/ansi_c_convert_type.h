@@ -6,12 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Conversion
+
 #ifndef CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 #define CPROVER_ANSI_C_ANSI_C_CONVERT_TYPE_H
 
 #include <util/message.h>
 
-#include "c_types.h"
 #include "c_qualifiers.h"
 #include "c_storage_spec.h"
 

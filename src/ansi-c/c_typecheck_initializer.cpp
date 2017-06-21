@@ -6,8 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Conversion / Type Checking
+
 #include <util/arith_tools.h>
-#include <util/config.h>
+#include <util/c_types.h>
 #include <util/type_eq.h>
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
@@ -16,22 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include "c_types.h"
 #include "c_typecheck_base.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::do_initializer(
   exprt &initializer,
@@ -60,19 +50,7 @@ void c_typecheck_baset::do_initializer(
   initializer=result;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: initialize something of type `type' with given
-          value `value'
-
-\*******************************************************************/
-
+/// initialize something of type `type' with given value `value'
 exprt c_typecheck_baset::do_initializer_rec(
   const exprt &value,
   const typet &type,
@@ -230,18 +208,6 @@ exprt c_typecheck_baset::do_initializer_rec(
   return result;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::do_initializer(symbolt &symbol)
 {
   // this one doesn't need initialization
@@ -284,18 +250,6 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::designator_enter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::designator_enter(
   const typet &type,
@@ -394,18 +348,8 @@ void c_typecheck_baset::designator_enter(
   designator.push_entry(entry);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_designated_initializer
-
-  Inputs: pre-initialized result, designator
-
- Outputs: sets result
-
- Purpose:
-
-\*******************************************************************/
-
+/// \param pre:initialized result, designator
+/// \return sets result
 void c_typecheck_baset::do_designated_initializer(
   exprt &result,
   designatort &designator,
@@ -646,18 +590,6 @@ void c_typecheck_baset::do_designated_initializer(
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::increment_designator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::increment_designator(designatort &designator)
 {
   assert(!designator.empty());
@@ -705,18 +637,6 @@ void c_typecheck_baset::increment_designator(designatort &designator)
     assert(!designator.empty());
   }
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::make_designator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 designatort c_typecheck_baset::make_designator(
   const typet &src_type,
@@ -864,18 +784,6 @@ designatort c_typecheck_baset::make_designator(
 
   return designator;
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer_list
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt c_typecheck_baset::do_initializer_list(
   const exprt &value,

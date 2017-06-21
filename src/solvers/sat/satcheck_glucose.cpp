@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef _MSC_VER
 #include <inttypes.h>
 #endif
@@ -24,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #error "Expected HAVE_GLUCOSE"
 #endif
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(const bvt &bv, Glucose::vec<Glucose::Lit> &dest)
 {
   dest.capacity(bv.size());
@@ -44,18 +33,6 @@ void convert(const bvt &bv, Glucose::vec<Glucose::Lit> &dest)
     if(!it->is_false())
       dest.push(Glucose::mkLit(it->var_no(), it->sign()));
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 tvt satcheck_glucose_baset<T>::l_get(literalt a) const
@@ -85,18 +62,6 @@ tvt satcheck_glucose_baset<T>::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::set_polarity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 void satcheck_glucose_baset<T>::set_polarity(literalt a, bool value)
 {
@@ -105,51 +70,15 @@ void satcheck_glucose_baset<T>::set_polarity(literalt a, bool value)
   solver->setPolarity(a.var_no(), value);
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_no_simplifiert::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_glucose_no_simplifiert::solver_text()
 {
   return "Glucose Syrup without simplifier";
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_simplifiert::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_glucose_simplifiert::solver_text()
 {
   return "Glucose Syrup with simplifier";
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::add_variables
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 void satcheck_glucose_baset<T>::add_variables()
@@ -157,18 +86,6 @@ void satcheck_glucose_baset<T>::add_variables()
   while((unsigned)solver->nVars()<no_variables())
     solver->newVar();
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::lcnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
@@ -194,18 +111,6 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 
   clause_counter++;
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<typename T>
 propt::resultt satcheck_glucose_baset<T>::prop_solve()
@@ -265,18 +170,6 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
   return P_UNSATISFIABLE;
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::set_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 {
@@ -291,35 +184,11 @@ void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
   solver->model[v]=Glucose::lbool(value);
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::satcheck_glucose_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 satcheck_glucose_baset<T>::satcheck_glucose_baset(T *_solver):
   solver(_solver)
 {
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::~satcheck_glucose_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<>
 satcheck_glucose_baset<Glucose::Solver>::~satcheck_glucose_baset()
@@ -333,18 +202,6 @@ satcheck_glucose_baset<Glucose::SimpSolver>::~satcheck_glucose_baset()
   delete solver;
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::is_in_conflict
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 bool satcheck_glucose_baset<T>::is_in_conflict(literalt a) const
 {
@@ -357,18 +214,6 @@ bool satcheck_glucose_baset<T>::is_in_conflict(literalt a) const
   return false;
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_baset::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<typename T>
 void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
 {
@@ -378,51 +223,15 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert():
   satcheck_glucose_baset<Glucose::Solver>(new Glucose::Solver)
 {
 }
 
-/*******************************************************************\
-
-Function: satcheck_glucose_simplifiert::satcheck_glucose_simplifiert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_glucose_simplifiert::satcheck_glucose_simplifiert():
   satcheck_glucose_baset<Glucose::SimpSolver>(new Glucose::SimpSolver)
 {
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_simplifiert::set_frozen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_glucose_simplifiert::set_frozen(literalt a)
 {
@@ -432,18 +241,6 @@ void satcheck_glucose_simplifiert::set_frozen(literalt a)
     solver->setFrozen(a.var_no(), true);
   }
 }
-
-/*******************************************************************\
-
-Function: satcheck_glucose_simplifiert::is_eliminated
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool satcheck_glucose_simplifiert::is_eliminated(literalt a) const
 {

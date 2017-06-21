@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <ostream>
 
 #include <util/symbol_table.h>
@@ -17,18 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_parse_tree.h"
 
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::swap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parse_treet::classt::swap(
   classt &other)
 {
@@ -37,23 +26,14 @@ void java_bytecode_parse_treet::classt::swap(
   std::swap(other.is_enum, is_enum);
   std::swap(other.enum_elements, enum_elements);
   std::swap(other.is_abstract, is_abstract);
+  std::swap(other.is_public, is_public);
+  std::swap(other.is_protected, is_protected);
+  std::swap(other.is_private, is_private);
   other.implements.swap(implements);
   other.fields.swap(fields);
   other.methods.swap(methods);
   other.annotations.swap(annotations);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::classt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parse_treet::output(std::ostream &out) const
 {
@@ -65,18 +45,6 @@ void java_bytecode_parse_treet::output(std::ostream &out) const
       it++)
     out << "  " << *it << '\n';
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::classt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 {
@@ -113,18 +81,6 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
   out << '\n';
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::annotationt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 {
   symbol_tablet symbol_table;
@@ -150,18 +106,6 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::annotationt::element_value_pairt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
   std::ostream &out) const
 {
@@ -171,18 +115,6 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
   out << '"' << element_name << '"' << '=';
   out << expr2java(value, ns);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::methodt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 {
@@ -228,7 +160,7 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
   for(const auto &i : instructions)
   {
-    if(i.source_location.get_line()!=irep_idt())
+    if(!i.source_location.get_line().empty())
       out << "    // " << i.source_location << '\n';
 
     out << "    " << i.address << ": ";
@@ -262,18 +194,6 @@ void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 
   out << '\n';
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parse_treet::fieldt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parse_treet::fieldt::output(std::ostream &out) const
 {

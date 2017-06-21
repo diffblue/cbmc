@@ -9,6 +9,9 @@ Date: August 2013
 
 \*******************************************************************/
 
+/// \file
+/// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
+
 #ifndef CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 #define CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 
@@ -87,7 +90,11 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final;
 
-  void make_top() final
+  jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const override;
+
+  void make_top() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 

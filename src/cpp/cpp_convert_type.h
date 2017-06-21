@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Conversion
+
 #ifndef CPROVER_CPP_CPP_CONVERT_TYPE_H
 #define CPROVER_CPP_CPP_CONVERT_TYPE_H
 

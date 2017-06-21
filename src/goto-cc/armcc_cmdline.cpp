@@ -6,23 +6,17 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object to mimick ARM's armcc
+
 #include <cstring>
 #include <iostream>
 
 #include "armcc_cmdline.h"
 
-/*******************************************************************\
-
-Function: armcc_cmdlinet::parse
-
-  Inputs: argument count, argument strings
-
- Outputs: none
-
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
-
+/// parses the commandline options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 // see
 // http://infocenter.arm.com/help/topic/com.arm.doc.dui0472c/Cchbggjb.html
 
@@ -316,7 +310,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     else
     { // unrecognized option
       std::cout << "Warning: uninterpreted armcc option '"
-                << argv[i] << "'" << std::endl;
+                << argv[i] << "'\n";
     }
   }
 

@@ -8,6 +8,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// (naive) Fence insertion
+
 #ifndef CPROVER_MUSKETEER_FENCE_SHARED_H
 #define CPROVER_MUSKETEER_FENCE_SHARED_H
 

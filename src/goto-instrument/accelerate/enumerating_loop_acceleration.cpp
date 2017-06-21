@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <iostream>
 
 #include "enumerating_loop_acceleration.h"
@@ -22,7 +25,7 @@ bool enumerating_loop_accelerationt::accelerate(
   while(path_enumerator->next(path) && enumerated++!=path_limit)
   {
 #ifdef DEBUG
-    std::cout << "Found a path..." << std::endl;
+    std::cout << "Found a path...\n";
     namespacet ns(symbol_table);
 
     for(patht::iterator it = path.begin();
@@ -37,7 +40,7 @@ bool enumerating_loop_accelerationt::accelerate(
     {
       // We accelerated this path successfully -- return it.
 #ifdef DEBUG
-      std::cout << "Accelerated it" << std::endl;
+      std::cout << "Accelerated it\n";
 #endif
 
       accelerator.path.swap(path);
@@ -49,7 +52,7 @@ bool enumerating_loop_accelerationt::accelerate(
 
   // No more paths, or we hit the enumeration limit.
 #ifdef DEBUG
-  std::cout << "No more paths to accelerate!" << std::endl;
+  std::cout << "No more paths to accelerate!\n";
 #endif
 
   return false;

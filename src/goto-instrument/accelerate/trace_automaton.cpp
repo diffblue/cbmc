@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #include <utility>
 #include <iostream>
 
@@ -15,7 +18,7 @@ Author: Matt Lewis
 void trace_automatont::build()
 {
 #ifdef DEBUG
-  std::cout << "NTA:" << std::endl;
+  std::cout << "NTA:\n";
   nta.output(std::cout);
 #endif
 
@@ -23,7 +26,7 @@ void trace_automatont::build()
   // minimise();
 
 #ifdef DEBUG
-  std::cout << "DTA:" << std::endl;
+  std::cout << "DTA:\n";
   dta.output(std::cout);
 #endif
 }
@@ -90,9 +93,9 @@ void trace_automatont::add_path(patht &path)
   }
 
 #ifdef DEBUG
-  std::cout << std::endl;
+  std::cout << '\n';
 
-  std::cout << "Final state: " << state << std::endl;
+  std::cout << "Final state: " << state << '\n';
 #endif
 
   nta.set_accepting(state);
@@ -163,7 +166,7 @@ void trace_automatont::determinise()
 #ifdef DEBUG
   std::cout << "Produced DTA with " << dta.num_states << " states and "
             << dta.accept_states.size() << " accept states and "
-            << dta.count_transitions() << " transitions" << std::endl;
+            << dta.count_transitions() << " transitions\n";
 #endif
 }
 
@@ -242,7 +245,7 @@ statet trace_automatont::add_dstate(state_sett &s)
 #ifdef DEBUG
       std::cout << "NTA state " << *it
                 << " is accepting, so accepting DTA state "
-                << state_num << std::endl;
+                << state_num << '\n';
 #endif
 
       dta.set_accepting(state_num);
@@ -385,7 +388,7 @@ void automatont::reverse(goto_programt::targett epsilon)
   std::cout << "Reversing automaton, old init=" << init_state
             << ", new init=" << new_init << ", old accept="
             << *(accept_states.begin()) << '/' << accept_states.size()
-            << " new accept=" << init_state << std::endl;
+            << " new accept=" << init_state << '\n';
 
   accept_states.clear();
   set_accepting(init_state);
@@ -463,14 +466,14 @@ void trace_automatont::minimise()
 
 void automatont::output(std::ostream &str)
 {
-  str << "Init: " << init_state << std::endl;
+  str << "Init: " << init_state << '\n';
 
   str << "Accept states: ";
 
   for(const auto &state : accept_states)
     str << state << ' ';
 
-  str << std::endl;
+  str << '\n';
 
   for(unsigned int i=0; i < transitions.size(); ++i)
   {
@@ -479,7 +482,7 @@ void automatont::output(std::ostream &str)
       goto_programt::targett l=trans.first;
       statet j=trans.second;
 
-      str << i << " -- " << l->location_number << " --> " << j << std::endl;
+      str << i << " -- " << l->location_number << " --> " << j << '\n';
     }
   }
 }

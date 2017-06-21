@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_PROP_PROP_CONV_H
 #define CPROVER_SOLVERS_PROP_PROP_CONV_H
 
@@ -54,6 +55,9 @@ public:
   // returns true if an assumption is in the final conflict
   virtual bool is_in_conflict(literalt l) const;
   virtual bool has_is_in_conflict() const { return false; }
+
+  // Resource limits:
+  virtual void set_time_limit_seconds(uint32_t) {}
 };
 
 //
@@ -113,6 +117,11 @@ public:
 
   const cachet &get_cache() const { return cache; }
   const symbolst &get_symbols() const { return symbols; }
+
+  void set_time_limit_seconds(uint32_t lim) override
+  {
+    prop.set_time_limit_seconds(lim);
+  }
 
 protected:
   virtual void post_process();

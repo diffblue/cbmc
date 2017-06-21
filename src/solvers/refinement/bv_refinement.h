@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Abstraction Refinement Loop
+
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 

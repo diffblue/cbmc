@@ -6,6 +6,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// ILP construction for all cycles and resolution
+
 #include <util/graph.h>
 
 #include <sstream>
@@ -20,18 +23,6 @@ Author: Vincent Nimal
 #include "ilp.h"
 
 class abstract_eventt;
-
-/*******************************************************************\
-
-Function: fence_insertert::fence_cost
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 unsigned fence_insertert::fence_cost(fence_typet f) const
 {
@@ -52,18 +43,6 @@ unsigned fence_insertert::fence_cost(fence_typet f) const
   return 0;
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fence_insertert::compute()
 {
   compute_fence_options();
@@ -75,18 +54,6 @@ void fence_insertert::compute()
   else
     instrumenter.message.result() << "no cycle concerned" << messaget::eom;
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fence_insertert::preprocess()
 {
@@ -239,18 +206,6 @@ void fence_insertert::preprocess()
   }
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::mip_set_var
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void inline fence_insertert::mip_set_var(
   ilpt &ilp,
   unsigned &i)
@@ -353,18 +308,6 @@ void inline fence_insertert::mip_set_var(
 #endif
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::mip_set_cst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void inline fence_insertert::mip_set_cst(ilpt &ilp, unsigned &i)
 {
 #ifdef HAVE_GLPK
@@ -458,18 +401,6 @@ void inline fence_insertert::mip_set_cst(ilpt &ilp, unsigned &i)
   throw "sorry, musketeer requires glpk; please recompile musketeer with glpk";
 #endif
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::mip_fill_matrix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void inline fence_insertert::mip_fill_matrix(
   ilpt &ilp,
@@ -768,18 +699,6 @@ void inline fence_insertert::mip_fill_matrix(
 #endif
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::solve()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fence_insertert::solve()
 {
 #ifdef HAVE_GLPK
@@ -889,34 +808,10 @@ void fence_insertert::solve()
 #endif
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::import_freq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fence_insertert::import_freq()
 {
   /* TODO */
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::print_to_file
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fence_insertert::print_to_file()
 {
@@ -931,7 +826,7 @@ void fence_insertert::print_to_file()
 
     s << to_string(it->second) << "|" << first.source_location.get_file()
       << "|" << first.source_location.get_line() << "|"
-      << first.source_location.get_column() << std::endl;
+      << first.source_location.get_column() << '\n';
     non_redundant_display.insert(s.str());
   }
 
@@ -943,18 +838,6 @@ void fence_insertert::print_to_file()
     results << *it;
   results.close();
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::print_to_file_2
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 /* prints final results */
 void fence_insertert::print_to_file_2()
@@ -972,7 +855,7 @@ void fence_insertert::print_to_file_2()
     s << to_string(it->second) << "|" << first.source_location.get_file()
     << "|" << first.source_location.get_line() << "|"
     << second.source_location.get_file()
-    << "|" << second.source_location.get_line() << std::endl;
+    << "|" << second.source_location.get_line() << '\n';
     non_redundant_display.insert(s.str());
   }
 
@@ -984,18 +867,6 @@ void fence_insertert::print_to_file_2()
     results << *it;
   results.close();
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::print_to_file_3
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 /* prints final results */
 void fence_insertert::print_to_file_3()
@@ -1018,7 +889,7 @@ void fence_insertert::print_to_file_3()
       << second.source_location.get_file() << "|"
       << second.source_location.get_function() << "|"
       << second.source_location.get_line()
-      << "|" << second.variable << std::endl;
+      << "|" << second.variable << '\n';
     non_redundant_display.insert(s.str());
     }
     catch(std::string s)
@@ -1037,18 +908,6 @@ void fence_insertert::print_to_file_3()
     results << *it;
   results.close();
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::print_to_file_4
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 /* prints final results */
 void fence_insertert::print_to_file_4()
@@ -1074,7 +933,7 @@ void fence_insertert::print_to_file_4()
         << second.source_location.get_function() << "|"
         << second.source_location.get_line()
         << "|" << second.variable << "|"
-        << get_type(second.variable).get("#c_type") << std::endl;
+        << get_type(second.variable).get("#c_type") << '\n';
       non_redundant_display.insert(s.str());
     }
     catch (std::string s)
@@ -1094,18 +953,6 @@ void fence_insertert::print_to_file_4()
   results.close();
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string fence_insertert::to_string(fence_typet f) const
 {
   switch(f)
@@ -1119,34 +966,10 @@ std::string fence_insertert::to_string(fence_typet f) const
   assert(0);
 }
 
-/*******************************************************************\
-
-Function: fence_inserter::col_to_var
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 inline unsigned fence_insertert::col_to_var(unsigned u) const
 {
   return (u-u%fence_options)/fence_options+(u%fence_options!=0?1:0);
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::col_to_fence
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 inline fence_insertert::fence_typet fence_insertert::col_to_fence(unsigned u)
   const
@@ -1162,18 +985,6 @@ inline fence_insertert::fence_typet fence_insertert::col_to_fence(unsigned u)
   assert(0);
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::var_fence_to_col
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 inline unsigned fence_insertert::var_fence_to_col(fence_typet f, unsigned var)
   const
 {
@@ -1187,18 +998,6 @@ inline unsigned fence_insertert::var_fence_to_col(fence_typet f, unsigned var)
   }
   assert(0);
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::compute_fence_options
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void fence_insertert::compute_fence_options()
 {
@@ -1218,18 +1017,6 @@ void fence_insertert::compute_fence_options()
   }
 }
 
-/*******************************************************************\
-
-Function: fence_insertert::print_vars
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void fence_insertert::print_vars() const
 {
   instrumenter.message.statistics()
@@ -1248,18 +1035,6 @@ void fence_insertert::print_vars() const
   instrumenter.message.statistics() << "-----------------------------------"
     << messaget::eom;
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::get_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet fence_insertert::get_type(const irep_idt &id)
 {
@@ -1305,18 +1080,6 @@ typet fence_insertert::get_type(const irep_idt &id)
     return field;
   }
 }
-
-/*******************************************************************\
-
-Function: fence_insertert::type_component
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet fence_insertert::type_component(
   std::list<std::string>::const_iterator it,

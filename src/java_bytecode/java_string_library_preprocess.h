@@ -8,6 +8,9 @@ Date:   March 2017
 
 \*******************************************************************/
 
+/// \file
+/// Produce code for simple implementation of String Java libraries
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
 
@@ -142,6 +145,16 @@ private:
     symbol_tablet &symbol_table);
 
   codet make_copy_constructor_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
+  codet make_string_length_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
+  codet make_object_get_class_code(
     const code_typet &type,
     const source_locationt &loc,
     symbol_tablet &symbol_table);

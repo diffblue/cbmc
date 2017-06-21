@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <set>
 #include <stack>
 
@@ -19,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // native CNF back-end.
 #define USE_PG
 
-/*******************************************************************\
-
-Function: aig_prop_baset::land
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::land(const bvt &bv)
 {
   literalt literal=const_literal(true);
@@ -42,18 +31,6 @@ literalt aig_prop_baset::land(const bvt &bv)
 
   return literal;
 }
-
-/*******************************************************************\
-
-Function: aig_prop_baset::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt aig_prop_baset::lor(const bvt &bv)
 {
@@ -67,18 +44,6 @@ literalt aig_prop_baset::lor(const bvt &bv)
   return neg(literal);
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::lxor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::lxor(const bvt &bv)
 {
   literalt literal=const_literal(false);
@@ -88,18 +53,6 @@ literalt aig_prop_baset::lxor(const bvt &bv)
 
   return literal;
 }
-
-/*******************************************************************\
-
-Function: aig_prop_baset::land
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt aig_prop_baset::land(literalt a, literalt b)
 {
@@ -116,34 +69,10 @@ literalt aig_prop_baset::land(literalt a, literalt b)
   return dest.new_and_node(a, b);
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::lor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::lor(literalt a, literalt b)
 {
   return neg(land(neg(a), neg(b))); // De Morgan's
 }
-
-/*******************************************************************\
-
-Function: aig_prop_baset::lxor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt aig_prop_baset::lxor(literalt a, literalt b)
 {
@@ -166,85 +95,25 @@ literalt aig_prop_baset::lxor(literalt a, literalt b)
   return lor(land(a, neg(b)), land(neg(a), b));
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::lnand
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::lnand(literalt a, literalt b)
 {
   return !land(a, b);
 }
-
-/*******************************************************************\
-
-Function: aig_prop_baset::lnor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt aig_prop_baset::lnor(literalt a, literalt b)
 {
   return !lor(a, b);
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::lequal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::lequal(literalt a, literalt b)
 {
   return !lxor(a, b);
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::limplies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt aig_prop_baset::limplies(literalt a, literalt b)
 {
   return lor(neg(a), b);
 }
-
-/*******************************************************************\
-
-Function: aig_prop_baset::lselect
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt aig_prop_baset::lselect(literalt a, literalt b, literalt c)
 {  // a?b:c=(a AND b) OR (/a AND c)
@@ -261,18 +130,6 @@ literalt aig_prop_baset::lselect(literalt a, literalt b, literalt c)
   return lor(land(a, b), land(neg(a), c));
 }
 
-/*******************************************************************\
-
-Function: aig_prop_baset::set_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void aig_prop_baset::set_equal(literalt a, literalt b)
 {
 #ifdef USE_AIG_COMPACT
@@ -288,34 +145,10 @@ void aig_prop_baset::set_equal(literalt a, literalt b)
 #endif
 }
 
-/*******************************************************************\
-
-Function: aig_prop_solvert::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt aig_prop_solvert::l_get(literalt a) const
 {
   return solver.l_get(a);
 }
-
-/*******************************************************************\
-
-Function: aig_prop_solvert::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt aig_prop_solvert::prop_solve()
 {
@@ -326,18 +159,9 @@ propt::resultt aig_prop_solvert::prop_solve()
   return solver.prop_solve();
 }
 
-/*******************************************************************\
-
-Function: aig_prop_solvert::compute_phase
-
-  Inputs: Two vectors of bools of size aig.nodes.size()
-
- Outputs: These vectors filled in with per node phase information
-
- Purpose: Compute the phase information needed for Plaisted-Greenbaum encoding
-
-\*******************************************************************/
-
+/// Compute the phase information needed for Plaisted-Greenbaum encoding
+/// \par parameters: Two vectors of bools of size aig.nodes.size()
+/// \return These vectors filled in with per node phase information
 void aig_prop_solvert::compute_phase(
   std::vector<bool> &n_pos,
   std::vector<bool> &n_neg)
@@ -400,18 +224,9 @@ void aig_prop_solvert::compute_phase(
 }
 
 
-/*******************************************************************\
-
-Function: aig_prop_solvert::usage_count
-
-  Inputs: Two vectors of unsigned of size aig.nodes.size()
-
- Outputs: These vectors filled in with per node usage information
-
- Purpose: Compact encoding for single usage variable
-
-\*******************************************************************/
-
+/// Compact encoding for single usage variable
+/// \par parameters: Two vectors of unsigned of size aig.nodes.size()
+/// \return These vectors filled in with per node usage information
 void aig_prop_solvert::usage_count(
   std::vector<unsigned> &p_usage_count,
   std::vector<unsigned> &n_usage_count)
@@ -519,18 +334,10 @@ void aig_prop_solvert::usage_count(
   #endif
 }
 
-/*******************************************************************\
-
-Function: aig_prop_solvert::convert_node
-
-  Inputs: The node to convert, the phases required and the usage counts.
-
- Outputs: The node converted to CNF in the solver object.
-
- Purpose: Convert one AIG node, including special handling of a couple of cases
-
-\*******************************************************************/
-
+/// Convert one AIG node, including special handling of a couple of cases
+/// \par parameters: The node to convert, the phases required and the usage
+///   counts.
+/// \return The node converted to CNF in the solver object.
 void aig_prop_solvert::convert_node(
   unsigned n,
   const aigt::nodet &node,
@@ -741,18 +548,6 @@ void aig_prop_solvert::convert_node(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: aig_prop_solvert::convert_aig
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void aig_prop_solvert::convert_aig()
 {

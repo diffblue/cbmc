@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Base class for command line interpretation
+
 #ifndef CPROVER_GOTO_CC_GCC_MODE_H
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
@@ -33,6 +36,8 @@ protected:
 
   const bool act_as_ld;
   std::string native_tool_name;
+
+  const std::map<std::string, std::set<std::string>> arch_map;
 
   int preprocess(
     const std::string &language,

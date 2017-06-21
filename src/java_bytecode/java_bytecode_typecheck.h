@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Language Type Checking
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_TYPECHECK_H
 

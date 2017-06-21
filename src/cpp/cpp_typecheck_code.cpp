@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <util/source_location.h>
 
 #include "cpp_typecheck.h"
@@ -14,18 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 #include "cpp_util.h"
 #include "cpp_exception_id.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {
@@ -45,21 +36,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
           statement==ID_msc_if_not_exists)
   {
   }
+  else if(statement==ID_decl_block)
+  {
+    // type checked already
+  }
   else
     c_typecheck_baset::typecheck_code(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_try_catch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_try_catch(codet &code)
 {
@@ -127,18 +110,6 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_ifthenelse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
@@ -153,18 +124,6 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     c_typecheck_baset::typecheck_ifthenelse(code);
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_while
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_while(code_whilet &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
@@ -178,18 +137,6 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
   else
     c_typecheck_baset::typecheck_while(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_switch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_switch(code_switcht &code)
 {
@@ -221,18 +168,6 @@ void cpp_typecheckt::typecheck_switch(code_switcht &code)
   else
     c_typecheck_baset::typecheck_switch(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_member_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_member_initializer(codet &code)
 {
@@ -413,18 +348,6 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_decl(codet &code)
 {
   if(code.operands().size()!=1)
@@ -518,18 +441,6 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   code.swap(new_code);
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheck_codet::typecheck_block
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_block(codet &code)
 {
   cpp_save_scopet saved_scope(cpp_scopes);
@@ -537,18 +448,6 @@ void cpp_typecheckt::typecheck_block(codet &code)
 
   c_typecheck_baset::typecheck_block(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_assign(codet &code)
 {

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANSI_C_C_STORAGE_SPEC_H
 #define CPROVER_ANSI_C_C_STORAGE_SPEC_H
 
@@ -76,7 +77,13 @@ public:
     is_register     |=other.is_register;
     is_inline       |=other.is_inline;
     is_thread_local |=other.is_thread_local;
-    // attributes belong to the declarator, don't replace them
+    is_weak         |=other.is_weak;
+    if(alias.empty())
+      alias=other.alias;
+    if(asm_label.empty())
+      asm_label=other.asm_label;
+    if(section.empty())
+      section=other.section;
 
     return *this;
   }

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_TYPECHECK_H
 #define CPROVER_UTIL_TYPECHECK_H
 
@@ -16,30 +17,27 @@ class typecheckt:public messaget
 {
 public:
   explicit typecheckt(message_handlert &_message_handler):
-    messaget(_message_handler),
-    error_found(false)
+    messaget(_message_handler)
   {
   }
 
   virtual ~typecheckt() { }
 
-  mstreamt &error()
+  // not pretty, but makes transition easier
+  void err_location(const source_locationt &loc)
   {
-    error_found=true;
-    return messaget::error();
+    messaget::error().source_location=loc;
   }
 
   // not pretty, but makes transition easier
   void err_location(const exprt &src)
   {
-    error().source_location=src.find_source_location();
+    err_location(src.find_source_location());
   }
 
-  bool error_found;
-
-  bool get_error_found() const
+  void err_location(const typet &src)
   {
-    return error_found;
+    err_location(src.source_location());
   }
 
 protected:

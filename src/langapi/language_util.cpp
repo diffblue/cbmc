@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+
 #include <memory>
 
 #include <util/symbol_table.h>
@@ -15,18 +16,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "language_util.h"
 #include "mode.h"
-
-/*******************************************************************\
-
-Function: get_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static languaget* get_language(
   const namespacet &ns,
@@ -48,18 +37,6 @@ static languaget* get_language(
   return ptr;
 }
 
-/*******************************************************************\
-
-Function: from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string from_expr(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -72,18 +49,6 @@ std::string from_expr(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string from_type(
   const namespacet &ns,
@@ -98,18 +63,6 @@ std::string from_type(
   return result;
 }
 
-/*******************************************************************\
-
-Function: type_to_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string type_to_name(
   const namespacet &ns,
   const irep_idt &identifier,
@@ -123,53 +76,17 @@ std::string type_to_name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string from_expr(const exprt &expr)
 {
   symbol_tablet symbol_table;
   return from_expr(namespacet(symbol_table), "", expr);
 }
 
-/*******************************************************************\
-
-Function: from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string from_type(const typet &type)
 {
   symbol_tablet symbol_table;
   return from_type(namespacet(symbol_table), "", type);
 }
-
-/*******************************************************************\
-
-Function: to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt to_expr(
   const namespacet &ns,
@@ -187,18 +104,6 @@ exprt to_expr(
 
   return expr;
 }
-
-/*******************************************************************\
-
-Function: type_to_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string type_to_name(const typet &type)
 {

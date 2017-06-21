@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -15,22 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "goto_symex.h"
 #include "symex_dereference_state.h"
-
-/*******************************************************************\
-
-Function: goto_symext::dereference_rec_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::dereference_rec_address_of(
   exprt &expr,
@@ -72,18 +63,6 @@ void goto_symext::dereference_rec_address_of(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::is_index_member_symbol_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_symext::is_index_member_symbol_if(const exprt &expr)
 {
   // Could be member, could be if, could be index.
@@ -109,18 +88,7 @@ bool goto_symext::is_index_member_symbol_if(const exprt &expr)
     return false;
 }
 
-/*******************************************************************\
-
-Function: goto_symext::address_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose: Evaluate an ID_address_of expression
-
-\*******************************************************************/
-
+/// Evaluate an ID_address_of expression
 exprt goto_symext::address_arithmetic(
   const exprt &expr,
   statet &state,
@@ -258,18 +226,6 @@ exprt goto_symext::address_arithmetic(
   return result;
 }
 
-/*******************************************************************\
-
-Function: goto_symext::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::dereference_rec(
   exprt &expr,
   statet &state,
@@ -297,7 +253,7 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode);
 
-    // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
+    // std::cout << "**** " << from_expr(ns, "", tmp1) << '\n';
     exprt tmp2=
       dereference.dereference(
         tmp1,
@@ -305,7 +261,7 @@ void goto_symext::dereference_rec(
         write?
           value_set_dereferencet::modet::WRITE:
           value_set_dereferencet::modet::READ);
-    // std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
+    // std::cout << "**** " << from_expr(ns, "", tmp2) << '\n';
 
     expr.swap(tmp2);
 
@@ -383,18 +339,6 @@ void goto_symext::dereference_rec(
       dereference_rec(*it, state, guard, write);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::dereference(
   exprt &expr,

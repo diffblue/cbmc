@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C Language Conversion
+
 #ifndef CPROVER_ANSI_C_LITERALS_CONVERT_FLOAT_LITERAL_H
 #define CPROVER_ANSI_C_LITERALS_CONVERT_FLOAT_LITERAL_H
 

@@ -6,11 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 #include <util/decision_procedure.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <pointer-analysis/dereference.h>
 
@@ -22,18 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #include <langapi/language_util.h>
 #endif
-
-/*******************************************************************\
-
-Function: initial_state
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 path_symex_statet initial_state(
   var_mapt &var_map,
@@ -50,81 +41,33 @@ path_symex_statet initial_state(
   return s;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::get_pc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 loc_reft path_symex_statet::get_pc() const
 {
   assert(current_thread<threads.size());
   return threads[current_thread].pc;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
-  out << "  PC: " << thread.pc << std::endl;
+  out << "  PC: " << thread.pc << '\n';
   out << "  Call stack:";
   for(call_stackt::const_iterator
       it=thread.call_stack.begin();
       it!=thread.call_stack.end();
       it++)
-    out << " " << it->return_location << std::endl;
-  out << std::endl;
+    out << " " << it->return_location << '\n';
+  out << '\n';
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symex_statet::output(std::ostream &out) const
 {
   for(unsigned t=0; t<threads.size(); t++)
   {
-    out << "*** Thread " << t << std::endl;
+    out << "*** Thread " << t << '\n';
     output(threads[t], out);
-    out << std::endl;
+    out << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::get_var_state
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 path_symex_statet::var_statet &path_symex_statet::get_var_state(
   const var_mapt::var_infot &var_info)
@@ -137,18 +80,6 @@ path_symex_statet::var_statet &path_symex_statet::get_var_state(
     var_val.resize(var_info.number+1);
   return var_val[var_info.number];
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::record_step
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void path_symex_statet::record_step()
 {
@@ -173,18 +104,6 @@ void path_symex_statet::record_step()
   step.thread_nr=current_thread;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::is_feasible
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool path_symex_statet::is_feasible(
   decision_proceduret &decision_procedure) const
 {
@@ -204,18 +123,6 @@ bool path_symex_statet::is_feasible(
 
   return true; // not really reachable
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::check_assertion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool path_symex_statet::check_assertion(
   decision_proceduret &decision_procedure)

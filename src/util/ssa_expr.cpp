@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <sstream>
 #include <cassert>
 
 #include <util/arith_tools.h>
 
 #include "ssa_expr.h"
-
-/*******************************************************************\
-
-Function: build_identifier_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void build_ssa_identifier_rec(
   const exprt &expr,
@@ -90,18 +79,6 @@ bool ssa_exprt::can_build_identifier(const exprt &expr)
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: ssa_exprt::build_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
   const exprt &expr,

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_CPP_CPP_INTERNAL_ADDITIONS_H
 #define CPROVER_CPP_CPP_INTERNAL_ADDITIONS_H
 

@@ -6,22 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// limit class path loading
+
 #include <json/json_parser.h>
 
 #include "java_class_loader_limit.h"
 
-/*******************************************************************\
-
-Function: java_class_loader_limitt::setup_class_load_limit
-
-  Inputs: parameter from `java-cp-include-files`
-
- Outputs:
-
- Purpose: initializes class with either regex matcher or match set
-
-\*******************************************************************/
-
+/// initializes class with either regex matcher or match set
+/// \par parameters: parameter from `java-cp-include-files`
 void java_class_loader_limitt::setup_class_load_limit(
   std::string &java_cp_include_files)
 {
@@ -54,18 +47,8 @@ void java_class_loader_limitt::setup_class_load_limit(
   }
 }
 
-/*******************************************************************\
-
-Function: java_class_loader_limitt::load_class_file
-
-  Inputs: class file name
-
- Outputs: true if file should be loaded, else false
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: class file name
+/// \return true if file should be loaded, else false
 bool java_class_loader_limitt::load_class_file(const irep_idt &file_name)
 {
   if(regex_match)

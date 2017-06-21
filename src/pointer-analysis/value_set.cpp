@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set
+
 #include <cassert>
 #include <ostream>
 
@@ -19,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/cprover_prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #ifdef DEBUG
 #include <langapi/language_util.h>
@@ -31,18 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 const value_sett::object_map_dt value_sett::object_map_dt::blank;
 object_numberingt value_sett::object_numbering;
-
-/*******************************************************************\
-
-Function: value_sett::field_sensitive
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_sett::field_sensitive(
   const irep_idt &id,
@@ -58,18 +49,6 @@ bool value_sett::field_sensitive(
   // otherwise it has to be a struct
   return ns.follow(type).id()==ID_struct;
 }
-
-/*******************************************************************\
-
-Function: value_sett::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 value_sett::entryt &value_sett::get_entry(
   const entryt &e,
@@ -88,18 +67,6 @@ value_sett::entryt &value_sett::get_entry(
 
   return r.first->second;
 }
-
-/*******************************************************************\
-
-Function: value_sett::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_sett::insert(
   object_mapt &dest,
@@ -125,18 +92,6 @@ bool value_sett::insert(
     return true;
   }
 }
-
-/*******************************************************************\
-
-Function: value_sett::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::output(
   const namespacet &ns,
@@ -224,21 +179,9 @@ void value_sett::output(
       }
     }
 
-    out << " } " << std::endl;
+    out << " } \n";
   }
 }
-
-/*******************************************************************\
-
-Function: value_sett::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt value_sett::to_expr(object_map_dt::const_iterator it) const
 {
@@ -259,18 +202,6 @@ exprt value_sett::to_expr(object_map_dt::const_iterator it) const
 
   return od;
 }
-
-/*******************************************************************\
-
-Function: value_sett::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_sett::make_union(const value_sett::valuest &new_values)
 {
@@ -311,18 +242,6 @@ bool value_sett::make_union(const value_sett::valuest &new_values)
   return result;
 }
 
-/*******************************************************************\
-
-Function: value_sett::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const
 {
   bool result=false;
@@ -337,18 +256,6 @@ bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: value_sett::eval_pointer_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_sett::eval_pointer_offset(
   exprt &expr,
@@ -386,7 +293,7 @@ bool value_sett::eval_pointer_offset(
         if(mod && ptr_offset!=previous_offset)
           return false;
 
-        new_expr=from_integer(ptr_offset, index_type());
+        new_expr=from_integer(ptr_offset, expr.type());
         previous_offset=ptr_offset;
         mod=true;
       }
@@ -402,18 +309,6 @@ bool value_sett::eval_pointer_offset(
 
   return mod;
 }
-
-/*******************************************************************\
-
-Function: value_sett::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::get_value_set(
   const exprt &expr,
@@ -432,21 +327,9 @@ void value_sett::get_value_set(
   #if 0
   for(value_setst::valuest::const_iterator it=dest.begin();
       it!=dest.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
   #endif
 }
-
-/*******************************************************************\
-
-Function: value_sett::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::get_value_set(
   const exprt &expr,
@@ -461,18 +344,6 @@ void value_sett::get_value_set(
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
 
-/*******************************************************************\
-
-Function: value_sett::get_value_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -482,7 +353,7 @@ void value_sett::get_value_set_rec(
 {
   #if 0
   std::cout << "GET_VALUE_SET_REC EXPR: " << from_expr(ns, "", expr) << "\n";
-  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
   #endif
 
   const typet &expr_type=ns.follow(expr.type());
@@ -717,10 +588,23 @@ void value_sett::get_value_set_rec(
 
       if(i_is_set)
       {
-        i*=pointer_offset_size(ptr_operand.type().subtype(), ns);
+        typet pointer_sub_type=ptr_operand.type().subtype();
+        if(pointer_sub_type.id()==ID_empty)
+          pointer_sub_type=char_type();
 
-        if(expr.id()==ID_minus)
-          i.negate();
+        mp_integer size=pointer_offset_size(pointer_sub_type, ns);
+
+        if(size<=0)
+        {
+          i_is_set=false;
+        }
+        else
+        {
+          i*=size;
+
+          if(expr.id()==ID_minus)
+            i.negate();
+        }
       }
 
       get_value_set_rec(
@@ -985,7 +869,7 @@ void value_sett::get_value_set_rec(
   else
   {
     #if 0
-    std::cout << "WARNING: not doing " << expr.id() << std::endl;
+    std::cout << "WARNING: not doing " << expr.id() << '\n';
     #endif
   }
 
@@ -1002,18 +886,6 @@ void value_sett::get_value_set_rec(
   std::cout << "\n";
   #endif
 }
-
-/*******************************************************************\
-
-Function: value_sett::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::dereference_rec(
   const exprt &src,
@@ -1033,18 +905,6 @@ void value_sett::dereference_rec(
     dest=src;
 }
 
-/*******************************************************************\
-
-Function: value_sett::get_reference_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::get_reference_set(
   const exprt &expr,
   value_setst::valuest &dest,
@@ -1060,18 +920,6 @@ void value_sett::get_reference_set(
     dest.push_back(to_expr(it));
 }
 
-/*******************************************************************\
-
-Function: value_sett::get_reference_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::get_reference_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -1079,7 +927,7 @@ void value_sett::get_reference_set_rec(
 {
   #if 0
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
+            << '\n';
   #endif
 
   if(expr.id()==ID_symbol ||
@@ -1105,7 +953,7 @@ void value_sett::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
     #endif
 
     return;
@@ -1155,7 +1003,14 @@ void value_sett::get_reference_set_rec(
         }
         else if(!to_integer(offset, i) &&
                 o.offset_is_zero())
-          o.offset=i*pointer_offset_size(array_type.subtype(), ns);
+        {
+          mp_integer size=pointer_offset_size(array_type.subtype(), ns);
+
+          if(size<=0)
+            o.offset_is_set=false;
+          else
+            o.offset=i*size;
+        }
         else
           o.offset_is_set=false;
 
@@ -1230,18 +1085,6 @@ void value_sett::get_reference_set_rec(
   insert(dest, exprt(ID_unknown, expr.type()));
 }
 
-/*******************************************************************\
-
-Function: value_sett::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::assign(
   const exprt &lhs,
   const exprt &rhs,
@@ -1250,8 +1093,8 @@ void value_sett::assign(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;
+  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
   output(ns, std::cout);
   #endif
 
@@ -1363,18 +1206,6 @@ void value_sett::assign(
   }
 }
 
-/*******************************************************************\
-
-Function: value_sett::do_free
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::do_free(
   const exprt &op,
   const namespacet &ns)
@@ -1455,18 +1286,6 @@ void value_sett::do_free(
   }
 }
 
-/*******************************************************************\
-
-Function: value_sett::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::assign_rec(
   const exprt &lhs,
   const object_mapt &values_rhs,
@@ -1475,16 +1294,16 @@ void value_sett::assign_rec(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << std::endl;
-  std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << std::endl;
-  std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "ASSIGN_REC LHS: " << from_expr(ns, "", lhs) << '\n';
+  std::cout << "ASSIGN_REC LHS ID: " << lhs.id() << '\n';
+  std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();
       it!=values_rhs.read().end();
       it++)
     std::cout << "ASSIGN_REC RHS: " <<
-      from_expr(ns, "", object_numbering[it->first]) << std::endl;
-  std::cout << std::endl;
+      from_expr(ns, "", object_numbering[it->first]) << '\n';
+  std::cout << '\n';
   #endif
 
   if(lhs.id()==ID_symbol)
@@ -1600,18 +1419,6 @@ void value_sett::assign_rec(
     throw "assign NYI: `"+lhs.id_string()+"'";
 }
 
-/*******************************************************************\
-
-Function: value_sett::do_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::do_function_call(
   const irep_idt &function,
   const exprt::operandst &arguments,
@@ -1658,18 +1465,6 @@ void value_sett::do_function_call(
   // we could delete the dummy_arg_* now.
 }
 
-/*******************************************************************\
-
-Function: value_sett::do_end_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_sett::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
@@ -1681,18 +1476,6 @@ void value_sett::do_end_function(
 
   assign(lhs, rhs, ns, false, false);
 }
-
-/*******************************************************************\
-
-Function: value_sett::apply_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::apply_code(
   const codet &code,
@@ -1802,6 +1585,9 @@ void value_sett::apply_code(
   else if(statement==ID_array_copy)
   {
   }
+  else if(statement==ID_array_replace)
+  {
+  }
   else if(statement==ID_assume)
   {
     guard(to_code_assume(code).op0(), ns);
@@ -1821,22 +1607,10 @@ void value_sett::apply_code(
   }
   else
   {
-    // std::cerr << code.pretty() << std::endl;
+    // std::cerr << code.pretty() << '\n';
     throw "value_sett: unexpected statement: "+id2string(statement);
   }
 }
-
-/*******************************************************************\
-
-Function: value_sett::guard
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_sett::guard(
   const exprt &expr,
@@ -1871,18 +1645,6 @@ void value_sett::guard(
     assign(expr.op0(), address_of, ns, false, false);
   }
 }
-
-/*******************************************************************\
-
-Function: value_sett::make_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt value_sett::make_member(
   const exprt &src,

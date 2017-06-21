@@ -6,6 +6,9 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// Read Goto Programs
+
 #if defined(__linux__) || \
     defined(__FreeBSD_kernel__) || \
     defined(__GNU__) || \
@@ -34,18 +37,6 @@ Author:
 #include "elf_reader.h"
 #include "osx_fat_reader.h"
 
-/*******************************************************************\
-
-Function: read_goto_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool read_goto_binary(
   const std::string &filename,
   goto_modelt &dest,
@@ -54,18 +45,6 @@ bool read_goto_binary(
   return read_goto_binary(
     filename, dest.symbol_table, dest.goto_functions, message_handler);
 }
-
-/*******************************************************************\
-
-Function: read_goto_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool read_goto_binary(
   const std::string &filename,
@@ -172,18 +151,6 @@ bool read_goto_binary(
   return true;
 }
 
-/*******************************************************************\
-
-Function: is_goto_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool is_goto_binary(const std::string &filename)
 {
   #ifdef _MSC_VER
@@ -245,18 +212,6 @@ bool is_goto_binary(const std::string &filename)
   return false;
 }
 
-/*******************************************************************\
-
-Function: rename_symbols_in_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static void rename_symbols_in_function(
   goto_functionst::goto_functiont &function,
   const rename_symbolt &rename_symbol)
@@ -271,25 +226,14 @@ static void rename_symbols_in_function(
   }
 }
 
-/*******************************************************************\
-
-Function: link_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool link_functions(
   symbol_tablet &dest_symbol_table,
   goto_functionst &dest_functions,
   const symbol_tablet &src_symbol_table,
   goto_functionst &src_functions,
   const rename_symbolt &rename_symbol,
-  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols)
+  const std::unordered_set<irep_idt, irep_id_hash> &weak_symbols,
+  const replace_symbolt &object_type_updates)
 {
   namespacet ns(dest_symbol_table);
   namespacet src_ns(src_symbol_table);
@@ -368,8 +312,8 @@ static bool link_functions(
       #if 0
       if(!base_type_eq(symbol.type, ns.lookup(id).type, ns))
       {
-        std::cerr << symbol << std::endl;
-        std::cerr << ns.lookup(id) << std::endl;
+        std::cerr << symbol << '\n';
+        std::cerr << ns.lookup(id) << '\n';
       }
       assert(base_type_eq(symbol.type, ns.lookup(id).type, ns));
       #endif
@@ -381,21 +325,22 @@ static bool link_functions(
     Forall_goto_functions(dest_it, dest_functions)
       rename_symbols_in_function(dest_it->second, macro_application);
 
+  if(!object_type_updates.expr_map.empty())
+  {
+    Forall_goto_functions(dest_it, dest_functions)
+      Forall_goto_program_instructions(iit, dest_it->second.body)
+      {
+        object_type_updates(iit->code);
+        object_type_updates(iit->guard);
+      }
+  }
+
   return false;
 }
 
-/*******************************************************************\
-
-Function: read_object_and_link
-
-  Inputs: a file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: reads an object file
-
-\*******************************************************************/
-
+/// reads an object file
+/// \par parameters: a file_name
+/// \return true on error, false otherwise
 bool read_object_and_link(
   const std::string &file_name,
   symbol_tablet &symbol_table,
@@ -427,26 +372,22 @@ bool read_object_and_link(
   if(linking.typecheck_main())
     return true;
 
-  if(link_functions(symbol_table, functions,
-                    temp_model.symbol_table, temp_model.goto_functions,
-                    linking.rename_symbol, weak_symbols))
+  if(link_functions(
+      symbol_table,
+      functions,
+      temp_model.symbol_table,
+      temp_model.goto_functions,
+      linking.rename_symbol,
+      weak_symbols,
+      linking.object_type_updates))
     return true;
 
   return false;
 }
 
-/*******************************************************************\
-
-Function: read_object_and_link
-
-  Inputs: a file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: reads an object file
-
-\*******************************************************************/
-
+/// reads an object file
+/// \par parameters: a file_name
+/// \return true on error, false otherwise
 bool read_object_and_link(
   const std::string &file_name,
   goto_modelt &goto_model,

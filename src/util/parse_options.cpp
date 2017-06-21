@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <iostream>
 
 #if defined (_WIN32)
@@ -19,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "parse_options.h"
 #include "signal_catcher.h"
 
-/*******************************************************************\
-
-Function: parse_options_baset::parse_options_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 parse_options_baset::parse_options_baset(
   const std::string &_optstring, int argc, const char **argv)
 {
@@ -38,51 +27,15 @@ parse_options_baset::parse_options_baset(
   parse_result=cmdline.parse(argc, argv, optstring.c_str());
 }
 
-/*******************************************************************\
-
-Function: parse_options_baset::help
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void parse_options_baset::help()
 {
 }
-
-/*******************************************************************\
-
-Function: parse_options_baset::usage_error
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void parse_options_baset::usage_error()
 {
   std::cerr << "Usage error!\n\n";
   help();
 }
-
-/*******************************************************************\
-
-Function: parse_options_baset::main
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 int parse_options_baset::main()
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Convert file contents to C strings
+
 #include <iostream>
 #include <string>
 
@@ -37,6 +40,6 @@ int main()
         std::cout << ch;
     }
 
-    std::cout << "\\n\"" << std::endl;
+    std::cout << "\\n\"\n";
   }
 }

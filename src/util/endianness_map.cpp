@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <ostream>
 #include <cassert>
 
@@ -14,18 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "endianness_map.h"
 #include "namespace.h"
-
-/*******************************************************************\
-
-Function: endianness_mapt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void endianness_mapt::output(std::ostream &out) const
 {
@@ -39,18 +28,6 @@ void endianness_mapt::output(std::ostream &out) const
   }
 }
 
-/*******************************************************************\
-
-Function: endianness_mapt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void endianness_mapt::build(const typet &src, bool little_endian)
 {
   if(little_endian)
@@ -58,18 +35,6 @@ void endianness_mapt::build(const typet &src, bool little_endian)
   else
     build_big_endian(src);
 }
-
-/*******************************************************************\
-
-Function: endianness_mapt::build_little_endian
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void endianness_mapt::build_little_endian(const typet &src)
 {
@@ -83,18 +48,6 @@ void endianness_mapt::build_little_endian(const typet &src)
   for(std::size_t i=map.size(); i<new_size; ++i)
     map.push_back(i);
 }
-
-/*******************************************************************\
-
-Function: endianness_mapt::build_big_endian
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void endianness_mapt::build_big_endian(const typet &src)
 {

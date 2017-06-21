@@ -6,6 +6,9 @@ Author: Chris Smowton, chris@smowton.net
 
 \*******************************************************************/
 
+/// \file
+/// Simple checked pointers
+
 #ifndef CPROVER_UTIL_SAFE_POINTER_H
 #define CPROVER_UTIL_SAFE_POINTER_H
 

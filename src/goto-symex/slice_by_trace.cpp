@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Slicer for symex traces
+
 #include <cstring>
 #include <set>
 #include <fstream>
@@ -21,23 +24,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "slice_by_trace.h"
 
-/*******************************************************************\
-
-Function: slice_by_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,
   symex_target_equationt &equation)
 {
-  std::cout << "Slicing by trace..." << std::endl;
+  std::cout << "Slicing by trace...\n";
 
   merge_identifier="goto_symex::\\merge";
   merge_symbol=symbol_exprt(typet(ID_bool));
@@ -124,24 +115,12 @@ void symex_slice_by_tracet::slice_by_trace(
 
   assign_merges(equation); // Now add the merge variable assignments to eqn
 
-  std::cout << "Finished slicing by trace..." << std::endl;
+  std::cout << "Finished slicing by trace...\n";
 }
-
-/*******************************************************************\
-
-Function: read_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_slice_by_tracet::read_trace(std::string filename)
 {
-  std::cout << "Reading trace from file " << filename << std::endl;
+  std::cout << "Reading trace from file " << filename << '\n';
   std::ifstream file(filename);
   if(file.fail())
     throw "failed to read from trace file";
@@ -184,18 +163,6 @@ void symex_slice_by_tracet::read_trace(std::string filename)
   t.push_back(t_e);
 }
 
-/*******************************************************************\
-
-Function: parse_alphabet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool symex_slice_by_tracet::parse_alphabet(std::string read_line)
 {
   if((read_line==":") || (read_line == ":exact") ||
@@ -210,23 +177,11 @@ bool symex_slice_by_tracet::parse_alphabet(std::string read_line)
     std::cout << "Alphabet: ";
     if(!alphabet_parity)
       std::cout << "!";
-    std::cout << read_line << std::endl;
+    std::cout << read_line << '\n';
     alphabet.insert(read_line);
   }
   return false;
 }
-
-/*******************************************************************\
-
-Function: parse_events
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_slice_by_tracet::parse_events(std::string read_line)
 {
@@ -235,7 +190,7 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
   bool parity=strstr(read_line.c_str(), "!")==NULL;
   bool universe=strstr(read_line.c_str(), "?")!=NULL;
   bool has_values=strstr(read_line.c_str(), " ")!=NULL;
-  std::cout << "Trace: " << read_line << std::endl;
+  std::cout << "Trace: " << read_line << '\n';
   std::vector<irep_idt> value_v;
   if(has_values)
   {
@@ -276,18 +231,6 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
   sigma.push_back(es);
 }
 
-/*******************************************************************\
-
-Function: compute_ts_back
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_slice_by_tracet::compute_ts_back(
   symex_target_equationt &equation)
 {
@@ -314,12 +257,12 @@ void symex_slice_by_tracet::compute_ts_back(
       exprt guard=i->guard;
 
 #if 0
-      std::cout << "EVENT:  " << event << std::endl;
-      std::cout << "GUARD:  " << from_expr(ns, "", guard) << std::endl;
+      std::cout << "EVENT:  " << event << '\n';
+      std::cout << "GUARD:  " << from_expr(ns, "", guard) << '\n';
       for(size_t j=0; j < t.size(); j++)
       {
         std::cout << "t[" << j << "]=" << from_expr(ns, "", t[j]) <<
-          std::endl;
+          '\n';
       }
 #endif
 
@@ -430,34 +373,10 @@ void symex_slice_by_tracet::compute_ts_back(
   }
 }
 
-/*******************************************************************\
-
-Function: compute_ts_fd
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_slice_by_tracet::compute_ts_fd(
   symex_target_equationt &equation)
 {
 }
-
-/*******************************************************************\
-
-Function:  slice_SSA_steps
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_slice_by_tracet::slice_SSA_steps(
   symex_target_equationt &equation,
@@ -489,7 +408,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
     if(!guard.is_true())
       potential_SSA_steps++;
     // it->output(ns,std::cout);
-    // std::cout << "-----------------" << std::endl;
+    // std::cout << "-----------------\n";
 
     if((guard.id()==ID_symbol) || (guard.id() == ID_not))
     {
@@ -529,7 +448,7 @@ void symex_slice_by_tracet::slice_SSA_steps(
       }
       else if(guard.id()==ID_or)
       {
-        std::cout << "Guarded by an OR." << std::endl;
+        std::cout << "Guarded by an OR.\n";
       }
     }
 
@@ -568,25 +487,13 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
   std::cout << "Trace slicing effectively removed "
             << (sliced_SSA_steps + sliced_conds) << " out of "
-            << equation.SSA_steps.size() << " SSA_steps." << std::endl;
+            << equation.SSA_steps.size() << " SSA_steps.\n";
   std::cout << "  ("
                 << ((sliced_SSA_steps + sliced_conds) - trace_loc_sliced)
             << " out of "
             << (equation.SSA_steps.size()-trace_SSA_steps-location_SSA_steps)
-            << " non-trace, non-location SSA_steps)" << std::endl;
+            << " non-trace, non-location SSA_steps)\n";
 }
-
-/*******************************************************************\
-
-Function:  matches
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool symex_slice_by_tracet::matches(
   event_sett s,
@@ -595,18 +502,6 @@ bool symex_slice_by_tracet::matches(
   bool present=s.first.count(event)!=0;
   return ((s.second && present) || (!s.second && !present));
 }
-
-/*******************************************************************\
-
-Function:  assign_merges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_slice_by_tracet::assign_merges(
   symex_target_equationt &equation)
@@ -637,18 +532,6 @@ void symex_slice_by_tracet::assign_merges(
     SSA_step.source=empty_source;
   }
 }
-
-/*******************************************************************\
-
-Function:  implied_guards
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 {
@@ -731,18 +614,6 @@ std::set<exprt> symex_slice_by_tracet::implied_guards(exprt e)
 
   return s;
 }
-
-/*******************************************************************\
-
-Function: symex_slice_by_tracet::implies_false
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool symex_slice_by_tracet::implies_false(const exprt e)
 {

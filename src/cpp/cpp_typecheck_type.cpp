@@ -6,7 +6,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <util/source_location.h>
+#include <util/simplify_expr.h>
 
 #include <ansi-c/c_qualifiers.h>
 
@@ -14,21 +18,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 #include "expr2cpp.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  assert(type.id()!=irep_idt());
+  assert(!type.id().empty());
   assert(type.is_not_nil());
 
   try
@@ -126,7 +118,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     exprt &size_expr=to_array_type(type).size();
 
     if(size_expr.is_not_nil())
+    {
       typecheck_expr(size_expr);
+      simplify(size_expr, *this);
+    }
 
     typecheck_type(type.subtype());
 

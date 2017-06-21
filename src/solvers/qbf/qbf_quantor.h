@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_QBF_QBF_QUANTOR_H
 #define CPROVER_SOLVERS_QBF_QBF_QUANTOR_H
 

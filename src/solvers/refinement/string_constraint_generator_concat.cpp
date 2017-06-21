@@ -7,21 +7,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generates string constraints for functions adding content add the end of
+///   strings
+
 #include <solvers/refinement/string_constraint_generator.h>
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat
-
-  Inputs: two string expressions
-
- Outputs: a new string expression
-
- Purpose: add axioms to say that the returned string expression is equal to
-          the concatenation of the two string expressions given as input
-
-\*******************************************************************/
-
+/// add axioms to say that the returned string expression is equal to the
+/// concatenation of the two string expressions given as input
+/// \par parameters: two string expressions
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat(
   const string_exprt &s1, const string_exprt &s2)
 {
@@ -53,20 +48,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
   return res;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat
-
-  Inputs: function application with two arguments which are strings
-
- Outputs: a new string expression
-
- Purpose: add axioms to say that the returned string expression is equal to
-          the concatenation of the two string arguments of
-          the function application
-
-\*******************************************************************/
-
+/// add axioms to say that the returned string expression is equal to the
+/// concatenation of the two string arguments of the function application
+/// \par parameters: function application with two arguments which are strings
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat(
   const function_application_exprt &f)
 {
@@ -79,18 +64,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_int
-
-  Inputs: function application with two arguments: a string and an integer
-
- Outputs: a new string expression
-
- Purpose: add axioms corresponding to the StringBuilder.append(I) java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the StringBuilder.append(I) java function
+/// \par parameters: function application with two arguments: a string and an
+///   integer
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_int(
   const function_application_exprt &f)
 {
@@ -101,19 +78,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_int(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_long
-
-  Inputs: function application with two arguments: a string and a
-          integer of type long
-
- Outputs: a new string expression
-
- Purpose: Add axioms corresponding to the StringBuilder.append(J) java function
-
-\*******************************************************************/
-
+/// Add axioms corresponding to the StringBuilder.append(J) java function
+/// \par parameters: function application with two arguments: a string and a
+/// integer of type long
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_long(
   const function_application_exprt &f)
 {
@@ -123,18 +91,9 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_long(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_bool
-
-  Inputs: function application two arguments: a string and a bool
-
- Outputs: a new string expression
-
- Purpose: add axioms corresponding to the StringBuilder.append(Z) java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the StringBuilder.append(Z) java function
+/// \par parameters: function application two arguments: a string and a bool
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_bool(
   const function_application_exprt &f)
 {
@@ -144,18 +103,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_bool(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_char
-
-  Inputs: function application with two arguments: a string and a char
-
- Outputs: a new string expression
-
- Purpose: add axioms corresponding to the StringBuilder.append(C) java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the StringBuilder.append(C) java function
+/// \par parameters: function application with two arguments: a string and a
+///   char
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   const function_application_exprt &f)
 {
@@ -165,18 +116,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_double
-
-  Inputs: function application with two arguments: a string and a double
-
- Outputs: a new string expression
-
- Purpose: add axioms corresponding to the StringBuilder.append(D) java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the StringBuilder.append(D) java function
+/// \par parameters: function application with two arguments: a string and a
+///   double
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_double(
   const function_application_exprt &f)
 {
@@ -187,18 +130,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_double(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_float
-
-  Inputs: function application with two arguments: a string and a float
-
- Outputs: a new string expression
-
- Purpose: add axioms corresponding to the StringBuilder.append(F) java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the StringBuilder.append(F) java function
+/// \par parameters: function application with two arguments: a string and a
+///   float
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_float(
   const function_application_exprt &f)
 {
@@ -209,19 +144,10 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_float(
   return add_axioms_for_concat(s1, s2);
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_concat_code_point
-
-  Inputs: function application with two arguments: a string and a code point
-
- Outputs: a new string expression
-
- Purpose: Add axioms corresponding to the StringBuilder.appendCodePoint(I)
-          function
-
-\*******************************************************************/
-
+/// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
+/// \par parameters: function application with two arguments: a string and a
+///   code point
+/// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat_code_point(
   const function_application_exprt &f)
 {

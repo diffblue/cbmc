@@ -8,6 +8,9 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Compile and link source and object files.
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -65,19 +68,9 @@ Date: June 2006
 #define pclose _pclose
 #endif
 
-/*******************************************************************\
-
-Function: compilet::doit
-
-  Inputs: none
-
- Outputs: true on error, false otherwise
-
- Purpose: reads and source and object files, compiles and links them
-          into goto program objects.
-
-\*******************************************************************/
-
+/// reads and source and object files, compiles and links them into goto program
+/// objects.
+/// \return true on error, false otherwise
 bool compilet::doit()
 {
   compiled_functions.clear();
@@ -121,6 +114,9 @@ bool compilet::doit()
     return true;
   }
 
+  const unsigned warnings_before=
+    get_message_handler().get_message_count(messaget::M_WARNING);
+
   if(source_files.size()>0)
     if(compile())
       return true;
@@ -133,22 +129,14 @@ bool compilet::doit()
       return true;
   }
 
-  return false;
+  return
+    warning_is_fatal &&
+    get_message_handler().get_message_count(messaget::M_WARNING)!=
+    warnings_before;
 }
 
-/*******************************************************************\
-
-Function: compilet::add_input_file
-
-  Inputs: none
-
- Outputs: false on success, true on error.
-
- Purpose: puts input file names into a list and does preprocessing for
-          libraries.
-
-\*******************************************************************/
-
+/// puts input file names into a list and does preprocessing for libraries.
+/// \return false on success, true on error.
 bool compilet::add_input_file(const std::string &file_name)
 {
   // first of all, try to open the file
@@ -156,8 +144,8 @@ bool compilet::add_input_file(const std::string &file_name)
     std::ifstream in(file_name);
     if(!in)
     {
-      error() << "failed to open file `" << file_name << "'" << eom;
-      return false; // generously ignore
+      warning() << "failed to open file `" << file_name << "'" << eom;
+      return warning_is_fatal; // generously ignore unless -Werror
     }
   }
 
@@ -168,7 +156,7 @@ bool compilet::add_input_file(const std::string &file_name)
     // a file without extension; will ignore
     warning() << "input file `" << file_name
               << "' has no extension, not considered" << eom;
-    return false;
+    return warning_is_fatal;
   }
 
   std::string ext = file_name.substr(r+1, file_name.length());
@@ -288,19 +276,9 @@ bool compilet::add_input_file(const std::string &file_name)
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::find_library
-
-  Inputs: library name
-
- Outputs: true if found, false otherwise
-
- Purpose: tries to find a library object file that matches the given
-          library name.
-
-\*******************************************************************/
-
+/// tries to find a library object file that matches the given library name.
+/// \par parameters: library name
+/// \return true if found, false otherwise
 bool compilet::find_library(const std::string &name)
 {
   std::string tmp;
@@ -329,7 +307,7 @@ bool compilet::find_library(const std::string &name)
       else if(is_elf_file(libname))
       {
         warning() << "Warning: Cannot read ELF library " << libname << eom;
-        return false;
+        return warning_is_fatal;
       }
     }
   }
@@ -337,19 +315,10 @@ bool compilet::find_library(const std::string &name)
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::is_elf_file
-
-  Inputs: file name
-
- Outputs: true if the given file name exists and is an ELF file,
-          false otherwise
-
- Purpose: checking if we can load an object file
-
-\*******************************************************************/
-
+/// checking if we can load an object file
+/// \par parameters: file name
+/// \return true if the given file name exists and is an ELF file, false
+///   otherwise
 bool compilet::is_elf_file(const std::string &file_name)
 {
   std::fstream in;
@@ -368,22 +337,12 @@ bool compilet::is_elf_file(const std::string &file_name)
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::link
-
-  Inputs: none
-
- Outputs: true on error, false otherwise
-
- Purpose: parses object files and links them
-
-\*******************************************************************/
-
+/// parses object files and links them
+/// \return true on error, false otherwise
 bool compilet::link()
 {
   // "compile" hitherto uncompiled functions
-  print(8, "Compiling functions");
+  statistics() << "Compiling functions" << eom;
   convert_symbols(compiled_functions);
 
   // parse object files
@@ -409,7 +368,7 @@ bool compilet::link()
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, "main", ui_message_handler))
+    if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
       return true;
 
     // entry_point may (should) add some more functions.
@@ -423,19 +382,9 @@ bool compilet::link()
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::compile
-
-  Inputs: none
-
- Outputs: true on error, false otherwise
-
- Purpose: parses source files and writes object files, or keeps the
-          symbols in the symbol_table depending on the doLink flag.
-
-\*******************************************************************/
-
+/// parses source files and writes object files, or keeps the symbols in the
+/// symbol_table depending on the doLink flag.
+/// \return true on error, false otherwise
 bool compilet::compile()
 {
   while(!source_files.empty())
@@ -489,18 +438,8 @@ bool compilet::compile()
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::parse
-
-  Inputs: file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: parses a source file (low-level parsing)
-
-\*******************************************************************/
-
+/// parses a source file (low-level parsing)
+/// \return true on error, false otherwise
 bool compilet::parse(const std::string &file_name)
 {
   if(file_name=="-")
@@ -554,7 +493,7 @@ bool compilet::parse(const std::string &file_name)
 
   if(mode==PREPROCESS_ONLY)
   {
-    print(8, "Preprocessing: "+file_name);
+    statistics() << "Preprocessing: " << file_name << eom;
 
     std::ostream *os = &std::cout;
     std::ofstream ofs;
@@ -576,7 +515,7 @@ bool compilet::parse(const std::string &file_name)
   }
   else
   {
-    print(8, "Parsing: "+file_name);
+    statistics() << "Parsing: " << file_name << eom;
 
     if(language.parse(infile, file_name))
     {
@@ -590,25 +529,15 @@ bool compilet::parse(const std::string &file_name)
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::parse_stdin
-
-  Inputs: file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: parses a source file (low-level parsing)
-
-\*******************************************************************/
-
+/// parses a source file (low-level parsing)
+/// \return true on error, false otherwise
 bool compilet::parse_stdin()
 {
   ansi_c_languaget language;
 
   language.set_message_handler(get_message_handler());
 
-  print(8, "Parsing: (stdin)");
+  statistics() << "Parsing: (stdin)" << eom;
 
   if(mode==PREPROCESS_ONLY)
   {
@@ -643,19 +572,10 @@ bool compilet::parse_stdin()
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::write_object_file
-
-  Inputs: file_name, functions table
-
- Outputs: true on error, false otherwise
-
- Purpose: writes the goto functions in the function table to a
-          binary format object file.
-
-\*******************************************************************/
-
+/// writes the goto functions in the function table to a binary format object
+/// file.
+/// \par parameters: file_name, functions table
+/// \return true on error, false otherwise
 bool compilet::write_object_file(
   const std::string &file_name,
   const symbol_tablet &lsymbol_table,
@@ -664,19 +584,10 @@ bool compilet::write_object_file(
   return write_bin_object_file(file_name, lsymbol_table, functions);
 }
 
-/*******************************************************************\
-
-Function: compilet::write_bin_object_file
-
-  Inputs: file_name, functions table
-
- Outputs: true on error, false otherwise
-
- Purpose: writes the goto functions in the function table to a
-          binary format object file.
-
-\*******************************************************************/
-
+/// writes the goto functions in the function table to a binary format object
+/// file.
+/// \par parameters: file_name, functions table
+/// \return true on error, false otherwise
 bool compilet::write_bin_object_file(
   const std::string &file_name,
   const symbol_tablet &lsymbol_table,
@@ -710,18 +621,8 @@ bool compilet::write_bin_object_file(
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::parse_source
-
-  Inputs: file_name
-
- Outputs: true on error, false otherwise
-
- Purpose: parses a source file
-
-\*******************************************************************/
-
+/// parses a source file
+/// \return true on error, false otherwise
 bool compilet::parse_source(const std::string &file_name)
 {
   if(parse(file_name))
@@ -740,41 +641,21 @@ bool compilet::parse_source(const std::string &file_name)
   return false;
 }
 
-/*******************************************************************\
-
-Function: compilet::compilet
-
-  Inputs: none
-
- Outputs: nothing
-
- Purpose: constructor
-
-\*******************************************************************/
-
-compilet::compilet(cmdlinet &_cmdline):
-  language_uit(_cmdline, ui_message_handler),
-  ui_message_handler(_cmdline, "goto-cc " CBMC_VERSION),
+/// constructor
+/// \return nothing
+compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
+  language_uit(_cmdline, mh),
   ns(symbol_table),
-  cmdline(_cmdline)
+  cmdline(_cmdline),
+  warning_is_fatal(Werror)
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
   working_directory=get_current_working_directory();
 }
 
-/*******************************************************************\
-
-Function: compilet::~compilet
-
-  Inputs: none
-
- Outputs: nothing
-
- Purpose: cleans up temporary files
-
-\*******************************************************************/
-
+/// cleans up temporary files
+/// \return nothing
 compilet::~compilet()
 {
   // clean up temp dirs
@@ -784,18 +665,6 @@ compilet::~compilet()
       it++)
     delete_directory(*it);
 }
-
-/*******************************************************************\
-
-Function: compilet::function_body_count
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 unsigned compilet::function_body_count(const goto_functionst &functions)
 {
@@ -811,38 +680,14 @@ unsigned compilet::function_body_count(const goto_functionst &functions)
   return fbs;
 }
 
-/*******************************************************************\
-
-Function: compilet::add_compiler_specific_defines
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void compilet::add_compiler_specific_defines(configt &config) const
 {
   config.ansi_c.defines.push_back("__GOTO_CC_VERSION__=" CBMC_VERSION);
 }
 
-/*******************************************************************\
-
-Function: compilet::convert_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, dest, ui_message_handler);
+  goto_convert_functionst converter(symbol_table, dest, get_message_handler());
 
   // the compilation may add symbols!
 
@@ -872,7 +717,7 @@ void compilet::convert_symbols(goto_functionst &dest)
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {
-        print(9, "Compiling "+id2string(s_it->first));
+        debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first);
         s_it->second.value=exprt("compiled");
       }

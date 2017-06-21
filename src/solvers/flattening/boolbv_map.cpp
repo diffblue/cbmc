@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <util/threeval.h>
 
 #include "../prop/prop.h"
@@ -16,18 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-/*******************************************************************\
-
-Function: boolbv_mapt::map_entryt::get_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
 {
@@ -57,18 +46,6 @@ std::string boolbv_mapt::map_entryt::get_value(const propt &prop) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: boolbv_mapt::get_map_entry
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
   const irep_idt &identifier,
   const typet &type)
@@ -95,18 +72,6 @@ boolbv_mapt::map_entryt &boolbv_mapt::get_map_entry(
   return map_entry;
 }
 
-/*******************************************************************\
-
-Function: boolbv_mapt::show
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void boolbv_mapt::show() const
 {
   for(mappingt::const_iterator it=mapping.begin();
@@ -115,18 +80,6 @@ void boolbv_mapt::show() const
   {
   }
 }
-
-/*******************************************************************\
-
-Function: boolbv_mapt::get_literals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbv_mapt::get_literals(
   const irep_idt &identifier,
@@ -160,22 +113,10 @@ void boolbv_mapt::get_literals(
 
     #ifdef DEBUG
     std::cout << "NEW: " << identifier << ":" << bit
-              << "=" << l << std::endl;
+              << "=" << l << '\n';
     #endif
   }
 }
-
-/*******************************************************************\
-
-Function: boolbv_mapt::set_literals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbv_mapt::set_literals(
   const irep_idt &identifier,

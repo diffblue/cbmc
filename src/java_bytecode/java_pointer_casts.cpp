@@ -6,24 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Pointer Casts
+
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/namespace.h>
 
 #include "java_pointer_casts.h"
 
-/*******************************************************************\
-
-Function: clean_deref
-
-  Inputs: pointer
-
- Outputs: dereferenced pointer
-
- Purpose: dereference pointer expression
-
-\*******************************************************************/
-
+/// dereference pointer expression
+/// \return dereferenced pointer
 static exprt clean_deref(const exprt &ptr)
 {
   return ptr.id()==ID_address_of
@@ -31,19 +24,9 @@ static exprt clean_deref(const exprt &ptr)
              : dereference_exprt(ptr, ptr.type().subtype());
 }
 
-/*******************************************************************\
-
-Function: find_superclass_with_type
-
-  Inputs: pointer
-          target type to search
-
- Outputs: true iff a super class with target type is found
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: pointer
+/// target type to search
+/// \return true iff a super class with target type is found
 bool find_superclass_with_type(
   exprt &ptr,
   const typet &target_type,
@@ -77,18 +60,8 @@ bool find_superclass_with_type(
 }
 
 
-/*******************************************************************\
-
-Function: look_through_casts
-
-  Inputs: input expression
-
- Outputs: recursively search target of typecast
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: input expression
+/// \return recursively search target of typecast
 static const exprt &look_through_casts(const exprt &in)
 {
   if(in.id()==ID_typecast)
@@ -101,20 +74,10 @@ static const exprt &look_through_casts(const exprt &in)
 }
 
 
-/*******************************************************************\
-
-Function: make_clean_pointer_cast
-
-  Inputs: raw pointer
-          target type
-          namespace
-
- Outputs: cleaned up typecast expression
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: raw pointer
+/// target type
+/// namespace
+/// \return cleaned up typecast expression
 exprt make_clean_pointer_cast(
   const exprt &rawptr,
   const typet &target_type,

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
 #define CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
 

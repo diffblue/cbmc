@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Path-based Symbolic Execution
+
 #ifndef CPROVER_SYMEX_PATH_SEARCH_H
 #define CPROVER_SYMEX_PATH_SEARCH_H
 

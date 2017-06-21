@@ -6,6 +6,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_STRING2INT_H
 #define CPROVER_UTIL_STRING2INT_H
 

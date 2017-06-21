@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Inlining
+
 #include <cassert>
 
 #include <util/prefix.h>
@@ -17,18 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "remove_skip.h"
 #include "goto_inline.h"
 #include "goto_inline_class.h"
-
-/*******************************************************************\
-
-Function: goto_inline
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inline(
   goto_modelt &goto_model,
@@ -42,18 +33,6 @@ void goto_inline(
     message_handler,
     adjust_function);
 }
-
-/*******************************************************************\
-
-Function: goto_inline
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_inline(
   goto_functionst &goto_functions,
@@ -118,28 +97,13 @@ void goto_inline(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_partial_inline
-
-  Inputs:
-    goto_model:
-      Source of the symbol table and function map to use.
-    message_handler:
-      Message handler used by goto_inlinet.
-    smallfunc_limit:
-      The maximum number of instructions in functions to be inlined.
-    adjust_function:
-      Tell goto_inlinet to adjust function.
-
- Outputs:
-
- Purpose:
-    Inline all function calls to functions either marked as "inlined" or
-    smaller than smallfunc_limit (by instruction count).
-
-\*******************************************************************/
-
+/// Inline all function calls to functions either marked as "inlined" or
+/// smaller than smallfunc_limit (by instruction count).
+/// \param goto_model: Source of the symbol table and function map to use.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param smallfunc_limit: The maximum number of instructions in functions to
+///   be inlined.
+/// \param adjust_function: Tell goto_inlinet to adjust function.
 void goto_partial_inline(
   goto_modelt &goto_model,
   message_handlert &message_handler,
@@ -155,31 +119,15 @@ void goto_partial_inline(
     adjust_function);
 }
 
-/*******************************************************************\
-
-Function: goto_partial_inline
-
-  Inputs:
-    goto_functions:
-      The function map to use to find functions containing calls and function
-      bodies.
-    ns:
-      Namespace used by goto_inlinet.
-    message_handler:
-      Message handler used by goto_inlinet.
-    smallfunc_limit:
-      The maximum number of instructions in functions to be inlined.
-    adjust_function:
-      Tell goto_inlinet to adjust function.
-
- Outputs:
-
- Purpose:
-    Inline all function calls to functions either marked as "inlined" or
-    smaller than smallfunc_limit (by instruction count).
-
-\*******************************************************************/
-
+/// Inline all function calls to functions either marked as "inlined" or
+/// smaller than smallfunc_limit (by instruction count).
+/// \param goto_functions: The function map to use to find functions containing
+///   calls and function bodies.
+/// \param ns: Namespace used by goto_inlinet.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param smallfunc_limit: The maximum number of instructions in functions to
+///   be inlined.
+/// \param adjust_function: Tell goto_inlinet to adjust function.
 void goto_partial_inline(
   goto_functionst &goto_functions,
   const namespacet &ns,
@@ -259,24 +207,12 @@ void goto_partial_inline(
   goto_inline.goto_inline(inline_map, false);
 }
 
-/*******************************************************************\
-
-Function: goto_function_inline
-
-  Inputs:
-    goto_model: Source of the symbol table and function map to use.
-    function: The function whose calls to inline.
-    message_handler: Message handler used by goto_inlinet.
-    adjust_function: Tell goto_inlinet to adjust function.
-    caching: Tell goto_inlinet to cache.
-
- Outputs:
-
- Purpose:
-    Inline all function calls made from a particular function
-
-\*******************************************************************/
-
+/// Inline all function calls made from a particular function
+/// \param goto_model: Source of the symbol table and function map to use.
+/// \param function: The function whose calls to inline.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param caching: Tell goto_inlinet to cache.
 void goto_function_inline(
   goto_modelt &goto_model,
   const irep_idt function,
@@ -294,25 +230,13 @@ void goto_function_inline(
     caching);
 }
 
-/*******************************************************************\
-
-Function: goto_function_inline
-
-  Inputs:
-    goto_functions: The function map to use to find function bodies.
-    function: The function whose calls to inline.
-    ns: Namespace used by goto_inlinet.
-    message_handler: Message handler used by goto_inlinet.
-    adjust_function: Tell goto_inlinet to adjust function.
-    caching: Tell goto_inlinet to cache.
-
- Outputs:
-
- Purpose:
-    Inline all function calls made from a particular function
-
-\*******************************************************************/
-
+/// Inline all function calls made from a particular function
+/// \param goto_functions: The function map to use to find function bodies.
+/// \param function: The function whose calls to inline.
+/// \param ns: Namespace used by goto_inlinet.
+/// \param message_handler: Message handler used by goto_inlinet.
+/// \param adjust_function: Tell goto_inlinet to adjust function.
+/// \param caching: Tell goto_inlinet to cache.
 void goto_function_inline(
   goto_functionst &goto_functions,
   const irep_idt function,
@@ -356,18 +280,6 @@ void goto_function_inline(
 
   goto_inline.goto_inline(function, goto_function, inline_map, true);
 }
-
-/*******************************************************************\
-
-Function: goto_function_inline_and_log
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 jsont goto_function_inline_and_log(
   goto_functionst &goto_functions,

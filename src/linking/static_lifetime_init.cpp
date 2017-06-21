@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <cstdlib>
 
@@ -16,24 +17,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include <goto-programs/goto_functions.h>
 
 #include "static_lifetime_init.h"
 #include "zero_initializer.h"
-
-/*******************************************************************\
-
-Function: static_lifetime_init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool static_lifetime_init(
   symbol_tablet &symbol_table,
@@ -156,7 +145,6 @@ bool static_lifetime_init(
 
   // call designated "initialization" functions
 
-  #if 0
   for(const std::string &id : symbols)
   {
     const symbolt &symbol=ns.lookup(id);
@@ -170,7 +158,6 @@ bool static_lifetime_init(
       dest.move_to_operands(function_call);
     }
   }
-  #endif
 
   return false;
 }

@@ -6,6 +6,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// Constant Function Pointer Propagation
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -140,20 +143,10 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: 'it' pointing to the callsite to update, 'function' the function
-          actually called, 'stack_scope' the place where the constant was
-          defined in the call stack
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: 'it' pointing to the callsite to update, 'function' the
+///   function
+/// actually called, 'stack_scope' the place where the constant was
+/// defined in the call stack
 void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   const symbol_exprt &const_function,
   unsigned stack_scope)
@@ -341,19 +334,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   callsite_stack.swap(new_callsite_stack);
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose: adds const pointers (instantiated here or propagated) passed
-          as arguments in the map
-
-\*******************************************************************/
-
+/// adds const pointers (instantiated here or propagated) passed as arguments in
+/// the map
 void const_function_pointer_propagationt::arg_stackt::add_args(
   const symbol_exprt &const_function,
   goto_programt::instructionst::iterator it)
@@ -431,18 +413,6 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_function_pointer_propagationt::arg_stackt::remove_args()
 {
   /* remove the parameter names */
@@ -452,18 +422,6 @@ void const_function_pointer_propagationt::arg_stackt::remove_args()
     cfpp.message.debug() << "SET: remove " << *arg_it << messaget::eom;
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_function_pointer_propagationt::propagate(
   const irep_idt &function_id)
@@ -584,18 +542,6 @@ void const_function_pointer_propagationt::propagate(
 
   functions_met.erase(function_id);
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void propagate_const_function_pointers(
   symbol_tablet &symbol_table,

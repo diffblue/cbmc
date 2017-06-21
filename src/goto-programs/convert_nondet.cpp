@@ -6,6 +6,9 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Convert side_effect_expr_nondett expressions
+
 #include "goto-programs/convert_nondet.h"
 #include "goto-programs/goto_convert.h"
 #include "goto-programs/goto_model.h"
@@ -15,26 +18,15 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 #include "util/irep_ids.h"
 
-/*******************************************************************\
-
-Function: insert_nondet_init_code
-
-  Inputs:
-    goto_program: The goto program to modify.
-    target: One of the steps in that goto program.
-    symbol_table: The global symbol table.
-    message_handler: Handles logging.
-    max_nondet_array_length: Maximum size of new nondet arrays.
-
-  Outputs: The next instruction to process with this function.
-
- Purpose: Checks an instruction to see whether it contains an assignment
-          from side_effect_expr_nondet.  If so, replaces the instruction
-          with a range of instructions to properly nondet-initialize
-          the lhs.
-
-\*******************************************************************/
-
+/// Checks an instruction to see whether it contains an assignment from
+/// side_effect_expr_nondet.  If so, replaces the instruction with a range of
+/// instructions to properly nondet-initialize the lhs.
+/// \param goto_program: The goto program to modify.
+/// \param target: One of the steps in that goto program.
+/// \param symbol_table: The global symbol table.
+/// \param message_handler: Handles logging.
+/// \param max_nondet_array_length: Maximum size of new nondet arrays.
+/// \return The next instruction to process with this function.
 static goto_programt::targett insert_nondet_init_code(
   goto_programt &goto_program,
   const goto_programt::targett &target,
@@ -108,22 +100,13 @@ static goto_programt::targett insert_nondet_init_code(
   return next_instr;
 }
 
-/*******************************************************************\
-
-Function: convert_nondet
-
-  Inputs:
-    goto_program: The goto program to modify.
-    symbol_table: The global symbol table.
-    message_handler: Handles logging.
-    max_nondet_array_length: Maximum size of new nondet arrays.
-
- Purpose: For each instruction in the goto program, checks if it is
-          an assignment from nondet and replaces it with the appropriate
-          composite initialization code if so.
-
-\*******************************************************************/
-
+/// For each instruction in the goto program, checks if it is an assignment from
+/// nondet and replaces it with the appropriate composite initialization code if
+/// so.
+/// \param goto_program: The goto program to modify.
+/// \param symbol_table: The global symbol table.
+/// \param message_handler: Handles logging.
+/// \param max_nondet_array_length: Maximum size of new nondet arrays.
 static void convert_nondet(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,

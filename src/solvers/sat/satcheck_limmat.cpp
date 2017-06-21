@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 
 
@@ -16,52 +17,16 @@ extern "C"
 #include "limmat.h"
 }
 
-/*******************************************************************\
-
-Function: satcheck_limmatt::satcheck_limmatt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_limmatt::satcheck_limmatt()
 {
   solver=new_Limmat(NULL);
 }
-
-/*******************************************************************\
-
-Function: satcheck_limmatt::~satcheck_limmatt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 satcheck_limmatt::~satcheck_limmatt()
 {
   if(solver!=NULL)
     delete_Limmat(solver);
 }
-
-/*******************************************************************\
-
-Function: satcheck_limmatt::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt satcheck_limmatt::l_get(literalt a) const
 {
@@ -88,34 +53,10 @@ tvt satcheck_limmatt::l_get(literalt a) const
   return result;
 }
 
-/*******************************************************************\
-
-Function: satcheck_limmatt::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_limmatt::solver_text()
 {
   return std::string("Limmat version ")+version_Limmat();
 }
-
-/*******************************************************************\
-
-Function: satcheck_limmatt::copy_cnf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void satcheck_limmatt::copy_cnf()
 {
@@ -137,18 +78,6 @@ void satcheck_limmatt::copy_cnf()
     delete clause;
   }
 }
-
-/*******************************************************************\
-
-Function: satcheck_limmatt::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt satcheck_limmatt::prop_solve()
 {

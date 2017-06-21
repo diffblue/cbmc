@@ -6,6 +6,9 @@ Author: Romain Brenguier
 
 \*******************************************************************/
 
+/// \file
+/// Sparse Vectors
+
 #ifndef CPROVER_UTIL_SPARSE_VECTOR_H
 #define CPROVER_UTIL_SPARSE_VECTOR_H
 

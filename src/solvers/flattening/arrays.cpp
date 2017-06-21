@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <iostream>
 
@@ -21,18 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arrays.h"
 
-/*******************************************************************\
-
-Function: arrayst::arrayst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 arrayst::arrayst(
   const namespacet &_ns,
   propt &_prop):equalityt(_ns, _prop)
@@ -40,18 +29,6 @@ arrayst::arrayst(
   lazy_arrays = false;        // will be set to true when --refine is used
   incremental_cache = false;  // for incremental solving
 }
-
-/*******************************************************************\
-
-Function: arrayst::record_array_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::record_array_index(const index_exprt &index)
 {
@@ -62,18 +39,6 @@ void arrayst::record_array_index(const index_exprt &index)
   index_map[number].insert(index.index());
   update_indices.insert(number);
 }
-
-/*******************************************************************\
-
-Function: arrayst::record_array_equality
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt arrayst::record_array_equality(
   const equal_exprt &equality)
@@ -102,18 +67,6 @@ literalt arrayst::record_array_equality(
 
   return array_equalities.back().l;
 }
-
-/*******************************************************************\
-
-Function: arrayst::collect_indices
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::collect_indices()
 {
@@ -148,18 +101,6 @@ void arrayst::collect_indices(const exprt &expr)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: arrayst::collect_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::collect_arrays(const exprt &a)
 {
@@ -284,20 +225,7 @@ void arrayst::collect_arrays(const exprt &a)
     throw "unexpected array expression (collect_arrays): `"+a.id_string()+"'";
 }
 
-/*******************************************************************\
-
-Function: arrayst::add_array_constraint
-
-  Inputs:
-
- Outputs:
-
- Purpose: adds array constraints
-          (refine=true...lazily for the refinement loop)
-
-\*******************************************************************/
-
-
+/// adds array constraints (refine=true...lazily for the refinement loop)
 void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
 {
   if(lazy_arrays && refine)
@@ -322,18 +250,6 @@ void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
     prop.l_set_to_true(convert(lazy.lazy));
   }
 }
-
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::add_array_constraints()
 {
@@ -373,24 +289,12 @@ void arrayst::add_array_constraints()
   add_array_Ackermann_constraints();
 }
 
-/*******************************************************************\
-
-Function: arrayst::add_array_Ackermann_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void arrayst::add_array_Ackermann_constraints()
 {
   // this is quadratic!
 
 #if 0
-  std::cout << "arrays.size(): " << arrays.size() << std::endl;
+  std::cout << "arrays.size(): " << arrays.size() << '\n';
 #endif
 
   // iterate over arrays
@@ -399,7 +303,7 @@ void arrayst::add_array_Ackermann_constraints()
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
 #if 0
-    std::cout << "index_set.size(): " << index_set.size() << std::endl;
+    std::cout << "index_set.size(): " << index_set.size() << '\n';
 #endif
 
     // iterate over indices, 2x!
@@ -453,18 +357,7 @@ void arrayst::add_array_Ackermann_constraints()
   }
 }
 
-/*******************************************************************\
-
-Function: arrayst::update_index_map
-
-  Inputs:
-
- Outputs:
-
- Purpose: merge the indices into the root
-
-\*******************************************************************/
-
+/// merge the indices into the root
 void arrayst::update_index_map(std::size_t i)
 {
   if(arrays.is_root_number(i))
@@ -516,22 +409,10 @@ void arrayst::update_index_map(bool update_all)
                 << arrays.find_number(i1->first) << " = "
                 << from_expr(ns, "", arrays[arrays.find_number(i1->first)])
                 << "): "
-                << from_expr(ns, "", *i2) << std::endl;
-  std::cout << "-----" << std::endl;
+                << from_expr(ns, "", *i2) << '\n';
+  std::cout << "-----\n";
 #endif
 }
-
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::add_array_constraints(
   const index_sett &index_set,
@@ -568,18 +449,6 @@ void arrayst::add_array_constraints(
     prop.lcnf(!array_equality.l, convert(equality_expr));
   }
 }
-
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::add_array_constraints(
   const index_sett &index_set,
@@ -647,18 +516,6 @@ void arrayst::add_array_constraints(
       "unexpected array expression (add_array_constraints): `"+
         expr.id_string()+"'";
 }
-
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints_with
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::add_array_constraints_with(
   const index_sett &index_set,
@@ -743,18 +600,6 @@ void arrayst::add_array_constraints_with(
   }
 }
 
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void arrayst::add_array_constraints_update(
   const index_sett &index_set,
   const update_exprt &expr)
@@ -830,18 +675,6 @@ void arrayst::add_array_constraints_update(
 #endif
 }
 
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints_array_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void arrayst::add_array_constraints_array_of(
   const index_sett &index_set,
   const array_of_exprt &expr)
@@ -868,18 +701,6 @@ void arrayst::add_array_constraints_array_of(
     add_array_constraint(lazy, false); // added immediately
   }
 }
-
-/*******************************************************************\
-
-Function: arrayst::add_array_constraints_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void arrayst::add_array_constraints_if(
   const index_sett &index_set,

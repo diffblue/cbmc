@@ -22,6 +22,8 @@ extern char *yyansi_ctext;
 
 #include "parser_static.inc"
 
+#include "literals/convert_integer_literal.h"
+
 #include "ansi_c_y.tab.h"
 
 // statements have right recursion, deep nesting of statements thus
@@ -423,6 +425,17 @@ offsetof_member_designator:
           $$=$1;
           set($2, ID_index);
           mto($2, $3);
+          mto($$, $2);
+        }
+        | offsetof_member_designator TOK_ARROW member_name
+        {
+          $$=$1;
+          set($2, ID_index);
+          exprt tmp=convert_integer_literal("0");
+          stack($2).move_to_operands(tmp);
+          mto($$, $2);
+          set($2, ID_member);
+          stack($2).set(ID_component_name, stack($3).get(ID_C_base_name));
           mto($$, $2);
         }
         ;

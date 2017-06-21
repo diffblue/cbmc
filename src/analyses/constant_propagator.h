@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// Constant propagation
+
 #ifndef CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 #define CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
 
@@ -29,6 +32,10 @@ public:
   void make_bottom() final { values.set_to_bottom(); }
   void make_entry() final { values.set_to_top(); }
   bool merge(const constant_propagator_domaint &, locationt, locationt);
+
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns) const override;
 
   struct valuest
   {

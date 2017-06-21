@@ -1,0 +1,20 @@
+CORE
+preproc.i
+-mthumb -o linked-object.gb object.intel
+^EXIT=(64|1)$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+This tests the -mthumb flag that should activate ARM-32 mode. The object
+file 'object.intel' was compiled from 'source.c' with goto-cc on a
+64-bit platform:
+
+  goto-cc -c source.c
+
+preproc.i is already pre-processed so that it can be linked in without
+needing to invoke a pre-processor from a cross-compile toolchain on your
+local machine. Linking it together with the Intel object file, while
+passing -mthumb on the command line, should fail because -mthumb implies
+that we're trying to make an ARM executable.

@@ -6,25 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::template_suffix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
@@ -88,18 +79,6 @@ std::string cpp_typecheckt::template_suffix(
   return result;
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::show_instantiation_stack
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
 {
   for(instantiation_stackt::const_iterator
@@ -121,21 +100,9 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
         out << to_string(*a_it);
     }
 
-    out << "> at " << s_it->source_location << std::endl;
+    out << "> at " << s_it->source_location << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::class_template_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const symbolt &cpp_typecheckt::class_template_symbol(
   const source_locationt &source_location,
@@ -212,18 +179,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   return *s_ptr;
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::elaborate_class_template
-
-  Inputs:
-
- Outputs:
-
- Purpose: elaborate class template instances
-
-\*******************************************************************/
-
+/// elaborate class template instances
 void cpp_typecheckt::elaborate_class_template(
   const typet &type)
 {
@@ -248,21 +204,10 @@ void cpp_typecheckt::elaborate_class_template(
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::instantiate_template
-
-  Inputs: location of the instantiation,
-          the identifier of the template symbol,
-          typechecked template arguments,
-          an (optional) specialization
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: location of the instantiation,
+/// the identifier of the template symbol,
+/// typechecked template arguments,
+/// an (optional) specialization
 #define MAX_DEPTH 50
 
 const symbolt &cpp_typecheckt::instantiate_template(
@@ -286,8 +231,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
   instantiation_stack.back().full_template_args=full_template_args;
 
   #if 0
-  std::cout << "L: " << source_location << std::endl;
-  std::cout << "I: " << template_symbol.name << std::endl;
+  std::cout << "L: " << source_location << '\n';
+  std::cout << "I: " << template_symbol.name << '\n';
   #endif
 
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -310,7 +255,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     else
       std::cout << to_string(*it);
   }
-  std::cout << ">" << std::endl;
+  std::cout << ">\n";
   #endif
 
   // do we have arguments?
@@ -429,7 +374,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 
   #if 0
-  std::cout << "MAP:" << std::endl;
+  std::cout << "MAP:\n";
   template_map.print(std::cout);
   #endif
 
@@ -540,7 +485,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
     bool is_static=new_decl.storage_spec().is_static();
     irep_idt access = new_decl.get(ID_C_access);
 
-    assert(access != irep_idt());
+    assert(!access.empty());
     assert(symb.type.id()==ID_struct);
 
     typecheck_compound_declarator(

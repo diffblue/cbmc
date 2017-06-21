@@ -9,6 +9,9 @@ Date: November 2011
 
 \*******************************************************************/
 
+/// \file
+/// Nondeterministic initialization of certain global scope variables
+
 #include <util/namespace.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
@@ -17,18 +20,6 @@ Date: November 2011
 #include <goto-programs/goto_functions.h>
 
 #include "nondet_static.h"
-
-/*******************************************************************\
-
-Function: nondet_static
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void nondet_static(
   const namespacet &ns,
@@ -79,18 +70,6 @@ void nondet_static(
   }
 }
 
-
-/*******************************************************************\
-
-Function: nondet_static
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void nondet_static(
   const namespacet &ns,

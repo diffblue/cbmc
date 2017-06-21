@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Program Transformation
+
 #include <cassert>
 
 #include <util/rational.h>
@@ -24,23 +27,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
 
 #include "goto_convert_class.h"
 #include "format_strings.h"
-
-/*******************************************************************\
-
-Function: goto_convertt::do_prob_uniform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,
@@ -120,18 +111,6 @@ void goto_convertt::do_prob_uniform(
   copy(assignment, ASSIGN, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_prob_coin
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_prob_coin(
   const exprt &lhs,
   const exprt &function,
@@ -209,18 +188,6 @@ void goto_convertt::do_prob_coin(
   copy(assignment, ASSIGN, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_printf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_printf(
   const exprt &lhs,
   const exprt &function,
@@ -255,18 +222,6 @@ void goto_convertt::do_printf(
   else
     assert(false);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_scanf
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_scanf(
   const exprt &lhs,
@@ -335,7 +290,9 @@ void goto_convertt::do_scanf(
 
               copy(array_copy_statement, OTHER, dest);
               #else
-              exprt lhs=dereference_exprt(ptr, type.subtype());
+              exprt lhs=
+                index_exprt(
+                  dereference_exprt(ptr, type), from_integer(0, index_type()));
               exprt rhs=side_effect_expr_nondett(type.subtype());
               code_assignt assign(lhs, rhs);
               assign.add_source_location()=function.source_location();
@@ -371,18 +328,6 @@ void goto_convertt::do_scanf(
     assert(false);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_input
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_input(
   const exprt &lhs,
   const exprt &function,
@@ -404,18 +349,6 @@ void goto_convertt::do_input(
   copy(input_code, OTHER, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_output(
   const exprt &lhs,
   const exprt &function,
@@ -436,18 +369,6 @@ void goto_convertt::do_output(
 
   copy(output_code, OTHER, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_atomic_begin
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_atomic_begin(
   const exprt &lhs,
@@ -473,18 +394,6 @@ void goto_convertt::do_atomic_begin(
   t->source_location=function.source_location();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_atomic_end
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_convertt::do_atomic_end(
   const exprt &lhs,
   const exprt &function,
@@ -508,18 +417,6 @@ void goto_convertt::do_atomic_end(
   goto_programt::targett t=dest.add_instruction(ATOMIC_END);
   t->source_location=function.source_location();
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_cpp_new
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_cpp_new(
   const exprt &lhs,
@@ -641,18 +538,6 @@ void goto_convertt::do_cpp_new(
   dest.destructive_append(tmp_initializer);
 }
 
-/*******************************************************************\
-
-Function: set_class_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void set_class_identifier(
   struct_exprt &expr,
   const namespacet &ns,
@@ -677,18 +562,6 @@ void set_class_identifier(
     set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_java_new
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_java_new(
   const exprt &lhs,
@@ -744,18 +617,6 @@ void goto_convertt::do_java_new(
   t_i->code=code_assignt(deref, zero_object);
   t_i->source_location=location;
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_java_new_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_java_new_array(
   const exprt &lhs,
@@ -844,7 +705,17 @@ void goto_convertt::do_java_new_array(
     allocate_data_type=data.type();
 
   side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, allocate_data_type);
-  data_cpp_new_expr.set(ID_size, rhs.op0());
+
+  // The instruction may specify a (hopefully small) upper bound on the
+  // array size, in which case we allocate a fixed-length array that may
+  // be larger than the `length` member rather than use a true variable-
+  // length array, which produces a more complex formula in the current
+  // backend.
+  const irept size_bound=rhs.find(ID_length_upper_bound);
+  if(size_bound.is_nil())
+    data_cpp_new_expr.set(ID_size, rhs.op0());
+  else
+    data_cpp_new_expr.set(ID_size, size_bound);
 
   // Must directly assign the new array to a temporary
   // because goto-symex will notice `x=side_effect_exprt` but not
@@ -936,19 +807,7 @@ void goto_convertt::do_java_new_array(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::cpp_new_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose: builds a goto program for object initialization
-          after new
-
-\*******************************************************************/
-
+/// builds a goto program for object initialization after new
 void goto_convertt::cpp_new_initializer(
   const exprt &lhs,
   const side_effect_exprt &rhs,
@@ -976,18 +835,6 @@ void goto_convertt::cpp_new_initializer(
       assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::get_array_argument
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt goto_convertt::get_array_argument(const exprt &src)
 {
@@ -1025,19 +872,8 @@ exprt goto_convertt::get_array_argument(const exprt &src)
   return src.op0().op0();
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_array_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_convertt::do_array_set(
+void goto_convertt::do_array_op(
+  const irep_idt &id,
   const exprt &lhs,
   const exprt &function,
   const exprt::operandst &arguments,
@@ -1046,60 +882,17 @@ void goto_convertt::do_array_set(
   if(arguments.size()!=2)
   {
     error().source_location=function.find_source_location();
-    error() << "array_set expects two arguments" << eom;
+    error() << id << " expects two arguments" << eom;
     throw 0;
   }
 
-  codet array_set_statement;
-  array_set_statement.set_statement(ID_array_set);
-  array_set_statement.operands()=arguments;
+  codet array_op_statement;
+  array_op_statement.set_statement(id);
+  array_op_statement.operands()=arguments;
+  array_op_statement.add_source_location()=function.source_location();
 
-  copy(array_set_statement, OTHER, dest);
+  copy(array_op_statement, OTHER, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_convertt::do_array_copy
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void goto_convertt::do_array_copy(
-  const exprt &lhs,
-  const exprt &function,
-  const exprt::operandst &arguments,
-  goto_programt &dest)
-{
-  if(arguments.size()!=2)
-  {
-    error().source_location=function.find_source_location();
-    error() << "array_copy expects two arguments" << eom;
-    throw 0;
-  }
-
-  codet array_copy_statement;
-  array_copy_statement.set_statement(ID_array_copy);
-  array_copy_statement.operands()=arguments;
-
-  copy(array_copy_statement, OTHER, dest);
-}
-
-/*******************************************************************\
-
-Function: goto_convertt::do_array_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_convertt::do_array_equal(
   const exprt &lhs,
@@ -1139,22 +932,11 @@ void goto_convertt::do_array_equal(
     assignment.lhs()=lhs;
     assignment.rhs()=binary_exprt(
       lhs_array, ID_array_equal, rhs_array, lhs.type());
+    assignment.add_source_location()=function.source_location();
 
     convert(assignment, dest);
   }
 }
-
-/*******************************************************************\
-
-Function: is_lvalue
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool is_lvalue(const exprt &expr)
 {
@@ -1169,18 +951,6 @@ bool is_lvalue(const exprt &expr)
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: make_va_list
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt make_va_list(const exprt &expr)
 {
@@ -1197,19 +967,7 @@ exprt make_va_list(const exprt &expr)
   return expr;
 }
 
-/*******************************************************************\
-
-Function: goto_convertt::do_function_call_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose: add function calls to function queue for later
-          processing
-
-\*******************************************************************/
-
+/// add function calls to function queue for later processing
 void goto_convertt::do_function_call_symbol(
   const exprt &lhs,
   const symbol_exprt &function,
@@ -1470,19 +1228,21 @@ void goto_convertt::do_function_call_symbol(
     assignment.add_source_location()=function.source_location();
     copy(assignment, ASSIGN, dest);
   }
-  else if(has_prefix(id2string(identifier), CPROVER_PREFIX "array_set"))
-  {
-    do_array_set(lhs, function, arguments, dest);
-  }
-  else if(identifier==CPROVER_PREFIX "array_equal" ||
-          identifier=="__CPROVER::array_equal")
+  else if(identifier==CPROVER_PREFIX "array_equal")
   {
     do_array_equal(lhs, function, arguments, dest);
   }
-  else if(identifier==CPROVER_PREFIX "array_copy" ||
-          identifier=="__CPROVER::array_equal")
+  else if(identifier==CPROVER_PREFIX "array_set")
   {
-    do_array_copy(lhs, function, arguments, dest);
+    do_array_op(ID_array_set, lhs, function, arguments, dest);
+  }
+  else if(identifier==CPROVER_PREFIX "array_copy")
+  {
+    do_array_op(ID_array_copy, lhs, function, arguments, dest);
+  }
+  else if(identifier==CPROVER_PREFIX "array_replace")
+  {
+    do_array_op(ID_array_replace, lhs, function, arguments, dest);
   }
   else if(identifier=="printf")
   /*
@@ -1588,8 +1348,18 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
-    const irep_idt description=
-      "assertion "+id2string(get_string_constant(arguments[3]));
+    irep_idt description;
+    try
+    {
+      description="assertion "+id2string(get_string_constant(arguments[3]));
+    }
+    catch(int)
+    {
+      // we might be building newlib, where __assert_func is passed
+      // a pointer-typed symbol; the warning will still have been
+      // printed
+      description="assertion";
+    }
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=false_exprt();

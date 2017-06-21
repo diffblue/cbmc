@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
@@ -18,22 +21,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 #endif
 
-/*******************************************************************\
-
-Function: path_symex_statet::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  // std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
+  // std::cout << "path_symex_statet::read " << src.pretty() << '\n';
   #endif
 
   // This has three phases!
@@ -49,29 +40,17 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
-  // std::cout << " ==> " << tmp.pretty() << std::endl;
+  // std::cout << " ==> " << tmp.pretty() << '\n';
   #endif
 
   return tmp5;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::expand_structs_and_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 {
   #ifdef DEBUG
   std::cout << "expand_structs_and_arrays: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   const typet &src_type=var_map.ns.follow(src.type());
@@ -180,18 +159,6 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
   return src;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::array_theory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
 {
   // top-level constant-sized arrays only right now
@@ -244,25 +211,13 @@ exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
   return src;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   bool propagate)
 {
   #ifdef DEBUG
   std::cout << "instantiate_rec: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   // check whether this is a symbol(.member|[index])*
@@ -347,18 +302,6 @@ exprt path_symex_statet::instantiate_rec(
 
   return src2;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::read_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::read_symbol_member_index(
   const exprt &src,
@@ -451,7 +394,7 @@ exprt path_symex_statet::read_symbol_member_index(
 
   #ifdef DEBUG
   std::cout << "read_symbol_member_index_rec " << identifier
-            << " var_info " << var_info.full_identifier << std::endl;
+            << " var_info " << var_info.full_identifier << '\n';
   #endif
 
   // warning: reference is not stable
@@ -464,7 +407,7 @@ exprt path_symex_statet::read_symbol_member_index(
   else
   {
     // we do some SSA symbol
-    if(var_state.ssa_symbol.get_identifier()==irep_idt())
+    if(var_state.ssa_symbol.get_identifier().empty())
     {
       // produce one
       var_state.ssa_symbol=var_info.ssa_symbol();
@@ -473,18 +416,6 @@ exprt path_symex_statet::read_symbol_member_index(
     return var_state.ssa_symbol;
   }
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::is_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool path_symex_statet::is_symbol_member_index(const exprt &src) const
 {
@@ -539,18 +470,6 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
   }
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::array_index_as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string path_symex_statet::array_index_as_string(const exprt &src) const
 {
   exprt tmp=simplify_expr(src, var_map.ns);
@@ -561,18 +480,6 @@ std::string path_symex_statet::array_index_as_string(const exprt &src) const
   else
     return "[*]";
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::dereference_rec(
   const exprt &src,
@@ -610,24 +517,12 @@ exprt path_symex_statet::dereference_rec(
   return src2;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::instantiate_rec_address(
   const exprt &src,
   bool propagate)
 {
   #ifdef DEBUG
-  std::cout << "instantiate_rec_address: " << src.id() << std::endl;
+  std::cout << "instantiate_rec_address: " << src.id() << '\n';
   #endif
 
   if(src.id()==ID_symbol)
@@ -687,7 +582,7 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     // this shouldn't really happen
     #ifdef DEBUG
-    std::cout << "SRC: " << src.pretty() << std::endl;
+    std::cout << "SRC: " << src.pretty() << '\n';
     #endif
     throw "address of unexpected `"+src.id_string()+"'";
   }

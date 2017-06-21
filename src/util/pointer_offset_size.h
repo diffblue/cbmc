@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Logic
+
 #ifndef CPROVER_UTIL_POINTER_OFFSET_SIZE_H
 #define CPROVER_UTIL_POINTER_OFFSET_SIZE_H
 

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include <cstdlib>
 #include <cctype>
 #include <cassert>
@@ -20,18 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 typedef BigInt::ullong_t ullong_t; // NOLINT(readability/identifiers)
 typedef BigInt::llong_t llong_t; // NOLINT(readability/identifiers)
-
-/*******************************************************************\
-
-Function: >>
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)
 {
@@ -51,34 +40,10 @@ mp_integer operator>>(const mp_integer &a, const mp_integer &b)
   }
 }
 
-/*******************************************************************\
-
-Function: <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 mp_integer operator<<(const mp_integer &a, const mp_integer &b)
 {
   return a*power(2, b);
 }
-
-/*******************************************************************\
-
-Function: <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &operator<<(std::ostream &out, const mp_integer &n)
 {
@@ -86,19 +51,9 @@ std::ostream &operator<<(std::ostream &out, const mp_integer &n)
   return out;
 }
 
-/*******************************************************************\
-
-Function: string2integer
-
-  Inputs: string of '0'-'9' etc. most significant digit first
-          base of number representation
-
- Outputs: mp_integer
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: string of '0'-'9' etc. most significant digit first
+/// base of number representation
+/// \return mp_integer
 const mp_integer string2integer(const std::string &n, unsigned base)
 {
   for(unsigned i=0; i<n.size(); i++)
@@ -108,18 +63,7 @@ const mp_integer string2integer(const std::string &n, unsigned base)
   return mp_integer(n.c_str(), base);
 }
 
-/*******************************************************************\
-
-Function: integer2binary
-
-  Inputs:
-
- Outputs: string of '0'/'1', most significant bit first
-
- Purpose:
-
-\*******************************************************************/
-
+/// \return string of '0'/'1', most significant bit first
 const std::string integer2binary(const mp_integer &n, std::size_t width)
 {
   mp_integer a(n);
@@ -161,18 +105,6 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
   return result;
 }
 
-/*******************************************************************\
-
-Function: integer2string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string integer2string(const mp_integer &n, unsigned base)
 {
   unsigned len = n.digits(base) + 2;
@@ -186,18 +118,9 @@ const std::string integer2string(const mp_integer &n, unsigned base)
   return result;
 }
 
-/*******************************************************************\
-
-Function: binary2integer
-
-  Inputs: string of '0'/'1', most significant bit first
-
- Outputs: mp_integer
-
- Purpose: convert binary string representation to mp_integer
-
-\*******************************************************************/
-
+/// convert binary string representation to mp_integer
+/// \par parameters: string of '0'/'1', most significant bit first
+/// \return mp_integer
 const mp_integer binary2integer(const std::string &n, bool is_signed)
 {
   if(n.empty())
@@ -267,35 +190,11 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
   #endif
 }
 
-/*******************************************************************\
-
-Function: integer2ulong
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 mp_integer::ullong_t integer2ulong(const mp_integer &n)
 {
   assert(n.is_ulong());
   return n.to_ulong();
 }
-
-/*******************************************************************\
-
-Function: integer2size_t
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::size_t integer2size_t(const mp_integer &n)
 {
@@ -305,18 +204,6 @@ std::size_t integer2size_t(const mp_integer &n)
   return (std::size_t)ull;
 }
 
-/*******************************************************************\
-
-Function: integer2unsigned
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 unsigned integer2unsigned(const mp_integer &n)
 {
   assert(n>=0);
@@ -325,105 +212,45 @@ unsigned integer2unsigned(const mp_integer &n)
   return (unsigned)ull;
 }
 
-/*******************************************************************\
-
-Function: bitwise_or
-
-  Inputs:
-
- Outputs:
-
- Purpose: bitwise or
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// bitwise or bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
 mp_integer bitwise_or(const mp_integer &a, const mp_integer &b)
 {
   ullong_t result=a.to_ulong()|b.to_ulong();
   return result;
 }
 
-/*******************************************************************\
-
-Function: bitwise_and
-
-  Inputs:
-
- Outputs:
-
- Purpose: bitwise and
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// bitwise and bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
 mp_integer bitwise_and(const mp_integer &a, const mp_integer &b)
 {
   ullong_t result=a.to_ulong()&b.to_ulong();
   return result;
 }
 
-/*******************************************************************\
-
-Function: bitwise_xor
-
-  Inputs:
-
- Outputs:
-
- Purpose: bitwise xor
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// bitwise xor bitwise operations only make sense on native objects, hence the
+/// largest object size should be the largest available c++ integer size
+/// (currently long long)
 mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
 {
   ullong_t result=a.to_ulong()^b.to_ulong();
   return result;
 }
 
-/*******************************************************************\
-
-Function: bitwise_neg
-
-  Inputs:
-
- Outputs:
-
- Purpose: bitwise negation
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// bitwise negation bitwise operations only make sense on native objects, hence
+/// the largest object size should be the largest available c++ integer size
+/// (currently long long)
 mp_integer bitwise_neg(const mp_integer &a)
 {
   ullong_t result=~a.to_ulong();
   return result;
 }
 
-/*******************************************************************\
-
-Function: arith_left_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose: arithmetic left shift
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// arithmetic left shift bitwise operations only make sense on native objects,
+/// hence the largest object size should be the largest available c++ integer
+/// size (currently long long)
 mp_integer arith_left_shift(
   const mp_integer &a,
   const mp_integer &b,
@@ -441,21 +268,9 @@ mp_integer arith_left_shift(
   return result&mask;
 }
 
-/*******************************************************************\
-
-Function: arith_right_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose: arithmetic right shift (loads sign on MSB)
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// arithmetic right shift (loads sign on MSB) bitwise operations only make
+/// sense on native objects, hence the largest object size should be the largest
+/// available c++ integer size (currently long long)
 mp_integer arith_right_shift(
   const mp_integer &a,
   const mp_integer &b,
@@ -472,21 +287,9 @@ mp_integer arith_right_shift(
   return result;
 }
 
-/*******************************************************************\
-
-Function: logic_left_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose: logic left shift
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// logic left shift bitwise operations only make sense on native objects, hence
+/// the largest object size should be the largest available c++ integer size
+/// (currently long long)
 mp_integer logic_left_shift(
   const mp_integer &a,
   const mp_integer &b,
@@ -509,21 +312,9 @@ mp_integer logic_left_shift(
   return result;
 }
 
-/*******************************************************************\
-
-Function: logic_right_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose: logic right shift (loads 0 on MSB)
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// logic right shift (loads 0 on MSB) bitwise operations only make sense on
+/// native objects, hence the largest object size should be the largest
+/// available c++ integer size (currently long long)
 mp_integer logic_right_shift(
   const mp_integer &a,
   const mp_integer &b,
@@ -537,21 +328,9 @@ mp_integer logic_right_shift(
   return result;
 }
 
-/*******************************************************************\
-
-Function: rotate_right
-
-  Inputs:
-
- Outputs:
-
- Purpose: rotates right (MSB=LSB)
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// rotates right (MSB=LSB) bitwise operations only make sense on native
+/// objects, hence the largest object size should be the largest available c++
+/// integer size (currently long long)
 mp_integer rotate_right(
   const mp_integer &a,
   const mp_integer &b,
@@ -568,21 +347,9 @@ mp_integer rotate_right(
   return result;
 }
 
-/*******************************************************************\
-
-Function: rotate_left
-
-  Inputs:
-
- Outputs:
-
- Purpose: rotate left (LSB=MSB)
-          bitwise operations only make sense on native objects, hence the
-          largest object size should be the largest available c++ integer
-          size (currently long long)
-
-\*******************************************************************/
-
+/// rotate left (LSB=MSB) bitwise operations only make sense on native objects,
+/// hence the largest object size should be the largest available c++ integer
+/// size (currently long long)
 mp_integer rotate_left(
   const mp_integer &a,
   const mp_integer &b,

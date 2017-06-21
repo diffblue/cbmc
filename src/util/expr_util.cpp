@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "expr_util.h"
 #include "expr.h"
 #include "fixedbv.h"
@@ -15,18 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "namespace.h"
 #include "arith_tools.h"
 
-/*******************************************************************\
-
-Function: make_next_state
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void make_next_state(exprt &expr)
 {
   Forall_operands(it, expr)
@@ -35,18 +24,6 @@ void make_next_state(exprt &expr)
   if(expr.id()==ID_symbol)
     expr.id(ID_next_symbol);
 }
-
-/*******************************************************************\
-
-Function: make_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt make_binary(const exprt &expr)
 {
@@ -59,14 +36,14 @@ exprt make_binary(const exprt &expr)
   const typet &type=expr.type();
 
   exprt previous=operands.front();
-  assert(previous.type()==type);
+  PRECONDITION(previous.type()==type);
 
   for(exprt::operandst::const_iterator
       it=++operands.begin();
       it!=operands.end();
       ++it)
   {
-    assert(it->type()==type);
+    PRECONDITION(it->type()==type);
 
     exprt tmp=expr;
     tmp.operands().clear();
@@ -79,22 +56,10 @@ exprt make_binary(const exprt &expr)
   return previous;
 }
 
-/*******************************************************************\
-
-Function: make_with_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 with_exprt make_with_expr(const update_exprt &src)
 {
   const exprt::operandst &designator=src.designator();
-  assert(!designator.empty());
+  PRECONDITION(!designator.empty());
 
   with_exprt result;
   exprt *dest=&result;
@@ -113,7 +78,7 @@ with_exprt make_with_expr(const update_exprt &src)
       //  to_member_designator(*it).get_component_name();
     }
     else
-      assert(false);
+      UNREACHABLE;
 
     *dest=tmp;
     dest=&to_with_expr(*dest).new_value();
@@ -121,18 +86,6 @@ with_exprt make_with_expr(const update_exprt &src)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: is_not_zero
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt is_not_zero(
   const exprt &src,
@@ -155,25 +108,13 @@ exprt is_not_zero(
     src_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal;
 
   exprt zero=from_integer(0, src_type);
-  assert(zero.is_not_nil());
+  CHECK_RETURN(zero.is_not_nil());
 
   binary_exprt comparison(src, id, zero, bool_typet());
   comparison.add_source_location()=src.source_location();
 
   return comparison;
 }
-
-/*******************************************************************\
-
-Function: boolean_negate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt boolean_negate(const exprt &src)
 {
@@ -187,18 +128,6 @@ exprt boolean_negate(const exprt &src)
     return not_exprt(src);
 }
 
-/*******************************************************************\
-
-Function: has_subexpr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool has_subexpr(const exprt &src, const irep_idt &id)
 {
   if(src.id()==id)
@@ -211,22 +140,10 @@ bool has_subexpr(const exprt &src, const irep_idt &id)
   return false;
 }
 
-/*******************************************************************\
-
-Function: lift_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 if_exprt lift_if(const exprt &src, std::size_t operand_number)
 {
-  assert(operand_number<src.operands().size());
-  assert(src.operands()[operand_number].id()==ID_if);
+  PRECONDITION(operand_number<src.operands().size());
+  PRECONDITION(src.operands()[operand_number].id()==ID_if);
 
   const if_exprt if_expr=to_if_expr(src.operands()[operand_number]);
   const exprt true_case=if_expr.true_case();

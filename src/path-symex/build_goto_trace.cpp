@@ -6,20 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Build Goto Trace from State History
+
 #include "build_goto_trace.h"
 
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose: follow state history to build a goto trace
-
-\*******************************************************************/
-
+/// follow state history to build a goto trace
 void build_goto_trace(
   const path_symex_statet &state,
   const decision_proceduret &decision_procedure,
@@ -113,7 +105,7 @@ void build_goto_trace(
     const irep_idt &comment=
       instruction.source_location.get_comment();
 
-    if(comment!=irep_idt())
+    if(!comment.empty())
       trace_step.comment=id2string(comment);
     else
       trace_step.comment="assertion";

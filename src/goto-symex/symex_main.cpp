@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #include <cassert>
 
 #include <util/std_expr.h>
@@ -17,35 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-/*******************************************************************\
-
-Function: goto_symext::new_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::new_name(symbolt &symbol)
 {
   get_new_name(symbol, ns);
   new_symbol_table.add(symbol);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::vcc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::vcc(
   const exprt &vcc_expr,
@@ -73,18 +52,6 @@ void goto_symext::vcc(
   remaining_vccs++;
   target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::symex_assume
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
@@ -115,18 +82,6 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
     symex_atomic_end(state);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::rewrite_quantifiers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 {
   if(expr.id()==ID_forall)
@@ -143,18 +98,7 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex from given state
-
-\*******************************************************************/
-
+/// symex from given state
 void goto_symext::operator()(
   statet &state,
   const goto_functionst &goto_functions,
@@ -181,7 +125,7 @@ void goto_symext::operator()(
        state.source.thread_nr+1<state.threads.size())
     {
       unsigned t=state.source.thread_nr+1;
-      // std::cout << "********* Now executing thread " << t << std::endl;
+      // std::cout << "********* Now executing thread " << t << '\n';
       state.switch_to_thread(t);
     }
   }
@@ -190,18 +134,7 @@ void goto_symext::operator()(
   state.dirty=0;
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex starting from given program
-
-\*******************************************************************/
-
+/// symex starting from given program
 void goto_symext::operator()(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
@@ -210,18 +143,7 @@ void goto_symext::operator()(
   operator() (state, goto_functions, goto_program);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex from entry point
-
-\*******************************************************************/
-
+/// symex from entry point
 void goto_symext::operator()(const goto_functionst &goto_functions)
 {
   goto_functionst::function_mapt::const_iterator it=
@@ -235,18 +157,7 @@ void goto_symext::operator()(const goto_functionst &goto_functions)
   operator()(goto_functions, body);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::symex_step
-
-  Inputs:
-
- Outputs:
-
- Purpose: do just one step
-
-\*******************************************************************/
-
+/// do just one step
 void goto_symext::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
