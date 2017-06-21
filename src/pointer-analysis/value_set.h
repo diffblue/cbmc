@@ -80,6 +80,7 @@ public:
     const_iterator cend() const { return data.cend(); }
 
     size_t size() const { return data.size(); }
+    bool empty() const { return data.empty(); }
 
     objectt &operator[](unsigned i) { return data[i]; }
 
