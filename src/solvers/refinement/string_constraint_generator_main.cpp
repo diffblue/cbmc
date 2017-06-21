@@ -463,7 +463,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_of_int_hex_func)
     res=add_axioms_from_int_hex(expr);
   else if(id==ID_cprover_string_of_float_func)
-    res=add_axioms_from_float(expr);
+    res=add_axioms_for_string_of_float(expr);
   else if(id==ID_cprover_string_of_float_scientific_notation_func)
     res=add_axioms_from_float_scientific_notation(expr);
   else if(id==ID_cprover_string_of_double_func)
