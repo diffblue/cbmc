@@ -128,7 +128,6 @@ int as_modet::doit()
 
   // determine actions to be undertaken
   compilet compiler(cmdline, message_handler, cmdline.isset("fatal-warnings"));
-  compiler.ui_message_handler.set_verbosity(verbosity);
 
   if(cmdline.isset('b')) // as86 only
   {
