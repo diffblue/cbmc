@@ -7,7 +7,8 @@ Here a few minimalistic coding rules for the CPROVER source tree.
     - Subsequent lines should be indented two more than the initial line
     - Break after `=` if it is part of an assignment
       - For chained calls, prefer immediately before `.`
-    - For other operators (e.g. &&, `+`) prefer immediately after the operator
+    - For other operators (e.g. `&&`, `+`) prefer immediately after the
+      operator
     - For brackets, break after the bracket
       - In the case of function calls, put each argument on a separate line if
         they do not fit after one line break
