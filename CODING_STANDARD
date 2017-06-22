@@ -70,18 +70,18 @@ Comments:
   ///   like this.
   /// \return The return value is literally the value returned by the
   ///   function. For out-parameters, use "\param [out]".
-  return_typet my_function(argt arg_name, argt &long_arg_name);
+  return_typet my_function(argt arg_name, argt &long_arg_name)
   ```
   
 - The priority of documentation is readability. Therefore, feel free
   to use Doxygen features, or to add whitespace for multi-paragraph
   comment blocks if necessary.
   
-- Prefer to place documentation in headers. This makes it easier for
-  clients of your code to understand your interfaces, without having
-  to cross-reference between the header and source file. Entities which
-  are not declared in any header should still be documented where they
-  are defined.
+- A comment block should immediately precede the definition of the
+  entity it documents, which will generally mean that it will live in the
+  source file. This allows us to take advantage of the one definition
+  rule. If each entity is defined only once, then it is also documented
+  only once.
   
 - The documentation block must *immediately* precede the entity it
   documents. Don't insert empty lines between docs and functions,
