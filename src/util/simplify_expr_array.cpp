@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "byte_operators.h"
+#include "expr_util.h"
 #include "pointer_offset_size.h"
 #include "replace_expr.h"
 #include "std_expr.h"
@@ -51,6 +52,13 @@ simplify_exprt::simplify_index(const index_exprt &expr)
       index = to_mult_expr(index_div_expr.dividend()).op1();
       no_change = false;
     }
+  }
+  else if(index.id() == ID_if)
+  {
+    if_exprt if_expr = lift_if(expr, 1);
+    if_expr.true_case() = simplify_index(to_index_expr(if_expr.true_case()));
+    if_expr.false_case() = simplify_index(to_index_expr(if_expr.false_case()));
+    return changed(simplify_if(if_expr));
   }
 
   if(array.id() == ID_array_comprehension)
@@ -199,16 +207,10 @@ simplify_exprt::simplify_index(const index_exprt &expr)
   }
   else if(array.id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(array);
-    exprt cond=if_expr.cond();
-
-    index_exprt idx_false=to_index_expr(expr);
-    idx_false.array()=if_expr.false_case();
-
-    new_expr.array() = if_expr.true_case();
-
-    exprt result = if_exprt(cond, new_expr, idx_false, expr.type());
-    return changed(simplify_rec(result));
+    if_exprt if_expr = lift_if(expr, 0);
+    if_expr.true_case() = simplify_index(to_index_expr(if_expr.true_case()));
+    if_expr.false_case() = simplify_index(to_index_expr(if_expr.false_case()));
+    return changed(simplify_if(if_expr));
   }
 
   if(no_change)

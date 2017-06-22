@@ -1,7 +1,10 @@
-CORE thorough-paths broken-smt-backend
+FUTURE thorough-paths broken-smt-backend
 test.c
 --no-simplify --unwind 300 --object-bits 8
 too many addressed objects
 ^EXIT=6$
 ^SIGNAL=0$
 --
+Propagating if expressions without support by the simplifier makes this test
+very expensive. Propagation of if expressions should likely be made conditional
+on simplification being enabled.

@@ -12,8 +12,8 @@ Author: Michael Tautschig, tautschn@amazon.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_IS_CONSTANT_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_IS_CONSTANT_H
 
-#include <util/expr.h>
 #include <util/expr_util.h>
+#include <util/std_expr.h>
 
 class goto_symex_is_constantt : public is_constantt
 {
@@ -46,6 +46,13 @@ protected:
       return true;
       */
       return false;
+    }
+    else if(auto if_expr = expr_try_dynamic_cast<if_exprt>(expr))
+    {
+      // consider ?: constant if both branches are constants, irrespective of
+      // the condition
+      return is_constant(if_expr->true_case()) &&
+             is_constant(if_expr->false_case());
     }
 
     return is_constantt::is_constant(expr);

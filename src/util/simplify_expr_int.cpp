@@ -461,6 +461,18 @@ simplify_exprt::resultt<> simplify_exprt::simplify_plus(const plus_exprt &expr)
       return changed(simplify_plus(result));
     }
 
+    for(std::size_t op_if = 0; op_if < expr.operands().size(); ++op_if)
+    {
+      if(expr.operands()[op_if].id() == ID_if)
+      {
+        if_exprt if_expr = lift_if(expr, op_if);
+        if_expr.true_case() = simplify_plus(to_plus_expr(if_expr.true_case()));
+        if_expr.false_case() =
+          simplify_plus(to_plus_expr(if_expr.false_case()));
+        return changed(simplify_if(if_expr));
+      }
+    }
+
     // count the constants
     size_t count=0;
     forall_operands(it, expr)
