@@ -94,7 +94,7 @@ void string_refinementt::display_index_set()
   for(const auto &i : index_set)
   {
     const exprt &s=i.first;
-    debug() << "IS(" << from_expr(s) << ")=={" << eom;
+    debug() << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
 
     for(auto j : i.second)
     {
@@ -103,7 +103,7 @@ void string_refinementt::display_index_set()
         count_current++;
         debug() << "**";
       }
-      debug() << "  " << from_expr(j) << ";" << eom;
+      debug() << "  " << from_expr(ns, "", j) << ";" << eom;
       count++;
     }
     debug() << "}"  << eom;
@@ -121,10 +121,10 @@ void string_refinementt::add_instantiations()
   for(const auto &i : current_index_set)
   {
     const exprt &s=i.first;
-    debug() << "IS(" << from_expr(s) << ")=={";
+    debug() << "IS(" << from_expr(ns, "", s) << ")=={";
 
     for(const auto &j : i.second)
-      debug() << from_expr(j) << "; ";
+      debug() << from_expr(ns, "", j) << "; ";
     debug() << "}"  << eom;
 
     for(const auto &j : i.second)
@@ -249,7 +249,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
     else
     {
       debug() << "string_refinement warning: not handling char_array: "
-              << from_expr(rhs) << eom;
+              << from_expr(ns, "", rhs) << eom;
       return true;
     }
   }
@@ -313,7 +313,7 @@ void string_refinementt::concretize_string(const exprt &expr)
            mp_index>=concretize_limit)
         {
           debug() << "concretize_string: ignoring out of bound index: "
-                  << from_expr(simple_i) << eom;
+                  << from_expr(ns, "", simple_i) << eom;
         }
         else
         {
@@ -333,8 +333,8 @@ void string_refinementt::concretize_string(const exprt &expr)
 
       array_exprt arr(to_array_type(content.type()));
       arr.operands()=result;
-      debug() << "Concretized " << from_expr(content_expr)
-              << " = " << from_expr(arr) << eom;
+      debug() << "Concretized " << from_expr(ns, "", content_expr)
+              << " = " << from_expr(ns, "", arr) << eom;
       found_content[content]=arr;
     }
   }
@@ -393,7 +393,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     if(eq_expr.lhs().type()!=eq_expr.rhs().type())
     {
       debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(expr) << " [inconsistent types]" << eom;
+              << from_expr(ns, "", expr) << " [inconsistent types]" << eom;
       debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
       debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
       return;
@@ -415,7 +415,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     if(lhs.id()!=ID_symbol)
     {
       debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(expr) << eom;
+              << from_expr(ns, "", expr) << eom;
       return;
     }
 
@@ -427,7 +427,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
          eq_expr.lhs().type().subtype() != subst_rhs.type().subtype())
       {
         debug() << "(sr::set_to) WARNING: ignoring "
-                << from_expr(expr) << " [inconsistent types after substitution]"
+                << from_expr(ns, "", expr) << " [inconsistent types after substitution]"
                 << eom;
         return;
       }
@@ -624,7 +624,7 @@ void string_refinementt::add_lemma(
     return;
   }
 
-  debug() << "adding lemma " << from_expr(simple_lemma) << eom;
+  debug() << "adding lemma " << from_expr(ns, "", simple_lemma) << eom;
 
   prop.l_set_to_true(convert(simple_lemma));
 }
@@ -648,7 +648,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   {
 #if 0
     debug() << "(sr::get_array) string of unknown size: "
-            << from_expr(size_val) << eom;
+            << from_expr(ns, "", size_val) << eom;
 #endif
     return empty_ret;
   }
@@ -721,7 +721,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   else
   {
 #if 0
-    debug() << "unable to get array-list value of " << from_expr(arr)
+    debug() << "unable to get array-list value of " << from_expr(ns, "", arr)
             << " of size " << n << eom;
 #endif
     return array_of_exprt(from_integer(0, char_type), ret_type);
@@ -809,14 +809,14 @@ void string_refinementt::fill_model()
 
       current_model[elength]=len;
       current_model[econtent]=arr;
-      debug() << from_expr(to_symbol_expr(it.first)) << "="
-              << from_expr(refined);
+      debug() << from_expr(ns, "", to_symbol_expr(it.first)) << "="
+              << from_expr(ns, "", refined);
 
       if(arr.id()==ID_array)
         debug() << " = \"" << string_of_array(to_array_expr(arr))
-                << "\" (size:" << from_expr(len) << ")"<< eom;
+                << "\" (size:" << from_expr(ns, "", len) << ")"<< eom;
       else
-        debug() << " = " << from_expr(arr) << " (size:" << from_expr(len)
+        debug() << " = " << from_expr(ns, "", arr) << " (size:" << from_expr(ns, "", len)
                 << ")" << eom;
     }
     else
@@ -828,22 +828,22 @@ void string_refinementt::fill_model()
       exprt arr_model=get_array(arr);
       current_model[it.first]=arr_model;
 
-      debug() << from_expr(to_symbol_expr(it.first)) << "="
-              << from_expr(arr) << " = " << from_expr(arr_model) << "" << eom;
+      debug() << from_expr(ns, "", to_symbol_expr(it.first)) << "="
+              << from_expr(ns, "", arr) << " = " << from_expr(ns, "", arr_model) << "" << eom;
     }
   }
 
   for(auto it : generator.boolean_symbols)
   {
       debug() << "" << it.get_identifier() << " := "
-              << from_expr(supert::get(it)) << eom;
+              << from_expr(ns, "", supert::get(it)) << eom;
       current_model[it]=supert::get(it);
   }
 
   for(auto it : generator.index_symbols)
   {
      debug() << "" << it.get_identifier() << " := "
-              << from_expr(supert::get(it)) << eom;
+              << from_expr(ns, "", supert::get(it)) << eom;
      current_model[it]=supert::get(it);
   }
 }
@@ -1056,7 +1056,7 @@ exprt string_refinementt::negation_of_constraint(
   and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
-  debug() << "(sr::check_axioms) negated axiom: " << from_expr(negaxiom) << eom;
+  debug() << "(sr::check_axioms) negated axiom: " << from_expr(ns, "", negaxiom) << eom;
   substitute_array_access(negaxiom);
   solver << negaxiom;
 }
@@ -1100,7 +1100,7 @@ bool string_refinementt::check_axioms()
         exprt val=solver.get(axiom_in_model.univ_var());
         debug() << "string constraint can be violated for "
                 << axiom_in_model.univ_var().get_identifier()
-                << " = " << from_expr(val) << eom;
+                << " = " << from_expr(ns, "", val) << eom;
         violated[i]=val;
       }
       break;
@@ -1147,7 +1147,7 @@ bool string_refinementt::check_axioms()
         implies_exprt instance(premise, body);
         replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
-        debug() << "adding counter example " << from_expr(instance) << eom;
+        debug() << "adding counter example " << from_expr(ns, "", instance) << eom;
         add_lemma(instance);
       }
     }
@@ -1382,8 +1382,8 @@ void string_refinementt::add_to_index_set(const exprt &s, exprt i)
   }
   if(index_set[s].insert(i).second)
   {
-    debug() << "adding to index set of " << from_expr(s)
-            << ": " << from_expr(i) << eom;
+    debug() << "adding to index set of " << from_expr(ns, "", s)
+            << ": " << from_expr(ns, "", i) << eom;
     current_index_set[s].insert(i);
   }
 }
@@ -1529,15 +1529,16 @@ void string_refinementt::instantiate_not_contains(
   exprt s0=axiom.s0();
   exprt s1=axiom.s1();
 
-  debug() << "instantiate not contains " << from_expr(s0) << " : "
-          << from_expr(s1) << eom;
+  debug() << "instantiate not contains " << from_expr(ns, "", s0) << " : "
+          << from_expr(ns, "", s1) << eom;
   expr_sett index_set0=index_set[to_string_expr(s0).content()];
   expr_sett index_set1=index_set[to_string_expr(s1).content()];
 
   for(auto it0 : index_set0)
     for(auto it1 : index_set1)
     {
-      debug() << from_expr(it0) << " : " << from_expr(it1) << eom;
+      debug() << from_expr(ns, "", it0) << " : " << from_expr(ns, "", it1)
+              << eom;
       exprt val=minus_exprt(it0, it1);
       exprt witness=generator.get_witness_of(axiom, val);
       and_exprt prem_and_is_witness(
