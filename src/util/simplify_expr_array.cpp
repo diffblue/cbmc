@@ -10,7 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include "expr.h"
+#include "expr_util.h"
 #include "namespace.h"
 #include "std_expr.h"
 #include "replace_expr.h"
@@ -44,6 +44,17 @@ bool simplify_exprt::simplify_index(exprt &expr)
       expr.op1()=tmp;
       result=false;
     }
+  }
+  else if(index.id()==ID_if &&
+          index.operands().size()==3)
+  {
+    if_exprt if_expr=lift_if(expr, 1);
+    simplify_index(if_expr.true_case());
+    simplify_index(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
+
+    return false;
   }
 
   if(array.id()==ID_lambda)
@@ -213,16 +224,11 @@ bool simplify_exprt::simplify_index(exprt &expr)
   }
   else if(array.id()==ID_if)
   {
-    const if_exprt &if_expr=to_if_expr(array);
-    exprt cond=if_expr.cond();
-
-    index_exprt idx_false=to_index_expr(expr);
-    idx_false.array()=if_expr.false_case();
-
-    to_index_expr(expr).array()=if_expr.true_case();
-
-    expr=if_exprt(cond, expr, idx_false, expr.type());
-    simplify_rec(expr);
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_index(if_expr.true_case());
+    simplify_index(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
 
     return false;
   }
