@@ -4,10 +4,14 @@ PARAM = --incremental
 # --refine   --slice-formula
 
 test:
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 30 ../../../src/cbmc/cbmc $(PARAM)"
+	@if ! ../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 30 ../../../src/cbmc/cbmc $(PARAM)" ; then \
+	../failed-tests-printer.pl ; \
+		exit 1 ; \
+	fi
 
 tests.log: ../test.pl
-	@../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 30 ../../../src/cbmc/cbmc $(PARAM)"
+	@if ! ../test.pl -c "perl -e 'alarm shift @ARGV; exec @ARGV' 30 ../../../src/cbmc/cbmc $(PARAM)" ; then \
+	../failed-tests-printer.pl ; \
 
 show:
 	@for dir in *; do \
