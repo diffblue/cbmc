@@ -217,9 +217,10 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 string_exprt string_constraint_generatort::add_axioms_from_int(
   const exprt &i, size_t max_size, const refined_string_typet &ref_type)
 {
+  PRECONDITION(i.type().id()==ID_signedbv);
+  PRECONDITION(max_size<std::numeric_limits<size_t>::max());
   string_exprt res=fresh_string(ref_type);
   const typet &type=i.type();
-  assert(type.id()==ID_signedbv);
   exprt ten=from_integer(10, type);
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -262,8 +263,6 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
     and_exprt(res.axiom_for_is_strictly_longer_than(1), starts_with_minus),
     not_exprt(equal_exprt(res[1], zero_char)));
   axioms.push_back(a4);
-
-  assert(max_size<std::numeric_limits<size_t>::max());
 
   for(size_t size=1; size<=max_size; size++)
   {
