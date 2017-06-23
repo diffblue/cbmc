@@ -37,11 +37,11 @@ exprt get_exponent(
     from_integer(spec.bias(), signedbv_typet(32)));
 }
 
-/// Gets the magnitude without hidden bit
+/// Gets the fraction without hidden bit
 /// \param src: a floating point expression
 /// \param spec: specification for floating points
-/// \return An unsigned value representing the magnitude.
-exprt get_magnitude(const exprt &src, const ieee_float_spect &spec)
+/// \return An unsigned value representing the fractional part.
+exprt get_fraction(const exprt &src, const ieee_float_spect &spec)
 {
   return extractbits_exprt(src, spec.f-1, 0, unsignedbv_typet(spec.f));
 }
@@ -61,12 +61,12 @@ exprt get_significand(
 {
   PRECONDITION(type.id()==ID_unsignedbv);
   PRECONDITION(to_unsignedbv_type(type).get_width()>spec.f);
-  typecast_exprt magnitude(get_magnitude(src, spec), type);
+  typecast_exprt fraction(get_fraction(src, spec), type);
   exprt exponent=get_exponent(src, spec);
   equal_exprt all_zeros(exponent, from_integer(0, exponent.type()));
   exprt hidden_bit=from_integer((1 << spec.f), type);
-  plus_exprt with_hidden_bit(magnitude, hidden_bit);
-  return if_exprt(all_zeros, magnitude, with_hidden_bit);
+  bitor_exprt with_hidden_bit(fraction, hidden_bit);
+  return if_exprt(all_zeros, fraction, with_hidden_bit);
 }
 
 /// Create an expression to represent a float or double value.
@@ -126,9 +126,9 @@ exprt floatbv_of_int_expr(const exprt &i, const ieee_float_spect &spec)
 /// floating point value in decimal.
 /// We are looking for d such that n * 10^d = m * 2^e, so:
 /// d = log_10(m) + log_10(2) * e - log_10(n)
-/// m -- the magnitude -- should be between 1 and 2 so log_10(m)
+/// m -- the fraction -- should be between 1 and 2 so log_10(m)
 /// in [0,log_10(2)].
-/// n -- the magnitude in base 10 -- should be between 1 and 10 so
+/// n -- the fraction in base 10 -- should be between 1 and 10 so
 /// log_10(n) in [0, 1].
 /// So the estimate is given by:
 /// d ~=~  floor(log_10(2) * e)
@@ -230,7 +230,7 @@ string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
   // a2 : starts_with_dot && no_trailing_zero && is_number
   // starts_with_dot: res[0] = '.'
   // is_number: forall i:[1, max_size[. '0' < res[i] < '9'
-  // no_trailing_zero: forall j:[2, max_size[. !(|res| = j+1 && res[j]='0')
+  // no_trailing_zero: forall j:[2, max_size[. !(|res| = j+1 && res[j] = '0')
   // a3 : int_expr = sum_j 10^j (j < |res| ? res[j] - '0' : 0)
 
   and_exprt a1(res.axiom_for_is_strictly_longer_than(1),
@@ -258,8 +258,8 @@ string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
     sum=plus_exprt(ten_sum, to_add);
 
     and_exprt is_number(
-          binary_relation_exprt(res[j], ID_ge, zero_char),
-          binary_relation_exprt(res[j], ID_le, nine_char));
+      binary_relation_exprt(res[j], ID_ge, zero_char),
+      binary_relation_exprt(res[j], ID_le, nine_char));
     digit_constraints.push_back(is_number);
 
     // There are no trailing zeros except for ".0" (i.e j=2)
@@ -317,13 +317,13 @@ string_exprt string_constraint_generatort::
   exprt bin_significand_int=
     get_significand(f, float_spec, unsignedbv_typet(32));
   // `bin_significand` represents $m$ and is obtained
-  // by multiplying `binary_significand_as_int` by 1/0x800000=1.192092896e-7.
+  // by multiplying `binary_significand_as_int` by 1/0x800000 = 2^-23
   exprt bin_significand=floatbv_mult(
     floatbv_typecast_exprt(bin_significand_int, round_to_zero_expr, float_type),
-    constant_float(1.192092896e-7, float_spec));
+    constant_float(0x1p-23, float_spec));
 
   // This is a first approximation of the exponent that will adjust
-  // if the magnitude we get is greater than 10
+  // if the fraction we get is greater than 10
   exprt dec_exponent_estimate=estimate_decimal_exponent(f, float_spec);
 
   // Table for values of $2^x / 10^(floor(log_10(2)*x))$ where x=Range[0,128]
@@ -396,7 +396,7 @@ string_exprt string_constraint_generatort::
     plus_exprt(dec_exponent_estimate, from_integer(1, int_type)),
     dec_exponent_estimate);
 
-  // `dec_significand` is divided by 10 if it exeeds 10
+  // `dec_significand` is divided by 10 if it exceeds 10
   dec_significand=if_exprt(
     estimate_too_small,
     floatbv_mult(dec_significand, constant_float(0.1, float_spec)),
@@ -428,7 +428,7 @@ string_exprt string_constraint_generatort::
   string_exprt string_expr_with_fractional_part=add_axioms_for_concat(
     string_expr_integer_part, string_fractional_part);
 
-  // string_expr_with_E = concat(string_magnitude, string_lit_E)
+  // string_expr_with_E = concat(string_fraction, string_lit_E)
   string_exprt string_expr_with_E=add_axioms_for_concat_char(
     string_expr_with_fractional_part,
     from_integer('E', ref_type.get_char_type()));
