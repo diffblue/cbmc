@@ -267,8 +267,18 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
 
   for(size_t size=1; size<=max_size; size++)
   {
-    // For each possible size, we add axioms:
-    // a5 : forall 1 <= j < size. '0' <= res[j] <= '9' && sum == 10 * (sum/10)
+    // For each possible size, we have:
+    // sum_0 = starts_with_digit ? res[0]-'0' : 0
+    // sum_j = 10 * sum_{j-1} + res[i] - '0'
+    // and add axioms:
+    // a5 : |res| == size =>
+    //        forall 1 <= j < size.
+    //          is_number && (j >= max_size-2 => no_overflow)
+    //     where is_number := '0' <= res[j] <= '9'
+    //     and no_overflow := sum_{j-1} = (10 * sum_{j-1} / 10)
+    //                        && sum_j >= sum_{j - 1}
+    //         (the first part avoid overflows in multiplication and
+    //          the second one in additions)
     // a6 : |res| == size && '0' <= res[0] <= '9' => i == sum
     // a7 : |res| == size && res[0] == '-' => i == -sum
 
@@ -301,8 +311,8 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
     }
 
     equal_exprt premise=res.axiom_for_has_length(size);
-    exprt a5=conjunction(digit_constraints);
-    axioms.push_back(implies_exprt(premise, a5));
+    implies_exprt a5(premise, conjunction(digit_constraints));
+    axioms.push_back(a5);
 
     implies_exprt a6(
       and_exprt(premise, starts_with_digit), equal_exprt(i, sum));
