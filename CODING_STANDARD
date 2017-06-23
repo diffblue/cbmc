@@ -41,34 +41,52 @@ Whitespaces:
 - Have a newline at the end of a file
 
 Comments:
-- Do not use /* */ except for file and function comment blocks
+- Do not use /* */
 - Each source and header file must start with a comment block
-  stating the Module name and Author [will be changed when we roll out doxygen]
-- Each function in the source file (not the header) is preceded
-  by a function comment header consisting of a comment block stating
-  Name, Inputs,  Outputs and Purpose [will be changed when we roll
-  out doxygen]
-   - It should look like this:
-   ```
-   /*******************************************************************\
-
-   Function: class_namet::function_name
-
-    Inputs:
-     arg_name - Description of its purpose
-     long_arg_name - Descriptions should be indented
-                     to match the first line of the
-                     description
-
-    Outputs: A description of what the function returns
-
-    Purpose: A description of what the function does.
-             Again, indentation with the line above
-
-   \*******************************************************************/
-   ```
-- An empty line should appear between the bottom of the function comment header
-  and the function.
+  stating the author. See existing source for an example of the
+  format of this block.
+  This should be followed by a Doxygen `\file` comment:
+  ```
+  /// \file
+  /// <Some information about this file goes here>
+  ```
+  Note that the `\file` tag must be immediately followed by a newline in
+  order for Doxygen to relate the comment to the current file.
+  
+- Each function should be preceded by a Doxygen comment describing
+  that function. The format should match the
+  [LLVM guidelines](http://llvm.org/docs/CodingStandards.html#doxygen-use-in-documentation-comments),
+  with one extension: `\param` and `\return` comments longer than a
+  single line should have subsequent lines indented by two spaces, so
+  that the tags stand out.
+  An example:
+  ```c++
+  /// This sentence, until the first dot followed by whitespace, becomes
+  /// the brief description. More detailed text follows. Feel free to
+  /// break this into paragraphs to aid readability.
+  /// \param arg_name: This parameter doesn't need much description
+  /// \param [out] long_arg_name: This parameter is mutated by the function.
+  ///   Extra info about the parameter gets indented an extra two columns,
+  ///   like this.
+  /// \return The return value is literally the value returned by the
+  ///   function. For out-parameters, use "\param [out]".
+  return_typet my_function(argt arg_name, argt &long_arg_name)
+  ```
+  
+- The priority of documentation is readability. Therefore, feel free
+  to use Doxygen features, or to add whitespace for multi-paragraph
+  comment blocks if necessary.
+  
+- A comment block should immediately precede the definition of the
+  entity it documents, which will generally mean that it will live in the
+  source file. This allows us to take advantage of the one definition
+  rule. If each entity is defined only once, then it is also documented
+  only once.
+  
+- The documentation block must *immediately* precede the entity it
+  documents. Don't insert empty lines between docs and functions,
+  because this will confuse Doxygen.
+  
 - Put comments on a separate line
 - Use comments to explain the non-obvious
 - Use #if 0 for commenting out source code
