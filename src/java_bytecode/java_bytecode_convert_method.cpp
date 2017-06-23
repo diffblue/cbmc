@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/simplify_expr.h>
 
 #include <linking/zero_initializer.h>
 
@@ -1437,7 +1438,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?ipush"))
     {
       assert(results.size()==1);
-      results[0]=typecast_exprt(arg0, java_int_type());
+      mp_integer int_value;
+      bool ret=to_integer(to_constant_expr(arg0), int_value);
+      INVARIANT(!ret, "?ipush argument should be an integer");
+      results[0]=from_integer(int_value, java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
