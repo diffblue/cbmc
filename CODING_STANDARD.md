@@ -93,7 +93,7 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 - Separate basic words by `_`
 - Avoid abbreviations (e.g. prefer `symbol_table` to `st`).
 - User defined type identifiers have to be terminated by `t`. Moreover, before
-  `t` may not be `t`.
+  `t` may not be `_`.
 - Do not use `m_` prefix nor `_` suffix for names of attributes of structured
   types.
 - Enum values may use the characters `[A-Z0-9_]`
@@ -113,7 +113,7 @@ Here a few minimalistic coding rules for the CPROVER source tree.
         source_file2.cpp \
         # Empty last line
   ```
-- This ensures the Makefiles can be easily merged.
+  This ensures the Makefiles can be easily merged.
 
 # Program Command Line Options
 - Each program contains a `program_name_parse_optionst` class which should
