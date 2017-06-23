@@ -37,6 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
@@ -332,6 +333,10 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
       status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_model.goto_functions, ui_message_handler);
     }
+
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_model.goto_functions);
 
     if(cmdline.isset("cover"))
     {
