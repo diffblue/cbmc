@@ -987,6 +987,24 @@ static unsigned get_bytecode_type_width(const typet &ty)
   return ty.get_unsigned_int(ID_width);
 }
 
+/// Merge code's source location with source_location, and recursively
+/// do the same to operand code. Typically this is used for a code_blockt
+/// as is generated for some Java operations such as "putstatic", but will
+/// also work if they generate conditionals, loops, etc.
+/// Merge means that any fields already set in code.add_source_location()
+/// remain so; any new ones from source_location are added.
+static void merge_source_location_rec(
+  codet &code,
+  const source_locationt &source_location)
+{
+  code.add_source_location().merge(source_location);
+  for(exprt &op : code.operands())
+  {
+    if(op.id()==ID_code)
+      merge_source_location_rec(to_code(op), source_location);
+  }
+}
+
 codet java_bytecode_convert_methodt::convert_instructions(
   const methodt &method,
   const code_typet &method_type,
@@ -2478,7 +2496,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
 
     if(!i_it->source_location.get_line().empty())
-      c.add_source_location()=i_it->source_location;
+      merge_source_location_rec(c, i_it->source_location);
 
     push(results);
 
