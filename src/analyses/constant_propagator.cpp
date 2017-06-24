@@ -66,7 +66,9 @@ void constant_propagator_domaint::transform(
     dynamic_cast<constant_propagator_ait *>(&ai);
   bool have_dirty=(cp!=nullptr);
 
-  // INVARIANT(!values.is_bottom);
+  // Transform on a domain that is bottom is possible
+  // if a branch is impossible the target can still wind
+  // up on the work list.
   if(values.is_bottom)
     return;
 
