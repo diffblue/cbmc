@@ -54,13 +54,13 @@ public:
     void set_to_bottom()
     {
       replace_const.clear();
-      is_bottom = true;
+      is_bottom=true;
     }
 
     void set_to(const irep_idt &lhs_id, const exprt &rhs_val)
     {
-      replace_const.expr_map[lhs_id] = rhs_val;
-      is_bottom = false;
+      replace_const.expr_map[lhs_id]=rhs_val;
+      is_bottom=false;
     }
 
     void set_to(const symbol_exprt &lhs, const exprt &rhs_val)
@@ -81,9 +81,8 @@ public:
     void set_to_top()
     {
       replace_const.clear();
-      is_bottom = false;
+      is_bottom=false;
     }
-
   };
 
   valuest values;
@@ -128,8 +127,7 @@ public:
 protected:
   friend class constant_propagator_domaint;
 
-  void replace_array_symbol(
-		  exprt &expr);
+  void replace_array_symbol(exprt &expr);
 
   void replace(
     goto_functionst::goto_functiont &,
@@ -142,7 +140,6 @@ protected:
   void replace_types_rec(
     const replace_symbolt &replace_const,
     exprt &expr);
-
 };
 
 #endif // CPROVER_ANALYSES_CONSTANT_PROPAGATOR_H
