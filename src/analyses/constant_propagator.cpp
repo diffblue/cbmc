@@ -405,18 +405,24 @@ bool constant_propagator_domaint::valuest::merge(const valuest &src)
 
     if(b_it==src.replace_const.expr_map.end())
     {
-      //cannot use set_to_top here
-      replace_const.expr_map.erase(it);
-      changed = true;
-      break;
+      // cannot use set_to_top here
+      it=replace_const.expr_map.erase(it);
+      changed=true;
     }
     else
     {
-      const exprt previous=it->second;
-      replace_const.expr_map[b_it->first]=b_it->second;
-      if (it->second != previous) changed = true;
-
-      it++;
+      if(it->second==b_it->second)
+      {
+        // keep it
+        it++;
+      }
+      else
+      {
+        // different -> set to top
+        // (cannot use set_to_top here)
+        it=replace_const.expr_map.erase(it);
+        changed=true;
+      }
     }
   }
   return changed;
