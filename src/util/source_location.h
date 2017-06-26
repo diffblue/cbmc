@@ -162,6 +162,10 @@ public:
     return is_built_in(id2string(get_file()));
   }
 
+  /// Set all unset source-location fields in this object to their values in
+  /// 'from'. Leave set fields in this object alone.
+  void merge(const source_locationt &from);
+
   static const source_locationt &nil()
   {
     return static_cast<const source_locationt &>(get_nil_irep());
