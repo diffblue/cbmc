@@ -405,7 +405,7 @@ bool java_bytecode_languaget::typecheck(
     if(c_it->second.parsed_class.name.empty())
       continue;
 
-    debug() << "Converting class " << c_it->first << eom;
+    debug() << "Generating class/member symbols: " << c_it->first << eom;
 
     if(java_bytecode_convert_class(
          c_it->second,
