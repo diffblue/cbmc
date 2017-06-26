@@ -6,6 +6,7 @@ DIRS = ansi-c \
        goto-instrument \
        goto-instrument-typedef \
        goto-diff \
+       invariants \
        test-script \
        # Empty last line
 
