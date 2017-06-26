@@ -887,6 +887,10 @@ bool cbmc_parse_optionst::process_goto_program(
       remove_unused_functions(goto_functions, ui_message_handler);
     }
 
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_functions);
+
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
@@ -915,7 +919,7 @@ bool cbmc_parse_optionst::process_goto_program(
         full_slicer(goto_functions, ns);
     }
 
-    // remove skips
+    // remove any skips introduced since coverage instrumentation
     remove_skip(goto_functions);
     goto_functions.update();
   }
