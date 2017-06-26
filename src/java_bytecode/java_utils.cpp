@@ -36,7 +36,8 @@ unsigned java_local_variable_slots(const typet &t)
     bitwidth==64,
     "all types constructed in java_types.cpp encode JVM types "
     "with these bit widths");
-  INVARIANT(bitwidth!=0 || t.id()==ID_pointer,
+  INVARIANT(
+    bitwidth!=0 || t.id()==ID_pointer,
     "if bitwidth is 0, then this a reference to a class, which is 1 slot");
 
   return bitwidth==64 ? 2 : 1;
@@ -44,7 +45,7 @@ unsigned java_local_variable_slots(const typet &t)
 
 unsigned java_method_parameter_slots(const code_typet &t)
 {
-  unsigned slots = 0;
+  unsigned slots=0;
 
   for(const auto &p : t.parameters())
     slots+=java_local_variable_slots(p.type());
