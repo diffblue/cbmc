@@ -67,7 +67,7 @@ void rd_range_domaint::transform(
   // cleanup parameters
   else if(from->is_end_function())
     transform_end_function(ns, from, to, *rd);
-  // lhs assignements
+  // lhs assignments
   else if(from->is_assign())
     transform_assign(ns, from, from, *rd);
   // initial (non-deterministic) value
@@ -559,7 +559,7 @@ void rd_range_domaint::output(std::ostream &out) const
   }
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge_inner(
   values_innert &dest,
   const values_innert &other)
@@ -610,7 +610,7 @@ bool rd_range_domaint::merge_inner(
   return more;
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
   locationt from,
@@ -646,7 +646,7 @@ bool rd_range_domaint::merge(
   return changed;
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge_shared(
   const rd_range_domaint &other,
   goto_programt::const_targett from,

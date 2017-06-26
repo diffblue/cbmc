@@ -19,7 +19,7 @@ Author: Daniel Kroening
 
 #include "ms_cl_cmdline.h"
 
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 const char *non_ms_cl_options[]=
@@ -116,7 +116,7 @@ void ms_cl_cmdlinet::parse_env()
   #endif
 }
 
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 bool ms_cl_cmdlinet::parse(int argc, const char **argv)

@@ -155,13 +155,13 @@ public:
 
   valuest values;
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(object_mapt &dest, const object_mapt &src) const;
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(const valuest &new_values);
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(const value_sett &new_values)
   {
     return make_union(new_values.values);

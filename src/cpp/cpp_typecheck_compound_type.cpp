@@ -148,7 +148,7 @@ void cpp_typecheckt::typecheck_compound_type(
   }
 
   // The identifier 'tag-X' matches what the C front-end does!
-  // The hypen is deliberate to avoid collisions with other
+  // The hyphen is deliberate to avoid collisions with other
   // identifiers.
   const irep_idt symbol_name=
     dest_scope->prefix+
@@ -1079,7 +1079,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       ID_public, false, false, false);
   }
 
-  // setup virtual tables before doing the constructors
+  // set up virtual tables before doing the constructors
   if(symbol.type.id()==ID_struct)
     do_virtual_table(symbol);
 
@@ -1382,7 +1382,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
     if(comp.get_anonymous())
     {
       const symbolt &symbol=lookup(comp.type().get(ID_identifier));
-      // recrusive call
+      // recursive call
       add_anonymous_members_to_scope(symbol);
     }
     else

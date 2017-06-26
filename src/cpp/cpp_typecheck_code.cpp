@@ -459,7 +459,7 @@ void cpp_typecheckt::typecheck_assign(codet &code)
     throw 0;
   }
 
-  // turn into a sideeffect
+  // turn into a side effect
   side_effect_exprt expr(code.get(ID_statement));
   expr.operands() = code.operands();
   typecheck_expr(expr);

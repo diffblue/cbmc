@@ -67,7 +67,7 @@ void goto_symext::symex_start_thread(statet &state)
     // get L0 name for current thread
     lhs.set_level_0(t);
 
-    // setup L1 name
+    // set up L1 name
     if(!state.level1.current_names.insert(
         std::make_pair(lhs.get_l1_object_identifier(),
                        std::make_pair(lhs, 0))).second)

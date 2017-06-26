@@ -19,7 +19,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 unsigned safe_string2unsigned(const std::string &str, int base=10);
 std::size_t safe_string2size_t(const std::string &str, int base=10);
 
-// The below mimick C's atoi/atol: any errors are silently ignored.
+// The below mimic C's atoi/atol: any errors are silently ignored.
 // They are meant to replace atoi/atol.
 int unsafe_string2int(const std::string &str, int base=10);
 unsigned unsafe_string2unsigned(const std::string &str, int base=10);

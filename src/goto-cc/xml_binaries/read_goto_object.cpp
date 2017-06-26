@@ -95,7 +95,7 @@ bool read_goto_object(
           {
             // makes sure there is an empty function
             // for this symbol. if we got code for it,
-            // it will be added lateron.
+            // it will be added later on.
             functions.function_map[symbol.name].type=
               to_code_type(symbol.type);
           }

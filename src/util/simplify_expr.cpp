@@ -221,7 +221,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
-  // elminiate casts to proper bool
+  // eliminate casts to proper bool
   if(expr_type.id()==ID_bool)
   {
     // rewrite (bool)x to x!=0
@@ -236,7 +236,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
-  // elminiate casts to _Bool
+  // eliminate casts to _Bool
   if(expr_type.id()==ID_c_bool &&
      op_type.id()!=ID_bool)
   {
@@ -1348,7 +1348,7 @@ bool simplify_exprt::simplify_update(exprt &expr)
       value_ptr=&value_ptr->operands()[number];
     }
     else
-      return true; // give up, unkown designator
+      return true; // give up, unknown designator
   }
 
   // found, done

@@ -24,7 +24,7 @@ Author: Thomas Kiley
 
 #include "show_goto_functions_xml.h"
 
-/// For outputing the GOTO program in a readable xml format.
+/// For outputting the GOTO program in a readable xml format.
 /// \param ns: the namespace to use to resolve names with
 show_goto_functions_xmlt::show_goto_functions_xmlt(const namespacet &ns):
   ns(ns)

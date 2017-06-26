@@ -1268,6 +1268,6 @@ void ieee_floatt::next_representable(bool greater)
 
   unpack(old);
 
-  // sign change impossible (zero case caught earler)
+  // sign change impossible (zero case caught earlier)
   set_sign(old_sign);
 }

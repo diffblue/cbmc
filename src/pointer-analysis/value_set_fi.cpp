@@ -658,7 +658,7 @@ void value_set_fit::get_value_set_rec(
   else if(expr.id()==ID_array_of ||
           expr.id()==ID_array)
   {
-    // an array constructur, possibly containing addresses
+    // an array constructor, possibly containing addresses
     forall_operands(it, expr)
       get_value_set_rec(*it, dest, suffix, original_type, ns, recursion_set);
   }
@@ -1457,7 +1457,7 @@ void value_set_fit::apply_code(
   }
   else if(statement==ID_expression)
   {
-    // can be ignored, we don't expect sideeffects here
+    // can be ignored, we don't expect side effects here
   }
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)

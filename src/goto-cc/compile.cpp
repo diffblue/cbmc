@@ -77,7 +77,7 @@ bool compilet::doit()
 
   add_compiler_specific_defines(config);
 
-  // Parse commandline for source and object file names
+  // Parse command line for source and object file names
   for(std::size_t i=0; i<_cmdline.args.size(); i++)
     if(add_input_file(_cmdline.args[i]))
       return true;
@@ -703,7 +703,7 @@ void compilet::convert_symbols(goto_functionst &dest)
     Forall_symbols(it, symbol_table.symbols)
       symbols.insert(it->first);
 
-    // the symbol table itertors aren't stable
+    // the symbol table iterators aren't stable
     for(symbols_sett::const_iterator
         it=symbols.begin();
         it!=symbols.end();

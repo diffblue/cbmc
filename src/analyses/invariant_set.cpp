@@ -1103,7 +1103,7 @@ void invariant_sett::apply_code(const codet &code)
   }
   else if(statement==ID_function_call)
   {
-    // may be a desaster
+    // may be a disaster
     make_true();
   }
   else if(statement==ID_cpp_delete ||

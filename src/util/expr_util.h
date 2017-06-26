@@ -36,7 +36,7 @@ void make_next_state(exprt &);
 /*! splits an expression with >=3 operands into nested binary expressions */
 exprt make_binary(const exprt &);
 
-/*! converts an udpate expr into a (possibly nested) with expression */
+/*! converts an update expr into a (possibly nested) with expression */
 with_exprt make_with_expr(const update_exprt &);
 
 /*! converts a scalar/float expression to C/C++ Booleans */
@@ -46,7 +46,7 @@ exprt is_not_zero(const exprt &, const namespacet &ns);
     and swapping false and true */
 exprt boolean_negate(const exprt &);
 
-/*! returns true if the expression has a subexpresion with given ID */
+/*! returns true if the expression has a subexpression with given ID */
 bool has_subexpr(const exprt &, const irep_idt &);
 
 /*! lift up an if_exprt one level */

@@ -100,7 +100,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     // get that mode
     irep_idt mode=type.get(ID_size);
 
-    // A list of all modes ist at
+    // A list of all modes is at
     // http://www.delorie.com/gnu/docs/gcc/gccint_53.html
     typecheck_type(type.subtype());
 

@@ -48,7 +48,7 @@ protected:
   bool add_safety_assertion;
 
   // We can optionally halt the FP removal if we aren't able to use
-  // remove_const_function_pointerst to sucessfully narrow to a small
+  // remove_const_function_pointerst to successfully narrow to a small
   // subset of possible functions and just leave the function pointer
   // as it is.
   // This can be activated in goto-instrument using
@@ -313,7 +313,7 @@ void remove_function_pointerst::remove_function_pointer(
     if(only_resolve_const_fps)
     {
       // If this mode is enabled, we only remove function pointers
-      // that we can resolve either to an exact funciton, or an exact subset
+      // that we can resolve either to an exact function, or an exact subset
       // (e.g. a variable index in a constant array).
       // Since we haven't found functions, we would now resort to
       // replacing the function pointer with any function with a valid signature

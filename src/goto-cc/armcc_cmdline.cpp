@@ -1,20 +1,20 @@
 /*******************************************************************\
 
-Module: A special command line object to mimick ARM's armcc
+Module: A special command line object to mimic ARM's armcc
 
 Author: Daniel Kroening
 
 \*******************************************************************/
 
 /// \file
-/// A special command line object to mimick ARM's armcc
+/// A special command line object to mimic ARM's armcc
 
 #include <cstring>
 #include <iostream>
 
 #include "armcc_cmdline.h"
 
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 // see

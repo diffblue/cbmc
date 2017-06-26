@@ -350,7 +350,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // This is C11.
     // The operand is already typechecked. Depending
-    // on it's type, we return one of the generic associatios.
+    // on its type, we return one of the generic associations.
 
     if(expr.operands().size()!=1)
     {
@@ -2420,7 +2420,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     exprt tmp;
 
-    // the followin means "don't know"
+    // the following means "don't know"
     if(arg1==0 || arg1==1)
     {
       tmp=from_integer(-1, size_type());
@@ -2755,7 +2755,7 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
   if(s0!=s1)
     return false;
 
-  // comparse subtype
+  // compare subtype
   if((type0.subtype().id()==ID_signedbv ||
       type0.subtype().id()==ID_unsignedbv) &&
      (type1.subtype().id()==ID_signedbv ||

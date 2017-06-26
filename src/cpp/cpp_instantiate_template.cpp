@@ -332,7 +332,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     if(id_set.size()==1)
     {
-      // It has already been instantianted!
+      // It has already been instantiated!
       const cpp_idt &cpp_id = **id_set.begin();
 
       assert(cpp_id.id_class == cpp_idt::id_classt::CLASS ||

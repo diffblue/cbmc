@@ -86,7 +86,7 @@ void print_struct_alignment_problems(
     }
     else if(it->second.type.id()==ID_array)
     {
-      // is this structure likely to introduce dataraces?
+      // is this structure likely to introduce data races?
       #if 0
       const namespacet ns(symbol_table);
       const array_typet array=to_array_type(it->second.type);

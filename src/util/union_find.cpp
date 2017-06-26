@@ -85,7 +85,7 @@ void unsigned_union_find::re_root(size_type old_root, size_type new_root)
   if(find(new_root)!=old_root)
     return;
 
-  // make sure we actually do s.th.
+  // make sure we actually do something
   assert(new_root!=old_root);
   assert(nodes[old_root].count>=2);
 

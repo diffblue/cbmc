@@ -222,7 +222,7 @@ public:
 protected:
   class symbol_tablet &symbol_table;
 
-  // number of threads interferring
+  // number of threads interfering
   unsigned nb_threads;
 
   // instrumentations (not to be instrumented again)

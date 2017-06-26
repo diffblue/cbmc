@@ -305,7 +305,7 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
-/// typecheck class tempalte members; these can be methods or static members
+/// typecheck class template members; these can be methods or static members
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
@@ -520,7 +520,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // currently we are more restrictive
     // than the standard
     error().source_location=cpp_name.source_location();
-    error() << "bad template-class-sepcialization name" << eom;
+    error() << "bad template-class-specialization name" << eom;
     throw 0;
   }
 
@@ -953,7 +953,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
       typet type=parameter.type();
 
-      // First check the parameter type (might have ealier
+      // First check the parameter type (might have earlier
       // type parameters in it). Needs to be checked in scope
       // of template.
       {
@@ -1046,7 +1046,7 @@ void cpp_typecheckt::convert_template_declaration(
     typecheck_class_template(declaration);
     return;
   }
-  // maybe function template, maybe class template member, maye
+  // maybe function template, maybe class template member, maybe
   // template variable
   else
   {

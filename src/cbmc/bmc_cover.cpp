@@ -68,7 +68,7 @@ public:
     std::string description;
     source_locationt source_location;
 
-    // if satisified, we compute a goto_trace
+    // if satisfied, we compute a goto_trace
     bool satisfied;
 
     goalt(

@@ -265,7 +265,7 @@ protected:
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      /* functino to analyse */
+      /* function to analyse */
       const irep_idt &function,
       /* incoming edges */
       const std::set<nodet> &initial_vertex,

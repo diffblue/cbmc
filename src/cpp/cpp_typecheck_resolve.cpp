@@ -1269,7 +1269,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
     cpp_typecheck.error().source_location=source_location;
     cpp_typecheck.error()
       << "namespace `"
-      << base_name << "' is ambigous" << messaget::eom;
+      << base_name << "' is ambiguous" << messaget::eom;
     throw 0;
   }
 }
@@ -1801,7 +1801,7 @@ void cpp_typecheck_resolvet::guess_template_args(
 
     if(cpp_name.has_template_args())
     {
-      // this could be s.th. like my_template<T>, and we need
+      // this could be something like my_template<T>, and we need
       // to match 'T'. Then 'desired_type' has to be a template instance.
 
       // TODO

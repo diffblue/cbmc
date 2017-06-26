@@ -2763,7 +2763,7 @@ bool Parser::rDeclarator(
   std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 1\n";
   #endif
 
-  // we can have one or more declatator qualifiers
+  // we can have one or more declarator qualifiers
   if(!rDeclaratorQualifier())
     return false;
 
@@ -2777,7 +2777,7 @@ bool Parser::rDeclarator(
   if(!optPtrOperator(d_outer))
     return false;
 
-  // we can have another sequence of declatator qualifiers
+  // we can have another sequence of declarator qualifiers
   if(!rDeclaratorQualifier())
     return false;
 

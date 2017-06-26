@@ -308,7 +308,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       {
       }
 
-      message.debug() << "callsite targetted: " << (*callsite)->source_location
+      message.debug() << "callsite targeted: " << (*callsite)->source_location
         << " function: " << const_function.get_identifier() << messaget::eom;
 
       assert(it->source_location==(*callsite)->source_location);

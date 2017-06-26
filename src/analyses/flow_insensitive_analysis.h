@@ -161,7 +161,7 @@ protected:
     working_set.push(l);
   }
 
-  // true = found s.th. new
+  // true = found something new
   bool fixedpoint(
     const goto_programt &goto_program,
     const goto_functionst &goto_functions);
@@ -173,7 +173,7 @@ protected:
   void fixedpoint(
     const goto_functionst &goto_functions);
 
-  // true = found s.th. new
+  // true = found something new
   bool visit(
     locationt l,
     working_sett &working_set,

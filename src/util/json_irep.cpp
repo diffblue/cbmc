@@ -15,7 +15,7 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 #include <algorithm>
 
-/// To convert to JSON from an irep structure by recurssively generating JSON
+/// To convert to JSON from an irep structure by recursively generating JSON
 /// for the different sub trees.
 /// \param include_comments: when writing JSON, should the comments
 /// sub tree be included.
@@ -23,7 +23,7 @@ json_irept::json_irept(bool include_comments):
   include_comments(include_comments)
 {}
 
-/// To convert to JSON from an irep structure by recurssively generating JSON
+/// To convert to JSON from an irep structure by recursively generating JSON
 /// for the different sub trees.
 /// \param irep: The irep structure to turn into json
 /// \param json: The json object to be filled up.

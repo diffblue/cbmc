@@ -380,7 +380,7 @@ void shared_bufferst::det_flush(
   // We update (or not) the value in the memory
   assignment(goto_program, target, source_location, object, new_value_expr);
 
-  // We udpate the flags of the buffer
+  // We update the flags of the buffer
   // if buff0 used and mine, then it is no more used, as we flushed the last
   // write and -ws-> imposes not to have other writes in the buffer
   assignment(

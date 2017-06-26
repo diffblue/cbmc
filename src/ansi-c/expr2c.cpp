@@ -1943,7 +1943,7 @@ std::string expr2ct::convert_struct(
 /// \param src: The struct declaration expression
 /// precedence
 /// \param include_padding_components: Should the generated C code include the
-///   padding members added to structs for GOTOs benifit
+///   padding members added to structs for GOTOs benefit
 /// \return A string representation of the struct expression
 std::string expr2ct::convert_struct(
   const exprt &src,

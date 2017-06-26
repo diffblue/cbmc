@@ -56,7 +56,7 @@ public:
   }
 };
 
-// a node type with an exta bit
+// a node type with an extra bit
 template<class E>
 class visited_nodet:public graph_nodet<E>
 {

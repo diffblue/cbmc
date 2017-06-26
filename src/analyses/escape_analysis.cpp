@@ -371,7 +371,7 @@ void escape_domaint::check_lhs(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    // pointer with aleanup function?
+    // pointer with cleanup function?
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
 

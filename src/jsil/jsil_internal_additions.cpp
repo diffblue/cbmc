@@ -81,7 +81,7 @@ void jsil_internal_additions(symbol_tablet &dest)
     dest.add(symbol);
   }
 
-  // add empty symbol used for decl statemements
+  // add empty symbol used for decl statements
 
   {
     symbolt symbol;

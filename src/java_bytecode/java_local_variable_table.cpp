@@ -91,7 +91,7 @@ struct procedure_local_cfg_baset<
   }
 };
 
-// Grab some class typdefs for brevity:
+// Grab some class typedefs for brevity:
 typedef java_bytecode_convert_methodt::holet
   holet;
 typedef java_bytecode_convert_methodt::local_variable_with_holest

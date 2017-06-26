@@ -1,13 +1,13 @@
 /*******************************************************************\
 
-Module: Field-insensitive, location-sensitive gobal may alias analysis
+Module: Field-insensitive, location-sensitive global may alias analysis
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// Field-insensitive, location-sensitive gobal may alias analysis
+/// Field-insensitive, location-sensitive global may alias analysis
 
 #include "global_may_alias.h"
 

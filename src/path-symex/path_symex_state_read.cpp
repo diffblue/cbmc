@@ -359,7 +359,7 @@ exprt path_symex_statet::read_symbol_member_index(
         suffix="."+id2string(member_expr.get_component_name())+suffix;
       }
       else
-        return nil_exprt(); // includes unions, deliberatley
+        return nil_exprt(); // includes unions, deliberately
     }
     else if(current.id()==ID_index)
     {
@@ -452,7 +452,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
         next=&(member_expr.struct_op());
       }
       else
-        return false; // includes unions, deliberatley
+        return false; // includes unions, deliberately
     }
     else if(current->id()==ID_index)
     {
