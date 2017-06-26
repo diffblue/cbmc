@@ -9,12 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2java.h"
 
 #include <cassert>
+#include <sstream>
 
 #include <util/namespace.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/arith_tools.h>
+#include <util/ieee_float.h>
 
 #include <ansi-c/c_qualifiers.h>
 #include <ansi-c/c_misc.h>
@@ -235,6 +237,58 @@ std::string expr2javat::convert_constant(
     dest+='L';
     return dest;
   }
+  else if((src.type()==java_float_type()) ||
+          (src.type()==java_double_type()))
+  {
+    ieee_floatt ieee_repr(to_constant_expr(src));
+    std::string result;
+
+    bool is_java_float=(src.type()==java_float_type());
+    if(ieee_repr.is_zero())
+    {
+      if(ieee_repr.get_sign())
+        result+='-';
+      result+="0.0";
+      if(is_java_float)
+        result+='f';
+      return result;
+    }
+
+    if(ieee_repr.is_NaN())
+    {
+       if(is_java_float)
+         return "Float.NaN";
+       else
+         return "Double.NaN";
+    }
+
+    if(ieee_repr.is_infinity())
+    {
+      if(is_java_float)
+      {
+        if(ieee_repr.get_sign())
+          return "Float.NEGATIVE_INFINITY";
+        else
+          return "Float.POSITIVE_INFINITY";
+      }
+      else
+      {
+        if(ieee_repr.get_sign())
+          return "Double.NEGATIVE_INFINITY";
+        else
+          return "Double.POSITIVE_INFINITY";
+      }
+    }
+
+    std::stringstream buffer;
+    buffer << std::hexfloat;
+    if(is_java_float)
+      buffer << ieee_repr.to_float() << 'f';
+    else
+      buffer << ieee_repr.to_double();
+    return buffer.str();
+  }
+
 
   return expr2ct::convert_constant(src, precedence);
 }
