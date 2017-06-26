@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -108,25 +109,10 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-const size_t SLOTS_PER_INTEGER(1u);
-const size_t INTEGER_WIDTH(64u);
-static size_t count_slots(
-  const size_t value,
-  const code_typet::parametert &param)
-{
-  const std::size_t width(param.type().get_unsigned_int(ID_width));
-  return value+SLOTS_PER_INTEGER+width/INTEGER_WIDTH;
-}
-
-static size_t get_variable_slots(const code_typet::parametert &param)
-{
-  return count_slots(0, param);
-}
-
 static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
 {
   const auto to_strip_str=id2string(to_strip);
-  assert(has_prefix(to_strip_str, "java::"));
+  PRECONDITION(has_prefix(to_strip_str, "java::"));
   return to_strip_str.substr(6, std::string::npos);
 }
 
@@ -313,12 +299,22 @@ void java_bytecode_convert_methodt::convert(
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
+  // Determine the number of local variable slots used by the JVM to maintan the
+  // formal parameters
+  slots_for_parameters = java_method_parameter_slots(code_type);
+
+  debug() << "Generating codet: class "
+             << class_symbol.name << ", method "
+             << m.name << eom;
+
+  // We now set up the local variables for the method parameters
   variables.clear();
 
-  // find parameter names in the local variable table:
+  // Find parameter names in the local variable table:
   for(const auto &v : m.local_variable_table)
   {
-    if(v.start_pc!=0) // Local?
+    // Skip this variable if it is not a method parameter
+    if(!is_parameter(v))
       continue;
 
     typet t=java_type_from_string(v.signature);
@@ -340,8 +336,10 @@ void java_bytecode_convert_methodt::convert(
   for(const auto &param : parameters)
   {
     variables[param_index].resize(1);
-    param_index+=get_variable_slots(param);
+    param_index+=java_local_variable_slots(param.type());
   }
+  INVARIANT(param_index==slots_for_parameters,
+    "java_parameter_count and local computation must agree");
 
   // assign names to parameters
   param_index=0;
@@ -353,8 +351,6 @@ void java_bytecode_convert_methodt::convert(
     {
       base_name="this";
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
-      param.set_base_name(base_name);
-      param.set_identifier(identifier);
     }
     else
     {
@@ -369,10 +365,9 @@ void java_bytecode_convert_methodt::convert(
         base_name="arg"+std::to_string(param_index)+suffix;
         identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
-
-      param.set_base_name(base_name);
-      param.set_identifier(identifier);
     }
+    param.set_base_name(base_name);
+    param.set_identifier(identifier);
 
     // add to symbol table
     parameter_symbolt parameter_symbol;
@@ -382,41 +377,34 @@ void java_bytecode_convert_methodt::convert(
     parameter_symbol.type=param.type();
     symbol_table.add(parameter_symbol);
 
-    // add as a JVM variable
-    std::size_t slots=get_variable_slots(param);
+    // Add as a JVM local variable
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
     variables[param_index][0].is_parameter=true;
     variables[param_index][0].start_pc=0;
     variables[param_index][0].length=std::numeric_limits<size_t>::max();
-    variables[param_index][0].is_parameter=true;
-    param_index+=slots;
-    assert(param_index>0);
+    param_index+=java_local_variable_slots(param.type());
   }
+
+  // The parameter slots detected in this function should agree with what
+  // java_parameter_count() thinks about this method
+  INVARIANT(param_index==slots_for_parameters,
+    "java_parameter_count and local computation must agree");
 
   const bool is_virtual=!m.is_static && !m.is_final;
 
-  #if 0
-  class_type.methods().push_back(class_typet::methodt());
-  class_typet::methodt &method=class_type.methods().back();
-  #else
+  // Construct a methodt, which lives within the class type; this object is
+  // never used for anything useful and could be removed
   class_typet::methodt method;
-  #endif
-
   method.set_base_name(m.base_name);
   method.set_name(method_identifier);
-
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
-
+  method.type()=member_type;
   if(is_constructor(method))
     method.set(ID_constructor, true);
 
-  method.type()=member_type;
-
   // we add the symbol for the method
-
   symbolt method_symbol;
-
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
   method_symbol.mode=ID_java;
@@ -435,15 +423,13 @@ void java_bytecode_convert_methodt::convert(
     method_symbol.type.set(ID_constructor, true);
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
-
-  tmp_vars.clear();
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(
-      m, code_type, method_symbol.name);
+    method_symbol.value=convert_instructions(m, code_type, method_symbol.name);
 
   // Replace the existing stub symbol with the real deal:
   const auto s_it=symbol_table.symbols.find(method.get_name());
-  assert(s_it!=symbol_table.symbols.end());
+  INVARIANT(s_it!=symbol_table.symbols.end(),
+    "the symbol was there earlier on this function; it must be there now");
   symbol_table.symbols.erase(s_it);
 
   symbol_table.add(method_symbol);
@@ -1144,6 +1130,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       a_it->second.predecessors.insert(address.first);
     }
   }
+
+  // Clean the list of temporary variables created by a call to `tmp_variable`.
+  // These are local variables in the goto function used to represent temporary
+  // values of the JVM operand stack, newly allocated objects before the
+  // constructor is called, ...
+  tmp_vars.clear();
 
   // Now that the control flow graph is built, set up our local variables
   // (these require the graph to determine live ranges)

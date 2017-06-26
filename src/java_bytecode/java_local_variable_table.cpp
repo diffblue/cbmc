@@ -12,6 +12,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_bytecode_convert_method_class.h"
 
 #include "java_types.h"
+#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/invariant.h>
@@ -58,7 +59,7 @@ struct procedure_local_cfg_baset<
     for(const auto &table_entry : method.exception_table)
     {
       auto findit=amap.find(table_entry.start_pc);
-      assert(findit!=amap.end() &&
+      INVARIANT(findit!=amap.end(),
              "Exception table entry doesn't point to an instruction?");
       for(; findit->first<table_entry.end_pc; ++findit)
       {
@@ -190,9 +191,11 @@ static bool is_store_to_slot(
   else
   {
     // Store shorthands, like "store_0", "store_1"
-    assert(prevstatement[6]=='_' && prevstatement.size()==8);
-    std::string storeslot(1, prevstatement[7]);
-    assert(isdigit(storeslot[0]));
+    INVARIANT(prevstatement[6]=='_' && prevstatement.size()==8,
+      "expected store instruction looks like store_0, store_1...");
+    storeslot=prevstatement[7];
+    INVARIANT(isdigit(storeslot[0]),
+      "store_? instructions should end in a digit");
     storeslotidx=safe_string2unsigned(storeslot);
   }
   return storeslotidx==slotidx;
@@ -207,7 +210,7 @@ static void maybe_add_hole(
   unsigned from,
   unsigned to)
 {
-  assert(to>=from);
+  PRECONDITION(to>=from);
   if(to!=from)
     var.holes.push_back({from, to-from});
 }
@@ -234,7 +237,7 @@ static void populate_variable_address_map(
         idx!=idxlim;
         ++idx)
     {
-      assert((!live_variable_at_address[idx]) && "Local variable table clash?");
+      INVARIANT(!live_variable_at_address[idx], "Local variable table clash?");
       live_variable_at_address[idx]=&*it;
     }
   }
@@ -265,20 +268,28 @@ static void populate_predecessor_map(
   messaget msg(msg_handler);
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
-    // Parameters are irrelevant to us and shouldn't be changed:
-    if(it->var.start_pc==0)
+    // All entries of the "local_variable_table_with_holest" processed in this
+    // function concern the same Java Local Variable Table slot/register. This
+    // is because "find_initialisers()" has already sorted them.
+    INVARIANT(it->var.index==firstvar->var.index,
+      "all entries are for the same local variable slot");
+
+    // Parameters are irrelevant to us and shouldn't be changed. This is because
+    // they cannot have live predecessor ranges: they are initialized by the JVM
+    // and no other live variable range can flow into them.
+    if(it->is_parameter)
       continue;
 
     // Find the last instruction within the live range:
     unsigned end_pc=it->var.start_pc+it->var.length;
     auto amapit=amap.find(end_pc);
-    assert(amapit!=amap.begin());
+    INVARIANT(amapit!=amap.begin(),
+      "current bytecode shall not be the first");
     auto old_amapit=amapit;
     --amapit;
     if(old_amapit==amap.end())
     {
-      assert(
-        end_pc>amapit->first &&
+      INVARIANT(end_pc>amapit->first,
         "Instruction live range doesn't align to instruction boundary?");
     }
 
@@ -292,6 +303,7 @@ static void populate_predecessor_map(
           (pred<live_variable_at_address.size() ?
            live_variable_at_address[pred] :
            nullptr);
+
         if(pred_var==&*it)
         {
           // Flow from within same live range?
@@ -303,7 +315,8 @@ static void populate_predecessor_map(
           // Check if this is an initialiser, and if so expand the live range
           // to include it, but don't check its predecessors:
           auto inst_before_this=amapit;
-          assert(inst_before_this!=amap.begin());
+          INVARIANT(inst_before_this!=amap.begin(),
+            "we shall not be on the first bytecode of the method");
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
           {
@@ -364,7 +377,7 @@ static unsigned get_common_dominator(
   const std::set<local_variable_with_holest*> &merge_vars,
   const java_cfg_dominatorst &dominator_analysis)
 {
-  assert(!merge_vars.empty());
+  PRECONDITION(!merge_vars.empty());
 
   unsigned first_pc=UINT_MAX;
   for(auto v : merge_vars)
@@ -656,10 +669,11 @@ void java_bytecode_convert_methodt::setup_local_variables(
   dominator_analysis(dominator_args);
 
   // Find out which local variable table entries should be merged:
-  // Wrap each entry so we have somewhere to record live ranges with holes:
+  // Wrap each entry so we have a data structure to work during function calls,
+  // where we record live ranges with holes:
   std::vector<local_variable_with_holest> vars_with_holes;
   for(const auto &v : m.local_variable_table)
-    vars_with_holes.push_back({v, {}});
+    vars_with_holes.push_back({v, is_parameter(v), {}});
 
   // Merge variable records:
   find_initialisers(vars_with_holes, amap, dominator_analysis);
@@ -677,7 +691,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
   // length values in the local variable table
   for(const auto &v : vars_with_holes)
   {
-    if(v.var.start_pc==0) // Parameter?
+    if(v.is_parameter)
       continue;
 
     typet t=java_type_from_string(v.var.signature);

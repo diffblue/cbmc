@@ -42,7 +42,8 @@ public:
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     character_preprocess(_character_preprocess),
-    method_has_this(false)
+    method_has_this(false),
+    slots_for_parameters(0)
   {
   }
 
@@ -67,6 +68,11 @@ protected:
   typet method_return_type;
   character_refine_preprocesst character_preprocess;
 
+  /// Number of local variable slots used by the JVM to pass parameters upon
+  /// invocation of the method under translation.
+  /// Initialized in `convert`.
+  unsigned slots_for_parameters;
+
 public:
   struct holet
   {
@@ -77,6 +83,7 @@ public:
   struct local_variable_with_holest
   {
     local_variablet var;
+    bool is_parameter;
     std::vector<holet> holes;
   };
 
@@ -149,6 +156,14 @@ public:
   void push(const exprt::operandst &o);
 
   bool is_constructor(const class_typet::methodt &method);
+
+  /// Returns true iff the slot index of the local variable of a method (coming
+  /// from the LVT) is a parameter of that method. Assumes that
+  /// `slots_for_parameters` is initialized upon call.
+  bool is_parameter(const local_variablet &v)
+  {
+    return v.index < slots_for_parameters;
+  }
 
   struct converted_instructiont
   {
