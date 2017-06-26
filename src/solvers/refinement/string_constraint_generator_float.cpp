@@ -317,10 +317,11 @@ string_exprt string_constraint_generatort::
   exprt bin_significand_int=
     get_significand(f, float_spec, unsignedbv_typet(32));
   // `bin_significand` represents $m$ and is obtained
-  // by multiplying `binary_significand_as_int` by 1/0x800000 = 2^-23
+  // by multiplying `binary_significand_as_int` by
+  // 1/0x800000 = 2^-23 = 1.1920928955078125 * 10^-7
   exprt bin_significand=floatbv_mult(
     floatbv_typecast_exprt(bin_significand_int, round_to_zero_expr, float_type),
-    constant_float(0x1p-23, float_spec));
+    constant_float(1.1920928955078125e-7, float_spec));
 
   // This is a first approximation of the exponent that will adjust
   // if the fraction we get is greater than 10
