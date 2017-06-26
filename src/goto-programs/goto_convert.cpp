@@ -1264,6 +1264,19 @@ void goto_convertt::convert_switch(
 
   goto_programt tmp_cases;
 
+  // The case number represents which case this corresponds to in the sequence
+  // of case statements.
+  //
+  // switch (x)
+  // {
+  // case 2:  // case_number 1
+  //   ...;
+  // case 3:  // case_number 2
+  //   ...;
+  // case 10: // case_number 3
+  //   ...;
+  // }
+  size_t case_number=1;
   for(auto &case_pair : targets.cases)
   {
     const caset &case_ops=case_pair.second;
@@ -1272,10 +1285,15 @@ void goto_convertt::convert_switch(
 
     exprt guard_expr=case_guard(argument, case_ops);
 
+    source_locationt source_location=case_ops.front().find_source_location();
+    source_location.set_case_number(std::to_string(case_number));
+    case_number++;
+    guard_expr.add_source_location()=source_location;
+
     goto_programt::targett x=tmp_cases.add_instruction();
     x->make_goto(case_pair.first);
     x->guard.swap(guard_expr);
-    x->source_location=case_ops.front().find_source_location();
+    x->source_location=source_location;
   }
 
   {
