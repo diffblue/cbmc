@@ -24,13 +24,17 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message) = 0;
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted) = 0;
 
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   virtual void flush(unsigned level)
   {
@@ -60,18 +64,22 @@ protected:
 class null_message_handlert:public message_handlert
 {
 public:
-  virtual void print(unsigned level, const std::string &message)
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted)
   {
-    message_handlert::print(level, message);
+    message_handlert::print(level, message, preformatted);
   }
 
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location)
+    const source_locationt &location,
+    bool preformatted)
   {
-    print(level, message);
+    print(level, message, preformatted);
   }
 };
 
@@ -82,9 +90,12 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message)
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted)
   {
-    message_handlert::print(level, message);
+    message_handlert::print(level, message, preformatted);
 
     if(verbosity>=level)
       out << message << '\n';
@@ -159,20 +170,23 @@ public:
       unsigned _message_level,
       messaget &_message):
       message_level(_message_level),
-      message(_message)
+      message(_message),
+      preformatted(false)
     {
     }
 
     mstreamt(const mstreamt &other):
       message_level(other.message_level),
       message(other.message),
-      source_location(other.source_location)
+      source_location(other.source_location),
+      preformatted(false)
     {
     }
 
     unsigned message_level;
     messaget &message;
     source_locationt source_location;
+    bool preformatted;
 
     template <class T>
     mstreamt &operator << (const T &x)
@@ -198,12 +212,20 @@ public:
         m.message_level,
         m.str(),
         -1,
-        m.source_location);
+        m.source_location,
+        m.preformatted);
       m.message.message_handler->flush(m.message_level);
     }
+    m.preformatted=false;
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
     m.source_location.clear();
+    return m;
+  }
+
+  static mstreamt &preformatted_output(mstreamt &m)
+  {
+    m.preformatted=true;
     return m;
   }
 

@@ -64,7 +64,7 @@ void bmct::error_trace()
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      status() << xml << eom;
+      status() << preformatted_output << xml << eom;
     }
     break;
 
@@ -83,7 +83,7 @@ void bmct::error_trace()
       result["status"]=json_stringt("failed");
       jsont &json_trace=result["trace"];
       convert(ns, goto_trace, json_trace);
-      status() << ",\n" << json_result << eom;
+      status() << preformatted_output << json_result << eom;
     }
     break;
   }

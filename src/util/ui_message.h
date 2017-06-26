@@ -44,32 +44,37 @@ protected:
   // overloading
   virtual void print(
     unsigned level,
-    const std::string &message);
+    const std::string &message,
+    bool preformatted);
 
   // overloading
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   virtual void xml_ui_msg(
     const std::string &type,
     const std::string &msg1,
     const std::string &msg2,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   virtual void json_ui_msg(
     const std::string &type,
     const std::string &msg1,
     const std::string &msg2,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   virtual void ui_msg(
     const std::string &type,
     const std::string &msg1,
     const std::string &msg2,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   const char *level_string(unsigned level);
 };
