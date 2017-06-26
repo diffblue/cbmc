@@ -169,10 +169,12 @@ string_exprt string_constraint_generatort::add_axioms_from_double(
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
 /// leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal
-/// digits representing the fractional part of m.
+/// digits representing the fractional part of m. This specification is correct
+/// for inputs that do not exceed 100000 and the function is unspecified for
+/// other values.
 ///
 /// TODO: this specification is not correct for negative numbers and
-/// double precision and floating point value that exceed 100000
+/// double precision
 /// \param f: expression representing a float
 /// \param ref_type: refined type for strings
 /// \return a new string expression
