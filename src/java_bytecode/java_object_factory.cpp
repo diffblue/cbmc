@@ -49,6 +49,7 @@ static symbolt &new_tmp_symbol(
 
 class java_object_factoryt
 {
+protected:
   std::vector<const symbolt *> &symbols_created;
   const source_locationt &loc;
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
@@ -65,13 +66,14 @@ class java_object_factoryt
   code_assignt get_null_assignment(
     const exprt &expr,
     const pointer_typet &ptr_type);
-
-  void gen_pointer_target_init(
+protected:
+  virtual void gen_pointer_target_init(
     code_blockt &assignments,
     const exprt &expr,
     const typet &target_type,
     bool create_dynamic_objects,
-    update_in_placet);
+    update_in_placet update_in_place);
+protected:
 
   void allocate_nondet_length_array(
     code_blockt &assignments,
@@ -94,6 +96,8 @@ public:
       ns(_symbol_table)
   {}
 
+  virtual ~java_object_factoryt()=default;
+
   exprt allocate_object(
     code_blockt &assignments,
     const exprt &,
@@ -105,7 +109,7 @@ public:
     const exprt &expr,
     update_in_placet);
 
-  void gen_nondet_init(
+  virtual void gen_nondet_init(
     code_blockt &assignments,
     const exprt &expr,
     bool is_sub,
@@ -134,6 +138,36 @@ private:
     bool create_dynamic_objects,
     const struct_typet &struct_type,
     const update_in_placet &update_in_place);
+};
+
+
+class java_object_factory_with_randomt:java_object_factoryt
+{
+public:
+  java_object_factory_with_randomt(
+    std::vector<const symbolt *> &_symbols_created,
+    const source_locationt &loc,
+    bool _assume_non_null,
+    size_t _max_nondet_array_length,
+    symbol_tablet &_symbol_table):
+      java_object_factoryt(
+        _symbols_created,
+        loc,
+        _assume_non_null,
+        _max_nondet_array_length,
+        _symbol_table)
+  {}
+
+  void gen_nondet_init(
+    code_blockt &assignments,
+    const exprt &expr,
+    bool is_sub,
+    irep_idt class_identifier,
+    bool skip_classid,
+    bool create_dynamic_objects,
+    bool override,
+    const typet &override_type,
+    update_in_placet update_in_place) override;
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -660,7 +694,7 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
-/// Allocates a fresh array. Single-use herem at the moment, but useful to keep
+/// Allocates a fresh array. Single-use at the moment, but useful to keep
 /// as a separate function for downstream branches.
 /// \par parameters: `lhs`, symbol to assign the new array structure
 /// `max_length_expr`, maximum length of the new array (minimum is fixed at zero
@@ -857,23 +891,12 @@ exprt object_factory(
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
 
-  typet real_type=type;
-  if(type.id()==ID_pointer && type.subtype().id()==ID_symbol)
-  {
-    const pointer_typet &pointer_type=to_pointer_type(type);
-    const namespacet ns(symbol_table);
-    get_concrete_class_at_randomt get_concrete_class_at_random(ns);
-    const typet &resolved_type=
-      get_concrete_class_at_random(pointer_type);
-    real_type.subtype()=resolved_type;
-  }
-
   auxiliary_symbolt main_symbol;
   main_symbol.mode=ID_java;
   main_symbol.is_static_lifetime=false;
   main_symbol.name=identifier;
   main_symbol.base_name=base_name;
-  main_symbol.type=real_type;
+  main_symbol.type=type;
   main_symbol.location=loc;
 
   exprt object=main_symbol.symbol_expr();
@@ -884,11 +907,7 @@ exprt object_factory(
 
   std::vector<const symbolt *> symbols_created;
   symbols_created.push_back(main_symbol_ptr);
-
-  symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, real_type);
-  aux_symbol.is_static_lifetime=true;
-
-  java_object_factoryt state(
+  java_object_factory_with_randomt state(
     symbols_created,
     loc,
     !allow_null,
@@ -951,7 +970,7 @@ void gen_nondet_init(
 {
   std::vector<const symbolt *> symbols_created;
 
-  java_object_factoryt state(
+  java_object_factory_with_randomt state(
     symbols_created,
     loc,
     assume_non_null,
@@ -979,4 +998,69 @@ void gen_nondet_init(
   }
 
   init_code.append(assignments);
+}
+
+
+void java_object_factory_with_randomt::gen_nondet_init(
+  code_blockt &assignments,
+  const exprt &expr,
+  bool is_sub,
+  irep_idt class_identifier,
+  bool skip_classid,
+  bool create_dynamic_objects,
+  bool override,
+  const typet &override_type,
+  update_in_placet update_in_place)
+{
+  const typet &type=
+    override ? ns.follow(override_type) : ns.follow(expr.type());
+  typet real_type=type;
+
+  if(type.id()==ID_pointer && type.subtype().id()==ID_symbol)
+  {
+    const pointer_typet &pointer_type=to_pointer_type(type);
+    const namespacet ns(symbol_table);
+    get_concrete_class_at_randomt get_concrete_class_at_random(ns);
+    const typet &resolved_type=
+      get_concrete_class_at_random(pointer_type);
+
+    if(resolved_type!=real_type.subtype())
+    {
+      // Generate GOTO code to initalize the selected concrete type
+      // A { ... } tmp_object;
+      // A.x = NONDET ...
+      // // non-det init of all the fields of A
+      // A * p = &tmp_object
+      // expr = (I *)p
+
+      symbolt new_symbol=new_tmp_symbol(symbol_table, loc, pointer_typet(resolved_type));
+
+      // Generate a new object into this new symbol
+      gen_nondet_init(
+        assignments,
+        new_symbol.symbol_expr(),
+        is_sub,
+        class_identifier,
+        skip_classid,
+        create_dynamic_objects,
+        override,
+        override_type,
+        update_in_placet::NO_UPDATE_IN_PLACE);
+
+      assignments.add(
+        code_assignt(expr, typecast_exprt(new_symbol.symbol_expr(), type)));
+
+      return;
+    }
+  }
+  java_object_factoryt::gen_nondet_init(
+    assignments,
+    expr,
+    is_sub,
+    class_identifier,
+    skip_classid,
+    create_dynamic_objects,
+    override,
+    override_type,
+    update_in_place);
 }
