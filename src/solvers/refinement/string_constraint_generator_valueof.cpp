@@ -298,6 +298,10 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
         binary_relation_exprt(res[j], ID_le, nine_char));
       digit_constraints.push_back(is_number);
 
+      // An overflow can happen when reaching the last index of a string of
+      // maximal size which is `max_size` for negative numbers and
+      // `max_size - 1` for positive numbers because of the abscence of a `-`
+      // sign.
       if(j>=max_size-2)
       {
         // check for overflows if the size is big
