@@ -547,7 +547,7 @@ static void merge_variable_table_entries(
 /// Given a sequence of users of the same local variable slot, this figures out
 /// which ones are related by control flow, and combines them into a single
 /// entry with holes, such that after combination we can create a single
-/// declaration per variable table entry, placed at the live range's start
+/// GOTO variable per variable table entry, placed at the live range's start
 /// address, which may be moved back so that the declaration dominates all uses.
 /// \par parameters: `firstvar`-`varlimit`: sequence of variable table entries,
 ///   all of which should concern the same slot index.
