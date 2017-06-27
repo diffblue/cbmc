@@ -374,27 +374,27 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
   {
     index_exprt ie = to_index_expr(condition);
     exprt index = ie.index();
-    bool changed = ai_simplify(index, ns);
-    if(changed)
+    bool no_simplification=ai_simplify(index, ns);
+    if(!no_simplification)
     {
       ie.index() = index;
       condition = simplify_expr(ie, ns);
     }
 
-    return !changed;
+    return no_simplification;
   }
   else if(condition.id()==ID_dereference)
   {
     dereference_exprt de = to_dereference_expr(condition);
     exprt pointer = de.pointer();
-    bool changed = ai_simplify(pointer, ns);
-    if(changed)
+    bool no_simplification = ai_simplify(pointer, ns);
+    if(!no_simplification)
     {
       de.pointer() = pointer;
       condition = simplify_expr(de, ns);  // So *(&x) -> x
     }
 
-    return !changed;
+    return no_simplification;
   }
   else if(condition.id()==ID_member)
   {
@@ -402,14 +402,14 @@ bool variable_sensitivity_domaint::ai_simplify_lhs(
     exprt compound = me.compound();
     // Carry on the RHS since we still require an addressable object for the
     // struct
-    bool changed = ai_simplify_lhs(compound, ns);
-    if(changed)
+    bool no_simplification = ai_simplify_lhs(compound, ns);
+    if(!no_simplification)
     {
       me.compound() = compound;
       condition = simplify_expr(me, ns);
     }
 
-    return !changed;
+    return no_simplification;
   }
   else
     return true;
