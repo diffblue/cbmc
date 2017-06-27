@@ -19,11 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
+#include <util/invariant.h>
 
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>
+#include <goto-programs/class_hierarchy.h>
 #include <analyses/cfg_dominators.h>
 
 #include "java_bytecode_convert_method.h"
@@ -32,6 +34,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 #include "java_string_library_preprocess.h"
+#include "java_utils.h"
 
 #include <limits>
 #include <algorithm>
@@ -1428,12 +1431,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       assert(arg0.id()==ID_virtual_function);
 
-      // does the function symbol exist?
+      // if we don't have a definition for the called symbol, and we won't
+      // inherit a definition from a super-class, create a stub.
       irep_idt id=arg0.get(ID_identifier);
-
-      if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+      if(symbol_table.symbols.find(id)==symbol_table.symbols.end() &&
+         !(is_virtual && is_method_inherited(arg0.get(ID_C_class), id)))
       {
-        // no, create stub
         symbolt symbol;
         symbol.name=id;
         symbol.base_name=arg0.get(ID_C_base_name);
@@ -2687,3 +2690,40 @@ void java_bytecode_convert_method(
 
   java_bytecode_convert_method(class_symbol, method);
 }
+
+const bool java_bytecode_convert_methodt::is_method_inherited(
+  const irep_idt &classname, const irep_idt &methodid) const
+{
+  class_hierarchyt ch;
+  namespacet ns(symbol_table);
+  ch(symbol_table);
+
+  std::string stripped_methodid(id2string(methodid));
+  stripped_methodid.erase(0, classname.size());
+
+  const std::string &classpackage=java_class_to_package(id2string(classname));
+  const auto &parents=ch.get_parents_trans(classname);
+  for(const auto &parent : parents)
+  {
+    const irep_idt id=id2string(parent)+stripped_methodid;
+    const symbolt *symbol;
+    if(!ns.lookup(id, symbol) &&
+       symbol->type.id()==ID_code)
+    {
+      const auto &access=symbol->type.get(ID_access);
+      if(access==ID_public || access==ID_protected)
+        return true;
+      // methods with the default access modifier are only
+      // accessible within the same package.
+      else if(access==ID_default &&
+              java_class_to_package(id2string(parent))==classpackage)
+        return true;
+      else if(access==ID_private)
+        continue;
+      else
+        INVARIANT(false, "Unexpected access modifier.");
+    }
+  }
+  return false;
+}
+

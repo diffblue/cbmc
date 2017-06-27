@@ -258,6 +258,10 @@ protected:
   bool class_needs_clinit(const irep_idt &classname);
   exprt get_or_create_clinit_wrapper(const irep_idt &classname);
   codet get_clinit_call(const irep_idt &classname);
+
+  const bool is_method_inherited(
+    const irep_idt &classname,
+    const irep_idt &methodid) const;
 };
 
 #endif
