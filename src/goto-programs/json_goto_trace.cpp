@@ -19,14 +19,23 @@ Author: Daniel Kroening
 #include <util/json_expr.h>
 
 #include <langapi/language_util.h>
+#include <solvers/flattening/pointer_logic.h>
 
 /// Replaces in src, expressions of the form pointer_offset(constant) by that
 /// constant.
 /// \param src: an expression
 void remove_pointer_offsets(exprt &src)
 {
-  if(src.id()==ID_pointer_offset && src.op0().id()==ID_constant)
-    src=src.op0();
+  if(src.id()==ID_pointer_offset &&
+     src.op0().id()==ID_constant &&
+     src.op0().type().id()==ID_pointer)
+  {
+    std::string binary_str=id2string(to_constant_expr(src.op0()).get_value());
+    // The constant address consists of OBJECT-ID || OFFSET.
+    // Shift out the object-identifier bits, leaving only the offset:
+    mp_integer offset=binary2integer(binary_str.substr(BV_ADDR_BITS), false);
+    src=from_integer(offset, src.type());
+  }
   else
     for(auto &op : src.operands())
       remove_pointer_offsets(op);
