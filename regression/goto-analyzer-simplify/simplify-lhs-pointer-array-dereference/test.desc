@@ -1,0 +1,6 @@
+CORE
+main.c
+"--variable --arrays --pointers"
+array\[0l\] = 5
+array\[\(signed long int\)nondet\] = 6
+new_array\[1l\] = 7
