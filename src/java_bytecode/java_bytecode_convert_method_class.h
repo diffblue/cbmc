@@ -260,6 +260,10 @@ protected:
   exprt get_or_create_clinit_wrapper(const irep_idt &classname);
   codet get_clinit_call(const irep_idt &classname);
 
+  const bool is_method_inherited(
+    const irep_idt &classname,
+    const irep_idt &methodid) const;
+
   enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
   void save_stack_entries(
     const std::string &,

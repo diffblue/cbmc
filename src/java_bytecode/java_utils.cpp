@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/invariant.h>
+#include <util/string_utils.h>
 
 #include "java_types.h"
 
@@ -51,4 +52,9 @@ unsigned java_method_parameter_slots(const code_typet &t)
     slots+=java_local_variable_slots(p.type());
 
   return slots;
+}
+
+const std::string java_class_to_package(const std::string &canonical_classname)
+{
+  return trim_from_last_delimiter(canonical_classname, '.');
 }

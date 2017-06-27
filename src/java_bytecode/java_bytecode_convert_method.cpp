@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>
+#include <goto-programs/class_hierarchy.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
@@ -1452,12 +1453,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       assert(arg0.id()==ID_virtual_function);
 
-      // does the function symbol exist?
+      // if we don't have a definition for the called symbol, and we won't
+      // inherit a definition from a super-class, create a stub.
       irep_idt id=arg0.get(ID_identifier);
-
-      if(symbol_table.symbols.find(id)==symbol_table.symbols.end())
+      if(symbol_table.symbols.find(id)==symbol_table.symbols.end() &&
+         !(is_virtual && is_method_inherited(arg0.get(ID_C_class), id)))
       {
-        // no, create stub
         symbolt symbol;
         symbol.name=id;
         symbol.base_name=arg0.get(ID_C_base_name);

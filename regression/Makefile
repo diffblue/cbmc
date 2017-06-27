@@ -2,6 +2,7 @@ DIRS = ansi-c \
        cbmc \
        cpp \
        cbmc-java \
+       cbmc-java-inheritance \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
