@@ -2,6 +2,8 @@
 
 SRC = unit_tests.cpp \
       catch_example.cpp \
+      util/simplify_expr/simplify_typecast.cpp \
+      unit-src/unit_util.cpp \
       # Empty last line
 
 INCLUDES= -I ../src/ -I.
@@ -24,6 +26,7 @@ LIBS += ../src/ansi-c/ansi-c$(LIBEXT) \
         ../src/assembler/assembler$(LIBEXT) \
         ../src/analyses/analyses$(LIBEXT) \
         ../src/solvers/solvers$(LIBEXT) \
+        ../src/util/util$(LIBEXT) \
         # Empty last line
 
 TESTS = unit_tests$(EXEEXT) \
