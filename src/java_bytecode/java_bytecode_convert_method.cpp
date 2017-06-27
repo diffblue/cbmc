@@ -2797,60 +2797,39 @@ void java_bytecode_convert_method(
   java_bytecode_convert_method(class_symbol, method);
 }
 
-/// Returns true iff method \p methodid from class \p classname is
-/// a method inherited from a class (and not an interface!) from which
-/// \p classname inherits, either directly or indirectly.
-bool java_bytecode_convert_methodt::is_method_inherited(
+const bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname, const irep_idt &methodid) const
 {
-  resolve_concrete_function_callt call_resolver(symbol_table);
-  const resolve_concrete_function_callt ::concrete_function_callt &
-    resolved_call=call_resolver(classname, methodid);
+  class_hierarchyt ch;
+  namespacet ns(symbol_table);
+  ch(symbol_table);
 
-  // resolved_call is a pair (class-name, method-name) found by walking the
-  // chain of class inheritance (not interfaces!) and stopping on the first
-  // class that contains a method of equal name and type to `methodid`
+  std::string stripped_methodid(id2string(methodid));
+  stripped_methodid.erase(0, classname.size());
 
-  if(resolved_call.is_valid())
+  const std::string &classpackage=java_class_to_package(id2string(classname));
+  const auto &parents=ch.get_parents_trans(classname);
+  for(const auto &parent : parents)
   {
-    const symbolt &function_symbol=
-      symbol_table.lookup(resolved_call.get_virtual_method_name());
-
-    INVARIANT(function_symbol.type.id()==ID_code, "Function must be code");
-
-    const auto &access=function_symbol.type.get(ID_access);
-    if(access==ID_public || access==ID_protected)
+    const irep_idt id=id2string(parent)+stripped_methodid;
+    const symbolt *symbol;
+    if(!ns.lookup(id, symbol) &&
+       symbol->type.id()==ID_code)
     {
-      // since the method is public, it is a public method of `classname`, it is
-      // inherited
-      return true;
+      const auto &access=symbol->type.get(ID_access);
+      if(access==ID_public || access==ID_protected)
+        return true;
+      // methods with the default access modifier are only
+      // accessible within the same package.
+      else if(access==ID_default &&
+              java_class_to_package(id2string(parent))==classpackage)
+        return true;
+      else if(access==ID_private)
+        continue;
+      else
+        INVARIANT(false, "Unexpected access modifier.");
     }
-
-    // methods with the default access modifier are only
-    // accessible within the same package.
-    if(access==ID_default)
-    {
-      const std::string &class_package=
-        java_class_to_package(id2string(classname));
-      const std::string &method_package=
-        java_class_to_package(id2string(resolved_call.get_class_identifier()));
-      return method_package==class_package;
-    }
-
-    if(access==ID_private)
-    {
-      // We return false because the method found by the call_resolver above
-      // proves that `methodid` cannot be inherited (assuming that the original
-      // Java code compiles). This is because, as we walk the inheritance chain
-      // for `classname` from Object to `classname`, a method can only become
-      // "more accessible". So, if the last occurrence is private, all others
-      // before must be private as well, and none is inherited in `classname`.
-      return false;
-    }
-
-    INVARIANT(false, "Unexpected access modifier.");
   }
-
   return false;
 }
 
