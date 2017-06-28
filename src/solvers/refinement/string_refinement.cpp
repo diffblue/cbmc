@@ -1176,8 +1176,10 @@ std::map<exprt, int> string_refinementt::map_representation_of_sum(
     to_process.pop_back();
     if(cur.id()==ID_plus)
     {
-      to_process.push_back(std::make_pair(cur.op1(), positive));
-      to_process.push_back(std::make_pair(cur.op0(), positive));
+      for(const exprt &op : cur.operands())
+      {
+        to_process.push_back(std::make_pair(op, positive));
+      }
     }
     else if(cur.id()==ID_minus)
     {
