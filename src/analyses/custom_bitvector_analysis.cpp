@@ -334,6 +334,54 @@ void custom_bitvector_domaint::transform(
             }
           }
         }
+        else
+        {
+          goto_programt::const_targett next=from;
+          ++next;
+
+          // only if there is an actual call, i.e., we have a body
+          if(next!=to)
+          {
+            const code_typet &code_type=
+              to_code_type(ns.lookup(identifier).type);
+
+            code_function_callt::argumentst::const_iterator arg_it=
+              code_function_call.arguments().begin();
+            for(const auto &param : code_type.parameters())
+            {
+              const irep_idt &p_identifier=param.get_identifier();
+              if(p_identifier.empty())
+                continue;
+
+              // there may be a mismatch in the number of arguments
+              if(arg_it==code_function_call.arguments().end())
+                break;
+
+              // assignments arguments -> parameters
+              symbol_exprt p=ns.lookup(p_identifier).symbol_expr();
+              // may alias other stuff
+              std::set<exprt> lhs_set=cba.aliases(p, from);
+
+              vectorst rhs_vectors=get_rhs(*arg_it);
+
+              for(const auto &lhs : lhs_set)
+              {
+                assign_lhs(lhs, rhs_vectors);
+              }
+
+              // is it a pointer?
+              if(p.type().id()==ID_pointer)
+              {
+                dereference_exprt lhs_deref(p);
+                dereference_exprt rhs_deref(*arg_it);
+                vectorst rhs_vectors=get_rhs(rhs_deref);
+                assign_lhs(lhs_deref, rhs_vectors);
+              }
+
+              ++arg_it;
+            }
+          }
+        }
       }
     }
     break;
