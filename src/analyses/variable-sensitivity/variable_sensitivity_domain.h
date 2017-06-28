@@ -104,10 +104,6 @@ public:
   bool is_bottom() const override;
   bool is_top() const override;
 
-  bool ai_simplify_lhs(
-    exprt &condition,
-    const namespacet &ns) const override;
-
 private:
   void transform_function_call(
     locationt from,

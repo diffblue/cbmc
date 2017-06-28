@@ -1,0 +1,8 @@
+CORE
+main.c
+"--variable --arrays --pointers --structs"
+
+symbol = 5
+\*value\.pointer_component = 6
+value\.array\[1l\] = 2
+value\.array\[\(signed long int\)nondet\] = 3

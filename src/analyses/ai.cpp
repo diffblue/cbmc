@@ -57,29 +57,31 @@ bool ai_domain_baset::ai_simplify_lhs(
   if(condition.id()==ID_index)
   {
     index_exprt ie=to_index_expr(condition);
-    bool changed=ai_simplify(ie.index(), ns);
-    if(changed)
+    bool no_simplification=ai_simplify(ie.index(), ns);
+    if(!no_simplification)
       condition=simplify_expr(ie, ns);
 
-    return !changed;
+    return no_simplification;
   }
   else if(condition.id()==ID_dereference)
   {
     dereference_exprt de=to_dereference_expr(condition);
-    bool changed=ai_simplify(de.pointer(), ns);
-    if(changed)
+    bool no_simplification=ai_simplify(de.pointer(), ns);
+    if(!no_simplification)
       condition=simplify_expr(de, ns);  // So *(&x) -> x
 
-    return !changed;
+    return no_simplification;
   }
   else if(condition.id()==ID_member)
   {
     member_exprt me=to_member_expr(condition);
-    bool changed=ai_simplify_lhs(me.compound(), ns); // <-- lhs!
-    if(changed)
+    // Carry on the RHS since we still require an addressable object for the
+    // struct
+    bool no_simplification=ai_simplify_lhs(me.compound(), ns);
+    if(!no_simplification)
       condition=simplify_expr(me, ns);
 
-    return !changed;
+    return no_simplification;
   }
   else
     return true;
