@@ -16,6 +16,7 @@ Date: April 2016
 #include <sstream>
 
 #include <util/cprover_prefix.h>
+#include <util/invariant.h>
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/config.h>
@@ -132,8 +133,8 @@ bool model_argc_argv(
             symbol_table.add(it->second))
       UNREACHABLE;
   }
+  POSTCONDITION(value.is_not_nil());
 
-  assert(value.is_not_nil());
   goto_convert(
     to_code(value),
     symbol_table,
@@ -147,15 +148,17 @@ bool model_argc_argv(
 
   goto_functionst::function_mapt::iterator start_entry=
     goto_functions.function_map.find(goto_functions.entry_point());
-  assert(
+  DATA_INVARIANT(
     start_entry!=goto_functions.function_map.end() &&
-    start_entry->second.body_available());
+    start_entry->second.body_available(),
+    "entry point expected to have a body");
 
   goto_programt &start=start_entry->second.body;
   goto_programt::targett main_call=start.instructions.begin();
   for(goto_programt::targett end=start.instructions.end();
       main_call!=end;
       ++main_call)
+  {
     if(main_call->is_function_call())
     {
       const exprt &func=
@@ -164,8 +167,9 @@ bool model_argc_argv(
          to_symbol_expr(func).get_identifier()==main_symbol.name)
         break;
     }
+  }
+  POSTCONDITION(main_call!=start.instructions.end());
 
-  assert(main_call!=start.instructions.end());
   start.insert_before_swap(main_call, init_instructions);
 
   // update counters etc.
