@@ -367,6 +367,12 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       {
       }
     }
+    else
+    {
+      exprt smaller_width_value=expr.op0();
+      expr.swap(smaller_width_value);
+      return false;
+    }
   }
 
   // Push a numerical typecast into pointer arithmetic
