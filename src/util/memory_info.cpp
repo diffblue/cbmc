@@ -63,7 +63,7 @@ void memory_info(std::ostream &out)
       << static_cast<double>(t_info.virtual_size)/1000000 << "m\n";
 
   malloc_statistics_t t;
-  malloc_zone_statistics(NULL, &t);
+  malloc_zone_statistics(nullptr, &t);
   out << "  max_size_in_use: "
       << static_cast<double>(t.max_size_in_use)/1000000 << "m\n";
   out << "  size_allocated: "

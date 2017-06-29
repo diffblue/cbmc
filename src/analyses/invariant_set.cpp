@@ -144,7 +144,7 @@ bool invariant_sett::get_object(
   const exprt &expr,
   unsigned &n) const
 {
-  assert(object_store!=NULL);
+  assert(object_store!=nullptr);
   return object_store->get(expr, n);
 }
 
@@ -315,7 +315,7 @@ void invariant_sett::output(
     return;
   }
 
-  assert(object_store!=NULL);
+  assert(object_store!=nullptr);
 
   for(unsigned i=0; i<eq_set.size(); i++)
     if(eq_set.is_root(i) &&
@@ -899,7 +899,7 @@ std::string invariant_sett::to_string(
   unsigned a,
   const irep_idt &identifier) const
 {
-  assert(object_store!=NULL);
+  assert(object_store!=nullptr);
   return object_store->to_string(a, identifier);
 }
 

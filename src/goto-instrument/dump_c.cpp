@@ -716,7 +716,7 @@ static bool find_block_position_rec(
   if(!root.has_operands())
     return false;
 
-  code_blockt *our_dest=0;
+  code_blockt *our_dest=nullptr;
 
   exprt::operandst &operands=root.operands();
   exprt::operandst::iterator first_found=operands.end();
@@ -807,14 +807,14 @@ void dump_ct::insert_local_static_decls(
     std::list<irep_idt> redundant;
     cleanup_decl(d, redundant, type_decls);
 
-    code_blockt *dest_ptr=0;
+    code_blockt *dest_ptr=nullptr;
     exprt::operandst::iterator before=b.operands().end();
 
     // some use of static variables might be optimised out if it is
     // within an if(false) { ... } block
     if(find_block_position_rec(*it, b, dest_ptr, before))
     {
-      assert(dest_ptr!=0);
+      assert(dest_ptr!=nullptr);
       dest_ptr->operands().insert(before, d);
     }
   }
@@ -844,14 +844,14 @@ void dump_ct::insert_local_type_decls(
     // another hack to ensure symbols inside types are seen
     skip.type()=type;
 
-    code_blockt *dest_ptr=0;
+    code_blockt *dest_ptr=nullptr;
     exprt::operandst::iterator before=b.operands().end();
 
     // we might not find it in case a transparent union type cast
     // has been removed by cleanup operations
     if(find_block_position_rec(*it, b, dest_ptr, before))
     {
-      assert(dest_ptr!=0);
+      assert(dest_ptr!=nullptr);
       dest_ptr->operands().insert(before, skip);
     }
   }

@@ -102,7 +102,7 @@ public:
   rd_range_domaint():
     ai_domain_baset(),
     has_values(false),
-    bv_container(0)
+    bv_container(nullptr)
   {
   }
 
@@ -243,9 +243,9 @@ public:
   explicit reaching_definitions_analysist(const namespacet &_ns):
     concurrency_aware_ait<rd_range_domaint>(),
     ns(_ns),
-    value_sets(0),
-    is_threaded(0),
-    is_dirty(0)
+    value_sets(nullptr),
+    is_threaded(nullptr),
+    is_dirty(nullptr)
   {
   }
 
@@ -259,7 +259,7 @@ public:
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
     rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
-    assert(rd_state!=0);
+    assert(rd_state!=nullptr);
 
     rd_state->set_bitvector_container(*this);
 

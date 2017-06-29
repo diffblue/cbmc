@@ -1197,7 +1197,7 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
     const source_locationt &current_location=current_event.source_location;
 
     /* select relevant thread (po) -- or function contained in this thread */
-    goto_programt *current_po=0;
+    goto_programt *current_po=nullptr;
     bool thread_found=false;
 
     Forall_goto_functions(f_it, goto_functions)

@@ -192,7 +192,7 @@ static const char *options_no_arg[]=
   "--translate_gcc",
   "--translate_gld",
   "-W",
-  NULL
+  nullptr
 };
 
 static const char *options_with_prefix[]=
@@ -242,7 +242,7 @@ static const char *options_with_prefix[]=
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
   "--configure_extra_libraries=",
-  NULL
+  nullptr
 };
 
 static const char *options_with_arg[]=
@@ -262,7 +262,7 @@ static const char *options_with_arg[]=
   "-o",
   "--cpu",
   "--apcs",
-  NULL
+  nullptr
 };
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)
