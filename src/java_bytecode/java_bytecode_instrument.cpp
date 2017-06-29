@@ -15,21 +15,26 @@ Date:   June 2017
 
 #include <goto-programs/goto_functions.h>
 
+#include "java_bytecode_convert_class.h"
 #include "java_bytecode_instrument.h"
 #include "java_entry_point.h"
 #include "java_object_factory.h"
 #include "java_root_class.h"
 #include "java_types.h"
+#include "java_utils.h"
 
-class java_bytecode_instrumentt
+class java_bytecode_instrumentt:public messaget
 {
 public:
   java_bytecode_instrumentt(
     symbol_tablet &_symbol_table,
     const bool _throw_runtime_exceptions,
+    message_handlert &_message_handler,
     const size_t _max_array_length):
+    messaget(_message_handler),
     symbol_table(_symbol_table),
     throw_runtime_exceptions(_throw_runtime_exceptions),
+    message_handler(_message_handler),
     max_array_length(_max_array_length)
     {
     }
@@ -38,8 +43,9 @@ public:
 
 protected:
   symbol_tablet &symbol_table;
-  bool throw_runtime_exceptions;
-  size_t max_array_length;
+  const bool throw_runtime_exceptions;
+  message_handlert &message_handler;
+  const size_t max_array_length;
 
   codet throw_exception(
     const exprt &cond,
@@ -92,25 +98,12 @@ codet java_bytecode_instrumentt::throw_exception(
 
   if(!symbol_table.has_symbol(exc_obj_name))
   {
-    // for now, create a class stub
-    // TODO: model exceptions and use that model
-    class_typet class_type;
-    class_type.set_tag(exc_name);
-    class_type.set(ID_base_name, exc_name);
-    class_type.set(ID_incomplete_class, true);
-
-    // produce class symbol
-    symbolt exc_symbol;
-    exc_symbol.base_name=exc_name;
-    exc_symbol.pretty_name=exc_name;
-    exc_symbol.name="java::"+id2string(exc_name);
-    class_type.set(ID_name, exc_symbol.name);
-    exc_symbol.type=class_type;
-    exc_symbol.mode=ID_java;
-    exc_symbol.is_type=true;
-    symbol_table.add(exc_symbol);
-    // create the class identifier
-    java_root_class(exc_symbol);
+    generate_class_stub(
+      exc_name,
+      symbol_table,
+      get_message_handler());
+    const symbolt &exc_symbol=symbol_table.lookup(
+      "java::"+id2string(exc_name));
 
     // create the exception object
     exc=object_factory(
@@ -512,12 +505,14 @@ void java_bytecode_instrumentt::operator()(exprt &expr)
 /// in order to be able to call the object factory to create exceptions.
 void java_bytecode_instrument(
   symbol_tablet &symbol_table,
-  bool throw_runtime_exceptions,
-  size_t max_array_length)
+  const bool throw_runtime_exceptions,
+  message_handlert &message_handler,
+  const size_t max_array_length)
 {
   java_bytecode_instrumentt instrument(
     symbol_table,
     throw_runtime_exceptions,
+    message_handler,
     max_array_length);
 
   Forall_symbols(s_it, symbol_table.symbols)

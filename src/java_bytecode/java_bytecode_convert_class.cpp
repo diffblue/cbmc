@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_language.h"
+#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
@@ -54,11 +55,15 @@ public:
 
     if(parse_tree.loading_successful)
       convert(parse_tree.parsed_class);
-    else if(string_refinement_enabled &&
-            parse_tree.parsed_class.name=="java.lang.String")
-      add_string_type();
-    else
-      generate_class_stub(parse_tree.parsed_class.name);
+
+    if(string_preprocess.is_known_string_type(parse_tree.parsed_class.name))
+      string_preprocess.add_string_type(
+        parse_tree.parsed_class.name, symbol_table);
+    else if(!loading_success)
+      generate_class_stub(
+        parse_tree.parsed_class.name,
+        symbol_table,
+        get_message_handler());
   }
 
   typedef java_bytecode_parse_treet::classt classt;
@@ -76,7 +81,6 @@ protected:
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const fieldt &f);
 
-  void generate_class_stub(const irep_idt &class_name);
   void add_array_types();
   void add_string_type();
 };
@@ -173,40 +177,6 @@ void java_bytecode_convert_classt::convert(const classt &c)
   // is this a root class?
   if(c.extends.empty())
     java_root_class(*class_symbol);
-}
-
-void java_bytecode_convert_classt::generate_class_stub(
-  const irep_idt &class_name)
-{
-  class_typet class_type;
-
-  class_type.set_tag(class_name);
-  class_type.set(ID_base_name, class_name);
-
-  class_type.set(ID_incomplete_class, true);
-
-  // produce class symbol
-  symbolt new_symbol;
-  new_symbol.base_name=class_name;
-  new_symbol.pretty_name=class_name;
-  new_symbol.name="java::"+id2string(class_name);
-  class_type.set(ID_name, new_symbol.name);
-  new_symbol.type=class_type;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=true;
-
-  symbolt *class_symbol;
-
-  if(symbol_table.move(new_symbol, class_symbol))
-  {
-    warning() << "stub class symbol " << new_symbol.name
-              << " already exists" << eom;
-  }
-  else
-  {
-    // create the class identifier etc
-    java_root_class(*class_symbol);
-  }
 }
 
 void java_bytecode_convert_classt::convert(

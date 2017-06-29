@@ -9,9 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 
+#include <util/symbol_table.h>
 #include <util/type.h>
 
 bool java_is_array_type(const typet &type);
+
+void generate_class_stub(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler);
 
 /// Returns the number of JVM local variables (slots) taken by a local variable
 /// that, when translated to goto, has type \p t.

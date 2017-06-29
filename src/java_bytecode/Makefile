@@ -5,6 +5,7 @@ SRC = bytecode_info.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
+      java_bytecode_instrument.cpp \
       java_bytecode_internal_additions.cpp \
       java_bytecode_language.cpp \
       java_bytecode_parse_tree.cpp \
@@ -16,7 +17,6 @@ SRC = bytecode_info.cpp \
       java_class_loader.cpp \
       java_class_loader_limit.cpp \
       java_entry_point.cpp \
-      java_bytecode_instrument.cpp \
       java_local_variable_table.cpp \
       java_object_factory.cpp \
       java_pointer_casts.cpp \

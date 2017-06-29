@@ -457,6 +457,7 @@ bool java_bytecode_languaget::typecheck(
   java_bytecode_instrument(
     symbol_table,
     throw_runtime_exceptions,
+    get_message_handler(),
     max_nondet_array_length);
 
   // now typecheck all
