@@ -1,3 +1,5 @@
+#include<assert.h>
+
 void exit(int status);
 
 int main() {
