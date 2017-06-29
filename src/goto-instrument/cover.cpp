@@ -191,6 +191,10 @@ const char *as_string(coverage_criteriont c)
   case coverage_criteriont::PATH: return "path";
   case coverage_criteriont::MCDC: return "MC/DC";
   case coverage_criteriont::ASSERTION: return "assertion";
+  case coverage_criteriont::RUNTIME_EXCEPTION:
+    return "runtime exception";
+  case coverage_criteriont::USER_ASSERTION:
+    return "user assertion";
   case coverage_criteriont::COVER: return "cover instructions";
   default: return "";
   }
@@ -1381,6 +1385,8 @@ bool instrument_cover_goals(
   std::list<std::string> criteria_strings=cmdline.get_values("cover");
   std::set<coverage_criteriont> criteria;
   bool keep_assertions=false;
+  bool keep_exception_assertions=false;
+  bool keep_user_assertions=false;
 
   for(const auto &criterion_string : criteria_strings)
   {
@@ -1397,6 +1403,18 @@ bool instrument_cover_goals(
       c=coverage_criteriont::BRANCH;
     else if(criterion_string=="location" || criterion_string=="locations")
       c=coverage_criteriont::LOCATION;
+    else if(criterion_string=="runtime_exception" ||
+            criterion_string=="runtime_exceptions")
+    {
+      c=coverage_criteriont::RUNTIME_EXCEPTION;
+      keep_exception_assertions=true;
+    }
+    else if(criterion_string=="user_assertion" ||
+            criterion_string=="user_assertions")
+    {
+      c=coverage_criteriont::USER_ASSERTION;
+      keep_user_assertions=true;
+    }
     else if(criterion_string=="decision" || criterion_string=="decisions")
       c=coverage_criteriont::DECISION;
     else if(criterion_string=="condition" || criterion_string=="conditions")
@@ -1434,7 +1452,11 @@ bool instrument_cover_goals(
       goto_programt &body=f_it->second.body;
       Forall_goto_program_instructions(i_it, body)
       {
-        if(i_it->is_assert())
+        if(i_it->is_assert() &&
+            (!keep_exception_assertions ||
+             i_it->source_location.get_bool("user-provided")) &&
+            (!keep_user_assertions ||
+             !i_it->source_location.get_bool("user-provided")))
           i_it->type=goto_program_instruction_typet::ASSUME;
       }
     }

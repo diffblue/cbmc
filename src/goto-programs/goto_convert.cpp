@@ -909,7 +909,16 @@ void goto_convertt::convert_assert(
   t->guard.swap(cond);
   t->source_location=code.source_location();
   t->source_location.set(ID_property, ID_assertion);
-  t->source_location.set("user-provided", true);
+  irep_idt property_class=t->source_location.get_property_class();
+  // if it's not our instrumentation for runtime exceptions, then it must be
+  // provided by the user
+  if(id2string(property_class)!="array-index-out-of-bounds-high" &&
+     id2string(property_class)!="array-index-out-of-bounds-low" &&
+     id2string(property_class)!="null-pointer-exception" &&
+     id2string(property_class)!="bad-dynamic-cast" &&
+     id2string(property_class)!="array-create-negative-size" &&
+     id2string(property_class)!="pointer-dereference")
+    t->source_location.set("user-provided", true);
 }
 
 void goto_convertt::convert_skip(

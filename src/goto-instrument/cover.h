@@ -34,7 +34,8 @@ private:
 enum class coverage_criteriont
 {
   LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, ASSERTION, COVER };
+  PATH, MCDC, ASSERTION, RUNTIME_EXCEPTION,
+  USER_ASSERTION, COVER };
 
 bool consider_goals(
   const goto_programt &goto_program,
