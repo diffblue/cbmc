@@ -346,7 +346,7 @@ void const_graph_visitort::PT(
 #ifdef BTWN1
     event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
-    /* all the pos in between */
+    /// all the pos in between
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(e.first).begin();
       next_it!=egraph.po_out(e.first).end();

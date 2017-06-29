@@ -258,18 +258,18 @@ protected:
       }
     }
 
-    // TODO: move the visitor outside, and inherit
+    /// TODO: move the visitor outside, and inherit
     virtual void visit_cfg_function(
-      /* value_sets and options */
+      /// value_sets and options
       value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      /* function to analyse */
+      /// function to analyse
       const irep_idt &function,
-      /* incoming edges */
+      /// incoming edges
       const std::set<nodet> &initial_vertex,
-      /* outcoming edges */
+      /// outcoming edges
       std::set<nodet> &ending_vertex);
 
     bool inline local(const irep_idt &i);

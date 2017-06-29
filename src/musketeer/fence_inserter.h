@@ -64,7 +64,7 @@ public:
 
   instrumentert &instrumenter;
 
-  /* normal variables used almost every time */
+  /// normal variables used almost every time
   std::map<unsigned, edget> &map_to_e;
   std::map<edget, unsigned> &map_from_e;
   unsigned add_edge(const edget &e) { return var.add_edge(e); }
@@ -73,11 +73,11 @@ public:
     return invisible_var.add_edge(e);
   }
 
-  /* number of constraints */
+  /// number of constraints
   std::size_t constraints_number;
   const memory_modelt model;
 
-  /* to retrieve the concrete graph edges involved in the (abstract) cycles */
+  /// to retrieve the concrete graph edges involved in the (abstract) cycles
   const_graph_visitort const_graph_visitor;
 
 protected:
