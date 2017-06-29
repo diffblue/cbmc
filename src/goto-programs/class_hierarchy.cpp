@@ -18,6 +18,10 @@ Date: April 2016
 
 #include "class_hierarchy.h"
 
+/// Looks for all the struct types in the symbol table and construct a map from
+/// class names to a data structure that contains lists of parent and child
+/// classes for each struct type (ie class).
+/// \param symbol_table: The symbol table to analyze
 void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 {
   forall_symbols(it, symbol_table.symbols)
