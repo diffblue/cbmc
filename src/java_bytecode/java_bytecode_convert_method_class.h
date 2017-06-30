@@ -41,7 +41,8 @@ public:
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
-    string_preprocess(_string_preprocess)
+    string_preprocess(_string_preprocess),
+    slots_for_parameters(0)
   {
   }
 
@@ -61,10 +62,24 @@ protected:
   const size_t max_array_length;
   safe_pointer<ci_lazy_methodst> lazy_methods;
 
+  /// Fully qualified name of the method under translation.
+  /// Initialized by `convert`.
+  /// Example: "my.package.ClassName.myMethodName:(II)I"
   irep_idt method_id;
+
+  /// A copy of `method_id` :/
   irep_idt current_method;
+
+  /// Return type of the method under conversion.
+  /// Initialized by `convert`.
   typet method_return_type;
+
   java_string_library_preprocesst &string_preprocess;
+
+  /// Number of local variable slots used by the JVM to pass parameters upon
+  /// invocation of the method under translation.
+  /// Initialized in `convert`.
+  unsigned slots_for_parameters;
 
 public:
   struct holet
@@ -76,6 +91,7 @@ public:
   struct local_variable_with_holest
   {
     local_variablet var;
+    bool is_parameter;
     std::vector<holet> holes;
   };
 
@@ -93,7 +109,7 @@ public:
     variablet() : symbol_expr(), start_pc(0), length(0), is_parameter(false) {}
   };
 
- protected:
+protected:
   typedef std::vector<variablet> variablest;
   expanding_vectort<variablest> variables;
   std::set<symbol_exprt> used_local_names;
@@ -147,7 +163,17 @@ public:
   void pop_residue(std::size_t n);
   void push(const exprt::operandst &o);
 
+  /// Determines whether the `method` is a constructor or a static initializer,
+  /// by checking whether its name equals either <init> or <clinit>
   bool is_constructor(const class_typet::methodt &method);
+
+  /// Returns true iff the slot index of the local variable of a method (coming
+  /// from the LVT) is a parameter of that method. Assumes that
+  /// `slots_for_parameters` is initialized upon call.
+  bool is_parameter(const local_variablet &v)
+  {
+    return v.index<slots_for_parameters;
+  }
 
   struct converted_instructiont
   {
@@ -171,12 +197,12 @@ public:
     java_cfg_dominatorst;
 
 protected:
-  void find_initialisers(
+  void find_initializers(
     local_variable_table_with_holest &vars,
     const address_mapt &amap,
     const java_cfg_dominatorst &doms);
 
-  void find_initialisers_for_slot(
+  void find_initializers_for_slot(
     local_variable_table_with_holest::iterator firstvar,
     local_variable_table_with_holest::iterator varlimit,
     const address_mapt &amap,

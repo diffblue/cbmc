@@ -1,0 +1,12 @@
+KNOWNBUG
+unexpected.class
+--verbosity 10 --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The LVT in the only method in unexpected.class does not satisfy the constraints
+expected by the bytecode to goto conversion algorithms. Namely, the live range
+of parameter x in that method is not preceeded by a store_i instruction, which
+is perfectly possibly as per the JVM specs but currently additionally required
+in CBMC.

@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
 #include "java_types.h"
+#include "java_utils.h"
 #include "java_string_library_preprocess.h"
 
 #include <limits>
@@ -106,26 +107,13 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-const size_t SLOTS_PER_INTEGER(1u);
-const size_t INTEGER_WIDTH(64u);
-static size_t count_slots(
-  const size_t value,
-  const code_typet::parametert &param)
-{
-  const std::size_t width(param.type().get_unsigned_int(ID_width));
-  return value+SLOTS_PER_INTEGER+width/INTEGER_WIDTH;
-}
-
-static size_t get_variable_slots(const code_typet::parametert &param)
-{
-  return count_slots(0, param);
-}
-
 static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
 {
-  const auto to_strip_str=id2string(to_strip);
-  assert(has_prefix(to_strip_str, "java::"));
-  return to_strip_str.substr(6, std::string::npos);
+  const std::string to_strip_str=id2string(to_strip);
+  const std::string prefix="java::";
+
+  PRECONDITION(has_prefix(to_strip_str, prefix));
+  return to_strip_str.substr(prefix.size(), std::string::npos);
 }
 
 // name contains <init> or <clinit>
@@ -297,25 +285,44 @@ void java_bytecode_convert_methodt::convert(
   const symbolt &class_symbol,
   const methodt &m)
 {
+  // Construct the fully qualified method name
+  // (e.g. "my.package.ClassName.myMethodName:(II)I") and query the symbol table
+  // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
+  // associated to the method
   const irep_idt method_identifier=
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
   method_id=method_identifier;
 
   const auto &old_sym=symbol_table.lookup(method_identifier);
 
+  // Obtain a std::vector of code_typet::parametert objects from the
+  // (function) type of the symbol
   typet member_type=old_sym.type;
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
 
+  // Determine the number of local variable slots used by the JVM to maintan the
+  // formal parameters
+  slots_for_parameters=java_method_parameter_slots(code_type);
+
+  debug() << "Generating codet: class "
+             << class_symbol.name << ", method "
+             << m.name << eom;
+
+  // We now set up the local variables for the method parameters
   variables.clear();
 
-  // find parameter names in the local variable table:
+  // Find parameter names in the local variable table:
   for(const auto &v : m.local_variable_table)
   {
-    if(v.start_pc!=0) // Local?
+    // Skip this variable if it is not a method parameter
+    if(!is_parameter(v))
       continue;
 
+    // Construct a fully qualified name for the parameter v,
+    // e.g. my.package.ClassName.myMethodName:(II)I::anIntParam, and then a
+    // symbol_exprt with the parameter and its type
     typet t=java_type_from_string(v.signature);
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.name;
@@ -323,6 +330,10 @@ void java_bytecode_convert_methodt::convert(
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.name);
 
+    // Create a new variablet in the variables vector; in fact this entry will
+    // be rewritten below in the loop that iterates through the method
+    // parameters; the only field that seem to be useful to write here is the
+    // symbol_expr, others will be rewritten
     variables[v.index].push_back(variablet());
     auto &newv=variables[v.index].back();
     newv.symbol_expr=result;
@@ -330,46 +341,59 @@ void java_bytecode_convert_methodt::convert(
     newv.length=v.length;
   }
 
-  // set up variables array
+  // The variables is a expanding_vectort, and the loop above may have expanded
+  // the vector introducing gaps where the entries are empty vectors. We now
+  // make sure that the vector of each LV slot contains exactly one variablet,
+  // possibly default-initialized
   std::size_t param_index=0;
   for(const auto &param : parameters)
   {
     variables[param_index].resize(1);
-    param_index+=get_variable_slots(param);
+    param_index+=java_local_variable_slots(param.type());
   }
+  INVARIANT(
+    param_index==slots_for_parameters,
+    "java_parameter_count and local computation must agree");
 
-  // assign names to parameters
+  // Assign names to parameters
   param_index=0;
   for(auto &param : parameters)
   {
     irep_idt base_name, identifier;
 
+    // Construct a sensible base name (base_name) and a fully qualified name
+    // (identifier) for every parameter of the method under translation,
+    // regardless of whether we have an LVT or not; and assign it to the
+    // parameter object (which is stored in the type of the symbol, not in the
+    // symbol table)
     if(param_index==0 && param.get_this())
     {
+      // my.package.ClassName.myMethodName:(II)I::this
       base_name="this";
       identifier=id2string(method_identifier)+"::"+id2string(base_name);
-      param.set_base_name(base_name);
-      param.set_identifier(identifier);
     }
     else
     {
-      // in the variable table?
+      // if already present in the LVT ...
       base_name=variables[param_index][0].symbol_expr.get(ID_C_base_name);
       identifier=variables[param_index][0].symbol_expr.get(ID_identifier);
 
+      // ... then base_name will not be empty
       if(base_name.empty())
       {
+        // my.package.ClassName.myMethodName:(II)I::argNT, where N is the local
+        // variable slot where the parameter is stored and T is a character
+        // indicating the type
         const typet &type=param.type();
         char suffix=java_char_from_type(type);
         base_name="arg"+std::to_string(param_index)+suffix;
         identifier=id2string(method_identifier)+"::"+id2string(base_name);
       }
-
-      param.set_base_name(base_name);
-      param.set_identifier(identifier);
     }
+    param.set_base_name(base_name);
+    param.set_identifier(identifier);
 
-    // add to symbol table
+    // Build a new symbol for the parameter and add it to the symbol table
     parameter_symbolt parameter_symbol;
     parameter_symbol.base_name=base_name;
     parameter_symbol.mode=ID_java;
@@ -377,47 +401,45 @@ void java_bytecode_convert_methodt::convert(
     parameter_symbol.type=param.type();
     symbol_table.add(parameter_symbol);
 
-    // add as a JVM variable
-    std::size_t slots=get_variable_slots(param);
+    // Add as a JVM local variable
     variables[param_index][0].symbol_expr=parameter_symbol.symbol_expr();
     variables[param_index][0].is_parameter=true;
     variables[param_index][0].start_pc=0;
     variables[param_index][0].length=std::numeric_limits<size_t>::max();
-    variables[param_index][0].is_parameter=true;
-    param_index+=slots;
-    assert(param_index>0);
+    param_index+=java_local_variable_slots(param.type());
   }
+
+  // The parameter slots detected in this function should agree with what
+  // java_parameter_count() thinks about this method
+  INVARIANT(
+    param_index==slots_for_parameters,
+    "java_parameter_count and local computation must agree");
 
   const bool is_virtual=!m.is_static && !m.is_final;
 
-  #if 0
-  class_type.methods().push_back(class_typet::methodt());
-  class_typet::methodt &method=class_type.methods().back();
-  #else
+  // Construct a methodt, which lives within the class type; this object is
+  // never used for anything useful and could be removed
   class_typet::methodt method;
-  #endif
-
   method.set_base_name(m.base_name);
   method.set_name(method_identifier);
-
   method.set(ID_abstract, m.is_abstract);
   method.set(ID_is_virtual, is_virtual);
-
+  method.type()=member_type;
   if(is_constructor(method))
     method.set(ID_constructor, true);
 
-  method.type()=member_type;
-
   // we add the symbol for the method
-
   symbolt method_symbol;
-
   method_symbol.name=method.get_name();
   method_symbol.base_name=method.get_base_name();
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
 
+  // Set up the pretty name for the method entry in the symbol table.
+  // The pretty name of a constructor includes the base name of the class
+  // instead of the internal method name "<init>". For regular methods, it's
+  // just the base name of the method.
   if(method.get_base_name()=="<init>")
     method_symbol.pretty_name=id2string(class_symbol.pretty_name)+"."+
                               id2string(class_symbol.base_name)+"()";
@@ -428,19 +450,20 @@ void java_bytecode_convert_methodt::convert(
   method_symbol.type=member_type;
   if(is_constructor(method))
     method_symbol.type.set(ID_constructor, true);
+
   current_method=method_symbol.name;
   method_has_this=code_type.has_this();
-
-  tmp_vars.clear();
   if((!m.is_abstract) && (!m.is_native))
-    method_symbol.value=convert_instructions(
-      m, code_type, method_symbol.name);
+    method_symbol.value=convert_instructions(m, code_type, method_symbol.name);
 
   // Replace the existing stub symbol with the real deal:
   const auto s_it=symbol_table.symbols.find(method.get_name());
-  assert(s_it!=symbol_table.symbols.end());
+  INVARIANT(
+    s_it!=symbol_table.symbols.end(),
+    "the symbol was there earlier on this function; it must be there now");
   symbol_table.symbols.erase(s_it);
 
+  // Insert the method symbol in the symbol table
   symbol_table.add(method_symbol);
 }
 
@@ -1137,6 +1160,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       a_it->second.predecessors.insert(address.first);
     }
   }
+
+  // Clean the list of temporary variables created by a call to `tmp_variable`.
+  // These are local variables in the goto function used to represent temporary
+  // values of the JVM operand stack, newly allocated objects before the
+  // constructor is called, ...
+  tmp_vars.clear();
 
   // Now that the control flow graph is built, set up our local variables
   // (these require the graph to determine live ranges)
