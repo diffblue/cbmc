@@ -59,11 +59,6 @@ class java_object_factoryt
     const exprt &expr,
     const pointer_typet &ptr_type);
 
-  void gen_pointer_target_init(
-    const exprt &expr,
-    const typet &target_type,
-    bool create_dynamic_objects,
-    update_in_placet update_in_place);
 
   code_assignt get_null_assignment(
     const exprt &expr,
@@ -396,8 +391,10 @@ void java_object_factoryt::gen_pointer_target_init(
     if(target.id()==ID_address_of)
       init_expr=target.op0();
     else
+    {
       init_expr=
         dereference_exprt(target, target.type().subtype());
+    }
     gen_nondet_init(
       assignments,
       init_expr,
