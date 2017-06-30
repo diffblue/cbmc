@@ -209,16 +209,17 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 
 /// add axioms to say the string corresponds to the result of String.valueOf(I)
 /// or String.valueOf(J) java functions applied on the integer expression
-/// \par parameters: a signed integer expression, and a maximal size for the
-///   string
-/// representation
+/// \param i: a signed integer expression
+/// \param max_size: a maximal size for the string representation
+/// \param ref_type: type for refined strings
 /// \return a string expression
 string_exprt string_constraint_generatort::add_axioms_from_int(
   const exprt &i, size_t max_size, const refined_string_typet &ref_type)
 {
+  PRECONDITION(i.type().id()==ID_signedbv);
+  PRECONDITION(max_size<std::numeric_limits<size_t>::max());
   string_exprt res=fresh_string(ref_type);
   const typet &type=i.type();
-  assert(type.id()==ID_signedbv);
   exprt ten=from_integer(10, type);
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -262,12 +263,20 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
     not_exprt(equal_exprt(res[1], zero_char)));
   axioms.push_back(a4);
 
-  assert(max_size<std::numeric_limits<size_t>::max());
-
   for(size_t size=1; size<=max_size; size++)
   {
-    // For each possible size, we add axioms:
-    // a5 : forall 1 <= j < size. '0' <= res[j] <= '9' && sum == 10 * (sum/10)
+    // For each possible size, we have:
+    // sum_0 = starts_with_digit ? res[0]-'0' : 0
+    // sum_j = 10 * sum_{j-1} + res[i] - '0'
+    // and add axioms:
+    // a5 : |res| == size =>
+    //        forall 1 <= j < size.
+    //          is_number && (j >= max_size-2 => no_overflow)
+    //     where is_number := '0' <= res[j] <= '9'
+    //     and no_overflow := sum_{j-1} = (10 * sum_{j-1} / 10)
+    //                        && sum_j >= sum_{j - 1}
+    //         (the first part avoid overflows in multiplication and
+    //          the second one in additions)
     // a6 : |res| == size && '0' <= res[0] <= '9' => i == sum
     // a7 : |res| == size && res[0] == '-' => i == -sum
 
@@ -288,7 +297,11 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
         binary_relation_exprt(res[j], ID_le, nine_char));
       digit_constraints.push_back(is_number);
 
-      if(j>=max_size-1)
+      // An overflow can happen when reaching the last index of a string of
+      // maximal size which is `max_size` for negative numbers and
+      // `max_size - 1` for positive numbers because of the abscence of a `-`
+      // sign.
+      if(j>=max_size-2)
       {
         // check for overflows if the size is big
         and_exprt no_overflow(
@@ -299,10 +312,10 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
       sum=new_sum;
     }
 
-    exprt a5=conjunction(digit_constraints);
+    equal_exprt premise=res.axiom_for_has_length(size);
+    implies_exprt a5(premise, conjunction(digit_constraints));
     axioms.push_back(a5);
 
-    equal_exprt premise=res.axiom_for_has_length(size);
     implies_exprt a6(
       and_exprt(premise, starts_with_digit), equal_exprt(i, sum));
     axioms.push_back(a6);

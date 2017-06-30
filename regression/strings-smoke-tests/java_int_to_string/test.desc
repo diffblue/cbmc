@@ -1,7 +1,10 @@
 CORE
 test_int.class
 --refine-strings
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+assertion.* file test_int.java line 6 .* SUCCESS$
+assertion.* file test_int.java line 9 .* SUCCESS$
+assertion.* file test_int.java line 11 .* FAILURE$
+assertion.* file test_int.java line 13 .* FAILURE$
 --
