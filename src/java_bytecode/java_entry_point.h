@@ -35,4 +35,4 @@ main_function_resultt get_main_symbol(
   message_handlert &,
   bool allow_no_body=false);
 
-#endif
+#endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
