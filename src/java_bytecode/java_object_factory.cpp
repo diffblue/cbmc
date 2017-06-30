@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-#include <java_bytecode/get_concrete_class_at_random.h>
 
+#include <java_bytecode/select_pointer_type.h>
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -1096,11 +1096,12 @@ void java_object_factory_with_randomt::gen_nondet_init(
   {
     const pointer_typet &pointer_type=to_pointer_type(type);
     const namespacet ns(symbol_table);
-    get_concrete_class_at_randomt get_concrete_class_at_random(ns);
-    const typet &resolved_type=
-      get_concrete_class_at_random(pointer_type);
 
-    if(resolved_type!=real_type.subtype())
+    select_pointer_typet pointer_type_selector(ns);
+    const pointer_typet &replacement_pointer=
+      pointer_type_selector(pointer_type);
+
+    if(replacement_pointer!=real_type)
     {
       // Generate GOTO code to initalize the selected concrete type
       // A { ... } tmp_object;
@@ -1109,7 +1110,7 @@ void java_object_factory_with_randomt::gen_nondet_init(
       // A * p = &tmp_object
       // expr = (I *)p
 
-      symbolt new_symbol=new_tmp_symbol(symbol_table, loc, pointer_typet(resolved_type));
+      symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
 
       // Generate a new object into this new symbol
       gen_nondet_init(

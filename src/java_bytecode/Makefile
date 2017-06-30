@@ -2,7 +2,7 @@ SRC = bytecode_info.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       expr2java.cpp \
-      get_concrete_class_at_random.cpp \
+      get_concrete_class_alphabetically.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
@@ -24,6 +24,7 @@ SRC = bytecode_info.cpp \
       java_root_class.cpp \
       java_types.cpp \
       java_utils.cpp \
+      select_pointer_type.cpp \
       # Empty last line
 
 INCLUDES= -I ..
