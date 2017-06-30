@@ -522,7 +522,7 @@ bool java_entry_point(
   if(to_code_type(symbol.type).return_type()!=empty_typet())
   {
     auxiliary_symbolt return_symbol;
-    return_symbol.mode=ID_C;
+    return_symbol.mode=ID_java;
     return_symbol.is_static_lifetime=false;
     return_symbol.name=JAVA_ENTRY_POINT_RETURN_SYMBOL;
     return_symbol.base_name="return";
@@ -536,7 +536,7 @@ bool java_entry_point(
   {
     // add the exceptional return value
     auxiliary_symbolt exc_symbol;
-    exc_symbol.mode=ID_C;
+    exc_symbol.mode=ID_java;
     exc_symbol.is_static_lifetime=true;
     exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
     exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
