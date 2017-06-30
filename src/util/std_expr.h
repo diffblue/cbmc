@@ -1790,9 +1790,8 @@ public:
   floatbv_typecast_exprt(
     const exprt &op,
     const exprt &rounding,
-    const typet &_type):binary_exprt(ID_floatbv_typecast, _type)
+    const typet &_type):binary_exprt(op, ID_floatbv_typecast, rounding, _type)
   {
-    copy_to_operands(op, rounding);
   }
 
   exprt &op()

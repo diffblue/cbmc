@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// Add axioms to say that the returned string expression is equal to the
+/// Add axioms enforcing that the returned string expression is equal to the
 /// concatenation of s1 with the substring of s2 starting at index start_index
 /// and ending at index end_index.
 ///
@@ -77,7 +77,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
   return add_axioms_for_concat_substr(s1, s2, index_zero, s2.length());
 }
 
-/// Add axioms to say that the returned string expression is equal to the
+/// Add axioms enforcing that the returned string expression is equal to the
 /// concatenation of the two string arguments of the function application.
 ///
 /// In case 4 arguments instead of 2 are given the last two arguments are
@@ -85,7 +85,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat(
 /// of the second argument: this is similar to the Java
 /// StringBuilder.append(CharSequence s, int start, int end) method.
 ///
-/// \param f: function application with two arguments which are strings
+/// \param f: function application with two string arguments
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_concat(
   const function_application_exprt &f)
@@ -148,9 +148,21 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_char(
   const function_application_exprt &f)
 {
   string_exprt s1=get_string_expr(args(f, 2)[0]);
-  const refined_string_typet &ref_type=to_refined_string_type(s1.type());
-  string_exprt s2=add_axioms_from_char(args(f, 2)[1], ref_type);
-  return add_axioms_for_concat(s1, s2);
+  return add_axioms_for_concat_char(s1, args(f, 2)[1]);
+}
+
+/// Add axioms corresponding to adding the character char at the end of
+/// string_expr.
+/// \param string_expr: a string expression
+/// \param char' a character expression
+/// \return a new string expression
+string_exprt string_constraint_generatort::add_axioms_for_concat_char(
+  const string_exprt &string_expr, const exprt &char_expr)
+{
+  const refined_string_typet &ref_type=
+    to_refined_string_type(string_expr.type());
+  string_exprt s2=add_axioms_from_char(char_expr, ref_type);
+  return add_axioms_for_concat(string_expr, s2);
 }
 
 /// Add axioms corresponding to the StringBuilder.append(D) java function
@@ -162,7 +174,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_double(
   string_exprt s1=get_string_expr(args(f, 2)[0]);
   PRECONDITION(refined_string_typet::is_refined_string_type(f.type()));
   refined_string_typet ref_type=to_refined_string_type(f.type());
-  string_exprt s2=add_axioms_from_float(args(f, 2)[1], ref_type, true);
+  string_exprt s2=add_axioms_for_string_of_float(args(f, 2)[1], ref_type);
   return add_axioms_for_concat(s1, s2);
 }
 
@@ -175,7 +187,7 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_float(
   string_exprt s1=get_string_expr(args(f, 2)[0]);
   PRECONDITION(refined_string_typet::is_refined_string_type(f.type()));
   refined_string_typet ref_type=to_refined_string_type(f.type());
-  string_exprt s2=add_axioms_from_float(args(f, 2)[1], ref_type, false);
+  string_exprt s2=add_axioms_for_string_of_float(args(f, 2)[1], ref_type);
   return add_axioms_for_concat(s1, s2);
 }
 
