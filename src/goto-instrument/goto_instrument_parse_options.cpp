@@ -621,7 +621,7 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
-      const bool h_libc=cmdline.isset("use-system-headers");
+      const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
       namespacet ns(symbol_table);
 
@@ -1542,7 +1542,7 @@ void goto_instrument_parse_optionst::help()
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
-    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with libc includes\n" // NOLINT(*)
+    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
     " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"

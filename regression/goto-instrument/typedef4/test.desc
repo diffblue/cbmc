@@ -1,6 +1,6 @@
 CORE
 main.c
---dump-c --use-system-headers
+--dump-c
 ^EXIT=0$
 ^SIGNAL=0$
 --
