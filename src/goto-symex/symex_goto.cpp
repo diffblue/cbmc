@@ -105,18 +105,6 @@ void goto_symext::symex_goto(statet &state)
       return; // nothing else to do
     }
   }
-  else if(new_guard.is_true() && !old_guard.is_true())
-  {
-    // we may have left a loop (i.e., the forward goto is beyond
-    // the end of the loop) as the loop condition has become false
-    // via constant propagation and simplification (the original
-    // condition "old_guard" was not trivially true, but "new_guard"
-    // is) -- reset all candidate loop counters
-    for(const auto &i_e : instruction.incoming_edges)
-      if(i_e->is_goto() && i_e->is_backwards_goto() &&
-         goto_target->location_number>i_e->location_number)
-        frame.loop_iterations[goto_programt::loop_id(i_e)].count=0;
-  }
 
   goto_programt::const_targett new_state_pc, state_pc;
   symex_targett::sourcet original_source=state.source;
