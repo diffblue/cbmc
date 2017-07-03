@@ -47,7 +47,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           it!=deleted_functions.end(); ++it)
       {
         const goto_programt &program=
-          goto_model2.goto_functions.function_map.at(*it).body;
+          goto_model1.goto_functions.function_map.at(*it).body;
         out << "  "
           << program.instructions.begin()->source_location.get_file()
           << ": " << *it << "\n";
