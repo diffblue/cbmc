@@ -1,0 +1,16 @@
+CORE
+test_parseint_with_radix.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 8.* SUCCESS$
+^\[.*assertion.2\].* line 9.* FAILURE$
+^\[.*assertion.3\].* line 14.* SUCCESS$
+^\[.*assertion.4\].* line 15.* FAILURE$
+^\[.*assertion.5\].* line 20.* SUCCESS$
+^\[.*assertion.6\].* line 21.* FAILURE$
+^\[.*assertion.7\].* line 26.* SUCCESS$
+^\[.*assertion.8\].* line 27.* FAILURE$
+^\[.*assertion.9\].* line 32.* SUCCESS$
+^\[.*assertion.10\].* line 33.* FAILURE$
+--
