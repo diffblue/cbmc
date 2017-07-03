@@ -112,3 +112,6 @@ src/util/irep_ids_convert
 src/util/irep_ids_convert.exe
 
 *.pyc
+
+# auto generated documentation
+doc/html/
