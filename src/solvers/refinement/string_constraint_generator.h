@@ -294,7 +294,7 @@ private:
 
   exprt add_axioms_for_parse_int(const function_application_exprt &f);
   exprt add_axioms_for_correct_number_format(
-    const string_exprt &str, std::size_t max_size=10);
+    const string_exprt &str, const exprt &radix, std::size_t max_size=10);
   exprt add_axioms_for_to_char_array(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
 
@@ -329,5 +329,7 @@ private:
 };
 
 exprt is_digit_with_radix(exprt chr, exprt radix);
+exprt get_numeric_value_from_character(
+  const exprt &chr, const typet &char_type, const typet &type);
 
 #endif

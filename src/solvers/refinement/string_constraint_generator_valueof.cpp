@@ -357,11 +357,14 @@ string_exprt string_constraint_generatort::add_axioms_for_value_of(
 }
 
 /// Add axioms making the return value true if the given string is a correct
-/// number.
-/// \param f: function application with one string expression
-/// \return an boolean expression
+/// number in the given radix
+/// \param str: string expression
+/// \param radix: the radix
+/// \param max_size: maximum number of characters
+/// \return a boolean expression saying whether the string does represent a
+///   number with the given radix
 exprt string_constraint_generatort::add_axioms_for_correct_number_format(
-  const string_exprt &str, std::size_t max_size)
+  const string_exprt &str, const exprt &radix, std::size_t max_size)
 {
   symbol_exprt correct=fresh_boolean("correct_number_format");
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
@@ -375,16 +378,14 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
   exprt chr=str[0];
   equal_exprt starts_with_minus(chr, minus_char);
   equal_exprt starts_with_plus(chr, plus_char);
-  and_exprt starts_with_digit(
-    binary_relation_exprt(chr, ID_ge, zero_char),
-    binary_relation_exprt(chr, ID_le, nine_char));
+  exprt starts_with_digit=is_digit_with_radix(chr, radix);
 
   // TODO: we should have implications in the other direction for correct
   // correct => |str| > 0
   exprt non_empty=str.axiom_for_is_longer_than(from_integer(1, index_type));
   axioms.push_back(implies_exprt(correct, non_empty));
 
-  // correct => (str[0] = '+' or '-' || '0' <= str[0] <= '9')
+  // correct => (str[0] = '+' or '-' || is_digit_with_radix(str[0], radix))
   or_exprt correct_first(
     or_exprt(starts_with_minus, starts_with_plus), starts_with_digit);
   axioms.push_back(implies_exprt(correct, correct_first));
@@ -399,11 +400,9 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
   axioms.push_back(
     implies_exprt(correct, str.axiom_for_is_shorter_than(max_size)));
 
-  // forall 1 <= qvar < |str| . correct => '0'<= str[qvar] <= '9'
+  // forall 1 <= qvar < |str| . correct => is_digit_with_radix(str[qvar], radix)
   symbol_exprt qvar=fresh_univ_index("number_format", index_type);
-  and_exprt is_digit(
-    binary_relation_exprt(str[qvar], ID_ge, zero_char),
-    binary_relation_exprt(str[qvar], ID_le, nine_char));
+  exprt is_digit=is_digit_with_radix(str[qvar], radix);
   string_constraintt all_digits(
     qvar, from_integer(1, index_type), str.length(), correct, is_digit);
   axioms.push_back(all_digits);
@@ -412,58 +411,66 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
 }
 
 /// add axioms corresponding to the Integer.parseInt java function
-/// \param f: function application with one string expression
+/// \param f: a function application with either one string expression or one
+///   string expression and an expression for the radix
 /// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
-  string_exprt str=get_string_expr(args(f, 1)[0]);
+  PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
+  string_exprt str=get_string_expr(f.arguments()[0]);
+  const exprt radix=
+    f.arguments().size()==1?from_integer(10, f.type()):f.arguments()[1];
+
   const typet &type=f.type();
   symbol_exprt i=fresh_symbol("parsed_int", type);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
-  exprt zero_char=constant_char('0', char_type);
   exprt minus_char=constant_char('-', char_type);
   exprt plus_char=constant_char('+', char_type);
   assert(type.id()==ID_signedbv);
-  exprt ten=from_integer(10, type);
 
   exprt chr=str[0];
   exprt starts_with_minus=equal_exprt(chr, minus_char);
   exprt starts_with_plus=equal_exprt(chr, plus_char);
-  exprt starts_with_digit=binary_relation_exprt(chr, ID_ge, zero_char);
+  exprt starts_with_digit=
+    not_exprt(or_exprt(starts_with_minus, starts_with_plus));
 
-  // TODO: we should throw an exception when this does not hold:
-  exprt correct=add_axioms_for_correct_number_format(str);
+  /// TODO: we should throw an exception when this does not hold:
+  exprt correct=add_axioms_for_correct_number_format(str, radix);
   axioms.push_back(correct);
 
+  /// TODO(OJones): size should depend on the radix
+  /// TODO(OJones): we should deal with overflow properly
   for(unsigned size=1; size<=10; size++)
   {
     exprt sum=from_integer(0, type);
-    exprt first_value=typecast_exprt(minus_exprt(chr, zero_char), type);
+    exprt first_value=get_numeric_value_from_character(chr, char_type, type);
+    equal_exprt premise=str.axiom_for_has_length(size);
 
     for(unsigned j=1; j<size; j++)
     {
-      mult_exprt ten_sum(sum, ten);
+      mult_exprt radix_sum(sum, radix);
       if(j>=9)
       {
         // We have to be careful about overflows
-        div_exprt div(sum, ten);
-        equal_exprt no_overflow(div, sum);
+        div_exprt div(sum, radix);
+        implies_exprt no_overflow(premise, (equal_exprt(div, sum)));
         axioms.push_back(no_overflow);
       }
 
       sum=plus_exprt_with_overflow_check(
-        ten_sum,
-        typecast_exprt(minus_exprt(str[j], zero_char), type));
+        radix_sum,
+        get_numeric_value_from_character(str[j], char_type, type));
 
-      mult_exprt first(first_value, ten);
+      mult_exprt first(first_value, radix);
       if(j>=9)
       {
         // We have to be careful about overflows
-        div_exprt div_first(first, ten);
+        div_exprt div_first(first, radix);
         implies_exprt no_overflow_first(
-          starts_with_digit, equal_exprt(div_first, first_value));
+          and_exprt(starts_with_digit, premise),
+          equal_exprt(div_first, first_value));
         axioms.push_back(no_overflow_first);
       }
       first_value=first;
@@ -474,7 +481,6 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     // a2 : starts_with_plus => i=sum
     // a3 : starts_with_minus => i=-sum
 
-    equal_exprt premise=str.axiom_for_has_length(size);
     implies_exprt a1(
       and_exprt(premise, starts_with_digit),
       equal_exprt(i, plus_exprt(sum, first_value)));
@@ -527,4 +533,33 @@ exprt is_digit_with_radix(exprt chr, exprt radix)
     binary_relation_exprt(radix, ID_le, from_integer(10, radix.type())),
     is_digit_when_radix_le_10,
     is_digit_when_radix_gt_10);
+}
+
+/// Get the numeric value of a character, assuming that the radix is large
+/// enough
+/// \param chr: the character to get the numeric value of
+/// \param char_type: the type to use for characters
+/// \param type: the type to use for the return value
+/// \return an integer expression of the given type with the numeric value of
+///   the char
+exprt get_numeric_value_from_character(
+  const exprt &chr, const typet &char_type, const typet &type)
+{
+  constant_exprt zero_char=from_integer('0', char_type);
+  constant_exprt a_char=from_integer('a', char_type);
+  constant_exprt A_char=from_integer('A', char_type);
+  constant_exprt ten_int=from_integer(10, char_type);
+
+  binary_relation_exprt upper_case(chr, ID_ge, A_char);
+  binary_relation_exprt lower_case(chr, ID_ge, a_char);
+
+  return typecast_exprt(
+    if_exprt(
+      lower_case,
+      plus_exprt(minus_exprt(chr, a_char), ten_int),
+      if_exprt(
+        upper_case,
+        plus_exprt(minus_exprt(chr, A_char), ten_int),
+        minus_exprt(chr, zero_char))),
+    type);
 }

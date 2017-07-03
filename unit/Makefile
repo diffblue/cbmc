@@ -3,6 +3,7 @@
 SRC = unit_tests.cpp \
       catch_example.cpp \
       solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
+      solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
       # Empty last line
 
 INCLUDES= -I ../src/ -I.
