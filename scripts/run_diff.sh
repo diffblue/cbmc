@@ -5,11 +5,12 @@ set -e
 script_folder=`dirname $0`
 absolute_repository_root=`git rev-parse --show-toplevel`
 mode=$1
+modes="CPPLINT | DOXYGEN"
 
 if [[ "$#" -gt 3 ]]
 then
   echo "Script for running a checker script only on modified lines. Arguments:"
-  echo "mode - tool to run: CPPLINT"
+  echo "mode - tool to run: $modes"
   echo "target - a git reference to the branch we want to compare against (default: 'master')"
   echo "tip - a git reference to the commit with changes (default: current working tree)"
   exit 1
@@ -32,9 +33,23 @@ then
   else
     cmd='$script_folder/cpplint.py $file 2>&1 >/dev/null'
   fi
+elif [[ "$mode" == "DOXYGEN" ]]
+then
+  doxygen=doxygen
+  doxygenlogdir="doc/html"
+  doxygenlog="$doxygenlogdir/doxygen.log"
+  if ! $doxygen --version &>/dev/null
+  then
+    echo "Lint script could not be found in the $script_folder directory"
+    echo "Ensure cpplint.py is inside the $script_folder directory then run again"
+    exit 1
+  else
+    mkdir -p $doxygenlogdir && cd src && $doxygen &> ../$doxygenlog && cd ..
+    cmd='cat $doxygenlog'
+  fi
 else
   echo "Mode $mode not recognized"
-  echo "Possible values: CPPLINT"
+  echo "Possible values: $modes"
   exit 1
 fi
 
