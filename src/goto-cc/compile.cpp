@@ -714,6 +714,7 @@ void compilet::convert_symbols(goto_functionst &dest)
 
       if(s_it->second.type.id()==ID_code &&
          !s_it->second.is_macro &&
+         !s_it->second.is_type &&
           s_it->second.value.id()!="compiled" &&
           s_it->second.value.is_not_nil())
       {
