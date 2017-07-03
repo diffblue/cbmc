@@ -208,7 +208,6 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
-          assert(step.full_lhs_value.is_not_nil());
           exprt simplified=simplify_array_access(step.full_lhs_value);
           full_lhs_value=json(simplified, ns, symbol->mode);
         }
