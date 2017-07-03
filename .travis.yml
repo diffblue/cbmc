@@ -134,6 +134,15 @@ matrix:
       script: scripts/travis_lint.sh
       before_cache:
 
+    - env: NAME="DOXYGEN-CHECK"
+      addons:
+        apt:
+          packages:
+            - doxygen
+      install:
+      script: scripts/travis_doxygen.sh
+      before_cache:
+
   allow_failures:
     - env: NAME="CPP-LINT"
       install:
