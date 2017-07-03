@@ -1,4 +1,3 @@
-
 DIRS = ansi-c \
        cbmc \
        cpp \
@@ -6,6 +5,7 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
+       goto-diff \
        test-script \
        # Empty last line
 

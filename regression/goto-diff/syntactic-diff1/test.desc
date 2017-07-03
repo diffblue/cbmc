@@ -1,0 +1,10 @@
+KNOWNBUG
+b.gb
+a.gb
+// Enable multi-line checking
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+new functions:\n\s+b.c: bar\nmodified functions:\n\s+b.c: main\ndeleted functions:\n\s+a.c: foo
+--
+^warning: ignoring
