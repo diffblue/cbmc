@@ -328,4 +328,6 @@ private:
   bool is_constant_string(const string_exprt &expr) const;
 };
 
+exprt is_digit_with_radix(exprt chr, exprt radix);
+
 #endif

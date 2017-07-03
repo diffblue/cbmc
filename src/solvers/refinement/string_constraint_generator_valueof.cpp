@@ -490,3 +490,41 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   }
   return i;
 }
+
+/// Check if a character is a digit with respect to the given radix, e.g. if the
+/// radix is 10 then check if the character is in the range 0-9.
+/// \param chr: the character
+/// \param radix:  the radix
+/// \return an expression for the condition
+exprt is_digit_with_radix(exprt chr, exprt radix)
+{
+  const typet &char_type=chr.type();
+  exprt zero_char=from_integer('0', char_type);
+  exprt nine_char=from_integer('9', char_type);
+  exprt a_char=from_integer('a', char_type);
+  exprt A_char=from_integer('A', char_type);
+
+  and_exprt is_digit_when_radix_le_10(
+    binary_relation_exprt(chr, ID_ge, zero_char),
+    binary_relation_exprt(
+      chr, ID_lt, plus_exprt(zero_char, typecast_exprt(radix, char_type))));
+
+  minus_exprt radix_minus_ten(
+    typecast_exprt(radix, char_type), from_integer(10, char_type));
+
+  or_exprt is_digit_when_radix_gt_10(
+    and_exprt(
+      binary_relation_exprt(chr, ID_ge, zero_char),
+      binary_relation_exprt(chr, ID_le, nine_char)),
+    and_exprt(
+      binary_relation_exprt(chr, ID_ge, a_char),
+      binary_relation_exprt(chr, ID_lt, plus_exprt(a_char, radix_minus_ten))),
+    and_exprt(
+      binary_relation_exprt(chr, ID_ge, A_char),
+      binary_relation_exprt(chr, ID_lt, plus_exprt(A_char, radix_minus_ten))));
+
+  return if_exprt(
+    binary_relation_exprt(radix, ID_le, from_integer(10, radix.type())),
+    is_digit_when_radix_le_10,
+    is_digit_when_radix_gt_10);
+}
