@@ -9,9 +9,6 @@ public class Test {
         A a=null;
         try {
             int i=a.i;
-            // TODO: an explicit throw is currently needed in order
-            // for CBMC to convert the exception handler
-            throw new B();
         }
         catch (NullPointerException exc) {
             assert false;
