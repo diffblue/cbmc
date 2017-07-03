@@ -1048,6 +1048,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
 
     if(i_it->statement=="athrow" ||
+       i_it->statement=="putfield" ||
+       i_it->statement=="getfield" ||
+       i_it->statement=="checkcast" ||
+       i_it->statement=="newarray" ||
+       i_it->statement=="anewarray" ||
+       i_it->statement==patternt("?astore") ||
+       i_it->statement==patternt("?aload") ||
        i_it->statement=="invokestatic" ||
        i_it->statement=="invokevirtual" ||
        i_it->statement=="invokespecial" ||
