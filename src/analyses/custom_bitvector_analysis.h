@@ -87,7 +87,7 @@ public:
 
   tvt has_values;
 
-  custom_bitvector_domaint():has_values(true)
+  custom_bitvector_domaint():has_values(false)
   {
   }
 
@@ -145,6 +145,7 @@ public:
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)
   {
+    ait<custom_bitvector_domaint>::initialize(_goto_functions);
     local_may_alias_factory(_goto_functions);
   }
 
