@@ -20,7 +20,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     case ui_message_handlert::uit::PLAIN:
     {
       out << "total number of functions: " << total_functions_count << "\n";
-      out << "new functions: \n";
+      out << "new functions:\n";
       for(irep_id_sett::const_iterator it=new_functions.begin();
           it!=new_functions.end(); ++it)
       {
@@ -31,7 +31,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "modified functions: \n";
+      out << "modified functions:\n";
       for(irep_id_sett::const_iterator it=modified_functions.begin();
           it!=modified_functions.end(); ++it)
       {
@@ -42,7 +42,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "deleted functions: \n";
+      out << "deleted functions:\n";
       for(irep_id_sett::const_iterator it=deleted_functions.begin();
           it!=deleted_functions.end(); ++it)
       {
