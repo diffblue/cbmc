@@ -289,10 +289,12 @@ static void populate_predecessor_map(
     if(it->is_parameter)
       continue;
 
-    msg.debug() << "ppm: processing var idx " << it->var.index
+#ifdef DEBUG
+    msg.debug() << "jcm: ppm: processing var idx " << it->var.index
                 << " name '" << it->var.name << "' start-pc "
                 << it->var.start_pc << " len " << it->var.length
                 << "; holes " << it->holes.size() << messaget::eom;
+#endif
 
     // Find the last instruction within the live range:
     unsigned end_pc=it->var.start_pc+it->var.length;
@@ -362,11 +364,11 @@ static void populate_predecessor_map(
                *(inst_before_this->second.source),
                it->var.index))
           {
-            msg.error() << "Local variable table: didn't find initializing "
-                        << "store for predecessor of bytecode at address "
-                        << amapit->first << " ("
-                        << amapit->second.predecessors.size()
-                        << " predecessors)" << msg.eom;
+            msg.warning() << "Local variable table: didn't find initializing "
+                          << "store for predecessor of bytecode at address "
+                          << amapit->first << " ("
+                          << amapit->second.predecessors.size()
+                          << " predecessors)" << msg.eom;
             throw "local variable table: unexpected live ranges";
           }
           new_start_pc=pred;
@@ -541,7 +543,7 @@ static void merge_variable_table_entries(
 /// Given a sequence of users of the same local variable slot, this figures out
 /// which ones are related by control flow, and combines them into a single
 /// entry with holes, such that after combination we can create a single
-/// declaration per variable table entry, placed at the live range's start
+/// GOTO variable per variable table entry, placed at the live range's start
 /// address, which may be moved back so that the declaration dominates all uses.
 /// \par parameters: `firstvar`-`varlimit`: sequence of variable table entries,
 ///   all of which should concern the same slot index.
@@ -720,8 +722,24 @@ void java_bytecode_convert_methodt::setup_local_variables(
   for(const auto &v : m.local_variable_table)
     vars_with_holes.push_back({v, is_parameter(v), {}});
 
-  // Merge variable records:
-  find_initializers(vars_with_holes, amap, dominator_analysis);
+  // Merge variable records. See documentation of in
+  // `find_initializers_for_slot` for more details. If the strategy employed
+  // there fails with an exception, we just ignore the LVT for this method, no
+  // variable is generated in `this->variables[]` (because we return here and
+  // dont let the for loop below to execute), and as a result the method
+  // this->variable() will be forced to create new `anonlocal::` variables, as
+  // the only source of variable names for that method is `this->variables[]`.
+  try
+  {
+    find_initializers(vars_with_holes, amap, dominator_analysis);
+  }
+  catch(const char *message)
+  {
+    warning() << "Bytecode -> codet translation error: " << message << eom
+              << "This is probably due to an unexpected LVT, "
+              << "falling back to translation without LVT" << eom;
+    return;
+  }
 
   // Clean up removed records from the variable table:
   cleanup_var_table(vars_with_holes);
