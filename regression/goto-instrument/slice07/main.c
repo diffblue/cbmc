@@ -1,7 +1,11 @@
 #include <assert.h>
+#ifdef __GNUC__
 #include <pthread.h>
+#endif
 
-//#define NULL 0
+#ifndef __GNUC__
+#define NULL 0
+#endif
 
 int g;
 
@@ -34,17 +38,18 @@ void *t2(void *arg)
 
 int main()
 {
+#ifdef __GNUC__
   pthread_t id1, id2;
-  
+#endif  
   int arg1=10, arg2=20;
-
+#ifdef __GNUC__
   pthread_create(&id1, NULL, t1, &arg1);
   pthread_create(&id2, NULL, t2, &arg2);
-
+#endif
   assert(g==0);
-
+#ifdef __GNUC__
   pthread_join(id1, NULL);
   pthread_join(id2, NULL);
-
+#endif
   return 0;
 }
