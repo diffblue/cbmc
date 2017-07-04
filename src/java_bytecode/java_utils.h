@@ -32,4 +32,17 @@ unsigned java_method_parameter_slots(const code_typet &t);
 
 const std::string java_class_to_package(const std::string &canonical_classname);
 
+/// Attaches a source location to an expression and all of its subexpressions.
+/// Usually only codet needs this, but there are a few known examples of
+/// expressions needing a location, such as
+/// `goto_convertt::do_function_call_symbol` (function() needs a location)
+/// and `goto_convertt::clean_expr` (any subexpression being split into a
+/// separate instruction needs a location), so for safety we give every
+/// mentioned expression a location.
+/// Any code or expressions with source location fields already set keep those
+/// fields using rules of source_locationt::merge.
+void merge_source_location_rec(
+  exprt &expr,
+  const source_locationt &source_location);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
