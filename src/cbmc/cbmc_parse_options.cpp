@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-symex/adjust_float_expressions.h>
 
 #include <goto-instrument/full_slicer.h>
+#include <goto-instrument/reachability_slicer.h>
 #include <goto-instrument/nondet_static.h>
 #include <goto-instrument/cover.h>
 
@@ -820,6 +821,19 @@ bool cbmc_parse_optionst::process_goto_program(
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
+
+    // full slice?
+    if(cmdline.isset("full-slice"))
+    {
+      status() << "Performing a full slice" << eom;
+      full_slicer(goto_functions, ns);
+
+      status() << "Performing a reachability slice" << eom;
+       if(cmdline.isset("property"))
+         reachability_slicer(goto_functions, cmdline.get_values("property"));
+       else
+         reachability_slicer(goto_functions);
+    }
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_functions, ns);
