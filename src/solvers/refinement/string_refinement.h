@@ -121,10 +121,15 @@ private:
   void set_to(const exprt &expr, bool value) override;
 
   void add_instantiations();
-  void add_negation_of_constraint_to_solver(
-    const string_constraintt &axiom, supert &solver);
+  exprt negation_of_not_contains_constraint(
+    const string_not_contains_constraintt &axiom,
+    const exprt &val,
+    const symbol_exprt &univ_var);
+  exprt negation_of_constraint(const string_constraintt &axiom);
   void fill_model();
   bool check_axioms();
+  bool is_axiom_sat(
+    const exprt &axiom, const symbol_exprt& var, exprt &witness);
 
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
   void update_index_set(const exprt &formula);
