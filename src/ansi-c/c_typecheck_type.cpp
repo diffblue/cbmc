@@ -1603,6 +1603,10 @@ void c_typecheck_baset::typecheck_symbol_type(typet &type)
   {
     type=integer_typet();
   }
+  else if(symbol.base_name=="__CPROVER_real")
+  {
+    type=real_typet();
+  }
 }
 
 /*******************************************************************\

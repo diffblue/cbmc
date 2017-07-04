@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 temporary_output_blockt::temporary_output_blockt()
 {
-  std::cout.setstate(std::ios_base::failbit);
+  //std::cout.setstate(std::ios_base::failbit);
 }
 
 temporary_output_blockt::~temporary_output_blockt()

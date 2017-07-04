@@ -522,6 +522,8 @@ exprt size_of_expr(
     return from_integer(
       32/8, signedbv_typet(config.ansi_c.pointer_width));
   }
+  else if(type.id()==ID_rational || type.id()==ID_real || type.id()==ID_integer)
+    return from_integer(1, signedbv_typet(config.ansi_c.pointer_width));
   else
     return nil_exprt();
 }

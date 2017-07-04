@@ -136,6 +136,7 @@ void ansi_c_internal_additions(std::string &code)
     "const unsigned __CPROVER_constant_infinity_uint;\n"
     "typedef void __CPROVER_integer;\n"
     "typedef void __CPROVER_rational;\n"
+    "typedef void __CPROVER_real;\n"
     "void __CPROVER_initialize(void);\n"
     "void __CPROVER_input(const char *id, ...);\n"
     "void __CPROVER_output(const char *id, ...);\n"

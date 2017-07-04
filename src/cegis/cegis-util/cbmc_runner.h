@@ -35,24 +35,6 @@ public:
  * @param st
  * @param gf
  * @param result
- * @param keep_goto_programs
- *
- * @return
- */
-safety_checkert::resultt run_cbmc(
-    const class symbol_tablet &st,
-    const class goto_functionst &gf,
-    cbmc_resultt &result,
-    bool keep_goto_programs);
-
-/**
- * @brief
- *
- * @details
- *
- * @param st
- * @param gf
- * @param result
  * @param options
  *
  * @return

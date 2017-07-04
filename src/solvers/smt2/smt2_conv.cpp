@@ -17,8 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/base_type.h>
 #include <util/string2int.h>
+#include <util/config.h>
 
 #include <ansi-c/string_constant.h>
+#include <ansi-c/c_types.h>
 
 #include <langapi/language_util.h>
 
@@ -1014,6 +1016,10 @@ std::string smt2_convt::type2id(const typet &type) const
   {
     return "b";
   }
+  else if(type.id()==ID_rational || type.id()==ID_real)
+  {
+    return "Real";
+  }
   else if(type.id()==ID_c_enum_tag)
   {
     return type2id(ns.follow_tag(to_c_enum_tag_type(type)).subtype());
@@ -1225,7 +1231,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
 
-    if(expr.type().id()==ID_rational)
+    if(expr.type().id()==ID_rational || expr.type().id()==ID_real)
     {
       out << "(- ";
       convert_expr(expr.op0());
@@ -2524,6 +2530,35 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       exprt tmp=typecast_exprt(src, bool_typet());
       convert_typecast(typecast_exprt(tmp, dest_type));
     }
+    else if(src_type.id()==ID_rational || src_type.id()==ID_real)
+    {
+#define FE_TONEAREST 0
+#define FE_DOWNWARD 1
+#define FE_UPWARD 2
+#define FE_TOWARDZERO 3
+
+      exprt rounding_mode;
+      switch(config.ansi_c.rounding_mode)
+      {
+      case ieee_floatt::rounding_modet::ROUND_TO_EVEN:
+        rounding_mode=from_integer(FE_TONEAREST, unsigned_int_type());
+        break;
+      case ieee_floatt::rounding_modet::ROUND_TO_MINUS_INF:
+        rounding_mode=from_integer(FE_DOWNWARD, unsigned_int_type());
+        break;
+      case ieee_floatt::rounding_modet::ROUND_TO_PLUS_INF:
+        rounding_mode=from_integer(FE_UPWARD, unsigned_int_type());
+        break;
+      case ieee_floatt::rounding_modet::ROUND_TO_ZERO:
+        rounding_mode=from_integer(FE_TOWARDZERO, unsigned_int_type());
+        break;
+      default:
+        // Leave empty. convert_floatbv_typecast will encode choice in formula.
+        break;
+      }
+      const floatbv_typecast_exprt float_cast(src, rounding_mode, dest_type);
+      convert_floatbv_typecast(float_cast);
+    }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
   }
@@ -2540,6 +2575,58 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
       typecast_exprt tmp(typecast_exprt(src, t), dest_type);
       convert_typecast(tmp);
     }
+  }
+  else if(dest_type.id()==ID_integer)
+  {
+    if(src_type.id()==ID_signedbv ||
+       src_type.id()==ID_unsignedbv ||
+       src_type.id()==ID_bv ||
+       src_type.id()==ID_c_enum ||
+       src_type.id()==ID_c_bool)
+    {
+      out << "(bv2int ";
+      convert_expr(src);
+      out << ')';
+    }
+    else
+      UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> integer");
+  }
+  else if(dest_type.id()==ID_rational || dest_type.id()==ID_real)
+  {
+    if(src_type.id()==ID_floatbv)
+    {
+      out << "(fp.to_real ";
+      convert_expr(src);
+      out << ')';
+    }
+    else if(src_type.id()==ID_integer)
+    {
+      out << "(to_real ";
+      convert_expr(src);
+      out << ')';
+    }
+    else if(src_type.id()==ID_signedbv ||
+            src_type.id()==ID_unsignedbv ||
+            src_type.id()==ID_bv ||
+            src_type.id()==ID_c_enum ||
+            src_type.id()==ID_c_bool)
+    {
+      const typecast_exprt bv_to_integer(src, integer_typet());
+      convert_expr(typecast_exprt(bv_to_integer, real_typet()));
+    }
+    else if(src_type.id()==ID_fixedbv)
+    {
+      out << "(/ (to_real (bv2int ";
+      convert_expr(src);
+      out << ")) ";
+
+      const fixedbv_typet &fixedbv_type=to_fixedbv_type(src_type);
+      const std::size_t divisor=1u << fixedbv_type.get_fraction_bits();
+      out << divisor;
+      out << ".0)";
+    }
+    else
+      UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> real");
   }
   else
     UNEXPECTEDCASE(
@@ -2567,7 +2654,9 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 
   if(dest_type.id()==ID_floatbv)
   {
-    if(src_type.id()==ID_floatbv)
+    if(src_type.id()==ID_floatbv  ||
+       src_type.id()==ID_rational ||
+       src_type.id()==ID_real)
     {
       // float to float
 
@@ -2996,7 +3085,7 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     assert(it!=defined_expressions.end());
     out << it->second;
   }
-  else if(expr_type.id()==ID_rational)
+  else if(expr_type.id()==ID_rational || expr_type.id()==ID_real)
   {
     std::string value=id2string(expr.get_value());
     size_t pos=value.find("/");
@@ -3182,6 +3271,7 @@ void smt2_convt::convert_relation(const exprt &expr)
       convert_floatbv(expr);
   }
   else if(op_type.id()==ID_rational ||
+          op_type.id()==ID_real ||
           op_type.id()==ID_integer)
   {
     out << "(";
@@ -3270,7 +3360,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
       out << ")";
     }
-    else if(expr.type().id()==ID_rational)
+    else if(expr.type().id()==ID_rational || expr.type().id()==ID_real)
     {
       out << "(+";
       convert_expr(expr.op0());
@@ -3626,6 +3716,14 @@ void smt2_convt::convert_div(const div_exprt &expr)
 
     out << "))";
   }
+  else if(expr.type().id()==ID_rational || expr.type().id()==ID_real)
+  {
+    out << "(/ ";
+    convert_expr(expr.op0());
+    out << ' ';
+    convert_expr(expr.op1());
+    out << ')';
+  }
   else if(expr.type().id()==ID_floatbv)
   {
     // Floating-point division should have be been converted
@@ -3737,7 +3835,7 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
 
     out << "))"; // bvmul, extract
   }
-  else if(expr.type().id()==ID_rational)
+  else if(expr.type().id()==ID_rational || expr.type().id()==ID_real)
   {
     out << "(*";
 
@@ -4972,7 +5070,7 @@ void smt2_convt::convert_type(const typet &type)
       out << "(_ BitVec "
           << floatbv_type.get_width() << ")";
   }
-  else if(type.id()==ID_rational)
+  else if(type.id()==ID_rational || type.id()==ID_real)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";

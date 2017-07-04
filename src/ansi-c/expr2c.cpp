@@ -244,9 +244,10 @@ std::string expr2ct::convert_rec(
   {
     return q+"__CPROVER_string"+d;
   }
-  else if(src.id()==ID_natural ||
-          src.id()==ID_integer ||
-          src.id()==ID_rational)
+  else if(src.id()==ID_natural  ||
+          src.id()==ID_integer  ||
+          src.id()==ID_rational ||
+          src.id()==ID_real)
   {
     return q+src.id_string()+d;
   }
@@ -2275,9 +2276,10 @@ std::string expr2ct::convert_constant(
   const irep_idt value=src.get_value();
   std::string dest;
 
-  if(type.id()==ID_integer ||
-     type.id()==ID_natural ||
-     type.id()==ID_rational)
+  if(type.id()==ID_integer  ||
+     type.id()==ID_natural  ||
+     type.id()==ID_rational ||
+     type.id()==ID_real)
   {
     dest=id2string(value);
   }
@@ -2313,7 +2315,7 @@ std::string expr2ct::convert_constant(
     // failed...
     return "/*enum*/"+integer2string(int_value);
   }
-  else if(type.id()==ID_rational)
+  else if(type.id()==ID_rational || type.id()==ID_real)
     return convert_norep(src, precedence);
   else if(type.id()==ID_bv)
   {

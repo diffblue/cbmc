@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/bv_arithmetic.h>
+
 #include <goto-programs/goto_trace.h>
 
 #include <cegis/cegis-util/program_helper.h>
@@ -58,12 +60,42 @@ bool is_solution(const goto_trace_stept &step)
   return CEGIS_CONTROL_VECTOR_SOLUTION_VAR_NAME == id;
 }
 
-const array_exprt &find_solution(const goto_tracet &trace)
+array_exprt convert_array_of(const exprt &value)
+{
+  const irep_idt &value_id=value.id();
+  if(ID_with == value_id)
+  {
+    const with_exprt &with=to_with_expr(value);
+    array_exprt value(convert_array_of(with.old()));
+    const bv_arithmetict bv(with.where());
+    const size_t index=(size_t) bv.to_integer().to_ulong();
+    value.operands()[index]=with.new_value();
+    return value;
+  }
+  else if(ID_array_of == value_id)
+  {
+    const array_typet &array_type=to_array_type(value.type());
+    array_exprt result(array_type);
+    const bv_arithmetict bv(array_type.size());
+    const size_t size=(size_t) bv.to_integer().to_ulong();
+    const exprt &element=to_array_of_expr(value).what();
+    fill_n(back_inserter(result.operands()), size, element);
+    return result;
+  }
+
+  assert(!"Invalid solution structure.");
+}
+
+array_exprt find_solution(const goto_tracet &trace)
 {
   const goto_tracet::stepst &steps=trace.steps;
   const auto it=std::find_if(steps.begin(), steps.end(), is_solution);
   assert(steps.end() != it);
-  return to_array_expr(it->full_lhs_value);
+  const exprt value =it->full_lhs_value;
+  if(ID_array == value.id())
+    return to_array_expr(value);
+
+  return convert_array_of(value);
 }
 }
 

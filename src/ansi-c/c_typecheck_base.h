@@ -255,7 +255,9 @@ protected:
            src.id()==ID_c_bool ||
            src.id()==ID_bool ||
            src.id()==ID_c_enum_tag ||
-           src.id()==ID_c_bit_field;
+           src.id()==ID_c_bit_field ||
+           src.id()==ID_rational ||
+           src.id()==ID_real;
   }
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> asm_label_mapt;
