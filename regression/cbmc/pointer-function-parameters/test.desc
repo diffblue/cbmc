@@ -5,7 +5,7 @@ main.c
 ^\*\* Used 3 iterations$
 ^Test suite:$
 ^a=\(\(signed int \*\)NULL\), tmp\$1=[^,]*$
-^a=&tmp\$1, tmp\$1=4$
-^a=&tmp\$1, tmp\$1=([012356789][0-9]*|4[0-9]+)$
+^a=&tmp\$1!0, tmp\$1=4$
+^a=&tmp\$1!0, tmp\$1=([012356789][0-9]*|4[0-9]+)$
 --
 ^warning: ignoring

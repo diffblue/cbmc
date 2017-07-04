@@ -308,17 +308,8 @@ void build_goto_trace(
         goto_trace_step.io_args.push_back(j);
       else
       {
-        // we only expect constants here
-        exprt expr=to_constant_expr(prop_conv.get(j));
-        if(expr.has_operands() && expr.op0().id()==ID_address_of)
-        {
-          exprt *op=&(to_address_of_expr(expr.op0()).object());
-          while(op->id()==ID_member || op->id()==ID_index)
-            op=&(op->op0());
-          *op=to_ssa_expr(*op).get_original_expr();
-        }
-        // use expr in the output
-        goto_trace_step.io_args.push_back(expr);
+        exprt tmp=prop_conv.get(j);
+        goto_trace_step.io_args.push_back(tmp);
       }
     }
 
