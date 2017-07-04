@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 
 #include <util/type.h>
+#include <util/symbol_table.h>
 
 #include "java_bytecode_parse_tree.h"
 
@@ -15,6 +16,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 
 bool java_is_array_type(const typet &type);
+
+void generate_class_stub(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler);
 
 /// Returns the number of JVM local variables (slots) taken by a local variable
 /// that, when translated to goto, has type \p t.

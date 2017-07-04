@@ -65,6 +65,7 @@ class optionst;
   "(graphml-witness):" \
   "(java-max-vla-length):(java-unwind-enum-static)" \
   "(java-cp-include-files):" \
+  "(java-throw-runtime-exceptions)" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
   "(test-invariant-failure)" \
