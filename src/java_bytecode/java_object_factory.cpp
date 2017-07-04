@@ -49,7 +49,6 @@ static symbolt &new_tmp_symbol(
 
 class java_object_factoryt
 {
-protected:
   std::vector<const symbolt *> &symbols_created;
   const source_locationt &loc;
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
@@ -95,8 +94,6 @@ public:
       ns(_symbol_table)
   {}
 
-  virtual ~java_object_factoryt()=default;
-
   exprt allocate_object(
     code_blockt &assignments,
     const exprt &,
@@ -108,7 +105,7 @@ public:
     const exprt &expr,
     update_in_placet);
 
-  virtual void gen_nondet_init(
+  void gen_nondet_init(
     code_blockt &assignments,
     const exprt &expr,
     bool is_sub,
@@ -137,6 +134,11 @@ private:
     bool create_dynamic_objects,
     const struct_typet &struct_type,
     const update_in_placet &update_in_place);
+
+  symbol_exprt gen_nondet_subtype_pointer_init(
+    code_blockt &assignments,
+    bool create_dynamic_objects,
+    const pointer_typet &substitute_pointer_type);
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -428,6 +430,27 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const pointer_typet &pointer_type,
   const update_in_placet &update_in_place)
 {
+  select_pointer_typet pointer_type_selector(ns);
+  const pointer_typet &replacement_pointer_type=
+    pointer_type_selector(pointer_type);
+
+  // If we are changing the pointer, we generate code for creating a pointer
+  // to the substituted type instead
+  if(replacement_pointer_type!=pointer_type)
+  {
+    const symbol_exprt real_pointer_symbol=gen_nondet_subtype_pointer_init(
+      assignments,
+      create_dynamic_objects,
+      replacement_pointer_type);
+
+    // Having created a pointer to object of type replacement_pointer_type
+    // we now assign it back to the original pointer with a cast
+    // from pointer_type to replacement_pointer_type
+    assignments.add(
+      code_assignt(expr, typecast_exprt(real_pointer_symbol, pointer_type)));
+    return;
+  }
+
   const typet &subtype=ns.follow(pointer_type.subtype());
   if(subtype.id()==ID_struct)
   {
@@ -531,6 +554,41 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
     assignments.add(update_check);
   }
+}
+
+/// Generate GOTO code to initalize the selected concrete type
+/// A { ... } tmp_object;
+/// A.x = NONDET ...
+/// // non-det init of all the fields of A
+/// A * p = &tmp_object
+/// expr = (I *)p
+/// \param assignments: the code to append to
+/// \param create_dynamic_objects: if true, use malloc to allocate objects;
+///   otherwise generate fresh static symbols.
+/// \param replacement_pointer: The type of the pointer we actually want to
+///   to create.
+/// \return The symbol expression that corresponds to the pointer to object
+///   created of the required type.
+symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
+  code_blockt &assignments,
+  bool create_dynamic_objects,
+  const pointer_typet &replacement_pointer)
+{
+  symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
+
+  // Generate a new object into this new symbol
+  gen_nondet_init(
+    assignments,
+    new_symbol.symbol_expr(),
+    false,
+    "",
+    false,
+    create_dynamic_objects,
+    false,
+    typet(),
+    update_in_placet::NO_UPDATE_IN_PLACE);
+
+  return new_symbol.symbol_expr();
 }
 
 /// Initialises an object tree rooted at `expr`, allocating child objects as
@@ -1046,7 +1104,7 @@ void gen_nondet_init(
 {
   std::vector<const symbolt *> symbols_created;
 
-  java_object_factory_with_randomt state(
+  java_object_factoryt state(
     symbols_created,
     loc,
     assume_non_null,
@@ -1074,70 +1132,4 @@ void gen_nondet_init(
   }
 
   init_code.append(assignments);
-}
-
-
-void java_object_factory_with_randomt::gen_nondet_init(
-  code_blockt &assignments,
-  const exprt &expr,
-  bool is_sub,
-  irep_idt class_identifier,
-  bool skip_classid,
-  bool create_dynamic_objects,
-  bool override,
-  const typet &override_type,
-  update_in_placet update_in_place)
-{
-  const typet &type=
-    override ? ns.follow(override_type) : ns.follow(expr.type());
-  typet real_type=type;
-
-  if(type.id()==ID_pointer && type.subtype().id()==ID_symbol)
-  {
-    const pointer_typet &pointer_type=to_pointer_type(type);
-    const namespacet ns(symbol_table);
-
-    select_pointer_typet pointer_type_selector(ns);
-    const pointer_typet &replacement_pointer=
-      pointer_type_selector(pointer_type);
-
-    if(replacement_pointer!=real_type)
-    {
-      // Generate GOTO code to initalize the selected concrete type
-      // A { ... } tmp_object;
-      // A.x = NONDET ...
-      // // non-det init of all the fields of A
-      // A * p = &tmp_object
-      // expr = (I *)p
-
-      symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
-
-      // Generate a new object into this new symbol
-      gen_nondet_init(
-        assignments,
-        new_symbol.symbol_expr(),
-        is_sub,
-        class_identifier,
-        skip_classid,
-        create_dynamic_objects,
-        override,
-        override_type,
-        update_in_placet::NO_UPDATE_IN_PLACE);
-
-      assignments.add(
-        code_assignt(expr, typecast_exprt(new_symbol.symbol_expr(), type)));
-
-      return;
-    }
-  }
-  java_object_factoryt::gen_nondet_init(
-    assignments,
-    expr,
-    is_sub,
-    class_identifier,
-    skip_classid,
-    create_dynamic_objects,
-    override,
-    override_type,
-    update_in_place);
 }
