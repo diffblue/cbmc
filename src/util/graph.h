@@ -19,6 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <cassert>
 #include <algorithm>
+#include <queue>
+
+#include "invariant.h"
 
 class empty_edget
 {
@@ -225,6 +228,13 @@ public:
 
   // return value: number of SCCs
   std::size_t SCCs(std::vector<node_indext> &subgraph_nr);
+
+  bool is_dag() const
+  {
+    return empty() || !topsort().empty();
+  }
+
+  std::list<node_indext> topsort() const;
 
   void output_dot(std::ostream &out) const;
   void output_dot_node(std::ostream &out, node_indext n) const;
@@ -568,6 +578,52 @@ void grapht<N>::make_chordal()
     // remove node from tmp graph
     tmp.remove_edges(i);
   }
+}
+
+/// Find a topological order of the nodes if graph is DAG, return empty list for
+/// non-DAG or empty graph. Uses Kahn's algorithm running in O(#edges+#nodes).
+template<class N>
+std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
+{
+  // list of topologically sorted nodes
+  std::list<node_indext> nodelist;
+  // queue of working set nodes with in-degree zero
+  std::queue<node_indext> indeg0_nodes;
+  // in-degree for each node
+  std::vector<size_t> in_deg(nodes.size(), 0);
+
+  // abstract graph as in-degree of each node
+  for(node_indext idx=0; idx<nodes.size(); idx++)
+  {
+    in_deg[idx]=in(idx).size();
+    if(in_deg[idx]==0)
+      indeg0_nodes.push(idx);
+  }
+
+  while(!indeg0_nodes.empty())
+  {
+    node_indext source=indeg0_nodes.front();
+    indeg0_nodes.pop();
+    nodelist.push_back(source);
+
+    for(const auto &edge : out(source))
+    {
+      const node_indext target=edge.first;
+      INVARIANT(in_deg[target]!=0, "in-degree of node cannot be zero here");
+
+      // remove edge from graph, by decrementing the in-degree of target
+      // outgoing edges from source will not be traversed again
+      in_deg[target]--;
+      if(in_deg[target]==0)
+        indeg0_nodes.push(target);
+    }
+  }
+
+  // if all nodes are sorted, the graph is acyclic
+  // return empty list in case of cyclic graph
+  if(nodelist.size()!=nodes.size())
+    nodelist.clear();
+  return nodelist;
 }
 
 template<class N>
