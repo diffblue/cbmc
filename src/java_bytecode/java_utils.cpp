@@ -56,7 +56,6 @@ unsigned java_method_parameter_slots(const code_typet &t)
   return slots;
 }
 
-
 const std::string java_class_to_package(const std::string &canonical_classname)
 {
   return trim_from_last_delimiter(canonical_classname, '.');
@@ -99,4 +98,13 @@ void generate_class_stub(
     // create the class identifier etc
     java_root_class(*class_symbol);
   }
+}
+
+void merge_source_location_rec(
+  exprt &expr,
+  const source_locationt &source_location)
+{
+  expr.add_source_location().merge(source_location);
+  for(exprt &op : expr.operands())
+    merge_source_location_rec(op, source_location);
 }
