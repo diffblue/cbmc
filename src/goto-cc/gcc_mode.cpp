@@ -17,9 +17,12 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
+#include <cstddef>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <numeric>
+#include <sstream>
 
 #include <util/string2int.h>
 #include <util/tempdir.h>
@@ -327,6 +330,30 @@ int gcc_modet::doit()
       debug() << "GCC mode" << eom;
   }
 
+  // determine actions to be undertaken
+  compilet compiler(cmdline,
+                    gcc_message_handler,
+                    cmdline.isset("Werror") &&
+                    cmdline.isset("Wextra") &&
+                    !cmdline.isset("Wno-error"));
+
+  if(act_as_ld)
+    compiler.mode=compilet::LINK_LIBRARY;
+  else if(cmdline.isset('S'))
+    compiler.mode=compilet::ASSEMBLE_ONLY;
+  else if(cmdline.isset('c'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else if(cmdline.isset('E'))
+  {
+    compiler.mode=compilet::PREPROCESS_ONLY;
+    UNREACHABLE;
+  }
+  else if(cmdline.isset("shared") ||
+          cmdline.isset('r')) // really not well documented
+    compiler.mode=compilet::COMPILE_LINK;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
+
   // In gcc mode, we have just pass on to gcc to handle the following:
   // * if -M or -MM is given, we do dependencies only
   // * preprocessing (-E)
@@ -339,7 +366,7 @@ int gcc_modet::doit()
           cmdline.isset("MM") ||
           cmdline.isset('E') ||
           !cmdline.have_infile_arg())
-    return run_gcc(); // exit!
+    return run_gcc(compiler.symbol_table); // exit!
 
   // get configuration
   config.set(cmdline);
@@ -426,30 +453,6 @@ int gcc_modet::doit()
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;
 
-  // determine actions to be undertaken
-  compilet compiler(cmdline,
-                    gcc_message_handler,
-                    cmdline.isset("Werror") &&
-                    cmdline.isset("Wextra") &&
-                    !cmdline.isset("Wno-error"));
-
-  if(act_as_ld)
-    compiler.mode=compilet::LINK_LIBRARY;
-  else if(cmdline.isset('S'))
-    compiler.mode=compilet::ASSEMBLE_ONLY;
-  else if(cmdline.isset('c'))
-    compiler.mode=compilet::COMPILE_ONLY;
-  else if(cmdline.isset('E'))
-  {
-    compiler.mode=compilet::PREPROCESS_ONLY;
-    assert(false);
-  }
-  else if(cmdline.isset("shared") ||
-          cmdline.isset('r')) // really not well documented
-    compiler.mode=compilet::COMPILE_LINK;
-  else
-    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
-
   switch(compiler.mode)
   {
   case compilet::LINK_LIBRARY:
@@ -464,7 +467,6 @@ int gcc_modet::doit()
     debug() << "Compiling and linking a library" << eom; break;
   case compilet::COMPILE_LINK_EXECUTABLE:
     debug() << "Compiling and linking an executable" << eom; break;
-  default: assert(false);
   }
 
   if(cmdline.isset("i386-win32") ||
@@ -633,10 +635,10 @@ int gcc_modet::doit()
 
   if(compiler.source_files.empty() &&
      compiler.object_files.empty())
-    return run_gcc(); // exit!
+    return run_gcc(compiler.symbol_table); // exit!
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
-    return asm_output(act_as_bcc, compiler.source_files);
+    return asm_output(act_as_bcc, compiler.source_files, compiler.symbol_table);
 
   // do all the rest
   if(compiler.doit())
@@ -645,7 +647,7 @@ int gcc_modet::doit()
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary && !act_as_bcc)
-    return gcc_hybrid_binary();
+    return gcc_hybrid_binary(compiler.symbol_table);
 
   return EX_OK;
 }
@@ -718,7 +720,7 @@ int gcc_modet::preprocess(
   new_argv.push_back(src);
 
   // overwrite argv[0]
-  assert(new_argv.size()>=1);
+  PRECONDITION(new_argv.size()>=1);
   new_argv[0]=native_tool_name.c_str();
 
   #if 0
@@ -732,15 +734,35 @@ int gcc_modet::preprocess(
 }
 
 /// run gcc or clang with original command line
-int gcc_modet::run_gcc()
+int gcc_modet::run_gcc(const symbol_tablet &symbol_table)
 {
-  assert(!cmdline.parsed_argv.empty());
+  PRECONDITION(!cmdline.parsed_argv.empty());
 
   // build new argv
   std::vector<std::string> new_argv;
   new_argv.reserve(cmdline.parsed_argv.size());
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
+
+  // Undefine all __CPROVER macros for the system compiler
+  for(const auto &sym : symbol_table.symbols)
+    if(has_prefix(id2string(sym.second.name), CPROVER_PREFIX) &&
+       sym.second.type.id()==ID_code)
+    {
+      std::ostringstream addition;
+      addition << "-D" << sym.second.name << "(";
+      std::size_t n_params=to_code_type(sym.second.type).parameters().size();
+      std::vector<char> params(n_params);
+      std::iota(params.begin(), params.end(), 'a');
+      for(std::vector<char>::iterator it=params.begin(); it!=params.end(); ++it)
+      {
+        addition << *it;
+        if(it+1!=params.end())
+          addition << ",";
+      }
+      addition << ")= ";
+      new_argv.push_back(addition.str());
+    }
 
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
@@ -755,7 +777,7 @@ int gcc_modet::run_gcc()
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
 
-int gcc_modet::gcc_hybrid_binary()
+int gcc_modet::gcc_hybrid_binary(const symbol_tablet &symbol_table)
 {
   {
     bool have_files=false;
@@ -825,7 +847,7 @@ int gcc_modet::gcc_hybrid_binary()
   }
   objcopy_cmd+="objcopy";
 
-  int result=run_gcc();
+  int result=run_gcc(symbol_table);
 
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
@@ -896,7 +918,8 @@ int gcc_modet::gcc_hybrid_binary()
 
 int gcc_modet::asm_output(
   bool act_as_bcc,
-  const std::list<std::string> &preprocessed_source_files)
+  const std::list<std::string> &preprocessed_source_files,
+  const symbol_tablet &symbol_table)
 {
   {
     bool have_files=false;
@@ -917,7 +940,7 @@ int gcc_modet::asm_output(
     debug() << "Running " << native_tool_name
       << " to generate native asm output" << eom;
 
-    int result=run_gcc();
+    int result=run_gcc(symbol_table);
     if(result!=0)
       // native tool failed
       return result;

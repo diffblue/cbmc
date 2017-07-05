@@ -4,6 +4,7 @@ DIRS = ansi-c \
        cpp \
        cbmc-java \
        goto-analyzer \
+       goto-gcc \
        goto-instrument \
        goto-instrument-typedef \
        test-script \
@@ -11,7 +12,11 @@ DIRS = ansi-c \
 
 
 test:
-	$(foreach var,$(DIRS), $(MAKE) -C $(var) test || exit 1;)
+	@for dir in $(DIRS); do \
+		if [ -d "$$dir" ]; then \
+			$(MAKE) -C "$$dir" test || exit 1; \
+		fi; \
+	done;
 
 clean:
 	@for dir in *; do \
