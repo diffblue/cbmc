@@ -317,7 +317,7 @@ private:
     const function_application_exprt &expr, size_t nb)
   {
     const function_application_exprt::argumentst &args=expr.arguments();
-    assert(args.size()==nb);
+    PRECONDITION(args.size()==nb);
     return args;
   }
 

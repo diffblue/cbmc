@@ -21,9 +21,9 @@ bv_refinementt::bv_refinementt(
   do_arithmetic_refinement(true)
 {
   // check features we need
-  assert(prop.has_set_assumptions());
-  assert(prop.has_set_to());
-  assert(prop.has_is_in_conflict());
+  PRECONDITION(prop.has_set_assumptions());
+  PRECONDITION(prop.has_set_to());
+  PRECONDITION(prop.has_is_in_conflict());
 }
 
 bv_refinementt::~bv_refinementt()

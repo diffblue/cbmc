@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for functions generating strings from other
 ///   types, in particular int, long, float, double, char, bool
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// Add axioms corresponding to the String.valueOf(I) java function.
@@ -54,7 +55,7 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
   string_exprt res=fresh_string(ref_type);
   const typet &char_type=ref_type.get_char_type();
 
-  assert(b.type()==bool_typet() || b.type().id()==ID_c_bool);
+  PRECONDITION(b.type()==bool_typet() || b.type().id()==ID_c_bool);
 
   typecast_exprt eq(b, bool_typet());
 
@@ -236,7 +237,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
 {
   string_exprt res=fresh_string(ref_type);
   const typet &type=i.type();
-  assert(type.id()==ID_signedbv);
+  PRECONDITION(type.id()==ID_signedbv);
   const typet &index_type=ref_type.get_index_type();
   const typet &char_type=ref_type.get_char_type();
   exprt sixteen=from_integer(16, index_type);
@@ -350,7 +351,10 @@ string_exprt string_constraint_generatort::add_axioms_for_value_of(
   }
   else
   {
-    assert(args.size()==1);
+    INVARIANT(
+      args.size()==1,
+      string_refinement_invariantt("f can only have 1 or 3 arguments and the "
+        "case of 3 has been handled"));
     return add_axioms_for_java_char_array(args[0]);
   }
 }
@@ -429,7 +433,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   const typet &char_type=ref_type.get_char_type();
   exprt minus_char=constant_char('-', char_type);
   exprt plus_char=constant_char('+', char_type);
-  assert(type.id()==ID_signedbv);
+  PRECONDITION(type.id()==ID_signedbv);
 
   exprt chr=str[0];
   exprt starts_with_minus=equal_exprt(chr, minus_char);

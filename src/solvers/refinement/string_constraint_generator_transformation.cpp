@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for string transformations, that is, functions
 ///   taking one string and returning another
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// add axioms to say that the returned string expression has length given by
@@ -69,7 +70,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  assert(args.size()>=2);
+  PRECONDITION(args.size()>=2);
   string_exprt str=get_string_expr(args[0]);
   exprt i(args[1]);
   exprt j;
@@ -79,7 +80,10 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   }
   else
   {
-    assert(args.size()==2);
+    INVARIANT(
+      args.size()==2,
+      string_refinement_invariantt("f must have 2 or 3 arguments and the case "
+        "of 3 arguments is already handled"));
     j=str.length();
   }
   return add_axioms_for_substring(str, i, j);
@@ -96,8 +100,8 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 {
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &index_type=ref_type.get_index_type();
-  assert(start.type()==index_type);
-  assert(end.type()==index_type);
+  PRECONDITION(start.type()==index_type);
+  PRECONDITION(end.type()==index_type);
   string_exprt res=fresh_string(ref_type);
 
   // We add axioms:
@@ -397,8 +401,8 @@ string_exprt string_constraint_generatort::add_axioms_for_delete_char_at(
 string_exprt string_constraint_generatort::add_axioms_for_delete(
   const string_exprt &str, const exprt &start, const exprt &end)
 {
-  assert(start.type()==str.length().type());
-  assert(end.type()==str.length().type());
+  PRECONDITION(start.type()==str.length().type());
+  PRECONDITION(end.type()==str.length().type());
   string_exprt str1=add_axioms_for_substring(
     str, from_integer(0, str.length().type()), start);
   string_exprt str2=add_axioms_for_substring(str, end, str.length());

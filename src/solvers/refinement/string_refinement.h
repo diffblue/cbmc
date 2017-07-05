@@ -24,6 +24,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/replace_expr.h>
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_constraint_generator.h>
+#include <solvers/refinement/string_refinement_invariant.h>
 
 #define MAX_NB_REFINEMENT 100
 
@@ -198,7 +199,10 @@ void string_refinementt::pad_vector(
     // pad until we reach the next initialized index (right to left)
     while(i>leftmost_index_to_pad)
       concrete_array[(i--)-1]=last_concretized;
-    assert(i==leftmost_index_to_pad);
+    INVARIANT(
+      i==leftmost_index_to_pad,
+      string_refinement_invariantt("Loop decrements i until it is not greater "
+        " than leftmost_index_to_pad"));
     if(i>0)
       last_concretized=concrete_array[i-1];
   }
