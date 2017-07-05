@@ -38,4 +38,9 @@ hosted on GitHub.
   exercises---mostly modifying goto-instrument, and thus learning to
   manipulate the main data structures used within CBMC.
 
+* The \subpage cbmc-guide "CBMC guide" is a single document describing
+  the layout of the codebase and many of the important data structures.
+  It probably contains more information than the module pages at the
+  moment, but may be somewhat out-of-date.
+
 \defgroup module_hidden _hidden
