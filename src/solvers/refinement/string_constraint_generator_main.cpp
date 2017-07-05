@@ -21,6 +21,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <ansi-c/string_constant.h>
 #include <java_bytecode/java_types.h>
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <util/arith_tools.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
@@ -131,7 +132,7 @@ string_exprt string_constraint_generatort::fresh_string(
 /// \return a string expression
 string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
 {
-  assert(refined_string_typet::is_refined_string_type(expr.type()));
+  PRECONDITION(refined_string_typet::is_refined_string_type(expr.type()));
 
   if(expr.id()==ID_symbol)
   {
@@ -151,7 +152,7 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
 string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
     const exprt &jls)
 {
-  assert(jls.id()==ID_struct);
+  PRECONDITION(jls.id()==ID_struct);
 
   exprt length(to_struct_expr(jls).op1());
   // TODO: Add assertion on the type.
@@ -206,11 +207,11 @@ void string_constraint_generatort::add_default_axioms(
 string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   const exprt &string)
 {
-  assert(refined_string_typet::is_refined_string_type(string.type()));
+  PRECONDITION(refined_string_typet::is_refined_string_type(string.type()));
   refined_string_typet type=to_refined_string_type(string.type());
 
   // Function applications should have been removed before
-  assert(string.id()!=ID_function_application);
+  PRECONDITION(string.id()!=ID_function_application);
 
   if(string.id()==ID_symbol)
   {
@@ -237,9 +238,13 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   }
   else
   {
-    throw "add_axioms_for_refined_string:\n"+string.pretty()+
-      "\nwhich is not a function application, "+
-      "a symbol, a struct or an if expression";
+    INVARIANT(
+      false,
+      string_refinement_invariantt("add_axioms_for_refined_string:\n"+
+        string.pretty()+"\nwhich is not a function application, a symbol, a "+
+        "struct or an if expression"));
+    // For the compiler
+    throw 0;
   }
 }
 
@@ -249,10 +254,10 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
 string_exprt string_constraint_generatort::add_axioms_for_if(
   const if_exprt &expr)
 {
-  assert(
+  PRECONDITION(
     refined_string_typet::is_refined_string_type(expr.true_case().type()));
   string_exprt t=get_string_expr(expr.true_case());
-  assert(
+  PRECONDITION(
     refined_string_typet::is_refined_string_type(expr.false_case().type()));
   string_exprt f=get_string_expr(expr.false_case());
   const refined_string_typet &ref_type=to_refined_string_type(t.type());
@@ -337,7 +342,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   const function_application_exprt &expr)
 {
   const exprt &name=expr.function();
-  assert(name.id()==ID_symbol);
+  PRECONDITION(name.id()==ID_symbol);
 
   const irep_idt &id=is_ssa_expr(name)?to_ssa_expr(name).get_object_name():
     to_symbol_expr(name).get_identifier();
@@ -522,7 +527,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     std::string msg(
       "string_constraint_generator::function_application: unknown symbol :");
     msg+=id2string(id);
-    throw msg;
+    DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
   function_application_cache[expr]=res;
   return res;
@@ -544,7 +549,10 @@ string_exprt string_constraint_generatort::add_axioms_for_copy(
   }
   else
   {
-    assert(args.size()==3);
+    INVARIANT(
+      args.size()==3,
+      string_refinement_invariantt("f must have 1 or 3 arguments and the case "
+        "of 3 arguments is already handled"));
     string_exprt s1=get_string_expr(args[0]);
     exprt offset=args[1];
     exprt count=args[2];
@@ -584,7 +592,7 @@ exprt string_constraint_generatort::add_axioms_for_char_pointer(
   //       refinement. We need regression tests that use that function.
 
   // TODO: we do not know what to do in the other cases
-  assert(false);
+  TODO;
   return exprt();
 }
 
@@ -611,7 +619,7 @@ string_exprt string_constraint_generatort::add_axioms_from_char_array(
   const exprt &offset,
   const exprt &count)
 {
-  assert(false); // deprecated, we should use add_axioms_for_substring instead
+  UNREACHABLE; // deprecated, we should use add_axioms_for_substring instead
   const typet &char_type=to_array_type(data.type()).subtype();
   const typet &index_type=length.type();
   refined_string_typet ref_type(index_type, char_type);
@@ -623,7 +631,7 @@ string_exprt string_constraint_generatort::add_axioms_from_char_array(
 
   symbol_exprt qvar=fresh_univ_index("QA_string_of_char_array", index_type);
   exprt char_in_tab=data;
-  assert(char_in_tab.id()==ID_index);
+  PRECONDITION(char_in_tab.id()==ID_index);
   char_in_tab.op1()=plus_exprt_with_overflow_check(qvar, offset);
 
   string_constraintt a1(qvar, count, equal_exprt(str[qvar], char_in_tab));
@@ -641,7 +649,7 @@ string_exprt string_constraint_generatort::add_axioms_from_char_array(
 string_exprt string_constraint_generatort::add_axioms_from_char_array(
   const function_application_exprt &f)
 {
-  assert(false); // deprecated, we should use add_axioms_for_substring instead
+  UNREACHABLE; // deprecated, we should use add_axioms_for_substring instead
   exprt offset;
   exprt count;
   if(f.arguments().size()==4)
@@ -651,7 +659,10 @@ string_exprt string_constraint_generatort::add_axioms_from_char_array(
   }
   else
   {
-    assert(f.arguments().size()==2);
+    INVARIANT(
+      f.arguments().size()==2,
+      string_refinement_invariantt("f must have 2 or 4 arguments and the case "
+        "of 4 arguments is already handled"));
     count=f.arguments()[0];
     offset=from_integer(0, count.type());
   }
@@ -676,7 +687,7 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  assert(args.size()==1); // there should be exactly 1 argument to char literal
+  PRECONDITION(args.size()==1); // there should be exactly 1 arg to char literal
 
   const exprt &arg=args[0];
   // for C programs argument to char literal should be one string constant
@@ -688,12 +699,15 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
   {
     const string_constantt s=to_string_constant(arg.op0().op0().op0());
     irep_idt sval=s.get_value();
-    assert(sval.size()==1);
+    CHECK_RETURN(sval.size()==1);
     return from_integer(unsigned(sval[0]), arg.type());
   }
   else
   {
-    throw "convert_char_literal unimplemented";
+    // convert_char_literal unimplemented
+    UNIMPLEMENTED;
+    // For the compiler
+    throw 0;
   }
 }
 

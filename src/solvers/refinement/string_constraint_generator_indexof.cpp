@@ -11,6 +11,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// Generates string constraints for the family of indexOf and lastIndexOf java
 ///   functions
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// Add axioms stating that the returned value is the index within str of the
@@ -149,7 +150,10 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     //      haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
-    assert(!to_integer(needle.length(), sub_length));
+    INVARIANT(
+      !to_integer(needle.length(), sub_length),
+      string_refinement_invariantt("a constant string must have constant "
+        "length"));
     exprt::operandst disjuncts;
     for(mp_integer offset=0; offset<sub_length; ++offset)
     {
@@ -263,7 +267,10 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     //      haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
     mp_integer sub_length;
-    assert(!to_integer(needle.length(), sub_length));
+    INVARIANT(
+      !to_integer(needle.length(), sub_length),
+      string_refinement_invariantt("a constant string must have constant "
+        "length"));
     exprt::operandst disjuncts;
     for(mp_integer offset=0; offset<sub_length; ++offset)
     {
@@ -299,7 +306,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   string_exprt str=get_string_expr(args[0]);
   const exprt &c=args[1];
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  assert(f.type()==ref_type.get_index_type());
+  PRECONDITION(f.type()==ref_type.get_index_type());
   exprt from_index;
 
   if(args.size()==2)
@@ -307,7 +314,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   else if(args.size()==3)
     from_index=args[2];
   else
-    assert(false);
+    UNREACHABLE;
 
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
@@ -316,7 +323,10 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   }
   else
   {
-    assert(refined_string_typet::is_refined_string_type(c.type()));
+    INVARIANT(
+      refined_string_typet::is_refined_string_type(c.type()),
+      string_refinement_invariantt("c can only be a (un)signedbv or a refined "
+        "string and the (un)signedbv case is already handled"));
     string_exprt sub=get_string_expr(c);
     return add_axioms_for_index_of_string(str, sub, from_index);
   }
@@ -396,14 +406,14 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   exprt c=args[1];
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   exprt from_index;
-  assert(f.type()==ref_type.get_index_type());
+  PRECONDITION(f.type()==ref_type.get_index_type());
 
   if(args.size()==2)
     from_index=minus_exprt(str.length(), from_integer(1, str.length().type()));
   else if(args.size()==3)
     from_index=args[2];
   else
-    assert(false);
+    UNREACHABLE;
 
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {

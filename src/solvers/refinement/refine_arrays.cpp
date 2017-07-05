@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/find_symbols.h>
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/sat/satcheck.h>
 
 /// generate array constraints
@@ -55,7 +56,9 @@ void bv_refinementt::arrays_overapproximated()
     if(current.id()==ID_implies)
     {
       implies_exprt imp=to_implies_expr(current);
-      assert(imp.operands().size()==2);
+      DATA_INVARIANT(
+        imp.operands().size()==2,
+        string_refinement_invariantt("implies must have two operands"));
       exprt implies_simplified=get(imp.op0());
       if(implies_simplified==false_exprt())
       {
@@ -67,7 +70,9 @@ void bv_refinementt::arrays_overapproximated()
     if(current.id()==ID_or)
     {
       or_exprt orexp=to_or_expr(current);
-      assert(orexp.operands().size()==2);
+      INVARIANT(
+        orexp.operands().size()==2,
+        string_refinement_invariantt("only treats the case of a binary or"));
       exprt o1=get(orexp.op0());
       exprt o2=get(orexp.op1());
       if(o1==true_exprt() || o2 == true_exprt())
@@ -91,7 +96,13 @@ void bv_refinementt::arrays_overapproximated()
       lazy_array_constraints.erase(it++);
       break;
     default:
-      assert(false);
+      error() << "error in array over approximation check" << eom;
+      INVARIANT(
+        false,
+        string_refinement_invariantt("error in array over approximation "
+          "check"));
+      // Placeholder to tell the compiler we bail
+      throw 0;
     }
   }
 

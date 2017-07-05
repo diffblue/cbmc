@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/refined_string_type.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
@@ -126,7 +127,7 @@ void string_refinementt::add_instantiations()
 void string_refinementt::add_symbol_to_symbol_map(
   const exprt &lhs, const exprt &rhs)
 {
-  assert(lhs.id()==ID_symbol);
+  PRECONDITION(lhs.id()==ID_symbol);
 
   // We insert the mapped value of the rhs, if it exists.
   auto it=symbol_resolve.find(rhs);
@@ -149,7 +150,7 @@ void string_refinementt::add_symbol_to_symbol_map(
 void string_refinementt::set_char_array_equality(
   const exprt &lhs, const exprt &rhs)
 {
-  assert(lhs.id()==ID_symbol);
+  PRECONDITION(lhs.id()==ID_symbol);
 
   if(rhs.id()==ID_array && rhs.type().id()==ID_array)
   {
@@ -269,10 +270,18 @@ void string_refinementt::concretize_string(const exprt &expr)
     mp_integer found_length;
     if(!to_integer(length, found_length))
     {
-      assert(found_length.is_long());
-      assert(found_length>=0);
+      INVARIANT(
+        found_length.is_long(),
+        string_refinement_invariantt("the length of a string should be a "
+          "long"));
+      INVARIANT(
+        found_length>=0,
+        string_refinement_invariantt("the length of a string should be >= 0"));
       size_t concretize_limit=found_length.to_long();
-      assert(concretize_limit<=generator.max_string_length);
+      INVARIANT(
+        concretize_limit<=generator.max_string_length,
+        string_refinement_invariantt("string length must be less than the max "
+          "length"));
       exprt content_expr=str.content();
       std::vector<exprt> result;
 
@@ -367,7 +376,10 @@ void string_refinementt::concretize_lengths()
 /// \par parameters: an expression and the value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
-  assert(equality_propagation);
+  INVARIANT(
+    equality_propagation,
+    string_refinement_invariantt("set_to should only be called when equality "
+      "propagation is enabled"));
 
   if(expr.id()==ID_equal)
   {
@@ -386,7 +398,10 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     {
       error() << "string_refinementt::set_to got non-boolean operand: "
               << expr.pretty() << eom;
-      throw 0;
+      INVARIANT(
+        false,
+        string_refinement_invariantt("set_to should only be called with exprs "
+          "of type bool"));
     }
 
     // Preprocessing to remove function applications.
@@ -427,9 +442,12 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     else
     {
       // TODO: Something should also be done if value is false.
-      assert(!is_char_array(eq_expr.rhs().type()));
-      assert(!refined_string_typet::is_refined_string_type(
-        eq_expr.rhs().type()));
+      INVARIANT(
+        !is_char_array(eq_expr.rhs().type()),
+        string_refinement_invariantt("set_to cannot set a char_array"));
+      INVARIANT(
+        !refined_string_typet::is_refined_string_type(eq_expr.rhs().type()),
+        string_refinement_invariantt("set_to cannot set a refined_string"));
     }
 
     non_string_axioms.push_back(std::make_pair(equal_exprt(lhs, subst_rhs),
@@ -744,9 +762,30 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
       return std::string("");
 
   exprt size_expr=to_array_type(arr.type()).size();
-  assert(size_expr.id()==ID_constant);
+  PRECONDITION(size_expr.id()==ID_constant);
   to_unsigned_integer(to_constant_expr(size_expr), n);
-  return utf16_constant_array_to_java(arr, n);
+  std::string str(n, '?');
+
+  std::ostringstream result;
+  std::locale loc;
+
+  for(size_t i=0; i<arr.operands().size() && i<n; i++)
+  {
+    // TODO: factorize with utf16_little_endian_to_ascii
+    unsigned c;
+    exprt arr_i=arr.operands()[i];
+    PRECONDITION(arr_i.id()==ID_constant);
+    to_unsigned_integer(to_constant_expr(arr_i), c);
+    if(c<=255 && c>=32)
+      result << (unsigned char) c;
+    else
+    {
+      result << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+             << (unsigned int) c;
+    }
+  }
+
+  return result.str();
 }
 
 /// Fill in `current_model` by mapping the variables created by the solver to
@@ -776,12 +815,16 @@ void string_refinementt::fill_model()
         debug() << " = \"" << string_of_array(to_array_expr(arr))
                 << "\" (size:" << from_expr(ns, "", len) << ")"<< eom;
       else
-        debug() << " = " << from_expr(ns, "", arr) << " (size:" << from_expr(ns, "", len)
-                << ")" << eom;
+        debug() << " = " << from_expr(ns, "", arr)
+                << " (size:" << from_expr(ns, "", len) << ")" << eom;
     }
     else
     {
-      assert(is_char_array(it.second.type()));
+      INVARIANT(
+        is_char_array(it.second.type()),
+        string_refinement_invariantt("symbol_resolve should only map to "
+          "refined_strings or to char_arrays, and refined_strings are already "
+          "handled"));
       exprt arr=it.second;
       replace_expr(symbol_resolve, arr);
       replace_expr(current_model, arr);
@@ -789,7 +832,8 @@ void string_refinementt::fill_model()
       current_model[it.first]=arr_model;
 
       debug() << from_expr(ns, "", to_symbol_expr(it.first)) << "="
-              << from_expr(ns, "", arr) << " = " << from_expr(ns, "", arr_model) << "" << eom;
+              << from_expr(ns, "", arr) << " = "
+              << from_expr(ns, "", arr_model) << "" << eom;
     }
   }
 
@@ -826,14 +870,17 @@ exprt string_refinementt::substitute_array_with_expr(
     const exprt &then_expr=with_expr.new_value();
     exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
     const typet &type=then_expr.type();
-    assert(else_expr.type()==type);
+    CHECK_RETURN(else_expr.type()==type);
     return if_exprt(
       equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
   }
   else
   {
-    // Only handle 'with' expressions on 'array_of' expressions.
-    assert(expr.id()==ID_array_of);
+    // Only handle 'with' expressions and 'array_of' expressions.
+    INVARIANT(
+      expr.id()==ID_array_of,
+      string_refinement_invariantt("only handles 'with' and 'array_of' "
+        "expressions, and expr is 'with' is handled above"));
     return to_array_of_expr(expr).what();
   }
 }
@@ -890,10 +937,16 @@ void string_refinementt::substitute_array_access(exprt &expr) const
       return;
     }
 
-    assert(index_expr.array().id()==ID_array);
+    DATA_INVARIANT(
+      index_expr.array().id()==ID_array,
+      string_refinement_invariantt("and index expression must be on a symbol, "
+        "with, array_of, if, or array, and all cases besides array are handled "
+        "above"));
     array_exprt &array_expr=to_array_expr(index_expr.array());
 
-    assert(!array_expr.operands().empty());
+    INVARIANT(
+      !array_expr.operands().empty(),
+      string_refinement_invariantt("the array expression should not be empty"));
     size_t last_index=array_expr.operands().size()-1;
 
     const typet &char_type=index_expr.array().type().subtype();
@@ -901,8 +954,11 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 
     if(ite.type()!=char_type)
     {
-      // We have to manualy set the type for unknown values
-      assert(ite.id()==ID_unknown);
+      // We have to manually set the type for unknown values
+      INVARIANT(
+        ite.id()==ID_unknown,
+        string_refinement_invariantt("the last element can only have type char "
+          "or unknown, and it is not char type"));
       ite.type()=char_type;
     }
 
@@ -914,7 +970,10 @@ void string_refinementt::substitute_array_access(exprt &expr) const
       equal_exprt equals(index_expr.index(), from_integer(i, java_int_type()));
       if(op_it->type()!=char_type)
       {
-        assert(op_it->id()==ID_unknown);
+        INVARIANT(
+          op_it->id()==ID_unknown,
+          string_refinement_invariantt("elements can only have type char or "
+            "unknown, and it is not char type"));
         op_it->type()=char_type;
       }
       ite=if_exprt(equals, *op_it, ite);
@@ -1132,7 +1191,8 @@ bool string_refinementt::check_axioms()
         implies_exprt instance(premise, body);
         replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
-        debug() << "adding counter example " << from_expr(ns, "", instance) << eom;
+        debug() << "adding counter example " << from_expr(ns, "", instance)
+                << eom;
         add_lemma(instance);
       }
     }
@@ -1286,14 +1346,20 @@ exprt string_refinementt::compute_inverse_function(
   bool neg=false;
 
   auto it=elems.find(qvar);
-  assert(it!=elems.end());
+  INVARIANT(
+    it!=elems.end(),
+    string_refinement_invariantt("a function must have an occurrence of qvar"));
   if(it->second==1 || it->second==-1)
   {
     neg=(it->second==1);
   }
   else
   {
-    assert(it->second==0);
+    INVARIANT(
+      it->second==0,
+      string_refinement_invariantt("a proper function must have exactly one "
+        "occurrences after reduction, or it canceled out, and it does not have "
+        " one"));
     debug() << "in string_refinementt::compute_inverse_function:"
             << " warning: occurrences of qvar canceled out " << eom;
   }
@@ -1427,7 +1493,9 @@ void string_refinementt::update_index_set(const exprt &formula)
     {
       const exprt &s=cur.op0();
       const exprt &i=cur.op1();
-      assert(s.type().id()==ID_array);
+      DATA_INVARIANT(
+        s.type().id()==ID_array,
+        string_refinement_invariantt("index expressions must index on arrays"));
       exprt simplified=simplify_sum(i);
       add_to_index_set(s, simplified);
     }
@@ -1574,7 +1642,10 @@ exprt string_refinementt::substitute_array_lists(exprt expr) const
 
   if(expr.id()=="array-list")
   {
-    assert(expr.operands().size()>=2);
+    DATA_INVARIANT(
+      expr.operands().size()>=2,
+      string_refinement_invariantt("array-lists must have at least two "
+        "operands"));
     typet &char_type=expr.operands()[1].type();
     array_typet arr_type(char_type, infinity_exprt(char_type));
     array_of_exprt new_arr(from_integer(0, char_type),
@@ -1645,6 +1716,8 @@ bool string_refinementt::is_axiom_sat(
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     return false;
   default:
-    throw "failure in checking axiom";
+    INVARIANT(false, string_refinement_invariantt("failure in checking axiom"));
+    // To tell the compiler that the previous line bails
+    throw 0;
   }
 }
