@@ -32,4 +32,10 @@ hosted on GitHub.
   contributors to CBMC. It describes the stages through which CBMC
   transforms source files into bug reports and counterexamples, linking
   to the relevant documentation for each stage.
+
+* The \subpage cbmc-hacking "CBMC hacking HOWTO" helps new contributors
+  to CProver to get their feet wet through a series of programming
+  exercises---mostly modifying goto-instrument, and thus learning to
+  manipulate the main data structures used within CBMC.
+
 \defgroup module_hidden _hidden
