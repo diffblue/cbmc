@@ -20,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \brief A specialization of goto_program_templatet over
            goto programs in which instructions have codet type.
-    \ingroup gr_goto_programs
 */
 class goto_programt:public goto_program_templatet<codet, exprt>
 {

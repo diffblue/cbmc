@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT1_SMT1_DEC_H
 #define CPROVER_SOLVERS_SMT1_SMT1_DEC_H
 
-/*! \defgroup gr_smt1 SMT-LIB 1.x Interface */
-
 #include <fstream>
 
 #include "smt1_conv.h"
@@ -28,7 +26,6 @@ protected:
 };
 
 /*! \brief Decision procedure interface for various SMT 1.x solvers
-    \ingroup gr_smt1
 */
 class smt1_dect:protected smt1_temp_filet, public smt1_convt
 {

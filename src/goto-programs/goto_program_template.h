@@ -12,8 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
 
-/*! \defgroup gr_goto_programs Goto programs */
-
 #include <cassert>
 #include <iosfwd>
 #include <set>
@@ -53,7 +51,6 @@ std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
 
 /*! \brief A generic container class for a control flow graph
            for one function, in the form of a goto-program
-    \ingroup gr_goto_programs
 */
 template <class codeT, class guardT>
 class goto_program_templatet
