@@ -210,9 +210,6 @@ void custom_bitvector_domaint::transform(
   ai_baset &ai,
   const namespacet &ns)
 {
-  if(has_values.is_false())
-    return;
-
   // upcast of ai
   custom_bitvector_analysist &cba=
     static_cast<custom_bitvector_analysist &>(ai);
@@ -334,6 +331,54 @@ void custom_bitvector_domaint::transform(
               {
                 set_bit(lhs, bit_nr, mode);
               }
+            }
+          }
+        }
+        else
+        {
+          goto_programt::const_targett next=from;
+          ++next;
+
+          // only if there is an actual call, i.e., we have a body
+          if(next!=to)
+          {
+            const code_typet &code_type=
+              to_code_type(ns.lookup(identifier).type);
+
+            code_function_callt::argumentst::const_iterator arg_it=
+              code_function_call.arguments().begin();
+            for(const auto &param : code_type.parameters())
+            {
+              const irep_idt &p_identifier=param.get_identifier();
+              if(p_identifier.empty())
+                continue;
+
+              // there may be a mismatch in the number of arguments
+              if(arg_it==code_function_call.arguments().end())
+                break;
+
+              // assignments arguments -> parameters
+              symbol_exprt p=ns.lookup(p_identifier).symbol_expr();
+              // may alias other stuff
+              std::set<exprt> lhs_set=cba.aliases(p, from);
+
+              vectorst rhs_vectors=get_rhs(*arg_it);
+
+              for(const auto &lhs : lhs_set)
+              {
+                assign_lhs(lhs, rhs_vectors);
+              }
+
+              // is it a pointer?
+              if(p.type().id()==ID_pointer)
+              {
+                dereference_exprt lhs_deref(p);
+                dereference_exprt rhs_deref(*arg_it);
+                vectorst rhs_vectors=get_rhs(rhs_deref);
+                assign_lhs(lhs_deref, rhs_vectors);
+              }
+
+              ++arg_it;
             }
           }
         }
@@ -484,44 +529,55 @@ bool custom_bitvector_domaint::merge(
   locationt from,
   locationt to)
 {
-  if(b.has_values.is_false())
-    return false; // no change
-
-  if(has_values.is_false())
-  {
-    *this=b;
-    return true; // change
-  }
-
-  bool changed=false;
+  bool changed=has_values.is_false();
+  has_values=tvt::unknown();
 
   // first do MAY
-  for(const auto &bit : may_bits)
+  bitst::iterator it=may_bits.begin();
+  for(const auto &bit : b.may_bits)
   {
-    bit_vectort &a_bits=may_bits[bit.first];
-    bit_vectort old=a_bits;
-    a_bits|=bit.second;
-    if(old!=a_bits)
+    while(it!=may_bits.end() && it->first<bit.first)
+      ++it;
+    if(it==may_bits.end() || bit.first<it->first)
+    {
+      may_bits.insert(it, bit);
       changed=true;
+    }
+    else if(it!=may_bits.end())
+    {
+      bit_vectort &a_bits=it->second;
+      bit_vectort old=a_bits;
+      a_bits|=bit.second;
+      if(old!=a_bits)
+        changed=true;
+
+      ++it;
+    }
   }
 
   // now do MUST
-  for(auto &bit : must_bits)
+  it=must_bits.begin();
+  for(auto &bit : b.must_bits)
   {
-    bitst::const_iterator b_it=
-      b.must_bits.find(bit.first);
-
-    if(b_it==b.must_bits.end())
+    while(it!=must_bits.end() && it->first<bit.first)
     {
-      bit.second=0;
+      it=must_bits.erase(it);
       changed=true;
     }
-    else
+    if(it==must_bits.end() || bit.first<it->first)
     {
-      bit_vectort old=bit.second;
-      bit.second&=bit.second;
-      if(old!=bit.second)
+      must_bits.insert(it, bit);
+      changed=true;
+    }
+    else if(it!=must_bits.end())
+    {
+      bit_vectort &a_bits=it->second;
+      bit_vectort old=a_bits;
+      a_bits&=bit.second;
+      if(old!=a_bits)
         changed=true;
+
+      ++it;
     }
   }
 

@@ -570,6 +570,14 @@ std::string expr2ct::convert_rec(
 
     c_qualifierst ret_qualifiers;
     ret_qualifiers.read(code_type.return_type());
+    // _Noreturn should go with the return type
+    if(new_qualifiers.is_noreturn)
+    {
+      ret_qualifiers.is_noreturn=true;
+      new_qualifiers.is_noreturn=false;
+      q=new_qualifiers.as_string();
+    }
+
     const typet &return_type=code_type.return_type();
 
     // return type may be a function pointer or array
@@ -1845,10 +1853,12 @@ std::string expr2ct::convert_constant(
 
     if(dest!="" && isdigit(dest[dest.size()-1]))
     {
+      if(dest.find('.')==std::string::npos)
+        dest+=".0";
+
+      // ANSI-C: double is default; float/long-double require annotation
       if(src.type()==float_type())
         dest+='f';
-      else if(src.type()==double_type())
-        dest+=""; // ANSI-C: double is default
       else if(src.type()==long_double_type())
         dest+='l';
     }
@@ -2600,7 +2610,7 @@ std::string expr2ct::convert_code_switch(
   const codet &src,
   unsigned indent)
 {
-  if(src.operands().size()<1)
+  if(src.operands().empty())
   {
     unsigned precedence;
     return convert_norep(src, precedence);
@@ -3534,7 +3544,11 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(src, "isinf", precedence=16);
 
   else if(src.id()==ID_bswap)
-    return convert_function(src, "bswap", precedence=16);
+    return convert_function(
+      src,
+      "__builtin_bswap"+
+      integer2string(pointer_offset_bits(src.op0().type(), ns)),
+      precedence=16);
 
   else if(src.id()==ID_isnormal)
     return convert_function(src, "isnormal", precedence=16);

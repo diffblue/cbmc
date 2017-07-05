@@ -521,21 +521,21 @@ bool event_grapht::graph_explorert::backtrack(
 
       std::stack<event_idt> tmp;
 
-      while(marked_stack.size()>0 && marked_stack.top()!=vertex)
+      while(!marked_stack.empty() && marked_stack.top()!=vertex)
       {
         tmp.push(marked_stack.top());
         mark[marked_stack.top()]=false;
         marked_stack.pop();
       }
 
-      if(marked_stack.size()>0)
+      if(!marked_stack.empty())
       {
         assert(marked_stack.top()==vertex);
         mark[vertex]=true;
       }
       else
       {
-        while(tmp.size()>0)
+        while(!tmp.empty())
         {
           marked_stack.push(tmp.top());
           mark[tmp.top()]=true;

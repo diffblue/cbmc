@@ -189,7 +189,7 @@ void weak_memory(
       <<" cycles found"<<messaget::eom;
 
     /* if no cycle, no need to instrument */
-    if(instrumenter.set_of_cycles.size() == 0)
+    if(instrumenter.set_of_cycles.empty())
     {
       message.status()<<"program safe -- no need to instrument"<<messaget::eom;
       return;

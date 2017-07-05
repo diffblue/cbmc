@@ -25,7 +25,14 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
   std::size_t width=boolbv_width(array_type);
 
   if(width==0)
-    return conversion_failed(expr);
+  {
+    // A zero-length array is acceptable;
+    // an element with unknown size is not.
+    if(boolbv_width(array_type.subtype())==0)
+      return conversion_failed(expr);
+    else
+      return bvt();
+  }
 
   const exprt &array_size=array_type.size();
 

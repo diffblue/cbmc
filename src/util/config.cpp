@@ -855,6 +855,9 @@ bool configt::set(const cmdlinet &cmdline)
       #ifdef _WIN32
       ansi_c.defines.push_back("__CYGWIN__");
       #endif
+
+      // MinGW has extra defines
+      ansi_c.defines.push_back("__int64=\"long long\"");
     }
     else
     {

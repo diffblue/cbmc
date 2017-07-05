@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <sstream>
 
+#include "invariant.h"
 #include "source_location.h"
 
 class message_handlert
@@ -136,6 +137,7 @@ public:
 
   message_handlert &get_message_handler()
   {
+    INVARIANT(message_handler!=nullptr, "message handler is set");
     return *message_handler;
   }
 

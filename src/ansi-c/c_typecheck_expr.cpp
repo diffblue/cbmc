@@ -2566,7 +2566,7 @@ exprt c_typecheck_baset::do_special_functions(
     // http://gcc.gnu.org/onlinedocs/gcc-4.1.1/gcc/Atomic-Builtins.html
 
     // adjust return type of function to match pointer subtype
-    if(expr.arguments().size()<1)
+    if(expr.arguments().empty())
     {
       err_location(f_op);
       error() << "__sync_* primitives take as least one argument" << eom;

@@ -31,6 +31,7 @@ public:
     const bool _throw_runtime_exceptions,
     message_handlert &_message_handler,
     const size_t _max_array_length):
+    messaget(_message_handler),
     symbol_table(_symbol_table),
     throw_runtime_exceptions(_throw_runtime_exceptions),
     message_handler(_message_handler),

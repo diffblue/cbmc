@@ -302,7 +302,7 @@ static bool link_functions(
   rename_symbolt macro_application;
 
   forall_symbols(it, dest_symbol_table.symbols)
-    if(it->second.is_macro)
+    if(it->second.is_macro && !it->second.is_type)
     {
       const symbolt &symbol=it->second;
 

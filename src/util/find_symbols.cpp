@@ -124,6 +124,10 @@ void find_symbols(kindt kind, const typet &src, find_symbols_sett &dest)
 
     forall_subtypes(it, src)
       find_symbols(kind, *it, dest);
+
+    const irep_idt &typedef_name=src.get(ID_C_typedef);
+    if(!typedef_name.empty())
+      dest.insert(typedef_name);
   }
 
   if(src.id()==ID_struct ||

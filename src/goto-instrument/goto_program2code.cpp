@@ -110,14 +110,23 @@ void goto_program2codet::scan_for_varargs()
   forall_goto_program_instructions(target, goto_program)
     if(target->is_assign())
     {
+      const exprt &l=to_code_assign(target->code).lhs();
       const exprt &r=to_code_assign(target->code).rhs();
 
+      // find va_arg_next
       if(r.id()==ID_side_effect &&
          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
       {
         assert(r.has_operands());
         va_list_expr.insert(r.op0());
       }
+      // try our modelling of va_start
+      else if(l.type().id()==ID_pointer &&
+              l.type().get(ID_C_typedef)=="va_list" &&
+              l.id()==ID_symbol &&
+              r.id()==ID_typecast &&
+              to_typecast_expr(r).op().id()==ID_address_of)
+        va_list_expr.insert(l);
     }
 
   if(!va_list_expr.empty())
@@ -556,7 +565,7 @@ goto_programt::const_targett goto_program2codet::convert_goto(
   else if(!target->guard.is_true())
     return convert_goto_switch(target, upper_bound, dest);
   else if(!loop_last_stack.empty())
-    return convert_goto_break_continue(target, dest);
+    return convert_goto_break_continue(target, upper_bound, dest);
   else
     return convert_goto_goto(target, dest);
 }
@@ -794,7 +803,14 @@ bool goto_program2codet::set_block_end_points(
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
+      {
+        // simplification may have figured out that a case is unreachable
+        // this is possibly getting too weird, abort to be safe
+        if(case_end==it->case_start)
+          return true;
+
         continue;
+      }
 
       // find the last instruction dominated by the case start
       if(n.dominators.find(it->case_start)==n.dominators.end())
@@ -1098,7 +1114,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
        upper_bound->location_number < end_if->location_number))
   {
     if(!loop_last_stack.empty())
-      return convert_goto_break_continue(target, dest);
+      return convert_goto_break_continue(target, upper_bound, dest);
     else
       return convert_goto_goto(target, dest);
   }
@@ -1131,6 +1147,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
 
 goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
     codet &dest)
 {
   assert(!loop_last_stack.empty());
@@ -1140,7 +1157,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   // 1: ...
   goto_programt::const_targett next=target;
   for(++next;
-      next!=goto_program.instructions.end();
+      next!=upper_bound && next!=goto_program.instructions.end();
       ++next)
   {
     cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
@@ -1495,6 +1512,11 @@ void goto_program2codet::cleanup_code(
       cleanup_expr(to_array_type(code.op0().type()).size(), true);
 
     add_local_types(code.op0().type());
+
+    const irep_idt &typedef_str=code.op0().type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      code.op0().type().remove(ID_C_typedef);
 
     return;
   }
@@ -1851,6 +1873,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     add_local_types(t);
     expr=typecast_exprt(expr, t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
@@ -1863,6 +1890,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     expr.make_typecast(t);
     add_local_types(t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_side_effect)
   {
@@ -1977,6 +2009,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     else
     {
       add_local_types(expr.type());
+
+      const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+      if(!typedef_str.empty() &&
+         typedef_names.find(typedef_str)==typedef_names.end())
+        expr.type().remove(ID_C_typedef);
 
       assert(expr.type().id()!=ID_union &&
              expr.type().id()!=ID_struct);

@@ -84,12 +84,13 @@ public:
     typedef objmapt::iterator iterator;
 
     const_iterator find(unsigned k) { return objmap.find(k); }
-    iterator begin(void) { return objmap.begin(); }
-    const_iterator begin(void) const { return objmap.begin(); }
-    iterator end(void) { return objmap.end(); }
-    const_iterator end(void) const { return objmap.end(); }
-    size_t size(void) const { return objmap.size(); }
-    void clear(void) { objmap.clear(); validity_ranges.clear(); }
+    iterator begin() { return objmap.begin(); }
+    const_iterator begin() const { return objmap.begin(); }
+    iterator end() { return objmap.end(); }
+    const_iterator end() const { return objmap.end(); }
+    size_t size() const { return objmap.size(); }
+    bool empty() const { return objmap.empty(); }
+    void clear() { objmap.clear(); validity_ranges.clear(); }
 
     objectt &operator[](unsigned k)
     {
@@ -112,7 +113,7 @@ public:
       unsigned function;
       unsigned from, to;
 
-      validity_ranget(void):
+      validity_ranget():
         function(0), from(0), to(0)
       {
       }
@@ -318,7 +319,7 @@ public:
     const exprt &code,
     const namespacet &ns);
 
-  bool handover(void);
+  bool handover();
 
   void assign(
     const exprt &lhs,
