@@ -200,26 +200,30 @@ codet java_bytecode_instrumentt::check_class_cast(
   exprt null_check_op=class1;
   if(null_check_op.type()!=voidptr)
     null_check_op.make_typecast(voidptr);
-  notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
 
-  // checkcast passes when the operand is null
-  and_exprt and_expr(op_not_null, not_exprt(class_cast_check));
-
+  codet check_code;
   if(throw_runtime_exceptions)
-    return throw_exception(
-      and_expr,
-      original_loc,
-      "ClassCastException");
-
-  code_assertt assert_class(class_cast_check);
-  assert_class.add_source_location().
-    set_comment("Dynamic cast check");
-  assert_class.add_source_location().
-    set_property_class("bad-dynamic-cast");
+  {
+    check_code=
+      throw_exception(
+        not_exprt(class_cast_check),
+        original_loc,
+        "ClassCastException");
+  }
+  else
+  {
+    code_assertt assert_class(class_cast_check);
+    assert_class.add_source_location().
+      set_comment("Dynamic cast check");
+    assert_class.add_source_location().
+      set_property_class("bad-dynamic-cast");
+    check_code=std::move(assert_class);
+  }
 
   code_ifthenelset conditional_check;
+  notequal_exprt op_not_null(null_check_op, null_pointer_exprt(voidptr));
   conditional_check.cond()=std::move(op_not_null);
-  conditional_check.then_case()=std::move(assert_class);
+  conditional_check.then_case()=std::move(check_code);
   return conditional_check;
 }
 
