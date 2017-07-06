@@ -193,20 +193,22 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   symbol_exprt contains=fresh_boolean("contains_substring");
 
   // We add axioms:
-  // a1 : contains ==> offset <= from_index && offset <= |haystack| - |needle|
+  // a1 : contains ==> -1 <= offset && offset <= from_index
+  //                   && offset <= |haystack| - |needle|
   // a2 : !contains <=> offset = -1
-  // a3 : forall n:[0, needle.length[,
+  // a3 : forall n:[0, |needle|[,
   //        contains ==> haystack[n+offset] = needle[n]
   // a4 : forall n:[offset+1, min(from_index, |haystack| - |needle|)].
   //        contains ==>
-  //          (exists m:[0,|substring|[. haystack[m+n] != needle[m]])
+  //          (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
   // a5:  forall n:[0, min(from_index, |haystack| - |needle|)].
   //        !contains ==>
-  //          (exists m:[0,|substring|[. haystack[m+n] != needle[m])
+  //          (exists m:[0,|needle|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
     contains,
     and_exprt(
+      binary_relation_exprt(from_integer(-1, index_type), ID_le, offset),
       binary_relation_exprt(
         offset, ID_le, minus_exprt(haystack.length(), needle.length())),
       binary_relation_exprt(offset, ID_le, from_index)));
@@ -255,8 +257,8 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   {
     // Unfold the existential quantifier as a disjunction in case of a constant
     // a4 && a5 <=> a6:
-    //  forall n:[0, min(from_index,|haystack|-|needle|)].
-    //    !contains || n > offset ==>
+    //  forall n:[0, min(from_index, |haystack| - |needle|)].
+    //    !contains || (n > offset) ==>
     //      haystack[n] != needle[0] || ... ||
     //      haystack[n+|needle|-1] != needle[|needle|-1]
     symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
@@ -273,6 +275,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 
     or_exprt premise(
       not_exprt(contains), binary_relation_exprt(qvar2, ID_gt, offset));
+
     string_constraintt a6(
       qvar2,
       from_integer(0, index_type),
