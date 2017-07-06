@@ -328,7 +328,7 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
   }
   else if(statement==ID_assert)
   {
-    code_assertt code_assert=to_code_assert(code);
+    const code_assertt &code_assert=to_code_assert(code);
 
     // does this correspond to checkcast?
     if(code_assert.assertion().id()==ID_java_instanceof)
@@ -339,13 +339,11 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
         code_assert.assertion().operands().size()==2,
         "Instanceof should have 2 operands");
 
-      block.copy_to_operands(
+      code=
         check_class_cast(
           code_assert.assertion().op0(),
           code_assert.assertion().op1(),
-          code_assert.source_location()));
-      block.copy_to_operands(code_assert);
-      code=block;
+          code_assert.source_location());
     }
   }
   else if(statement==ID_block)
