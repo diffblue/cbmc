@@ -1,0 +1,7 @@
+CORE
+TestClass.class
+--cover location --function TestClass.foo --show-goto-functions
+
+@class_identifier = "java::A";
+ = \(struct I \*\)
+tmp_object_factory\$\d+ = null;
