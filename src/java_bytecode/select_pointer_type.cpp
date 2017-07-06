@@ -51,6 +51,12 @@ bool select_pointer_typet::is_abstract_type(
   const pointer_typet &pointer_type) const
 {
   const typet &pointing_to_type=ns.follow(pointer_type.subtype());
+
+  // void* pointers should be not considered abstract
+  // These happen in Java when initializing the exeception value.
+  if(pointing_to_type.id()==ID_empty)
+    return false;
+
   INVARIANT(
     pointing_to_type.id()==ID_struct,
     "All pointers in Java should be to classes");
