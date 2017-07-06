@@ -265,10 +265,10 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
-  if((cmdline.isset('v') || cmdline.isset("version")) &&
-     cmdline.have_infile_arg()) // let the native tool print the version
+  if((cmdline.isset('v') && cmdline.have_infile_arg()) ||
+     (cmdline.isset("version") && !produce_hybrid_binary))
   {
-    // This a) prints the version and b) increases verbosity.
+    // "-v" a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
 
     if(act_as_ld)
@@ -282,6 +282,9 @@ int gcc_modet::doit()
 
   if(cmdline.isset("version"))
   {
+    if(produce_hybrid_binary)
+      return run_gcc();
+
     std::cout << '\n' <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
@@ -293,6 +296,9 @@ int gcc_modet::doit()
 
   if(cmdline.isset("dumpversion"))
   {
+    if(produce_hybrid_binary)
+      return run_gcc();
+
     std::cout << "3.4.4\n";
     return EX_OK;
   }
