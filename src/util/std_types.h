@@ -401,6 +401,11 @@ public:
 
     return false;
   }
+
+  bool is_abstract() const
+  {
+    return get_bool(ID_abstract);
+  }
 };
 
 /*! \brief Cast a generic typet to a \ref class_typet
