@@ -1,0 +1,9 @@
+CORE
+test.class
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Dynamic cast check: FAILURE
+^warning: ignoring
