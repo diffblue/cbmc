@@ -257,6 +257,19 @@ protected:
   const bool is_method_inherited(
     const irep_idt &classname,
     const irep_idt &methodid) const;
+
+  enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
+  void save_stack_entries(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    const bytecode_write_typet,
+    const irep_idt &);
+  void create_stack_tmp_var(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    exprt &);
 };
 
 #endif

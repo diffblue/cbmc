@@ -5,6 +5,7 @@ main.c
 ^\s*IF fp == f2 THEN GOTO [0-9]$
 ^\s*IF fp == f3 THEN GOTO [0-9]$
 ^\s*IF fp == f4 THEN GOTO [0-9]$
+replacing function pointer by 3 possible targets
 ^SIGNAL=0$
 --
 ^warning: ignoring
@@ -14,3 +15,4 @@ main.c
 ^\s*IF fp_tbl\[\(signed long int\)i\] == f7 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[\(signed long int\)i\] == f8 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[\(signed long int\)i\] == f9 THEN GOTO [0-9]$
+function \w+: replacing function pointer by 9 possible targets

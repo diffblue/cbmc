@@ -150,6 +150,11 @@ public:
     return nodes.size();
   }
 
+  bool empty() const
+  {
+    return nodes.empty();
+  }
+
   const edgest &in(node_indext n) const
   {
     return nodes[n].in;

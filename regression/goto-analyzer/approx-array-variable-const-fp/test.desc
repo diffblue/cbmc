@@ -14,3 +14,4 @@ main.c
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f8 THEN GOTO [0-9]$
 ^\s*IF fp_tbl\[\(signed (long )*long int\)i\] == f9 THEN GOTO [0-9]$
 ^warning: ignoring
+function \w+: replacing function pointer by 9 possible targets

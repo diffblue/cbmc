@@ -151,7 +151,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   const symbol_exprt &const_function,
   unsigned stack_scope)
 {
-  assert(callsite_stack.size()>0);
+  assert(!callsite_stack.empty());
 
   /* for the reconstruction of the {call,callsite}_stacks after the
      duplication */
@@ -209,8 +209,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         it!=function_dup.body.instructions.end(); ++it)
         it->function=function_new_id;
 
-      assert(goto_functions.function_map[function_new_id].
-             body.instructions.size()>0);
+      assert(goto_functions.function_map[function_new_id].body.empty());
 
       /* removes in definition the argument leading to the const_function */
       code_typet::parameterst &args=function_dup.type.parameters();

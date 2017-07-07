@@ -152,7 +152,7 @@ static bool build_graph(
   graphmlt &dest,
   graphmlt::node_indext &entry)
 {
-  assert(dest.size()==0);
+  assert(dest.empty());
 
   name_mapt name_to_node;
   std::map<std::string, std::map<std::string, std::string> > defaults;

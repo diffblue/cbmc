@@ -36,12 +36,8 @@ void goto_symext::symex_goto(statet &state)
     if(!state.guard.is_false())
       target.location(state.guard.as_expr(), state.source);
 
-    // reset unwinding counter
-    if(instruction.is_backwards_goto())
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
-
     // next instruction
-    state.source.pc++;
+    symex_transition(state);
     return; // nothing to do
   }
 
@@ -77,7 +73,7 @@ void goto_symext::symex_goto(statet &state)
       symex_assume(state, negated_cond);
 
       // next instruction
-      state.source.pc++;
+      symex_transition(state);
       return;
     }
 
@@ -91,17 +87,14 @@ void goto_symext::symex_goto(statet &state)
       // no!
       loop_bound_exceeded(state, new_guard);
 
-      // reset unwinding
-      unwind=0;
-
       // next instruction
-      state.source.pc++;
+      symex_transition(state);
       return;
     }
 
     if(new_guard.is_true())
     {
-      state.source.pc=goto_target;
+      symex_transition(state, goto_target, true);
       return; // nothing else to do
     }
   }
@@ -122,7 +115,7 @@ void goto_symext::symex_goto(statet &state)
 
     if(state_pc==goto_target)
     {
-      state.source.pc=goto_target;
+      symex_transition(state, goto_target);
       return; // nothing else to do
     }
   }
@@ -140,7 +133,7 @@ void goto_symext::symex_goto(statet &state)
   goto_state_list.push_back(statet::goto_statet(state));
   statet::goto_statet &new_state=goto_state_list.back();
 
-  state.source.pc=state_pc;
+  symex_transition(state, state_pc, !forward);
 
   // adjust guards
   if(new_guard.is_true())

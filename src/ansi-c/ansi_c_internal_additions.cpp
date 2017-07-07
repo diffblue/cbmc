@@ -197,6 +197,18 @@ void ansi_c_internal_additions(std::string &code)
     "long double __CPROVER_infl(void);\n"
     "int __CPROVER_thread_local __CPROVER_rounding_mode="+
       std::to_string(config.ansi_c.rounding_mode)+";\n"
+    "int __CPROVER_isgreaterf(float f, float g);\n"
+    "int __CPROVER_isgreaterd(double f, double g);\n"
+    "int __CPROVER_isgreaterequalf(float f, float g);\n"
+    "int __CPROVER_isgreaterequald(double f, double g);\n"
+    "int __CPROVER_islessf(float f, float g);\n"
+    "int __CPROVER_islessd(double f, double g);\n"
+    "int __CPROVER_islessequalf(float f, float g);\n"
+    "int __CPROVER_islessequald(double f, double g);\n"
+    "int __CPROVER_islessgreaterf(float f, float g);\n"
+    "int __CPROVER_islessgreaterd(double f, double g);\n"
+    "int __CPROVER_isunorderedf(float f, float g);\n"
+    "int __CPROVER_isunorderedd(double f, double g);\n"
 
     // absolute value
     "int __CPROVER_abs(int x);\n"

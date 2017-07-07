@@ -53,6 +53,7 @@ void mm_io(
         {
           const dereference_exprt &d=*deref_expr_r.begin();
           source_locationt source_location=it->source_location;
+          irep_idt function=it->function;
           code_function_callt fc;
           const code_typet &ct=to_code_type(mm_io_r.type());
 
@@ -72,6 +73,7 @@ void mm_io(
           goto_function.body.insert_before_swap(it);
           it->make_function_call(fc);
           it->source_location=source_location;
+          it->function=function;
           it++;
         }
       }
@@ -82,6 +84,7 @@ void mm_io(
         {
           const dereference_exprt &d=to_dereference_expr(a.lhs());
           source_locationt source_location=it->source_location;
+          irep_idt function=it->function;
           code_function_callt fc;
           const code_typet &ct=to_code_type(mm_io_w.type());
           const typet &pt=ct.parameters()[0].type();
@@ -96,6 +99,7 @@ void mm_io(
           goto_function.body.insert_before_swap(it);
           it->make_function_call(fc);
           it->source_location=source_location;
+          it->function=function;
           it++;
         }
       }

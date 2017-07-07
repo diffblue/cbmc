@@ -92,6 +92,7 @@ double __CPROVER_inf(void);
 float __CPROVER_inff(void);
 long double __CPROVER_infl(void);
 //extern int __CPROVER_thread_local __CPROVER_rounding_mode;
+int __CPROVER_isgreaterd(double f, double g);
 
 // absolute value
 int __CPROVER_abs(int);

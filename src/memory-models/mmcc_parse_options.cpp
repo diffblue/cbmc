@@ -48,7 +48,7 @@ int mmcc_parse_optionst::doit()
 
       return convert(in, cmdline.args[0]);
     }
-    else if(cmdline.args.size()==0)
+    else if(cmdline.args.empty())
     {
       return convert(std::cin, "stdin");
     }

@@ -536,7 +536,7 @@ void value_sett::get_value_set_rec(
 
         get_value_set_rec(expr.op0(), tmp, suffix, original_type, ns);
 
-        if(tmp.read().size()==0)
+        if(tmp.read().empty())
         {
           // if not, throw in integer
           insert(dest, exprt(ID_integer_address, unsigned_char_type()));

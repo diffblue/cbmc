@@ -574,13 +574,13 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
        expr.type().subtype().id()==ID_code)
     {
       code_typet code1=to_code_type(expr.type().subtype());
-      assert(code1.parameters().size()>0);
+      assert(!code1.parameters().empty());
       code_typet::parametert this1=code1.parameters()[0];
       assert(this1.get(ID_C_base_name)==ID_this);
       code1.parameters().erase(code1.parameters().begin());
 
       code_typet code2=to_code_type(type.subtype());
-      assert(code2.parameters().size()>0);
+      assert(!code2.parameters().empty());
       code_typet::parametert this2=code2.parameters()[0];
       assert(this2.get(ID_C_base_name)==ID_this);
       code2.parameters().erase(code2.parameters().begin());

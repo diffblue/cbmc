@@ -38,6 +38,5 @@ void xml_goto_function_convertt::convert(
   xml_goto_program_convertt gpconverter(ireps_container);
   function.body.clear();
   gpconverter.convert(xml, function.body);
-  function.body_available = function.body.instructions.size()>0;
   // don't forget to fix the functions type via the symbol table!
 }

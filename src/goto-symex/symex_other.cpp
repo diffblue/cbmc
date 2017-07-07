@@ -94,13 +94,21 @@ void goto_symext::symex_other(
     clean_code.op1()=d1;
 
     clean_expr(clean_code.op0(), state, true);
+    exprt op0_offset=from_integer(0, index_type());
     if(clean_code.op0().id()==byte_extract_id() &&
        clean_code.op0().type().id()==ID_empty)
+    {
+      op0_offset=to_byte_extract_expr(clean_code.op0()).offset();
       clean_code.op0()=clean_code.op0().op0();
+    }
     clean_expr(clean_code.op1(), state, false);
+    exprt op1_offset=from_integer(0, index_type());
     if(clean_code.op1().id()==byte_extract_id() &&
        clean_code.op1().type().id()==ID_empty)
+    {
+      op1_offset=to_byte_extract_expr(clean_code.op1()).offset();
       clean_code.op1()=clean_code.op1().op0();
+    }
 
     process_array_expr(clean_code.op0());
     clean_expr(clean_code.op0(), state, true);
@@ -109,23 +117,45 @@ void goto_symext::symex_other(
 
 
     if(!base_type_eq(clean_code.op0().type(),
-                     clean_code.op1().type(), ns))
+                     clean_code.op1().type(), ns) ||
+       !op0_offset.is_zero() || !op1_offset.is_zero())
     {
       byte_extract_exprt be(byte_extract_id());
-      be.offset()=from_integer(0, index_type());
 
       if(statement==ID_array_copy)
       {
         be.op()=clean_code.op1();
+        be.offset()=op1_offset;
         be.type()=clean_code.op0().type();
         clean_code.op1()=be;
+
+        if(!op0_offset.is_zero())
+        {
+          byte_extract_exprt op0(
+            byte_extract_id(),
+            clean_code.op0(),
+            op0_offset,
+            clean_code.op0().type());
+          clean_code.op0()=op0;
+        }
       }
       else
       {
         // ID_array_replace
         be.op()=clean_code.op0();
+        be.offset()=op0_offset;
         be.type()=clean_code.op1().type();
         clean_code.op0()=be;
+
+        if(!op1_offset.is_zero())
+        {
+          byte_extract_exprt op1(
+            byte_extract_id(),
+            clean_code.op1(),
+            op1_offset,
+            clean_code.op1().type());
+          clean_code.op1()=op1;
+        }
       }
     }
 

@@ -76,7 +76,7 @@ json_objectt show_goto_functions_jsont::convert(
         instruction_entry["instruction"]=
           json_stringt(instruction_builder.str());
 
-        if(instruction.code.operands().size()>0)
+        if(!instruction.code.operands().empty())
         {
           json_arrayt operand_array;
           for(const exprt &operand : instruction.code.operands())

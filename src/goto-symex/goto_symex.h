@@ -155,6 +155,16 @@ protected:
   irep_idt guard_identifier;
 
   // symex
+  virtual void symex_transition(
+    statet &state,
+    goto_programt::const_targett to,
+    bool is_backwards_goto=false);
+  virtual void symex_transition(statet &state)
+  {
+    goto_programt::const_targett next=state.source.pc;
+    ++next;
+    symex_transition(state, next);
+  }
 
   virtual void symex_goto(statet &state);
   virtual void symex_start_thread(statet &state);

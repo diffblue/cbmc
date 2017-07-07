@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/simplify_expr.h>
 
 #include <linking/zero_initializer.h>
 
@@ -1496,8 +1497,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
       typet element_type=data_ptr.type().subtype();
       const dereference_exprt element(data_plus_offset, element_type);
 
-      c=code_assignt(element, op[2]);
-      c.add_source_location()=i_it->source_location;
+      code_blockt block;
+      block.add_source_location()=i_it->source_location;
+
+      save_stack_entries(
+        "stack_astore",
+        element_type,
+        block,
+        bytecode_write_typet::ARRAY_REF,
+        "");
+
+      code_assignt array_put(element, op[2]);
+      array_put.add_source_location()=i_it->source_location;
+      block.move_to_operands(array_put);
+      c=block;
     }
     else if(statement==patternt("?store"))
     {
@@ -1506,12 +1519,24 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       exprt var=
         variable(arg0, statement[0], i_it->address, NO_CAST);
+      const irep_idt &var_name=to_symbol_expr(var).get_identifier();
 
       exprt toassign=op[0];
       if('a'==statement[0] && toassign.type()!=var.type())
         toassign=typecast_exprt(toassign, var.type());
 
-      c=code_assignt(var, toassign);
+      code_blockt block;
+
+      save_stack_entries(
+        "stack_store",
+        toassign.type(),
+        block,
+        bytecode_write_typet::VARIABLE,
+        var_name);
+      code_assignt assign(var, toassign);
+      assign.add_source_location()=i_it->source_location;
+      block.copy_to_operands(assign);
+      c=block;
     }
     else if(statement==patternt("?aload"))
     {
@@ -1673,7 +1698,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?ipush"))
     {
       assert(results.size()==1);
-      results[0]=typecast_exprt(arg0, java_int_type());
+      mp_integer int_value;
+      bool ret=to_integer(to_constant_expr(arg0), int_value);
+      INVARIANT(!ret, "?ipush argument should be an integer");
+      results[0]=from_integer(int_value, java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
@@ -1756,13 +1784,25 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="iinc")
     {
+      code_blockt block;
+      block.add_source_location()=i_it->source_location;
+      // search variable on stack
+      const exprt &locvar=variable(arg0, 'i', i_it->address, NO_CAST);
+      save_stack_entries(
+        "stack_iinc",
+        java_int_type(),
+        block,
+        bytecode_write_typet::VARIABLE,
+        to_symbol_expr(locvar).get_identifier());
+
       code_assignt code_assign;
       code_assign.lhs()=
         variable(arg0, 'i', i_it->address, NO_CAST);
       code_assign.rhs()=plus_exprt(
         variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
         typecast_exprt(arg1, java_int_type()));
-      c=code_assign;
+      block.copy_to_operands(code_assign);
+      c=block;
     }
     else if(statement==patternt("?xor"))
     {
@@ -2001,8 +2041,16 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement=="putfield")
     {
-      assert(op.size()==2 && results.size()==0);
-      c=code_assignt(to_member(op[0], arg0), op[1]);
+      assert(op.size()==2 && results.empty());
+      code_blockt block;
+      save_stack_entries(
+        "stack_field",
+        op[1].type(),
+        block,
+        bytecode_write_typet::FIELD,
+        arg0.get(ID_component_name));
+      block.copy_to_operands(code_assignt(to_member(op[0], arg0), op[1]));
+      c=block;
     }
     else if(statement=="putstatic")
     {
@@ -2015,15 +2063,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
         lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
-      c=code_assignt(symbol_expr, op[0]);
+
+      code_blockt block;
+      block.add_source_location()=i_it->source_location;
+
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
-      {
-        code_blockt ret_block;
-        ret_block.move_to_operands(clinit_call);
-        ret_block.move_to_operands(c);
-        c=std::move(ret_block);
-      }
+        block.move_to_operands(clinit_call);
+
+      save_stack_entries(
+        "stack_static_field",
+        symbol_expr.type(),
+        block,
+        bytecode_write_typet::STATIC_FIELD,
+        symbol_expr.get_identifier());
+      block.copy_to_operands(code_assignt(symbol_expr, op[0]));
+      c=block;
     }
     else if(statement==patternt("?2?")) // i2c etc.
     {
@@ -2042,6 +2097,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       const exprt tmp=tmp_variable("new", ref_type);
       c=code_assignt(tmp, java_new_expr);
+      c.add_source_location()=i_it->source_location;
       codet clinit_call=
         get_clinit_call(to_symbol_type(arg0.type()).get_identifier());
       if(clinit_call.get_statement()!=ID_skip)
@@ -2160,7 +2216,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="tableswitch" ||
             statement=="lookupswitch")
     {
-      assert(op.size()==1 && results.size()==0);
+      assert(op.size()==1 && results.empty());
 
       // we turn into switch-case
       code_switcht code_switch;
@@ -2513,7 +2569,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_labelt newlabel(label(std::to_string(address)), code_blockt());
       root_block.move_to_operands(newlabel);
       root.branch.push_back(block_tree_nodet::get_leaf());
-      assert((root.branch_addresses.size()==0 ||
+      assert((root.branch_addresses.empty() ||
               root.branch_addresses.back()<address) &&
              "Block addresses should be unique and increasing");
       root.branch_addresses.push_back(address);
@@ -2672,3 +2728,58 @@ const bool java_bytecode_convert_methodt::is_method_inherited(
   return false;
 }
 
+/// create temporary variables if a write instruction can have undesired
+/// side-effects
+void java_bytecode_convert_methodt::save_stack_entries(
+  const std::string &tmp_var_prefix,
+  const typet &tmp_var_type,
+  code_blockt &block,
+  const bytecode_write_typet write_type,
+  const irep_idt &identifier)
+{
+  for(auto &stack_entry : stack)
+  {
+    // remove typecasts if existing
+    while(stack_entry.id()==ID_typecast)
+      stack_entry=to_typecast_expr(stack_entry).op();
+
+    // variables or static fields and symbol -> save symbols with same id
+    if((write_type==bytecode_write_typet::VARIABLE ||
+        write_type==bytecode_write_typet::STATIC_FIELD) &&
+       stack_entry.id()==ID_symbol)
+    {
+      const symbol_exprt &var=to_symbol_expr(stack_entry);
+      if(var.get_identifier()==identifier)
+        create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+    }
+
+    // array reference and dereference -> save all references on the stack
+    else if(write_type==bytecode_write_typet::ARRAY_REF &&
+            stack_entry.id()==ID_dereference)
+      create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+
+    // field and member access -> compare component name
+    else if(write_type==bytecode_write_typet::FIELD &&
+            stack_entry.id()==ID_member)
+    {
+      const irep_idt &entry_id=
+        to_member_expr(stack_entry).get_component_name();
+      if(entry_id==identifier)
+        create_stack_tmp_var(tmp_var_prefix, tmp_var_type, block, stack_entry);
+    }
+  }
+}
+
+/// actually create a temporary variable to hold the value of a stack
+/// entry
+void java_bytecode_convert_methodt::create_stack_tmp_var(
+  const std::string &tmp_var_prefix,
+  const typet &tmp_var_type,
+  code_blockt &block,
+  exprt &stack_entry)
+{
+  const exprt tmp_var=
+    tmp_variable(tmp_var_prefix, tmp_var_type);
+  block.copy_to_operands(code_assignt(tmp_var, stack_entry));
+  stack_entry=tmp_var;
+}

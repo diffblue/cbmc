@@ -95,6 +95,9 @@ exprt to_expr(
 {
   std::unique_ptr<languaget> p(get_language(ns, identifier));
 
+  null_message_handlert null_message_handler;
+  p->set_message_handler(null_message_handler);
+
   const symbolt &symbol=ns.lookup(identifier);
 
   exprt expr;

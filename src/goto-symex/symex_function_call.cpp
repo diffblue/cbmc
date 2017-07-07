@@ -254,7 +254,7 @@ void goto_symext::symex_function_call_code(
       state.guard.add(false_exprt());
     }
 
-    state.source.pc++;
+    symex_transition(state);
     return;
   }
 
@@ -276,7 +276,7 @@ void goto_symext::symex_function_call_code(
       symex_assign_rec(state, code);
     }
 
-    state.source.pc++;
+    symex_transition(state);
     return;
   }
 
@@ -314,7 +314,7 @@ void goto_symext::symex_function_call_code(
   frame.loop_iterations[identifier].count++;
 
   state.source.is_set=true;
-  state.source.pc=goto_function.body.instructions.begin();
+  symex_transition(state, goto_function.body.instructions.begin());
 }
 
 /// pop one call frame
@@ -326,7 +326,7 @@ void goto_symext::pop_frame(statet &state)
     statet::framet &frame=state.top();
 
     // restore program counter
-    state.source.pc=frame.calling_location.pc;
+    symex_transition(state, frame.calling_location.pc);
 
     // restore L1 renaming
     state.level1.restore_from(frame.old_level1);

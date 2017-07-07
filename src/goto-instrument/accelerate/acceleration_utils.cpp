@@ -573,7 +573,7 @@ bool acceleration_utilst::do_arrays(
             << " array assignments\n";
 #endif
 
-  if(array_assignments.size()==0)
+  if(array_assignments.empty())
   {
     // The loop doesn't write to any arrays.  We're done!
     return true;

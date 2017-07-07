@@ -466,7 +466,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         {
           is_virtual=true;
           const code_typet &code_type=to_code_type(comp.type());
-          assert(code_type.parameters().size()>0);
+          assert(!code_type.parameters().empty());
           const typet &pointer_type=code_type.parameters()[0].type();
           assert(pointer_type.id()==ID_pointer);
           virtual_bases.insert(pointer_type.subtype().get(ID_identifier));
