@@ -305,6 +305,7 @@ codet java_bytecode_instrumentt::check_array_length(
 void java_bytecode_instrumentt::instrument_code(exprt &expr)
 {
   codet &code=to_code(expr);
+  source_locationt old_source_location=code.source_location();
 
   const irep_idt &statement=code.get_statement();
 
@@ -408,6 +409,10 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
     block.copy_to_operands(code);
     code=block;
   }
+
+  // Ensure source location is retained:
+  if(!old_source_location.get_line().empty())
+    merge_source_location_rec(code, old_source_location);
 }
 
 /// Computes the instrumentation for `expr` in the form of
