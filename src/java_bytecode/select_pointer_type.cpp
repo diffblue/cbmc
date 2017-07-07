@@ -43,7 +43,8 @@ pointer_typet select_pointer_typet::operator()(
   return resolved_type;
 }
 
-/// Find out whether a pointer is pointing to an abstract class or interface
+/// Find out whether a pointer is pointing to an abstract type (either an
+/// abstract class or an interface).
 /// \param pointer_type: The type of the pointer
 /// \return True if the type pointed to is either an abstract class or an
 ///   interface.
@@ -51,16 +52,15 @@ bool select_pointer_typet::is_abstract_type(
   const pointer_typet &pointer_type) const
 {
   const typet &pointing_to_type=ns.follow(pointer_type.subtype());
-
-  // void* pointers should be not considered abstract
-  // These happen in Java when initializing the exeception value.
-  if(pointing_to_type.id()==ID_empty)
+  if(pointing_to_type.id()==ID_struct)
+  {
+    const class_typet &class_type=to_class_type(pointing_to_type);
+    return class_type.is_class() && class_type.is_abstract();
+  }
+  else
+  {
+    // we are dealing with some other type that a reference to a polymorphic
+    // class so therefore we are definitely not abstract
     return false;
-
-  INVARIANT(
-    pointing_to_type.id()==ID_struct,
-    "All pointers in Java should be to classes");
-
-  const class_typet &class_type=to_class_type(pointing_to_type);
-  return class_type.is_class() && class_type.is_abstract();
+  }
 }
