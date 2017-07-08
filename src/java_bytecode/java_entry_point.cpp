@@ -130,25 +130,6 @@ void java_static_lifetime_init(
       }
     }
   }
-
-  // we now need to run all the <clinit> methods
-
-  for(symbol_tablet::symbolst::const_iterator
-      it=symbol_table.symbols.begin();
-      it!=symbol_table.symbols.end();
-      it++)
-  {
-    if(it->second.base_name=="<clinit>" &&
-       it->second.type.id()==ID_code &&
-       it->second.mode==ID_java)
-    {
-      code_function_callt function_call;
-      function_call.lhs()=nil_exprt();
-      function_call.function()=it->second.symbol_expr();
-      function_call.add_source_location()=source_location;
-      code_block.add(function_call);
-    }
-  }
 }
 
 exprt::operandst java_build_arguments(
@@ -239,7 +220,8 @@ void java_record_outputs(
     codet output(ID_output);
     output.operands().resize(2);
 
-    const symbolt &return_symbol=symbol_table.lookup("return'");
+    const symbolt &return_symbol=
+      symbol_table.lookup(JAVA_ENTRY_POINT_RETURN_SYMBOL);
 
     output.op0()=
       address_of_exprt(
@@ -540,9 +522,9 @@ bool java_entry_point(
   if(to_code_type(symbol.type).return_type()!=empty_typet())
   {
     auxiliary_symbolt return_symbol;
-    return_symbol.mode=ID_C;
+    return_symbol.mode=ID_java;
     return_symbol.is_static_lifetime=false;
-    return_symbol.name="return'";
+    return_symbol.name=JAVA_ENTRY_POINT_RETURN_SYMBOL;
     return_symbol.base_name="return";
     return_symbol.type=to_code_type(symbol.type).return_type();
 
@@ -550,14 +532,17 @@ bool java_entry_point(
     call_main.lhs()=return_symbol.symbol_expr();
   }
 
-  // add the exceptional return value
-  auxiliary_symbolt exc_symbol;
-  exc_symbol.mode=ID_C;
-  exc_symbol.is_static_lifetime=false;
-  exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
-  exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
-  exc_symbol.type=typet(ID_pointer, empty_typet());
-  symbol_table.add(exc_symbol);
+  if(!symbol_table.has_symbol(id2string(symbol.name)+EXC_SUFFIX))
+  {
+    // add the exceptional return value
+    auxiliary_symbolt exc_symbol;
+    exc_symbol.mode=ID_java;
+    exc_symbol.is_static_lifetime=true;
+    exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
+    exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
+    exc_symbol.type=typet(ID_pointer, empty_typet());
+    symbol_table.add(exc_symbol);
+  }
 
   exprt::operandst main_arguments=
     java_build_arguments(

@@ -279,6 +279,9 @@ void java_bytecode_parsert::rClassFile()
 
   parsed_class.is_abstract=(access_flags&ACC_ABSTRACT)!=0;
   parsed_class.is_enum=(access_flags&ACC_ENUM)!=0;
+  parsed_class.is_public=(access_flags&ACC_PUBLIC)!=0;
+  parsed_class.is_protected=(access_flags&ACC_PROTECTED)!=0;
+  parsed_class.is_private=(access_flags&ACC_PRIVATE)!=0;
   parsed_class.name=
     constant(this_class).type().get(ID_C_base_name);
 

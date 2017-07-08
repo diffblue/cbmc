@@ -49,7 +49,7 @@ literalt arrayst::record_array_equality(
   // check types
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
-    std::cout << equality.pretty() << '\n';
+    prop.error() << equality.pretty() << messaget::eom;
     throw "record_array_equality got equality without matching types";
   }
 
@@ -115,7 +115,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << '\n';
+      prop.error() << a.pretty() << messaget::eom;
       throw "collect_arrays got 'with' without matching types";
     }
 
@@ -137,7 +137,7 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op0().type(), ns))
     {
-      std::cout << a.pretty() << '\n';
+      prop.error() << a.pretty() << messaget::eom;
       throw "collect_arrays got 'update' without matching types";
     }
 
@@ -161,14 +161,14 @@ void arrayst::collect_arrays(const exprt &a)
     // check types
     if(!base_type_eq(array_type, a.op1().type(), ns))
     {
-      std::cout << a.pretty() << '\n';
+      prop.error() << a.pretty() << messaget::eom;
       throw "collect_arrays got if without matching types";
     }
 
     // check types
     if(!base_type_eq(array_type, a.op2().type(), ns))
     {
-      std::cout << a.pretty() << '\n';
+      prop.error() << a.pretty() << messaget::eom;
       throw "collect_arrays got if without matching types";
     }
 
@@ -535,8 +535,8 @@ void arrayst::add_array_constraints_with(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << '\n';
-      assert(false);
+      prop.error() << expr.pretty() << messaget::eom;
+      throw "index_expr and value types should match";
     }
 
     lazy_constraintt lazy(
@@ -619,8 +619,8 @@ void arrayst::add_array_constraints_update(
 
     if(index_expr.type()!=value.type())
     {
-      std::cout << expr.pretty() << '\n';
-      assert(false);
+      prop.error() << expr.pretty() << messaget::eom;
+      throw "index_expr and value types should match";
     }
 
     set_to_true(equal_exprt(index_expr, value));

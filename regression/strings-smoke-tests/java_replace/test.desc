@@ -1,0 +1,10 @@
+FUTURE
+test_replace.class
+--refine-strings --string-max-length 100
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+diffblue/test-gen#256
+This test is only effective with a model of
+java.lang.String.replace(LCharSequence; LCharSequence).

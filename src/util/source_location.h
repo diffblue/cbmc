@@ -75,6 +75,11 @@ public:
     return get(ID_java_bytecode_index);
   }
 
+  const irep_idt &get_basic_block_covered_lines() const
+  {
+    return get(ID_basic_block_covered_lines);
+  }
+
   void set_file(const irep_idt &file)
   {
     set(ID_file, file);
@@ -130,6 +135,11 @@ public:
     set(ID_java_bytecode_index, index);
   }
 
+  void set_basic_block_covered_lines(const irep_idt &covered_lines)
+  {
+    return set(ID_basic_block_covered_lines, covered_lines);
+  }
+
   void set_hide()
   {
     set(ID_hide, true);
@@ -151,6 +161,10 @@ public:
   {
     return is_built_in(id2string(get_file()));
   }
+
+  /// Set all unset source-location fields in this object to their values in
+  /// 'from'. Leave set fields in this object alone.
+  void merge(const source_locationt &from);
 
   static const source_locationt &nil()
   {

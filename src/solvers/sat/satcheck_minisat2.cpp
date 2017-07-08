@@ -11,6 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <inttypes.h>
 #endif
 
+#include <signal.h>
+#include <unistd.h>
+
 #include <cassert>
 #include <stack>
 
@@ -113,6 +116,17 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   clause_counter++;
 }
 
+#ifndef _WIN32
+
+static Minisat::Solver *solver_to_interrupt=nullptr;
+
+static void interrupt_solver(int signum)
+{
+  solver_to_interrupt->interrupt();
+}
+
+#endif
+
 template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
@@ -152,7 +166,45 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         Minisat::vec<Minisat::Lit> solver_assumptions;
         convert(assumptions, solver_assumptions);
 
-        if(solver->solve(solver_assumptions))
+        using Minisat::lbool;
+
+#ifndef _WIN32
+
+        void (*old_handler)(int)=SIG_ERR;
+
+        if(time_limit_seconds!=0)
+        {
+          solver_to_interrupt=solver;
+          old_handler=signal(SIGALRM, interrupt_solver);
+          if(old_handler==SIG_ERR)
+            warning() << "Failed to set solver time limit" << eom;
+          else
+            alarm(time_limit_seconds);
+        }
+
+        lbool solver_result=solver->solveLimited(solver_assumptions);
+
+        if(old_handler!=SIG_ERR)
+        {
+          alarm(0);
+          signal(SIGALRM, old_handler);
+          solver_to_interrupt=solver;
+        }
+
+#else // _WIN32
+
+        if(time_limit_seconds!=0)
+        {
+          messaget::warning() <<
+            "Time limit ignored (not supported on Win32 yet)" << messaget::eom;
+        }
+
+        lbool solver_result=
+          solver->solve(solver_assumptions) ? l_True : l_False;
+
+#endif
+
+        if(solver_result==l_True)
         {
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
@@ -160,10 +212,17 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }
-        else
+        else if(solver_result==l_False)
         {
           messaget::status() <<
             "SAT checker: instance is UNSATISFIABLE" << eom;
+        }
+        else
+        {
+          messaget::status() <<
+            "SAT checker: timed out or other error" << eom;
+          status=statust::ERROR;
+          return resultt::P_ERROR;
         }
       }
     }
@@ -196,7 +255,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 
 template<typename T>
 satcheck_minisat2_baset<T>::satcheck_minisat2_baset(T *_solver):
-  solver(_solver)
+  solver(_solver), time_limit_seconds(0)
 {
 }
 

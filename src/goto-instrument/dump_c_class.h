@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/language.h>
 
 #include <langapi/mode.h>
+#include <goto-programs/system_library_symbols.h>
 
 class dump_ct
 {
@@ -31,11 +32,11 @@ public:
     goto_functions(_goto_functions),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
-    language(factory()),
-    use_all_headers(use_all_headers)
+    language(factory())
   {
     if(use_system_headers)
-      init_system_library_map();
+      system_symbols=system_library_symbolst();
+    system_symbols.set_use_all_headers(use_all_headers);
   }
 
   virtual ~dump_ct()
@@ -50,16 +51,13 @@ protected:
   symbol_tablet copied_symbol_table;
   const namespacet ns;
   languaget *language;
-  const bool use_all_headers;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
 
-  typedef std::unordered_map<irep_idt, std::string, irep_id_hash>
-    system_library_mapt;
-  system_library_mapt system_library_map;
+  system_library_symbolst system_symbols;
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
     declared_enum_constants_mapt;
@@ -84,13 +82,8 @@ protected:
   typedef std::unordered_map<typet, irep_idt, irep_hash> typedef_typest;
   typedef_typest typedef_types;
 
-  void init_system_library_map();
-
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);
-
-  bool ignore(const symbolt &symbol);
-  bool ignore(const typet &type);
 
   static std::string indent(const unsigned n)
   {

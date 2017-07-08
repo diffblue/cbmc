@@ -62,6 +62,15 @@ std::string source_locationt::as_string(bool print_cwd) const
   return dest;
 }
 
+void source_locationt::merge(const source_locationt &from)
+{
+  forall_named_irep(it, from.get_named_sub())
+  {
+    if(get(it->first).empty())
+      set(it->first, it->second);
+  }
+}
+
 std::ostream &operator << (
   std::ostream &out,
   const source_locationt &source_location)

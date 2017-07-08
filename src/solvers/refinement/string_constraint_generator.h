@@ -20,29 +20,29 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
+#include <limits>
 #include <util/string_expr.h>
-#include <solvers/refinement/refined_string_type.h>
+#include <util/replace_expr.h>
+#include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
 class string_constraint_generatort
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
-  // string constraints for different string funcitons and add them
+  // string constraints for different string functions and add them
   // to the axiom list.
 
   string_constraint_generatort():
-    mode(ID_unknown)
+    max_string_length(std::numeric_limits<size_t>::max()),
+    force_printable_characters(false)
   { }
 
-  void set_mode(irep_idt _mode)
-  {
-    // only C and java modes supported
-    assert((_mode==ID_java) || (_mode==ID_C));
-    mode=_mode;
-  }
+  // Constraints on the maximal length of strings
+  size_t max_string_length;
 
-  irep_idt &get_mode() { return mode; }
+  // Should we add constraints on the characters
+  bool force_printable_characters;
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
@@ -72,21 +72,22 @@ public:
   symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);
+  string_exprt get_string_expr(const exprt &expr);
+  string_exprt convert_java_string_to_string_exprt(
+    const exprt &underlying);
+  plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
-  // We maintain a map from symbols to strings.
-  std::map<irep_idt, string_exprt> symbol_to_string;
+  // Maps unresolved symbols to the string_exprt that was created for them
+  std::map<irep_idt, string_exprt> unresolved_symbols;
 
-  string_exprt find_or_add_string_of_symbol(const symbol_exprt &sym);
+  // Set of strings that have been created by the generator
+  std::set<string_exprt> created_strings;
 
-  void assign_to_symbol(
-    const symbol_exprt &sym, const string_exprt &expr)
-  {
-    symbol_to_string[sym.get_identifier()]=expr;
-  }
+  string_exprt find_or_add_string_of_symbol(
+    const symbol_exprt &sym,
+    const refined_string_typet &ref_type);
 
-  string_exprt add_axioms_for_string_expr(const exprt &expr);
-  void set_string_symbol_equal_to_expr(
-    const symbol_exprt &sym, const exprt &str);
+  string_exprt add_axioms_for_refined_string(const exprt &expr);
 
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
@@ -103,8 +104,11 @@ private:
   const std::size_t MAX_FLOAT_LENGTH=15;
   const std::size_t MAX_DOUBLE_LENGTH=30;
 
+  std::map<function_application_exprt, exprt> function_application_cache;
+
   static irep_idt extract_java_string(const symbol_exprt &s);
 
+  void add_default_axioms(const string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
 
   // The following functions add axioms for the returned value
@@ -124,6 +128,9 @@ private:
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
   exprt add_axioms_for_hash_code(const function_application_exprt &f);
+  // To each string on which hash_code was called we associate a symbol
+  // representing the return value of the hash_code function.
+  std::map<string_exprt, exprt> hash_code_of_string;
 
   exprt add_axioms_for_is_empty(const function_application_exprt &f);
   exprt add_axioms_for_is_prefix(
@@ -138,11 +145,18 @@ private:
   string_exprt add_axioms_for_copy(const function_application_exprt &f);
   string_exprt add_axioms_for_concat(
     const string_exprt &s1, const string_exprt &s2);
+  string_exprt add_axioms_for_concat_substr(
+    const string_exprt &s1,
+    const string_exprt &s2,
+    const exprt &start_index,
+    const exprt &end_index);
   string_exprt add_axioms_for_concat(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_int(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_long(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_bool(const function_application_exprt &f);
   string_exprt add_axioms_for_concat_char(const function_application_exprt &f);
+  string_exprt add_axioms_for_concat_char(
+    const string_exprt &string_expr, const exprt &char_expr);
   string_exprt add_axioms_for_concat_double(
     const function_application_exprt &f);
   string_exprt add_axioms_for_concat_float(const function_application_exprt &f);
@@ -194,24 +208,18 @@ private:
     const exprt &from_index);
 
   // Add axioms corresponding to the String.indexOf:(String;I) java function
-  // TODO: the specifications are only partial:
-  // we add axioms stating that the returned value is either -1 or greater than
-  // from_index and the string beggining there has prefix substring
   exprt add_axioms_for_index_of_string(
-    const string_exprt &str,
-    const string_exprt &substring,
+    const string_exprt &haystack,
+    const string_exprt &needle,
     const exprt &from_index);
 
   // Add axioms corresponding to the String.indexOf java functions
-  // TODO: the specifications are only partial for the ones that look for
-  // strings
   exprt add_axioms_for_index_of(const function_application_exprt &f);
 
   // Add axioms corresponding to the String.lastIndexOf:(String;I) java function
-  // TODO: the specifications are only partial
   exprt add_axioms_for_last_index_of_string(
-    const string_exprt &str,
-    const string_exprt &substring,
+    const string_exprt &haystack,
+    const string_exprt &needle,
     const exprt &from_index);
 
   // Add axioms corresponding to the String.lastIndexOf:(CI) java function
@@ -221,7 +229,6 @@ private:
     const exprt &from_index);
 
   // Add axioms corresponding to the String.lastIndexOf java functions
-  // TODO: the specifications is only partial
   exprt add_axioms_for_last_index_of(const function_application_exprt &f);
 
   // TODO: the specifications of these functions is only partial
@@ -229,9 +236,17 @@ private:
   // and minus infinity the string are "Infinity" and "-Infinity respectively
   // otherwise the string contains only characters in [0123456789.] and '-' at
   // the start for negative number
-  string_exprt add_axioms_from_float(const function_application_exprt &f);
-  string_exprt add_axioms_from_float(
-    const exprt &f, bool double_precision=false);
+  string_exprt add_axioms_for_string_of_float(
+    const function_application_exprt &f);
+  string_exprt add_axioms_for_string_of_float(
+    const exprt &f, const refined_string_typet &ref_type);
+
+  string_exprt add_axioms_for_fractional_part(
+    const exprt &i, size_t max_size, const refined_string_typet &ref_type);
+  string_exprt add_axioms_from_float_scientific_notation(
+    const exprt &f, const refined_string_typet &ref_type);
+  string_exprt add_axioms_from_float_scientific_notation(
+    const function_application_exprt &f);
 
   // Add axioms corresponding to the String.valueOf(D) java function
   // TODO: the specifications is only partial
@@ -260,6 +275,7 @@ private:
   string_exprt add_axioms_for_code_point(
     const exprt &code_point, const refined_string_typet &ref_type);
   string_exprt add_axioms_for_java_char_array(const exprt &char_array);
+  exprt add_axioms_for_char_pointer(const function_application_exprt &fun);
   string_exprt add_axioms_for_if(const if_exprt &expr);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);
 
@@ -277,6 +293,8 @@ private:
     const function_application_exprt &f);
 
   exprt add_axioms_for_parse_int(const function_application_exprt &f);
+  exprt add_axioms_for_correct_number_format(
+    const string_exprt &str, const exprt &radix, std::size_t max_size=10);
   exprt add_axioms_for_to_char_array(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
 
@@ -284,6 +302,9 @@ private:
   // TODO: this does not work at the moment because of the way we treat
   // string pointers
   symbol_exprt add_axioms_for_intern(const function_application_exprt &f);
+
+  // Pool used for the intern method
+  std::map<string_exprt, symbol_exprt> intern_of_string;
 
   // Tells which language is used. C and Java are supported
   irep_idt mode;
@@ -297,17 +318,18 @@ private:
     return args;
   }
 
+private:
+  // Helper functions
   exprt int_of_hex_char(const exprt &chr) const;
   exprt is_high_surrogate(const exprt &chr) const;
   exprt is_low_surrogate(const exprt &chr) const;
-  static exprt character_equals_ignore_case(
+  exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
-
-  // Pool used for the intern method
-  std::map<string_exprt, symbol_exprt> pool;
-
-  // Used to determine whether hashcode should be equal
-  std::map<string_exprt, symbol_exprt> hash;
+  bool is_constant_string(const string_exprt &expr) const;
 };
+
+exprt is_digit_with_radix(exprt chr, exprt radix);
+exprt get_numeric_value_from_character(
+  const exprt &chr, const typet &char_type, const typet &type);
 
 #endif

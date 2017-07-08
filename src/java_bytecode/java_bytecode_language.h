@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 
 #include "java_class_loader.h"
-#include "character_refine_preprocess.h"
+#include "java_string_library_preprocess.h"
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 
@@ -50,7 +50,9 @@ public:
     symbol_tablet &context,
     const std::string &module) override;
 
-  bool final(
+  void replace_string_methods(symbol_tablet &context);
+
+  virtual bool final(
     symbol_tablet &context) override;
 
   void show_parse(std::ostream &out) override;
@@ -101,7 +103,8 @@ protected:
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
-  character_refine_preprocesst character_preprocess;
+  bool throw_runtime_exceptions;
+  java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
 };
 

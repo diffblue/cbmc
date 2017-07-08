@@ -1701,6 +1701,10 @@ void goto_checkt::goto_check(
 
         if(!it->source_location.get_column().empty())
           i_it->source_location.set_column(it->source_location.get_column());
+
+        if(it->source_location.get_java_bytecode_index()!=irep_idt())
+          i_it->source_location.set_java_bytecode_index(
+            it->source_location.get_java_bytecode_index());
       }
 
       if(i_it->function.empty())

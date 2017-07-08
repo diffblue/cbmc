@@ -1,0 +1,7 @@
+CORE
+Test.class
+--cover location --trace --json-ui
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring

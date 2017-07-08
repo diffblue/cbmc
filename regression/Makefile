@@ -3,9 +3,11 @@ DIRS = ansi-c \
        cbmc \
        cpp \
        cbmc-java \
+       cbmc-java-inheritance \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
+       strings-smoke-tests \
        test-script \
        # Empty last line
 

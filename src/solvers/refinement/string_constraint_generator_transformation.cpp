@@ -24,28 +24,35 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 string_exprt string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
 {
-  string_exprt s1=add_axioms_for_string_expr(args(f, 2)[0]);
+  string_exprt s1=get_string_expr(args(f, 2)[0]);
   exprt k=args(f, 2)[1];
   const refined_string_typet &ref_type=to_refined_string_type(s1.type());
   string_exprt res=fresh_string(ref_type);
 
   // We add axioms:
   // a1 : |res|=k
-  // a2 : forall i<k. (i<k ==> s[i]=s1[i]) &&(i >= k ==> s[i]=0)
+  // a2 : forall i<|s1|. i < |res|  ==> res[i] = s1[i]
+  // a3 : forall i<|s1|. i >= |res| ==> res[i] = 0
 
   axioms.push_back(res.axiom_for_has_length(k));
 
   symbol_exprt idx=fresh_univ_index(
     "QA_index_set_length", ref_type.get_index_type());
   string_constraintt a2(
-    idx, k, and_exprt(
-      implies_exprt(
-        s1.axiom_for_is_strictly_longer_than(idx),
-        equal_exprt(s1[idx], res[idx])),
-      implies_exprt(
-        s1.axiom_for_is_shorter_than(idx),
-        equal_exprt(s1[idx], constant_char(0, ref_type.get_char_type())))));
+    idx,
+    s1.length(),
+    res.axiom_for_is_strictly_longer_than(idx),
+    equal_exprt(s1[idx], res[idx]));
   axioms.push_back(a2);
+
+  symbol_exprt idx2=fresh_univ_index(
+    "QA_index_set_length2", ref_type.get_index_type());
+  string_constraintt a3(
+    idx2,
+    s1.length(),
+    res.axiom_for_is_shorter_than(idx2),
+    equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type())));
+  axioms.push_back(a3);
 
   return res;
 }
@@ -63,7 +70,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   assert(args.size()>=2);
-  string_exprt str=add_axioms_for_string_expr(args[0]);
+  string_exprt str=get_string_expr(args[0]);
   exprt i(args[1]);
   exprt j;
   if(args.size()==3)
@@ -89,7 +96,6 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 {
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &index_type=ref_type.get_index_type();
-  symbol_exprt idx=fresh_exist_index("index_substring", index_type);
   assert(start.type()==index_type);
   assert(end.type()==index_type);
   string_exprt res=fresh_string(ref_type);
@@ -112,8 +118,11 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   // Warning: check what to do if the string is not long enough
   axioms.push_back(str.axiom_for_is_longer_than(end));
 
-  string_constraintt a4(
-    idx, res.length(), equal_exprt(res[idx], str[plus_exprt(start, idx)]));
+  symbol_exprt idx=fresh_univ_index("QA_index_substring", index_type);
+  string_constraintt a4(idx,
+                        res.length(),
+                        equal_exprt(res[idx],
+                        str[plus_exprt(start, idx)]));
   axioms.push_back(a4);
   return res;
 }
@@ -124,7 +133,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
 string_exprt string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &index_type=ref_type.get_index_type();
   string_exprt res=fresh_string(ref_type);
@@ -143,7 +152,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   // a8 : forall n<|s1|, s[idx+n]=s1[n]
   // a9 : (s[m]>' ' &&s[m+|s1|-1]>' ') || m=|s|
 
-  exprt a1=str.axiom_for_is_longer_than(plus_exprt(idx, res.length()));
+  exprt a1=str.axiom_for_is_longer_than(
+    plus_exprt_with_overflow_check(idx, res.length()));
   axioms.push_back(a1);
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
@@ -165,7 +175,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   axioms.push_back(a6);
 
   symbol_exprt n2=fresh_univ_index("QA_index_trim2", index_type);
-  minus_exprt bound(str.length(), plus_exprt(idx, res.length()));
+  minus_exprt bound(str.length(), plus_exprt_with_overflow_check(idx,
+                                                                 res.length()));
   binary_relation_exprt eqn2(
     str[plus_exprt(idx, plus_exprt(res.length(), n2))],
     ID_le,
@@ -180,7 +191,8 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   axioms.push_back(a8);
 
   minus_exprt index_before(
-    plus_exprt(idx, res.length()), from_integer(1, index_type));
+    plus_exprt_with_overflow_check(idx, res.length()),
+      from_integer(1, index_type));
   binary_relation_exprt no_space_before(str[index_before], ID_gt, space_char);
   or_exprt a9(
     equal_exprt(idx, str.length()),
@@ -197,41 +209,63 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
 string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
   string_exprt res=fresh_string(ref_type);
-  exprt char_a=constant_char('a', char_type);
-  exprt char_A=constant_char('A', char_type);
-  exprt char_z=constant_char('z', char_type);
-  exprt char_Z=constant_char('Z', char_type);
+  const exprt char_A=constant_char('A', char_type);
+  const exprt char_Z=constant_char('Z', char_type);
 
-  // TODO: add support for locales using case mapping information
-  // from the UnicodeData file.
+
+  // TODO: for now, only characters in Basic Latin and Latin-1 supplement
+  // are supported (up to 0x100), we should add others using case mapping
+  // information from the UnicodeData file.
 
   // We add axioms:
   // a1 : |res| = |str|
-  // a2 : forall idx<str.length, 'A'<=str[idx]<='Z' => res[idx]=str[idx]+'a'-'A'
-  // a3 : forall idx<str.length, !('a'<=str[idx]<='z') => res[idx]=str[idx]
-  // forall idx<str.length,
-  // this[idx]='A'<=str[idx]<='Z' ? str[idx]+'a'-'A' : str[idx]
+  // a2 : forall idx<str.length,
+  //   is_upper_case(str[idx])?
+  //      res[idx]=str[idx]+diff : res[idx]=str[idx]<0x100
+  // where diff is the difference between lower case and upper case characters:
+  // diff = 'a'-'A' = 0x20
 
   exprt a1=res.axiom_for_has_same_length_as(str);
   axioms.push_back(a1);
 
   symbol_exprt idx=fresh_univ_index("QA_lower_case", index_type);
-  exprt is_upper_case=and_exprt(
+  exprt::operandst upper_case;
+  // Characters between 'A' and 'Z' are upper-case
+  upper_case.push_back(and_exprt(
     binary_relation_exprt(char_A, ID_le, str[idx]),
-    binary_relation_exprt(str[idx], ID_le, char_Z));
-  minus_exprt diff(char_a, char_A);
-  equal_exprt convert(res[idx], plus_exprt(str[idx], diff));
-  string_constraintt a2(idx, res.length(), is_upper_case, convert);
+    binary_relation_exprt(str[idx], ID_le, char_Z)));
+
+  // Characters between 0xc0 (latin capital A with grave)
+  // and 0xd6 (latin capital O with diaeresis) are upper-case
+  upper_case.push_back(and_exprt(
+    binary_relation_exprt(from_integer(0xc0, char_type), ID_le, str[idx]),
+    binary_relation_exprt(str[idx], ID_le, from_integer(0xd6, char_type))));
+
+  // Characters between 0xd8 (latin capital O with stroke)
+  // and 0xde (latin capital thorn) are upper-case
+  upper_case.push_back(and_exprt(
+    binary_relation_exprt(from_integer(0xd8, char_type), ID_le, str[idx]),
+    binary_relation_exprt(str[idx], ID_le, from_integer(0xde, char_type))));
+
+  exprt is_upper_case=disjunction(upper_case);
+
+  // The difference between upper-case and lower-case for the basic latin and
+  // latin-1 supplement is 0x20.
+  exprt diff=from_integer(0x20, char_type);
+  equal_exprt converted(res[idx], plus_exprt(str[idx], diff));
+  and_exprt non_converted(
+    equal_exprt(res[idx], str[idx]),
+    binary_relation_exprt(str[idx], ID_lt, from_integer(0x100, char_type)));
+  if_exprt conditional_convert(is_upper_case, converted, non_converted);
+
+  string_constraintt a2(idx, res.length(), conditional_convert);
   axioms.push_back(a2);
 
-  equal_exprt eq(res[idx], str[idx]);
-  string_constraintt a3(idx, res.length(), not_exprt(is_upper_case), eq);
-  axioms.push_back(a3);
   return res;
 }
 
@@ -241,7 +275,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
 string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const function_application_exprt &expr)
 {
-  string_exprt str=add_axioms_for_string_expr(args(expr, 1)[0]);
+  string_exprt str=get_string_expr(args(expr, 1)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -288,7 +322,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 string_exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   string_exprt res=fresh_string(ref_type);
   with_exprt sarrnew(str.content(), args(f, 3)[1], args(f, 3)[2]);
@@ -313,7 +347,7 @@ string_exprt string_constraint_generatort::add_axioms_for_char_set(
 string_exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const exprt &old_char=args(f, 3)[1];
   const exprt &new_char=args(f, 3)[2];
@@ -347,10 +381,12 @@ string_exprt string_constraint_generatort::add_axioms_for_replace(
 string_exprt string_constraint_generatort::add_axioms_for_delete_char_at(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 2)[0]);
+  string_exprt str=get_string_expr(args(f, 2)[0]);
   exprt index_one=from_integer(1, str.length().type());
   return add_axioms_for_delete(
-    str, args(f, 2)[1], plus_exprt(args(f, 2)[1], index_one));
+    str,
+    args(f, 2)[1],
+    plus_exprt_with_overflow_check(args(f, 2)[1], index_one));
 }
 
 /// add axioms stating that the returned string corresponds to the input one
@@ -376,6 +412,6 @@ string_exprt string_constraint_generatort::add_axioms_for_delete(
 string_exprt string_constraint_generatort::add_axioms_for_delete(
   const function_application_exprt &f)
 {
-  string_exprt str=add_axioms_for_string_expr(args(f, 3)[0]);
+  string_exprt str=get_string_expr(args(f, 3)[0]);
   return add_axioms_for_delete(str, args(f, 3)[1], args(f, 3)[2]);
 }

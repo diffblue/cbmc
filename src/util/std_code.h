@@ -1039,13 +1039,40 @@ class side_effect_expr_nondett:public side_effect_exprt
 public:
   side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
+    set_nullable(true);
   }
 
   explicit side_effect_expr_nondett(const typet &_type):
     side_effect_exprt(ID_nondet, _type)
   {
+    set_nullable(true);
+  }
+
+  void set_nullable(bool nullable)
+  {
+    set(ID_is_nondet_nullable, nullable);
+  }
+
+  bool get_nullable() const
+  {
+    return get_bool(ID_is_nondet_nullable);
   }
 };
+
+inline side_effect_expr_nondett &to_side_effect_expr_nondet(exprt &expr)
+{
+  auto &side_effect_expr_nondet=to_side_effect_expr(expr);
+  assert(side_effect_expr_nondet.get_statement()==ID_nondet);
+  return static_cast<side_effect_expr_nondett &>(side_effect_expr_nondet);
+}
+
+inline const side_effect_expr_nondett &to_side_effect_expr_nondet(
+  const exprt &expr)
+{
+  const auto &side_effect_expr_nondet=to_side_effect_expr(expr);
+  assert(side_effect_expr_nondet.get_statement()==ID_nondet);
+  return static_cast<const side_effect_expr_nondett &>(side_effect_expr_nondet);
+}
 
 /*! \brief A function call side effect
 */

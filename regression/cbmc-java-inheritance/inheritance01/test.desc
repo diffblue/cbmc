@@ -1,0 +1,5 @@
+CORE
+test.class
+--function test.check
+^EXIT=0$
+^SIGNAL=0$

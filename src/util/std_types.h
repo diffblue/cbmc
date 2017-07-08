@@ -362,35 +362,49 @@ public:
     return is_class()?ID_private:ID_public;
   }
 
-  const irept::subt &bases() const
+  class baset:public exprt
   {
-    return find(ID_bases).get_sub();
+  public:
+    baset():exprt(ID_base)
+    {
+    }
+
+    explicit baset(const typet &base):exprt(ID_base, base)
+    {
+    }
+  };
+
+  typedef std::vector<baset> basest;
+
+  const basest &bases() const
+  {
+    return (const basest &)find(ID_bases).get_sub();
   }
 
-  irept::subt &bases()
+  basest &bases()
   {
-    return add(ID_bases).get_sub();
+    return (basest &)add(ID_bases).get_sub();
   }
 
   void add_base(const typet &base)
   {
-    bases().push_back(exprt(ID_base, base));
+    bases().push_back(baset(base));
   }
 
   bool has_base(const irep_idt &id) const
   {
-    const irept::subt &b=bases();
-
-    forall_irep(it, b)
+    for(const auto &b : bases())
     {
-      assert(it->id()==ID_base);
-      const irept &type=it->find(ID_type);
-      assert(type.id()==ID_symbol);
-      if(type.get(ID_identifier)==id)
+      if(to_symbol_type(b.type()).get(ID_identifier)==id)
         return true;
     }
 
     return false;
+  }
+
+  bool is_abstract() const
+  {
+    return get_bool(ID_abstract);
   }
 };
 
@@ -856,6 +870,16 @@ public:
   void set_inlined(bool value)
   {
     set(ID_C_inlined, value);
+  }
+
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
   }
 
   // this produces the list of parameter identifiers

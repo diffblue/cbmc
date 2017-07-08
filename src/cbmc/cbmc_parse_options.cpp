@@ -45,6 +45,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/replace_java_nondet.h>
+#include <goto-programs/convert_nondet.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -56,6 +58,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
+
+#include "java_bytecode/java_bytecode_language.h"
 
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
@@ -286,6 +290,16 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine", true);
     options.set_option("refine-arrays", true);
     options.set_option("refine-arithmetic", true);
+  }
+
+  if(cmdline.isset("refine-strings"))
+  {
+    options.set_option("refine-strings", true);
+    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
+    options.set_option("string-printable", cmdline.isset("string-printable"));
+    if(cmdline.isset("string-max-length"))
+      options.set_option(
+        "string-max-length", cmdline.get_value("string-max-length"));
   }
 
   if(cmdline.isset("max-node-refinement"))
@@ -817,6 +831,20 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_complex(symbol_table, goto_functions);
     rewrite_union(goto_functions, ns);
 
+    // Similar removal of java nondet statements:
+    // TODO Should really get this from java_bytecode_language somehow, but we
+    // don't have an instance of that here.
+    const auto max_nondet_array_length=
+      cmdline.isset("java-max-input-array-length")
+        ? std::stoi(cmdline.get_value("java-max-input-array-length"))
+        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    replace_java_nondet(goto_functions);
+    convert_nondet(
+      goto_functions,
+      symbol_table,
+      ui_message_handler,
+      max_nondet_array_length);
+
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
     goto_check(ns, options, goto_functions);
@@ -859,6 +887,10 @@ bool cbmc_parse_optionst::process_goto_program(
       remove_unused_functions(goto_functions, ui_message_handler);
     }
 
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_functions);
+
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
@@ -887,7 +919,7 @@ bool cbmc_parse_optionst::process_goto_program(
         full_slicer(goto_functions, ns);
     }
 
-    // remove skips
+    // remove any skips introduced since coverage instrumentation
     remove_skip(goto_functions);
     goto_functions.update();
   }
@@ -1038,6 +1070,7 @@ void cbmc_parse_optionst::help()
     // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-throw-runtime-exceptions Make implicit runtime exceptions explicit"
     " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
@@ -1070,6 +1103,10 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --refine-strings             use string refinement (experimental)\n"
+    " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
+    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings (experimental)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
