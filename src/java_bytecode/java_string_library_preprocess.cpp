@@ -820,6 +820,11 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   // Assignments
   code_blockt code;
   code.add(code_assignt(lhs.length(), rhs_length));
+
+  // We always assume data of a String is not null
+  not_exprt data_not_null(equal_exprt(
+    member_data, null_pointer_exprt(to_pointer_type(member_data.type()))));
+  code.add(code_assumet(data_not_null));
   code.add(code_assignt(lhs.content(), rhs_data));
   return code;
 }
@@ -1371,9 +1376,10 @@ exprt java_string_library_preprocesst::make_argument_for_format(
   // arg_i = argv[index]
   exprt obj=get_object_at_index(argv, index);
   symbolt object_symbol=get_fresh_aux_symbol(
-    obj.type(), "tmp_format_obj", "tmp_format_obj", loc, ID_java, symbol_table);
+    obj.type(), "tmp_object", "tmp_object", loc, ID_java, symbol_table);
   symbol_exprt arg_i=object_symbol.symbol_expr();
-  allocate_dynamic_object_with_decl(arg_i, symbol_table, loc, code);
+  (void) allocate_dynamic_object_with_decl(
+    arg_i, obj.type(), symbol_table, loc, code, false);
   code.add(code_assignt(arg_i, obj));
   code.add(code_assumet(not_exprt(equal_exprt(
     arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))));
@@ -1889,6 +1895,15 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z"]=
       ID_cprover_string_equals_ignore_case_func;
+  conversion_table
+    ["java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)"
+      "Ljava/lang/String;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_string_format_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_function
     ["java::java.lang.String.hashCode:()I"]=
       ID_cprover_string_hash_code_func;
@@ -2229,7 +2244,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_2,
         std::placeholders::_3);
 
- // CharSequence library
+  // CharSequence library
   cprover_equivalent_to_java_function
     ["java::java.lang.CharSequence.charAt:(I)C"]=
       ID_cprover_string_char_at_func;
