@@ -868,18 +868,6 @@ codet java_string_library_preprocesst::make_equals_function_code(
   return code;
 }
 
-/// construct a string_exprt from a constant string value
-/// \param s: a string
-/// \param symbol_table: a symbol table
-/// \return an expression representing a string expr with the given content
-exprt java_string_library_preprocesst::string_literal(
-  const std::string &s, symbol_tablet &symbol_table)
-{
-  constant_exprt expr(s, string_typet());
-  return make_function_application(
-    ID_cprover_string_literal_func, {expr}, refined_string_type, symbol_table);
-}
-
 /// Provide code for the String.valueOf(F) function.
 /// \param type: type of the function call
 /// \param loc: location in the program_invocation_name
