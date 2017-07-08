@@ -815,6 +815,11 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   // Assignments
   code_blockt code;
   code.add(code_assignt(lhs.length(), rhs_length));
+
+  // We always assume data of a String is not null
+  not_exprt data_not_null(equal_exprt(
+    member_data, null_pointer_exprt(to_pointer_type(member_data.type()))));
+  code.add(code_assumet(data_not_null));
   code.add(code_assignt(lhs.content(), rhs_data));
   return code;
 }
@@ -1166,6 +1171,308 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
 
   // return lhs
   code.add(code_returnt(lhs));
+  return code;
+}
+
+/// Adds to the code an assignment of the form
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// type_name tmp_type_name
+/// tmp_type_name = ((Classname*)arg_i)->value
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// and returns `tmp_typename`.
+/// In case the class corresponding to `type_name` is not available in
+/// `symbol_table`, the variable is declared but not assigned.
+/// Used to access the values of the arguments of `String.format`.
+/// \param object: an expression representing a reference to an object
+/// \param type_name: name of the corresponding primitive type, this can be
+///        one of the following: ID_boolean, ID_char, ID_byte, ID_short, ID_int,
+///        ID_long, ID_float, ID_double, ID_void
+/// \param loc: a location in the source
+/// \param symbol_table: the symbol table
+/// \param code: code block to which we are adding some assignments
+/// \return An expression contaning a symbol `tmp_type_name` where `type_name`
+///         is the given argument (ie. boolean, char etc.). Which represents the
+///         primitive value contained in the given object.
+exprt java_string_library_preprocesst::get_primitive_value_of_object(
+  const exprt &object,
+  irep_idt type_name,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table,
+  code_blockt &code)
+{
+  symbol_typet object_type;
+  typet value_type;
+  if(type_name==ID_boolean)
+  {
+    value_type=java_boolean_type();
+    object_type=symbol_typet("java::java.lang.Boolean");
+  }
+  else if(type_name==ID_char)
+  {
+    value_type=java_char_type();
+    object_type=symbol_typet("java::java.lang.Character");
+  }
+  else if(type_name==ID_byte)
+  {
+    value_type=java_byte_type();
+    object_type=symbol_typet("java::java.lang.Byte");
+  }
+  else if(type_name==ID_short)
+  {
+    value_type=java_short_type();
+    object_type=symbol_typet("java::java.lang.Short");
+  }
+  else if(type_name==ID_int)
+  {
+    value_type=java_int_type();
+    object_type=symbol_typet("java::java.lang.Integer");
+  }
+  else if(type_name==ID_long)
+  {
+    value_type=java_long_type();
+    object_type=symbol_typet("java::java.lang.Long");
+  }
+  else if(type_name==ID_float)
+  {
+    value_type=java_float_type();
+    object_type=symbol_typet("java::java.lang.Float");
+  }
+  else if(type_name==ID_double)
+  {
+    value_type=java_double_type();
+    object_type=symbol_typet("java::java.lang.Double");
+  }
+  else if(type_name==ID_void)
+    return nil_exprt();
+  else
+    UNREACHABLE;
+
+  // declare tmp_type_name to hold the value
+  std::string aux_name="tmp_"+id2string(type_name);
+  symbolt symbol=get_fresh_aux_symbol(
+    value_type, aux_name, aux_name, loc, ID_java, symbol_table);
+  exprt value=symbol.symbol_expr();
+
+  // Check that the type of the object is in the symbol table,
+  // otherwise there is no safe way of finding its value.
+  if(symbol_table.has_symbol(object_type.get_identifier()))
+  {
+    struct_typet struct_type=to_struct_type(
+      symbol_table.lookup(object_type.get_identifier()).type);
+    // Check that the type has a value field
+    const struct_union_typet::componentt value_comp=
+      struct_type.get_component("value");
+    if(!value_comp.is_nil())
+    {
+      pointer_typet pointer_type(struct_type);
+      dereference_exprt deref(
+        typecast_exprt(object, pointer_type), pointer_type.subtype());
+      member_exprt deref_value(deref, value_comp.get_name(), value_comp.type());
+      code.add(code_assignt(value, deref_value));
+      return value;
+    }
+  }
+
+  warning() << object_type.get_identifier()
+            << " not available to format function" << eom;
+  code.add(code_declt(value));
+  return value;
+}
+
+/// Helper for format function. Returns the expression:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// *((void**)(argv->data)+index )
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// which corresponds to the object at position `index` in  `argv`.
+/// \param argv: reference to an array of references
+/// \param index: index of the desired object
+/// \return An expression representing the object at position `index` of `argv`.
+exprt java_string_library_preprocesst::get_object_at_index(
+  const exprt &argv,
+  int index)
+{
+  dereference_exprt deref_objs(argv, argv.type().subtype());
+  pointer_typet empty_pointer((empty_typet()));
+  pointer_typet pointer_of_pointer;
+  pointer_of_pointer.copy_to_subtypes(empty_pointer);
+  member_exprt data_member(deref_objs, "data", pointer_of_pointer);
+  plus_exprt data_pointer_plus_index(
+    data_member, from_integer(index, java_int_type()), data_member.type());
+  dereference_exprt data_at_index(
+    data_pointer_plus_index, data_pointer_plus_index.type().subtype());
+  return data_at_index;
+}
+
+/// Helper for format function. Adds code:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// string_expr arg_i_string_expr;
+/// int tmp_int;
+/// float tmp_float;
+/// char tmp_char;
+/// boolean tmp_boolean;
+/// Object* arg_i=get_object_at_index(argv, index)
+/// if(arg_i!=NULL)
+/// {
+///   if(arg_i.@class_identifier=="java::java.lang.String")
+///   {
+///     arg_i_string_expr = (string_expr)((String*)arg_i_as_string)
+///   }
+///   tmp_int=((Integer)arg_i)->value
+///   tmp_float=((Float)arg_i)->value
+///   tmp_char=((Char)arg_i)->value
+///   tmp_boolean=((Boolean)arg_i)->value
+/// }
+/// arg_i_struct = { string_expr=arg_i_string_expr;
+///   integer=tmp_int; float=tmp_float; char=tmp_char; boolean=tmp_boolean}
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// and returns `arg_i_struct`.
+///
+/// TODO: date_time and hash code are not implemented
+/// \param argv: reference to an array of references
+/// \param index: index of the desired argument
+/// \param structured_type: type for arguments of the internal format function
+/// \param loc: a location in the source
+/// \param symbol_table: the symbol table
+/// \param code: code block to which we are adding some assignments
+/// \return An expression of type `structured_type` representing the possible
+///         values of the argument at position `index` of `argv`.
+exprt java_string_library_preprocesst::make_argument_for_format(
+  const exprt &argv,
+  int index,
+  const struct_typet &structured_type,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table,
+  code_blockt &code)
+{
+  // Declarations of the fields of arg_i_struct
+  // arg_i_struct is { arg_i_string_expr, tmp_int, tmp_char, ... }
+  struct_exprt arg_i_struct(structured_type);
+  std::list<exprt> field_exprs;
+  for(const auto & comp : structured_type.components())
+  {
+    const irep_idt &name=comp.get_name();
+    const typet &type=comp.type();
+    exprt field_expr;
+    if(name!="string_expr")
+    {
+      std::string tmp_name="tmp_"+id2string(name);
+      symbolt field_symbol=get_fresh_aux_symbol(
+        type, tmp_name, tmp_name, loc, ID_java, symbol_table);
+      field_expr=field_symbol.symbol_expr();
+      code.add(code_declt(field_expr));
+    }
+    else
+      field_expr=fresh_string_expr(loc, symbol_table, code);
+
+    field_exprs.push_back(field_expr);
+    arg_i_struct.copy_to_operands(field_expr);
+  }
+
+  // arg_i = argv[index]
+  exprt obj=get_object_at_index(argv, index);
+  symbolt object_symbol=get_fresh_aux_symbol(
+    obj.type(), "tmp_object", "tmp_object", loc, ID_java, symbol_table);
+  symbol_exprt arg_i=object_symbol.symbol_expr();
+  (void) allocate_dynamic_object_with_decl(
+    arg_i, obj.type(), symbol_table, loc, code, false);
+  code.add(code_assignt(arg_i, obj));
+  code.add(code_assumet(not_exprt(equal_exprt(
+    arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))));
+
+  // if arg_i != null then [code_not_null]
+  code_ifthenelset code_avoid_null_arg;
+  code_avoid_null_arg.cond()=not_exprt(equal_exprt(
+    arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))));
+  code_blockt code_not_null;
+
+  // Assigning all the fields of arg_i_struct
+  for(const auto &comp : structured_type.components())
+  {
+    const irep_idt &name=comp.get_name();
+    exprt field_expr=field_exprs.front();
+    field_exprs.pop_front();
+
+    if(name=="string_expr")
+    {
+      pointer_typet string_pointer(symbol_typet("java::java.lang.String"));
+      typecast_exprt arg_i_as_string(arg_i, string_pointer);
+      code_not_null.add(code_assign_java_string_to_string_expr(
+        to_string_expr(field_expr), arg_i_as_string, symbol_table));
+      exprt arg_i_string_expr_sym=fresh_string_expr_symbol(
+        loc, symbol_table, code_not_null);
+      code_not_null.add(code_assignt(
+        arg_i_string_expr_sym, to_string_expr(field_expr)));
+    }
+    else if(name==ID_int || name==ID_float || name==ID_char || name==ID_boolean)
+    {
+      exprt value=get_primitive_value_of_object(
+        arg_i, name, loc, symbol_table, code_not_null);
+      code_not_null.add(code_assignt(field_expr, value));
+    }
+    else
+    {
+      // TODO: date_time and hash_code not implemented
+    }
+  }
+
+  code.add(code_not_null);
+  return arg_i_struct;
+}
+
+/// Used to provide code for the Java String.format function.
+///
+/// TODO: date_time and hash code are not implemented, and we set a limit of
+/// 10 arguments
+/// \param type: type of the function call
+/// \param loc: location in the program_invocation_name
+/// \param symbol_table: symbol table
+/// \return Code implementing the Java String.format function.
+///         Since the exact class of the arguments is not known, we give as
+///         argument to the internal format function a structure containing
+///         the different possible types.
+codet java_string_library_preprocesst::make_string_format_code(
+  const code_typet &type,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table)
+{
+  PRECONDITION(type.parameters().size()==2);
+  code_blockt code;
+  exprt::operandst args=process_parameters(
+    type.parameters(), loc, symbol_table, code);
+  INVARIANT(args.size()==2, "String.format should have two arguments");
+
+  // The argument can be:
+  // a string, an integer, a floating point, a character, a boolean,
+  // an object of which we take the hash code, or a date/time
+  struct_typet structured_type;
+  structured_type.components().emplace_back("string_expr", refined_string_type);
+  structured_type.components().emplace_back(ID_int, java_int_type());
+  structured_type.components().emplace_back(ID_float, java_float_type());
+  structured_type.components().emplace_back(ID_char, java_char_type());
+  structured_type.components().emplace_back(ID_boolean, java_boolean_type());
+  // TODO: hash_code not implemented for now
+  structured_type.components().emplace_back("hashcode", java_int_type());
+  // TODO: date_time type not implemented for now
+  structured_type.components().emplace_back("date_time", java_int_type());
+
+  // We will process arguments so that each is converted to a `struct_exprt`
+  // containing each possible type used in format specifiers.
+  std::vector<exprt> processed_args;
+  processed_args.push_back(args[0]);
+  for(std::size_t i=0; i<MAX_FORMAT_ARGS; ++i)
+    processed_args.push_back(make_argument_for_format(
+      args[1], i, structured_type, loc, symbol_table, code));
+
+  string_exprt string_expr=fresh_string_expr(loc, symbol_table, code);
+  code.add(code_assign_function_to_string_expr(
+    string_expr, ID_cprover_string_format_func, processed_args, symbol_table));
+  exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, code);
+  code.add(code_assignt(string_expr_sym, string_expr));
+  exprt java_string=allocate_fresh_string(
+    type.return_type(), loc, symbol_table, code);
+  code.add(code_assign_string_expr_to_new_java_string(
+    java_string, string_expr, loc, symbol_table));
+  code.add(code_returnt(java_string));
   return code;
 }
 
@@ -1582,6 +1889,15 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.String.equalsIgnoreCase:(Ljava/lang/String;)Z"]=
       ID_cprover_string_equals_ignore_case_func;
+  conversion_table
+    ["java::java.lang.String.format:(Ljava/lang/String;[Ljava/lang/Object;)"
+      "Ljava/lang/String;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_string_format_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_function
     ["java::java.lang.String.hashCode:()I"]=
       ID_cprover_string_hash_code_func;
@@ -1922,7 +2238,7 @@ void java_string_library_preprocesst::initialize_conversion_table()
         std::placeholders::_2,
         std::placeholders::_3);
 
- // CharSequence library
+  // CharSequence library
   cprover_equivalent_to_java_function
     ["java::java.lang.CharSequence.charAt:(I)C"]=
       ID_cprover_string_char_at_func;
