@@ -26,7 +26,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
-class string_constraint_generatort
+class string_constraint_generatort: messaget
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
@@ -94,6 +94,12 @@ public:
 
   static constant_exprt constant_char(int i, const typet &char_type);
 
+
+  // Used by format function
+  class format_specifiert;
+
+  // Helper function which can be useful outside of this class
+  std::string string_of_constant_array(const array_exprt &arr, unsigned length);
 
 private:
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
@@ -170,6 +176,21 @@ private:
   string_exprt add_axioms_for_delete(const function_application_exprt &expr);
   string_exprt add_axioms_for_delete_char_at(
     const function_application_exprt &expr);
+  string_exprt add_axioms_for_format(const function_application_exprt &f);
+  string_exprt add_axioms_for_format(
+    const std::string &s,
+    const std::vector<exprt> &args,
+    const refined_string_typet &ref_type);
+  exprt add_axioms_for_format_specifier_is_correct(
+    const function_application_exprt &expr);
+  bool add_axioms_for_format_specifier_is_correct(
+    const std::string &s);
+
+  string_exprt add_axioms_for_format_specifier(
+    const format_specifiert &fs,
+    const struct_exprt &arg,
+    const refined_string_typet &ref_type);
+
   string_exprt add_axioms_for_insert(
     const string_exprt &s1, const string_exprt &s2, const exprt &offset);
   string_exprt add_axioms_for_insert(const function_application_exprt &f);
