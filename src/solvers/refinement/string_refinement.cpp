@@ -240,10 +240,15 @@ bool string_refinementt::add_axioms_for_string_assigns(
       add_symbol_to_symbol_map(lhs, rhs);
       return false;
     }
-    else if(rhs.id() == ID_nondet_symbol)
+    else if(rhs.id()==ID_nondet_symbol)
     {
       add_symbol_to_symbol_map(
         lhs, generator.fresh_symbol("nondet_array", lhs.type()));
+      return false;
+    }
+    else if(rhs.id()==ID_if)
+    {
+      generator.add_axioms_for_if_array(lhs, to_if_expr(rhs));
       return false;
     }
     else
