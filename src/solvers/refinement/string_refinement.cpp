@@ -253,8 +253,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
     }
     else
     {
-      debug() << "string_refinement warning: not handling char_array: "
-              << from_expr(ns, "", rhs) << eom;
+      warning() << "ignoring char array " << from_expr(ns, "", rhs) << eom;
       return true;
     }
   }
@@ -397,8 +396,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     if(eq_expr.lhs().type()!=eq_expr.rhs().type())
     {
-      debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(ns, "", expr) << " [inconsistent types]" << eom;
+      warning() << "ignoring " << from_expr(ns, "", expr)
+                << " [inconsistent types]" << eom;
       debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
       debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
       return;
@@ -419,8 +418,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     // TODO: See if this happens at all.
     if(lhs.id()!=ID_symbol)
     {
-      debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(ns, "", expr) << eom;
+      warning() << "ignoring " << from_expr(ns, "", expr) << eom;
       return;
     }
 
@@ -431,9 +429,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
          subst_rhs.type().id() != ID_array ||
          eq_expr.lhs().type().subtype() != subst_rhs.type().subtype())
       {
-        debug() << "(sr::set_to) WARNING: ignoring "
-                << from_expr(ns, "", expr) << " [inconsistent types after substitution]"
-                << eom;
+        warning() << "ignoring " << from_expr(ns, "", expr)
+                  << " [inconsistent types after substitution]" << eom;
         return;
       }
       else
