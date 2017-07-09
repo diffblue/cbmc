@@ -1,0 +1,9 @@
+CORE
+test.class
+--refine-strings --string-max-length 100
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 12.* SUCCESS$
+^\[.*assertion.2\].* line 13.* FAILURE$
+--
+$ignoring\s*char\s*array
