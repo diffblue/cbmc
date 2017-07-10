@@ -1,8 +1,13 @@
 .PHONY: all cprover.dir test
 
-SRC = unit_tests.cpp \
-      catch_example.cpp \
+# Source files for test utilities
+SRC = src/expr/require_expr.cpp \
       # Empty last line
+
+# Test source files
+SRC += unit_tests.cpp \
+       catch_example.cpp \
+       # Empty last line
 
 INCLUDES= -I ../src/ -I.
 
