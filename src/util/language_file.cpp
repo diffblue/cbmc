@@ -14,16 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
-  language(rhs.language==NULL?NULL:rhs.language->new_language()),
+  language(rhs.language?rhs.language->new_language():nullptr),
   filename(rhs.filename)
 {
 }
 
-language_filet::~language_filet()
-{
-  if(language!=NULL)
-    delete language;
-}
+/// To avoid compiler errors, the complete definition of a pointed-to type must
+/// be visible at the point at which the unique_ptr destructor is created.  In
+/// this case, the pointed-to type is forward-declared, so we have to place the
+/// destructor in the source file, where the full definition is availible.
+language_filet::~language_filet()=default;
+
+language_filet::language_filet()=default;
 
 void language_filet::get_modules()
 {
@@ -51,8 +53,9 @@ void language_filest::set_should_generate_opaque_method_stubs(
 {
   for(file_mapt::value_type &language_file_entry : file_map)
   {
-    languaget *language=language_file_entry.second.language;
-    language->set_should_generate_opaque_method_stubs(stubs_enabled);
+    assert(language_file_entry.second.language!=nullptr);
+    auto &language=*language_file_entry.second.language;
+    language.set_should_generate_opaque_method_stubs(stubs_enabled);
   }
 }
 

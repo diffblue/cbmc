@@ -9,8 +9,8 @@ Author: Peter Schrammel
 /// \file
 /// GOTO-DIFF Command Line Option Processing
 
-#include <fstream>
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -18,6 +18,7 @@ Author: Peter Schrammel
 #include <util/config.h>
 #include <util/language.h>
 #include <util/options.h>
+#include <util/make_unique.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -317,9 +318,9 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_difft> goto_diff;
-  goto_diff = std::unique_ptr<goto_difft>(
-    new syntactic_difft(goto_model1, goto_model2, get_message_handler()));
+  std::unique_ptr<goto_difft> goto_diff=
+    util_make_unique<syntactic_difft>(
+      goto_model1, goto_model2, get_message_handler());
   goto_diff->set_ui(get_ui());
 
   (*goto_diff)();

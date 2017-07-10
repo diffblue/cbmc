@@ -14,7 +14,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /*! \defgroup gr_cpp C++ front-end */
 
+#include <memory>
+
 #include <util/language.h>
+#include <util/make_unique.h> // unique_ptr
 
 #include "cpp_parse_tree.h"
 
@@ -76,8 +79,8 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
-  languaget *new_language() override
-  { return new cpp_languaget; }
+  std::unique_ptr<languaget> new_language() override
+  { return util_make_unique<cpp_languaget>(); }
 
   std::string id() const override { return "cpp"; }
   std::string description() const override { return "C++"; }
@@ -97,6 +100,6 @@ protected:
   }
 };
 
-languaget *new_cpp_language();
+std::unique_ptr<languaget> new_cpp_language();
 
 #endif // CPROVER_CPP_CPP_LANGUAGE_H
