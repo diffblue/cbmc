@@ -224,12 +224,13 @@ exprt allocate_dynamic_object_with_decl(
 {
   std::vector<const symbolt *> symbols_created;
 
+  code_blockt tmp_block;
   exprt result=allocate_dynamic_object(
     target_expr,
     allocate_type,
     symbol_table,
     loc,
-    output_code,
+    tmp_block,
     symbols_created,
     cast_needed);
 
@@ -241,6 +242,9 @@ exprt allocate_dynamic_object_with_decl(
     decl.add_source_location()=loc;
     output_code.add(decl);
   }
+
+  for(const exprt &code : tmp_block.operands())
+    output_code.add(to_code(code));
 
   return result;
 }
