@@ -2,6 +2,7 @@
 
 # Source files for test utilities
 SRC = src/expr/require_expr.cpp \
+      src/ansi-c/c_to_expr.cpp \
       # Empty last line
 
 # Test source files
