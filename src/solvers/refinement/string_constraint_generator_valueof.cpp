@@ -109,7 +109,6 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   exprt zero_char=constant_char('0', char_type);
   exprt nine_char=constant_char('9', char_type);
   exprt minus_char=constant_char('-', char_type);
-  exprt zero=from_integer(0, index_type);
   exprt max=from_integer(max_size, index_type);
 
   // We add axioms:
@@ -118,7 +117,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   // a3 : |res|>1 && '0'<=res[0]<='9' => res[0]!='0'
   // a4 : |res|>1 && res[0]='-' => res[1]!='0'
 
-  binary_relation_exprt is_negative(i, ID_lt, zero);
+  binary_relation_exprt is_negative(i, ID_lt, from_integer(0, i.type()));
   and_exprt correct_length1(
     res.axiom_for_is_strictly_longer_than(1),
     res.axiom_for_is_shorter_than(max));
