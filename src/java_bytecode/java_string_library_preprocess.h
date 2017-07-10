@@ -286,8 +286,6 @@ private:
     const std::string &s,
     symbol_tablet &symbol_table);
 
-  exprt string_literal(const std::string &s, symbol_tablet &symbol_table);
-
   codet make_function_from_call(
     const irep_idt &function_name,
     const code_typet &type,
