@@ -1941,6 +1941,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_function
     ["java::java.lang.Integer.parseInt:(Ljava/lang/String;I)I"]=
       ID_cprover_string_parse_int_func;
+  cprover_equivalent_to_java_function
+    ["java::java.lang.Long.parseLong:(Ljava/lang/String;)J"]=
+      ID_cprover_string_parse_int_func;
+  cprover_equivalent_to_java_function
+    ["java::java.lang.Long.parseLong:(Ljava/lang/String;I)J"]=
+      ID_cprover_string_parse_int_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toHexString:(I)Ljava/lang/String;"]=
       ID_cprover_string_of_int_hex_func;
