@@ -17,16 +17,15 @@
 
 #include <util/std_expr.h>
 
-class require_exprt
+namespace require_exprt
 {
-public:
-  static index_exprt require_index(const exprt &expr, int expected_index);
-  static index_exprt require_top_index(const exprt &expr);
+  index_exprt require_index(const exprt &expr, int expected_index);
+  index_exprt require_top_index(const exprt &expr);
 
-  static member_exprt require_member(
+  member_exprt require_member(
     const exprt &expr, const irep_idt &component_identifier);
 
-  static symbol_exprt require_symbol(
+  symbol_exprt require_symbol(
     const exprt &expr, const irep_idt &symbol_name);
 };
 
