@@ -12,7 +12,7 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-LIBS += ../src/ansi-c/ansi-c$(LIBEXT) \
+OBJ += ../src/ansi-c/ansi-c$(LIBEXT) \
         ../src/cpp/cpp$(LIBEXT) \
         ../src/json/json$(LIBEXT) \
         ../src/linking/linking$(LIBEXT) \
