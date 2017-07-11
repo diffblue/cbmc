@@ -32,7 +32,6 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(t)
 {
   assert(t.id()==ID_pointer);
-  value=nil_exprt();
 }
 
 /*******************************************************************\
@@ -56,7 +55,6 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     pointer_abstract_objectt(t, tp, bttm)
 {
   assert(t.id()==ID_pointer);
-  value=nil_exprt();
 }
 
 /*******************************************************************\
@@ -74,7 +72,7 @@ Function: constant_pointer_abstract_objectt::constant_pointer_abstract_objectt
 
 constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const constant_pointer_abstract_objectt &old):
-    pointer_abstract_objectt(old), value(old.value)
+    pointer_abstract_objectt(old), value_stack(old.value_stack)
 {}
 
 /*******************************************************************\
@@ -94,26 +92,11 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
   const exprt &e,
   const abstract_environmentt &environment,
   const namespacet &ns):
-    pointer_abstract_objectt(e, environment, ns)
+    pointer_abstract_objectt(e, environment, ns),
+    value_stack(e, environment, ns)
 {
   assert(e.type().id()==ID_pointer);
-  value=nil_exprt();
-
-  if(e.id()==ID_address_of)
-  {
-    value=e;
-    top=false;
-  }
-  else if(e.id()==ID_constant)
-  {
-    constant_exprt constant_expr(to_constant_expr(e));
-    if(constant_expr.get_value()==ID_NULL)
-    {
-      value=e;
-      top=false;
-    }
-  }
-  // Else unknown expression type - possibly we should handle more
+  top=value_stack.is_top_value();
 }
 
 /*******************************************************************\
@@ -174,8 +157,10 @@ abstract_object_pointert
   }
   else
   {
-    // Can we actually merge these value
-    if(value==other->value)
+    bool matching_pointer=
+      value_stack.to_expression()==other->value_stack.to_expression();
+
+    if(matching_pointer)
     {
       return shared_from_this();
     }
@@ -213,7 +198,7 @@ exprt constant_pointer_abstract_objectt::to_constant() const
   {
     // TODO(tkiley): I think we would like to eval this before using it
     // in the to_constant.
-    return value;
+    return value_stack.to_expression();
   }
 }
 
@@ -236,33 +221,27 @@ Function: constant_pointer_abstract_objectt::output
 void constant_pointer_abstract_objectt::output(
   std::ostream &out, const ai_baset &ai, const namespacet &ns) const
 {
-  if(is_top() || is_bottom())
+  if(is_top() || is_bottom() || value_stack.is_top_value())
   {
     pointer_abstract_objectt::output(out, ai, ns);
   }
   else
   {
-    if(value.id()==ID_constant && value.get(ID_value)==ID_NULL)
+    out << "ptr ->(";
+    const exprt &value=value_stack.to_expression();
+    if(value.id()==ID_address_of)
     {
-      out << "NULL";
-    }
-    else
-    {
-      out << "ptr ->(";
-      if(value.id()==ID_address_of)
+      const address_of_exprt &address_expr(to_address_of_expr(value));
+      if(address_expr.object().id()==ID_symbol)
       {
-        const address_of_exprt &address_expr(to_address_of_expr(value));
-        if(address_expr.object().id()==ID_symbol)
-        {
-          const symbol_exprt &symbol_pointed_to(
-            to_symbol_expr(address_expr.object()));
+        const symbol_exprt &symbol_pointed_to(
+          to_symbol_expr(address_expr.object()));
 
-          out << symbol_pointed_to.get_identifier();
-        }
+        out << symbol_pointed_to.get_identifier();
       }
-
-      out << ")";
     }
+
+    out << ")";
   }
 }
 
@@ -286,28 +265,16 @@ Function: constant_pointer_abstract_objectt::read_dereference
 abstract_object_pointert constant_pointer_abstract_objectt::read_dereference(
   const abstract_environmentt &env, const namespacet &ns) const
 {
-  if(is_top() || is_bottom() || value.id()==ID_nil)
+  if(is_top() || is_bottom() || value_stack.is_top_value())
   {
     // Return top if dereferencing a null pointer or we are top
-    bool is_value_top = is_top() || value.id()==ID_nil;
+    bool is_value_top = is_top() || value_stack.is_top_value();
     return env.abstract_object_factory(
       type().subtype(), ns, is_value_top, !is_value_top);
   }
   else
   {
-    if(value.id()==ID_address_of)
-    {
-      return env.eval(value.op0(), ns);
-    }
-    else if(value.id()==ID_constant)
-    {
-      // Reading a null pointer, return top
-      return env.abstract_object_factory(type().subtype(), ns, true, false);
-    }
-    else
-    {
-      return env.abstract_object_factory(type().subtype(), ns, true, false);
-    }
+    return env.eval(value_stack.to_expression().op0(), ns);
   }
 }
 
@@ -344,22 +311,13 @@ sharing_ptrt<pointer_abstract_objectt>
     const abstract_object_pointert new_value,
     bool merging_write) const
 {
-  if(is_top() || is_bottom())
+  if(is_top() || is_bottom() || value_stack.is_top_value())
   {
     return pointer_abstract_objectt::write_dereference(
       environment, ns, stack, new_value, merging_write);
   }
   else
   {
-    // If not an address, we don't know what we are pointing to
-    if(value.id()!=ID_address_of)
-    {
-      return pointer_abstract_objectt::write_dereference(
-        environment, ns, stack, new_value, merging_write);
-    }
-
-    const address_of_exprt &address_expr=to_address_of_expr(value);
-
     sharing_ptrt<constant_pointer_abstract_objectt> copy=
       sharing_ptrt<constant_pointer_abstract_objectt>(
         new constant_pointer_abstract_objectt(*this));
@@ -369,26 +327,30 @@ sharing_ptrt<pointer_abstract_objectt>
       // We should not be changing the type of an abstract object
       assert(new_value->type()==type().subtype());
 
-
+      // Get an expression that we can assign to
+      exprt value=value_stack.to_expression().op0();
       if(merging_write)
       {
         abstract_object_pointert pointed_value=
-          environment.eval(address_expr.object(), ns);
+          environment.eval(value, ns);
         bool modifications;
         abstract_object_pointert merged_value=
           abstract_objectt::merge(pointed_value, new_value, modifications);
-        environment.assign(address_expr.object(), merged_value, ns);
+        environment.assign(value, merged_value, ns);
       }
       else
       {
-        environment.assign(address_expr.object(), new_value, ns);
+        environment.assign(value, new_value, ns);
       }
     }
     else
     {
+      exprt value=value_stack.to_expression().op0();
       abstract_object_pointert pointed_value=
-        environment.eval(address_expr.object(), ns);
-      environment.write(pointed_value, new_value, stack, ns, merging_write);
+        environment.eval(value, ns);
+      abstract_object_pointert modified_value=
+        environment.write(pointed_value, new_value, stack, ns, merging_write);
+        environment.assign(value, modified_value, ns);
 
       // but the pointer itself does not change!
     }
