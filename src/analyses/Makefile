@@ -36,6 +36,8 @@ SRC = ai.cpp \
       variable-sensitivity/variable_sensitivity_object_factory.cpp \
       variable-sensitivity/full_struct_abstract_object.cpp \
       variable-sensitivity/constant_array_abstract_object.cpp \
+      variable-sensitivity/write_stack.cpp \
+      variable-sensitivity/write_stack_entry.cpp \
       # Empty last line
 
 INCLUDES= -I ..
