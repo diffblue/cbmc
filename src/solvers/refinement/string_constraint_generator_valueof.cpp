@@ -419,7 +419,9 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
   string_exprt str=get_string_expr(f.arguments()[0]);
   const exprt radix=
-    f.arguments().size()==1?from_integer(10, f.type()):f.arguments()[1];
+    f.arguments().size()==1?
+      static_cast<exprt>(from_integer(10, f.type())):
+      static_cast<exprt>(typecast_exprt(f.arguments()[1], f.type()));
 
   const typet &type=f.type();
   symbol_exprt i=fresh_symbol("parsed_int", type);
@@ -436,21 +438,23 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     not_exprt(or_exprt(starts_with_minus, starts_with_plus));
 
   /// TODO: we should throw an exception when this does not hold:
-  exprt correct=add_axioms_for_correct_number_format(str, radix);
+  const std::size_t max_string_length=40;
+  const exprt &correct=add_axioms_for_correct_number_format(
+    str, radix, max_string_length);
   axioms.push_back(correct);
 
   /// TODO(OJones): size should depend on the radix
   /// TODO(OJones): we should deal with overflow properly
-  for(unsigned size=1; size<=10; size++)
+  for(std::size_t size=1; size<=max_string_length; size++)
   {
     exprt sum=from_integer(0, type);
     exprt first_value=get_numeric_value_from_character(chr, char_type, type);
     equal_exprt premise=str.axiom_for_has_length(size);
 
-    for(unsigned j=1; j<size; j++)
+    for(std::size_t j=1; j<size; j++)
     {
       mult_exprt radix_sum(sum, radix);
-      if(j>=9)
+      if(j>=max_string_length-1)
       {
         // We have to be careful about overflows
         div_exprt div(sum, radix);
@@ -463,7 +467,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
         get_numeric_value_from_character(str[j], char_type, type));
 
       mult_exprt first(first_value, radix);
-      if(j>=9)
+      if(j>=max_string_length-1)
       {
         // We have to be careful about overflows
         div_exprt div_first(first, radix);
