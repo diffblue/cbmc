@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_object_factory.h"
 
 #include <unordered_set>
 #include <sstream>
@@ -26,7 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-#include "java_object_factory.h"
+
+#include <java_bytecode/select_pointer_type.h>
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -59,11 +61,6 @@ class java_object_factoryt
     const exprt &expr,
     const pointer_typet &ptr_type);
 
-  void gen_pointer_target_init(
-    const exprt &expr,
-    const typet &target_type,
-    bool create_dynamic_objects,
-    update_in_placet update_in_place);
 
   code_assignt get_null_assignment(
     const exprt &expr,
@@ -74,7 +71,7 @@ class java_object_factoryt
     const exprt &expr,
     const typet &target_type,
     bool create_dynamic_objects,
-    update_in_placet);
+    update_in_placet update_in_place);
 
   void allocate_nondet_length_array(
     code_blockt &assignments,
@@ -137,6 +134,11 @@ private:
     bool create_dynamic_objects,
     const struct_typet &struct_type,
     const update_in_placet &update_in_place);
+
+  symbol_exprt gen_nondet_subtype_pointer_init(
+    code_blockt &assignments,
+    bool create_dynamic_objects,
+    const pointer_typet &substitute_pointer_type);
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -356,8 +358,10 @@ void java_object_factoryt::gen_pointer_target_init(
     if(target.id()==ID_address_of)
       init_expr=target.op0();
     else
+    {
       init_expr=
         dereference_exprt(target, target.type().subtype());
+    }
     gen_nondet_init(
       assignments,
       init_expr,
@@ -394,11 +398,33 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const pointer_typet &pointer_type,
   const update_in_placet &update_in_place)
 {
+  select_pointer_typet pointer_type_selector(ns);
+  const pointer_typet &replacement_pointer_type=
+    pointer_type_selector(pointer_type);
+
+  // If we are changing the pointer, we generate code for creating a pointer
+  // to the substituted type instead
+  if(replacement_pointer_type!=pointer_type)
+  {
+    const symbol_exprt real_pointer_symbol=gen_nondet_subtype_pointer_init(
+      assignments,
+      create_dynamic_objects,
+      replacement_pointer_type);
+
+    // Having created a pointer to object of type replacement_pointer_type
+    // we now assign it back to the original pointer with a cast
+    // from pointer_type to replacement_pointer_type
+    assignments.add(
+      code_assignt(expr, typecast_exprt(real_pointer_symbol, pointer_type)));
+    return;
+  }
+
   const typet &subtype=ns.follow(pointer_type.subtype());
   if(subtype.id()==ID_struct)
   {
     const struct_typet &struct_type=to_struct_type(subtype);
     const irep_idt &struct_tag=struct_type.get_tag();
+
     // If this is a recursive type of some kind, set null.
     if(!recursion_set.insert(struct_tag).second)
     {
@@ -496,6 +522,41 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
     assignments.add(update_check);
   }
+}
+
+/// Generate GOTO code to initalize the selected concrete type
+/// A { ... } tmp_object;
+/// A.x = NONDET ...
+/// // non-det init of all the fields of A
+/// A * p = &tmp_object
+/// expr = (I *)p
+/// \param assignments: the code to append to
+/// \param create_dynamic_objects: if true, use malloc to allocate objects;
+///   otherwise generate fresh static symbols.
+/// \param replacement_pointer: The type of the pointer we actually want to
+///   to create.
+/// \return The symbol expression that corresponds to the pointer to object
+///   created of the required type.
+symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
+  code_blockt &assignments,
+  bool create_dynamic_objects,
+  const pointer_typet &replacement_pointer)
+{
+  symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
+
+  // Generate a new object into this new symbol
+  gen_nondet_init(
+    assignments,
+    new_symbol.symbol_expr(),
+    false,
+    "",
+    false,
+    create_dynamic_objects,
+    false,
+    typet(),
+    update_in_placet::NO_UPDATE_IN_PLACE);
+
+  return new_symbol.symbol_expr();
 }
 
 /// Initialises an object tree rooted at `expr`, allocating child objects as
@@ -660,7 +721,7 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
-/// Allocates a fresh array. Single-use herem at the moment, but useful to keep
+/// Allocates a fresh array. Single-use at the moment, but useful to keep
 /// as a separate function for downstream branches.
 /// \par parameters: `lhs`, symbol to assign the new array structure
 /// `max_length_expr`, maximum length of the new array (minimum is fixed at zero
@@ -873,10 +934,6 @@ exprt object_factory(
 
   std::vector<const symbolt *> symbols_created;
   symbols_created.push_back(main_symbol_ptr);
-
-  symbolt &aux_symbol=new_tmp_symbol(symbol_table, loc, type);
-  aux_symbol.is_static_lifetime=true;
-
   java_object_factoryt state(
     symbols_created,
     loc,
