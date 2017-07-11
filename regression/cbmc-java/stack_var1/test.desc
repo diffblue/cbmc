@@ -1,0 +1,9 @@
+CORE
+stack_test.class
+
+^EXIT=10$
+^SIGNAL=0$
+^.*assertion at file stack_test.java line 5 function.*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

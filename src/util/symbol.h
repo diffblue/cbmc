@@ -145,6 +145,14 @@ public:
     is_file_local=true;
     is_auxiliary=true;
   }
+
+  auxiliary_symbolt(const irep_idt &name, const typet &type):
+    auxiliary_symbolt()
+  {
+    this->name=name;
+    this->base_name=name;
+    this->type=type;
+  }
 };
 
 /*! \brief Symbol table entry of function parameter

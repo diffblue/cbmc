@@ -45,7 +45,10 @@ int my_mkstemps(char *template_str, int suffix_len)
 
   std::size_t template_length=strlen(template_str);
 
-  if(suffix_len+6>template_length)
+  if(suffix_len<0)
+    return -1;
+
+  if(static_cast<std::size_t>(suffix_len+6)>template_length)
     return -1; // suffix too long
 
   char *XXXXXX_pos=

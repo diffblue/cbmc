@@ -4,5 +4,6 @@ main.c
 ^Removing function pointers and virtual functions$
 ^\s*ASSERT FALSE // invalid function pointer$
 ^SIGNAL=0$
+replacing function pointer by 0 possible targets
 --
 ^warning: ignoring

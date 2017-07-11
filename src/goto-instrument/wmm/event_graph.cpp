@@ -55,7 +55,7 @@ void event_grapht::print_rec_graph(std::ofstream &file, event_idt node_id,
 
 void event_grapht::print_graph()
 {
-  assert(po_order.size()>0);
+  assert(!po_order.empty());
   std::set<event_idt> visited;
   event_idt root=po_order.front();
   std::ofstream file;
@@ -113,7 +113,7 @@ event_idt event_grapht::copy_segment(event_idt begin, event_idt end)
   /* collects the nodes of the subgraph */
   explore_copy_segment(covered, begin, end);
 
-  if(covered.size()==0)
+  if(covered.empty())
     return end;
 
 //  for(std::set<event_idt>::const_iterator it=covered.begin();

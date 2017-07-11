@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/threeval.h>
+#include <util/invariant.h>
 
 #include "satcheck_minisat2.h"
 
@@ -155,7 +156,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
         {
           messaget::status() <<
             "SAT checker: instance is SATISFIABLE" << eom;
-          assert(solver->model.size()!=0);
+          CHECK_RETURN(solver->model.size()>0);
           status=statust::SAT;
           return resultt::P_SATISFIABLE;
         }

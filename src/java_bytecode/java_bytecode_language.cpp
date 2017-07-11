@@ -507,7 +507,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   do
   {
     any_new_methods=false;
-    while(method_worklist2.size()!=0)
+    while(!method_worklist2.empty())
     {
       std::swap(method_worklist1, method_worklist2);
       for(const auto &mname : method_worklist1)

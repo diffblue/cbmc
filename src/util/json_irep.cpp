@@ -52,7 +52,7 @@ void json_irept::convert_sub_tree(
   const irept::subt &sub_trees,
   json_objectt &parent) const
 {
-  if(sub_trees.size()>0)
+  if(!sub_trees.empty())
   {
     json_arrayt sub_objects;
     for(const irept &sub_tree : sub_trees)
@@ -77,7 +77,7 @@ void json_irept::convert_named_sub_tree(
   const irept::named_subt &sub_trees,
   json_objectt &parent) const
 {
-  if(sub_trees.size()>0)
+  if(!sub_trees.empty())
   {
     json_objectt sub_objects;
     for(const auto &sub_tree : sub_trees)

@@ -212,7 +212,7 @@ struct bytecode_infot const bytecode_info[]=
 { "return",         0xb1, ' ', 0, 0, ' ' }, // → [empty]; return void from method  NOLINT(*)
 { "saload",         0x35, ' ', 2, 1, 's' }, // arrayref, index → value; load short from array  NOLINT(*)
 { "sastore",        0x56, ' ', 3, 0, 's' }, // arrayref, index, value →; store short to array  NOLINT(*)
-{ "sipush",         0x11, 's', 0, 1, 's' }, // → value; push a short onto the stack  NOLINT(*)
+{ "sipush",         0x11, 's', 0, 1, 'i' }, // → value; push a short onto the stack as an integer value  NOLINT(*)
 { "swap",           0x5f, ' ', 2, 2, ' ' }, // value2, value1 → value1, value2; swaps two top words on the stack (note that value1 and value2 must not be double or long)  NOLINT(*)
 { "tableswitch",    0xaa, 'T', 1, 0, ' ' }, // index →; continue execution from an address in the table at offset index  NOLINT(*)
 { "breakpoint",     0xca, ' ', 0, 0, ' ' }, // ; reserved for breakpoints in Java debuggers; should not appear in any class file  NOLINT(*)

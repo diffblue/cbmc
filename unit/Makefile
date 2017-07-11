@@ -1,12 +1,18 @@
 .PHONY: all cprover.dir test
 
-SRC = unit_tests.cpp \
-      catch_example.cpp \
+# Source files for test utilities
+SRC = src/expr/require_expr.cpp \
+      src/ansi-c/c_to_expr.cpp \
+      # Empty last line
+
+# Test source files
+SRC += unit_tests.cpp \
+       catch_example.cpp \
       analyses/variable-sensitivity/abstract_object/merge.cpp \
       analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
       analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
       analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
-      # Empty last line
+       # Empty last line
 
 INCLUDES= -I ../src/ -I.
 
@@ -16,7 +22,7 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-LIBS += ../src/ansi-c/ansi-c$(LIBEXT) \
+OBJ += ../src/ansi-c/ansi-c$(LIBEXT) \
         ../src/cpp/cpp$(LIBEXT) \
         ../src/json/json$(LIBEXT) \
         ../src/linking/linking$(LIBEXT) \

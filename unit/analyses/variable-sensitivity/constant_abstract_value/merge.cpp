@@ -15,14 +15,6 @@
 #include <analyses/variable-sensitivity/abstract_object.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
 
-
-// Debug printer for irept
-std::ostream &operator<<(std::ostream &os, const irept &value)
-{
-  os << value.pretty();
-  return os;
-}
-
 SCENARIO("merge_constant_abstract_value",
   "[core][analyses][variable-sensitivity][constant_abstract_value][merge]")
 {

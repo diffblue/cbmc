@@ -578,6 +578,19 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("print-internal-representation"))
+    {
+      for(auto const &pair : goto_functions.function_map)
+        for(auto const &ins : pair.second.body.instructions)
+        {
+          if(ins.code.is_not_nil())
+            status() << ins.code.pretty() << eom;
+          if(ins.guard.is_not_nil())
+            status() << "[guard] " << ins.guard.pretty() << eom;
+        }
+      return 0;
+    }
+
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
@@ -608,7 +621,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
-      const bool h=cmdline.isset("use-system-headers");
+      const bool h_libc=!cmdline.isset("no-system-headers");
+      const bool h_all=cmdline.isset("use-all-headers");
       namespacet ns(symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -627,10 +641,11 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
       }
       else
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, std::cout);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_functions, h_libc, h_all, ns, std::cout);
 
       return 0;
     }
@@ -770,6 +785,7 @@ int goto_instrument_parse_optionst::doit()
     error() << "Out of memory" << eom;
     return 11;
   }
+// NOLINTNEXTLINE(readability/fn_size)
 }
 
 void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
@@ -1451,6 +1467,8 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --print-internal-representation\n" // NOLINTNEXTLINE(*)
+    "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
@@ -1478,7 +1496,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
-    " --undefined-function-is-assume-false\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     "\n"
     "Loop transformations:\n"
@@ -1523,7 +1542,8 @@ void goto_instrument_parse_optionst::help()
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
-    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
+    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
+    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"

@@ -154,7 +154,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
       {
         messaget::status() <<
           "SAT checker: instance is SATISFIABLE" << eom;
-        assert(solver->model.size()!=0);
+        assert(!solver->model.empty());
         status=SAT;
         return P_SATISFIABLE;
       }

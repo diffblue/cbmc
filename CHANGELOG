@@ -8,6 +8,8 @@
 * GOTO-ANALYZER: New option --unreachable-functions, --reachable-functions
 * GOTO-INSTRUMENT: New option --undefined-function-is-assume-false
 * GOTO-INSTRUMENT: New option --remove-function-body
+* GOTO-INSTRUMENT: New option --use-all-headers, changed --use-system-headers to
+  --no-system-headers
 
 
 5.7
