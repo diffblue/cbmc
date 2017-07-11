@@ -11,6 +11,7 @@
 #include <iosfwd>
 
 #include <analyses/variable-sensitivity/pointer_abstract_object.h>
+#include <analyses/variable-sensitivity/write_stack.h>
 
 class constant_pointer_abstract_objectt:public pointer_abstract_objectt
 {
@@ -57,7 +58,7 @@ private:
   abstract_object_pointert merge_constant_pointers(
     const constant_pointer_abstract_pointert other) const;
 
-  exprt value;
+  write_stackt value_stack;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_POINTER_ABSTRACT_OBJECT_H // NOLINT(*)

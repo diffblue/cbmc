@@ -9,9 +9,9 @@ sensitivity_test_two_value_pointer_to_two_value_array.c
 ^\[main\.assertion\.4\] .* 1\[p\]==2: UNKNOWN$
 ^\[main\.assertion\.5\] .* \*\(p\+1\)==2: UNKNOWN$
 ^\[main\.assertion\.6\] .* \*\(1\+p\)==2: UNKNOWN$
-^\[main\.assertion\.7\] .* \*\(p-1\)==1: UNKNOWN$
-^\[main\.assertion\.8\] .* q==p\+1: UNKNOWN$
-^\[main\.assertion\.9\] .* \*q==2: UNKNOWN$
+^\[main\.assertion\.7\] .* q==p\+1: UNKNOWN$
+^\[main\.assertion\.8\] .* \*q==2: UNKNOWN$
+^\[main\.assertion\.9\] .* \*\(q-1\)==1: UNKNOWN$
 ^\[main\.assertion\.10\] .* q-p==x: UNKNOWN$
 ^\[main\.assertion\.11\] .* a\[1\]==4: UNKNOWN$
 ^\[main\.assertion\.12\] .* a\[1\]==5: UNKNOWN$
