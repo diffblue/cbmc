@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/cmdline.h>
 #include <util/string2int.h>
+#include <util/invariant.h>
 #include <json/json_parser.h>
 
 #include <goto-programs/class_hierarchy.h>
@@ -79,6 +80,8 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   }
   else
     java_cp_include_files=".*";
+
+  language_options_initialized=true;
 }
 
 std::set<std::string> java_bytecode_languaget::extensions() const
@@ -105,6 +108,7 @@ bool java_bytecode_languaget::parse(
   std::istream &instream,
   const std::string &path)
 {
+  PRECONDITION(language_options_initialized);
   java_class_loader.set_message_handler(get_message_handler());
   java_class_loader.set_java_cp_include_files(java_cp_include_files);
 
