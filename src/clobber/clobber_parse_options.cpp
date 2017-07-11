@@ -248,6 +248,7 @@ bool clobber_parse_optionst::get_goto_program(
       }
 
       languaget *language=get_language_from_filename(filename);
+      language->get_language_options(cmdline);
 
       if(language==NULL)
       {
