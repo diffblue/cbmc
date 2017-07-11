@@ -18,6 +18,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
        analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
        analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
+       analyses/variable-sensitivity/write_stack.cpp \
        ansi-c/max_malloc_size.cpp \
        ansi-c/type2name.cpp \
        big-int/big-int.cpp \
