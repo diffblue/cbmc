@@ -1,7 +1,8 @@
-KNOWNBUG
+CORE
 test.class
 --refine-strings
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+[.*assertion\.1] .* line 8 .* FAILURE
+^VERIFICATION FAILED$
 --
