@@ -8,20 +8,21 @@ int main(int argc, char *argv[])
   int *p=a;
   __CPROVER_assert(p==&a[0], "p==&a[0]");
 
+  // Read through pointer
   __CPROVER_assert(*p==1, "*p==1");
 
+  // Read through offset pointer
   __CPROVER_assert(p[1]==2, "p[1]==2");
   __CPROVER_assert(1[p]==2, "1[p]==2");
 
   __CPROVER_assert(*(p+1)==2, "*(p+1)==2");
   __CPROVER_assert(*(1+p)==2, "*(1+p)==2");
 
-  __CPROVER_assert(*(p-1)==1, "*(p-1)==1");
-
   // Test pointer arithmetic
   int *q=&a[1];
   __CPROVER_assert(q==p+1, "q==p+1");
   __CPROVER_assert(*q==2, "*q==2");
+  __CPROVER_assert(*(q-1)==1, "*(q-1)==1");
 
   // Test pointer diffs
   ptrdiff_t x=1;
