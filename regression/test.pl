@@ -71,7 +71,8 @@ sub test($$$$$) {
 
   $options =~ s/$ign//g if(defined($ign));
 
-  my $output = $input;
+  my $output = $test;
+  $output =~ s/^.*\///;
   $output =~ s/\.[^.]*$/.out/;
 
   if($output eq $input) {
@@ -80,6 +81,7 @@ sub test($$$$$) {
   }
 
   print LOG "Test '$name'\n";
+  print LOG "  Test file: $test\n";
   print LOG "  Level: $level\n";
   print LOG "  Input: $input\n";
   print LOG "  Output: $output\n";
