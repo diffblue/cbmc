@@ -1,6 +1,6 @@
 CORE
 interface1.class
---taint taint.json
+--taint taint.json --function interface1.my_method
 ^EXIT=0$
 ^SIGNAL=0$
 ^file interface1.java line 18( function .*)?: There is a flow! \(taint rule sink_rule\)$

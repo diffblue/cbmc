@@ -1,6 +1,6 @@
 CORE
 basic2.class
---taint taint.json
+--taint taint.json --function basic2.my_method
 ^EXIT=0$
 ^SIGNAL=0$
 ^file basic2.java line 8( function .*)?: There is a T1 flow \(taint rule my_h1\)$
