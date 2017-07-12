@@ -60,27 +60,40 @@ inline void abort(void)
 /* FUNCTION: calloc */
 
 #undef calloc
-#undef malloc
-
-inline void *malloc(__CPROVER_size_t malloc_size);
 
 inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 {
+  // realistically, calloc may return NULL,
+  // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
-  void *res;
-  res=malloc(nmemb*size);
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(nmemb*size<(1UL<<((sizeof(char*)-1)*8-1)));
+  void *malloc_res;
+  malloc_res=__CPROVER_allocate(nmemb*size, 1);
+
+  // make sure it's not recorded as deallocated
+  __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
+
+  // record the object size for non-determistic bounds checking
+  __CPROVER_bool record_malloc;
+  __CPROVER_malloc_object=record_malloc?malloc_res:__CPROVER_malloc_object;
+  __CPROVER_malloc_size=record_malloc?nmemb*size:__CPROVER_malloc_size;
+  __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
+
+  // detect memory leaks
+  __CPROVER_bool record_may_leak;
+  __CPROVER_memory_leak=record_may_leak?malloc_res:__CPROVER_memory_leak;
+
   #ifdef __CPROVER_STRING_ABSTRACTION
-  __CPROVER_is_zero_string(res)=1;
-  __CPROVER_zero_string_length(res)=0;
-  //for(int i=0; i<nmemb*size; i++) res[i]=0;
-  #else
-  if(nmemb>1)
-    __CPROVER_array_set(res, 0);
-  else if(nmemb==1)
-    for(__CPROVER_size_t i=0; i<size; ++i)
-      ((char*)res)[i]=0;
+  __CPROVER_is_zero_string(malloc_res)=1;
+  __CPROVER_zero_string_length(malloc_res)=0;
   #endif
-  return res;
+
+  return malloc_res;
 }
 
 /* FUNCTION: malloc */
@@ -90,10 +103,16 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
   // realistically, malloc may return NULL,
-  // and __CPROVER_malloc doesn't, but no one cares
+  // and __CPROVER_allocate doesn't, but no one cares
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(malloc_size<(1UL<<((sizeof(char*)-1)*8-1)));
   void *malloc_res;
-  malloc_res=__CPROVER_malloc(malloc_size);
+  malloc_res=__CPROVER_allocate(malloc_size, 0);
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -116,8 +135,14 @@ inline void *malloc(__CPROVER_size_t malloc_size)
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(alloca_size<(1UL<<((sizeof(char*)-1)*8-1)));
   void *res;
-  res=__CPROVER_malloc(alloca_size);
+  res=__CPROVER_allocate(alloca_size, 0);
 
   // make sure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -301,6 +326,8 @@ inline long atol(const char *nptr)
 #define __CPROVER_LIMITS_H_INCLUDED
 #endif
 
+inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
+
 inline char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
@@ -330,7 +357,7 @@ inline char *getenv(const char *name)
   // the range.
 
   __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  buffer=(char *)__CPROVER_malloc(buf_size);
+  buffer=(char *)__builtin_alloca(buf_size);
   buffer[buf_size-1]=0;
 
   return buffer;

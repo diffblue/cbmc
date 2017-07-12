@@ -61,8 +61,8 @@ void goto_symext::symex_assign(
     else if(statement==ID_cpp_new ||
             statement==ID_cpp_new_array)
       symex_cpp_new(state, lhs, side_effect_expr);
-    else if(statement==ID_malloc)
-      symex_malloc(state, lhs, side_effect_expr);
+    else if(statement==ID_allocate)
+      symex_allocate(state, lhs, side_effect_expr);
     else if(statement==ID_printf)
       symex_printf(state, lhs, side_effect_expr);
     else if(statement==ID_gcc_builtin_va_arg_next)

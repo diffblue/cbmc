@@ -4,7 +4,7 @@ unsigned char* init1()
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);
-  unsigned char* buffer=__CPROVER_malloc(1);
+  unsigned char* buffer=__CPROVER_allocate(1, 0);
   assert(buffer!=0);
 
   buffer[0]=0;
@@ -18,7 +18,7 @@ unsigned char* init2()
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);
-  unsigned char* buffer=__CPROVER_malloc(1*sizeof(unsigned char));
+  unsigned char* buffer=__CPROVER_allocate(1*sizeof(unsigned char), 0);
   assert(buffer!=0);
 
   buffer[0]=0;
@@ -32,7 +32,7 @@ unsigned char* init3()
   if (size!=1) return 0;
 
   assert(sizeof(unsigned char)==1);
-  unsigned char* buffer=__CPROVER_malloc(sizeof(unsigned char)*1);
+  unsigned char* buffer=__CPROVER_allocate(sizeof(unsigned char)*1, 0);
   assert(buffer!=0);
 
   buffer[0]=0;

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Concrete Symbolic Transformer
 
 #include <util/arith_tools.h>
+#include <util/message.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
 #include <util/byte_operators.h>
@@ -98,9 +99,9 @@ void path_symext::assign(
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(rhs);
     const irep_idt &statement=side_effect_expr.get_statement();
 
-    if(statement==ID_malloc)
+    if(statement==ID_allocate)
     {
-      symex_malloc(state, lhs, side_effect_expr);
+      symex_allocate(state, lhs, side_effect_expr);
       return;
     }
     else if(statement==ID_nondet)
@@ -152,13 +153,13 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   return nil_typet();
 }
 
-void path_symext::symex_malloc(
+void path_symext::symex_allocate(
   path_symex_statet &state,
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=1)
-    throw "malloc expected to have one operand";
+  if(code.operands().size()!=2)
+    throw "allocate expected to have two operands";
 
   // increment dynamic object counter
   unsigned dynamic_count=++state.var_map.dynamic_count;
@@ -243,6 +244,23 @@ void path_symext::symex_malloc(
   value_symbol.type=object_type;
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
+
+  exprt zero_init=code.op1();
+  exprt zero_init_val=state.read(zero_init);
+
+  if(zero_init_val.is_constant() && !zero_init_val.is_zero())
+  {
+    null_message_handlert null_message;
+    exprt zero_value=
+      zero_initializer(
+        object_type,
+        code.source_location(),
+        state.var_map.ns,
+        null_message);
+
+    if(zero_value.is_not_nil())
+      assign(state, value_symbol.symbol_expr(), zero_value);
+  }
 
   address_of_exprt rhs;
 

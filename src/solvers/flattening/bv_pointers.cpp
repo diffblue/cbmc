@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
+#include <util/ssa_expr.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/threeval.h>
@@ -29,31 +30,15 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     if(operands.size()==1 &&
        is_ptr(operands[0].type()))
     {
-      const bvt &bv=convert_bv(operands[0]);
+      // we postpone
+      literalt l=prop.new_variable();
 
-      if(!bv.empty())
-      {
-        bvt invalid_bv, null_bv;
-        encode(pointer_logic.get_invalid_object(), invalid_bv);
-        encode(pointer_logic.get_null_object(),    null_bv);
+      postponed_list.push_back(postponedt());
+      postponed_list.back().op=convert_bv(operands[0]);
+      postponed_list.back().bv.push_back(l);
+      postponed_list.back().expr=expr;
 
-        bvt equal_invalid_bv, equal_null_bv;
-        equal_invalid_bv.resize(object_bits);
-        equal_null_bv.resize(object_bits);
-
-        for(std::size_t i=0; i<object_bits; i++)
-        {
-          equal_invalid_bv[i]=prop.lequal(bv[offset_bits+i],
-                                          invalid_bv[offset_bits+i]);
-          equal_null_bv[i]   =prop.lequal(bv[offset_bits+i],
-                                          null_bv[offset_bits+i]);
-        }
-
-        literalt equal_invalid=prop.land(equal_invalid_bv);
-        literalt equal_null=prop.land(equal_null_bv);
-
-        return prop.lor(equal_invalid, equal_null);
-      }
+      return l;
     }
   }
   else if(expr.id()==ID_dynamic_object)
@@ -439,6 +424,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_byte_extract(to_byte_extract_expr(expr));
   }
+  else if(expr.id()==ID_byte_update_little_endian ||
+          expr.id()==ID_byte_update_big_endian)
+    throw "Byte-wise updates of pointers are unsupported";
 
   return conversion_failed(expr);
 }
@@ -779,6 +767,78 @@ void bv_pointerst::do_postponed(
 
       prop.l_set_to(prop.limplies(l1, l2), true);
     }
+  }
+  else if(postponed.expr.id()==ID_invalid_pointer)
+  {
+    const pointer_logict::objectst &objects=pointer_logic.objects;
+
+    bvt disj;
+    disj.reserve(objects.size());
+
+    bvt saved_bv=postponed.op;
+    saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+
+    bvt invalid_bv, null_bv;
+    encode(pointer_logic.get_invalid_object(), invalid_bv);
+    invalid_bv.erase(invalid_bv.begin(), invalid_bv.begin()+offset_bits);
+    encode(pointer_logic.get_null_object(),    null_bv);
+    null_bv.erase(null_bv.begin(), null_bv.begin()+offset_bits);
+
+    disj.push_back(bv_utils.equal(saved_bv, invalid_bv));
+    disj.push_back(bv_utils.equal(saved_bv, null_bv));
+
+    // compare object part to non-allocated dynamic objects
+    std::size_t number=0;
+
+    for(pointer_logict::objectst::const_iterator
+        it=objects.begin();
+        it!=objects.end();
+        it++, number++)
+    {
+      const exprt &expr=*it;
+
+      if(!pointer_logic.is_dynamic_object(expr) ||
+         !is_ssa_expr(expr))
+        continue;
+
+      // only compare object part
+      bvt bv;
+      encode(number, bv);
+
+      bv.erase(bv.begin(), bv.begin()+offset_bits);
+      assert(bv.size()==saved_bv.size());
+
+      literalt l1=bv_utils.equal(bv, saved_bv);
+
+      const ssa_exprt &ssa=to_ssa_expr(expr);
+
+      const exprt &guard=
+        static_cast<const exprt&>(
+          ssa.get_original_expr().find("#dynamic_guard"));
+
+      if(guard.is_nil())
+        continue;
+
+      const bvt &guard_bv=convert_bv(guard);
+      assert(guard_bv.size()==1);
+      literalt l_guard=guard_bv[0];
+
+      disj.push_back(prop.land(!l_guard, l1));
+    }
+
+    // compare object part to max object number
+    bvt bv;
+    encode(number, bv);
+
+    bv.erase(bv.begin(), bv.begin()+offset_bits);
+    assert(bv.size()==saved_bv.size());
+
+    disj.push_back(
+      bv_utils.rel(saved_bv, ID_ge, bv, bv_utilst::UNSIGNED));
+
+    assert(postponed.bv.size()==1);
+    literalt l=postponed.bv.front();
+    prop.l_set_to(prop.lequal(prop.lor(disj), l), true);
   }
   else
     assert(false);

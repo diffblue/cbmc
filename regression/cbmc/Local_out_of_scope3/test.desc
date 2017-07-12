@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 main.c
--D_ENABLE_CHAIN_ --unwind 2
+--pointer-check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

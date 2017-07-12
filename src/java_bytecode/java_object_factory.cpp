@@ -165,8 +165,9 @@ exprt java_object_factoryt::allocate_object(
     {
       assert(!object_size.is_nil() && "size of Java objects should be known");
       // malloc expression
-      exprt malloc_expr=side_effect_exprt(ID_malloc);
+      exprt malloc_expr=side_effect_exprt(ID_allocate);
       malloc_expr.copy_to_operands(object_size);
+      malloc_expr.copy_to_operands(false_exprt());
       typet result_type=pointer_typet(allocate_type);
       malloc_expr.type()=result_type;
       // Create a symbol for the malloc expression so we can initialize

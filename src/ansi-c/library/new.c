@@ -6,7 +6,13 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   // This just does memory allocation.
   __CPROVER_HIDE:;
   void *res;
-  res=__CPROVER_malloc(malloc_size);
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(malloc_size<(1UL<<((sizeof(char*)-1)*8-1)));
+  res=__CPROVER_allocate(malloc_size, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -31,8 +37,14 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   // The constructor call is done by the front-end.
   // This just does memory allocation.
   __CPROVER_HIDE:;
+  // ensure that all bytes in the allocated memory can be addressed
+  // using our object:offset encoding as specified in
+  // flattening/pointer_logic.h; also avoid sign-extension issues
+  // for 32-bit systems that yields a maximum allocation of 2^23-1,
+  // i.e., just under 8MB
+  __CPROVER_assume(size*count<(1UL<<((sizeof(char*)-1)*8-1)));
   void *res;
-  res=__CPROVER_malloc(size*count);
+  res=__CPROVER_allocate(size*count, 0);
 
   // ensure it's not recorded as deallocated
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
@@ -87,6 +99,9 @@ inline void __delete(void *ptr)
     // non-deterministically record as deallocated
     __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }
 
@@ -116,5 +131,8 @@ inline void __delete_array(void *ptr)
     // non-deterministically record as deallocated
     __CPROVER_bool record;
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
+
+    // detect memory leaks
+    if(__CPROVER_memory_leak==ptr) __CPROVER_memory_leak=0;
   }
 }

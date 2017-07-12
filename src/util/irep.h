@@ -18,9 +18,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "irep_ids.h"
 
 #define SHARING
-// #define HASH_CODE
+#define HASH_CODE
 #define USE_MOVE
-// #define SUB_IS_LIST
+#define SUB_IS_LIST
 
 #ifdef SUB_IS_LIST
 #include <list>

@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/expr_util.h>
+#include <util/message.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
@@ -50,18 +52,21 @@ inline static typet c_sizeof_type_rec(const exprt &expr)
   return nil_typet();
 }
 
-void goto_symext::symex_malloc(
+void goto_symext::symex_allocate(
   statet &state,
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=1)
-    throw "malloc expected to have one operand";
+  if(code.operands().size()!=2)
+    throw "allocate expected to have two operands";
 
   if(lhs.is_nil())
     return; // ignore
 
   dynamic_counter++;
+  // we can only encode 254 fresh objects + invalid + null in 8 bits
+  if(dynamic_counter>254)
+    throw "at most 254 distinct dynamic objects are supported";
 
   exprt size=code.op0();
   typet object_type=nil_typet();
@@ -164,19 +169,43 @@ void goto_symext::symex_malloc(
 
   new_symbol_table.add(value_symbol);
 
+  exprt zero_init=code.op1();
+  state.rename(zero_init, ns); // to allow constant propagation
+  simplify(zero_init, ns);
+
+  if(zero_init.is_constant() && !zero_init.is_zero())
+  {
+    null_message_handlert null_message;
+    exprt zero_value=
+      zero_initializer(
+        object_type,
+        code.source_location(),
+        ns,
+        null_message);
+
+    if(zero_value.is_not_nil())
+    {
+      code_assignt assignment(value_symbol.symbol_expr(), zero_value);
+      symex_assign_rec(state, assignment);
+    }
+  }
+
   address_of_exprt rhs;
+
+  symbol_exprt v=value_symbol.symbol_expr();
+  v.add("#dynamic_guard", state.guard);
 
   if(object_type.id()==ID_array)
   {
     rhs.type()=pointer_typet(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
-    index_expr.array()=value_symbol.symbol_expr();
+    index_expr.array()=v;
     index_expr.index()=from_integer(0, index_type());
     rhs.op0()=index_expr;
   }
   else
   {
-    rhs.op0()=value_symbol.symbol_expr();
+    rhs.op0()=v;
     rhs.type()=pointer_typet(value_symbol.type);
   }
 
@@ -373,6 +402,9 @@ void goto_symext::symex_cpp_new(
   do_array=(code.get(ID_statement)==ID_cpp_new_array);
 
   dynamic_counter++;
+  // we can only encode 254 fresh objects + invalid + null in 8 bits
+  if(dynamic_counter>254)
+    throw "at most 254 distinct dynamic objects are supported";
 
   const std::string count_string(std::to_string(dynamic_counter));
 

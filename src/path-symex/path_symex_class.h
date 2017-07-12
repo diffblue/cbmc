@@ -68,7 +68,7 @@ protected:
 
   void set_return_value(path_symex_statet &, const exprt &);
 
-  void symex_malloc(
+  void symex_allocate(
     path_symex_statet &state,
     const exprt &lhs,
     const side_effect_exprt &code);
