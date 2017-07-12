@@ -64,6 +64,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &x")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -86,6 +87,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[0]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -103,6 +105,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -120,6 +123,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[0]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -139,6 +143,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[1]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -157,6 +162,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[1]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -176,6 +182,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[2]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -195,6 +202,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[0]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -214,6 +222,7 @@ SCENARIO("Constructing write stacks",
       THEN("The constructed stack should be &a[2]")
       {
         auto stack=write_stackt(in_expr, environment, ns);
+        REQUIRE_FALSE(stack.is_top_value());
         const exprt &out_expr=stack.to_expression();
 
         CAPTURE(expr2c(out_expr, ns));
@@ -239,6 +248,7 @@ SCENARIO("Constructing write stacks",
         THEN("The constructed stack should be &a[TOP]")
         {
           auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
           const exprt &out_expr=stack.to_expression();
 
           CAPTURE(expr2c(out_expr, ns));
@@ -265,6 +275,7 @@ SCENARIO("Constructing write stacks",
         THEN("The constructed stack should be &a[2]")
         {
           auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
           const exprt &out_expr=stack.to_expression();
 
           CAPTURE(expr2c(out_expr, ns));
@@ -308,6 +319,7 @@ SCENARIO("Constructing write stacks",
         THEN("The constructed stack should be &s.comp")
         {
           auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
           const exprt &out_expr=stack.to_expression();
 
           CAPTURE(expr2c(out_expr, ns));
@@ -327,6 +339,7 @@ SCENARIO("Constructing write stacks",
         THEN("The constructed stack should be &s.comp2")
         {
           auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
           const exprt &out_expr=stack.to_expression();
 
           CAPTURE(expr2c(out_expr, ns));
@@ -384,6 +397,7 @@ SCENARIO("Constructing write stacks",
         THEN("The constructed stack should be &arr_s[1].comp")
         {
           auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
           const exprt &out_expr=stack.to_expression();
 
           CAPTURE(expr2c(out_expr, ns));
@@ -424,6 +438,7 @@ SCENARIO("Constructing write stacks",
           THEN("The constructed stack should be &arr_s[TOP].comp")
           {
             auto stack=write_stackt(in_expr, environment, ns);
+            REQUIRE_FALSE(stack.is_top_value());
             const exprt &out_expr=stack.to_expression();
 
             CAPTURE(expr2c(out_expr, ns));

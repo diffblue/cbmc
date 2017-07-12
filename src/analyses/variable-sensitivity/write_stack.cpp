@@ -105,10 +105,12 @@ void write_stackt::construct_stack_to_pointer(
 
     if(!top_stack)
     {
-      // check the top of the stack is pointing at an array - we don't support
-      // offset apart from within arrays
-      std::shared_ptr<const write_stack_entryt> entry=
-        *std::prev(stack.cend());
+      // check the symbol at the bottom of the stack
+      std::shared_ptr<const write_stack_entryt> entry=*stack.cbegin();
+      INVARIANT(
+        entry->get_access_expr().id()==ID_symbol,
+        "The base should be an addressable location (i.e. symbol)");
+
       if(entry->get_access_expr().type().id()!=ID_array)
       {
         top_stack=true;
@@ -175,6 +177,8 @@ void write_stackt::construct_stack_to_array_index(
 ///   for top elements.
 exprt write_stackt::to_expression() const
 {
+  // A top stack is useless and its expression should not be evaluated
+  PRECONDITION(!is_top_value());
   exprt access_expr=nil_exprt();
   for(const std::shared_ptr<write_stack_entryt> &entry : stack)
   {
