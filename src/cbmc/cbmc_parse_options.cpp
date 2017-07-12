@@ -503,7 +503,11 @@ int cbmc_parse_optionst::doit()
   // unwinds <clinit> loops to number of enum elements
   // side effect: add this as explicit unwind to unwind set
   if(options.get_bool_option("java-unwind-enum-static"))
-    remove_static_init_loops(symbol_table, goto_functions, options);
+    remove_static_init_loops(
+      symbol_table,
+      goto_functions,
+      options,
+      ui_message_handler);
 
   // get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
