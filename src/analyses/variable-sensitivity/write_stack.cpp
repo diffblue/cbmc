@@ -60,14 +60,6 @@ void write_stackt::construct_stack_to_pointer(
 {
   PRECONDITION(expr.type().id()==ID_pointer);
 
-  // If we are a pointer to a struct, we do not currently support reading
-  // writing directly to it so just create a top stack
-  if(ns.follow(expr.type().subtype()).id()==ID_struct)
-  {
-    top_stack=true;
-    return;
-  }
-
   if(expr.id()==ID_address_of)
   {
     // resovle reminder, can either be a symbol, member or index of
