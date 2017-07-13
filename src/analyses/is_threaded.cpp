@@ -51,7 +51,7 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns) final
+    const namespacet &ns) final override
   {
     // assert(reachable);
 
@@ -62,22 +62,34 @@ public:
       is_threaded=true;
   }
 
-  void make_bottom() final
+  void make_bottom() final override
   {
     reachable=false;
     is_threaded=false;
   }
 
-  void make_top() final
+  void make_top() final override
   {
     reachable=true;
     is_threaded=true;
   }
 
-  void make_entry() final
+  void make_entry() final override
   {
     reachable=true;
     is_threaded=false;
+  }
+
+  bool is_bottom() const override final
+  {
+    assert(reachable || !is_threaded);
+
+    return !reachable;
+  }
+
+  bool is_top() const override final
+  {
+    return reachable && is_threaded;
   }
 };
 
