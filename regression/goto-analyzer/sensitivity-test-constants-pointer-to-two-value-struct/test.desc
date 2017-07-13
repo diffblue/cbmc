@@ -9,5 +9,19 @@ sensitivity_test_constants_pointer_to_two_value_struct.c
 ^\[main.assertion.4\] .* p->a==1: Unknown$
 ^\[main.assertion.5\] .* p->b==2.0: Unknown$
 ^\[main.assertion.6\] .* p->b==1.0: Unknown$
+\[main\.assertion\.7\] .* comp_p==&x\.a: Unknown$
+\[main\.assertion\.8\] .* comp_p==&x\.b: Unknown$
+\[main\.assertion\.9\] .* \*comp_p==0: Unknown$
+\[main\.assertion\.10\] .* \*comp_p==1: Unknown$
+\[main\.assertion\.11\] .* compb_p==&x\.a: Unknown$
+\[main\.assertion\.12\] .* compb_p==&x\.b: Unknown$
+\[main\.assertion\.13\] .* \*compb_p==2\.0: Unknown$
+\[main\.assertion\.14\] .* \*compb_p==1\.0: Unknown$
+\[main\.assertion\.15\] .* implicit_p==&x\.a: Unknown$
+\[main\.assertion\.16\] .* implicit_p==&x: Unknown$
+\[main\.assertion\.17\] .* \*implicit_p==0: Unknown$
+\[main\.assertion\.18\] .* \*implicit_p==1: Unknown$
+\[main\.assertion\.19\] .* x\.a==5: Unknown$
+\[main\.assertion\.20\] .* x\.a==1: Unknown$
 --
 ^warning: ignoring

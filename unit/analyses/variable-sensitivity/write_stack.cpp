@@ -353,13 +353,27 @@ SCENARIO("Constructing write stacks",
       }
       WHEN("Constructing from &s")
       {
-        // fiddly as it depends on the type to some degree
-        // if we want to make a (struct str *) then we want to make a pointer to
-        // &s
-        // If it is a pointer to the type of the first component then we really
-        // want &(s.comp)
-        // for now we just reject and create a junk stack
         exprt in_expr=to_expr("&s", ns);
+        CAPTURE(expr2c(in_expr, ns));
+
+        THEN("Then should get a write stack representing &s")
+        {
+          auto stack=write_stackt(in_expr, environment, ns);
+          REQUIRE_FALSE(stack.is_top_value());
+          const exprt &out_expr=stack.to_expression();
+
+          CAPTURE(expr2c(out_expr, ns));
+
+          REQUIRE(out_expr.id()==ID_address_of);
+          const exprt &object=out_expr.op0();
+          require_exprt::require_symbol(object, "s");
+        }
+      }
+      WHEN("Constructing from (int *)&s")
+      {
+        // TODO: we could in theory analyse the struct and offset the pointer
+        // but not yet
+        exprt in_expr=to_expr("(int *)&s", ns);
         CAPTURE(expr2c(in_expr, ns));
 
         THEN("Then should get a top stack")
@@ -419,9 +433,16 @@ SCENARIO("Constructing write stacks",
 
         THEN("The constructed stack should be TOP")
         {
-          // Since we don't allow constructing a pointer to a struct yet
           auto stack=write_stackt(in_expr, environment, ns);
-          REQUIRE(stack.is_top_value());
+          REQUIRE_FALSE(stack.is_top_value());
+          const exprt &out_expr=stack.to_expression();
+
+          CAPTURE(expr2c(out_expr, ns));
+
+          REQUIRE(out_expr.id()==ID_address_of);
+          const exprt &object=out_expr.op0();
+          const index_exprt &index_expr=require_exprt::require_index(object, 1);
+          require_exprt::require_symbol(index_expr.array(), "arr_s");
         }
       }
       GIVEN("A symbol int x")
