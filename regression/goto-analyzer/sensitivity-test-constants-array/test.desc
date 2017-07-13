@@ -1,6 +1,6 @@
 CORE
 sensitivity_test_constants_array.c
---variable --arrays --verify
+--variable --arrays --verify --pointers
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main.assertion.1\] .* a\[1\]==0: Success$
@@ -9,8 +9,8 @@ sensitivity_test_constants_array.c
 ^\[main.assertion.4\] .* b\[1\]==1: Failure \(if reachable\)$
 ^\[main.assertion.5\] .* \*\(b\+1\)==0: Success$
 ^\[main.assertion.6\] .* \*\(b\+1\)==1: Failure \(if reachable\)$
-^\[main.assertion.7\] .* \*\(1\+b\)==0: Unknown$
-^\[main.assertion.8\] .* \*\(1\+b\)==1: Unknown$
+^\[main.assertion.7\] .* \*\(1\+b\)==0: Success$
+^\[main.assertion.8\] .* \*\(1\+b\)==1: Failure \(if reachable\)$
 ^\[main.assertion.9\] .* 1\[b\]==0: Success$
 ^\[main.assertion.10\] .* 1\[b\]==1: Failure \(if reachable\)$
 ^\[main.assertion.11\] .* c\[0\]==0: Success$
