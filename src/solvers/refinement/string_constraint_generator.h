@@ -94,6 +94,9 @@ public:
 
   static constant_exprt constant_char(int i, const typet &char_type);
 
+  // Used by string refinement
+  void add_axioms_for_if_array(const exprt &lhs, const if_exprt &expr);
+
 private:
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
   // that is -2147483648 so takes 11 characters to write.

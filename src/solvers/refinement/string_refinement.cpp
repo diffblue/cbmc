@@ -218,16 +218,20 @@ bool string_refinementt::add_axioms_for_string_assigns(
       add_symbol_to_symbol_map(lhs, rhs);
       return false;
     }
-    else if(rhs.id() == ID_nondet_symbol)
+    else if(rhs.id()==ID_nondet_symbol)
     {
       add_symbol_to_symbol_map(
         lhs, generator.fresh_symbol("nondet_array", lhs.type()));
       return false;
     }
+    else if(rhs.id()==ID_if)
+    {
+      generator.add_axioms_for_if_array(lhs, to_if_expr(rhs));
+      return false;
+    }
     else
     {
-      debug() << "string_refinement warning: not handling char_array: "
-              << from_expr(ns, "", rhs) << eom;
+      warning() << "ignoring char array " << from_expr(ns, "", rhs) << eom;
       return true;
     }
   }
@@ -370,8 +374,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     if(eq_expr.lhs().type()!=eq_expr.rhs().type())
     {
-      debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(ns, "", expr) << " [inconsistent types]" << eom;
+      warning() << "ignoring " << from_expr(ns, "", expr)
+                << " [inconsistent types]" << eom;
       debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
       debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
       return;
@@ -392,8 +396,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     // TODO: See if this happens at all.
     if(lhs.id()!=ID_symbol)
     {
-      debug() << "(sr::set_to) WARNING: ignoring "
-              << from_expr(ns, "", expr) << eom;
+      warning() << "ignoring " << from_expr(ns, "", expr) << eom;
       return;
     }
 
@@ -404,9 +407,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
          subst_rhs.type().id() != ID_array ||
          eq_expr.lhs().type().subtype() != subst_rhs.type().subtype())
       {
-        debug() << "(sr::set_to) WARNING: ignoring "
-                << from_expr(ns, "", expr) << " [inconsistent types after substitution]"
-                << eom;
+        warning() << "ignoring " << from_expr(ns, "", expr)
+                  << " [inconsistent types after substitution]" << eom;
         return;
       }
       else
@@ -857,9 +859,15 @@ exprt string_refinementt::substitute_array_with_expr(
 }
 
 /// create an equivalent expression where array accesses and 'with' expressions
-/// are replaced by 'if' expressions. e.g. for an array access arr[x], where:
-/// `arr := {12, 24, 48}` the constructed expression will be: `index==0 ? 12 :
-/// index==1 ? 24 : 48`
+/// are replaced by 'if' expressions, in particular:
+///  * for an array access `arr[x]`, where:
+///    `arr := {12, 24, 48}` the constructed expression will be:
+///    `index==0 ? 12 : index==1 ? 24 : 48`
+///  * for an array access `arr[x]`, where:
+///    `arr := array_of(12) with {0:=24} with {2:=42}` the constructed
+///    expression will be: `index==0 ? 24 : index==2 ? 42 : 12`
+///  * for an array access `(g1?arr1:arr2)[x]` where `arr1 := {12}` and
+///    `arr2 := {34}`, the constructed expression will be: `g1 ? 12 : 34`
 /// \param expr: an expression containing array accesses
 /// \return an expression containing no array access
 void string_refinementt::substitute_array_access(exprt &expr) const
@@ -887,6 +895,18 @@ void string_refinementt::substitute_array_access(exprt &expr) const
     if(index_expr.array().id()==ID_array_of)
     {
       expr=to_array_of_expr(index_expr.array()).op();
+      return;
+    }
+
+    if(index_expr.array().id()==ID_if)
+    {
+      // Substitute recursively in branches of conditional expressions
+      if_exprt if_expr=to_if_expr(index_expr.array());
+      exprt true_case=index_exprt(if_expr.true_case(), index_expr.index());
+      substitute_array_access(true_case);
+      exprt false_case=index_exprt(if_expr.false_case(), index_expr.index());
+      substitute_array_access(false_case);
+      expr=if_exprt(if_expr.cond(), true_case, false_case);
       return;
     }
 
