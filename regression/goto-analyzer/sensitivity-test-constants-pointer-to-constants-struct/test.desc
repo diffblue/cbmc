@@ -1,16 +1,30 @@
-KNOWNBUG
+CORE
 sensitivity_test_constants_pointer_to_constants_struct.c
 --variable --pointers --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] .* \(\*p\).a==0: Success$
-^\[main.assertion.2\] .* \(\*p\).a==1: Failure \(if reachable\)$
-^\[main.assertion.3\] .* p->a==0: Success$
-^\[main.assertion.4\] .* p->a==1: Failure \(if reachable\)$
-^\[main.assertion.5\] .* p->b==2.0: Success$
-^\[main.assertion.6\] .* p->b==1.0: Failure \(if reachable\)$
+^\[main\.assertion\.1\] .* \(\*p\).a==0: Success$
+^\[main\.assertion\.2\] .* \(\*p\).a==1: Failure \(if reachable\)$
+^\[main\.assertion\.3\] .* p->a==0: Success$
+^\[main\.assertion\.4\] .* p->a==1: Failure \(if reachable\)$
+^\[main\.assertion\.5\] .* p->b==2.0: Success$
+^\[main\.assertion\.6\] .* p->b==1.0: Failure \(if reachable\)$
+^\[main\.assertion\.9\] .* \*comp_p==0: Success$
+^\[main\.assertion\.10\] .* \*comp_p==1: Failure \(if reachable\)$
+^\[main\.assertion\.13\] .* \*compb_p==2.0: Success$
+^\[main\.assertion\.14\] .* \*compb_p==1.0: Failure \(if reachable\)$
+^\[main\.assertion\.17\] .* \*implicit_p==0: Unknown$
+^\[main\.assertion\.18\] .* \*implicit_p==1: Unknown$
+^\[main\.assertion\.19\] .* x.a==5: Unknown$
+^\[main\.assertion\.20\] .* x.a==1: Unknown$
 --
 ^warning: ignoring
 --
-The final two assertions are the wrong way round as modifying the pointer
-does not seem to be propogating through. See #96
+The following assertions are not checked since simplify_expr doesn't handle
+them. See issue diffblue/cbmc-toyota#145
+^\[main\.assertion\.7\] .* comp_p==&x.a: Success
+^\[main\.assertion\.8\] .* comp_p==&x.b: Failure \(if reachable\)$
+^\[main\.assertion\.11\] .* compb_p==&x.a: Failure \(if reachable\)$
+^\[main\.assertion\.12\] .* compb_p==&x.b: Success
+^\[main\.assertion\.15\] .* implicit_p==&x.a: Success
+^\[main\.assertion\.16\] .* implicit_p==&x: Success
