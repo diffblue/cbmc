@@ -5,7 +5,7 @@ public class test
 {
   public static void main(C c)
   {
-    if(c==null)
+    if(c==null || c.a==null)
       return;
     c.a.f();
   }
