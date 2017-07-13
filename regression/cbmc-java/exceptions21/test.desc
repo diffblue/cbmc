@@ -1,0 +1,11 @@
+CORE
+test.class
+--function test.f --java-throw-runtime-exceptions
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+reference is null in .*: FAILURE
+--
+This checks that the second use of a particular exception type in a given function is correctly initialised.
+In the failing case the #exception_value variable is nondet at the time it is thrown, so cbmc can set it to null and fail an assertion.

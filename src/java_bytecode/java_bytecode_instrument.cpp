@@ -9,6 +9,7 @@ Date:   June 2017
 \*******************************************************************/
 
 #include <util/arith_tools.h>
+#include <util/fresh_symbol.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
@@ -18,7 +19,6 @@ Date:   June 2017
 #include "java_bytecode_convert_class.h"
 #include "java_bytecode_instrument.h"
 #include "java_entry_point.h"
-#include "java_object_factory.h"
 #include "java_root_class.h"
 #include "java_types.h"
 #include "java_utils.h"
@@ -90,47 +90,46 @@ codet java_bytecode_instrumentt::throw_exception(
   const source_locationt &original_loc,
   const irep_idt &exc_name)
 {
-  exprt exc;
-  code_blockt init_code;
-  const irep_idt &exc_obj_name=
-    id2string(goto_functionst::entry_point())+
-    "::"+id2string(exc_name);
+  irep_idt exc_class_name("java::"+id2string(exc_name));
 
-  if(!symbol_table.has_symbol(exc_obj_name))
+  if(!symbol_table.has_symbol(exc_class_name))
   {
     generate_class_stub(
       exc_name,
       symbol_table,
       get_message_handler());
-    const symbolt &exc_symbol=symbol_table.lookup(
-      "java::"+id2string(exc_name));
-
-    // create the exception object
-    exc=object_factory(
-      pointer_typet(exc_symbol.type),
-      exc_name,
-      init_code,
-      false,
-      symbol_table,
-      max_array_length,
-      allocation_typet::LOCAL,
-      original_loc);
   }
-  else
-    exc=symbol_table.lookup(exc_obj_name).symbol_expr();
+
+  pointer_typet exc_ptr_type;
+  exc_ptr_type.subtype()=symbol_typet(exc_class_name);
+
+  // Allocate and throw an instance of the exception class:
+
+  symbolt &new_symbol=
+    get_fresh_aux_symbol(
+      exc_ptr_type,
+      "new_exception",
+      "new_exception",
+      original_loc,
+      ID_java,
+      symbol_table);
+
+  side_effect_exprt new_instance(ID_java_new, exc_ptr_type);
+  code_assignt assign_new(new_symbol.symbol_expr(), new_instance);
 
   side_effect_expr_throwt throw_expr;
-  throw_expr.add_source_location()=original_loc;
-  throw_expr.move_to_operands(exc);
+  throw_expr.copy_to_operands(new_symbol.symbol_expr());
+
+  code_blockt throw_code;
+  throw_code.move_to_operands(assign_new);
+  throw_code.copy_to_operands(code_expressiont(throw_expr));
 
   code_ifthenelset if_code;
   if_code.add_source_location()=original_loc;
   if_code.cond()=cond;
-  if_code.then_case()=code_expressiont(throw_expr);
+  if_code.then_case()=throw_code;
 
-  init_code.move_to_operands(if_code);
-
-  return init_code;
+  return if_code;
 }
 
 /// Checks whether the array access array_struct[idx] is out-of-bounds,
@@ -209,7 +208,7 @@ codet java_bytecode_instrumentt::check_class_cast(
       throw_exception(
         not_exprt(class_cast_check),
         original_loc,
-        "ClassCastException");
+        "java.lang.ClassCastException");
   }
   else
   {
