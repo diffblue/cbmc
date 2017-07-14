@@ -6,13 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
+
+#include <memory>
 
 #include <util/message.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
+
+#include <java_bytecode/select_pointer_type.h>
 
 /// Selects the kind of allocation used by java_object_factory et al.
 enum class allocation_typet {
@@ -32,7 +35,8 @@ exprt object_factory(
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
   allocation_typet alloc_type,
-  const source_locationt &);
+  const source_locationt &location,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector);
 
 enum class update_in_placet
 {
@@ -50,6 +54,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector,
   update_in_placet update_in_place);
 
 exprt allocate_dynamic_object(

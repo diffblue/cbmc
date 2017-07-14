@@ -11,56 +11,15 @@
 /// classes to concrete versions).
 
 #include "select_pointer_type.h"
-
-#include <java_bytecode/get_concrete_class_alphabetically.h>
-
-#include <util/invariant.h>
-#include <util/namespace.h>
 #include <util/std_types.h>
 
-
-/// Select what type should be used for a given pointer type. If the class
-/// pointed to is abstract then we consider using a subclass of it.
+/// Select what type should be used for a given pointer type. For the base class
+/// we just use the supplied type. Derived classes can override this behaviour
+/// to provide more sophisticated type selection
 /// \param pointer_type: The pointer type replace
 /// \return A pointer type where the subtype may have been modified
-pointer_typet select_pointer_typet::operator()(
+pointer_typet select_pointer_typet::convert_pointer_type(
   const pointer_typet &pointer_type) const
 {
-  // Currently only replace abstract classes
-  // Potentially in the future we might want to consider anything with
-  // derived classes
-  if(!is_abstract_type(pointer_type))
-  {
-    return pointer_type;
-  }
-
-  // TODO(tkiley): Look to see whether there is a suitable model class to use
-
-  get_concrete_class_alphabeticallyt get_concrete_class_alphabetically(ns);
-  const pointer_typet &resolved_type=
-    get_concrete_class_alphabetically(pointer_type);
-
-  return resolved_type;
-}
-
-/// Find out whether a pointer is pointing to an abstract type (either an
-/// abstract class or an interface).
-/// \param pointer_type: The type of the pointer
-/// \return True if the type pointed to is either an abstract class or an
-///   interface.
-bool select_pointer_typet::is_abstract_type(
-  const pointer_typet &pointer_type) const
-{
-  const typet &pointing_to_type=ns.follow(pointer_type.subtype());
-  if(pointing_to_type.id()==ID_struct)
-  {
-    const class_typet &class_type=to_class_type(pointing_to_type);
-    return class_type.is_class() && class_type.is_abstract();
-  }
-  else
-  {
-    // we are dealing with some other type that a reference to a polymorphic
-    // class so therefore we are definitely not abstract
-    return false;
-  }
+  return  pointer_type;
 }

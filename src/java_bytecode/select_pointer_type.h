@@ -19,14 +19,9 @@ class namespacet;
 class select_pointer_typet
 {
 public:
-  explicit select_pointer_typet(const namespacet &ns):ns(ns)
-  {}
-
-  pointer_typet operator()(const pointer_typet &pointer_type) const;
-private:
-  bool is_abstract_type(const pointer_typet &pointer_type) const;
-
-  const namespacet &ns;
+  virtual ~select_pointer_typet()=default;
+  virtual pointer_typet convert_pointer_type(
+    const pointer_typet &pointer_type) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H

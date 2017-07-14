@@ -2,7 +2,6 @@ SRC = bytecode_info.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
       expr2java.cpp \
-      get_concrete_class_alphabetically.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \

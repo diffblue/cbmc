@@ -10,8 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 #define CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 
+#include <memory>
 #include <util/irep.h>
 #include <util/symbol.h>
+#include <java_bytecode/select_pointer_type.h>
 
 #define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"
 
@@ -20,7 +22,8 @@ bool java_entry_point(
   const irep_idt &main_class,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  size_t max_nondet_array_length);
+  size_t max_nondet_array_length,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector);
 
 typedef struct
 {
