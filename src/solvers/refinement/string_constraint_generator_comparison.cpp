@@ -14,7 +14,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// add axioms stating that the result is true exactly when the strings
-/// represented by the arguments are equal
+/// represented by the arguments are equal. the variable ending in
+/// `witness_unequal` is -1 if the length differs or an index at which the
+/// strings are different
 /// \par parameters: function application with two string arguments
 /// \return a expression of Boolean type
 exprt string_constraint_generatort::add_axioms_for_equals(
