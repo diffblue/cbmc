@@ -11,6 +11,12 @@ Date:   March 2017
 
 \*******************************************************************/
 
+/// \file
+/// Preprocess a goto-programs so that calls to the java Character library are
+///   replaced by simple expressions. For now support is limited to character in
+///   the ASCII range, some methods may have incorrect specifications outside of
+///   this range.
+
 #ifndef CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 #define CPROVER_JAVA_BYTECODE_CHARACTER_REFINE_PREPROCESS_H
 
