@@ -327,7 +327,7 @@ void java_object_factoryt::gen_pointer_target_init(
   bool create_dynamic_objects,
   update_in_placet update_in_place)
 {
-  assert(update_in_place!=MAY_UPDATE_IN_PLACE);
+  assert(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
 
   if(target_type.id()==ID_struct &&
      has_prefix(
@@ -342,7 +342,7 @@ void java_object_factoryt::gen_pointer_target_init(
   else
   {
     exprt target;
-    if(update_in_place==NO_UPDATE_IN_PLACE)
+    if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
     {
       target=allocate_object(
         assignments,
@@ -428,7 +428,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     // If this is a recursive type of some kind, set null.
     if(!recursion_set.insert(struct_tag).second)
     {
-      if(update_in_place==NO_UPDATE_IN_PLACE)
+      if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
         assignments.copy_to_operands(
           get_null_assignment(expr, pointer_type));
@@ -441,17 +441,17 @@ void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt new_object_assignments;
   code_blockt update_in_place_assignments;
 
-  if(update_in_place!=NO_UPDATE_IN_PLACE)
+  if(update_in_place!=update_in_placet::NO_UPDATE_IN_PLACE)
   {
     gen_pointer_target_init(
       update_in_place_assignments,
       expr,
       subtype,
       create_dynamic_objects,
-      MUST_UPDATE_IN_PLACE);
+      update_in_placet::MUST_UPDATE_IN_PLACE);
   }
 
-  if(update_in_place==MUST_UPDATE_IN_PLACE)
+  if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
   {
     assignments.append(update_in_place_assignments);
     return;
@@ -465,7 +465,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     expr,
     subtype,
     create_dynamic_objects,
-    NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Determine whether the pointer can be null.
   // In particular the array field of a String should not be null.
@@ -506,13 +506,13 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   // Similarly to above, maybe use a conditional if both the
   // allocate-fresh and update-in-place cases are allowed:
-  if(update_in_place==NO_UPDATE_IN_PLACE)
+  if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
   {
     assignments.append(new_object_assignments);
   }
   else
   {
-    INVARIANT(update_in_place==MAY_UPDATE_IN_PLACE,
+    INVARIANT(update_in_place==update_in_placet::MAY_UPDATE_IN_PLACE,
       "No update and must update should have already been resolved");
 
     code_ifthenelset update_check;
@@ -604,7 +604,7 @@ void java_object_factoryt::gen_nondet_struct_init(
 
     if(name=="@class_identifier")
     {
-      if(update_in_place==MUST_UPDATE_IN_PLACE)
+      if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
         continue;
 
       if(skip_classid)
@@ -618,7 +618,7 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
     else if(name=="@lock")
     {
-      if(update_in_place==MUST_UPDATE_IN_PLACE)
+      if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
         continue;
       code_assignt code(me, from_integer(0, me.type()));
       code.add_source_location()=loc;
@@ -634,8 +634,8 @@ void java_object_factoryt::gen_nondet_struct_init(
       // If this is a pointer to another object, offer the chance
       // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
       update_in_placet substruct_in_place=
-        update_in_place==MUST_UPDATE_IN_PLACE && !_is_sub ?
-        MAY_UPDATE_IN_PLACE :
+        update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE && !_is_sub ?
+        update_in_placet::MAY_UPDATE_IN_PLACE :
         update_in_place;
       gen_nondet_init(
         assignments,
@@ -754,7 +754,7 @@ void java_object_factoryt::allocate_nondet_length_array(
     false,
     false,
     typet(),
-    NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Insert assumptions to bound its length:
   binary_relation_exprt
@@ -783,7 +783,7 @@ void java_object_factoryt::gen_nondet_array_init(
   update_in_placet update_in_place)
 {
   assert(expr.type().id()==ID_pointer);
-  assert(update_in_place!=MAY_UPDATE_IN_PLACE);
+  assert(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
   const typet &type=ns.follow(expr.type().subtype());
   const struct_typet &struct_type=to_struct_type(type);
   assert(expr.type().subtype().id()==ID_symbol);
@@ -792,7 +792,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   auto max_length_expr=from_integer(max_nondet_array_length, java_int_type());
 
-  if(update_in_place==NO_UPDATE_IN_PLACE)
+  if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
   {
     allocate_nondet_length_array(
       assignments,
@@ -855,7 +855,7 @@ void java_object_factoryt::gen_nondet_array_init(
 
   assignments.move_to_operands(done_test);
 
-  if(update_in_place!=MUST_UPDATE_IN_PLACE)
+  if(update_in_place!=update_in_placet::MUST_UPDATE_IN_PLACE)
   {
     // Add a redundant if(counter == max_length) break
     // that is easier for the unwinder to understand.
@@ -874,8 +874,8 @@ void java_object_factoryt::gen_nondet_array_init(
   // If this is a pointer to another object, offer the chance
   // to leave it alone by setting MAY_UPDATE_IN_PLACE instead.
   update_in_placet child_update_in_place=
-    update_in_place==MUST_UPDATE_IN_PLACE ?
-    MAY_UPDATE_IN_PLACE :
+    update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE ?
+    update_in_placet::MAY_UPDATE_IN_PLACE :
     update_in_place;
   gen_nondet_init(
     assignments,
@@ -950,7 +950,7 @@ exprt object_factory(
     false,
     false,
     typet(),
-    NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Add the following code to init_code for each symbol that's been created:
   //   <type> <identifier>;

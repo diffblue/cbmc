@@ -85,9 +85,10 @@ static goto_programt::targett insert_nondet_init_code(
     symbol_table,
     source_loc,
     true,
+    true,
     !nullable,
     max_nondet_array_length,
-    NO_UPDATE_IN_PLACE);
+    update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Convert this code into goto instructions
   goto_programt new_instructions;
