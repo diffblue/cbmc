@@ -1213,6 +1213,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
       ID_cprover_string_literal_func,
       {class_identifier},
       symbol_table));
+  exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, code);
+  code.add(code_assignt(string_expr_sym, string_expr));
 
   // string_expr1 = substr(string_expr, 6)
   // We do this to remove the "java::" prefix
@@ -1223,6 +1225,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
       ID_cprover_string_substring_func,
       {string_expr, from_integer(6, java_int_type())},
       symbol_table));
+  exprt string_expr_sym1=fresh_string_expr_symbol(loc, symbol_table, code);
+  code.add(code_assignt(string_expr_sym1, string_expr1));
 
   // string1 = (String*) string_expr
   pointer_typet string_ptr_type(
