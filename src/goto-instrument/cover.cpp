@@ -19,12 +19,12 @@ Date: May 2016
 
 #include <util/format_number_range.h>
 #include <util/prefix.h>
-#include <util/message.h>
 #include <util/string2int.h>
 #include <util/cprover_prefix.h>
 #include <util/config.h>
 
 #include <json/json_parser.h>
+#include <util/message.h>
 
 class basic_blockst
 {
