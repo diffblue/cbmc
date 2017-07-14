@@ -23,7 +23,7 @@ exprt object_factory(
   size_t max_nondet_array_length,
   const source_locationt &);
 
-enum update_in_placet
+enum class update_in_placet
 {
   NO_UPDATE_IN_PLACE,
   MAY_UPDATE_IN_PLACE,
@@ -39,7 +39,7 @@ void gen_nondet_init(
   bool create_dyn_objs,
   bool assume_non_null,
   size_t max_nondet_array_length,
-  update_in_placet update_in_place=NO_UPDATE_IN_PLACE);
+  update_in_placet update_in_place);
 
 exprt allocate_dynamic_object(
   const exprt &target_expr,
