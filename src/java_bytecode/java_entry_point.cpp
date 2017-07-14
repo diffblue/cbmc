@@ -78,7 +78,8 @@ void java_static_lifetime_init(
   symbol_tablet &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length)
+  unsigned max_nondet_array_length,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector)
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
@@ -119,7 +120,8 @@ void java_static_lifetime_init(
           symbol_table,
           max_nondet_array_length,
           allocation_typet::GLOBAL,
-          source_location);
+          source_location,
+          pointer_type_selector);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
       }
@@ -138,7 +140,8 @@ exprt::operandst java_build_arguments(
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
-  unsigned max_nondet_array_length)
+  size_t max_nondet_array_length,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -182,7 +185,8 @@ exprt::operandst java_build_arguments(
         symbol_table,
         max_nondet_array_length,
         allocation_typet::LOCAL,
-        function.location);
+        function.location,
+        pointer_type_selector);
 
     // record as an input
     codet input(ID_input);
@@ -462,7 +466,8 @@ bool java_entry_point(
   const irep_idt &main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  std::shared_ptr<select_pointer_typet> pointer_type_selector)
 {
   // check if the entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -485,7 +490,8 @@ bool java_entry_point(
     symbol_table,
     symbol.location,
     assume_init_pointers_not_null,
-    max_nondet_array_length);
+    max_nondet_array_length,
+    pointer_type_selector);
 
   code_blockt init_code;
 
@@ -552,7 +558,8 @@ bool java_entry_point(
       init_code,
       symbol_table,
       assume_init_pointers_not_null,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      pointer_type_selector);
   call_main.arguments()=main_arguments;
 
   init_code.move_to_operands(call_main);

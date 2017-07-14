@@ -1,7 +1,0 @@
-CORE
-TestClass.class
---cover location --function TestClass.foo --show-goto-functions
-@class_identifier = "java::A";
-@class_identifier = "java::C";
-.someObject1 = \(struct I \*\)
-.someObject2 = \(struct J \*\)

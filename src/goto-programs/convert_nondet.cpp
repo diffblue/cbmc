@@ -14,6 +14,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "goto-programs/goto_model.h"
 #include "goto-programs/remove_skip.h"
 
+#include <memory>
 #include "java_bytecode/java_object_factory.h" // gen_nondet_init
 
 #include "util/irep_ids.h"
@@ -88,6 +89,7 @@ static goto_programt::targett insert_nondet_init_code(
     allocation_typet::DYNAMIC,
     !nullable,
     max_nondet_array_length,
+    std::make_shared<select_pointer_typet>(),
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Convert this code into goto instructions

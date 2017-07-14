@@ -1,8 +1,0 @@
-CORE
-TestClass.class
---cover location --function TestClass.foo --show-goto-functions
-@class_identifier = "java::A";
- = \(struct I \*\)
-@class_identifier = "java::C";
- = \(struct J \*\)
-tmp_object_factory\$\d+ = null;

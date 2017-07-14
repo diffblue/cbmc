@@ -704,7 +704,8 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
       main_class,
       get_message_handler(),
       assume_inputs_non_null,
-      max_nondet_array_length));
+      max_nondet_array_length,
+      std::make_shared<select_pointer_typet>()));
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)
