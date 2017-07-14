@@ -30,19 +30,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
-/*******************************************************************\
-
-Constructor: string_refinementt
-
-     Inputs:
-       _ns - a namespace
-       _prop - a decision procedure
-       refinement_bound - a bound on the number of refinements
-
-    Purpose: refinement_bound is a bound on the number of refinement allowed.
-
-\*******************************************************************/
-
 string_refinementt::string_refinementt(
   const namespacet &_ns,
   propt &_prop,
@@ -77,14 +64,6 @@ void string_refinementt::enforce_printable_characters()
 {
   generator.force_printable_characters=true;
 }
-
-/*******************************************************************\
-
-Function: string_refinementt::display_index_set
-
- Purpose: display the current index set, for debugging
-
-\*******************************************************************/
 
 /// display the current index set, for debugging
 void string_refinementt::display_index_set()
