@@ -531,7 +531,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
     switch(res)
     {
-    case D_SATISFIABLE:
+    case resultt::D_SATISFIABLE:
       if(!check_axioms())
       {
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
@@ -540,7 +540,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       {
         debug() << "check_SAT: the model is correct" << eom;
         concretize_lengths();
-        return D_SATISFIABLE;
+        return resultt::D_SATISFIABLE;
       }
 
       debug() <<  "refining..." << eom;
@@ -587,7 +587,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
   debug() << "string_refinementt::dec_solve reached the maximum number"
            << "of steps allowed" << eom;
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
 
 /// fills as many 0 as necessary in the bit vectors to have the right width
