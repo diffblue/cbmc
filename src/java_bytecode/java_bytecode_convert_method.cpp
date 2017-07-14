@@ -1503,10 +1503,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
         bytecode_write_typet::ARRAY_REF,
         "");
 
-      codet bounds_check=
-        get_array_bounds_check(deref, op[1], i_it->source_location);
-      bounds_check.add_source_location()=i_it->source_location;
-      block.move_to_operands(bounds_check);
       code_assignt array_put(element, op[2]);
       array_put.add_source_location()=i_it->source_location;
       block.move_to_operands(array_put);
