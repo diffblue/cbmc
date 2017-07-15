@@ -17,7 +17,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
-/// \param non:typchecked object, non-typechecked operands
+/// \param object: non-typechecked object
+/// \param operands: non-typechecked operands
 /// \return typechecked code
 codet cpp_typecheckt::cpp_constructor(
   const source_locationt &source_location,
@@ -40,8 +41,8 @@ codet cpp_typecheckt::cpp_constructor(
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
     // In the general case, a program is not allow to use this form of
-    // construct. This way of initializing an array is used internaly only.
-    // The purpose of the tag #arra_ini is to rule out ill-formed
+    // construct. This way of initializing an array is used internally only.
+    // The purpose of the tag #array_ini is to rule out ill-formed
     // programs.
 
     if(!operands.empty() && !operands.front().get_bool("#array_ini"))

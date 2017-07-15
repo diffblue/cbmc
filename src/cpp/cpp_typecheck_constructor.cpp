@@ -353,7 +353,7 @@ void cpp_typecheckt::default_cpctor(
   }
 }
 
-/// Generate declarartion of the implicit default assignment operator
+/// Generate declaration of the implicit default assignment operator
 void cpp_typecheckt::default_assignop(
   const symbolt &symbol,
   cpp_declarationt &cpctor)
@@ -508,7 +508,7 @@ void cpp_typecheckt::default_assignop_value(
   ret_code.type()=code_typet();
 }
 
-/// Check a constructor initialization-list. An initalizer has to be a data
+/// Check a constructor initialization-list. An initializer has to be a data
 /// member declared in this class or a direct-parent constructor.
 /// \param bases: the parents of the class
 /// \param components: the components of the class
@@ -647,7 +647,7 @@ void cpp_typecheckt::check_member_initializers(
 /// direct-parent constructors are called. Second, all the non-pod data members
 /// are initialized.
 ///
-///    Note: The initialization order follows the decalration order.
+///    Note: The initialization order follows the declaration order.
 /// \param struct_union_type: the class/struct/union
 /// \param initializers: the constructor initializers
 /// \return initializers is updated.
@@ -709,7 +709,7 @@ void cpp_typecheckt::full_member_initialization(
 
     const irept &bases=struct_union_type.find(ID_bases);
 
-    // Subsequenlty, we need to call the non-POD parent constructors
+    // Subsequently, we need to call the non-POD parent constructors
     forall_irep(parent_it, bases.get_sub())
     {
       assert(parent_it->id()==ID_base);

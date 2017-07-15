@@ -147,7 +147,7 @@ public:
     make_top();
   }
 
-  // returns true iff there is s.th. new
+  // returns true iff there is something new
   bool merge(
     const rd_range_domaint &other,
     locationt from,

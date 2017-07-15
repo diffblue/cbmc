@@ -461,7 +461,7 @@ void java_object_factoryt::gen_nondet_init(
   }
 }
 
-/// Allocates a fresh array. Single-use herem at the moment, but useful to keep
+/// Allocates a fresh array. Single-use at the moment, but useful to keep
 /// as a separate function for downstream branches.
 /// \par parameters: `lhs`, symbol to assign the new array structure
 /// `max_length_expr`, maximum length of the new array (minimum is fixed at zero

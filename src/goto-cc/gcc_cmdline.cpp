@@ -18,7 +18,7 @@ Author: CM Wintersteiger, 2006
 
 #include "gcc_cmdline.h"
 
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 // non-gcc options

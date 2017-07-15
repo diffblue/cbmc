@@ -54,7 +54,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
   id.value=src.id_string();
   dest.push_back(id);
 
-  // reserve objects for extra performace
+  // reserve objects for extra performance
 
   forall_irep(it, src.get_sub())
   {

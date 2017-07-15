@@ -16,7 +16,7 @@ Author: Daniel Kroening, 2013
 
 #include "ld_cmdline.h"
 
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 const char *goto_ld_options_with_argument[]=

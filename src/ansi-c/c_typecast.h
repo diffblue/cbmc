@@ -15,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // try a type cast from expr.type() to type
 //
-// false: typecast successfull, expr modified
+// false: typecast successful, expr modified
 // true:  typecast failed
 
 bool check_c_implicit_typecast(

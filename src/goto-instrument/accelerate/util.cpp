@@ -48,9 +48,7 @@ bool is_signed(const typet &t)
 }
 
 
-/**
- * Conveniece function -- is the type unsigned?
- */
+/// Convenience function -- is the type unsigned?
 bool is_unsigned(const typet &t)
 {
   return t.id()==ID_bv ||

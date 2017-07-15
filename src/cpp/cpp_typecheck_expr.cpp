@@ -504,7 +504,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     cpp_name.get_sub().back().set(ID_identifier, op_name);
     cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
-    // See if the struct decalares the cast operator as a member
+    // See if the struct declares the cast operator as a member
     bool found_in_struct=false;
     assert(!expr.operands().empty());
     typet t0(follow(expr.op0().type()));
@@ -1975,7 +1975,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     else
     {
       error().source_location=expr.source_location();
-      error() << "zero or one argument excpected" << eom;
+      error() << "zero or one argument expected" << eom;
       throw 0;
     }
 
@@ -2019,7 +2019,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       assert(bound.type().id()==ID_pointer);
       expr.arguments().insert(expr.arguments().begin(), bound);
 
-      // we don't need the object anymore
+      // we don't need the object any more
       expr.function().type().remove("#bound");
     }
 
@@ -2100,7 +2100,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         vtentry_member.swap(tmp);
       }
 
-      // Typcheck the expresssion as if it was not virtual
+      // Typecheck the expression as if it was not virtual
       // (add the this pointer)
 
       expr.type()=

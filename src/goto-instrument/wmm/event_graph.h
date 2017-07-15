@@ -97,9 +97,8 @@ public:
        from.hide_internals(&target) */
     void hide_internals(critical_cyclet &reduced) const;
 
-    /* checks whether there is at leat one pair which is unsafe
-       (takes fences and dependencies into account), and adds
-       the unsafe pairs in the set */
+    /// checks whether there is at least one pair which is unsafe (takes fences
+    /// and dependencies into account), and adds the unsafe pairs in the set
     bool is_unsafe(memory_modelt model, bool fast=false);
 
     /* do not update the unsafe pairs set */

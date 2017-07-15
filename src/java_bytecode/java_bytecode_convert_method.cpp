@@ -174,7 +174,7 @@ const exprt java_bytecode_convert_methodt::variable(
 
   if(var.symbol_expr.get_identifier().empty())
   {
-    // an un-named local variable
+    // an unnamed local variable
     irep_idt base_name="anonlocal::"+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
@@ -546,7 +546,7 @@ code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
 ///   'allow_merge'
 /// which is always true except when called from get_block_for_pcrange
 /// \return See above, plus potential side-effects on 'tree' and 'this_block' as
-///   descibed in 'Purpose'
+///   described in 'Purpose'
 code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,

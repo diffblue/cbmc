@@ -192,7 +192,7 @@ bool cpp_typecheckt::standard_conversion_qualification(
 /// An rvalue of type bool can be converted to an rvalue of type int,
 /// with false becoming zero and true becoming one.
 /// \par parameters: A typechecked expression 'expr'
-/// \return True iff the integral pormotion is possible. The result of the
+/// \return True iff the integral promotion is possible. The result of the
 ///   conversion is stored in 'new_expr'.
 bool cpp_typecheckt::standard_conversion_integral_promotion(
   const exprt &expr,
@@ -299,7 +299,7 @@ bool cpp_typecheckt::standard_conversion_floating_point_promotion(
 /// the set of integral conversions.
 /// \par parameters: A typechecked expression 'expr', a destination
 /// type 'type'
-/// \return True iff the integral pormotion is possible. The result of the
+/// \return True iff the integral promotion is possible. The result of the
 ///   conversion is stored in 'new_expr'.
 bool cpp_typecheckt::standard_conversion_integral_conversion(
   const exprt &expr,
@@ -1411,7 +1411,7 @@ bool cpp_typecheckt::reference_binding(
      type.subtype().get_bool(ID_C_volatile))
     return false;
 
-  // TODO: hanlde the case for implicit parameters
+  // TODO: handle the case for implicit parameters
   if(!type.subtype().get_bool(ID_C_constant) &&
      !expr.get_bool(ID_C_lvalue))
     return false;

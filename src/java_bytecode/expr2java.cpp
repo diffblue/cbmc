@@ -276,8 +276,8 @@ std::string expr2javat::convert_rec(
     const code_typet &code_type=to_code_type(src);
 
     // Java doesn't really have syntax for function types,
-    // so we make one up, loosley inspired by the syntax
-    // of lamda expressions.
+    // so we make one up, loosely inspired by the syntax
+    // of lambda expressions.
 
     std::string dest="";
 

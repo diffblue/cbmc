@@ -159,7 +159,7 @@ std::size_t irep_serializationt::insert_on_read(
   return id;
 }
 
-/// outputs 4 characters for a long, most-significand byte first
+/// outputs 4 characters for a long, most-significant byte first
 /// \par parameters: an output stream and a number
 /// \return nothing
 void write_gb_word(std::ostream &out, std::size_t u)

@@ -296,7 +296,7 @@ void goto_convertt::finish_guarded_gotos(goto_programt &dest)
     gg.gotoiter->guard=gg.guard;
     // goto_programt doesn't provide an erase operation,
     // perhaps for a good reason, so let's be cautious and just
-    // flatten the un-needed instructions into skips.
+    // flatten the unneeded instructions into skips.
     for(auto it=gg.ifiter, itend=gg.gotoiter; it!=itend; ++it)
       it->make_skip();
   }

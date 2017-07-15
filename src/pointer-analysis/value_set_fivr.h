@@ -302,7 +302,7 @@ public:
   valuest values;
   valuest temporary_values;
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(
     object_mapt &dest,
     const object_mapt &src) const;

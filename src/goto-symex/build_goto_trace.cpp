@@ -261,7 +261,7 @@ void build_goto_trace(
   }
 
   // Now assemble into a single goto_trace.
-  // This expoits sorted-ness of the map.
+  // This exploits sorted-ness of the map.
   for(auto &t_it : time_map)
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 

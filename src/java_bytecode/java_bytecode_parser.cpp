@@ -430,7 +430,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Long:
     case CONSTANT_Double:
       it->number=read_u8();
-      // Eight-byte constants take up two entires
+      // Eight-byte constants take up two entries
       // in the constant_pool table, for annoying this programmer.
       if(it==constant_pool.end())
       {

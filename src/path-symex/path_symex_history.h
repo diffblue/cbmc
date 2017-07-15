@@ -58,7 +58,7 @@ public:
 
   void generate_successor();
 
-  // build a forward-traversible version of the history
+  // build a forward-traversable version of the history
   void build_history(std::vector<path_symex_step_reft> &dest) const;
 
 protected:

@@ -103,7 +103,7 @@ static void check_apply_invariants(
   modifiest modifies;
   get_modifies(local_may_alias, loop, modifies);
 
-  // build the havoc-ing code
+  // build the havocking code
   goto_programt havoc_code;
 
   // assert the invariant

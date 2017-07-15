@@ -762,7 +762,7 @@ void value_sett::get_value_set_rec(
   }
   else if(expr.id()==ID_array)
   {
-    // an array constructur, possibly containing addresses
+    // an array constructor, possibly containing addresses
     forall_operands(it, expr)
       get_value_set_rec(*it, dest, suffix, original_type, ns);
   }
@@ -1538,7 +1538,7 @@ void value_sett::apply_code(
   }
   else if(statement==ID_expression)
   {
-    // can be ignored, we don't expect sideeffects here
+    // can be ignored, we don't expect side effects here
   }
   else if(statement=="cpp_delete" ||
           statement=="cpp_delete[]")

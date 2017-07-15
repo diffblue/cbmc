@@ -349,7 +349,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
         return true;
       }
 
-      status() << "Instrumenting coverge goals" << eom;
+      status() << "Instrumenting coverage goals" << eom;
       instrument_cover_goals(symbol_table, goto_model.goto_functions, c);
       goto_model.goto_functions.update();
     }

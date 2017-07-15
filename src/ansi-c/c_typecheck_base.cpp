@@ -165,7 +165,7 @@ void c_typecheck_baset::typecheck_redefinition_type(
   const typet &final_old=follow(old_symbol.type);
   const typet &final_new=follow(new_symbol.type);
 
-  // see if we had s.th. incomplete before
+  // see if we had something incomplete before
   if(final_old.id()==ID_incomplete_struct ||
      final_old.id()==ID_incomplete_union ||
      final_old.id()==ID_incomplete_c_enum)
