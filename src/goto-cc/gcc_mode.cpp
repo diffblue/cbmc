@@ -781,12 +781,10 @@ int gcc_modet::preprocess(
   assert(new_argv.size()>=1);
   new_argv[0]=native_tool_name.c_str();
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << '\n';
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
@@ -805,12 +803,10 @@ int gcc_modet::run_gcc()
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << '\n';
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
