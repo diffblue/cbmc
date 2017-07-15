@@ -42,6 +42,7 @@ const char *as_options_without_argument[]=
   "-K",
   "-L",
   "--keep-locals",
+  "-Qy",
   "-R",
   "--reduce-memory-overheads",
   "--statistics",
