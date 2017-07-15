@@ -22,6 +22,7 @@ Author: CM Wintersteiger, 2006
 #include <fstream>
 
 #include <util/string2int.h>
+#include <util/invariant.h>
 #include <util/tempdir.h>
 #include <util/config.h>
 #include <util/prefix.h>
@@ -502,7 +503,7 @@ int gcc_modet::doit()
   else if(cmdline.isset('E'))
   {
     compiler.mode=compilet::PREPROCESS_ONLY;
-    assert(false);
+    UNREACHABLE;
   }
   else if(cmdline.isset("shared") ||
           cmdline.isset('r')) // really not well documented
@@ -524,7 +525,6 @@ int gcc_modet::doit()
     debug() << "Compiling and linking a library" << eom; break;
   case compilet::COMPILE_LINK_EXECUTABLE:
     debug() << "Compiling and linking an executable" << eom; break;
-  default: assert(false);
   }
 
   if(cmdline.isset("i386-win32") ||
@@ -778,7 +778,7 @@ int gcc_modet::preprocess(
   new_argv.push_back(src);
 
   // overwrite argv[0]
-  assert(new_argv.size()>=1);
+  INVARIANT(new_argv.size()>=1, "No program name in argv");
   new_argv[0]=native_tool_name.c_str();
 
   debug() << "RUN:";
@@ -792,7 +792,7 @@ int gcc_modet::preprocess(
 /// run gcc or clang with original command line
 int gcc_modet::run_gcc()
 {
-  assert(!cmdline.parsed_argv.empty());
+  PRECONDITION(!cmdline.parsed_argv.empty());
 
   // build new argv
   std::vector<std::string> new_argv;
@@ -878,6 +878,11 @@ int gcc_modet::gcc_hybrid_binary()
   {
     objcopy_cmd=linker_name(cmdline, base_name);
     objcopy_cmd.erase(objcopy_cmd.size()-2);
+  }
+  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
+  {
+    objcopy_cmd=compiler_name(cmdline, base_name);
+    objcopy_cmd.erase(objcopy_cmd.size()-3);
   }
   objcopy_cmd+="objcopy";
 
