@@ -262,6 +262,7 @@ mini_bddt mini_bddt::operator^(const mini_bddt &other) const
 
 mini_bddt mini_bddt::operator!() const
 {
+  assert(is_initialized());
   return node->mgr->True()^*this;
 }
 
@@ -304,6 +305,8 @@ mini_bddt mini_bdd_mgrt::mk(
   const mini_bddt &high)
 {
   assert(var<=var_table.size());
+  assert(low.var()>var);
+  assert(high.var()>var);
 
   if(low.node_number()==high.node_number())
     return low;
