@@ -136,7 +136,45 @@ gcc_modet::gcc_modet(
     }}, // NOLINTNEXTLINE(whitespace/braces)
     {"arm64", {
       "cortex-a57", "cortex-a72", "exynos-m1"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"hppa", {"1.0", "1.1", "2.0"}}, // NOLINTNEXTLINE(whitespace/braces)
+    // PowerPC
+    // https://en.wikipedia.org/wiki/List_of_PowerPC_processors
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc", {
+      "powerpc", "601", "602", "603", "603e", "604", "604e", "630",
+      // PowerPC G3 == 7xx series
+      "G3", "740", "750",
+      // PowerPC G4 == 74xx series
+      "G4", "7400", "7450",
+      // SoC and low power: https://en.wikipedia.org/wiki/PowerPC_400
+      "401", "403", "405", "405fp", "440", "440fp", "464", "464fp",
+      "476", "476fp",
+      // e series. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e300c2", "e300c3", "e500mc", "ec603e",
+      // https://en.wikipedia.org/wiki/Titan_(microprocessor)
+      "titan",
     }},
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc64", {
+      "powerpc64",
+      // First IBM 64-bit processor
+      "620",
+      "970", "G5"
+      // All IBM POWER processors are 64 bit, but POWER 8 is
+      // little-endian so not in this list.
+      // https://en.wikipedia.org/wiki/Ppc64
+      "power3", "power4", "power5", "power5+", "power6", "power6x",
+      "power7", "rs64",
+      // e series SoC chips. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e500mc64", "e5500", "e6500",
+      // https://en.wikipedia.org/wiki/IBM_A2
+      "a2",
+    }},
+    // The latest Power processors are little endian.
+    {"powerpc64le", {"powerpc64le", "power8"}},
     // There are two MIPS architecture series. The 'old' one comprises
     // MIPS I - MIPS V (where MIPS I and MIPS II are 32-bit
     // architectures, and the III, IV and V are 64-bit). The 'new'
@@ -214,17 +252,33 @@ gcc_modet::gcc_modet(
     {"ia64", {
       "itanium", "itanium1", "merced", "itanium2", "mckinley"
     }}, // NOLINTNEXTLINE(whitespace/braces)
+    // x86 and x86_64. See
+    // https://en.wikipedia.org/wiki/List_of_AMD_microprocessors
+    // https://en.wikipedia.org/wiki/List_of_Intel_microprocessors
     {"i386", {
-      "i386", "i486", "i586", "pentium", "pentium-mmx", "pentiumpro",
-      "i686", "pentium2", "pentium3", "pentium3m", "pentium-m",
-      "pentium4", "pentium4m", "prescott", "nocona", "core2", "nehalem",
-      "westmere", "sandybridge", "ivybridge", "haswell", "broadwell",
-      "bonnell", "silvermont", "k6", "k6-2", "k6-3", "athlon",
-      "athlon-tbird", "athlon-4", "athlon-xp", "athlon-mp", "k8",
-      "opteron", "athlon64", "athlon-fx", "k8-sse3", "opteron-sse3",
-      "athlon64-sse3", "amdfam10", "barcelona", "bdver1", "bdver2",
-      "bdver3", "bdver4", "btver1", "btver2", "winchip-c6", "winchip2",
-      "c3", "c3-2", "geode",
+      // Intel generic
+      "i386", "i486", "i586", "i686",
+      // AMD
+      "k6", "k6-2", "k6-3", "athlon" "athlon-tbird", "athlon-4",
+      "athlon-xp", "athlon-mp",
+      // Everything called "pentium" by GCC is 32 bits; the only 64-bit
+      // Pentium flag recognized by GCC is "nocona".
+      "pentium", "pentium-mmx", "pentiumpro" "pentium2", "pentium3",
+      "pentium3m", "pentium-m" "pentium4", "pentium4m", "prescott",
+      // Misc
+      "winchip-c6", "winchip2", "c3", "c3-2", "geode",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"x86_64", {
+      // Intel
+      "nocona", "core2", "nehalem" "westmere", "sandybridge", "knl",
+      "ivybridge", "haswell", "broadwell" "bonnell", "silvermont",
+      // AMD generic
+      "k8", "k8-sse3", "opteron", "athlon64", "athlon-fx",
+      "opteron-sse3" "athlon64-sse3", "amdfam10", "barcelona",
+      // AMD "bulldozer" (high power, family 15h)
+      "bdver1", "bdver2" "bdver3", "bdver4",
+      // AMD "bobcat" (low power, family 14h)
+      "btver1", "btver2",
     }},
   })
 {
