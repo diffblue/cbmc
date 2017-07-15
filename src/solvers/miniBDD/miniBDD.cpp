@@ -194,18 +194,19 @@ public:
 
   mini_bddt operator()(const mini_bddt &x, const mini_bddt &y)
   {
-    return APP(x, y);
+    return APP_non_rec(x, y);
   }
 
 protected:
   bool (*fkt)(bool, bool);
-  mini_bddt APP(const mini_bddt &x, const mini_bddt &y);
+  mini_bddt APP_rec(const mini_bddt &x, const mini_bddt &y);
+  mini_bddt APP_non_rec(const mini_bddt &x, const mini_bddt &y);
 
   typedef std::map<std::pair<unsigned, unsigned>, mini_bddt> Gt;
   Gt G;
 };
 
-mini_bddt mini_bdd_applyt::APP(const mini_bddt &x, const mini_bddt &y)
+mini_bddt mini_bdd_applyt::APP_rec(const mini_bddt &x, const mini_bddt &y)
 {
   assert(x.is_initialized() && y.is_initialized());
   assert(x.node->mgr==y.node->mgr);
@@ -224,18 +225,119 @@ mini_bddt mini_bdd_applyt::APP(const mini_bddt &x, const mini_bddt &y)
     u=mini_bddt(fkt(x.is_true(), y.is_true())?mgr->True():mgr->False());
   else if(x.var()==y.var())
     u=mgr->mk(x.var(),
-              APP(x.low(), y.low()),
-              APP(x.high(), y.high()));
+              APP_rec(x.low(), y.low()),
+              APP_rec(x.high(), y.high()));
   else if(x.var()<y.var())
     u=mgr->mk(x.var(),
-              APP(x.low(), y),
-              APP(x.high(), y));
+              APP_rec(x.low(), y),
+              APP_rec(x.high(), y));
   else /* x.var() > y.var() */
     u=mgr->mk(y.var(),
-              APP(x, y.low()),
-              APP(x, y.high()));
+              APP_rec(x, y.low()),
+              APP_rec(x, y.high()));
 
   G[key]=u;
+
+  return u;
+}
+
+mini_bddt mini_bdd_applyt::APP_non_rec(
+  const mini_bddt &_x,
+  const mini_bddt &_y)
+{
+  struct stack_elementt
+  {
+    stack_elementt(
+      mini_bddt &_result,
+      const mini_bddt &_x,
+      const mini_bddt &_y):
+      result(_result), x(_x), y(_y),
+      key(x.node_number(), y.node_number()),
+      var(0), phase(phaset::INIT) { }
+    mini_bddt &result, x, y, lr, hr;
+    std::pair<unsigned, unsigned> key;
+    unsigned var;
+    enum class phaset { INIT, FINISH } phase;
+  };
+
+  mini_bddt u; // return value
+
+  std::stack<stack_elementt> stack;
+  stack.push(stack_elementt(u, _x, _y));
+
+  while(!stack.empty())
+  {
+    auto &t=stack.top();
+    const mini_bddt &x=t.x;
+    const mini_bddt &y=t.y;
+    assert(x.is_initialized() && y.is_initialized());
+    assert(x.node->mgr==y.node->mgr);
+
+    switch(t.phase)
+    {
+    case stack_elementt::phaset::INIT:
+      {
+        // dynamic programming
+        Gt::const_iterator G_it=G.find(t.key);
+        if(G_it!=G.end())
+        {
+          t.result=G_it->second;
+          stack.pop();
+        }
+        else
+        {
+          if(x.is_constant() && y.is_constant())
+          {
+            bool result_truth=fkt(x.is_true(), y.is_true());
+            const mini_bdd_mgrt &mgr=*x.node->mgr;
+            t.result=result_truth?mgr.True():mgr.False();
+            stack.pop();
+          }
+          else if(x.var()==y.var())
+          {
+            t.var=x.var();
+            t.phase=stack_elementt::phaset::FINISH;
+            assert(x.low().var()>t.var);
+            assert(y.low().var()>t.var);
+            assert(x.high().var()>t.var);
+            assert(y.high().var()>t.var);
+            stack.push(stack_elementt(t.lr, x.low(), y.low()));
+            stack.push(stack_elementt(t.hr, x.high(), y.high()));
+          }
+          else if(x.var()<y.var())
+          {
+            t.var=x.var();
+            t.phase=stack_elementt::phaset::FINISH;
+            assert(x.low().var()>t.var);
+            assert(x.high().var()>t.var);
+            stack.push(stack_elementt(t.lr, x.low(), y));
+            stack.push(stack_elementt(t.hr, x.high(), y));
+          }
+          else /* x.var() > y.var() */
+          {
+            t.var=y.var();
+            t.phase=stack_elementt::phaset::FINISH;
+            assert(y.low().var()>t.var);
+            assert(y.high().var()>t.var);
+            stack.push(stack_elementt(t.lr, x, y.low()));
+            stack.push(stack_elementt(t.hr, x, y.high()));
+          }
+        }
+      }
+      break;
+
+    case stack_elementt::phaset::FINISH:
+      {
+        mini_bdd_mgrt *mgr=x.node->mgr;
+        t.result=mgr->mk(t.var, t.lr, t.hr);
+        G[t.key]=t.result;
+        stack.pop();
+      }
+      break;
+    }
+  }
+
+  assert(u.is_initialized());
 
   return u;
 }
