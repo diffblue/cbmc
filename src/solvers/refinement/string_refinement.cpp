@@ -808,7 +808,7 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
   exprt size_expr=to_array_type(arr.type()).size();
   PRECONDITION(size_expr.id()==ID_constant);
   to_unsigned_integer(to_constant_expr(size_expr), n);
-  return generator.string_of_constant_array(arr, n);
+  return utf16_constant_array_to_ascii(arr, n);
 }
 
 /// Display part of the current model by mapping the variables created by the

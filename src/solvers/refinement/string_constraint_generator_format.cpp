@@ -17,6 +17,7 @@ Date:   May 2017
 #include <vector>
 
 #include <util/std_expr.h>
+#include <util/unicode.h>
 
 #include "string_constraint_generator.h"
 
@@ -395,26 +396,20 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
 /// \param length: an unsigned value representing the length of the array
 /// \return String of length `length` represented by the array assuming each
 ///   field in `arr` represents a character.
-std::string string_constraint_generatort::string_of_constant_array(
+std::string utf16_constant_array_to_ascii(
   const array_exprt &arr, unsigned int length)
 {
-  std::ostringstream result;
-
+  std::wstring out('?', length);
+  unsigned int c;
   for(size_t i=0; i<arr.operands().size() && i<length; i++)
   {
-    // TODO: factorize with utf16_little_endian_to_ascii
-    unsigned int c;
-    exprt arr_i=arr.operands()[i];
-    PRECONDITION(arr_i.id()==ID_constant);
-    to_unsigned_integer(to_constant_expr(arr_i), c);
-    if(c<=255 && c>=32)
-      result << (unsigned char) c;
-    else
-    {
-      result << "\\u" << std::hex << std::setw(4) << std::setfill('0') << c;
-    }
+    PRECONDITION(arr.operands()[i].id()==ID_constant);
+    bool conversion_failed=to_unsigned_integer(
+      to_constant_expr(arr.operands()[i]), c);
+    INVARIANT(!conversion_failed, "constant should be converted to unsigned");
+    out[i]=c;
   }
-  return result.str();
+  return utf16_little_endian_to_ascii(out);
 }
 
 /// Add axioms to specify the Java String.format function.
@@ -437,7 +432,8 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
   {
     unsigned int length;
     to_unsigned_integer(to_constant_expr(s1.length()), length);
-    std::string s=string_of_constant_array(to_array_expr(s1.content()), length);
+    std::string s=utf16_constant_array_to_ascii(
+      to_array_expr(s1.content()), length);
 
     // List of arguments after s
     std::vector<exprt> args(

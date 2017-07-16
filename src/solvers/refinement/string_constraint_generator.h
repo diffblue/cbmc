@@ -98,9 +98,6 @@ public:
   // Used by format function
   class format_specifiert;
 
-  // Helper function which can be useful outside of this class
-  std::string string_of_constant_array(const array_exprt &arr, unsigned length);
-
 private:
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
   // that is -2147483648 so takes 11 characters to write.
@@ -363,13 +360,8 @@ private:
 
 exprt is_digit_with_radix(exprt chr, exprt radix);
 exprt get_numeric_value_from_character(
-  const exprt &chr,
-  const typet &char_type,
-  const typet &type,
-  unsigned long radix=36ul);
-size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
-unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
-std::string utf16_constant_array_to_java(
+  const exprt &chr, const typet &char_type, const typet &type);
+std::string utf16_constant_array_to_ascii(
   const array_exprt &arr, unsigned length);
 
 #endif
