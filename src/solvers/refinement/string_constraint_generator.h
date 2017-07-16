@@ -176,7 +176,7 @@ private:
   string_exprt add_axioms_for_format(const function_application_exprt &f);
   string_exprt add_axioms_for_format(
     const std::string &s,
-    const std::vector<exprt> &args,
+    const exprt::operandst &args,
     const refined_string_typet &ref_type);
   exprt add_axioms_for_format_specifier_is_correct(
     const function_application_exprt &expr);
