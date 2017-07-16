@@ -108,73 +108,64 @@ void arrayst::collect_arrays(const exprt &a)
 
   if(a.id()==ID_with)
   {
-    if(a.operands().size()!=3)
-      throw "with expected to have three operands";
+    const with_exprt &with_expr=to_with_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, a.op0().type(), ns))
+    if(!base_type_eq(array_type, with_expr.old().type(), ns))
     {
       std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'with' without matching types";
     }
 
-    arrays.make_union(a, a.op0());
-    collect_arrays(a.op0());
+    arrays.make_union(a, with_expr.old());
+    collect_arrays(with_expr.old());
 
     // make sure this shows as an application
-    index_exprt index_expr;
-    index_expr.type()=array_type.subtype();
-    index_expr.array()=a.op0();
-    index_expr.index()=a.op1();
+    index_exprt index_expr(with_expr.old(), with_expr.where());
     record_array_index(index_expr);
   }
-  else if(a.id()==ID_update) // TODO: is this obsolete?
+  else if(a.id()==ID_update)
   {
-    if(a.operands().size()!=3)
-      throw "update expected to have three operands";
+    const update_exprt &update_expr=to_update_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, a.op0().type(), ns))
+    if(!base_type_eq(array_type, update_expr.old().type(), ns))
     {
       std::cout << a.pretty() << '\n';
       throw "collect_arrays got 'update' without matching types";
     }
 
-    arrays.make_union(a, a.op0());
-    collect_arrays(a.op0());
+    arrays.make_union(a, update_expr.old());
+    collect_arrays(update_expr.old());
 
 #if 0
     // make sure this shows as an application
-    index_exprt index_expr;
-    index_expr.type()=array_type.subtype();
-    index_expr.array()=a.op0();
-    index_expr.index()=a.op1();
+    index_exprt index_expr(update_expr.old(), update_expr.index());
     record_array_index(index_expr);
 #endif
   }
   else if(a.id()==ID_if)
   {
-    if(a.operands().size()!=3)
-      throw "if expected to have three operands";
+    const if_exprt &if_expr=to_if_expr(a);
 
     // check types
-    if(!base_type_eq(array_type, a.op1().type(), ns))
+    if(!base_type_eq(array_type, if_expr.true_case().type(), ns))
     {
       std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
     // check types
-    if(!base_type_eq(array_type, a.op2().type(), ns))
+    if(!base_type_eq(array_type, if_expr.false_case().type(), ns))
     {
       std::cout << a.pretty() << '\n';
       throw "collect_arrays got if without matching types";
     }
 
-    arrays.make_union(a, a.op1());
-    arrays.make_union(a, a.op2());
-    collect_arrays(a.op1());
-    collect_arrays(a.op2());
+    arrays.make_union(a, if_expr.true_case());
+    arrays.make_union(a, if_expr.false_case());
+    collect_arrays(if_expr.true_case());
+    collect_arrays(if_expr.false_case());
   }
   else if(a.id()==ID_symbol)
   {
@@ -272,14 +263,11 @@ void arrayst::add_array_constraints()
   }
 
   // add constraints for equalities
-  for(array_equalitiest::const_iterator it=
-      array_equalities.begin();
-      it!=array_equalities.end();
-      it++)
+  for(const auto &equality : array_equalities)
   {
-    add_array_constraints(
-      index_map[arrays.find_number(it->f1)],
-      *it);
+    add_array_constraints_equality(
+      index_map[arrays.find_number(equality.f1)],
+      equality);
 
     // update_index_map should not be necessary here
   }
@@ -333,10 +321,8 @@ void arrayst::add_array_Ackermann_constraints()
 
           if(indices_equal_lit!=const_literal(false))
           {
-            index_exprt index_expr1;
-            index_expr1.type()=ns.follow(arrays[i].type()).subtype();
-            index_expr1.array()=arrays[i];
-            index_expr1.index()=*i1;
+            const typet &subtype=ns.follow(arrays[i].type()).subtype();
+            index_exprt index_expr1(arrays[i], *i1, subtype);
 
             index_exprt index_expr2=index_expr1;
             index_expr2.index()=*i2;
@@ -387,52 +373,39 @@ void arrayst::update_index_map(bool update_all)
   }
   else
   {
-    for(std::set<std::size_t>::const_iterator
-        it=update_indices.begin();
-        it!=update_indices.end(); it++)
-      update_index_map(*it);
+    for(const auto &index : update_indices)
+      update_index_map(index);
+
     update_indices.clear();
   }
 
 #ifdef DEBUG
   // print index sets
-  for(index_mapt::const_iterator
-      i1=index_map.begin();
-      i1!=index_map.end();
-      i1++)
-    for(index_sett::const_iterator
-        i2=i1->second.begin();
-        i2!=i1->second.end();
-        i2++)
-      std::cout << "Index set (" << i1->first << " = "
-                << arrays.find_number(i1->first) << " = "
-                << from_expr(ns, "", arrays[arrays.find_number(i1->first)])
+  for(const auto &index_entry : index_map)
+    for(const auto &index : index_entry.second)
+      std::cout << "Index set (" << index_entry.first << " = "
+                << arrays.find_number(index_entry.first) << " = "
+                << from_expr(ns, "",
+                             arrays[arrays.find_number(index_entry.first)])
                 << "): "
-                << from_expr(ns, "", *i2) << '\n';
+                << from_expr(ns, "", index) << '\n';
   std::cout << "-----\n";
 #endif
 }
 
-void arrayst::add_array_constraints(
+void arrayst::add_array_constraints_equality(
   const index_sett &index_set,
   const array_equalityt &array_equality)
 {
   // add constraints x=y => x[i]=y[i]
 
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(const auto &index : index_set)
   {
-    index_exprt index_expr1;
-    index_expr1.type()=ns.follow(array_equality.f1.type()).subtype();
-    index_expr1.array()=array_equality.f1;
-    index_expr1.index()=*it;
+    const typet &subtype1=ns.follow(array_equality.f1.type()).subtype();
+    index_exprt index_expr1(array_equality.f1, index, subtype1);
 
-    index_exprt index_expr2;
-    index_expr2.type()=ns.follow(array_equality.f2.type()).subtype();
-    index_expr2.array()=array_equality.f2;
-    index_expr2.index()=*it;
+    const typet &subtype2=ns.follow(array_equality.f2.type()).subtype();
+    index_exprt index_expr2(array_equality.f2, index, subtype2);
 
     assert(index_expr1.type()==index_expr2.type());
 
@@ -484,20 +457,11 @@ void arrayst::add_array_constraints(
     assert(expr.operands().size()==1);
 
     // add a[i]=b[i]
-    for(index_sett::const_iterator
-        it=index_set.begin();
-        it!=index_set.end();
-        it++)
+    for(const auto &index : index_set)
     {
-      index_exprt index_expr1;
-      index_expr1.type()=ns.follow(expr.type()).subtype();
-      index_expr1.array()=expr;
-      index_expr1.index()=*it;
-
-      index_exprt index_expr2;
-      index_expr2.type()=ns.follow(expr.type()).subtype();
-      index_expr2.array()=expr.op0();
-      index_expr2.index()=*it;
+      const typet &subtype=ns.follow(expr.type()).subtype();
+      index_exprt index_expr1(expr, index, subtype);
+      index_exprt index_expr2(expr.op0(), index, subtype);
 
       assert(index_expr1.type()==index_expr2.type());
 
@@ -527,10 +491,7 @@ void arrayst::add_array_constraints_with(
   const exprt &value=expr.new_value();
 
   {
-    index_exprt index_expr;
-    index_expr.type()=ns.follow(expr.type()).subtype();
-    index_expr.array()=expr;
-    index_expr.index()=index;
+    index_exprt index_expr(expr, index, ns.follow(expr.type()).subtype());
 
     if(index_expr.type()!=value.type())
     {
@@ -546,13 +507,8 @@ void arrayst::add_array_constraints_with(
   // use other array index applications for "else" case
   // add constraint x[I]=y[I] for I!=i
 
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(auto other_index : index_set)
   {
-    exprt other_index=*it;
-
     if(other_index!=index)
     {
       // we first build the guard
@@ -564,17 +520,9 @@ void arrayst::add_array_constraints_with(
 
       if(guard_lit!=const_literal(true))
       {
-        index_exprt index_expr1;
-        index_expr1.type()=ns.follow(expr.type()).subtype();
-        index_expr1.array()=expr;
-        index_expr1.index()=other_index;
-
-        index_exprt index_expr2;
-        index_expr2.type()=ns.follow(expr.type()).subtype();
-        index_expr2.array()=expr.op0();
-        index_expr2.index()=other_index;
-
-        assert(index_expr1.type()==index_expr2.type());
+        const typet &subtype=ns.follow(expr.type()).subtype();
+        index_exprt index_expr1(expr, other_index, subtype);
+        index_exprt index_expr2(expr.op0(), other_index, subtype);
 
         equal_exprt equality_expr(index_expr1, index_expr2);
 
@@ -611,10 +559,7 @@ void arrayst::add_array_constraints_update(
   const exprt &value=expr.new_value();
 
   {
-    index_exprt index_expr;
-    index_expr.type()=ns.follow(expr.type()).subtype();
-    index_expr.array()=expr;
-    index_expr.index()=index;
+    index_exprt index_expr(expr, index, ns.follow(expr.type()).subtype());
 
     if(index_expr.type()!=value.type())
     {
@@ -628,13 +573,8 @@ void arrayst::add_array_constraints_update(
   // use other array index applications for "else" case
   // add constraint x[I]=y[I] for I!=i
 
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(auto other_index : index_set)
   {
-    exprt other_index=*it;
-
     if(other_index!=index)
     {
       // we first build the guard
@@ -646,17 +586,9 @@ void arrayst::add_array_constraints_update(
 
       if(guard_lit!=const_literal(true))
       {
-        index_exprt index_expr1;
-        index_expr1.type()=ns.follow(expr.type()).subtype();
-        index_expr1.array()=expr;
-        index_expr1.index()=other_index;
-
-        index_exprt index_expr2;
-        index_expr2.type()=ns.follow(expr.type()).subtype();
-        index_expr2.array()=expr.op0();
-        index_expr2.index()=other_index;
-
-        assert(index_expr1.type()==index_expr2.type());
+        const typet &subtype=ns.follow(expr.type()).subtype();
+        index_exprt index_expr1(expr, other_index, subtype);
+        index_exprt index_expr2(expr.op0(), other_index, subtype);
 
         equal_exprt equality_expr(index_expr1, index_expr2);
 
@@ -682,15 +614,10 @@ void arrayst::add_array_constraints_array_of(
   // get other array index applications
   // and add constraint x[i]=v
 
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(const auto &index : index_set)
   {
-    index_exprt index_expr;
-    index_expr.type()=ns.follow(expr.type()).subtype();
-    index_expr.array()=expr;
-    index_expr.index()=*it;
+    const typet &subtype=ns.follow(expr.type()).subtype();
+    index_exprt index_expr(expr, index, subtype);
 
     assert(base_type_eq(index_expr.type(), expr.op0().type(), ns));
 
@@ -714,22 +641,11 @@ void arrayst::add_array_constraints_if(
 
   // first do true case
 
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(const auto &index : index_set)
   {
-    index_exprt index_expr1;
-    index_expr1.type()=ns.follow(expr.type()).subtype();
-    index_expr1.array()=expr;
-    index_expr1.index()=*it;
-
-    index_exprt index_expr2;
-    index_expr2.type()=ns.follow(expr.type()).subtype();
-    index_expr2.array()=expr.true_case();
-    index_expr2.index()=*it;
-
-    assert(index_expr1.type()==index_expr2.type());
+    const typet subtype=ns.follow(expr.type()).subtype();
+    index_exprt index_expr1(expr, index, subtype);
+    index_exprt index_expr2(expr.true_case(), index, subtype);
 
     // add implication
     lazy_constraintt lazy(lazy_typet::ARRAY_IF,
@@ -743,22 +659,11 @@ void arrayst::add_array_constraints_if(
   }
 
   // now the false case
-  for(index_sett::const_iterator
-      it=index_set.begin();
-      it!=index_set.end();
-      it++)
+  for(const auto &index : index_set)
   {
-    index_exprt index_expr1;
-    index_expr1.type()=ns.follow(expr.type()).subtype();
-    index_expr1.array()=expr;
-    index_expr1.index()=*it;
-
-    index_exprt index_expr2;
-    index_expr2.type()=ns.follow(expr.type()).subtype();
-    index_expr2.array()=expr.false_case();
-    index_expr2.index()=*it;
-
-    assert(index_expr1.type()==index_expr2.type());
+    const typet subtype=ns.follow(expr.type()).subtype();
+    index_exprt index_expr1(expr, index, subtype);
+    index_exprt index_expr2(expr.false_case(), index, subtype);
 
     // add implication
     lazy_constraintt lazy(
