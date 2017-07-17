@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
@@ -551,9 +552,15 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
     {
       // not a constant and not infinity
 
-      assert(!current_symbol_id.empty());
+      PRECONDITION(!current_symbol.name.empty());
 
-      const symbolt &base_symbol=lookup(current_symbol_id);
+      if(current_symbol.is_static_lifetime)
+      {
+        error().source_location=current_symbol.location;
+        error() << "array size of static symbol `"
+                << current_symbol.base_name << "' is not constant" << eom;
+        throw 0;
+      }
 
       // Need to pull out! We insert new symbol.
       source_locationt source_location=size.find_source_location();
@@ -564,7 +571,7 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       do
       {
         suffix="$array_size"+std::to_string(count);
-        temp_identifier=id2string(base_symbol.name)+suffix;
+        temp_identifier=id2string(current_symbol.name)+suffix;
         count++;
       }
       while(symbol_table.symbols.find(temp_identifier)!=
@@ -573,13 +580,13 @@ void c_typecheck_baset::typecheck_array_type(array_typet &type)
       // add the symbol to symbol table
       auxiliary_symbolt new_symbol;
       new_symbol.name=temp_identifier;
-      new_symbol.pretty_name=id2string(base_symbol.pretty_name)+suffix;
-      new_symbol.base_name=id2string(base_symbol.base_name)+suffix;
+      new_symbol.pretty_name=id2string(current_symbol.pretty_name)+suffix;
+      new_symbol.base_name=id2string(current_symbol.base_name)+suffix;
       new_symbol.type=size.type();
       new_symbol.type.set(ID_C_constant, true);
       new_symbol.is_type=false;
       new_symbol.is_static_lifetime=false;
-      new_symbol.value.make_nil();
+      new_symbol.value=size;
       new_symbol.location=source_location;
 
       symbol_table.add(new_symbol);
