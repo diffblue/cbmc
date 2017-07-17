@@ -3,10 +3,11 @@ public class test_parseint_with_radix
     public static void main(String[] args)
     {
         if (args.length == 1) {
-            String str1 = new String("F");
+            // 2^31-1, max value of Integer
+            String str1 = new String("7FFFFFFF");
             int parsed1 = Integer.parseInt(str1, 16);
-            assert(parsed1 == 15);
-            assert(parsed1 != 15);
+            assert(parsed1 == 2147483647);
+            assert(parsed1 != 2147483647);
         }
         else if (args.length == 2) {
             String str2 = new String("123");
