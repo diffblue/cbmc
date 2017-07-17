@@ -2047,18 +2047,27 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.empty() && results.size()==1);
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
+      const bool is_assertions_disabled_field=
+        field_name.find("$assertionsDisabled")!=std::string::npos;
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
-      if(lazy_methods && arg0.type().id()==ID_symbol)
+      if(lazy_methods)
       {
-        lazy_methods->add_needed_class(
-          to_symbol_type(arg0.type()).get_identifier());
+        if(arg0.type().id()==ID_symbol)
+        {
+          lazy_methods->add_needed_class(
+            to_symbol_type(arg0.type()).get_identifier());
+        }
+        else if(is_assertions_disabled_field)
+        {
+          lazy_methods->add_needed_class(arg0.get_string(ID_class));
+        }
       }
       results[0]=java_bytecode_promotion(symbol_expr);
 
       codet clinit_call=get_clinit_call(arg0.get_string(ID_class));
       if(clinit_call.get_statement()!=ID_skip)
         c=clinit_call;
-      else if(field_name.find("$assertionsDisabled")!=std::string::npos)
+      else if(is_assertions_disabled_field)
       {
         // set $assertionDisabled to false
         c=code_assignt(symbol_expr, false_exprt());
