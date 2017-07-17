@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Conversion
 
+#include "cpp_convert_type.h"
+
 #include <cassert>
 
 #include <util/config.h>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 
-#include "cpp_convert_type.h"
 #include "cpp_declaration.h"
 #include "cpp_name.h"
 

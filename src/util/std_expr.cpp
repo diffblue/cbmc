@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "std_expr.h"
 
 #include <cassert>
 
@@ -17,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 
 #include "std_types.h"
-#include "std_expr.h"
 
 bool constant_exprt::value_is_zero_string() const
 {

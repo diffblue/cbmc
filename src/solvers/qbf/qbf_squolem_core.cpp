@@ -9,14 +9,14 @@ Author: CM Wintersteiger
 /// \file
 /// Squolem Backend (with proofs)
 
+#include "qbf_squolem_core.h"
+
 #include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
 
 #include <util/c_types.h> // uint type for indices
-
-#include "qbf_squolem_core.h"
 
 qbf_squolem_coret::qbf_squolem_coret() : squolem(NULL)
 {

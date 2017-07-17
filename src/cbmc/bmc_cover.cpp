@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Test-Suite Generation with BMC
 
+#include "bmc.h"
+
 #include <iostream>
 
 #include <util/time_stopping.h>
@@ -24,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include "bmc.h"
 #include "bv_cbmc.h"
 
 class bmc_covert:

@@ -11,9 +11,9 @@ Date:   September 2014
 /// \file
 /// Remove 'complex' data type
 
-#include <util/arith_tools.h>
-
 #include "remove_complex.h"
+
+#include <util/arith_tools.h>
 
 static exprt complex_member(const exprt &expr, irep_idt id)
 {

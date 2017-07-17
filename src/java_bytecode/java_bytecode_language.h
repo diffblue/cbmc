@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 
+class symbolt;
+
 enum lazy_methods_modet
 {
   LAZY_METHODS_MODE_EAGER,

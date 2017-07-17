@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Module
 
+#include "cpp_language.h"
+
 #include <cstring>
 #include <sstream>
 #include <fstream>
@@ -23,7 +25,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/c_preprocess.h>
 
 #include "cpp_internal_additions.h"
-#include "cpp_language.h"
 #include "expr2cpp.h"
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"

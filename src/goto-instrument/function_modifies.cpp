@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Modifies
 
-#include <util/std_expr.h>
-
 #include "function_modifies.h"
+
+#include <util/std_expr.h>
 
 void function_modifiest::get_modifies_lhs(
   const local_may_aliast &local_may_alias,

@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "union_find.h"
 
 #include <algorithm>
-
-#include "union_find.h"
 
 void unsigned_union_find::make_union(size_type j, size_type k)
 {

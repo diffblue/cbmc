@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "unicode.h"
 
 #include <cstring>
 #include <locale>
 #include <iomanip>
 #include <sstream>
 #include <cstdint>
-
-#include "unicode.h"
 
 #ifdef _WIN32
 #include <windows.h>

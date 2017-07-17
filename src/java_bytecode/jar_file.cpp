@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "jar_file.h"
 
 #include <cstring>
 #include <cassert>
@@ -13,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <json/json_parser.h>
 #include <util/suffix.h>
-
-#include "jar_file.h"
 
 void jar_filet::open(
   java_class_loader_limitt &class_loader_limit,

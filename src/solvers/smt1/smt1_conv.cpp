@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// SMT Version 1 Backend
 
+#include "smt1_conv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -28,8 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
-
-#include "smt1_conv.h"
 
 void smt1_convt::print_assignment(std::ostream &out) const
 {

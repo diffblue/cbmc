@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Taint Analysis
 
+#include "taint_analysis.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/custom_bitvector_analysis.h>
 
-#include "taint_analysis.h"
 #include "taint_parser.h"
 
 class taint_analysist:public messaget

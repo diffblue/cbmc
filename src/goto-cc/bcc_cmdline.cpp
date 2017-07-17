@@ -9,12 +9,12 @@ Author: Michael Tautschnig
 /// \file
 /// A special command line object for Bruce's C Compiler
 
+#include "bcc_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "bcc_cmdline.h"
 
 // non-bcc options
 const char *goto_bcc_options_with_argument[]=

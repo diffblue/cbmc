@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "rename_symbol.h"
 
 #include "std_types.h"
 #include "std_expr.h"
-#include "rename_symbol.h"
 
 rename_symbolt::rename_symbolt()
 {

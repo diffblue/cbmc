@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Field-insensitive, location-sensitive escape analysis
 
-#include <util/simplify_expr.h>
-
 #include "escape_analysis.h"
+
+#include <util/simplify_expr.h>
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {

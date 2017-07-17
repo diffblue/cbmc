@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <set>
-
 #include "cpp_typecheck.h"
+
+#include <set>
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {

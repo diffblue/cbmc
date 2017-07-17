@@ -11,13 +11,13 @@ Date: May 2016
 /// \file
 /// Coverage Instrumentation
 
+#include "cover.h"
+
 #include <algorithm>
 #include <iterator>
 
 #include <util/prefix.h>
 #include <util/message.h>
-
-#include "cover.h"
 
 class basic_blockst
 {

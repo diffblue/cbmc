@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 
 #include <util/c_types.h>
 
 #include "cpp_type2name.h"
-#include "cpp_typecheck.h"
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)

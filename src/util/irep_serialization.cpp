@@ -11,10 +11,11 @@ Date: May 2007
 /// \file
 /// binary irep conversions with hashing
 
+#include "irep_serialization.h"
+
 #include <sstream>
 #include <iostream>
 
-#include "irep_serialization.h"
 #include "string_hash.h"
 
 void irep_serializationt::write_irep(

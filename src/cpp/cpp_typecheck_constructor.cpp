@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 
 #include <util/c_types.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
 /// \param parent_base_name: base name of typechecked parent

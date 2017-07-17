@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Remove Virtual Function (Method) Calls
 
+#include "remove_virtual_functions.h"
+
 #include <util/prefix.h>
 #include <util/type_eq.h>
 
 #include "class_hierarchy.h"
 #include "class_identifier.h"
-#include "remove_virtual_functions.h"
 
 class remove_virtual_functionst
 {

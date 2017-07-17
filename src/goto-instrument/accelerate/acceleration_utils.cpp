@@ -9,6 +9,8 @@ Author: Matt Lewis
 /// \file
 /// Loop Acceleration
 
+#include "acceleration_utils.h"
+
 #include <iostream>
 #include <map>
 #include <set>
@@ -39,7 +41,6 @@ Author: Matt Lewis
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
 
-#include "acceleration_utils.h"
 #include "accelerator.h"
 #include "util.h"
 #include "cone_of_influence.h"

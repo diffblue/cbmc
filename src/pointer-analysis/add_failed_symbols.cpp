@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Pointer Dereferencing
 
+#include "add_failed_symbols.h"
+
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-
-#include "add_failed_symbols.h"
 
 irep_idt failed_symbol_id(const irep_idt &id)
 {

@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_index(const index_exprt &expr)
 {

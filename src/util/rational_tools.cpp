@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Rational Numbers
 
+#include "rational_tools.h"
+
 #include "rational.h"
 #include "std_types.h"
-
-#include "rational_tools.h"
 
 static mp_integer power10(size_t i)
 {

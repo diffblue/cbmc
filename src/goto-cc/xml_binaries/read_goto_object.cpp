@@ -11,6 +11,8 @@ Date: June 2006
 /// \file
 /// Read goto object files.
 
+#include "read_goto_object.h"
+
 #include <xmllang/xml_parser.h>
 #include <util/namespace.h>
 #include <util/base_type.h>
@@ -20,7 +22,6 @@ Date: June 2006
 
 #include <langapi/mode.h>
 
-#include "read_goto_object.h"
 #include "xml_goto_function_hashing.h"
 #include "xml_irep_hashing.h"
 #include "xml_symbol_hashing.h"

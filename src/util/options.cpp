@@ -9,8 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Options
 
-#include "string2int.h"
 #include "options.h"
+
+#include "string2int.h"
 
 void optionst::set_option(const std::string &option,
                           const std::string &value)

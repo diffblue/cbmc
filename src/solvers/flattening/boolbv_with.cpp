@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
@@ -13,8 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/base_type.h>
 #include <util/endianness_map.h>
 #include <util/config.h>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_with(const exprt &expr)
 {

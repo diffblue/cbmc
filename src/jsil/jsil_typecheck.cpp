@@ -9,14 +9,14 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// \file
 /// Jsil Language
 
+#include "jsil_typecheck.h"
+
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 
 #include "expr2jsil.h"
 #include "jsil_types.h"
-
-#include "jsil_typecheck.h"
 
 std::string jsil_typecheckt::to_string(const exprt &expr)
 {

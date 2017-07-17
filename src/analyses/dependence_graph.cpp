@@ -12,14 +12,14 @@ Date: August 2013
 /// \file
 /// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
 
+#include "dependence_graph.h"
+
 #include <cassert>
 
 #include <util/json.h>
 #include <util/json_expr.h>
 
 #include "goto_rw.h"
-
-#include "dependence_graph.h"
 
 bool dep_graph_domaint::merge(
   const dep_graph_domaint &src,

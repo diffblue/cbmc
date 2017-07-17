@@ -11,11 +11,11 @@ Date: April 2016
 /// \file
 /// Unified diff (using LCSS) of goto functions
 
+#include "unified_diff.h"
+
 #include <algorithm>
 
 #include <goto-programs/goto_model.h>
-
-#include "unified_diff.h"
 
 unified_difft::unified_difft(const goto_modelt &model_old,
                              const goto_modelt &model_new):

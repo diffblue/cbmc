@@ -6,12 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cvc_prop.h"
 
 #include <cassert>
 #include <set>
-
-
-#include "cvc_prop.h"
 
 explicit cvc_propt::cvc_propt(std::ostream &_out):out(_out)
 {

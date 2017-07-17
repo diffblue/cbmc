@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert_class.h"
+
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <util/c_types.h>
-
-#include "goto_convert_class.h"
 
 bool goto_convertt::has_function_call(const exprt &expr)
 {

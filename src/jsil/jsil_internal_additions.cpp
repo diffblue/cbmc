@@ -9,6 +9,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// \file
 /// Jsil Language
 
+#include "jsil_internal_additions.h"
+
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
@@ -16,8 +18,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/c_types.h>
 
 #include "jsil_types.h"
-
-#include "jsil_internal_additions.h"
 
 void jsil_internal_additions(symbol_tablet &dest)
 {

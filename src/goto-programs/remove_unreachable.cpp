@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "remove_unreachable.h"
+
 #include <set>
 #include <stack>
-
-#include "remove_unreachable.h"
 
 /// remove unreachable code
 void remove_unreachable(goto_programt &goto_program)

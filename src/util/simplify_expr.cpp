@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr.h"
 
 #include <cassert>
 #include <algorithm>
@@ -13,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "rational.h"
 #include "simplify_expr_class.h"
-#include "simplify_expr.h"
 #include "mp_arith.h"
 #include "arith_tools.h"
 #include "replace_expr.h"

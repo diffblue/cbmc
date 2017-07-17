@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_language.h"
 
 #include <cstring>
 #include <sstream>
@@ -18,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/remove_internal_symbols.h>
 
 #include "ansi_c_entry_point.h"
-#include "ansi_c_language.h"
 #include "ansi_c_typecheck.h"
 #include "ansi_c_parser.h"
 #include "expr2c.h"

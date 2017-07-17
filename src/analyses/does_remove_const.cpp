@@ -9,14 +9,14 @@
 /// \file
 /// Analyses
 
+#include "does_remove_const.h"
+
 #include <goto-programs/goto_program.h>
 #include <util/type.h>
 #include <util/expr.h>
 #include <util/std_code.h>
 #include <util/base_type.h>
 #include <ansi-c/c_qualifiers.h>
-
-#include "does_remove_const.h"
 
 /// A naive analysis to look for casts that remove const-ness from pointers.
 /// \param goto_program: the goto program to check

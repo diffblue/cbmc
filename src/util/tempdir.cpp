@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include "tempdir.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -26,7 +27,6 @@ Author: CM Wintersteiger
 #include <unistd.h>
 #endif
 
-#include "tempdir.h"
 #include "file_util.h"
 
 std::string get_temporary_directory(const std::string &name_template)

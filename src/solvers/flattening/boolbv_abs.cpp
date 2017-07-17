@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <util/std_types.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"

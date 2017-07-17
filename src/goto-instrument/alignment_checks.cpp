@@ -9,11 +9,11 @@ Author:
 /// \file
 /// Alignment Checks
 
+#include "alignment_checks.h"
+
 #include <util/pointer_offset_size.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
-
-#include "alignment_checks.h"
 
 void print_struct_alignment_problems(
   const symbol_tablet &symbol_table,

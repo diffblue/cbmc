@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_internal_additions.h"
 
 #include <util/config.h>
-
-#include "ansi_c_internal_additions.h"
 
 const char gcc_builtin_headers_generic[]=
 "# 1 \"gcc_builtin_headers_generic.h\"\n"

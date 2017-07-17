@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "bmc.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -20,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/json_expr.h>
-
-#include "bmc.h"
 
 void bmct::show_vcc_plain(std::ostream &out)
 {

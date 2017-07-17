@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Function Inlining
 
+#include "goto_inline_class.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -24,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "remove_skip.h"
 #include "goto_inline.h"
-#include "goto_inline_class.h"
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,

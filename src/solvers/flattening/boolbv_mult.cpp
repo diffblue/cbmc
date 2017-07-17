@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <util/std_types.h>
-
-#include "boolbv.h"
 
 bvt boolbvt::convert_mult(const exprt &expr)
 {

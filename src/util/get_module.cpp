@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Find module symbol using name
 
+#include "get_module.h"
+
 #include <list>
 #include <set>
 
-#include "get_module.h"
 #include "message.h"
 #include "symbol_table.h"
 

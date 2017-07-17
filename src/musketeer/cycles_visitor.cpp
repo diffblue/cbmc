@@ -9,10 +9,11 @@ Author: Vincent Nimal
 /// \file
 /// cycles visitor for computing edges involved for fencing
 
+#include "cycles_visitor.h"
+
 #include <list>
 #include <map>
 
-#include "cycles_visitor.h"
 #include "fence_inserter.h"
 
 class instrumentert;

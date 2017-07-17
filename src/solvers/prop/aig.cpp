@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "aig.h"
 
 #include <cassert>
 #include <ostream>
 #include <string>
-
-#include "aig.h"
 
 std::string aigt::label(nodest::size_type v) const
 {

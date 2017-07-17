@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
 
 #include <list>
+#include <unordered_set>
 
 #include <analyses/natural_loops.h>
 

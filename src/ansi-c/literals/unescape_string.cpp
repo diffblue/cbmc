@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Conversion
 
+#include "unescape_string.h"
+
 #include <cassert>
 #include <cctype>
 
 #include <util/unicode.h>
-
-#include "unescape_string.h"
 
 static void append_universal_char(
   unsigned int value,

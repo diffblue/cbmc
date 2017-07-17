@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// String Abstraction
 
+#include "string_instrumentation.h"
+
 #include <algorithm>
 
 #include <util/std_expr.h>
@@ -20,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/format_strings.h>
 #include <util/c_types.h>
-
-#include "string_instrumentation.h"
 
 exprt is_zero_string(
   const exprt &what,

@@ -9,6 +9,8 @@ Author: Matt Lewis
 /// \file
 /// Loop Acceleration
 
+#include "accelerate.h"
+
 #include <analyses/natural_loops.h>
 
 #include <goto-programs/goto_functions.h>
@@ -22,7 +24,6 @@ Author: Matt Lewis
 #include <iostream>
 #include <list>
 
-#include "accelerate.h"
 #include "path.h"
 #include "polynomial_accelerator.h"
 #include "enumerating_loop_acceleration.h"

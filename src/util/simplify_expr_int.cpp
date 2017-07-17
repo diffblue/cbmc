@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr_class.h"
 
 #include <cassert>
 
 #include "base_type.h"
 #include "rational.h"
-#include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
 #include "config.h"

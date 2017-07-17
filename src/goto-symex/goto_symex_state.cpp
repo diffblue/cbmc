@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex_state.h"
+
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex_state.h"
 
 goto_symex_statet::goto_symex_statet():
   depth(0),

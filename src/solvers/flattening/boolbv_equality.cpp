@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <iostream>
 
@@ -15,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "flatten_byte_operators.h"
-#include "boolbv.h"
 
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {

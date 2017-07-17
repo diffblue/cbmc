@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_parser.h"
 
 #include <algorithm>
 #include <fstream>
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/string_constant.h>
 
-#include "java_bytecode_parser.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_types.h"
 #include "bytecode_info.h"

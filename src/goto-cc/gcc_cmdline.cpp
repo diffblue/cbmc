@@ -9,14 +9,14 @@ Author: CM Wintersteiger, 2006
 /// \file
 /// A special command line object for the gcc-like options
 
+#include "gcc_cmdline.h"
+
 #include <cassert>
 #include <cstring>
 #include <iostream>
 #include <fstream>
 
 #include <util/prefix.h>
-
-#include "gcc_cmdline.h"
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

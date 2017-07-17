@@ -17,6 +17,8 @@ Date: May 2016
 #include <goto-programs/goto_model.h>
 #include <util/cmdline.h>
 
+class message_handlert;
+
 enum class coverage_criteriont
 {
   LOCATION, BRANCH, DECISION, CONDITION,

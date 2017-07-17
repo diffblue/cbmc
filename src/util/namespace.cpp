@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Namespace
 
+#include "namespace.h"
+
 #include <algorithm>
 
 #include <cassert>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symbol_table.h"
 #include "prefix.h"
 #include "std_types.h"
-#include "namespace.h"
 
 unsigned get_max(
   const std::string &prefix,

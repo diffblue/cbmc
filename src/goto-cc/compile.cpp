@@ -11,6 +11,8 @@ Date: June 2006
 /// \file
 /// Compile and link source and object files.
 
+#include "compile.h"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -39,8 +41,6 @@ Date: June 2006
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
-
-#include "compile.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \

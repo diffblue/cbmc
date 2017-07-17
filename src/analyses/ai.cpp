@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Abstract Interpretation
 
+#include "ai.h"
+
 #include <cassert>
 #include <memory>
 #include <sstream>
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 
 #include "is_threaded.h"
-
-#include "ai.h"
 
 jsont ai_domain_baset::output_json(
   const ai_baset &ai,

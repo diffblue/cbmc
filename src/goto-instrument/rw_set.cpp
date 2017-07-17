@@ -11,6 +11,8 @@ Date: February 2006
 /// \file
 /// Race Detection for Threaded Goto Programs
 
+#include "rw_set.h"
+
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/namespace.h>
@@ -18,8 +20,6 @@ Date: February 2006
 #include <langapi/language_util.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
-
-#include "rw_set.h"
 
 void rw_set_baset::output(std::ostream &out) const
 {

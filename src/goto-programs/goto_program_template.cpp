@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Goto Program Template
 
-#include <ostream>
-
 #include "goto_program_template.h"
+
+#include <ostream>
 
 std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
 {

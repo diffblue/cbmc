@@ -9,9 +9,9 @@ Author:
 /// \file
 /// Read ELF
 
-#include <istream>
-
 #include "elf_reader.h"
+
+#include <istream>
 
 elf_readert::elf_readert(std::istream &_in):in(_in)
 {

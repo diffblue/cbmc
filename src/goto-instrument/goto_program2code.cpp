@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Dump Goto-Program as C/C++ Source
 
+#include "goto_program2code.h"
+
 #include <sstream>
 
 #include <util/c_types.h>
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
-
-#include "goto_program2code.h"
 
 static const exprt &skip_typecast(const exprt &expr)
 {

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_typecast.h"
 
 #include <algorithm>
 
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/simplify_expr.h>
 
-#include "c_typecast.h"
 #include "c_qualifiers.h"
 
 bool c_implicit_typecast(

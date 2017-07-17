@@ -6,11 +6,10 @@ Author:
 
 \*******************************************************************/
 
+#include "cpp_util.h"
 
 #include <util/expr.h>
 #include <util/symbol.h>
-
-#include "cpp_util.h"
 
 exprt cpp_symbol_expr(const symbolt &symbol)
 {

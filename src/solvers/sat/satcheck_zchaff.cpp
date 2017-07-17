@@ -6,11 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_zchaff.h"
 
 #include <cassert>
-
-
-#include "satcheck_zchaff.h"
 
 #include <zchaff_solver.h>
 

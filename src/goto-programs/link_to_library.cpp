@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Library Linking
 
+#include "link_to_library.h"
+
 #include <util/config.h>
 
 #include <ansi-c/cprover_library.h>
 
-#include "link_to_library.h"
 #include "compute_called_functions.h"
 #include "goto_convert_functions.h"
 

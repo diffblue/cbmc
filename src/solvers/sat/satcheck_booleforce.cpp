@@ -6,11 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_booleforce.h"
 
 #include <cassert>
-
-
-#include "satcheck_booleforce.h"
 
 extern "C"
 {

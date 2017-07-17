@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// CFG for One Function
 
+#include "local_cfg.h"
+
 #if 0
 #include <iterator>
 #include <algorithm>
@@ -21,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #endif
-
-#include "local_cfg.h"
 
 void local_cfgt::build(const goto_programt &goto_program)
 {

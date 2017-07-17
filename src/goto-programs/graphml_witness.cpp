@@ -9,14 +9,14 @@ Author: Daniel Kroening
 /// \file
 /// Witnesses for Traces and Proofs
 
+#include "graphml_witness.h"
+
 #include <util/base_type.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
-
-#include "graphml_witness.h"
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {

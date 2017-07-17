@@ -6,12 +6,11 @@ Author: Georg Weissenbacher, georg.weissenbacher@inf.ethz.ch
 
 \*******************************************************************/
 
+#include "bv_minimize.h"
 
 #include <cassert>
 
 #include <solvers/prop/minimize.h>
-
-#include "bv_minimize.h"
 
 void bv_minimizet::add_objective(
   prop_minimizet &prop_minimize,

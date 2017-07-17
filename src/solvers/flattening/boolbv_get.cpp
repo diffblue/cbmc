@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
@@ -15,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 
 exprt boolbvt::get(const exprt &expr) const

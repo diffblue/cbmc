@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_parser.h"
 
 #include <iostream>
 
-#include "ansi_c_parser.h"
 #include "c_storage_spec.h"
 
 ansi_c_parsert ansi_c_parser;

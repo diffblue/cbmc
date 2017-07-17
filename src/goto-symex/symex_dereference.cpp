@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -20,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
-#include "goto_symex.h"
 #include "symex_dereference_state.h"
 
 void goto_symext::dereference_rec_address_of(

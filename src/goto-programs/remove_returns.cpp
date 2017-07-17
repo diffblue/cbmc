@@ -11,10 +11,10 @@ Date:   September 2009
 /// \file
 /// Remove function return values
 
+#include "remove_returns.h"
+
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include "remove_returns.h"
 
 class remove_returnst
 {

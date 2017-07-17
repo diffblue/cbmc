@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_entry_point.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -24,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_functions.h>
 #include <linking/static_lifetime_init.h>
 
-#include "ansi_c_entry_point.h"
 #include "c_nondet_symbol_factory.h"
 
 exprt::operandst build_function_environment(

@@ -6,6 +6,7 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+#include "fence_shared.h"
 
 #include <iostream>
 #include <sstream>
@@ -23,8 +24,6 @@ Author: Vincent Nimal
 #include <goto-instrument/wmm/goto2graph.h>
 #include <goto-instrument/rw_set.h>
 // #include <goto-instrument/nondet_volatile.h>
-
-#include "fence_shared.h"
 
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>

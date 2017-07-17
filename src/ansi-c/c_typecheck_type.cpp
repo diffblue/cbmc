@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Type Checking
 
+#include "c_typecheck_base.h"
+
 #include <unordered_set>
 
 #include <util/c_types.h>
@@ -18,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/pointer_offset_size.h>
 
-#include "c_typecheck_base.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"

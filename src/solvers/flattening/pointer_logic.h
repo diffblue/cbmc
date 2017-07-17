@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define BV_ADDR_BITS 8
 
+class namespacet;
+
 class pointer_logict
 {
 public:

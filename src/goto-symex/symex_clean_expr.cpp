@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/base_type.h>
 
 #include <util/c_types.h>
-
-#include "goto_symex.h"
 
 void goto_symext::process_array_expr_rec(
   exprt &expr,

@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/source_location.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"

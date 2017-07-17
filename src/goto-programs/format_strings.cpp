@@ -9,14 +9,14 @@ Author: CM Wintersteiger
 /// \file
 /// Format String Parser
 
+#include "format_strings.h"
+
 #include <util/std_types.h>
 #include <util/std_expr.h>
 
 #include <util/c_types.h>
 
 #include <cctype>
-
-#include "format_strings.h"
 
 void parse_flags(
   std::string::const_iterator &it,

@@ -9,10 +9,10 @@ Author: Daniel Kroening
 /// \file
 /// A special command line object to mimic ARM's armcc
 
+#include "armcc_cmdline.h"
+
 #include <cstring>
 #include <iostream>
-
-#include "armcc_cmdline.h"
 
 /// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings

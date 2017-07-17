@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
+#include "ansi_c_declaration.h"
+
 #include <ostream>
 #include <cassert>
 
 #include <util/config.h>
 #include <util/std_types.h>
-
-#include "ansi_c_declaration.h"
 
 void ansi_c_declaratort::build(irept &src)
 {

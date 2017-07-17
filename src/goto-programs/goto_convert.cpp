@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert.h"
+
 #include <cassert>
 
 #include <util/cprover_prefix.h>
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
-#include "goto_convert.h"
 #include "goto_convert_class.h"
 #include "destructor.h"
 

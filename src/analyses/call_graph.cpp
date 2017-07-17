@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Function Call Graphs
 
+#include "call_graph.h"
+
 #include <util/std_expr.h>
 #include <util/xml.h>
-
-#include "call_graph.h"
 
 call_grapht::call_grapht()
 {

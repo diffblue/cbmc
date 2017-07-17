@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex.h"
+
 #include <util/byte_operators.h>
 #include <util/cprover_prefix.h>
 
 #include <util/c_types.h>
 
-#include "goto_symex.h"
 #include "goto_symex_state.h"
 
 // #define USE_UPDATE

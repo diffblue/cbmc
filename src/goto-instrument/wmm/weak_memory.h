@@ -16,10 +16,14 @@ Date: September 2011
 
 #include "wmm.h"
 
+#include "util/irep.h"
+
 class value_setst;
 class goto_functionst;
 class symbol_tablet;
 class message_handlert;
+class goto_programt;
+class messaget;
 
 void weak_memory(
   memory_modelt model,

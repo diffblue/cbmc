@@ -13,11 +13,11 @@ Date: 2013
 /// collection of pairs (for Pensieve's static delay-set analysis) in graph of
 ///   abstract events
 
+#include "event_graph.h"
+
 #include <fstream>
 
 #include <util/message.h>
-
-#include "event_graph.h"
 
 #define OUTPUT(s, fence, file, line, id, type)  \
   s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<'\n'

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "byte_operators.h"
 
 #include <cassert>
 
-#include "byte_operators.h"
 #include "config.h"
 
 irep_idt byte_extract_id()

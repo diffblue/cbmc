@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -23,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex.h"
 
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,

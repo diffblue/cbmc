@@ -11,9 +11,9 @@ Date: 2012
 /// \file
 /// collection of cycles in graph of abstract events
 
-#include <util/message.h>
-
 #include "event_graph.h"
+
+#include <util/message.h>
 
 /// after the collection, eliminates the executions forbidden by an indirect
 /// thin-air

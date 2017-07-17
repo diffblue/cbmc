@@ -11,6 +11,8 @@ Date: June 2011
 /// \file
 /// Traces of GOTO Programs in VCD (Value Change Dump) Format
 
+#include "vcd_goto_trace.h"
+
 #include <ctime>
 #include <ostream>
 #include <cassert>
@@ -18,8 +20,6 @@ Date: June 2011
 #include <util/arith_tools.h>
 #include <util/pointer_offset_size.h>
 #include <util/numbering.h>
-
-#include "vcd_goto_trace.h"
 
 std::string as_vcd_binary(
   const exprt &expr,

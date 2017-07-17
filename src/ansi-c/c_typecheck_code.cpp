@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C Language Type Checking
 
+#include "c_typecheck_base.h"
+
 #include <util/config.h>
 #include <linking/zero_initializer.h>
 
 #include "ansi_c_declaration.h"
-#include "c_typecheck_base.h"
 
 void c_typecheck_baset::start_typecheck_code()
 {

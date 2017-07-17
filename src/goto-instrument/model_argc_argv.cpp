@@ -11,6 +11,8 @@ Date: April 2016
 /// \file
 /// Initialize command line arguments
 
+#include "model_argc_argv.h"
+
 #include <sstream>
 
 #include <util/cprover_prefix.h>
@@ -26,8 +28,6 @@ Date: April 2016
 #include <goto-programs/goto_convert.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
-
-#include "model_argc_argv.h"
 
 bool model_argc_argv(
   symbol_tablet &symbol_table,

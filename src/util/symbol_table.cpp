@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "symbol_table.h"
 
 #include <ostream>
-
-#include "symbol_table.h"
 
 /// Add a new symbol to the symbol table
 /// \param symbol: The symbol to be added to the symbol table

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cvc_conv.h"
 
 #include <cassert>
 #include <cctype>
@@ -20,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
-
-#include "cvc_conv.h"
 
 void cvc_convt::print_assignment(std::ostream &out) const
 {

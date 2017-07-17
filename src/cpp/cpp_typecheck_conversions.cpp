@@ -9,6 +9,8 @@ Author:
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <cstdlib>
 
 #include <util/config.h>
@@ -19,8 +21,6 @@ Author:
 
 #include <ansi-c/c_qualifiers.h>
 #include <util/c_types.h>
-
-#include "cpp_typecheck.h"
 
 /// Lvalue-to-rvalue conversion
 ///

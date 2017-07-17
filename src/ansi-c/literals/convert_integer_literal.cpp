@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Conversion
 
+#include "convert_integer_literal.h"
+
 #include <cassert>
 #include <cctype>
 
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
-
-#include "convert_integer_literal.h"
 
 exprt convert_integer_literal(const std::string &src)
 {

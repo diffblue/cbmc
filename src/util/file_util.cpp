@@ -11,6 +11,8 @@ Date: January 2012
 /// \file
 /// File Utilities
 
+#include "file_util.h"
+
 #include <cerrno>
 
 #if defined(__linux__) || \
@@ -37,8 +39,6 @@ Date: January 2012
 #else
 #include <cstring>
 #endif
-
-#include "file_util.h"
 
 /// \return current working directory
 std::string get_current_working_directory()

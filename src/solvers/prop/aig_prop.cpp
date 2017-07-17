@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "aig_prop.h"
 
 #include <set>
 #include <stack>
-
-#include "aig_prop.h"
 
 // Tries to compact AIGs corresponding to xor and equality
 // Needed to match the performance of the native CNF back-end.

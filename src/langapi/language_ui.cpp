@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "language_ui.h"
 
 #include <fstream>
 #include <memory>
@@ -16,7 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/cmdline.h>
 #include <util/unicode.h>
 
-#include "language_ui.h"
 #include "mode.h"
 
 /// Constructor

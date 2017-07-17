@@ -11,13 +11,13 @@ Date: January 2010
 /// \file
 /// Detection for Uninitialized Local Variables
 
+#include "uninitialized.h"
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include <analyses/uninitialized_domain.h>
-
-#include "uninitialized.h"
 
 class uninitializedt
 {

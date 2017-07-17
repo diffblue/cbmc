@@ -103,6 +103,10 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 - Prefer forward declaration to includes, but forward declare at the top of the
   header file rather than in line
 - Guard headers with `#ifndef CPROVER_DIRECTORIES_FILE_H`, etc
+- The corresponding header for a given source file should always be the *first*
+  include in the source file. For example, given `foo.h` and `foo.cpp`, the
+  line `#include "foo.h"` should precede all other include statements in
+  `foo.cpp`.
 
 # Makefiles
 - Each source file should appear on a separate line

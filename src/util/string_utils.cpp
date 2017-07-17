@@ -6,12 +6,11 @@ Author: Daniel Poetzl
 
 \*******************************************************************/
 
+#include "string_utils.h"
 
 #include <cassert>
 #include <cctype>
 #include <algorithm>
-
-#include "string_utils.h"
 
 std::string strip_string(const std::string &s)
 {

@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <algorithm>
 
 #include <util/arith_tools.h>
@@ -19,7 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_type2name.h"
 #include "cpp_declarator_converter.h"
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_name.h"
 

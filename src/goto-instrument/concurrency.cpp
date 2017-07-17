@@ -11,13 +11,13 @@ Date: October 2012
 /// \file
 /// Encoding for Threaded Goto Programs
 
+#include "concurrency.h"
+
 #include <util/std_expr.h>
 #include <util/find_symbols.h>
 #include <util/replace_symbol.h>
 
 #include <analyses/is_threaded.h>
-
-#include "concurrency.h"
 
 class concurrency_instrumentationt
 {

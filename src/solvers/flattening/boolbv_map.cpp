@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv_map.h"
 
 #include <util/threeval.h>
 
 #include "../prop/prop.h"
 
-#include "boolbv_map.h"
 #include "boolbv_width.h"
 
 #ifdef DEBUG

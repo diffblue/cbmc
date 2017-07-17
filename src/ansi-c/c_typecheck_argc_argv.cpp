@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Conversion / Type Checking
 
-#include <util/arith_tools.h>
-
 #include "c_typecheck_base.h"
+
+#include <util/arith_tools.h>
 
 void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 {

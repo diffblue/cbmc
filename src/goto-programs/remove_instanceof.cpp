@@ -9,9 +9,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \file
 /// Remove Instance-of Operators
 
+#include "remove_instanceof.h"
+
 #include "class_hierarchy.h"
 #include "class_identifier.h"
-#include "remove_instanceof.h"
+
 #include <util/fresh_symbol.h>
 
 #include <sstream>

@@ -9,9 +9,9 @@ Author: Daiva Naudziuniene, daivan@amazon.com
 /// \file
 /// Jsil Language
 
-#include <algorithm>
-
 #include "jsil_types.h"
+
+#include <algorithm>
 
 typet jsil_any_type()
 {

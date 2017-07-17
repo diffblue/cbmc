@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_entry_point.h"
 
 #include <algorithm>
 #include <set>
@@ -28,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_exceptions.h>
 
-#include "java_entry_point.h"
 #include "java_object_factory.h"
 #include "java_types.h"
 

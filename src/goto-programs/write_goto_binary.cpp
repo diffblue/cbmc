@@ -9,13 +9,13 @@ Author: CM Wintersteiger
 /// \file
 /// Write GOTO binaries
 
+#include "write_goto_binary.h"
+
 #include <fstream>
 
 #include <util/message.h>
 #include <util/irep_serialization.h>
 #include <util/symbol_table.h>
-
-#include "write_goto_binary.h"
 
 /// Writes a goto program to disc, using goto binary format ver 2
 bool write_goto_binary_v3(

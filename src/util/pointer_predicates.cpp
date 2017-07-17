@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Various predicates over pointers in programs
 
+#include "pointer_predicates.h"
+
 #include "c_types.h"
 #include "cprover_prefix.h"
 #include "namespace.h"
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "pointer_offset_size.h"
 #include "config.h"
 #include "symbol.h"
-
-#include "pointer_predicates.h"
 
 exprt pointer_object(const exprt &p)
 {

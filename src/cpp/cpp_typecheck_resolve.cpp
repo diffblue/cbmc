@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck_resolve.h"
+
 #include <cstdlib>
 #include <algorithm>
 
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/anonymous_member.h>
 
 #include "cpp_typecheck.h"
-#include "cpp_typecheck_resolve.h"
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_util.h"

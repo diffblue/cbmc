@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Module
 
+#include "cpp_type2name.h"
+
 #include <string>
 
 #include <util/type.h>
 #include <util/std_types.h>
-
-#include "cpp_type2name.h"
 
 static std::string do_prefix(const std::string &s)
 {

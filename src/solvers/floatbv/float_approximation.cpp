@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "float_approximation.h"
 
 #include <cassert>
-
-#include "float_approximation.h"
 
 float_approximationt::~float_approximationt()
 {
