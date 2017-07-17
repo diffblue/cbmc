@@ -6216,9 +6216,22 @@ def CheckItemIndentationInNamespace(filename, raw_lines_no_comments, linenum,
 
 def CheckNamespaceOrUsing(filename, clean_lines, linenum, error):
   line = clean_lines.elided[linenum]
-  if Match(r'^namespace(\s|$)', line):
-    error(filename, linenum, 'readability/namespace', 4,
-          'Do not use namespaces')
+  if Match(r'^\s*namespace(\s+.*)?$', line):
+    num_lines=len(clean_lines.elided)
+    current_linenum=linenum
+    while current_linenum<num_lines:
+      current_line=clean_lines.elided[current_linenum]
+      if current_linenum==linenum:
+        is_named=Match(r'^\s*namespace\s+[^\s{]+.*$', current_line)
+      else:
+        is_named=Match(r'^\s*[^\s{]+.*$', current_line)
+      if is_named:
+        error(filename, linenum, 'readability/namespace', 4,
+              'Do not use namespaces')
+        break
+      if '{' in current_line:
+        break
+      current_linenum+=1
   if Match(r'^using\s', line):
     error(filename, linenum, 'readability/namespace', 4,
           'Do not use using')
