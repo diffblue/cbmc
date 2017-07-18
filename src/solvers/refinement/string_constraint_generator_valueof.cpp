@@ -411,92 +411,123 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
 
 /// add axioms corresponding to the Integer.parseInt java function
 /// \param f: a function application with either one string expression or one
-///   string expression and an expression for the radix
+///   string expression and an integer expression for the radix
 /// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  string_exprt str=get_string_expr(f.arguments()[0]);
+  const string_exprt str=get_string_expr(f.arguments()[0]);
   const exprt radix=
     f.arguments().size()==1?
       static_cast<exprt>(from_integer(10, f.type())):
       static_cast<exprt>(typecast_exprt(f.arguments()[1], f.type()));
 
   const typet &type=f.type();
-  symbol_exprt i=fresh_symbol("parsed_int", type);
+  const symbol_exprt i=fresh_symbol("parsed_int", type);
+  const symbol_exprt sign=fresh_symbol("sign_of_parsed_int", type);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
-  exprt minus_char=constant_char('-', char_type);
-  exprt plus_char=constant_char('+', char_type);
+  const exprt minus_char=constant_char('-', char_type);
+  const exprt plus_char=constant_char('+', char_type);
   assert(type.id()==ID_signedbv);
 
-  exprt chr=str[0];
-  exprt starts_with_minus=equal_exprt(chr, minus_char);
-  exprt starts_with_plus=equal_exprt(chr, plus_char);
-  exprt starts_with_digit=
+  const exprt chr=str[0];
+  const typet &index_type=ref_type.get_index_type();
+  const exprt zero_expr=from_integer(0, index_type);
+  const exprt one_expr=from_integer(1, index_type);
+  const exprt two_expr=from_integer(2, index_type);
+  const exprt starts_with_minus=equal_exprt(chr, minus_char);
+  const exprt starts_with_plus=equal_exprt(chr, plus_char);
+  const exprt starts_with_digit=
     not_exprt(or_exprt(starts_with_minus, starts_with_plus));
 
+  /// Currently we do not cope with excessive leading zeros. This value of
+  /// max_string_length is long enough to be able to represent every number in
+  /// every base. We experimented with making the max_string_length depend on
+  /// the base, but this did not make any difference.
+  const std::size_t max_string_length=to_bitvector_type(type).get_width()+1;
+
   /// TODO: we should throw an exception when this does not hold:
-  const std::size_t max_string_length=40;
   const exprt &correct=add_axioms_for_correct_number_format(
     str, radix, max_string_length);
   axioms.push_back(correct);
 
-  /// TODO(OJones): size should depend on the radix
-  /// TODO(OJones): we should deal with overflow properly
-  for(std::size_t size=1; size<=max_string_length; size++)
+  /// TODO(OJones) Fix the below algorithm to make it work for for -2^63 in
+  /// binary (currently radix^63 overflows).
+
+  /// First we deal with the contribution to i from all the characters after the
+  /// first one
+  for(std::size_t index=1; index<max_string_length; ++index)
   {
-    exprt sum=from_integer(0, type);
-    exprt first_value=get_numeric_value_from_character(chr, char_type, type);
-    equal_exprt premise=str.axiom_for_has_length(size);
+    const exprt index_expr=from_integer(index, index_type);
 
-    for(std::size_t j=1; j<size; j++)
-    {
-      mult_exprt radix_sum(sum, radix);
-      if(j>=max_string_length-1)
-      {
-        // We have to be careful about overflows
-        div_exprt div(sum, radix);
-        implies_exprt no_overflow(premise, (equal_exprt(div, sum)));
-        axioms.push_back(no_overflow);
-      }
+    /// We need an expr which is str.length()-index-1 when this is >= 0, and is
+    /// zero otherwise
+    if_exprt length_minus_index_minus_one(
+      binary_relation_exprt(index_expr, ID_lt, str.length()),
+      minus_exprt(minus_exprt(str.length(), index_expr), one_expr),
+      zero_expr);
 
-      sum=plus_exprt_with_overflow_check(
-        radix_sum,
-        get_numeric_value_from_character(str[j], char_type, type));
+    /// index < length => sign*str[index] = (i/radix^(length-index-1))%radix
+    const equal_exprt contribution_of_str_index(
+      mult_exprt(
+        sign, get_numeric_value_from_character(str[index], char_type, type)),
+      mod_exprt(
+        div_exprt(i, power_exprt(radix, length_minus_index_minus_one)), radix));
+    const implies_exprt qualified_contribution_of_str_index(
+      binary_relation_exprt(index_expr, ID_lt, str.length()),
+      contribution_of_str_index);
 
-      mult_exprt first(first_value, radix);
-      if(j>=max_string_length-1)
-      {
-        // We have to be careful about overflows
-        div_exprt div_first(first, radix);
-        implies_exprt no_overflow_first(
-          and_exprt(starts_with_digit, premise),
-          equal_exprt(div_first, first_value));
-        axioms.push_back(no_overflow_first);
-      }
-      first_value=first;
-    }
-
-    // If the length is `size`, we add axioms:
-    // a1 : starts_with_digit => i=sum+first_value
-    // a2 : starts_with_plus => i=sum
-    // a3 : starts_with_minus => i=-sum
-
-    implies_exprt a1(
-      and_exprt(premise, starts_with_digit),
-      equal_exprt(i, plus_exprt(sum, first_value)));
-    axioms.push_back(a1);
-
-    implies_exprt a2(and_exprt(premise, starts_with_plus), equal_exprt(i, sum));
-    axioms.push_back(a2);
-
-    implies_exprt a3(
-      and_exprt(premise, starts_with_minus),
-      equal_exprt(i, unary_minus_exprt(sum)));
-    axioms.push_back(a3);
+    axioms.push_back(qualified_contribution_of_str_index);
   }
+
+  /// Now we deal with the contribution to i from the first character, or the
+  /// second character if the first character is + or -, and also define sign as
+  /// 1 or -1 appropriately
+
+  const if_exprt length_minus_one(
+    binary_relation_exprt(zero_expr, ID_lt, str.length()),
+    minus_exprt(str.length(), one_expr),
+    zero_expr);
+  const if_exprt length_minus_two(
+    binary_relation_exprt(one_expr, ID_lt, str.length()),
+    minus_exprt(str.length(), two_expr),
+    zero_expr);
+
+  /// starts_with_digit => sign = 1 && sign*str[0] = i/radix^(length-1)
+  const implies_exprt starts_with_digit_first_digit(
+    starts_with_digit,
+    and_exprt(
+      equal_exprt(sign, from_integer(1, type)),
+      equal_exprt(
+        mult_exprt(
+          sign, get_numeric_value_from_character(str[0], char_type, type)),
+        div_exprt(i, power_exprt(radix, length_minus_one)))));
+  axioms.push_back(starts_with_digit_first_digit);
+
+  /// starts_with_plus => sign = 1 && sign*str[1] = i/radix^(length-2)
+  const implies_exprt starts_with_plus_first_digit(
+    starts_with_plus,
+    and_exprt(
+      equal_exprt(sign, from_integer(1, type)),
+      equal_exprt(
+        mult_exprt(
+          sign, get_numeric_value_from_character(str[1], char_type, type)),
+        div_exprt(i, power_exprt(radix, length_minus_two)))));
+  axioms.push_back(starts_with_plus_first_digit);
+
+  /// starts_with_minus => sign = -1 && sign*str[1] = i/radix^(length-2)
+  const implies_exprt starts_with_minus_first_digit(
+    starts_with_minus,
+    and_exprt(
+      equal_exprt(sign, from_integer(-1, type)),
+      equal_exprt(
+        mult_exprt(
+          sign, get_numeric_value_from_character(str[1], char_type, type)),
+        div_exprt(i, power_exprt(radix, length_minus_two)))));
+  axioms.push_back(starts_with_minus_first_digit);
+
   return i;
 }
 
