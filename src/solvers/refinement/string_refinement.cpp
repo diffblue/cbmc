@@ -159,9 +159,6 @@ void string_refinementt::set_char_array_equality(
       index_exprt arraycell(rhs, from_integer(i, index_type));
       equal_exprt arrayeq(arraycell, rhs.operands()[i]);
       add_lemma(arrayeq, false);
-#if 0
-      generator.axioms.push_back(arrayeq);
-#endif
     }
   }
   // At least for Java (as it is currently pre-processed), we need not consider
