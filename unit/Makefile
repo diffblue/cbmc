@@ -1,11 +1,17 @@
 .PHONY: all cprover.dir test
 
-SRC = unit_tests.cpp \
-      analyses/does_remove_const/does_expr_lose_const.cpp \
-      analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
-      analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
-      catch_example.cpp \
+# Source files for test utilities
+SRC = src/expr/require_expr.cpp \
+      src/ansi-c/c_to_expr.cpp \
       # Empty last line
+
+# Test source files
+SRC += unit_tests.cpp \
+       analyses/does_remove_const/does_expr_lose_const.cpp \
+       analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
+       analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
+       catch_example.cpp \
+       # Empty last line
 
 INCLUDES= -I ../src/ -I.
 
@@ -15,19 +21,21 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-LIBS += ../src/ansi-c/ansi-c$(LIBEXT) \
-        ../src/cpp/cpp$(LIBEXT) \
-        ../src/json/json$(LIBEXT) \
-        ../src/linking/linking$(LIBEXT) \
-        ../src/util/util$(LIBEXT) \
-        ../src/big-int/big-int$(LIBEXT) \
-        ../src/goto-programs/goto-programs$(LIBEXT) \
-        ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
-        ../src/langapi/langapi$(LIBEXT) \
-        ../src/assembler/assembler$(LIBEXT) \
-        ../src/analyses/analyses$(LIBEXT) \
-        ../src/solvers/solvers$(LIBEXT) \
-        # Empty last line
+CPROVER_LIBS =../src/ansi-c/ansi-c$(LIBEXT) \
+              ../src/cpp/cpp$(LIBEXT) \
+              ../src/json/json$(LIBEXT) \
+              ../src/linking/linking$(LIBEXT) \
+              ../src/util/util$(LIBEXT) \
+              ../src/big-int/big-int$(LIBEXT) \
+              ../src/goto-programs/goto-programs$(LIBEXT) \
+              ../src/pointer-analysis/pointer-analysis$(LIBEXT) \
+              ../src/langapi/langapi$(LIBEXT) \
+              ../src/assembler/assembler$(LIBEXT) \
+              ../src/analyses/analyses$(LIBEXT) \
+              ../src/solvers/solvers$(LIBEXT) \
+              # Empty last line
+
+OBJ += $(CPROVER_LIBS)
 
 TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
@@ -49,11 +57,11 @@ test: all
 unit_tests$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
-miniBDD$(EXEEXT): miniBDD$(OBJEXT)
+miniBDD$(EXEEXT): miniBDD$(OBJEXT) $(CPROVER_LIBS)
 	$(LINKBIN)
 
-string_utils$(EXEEXT): string_utils$(OBJEXT)
+string_utils$(EXEEXT): string_utils$(OBJEXT) $(CPROVER_LIBS)
 	$(LINKBIN)
 
-sharing_node$(EXEEXT): sharing_node$(OBJEXT)
+sharing_node$(EXEEXT): sharing_node$(OBJEXT) $(CPROVER_LIBS)
 	$(LINKBIN)
