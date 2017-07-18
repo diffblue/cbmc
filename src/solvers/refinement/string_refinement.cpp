@@ -107,13 +107,11 @@ void string_refinementt::add_instantiations()
       debug() << from_expr(ns, "", j) << "; ";
     debug() << "}"  << eom;
 
-    for(const auto &j : i.second)
+    for(const auto &ua : universal_axioms)
     {
-      const exprt &val=j;
-
-      for(const auto &ua : universal_axioms)
+      for(const auto &j : i.second)
       {
-        exprt lemma=instantiate(ua, s, val);
+        exprt lemma=instantiate(ua, s, j);
         add_lemma(lemma);
       }
     }
@@ -1380,7 +1378,7 @@ public:
 
   explicit find_qvar_visitort(const exprt &qvar): qvar_(qvar), found(false) {}
 
-  void operator()(const exprt &expr)
+  void operator()(const exprt &expr) override
   {
     if(expr==qvar_)
       found=true;
@@ -1509,39 +1507,45 @@ void string_refinementt::update_index_set(const exprt &formula)
 
 
 // Will be used to visit an expression and return the index used
-// with the given char array
+// with the given char array that contains qvar
 class find_index_visitort: public const_expr_visitort
 {
 private:
   const exprt &str_;
+  const symbol_exprt &qvar_;
 
 public:
-  explicit find_index_visitort(const exprt &str): str_(str) {}
+  exprt index;
 
-  void operator()(const exprt &expr)
+  explicit find_index_visitort(
+    const exprt &str, const symbol_exprt &qvar):
+      str_(str),
+      qvar_(qvar),
+      index(nil_exprt()) {}
+
+  void operator()(const exprt &expr) override
   {
-    if(expr.id()==ID_index)
+    if(index.is_nil() && expr.id()==ID_index)
     {
       const index_exprt &i=to_index_expr(expr);
-      if(i.array()==str_)
-        throw i.index();
+      if(i.array()==str_ && find_qvar(i.index(), qvar_))
+        index=i.index();
     }
   }
 };
 
-/// find an index used in the expression for str, for instance with arguments
-/// (str[k] == 'a') and str, the function should return k
-/// \par parameters: a formula expr and a char array str
-/// \return an index expression
-exprt find_index(const exprt &expr, const exprt &str)
+/// Finds an index on `str` used in `expr` that contains `qvar`, for instance
+/// with arguments ``(str[k] == 'a')``, `str`, and `k`, the function should
+/// return `k`.
+/// \param [in] expr: the expression to search
+/// \param [in] str: the string which must be indexed
+/// \param [in] qvar: the universal variable that must be in the index
+/// \return an index expression in `expr` on `str` containing `qvar`
+exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
-  find_index_visitort v1(str);
-  try
-  {
-    expr.visit(v1);
-    return nil_exprt();
-  }
-  catch (exprt i) { return i; }
+  find_index_visitort v(str, qvar);
+  expr.visit(v);
+  return v.index;
 }
 
 /// \par parameters: a universally quantified formula `axiom`, an array of char
@@ -1554,10 +1558,8 @@ exprt find_index(const exprt &expr, const exprt &str)
 exprt string_refinementt::instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val)
 {
-  exprt idx=find_index(axiom.body(), str);
+  exprt idx=find_index(axiom.body(), str, axiom.univ_var());
   if(idx.is_nil())
-    return true_exprt();
-  if(!find_qvar(idx, axiom.univ_var()))
     return true_exprt();
 
   exprt r=compute_inverse_function(axiom.univ_var(), val, idx);
