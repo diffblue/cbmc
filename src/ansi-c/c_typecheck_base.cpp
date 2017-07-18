@@ -45,8 +45,6 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
 
 void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
-  current_symbol_id=symbol.name;
-
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
@@ -703,6 +701,7 @@ void c_typecheck_baset::typecheck_declaration(
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
+      current_symbol=symbol;
 
       // now check other half of type
       typecheck_type(symbol.type);
