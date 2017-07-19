@@ -2050,6 +2050,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const bool is_assertions_disabled_field=
         field_name.find("$assertionsDisabled")!=std::string::npos;
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+
+      // If external, create a symbol table entry for this static field:
+      check_static_field_stub(symbol_expr, field_name);
+
       if(lazy_methods)
       {
         if(arg0.type().id()==ID_symbol)
@@ -2092,6 +2096,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt symbol_expr(arg0.type());
       const auto &field_name=arg0.get_string(ID_component_name);
       symbol_expr.set_identifier(arg0.get_string(ID_class)+"."+field_name);
+
+      // If external, create a symbol table entry for this static field:
+      check_static_field_stub(symbol_expr, field_name);
+
       if(lazy_methods && arg0.type().id()==ID_symbol)
       {
         lazy_methods->add_needed_class(
