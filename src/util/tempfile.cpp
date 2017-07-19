@@ -107,7 +107,7 @@ std::string get_temporary_file(
   #else
   std::string dir="/tmp/";
   const char *TMPDIR_env=getenv("TMPDIR");
-  if(TMPDIR_env!=0)
+  if(TMPDIR_env!=nullptr)
     dir=TMPDIR_env;
   if(*dir.rbegin()!='/')
     dir+='/';

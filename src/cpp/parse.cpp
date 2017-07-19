@@ -48,7 +48,7 @@ struct indenter // NOLINT(readability/identifiers)
 class new_scopet
 {
 public:
-  new_scopet():kind(kindt::NONE), anon_count(0), parent(NULL)
+  new_scopet():kind(kindt::NONE), anon_count(0), parent(nullptr)
   {
   }
 
@@ -155,7 +155,7 @@ public:
 
   std::string full_name() const
   {
-    return (parent==NULL?"":(parent->full_name()+"::"))+
+    return (parent==nullptr?"":(parent->full_name()+"::"))+
            id2string(id);
   }
 

@@ -288,7 +288,7 @@ static void populate_predecessor_map(
         auto pred_var=
           (pred<live_variable_at_address.size() ?
            live_variable_at_address[pred] :
-           0);
+           nullptr);
         if(pred_var==&*it)
         {
           // Flow from within same live range?

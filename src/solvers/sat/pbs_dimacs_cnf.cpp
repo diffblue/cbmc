@@ -125,7 +125,7 @@ bool pbs_dimacs_cnft::pbs_solve()
     {
       std::getline(file, line);
       if(strstr(line.c_str(),
-                "Variable Assignments Satisfying CNF Formula:")!=NULL)
+                "Variable Assignments Satisfying CNF Formula:")!=nullptr)
         {
           // print ("Reading assignments...\n");
           // std::cout << "No literals: " << no_variables() << "\n";
@@ -143,12 +143,12 @@ bool pbs_dimacs_cnft::pbs_solve()
           // std::cout << "\n";
           // print ("Finished reading assignments.\n");
         }
-      else if(strstr(line.c_str(), "SAT... SUM")!=NULL)
+      else if(strstr(line.c_str(), "SAT... SUM")!=nullptr)
         {
           // print (line);
           sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
         }
-      else if(strstr(line.c_str(), "SAT - All implied")!=NULL)
+      else if(strstr(line.c_str(), "SAT - All implied")!=nullptr)
         {
           // print (line);
           sscanf(
@@ -156,15 +156,15 @@ bool pbs_dimacs_cnft::pbs_solve()
             "%*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %*s %d",
             &opt_sum);
         }
-      else if(strstr(line.c_str(), "SAT... Solution")!=NULL)
+      else if(strstr(line.c_str(), "SAT... Solution")!=nullptr)
         {
           // print(line);
           sscanf(line.c_str(), "%*s %*s %*s %d", &opt_sum);
         }
-      else if(strstr(line.c_str(), "Optimal Soln")!=NULL)
+      else if(strstr(line.c_str(), "Optimal Soln")!=nullptr)
         {
           // print(line);
-          if(strstr(line.c_str(), "time out")!=NULL)
+          if(strstr(line.c_str(), "time out")!=nullptr)
             {
               status() << "WARNING:  TIMED OUT.  SOLUTION MAY BE INCORRECT."
                        << eom;
