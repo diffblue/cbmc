@@ -296,46 +296,6 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
   return res;
 }
 
-/// Add axioms enforcing that the content of the first array is equal to
-/// the true case array if the condition is true and
-/// the else case array otherwise.
-/// \param lhs: an expression
-/// \param expr: an if expression of type array
-void string_constraint_generatort::add_axioms_for_if_array(
-  const exprt &lhs, const if_exprt &expr)
-{
-  PRECONDITION(lhs.type()==expr.type());
-  PRECONDITION(expr.type().id()==ID_array);
-  exprt t=expr.true_case();
-  exprt f=expr.false_case();
-  INVARIANT(t.type()==f.type(), "branches of if_exprt should have same type");
-  const array_typet &type=to_array_type(t.type());
-  const typet &index_type=type.size().type();
-  const exprt max_length=from_integer(max_string_length, index_type);
-
-  // We add axioms:
-  // a1 : forall qvar<max_length, cond => lhs[qvar] = t[qvar]
-  // a1 : forall qvar2<max_length, !cond => lhs[qvar] = f[qvar]
-  symbol_exprt qvar=fresh_univ_index("QA_array_if_true", index_type);
-  equal_exprt qequal(index_exprt(lhs, qvar), index_exprt(t, qvar));
-
-  // In case t is a constant array of fixed length is does not make sense
-  // to talk about indexes exceeding this length
-  exprt upper_bound_t=
-    (t.id()==ID_array)?from_integer(t.operands().size(), index_type):max_length;
-  string_constraintt a1(qvar, upper_bound_t, expr.cond(), qequal);
-  axioms.push_back(a1);
-
-  symbol_exprt qvar2=fresh_univ_index("QA_array_if_false", index_type);
-  equal_exprt qequal2(index_exprt(lhs, qvar2), index_exprt(f, qvar2));
-  // In case f is a constant array of fixed length is does not make sense
-  // to talk about indexes exceeding this length
-  exprt upper_bound_f=
-    (f.id()==ID_array)?from_integer(f.operands().size(), index_type):max_length;
-  string_constraintt a2(qvar2, upper_bound_f, not_exprt(expr.cond()), qequal2);
-  axioms.push_back(a2);
-}
-
 /// if a symbol representing a string is present in the symbol_to_string table,
 /// returns the corresponding string, if the symbol is not yet present, creates
 /// a new string with the correct type depending on whether the mode is java or

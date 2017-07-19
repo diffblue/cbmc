@@ -226,7 +226,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
     }
     else if(rhs.id()==ID_if)
     {
-      generator.add_axioms_for_if_array(lhs, to_if_expr(rhs));
+      add_symbol_to_symbol_map(lhs, rhs);
       return false;
     }
     else
