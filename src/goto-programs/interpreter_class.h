@@ -145,7 +145,7 @@ protected:
       return 0;
     std::size_t ret=0;
     std::size_t alloc_size=base_address_to_alloc_size(address);
-    while(memory_iter!=memory.end() && ret<alloc_size)
+    while(memory_iter!=memory.end() && memory_iter->first<(address+alloc_size))
     {
       ++ret;
       ++memory_iter;
