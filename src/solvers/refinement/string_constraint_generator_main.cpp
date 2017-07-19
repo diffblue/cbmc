@@ -25,7 +25,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/arith_tools.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
-#include <iostream>
 
 unsigned string_constraint_generatort::next_symbol_id=1;
 
@@ -233,6 +232,25 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   else if(string.id()==ID_struct)
   {
     const string_exprt &s=to_string_expr(string);
+    INVARIANT(
+      s.length().id()==ID_symbol || s.length().id()==ID_constant,
+      "string length should be a symbol or a constant");
+    irep_idt content_id=s.content().id();
+    INVARIANT(
+      content_id==ID_symbol || content_id==ID_array || content_id==ID_if,
+      "string content should be a symbol, a constant array, or an if");
+    if(content_id==ID_if)
+    {
+      // If the string content is an if expression, we add axioms ensuring
+      // the content is the same as the content in the 'true' branch when the
+      // condition holds and the 'false' branch otherwise.
+      if_exprt if_expr=to_if_expr(s.content());
+      string_exprt str_true=add_axioms_for_refined_string(
+        string_exprt(s.length(), if_expr.true_case(), type));
+      string_exprt str_false=add_axioms_for_refined_string(
+        string_exprt(s.length(), if_expr.false_case(), type));
+      return add_axioms_for_if(if_exprt(if_expr.cond(), str_true, str_false));
+    }
     add_default_axioms(s);
     return s;
   }
