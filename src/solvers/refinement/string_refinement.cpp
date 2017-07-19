@@ -1413,6 +1413,30 @@ void string_refinementt::update_index_set(const std::vector<exprt> &cur)
     update_index_set(axiom);
 }
 
+/// An expression representing an array of characters can be in the form of an
+/// if expression for instance `cond?array1:(cond2:array2:array3)`.
+/// We return all the array expressions contained in `array_expr`.
+/// \param array_expr : an expression representing an array
+/// \return a vector containing symbols and constant arrays contained in the
+///         expression
+static std::vector<exprt> sub_arrays(const exprt &array_expr)
+{
+  if(array_expr.id()==ID_if)
+  {
+    std::vector<exprt> res1=sub_arrays(to_if_expr(array_expr).true_case());
+    std::vector<exprt> res2=sub_arrays(to_if_expr(array_expr).false_case());
+    res1.insert(res1.end(), res2.begin(), res2.end());
+    return res1;
+  }
+  else
+  {
+    INVARIANT(
+      array_expr.id()==ID_symbol || array_expr.id()==ID_array,
+      "character arrays should be symbol, constant array, or if expression");
+    return std::vector<exprt>(1, array_expr);
+  }
+}
+
 /// add to the index set all the indices that appear in the formula and the
 /// upper bound minus one
 /// \par parameters: a string constraint
@@ -1424,17 +1448,13 @@ void string_refinementt::add_to_index_set(const exprt &s, exprt i)
     mp_integer mpi;
     to_integer(i, mpi);
     if(mpi<0)
-    {
-      debug() << "add_to_index_set : ignoring negative number " << mpi << eom;
       return;
-    }
   }
-  if(index_set[s].insert(i).second)
-  {
-    debug() << "adding to index set of " << from_expr(ns, "", s)
-            << ": " << from_expr(ns, "", i) << eom;
-    current_index_set[s].insert(i);
-  }
+
+  std::vector<exprt> subs=sub_arrays(s);
+  for(const auto &sub : subs)
+    if(index_set[sub].insert(i).second)
+      current_index_set[sub].insert(i);
 }
 
 void string_refinementt::initial_index_set(const string_constraintt &axiom)
@@ -1504,7 +1524,6 @@ void string_refinementt::update_index_set(const exprt &formula)
     }
   }
 }
-
 
 // Will be used to visit an expression and return the index used
 // with the given char array that contains qvar
