@@ -10,6 +10,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \file
 /// Generates string constraints for string functions that return Boolean values
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// add axioms stating that the returned expression is true exactly when the
@@ -72,7 +73,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   string_exprt s0=get_string_expr(args[swap_arguments?1:0]);
   string_exprt s1=get_string_expr(args[swap_arguments?0:1]);
   exprt offset;
@@ -90,7 +91,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 exprt string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
 {
-  assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
 
   // We add axioms:
   // a1 : is_empty => |s0| = 0
@@ -113,8 +114,8 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const function_application_exprt &f, bool swap_arguments)
 {
   const function_application_exprt::argumentst &args=f.arguments();
-  assert(args.size()==2); // bad args to string issuffix?
-  assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(args.size()==2); // bad args to string issuffix?
+  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
 
   symbol_exprt issuffix=fresh_boolean("issuffix");
   typecast_exprt tc_issuffix(issuffix, f.type());
@@ -183,7 +184,7 @@ bool string_constraint_generatort::is_constant_string(
 exprt string_constraint_generatort::add_axioms_for_contains(
   const function_application_exprt &f)
 {
-  assert(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   string_exprt s0=get_string_expr(args(f, 2)[0]);
   string_exprt s1=get_string_expr(args(f, 2)[1]);
   bool constant=is_constant_string(s1);
@@ -222,7 +223,10 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     // If the string is constant, we can use a more efficient axiom for a4:
     // contains ==> AND_{i < |s1|} s1[i] = s0[startpos + i]
     mp_integer s1_length;
-    assert(!to_integer(s1.length(), s1_length));
+    INVARIANT(
+      !to_integer(s1.length(), s1_length),
+      string_refinement_invariantt("a constant string expression must have a "
+        "constant length"));
     exprt::operandst conjuncts;
     for(mp_integer i=0; i<s1_length; ++i)
     {

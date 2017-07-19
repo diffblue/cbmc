@@ -22,6 +22,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <langapi/language_ui.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <util/refined_string_type.h>
 
 class string_constraintt: public exprt
@@ -103,13 +104,13 @@ public:
 
 extern inline const string_constraintt &to_string_constraint(const exprt &expr)
 {
-  assert(expr.id()==ID_string_constraint && expr.operands().size()==5);
+  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
   return static_cast<const string_constraintt &>(expr);
 }
 
 extern inline string_constraintt &to_string_constraint(exprt &expr)
 {
-  assert(expr.id()==ID_string_constraint && expr.operands().size()==5);
+  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
   return static_cast<string_constraintt &>(expr);
 }
 
@@ -173,16 +174,22 @@ public:
 inline const string_not_contains_constraintt
 &to_string_not_contains_constraint(const exprt &expr)
 {
-  assert(expr.id()==ID_string_not_contains_constraint);
-  assert(expr.operands().size()==7);
+  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
+  DATA_INVARIANT(
+    expr.operands().size()==7,
+    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
+      "operands"));
   return static_cast<const string_not_contains_constraintt &>(expr);
 }
 
 inline string_not_contains_constraintt
 &to_string_not_contains_constraint(exprt &expr)
 {
-  assert(expr.id()==ID_string_not_contains_constraint);
-  assert(expr.operands().size()==7);
+  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
+  DATA_INVARIANT(
+    expr.operands().size()==7,
+    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
+      "operands"));
   return static_cast<string_not_contains_constraintt &>(expr);
 }
 

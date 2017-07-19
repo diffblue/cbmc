@@ -9,6 +9,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \file
 /// Generates string constraints for the family of insert Java functions
 
+#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// add axioms stating that the result correspond to the first string where we
@@ -18,7 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 string_exprt string_constraint_generatort::add_axioms_for_insert(
   const string_exprt &s1, const string_exprt &s2, const exprt &offset)
 {
-  assert(offset.type()==s1.length().type());
+  PRECONDITION(offset.type()==s1.length().type());
   string_exprt pref=add_axioms_for_substring(
     s1, from_integer(0, offset.type()), offset);
   string_exprt suf=add_axioms_for_substring(s1, offset, s1.length());
@@ -34,7 +35,7 @@ string_exprt string_constraint_generatort::add_axioms_for_insert(
 string_exprt string_constraint_generatort::add_axioms_for_insert(
   const function_application_exprt &f)
 {
-  assert(f.arguments().size()>=3);
+  PRECONDITION(f.arguments().size()>=3);
   string_exprt s1=get_string_expr(f.arguments()[0]);
   string_exprt s2=get_string_expr(f.arguments()[2]);
   const exprt &offset=f.arguments()[1];
@@ -47,7 +48,10 @@ string_exprt string_constraint_generatort::add_axioms_for_insert(
   }
   else
   {
-    assert(f.arguments().size()==3);
+    INVARIANT(
+      f.arguments().size()==3,
+      string_refinement_invariantt("f must have 2 or 5 arguments and the case "
+        "of 5 arguments is already handled"));
     return add_axioms_for_insert(s1, s2, offset);
   }
 }
@@ -156,7 +160,10 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_char_array(
   }
   else
   {
-    assert(f.arguments().size()==4);
+    INVARIANT(
+      f.arguments().size()==4,
+      string_refinement_invariantt("f must have 4 or 6 arguments and the case "
+        "of 6 arguments is already handled"));
     count=f.arguments()[2];
     offset=from_integer(0, count.type());
   }
