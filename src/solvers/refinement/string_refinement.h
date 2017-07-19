@@ -118,10 +118,6 @@ private:
   void set_to(const exprt &expr, bool value) override;
 
   void add_instantiations();
-  exprt negation_of_not_contains_constraint(
-    const string_not_contains_constraintt &axiom,
-    const symbol_exprt &univ_var);
-  exprt negation_of_constraint(const string_constraintt &axiom);
   void debug_model();
   bool check_axioms();
   bool is_axiom_sat(
@@ -149,6 +145,8 @@ private:
   std::map<exprt, int> map_representation_of_sum(const exprt &f) const;
   exprt sum_over_map(
     std::map<exprt, int> &m, const typet &type, bool negated=false) const;
+
+  bool is_valid_string_constraint(const string_constraintt &expr);
 
   exprt simplify_sum(const exprt &f) const;
   template <typename T1, typename T2>

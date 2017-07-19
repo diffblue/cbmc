@@ -21,6 +21,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <sstream>
 #include <iomanip>
+#include <stack>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
 #include <util/replace_expr.h>
@@ -518,6 +519,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     if(axiom.id()==ID_string_constraint)
     {
       string_constraintt c=to_string_constraint(axiom);
+      DATA_INVARIANT(
+        is_valid_string_constraint(c),
+        string_refinement_invariantt(
+          "string constraints satisfy their invariant"));
       universal_axioms.push_back(c);
     }
     else if(axiom.id()==ID_string_not_contains_constraint)
@@ -1026,10 +1031,11 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 /// \param axiom: the not_contains constraint to add the negation of
 /// \param univ_var: the universal variable for the negation of the axiom
 /// \return: the negation of the axiom under the current evaluation
-exprt string_refinementt::negation_of_not_contains_constraint(
+static exprt negation_of_not_contains_constraint(
   const string_not_contains_constraintt &axiom,
   const symbol_exprt &univ_var)
 {
+  // If the for all is vacuously true, the negation is false.
   exprt lbu=axiom.univ_lower_bound();
   exprt ubu=axiom.univ_upper_bound();
   if(lbu.id()==ID_constant && ubu.id()==ID_constant)
@@ -1038,37 +1044,29 @@ exprt string_refinementt::negation_of_not_contains_constraint(
     to_integer(to_constant_expr(lbu), lb_int);
     to_integer(to_constant_expr(ubu), ub_int);
     if(ub_int<=lb_int)
-    {
-      debug() << "(string_refinement::check_axioms) empty constraint with "
-              << "current model, adding false" << eom;
       return false_exprt();
-    }
   }
 
   exprt lbe=axiom.exists_lower_bound();
   exprt ube=axiom.exists_upper_bound();
 
-  INVARIANT(
-    lbe.id()==ID_constant && ube.id()==ID_constant,
-    string_refinement_invariantt("please"));
-
   mp_integer lbe_int, ube_int;
   to_integer(to_constant_expr(lbe), lbe_int);
   to_integer(to_constant_expr(ube), ube_int);
 
+  // If the premise is false, the implication is trivially true, so the
+  // negation is false.
   if(axiom.premise()==false_exprt())
-  {
-    debug() << "(string_refinement::check_axioms) false premise, adding false"
-            << eom;
     return false_exprt();
-  }
 
   and_exprt univ_bounds(
     binary_relation_exprt(lbu, ID_le, univ_var),
     binary_relation_exprt(ubu, ID_gt, univ_var));
 
+  // The negated existential becomes an universal, and this is the unrolling of
+  // that universal quantifier.
   std::vector<exprt> conjuncts;
-  for(mp_integer i=lbe_int; i<ube_int; i=i+1)
+  for(mp_integer i=lbe_int; i<ube_int; ++i)
   {
     const constant_exprt i_exprt=from_integer(i, univ_var.type());
     const equal_exprt equal_chars(
@@ -1079,9 +1077,6 @@ exprt string_refinementt::negation_of_not_contains_constraint(
   exprt equal_strings=conjunction(conjuncts);
   and_exprt negaxiom(univ_bounds, axiom.premise(), equal_strings);
 
-  debug() << "(string_refinement::check_axioms) negated not_contains axiom: "
-          << from_expr(ns, "", negaxiom) << eom;
-  substitute_array_access(negaxiom);
   return negaxiom;
 }
 
@@ -1093,9 +1088,9 @@ exprt string_refinementt::negation_of_not_contains_constraint(
 ///   their valuation in the current model.
 /// \param axiom: the not_contains constraint to add the negation of
 /// \return: the negation of the axiom under the current evaluation
-exprt string_refinementt::negation_of_constraint(
-  const string_constraintt &axiom)
+static exprt negation_of_constraint(const string_constraintt &axiom)
 {
+  // If the for all is vacuously true, the negation is false.
   exprt lb=axiom.lower_bound();
   exprt ub=axiom.upper_bound();
   if(lb.id()==ID_constant && ub.id()==ID_constant)
@@ -1104,26 +1099,17 @@ exprt string_refinementt::negation_of_constraint(
     to_integer(to_constant_expr(lb), lb_int);
     to_integer(to_constant_expr(ub), ub_int);
     if(ub_int<=lb_int)
-    {
-      debug() << "(string_refinement::check_axioms) empty constraint with "
-              << "current model, adding false" << eom;
       return false_exprt();
-    }
   }
 
+  // If the premise is false, the implication is trivially true, so the
+  // negation is false.
   if(axiom.premise()==false_exprt())
-  {
-    debug() << "(string_refinement::check_axioms) false premise, adding false"
-            << eom;
     return false_exprt();
-  }
 
   and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
-  debug() << "(string_refinement::check_axioms) negated universal axiom: "
-          << from_expr(ns, "", negaxiom) << eom;
-  substitute_array_access(negaxiom);
   return negaxiom;
 }
 
@@ -1154,7 +1140,10 @@ bool string_refinementt::check_axioms()
     const string_constraintt axiom_in_model(
       univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
 
-    const exprt negaxiom=negation_of_constraint(axiom_in_model);
+    exprt negaxiom=negation_of_constraint(axiom_in_model);
+    debug() << "(string_refinementt::check_axioms) Adding negated constraint: "
+            << from_expr(ns, "", negaxiom) << eom;
+    substitute_array_access(negaxiom);
     exprt witness;
 
     bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
@@ -1195,8 +1184,11 @@ bool string_refinementt::check_axioms()
       to_string_expr(get(s0)),
       to_string_expr(get(s1)));
 
-    const exprt negaxiom=negation_of_not_contains_constraint(
+    exprt negaxiom=negation_of_not_contains_constraint(
       nc_axiom_in_model, univ_var);
+    debug() << "(string_refinementt::check_axioms) Adding negated constraint: "
+            << from_expr(ns, "", negaxiom) << eom;
+    substitute_array_access(negaxiom);
     exprt witness;
 
     bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
@@ -1756,14 +1748,12 @@ exprt string_refinementt::get(const exprt &expr) const
   else if(refined_string_typet::is_refined_string_type(ecopy.type()) &&
           ecopy.id()==ID_struct)
   {
-    string_exprt ecopy2=to_string_expr(ecopy);
-    const exprt &econtent=ecopy2.content();
-    const exprt &elength=ecopy2.length();
+    const string_exprt &string=to_string_expr(ecopy);
+    const exprt &content=string.content();
+    const exprt &length=string.length();
 
-    exprt len=supert::get(elength);
-    len=simplify_expr(len, ns);
-    const exprt arr=get_array(econtent, len);
-    ecopy=string_exprt(len, arr, ecopy.type());
+    const exprt arr=get_array(content, length);
+    ecopy=string_exprt(length, arr, string.type());
   }
 
   ecopy=supert::get(ecopy);
@@ -1802,4 +1792,166 @@ bool string_refinementt::is_axiom_sat(
     // To tell the compiler that the previous line bails
     throw 0;
   }
+}
+
+/// \related string_constraintt
+typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
+
+/// \related string_constraintt
+class gather_indices_visitort: public const_expr_visitort
+{
+public:
+  array_index_mapt indices;
+
+  gather_indices_visitort(): indices() {}
+
+  void operator()(const exprt &expr) override
+  {
+    if(expr.id()==ID_index)
+    {
+      const index_exprt index=to_index_expr(expr);
+      const exprt s(index.array());
+      const exprt i(index.index());
+      indices[s].push_back(i);
+    }
+  }
+};
+
+/// \related string_constraintt
+static array_index_mapt gather_indices(const exprt &expr)
+{
+  gather_indices_visitort v;
+  expr.visit(v);
+  return v.indices;
+}
+
+/// \related string_constraintt
+class is_linear_arithmetic_expr_visitort: public const_expr_visitort
+{
+public:
+  bool correct;
+
+  is_linear_arithmetic_expr_visitort(): correct(true) {}
+
+  void operator()(const exprt &expr) override
+  {
+    if(expr.id()!=ID_plus && expr.id()!=ID_minus && expr.id()!=ID_unary_minus)
+    {
+      // This represents that the expr is a valid leaf, may not be future proof
+      // or 100% enforced, but is correct prescriptively. All non-sum exprs must
+      // be leaves.
+      correct&=expr.operands().empty();
+    }
+  }
+};
+
+/// \related string_constraintt
+static bool is_linear_arithmetic_expr(const exprt &expr)
+{
+  is_linear_arithmetic_expr_visitort v;
+  expr.visit(v);
+  return v.correct;
+}
+
+/// The universally quantified variable is only allowed to occur in index
+/// expressions in the body of a string constraint. This function returns true
+/// if this is the case and false otherwise.
+/// \related string_constraintt
+/// \param [in] expr: The string constraint to check
+/// \return true if the universal variable only occurs in index expressions,
+///   false otherwise.
+static bool universal_only_in_index(const string_constraintt &expr)
+{
+  // For efficiency, we do a depth-first search of the
+  // body. The exprt visitors do a BFS and hide the stack/queue, so we would
+  // need to store a map from child to parent.
+
+  // The unsigned int represents index depth we are. For example, if we are
+  // considering the fragment `a[b[x]]` (not inside an index expression), then
+  // the stack would look something like `[..., (a, 0), (b, 1), (x, 2)]`.
+  typedef std::pair<exprt, unsigned> valuet;
+  std::stack<valuet> stack;
+  // We start at 0 since expr is not an index expression, so expr.body() is not
+  // in an index expression.
+  stack.push(valuet(expr.body(), 0));
+  while(!stack.empty())
+  {
+    // Inspect current value
+    const valuet cur=stack.top();
+    stack.pop();
+    const exprt e=cur.first;
+    const unsigned index_depth=cur.second;
+    const unsigned child_index_depth=index_depth+(e.id()==ID_index?0:1);
+
+    // If we found the universal variable not in an index_exprt, fail
+    if(e==expr.univ_var() && index_depth==0)
+      return false;
+    else
+      forall_operands(it, e)
+        stack.push(valuet(*it, child_index_depth));
+  }
+  return true;
+}
+
+/// Checks the data invariant for \link string_constraintt
+/// \related string_constraintt
+/// \param [in] expr: the string constraint to check
+/// \return whether the constraint satisfies the invariant
+bool string_refinementt::is_valid_string_constraint(
+  const string_constraintt &expr)
+{
+  // Condition 1: The premise cannot contain any string indices
+  const array_index_mapt premise_indices=gather_indices(expr.premise());
+  if(!premise_indices.empty())
+  {
+    error() << "Premise has indices: " << from_expr(ns, "", expr) << ", map: {";
+    for(const auto &pair : premise_indices)
+    {
+      error() << from_expr(ns, "", pair.first) << ": {";
+      for(const auto &i : pair.second)
+        error() << from_expr(ns, "", i) <<  ", ";
+    }
+    error() << "}}" << eom;
+    return false;
+  }
+
+  const array_index_mapt body_indices=gather_indices(expr.body());
+  // Must validate for each string. Note that we have an invariant that the
+  // second value in the pair is non-empty.
+  for(const auto &pair : body_indices)
+  {
+    // Condition 2: All indices of the same string must be the of the same form
+    const exprt rep=pair.second.back();
+    for(size_t j=0; j<pair.second.size()-1; j++)
+    {
+      const exprt i=pair.second[j];
+      const equal_exprt equals(rep, i);
+      const exprt result=simplify_expr(equals, ns);
+      if(result.is_false())
+      {
+        error() << "Indices not equal: " << from_expr(ns, "", expr) << ", str: "
+                << from_expr(ns, "", pair.first) << eom;
+        return false;
+      }
+    }
+
+    // Condition 3: f must be linear
+    if(!is_linear_arithmetic_expr(rep))
+    {
+      error() << "f is not linear: " << from_expr(ns, "", expr) << ", str: "
+              << from_expr(ns, "", pair.first) << eom;
+      return false;
+    }
+
+    // Condition 4: the quantified variable can only occur in indices in the
+    // body
+    if(!universal_only_in_index(expr))
+    {
+      error() << "Universal variable outside of index:"
+              << from_expr(ns, "", expr) << eom;
+      return false;
+    }
+  }
+
+  return true;
 }

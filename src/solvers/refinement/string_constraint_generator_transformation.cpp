@@ -293,8 +293,9 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 
   // We add axioms:
   // a1 : |res| = |str|
-  // a2 : forall idx<str.length, 'a'<=str[idx]<='z' => res[idx]=str[idx]+'A'-'a'
-  // a3 : forall idx<str.length, !('a'<=str[idx]<='z') => res[idx]=str[idx]
+  // a2 : forall idx1<str.length, 'a'<=str[idx1]<='z' =>
+  //                                res[idx1]=str[idx1]+'A'-'a'
+  // a3 : forall idx2<str.length, !('a'<=str[idx2]<='z') => res[idx2]=str[idx2]
   // Note that index expressions are only allowed in the body of universal
   // axioms, so we use a trivial premise and push our premise into the body.
 
