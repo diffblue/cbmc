@@ -392,6 +392,17 @@ std::string expr2javat::convert_with_precedence(
   else if(src.id()==ID_side_effect &&
           src.get(ID_statement)==ID_throw)
     return convert_function(src, "throw", precedence=16);
+  else if(src.id()==ID_side_effect &&
+          src.get(ID_statement)==ID_exception_landingpad)
+  {
+    const exprt &catch_expr=
+      to_side_effect_expr_landingpad(src).catch_expr();
+    return "catch_landingpad(" +
+      convert(catch_expr.type()) +
+      ' ' +
+      convert(catch_expr) +
+      ')';
+  }
   else if(src.id()==ID_unassigned)
     return "?";
   else if(src.id()=="pod_constructor")

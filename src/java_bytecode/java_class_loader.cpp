@@ -31,6 +31,9 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   queue.push("java.lang.String");
   // add java.lang.Class
   queue.push("java.lang.Class");
+  // Require java.lang.Throwable as the catch-type used for
+  // universal exception handlers:
+  queue.push("java.lang.Throwable");
   queue.push(class_name);
 
   java_class_loader_limitt class_loader_limit(

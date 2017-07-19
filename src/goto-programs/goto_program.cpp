@@ -161,31 +161,47 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case CATCH:
-    if(!instruction.targets.empty())
+  {
+    if(instruction.code.get_statement()==ID_expression &&
+       instruction.code.op0().id()==ID_side_effect)
     {
-      out << "CATCH-PUSH ";
-
-      unsigned i=0;
-      const irept::subt &exception_list=
-        instruction.code.find(ID_exception_list).get_sub();
-      assert(instruction.targets.size()==exception_list.size());
-      for(instructiont::targetst::const_iterator
-          gt_it=instruction.targets.begin();
-          gt_it!=instruction.targets.end();
-          gt_it++,
-          i++)
-      {
-        if(gt_it!=instruction.targets.begin())
-          out << ", ";
-        out << exception_list[i].id() << "->"
-            << (*gt_it)->target_number;
-      }
+      const auto &landingpad=
+        to_side_effect_expr_landingpad(instruction.code.op0());
+      out << "EXCEPTION LANDING PAD ("
+          << from_type(ns, identifier, landingpad.catch_expr().type())
+          << ' '
+          << from_expr(ns, identifier, landingpad.catch_expr())
+          << ")";
     }
-    else
-      out << "CATCH-POP";
+    else if(instruction.code.get_statement()==ID_catch)
+    {
+      if(!instruction.targets.empty())
+      {
+        out << "CATCH-PUSH ";
+
+        unsigned i=0;
+        const irept::subt &exception_list=
+          instruction.code.find(ID_exception_list).get_sub();
+        assert(instruction.targets.size()==exception_list.size());
+        for(instructiont::targetst::const_iterator
+              gt_it=instruction.targets.begin();
+            gt_it!=instruction.targets.end();
+            gt_it++,
+              i++)
+        {
+          if(gt_it!=instruction.targets.begin())
+            out << ", ";
+          out << exception_list[i].id() << "->"
+              << (*gt_it)->target_number;
+        }
+      }
+      else
+        out << "CATCH-POP";
+    }
 
     out << '\n';
     break;
+  }
 
   case ATOMIC_BEGIN:
     out << "ATOMIC_BEGIN" << '\n';
