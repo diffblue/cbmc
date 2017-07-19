@@ -130,13 +130,6 @@ void goto_convertt::convert_java_try_catch(
       handlers_list[i].id(handlers_sub[i].id());
   }
 
-  // the CATCH instruction may also signal a handler
-  if(code.op0().has_operands())
-  {
-    catch_instruction->code.get_sub().resize(1);
-    catch_instruction->code.get_sub()[0]=code.op0().op0();
-  }
-
   // add a SKIP target for the end of everything
   goto_programt end;
   goto_programt::targett end_target=end.add_instruction();
@@ -146,6 +139,21 @@ void goto_convertt::convert_java_try_catch(
 
   // add the end-target
   dest.destructive_append(end);
+}
+
+/// Lower a side_effect_exprt describing an exception
+/// landing-pad (catch site) into GOTO code
+/// \param code: code to convert
+///   (must be a code_expressiont(side_effect_expr_landingpadt))
+/// \param [out] dest: code appended to this GOTO program
+void goto_convertt::convert_java_exception_landingpad(
+  const codet &code,
+  goto_programt &dest)
+{
+  PRECONDITION(code.get_statement()==ID_expression);
+  PRECONDITION(
+    to_side_effect_expr(code.op0()).get_statement()==ID_exception_landingpad);
+  copy(code, CATCH, dest);
 }
 
 void goto_convertt::convert_try_catch(

@@ -22,6 +22,7 @@ Date:   December 2016
 
 #include <util/c_types.h>
 #include <util/std_expr.h>
+#include <util/std_code.h>
 #include <util/symbol_table.h>
 
 #include <analyses/uncaught_exceptions_analysis.h>
@@ -179,8 +180,13 @@ void remove_exceptionst::add_exceptional_returns(
   }
 }
 
-/// at the beginning of each handler in function f  adds exc=f#exception_value;
-/// f#exception_value=NULL;
+/// Translates an exception landing-pad into instructions that copy the
+/// in-flight exception pointer to a nominated expression, then clear the
+/// in-flight exception, hence marking it caught.
+/// \param func_it: iterator pointing to the function containing this
+///   landingpad instruction
+/// \param instr_it [in, out]: iterator pointing to the landingpad instruction.
+///   Will be overwritten.
 void remove_exceptionst::instrument_exception_handler(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it)
@@ -188,37 +194,37 @@ void remove_exceptionst::instrument_exception_handler(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  PRECONDITION(instr_it->type==CATCH && instr_it->code.has_operands());
+  PRECONDITION(instr_it->type==CATCH);
 
   // retrieve the exception variable
-  const exprt &exception=instr_it->code.op0();
+  const auto &code_expr=to_code_expression(instr_it->code).expression();
+  const exprt &thrown_exception_local=
+    to_side_effect_expr_landingpad(code_expr).catch_expr();
+  irep_idt thrown_exception_global=id2string(function_id)+EXC_SUFFIX;
 
-  if(symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
+  if(symbol_table.has_symbol(thrown_exception_global))
   {
-    const symbolt &function_symbol=
-      symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    const symbol_exprt thrown_global_symbol=
+      symbol_table.lookup(thrown_exception_global).symbol_expr();
     // next we reset the exceptional return to NULL
-    symbol_exprt lhs_expr_null=function_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
+    null_pointer_exprt null_voidptr((pointer_type(empty_typet())));
 
     // add the assignment
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_assignment();
     t_null->source_location=instr_it->source_location;
     t_null->code=code_assignt(
-      lhs_expr_null,
-      rhs_expr_null);
+      thrown_global_symbol,
+      null_voidptr);
     t_null->function=instr_it->function;
 
-    // add the assignment exc=f#exception_value
-    symbol_exprt rhs_expr_exc=function_symbol.symbol_expr();
-
+    // add the assignment exc=f#exception_value (before the null assignment)
     goto_programt::targett t_exc=goto_program.insert_after(instr_it);
     t_exc->make_assignment();
     t_exc->source_location=instr_it->source_location;
     t_exc->code=code_assignt(
-      typecast_exprt(exception, rhs_expr_exc.type()),
-      rhs_expr_exc);
+      thrown_exception_local,
+      typecast_exprt(thrown_global_symbol, thrown_exception_local.type()));
     t_exc->function=instr_it->function;
   }
   instr_it->make_skip();
@@ -456,10 +462,18 @@ void remove_exceptionst::instrument_exceptions(
       code_declt decl=to_code_decl(instr_it->code);
       locals.push_back(decl.symbol());
     }
-    // it's a CATCH but not a handler (as it has no operands)
-    else if(instr_it->type==CATCH && !instr_it->code.has_operands())
+    // Is it a handler push/pop or catch landing-pad?
+    else if(instr_it->type==CATCH)
     {
-      if(instr_it->targets.empty()) // pop
+      // Is it an exception landing pad (start of a catch block)?
+      if(instr_it->code.get_statement()==ID_expression &&
+         instr_it->code.op0().id()==ID_side_effect &&
+         to_side_effect_expr(instr_it->code.op0()).get_statement()==
+         ID_exception_landingpad)
+      {
+        instrument_exception_handler(func_it, instr_it);
+      }
+      else if(instr_it->targets.empty()) // pop exception handler
       {
         // pop the local vars stack
         if(!stack_locals.empty())
@@ -479,7 +493,7 @@ void remove_exceptionst::instrument_exceptions(
 #endif
         }
       }
-      else // push
+      else // push exception handler
       {
         stack_locals.push_back(locals);
         locals.clear();
@@ -506,11 +520,6 @@ void remove_exceptionst::instrument_exceptions(
         }
       }
       instr_it->make_skip();
-    }
-    // CATCH handler
-    else if(instr_it->type==CATCH && instr_it->code.has_operands())
-    {
-      instrument_exception_handler(func_it, instr_it);
     }
     else if(instr_it->type==THROW)
     {

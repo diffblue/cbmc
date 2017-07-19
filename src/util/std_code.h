@@ -1152,6 +1152,7 @@ inline const side_effect_expr_throwt &to_side_effect_expr_throw(
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<const side_effect_expr_throwt &>(expr);
 }
+
 /*! \brief A side effect that pushes/pops a catch handler
 */
 class side_effect_expr_catcht:public side_effect_exprt
@@ -1180,6 +1181,49 @@ static inline const side_effect_expr_catcht &to_side_effect_expr_catch(
   assert(expr.id()==ID_side_effect);
   assert(expr.get(ID_statement)==ID_push_catch);
   return static_cast<const side_effect_expr_catcht &>(expr);
+}
+
+/*! \brief A side effect that catches an exception, assigning the exception
+      in flight to an expression (e.g. catch(Exception e) might be expressed
+      landingpadt(symbol_expr("e", ...)))
+*/
+class side_effect_expr_landingpadt:public side_effect_exprt
+{
+ public:
+  side_effect_expr_landingpadt():side_effect_exprt(ID_exception_landingpad)
+  {
+    operands().resize(1);
+  }
+  explicit side_effect_expr_landingpadt(const exprt &catch_expr):
+  side_effect_exprt(ID_exception_landingpad)
+  {
+    copy_to_operands(catch_expr);
+  }
+  const exprt &catch_expr() const
+  {
+    return op0();
+  }
+  exprt &catch_expr()
+  {
+    return op0();
+  }
+};
+
+static inline side_effect_expr_landingpadt &
+to_side_effect_expr_landingpad(exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_exception_landingpad);
+  return static_cast<side_effect_expr_landingpadt &>(expr);
+}
+
+static inline const side_effect_expr_landingpadt &
+to_side_effect_expr_landingpad(
+  const exprt &expr)
+{
+  assert(expr.id()==ID_side_effect);
+  assert(expr.get(ID_statement)==ID_exception_landingpad);
+  return static_cast<const side_effect_expr_landingpadt &>(expr);
 }
 
 /*! \brief A try/catch block
