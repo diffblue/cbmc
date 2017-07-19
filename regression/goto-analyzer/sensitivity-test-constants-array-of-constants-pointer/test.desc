@@ -13,14 +13,14 @@ sensitivity_test_constants_array_of_constants_pointer.c
 ^\[main.assertion.8\] .* \*b\[1\]==13: Failure \(if reachable\)$
 ^\[main.assertion.9\] .* \*\(b\+1\)==&b1: Success$
 ^\[main.assertion.10\] .* \*\(b\+1\)==&b3: Failure \(if reachable\)$
-^\[main.assertion.11\] .* \*\(1\+b\)==&b1: Unknown$
-^\[main.assertion.12\] .* \*\(1\+b\)==&b3: Unknown$
+^\[main.assertion.11\] .* \*\(1\+b\)==&b1: Success$
+^\[main.assertion.12\] .* \*\(1\+b\)==&b3: Failure \(if reachable\)$
 ^\[main.assertion.13\] .* 1\[b\]==&b1: Success$
 ^\[main.assertion.14\] .* 1\[b\]==&b3: Failure \(if reachable\)$
 ^\[main.assertion.15\] .* \*\*\(b\+1\)==11: Success$
 ^\[main.assertion.16\] .* \*\*\(b\+1\)==13: Failure \(if reachable\)$
-^\[main.assertion.17\] .* \*\*\(1\+b\)==11: Unknown$
-^\[main.assertion.18\] .* \*\*\(1\+b\)==13: Unknown$
+^\[main.assertion.17\] .* \*\*\(1\+b\)==11: Success$
+^\[main.assertion.18\] .* \*\*\(1\+b\)==13: Failure \(if reachable\)$
 ^\[main.assertion.19\] .* \*1\[b\]==11: Success$
 ^\[main.assertion.20\] .* \*1\[b\]==13: Failure \(if reachable\)$
 ^\[main.assertion.21\] .* c\[0\]==&c0: Unknown$
