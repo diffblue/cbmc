@@ -203,7 +203,8 @@ bool string_refinementt::is_char_array(const typet &type) const
 /// add lemmas to the solver corresponding to the given equation
 /// \param lhs: left hand side of an equality expression
 /// \param rhs: right and side of the equality
-/// \return false if the lemmas were added successfully, true otherwise
+/// \return true if the assignemnt needs to be handled by the parent class
+///         via `set_to`
 bool string_refinementt::add_axioms_for_string_assigns(
   const exprt &lhs, const exprt &rhs)
 {
@@ -224,7 +225,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
     else if(rhs.id()==ID_if)
     {
       add_symbol_to_symbol_map(lhs, rhs);
-      return false;
+      return true;
     }
     else
     {
