@@ -473,6 +473,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     alloc_type,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
+  auto set_null_inst=get_null_assignment(expr, pointer_type);
+
   // Determine whether the pointer can be null.
   // In particular the array field of a String should not be null.
   bool not_null=
@@ -483,7 +485,18 @@ void java_object_factoryt::gen_nondet_pointer_init(
       class_identifier=="java.lang.CharSequence") &&
      subtype.id()==ID_array);
 
-  if(not_null)
+  // Alternatively, if this is a void* we *must* initialise with null:
+  // (This can currently happen for some cases of #exception_value)
+  bool must_be_null=
+    subtype==empty_typet();
+
+  if(must_be_null)
+  {
+    // Add the following code to assignments:
+    // <expr> = nullptr;
+    new_object_assignments.add(set_null_inst);
+  }
+  else if(not_null)
   {
     // Add the following code to assignments:
     // <expr> = <aoe>;
@@ -500,8 +513,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
     //    <code from recursive call to gen_nondet_init() with
     //             tmp$<temporary_counter>>
     // }
-    auto set_null_inst=get_null_assignment(expr, pointer_type);
-
     code_ifthenelset null_check;
     null_check.cond()=side_effect_expr_nondett(bool_typet());
     null_check.then_case()=set_null_inst;
@@ -900,6 +911,29 @@ void java_object_factoryt::gen_nondet_array_init(
   assignments.move_to_operands(init_done_label);
 }
 
+/// Add code_declt instructions to `init_code` for every non-static symbol
+/// in `symbols_created`
+/// \param symbols_created: list of symbols
+/// \param loc: source location for new code_declt instances
+/// \param [out] init_code: gets code_declt for each symbol
+static void declare_created_symbols(
+  const std::vector<const symbolt *> &symbols_created,
+  const source_locationt &loc,
+  code_blockt &init_code)
+{
+  // Add the following code to init_code for each symbol that's been created:
+  //   <type> <identifier>;
+  for(const symbolt * const symbol_ptr : symbols_created)
+  {
+    if(!symbol_ptr->is_static_lifetime)
+    {
+      code_declt decl(symbol_ptr->symbol_expr());
+      decl.add_source_location()=loc;
+      init_code.add(decl);
+    }
+  }
+}
+
 /// Similar to `gen_nondet_init`, but returns an object expression
 /// rather than assigning to one.
 /// \param type: type of new object to create
@@ -960,17 +994,7 @@ exprt object_factory(
     typet(),
     update_in_placet::NO_UPDATE_IN_PLACE);
 
-  // Add the following code to init_code for each symbol that's been created:
-  //   <type> <identifier>;
-  for(const symbolt * const symbol_ptr : symbols_created)
-  {
-    if(!symbol_ptr->is_static_lifetime)
-    {
-      code_declt decl(symbol_ptr->symbol_expr());
-      decl.add_source_location()=loc;
-      init_code.add(decl);
-    }
-  }
+  declare_created_symbols(symbols_created, loc, init_code);
 
   init_code.append(assignments);
   return object;
@@ -1026,17 +1050,7 @@ void gen_nondet_init(
     typet(),
     update_in_place);
 
-  // Add the following code to init_code for each symbol that's been created:
-  //   <type> <identifier>;
-  for(const symbolt * const symbol_ptr : symbols_created)
-  {
-    if(!symbol_ptr->is_static_lifetime)
-    {
-      code_declt decl(symbol_ptr->symbol_expr());
-      decl.add_source_location()=loc;
-      init_code.add(decl);
-    }
-  }
+  declare_created_symbols(symbols_created, loc, init_code);
 
   init_code.append(assignments);
 }
