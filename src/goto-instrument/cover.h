@@ -18,6 +18,7 @@ Date: May 2016
 #include <util/cmdline.h>
 
 class message_handlert;
+class messaget;
 
 class coverage_goalst
 {

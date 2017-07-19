@@ -132,24 +132,33 @@ bool coverage_goalst::get_coverage_goals(
     return true;
   }
 
-  for(const auto &goal : json.array)
+  // traverse the given JSON file
+  for(const auto &goals_in_json : json.array)
   {
-    // get the file of each existing goal
-    irep_idt file=goal["file"].value;
-    source_location.set_file(file);
-
-    // get the function of each existing goal
-    irep_idt function=goal["function"].value;
-    source_location.set_function(function);
-
-    // get the lines array
-    if(goal["lines"].is_array())
+    // get the set of goals
+    if(goals_in_json["goals"].is_array())
     {
-      for(const auto &line_json : goal["lines"].array)
+      // store the source location for each existing goal
+      for(const auto &each_goal : goals_in_json["goals"].array)
       {
-        // get the line of each existing goal
-        irep_idt line=line_json["number"].value;
+        // get and set the bytecode_index
+        irep_idt bytecode_index=
+          each_goal["sourceLocation"]["bytecode_index"].value;
+        source_location.set_java_bytecode_index(bytecode_index);
+
+        // get and set the file
+        irep_idt file=each_goal["sourceLocation"]["file"].value;
+        source_location.set_file(file);
+
+        // get and set the function
+        irep_idt function=each_goal["sourceLocation"]["function"].value;
+        source_location.set_function(function);
+
+        // get and set the line
+        irep_idt line=each_goal["sourceLocation"]["line"].value;
         source_location.set_line(line);
+
+        // store the existing goal
         goals.add_goal(source_location);
       }
     }
