@@ -1050,7 +1050,9 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
               new_expr.swap(ctor_expr);
 
-              assert(new_expr.get(ID_statement)==ID_temporary_object);
+              INVARIANT(
+                new_expr.get(ID_statement)==ID_temporary_object,
+                "statement ID");
 
               if(to.get_bool(ID_C_constant))
                 new_expr.type().set(ID_C_constant, true);
