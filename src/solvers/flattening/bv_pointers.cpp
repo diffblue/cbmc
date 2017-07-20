@@ -95,7 +95,7 @@ bv_pointerst::bv_pointerst(
   boolbvt(_ns, _prop),
   pointer_logic(_ns)
 {
-  object_bits=BV_ADDR_BITS;
+  object_bits=config.bv_encoding.object_bits;
   offset_bits=config.ansi_c.pointer_width-object_bits;
   bits=config.ansi_c.pointer_width;
 }

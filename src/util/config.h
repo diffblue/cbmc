@@ -143,6 +143,12 @@ public:
     irep_idt main_class;
   } java;
 
+  struct bv_encodingt
+  {
+    // number of bits to encode heap object addresses
+    unsigned object_bits;
+  } bv_encoding;
+
   // this is the function to start executing
   std::string main;
 
