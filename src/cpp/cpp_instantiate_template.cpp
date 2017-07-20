@@ -130,7 +130,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
-  assert(template_scope!=nullptr);
+  INVARIANT(
+    template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
 
   irep_idt identifier=
     id2string(template_scope->prefix)+
@@ -284,7 +285,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
-  assert(template_scope!=nullptr);
+  INVARIANT(
+    template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
 
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);

@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class path_symex_stept;
 
+#define nullptr_exceptiont(str) str
+
 // This is a reference to a path_symex_stept,
 // and is really cheap to copy. These references are stable,
 // even though the underlying vector is not.
@@ -46,7 +48,7 @@ public:
 
   path_symex_historyt &get_history() const
   {
-    assert(history!=nullptr);
+    INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
     return *history;
   }
 
@@ -154,7 +156,7 @@ public:
 
 inline void path_symex_step_reft::generate_successor()
 {
-  assert(history!=nullptr);
+  INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
   path_symex_step_reft old=*this;
   index=history->step_container.size();
   history->step_container.push_back(path_symex_stept());
@@ -169,7 +171,7 @@ inline path_symex_step_reft &path_symex_step_reft::operator--()
 
 inline path_symex_stept &path_symex_step_reft::get() const
 {
-  assert(history!=nullptr);
+  INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
   assert(!is_nil());
   return history->step_container[index];
 }
