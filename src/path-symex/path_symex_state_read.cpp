@@ -465,7 +465,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
       return false;
 
     // next round
-    assert(next!=nullptr);
+    INVARIANT(next!=nullptr, nullptr_exceptiont("next is null"));
     current=next;
   }
 }

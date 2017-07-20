@@ -109,7 +109,7 @@ public:
 
   local_may_aliast &operator()(const irep_idt &fkt)
   {
-    assert(goto_functions!=nullptr);
+    PRECONDITION(goto_functions!=nullptr);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);
     if(f_it!=fkt_map.end())
       return *f_it->second;
