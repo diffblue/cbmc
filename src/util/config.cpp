@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "std_expr.h"
 #include "cprover_prefix.h"
+#include "string2int.h"
 
 configt config;
 
@@ -730,7 +731,9 @@ bool configt::set(const cmdlinet &cmdline)
 
   cpp.cpp_standard=cppt::default_cpp_standard();
 
-  bv_encoding.object_bits=8;
+  bv_encoding.object_bits=bv_encoding.default_object_bits;
+  // This will allow us to override by language defaults later.
+  bv_encoding.is_object_bits_default=true;
 
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
@@ -1012,6 +1015,20 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("round-to-zero"))
     ansi_c.rounding_mode=ieee_floatt::ROUND_TO_ZERO;
 
+  if(cmdline.isset("object-bits"))
+  {
+    bv_encoding.object_bits=
+      unsafe_string2unsigned(cmdline.get_value("object-bits"));
+    bv_encoding.is_object_bits_default=false;
+
+    if(!(0<bv_encoding.object_bits &&
+         bv_encoding.object_bits<ansi_c.pointer_width))
+    {
+      throw "object-bits must be positive and less than the pointer width ("+
+        std::to_string(ansi_c.pointer_width)+") ";
+    }
+  }
+
   return false;
 }
 
@@ -1145,6 +1162,36 @@ void configt::set_from_symbol_table(
 
   // mode, preprocessor (and all preprocessor command line options),
   // lib, string_abstraction not stored in namespace
+
+  set_object_bits_from_symbol_table(symbol_table);
+}
+
+/// Sets the number of bits used for object addresses
+/// \param symbol_table The symbol table
+void configt::set_object_bits_from_symbol_table(
+  const symbol_tablet &symbol_table)
+{
+  // has been overridden by command line option,
+  //   thus do not apply language defaults
+  if(!bv_encoding.is_object_bits_default)
+    return;
+
+  // set object_bits according to entry point language
+  if(symbol_table.has_symbol(CPROVER_PREFIX "_start"))
+  {
+    const symbolt &entry_point_symbol=
+      symbol_table.lookup(CPROVER_PREFIX "_start");
+
+    if(entry_point_symbol.mode==ID_java)
+      bv_encoding.object_bits=java.default_object_bits;
+    else if(entry_point_symbol.mode==ID_C)
+      bv_encoding.object_bits=ansi_c.default_object_bits;
+    else if(entry_point_symbol.mode==ID_cpp)
+      bv_encoding.object_bits=cpp.default_object_bits;
+    DATA_INVARIANT(
+      0<bv_encoding.object_bits && bv_encoding.object_bits<ansi_c.pointer_width,
+      "object_bits should fit into pointer width");
+  }
 }
 
 irep_idt configt::this_architecture()
