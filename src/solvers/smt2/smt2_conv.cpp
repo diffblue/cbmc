@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/base_type.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fixedbv.h>
 #include <util/ieee_float.h>
@@ -142,7 +143,7 @@ void smt2_convt::define_object_size(
   std::size_t pointer_width = boolbv_width(ptr.type());
   std::size_t number = 0;
   std::size_t h=pointer_width-1;
-  std::size_t l=pointer_width-BV_ADDR_BITS;
+  std::size_t l=pointer_width-config.bv_encoding.object_bits;
 
   for(const auto &o : pointer_logic.objects)
   {
@@ -161,9 +162,10 @@ void smt2_convt::define_object_size(
     out << "(assert (implies (= " <<
       "((_ extract " << h << " " << l << ") ";
     convert_expr(ptr);
-    out << ") (_ bv" << number << " " << BV_ADDR_BITS << "))" <<
-      "(= " << id << " (_ bv" << object_size.to_ulong() << " " <<
-      size_width << "))))\n";
+    out << ") (_ bv" << number << " "
+        << config.bv_encoding.object_bits << "))"
+        << "(= " << id << " (_ bv" << object_size.to_ulong() << " "
+        << size_width << "))))\n";
 
     ++number;
   }
@@ -454,7 +456,7 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
     to_integer(bv_expr, v);
 
     // split into object and offset
-    mp_integer pow=power(2, width-BV_ADDR_BITS);
+    mp_integer pow=power(2, width-config.bv_encoding.object_bits);
     pointer_logict::pointert ptr;
     ptr.object=integer2size_t(v/pow);
     ptr.offset=v%pow;
@@ -487,8 +489,10 @@ void smt2_convt::convert_address_of_rec(
   {
     out
       << "(concat (_ bv"
-      << pointer_logic.add_object(expr) << " " << BV_ADDR_BITS << ")"
-      << " (_ bv0 " << boolbv_width(result_type)-BV_ADDR_BITS << "))";
+      << pointer_logic.add_object(expr) << " "
+      << config.bv_encoding.object_bits << ")"
+      << " (_ bv0 "
+      << boolbv_width(result_type)-config.bv_encoding.object_bits << "))";
   }
   else if(expr.id()==ID_index)
   {
@@ -1308,7 +1312,8 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    std::size_t offset_bits=boolbv_width(expr.op0().type())-BV_ADDR_BITS;
+    std::size_t offset_bits=
+      boolbv_width(expr.op0().type())-config.bv_encoding.object_bits;
     std::size_t result_width=boolbv_width(expr.type());
 
     // max extract width
@@ -1330,7 +1335,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
     assert(expr.op0().type().id()==ID_pointer);
-    std::size_t ext=boolbv_width(expr.type())-BV_ADDR_BITS;
+    std::size_t ext=boolbv_width(expr.type())-config.bv_encoding.object_bits;
     std::size_t pointer_width=boolbv_width(expr.op0().type());
 
     if(ext>0)
@@ -1338,7 +1343,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << "((_ extract "
         << pointer_width-1 << " "
-        << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-config.bv_encoding.object_bits << ") ";
     convert_expr(expr.op0());
     out << ")";
 
@@ -1356,10 +1361,10 @@ void smt2_convt::convert_expr(const exprt &expr)
     std::size_t pointer_width=boolbv_width(expr.op0().type());
     out << "(= ((_ extract "
         << pointer_width-1 << " "
-        << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-config.bv_encoding.object_bits << ") ";
     convert_expr(expr.op0());
     out << ") (_ bv" << pointer_logic.get_invalid_object()
-        << " " << BV_ADDR_BITS << "))";
+        << " " << config.bv_encoding.object_bits << "))";
   }
   else if(expr.id()=="pointer_object_has_type")
   {
@@ -2725,14 +2730,14 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
 
     out << "(let ((?obj ((_ extract "
         << pointer_width-1 << " "
-        << pointer_width-BV_ADDR_BITS << ") ";
+        << pointer_width-config.bv_encoding.object_bits << ") ";
     convert_expr(expr.op0());
     out << "))) ";
 
     if(dynamic_objects.size()==1)
     {
       out << "(= (_ bv" << dynamic_objects.front()
-          << " " << BV_ADDR_BITS << ") ?obj)";
+          << " " << config.bv_encoding.object_bits << ") ?obj)";
     }
     else
     {
@@ -2740,7 +2745,7 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
 
       for(const auto &object : dynamic_objects)
         out << " (= (_ bv" << object
-            << " " << BV_ADDR_BITS << ") ?obj)";
+            << " " << config.bv_encoding.object_bits << ") ?obj)";
 
       out << ")"; // or
     }

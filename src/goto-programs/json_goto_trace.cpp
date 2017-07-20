@@ -20,7 +20,6 @@ Author: Daniel Kroening
 #include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
-#include <solvers/flattening/pointer_logic.h>
 
 /// Replaces in src, expressions of the form pointer_offset(constant) by that
 /// constant.
@@ -34,7 +33,8 @@ void remove_pointer_offsets(exprt &src)
     std::string binary_str=id2string(to_constant_expr(src.op0()).get_value());
     // The constant address consists of OBJECT-ID || OFFSET.
     // Shift out the object-identifier bits, leaving only the offset:
-    mp_integer offset=binary2integer(binary_str.substr(BV_ADDR_BITS), false);
+    mp_integer offset=binary2integer(
+      binary_str.substr(config.bv_encoding.object_bits), false);
     src=from_integer(offset, src.type());
   }
   else
