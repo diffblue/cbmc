@@ -6,13 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/c_types.h>
-
 #include "shared_buffers.h"
-
 #include "fence.h"
-
 #include "../rw_set.h"
+
+#include <util/c_types.h>
 
 /// returns a unique id (for fresh variables)
 std::string shared_bufferst::unique(void)
