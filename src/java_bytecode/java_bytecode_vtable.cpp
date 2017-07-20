@@ -118,7 +118,7 @@ public:
     struct_typet::componentt entry_component;
     entry_component.set_name(ifc_name);
     entry_component.set_base_name(ifc_method->get_base_name());
-    entry_component.type()=pointer_typet(implementation.type());
+    entry_component.type()=pointer_type(implementation.type());
     vtable_type.components().push_back(entry_component);
 
     const irep_idt &impl_name(implementation.get_name());
@@ -288,7 +288,7 @@ static void add_vtable_pointer_member(
 {
   struct_typet::componentt comp;
 
-  comp.type()=pointer_typet(symbol_typet(vt_name));
+  comp.type()=pointer_type(symbol_typet(vt_name));
   comp.set_name(ID_vtable_pointer);
   comp.set_base_name(ID_vtable_pointer);
   comp.set_pretty_name(ID_vtable_pointer);
@@ -391,7 +391,7 @@ static exprt get_ref(
   if(ID_symbol==type_id)
     return get_ref(address_of_exprt(this_obj), target_type);
   assert(ID_pointer==type_id);
-  const typecast_exprt cast(this_obj, pointer_typet(target_type));
+  const typecast_exprt cast(this_obj, pointer_type(target_type));
   return dereference_exprt(cast, target_type);
 }
 
@@ -436,13 +436,13 @@ exprt make_vtable_function(
   }
 
   const symbol_typet vtable_type(vtnamest::get_type(class_id));
-  const pointer_typet vt_ptr_type(vtable_type);
+  const pointer_typet vt_ptr_type=pointer_type(vtable_type);
   const symbol_typet target_type(class_id);
   const exprt this_ref(get_ref(this_obj, target_type));
   const typet ref_type(this_ref.type());
   const member_exprt vtable_member(this_ref, ID_vtable_pointer, vt_ptr_type);
   const dereference_exprt vtable(vtable_member, vtable_type); // TODO: cast?
-  const pointer_typet func_ptr_type(func.type());
+  const pointer_typet func_ptr_type=pointer_type(func.type());
   const member_exprt func_ptr(vtable, func_name, func_ptr_type);
   const dereference_exprt virtual_func(func_ptr, func.type());
   return virtual_func;

@@ -43,7 +43,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   binary_exprt get_may("get_may");
 
   // NULL is any
-  get_may.op0()=null_pointer_exprt(to_pointer_type(pointer_type(empty_typet())));
+  get_may.op0()=null_pointer_exprt(pointer_type(empty_typet()));
   get_may.op1()=address_of_exprt(mutex_locked_string);
 
   end->make_assertion(not_exprt(get_may));

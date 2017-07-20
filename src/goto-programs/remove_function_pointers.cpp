@@ -375,10 +375,7 @@ void remove_function_pointerst::remove_function_pointer(
     t3->make_goto(t_final, true_exprt());
 
     // goto to call
-    address_of_exprt address_of;
-    address_of.object()=fun;
-    address_of.type()=pointer_typet();
-    address_of.type().subtype()=fun.type();
+    address_of_exprt address_of(fun, pointer_type(fun.type()));
 
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());

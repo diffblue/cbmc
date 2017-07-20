@@ -825,14 +825,12 @@ void string_instrumentationt::do_strerror(
   }
 
   // return a pointer to some magic buffer
-  exprt index=exprt(ID_index, char_type());
-  index.copy_to_operands(
+  index_exprt index(
     symbol_buf.symbol_expr(),
-    from_integer(0, index_type()));
+    from_integer(0, index_type()),
+    char_type());
 
-  exprt ptr=exprt(ID_address_of, pointer_typet());
-  ptr.type().subtype()=char_type();
-  ptr.copy_to_operands(index);
+  address_of_exprt ptr(index);
 
   // make that zero-terminated
   {

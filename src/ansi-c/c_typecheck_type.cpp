@@ -1498,9 +1498,7 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
   {
     // see ISO/IEC 9899:1999 page 199 clause 8,
     // may be hidden in typedef
-    pointer_typet tmp;
-    tmp.subtype()=type;
-    type.swap(tmp);
+    type=pointer_type(type);
   }
   else if(type.id()==ID_KnR)
   {

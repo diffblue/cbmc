@@ -10,12 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Remove Virtual Function (Method) Calls
 
 #include "remove_virtual_functions.h"
-
-#include <util/prefix.h>
-#include <util/type_eq.h>
-
 #include "class_hierarchy.h"
 #include "class_identifier.h"
+
+#include <util/c_types.h>
+#include <util/prefix.h>
+#include <util/type_eq.h>
 
 class remove_virtual_functionst
 {
@@ -147,7 +147,8 @@ void remove_virtual_functionst::remove_virtual_function(
         t1->make_function_call(code);
         auto &newcall=to_code_function_call(t1->code);
         newcall.function()=fun.symbol_expr;
-        pointer_typet need_type(symbol_typet(fun.symbol_expr.get(ID_C_class)));
+        typet need_type=
+          pointer_type(symbol_typet(fun.symbol_expr.get(ID_C_class)));
         if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
           newcall.arguments()[0].make_typecast(need_type);
       }

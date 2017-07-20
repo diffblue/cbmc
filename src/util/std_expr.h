@@ -2590,19 +2590,19 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
 
 /*! \brief Operator to return the address of an object
 */
-class address_of_exprt:public exprt
+class address_of_exprt:public unary_exprt
 {
 public:
-  explicit address_of_exprt(const exprt &op):
-    exprt(ID_address_of, pointer_typet(op.type()))
+  explicit address_of_exprt(const exprt &op);
+
+  address_of_exprt(const exprt &op, const pointer_typet &_type):
+    unary_exprt(ID_address_of, op, _type)
   {
-    copy_to_operands(op);
   }
 
   address_of_exprt():
-    exprt(ID_address_of, pointer_typet())
+    unary_exprt(ID_address_of, pointer_typet())
   {
-    operands().resize(1);
   }
 
   exprt &object()

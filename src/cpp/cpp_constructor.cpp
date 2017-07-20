@@ -289,10 +289,7 @@ codet cpp_typecheckt::cpp_constructor(
     assert(tmp_this.id()==ID_address_of
            && tmp_this.op0().id()=="new_object");
 
-    exprt address_of(ID_address_of, typet(ID_pointer));
-    address_of.type().subtype()=object_tc.type();
-    address_of.copy_to_operands(object_tc);
-    tmp_this.swap(address_of);
+    tmp_this=address_of_exprt(object_tc);
 
     if(block.operands().empty())
       return to_code(initializer);

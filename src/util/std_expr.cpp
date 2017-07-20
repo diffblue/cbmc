@@ -13,10 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "byte_operators.h"
 #include "c_types.h"
-#include "config.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
-
 #include "std_types.h"
 
 bool constant_exprt::value_is_zero_string() const
@@ -170,4 +168,21 @@ extractbits_exprt::extractbits_exprt(
   src()=_src;
   upper()=constant_exprt::integer_constant(_upper);
   lower()=constant_exprt::integer_constant(_lower);
+}
+
+/*******************************************************************\
+
+Function: address_of_exprt::address_of_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+address_of_exprt::address_of_exprt(const exprt &_op):
+  unary_exprt(ID_address_of, _op, pointer_type(_op.type()))
+{
 }

@@ -73,15 +73,13 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
 {
   assert(expr.type().id()==ID_array);
 
-  exprt index(ID_index, expr.type().subtype());
-  index.copy_to_operands(expr, from_integer(0, index_type()));
+  index_exprt index(
+    expr,
+    from_integer(0, index_type()));
+
   index.set(ID_C_lvalue, true);
 
-  pointer_typet pointer;
-  pointer.subtype()=expr.type().subtype();
-
-  new_expr=exprt(ID_address_of, pointer);
-  new_expr.move_to_operands(index);
+  new_expr=address_of_exprt(index);
 
   return true;
 }
@@ -96,17 +94,10 @@ bool cpp_typecheckt::standard_conversion_array_to_pointer(
 bool cpp_typecheckt::standard_conversion_function_to_pointer(
   const exprt &expr, exprt &new_expr) const
 {
-  const code_typet &func_type=to_code_type(expr.type());
-
   if(!expr.get_bool(ID_C_lvalue))
     return false;
 
-  pointer_typet pointer;
-  pointer.subtype()=func_type;
-
-  new_expr=exprt(ID_address_of);
-  new_expr.copy_to_operands(expr);
-  new_expr.type()=pointer;
+  new_expr=address_of_exprt(expr);
 
   return true;
 }
@@ -887,16 +878,13 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         if(subtype_typecast(from_struct, to_struct))
         {
-          exprt address(ID_address_of, pointer_typet());
-          address.copy_to_operands(expr);
-          address.type().subtype()=expr.type();
+          exprt address=address_of_exprt(expr);
 
           // simplify address
           if(expr.id()==ID_dereference)
             address=expr.op0();
 
-          pointer_typet ptr_sub;
-          ptr_sub.subtype()=type;
+          pointer_typet ptr_sub=pointer_type(type);
           c_qualifierst qual_from;
           qual_from.read(expr.type());
           qual_from.write(ptr_sub.subtype());
@@ -1019,62 +1007,60 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           }
           else if(from_struct.is_not_nil() && arg1_struct.is_not_nil())
           {
-              // try derived-to-base conversion
-              exprt expr_pfrom(ID_address_of, pointer_typet());
-              expr_pfrom.type().subtype()=expr.type();
-              expr_pfrom.copy_to_operands(expr);
+            // try derived-to-base conversion
+            address_of_exprt expr_pfrom(expr, pointer_type(expr.type()));
+            pointer_typet pto=pointer_type(arg1_type);
 
-              pointer_typet pto;
-              pto.subtype()=arg1_type;
+            exprt expr_ptmp;
+            tmp_rank=0;
+            if(standard_conversion_sequence(
+                expr_pfrom, pto, expr_ptmp, tmp_rank))
+            {
+              // check if it's ambiguous
+              if(found)
+                return false;
+              found=true;
 
-              exprt expr_ptmp;
-              tmp_rank=0;
-              if(standard_conversion_sequence(
-                  expr_pfrom, pto, expr_ptmp, tmp_rank))
+              rank+=tmp_rank;
+
+              // create temporary object
+              exprt expr_deref=
+                exprt(ID_dereference, expr_ptmp.type().subtype());
+              expr_deref.set(ID_C_lvalue, true);
+              expr_deref.copy_to_operands(expr_ptmp);
+              expr_deref.add_source_location()=expr.source_location();
+
+              exprt new_object("new_object", type);
+              new_object.set(ID_C_lvalue, true);
+              new_object.type().set(ID_C_constant, false);
+
+              exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
+              func_symb.type()=comp_type;
               {
-                // check if it's ambiguous
-                if(found)
-                  return false;
-                found=true;
-
-                rank+=tmp_rank;
-
-                // create temporary object
-                exprt expr_deref=
-                  exprt(ID_dereference, expr_ptmp.type().subtype());
-                expr_deref.set(ID_C_lvalue, true);
-                expr_deref.copy_to_operands(expr_ptmp);
-                expr_deref.add_source_location()=expr.source_location();
-
-                exprt new_object("new_object", type);
-                new_object.set(ID_C_lvalue, true);
-                new_object.type().set(ID_C_constant, false);
-
-                exprt func_symb=cpp_symbol_expr(lookup(component.get(ID_name)));
-                func_symb.type()=comp_type;
-                {
-                  exprt tmp("already_typechecked");
-                  tmp.copy_to_operands(func_symb);
-                  func_symb.swap(func_symb);
-                }
-
-                side_effect_expr_function_callt ctor_expr;
-                ctor_expr.add_source_location()=expr.source_location();
-                ctor_expr.function().swap(func_symb);
-                ctor_expr.arguments().push_back(expr_deref);
-                typecheck_side_effect_function_call(ctor_expr);
-
-                new_expr.swap(ctor_expr);
-
-                assert(new_expr.get(ID_statement)==ID_temporary_object);
-
-                if(to.get_bool(ID_C_constant))
-                  new_expr.type().set(ID_C_constant, true);
+                exprt tmp("already_typechecked");
+                tmp.copy_to_operands(func_symb);
+                func_symb.swap(func_symb);
               }
+
+              side_effect_expr_function_callt ctor_expr;
+              ctor_expr.add_source_location()=expr.source_location();
+              ctor_expr.function().swap(func_symb);
+              ctor_expr.arguments().push_back(expr_deref);
+              typecheck_side_effect_function_call(ctor_expr);
+
+              new_expr.swap(ctor_expr);
+
+              INVARIANT(
+                new_expr.get(ID_statement)==ID_temporary_object,
+                "statement ID");
+
+              if(to.get_bool(ID_C_constant))
+                new_expr.type().set(ID_C_constant, true);
             }
           }
-          if(found)
-            return true;
+        }
+        if(found)
+          return true;
       }
   }
 
@@ -1297,9 +1283,8 @@ bool cpp_typecheckt::reference_binding(
         address_of_exprt tmp;
         tmp.add_source_location()=expr.source_location();
         tmp.object()=expr;
-        tmp.type()=pointer_typet();
+        tmp.type()=pointer_type(tmp.op0().type());
         tmp.type().set(ID_C_reference, true);
-        tmp.type().subtype()=tmp.op0().type();
         new_expr.swap(tmp);
       }
 
@@ -1427,10 +1412,9 @@ bool cpp_typecheckt::reference_binding(
   if(user_defined_conversion_sequence(arg_expr, type.subtype(), new_expr, rank))
   {
     address_of_exprt tmp;
-    tmp.type()=pointer_typet();
+    tmp.type()=pointer_type(new_expr.type());
     tmp.object()=new_expr;
     tmp.type().set(ID_C_reference, true);
-    tmp.type().subtype()= new_expr.type();
     tmp.add_source_location()=new_expr.source_location();
     new_expr.swap(tmp);
     return true;
@@ -1449,12 +1433,11 @@ bool cpp_typecheckt::reference_binding(
       new_expr.swap(tmp);
     }
 
-    exprt tmp(ID_address_of, pointer_typet());
-    tmp.copy_to_operands(new_expr);
+    address_of_exprt tmp(new_expr, pointer_type(new_expr.type()));
     tmp.type().set(ID_C_reference, true);
-    tmp.type().subtype()= new_expr.type();
     tmp.add_source_location()=new_expr.source_location();
-    new_expr.swap(tmp);
+
+    new_expr=tmp;
     return true;
   }
 
@@ -1715,10 +1698,9 @@ bool cpp_typecheckt::const_typecast(
     if(new_expr.type()!=type.subtype())
       return false;
 
-    exprt address_of(ID_address_of, type);
-    address_of.copy_to_operands(expr);
+    exprt address_of=address_of_exprt(expr, to_pointer_type(type));
     add_implicit_dereference(address_of);
-    new_expr.swap(address_of);
+    new_expr=address_of;
     return true;
   }
   else if(type.id()==ID_pointer)
@@ -1880,9 +1862,7 @@ bool cpp_typecheckt::reinterpret_typecast(
 
   if(is_reference(type) && e.get_bool(ID_C_lvalue))
   {
-    exprt tmp(ID_address_of, pointer_typet());
-    tmp.type().subtype()=e.type();
-    tmp.copy_to_operands(e);
+    exprt tmp=address_of_exprt(e);
     tmp.make_typecast(type);
     new_expr.swap(tmp);
     return true;
@@ -1946,10 +1926,8 @@ bool cpp_typecheckt::static_typecast(
           return true;
         }
 
-        exprt address_of(ID_address_of, pointer_typet());
-        address_of.type().subtype()=e.type();
-        address_of.copy_to_operands(e);
-        make_ptr_typecast(address_of , type);
+        exprt address_of=address_of_exprt(e);
+        make_ptr_typecast(address_of, type);
         new_expr.swap(address_of);
         return true;
       }
