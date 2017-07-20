@@ -26,10 +26,11 @@ public:
   static bool get_coverage_goals(
     const std::string &coverage,
     message_handlert &message_handler,
-    coverage_goalst &goals);
+    coverage_goalst &goals,
+    const irep_idt &mode);
   void add_goal(source_locationt goal);
   bool is_existing_goal(source_locationt source_loc);
-  void check_uncovered_goals(messaget msg);
+  void check_uncovered_goals(messaget &msg);
 
 private:
   std::map<source_locationt, bool> existing_goals;
