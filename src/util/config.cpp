@@ -730,6 +730,8 @@ bool configt::set(const cmdlinet &cmdline)
 
   cpp.cpp_standard=cppt::default_cpp_standard();
 
+  bv_encoding.object_bits=8;
+
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
   ansi_c.c_standard=ansi_ct::default_c_standard();
