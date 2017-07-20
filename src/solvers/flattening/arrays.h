@@ -105,8 +105,6 @@ protected:
     const index_sett &index_set, const array_equalityt &array_equality);
   void add_array_constraints(
     const index_sett &index_set, const exprt &expr);
-  void add_array_constraints(
-    const index_sett &index_set, const array_equalityt &array_equality);
   void add_array_constraints_if(
     const index_sett &index_set, const if_exprt &exprt);
   void add_array_constraints_with(
