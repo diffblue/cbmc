@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void mini_bdd_nodet::remove_reference()
 {
+  // NOLINTNEXTLINE(build/deprecated)
   assert(reference_counter!=0);
 
   reference_counter--;
@@ -208,7 +209,9 @@ protected:
 
 mini_bddt mini_bdd_applyt::APP_rec(const mini_bddt &x, const mini_bddt &y)
 {
+  // NOLINTNEXTLINE(build/deprecated)
   assert(x.is_initialized() && y.is_initialized());
+  // NOLINTNEXTLINE(build/deprecated)
   assert(x.node->mgr==y.node->mgr);
 
   // dynamic programming
@@ -270,7 +273,9 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
     auto &t=stack.top();
     const mini_bddt &x=t.x;
     const mini_bddt &y=t.y;
+    // NOLINTNEXTLINE(build/deprecated)
     assert(x.is_initialized() && y.is_initialized());
+    // NOLINTNEXTLINE(build/deprecated)
     assert(x.node->mgr==y.node->mgr);
 
     switch(t.phase)
@@ -297,9 +302,13 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=x.var();
             t.phase=stack_elementt::phaset::FINISH;
+            // NOLINTNEXTLINE(build/deprecated)
             assert(x.low().var()>t.var);
+            // NOLINTNEXTLINE(build/deprecated)
             assert(y.low().var()>t.var);
+            // NOLINTNEXTLINE(build/deprecated)
             assert(x.high().var()>t.var);
+            // NOLINTNEXTLINE(build/deprecated)
             assert(y.high().var()>t.var);
             stack.push(stack_elementt(t.lr, x.low(), y.low()));
             stack.push(stack_elementt(t.hr, x.high(), y.high()));
@@ -308,7 +317,9 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=x.var();
             t.phase=stack_elementt::phaset::FINISH;
+            // NOLINTNEXTLINE(build/deprecated)
             assert(x.low().var()>t.var);
+            // NOLINTNEXTLINE(build/deprecated)
             assert(x.high().var()>t.var);
             stack.push(stack_elementt(t.lr, x.low(), y));
             stack.push(stack_elementt(t.hr, x.high(), y));
@@ -317,7 +328,9 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
           {
             t.var=y.var();
             t.phase=stack_elementt::phaset::FINISH;
+            // NOLINTNEXTLINE(build/deprecated)
             assert(y.low().var()>t.var);
+            // NOLINTNEXTLINE(build/deprecated)
             assert(y.high().var()>t.var);
             stack.push(stack_elementt(t.lr, x, y.low()));
             stack.push(stack_elementt(t.hr, x, y.high()));
@@ -337,6 +350,7 @@ mini_bddt mini_bdd_applyt::APP_non_rec(
     }
   }
 
+  // NOLINTNEXTLINE(build/deprecated)
   assert(u.is_initialized());
 
   return u;
@@ -364,6 +378,7 @@ mini_bddt mini_bddt::operator^(const mini_bddt &other) const
 
 mini_bddt mini_bddt::operator!() const
 {
+  // NOLINTNEXTLINE(build/deprecated)
   assert(is_initialized());
   return node->mgr->True()^*this;
 }
@@ -406,8 +421,11 @@ mini_bddt mini_bdd_mgrt::mk(
   const mini_bddt &low,
   const mini_bddt &high)
 {
+  // NOLINTNEXTLINE(build/deprecated)
   assert(var<=var_table.size());
+  // NOLINTNEXTLINE(build/deprecated)
   assert(low.var()>var);
+  // NOLINTNEXTLINE(build/deprecated)
   assert(high.var()>var);
 
   if(low.node_number()==high.node_number())
@@ -501,6 +519,7 @@ mini_bddt restrictt::RES(const mini_bddt &u)
 {
   // replace 'var' in 'u' by constant 'value'
 
+  // NOLINTNEXTLINE(build/deprecated)
   assert(u.is_initialized());
   mini_bdd_mgrt *mgr=u.node->mgr;
 
