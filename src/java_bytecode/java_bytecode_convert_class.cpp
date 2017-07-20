@@ -20,9 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_language.h"
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 

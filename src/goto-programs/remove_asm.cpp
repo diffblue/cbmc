@@ -16,8 +16,8 @@ Date:   December 2014
 
 #include <sstream>
 
-#include <util/std_expr.h>
 #include <util/c_types.h>
+#include <util/std_expr.h>
 
 #include <ansi-c/string_constant.h>
 #include <assembler/assembler_parser.h>

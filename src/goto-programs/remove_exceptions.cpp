@@ -20,8 +20,8 @@ Date:   December 2016
 #include <stack>
 #include <algorithm>
 
-#include <util/std_expr.h>
 #include <util/c_types.h>
+#include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 class remove_exceptionst

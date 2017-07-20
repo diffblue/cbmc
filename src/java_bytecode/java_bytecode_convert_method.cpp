@@ -9,29 +9,28 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Bytecode Language Conversion
 
-#include "java_bytecode_convert_method.h"
-
 #ifdef DEBUG
 #include <iostream>
 #endif
 
+#include "java_bytecode_convert_method.h"
+#include "java_bytecode_convert_method_class.h"
+#include "bytecode_info.h"
+#include "java_types.h"
+
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/ieee_float.h>
 #include <util/namespace.h>
+#include <util/prefix.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
-#include <util/prefix.h>
-#include <util/arith_tools.h>
-#include <util/ieee_float.h>
-#include <util/simplify_expr.h>
-#include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
 
 #include <goto-programs/cfg.h>
 #include <analyses/cfg_dominators.h>
-
-#include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
-#include "java_types.h"
 
 #include <limits>
 #include <algorithm>
