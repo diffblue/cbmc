@@ -1095,6 +1095,7 @@ void cbmc_parse_optionst::help()
     " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
     "\n"
     "Backend options:\n"
+    " --object-bits n              number of bits used for object addresses\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"

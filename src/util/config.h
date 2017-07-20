@@ -118,6 +118,8 @@ public:
     libt lib;
 
     bool string_abstraction;
+
+    static const unsigned default_object_bits=8;
   } ansi_c;
 
   struct cppt
@@ -129,6 +131,8 @@ public:
     void set_cpp03() { cpp_standard=cpp_standardt::CPP03; }
     void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
     void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
+
+    static const unsigned default_object_bits=8;
   } cpp;
 
   struct verilogt
@@ -141,12 +145,17 @@ public:
     typedef std::list<std::string> classpatht;
     classpatht classpath;
     irep_idt main_class;
+
+    static const unsigned default_object_bits=16;
   } java;
 
   struct bv_encodingt
   {
     // number of bits to encode heap object addresses
     unsigned object_bits;
+    bool is_object_bits_default;
+
+    static const unsigned default_object_bits=8;
   } bv_encoding;
 
   // this is the function to start executing
@@ -157,6 +166,8 @@ public:
   void set_from_symbol_table(const symbol_tablet &);
 
   bool set(const cmdlinet &cmdline);
+
+  void set_object_bits_from_symbol_table(const symbol_tablet &);
 
   static irep_idt this_architecture();
   static irep_idt this_operating_system();
