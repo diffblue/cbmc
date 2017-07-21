@@ -784,17 +784,18 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
   return result.str();
 }
 
-/// Fill in `current_model` by mapping the variables created by the solver to
-/// constant expressions given by the current model
-void string_refinementt::fill_model()
+/// Display part of the current model by mapping the variables created by the
+/// solver to constant expressions given by the current model
+void string_refinementt::debug_model()
 {
   for(auto it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
+      debug() << " - " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
       string_exprt refined=to_string_expr(it.second);
-      // TODO: check whith this is necessary:
-      replace_expr(symbol_resolve, refined);
+      debug() << "     in_map: " << from_expr(ns, "", refined) << eom;
+      debug() << "     resolved: " << from_expr(ns, "", refined) << eom;
       const exprt &econtent=refined.content();
       const exprt &elength=refined.length();
 
@@ -804,15 +805,14 @@ void string_refinementt::fill_model()
 
       current_model[elength]=len;
       current_model[econtent]=arr;
-      debug() << from_expr(ns, "", to_symbol_expr(it.first)) << "="
-              << from_expr(ns, "", refined);
 
       if(arr.id()==ID_array)
-        debug() << " = \"" << string_of_array(to_array_expr(arr))
-                << "\" (size:" << from_expr(ns, "", len) << ")"<< eom;
+        debug() << "     as_string: \"" << string_of_array(to_array_expr(arr))
+                << "\"\n";
       else
-        debug() << " = " << from_expr(ns, "", arr)
-                << " (size:" << from_expr(ns, "", len) << ")" << eom;
+        debug() << "     as_char_array: " << from_expr(ns, "", arr) << "\n";
+
+      debug() << "     size: " << from_expr(ns, "", len) << eom;
     }
     else
     {
@@ -823,31 +823,31 @@ void string_refinementt::fill_model()
           "handled"));
       exprt arr=it.second;
       replace_expr(symbol_resolve, arr);
+      debug() << " - " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
+      debug() << "     resolved: " << from_expr(ns, "", arr) << "\n";
+
       replace_expr(current_model, arr);
       exprt arr_model=get_array(arr);
       current_model[it.first]=arr_model;
 
-      debug() << from_expr(ns, "", to_symbol_expr(it.first)) << "="
-              << from_expr(ns, "", arr) << " = "
-              << from_expr(ns, "", arr_model) << "" << eom;
+      debug() << "     char_array: " << from_expr(ns, "", arr_model) << eom;
     }
   }
 
   for(auto it : generator.boolean_symbols)
   {
-      debug() << "" << it.get_identifier() << " := "
+      debug() << " - " << it.get_identifier() << ": "
               << from_expr(ns, "", supert::get(it)) << eom;
       current_model[it]=supert::get(it);
   }
 
   for(auto it : generator.index_symbols)
   {
-     debug() << "" << it.get_identifier() << " := "
-              << from_expr(ns, "", supert::get(it)) << eom;
+     debug() << " - " << it.get_identifier() << ": "
+             << from_expr(ns, "", supert::get(it)) << eom;
      current_model[it]=supert::get(it);
   }
 }
-
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
 /// 'if' expressions. e.g. for an array access arr[x], where: `arr :=
@@ -1083,7 +1083,7 @@ bool string_refinementt::check_axioms()
           << "===========================================" << eom;
   debug() << "string_refinementt::check_axioms: build the"
           << " interpretation from the model of the prop_solver" << eom;
-  fill_model();
+  debug_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
