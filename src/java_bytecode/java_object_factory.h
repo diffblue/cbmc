@@ -14,6 +14,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 
+/// Selects the kind of allocation used by java_object_factory et al.
+enum class allocation_typet {
+  /// Allocate global objects
+  GLOBAL,
+  /// Allocate local stacked objects
+  LOCAL,
+  /// Allocate dynamic objects (using MALLOC)
+  DYNAMIC
+};
+
 exprt object_factory(
   const typet &type,
   const irep_idt base_name,
@@ -21,6 +31,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  allocation_typet alloc_type,
   const source_locationt &);
 
 enum class update_in_placet
@@ -36,7 +47,7 @@ void gen_nondet_init(
   symbol_tablet &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
-  bool create_dyn_objs,
+  allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
   update_in_placet update_in_place);

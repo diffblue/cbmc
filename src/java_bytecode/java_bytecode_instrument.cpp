@@ -113,6 +113,7 @@ codet java_bytecode_instrumentt::throw_exception(
       false,
       symbol_table,
       max_array_length,
+      allocation_typet::LOCAL,
       original_loc);
   }
   else
