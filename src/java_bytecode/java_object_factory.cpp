@@ -1071,3 +1071,49 @@ void gen_nondet_init(
 
   init_code.append(assignments);
 }
+
+/// Call object_factory with a default (identity) pointer_type_selector
+exprt object_factory(const typet &type,
+  const irep_idt base_name,
+  code_blockt &init_code,
+  bool allow_null,
+  symbol_tablet &symbol_table,
+  size_t max_nondet_array_length,
+  allocation_typet alloc_type,
+  const source_locationt &location)
+{
+  return object_factory(
+    type,
+    base_name,
+    init_code,
+    allow_null,
+    symbol_table,
+    max_nondet_array_length,
+    alloc_type,
+    location,
+    std::make_shared<select_pointer_typet>());
+}
+
+/// Call gen_nondet_init with a default (identity) pointer_type_selector
+void gen_nondet_init(const exprt &expr,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  bool skip_classid,
+  allocation_typet alloc_type,
+  bool assume_non_null,
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place)
+{
+  gen_nondet_init(
+    expr,
+    init_code,
+    symbol_table,
+    loc,
+    skip_classid,
+    alloc_type,
+    assume_non_null,
+    max_nondet_array_length,
+    std::make_shared<select_pointer_typet>(),
+    update_in_place);
+}

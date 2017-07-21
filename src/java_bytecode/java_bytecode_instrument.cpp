@@ -114,8 +114,7 @@ codet java_bytecode_instrumentt::throw_exception(
       symbol_table,
       max_array_length,
       allocation_typet::LOCAL,
-      original_loc,
-      std::make_shared<select_pointer_typet>());
+      original_loc);
   }
   else
     exc=symbol_table.lookup(exc_obj_name).symbol_expr();

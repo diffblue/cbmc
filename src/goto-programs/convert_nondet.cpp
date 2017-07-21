@@ -89,7 +89,6 @@ static goto_programt::targett insert_nondet_init_code(
     allocation_typet::DYNAMIC,
     !nullable,
     max_nondet_array_length,
-    std::make_shared<select_pointer_typet>(),
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Convert this code into goto instructions
