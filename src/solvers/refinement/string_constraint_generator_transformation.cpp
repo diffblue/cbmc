@@ -287,7 +287,6 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   exprt char_a=constant_char('a', char_type);
   exprt char_A=constant_char('A', char_type);
   exprt char_z=constant_char('z', char_type);
-  exprt char_Z=constant_char('Z', char_type);
 
   // TODO: add support for locales using case mapping information
   // from the UnicodeData file.
@@ -296,21 +295,29 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   // a1 : |res| = |str|
   // a2 : forall idx<str.length, 'a'<=str[idx]<='z' => res[idx]=str[idx]+'A'-'a'
   // a3 : forall idx<str.length, !('a'<=str[idx]<='z') => res[idx]=str[idx]
+  // Note that index expressions are only allowed in the body of universal
+  // axioms, so we use a trivial premise and push our premise into the body.
 
   exprt a1=res.axiom_for_has_same_length_as(str);
   axioms.push_back(a1);
 
-  symbol_exprt idx=fresh_univ_index("QA_upper_case", index_type);
+  symbol_exprt idx1=fresh_univ_index("QA_upper_case1", index_type);
   exprt is_lower_case=and_exprt(
-    binary_relation_exprt(char_a, ID_le, str[idx]),
-    binary_relation_exprt(str[idx], ID_le, char_z));
+    binary_relation_exprt(char_a, ID_le, str[idx1]),
+    binary_relation_exprt(str[idx1], ID_le, char_z));
   minus_exprt diff(char_A, char_a);
-  equal_exprt convert(res[idx], plus_exprt(str[idx], diff));
-  string_constraintt a2(idx, res.length(), is_lower_case, convert);
+  equal_exprt convert(res[idx1], plus_exprt(str[idx1], diff));
+  implies_exprt body1(is_lower_case, convert);
+  string_constraintt a2(idx1, res.length(), body1);
   axioms.push_back(a2);
 
-  equal_exprt eq(res[idx], str[idx]);
-  string_constraintt a3(idx, res.length(), not_exprt(is_lower_case), eq);
+  symbol_exprt idx2=fresh_univ_index("QA_upper_case2", index_type);
+  exprt is_not_lower_case=not_exprt(and_exprt(
+    binary_relation_exprt(char_a, ID_le, str[idx2]),
+    binary_relation_exprt(str[idx2], ID_le, char_z)));
+  equal_exprt eq(res[idx2], str[idx2]);
+  implies_exprt body2(is_not_lower_case, eq);
+  string_constraintt a3(idx2, res.length(), body2);
   axioms.push_back(a3);
   return res;
 }

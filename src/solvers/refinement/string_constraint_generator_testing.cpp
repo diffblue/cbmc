@@ -187,7 +187,6 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   string_exprt s0=get_string_expr(args(f, 2)[0]);
   string_exprt s1=get_string_expr(args(f, 2)[1]);
-  bool constant=is_constant_string(s1);
 
   symbol_exprt contains=fresh_boolean("contains");
   const refined_string_typet ref_type=to_refined_string_type(s0.type());
@@ -218,66 +217,24 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     equal_exprt(startpos, from_integer(-1, index_type)));
   axioms.push_back(a3);
 
-  if(constant)
-  {
-    // If the string is constant, we can use a more efficient axiom for a4:
-    // contains ==> AND_{i < |s1|} s1[i] = s0[startpos + i]
-    mp_integer s1_length;
-    INVARIANT(
-      !to_integer(s1.length(), s1_length),
-      string_refinement_invariantt("a constant string expression must have a "
-        "constant length"));
-    exprt::operandst conjuncts;
-    for(mp_integer i=0; i<s1_length; ++i)
-    {
-      exprt expr_i=from_integer(i, index_type);
-      plus_exprt shifted_i(expr_i, startpos);
-      conjuncts.push_back(equal_exprt(s1[expr_i], s0[shifted_i]));
-    }
-    implies_exprt a4(contains, conjunction(conjuncts));
-    axioms.push_back(a4);
+  symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
+  exprt qvar_shifted=plus_exprt(qvar, startpos);
+  string_constraintt a4(
+    qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
+  axioms.push_back(a4);
 
-    // The a5 constraint for constant strings translates to:
-    // !contains ==> |s1| > |s0| ||
-    //               (forall qvar <= |s0| - |s1|.
-    //                 !(AND_{i < |s1|} s1[i] == s0[i + qvar])
-    //
-    // which we implement as:
-    // forall qvar <= |s0| - |s1|.  (!contains && |s0| >= |s1|)
-    //     ==> !(AND_{i < |s1|} (s1[i] == s0[qvar+i]))
-    symbol_exprt qvar=fresh_univ_index("QA_contains_constant", index_type);
-    exprt::operandst conjuncts1;
-    for(mp_integer i=0; i<s1_length; ++i)
-    {
-      exprt expr_i=from_integer(i, index_type);
-      plus_exprt shifted_i(expr_i, qvar);
-      conjuncts1.push_back(equal_exprt(s1[expr_i], s0[shifted_i]));
-    }
+  // We rewrite axiom a4 as:
+  // forall startpos <= |s0|-|s1|.  (!contains && |s0| >= |s1|)
+  //     ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
+  string_not_contains_constraintt a5(
+    from_integer(0, index_type),
+    plus_exprt(from_integer(1, index_type), length_diff),
+    and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
+    from_integer(0, index_type),
+    s1.length(),
+    s0,
+    s1);
+  axioms.push_back(a5);
 
-    string_constraintt a5(
-      qvar,
-      plus_exprt(from_integer(1, index_type), length_diff),
-      and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
-      not_exprt(conjunction(conjuncts1)));
-    axioms.push_back(a5);
-  }
-  else
-  {
-    symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
-    exprt qvar_shifted=plus_exprt(qvar, startpos);
-    string_constraintt a4(
-      qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
-    axioms.push_back(a4);
-
-    // We rewrite axiom a4 as:
-    // forall startpos <= |s0|-|s1|.  (!contains && |s0| >= |s1|)
-    //     ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
-    string_not_contains_constraintt a5(
-      from_integer(0, index_type),
-      plus_exprt(from_integer(1, index_type), length_diff),
-      and_exprt(not_exprt(contains), s0.axiom_for_is_longer_than(s1)),
-      from_integer(0, index_type), s1.length(), s0, s1);
-    axioms.push_back(a5);
-  }
   return typecast_exprt(contains, f.type());
 }
