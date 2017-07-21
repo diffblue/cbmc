@@ -788,14 +788,17 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
 /// solver to constant expressions given by the current model
 void string_refinementt::debug_model()
 {
+  const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
     if(refined_string_typet::is_refined_string_type(it.second.type()))
     {
-      debug() << " - " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
+      debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
       string_exprt refined=to_string_expr(it.second);
-      debug() << "     in_map: " << from_expr(ns, "", refined) << eom;
-      debug() << "     resolved: " << from_expr(ns, "", refined) << eom;
+      debug() << indent << indent << "in_map: "
+              << from_expr(ns, "", refined) << eom;
+      debug() << indent << indent << "resolved: "
+              << from_expr(ns, "", refined) << eom;
       const exprt &econtent=refined.content();
       const exprt &elength=refined.length();
 
@@ -803,12 +806,13 @@ void string_refinementt::debug_model()
       len=simplify_expr(len, ns);
       exprt arr=get_array(econtent, len);
       if(arr.id()==ID_array)
-        debug() << "     as_string: \"" << string_of_array(to_array_expr(arr))
-                << "\"\n";
+        debug() << indent << indent << "as_string: \""
+                << string_of_array(to_array_expr(arr)) << "\"\n";
       else
-        debug() << "     as_char_array: " << from_expr(ns, "", arr) << "\n";
+        debug() << indent << indent << "as_char_array: "
+                << from_expr(ns, "", arr) << "\n";
 
-      debug() << "     size: " << from_expr(ns, "", len) << eom;
+      debug() << indent << indent << "size: " << from_expr(ns, "", len) << eom;
     }
     else
     {
@@ -819,10 +823,12 @@ void string_refinementt::debug_model()
           "handled"));
       exprt arr=it.second;
       replace_expr(symbol_resolve, arr);
-      debug() << " - " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
-      debug() << "     resolved: " << from_expr(ns, "", arr) << "\n";
+      debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
+      debug() << indent << indent << "resolved: "
+              << from_expr(ns, "", arr) << "\n";
       exprt arr_model=get_array(arr);
-      debug() << "     char_array: " << from_expr(ns, "", arr_model) << eom;
+      debug() << indent << indent << "char_array: "
+              << from_expr(ns, "", arr_model) << eom;
     }
   }
 
