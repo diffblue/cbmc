@@ -118,28 +118,71 @@ void string_refinementt::add_instantiations()
   }
 }
 
+/// List the simple expressions on which the expression depends in the
+/// `symbol_resolve` map. A simple expression is either a symbol or a
+/// constant array
+/// \param expr: an expression
+static void depends_in_symbol_map(const exprt &expr, std::vector<exprt> &accu)
+{
+  if(expr.id()==ID_if)
+  {
+    if_exprt if_expr=to_if_expr(expr);
+    depends_in_symbol_map(if_expr.true_case(), accu);
+    depends_in_symbol_map(if_expr.false_case(), accu);
+  }
+  else if(expr.id()==ID_struct)
+  {
+    string_exprt str=to_string_expr(expr);
+    depends_in_symbol_map(str.content(), accu);
+  }
+  else
+  {
+    INVARIANT(
+      expr.id()==ID_symbol || expr.id()==ID_array || expr.id()==ID_array_of,
+      "leaf in symbol resolve should be a symbol or a constant array");
+    accu.push_back(expr);
+  }
+}
+
 /// keeps a map of symbols to expressions, such as none of the mapped values
 /// exist as a key
 /// \param lhs: a symbol expression
-/// \param rhs: an expression to map it to
+/// \param rhs: an expression to map it to, which should be either a symbol
+///             a string_exprt, an array_exprt, an array_of_exprt or an
+///             if_exprt with branches of the previous kind
 void string_refinementt::add_symbol_to_symbol_map(
   const exprt &lhs, const exprt &rhs)
 {
   PRECONDITION(lhs.id()==ID_symbol);
+  PRECONDITION(rhs.id()==ID_symbol ||
+               rhs.id()==ID_array ||
+               rhs.id()==ID_array_of ||
+               rhs.id()==ID_if ||
+               (rhs.id()==ID_struct &&
+                refined_string_typet::is_refined_string_type(rhs.type())));
 
   // We insert the mapped value of the rhs, if it exists.
   auto it=symbol_resolve.find(rhs);
   const exprt &new_rhs=it!=symbol_resolve.end()?it->second:rhs;
-
   symbol_resolve[lhs]=new_rhs;
-  reverse_symbol_resolve[new_rhs].push_back(lhs);
 
-  const std::list<exprt> &symbols_to_update_with_new_rhs(
-    reverse_symbol_resolve[lhs]);
-  for(exprt item : symbols_to_update_with_new_rhs)
+  // List the leaves of new_rhs
+  std::vector<exprt> leaves;
+  depends_in_symbol_map(new_rhs, leaves);
+
+  const auto &symbols_to_update_with_new_rhs=reverse_symbol_resolve[lhs];
+
+  // We need to update all the symbols which depend on lhs
+  for(const exprt &item : symbols_to_update_with_new_rhs)
+    replace_expr(symbol_resolve, symbol_resolve[item]);
+
+  // Every time a symbol at the leaves is updated we need to update lhs
+  // and the symbols that depend on it
+  for(const auto &leaf : leaves)
   {
-    symbol_resolve[item]=new_rhs;
-    reverse_symbol_resolve[new_rhs].push_back(item);
+    reverse_symbol_resolve[leaf].push_back(lhs);
+    for(const exprt &item : symbols_to_update_with_new_rhs)
+      reverse_symbol_resolve[leaf].push_back(item);
   }
 }
 
