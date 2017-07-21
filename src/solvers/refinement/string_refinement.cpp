@@ -212,7 +212,7 @@ void string_refinementt::set_char_array_equality(
 
 /// remove functions applications and create the necessary axioms
 /// \par parameters: an expression containing function applications
-/// \return an epression containing no function application
+/// \return an expression containing no function application
 exprt string_refinementt::substitute_function_applications(exprt expr)
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
@@ -796,7 +796,7 @@ exprt string_refinementt::get_array(const exprt &arr) const
 }
 
 /// convert the content of a string to a more readable representation. This
-/// should only be used for debbuging.
+/// should only be used for debugging.
 /// \par parameters: a constant array expression and a integer expression
 /// \return a string
 std::string string_refinementt::string_of_array(const array_exprt &arr)
@@ -1023,7 +1023,7 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 }
 
 /// Negates the constraint to be fed to a solver. The intended usage is to find
-/// an assignement of the universal variable that would violate the axiom. To
+/// an assignment of the universal variable that would violate the axiom. To
 /// avoid false positives, the symbols other than the universal variable should
 /// have been replaced by their valuation in the current model.
 /// \pre Symbols other than the universal variable should have been replaced by
@@ -1081,7 +1081,7 @@ static exprt negation_of_not_contains_constraint(
 }
 
 /// Negates the constraint to be fed to a solver. The intended usage is to find
-/// an assignement of the universal variable that would violate the axiom. To
+/// an assignment of the universal variable that would violate the axiom. To
 /// avoid false positives, the symbols other than the universal variable should
 /// have been replaced by their valuation in the current model.
 /// \pre Symbols other than the universal variable should have been replaced by
@@ -1239,7 +1239,7 @@ bool string_refinementt::check_axioms()
   }
 }
 
-/// \par parameters: an expression with only addition and substraction
+/// \par parameters: an expression with only addition and subtraction
 /// \return a map where each leaf of the input is mapped to the number of times
 ///   it is added. For instance, expression $x + x - y$ would give the map x ->
 ///   2, y -> -1.
@@ -1356,7 +1356,7 @@ exprt string_refinementt::sum_over_map(
 }
 
 /// \par parameters: an expression with only plus and minus expr
-/// \return an equivalent expression in a cannonical form
+/// \return an equivalent expression in a canonical form
 exprt string_refinementt::simplify_sum(const exprt &f) const
 {
   std::map<exprt, int> map=map_representation_of_sum(f);
@@ -1376,7 +1376,7 @@ exprt string_refinementt::compute_inverse_function(
   exprt positive, negative;
   // number of time the element should be added (can be negative)
   // qvar has to be equal to val - f(0) if it appears positively in f
-  // (ie if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
+  // (i.e. if f(qvar)=f(0) + qvar) and f(0) - val if it appears negatively
   // in f. So we start by computing val - f(0).
   std::map<exprt, int> elems=map_representation_of_sum(minus_exprt(val, f));
 
@@ -1612,7 +1612,7 @@ exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 /// \return substitute `qvar` the universally quantified variable of `axiom`, by
 ///   an index `val`, in `axiom`, so that the index used for `str` equals `val`.
 ///   For instance, if `axiom` corresponds to $\forall q. s[q+x]='a' &&
-///   t[q]='b'$, `instantiate(axom,s,v)` would return an expression for
+///   t[q]='b'$, `instantiate(axiom,s,v)` would return an expression for
 ///   $s[v]='a' && t[v-x]='b'$.
 exprt string_refinementt::instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val)
@@ -1691,7 +1691,7 @@ void string_refinementt::instantiate_not_contains(
 
 /// replace array-lists by 'with' expressions
 /// \par parameters: an expression containing array-list expressions
-/// \return an epression containing no array-list
+/// \return an expression containing no array-list
 exprt string_refinementt::substitute_array_lists(exprt expr) const
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
@@ -1762,7 +1762,7 @@ exprt string_refinementt::get(const exprt &expr) const
 }
 
 /// Creates a solver with `axiom` as the only formula added and runs it. If it
-/// is SAT, then true is returned and the given evalutation of `var` is stored
+/// is SAT, then true is returned and the given evaluation of `var` is stored
 /// in `witness`. If UNSAT, then what witness is is undefined.
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
