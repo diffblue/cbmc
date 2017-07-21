@@ -127,7 +127,7 @@ private:
     const exprt &val,
     const symbol_exprt &univ_var);
   exprt negation_of_constraint(const string_constraintt &axiom);
-  void fill_model();
+  void debug_model();
   bool check_axioms();
   bool is_axiom_sat(
     const exprt &axiom, const symbol_exprt& var, exprt &witness);
