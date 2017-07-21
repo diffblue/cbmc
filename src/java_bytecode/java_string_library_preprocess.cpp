@@ -1655,6 +1655,14 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.toLowerCase:()Ljava/lang/String;"]=
       ID_cprover_string_to_lower_case_func;
+  conversion_table
+    ["java::java.lang.String.toString:()Ljava/lang/String;"]=
+      std::bind(
+        &java_string_library_preprocesst::make_copy_string_code,
+        this,
+        std::placeholders::_1,
+        std::placeholders::_2,
+        std::placeholders::_3);
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.toUpperCase:()Ljava/lang/String;"]=
       ID_cprover_string_to_upper_case_func;
