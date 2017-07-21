@@ -674,7 +674,7 @@ void string_refinementt::add_lemma(
 /// \return an array expression or an array_of_exprt
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 {
-  exprt arr_val=get_array(arr);
+  exprt arr_val=simplify_expr(get_array(arr), ns);
   exprt size_val=supert::get(size);
   size_val=simplify_expr(size_val, ns);
   typet char_type=arr.type().subtype();
