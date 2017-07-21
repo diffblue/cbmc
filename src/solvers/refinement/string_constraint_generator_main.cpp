@@ -165,7 +165,6 @@ string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
   {
     java_content=dereference_exprt(java_content, java_content.type());
   }
-
   refined_string_typet type(java_int_type(), java_char_type());
 
   return string_exprt(length, java_content, type);
