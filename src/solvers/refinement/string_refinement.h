@@ -120,7 +120,6 @@ private:
   void add_instantiations();
   exprt negation_of_not_contains_constraint(
     const string_not_contains_constraintt &axiom,
-    const exprt &val,
     const symbol_exprt &univ_var);
   exprt negation_of_constraint(const string_constraintt &axiom);
   void debug_model();

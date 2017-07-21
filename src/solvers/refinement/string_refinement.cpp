@@ -1024,12 +1024,10 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 /// \pre Symbols other than the universal variable should have been replaced by
 ///   their valuation in the current model.
 /// \param axiom: the not_contains constraint to add the negation of
-/// \param val: the existential witness for the axiom
 /// \param univ_var: the universal variable for the negation of the axiom
 /// \return: the negation of the axiom under the current evaluation
 exprt string_refinementt::negation_of_not_contains_constraint(
   const string_not_contains_constraintt &axiom,
-  const exprt &val,
   const symbol_exprt &univ_var)
 {
   exprt lbu=axiom.univ_lower_bound();
@@ -1041,7 +1039,8 @@ exprt string_refinementt::negation_of_not_contains_constraint(
     to_integer(to_constant_expr(ubu), ub_int);
     if(ub_int<=lb_int)
     {
-      debug() << "empty constraint with current model" << eom;
+      debug() << "(string_refinement::check_axioms) empty constraint with "
+              << "current model, adding false" << eom;
       return false_exprt();
     }
   }
@@ -1049,26 +1048,38 @@ exprt string_refinementt::negation_of_not_contains_constraint(
   exprt lbe=axiom.exists_lower_bound();
   exprt ube=axiom.exists_upper_bound();
 
+  INVARIANT(
+    lbe.id()==ID_constant && ube.id()==ID_constant,
+    string_refinement_invariantt("please"));
+
+  mp_integer lbe_int, ube_int;
+  to_integer(to_constant_expr(lbe), lbe_int);
+  to_integer(to_constant_expr(ube), ube_int);
+
   if(axiom.premise()==false_exprt())
   {
-    debug() << "(string_refinement::check_axioms) adding false" << eom;
+    debug() << "(string_refinement::check_axioms) false premise, adding false"
+            << eom;
     return false_exprt();
   }
 
-  // Witness is the Skolem function for the existential, which we evaluate at
-  // univ_var.
   and_exprt univ_bounds(
     binary_relation_exprt(lbu, ID_le, univ_var),
     binary_relation_exprt(ubu, ID_gt, univ_var));
-  and_exprt exists_bounds(
-    binary_relation_exprt(lbe, ID_le, val),
-    binary_relation_exprt(ube, ID_gt, val));
-  equal_exprt equal_chars(
-    axiom.s0()[plus_exprt(univ_var, val)],
-    axiom.s1()[val]);
-  and_exprt negaxiom(univ_bounds, axiom.premise(), exists_bounds, equal_chars);
 
-  debug() << "(sr::check_axioms) negated not_contains axiom: "
+  std::vector<exprt> conjuncts;
+  for(mp_integer i=lbe_int; i<ube_int; i=i+1)
+  {
+    const constant_exprt i_exprt=from_integer(i, univ_var.type());
+    const equal_exprt equal_chars(
+      axiom.s0()[plus_exprt(univ_var, i_exprt)],
+      axiom.s1()[i_exprt]);
+    conjuncts.push_back(equal_chars);
+  }
+  exprt equal_strings=conjunction(conjuncts);
+  and_exprt negaxiom(univ_bounds, axiom.premise(), equal_strings);
+
+  debug() << "(string_refinement::check_axioms) negated not_contains axiom: "
           << from_expr(ns, "", negaxiom) << eom;
   substitute_array_access(negaxiom);
   return negaxiom;
@@ -1094,21 +1105,23 @@ exprt string_refinementt::negation_of_constraint(
     to_integer(to_constant_expr(ub), ub_int);
     if(ub_int<=lb_int)
     {
-      debug() << "empty constraint with current model" << eom;
+      debug() << "(string_refinement::check_axioms) empty constraint with "
+              << "current model, adding false" << eom;
       return false_exprt();
     }
   }
 
   if(axiom.premise()==false_exprt())
   {
-    debug() << "(string_refinement::check_axioms) adding false" << eom;
+    debug() << "(string_refinement::check_axioms) false premise, adding false"
+            << eom;
     return false_exprt();
   }
 
   and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
-  debug() << "(sr::check_axioms) negated axiom: "
+  debug() << "(string_refinement::check_axioms) negated universal axiom: "
           << from_expr(ns, "", negaxiom) << eom;
   substitute_array_access(negaxiom);
   return negaxiom;
@@ -1173,8 +1186,6 @@ bool string_refinementt::check_axioms()
 
     symbol_exprt univ_var=generator.fresh_univ_index(
       "not_contains_univ_var", nc_axiom.s0().length().type());
-    exprt wit=generator.get_witness_of(nc_axiom, univ_var);
-    exprt val=get(wit);
     const string_not_contains_constraintt nc_axiom_in_model(
       get(univ_bound_inf),
       get(univ_bound_sup),
@@ -1185,7 +1196,7 @@ bool string_refinementt::check_axioms()
       to_string_expr(get(s1)));
 
     const exprt negaxiom=negation_of_not_contains_constraint(
-      nc_axiom_in_model, val, univ_var);
+      nc_axiom_in_model, univ_var);
     exprt witness;
 
     bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
@@ -1742,6 +1753,18 @@ exprt string_refinementt::get(const exprt &expr) const
     if(it!=found_length.end())
       return get_array(ecopy, it->second);
   }
+  else if(refined_string_typet::is_refined_string_type(ecopy.type()) &&
+          ecopy.id()==ID_struct)
+  {
+    string_exprt ecopy2=to_string_expr(ecopy);
+    const exprt &econtent=ecopy2.content();
+    const exprt &elength=ecopy2.length();
+
+    exprt len=supert::get(elength);
+    len=simplify_expr(len, ns);
+    const exprt arr=get_array(econtent, len);
+    ecopy=string_exprt(len, arr, ecopy.type());
+  }
 
   ecopy=supert::get(ecopy);
 
@@ -1773,6 +1796,7 @@ bool string_refinementt::is_axiom_sat(
     }
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     return false;
+  case decision_proceduret::resultt::D_ERROR:
   default:
     INVARIANT(false, string_refinement_invariantt("failure in checking axiom"));
     // To tell the compiler that the previous line bails
