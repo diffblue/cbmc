@@ -118,6 +118,7 @@ void java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
+          allocation_typet::GLOBAL,
           source_location);
         code_assignt assignment(sym.symbol_expr(), newsym);
         code_block.add(assignment);
@@ -180,6 +181,7 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
+        allocation_typet::LOCAL,
         function.location);
 
     // record as an input
