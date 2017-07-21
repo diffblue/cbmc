@@ -286,12 +286,13 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
     implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
-  axioms.push_back(string_constraintt(qvar, t.length(), expr.cond(), qequal));
+  string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
+  axioms.push_back(sc1);
   axioms.push_back(
     implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
-  string_constraintt sc2(qvar2, f.length(), not_exprt(expr.cond()), qequal2);
+  string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
   axioms.push_back(sc2);
   return res;
 }
