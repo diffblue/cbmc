@@ -942,11 +942,13 @@ static void declare_created_symbols(
 ///   the returned value or its child objects
 /// \param allow_null: if true, may return null; otherwise always
 ///   allocates an object
+/// \param symbol_table: gains any new symbols created, as per gen_nondet_init
+///   above.
 /// \param max_nondet_array_length: upper bound on size of initialised arrays
 /// \param alloc_type: allocation method (global, local or dynamic objects)
 /// \param loc: source location for all generated code
-/// \return `symbol_table` gains any new symbols created, as per gen_nondet_init
-///   above. `init_code`
+/// \return A symbol expression repesenting the new object that has been
+///   created.
 exprt object_factory(
   const typet &type,
   const irep_idt base_name,
@@ -1003,22 +1005,22 @@ exprt object_factory(
 /// Initialises a primitive or object tree rooted at `expr`, allocating child
 /// objects as necessary and nondet-initialising their members, or if MAY_ or
 /// MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated objects.
-/// \par parameters: `expr`: lvalue expression to initialise
-/// `loc`: source location for all generated code
-/// `skip_classid`: if true, skip initialising @class_identifier
-/// `create_dyn_objs`: if true, use malloc to allocate objects; otherwise
+/// \param expr: lvalue expression to initialise
+/// \param init_code: gets an instruction sequence to initialise or
+///   reinitialise `expr` and child objects it refers to.
+/// \param symbol_table: is modified with any new symbols created.
+///   This includes any necessary temporaries, and if `create_dyn_objs` is
+///   false, any allocated objects.
+/// \param loc: source location for all generated code
+/// \param skip_classid: if true, skip initialising @class_identifier
+/// \param create_dyn_objs: if true, use malloc to allocate objects; otherwise
 ///   generate fresh static symbols.
-/// `assume_non_null`: never initialise pointer members with null, unless forced
-///   to by recursive datatypes
-/// `message_handler`: logging
-/// `max_nondet_array_length`: upper bound on size of initialised arrays.
-/// `update_in_place`: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+/// \param assume_non_null: never initialise pointer members with null, unless
+///   forced to by recursive datatypes;
+/// \param max_nondet_array_length: upper bound on size of initialised arrays.
+/// \param update_in_place: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
 ///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
 ///   generate a runtime nondet branch between the NO_ and MUST_ cases.
-/// \return `init_code` gets an instruction sequence to initialise or
-///   reinitialise `expr` and child objects it refers to. `symbol_table` is
-///   modified with any new symbols created. This includes any necessary
-///   temporaries, and if `create_dyn_objs` is false, any allocated objects.
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
