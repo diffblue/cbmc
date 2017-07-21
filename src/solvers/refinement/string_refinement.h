@@ -94,10 +94,6 @@ private:
   std::map<exprt, exprt_listt> reverse_symbol_resolve;
   std::list<std::pair<exprt, bool>> non_string_axioms;
 
-  // Valuation in the current model of the symbols that have been created
-  // by the solver
-  replace_mapt current_model;
-
   // Length of char arrays found during concretization
   std::map<exprt, exprt> found_length;
   // Content of char arrays found during concretization

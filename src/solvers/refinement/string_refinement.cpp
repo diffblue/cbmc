@@ -802,10 +802,6 @@ void string_refinementt::debug_model()
       exprt len=supert::get(elength);
       len=simplify_expr(len, ns);
       exprt arr=get_array(econtent, len);
-
-      current_model[elength]=len;
-      current_model[econtent]=arr;
-
       if(arr.id()==ID_array)
         debug() << "     as_string: \"" << string_of_array(to_array_expr(arr))
                 << "\"\n";
@@ -825,11 +821,7 @@ void string_refinementt::debug_model()
       replace_expr(symbol_resolve, arr);
       debug() << " - " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
       debug() << "     resolved: " << from_expr(ns, "", arr) << "\n";
-
-      replace_expr(current_model, arr);
       exprt arr_model=get_array(arr);
-      current_model[it.first]=arr_model;
-
       debug() << "     char_array: " << from_expr(ns, "", arr_model) << eom;
     }
   }
@@ -838,14 +830,12 @@ void string_refinementt::debug_model()
   {
       debug() << " - " << it.get_identifier() << ": "
               << from_expr(ns, "", supert::get(it)) << eom;
-      current_model[it]=supert::get(it);
   }
 
   for(auto it : generator.index_symbols)
   {
      debug() << " - " << it.get_identifier() << ": "
              << from_expr(ns, "", supert::get(it)) << eom;
-     current_model[it]=supert::get(it);
   }
 }
 
