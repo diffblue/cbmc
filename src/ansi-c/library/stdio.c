@@ -794,3 +794,43 @@ inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
 
   return result;
 }
+
+/* FUNCTION: vasprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
+inline int vasprintf(char **ptr, const char *fmt, va_list ap)
+{
+  (void)*fmt;
+  (void)ap;
+
+  int result_buffer_size;
+  if(result_buffer_size<=0)
+    return -1;
+
+  *ptr=malloc(result_buffer_size);
+  for(int i=0; i<result_buffer_size; ++i)
+  {
+    char c;
+    (*ptr)[i]=c;
+    if(c=='\0')
+      break;
+  }
+
+  __CPROVER_assume(i<result_buffer_size);
+
+  return i;
+}
