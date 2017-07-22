@@ -647,17 +647,23 @@ void symex_target_equationt::SSA_stept::output(
     switch(assignment_type)
     {
     case assignment_typet::HIDDEN:
-      out << "HIDDEN"; break;
+      out << "HIDDEN";
+      break;
     case assignment_typet::STATE:
-      out << "STATE"; break;
+      out << "STATE";
+      break;
     case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
-      out << "VISIBLE_ACTUAL_PARAMETER"; break;
+      out << "VISIBLE_ACTUAL_PARAMETER";
+      break;
     case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
-      out << "HIDDEN_ACTUAL_PARAMETER"; break;
+      out << "HIDDEN_ACTUAL_PARAMETER";
+      break;
     case assignment_typet::PHI:
-      out << "PHI"; break;
+      out << "PHI";
+      break;
     case assignment_typet::GUARD:
-      out << "GUARD"; break;
+      out << "GUARD";
+      break;
     default:
       {
       }
