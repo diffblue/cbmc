@@ -600,7 +600,7 @@ exprt bv_pointerst::bv_get_rec(
   result.set_value(value);
 
   pointer_logict::pointert pointer;
-  pointer.object=integer2unsigned(binary2integer(value_addr, false));
+  pointer.object=integer2size_t(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
 
   // we add the elaborated expression as operand
