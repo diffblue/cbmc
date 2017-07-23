@@ -117,28 +117,71 @@ void string_refinementt::add_instantiations()
   }
 }
 
+/// List the simple expressions on which the expression depends in the
+/// `symbol_resolve` map. A simple expression is either a symbol or a
+/// constant array
+/// \param expr: an expression
+static void depends_in_symbol_map(const exprt &expr, std::vector<exprt> &accu)
+{
+  if(expr.id()==ID_if)
+  {
+    if_exprt if_expr=to_if_expr(expr);
+    depends_in_symbol_map(if_expr.true_case(), accu);
+    depends_in_symbol_map(if_expr.false_case(), accu);
+  }
+  else if(expr.id()==ID_struct)
+  {
+    string_exprt str=to_string_expr(expr);
+    depends_in_symbol_map(str.content(), accu);
+  }
+  else
+  {
+    INVARIANT(
+      expr.id()==ID_symbol || expr.id()==ID_array || expr.id()==ID_array_of,
+      "leaf in symbol resolve should be a symbol or a constant array");
+    accu.push_back(expr);
+  }
+}
+
 /// keeps a map of symbols to expressions, such as none of the mapped values
 /// exist as a key
 /// \param lhs: a symbol expression
-/// \param rhs: an expression to map it to
+/// \param rhs: an expression to map it to, which should be either a symbol
+///             a string_exprt, an array_exprt, an array_of_exprt or an
+///             if_exprt with branches of the previous kind
 void string_refinementt::add_symbol_to_symbol_map(
   const exprt &lhs, const exprt &rhs)
 {
   PRECONDITION(lhs.id()==ID_symbol);
+  PRECONDITION(rhs.id()==ID_symbol ||
+               rhs.id()==ID_array ||
+               rhs.id()==ID_array_of ||
+               rhs.id()==ID_if ||
+               (rhs.id()==ID_struct &&
+                refined_string_typet::is_refined_string_type(rhs.type())));
 
   // We insert the mapped value of the rhs, if it exists.
   auto it=symbol_resolve.find(rhs);
   const exprt &new_rhs=it!=symbol_resolve.end()?it->second:rhs;
-
   symbol_resolve[lhs]=new_rhs;
-  reverse_symbol_resolve[new_rhs].push_back(lhs);
 
-  const std::list<exprt> &symbols_to_update_with_new_rhs(
-    reverse_symbol_resolve[lhs]);
-  for(exprt item : symbols_to_update_with_new_rhs)
+  // List the leaves of new_rhs
+  std::vector<exprt> leaves;
+  depends_in_symbol_map(new_rhs, leaves);
+
+  const auto &symbols_to_update_with_new_rhs=reverse_symbol_resolve[lhs];
+
+  // We need to update all the symbols which depend on lhs
+  for(const exprt &item : symbols_to_update_with_new_rhs)
+    replace_expr(symbol_resolve, symbol_resolve[item]);
+
+  // Every time a symbol at the leaves is updated we need to update lhs
+  // and the symbols that depend on it
+  for(const auto &leaf : leaves)
   {
-    symbol_resolve[item]=new_rhs;
-    reverse_symbol_resolve[new_rhs].push_back(item);
+    reverse_symbol_resolve[leaf].push_back(lhs);
+    for(const exprt &item : symbols_to_update_with_new_rhs)
+      reverse_symbol_resolve[leaf].push_back(item);
   }
 }
 
@@ -158,9 +201,6 @@ void string_refinementt::set_char_array_equality(
       index_exprt arraycell(rhs, from_integer(i, index_type));
       equal_exprt arrayeq(arraycell, rhs.operands()[i]);
       add_lemma(arrayeq, false);
-#if 0
-      generator.axioms.push_back(arrayeq);
-#endif
     }
   }
   // At least for Java (as it is currently pre-processed), we need not consider
@@ -205,7 +245,8 @@ bool string_refinementt::is_char_array(const typet &type) const
 /// add lemmas to the solver corresponding to the given equation
 /// \param lhs: left hand side of an equality expression
 /// \param rhs: right and side of the equality
-/// \return false if the lemmas were added successfully, true otherwise
+/// \return true if the assignemnt needs to be handled by the parent class
+///         via `set_to`
 bool string_refinementt::add_axioms_for_string_assigns(
   const exprt &lhs, const exprt &rhs)
 {
@@ -225,8 +266,8 @@ bool string_refinementt::add_axioms_for_string_assigns(
     }
     else if(rhs.id()==ID_if)
     {
-      generator.add_axioms_for_if_array(lhs, to_if_expr(rhs));
-      return false;
+      add_symbol_to_symbol_map(lhs, rhs);
+      return true;
     }
     else
     {
@@ -632,7 +673,7 @@ void string_refinementt::add_lemma(
 /// \return an array expression or an array_of_exprt
 exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 {
-  exprt arr_val=get_array(arr);
+  exprt arr_val=simplify_expr(get_array(arr), ns);
   exprt size_val=supert::get(size);
   size_val=simplify_expr(size_val, ns);
   typet char_type=arr.type().subtype();
@@ -1412,6 +1453,30 @@ void string_refinementt::update_index_set(const std::vector<exprt> &cur)
     update_index_set(axiom);
 }
 
+/// An expression representing an array of characters can be in the form of an
+/// if expression for instance `cond?array1:(cond2:array2:array3)`.
+/// We return all the array expressions contained in `array_expr`.
+/// \param array_expr : an expression representing an array
+/// \return a vector containing symbols and constant arrays contained in the
+///         expression
+static std::vector<exprt> sub_arrays(const exprt &array_expr)
+{
+  if(array_expr.id()==ID_if)
+  {
+    std::vector<exprt> res1=sub_arrays(to_if_expr(array_expr).true_case());
+    std::vector<exprt> res2=sub_arrays(to_if_expr(array_expr).false_case());
+    res1.insert(res1.end(), res2.begin(), res2.end());
+    return res1;
+  }
+  else
+  {
+    INVARIANT(
+      array_expr.id()==ID_symbol || array_expr.id()==ID_array,
+      "character arrays should be symbol, constant array, or if expression");
+    return std::vector<exprt>(1, array_expr);
+  }
+}
+
 /// add to the index set all the indices that appear in the formula and the
 /// upper bound minus one
 /// \par parameters: a string constraint
@@ -1423,17 +1488,13 @@ void string_refinementt::add_to_index_set(const exprt &s, exprt i)
     mp_integer mpi;
     to_integer(i, mpi);
     if(mpi<0)
-    {
-      debug() << "add_to_index_set : ignoring negative number " << mpi << eom;
       return;
-    }
   }
-  if(index_set[s].insert(i).second)
-  {
-    debug() << "adding to index set of " << from_expr(ns, "", s)
-            << ": " << from_expr(ns, "", i) << eom;
-    current_index_set[s].insert(i);
-  }
+
+  std::vector<exprt> subs=sub_arrays(s);
+  for(const auto &sub : subs)
+    if(index_set[sub].insert(i).second)
+      current_index_set[sub].insert(i);
 }
 
 void string_refinementt::initial_index_set(const string_constraintt &axiom)
@@ -1503,7 +1564,6 @@ void string_refinementt::update_index_set(const exprt &formula)
     }
   }
 }
-
 
 // Will be used to visit an expression and return the index used
 // with the given char array that contains qvar

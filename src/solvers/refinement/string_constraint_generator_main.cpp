@@ -24,7 +24,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/arith_tools.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
-#include <iostream>
 
 unsigned string_constraint_generatort::next_symbol_id=1;
 
@@ -232,6 +231,25 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   else if(string.id()==ID_struct)
   {
     const string_exprt &s=to_string_expr(string);
+    INVARIANT(
+      s.length().id()==ID_symbol || s.length().id()==ID_constant,
+      "string length should be a symbol or a constant");
+    irep_idt content_id=s.content().id();
+    INVARIANT(
+      content_id==ID_symbol || content_id==ID_array || content_id==ID_if,
+      "string content should be a symbol, a constant array, or an if");
+    if(content_id==ID_if)
+    {
+      // If the string content is an if expression, we add axioms ensuring
+      // the content is the same as the content in the 'true' branch when the
+      // condition holds and the 'false' branch otherwise.
+      if_exprt if_expr=to_if_expr(s.content());
+      string_exprt str_true=add_axioms_for_refined_string(
+        string_exprt(s.length(), if_expr.true_case(), type));
+      string_exprt str_false=add_axioms_for_refined_string(
+        string_exprt(s.length(), if_expr.false_case(), type));
+      return add_axioms_for_if(if_exprt(if_expr.cond(), str_true, str_false));
+    }
     add_default_axioms(s);
     return s;
   }
@@ -267,54 +285,15 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
     implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
-  axioms.push_back(string_constraintt(qvar, t.length(), expr.cond(), qequal));
+  string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
+  axioms.push_back(sc1);
   axioms.push_back(
     implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
-  string_constraintt sc2(qvar2, f.length(), not_exprt(expr.cond()), qequal2);
+  string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
   axioms.push_back(sc2);
   return res;
-}
-
-/// Add axioms enforcing that the content of the first array is equal to
-/// the true case array if the condition is true and
-/// the else case array otherwise.
-/// \param lhs: an expression
-/// \param expr: an if expression of type array
-void string_constraint_generatort::add_axioms_for_if_array(
-  const exprt &lhs, const if_exprt &expr)
-{
-  PRECONDITION(lhs.type()==expr.type());
-  PRECONDITION(expr.type().id()==ID_array);
-  exprt t=expr.true_case();
-  exprt f=expr.false_case();
-  INVARIANT(t.type()==f.type(), "branches of if_exprt should have same type");
-  const array_typet &type=to_array_type(t.type());
-  const typet &index_type=type.size().type();
-  const exprt max_length=from_integer(max_string_length, index_type);
-
-  // We add axioms:
-  // a1 : forall qvar<max_length, cond => lhs[qvar] = t[qvar]
-  // a1 : forall qvar2<max_length, !cond => lhs[qvar] = f[qvar]
-  symbol_exprt qvar=fresh_univ_index("QA_array_if_true", index_type);
-  equal_exprt qequal(index_exprt(lhs, qvar), index_exprt(t, qvar));
-
-  // In case t is a constant array of fixed length is does not make sense
-  // to talk about indexes exceeding this length
-  exprt upper_bound_t=
-    (t.id()==ID_array)?from_integer(t.operands().size(), index_type):max_length;
-  string_constraintt a1(qvar, upper_bound_t, expr.cond(), qequal);
-  axioms.push_back(a1);
-
-  symbol_exprt qvar2=fresh_univ_index("QA_array_if_false", index_type);
-  equal_exprt qequal2(index_exprt(lhs, qvar2), index_exprt(f, qvar2));
-  // In case f is a constant array of fixed length is does not make sense
-  // to talk about indexes exceeding this length
-  exprt upper_bound_f=
-    (f.id()==ID_array)?from_integer(f.operands().size(), index_type):max_length;
-  string_constraintt a2(qvar2, upper_bound_f, not_exprt(expr.cond()), qequal2);
-  axioms.push_back(a2);
 }
 
 /// if a symbol representing a string is present in the symbol_to_string table,
