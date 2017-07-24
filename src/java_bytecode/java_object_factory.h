@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 #define CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
 
-#include <memory>
-
 #include <util/message.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
@@ -36,7 +34,7 @@ exprt object_factory(
   size_t max_nondet_array_length,
   allocation_typet alloc_type,
   const source_locationt &location,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector);
+  const select_pointer_typet &pointer_type_selector);
 
 exprt object_factory(
   const typet &type,
@@ -64,7 +62,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector,
+  const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place);
 
 void gen_nondet_init(

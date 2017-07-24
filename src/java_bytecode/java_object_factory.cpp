@@ -10,7 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 #include <sstream>
-#include <memory>
 
 #include <util/arith_tools.h>
 #include <util/fresh_symbol.h>
@@ -61,7 +60,7 @@ class java_object_factoryt
   /// Resolves pointer types potentially using some heuristics for example
   /// to replace pointers to interface types with pointers to concrete
   /// implementations.
-  std::shared_ptr<select_pointer_typet> pointer_type_selector;
+  const select_pointer_typet &pointer_type_selector;
 
   void set_null(
     const exprt &expr,
@@ -92,7 +91,7 @@ public:
     bool _assume_non_null,
     size_t _max_nondet_array_length,
     symbol_tablet &_symbol_table,
-    std::shared_ptr<select_pointer_typet> pointer_type_selector):
+    const select_pointer_typet &pointer_type_selector):
       symbols_created(_symbols_created),
       loc(loc),
       assume_non_null(_assume_non_null),
@@ -413,7 +412,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const update_in_placet &update_in_place)
 {
   const pointer_typet &replacement_pointer_type=
-    pointer_type_selector->convert_pointer_type(pointer_type);
+    pointer_type_selector.convert_pointer_type(pointer_type);
 
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
@@ -967,7 +966,7 @@ exprt object_factory(
   size_t max_nondet_array_length,
   allocation_typet alloc_type,
   const source_locationt &loc,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -1043,7 +1042,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector,
+  const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
   std::vector<const symbolt *> symbols_created;
@@ -1082,6 +1081,7 @@ exprt object_factory(const typet &type,
   allocation_typet alloc_type,
   const source_locationt &location)
 {
+  select_pointer_typet pointer_type_selector;
   return object_factory(
     type,
     base_name,
@@ -1091,7 +1091,7 @@ exprt object_factory(const typet &type,
     max_nondet_array_length,
     alloc_type,
     location,
-    std::make_shared<select_pointer_typet>());
+    pointer_type_selector);
 }
 
 /// Call gen_nondet_init with a default (identity) pointer_type_selector
@@ -1105,6 +1105,7 @@ void gen_nondet_init(const exprt &expr,
   size_t max_nondet_array_length,
   update_in_placet update_in_place)
 {
+  select_pointer_typet pointer_type_selector;
   gen_nondet_init(
     expr,
     init_code,
@@ -1114,6 +1115,6 @@ void gen_nondet_init(const exprt &expr,
     alloc_type,
     assume_non_null,
     max_nondet_array_length,
-    std::make_shared<select_pointer_typet>(),
+    pointer_type_selector,
     update_in_place);
 }
