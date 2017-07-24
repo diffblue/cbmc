@@ -94,10 +94,6 @@ private:
   std::map<exprt, exprt_listt> reverse_symbol_resolve;
   std::list<std::pair<exprt, bool>> non_string_axioms;
 
-  // Valuation in the current model of the symbols that have been created
-  // by the solver
-  replace_mapt current_model;
-
   // Length of char arrays found during concretization
   std::map<exprt, exprt> found_length;
   // Content of char arrays found during concretization
@@ -127,7 +123,7 @@ private:
     const exprt &val,
     const symbol_exprt &univ_var);
   exprt negation_of_constraint(const string_constraintt &axiom);
-  void fill_model();
+  void debug_model();
   bool check_axioms();
   bool is_axiom_sat(
     const exprt &axiom, const symbol_exprt& var, exprt &witness);
