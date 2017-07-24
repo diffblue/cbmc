@@ -22,7 +22,7 @@ const char *irep_ids_table[]=
 
 #include "irep_ids.def"
 
-  NULL,
+  nullptr,
 };
 
 #ifdef USE_DSTRING
@@ -47,7 +47,7 @@ void initialize_string_container()
 {
   // this is called by the constructor of string_containert
 
-  for(unsigned i=0; irep_ids_table[i]!=NULL; i++)
+  for(unsigned i=0; irep_ids_table[i]!=nullptr; i++)
   {
     unsigned x;
     x=string_container[irep_ids_table[i]];

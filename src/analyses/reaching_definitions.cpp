@@ -51,7 +51,7 @@ void rd_range_domaint::transform(
 {
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);
-  assert(rd!=0);
+  assert(rd!=nullptr);
 
   assert(bv_container);
 
@@ -298,7 +298,7 @@ void rd_range_domaint::transform_assign(
     const symbolt *symbol_ptr;
     if(ns.lookup(identifier, symbol_ptr))
       continue;
-    assert(symbol_ptr!=0);
+    assert(symbol_ptr!=nullptr);
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 

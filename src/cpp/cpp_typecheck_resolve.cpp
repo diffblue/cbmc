@@ -1117,7 +1117,7 @@ symbol_typet cpp_typecheck_resolvet::disambiguate_template_classes(
       static_cast<cpp_scopet *>(
         cpp_typecheck.cpp_scopes.id_map[id]);
 
-    if(template_scope==NULL)
+    if(template_scope==nullptr)
     {
       cpp_typecheck.error().source_location=source_location;
       cpp_typecheck.error() << "template identifier: " << id << '\n'
@@ -1959,7 +1959,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     static_cast<cpp_scopet *>(
       cpp_typecheck.cpp_scopes.id_map[template_identifier]);
 
-  if(template_scope==NULL)
+  if(template_scope==nullptr)
   {
     cpp_typecheck.error().source_location=source_location;
     cpp_typecheck.error() << "template identifier: "
