@@ -51,9 +51,10 @@ void rd_range_domaint::transform(
 {
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);
-  INVARIANT(
+  INVARIANT_STRUCTURED(
     rd!=nullptr,
-    bad_cast_exceptiont("ai has type reaching_definitions_analysist"));
+    bad_cast_exceptiont,
+    "ai has type reaching_definitions_analysist");
 
   assert(bv_container);
 
@@ -300,9 +301,10 @@ void rd_range_domaint::transform_assign(
     const symbolt *symbol_ptr;
     if(ns.lookup(identifier, symbol_ptr))
       continue;
-    INVARIANT(
+    INVARIANT_STRUCTURED(
       symbol_ptr!=nullptr,
-      nullptr_exceptiont("Symbol is in symbol table"));
+      nullptr_exceptiont,
+      "Symbol is in symbol table");
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 

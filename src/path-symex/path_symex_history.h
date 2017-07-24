@@ -15,13 +15,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <limits>
 
+#include <util/base_exceptions.h>
 #include <util/std_expr.h>
 
 #include "loc_ref.h"
 
 class path_symex_stept;
-
-#define nullptr_exceptiont(str) str
 
 // This is a reference to a path_symex_stept,
 // and is really cheap to copy. These references are stable,
@@ -48,7 +47,8 @@ public:
 
   path_symex_historyt &get_history() const
   {
-    INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
+    INVARIANT_STRUCTURED(
+      history!=nullptr, nullptr_exceptiont, "history is null");
     return *history;
   }
 
@@ -156,7 +156,8 @@ public:
 
 inline void path_symex_step_reft::generate_successor()
 {
-  INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
+  INVARIANT_STRUCTURED(
+    history!=nullptr, nullptr_exceptiont, "history is null");
   path_symex_step_reft old=*this;
   index=history->step_container.size();
   history->step_container.push_back(path_symex_stept());
@@ -171,7 +172,8 @@ inline path_symex_step_reft &path_symex_step_reft::operator--()
 
 inline path_symex_stept &path_symex_step_reft::get() const
 {
-  INVARIANT(history!=nullptr, nullptr_exceptiont("history is null"));
+  INVARIANT_STRUCTURED(
+    history!=nullptr, nullptr_exceptiont, "history is null");
   assert(!is_nil());
   return history->step_container[index];
 }

@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/base_exceptions.h>
 #include <util/simplify_expr.h>
 
 #include <util/c_types.h>
@@ -130,8 +131,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
-  INVARIANT(
-    template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
+  INVARIANT_STRUCTURED(
+    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
   irep_idt identifier=
     id2string(template_scope->prefix)+
@@ -285,8 +286,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
-  INVARIANT(
-    template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
+  INVARIANT_STRUCTURED(
+    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);

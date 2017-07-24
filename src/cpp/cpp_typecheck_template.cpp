@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <util/base_exceptions.h>
 #include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"
@@ -910,8 +911,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
       cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-      INVARIANT(
-        template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
+      INVARIANT_STRUCTURED(
+        template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
       cpp_scopes.go_to(*template_scope);
     }
 
@@ -961,9 +962,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-        INVARIANT(
+        INVARIANT_STRUCTURED(
           template_scope!=nullptr,
-          nullptr_exceptiont("template_scope is null"));
+          nullptr_exceptiont,
+          "template_scope is null");
         cpp_scopes.go_to(*template_scope);
         typecheck_type(type);
       }

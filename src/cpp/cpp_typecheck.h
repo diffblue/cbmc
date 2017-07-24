@@ -30,8 +30,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 #include "cpp_util.h"
 
-#define nullptr_exceptiont(str) str
-
 bool cpp_typecheck(
   cpp_parse_treet &cpp_parse_tree,
   symbol_tablet &symbol_table,

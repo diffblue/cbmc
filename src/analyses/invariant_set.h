@@ -22,8 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interval_template.h"
 
-#define nullptr_exceptiont(str) str
-
 class inv_object_storet
 {
 public:

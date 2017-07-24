@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iostream>
 
+#include <util/base_exceptions.h>
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/arith_tools.h>
@@ -315,8 +316,8 @@ void invariant_sett::output(
     return;
   }
 
-  INVARIANT(
-    object_store!=nullptr, nullptr_exceptiont("Object store is null"));
+  INVARIANT_STRUCTURED(
+    object_store!=nullptr, nullptr_exceptiont, "Object store is null");
 
   for(unsigned i=0; i<eq_set.size(); i++)
     if(eq_set.is_root(i) &&
