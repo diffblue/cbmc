@@ -79,7 +79,7 @@ void java_static_lifetime_init(
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
   unsigned max_nondet_array_length,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector)
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
@@ -141,7 +141,7 @@ exprt::operandst java_build_arguments(
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -467,7 +467,7 @@ bool java_entry_point(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
-  std::shared_ptr<select_pointer_typet> pointer_type_selector)
+  const select_pointer_typet &pointer_type_selector)
 {
   // check if the entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
