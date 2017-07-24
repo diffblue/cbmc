@@ -22,10 +22,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 goto_symex_statet::goto_symex_statet():
   depth(0),
-  symex_target(nullptr),
+  symex_target(NULL),
   atomic_section_id(0),
   record_events(true),
-  dirty(nullptr)
+  dirty(0)
 {
   threads.resize(1);
   new_frame();
@@ -541,7 +541,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // is it a shared object?
-  INVARIANT(dirty!=nullptr, nullptr_exceptiont("dirty is null"));
+  assert(dirty!=0);
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&
@@ -666,7 +666,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   expr=ssa_l1;
 
   // and record that
-  INVARIANT(symex_target!=nullptr, nullptr_exceptiont("symex_target is null"));
+  assert(symex_target!=NULL);
   symex_target->shared_read(
     guard.as_expr(),
     expr,
@@ -685,7 +685,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
-  INVARIANT(dirty!=nullptr, nullptr_exceptiont("dirty is null"));
+  assert(dirty!=0);
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&

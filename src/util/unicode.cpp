@@ -154,12 +154,12 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
 
 const char **narrow_argv(int argc, const wchar_t **argv_wide)
 {
-  if(argv_wide==nullptr)
-    return nullptr;
+  if(argv_wide==NULL)
+    return NULL;
 
   // the following never gets deleted
   const char **argv_narrow=new const char *[argc+1];
-  argv_narrow[argc]=nullptr;
+  argv_narrow[argc]=0;
 
   for(int i=0; i<argc; i++)
     argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());

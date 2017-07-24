@@ -70,7 +70,7 @@ void interpretert::command()
 {
   #define BUFSIZE 100
   char command[BUFSIZE];
-  if(fgets(command, BUFSIZE-1, stdin)==nullptr)
+  if(fgets(command, BUFSIZE-1, stdin)==NULL)
   {
     done=true;
     return;

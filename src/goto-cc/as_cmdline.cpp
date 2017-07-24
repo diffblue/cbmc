@@ -23,7 +23,7 @@ const char *goto_as_options_with_argument[]=
   "--function",
   "--native-assembler",
   "--print-rejected-preprocessed-source",
-  nullptr
+  NULL
 };
 
 const char *as_options_without_argument[]=
@@ -59,7 +59,7 @@ const char *as_options_without_argument[]=
   "--32", // i386
   "--64", // i386
   "-n", // i386
-  nullptr
+  NULL
 };
 
 const char *as_options_with_argument[]=
@@ -74,7 +74,7 @@ const char *as_options_with_argument[]=
   "-o",
   "-march", // i386
   "-mtune", // i386
-  nullptr
+  NULL
 };
 
 bool as_cmdlinet::parse(int argc, const char **argv)
@@ -104,7 +104,7 @@ bool as_cmdlinet::parse(int argc, const char **argv)
 
     // separated only, and also allow concatenation with "="
     for(const char **o=goto_as_options_with_argument;
-        *o!=nullptr && !found;
+        *o!=NULL && !found;
         ++o)
     {
       std::string os(*o);
@@ -170,7 +170,7 @@ bool as_cmdlinet::parse(int argc, const char **argv)
     }
 
     for(const char **o=as_options_with_argument;
-        *o!=nullptr && !found;
+        *o!=NULL && !found;
         ++o)
     {
       std::string os(*o);

@@ -454,18 +454,18 @@ void value_set_fivrnst::get_value_set_rec(
     if(expr.type().id()==ID_pointer)
     {
       // find the pointer operand
-      const exprt *ptr_operand=nullptr;
+      const exprt *ptr_operand=NULL;
 
       forall_operands(it, expr)
         if(it->type().id()==ID_pointer)
         {
-          if(ptr_operand==nullptr)
+          if(ptr_operand==NULL)
             ptr_operand=&(*it);
           else
             throw "more than one pointer operand in pointer arithmetic";
         }
 
-      if(ptr_operand==nullptr)
+      if(ptr_operand==NULL)
         throw "pointer type sum expected to have pointer operand";
 
       object_mapt pointer_expr_set;

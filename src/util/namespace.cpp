@@ -127,10 +127,10 @@ unsigned namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  if(symbol_table1!=nullptr)
+  if(symbol_table1!=NULL)
     m=std::max(m, ::get_max(prefix, symbol_table1->symbols));
 
-  if(symbol_table2!=nullptr)
+  if(symbol_table2!=NULL)
     m=std::max(m, ::get_max(prefix, symbol_table2->symbols));
 
   return m;
@@ -142,7 +142,7 @@ bool namespacet::lookup(
 {
   symbol_tablet::symbolst::const_iterator it;
 
-  if(symbol_table1!=nullptr)
+  if(symbol_table1!=NULL)
   {
     it=symbol_table1->symbols.find(name);
 
@@ -153,7 +153,7 @@ bool namespacet::lookup(
     }
   }
 
-  if(symbol_table2!=nullptr)
+  if(symbol_table2!=NULL)
   {
     it=symbol_table2->symbols.find(name);
 

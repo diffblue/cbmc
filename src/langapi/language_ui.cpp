@@ -68,7 +68,7 @@ bool language_uit::parse(const std::string &filename)
   lf.filename=filename;
   lf.language=get_language_from_filename(filename);
 
-  if(lf.language==nullptr)
+  if(lf.language==NULL)
   {
     source_locationt location;
     location.set_file(filename);
@@ -172,7 +172,7 @@ void language_uit::show_symbol_table_plain(
     else
     {
       ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
+      if(ptr==NULL)
         throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 

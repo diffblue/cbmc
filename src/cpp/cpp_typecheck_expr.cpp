@@ -471,7 +471,7 @@ struct operator_entryt
   { ID_notequal, "!=" },
   { ID_dereference, "*" },
   { ID_ptrmember, "->" },
-  { irep_idt(), nullptr }
+  { irep_idt(), NULL }
 };
 
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)

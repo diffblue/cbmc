@@ -29,7 +29,7 @@ const char *goto_cc_options_with_separated_argument[]=
   "--native-compiler",
   "--native-linker",
   "--print-rejected-preprocessed-source",
-  nullptr
+  NULL
 };
 
 // non-gcc options
@@ -52,7 +52,7 @@ const char *goto_cc_options_without_argument[]=
   "--no-arch",
   "--partial-inlining",
   "-?",
-  nullptr
+  NULL
 };
 
 // separated or concatenated
@@ -75,7 +75,7 @@ const char *gcc_options_with_argument[]=
   "-U",
   "-u", // goes to linker
   "-T", // goes to linker
-  nullptr
+  NULL
 };
 
 const char *gcc_options_with_separated_argument[]=
@@ -107,7 +107,7 @@ const char *gcc_options_with_separated_argument[]=
   "-current_version", // on the Mac
   "-compatibility_version",  // on the Mac
   "-z",
-  nullptr
+  NULL
 };
 
 const char *gcc_options_with_concatenated_argument[]=
@@ -115,7 +115,7 @@ const char *gcc_options_with_concatenated_argument[]=
   "-d",
   "-g",
   "-A",
-  nullptr
+  NULL
 };
 
 const char *gcc_options_without_argument[]=
@@ -209,7 +209,7 @@ const char *gcc_options_without_argument[]=
   "-EB",
   "-EL",
   "-fast", // Apple only
-  nullptr
+  NULL
 };
 
 bool gcc_cmdlinet::parse(int argc, const char **argv)
@@ -282,7 +282,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // separated only, and also allow concatenation with "="
       for(const char **o=goto_cc_options_with_separated_argument;
-          *o!=nullptr && !found;
+          *o!=NULL && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -354,7 +354,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // separated only, and also allow concatenation with "="
       for(const char **o=gcc_options_with_separated_argument;
-          *o!=nullptr && !found;
+          *o!=NULL && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -380,7 +380,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // concatenated _or_ separated, e.g., -I
       for(const char **o=gcc_options_with_argument;
-          *o!=nullptr && !found;
+          *o!=NULL && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -405,7 +405,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // concatenated only
       for(const char **o=gcc_options_with_concatenated_argument;
-          *o!=nullptr && !found;
+          *o!=NULL && !found;
           ++o)
       {
         if(has_prefix(argv_i, *o)) // concatenated

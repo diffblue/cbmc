@@ -133,7 +133,7 @@ public:
   // constructors, destructor
 
   messaget():
-    message_handler(nullptr),
+    message_handler(NULL),
     mstream(M_DEBUG, *this)
   {
   }

@@ -37,7 +37,7 @@ public:
     const namespacet &_ns,
     const optionst &_options):
     ns(_ns),
-    local_bitvector_analysis(nullptr)
+    local_bitvector_analysis(0)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");

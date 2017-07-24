@@ -38,7 +38,7 @@ bool model_argc_argv(
   messaget message(message_handler);
   const namespacet ns(symbol_table);
 
-  const symbolt *init_symbol=nullptr;
+  const symbolt *init_symbol=0;
   if(ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
   {
     message.error() << "Linking not done, missing "

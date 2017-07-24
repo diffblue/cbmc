@@ -430,7 +430,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
   // the loop avoids recursion
   while(true)
   {
-    const exprt *next=nullptr;
+    const exprt *next=0;
 
     if(current->id()==ID_symbol)
     {
@@ -465,7 +465,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
       return false;
 
     // next round
-    INVARIANT(next!=nullptr, nullptr_exceptiont("next is null"));
+    assert(next!=0);
     current=next;
   }
 }

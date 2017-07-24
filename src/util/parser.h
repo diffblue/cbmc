@@ -39,7 +39,7 @@ public:
     last_line.clear();
   }
 
-  parsert():in(nullptr) { clear(); }
+  parsert():in(NULL) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner
