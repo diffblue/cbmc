@@ -910,7 +910,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
       cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-      assert(template_scope!=NULL);
+      INVARIANT(
+        template_scope!=nullptr, nullptr_exceptiont("template_scope is null"));
       cpp_scopes.go_to(*template_scope);
     }
 
@@ -960,7 +961,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-        assert(template_scope!=NULL);
+        INVARIANT(
+          template_scope!=nullptr,
+          nullptr_exceptiont("template_scope is null"));
         cpp_scopes.go_to(*template_scope);
         typecheck_type(type);
       }

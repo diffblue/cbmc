@@ -26,6 +26,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class dirtyt;
 
+#define nullptr_exceptiont(str) str
+
 // central data structure: state
 class goto_symex_statet
 {

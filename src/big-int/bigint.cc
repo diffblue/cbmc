@@ -266,7 +266,7 @@ digit_div (onedig_t *r, const onedig_t *y, unsigned yl, onedig_t *q, unsigned ql
 	  --qh;
 	  add_back (r, y, yl);
 	}
-      if (q != 0)
+      if (q != nullptr)
 	q[i] = qh;
     }
 }
@@ -580,7 +580,7 @@ char *
 BigInt::as_string (char *p, unsigned l, onedig_t b) const
 {
   if (l < 2)
-    return 0;				// Not enough room for number.
+    return nullptr;				// Not enough room for number.
   p[--l] = '\0';
   // Check for zero. Would otherwise print as empty string.
   unsigned len = length;
@@ -598,7 +598,7 @@ BigInt::as_string (char *p, unsigned l, onedig_t b) const
   do
     {
       if (l == 0)
-	return 0;
+	return nullptr;
       onedig_t r = digit_div (dig, len, b);
       p[--l] = r < 10 ? r + '0' : 'A' + r - 10;
       if (dig[len-1] == 0)
@@ -608,7 +608,7 @@ BigInt::as_string (char *p, unsigned l, onedig_t b) const
   // Maybe attach sign.
   if (!positive){
     if (l == 0)
-      return 0;
+      return nullptr;
     else
       p[--l] = '-';
   }
@@ -1268,7 +1268,7 @@ BigInt::operator%= (BigInt const &y)
 	}
       if (a[al-1] >= b[bl-1])
 	a[al++] = 0;
-      digit_div (a, b, bl, 0, al - bl);
+      digit_div (a, b, bl, nullptr, al - bl);
       length = bl;
       adjust();
       if (scale != 1)

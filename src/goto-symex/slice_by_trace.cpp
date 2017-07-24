@@ -187,9 +187,9 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
 {
   if(read_line=="")
     return;
-  bool parity=strstr(read_line.c_str(), "!")==NULL;
-  bool universe=strstr(read_line.c_str(), "?")!=NULL;
-  bool has_values=strstr(read_line.c_str(), " ")!=NULL;
+  bool parity=strstr(read_line.c_str(), "!")==nullptr;
+  bool universe=strstr(read_line.c_str(), "?")!=nullptr;
+  bool has_values=strstr(read_line.c_str(), " ")!=nullptr;
   std::cout << "Trace: " << read_line << '\n';
   std::vector<irep_idt> value_v;
   if(has_values)

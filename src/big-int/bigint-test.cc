@@ -161,7 +161,7 @@ static void
 run_clisp_tests (char const *fn)
 {
   FILE *f = fopen (fn, "rt");
-  if (f == 0)
+  if (f == nullptr)
     {
       fprintf (stderr, "Error opening %s: %s.\n", fn, strerror (errno));
       return;

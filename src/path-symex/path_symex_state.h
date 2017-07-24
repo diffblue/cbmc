@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "var_map.h"
 #include "path_symex_history.h"
 
+#define nullptr_exceptiont(str) str
+
 struct path_symex_statet
 {
 public:

@@ -2,7 +2,7 @@
 
 // inline functions
 
-inline mini_bddt::mini_bddt():node(0)
+inline mini_bddt::mini_bddt():node(nullptr)
 {
 }
 
@@ -82,7 +82,7 @@ inline void mini_bddt::clear()
   if(is_initialized())
   {
     node->remove_reference();
-    node=NULL;
+    node=nullptr;
   }
 }
 

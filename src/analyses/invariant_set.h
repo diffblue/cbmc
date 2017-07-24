@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interval_template.h"
 
+#define nullptr_exceptiont(str) str
+
 class inv_object_storet
 {
 public:
@@ -98,9 +100,9 @@ public:
   invariant_sett():
     threaded(false),
     is_false(false),
-    value_sets(NULL),
-    object_store(NULL),
-    ns(NULL)
+    value_sets(nullptr),
+    object_store(nullptr),
+    ns(nullptr)
   {
   }
 

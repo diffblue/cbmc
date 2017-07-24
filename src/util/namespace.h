@@ -64,7 +64,7 @@ class namespacet:public namespace_baset
 public:
   // constructors
   explicit namespacet(const symbol_tablet &_symbol_table)
-  { symbol_table1=&_symbol_table; symbol_table2=NULL; }
+  { symbol_table1=&_symbol_table; symbol_table2=nullptr; }
 
   namespacet(
     const symbol_tablet &_symbol_table1,
@@ -101,12 +101,12 @@ class multi_namespacet:public namespacet
 {
 public:
   // constructors
-  multi_namespacet():namespacet(NULL, NULL)
+  multi_namespacet():namespacet(nullptr, nullptr)
   {
   }
 
   explicit multi_namespacet(
-    const symbol_tablet &symbol_table):namespacet(NULL, NULL)
+    const symbol_tablet &symbol_table):namespacet(nullptr, nullptr)
   {
     add(symbol_table);
   }
