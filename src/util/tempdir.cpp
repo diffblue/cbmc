@@ -58,7 +58,7 @@ std::string get_temporary_directory(const std::string &name_template)
   #else
     std::string prefixed_name_template="/tmp/";
     const char *TMPDIR_env=getenv("TMPDIR");
-    if(TMPDIR_env!=nullptr)
+    if(TMPDIR_env!=0)
       prefixed_name_template=TMPDIR_env;
     if(*prefixed_name_template.rbegin()!='/')
       prefixed_name_template+='/';

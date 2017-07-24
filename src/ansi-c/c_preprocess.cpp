@@ -344,7 +344,7 @@ bool c_preprocess(
 static bool is_dot_i_file(const std::string &path)
 {
   const char *ext=strrchr(path.c_str(), '.');
-  if(ext==nullptr)
+  if(ext==NULL)
     return false;
   if(std::string(ext)==".i" ||
      std::string(ext)==".ii")
@@ -889,7 +889,7 @@ bool c_preprocess_gcc_clang(
 
   FILE *stream=popen(command.c_str(), "r");
 
-  if(stream!=nullptr)
+  if(stream!=NULL)
   {
     int ch;
     while((ch=fgetc(stream))!=EOF)
@@ -1011,7 +1011,7 @@ bool c_preprocess_arm(
 
   FILE *stream=popen(command.c_str(), "r");
 
-  if(stream!=nullptr)
+  if(stream!=NULL)
   {
     int ch;
     while((ch=fgetc(stream))!=EOF)

@@ -250,7 +250,7 @@ bool clobber_parse_optionst::get_goto_program(
 
       languaget *language=get_language_from_filename(filename);
 
-      if(language==nullptr)
+      if(language==NULL)
       {
         error() << "failed to figure out type of file `" <<  filename << "'"
                 << eom;

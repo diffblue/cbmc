@@ -14,14 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
-  language(rhs.language==nullptr?nullptr:rhs.language->new_language()),
+  language(rhs.language==NULL?NULL:rhs.language->new_language()),
   filename(rhs.filename)
 {
 }
 
 language_filet::~language_filet()
 {
-  if(language!=nullptr)
+  if(language!=NULL)
     delete language;
 }
 

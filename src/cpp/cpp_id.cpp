@@ -24,7 +24,7 @@ cpp_idt::cpp_idt():
   id_class(id_classt::UNKNOWN),
   this_expr(static_cast<const exprt &>(get_nil_irep())),
   compound_counter(0),
-  parent(nullptr)
+  parent(NULL)
 {
 }
 

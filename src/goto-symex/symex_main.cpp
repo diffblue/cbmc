@@ -158,7 +158,7 @@ void goto_symext::operator()(
   }
 
   delete state.dirty;
-  state.dirty=nullptr;
+  state.dirty=0;
 }
 
 /// symex starting from given program

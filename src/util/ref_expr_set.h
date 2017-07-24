@@ -35,7 +35,7 @@ public:
 
   bool empty() const
   {
-    if(d==nullptr)
+    if(d==NULL)
       return true;
     return d->expr_set.empty();
   }
@@ -52,13 +52,13 @@ public:
 
   bool make_union(const ref_expr_sett &s2)
   {
-    if(s2.d==nullptr)
+    if(s2.d==NULL)
       return false;
 
     if(s2.d==d)
       return false;
 
-    if(d==nullptr)
+    if(d==NULL)
     {
       copy_from(s2);
       return true;

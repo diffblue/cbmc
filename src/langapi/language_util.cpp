@@ -30,7 +30,7 @@ static languaget* get_language(
 
   languaget *ptr=get_language_from_mode(symbol->mode);
 
-  if(ptr==nullptr)
+  if(ptr==NULL)
     throw "symbol `"+id2string(symbol->name)+
       "' has unknown mode '"+id2string(symbol->mode)+"'";
 

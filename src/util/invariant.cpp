@@ -57,7 +57,7 @@ static bool output_demangled_name(
 
     int demangle_success=1;
     char *demangled=
-      abi::__cxa_demangle(mangled.c_str(), nullptr, nullptr, &demangle_success);
+      abi::__cxa_demangle(mangled.c_str(), NULL, 0, &demangle_success);
 
     if(demangle_success==0)
     {

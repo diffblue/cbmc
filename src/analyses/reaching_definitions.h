@@ -26,9 +26,6 @@ class is_threadedt;
 class dirtyt;
 class reaching_definitions_analysist;
 
-#define bad_cast_exceptiont(str) str
-#define nullptr_exceptiont(str) str
-
 // requirement: V has a member "identifier" of type irep_idt
 template<typename V>
 class sparse_bitvector_analysist
@@ -105,7 +102,7 @@ public:
   rd_range_domaint():
     ai_domain_baset(),
     has_values(false),
-    bv_container(nullptr)
+    bv_container(0)
   {
   }
 
@@ -246,9 +243,9 @@ public:
   explicit reaching_definitions_analysist(const namespacet &_ns):
     concurrency_aware_ait<rd_range_domaint>(),
     ns(_ns),
-    value_sets(nullptr),
-    is_threaded(nullptr),
-    is_dirty(nullptr)
+    value_sets(0),
+    is_threaded(0),
+    is_dirty(0)
   {
   }
 
@@ -262,9 +259,7 @@ public:
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
     rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
-    INVARIANT(
-      rd_state!=nullptr,
-      bad_cast_exceptiont("rd_state has type rd_range_domaint"));
+    assert(rd_state!=0);
 
     rd_state->set_bitvector_container(*this);
 

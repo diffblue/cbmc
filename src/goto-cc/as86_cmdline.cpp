@@ -23,7 +23,7 @@ const char *goto_as86_options_with_argument[]=
   "--function",
   "--native-assembler",
   "--print-rejected-preprocessed-source",
-  nullptr
+  NULL
 };
 
 const char *as86_options_without_argument[]=
@@ -40,7 +40,7 @@ const char *as86_options_without_argument[]=
   "-u-", // both -u and -u- seem to be accepted
   "-v",
   "-w-",
-  nullptr
+  NULL
 };
 
 const char *as86_options_with_argument[]=
@@ -52,7 +52,7 @@ const char *as86_options_with_argument[]=
   "-b",
   "-s",
   "-t",
-  nullptr
+  NULL
 };
 
 bool as86_cmdlinet::parse(int argc, const char **argv)
@@ -75,7 +75,7 @@ bool as86_cmdlinet::parse(int argc, const char **argv)
 
     // separated only, and also allow concatenation with "="
     for(const char **o=goto_as86_options_with_argument;
-        *o!=nullptr && !found;
+        *o!=NULL && !found;
         ++o)
     {
       std::string os(*o);
@@ -113,7 +113,7 @@ bool as86_cmdlinet::parse(int argc, const char **argv)
     }
 
     for(const char **o=as86_options_with_argument;
-        *o!=nullptr && !found;
+        *o!=NULL && !found;
         ++o)
     {
       std::string os(*o);

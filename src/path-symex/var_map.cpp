@@ -84,7 +84,7 @@ void var_mapt::init(var_infot &var_info)
     }
     else
     {
-      const symbolt *symbol=nullptr;
+      const symbolt *symbol=0;
       if(ns.lookup(var_info.symbol, symbol))
         throw "var_mapt::init identifier \""
           +id2string(var_info.full_identifier)
