@@ -12,10 +12,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 #include <string>
 #include <sstream>
 
-#ifdef CPROVER_INVARIANT_PRINT_STACK_TRACE
 #include <iostream>
-#include <cstdlib>
-#endif
 
 // Backtraces compiler and C library specific
 // So we should include something explicitly from the C library
@@ -39,7 +36,7 @@ Author: Martin Brain, martin.brain@diffblue.com
 /// \return True <=> the entry has been successfully demangled and printed.
 static bool output_demangled_name(
   std::ostream &out,
-  const char * const stack_entry)
+  const std::string &stack_entry)
 {
   bool return_value=false;
 
@@ -75,40 +72,11 @@ static bool output_demangled_name(
 #endif
 
 
-/// Checks that the given invariant condition holds and prints a back trace
-/// and / or throws an exception depending on build configuration.
-/// Does not return if condition is false.
-/// Returns with no output or state change if true.
-///
-/// \param file : C string giving the name of the file.
-/// \param function : C string giving the name of the function.
-/// \param line : The line number of the invariant
-/// \param condition : The result of evaluating the invariant condition.
-/// \param reason : C string giving the reason why the invariant should be true.
-void check_invariant(
-  const char * const file,
-  const char * const function,
-  const int line,
-  const bool condition,
-  const char * const reason)
+/// Prints a back trace to 'out'
+/// \param out: Stream to print backtrace
+void print_backtrace(
+  std::ostream &out)
 {
-  if(condition)
-    return;
-
-#ifdef CPROVER_INVARIANT_PRINT_STACK_TRACE
-    std::ostream & out(std::cerr);
-#else
-    std::ostringstream out;
-#endif
-
-    // Flush regularly so that errors during output will result in
-    // partial error logs rather than nothing
-    out << "Invariant check failed\n" << std::flush;
-    out << "File " << file
-        << " function " << function
-        << " line " << line
-        << '\n' << std::flush;
-
 #ifdef __GLIBC__
     out << "Backtrace\n" << std::flush;
 
@@ -129,11 +97,39 @@ void check_invariant(
 #else
     out << "Backtraces not supported\n" << std::flush;
 #endif
+}
 
+/// Returns a backtrace
+/// \return backtrace with a file / function / line header.
+std::string get_backtrace()
+{
+  std::ostringstream ostr;
+  print_backtrace(ostr);
+  return ostr.str();
+}
 
-#ifdef CPROVER_INVARIANT_PRINT_STACK_TRACE
-    abort();
-#else
-    throw invariant_failedt(out.str());
-#endif
+/// Dump exception report to stderr
+void report_exception_to_stderr(const invariant_failedt &reason)
+{
+  std::cerr << "--- begin invariant violation report ---\n";
+  std::cerr << reason.what() << '\n';
+  std::cerr << "--- end invariant violation report ---\n";
+}
+
+std::string invariant_failedt::get_invariant_failed_message(
+  const std::string &file,
+  const std::string &function,
+  int line,
+  const std::string &backtrace,
+  const std::string &reason)
+{
+  std::ostringstream out;
+  out << "Invariant check failed\n"
+      << "File " << file
+      << " function " << function
+      << " line " << line << '\n'
+      << "Reason: " << reason
+      << "Backtrace:\n"
+      << backtrace << '\n';
+  return out.str();
 }
