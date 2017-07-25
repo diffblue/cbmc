@@ -1,8 +1,9 @@
-FUTURE
+CORE
 StringValueOf08.class
 --refine-strings --string-max-length 100
 ^EXIT=10$
 ^SIGNAL=0$
+^\[.*assertion\.1\] .* line 7 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

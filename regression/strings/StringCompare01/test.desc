@@ -6,3 +6,5 @@ StringCompare01.class
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Fails because string.regionMatches is not implemented
