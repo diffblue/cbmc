@@ -677,9 +677,6 @@ int cbmc_parse_optionst::get_goto_program(
       }
     }
 
-    if(!binaries.empty())
-      config.set_from_symbol_table(symbol_table);
-
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table();
