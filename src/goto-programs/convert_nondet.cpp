@@ -14,6 +14,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include "goto-programs/goto_model.h"
 #include "goto-programs/remove_skip.h"
 
+#include <memory>
 #include "java_bytecode/java_object_factory.h" // gen_nondet_init
 
 #include "util/irep_ids.h"

@@ -57,6 +57,11 @@ class java_object_factoryt
   symbol_tablet &symbol_table;
   namespacet ns;
 
+  /// Resolves pointer types potentially using some heuristics for example
+  /// to replace pointers to interface types with pointers to concrete
+  /// implementations.
+  const select_pointer_typet &pointer_type_selector;
+
   void set_null(
     const exprt &expr,
     const pointer_typet &ptr_type);
@@ -85,13 +90,15 @@ public:
     const source_locationt &loc,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
-    symbol_tablet &_symbol_table):
+    symbol_tablet &_symbol_table,
+    const select_pointer_typet &pointer_type_selector):
       symbols_created(_symbols_created),
       loc(loc),
       assume_non_null(_assume_non_null),
       max_nondet_array_length(_max_nondet_array_length),
       symbol_table(_symbol_table),
-      ns(_symbol_table)
+      ns(_symbol_table),
+      pointer_type_selector(pointer_type_selector)
   {}
 
   exprt allocate_object(
@@ -404,9 +411,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const pointer_typet &pointer_type,
   const update_in_placet &update_in_place)
 {
-  select_pointer_typet pointer_type_selector(ns);
   const pointer_typet &replacement_pointer_type=
-    pointer_type_selector(pointer_type);
+    pointer_type_selector.convert_pointer_type(pointer_type);
 
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
@@ -942,11 +948,15 @@ static void declare_created_symbols(
 ///   the returned value or its child objects
 /// \param allow_null: if true, may return null; otherwise always
 ///   allocates an object
+/// \param symbol_table: gains any new symbols created, as per gen_nondet_init
+///   above.
 /// \param max_nondet_array_length: upper bound on size of initialised arrays
 /// \param alloc_type: allocation method (global, local or dynamic objects)
 /// \param loc: source location for all generated code
-/// \return `symbol_table` gains any new symbols created, as per gen_nondet_init
-///   above. `init_code`
+/// \param pointer_type_selector: The pointer_selector to use to resolve
+///   pointer types where required.
+/// \return A symbol expression repesenting the new object that has been
+///   created.
 exprt object_factory(
   const typet &type,
   const irep_idt base_name,
@@ -955,7 +965,8 @@ exprt object_factory(
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
   allocation_typet alloc_type,
-  const source_locationt &loc)
+  const source_locationt &loc,
+  const select_pointer_typet &pointer_type_selector)
 {
   irep_idt identifier=id2string(goto_functionst::entry_point())+
     "::"+id2string(base_name);
@@ -981,7 +992,8 @@ exprt object_factory(
     loc,
     !allow_null,
     max_nondet_array_length,
-    symbol_table);
+    symbol_table,
+    pointer_type_selector);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
@@ -1003,22 +1015,24 @@ exprt object_factory(
 /// Initialises a primitive or object tree rooted at `expr`, allocating child
 /// objects as necessary and nondet-initialising their members, or if MAY_ or
 /// MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated objects.
-/// \par parameters: `expr`: lvalue expression to initialise
-/// `loc`: source location for all generated code
-/// `skip_classid`: if true, skip initialising @class_identifier
-/// `create_dyn_objs`: if true, use malloc to allocate objects; otherwise
+/// \param expr: lvalue expression to initialise
+/// \param init_code: gets an instruction sequence to initialise or
+///   reinitialise `expr` and child objects it refers to.
+/// \param symbol_table: is modified with any new symbols created.
+///   This includes any necessary temporaries, and if `create_dyn_objs` is
+///   false, any allocated objects.
+/// \param loc: source location for all generated code
+/// \param skip_classid: if true, skip initialising @class_identifier
+/// \param create_dyn_objs: if true, use malloc to allocate objects; otherwise
 ///   generate fresh static symbols.
-/// `assume_non_null`: never initialise pointer members with null, unless forced
-///   to by recursive datatypes
-/// `message_handler`: logging
-/// `max_nondet_array_length`: upper bound on size of initialised arrays.
-/// `update_in_place`: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
+/// \param assume_non_null: never initialise pointer members with null, unless
+///   forced to by recursive datatypes;
+/// \param max_nondet_array_length: upper bound on size of initialised arrays.
+/// \param pointer_type_selector: The pointer_selector to use to resolve
+///   pointer types where required.
+/// \param update_in_place: NO_UPDATE_IN_PLACE: initialise `expr` from scratch
 ///   MUST_UPDATE_IN_PLACE: reinitialise an existing object MAY_UPDATE_IN_PLACE:
 ///   generate a runtime nondet branch between the NO_ and MUST_ cases.
-/// \return `init_code` gets an instruction sequence to initialise or
-///   reinitialise `expr` and child objects it refers to. `symbol_table` is
-///   modified with any new symbols created. This includes any necessary
-///   temporaries, and if `create_dyn_objs` is false, any allocated objects.
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
@@ -1028,6 +1042,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
   std::vector<const symbolt *> symbols_created;
@@ -1037,7 +1052,8 @@ void gen_nondet_init(
     loc,
     assume_non_null,
     max_nondet_array_length,
-    symbol_table);
+    symbol_table,
+    pointer_type_selector);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
@@ -1053,4 +1069,52 @@ void gen_nondet_init(
   declare_created_symbols(symbols_created, loc, init_code);
 
   init_code.append(assignments);
+}
+
+/// Call object_factory with a default (identity) pointer_type_selector
+exprt object_factory(const typet &type,
+  const irep_idt base_name,
+  code_blockt &init_code,
+  bool allow_null,
+  symbol_tablet &symbol_table,
+  size_t max_nondet_array_length,
+  allocation_typet alloc_type,
+  const source_locationt &location)
+{
+  select_pointer_typet pointer_type_selector;
+  return object_factory(
+    type,
+    base_name,
+    init_code,
+    allow_null,
+    symbol_table,
+    max_nondet_array_length,
+    alloc_type,
+    location,
+    pointer_type_selector);
+}
+
+/// Call gen_nondet_init with a default (identity) pointer_type_selector
+void gen_nondet_init(const exprt &expr,
+  code_blockt &init_code,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  bool skip_classid,
+  allocation_typet alloc_type,
+  bool assume_non_null,
+  size_t max_nondet_array_length,
+  update_in_placet update_in_place)
+{
+  select_pointer_typet pointer_type_selector;
+  gen_nondet_init(
+    expr,
+    init_code,
+    symbol_table,
+    loc,
+    skip_classid,
+    alloc_type,
+    assume_non_null,
+    max_nondet_array_length,
+    pointer_type_selector,
+    update_in_place);
 }
