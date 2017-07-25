@@ -25,7 +25,7 @@ SCENARIO("get_numeric_value_from_character",
 
   REQUIRE(from_integer(0, int_type)==simplify_expr(
     get_numeric_value_from_character(
-      from_integer('0', char_type), char_type, int_type),ns));
+      from_integer('0', char_type), char_type, int_type), ns));
   REQUIRE(from_integer(9, int_type)==simplify_expr(
     get_numeric_value_from_character(
       from_integer('9', char_type),
