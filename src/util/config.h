@@ -152,10 +152,11 @@ public:
 
   bool set(const cmdlinet &cmdline);
 
-  void set_classpath(const std::string &cp);
-
   static irep_idt this_architecture();
   static irep_idt this_operating_system();
+
+private:
+  void set_classpath(const std::string &cp);
 };
 
 extern configt config;
