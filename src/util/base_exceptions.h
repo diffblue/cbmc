@@ -17,13 +17,21 @@ Author: Diffblue Ltd.
 class bad_cast_exceptiont:public invariant_failedt
 {
 public:
-  using invariant_failedt::invariant_failedt;
+  // Normally we'd prefer
+  // using invariant_failedt::invariant_failedt;
+  // However, this isn't supported on VS2013.
+
+  template <typename... Ts>
+  explicit bad_cast_exceptiont(Ts &&...ts):
+    invariant_failedt(std::forward<Ts>(ts)...) {}
 };
 
 class nullptr_exceptiont:public invariant_failedt
 {
 public:
-  using invariant_failedt::invariant_failedt;
+  template <typename... Ts>
+  explicit nullptr_exceptiont(Ts &&...ts):
+    invariant_failedt(std::forward<Ts>(ts)...) {}
 };
 
 #endif
