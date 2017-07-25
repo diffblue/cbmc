@@ -1,8 +1,9 @@
-KNOWNBUG
+CORE
 StringStartEnd02.class
 --refine-strings --unwind 30
 ^EXIT=10$
 ^SIGNAL=0$
+^\[.*assertion\.1\] .* line 13 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

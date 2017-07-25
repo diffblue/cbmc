@@ -1,7 +1,7 @@
-FUTURE
+CORE
 test_delete_char_at.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 9.* FAILURE$
+^\[.*assertion\.1\].* line 9.* FAILURE$
 --

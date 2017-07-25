@@ -1,8 +1,9 @@
-FUTURE
+CORE
 StringCompare02.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
+^\[.*assertion\.1\] .* line 12 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring
