@@ -209,8 +209,6 @@ bool clobber_parse_optionst::get_goto_program(
            symbol_table, goto_functions, get_message_handler()))
         return true;
 
-      config.set_from_symbol_table(symbol_table);
-
       if(cmdline.isset("show-symbol-table"))
       {
         show_symbol_table();
