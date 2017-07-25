@@ -867,7 +867,6 @@ void goto_instrument_parse_optionst::get_goto_program()
     throw 0;
 
   config.set(cmdline);
-  config.set_from_symbol_table(symbol_table);
 }
 
 void goto_instrument_parse_optionst::instrument_goto_program()

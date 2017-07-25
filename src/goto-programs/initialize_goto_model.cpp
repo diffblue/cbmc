@@ -131,9 +131,6 @@ bool initialize_goto_model(
         return true;
     }
 
-    if(!binaries.empty())
-      config.set_from_symbol_table(goto_model.symbol_table);
-
     msg.status() << "Generating GOTO Program" << messaget::eom;
 
     goto_convert(
