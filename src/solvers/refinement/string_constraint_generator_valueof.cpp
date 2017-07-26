@@ -364,12 +364,9 @@ string_exprt string_constraint_generatort::add_axioms_for_value_of(
 /// \param str: string expression
 /// \param radix: the radix
 /// \param max_size: maximum number of characters
-/// \return a boolean expression saying whether the string does represent a
-///   number with the given radix
-exprt string_constraint_generatort::add_axioms_for_correct_number_format(
+void string_constraint_generatort::add_axioms_for_correct_number_format(
   const string_exprt &str, const exprt &radix, std::size_t max_size)
 {
-  symbol_exprt correct=fresh_boolean("correct_number_format");
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
@@ -386,31 +383,34 @@ exprt string_constraint_generatort::add_axioms_for_correct_number_format(
   // TODO: we should have implications in the other direction for correct
   // correct => |str| > 0
   exprt non_empty=str.axiom_for_is_longer_than(from_integer(1, index_type));
-  axioms.push_back(implies_exprt(correct, non_empty));
+  axioms.push_back(non_empty);
 
   // correct => (str[0] = '+' or '-' || is_digit_with_radix(str[0], radix))
   or_exprt correct_first(
     or_exprt(starts_with_minus, starts_with_plus), starts_with_digit);
-  axioms.push_back(implies_exprt(correct, correct_first));
+  axioms.push_back(correct_first);
 
   // correct => str[0]='+' or '-' ==> |str| > 1
   implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
     str.axiom_for_is_longer_than(from_integer(2, index_type)));
-  axioms.push_back(implies_exprt(correct, contains_digit));
+  axioms.push_back(contains_digit);
 
   // correct => |str| < max_size
-  axioms.push_back(
-    implies_exprt(correct, str.axiom_for_is_shorter_than(max_size)));
+  axioms.push_back(str.axiom_for_is_shorter_than(max_size));
 
-  // forall 1 <= qvar < |str| . correct => is_digit_with_radix(str[qvar], radix)
-  symbol_exprt qvar=fresh_univ_index("number_format", index_type);
-  exprt is_digit=is_digit_with_radix(str[qvar], radix);
-  string_constraintt all_digits(
-    qvar, from_integer(1, index_type), str.length(), correct, is_digit);
-  axioms.push_back(all_digits);
-
-  return correct;
+  // forall 1 <= i < |str| . correct => is_digit_with_radix(str[i], radix)
+  // We unfold the above because we know that it will be used for all i up to
+  // str.length()
+  for(std::size_t index=1; index<max_size; ++index)
+  {
+    const exprt index_expr=from_integer(index, index_type);
+    /// index < length && correct => is_digit(str[index])
+    implies_exprt character_at_index_is_digit(
+      binary_relation_exprt(index_expr, ID_lt, str.length()),
+      is_digit_with_radix(str[index], radix));
+    axioms.push_back(character_at_index_is_digit);
+  }
 }
 
 /// add axioms corresponding to the Integer.parseInt java function
@@ -443,9 +443,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 
   /// TODO: we should throw an exception when this does not hold:
   const std::size_t max_string_length=40;
-  const exprt &correct=add_axioms_for_correct_number_format(
-    str, radix, max_string_length);
-  axioms.push_back(correct);
+  add_axioms_for_correct_number_format(str, radix, max_string_length);
 
   /// TODO(OJones): size should depend on the radix
   /// TODO(OJones): we should deal with overflow properly
