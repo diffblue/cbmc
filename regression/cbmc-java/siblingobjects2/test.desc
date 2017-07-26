@@ -1,0 +1,9 @@
+CORE
+test.class
+--function test.main
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+assertion at file test.java line 23 function java::test\.toplevel_pointers_not_null.*: FAILURE
+assertion at file test.java line 18 function java::test\.next_pointers_not_null.*: SUCCESS
+--
