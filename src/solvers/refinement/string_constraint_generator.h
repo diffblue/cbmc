@@ -293,9 +293,17 @@ private:
   exprt add_axioms_for_offset_by_code_point(
     const function_application_exprt &f);
 
-  exprt add_axioms_for_parse_int(const function_application_exprt &f);
+  exprt add_axioms_for_characters_in_integer_string(
+    const symbol_exprt& x,
+    const typet& type,
+    const typet& char_type,
+    const typet& index_type,
+    const string_exprt& str,
+    const std::size_t max_string_length,
+    const exprt& radix);
   void add_axioms_for_correct_number_format(
     const string_exprt &str, const exprt &radix, std::size_t max_size);
+  exprt add_axioms_for_parse_int(const function_application_exprt &f);
   exprt add_axioms_for_to_char_array(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
 
