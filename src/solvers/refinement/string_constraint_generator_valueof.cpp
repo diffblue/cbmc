@@ -365,7 +365,7 @@ string_exprt string_constraint_generatort::add_axioms_for_value_of(
 /// \param radix: the radix
 /// \param max_size: maximum number of characters
 void string_constraint_generatort::add_axioms_for_correct_number_format(
-  const string_exprt &str, const exprt &radix, std::size_t max_size)
+  const string_exprt &str, const exprt &radix_char_type, std::size_t max_size)
 {
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
@@ -378,7 +378,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   exprt chr=str[0];
   equal_exprt starts_with_minus(chr, minus_char);
   equal_exprt starts_with_plus(chr, plus_char);
-  exprt starts_with_digit=is_digit_with_radix(chr, radix);
+  exprt starts_with_digit=is_digit_with_radix(chr, radix_char_type);
 
   // TODO: we should have implications in the other direction for correct
   // correct => |str| > 0
@@ -408,7 +408,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
     /// index < length && correct => is_digit(str[index])
     implies_exprt character_at_index_is_digit(
       binary_relation_exprt(index_expr, ID_lt, str.length()),
-      is_digit_with_radix(str[index], radix));
+      is_digit_with_radix(str[index], radix_char_type));
     axioms.push_back(character_at_index_is_digit);
   }
 }
@@ -443,7 +443,8 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   /// TODO: we should throw an exception when this does not hold:
   /// Note that the only thing stopping us from taking longer strings with many
   /// leading zeros is the axioms for correct number format
-  add_axioms_for_correct_number_format(str, radix, max_string_length);
+  add_axioms_for_correct_number_format(
+    str, typecast_exprt(radix, char_type), max_string_length);
 
   /// TODO(OJones): Fix the below algorithm to make it work for min_int. There
   /// are two problems. (1) Because we build i as positive and then negate it if
@@ -513,21 +514,21 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 /// \param chr: the character
 /// \param radix:  the radix
 /// \return an expression for the condition
-exprt is_digit_with_radix(exprt chr, exprt radix)
+exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
 {
   const typet &char_type=chr.type();
   exprt zero_char=from_integer('0', char_type);
   exprt nine_char=from_integer('9', char_type);
   exprt a_char=from_integer('a', char_type);
   exprt A_char=from_integer('A', char_type);
+  constant_exprt ten_char_type=from_integer(10, char_type);
 
   and_exprt is_digit_when_radix_le_10(
     binary_relation_exprt(chr, ID_ge, zero_char),
     binary_relation_exprt(
-      chr, ID_lt, plus_exprt(zero_char, typecast_exprt(radix, char_type))));
+      chr, ID_lt, plus_exprt(zero_char, radix_char_type)));
 
-  minus_exprt radix_minus_ten(
-    typecast_exprt(radix, char_type), from_integer(10, char_type));
+  minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
 
   or_exprt is_digit_when_radix_gt_10(
     and_exprt(
@@ -541,7 +542,7 @@ exprt is_digit_with_radix(exprt chr, exprt radix)
       binary_relation_exprt(chr, ID_lt, plus_exprt(A_char, radix_minus_ten))));
 
   return if_exprt(
-    binary_relation_exprt(radix, ID_le, from_integer(10, radix.type())),
+    binary_relation_exprt(radix_char_type, ID_le, ten_char_type),
     is_digit_when_radix_le_10,
     is_digit_when_radix_gt_10);
 }
