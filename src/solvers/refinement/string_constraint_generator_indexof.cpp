@@ -15,7 +15,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_constraint_generator.h>
 
 /// Add axioms stating that the returned value is the index within str of the
-/// first occurence of c starting the search at from_index, or -1 if no such
+/// first occurrence of c starting the search at from_index, or -1 if no such
 /// character occurs at or after position from_index.
 /// \param str: a string expression
 /// \param c: an expression representing a character
@@ -69,7 +69,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 }
 
 /// Add axioms stating that the returned value is the index within haystack of
-/// the first occurence of needle starting the search at from_index, or -1 if
+/// the first occurrence of needle starting the search at from_index, or -1 if
 /// needle does not occur at or after position from_index.
 /// \param haystack: a string expression
 /// \param needle: a string expression
@@ -92,7 +92,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   //        contains ==> haystack[n+offset]=needle[n]
   // a4 : forall n:[from_index,offset[.
   //        contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
-  // a5:  forall n:[from_index,|haystack|-|needle|[.
+  // a5:  forall n:[from_index,|haystack|-|needle|].
   //        !contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
@@ -116,70 +116,35 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]));
   axioms.push_back(a3);
 
-  if(!is_constant_string(needle))
-  {
-    // string_not contains_constraintt are formulas of the form:
-    // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
-    string_not_contains_constraintt a4(
-      from_index,
-      offset,
-      contains,
-      from_integer(0, index_type),
-      needle.length(),
-      haystack,
-      needle);
-    axioms.push_back(a4);
+  // string_not contains_constraintt are formulas of the form:
+  // forall x in [lb,ub[. p(x) => exists y in [lb,ub[. s1[x+y] != s2[y]
+  string_not_contains_constraintt a4(
+    from_index,
+    offset,
+    contains,
+    from_integer(0, index_type),
+    needle.length(),
+    haystack,
+    needle);
+  axioms.push_back(a4);
 
-    string_not_contains_constraintt a5(
-      from_index,
+  string_not_contains_constraintt a5(
+    from_index,
+    plus_exprt( // Add 1 for inclusive upper bound.
       minus_exprt(haystack.length(), needle.length()),
-      not_exprt(contains),
-      from_integer(0, index_type),
-      needle.length(),
-      haystack,
-      needle);
-    axioms.push_back(a5);
-  }
-  else
-  {
-    // Unfold the existential quantifier as a disjunction in case of a constant
-    // a4 && a5 <=> a6:
-    //  forall n:[from_index,|haystack|-|needle|].
-    //    !contains || n < offset ==>
-    //      haystack[n] != needle[0] || ... ||
-    //      haystack[n+|needle|-1] != needle[|needle|-1]
-    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
-    mp_integer sub_length;
-    INVARIANT(
-      !to_integer(needle.length(), sub_length),
-      string_refinement_invariantt("a constant string must have constant "
-        "length"));
-    exprt::operandst disjuncts;
-    for(mp_integer offset=0; offset<sub_length; ++offset)
-    {
-      exprt expr_offset=from_integer(offset, index_type);
-      plus_exprt shifted(expr_offset, qvar2);
-      disjuncts.push_back(
-        not_exprt(equal_exprt(haystack[shifted], needle[expr_offset])));
-    }
-
-    or_exprt premise(
-      not_exprt(contains), binary_relation_exprt(qvar2, ID_lt, offset));
-    minus_exprt length_diff(haystack.length(), needle.length());
-    string_constraintt a6(
-      qvar2,
-      from_index,
-      plus_exprt(from_integer(1, index_type), length_diff),
-      premise,
-      disjunction(disjuncts));
-    axioms.push_back(a6);
-  }
+      from_integer(1, index_type)),
+    not_exprt(contains),
+    from_integer(0, index_type),
+    needle.length(),
+    haystack,
+    needle);
+  axioms.push_back(a5);
 
   return offset;
 }
 
 /// Add axioms stating that the returned value is the index within haystack of
-/// the last occurence of needle starting the search backward at from_index (ie
+/// the last occurrence of needle starting the search backward at from_index (ie
 /// the index is smaller or equal to from_index), or -1 if needle does not occur
 /// before from_index.
 /// \param haystack: a string expression
@@ -235,62 +200,25 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     from_index,
     length_diff);
 
-  if(!is_constant_string(needle))
-  {
-    string_not_contains_constraintt a4(
-      plus_exprt(offset, from_integer(1, index_type)),
-      plus_exprt(end_index, from_integer(1, index_type)),
-      contains,
-      from_integer(0, index_type),
-      needle.length(),
-      haystack,
-      needle);
-    axioms.push_back(a4);
+  string_not_contains_constraintt a4(
+    plus_exprt(offset, from_integer(1, index_type)),
+    plus_exprt(end_index, from_integer(1, index_type)),
+    contains,
+    from_integer(0, index_type),
+    needle.length(),
+    haystack,
+    needle);
+  axioms.push_back(a4);
 
-    string_not_contains_constraintt a5(
-      from_integer(0, index_type),
-      plus_exprt(end_index, from_integer(1, index_type)),
-      not_exprt(contains),
-      from_integer(0, index_type),
-      needle.length(),
-      haystack,
-      needle);
-    axioms.push_back(a5);
-  }
-  else
-  {
-    // Unfold the existential quantifier as a disjunction in case of a constant
-    // a4 && a5 <=> a6:
-    //  forall n:[0, min(from_index, |haystack| - |needle|)].
-    //    !contains || (n > offset) ==>
-    //      haystack[n] != needle[0] || ... ||
-    //      haystack[n+|needle|-1] != needle[|needle|-1]
-    symbol_exprt qvar2=fresh_univ_index("QA_index_of_string_2", index_type);
-    mp_integer sub_length;
-    INVARIANT(
-      !to_integer(needle.length(), sub_length),
-      string_refinement_invariantt("a constant string must have constant "
-        "length"));
-    exprt::operandst disjuncts;
-    for(mp_integer offset=0; offset<sub_length; ++offset)
-    {
-      exprt expr_offset=from_integer(offset, index_type);
-      plus_exprt shifted(expr_offset, qvar2);
-      disjuncts.push_back(
-        not_exprt(equal_exprt(haystack[shifted], needle[expr_offset])));
-    }
-
-    or_exprt premise(
-      not_exprt(contains), binary_relation_exprt(qvar2, ID_gt, offset));
-
-    string_constraintt a6(
-      qvar2,
-      from_integer(0, index_type),
-      plus_exprt(from_integer(1, index_type), end_index),
-      premise,
-      disjunction(disjuncts));
-    axioms.push_back(a6);
-  }
+  string_not_contains_constraintt a5(
+    from_integer(0, index_type),
+    plus_exprt(end_index, from_integer(1, index_type)),
+    not_exprt(contains),
+    from_integer(0, index_type),
+    needle.length(),
+    haystack,
+    needle);
+  axioms.push_back(a5);
 
   return offset;
 }
@@ -333,7 +261,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 }
 
 /// Add axioms stating that the returned value is the index within str of the
-/// last occurence of c starting the search backward at from_index, or -1 if no
+/// last occurrence of c starting the search backward at from_index, or -1 if no
 /// such character occurs at or before position from_index.
 /// \param str: a string expression
 /// \param c: an expression representing a character
@@ -373,7 +301,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
       equal_exprt(str[index], c)));
   axioms.push_back(a3);
 
-  symbol_exprt n=fresh_univ_index("QA_last_index_of", index_type);
+  symbol_exprt n=fresh_univ_index("QA_last_index_of1", index_type);
   string_constraintt a4(
     n,
     plus_exprt(index, index1),
@@ -382,7 +310,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     not_exprt(equal_exprt(str[n], c)));
   axioms.push_back(a4);
 
-  symbol_exprt m=fresh_univ_index("QA_last_index_of", index_type);
+  symbol_exprt m=fresh_univ_index("QA_last_index_of2", index_type);
   string_constraintt a5(
     m,
     from_index_plus_one,
