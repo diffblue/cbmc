@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/type.h>
 #include <util/symbol_table.h>
+#include <util/message.h>
 
 #include "java_bytecode_parse_tree.h"
 
@@ -44,5 +45,11 @@ const std::string java_class_to_package(const std::string &canonical_classname);
 void merge_source_location_rec(
   exprt &expr,
   const source_locationt &source_location);
+
+#define JAVA_STRING_LITERAL_PREFIX "java::java.lang.String.Literal"
+
+/// \param id: any string
+/// \return Returns true if 'id' identifies a string literal symbol
+bool is_java_string_literal_id(const irep_idt &id);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

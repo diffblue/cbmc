@@ -107,3 +107,8 @@ void merge_source_location_rec(
   for(exprt &op : expr.operands())
     merge_source_location_rec(op, source_location);
 }
+
+bool is_java_string_literal_id(const irep_idt &id)
+{
+  return has_prefix(id2string(id), JAVA_STRING_LITERAL_PREFIX);
+}
