@@ -389,6 +389,54 @@ void java_object_factoryt::gen_pointer_target_init(
   }
 }
 
+/// Recursion-set entry owner class. If a recursion-set entry is added
+/// in a particular scope, ensures that it is erased on leaving
+/// that scope.
+class recursion_set_entryt
+{
+  /// Recursion set to modify
+  std::unordered_set<irep_idt, irep_id_hash> &recursion_set;
+  /// Entry to erase on destruction, if non-empty
+  irep_idt erase_entry;
+
+public:
+  /// Initialise a recursion-set entry owner operating on a given set.
+  /// Initially it does not own any set entry.
+  /// \param _recursion_set: set to operate on.
+  recursion_set_entryt(std::unordered_set<irep_idt, irep_id_hash> &_recursion_set):
+    recursion_set(_recursion_set)
+  { }
+
+  /// Removes erase_entry (if set) from the controlled set.
+  ~recursion_set_entryt()
+  {
+    if(erase_entry!=irep_idt())
+      recursion_set.erase(erase_entry);
+  }
+
+  recursion_set_entryt(const recursion_set_entryt &)=delete;
+  recursion_set_entryt &operator=(const recursion_set_entryt &)=delete;
+
+  /// Try to add an entry to the controlled set. If it is added, own that
+  /// entry and erase it on destruction; otherwise do nothing.
+  /// \param entry: entry to add
+  /// \return true if added to the set (and therefore owned by this object)
+  bool insert_entry(const irep_idt &entry)
+  {
+    INVARIANT(
+      erase_entry==irep_idt(),
+      "insert_entry should only be called once");
+    INVARIANT(entry!=irep_idt(), "entry should be a struct tag");
+    bool ret=recursion_set.insert(entry).second;
+    if(ret)
+    {
+      // We added something, so erase it when this is destroyed:
+      erase_entry=entry;
+    }
+    return ret;
+  }
+};
+
 /// Initialises a primitive or object tree rooted at `expr`, of type pointer. It
 /// allocates child objects as necessary and nondet-initialising their members,
 /// or if MUST_UPDATE_IN_PLACE is set, re-initialising already-allocated
@@ -431,6 +479,10 @@ void java_object_factoryt::gen_nondet_pointer_init(
     return;
   }
 
+  // This deletes the recursion set entry on leaving this function scope,
+  // if one is set below.
+  recursion_set_entryt recursion_set_entry(recursion_set);
+
   const typet &subtype=ns.follow(pointer_type.subtype());
   if(subtype.id()==ID_struct)
   {
@@ -438,7 +490,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     const irep_idt &struct_tag=struct_type.get_tag();
 
     // If this is a recursive type of some kind, set null.
-    if(!recursion_set.insert(struct_tag).second)
+    if(!recursion_set_entry.insert_entry(struct_tag))
     {
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
