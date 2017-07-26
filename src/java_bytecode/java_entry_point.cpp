@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 #include <iostream>
 
 #include <util/arith_tools.h>
@@ -62,7 +63,6 @@ static void create_initialize(symbol_tablet &symbol_table)
     throw "failed to add "+std::string(INITIALIZE);
 }
 
-
 static bool should_init_symbol(const symbolt &sym)
 {
   if(sym.type.id()!=ID_code &&
@@ -73,6 +73,17 @@ static bool should_init_symbol(const symbolt &sym)
     return true;
 
   return is_java_string_literal_id(sym.name);
+}
+
+static bool is_non_null_library_global(const irep_idt &symbolid)
+{
+  static const std::unordered_set<irep_idt, irep_id_hash> non_null_globals=
+  {
+    "java::java.lang.System.out",
+    "java::java.lang.System.err",
+    "java::java.lang.System.in"
+  };
+  return non_null_globals.count(symbolid);
 }
 
 void java_static_lifetime_init(
@@ -110,6 +121,8 @@ void java_static_lifetime_init(
           if(has_suffix(namestr, suffix))
             allow_null=false;
           if(allow_null && is_java_string_literal_id(nameid))
+            allow_null=false;
+          if(allow_null && is_non_null_library_global(nameid))
             allow_null=false;
         }
         auto newsym=object_factory(
