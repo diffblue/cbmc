@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_object_factory.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
 
@@ -71,7 +72,7 @@ static bool should_init_symbol(const symbolt &sym)
      sym.mode==ID_java)
     return true;
 
-  return has_prefix(id2string(sym.name), "java::java.lang.String.Literal");
+  return is_java_string_literal_id(sym.name);
 }
 
 static bool is_non_null_library_global(const irep_idt &symbolid)
@@ -114,14 +115,13 @@ void java_static_lifetime_init(
         bool allow_null=!assume_init_pointers_not_null;
         if(allow_null)
         {
-          std::string namestr=id2string(sym.symbol_expr().get_identifier());
+          irep_idt nameid=sym.symbol_expr().get_identifier();
+          std::string namestr=id2string(nameid);
           const std::string suffix="@class_model";
           // Static '.class' fields are always non-null.
           if(has_suffix(namestr, suffix))
             allow_null=false;
-          if(allow_null && has_prefix(
-               namestr,
-               "java::java.lang.String.Literal"))
+          if(allow_null && is_java_string_literal_id(nameid))
             allow_null=false;
           if(allow_null && is_non_null_library_global(nameid))
             allow_null=false;
