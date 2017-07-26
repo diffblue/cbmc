@@ -310,7 +310,9 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
   if(opt_num.has_value())
   {
     // get root
-    const auto number = arrays.find_number(*opt_num);
+    const auto number = *opt_num;
+    if(!number)
+      return nil_exprt();
 
     assert(number<index_map.size());
     index_mapt::const_iterator it=index_map.find(number);

@@ -1,4 +1,4 @@
-KNOWNBUG broken-smt-backend
+CORE broken-smt-backend
 main.c
 --arrays-uf-always --no-propagation
 ^VERIFICATION SUCCESSFUL$

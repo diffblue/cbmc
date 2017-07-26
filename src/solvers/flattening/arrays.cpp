@@ -10,18 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/json.h>
-#include <util/message.h>
-#include <util/replace_expr.h>
 #include <util/std_expr.h>
 
 #include <solvers/prop/literal_expr.h>
 #include <solvers/prop/prop.h>
 
-#ifdef DEBUG
-#include <iostream>
+#ifdef DEBUG_ARRAYST
+#  include <iostream>
 #endif
-
-#include <unordered_set>
 
 arrayst::arrayst(
   const namespacet &_ns,
@@ -33,20 +29,13 @@ arrayst::arrayst(
     log(_message_handler),
     message_handler(_message_handler)
 {
-  lazy_arrays = false;        // will be set to true when --refine is used
-  incremental_cache = false;  // for incremental solving
   // get_array_constraints is true when --show-array-constraints is used
   get_array_constraints = _get_array_constraints;
 }
 
 void arrayst::record_array_index(const index_exprt &index)
 {
-  // we are not allowed to put the index directly in the
-  //   entry for the root of the equivalence class
-  //   because this map is accessed during building the error trace
-  std::size_t number=arrays.number(index.array());
-  if(index_map[number].insert(index.index()).second)
-    update_indices.insert(number);
+  collect_indices(index);
 }
 
 literalt arrayst::record_array_equality(
@@ -64,25 +53,18 @@ literalt arrayst::record_array_equality(
     op0.type().id() == ID_array,
     "record_array_equality parameter should be array-typed");
 
-  array_equalities.push_back(array_equalityt());
+  literalt l = SUB::equality(op0, op1);
+#ifdef DEBUG_ARRAYST
+  std::cout << "LIT " << l.get() << " == " << format(equality) << '\n';
+#endif
 
-  array_equalities.back().f1=op0;
-  array_equalities.back().f2=op1;
-  array_equalities.back().l=SUB::equality(op0, op1);
+  wegt::node_indext a1 = collect_arrays(op0);
+  wegt::node_indext a2 = collect_arrays(op1);
 
-  arrays.make_union(op0, op1);
-  collect_arrays(op0);
-  collect_arrays(op1);
+  // one undirected edge for each array equality
+  add_weg_edge(a1, a2, literal_exprt{l});
 
-  return array_equalities.back().l;
-}
-
-void arrayst::collect_indices()
-{
-  for(std::size_t i=0; i<arrays.size(); i++)
-  {
-    collect_indices(arrays[i]);
-  }
+  return l;
 }
 
 void arrayst::collect_indices(const exprt &expr)
@@ -107,7 +89,8 @@ void arrayst::collect_indices(const exprt &expr)
       return;
     }
 
-    collect_indices(e.index()); // necessary?
+    collect_indices(e.index());
+    collect_indices(e.array());
 
     const typet &array_op_type = e.array().type();
 
@@ -118,16 +101,24 @@ void arrayst::collect_indices(const exprt &expr)
 
       if(is_unbounded_array(array_type))
       {
-        record_array_index(e);
+#ifdef DEBUG_ARRAYST
+        std::cout << "RAI: " << format(e) << '\n';
+#endif
+        wegt::node_indext number = collect_arrays(e.array());
+        index_map[number].insert(e.index());
       }
     }
   }
 }
 
-void arrayst::collect_arrays(const exprt &a)
+arrayst::wegt::node_indext arrayst::collect_arrays(const exprt &a)
 {
+  wegt::node_indext a_ind = arrays.number(a);
+  expand_weg(a_ind);
+
   const array_typet &array_type = to_array_type(a.type());
 
+  // remember it
   if(a.id()==ID_with)
   {
     const with_exprt &with_expr=to_with_expr(a);
@@ -137,15 +128,17 @@ void arrayst::collect_arrays(const exprt &a)
       "collect_arrays got 'with' without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, with_expr.old());
-    collect_arrays(with_expr.old());
-
-    // make sure this shows as an application
     for(std::size_t i = 1; i < with_expr.operands().size(); i += 2)
     {
-      index_exprt index_expr(with_expr.old(), with_expr.operands()[i]);
-      record_array_index(index_expr);
+      collect_indices(with_expr.operands()[i]);     // where
+      collect_indices(with_expr.operands()[i + 1]); // new value
     }
+
+    // record 'old'
+    wegt::node_indext expr_old_ind = collect_arrays(with_expr.old());
+
+    // one undirected edge for each array update
+    add_weg_edge(a_ind, expr_old_ind, with_expr);
   }
   else if(a.id()==ID_update)
   {
@@ -156,14 +149,7 @@ void arrayst::collect_arrays(const exprt &a)
       "collect_arrays got 'update' without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, update_expr.old());
-    collect_arrays(update_expr.old());
-
-#if 0
-    // make sure this shows as an application
-    index_exprt index_expr(update_expr.old(), update_expr.index());
-    record_array_index(index_expr);
-#endif
+    UNIMPLEMENTED;
   }
   else if(a.id()==ID_if)
   {
@@ -179,10 +165,17 @@ void arrayst::collect_arrays(const exprt &a)
       "collect_arrays got if without matching types",
       irep_pretty_diagnosticst{a});
 
-    arrays.make_union(a, if_expr.true_case());
-    arrays.make_union(a, if_expr.false_case());
-    collect_arrays(if_expr.true_case());
-    collect_arrays(if_expr.false_case());
+    wegt::node_indext expr_true_ind = collect_arrays(if_expr.true_case());
+    wegt::node_indext expr_false_ind = collect_arrays(if_expr.false_case());
+
+    // do weg edges
+    literalt cond = convert(if_expr.cond());
+#ifdef DEBUG_ARRAYST
+    std::cout << "LIT " << cond.get() << " == " << format(if_expr.cond())
+              << '\n';
+#endif
+    add_weg_edge(a_ind, expr_true_ind, literal_exprt{cond});
+    add_weg_edge(a_ind, expr_false_ind, literal_exprt{!cond});
   }
   else if(a.id()==ID_symbol)
   {
@@ -199,20 +192,11 @@ void arrayst::collect_arrays(const exprt &a)
       "unexpected array expression: member with '" + struct_op.id_string() +
         "'");
   }
-  else if(a.id()==ID_constant ||
-          a.id()==ID_array ||
-          a.id()==ID_string_constant)
+  else if(a.id() == ID_array || a.id() == ID_string_constant)
   {
   }
   else if(a.id()==ID_array_of)
   {
-  }
-  else if(a.id()==ID_byte_update_little_endian ||
-          a.id()==ID_byte_update_big_endian)
-  {
-    DATA_INVARIANT(
-      false,
-      "byte_update should be removed before collect_arrays");
   }
   else if(a.id()==ID_typecast)
   {
@@ -223,637 +207,485 @@ void arrayst::collect_arrays(const exprt &a)
       typecast_op.type().id() == ID_array,
       "unexpected array type cast from " + typecast_op.type().id_string());
 
-    arrays.make_union(a, typecast_op);
-    collect_arrays(typecast_op);
+    wegt::node_indext op_ind = collect_arrays(typecast_op);
+
+    add_weg_edge(a_ind, op_ind, literal_exprt{const_literal(true)});
   }
   else if(a.id()==ID_index)
   {
-    // nested unbounded arrays
-    const auto &array_op = to_index_expr(a).array();
-    arrays.make_union(a, array_op);
-    collect_arrays(array_op);
+    // an array of arrays!
+    const exprt &array = to_index_expr(a).array();
+
+    collect_arrays(array);
   }
   else if(a.id() == ID_array_comprehension)
   {
+    const array_comprehension_exprt &array_comprehension =
+      to_array_comprehension_expr(a);
+    collect_indices(array_comprehension.body());
   }
   else
+    throw "unexpected array expression (collect_arrays): `" + a.id_string() +
+      "'";
+
+  return a_ind;
+}
+
+void arrayst::weg_path_condition(
+  const weg_patht &path,
+  const exprt &index_a,
+  exprt::operandst &cond) const
+{
+  for(const auto &pn : path)
   {
-    DATA_INVARIANT(
-      false,
-      "unexpected array expression (collect_arrays): '" + a.id_string() + "'");
+    if(!pn.edge.has_value())
+      break;
+
+#ifdef DEBUG_ARRAYST
+    std::cout << "edge: " << pn.n << "->" << (*pn.edge)->first << " "
+              << format(arrays[pn.n]) << "\n";
+#endif
+
+    const exprt &weg_edge = (*pn.edge)->second;
+
+    // TODO: we should filter out trivially-false conjunctions when literals and
+    // their negations or equalities and their notequal counterparts are
+    // included
+    if(weg_edge.id() == ID_with)
+    {
+      const auto &with_expr = to_with_expr(weg_edge);
+      for(std::size_t i = 1; i + 1 < with_expr.operands().size(); i += 2)
+      {
+        notequal_exprt inequality(with_expr.operands()[i], index_a);
+        cond.push_back(inequality);
+      }
+    }
+    else if(
+      weg_edge.id() == ID_literal &&
+      weg_edge != literal_exprt{const_literal(true)})
+    {
+      cond.push_back(weg_edge);
+    }
+    else
+      UNIMPLEMENTED;
   }
 }
 
-/// adds array constraints (refine=true...lazily for the refinement loop)
-void arrayst::add_array_constraint(const lazy_constraintt &lazy, bool refine)
+void arrayst::process_weg_path(const weg_patht &path)
 {
-  if(lazy_arrays && refine)
+  INVARIANT(!path.empty(), "path is not empty");
+  wegt::node_indext a = path.front().n;
+  wegt::node_indext b = path.back().n;
+
+#ifdef DEBUG_ARRAYST
+  std::cout << "PATH: ";
+  for(const auto &n : path)
+    std::cout << n.n << ",";
+  std::cout << '\n';
+#endif
+
+  // do constraints
+  const index_sett &index_set_a = index_map[a];
+  const index_sett &index_set_b = index_map[b];
+
+#ifdef DEBUG_ARRAYST
+  std::cout << "b is: " << format(arrays[b]) << '\n';
+#endif
+
+  for(const auto &index_a : index_set_a)
   {
-    // lazily add the constraint
-    if(incremental_cache)
+    // lazily instantiate read-over-write
+    if(arrays[b].id() == ID_with)
     {
-      if(expr_map.find(lazy.lazy) == expr_map.end())
+#if 0
+      // we got x=(y with [i:=v, j:=w, ...])
+      const auto &expr_b = to_with_expr(arrays[b]);
+      for(std::size_t i = 1; i + 1 < expr_b.operands().size(); i += 2)
       {
-        lazy_array_constraints.push_back(lazy);
-        expr_map[lazy.lazy] = true;
+        const exprt &index_b = expr_b.operands()[i];
+        const exprt &value_b = expr_b.operands()[i + 1];
+
+        // 1. we got a[i]...b[j], given as edges on the stack
+        // 2. add (i=j AND path_cond)=>a[i]=b[j]
+        // 3. The path condition requires the update indices
+        //    on the stack to be different from i.
+        exprt::operandst cond;
+        cond.reserve(path.size() + 1);
+        cond.push_back(equal_exprt(index_a, index_b));
+        weg_path_condition(path, index_a, cond);
+
+        // a_i=b_i
+        index_exprt a_i(arrays[a], index_a);
+        // cond => a_i=b_i
+        implies_exprt implication(conjunction(cond), equal_exprt(a_i, value_b));
+#  ifdef DEBUG_ARRAYST
+        std::cout << "C2a: " << format(implication) << '\n';
+#  endif
+        set_to_true(implication);
       }
+#endif
+    }
+    else if(arrays[b].id() == ID_array_of)
+    {
+#if 0
+      const auto &expr_b = to_array_of_expr(arrays[b]);
+      const exprt &value_b = expr_b.what();
+
+      // 1. we got a[i]...b[j], given as edges on the stack
+      // 2. add (i=j AND path_cond)=>a[i]=b[j]
+      // 3. The path condition requires the update indices
+      //    on the stack to be different from i.
+      exprt::operandst cond;
+      cond.reserve(path.size());
+      weg_path_condition(path, index_a, cond);
+
+      // a_i=value
+      index_exprt a_i(arrays[a], index_a);
+      // cond => a_i=b_i
+      implies_exprt implication(conjunction(cond), equal_exprt(a_i, value_b));
+#  ifdef DEBUG_ARRAYST
+      std::cout << "C2b: " << format(implication) << '\n';
+#  endif
+      set_to_true(implication);
+#endif
+    }
+    else if(arrays[b].id() == ID_array)
+    {
+#if 0
+      // we got x=[a, b, c, ...]
+      const auto &array_expr = to_array_expr(arrays[b]);
+      for(std::size_t i = 0; i < array_expr.operands().size(); ++i)
+      {
+        const exprt index_b = from_integer(i, index_a.type());
+        const exprt &value_b = array_expr.operands()[i];
+
+        // 1. we got a[i]...b[j], given as edges on the stack
+        // 2. add (i=j AND path_cond)=>a[i]=b[j]
+        // 3. The path condition requires the update indices
+        //    on the stack to be different from i.
+        exprt::operandst cond;
+        cond.reserve(path.size() + 1);
+        cond.push_back(equal_exprt(index_a, index_b));
+        weg_path_condition(path, index_a, cond);
+
+        // a_i=b_i
+        index_exprt a_i(arrays[a], index_a);
+        // cond => a_i=b_i
+        implies_exprt implication(conjunction(cond), equal_exprt(a_i, value_b));
+#  ifdef DEBUG_ARRAYST
+        std::cout << "C2c: " << format(implication) << '\n';
+#  endif
+        set_to_true(implication);
+      }
+#endif
+    }
+    else if(arrays[b].id() == ID_array_comprehension)
+    {
+#if 0
+      const auto &expr_b = to_array_comprehension_expr(arrays[b]);
+      exprt value_b = expr_b.instantiate({index_a});
+
+      // 1. we got a[i]...b[j], given as edges on the stack
+      // 2. add (i=j AND path_cond)=>a[i]=b[j]
+      // 3. The path condition requires the update indices
+      //    on the stack to be different from i.
+      exprt::operandst cond;
+      cond.reserve(path.size());
+      weg_path_condition(path, index_a, cond);
+
+      // a_i=value
+      index_exprt a_i(arrays[a], index_a);
+      // cond => a_i=b_i
+      implies_exprt implication(true_exprt{}, /*conjunction(cond),*/ equal_exprt(a_i, value_b));
+#  ifdef DEBUG_ARRAYST
+      std::cout << "C2d: " << format(implication) << '\n';
+#  endif
+      set_to_true(implication);
+#endif
     }
     else
     {
-      lazy_array_constraints.push_back(lazy);
+      DATA_INVARIANT_WITH_DIAGNOSTICS(
+        arrays[b].id() == ID_nondet_symbol || arrays[b].id() == ID_symbol ||
+          arrays[b].id() == ID_if || arrays[b].id() == ID_index,
+        "expected symbol, if, or index; got ",
+        arrays[b].pretty());
+    }
+
+    // TODO: a != b should be trivially true as we don't do self loops
+    if(
+      a !=
+      b) // we handle same-array-different index in add_array_Ackermann_constraints
+    {
+      for(const auto &index_b : index_set_b)
+      {
+        // skip over comparisons that are trivially false
+        if(index_a.is_constant() && index_b.is_constant() && index_a != index_b)
+        {
+          continue;
+        }
+
+        // 1. we got a[i]...b[j], given as edges on the stack
+        // 2. add (i=j AND path_cond)=>a[i]=b[j]
+        // 3. The path condition requires the update indices
+        //    on the stack to be different from i.
+        exprt::operandst cond;
+        cond.reserve(path.size() + 1);
+        cond.push_back(equal_exprt(index_a, index_b));
+        weg_path_condition(path, index_a, cond);
+
+        // a_i=b_i
+        index_exprt a_i(arrays[a], index_a);
+        index_exprt b_i(arrays[b], index_b);
+        // cond => a_i=b_i
+        implies_exprt implication(conjunction(cond), equal_exprt(a_i, b_i));
+#ifdef DEBUG_ARRAYST
+        std::cout << "C3: " << format(implication) << '\n';
+#endif
+        set_to_true(implication);
+      }
     }
   }
-  else
+
+#if 0
+  // extensional array encoding -- do this first as it may add to the index sets
+  if(a != b)
   {
-    // add the constraint eagerly
-    prop.l_set_to_true(convert(lazy.lazy));
+    exprt::operandst cond;
+    cond.reserve(path.size());
+    // collect all indices in with expressions along this path
+    // record the first and last with expression
+    // compute the path condition from a to first and last to b
+    //weg_path_condition(path, nil_exprt{}, cond);
+
+    implies_exprt implication(conjunction(cond), equal_exprt(arrays[a], arrays[b]));
+#  ifdef DEBUG_ARRAYST
+    std::cout << "E1: " << format(implication) << '\n';
+#  endif
+    set_to_true(implication);
   }
+#endif
 }
 
 void arrayst::add_array_constraints()
 {
-  collect_indices();
-  // at this point all indices should in the index set
-
-  // reduce initial index map
-  update_index_map(true);
-
-  // add constraints for if, with, array_of, lambda
-  std::set<std::size_t> roots_to_process, updated_roots;
-  for(std::size_t i=0; i<arrays.size(); i++)
-    roots_to_process.insert(arrays.find_number(i));
-
-  while(!roots_to_process.empty())
+  // preprocessing
+  for(std::size_t i = 0; i < arrays.size(); ++i)
   {
-    for(std::size_t i = 0; i < arrays.size(); i++)
+    if(arrays[i].id() == ID_array)
     {
-      if(roots_to_process.count(arrays.find_number(i)) == 0)
-        continue;
+      const auto &array_expr = to_array_expr(arrays[i]);
 
-      // take a copy as arrays may get modified by add_array_constraints
-      // in case of nested unbounded arrays
-      exprt a = arrays[i];
+      for(std::size_t j = 0; j < array_expr.operands().size(); ++j)
+      {
+        const exprt index_constant =
+          from_integer(j, to_array_type(array_expr.type()).index_type());
+        const exprt &value = array_expr.operands()[j];
 
-      add_array_constraints(index_map[arrays.find_number(i)], a);
-
-      // we have to update before it gets used in the next add_* call
-      for(const std::size_t u : update_indices)
-        updated_roots.insert(arrays.find_number(u));
-      update_index_map(false);
+        index_map[i].insert(index_constant);
+        equal_exprt eq{index_exprt{array_expr, index_constant}, value};
+#ifdef DEBUG_ARRAYST
+        std::cout << "PREPROC: " << format(eq) << '\n';
+#endif
+        set_to_true(eq);
+      }
     }
+    else if(arrays[i].id() == ID_array_comprehension)
+    {
+      const auto &array_comprehension = to_array_comprehension_expr(arrays[i]);
+      for(const auto r : weg.get_reachable(i, true))
+        index_map[i].insert(index_map[r].begin(), index_map[r].end());
 
-    roots_to_process = std::move(updated_roots);
-    updated_roots.clear();
+      for(const auto &index : index_map[i])
+      {
+        equal_exprt eq{
+          index_exprt{array_comprehension, index},
+          array_comprehension.instantiate({index})};
+#ifdef DEBUG_ARRAYST
+        std::cout << "PREPROC: " << format(eq) << '\n';
+#endif
+        set_to_true(eq);
+      }
+    }
+    else if(arrays[i].id() == ID_array_of)
+    {
+      const auto &array_of_expr = to_array_of_expr(arrays[i]);
+      const auto &value = array_of_expr.what();
+
+      for(const auto &index : index_map[i])
+      {
+        equal_exprt eq{index_exprt{array_of_expr, index}, value};
+#ifdef DEBUG_ARRAYST
+        std::cout << "PREPROC: " << format(eq) << '\n';
+#endif
+        set_to_true(eq);
+      }
+    }
+    else if(arrays[i].id() == ID_with)
+    {
+      const with_exprt &with_expr = to_with_expr(arrays[i]);
+
+      for(std::size_t j = 1; j < with_expr.operands().size(); j += 2)
+      {
+        index_map[i].insert(with_expr.operands()[j]);
+        equal_exprt eq{
+          index_exprt{with_expr, with_expr.operands()[j]},
+          with_expr.operands()[j + 1]};
+#ifdef DEBUG_ARRAYST
+        std::cout << "PREPROC: " << format(eq) << '\n';
+#endif
+        set_to_true(eq);
+      }
+    }
   }
 
-  // add constraints for equalities
-  for(const auto &equality : array_equalities)
+#ifdef DEBUG_ARRAYST
+  weg.output_dot(std::cout);
+  for(std::size_t i = 0; i < arrays.size(); ++i)
   {
-    add_array_constraints_equality(
-      index_map[arrays.find_number(equality.f1)],
-      equality);
+    std::cout << "IS of " << i << ":";
+    for(const auto &ind : index_map[i])
+      std::cout << " " << format(ind);
+    std::cout << '\n';
+  }
+#endif
 
-    // update_index_map should not be necessary here
+#ifdef DEBUG_ARRAYST
+  for(const auto &a : arrays)
+  {
+    std::cout << "array: " << format(a) << '\n';
+  }
+#endif
+
+  // Implement Algorithms 7.4.1 and 7.4.2 by enumerating all simple paths
+  // instead of iterating over all pairs of arrays and indices. Paths are
+  // enumerated by performing depth-first search from each node.
+
+  // auxiliary bit per node for DFS
+  std::vector<bool> visited;
+  visited.resize(weg.size());
+
+  for(wegt::node_indext a = 0; a < arrays.size(); a++)
+  {
+#ifdef DEBUG_ARRAYST
+    std::cout << "a is: " << format(arrays[a]) << '\n';
+#endif
+
+    // DFS from a_i to anything reachable in 'weg'
+    std::fill(visited.begin(), visited.end(), false);
+
+    weg_patht path;
+    path.emplace_back(a, std::set<wegt::node_indext>());
+    visited[a] = true;
+
+    while(!path.empty())
+    {
+      // get next edge a->b
+      stack_entryt &entry = path.back();
+
+      if(!entry.edge.has_value())
+      {
+        if(weg[entry.n].out.empty())
+        {
+          // no successors
+          path.pop_back();
+          continue;
+        }
+
+        entry.edge = weg[entry.n].out.cbegin();
+      }
+      else if(std::next(*entry.edge) == weg[entry.n].out.end())
+      {
+        // no further successor
+        path.pop_back();
+        continue;
+      }
+      else
+        ++(*entry.edge);
+
+      wegt::node_indext b = (*entry.edge)->first;
+
+      if(entry.path_nodes.find(b) != entry.path_nodes.end())
+        continue; // already done it
+
+      visited[b] = true;
+
+      // add node 'b' to path
+      path.emplace_back(b, entry.path_nodes);
+
+      // process
+      process_weg_path(path);
+    }
   }
 
   // add the Ackermann constraints
   add_array_Ackermann_constraints();
 }
 
+#if 1
 void arrayst::add_array_Ackermann_constraints()
 {
   // this is quadratic!
 
-#ifdef DEBUG
+#  ifdef DEBUG_ARRAYST
   std::cout << "arrays.size(): " << arrays.size() << '\n';
-#endif
+#  endif
 
   // iterate over arrays
-  for(std::size_t i=0; i<arrays.size(); i++)
+  // TODO: not clear when we really need this: certainly with arrays[i] ==
+  // ID_array, perhaps also in other cases
+  for(std::size_t i = 0; i < arrays.size(); i++)
   {
-    const index_sett &index_set=index_map[arrays.find_number(i)];
+    const index_sett &index_set = index_map[i];
 
-#ifdef DEBUG
+#  ifdef DEBUG_ARRAYST
     std::cout << "index_set.size(): " << index_set.size() << '\n';
-#endif
+#  endif
 
     // iterate over indices, 2x!
-    for(index_sett::const_iterator
-        i1=index_set.begin();
-        i1!=index_set.end();
+    for(index_sett::const_iterator i1 = index_set.begin();
+        i1 != index_set.end();
         i1++)
-      for(index_sett::const_iterator
-          i2=i1;
-          i2!=index_set.end();
-          i2++)
-        if(i1!=i2)
+    {
+      index_sett::const_iterator next = i1;
+      next++;
+      for(index_sett::const_iterator i2 = next; i2 != index_set.end(); i2++)
+      {
+        if(i1->is_constant() && i2->is_constant())
+          continue;
+
+        // index equality
+        equal_exprt indices_equal(*i1, *i2);
+
+        if(indices_equal.op0().type() != indices_equal.op1().type())
         {
-          if(i1->is_constant() && i2->is_constant())
-            continue;
-
-          // index equality
-          const equal_exprt indices_equal(
-            *i1, typecast_exprt::conditional_cast(*i2, i1->type()));
-
-          literalt indices_equal_lit=convert(indices_equal);
-
-          if(indices_equal_lit!=const_literal(false))
-          {
-            const typet &subtype =
-              to_array_type(arrays[i].type()).element_type();
-            index_exprt index_expr1(arrays[i], *i1, subtype);
-
-            index_exprt index_expr2=index_expr1;
-            index_expr2.index()=*i2;
-
-            equal_exprt values_equal(index_expr1, index_expr2);
-
-            // add constraint
-            lazy_constraintt lazy(lazy_typet::ARRAY_ACKERMANN,
-              implies_exprt(literal_exprt(indices_equal_lit), values_equal));
-            add_array_constraint(lazy, true); // added lazily
-            array_constraint_count[constraint_typet::ARRAY_ACKERMANN]++;
-
-#if 0 // old code for adding, not significantly faster
-            prop.lcnf(!indices_equal_lit, convert(values_equal));
-#endif
-          }
-        }
-  }
-}
-
-/// merge the indices into the root
-void arrayst::update_index_map(std::size_t i)
-{
-  if(arrays.is_root_number(i))
-    return;
-
-  std::size_t root_number=arrays.find_number(i);
-  INVARIANT(root_number!=i, "is_root_number incorrect?");
-
-  index_sett &root_index_set=index_map[root_number];
-  index_sett &index_set=index_map[i];
-
-  root_index_set.insert(index_set.begin(), index_set.end());
-}
-
-void arrayst::update_index_map(bool update_all)
-{
-  // iterate over non-roots
-  // possible reasons why update is needed:
-  //  -- there are new equivalence classes in arrays
-  //  -- there are new indices for arrays that are not the root
-  //     of an equivalence class
-  //     (and we cannot do that in record_array_index())
-  //  -- equivalence classes have been merged
-  if(update_all)
-  {
-    for(std::size_t i=0; i<arrays.size(); i++)
-      update_index_map(i);
-  }
-  else
-  {
-    for(const auto &index : update_indices)
-      update_index_map(index);
-
-    update_indices.clear();
-  }
-
-#ifdef DEBUG
-  // print index sets
-  for(const auto &index_entry : index_map)
-    for(const auto &index : index_entry.second)
-      std::cout << "Index set (" << index_entry.first << " = "
-                << arrays.find_number(index_entry.first) << " = "
-                << format(arrays[arrays.find_number(index_entry.first)])
-                << "): " << format(index) << '\n';
-  std::cout << "-----\n";
-#endif
-}
-
-void arrayst::add_array_constraints_equality(
-  const index_sett &index_set,
-  const array_equalityt &array_equality)
-{
-  // add constraints x=y => x[i]=y[i]
-
-  for(const auto &index : index_set)
-  {
-    const typet &element_type1 =
-      to_array_type(array_equality.f1.type()).element_type();
-    index_exprt index_expr1(array_equality.f1, index, element_type1);
-
-    const typet &element_type2 =
-      to_array_type(array_equality.f2.type()).element_type();
-    index_exprt index_expr2(array_equality.f2, index, element_type2);
-
-    DATA_INVARIANT(
-      index_expr1.type()==index_expr2.type(),
-      "array elements should all have same type");
-
-    array_equalityt equal;
-    equal.f1 = index_expr1;
-    equal.f2 = index_expr2;
-    equal.l = array_equality.l;
-    equal_exprt equality_expr(index_expr1, index_expr2);
-
-    // add constraint
-    // equality constraints are not added lazily
-    // convert must be done to guarantee correct update of the index_set
-    prop.lcnf(!array_equality.l, convert(equality_expr));
-    array_constraint_count[constraint_typet::ARRAY_EQUALITY]++;
-  }
-}
-
-void arrayst::add_array_constraints(
-  const index_sett &index_set,
-  const exprt &expr)
-{
-  if(expr.id()==ID_with)
-    return add_array_constraints_with(index_set, to_with_expr(expr));
-  else if(expr.id()==ID_update)
-    return add_array_constraints_update(index_set, to_update_expr(expr));
-  else if(expr.id()==ID_if)
-    return add_array_constraints_if(index_set, to_if_expr(expr));
-  else if(expr.id()==ID_array_of)
-    return add_array_constraints_array_of(index_set, to_array_of_expr(expr));
-  else if(expr.id() == ID_array)
-    return add_array_constraints_array_constant(index_set, to_array_expr(expr));
-  else if(expr.id() == ID_array_comprehension)
-  {
-    return add_array_constraints_comprehension(
-      index_set, to_array_comprehension_expr(expr));
-  }
-  else if(expr.id()==ID_symbol ||
-          expr.id()==ID_nondet_symbol ||
-          expr.id()==ID_constant ||
-          expr.id()=="zero_string" ||
-          expr.id()==ID_string_constant)
-  {
-  }
-  else if(
-    expr.id() == ID_member &&
-    (to_member_expr(expr).struct_op().id() == ID_symbol ||
-     to_member_expr(expr).struct_op().id() == ID_nondet_symbol))
-  {
-  }
-  else if(expr.id()==ID_byte_update_little_endian ||
-          expr.id()==ID_byte_update_big_endian)
-  {
-    INVARIANT(false, "byte_update should be removed before arrayst");
-  }
-  else if(expr.id()==ID_typecast)
-  {
-    // we got a=(type[])b
-    const auto &expr_typecast_op = to_typecast_expr(expr).op();
-
-    // add a[i]=b[i]
-    for(const auto &index : index_set)
-    {
-      const typet &element_type = to_array_type(expr.type()).element_type();
-      index_exprt index_expr1(expr, index, element_type);
-      index_exprt index_expr2(expr_typecast_op, index, element_type);
-
-      DATA_INVARIANT(
-        index_expr1.type()==index_expr2.type(),
-        "array elements should all have same type");
-
-      // add constraint
-      lazy_constraintt lazy(lazy_typet::ARRAY_TYPECAST,
-        equal_exprt(index_expr1, index_expr2));
-      add_array_constraint(lazy, false); // added immediately
-      array_constraint_count[constraint_typet::ARRAY_TYPECAST]++;
-    }
-  }
-  else if(expr.id()==ID_index)
-  {
-  }
-  else
-  {
-    DATA_INVARIANT(
-      false,
-      "unexpected array expression (add_array_constraints): '" +
-        expr.id_string() + "'");
-  }
-}
-
-void arrayst::add_array_constraints_with(
-  const index_sett &index_set,
-  const with_exprt &expr)
-{
-  // We got x=(y with [i:=v, j:=w, ...]).
-  // First add constraints x[i]=v, x[j]=w, ...
-  std::unordered_set<exprt, irep_hash> updated_indices;
-
-  const exprt::operandst &operands = expr.operands();
-  for(std::size_t i = 1; i + 1 < operands.size(); i += 2)
-  {
-    const exprt &index = operands[i];
-    const exprt &value = operands[i + 1];
-
-    index_exprt index_expr(
-      expr, index, to_array_type(expr.type()).element_type());
-
-    DATA_INVARIANT_WITH_DIAGNOSTICS(
-      index_expr.type() == value.type(),
-      "with-expression operand should match array element type",
-      irep_pretty_diagnosticst{expr});
-
-    lazy_constraintt lazy(
-      lazy_typet::ARRAY_WITH, equal_exprt(index_expr, value));
-    add_array_constraint(lazy, false); // added immediately
-    array_constraint_count[constraint_typet::ARRAY_WITH]++;
-
-    updated_indices.insert(index);
-  }
-
-  // For all other indices use the existing value, i.e., add constraints
-  // x[I]=y[I] for I!=i,j,...
-
-  for(auto other_index : index_set)
-  {
-    if(updated_indices.find(other_index) == updated_indices.end())
-    {
-      // we first build the guard
-      exprt::operandst disjuncts;
-      disjuncts.reserve(updated_indices.size());
-      for(const auto &index : updated_indices)
-      {
-        disjuncts.push_back(equal_exprt{
-          index, typecast_exprt::conditional_cast(other_index, index.type())});
-      }
-
-      literalt guard_lit = convert(disjunction(disjuncts));
-
-      if(guard_lit!=const_literal(true))
-      {
-        const typet &element_type = to_array_type(expr.type()).element_type();
-        index_exprt index_expr1(expr, other_index, element_type);
-        index_exprt index_expr2(expr.old(), other_index, element_type);
-
-        equal_exprt equality_expr(index_expr1, index_expr2);
-
-        // add constraint
-        lazy_constraintt lazy(lazy_typet::ARRAY_WITH, or_exprt(equality_expr,
-                                literal_exprt(guard_lit)));
-
-        add_array_constraint(lazy, false); // added immediately
-        array_constraint_count[constraint_typet::ARRAY_WITH]++;
-
-#if 0 // old code for adding, not significantly faster
-        {
-          literalt equality_lit=convert(equality_expr);
-
-          bvt bv;
-          bv.reserve(2);
-          bv.push_back(equality_lit);
-          bv.push_back(guard_lit);
-          prop.lcnf(bv);
-        }
-#endif
-      }
-    }
-  }
-}
-
-void arrayst::add_array_constraints_update(
-  const index_sett &,
-  const update_exprt &)
-{
-  // we got x=UPDATE(y, [i], v)
-  // add constaint x[i]=v
-
-#if 0
-  const exprt &index=expr.where();
-  const exprt &value=expr.new_value();
-
-  {
-    index_exprt index_expr(expr, index, expr.type().subtype());
-
-    DATA_INVARIANT_WITH_DIAGNOSTICS(
-      index_expr.type()==value.type(),
-      "update operand should match array element type",
-      irep_pretty_diagnosticst{expr});
-
-    set_to_true(equal_exprt(index_expr, value));
-  }
-
-  // use other array index applications for "else" case
-  // add constraint x[I]=y[I] for I!=i
-
-  for(auto other_index : index_set)
-  {
-    if(other_index!=index)
-    {
-      // we first build the guard
-
-      other_index = typecast_exprt::conditional_cast(other_index, index.type());
-
-      literalt guard_lit=convert(equal_exprt(index, other_index));
-
-      if(guard_lit!=const_literal(true))
-      {
-        const typet &subtype=expr.type().subtype();
-        index_exprt index_expr1(expr, other_index, subtype);
-        index_exprt index_expr2(expr.op0(), other_index, subtype);
-
-        equal_exprt equality_expr(index_expr1, index_expr2);
-
-        literalt equality_lit=convert(equality_expr);
-
-        // add constraint
-        bvt bv;
-        bv.reserve(2);
-        bv.push_back(equality_lit);
-        bv.push_back(guard_lit);
-        prop.lcnf(bv);
-      }
-    }
-  }
-#endif
-}
-
-void arrayst::add_array_constraints_array_of(
-  const index_sett &index_set,
-  const array_of_exprt &expr)
-{
-  // we got x=array_of[v]
-  // get other array index applications
-  // and add constraint x[i]=v
-
-  for(const auto &index : index_set)
-  {
-    const typet &element_type = expr.type().element_type();
-    index_exprt index_expr(expr, index, element_type);
-
-    DATA_INVARIANT(
-      index_expr.type() == expr.what().type(),
-      "array_of operand type should match array element type");
-
-    // add constraint
-    lazy_constraintt lazy(
-      lazy_typet::ARRAY_OF, equal_exprt(index_expr, expr.what()));
-    add_array_constraint(lazy, false); // added immediately
-    array_constraint_count[constraint_typet::ARRAY_OF]++;
-  }
-}
-
-void arrayst::add_array_constraints_array_constant(
-  const index_sett &index_set,
-  const array_exprt &expr)
-{
-  // we got x = { v, ... } - add constraint x[i] = v
-  const exprt::operandst &operands = expr.operands();
-
-  for(const auto &index : index_set)
-  {
-    const typet &element_type = expr.type().element_type();
-    const index_exprt index_expr{expr, index, element_type};
-
-    if(index.is_constant())
-    {
-      // We have a constant index - just pick the element at that index from the
-      // array constant.
-
-      const optionalt<std::size_t> i =
-        numeric_cast<std::size_t>(to_constant_expr(index));
-      // if the access is out of bounds, we leave it unconstrained
-      if(!i.has_value() || *i >= operands.size())
-        continue;
-
-      const exprt v = operands[*i];
-      DATA_INVARIANT(
-        index_expr.type() == v.type(),
-        "array operand type should match array element type");
-
-      // add constraint
-      lazy_constraintt lazy{lazy_typet::ARRAY_CONSTANT,
-                            equal_exprt{index_expr, v}};
-      add_array_constraint(lazy, false); // added immediately
-      array_constraint_count[constraint_typet::ARRAY_CONSTANT]++;
-    }
-    else
-    {
-      // We have a non-constant index into an array constant. We need to build a
-      // case statement testing the index against all possible values. Whenever
-      // neighbouring array elements are the same, we can test the index against
-      // the range rather than individual elements. This should be particularly
-      // helpful when we have arrays of zeros, as is the case for initializers.
-
-      std::vector<std::pair<std::size_t, std::size_t>> ranges;
-
-      for(std::size_t i = 0; i < operands.size(); ++i)
-      {
-        if(ranges.empty() || operands[i] != operands[ranges.back().first])
-          ranges.emplace_back(i, i);
-        else
-          ranges.back().second = i;
-      }
-
-      for(const auto &range : ranges)
-      {
-        exprt index_constraint;
-
-        if(range.first == range.second)
-        {
-          index_constraint =
-            equal_exprt{index, from_integer(range.first, index.type())};
-        }
-        else
-        {
-          index_constraint = and_exprt{
-            binary_predicate_exprt{
-              from_integer(range.first, index.type()), ID_le, index},
-            binary_predicate_exprt{
-              index, ID_le, from_integer(range.second, index.type())}};
+          indices_equal.op1() =
+            typecast_exprt(indices_equal.op1(), indices_equal.op0().type());
         }
 
-        lazy_constraintt lazy{
-          lazy_typet::ARRAY_CONSTANT,
-          implies_exprt{index_constraint,
-                        equal_exprt{index_expr, operands[range.first]}}};
-        add_array_constraint(lazy, true); // added lazily
-        array_constraint_count[constraint_typet::ARRAY_CONSTANT]++;
+        literalt indices_equal_lit = convert(indices_equal);
+
+        if(indices_equal_lit != const_literal(false))
+        {
+          const typet &subtype = arrays[i].type().subtype();
+          index_exprt index_expr1(arrays[i], *i1, subtype);
+
+          index_exprt index_expr2 = index_expr1;
+          index_expr2.index() = *i2;
+
+          equal_exprt values_equal(index_expr1, index_expr2);
+          prop.lcnf(!indices_equal_lit, convert(values_equal));
+
+#  ifdef DEBUG_ARRAYST
+          std::cout << "C4: " << format(indices_equal) << " => "
+                    << format(values_equal) << '\n';
+#  endif
+        }
       }
     }
   }
 }
-
-void arrayst::add_array_constraints_comprehension(
-  const index_sett &index_set,
-  const array_comprehension_exprt &expr)
-{
-  // we got x=lambda(i: e)
-  // get all other array index applications
-  // and add constraints x[j]=e[i/j]
-
-  for(const auto &index : index_set)
-  {
-    index_exprt index_expr{expr, index};
-    exprt comprehension_body = expr.body();
-    replace_expr(expr.arg(), index, comprehension_body);
-
-    // add constraint
-    lazy_constraintt lazy(
-      lazy_typet::ARRAY_COMPREHENSION,
-      equal_exprt(index_expr, comprehension_body));
-
-    add_array_constraint(lazy, false); // added immediately
-    array_constraint_count[constraint_typet::ARRAY_COMPREHENSION]++;
-  }
-}
-
-void arrayst::add_array_constraints_if(
-  const index_sett &index_set,
-  const if_exprt &expr)
-{
-  // we got x=(c?a:b)
-  literalt cond_lit=convert(expr.cond());
-
-  // get other array index applications
-  // and add c => x[i]=a[i]
-  //        !c => x[i]=b[i]
-
-  // first do true case
-
-  for(const auto &index : index_set)
-  {
-    const typet &element_type = to_array_type(expr.type()).element_type();
-    index_exprt index_expr1(expr, index, element_type);
-    index_exprt index_expr2(expr.true_case(), index, element_type);
-
-    // add implication
-    lazy_constraintt lazy(lazy_typet::ARRAY_IF,
-                            or_exprt(literal_exprt(!cond_lit),
-                              equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); // added immediately
-    array_constraint_count[constraint_typet::ARRAY_IF]++;
-
-#if 0 // old code for adding, not significantly faster
-    prop.lcnf(!cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
 #endif
-  }
-
-  // now the false case
-  for(const auto &index : index_set)
-  {
-    const typet &element_type = to_array_type(expr.type()).element_type();
-    index_exprt index_expr1(expr, index, element_type);
-    index_exprt index_expr2(expr.false_case(), index, element_type);
-
-    // add implication
-    lazy_constraintt lazy(
-      lazy_typet::ARRAY_IF,
-      or_exprt(literal_exprt(cond_lit),
-      equal_exprt(index_expr1, index_expr2)));
-    add_array_constraint(lazy, false); // added immediately
-    array_constraint_count[constraint_typet::ARRAY_IF]++;
-
-#if 0 // old code for adding, not significantly faster
-    prop.lcnf(cond_lit, convert(equal_exprt(index_expr1, index_expr2)));
-#endif
-  }
-}
 
 std::string arrayst::enum_to_string(constraint_typet type)
 {
