@@ -26,7 +26,7 @@ _cbmc_autocomplete()
    -I|--classpath|-cp|--outfile|--existing-coverage|--graphml-cex)
      #a switch that takes a file parameter of which we don't know an extension
      #TODO probably we can do more for -I, --classpath, -cp
-     _filedir
+     COMPREPLY=( $(compgen -f -- $cur) )
      return 0
      ;;
   esac
@@ -38,6 +38,6 @@ _cbmc_autocomplete()
   fi
 
   #if none of the above applies, offer directories and files that we can analyze
-  _filedir "@(class|jar|cpp|cc|c\+\+|ii|cxx|c|i|gb)"
+  COMPREPLY=( $(compgen -G '*.class|*.jar|*.cpp|*.cc|*.c\+\+|*.ii|*.cxx|*.c|*.i|*.gb' -- $cur) )
 }
 complete -F _cbmc_autocomplete cbmc
