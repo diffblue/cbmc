@@ -9,7 +9,9 @@ public class test_contains
       assert(!s.contains(t));
 
       String z = new String(x);
-      if (z.length() > 3) assert(t.contains(z));
-      else assert(z.contains(u));
+      if (z.length() > 3)
+        assert(t.contains(z));
+      else
+        assert(z.contains(u));
    }
 }
