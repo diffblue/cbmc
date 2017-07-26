@@ -55,7 +55,7 @@ public:
   unsigned node_number() const;
   void clear();
 
-  bool is_initialized() const { return node!=0; }
+  bool is_initialized() const { return node!=nullptr; }
 
   // internal
   explicit mini_bddt(class mini_bdd_nodet *_node);

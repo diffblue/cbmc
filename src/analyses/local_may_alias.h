@@ -94,7 +94,7 @@ protected:
 class local_may_alias_factoryt
 {
 public:
-  local_may_alias_factoryt():goto_functions(NULL)
+  local_may_alias_factoryt():goto_functions(nullptr)
   {
   }
 
@@ -109,7 +109,7 @@ public:
 
   local_may_aliast &operator()(const irep_idt &fkt)
   {
-    assert(goto_functions!=NULL);
+    PRECONDITION(goto_functions!=nullptr);
     fkt_mapt::iterator f_it=fkt_map.find(fkt);
     if(f_it!=fkt_map.end())
       return *f_it->second;

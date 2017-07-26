@@ -406,7 +406,7 @@ void java_bytecode_convert_methodt::convert(
 const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
   const irep_idt &statement)
 {
-  for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
+  for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
     if(statement==p->mnemonic)
       return *p;
 

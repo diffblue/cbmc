@@ -44,7 +44,7 @@ const char *non_ms_cl_options[]=
   "--partial-inlining",
   "--verbosity",
   "--function",
-  NULL
+  nullptr
 };
 
 bool ms_cl_cmdlinet::parse(const std::vector<std::string> &options)
@@ -110,7 +110,7 @@ void ms_cl_cmdlinet::parse_env()
 
   const char *CL_env=getenv("CL");
 
-  if(CL_env!=NULL)
+  if(CL_env!=nullptr)
     process_response_file_line(CL_env);
 
   #endif
@@ -275,7 +275,7 @@ void ms_cl_cmdlinet::process_non_cl_option(
 {
   set(s);
 
-  for(unsigned j=0; non_ms_cl_options[j]!=NULL; j++)
+  for(unsigned j=0; non_ms_cl_options[j]!=nullptr; j++)
     if(s==non_ms_cl_options[j])
       return;
 
@@ -288,7 +288,7 @@ void ms_cl_cmdlinet::process_non_cl_option(
 const char *ms_cl_flags[]=
 {
   "c", // compile only
-  NULL
+  nullptr
 };
 
 const char *ms_cl_prefixes[]=
@@ -406,7 +406,7 @@ const char *ms_cl_prefixes[]=
   "MT", //  link with LIBCMT.LIB
   "MDd", //  link with MSVCRTD.LIB debug lib
   "MTd", //  link with LIBCMTD.LIB debug lib
-  NULL
+  nullptr
 };
 
 void ms_cl_cmdlinet::process_cl_option(const std::string &s)
@@ -420,7 +420,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     return;
   }
 
-  for(std::size_t j=0; ms_cl_flags[j]!=NULL; j++)
+  for(std::size_t j=0; ms_cl_flags[j]!=nullptr; j++)
   {
     if(std::string(s, 1, std::string::npos)==ms_cl_flags[j])
     {
@@ -453,7 +453,7 @@ void ms_cl_cmdlinet::process_cl_option(const std::string &s)
     }
   }
 
-  for(std::size_t j=0; ms_cl_prefixes[j]!=NULL; j++)
+  for(std::size_t j=0; ms_cl_prefixes[j]!=nullptr; j++)
   {
     std::string ms_cl_prefix=ms_cl_prefixes[j];
 

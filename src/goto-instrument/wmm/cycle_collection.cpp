@@ -56,7 +56,7 @@ void event_grapht::graph_explorert::collect_cycles(
   for(std::size_t i=0; i<egraph.size(); i++)
     mark[i]=false;
 
-  std::list<event_idt>* order=0;
+  std::list<event_idt>* order=nullptr;
   /* on Power, rfe pairs are also potentially unsafe */
   switch(model)
   {
