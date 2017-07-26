@@ -1194,6 +1194,16 @@ void configt::set_object_bits_from_symbol_table(
   }
 }
 
+std::string configt::object_bits_info()
+{
+  return "Running with "+std::to_string(bv_encoding.object_bits)+
+    " object bits, "+
+    std::to_string(ansi_c.pointer_width-bv_encoding.object_bits)+
+    " offset bits ("+
+    (bv_encoding.is_object_bits_default ? "default" : "user-specified")+
+    ")";
+}
+
 irep_idt configt::this_architecture()
 {
   irep_idt this_arch;
