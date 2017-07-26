@@ -413,47 +413,35 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   }
 }
 
-/// add axioms corresponding to the Integer.parseInt java function
-/// \param f: a function application with either one string expression or one
-///   string expression and an integer expression for the radix
-/// \return an integer expression
-exprt string_constraint_generatort::add_axioms_for_parse_int(
-  const function_application_exprt &f)
+/// Add axioms connecting the characters in the input string to the value of the
+/// output integer
+/// \param x: symbol for abs(integer represented by str)
+/// \param type: the type for x
+/// \param char_type: the type to use for characters
+/// \param index_type: the type to use for indexes
+/// \param str: input string
+/// \param max_string_length: the maximum length str can have
+/// \param radix: the radix, with the same type as x
+/// \return an expression for the integer represented by the string
+exprt string_constraint_generatort::add_axioms_for_characters_in_integer_string(
+  const symbol_exprt& x,
+  const typet& type,
+  const typet& char_type,
+  const typet& index_type,
+  const string_exprt& str,
+  const std::size_t max_string_length,
+  const exprt& radix)
 {
-  PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  const string_exprt str=get_string_expr(f.arguments()[0]);
-  const typet &type=f.type();
-  PRECONDITION(type.id()==ID_signedbv);
-  const exprt radix=
-    f.arguments().size()==1?
-      static_cast<exprt>(from_integer(10, type)):
-      static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
-
-  const symbol_exprt x=fresh_symbol("parsed_int", type);
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
-  const typet &index_type=ref_type.get_index_type();
-  const exprt minus_char=constant_char('-', char_type);
-  const exprt zero_expr=from_integer(0, type);
-
-  /// We experimented with making the max_string_length depend on the base, but
-  /// this did not make any difference to the speed of execution.
-  const std::size_t max_string_length=to_bitvector_type(type).get_width()+1;
-
-  /// TODO: we should throw an exception when this does not hold:
-  /// Note that the only thing stopping us from taking longer strings with many
-  /// leading zeros is the axioms for correct number format
-  add_axioms_for_correct_number_format(
-    str, typecast_exprt(radix, char_type), max_string_length);
-
   /// TODO(OJones): Fix the below algorithm to make it work for min_int. There
   /// are two problems. (1) Because we build i as positive and then negate it if
   /// the first character is '-', we hit overflow for min_int because
   /// |min_int| > max_int. (2) radix^63 overflows. I think we'll have to
   /// special-case it.
 
+  const exprt zero_expr=from_integer(0, type);
   axioms.push_back(binary_relation_exprt(x, ID_ge, zero_expr));
 
+  const exprt one_index_type=from_integer(1, index_type);
   exprt radix_to_power_of_i;
   exprt no_overflow;
 
@@ -462,8 +450,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     /// We are counting backwards from the end of the string, i.e. i refers
     /// to str[j] where j=str.length()-i-1
     const constant_exprt i_expr=from_integer(i, index_type);
-    const minus_exprt j(
-      minus_exprt(str.length(), i_expr), from_integer(1, index_type));
+    const minus_exprt j(minus_exprt(str.length(), i_expr), one_index_type);
 
     if(i==0)
     {
@@ -472,7 +459,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     }
     else
     {
-      exprt radix_to_power_of_i_minus_one=radix_to_power_of_i;
+      const exprt radix_to_power_of_i_minus_one=radix_to_power_of_i;
       /// Note that power_exprt is probably designed for floating point. Also,
       /// it doesn't work when the exponent isn't a constant, hence why this
       /// loop is indexed by i instead of j. It is faster than
@@ -494,7 +481,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
     const if_exprt digit_value(
       i_is_valid,
       get_numeric_value_from_character(str[j], char_type, type),
-      from_integer(0, type));
+      zero_expr);
 
     /// when there is no overflow, str[j] = (x/radix^i)%radix
     const equal_exprt contribution_of_str_j(
@@ -506,7 +493,47 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
       not_exprt(no_overflow), equal_exprt(digit_value, zero_expr)));
   }
 
-  return if_exprt(equal_exprt(str[0], minus_char), unary_minus_exprt(x), x);
+  return if_exprt(
+    equal_exprt(str[0], constant_char('-', char_type)),
+    unary_minus_exprt(x),
+    x);
+}
+
+/// add axioms corresponding to the Integer.parseInt java function
+/// \param f: a function application with either one string expression or one
+///   string expression and an integer expression for the radix
+/// \return an integer expression
+exprt string_constraint_generatort::add_axioms_for_parse_int(
+  const function_application_exprt &f)
+{
+  PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
+  const string_exprt str=get_string_expr(f.arguments()[0]);
+  const typet &type=f.type();
+  PRECONDITION(type.id()==ID_signedbv);
+  const exprt radix=
+    f.arguments().size()==1?
+      static_cast<exprt>(from_integer(10, type)):
+      static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
+
+  const symbol_exprt x=fresh_symbol("abs_parsed_int", type);
+  const refined_string_typet &ref_type=to_refined_string_type(str.type());
+  const typet &char_type=ref_type.get_char_type();
+  const typet &index_type=ref_type.get_index_type();
+
+  /// We experimented with making the max_string_length depend on the base, but
+  /// this did not make any difference to the speed of execution.
+  const std::size_t max_string_length=to_bitvector_type(type).get_width()+1;
+
+  /// TODO: we should throw an exception when this does not hold:
+  /// Note that the only thing stopping us from taking longer strings with many
+  /// leading zeros is the axioms for correct number format
+  add_axioms_for_correct_number_format(
+    str, typecast_exprt(radix, char_type), max_string_length);
+
+  exprt parsed_int_expr=add_axioms_for_characters_in_integer_string(
+    x, type, char_type, index_type, str, max_string_length, radix);
+
+  return parsed_int_expr;
 }
 
 /// Check if a character is a digit with respect to the given radix, e.g. if the
