@@ -720,6 +720,8 @@ int cbmc_parse_optionst::get_goto_program(
       show_goto_functions(ns, get_ui(), goto_functions);
       return 0;
     }
+
+    status() << config.object_bits_info() << eom;
   }
 
   catch(const char *e)

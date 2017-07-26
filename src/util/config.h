@@ -168,6 +168,7 @@ public:
   bool set(const cmdlinet &cmdline);
 
   void set_object_bits_from_symbol_table(const symbol_tablet &);
+  std::string object_bits_info();
 
   static irep_idt this_architecture();
   static irep_idt this_operating_system();
