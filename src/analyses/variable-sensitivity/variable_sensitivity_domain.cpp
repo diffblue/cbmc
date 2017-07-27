@@ -72,7 +72,8 @@ void variable_sensitivity_domaint::transform(
 
       // TODO : check return values
       abstract_object_pointert r = abstract_state.eval(inst.rhs(), ns);
-      abstract_state.assign(inst.lhs(), r, ns);
+      abstract_object_pointert rhs = r->update_last_written_locations(from);
+      abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
 

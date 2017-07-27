@@ -110,6 +110,14 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
+  abstract_object_pointert update_last_written_locations(goto_programt::const_targett &location) const
+  {
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->last_written_locations.clear();
+    clone->last_written_locations.push_back(location);
+    return clone;
+  }
+
   std::vector<goto_programt::const_targett> get_last_written_locations() const
   {
     return last_written_locations;
