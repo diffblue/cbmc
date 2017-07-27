@@ -1,6 +1,6 @@
 KNOWNBUG
-test_parseint_with_radix.class
---refine-strings
+Test.class
+--refine-strings --function Test.foo
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 9.* SUCCESS$
