@@ -30,8 +30,10 @@
 #include <map>
 #include <iosfwd>
 #include <algorithm>
+#include <goto-programs/goto_program.h>
 
 #include <util/expr.h>
+
 
 class typet;
 class constant_exprt;
@@ -108,10 +110,16 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
+  std::vector<goto_programt::const_targett> get_last_written_locations() const
+  {
+    return last_written_locations;
+  }
+
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
+  std::vector<goto_programt::const_targett> last_written_locations;
 
   abstract_object_pointert abstract_object_merge(
     const abstract_object_pointert other) const;
