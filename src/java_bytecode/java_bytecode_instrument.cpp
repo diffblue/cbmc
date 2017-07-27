@@ -76,6 +76,8 @@ protected:
     const source_locationt &original_loc);
 
   void instrument_code(exprt &expr);
+  void add_expr_instrumentation(code_blockt &block, const exprt &expr);
+  void prepend_instrumentation(codet &code, code_blockt &instrumentation);
   codet instrument_expr(const exprt &expr);
 };
 
@@ -327,6 +329,42 @@ codet java_bytecode_instrumentt::check_array_length(
   return check;
 }
 
+/// Checks whether `expr` requires instrumentation, and if so adds it
+/// to `block`.
+/// \param [out] block: block where instrumentation will be added
+/// \param expr: expression to instrument
+void java_bytecode_instrumentt::add_expr_instrumentation(
+  code_blockt &block,
+  const exprt &expr)
+{
+  codet expr_instrumentation=instrument_expr(expr);
+  if(expr_instrumentation!=code_skipt())
+  {
+    if(expr_instrumentation.get_statement()==ID_block)
+      block.append(to_code_block(expr_instrumentation));
+    else
+      block.move_to_operands(expr_instrumentation);
+  }
+}
+
+/// Appends `code` to `instrumentation` and overwrites reference `code`
+/// with the augmented block if `instrumentation` is non-empty.
+/// \param [in, out] code: code being instrumented
+/// \param instrumentation: instrumentation code block to prepend
+void java_bytecode_instrumentt::prepend_instrumentation(
+  codet &code,
+  code_blockt &instrumentation)
+{
+  if(instrumentation!=code_blockt())
+  {
+    if(code.get_statement()==ID_block)
+      instrumentation.append(to_code_block(code));
+    else
+      instrumentation.copy_to_operands(code);
+    code=instrumentation;
+  }
+}
+
 /// Augments `expr` with instrumentation in the form of either
 /// assertions or runtime exceptions
 /// \par parameters: `expr`: the expression to be instrumented
@@ -342,11 +380,9 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
     code_assignt code_assign=to_code_assign(code);
 
     code_blockt block;
-    block.copy_to_operands(instrument_expr(code_assign.lhs()));
-    block.copy_to_operands(instrument_expr(code_assign.rhs()));
-    block.copy_to_operands(code_assign);
-
-    code=block;
+    add_expr_instrumentation(block, code_assign.lhs());
+    add_expr_instrumentation(block, code_assign.rhs());
+    prepend_instrumentation(code, block);
   }
   else if(statement==ID_expression)
   {
@@ -354,10 +390,8 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
       to_code_expression(code);
 
     code_blockt block;
-    block.copy_to_operands(
-      instrument_expr(code_expression.expression()));
-    block.copy_to_operands(code_expression);
-    code=block;
+    add_expr_instrumentation(block, code_expression.expression());
+    prepend_instrumentation(code, block);
   }
   else if(statement==ID_assert)
   {
@@ -393,49 +427,40 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
   {
     code_blockt block;
     code_ifthenelset &code_ifthenelse=to_code_ifthenelse(code);
-    block.copy_to_operands(instrument_expr(code_ifthenelse.cond()));
+    add_expr_instrumentation(block, code_ifthenelse.cond());
     instrument_code(code_ifthenelse.then_case());
     if(code_ifthenelse.else_case().is_not_nil())
       instrument_code(code_ifthenelse.else_case());
-    block.copy_to_operands(code);
-    code=block;
+    prepend_instrumentation(code, block);
   }
   else if(statement==ID_switch)
   {
     code_blockt block;
     code_switcht &code_switch=to_code_switch(code);
-    block.copy_to_operands(
-      instrument_expr(code_switch.value()));
-    block.copy_to_operands(
-      instrument_expr(code_switch.body()));
-    block.copy_to_operands(code);
-    code=block;
+    add_expr_instrumentation(block, code_switch.value());
+    add_expr_instrumentation(block, code_switch.body());
+    prepend_instrumentation(code, block);
   }
   else if(statement==ID_return)
   {
     if(code.operands().size()==1)
     {
       code_blockt block;
-      block.copy_to_operands(instrument_expr(code.op0()));
-      block.copy_to_operands(code);
-      code=block;
+      add_expr_instrumentation(block, code.op0());
+      prepend_instrumentation(code, block);
     }
   }
   else if(statement==ID_function_call)
   {
     code_blockt block;
     code_function_callt &code_function_call=to_code_function_call(code);
-    block.copy_to_operands(instrument_expr(code_function_call.lhs()));
-    block.copy_to_operands(instrument_expr(code_function_call.function()));
+    add_expr_instrumentation(block, code_function_call.lhs());
+    add_expr_instrumentation(block, code_function_call.function());
 
-    for(code_function_callt::argumentst::iterator
-          a_it=code_function_call.arguments().begin();
-        a_it!=code_function_call.arguments().end();
-        a_it++)
-      block.copy_to_operands(instrument_expr(*a_it));
+    for(const auto &arg : code_function_call.arguments())
+      add_expr_instrumentation(block, arg);
 
-    block.copy_to_operands(code);
-    code=block;
+    prepend_instrumentation(code, block);
   }
 
   // Ensure source location is retained:
@@ -451,6 +476,16 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
 codet java_bytecode_instrumentt::instrument_expr(
   const exprt &expr)
 {
+  code_blockt result;
+  // First check our operands:
+  forall_operands(it, expr)
+  {
+    codet op_result=instrument_expr(*it);
+    if(op_result!=code_skipt())
+      result.move_to_operands(op_result);
+  }
+
+  // Add any check due at this node:
   if(expr.id()==ID_plus &&
      expr.get_bool(ID_java_array_access))
   {
@@ -469,7 +504,7 @@ codet java_bytecode_instrumentt::instrument_expr(
             dereference_expr,
             plus_expr.op1(),
             expr.source_location());
-        return bounds_check;
+        result.move_to_operands(bounds_check);
       }
     }
   }
@@ -478,26 +513,33 @@ codet java_bytecode_instrumentt::instrument_expr(
     const side_effect_exprt &side_effect_expr=to_side_effect_expr(expr);
     const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_throw)
+    {
       // this corresponds to athrow and so we check that
       // we don't throw null
-      return check_null_dereference(
-        expr.op0(),
-        expr.source_location(),
-        true);
+      result.copy_to_operands(
+        check_null_dereference(
+          expr.op0(),
+          expr.source_location(),
+          true));
+    }
     else if(statement==ID_java_new_array)
+    {
       // this correpond to new array so we check that
       // length is >=0
-      return check_array_length(
-        expr.op0(),
-        expr.source_location());
+      result.copy_to_operands(
+        check_array_length(
+          expr.op0(),
+          expr.source_location()));
+    }
   }
   else if((expr.id()==ID_div || expr.id()==ID_mod) &&
           expr.type().id()==ID_signedbv)
   {
     // check division by zero (for integer types only)
-    return check_arithmetic_exception(
-      expr.op1(),
-      expr.source_location());
+    result.copy_to_operands(
+      check_arithmetic_exception(
+        expr.op1(),
+        expr.source_location()));
   }
   else if(expr.id()==ID_member &&
           expr.get_bool(ID_java_member_access))
@@ -514,19 +556,14 @@ codet java_bytecode_instrumentt::instrument_expr(
           dereference_expr.op0(),
           dereference_expr.source_location(),
           false);
-      return null_dereference_check;
+      result.move_to_operands(null_dereference_check);
     }
   }
 
-  if(!expr.has_operands())
+  if(result==code_blockt())
     return code_skipt();
-
-  code_blockt block;
-  forall_operands(it, expr)
-  {
-    block.copy_to_operands(instrument_expr(*it));
-  }
-  return block;
+  else
+    return result;
 }
 
 /// Instruments `expr`
