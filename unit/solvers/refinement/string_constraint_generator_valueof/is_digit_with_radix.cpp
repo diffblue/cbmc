@@ -18,57 +18,38 @@
 SCENARIO("is_digit_with_radix",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
-  typet char_type=unsignedbv_typet(16);
-  typet int_type=signedbv_typet(32);
+  const typet char_type=unsignedbv_typet(16);
   symbol_tablet symtab;
-  namespacet ns(symtab);
+  const namespacet ns(symtab);
 
   WHEN("Radix 10")
   {
-    int radix=10;
+    const constant_exprt radix_expr=from_integer(10, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('0', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('0', char_type), radix_expr), ns));
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('9', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('9', char_type), radix_expr), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('a', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('a', char_type), radix_expr), ns));
   }
   WHEN("Radix 8")
   {
-    int radix=8;
+    const constant_exprt radix_expr=from_integer(8, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('7', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('7', char_type), radix_expr), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('8', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('8', char_type), radix_expr), ns));
   }
   WHEN("Radix 16")
   {
-    int radix=16;
+    const constant_exprt radix_expr=from_integer(16, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('a', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('a', char_type), radix_expr), ns));
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('A', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('A', char_type), radix_expr), ns));
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('f', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('f', char_type), radix_expr), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(
-        from_integer('g', char_type),
-        from_integer(radix, int_type)), ns));
+      is_digit_with_radix(from_integer('g', char_type), radix_expr), ns));
   }
 }
