@@ -1,7 +1,9 @@
-FUTURE
+KNOWNBUG
 test_append_int.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 9.* FAILURE$
+^\[.*assertion\.1\].* line 9.* FAILURE$
 --
+--
+Requires private library, should be moved to test-gen suite

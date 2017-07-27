@@ -1,8 +1,9 @@
-FUTURE
+CORE
 StringConcatenation04.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
+^\[.*assertion\.1\] .* line 8 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

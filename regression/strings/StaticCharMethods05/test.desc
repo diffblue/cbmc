@@ -1,8 +1,11 @@
-FUTURE
+CORE
 StaticCharMethods05.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
+^\[pointer_dereference\.2\] reference is null in \*this->data: FAILURE$
+^\[.*assertion\.1\] .* line 12 .* FAILURE$
+^\[.*assertion\.2\] .* line 22 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

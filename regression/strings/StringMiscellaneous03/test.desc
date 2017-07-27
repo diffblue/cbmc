@@ -1,8 +1,9 @@
-FUTURE
+CORE
 StringMiscellaneous03.class
 --refine-strings --unwind 30
 ^EXIT=10$
 ^SIGNAL=0$
+^\[.*assertion\.1\] .* line 11 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

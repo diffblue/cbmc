@@ -1,7 +1,7 @@
-FUTURE
+CORE
 test_insert_char_array.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 12.* FAILURE$
+^\[.*assertion\.1\].* line 12.* FAILURE$
 --

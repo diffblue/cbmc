@@ -1,7 +1,7 @@
-FUTURE
+CORE
 test_empty.class
 --refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 6.* FAILURE$
+^\[.*assertion\.1\].* line 6.* FAILURE$
 --
