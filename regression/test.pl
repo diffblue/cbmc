@@ -3,6 +3,7 @@
 use subs;
 use strict;
 use warnings;
+use File::Basename;
 
 use Cwd;
 
@@ -71,7 +72,8 @@ sub test($$$$$) {
 
   $options =~ s/$ign//g if(defined($ign));
 
-  my $output = $input;
+  my $descriptor = basename($test);
+  my $output = $descriptor;
   $output =~ s/\.[^.]*$/.out/;
 
   if($output eq $input) {
@@ -82,6 +84,7 @@ sub test($$$$$) {
   print LOG "Test '$name'\n";
   print LOG "  Level: $level\n";
   print LOG "  Input: $input\n";
+  print LOG "  Descriptor: $descriptor\n";
   print LOG "  Output: $output\n";
   print LOG "  Options: $options\n";
   print LOG "  Results:\n";
