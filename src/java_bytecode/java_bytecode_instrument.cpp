@@ -550,23 +550,17 @@ codet java_bytecode_instrumentt::instrument_expr(
         expr.op1(),
         expr.source_location()));
   }
-  else if(expr.id()==ID_member &&
+  else if(expr.id()==ID_dereference &&
           expr.get_bool(ID_java_member_access))
   {
-    // this corresponds to either getfield or putfield
-    // so we must check null pointer dereference
-    const member_exprt &member_expr=to_member_expr(expr);
-    if(member_expr.op0().id()==ID_dereference)
-    {
-      const dereference_exprt dereference_expr=
-        to_dereference_expr(member_expr.op0());
-      codet null_dereference_check=
-        check_null_dereference(
-          dereference_expr.op0(),
-          dereference_expr.source_location(),
-          false);
-      result.move_to_operands(null_dereference_check);
-    }
+    // Check pointer non-null before access:
+    const dereference_exprt dereference_expr=to_dereference_expr(expr);
+    codet null_dereference_check=
+      check_null_dereference(
+        dereference_expr.op0(),
+        dereference_expr.source_location(),
+        false);
+    result.move_to_operands(null_dereference_check);
   }
 
   if(result==code_blockt())
