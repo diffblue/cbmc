@@ -909,7 +909,7 @@ void goto_checkt::pointer_validity_check(
   const exprt &access_ub,
   const irep_idt &mode)
 {
-  if(mode!=ID_java && !enable_pointer_check)
+  if(!enable_pointer_check)
     return;
 
   const exprt &pointer=expr.op0();
