@@ -118,6 +118,39 @@ public:
     return clone;
   }
 
+  abstract_object_pointert update_last_written_locations(const abstract_object_pointert &object) const
+  {
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->last_written_locations.clear();
+    for(auto location: object->get_last_written_locations())
+    {
+      clone->last_written_locations.push_back(location);
+    }
+    return clone;
+  }
+
+  void set_last_written_locations(const abstract_object_pointert &object)
+  {
+    std::cout << "* Setting last written locations\n";
+    last_written_locations.clear();
+    for(auto location: object->get_last_written_locations())
+    {
+      last_written_locations.push_back(location);
+    }
+  }
+
+  bool contains_last_written_location(goto_programt::const_targett &find)
+  {
+    for(auto location: last_written_locations)
+    {
+      if(location->location_number == find->location_number)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   std::vector<goto_programt::const_targett> get_last_written_locations() const
   {
     return last_written_locations;
