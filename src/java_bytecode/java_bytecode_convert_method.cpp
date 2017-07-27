@@ -524,15 +524,15 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
   exprt pointer2=
     typecast_exprt(pointer, java_reference_type(class_type));
 
-  const dereference_exprt obj_deref(pointer2, class_type);
+  dereference_exprt obj_deref(pointer2, class_type);
+  // tag it so it's easy to identify during instrumentation
+  obj_deref.set(ID_java_member_access, true);
 
-  member_exprt member_expr(
+  const member_exprt member_expr(
     obj_deref,
     fieldref.get(ID_component_name),
     fieldref.type());
 
-  // tag it so it's easy to identify during instrumentation
-  member_expr.set(ID_java_member_access, true);
   return member_expr;
 }
 
@@ -1496,7 +1496,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       exprt pointer=
         typecast_exprt(op[0], java_array_type(type_char));
 
-      const dereference_exprt deref(pointer, pointer.type().subtype());
+      dereference_exprt deref(pointer, pointer.type().subtype());
+      deref.set(ID_java_member_access, true);
 
       const member_exprt data_ptr(
         deref,
@@ -1559,7 +1560,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       exprt pointer=
         typecast_exprt(op[0], java_array_type(type_char));
 
-      const dereference_exprt deref(pointer, pointer.type().subtype());
+      dereference_exprt deref(pointer, pointer.type().subtype());
+      deref.set(ID_java_member_access, true);
 
       const member_exprt data_ptr(
         deref,
@@ -2237,8 +2239,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       exprt pointer=
         typecast_exprt(op[0], java_array_type(statement[0]));
 
-      const dereference_exprt array(pointer, pointer.type().subtype());
+      dereference_exprt array(pointer, pointer.type().subtype());
       assert(pointer.type().subtype().id()==ID_symbol);
+      array.set(ID_java_member_access, true);
 
       const member_exprt length(array, "length", java_int_type());
 
