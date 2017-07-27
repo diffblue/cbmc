@@ -45,18 +45,18 @@ Runtime decision procedure: 0.386s
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.1] reference is null in *args: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.2] reference is null in *new_tmp0: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.3] reference is null in *new_tmp2: SUCCESS
-[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.1] assertion at file test_parseint_with_radix.java line 9 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode-index 20: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.1] assertion at file test_parseint_with_radix.java line 9 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 20: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.1] Throw null: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.4] reference is null in *new_tmp3: SUCCESS
-[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.2] assertion at file test_parseint_with_radix.java line 10 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode-index 29: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.2] assertion at file test_parseint_with_radix.java line 10 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 29: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.2] Throw null: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.5] reference is null in *args: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.6] reference is null in *new_tmp4: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.7] reference is null in *new_tmp6: SUCCESS
-[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.3] assertion at file test_parseint_with_radix.java line 16 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode-index 52: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.3] assertion at file test_parseint_with_radix.java line 16 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 52: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.3] Throw null: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.8] reference is null in *new_tmp7: SUCCESS
-[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.4] assertion at file test_parseint_with_radix.java line 17 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode-index 61: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.4] assertion at file test_parseint_with_radix.java line 17 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 61: SUCCESS
 [java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.4] Throw null: SUCCESS
 [pointer_dereference.7] reference is null in *this: SUCCESS
 [array-create-negative-size.1] Array size should be >= 0: SUCCESS

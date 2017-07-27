@@ -1,0 +1,9 @@
+CORE
+Test.class
+--function Test.foo --refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 8.* SUCCESS$
+^\[.*assertion.2\].* line 9.* FAILURE$
+^\[.*assertion.3\].* line 15.* SUCCESS$
+^\[.*assertion.4\].* line 16.* FAILURE$

@@ -415,91 +415,97 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 
 /// add axioms corresponding to the Integer.parseInt java function
 /// \param f: a function application with either one string expression or one
-///   string expression and an expression for the radix
+///   string expression and an integer expression for the radix
 /// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  string_exprt str=get_string_expr(f.arguments()[0]);
+  const string_exprt str=get_string_expr(f.arguments()[0]);
+  const typet &type=f.type();
+  PRECONDITION(type.id()==ID_signedbv);
   const exprt radix=
     f.arguments().size()==1?
-      static_cast<exprt>(from_integer(10, f.type())):
-      static_cast<exprt>(typecast_exprt(f.arguments()[1], f.type()));
+      static_cast<exprt>(from_integer(10, type)):
+      static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
 
-  const typet &type=f.type();
-  symbol_exprt i=fresh_symbol("parsed_int", type);
+  const symbol_exprt x=fresh_symbol("parsed_int", type);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
-  exprt minus_char=constant_char('-', char_type);
-  exprt plus_char=constant_char('+', char_type);
-  PRECONDITION(type.id()==ID_signedbv);
+  const typet &index_type=ref_type.get_index_type();
+  const exprt minus_char=constant_char('-', char_type);
+  const exprt zero_expr=from_integer(0, type);
 
-  exprt chr=str[0];
-  exprt starts_with_minus=equal_exprt(chr, minus_char);
-  exprt starts_with_plus=equal_exprt(chr, plus_char);
-  exprt starts_with_digit=
-    not_exprt(or_exprt(starts_with_minus, starts_with_plus));
+  /// We experimented with making the max_string_length depend on the base, but
+  /// this did not make any difference to the speed of execution.
+  const std::size_t max_string_length=to_bitvector_type(type).get_width()+1;
 
   /// TODO: we should throw an exception when this does not hold:
-  const std::size_t max_string_length=40;
+  /// Note that the only thing stopping us from taking longer strings with many
+  /// leading zeros is the axioms for correct number format
   add_axioms_for_correct_number_format(str, radix, max_string_length);
 
-  /// TODO(OJones): size should depend on the radix
-  /// TODO(OJones): we should deal with overflow properly
-  for(std::size_t size=1; size<=max_string_length; size++)
+  /// TODO(OJones): Fix the below algorithm to make it work for min_int. There
+  /// are two problems. (1) Because we build i as positive and then negate it if
+  /// the first character is '-', we hit overflow for min_int because
+  /// |min_int| > max_int. (2) radix^63 overflows. I think we'll have to
+  /// special-case it.
+
+  axioms.push_back(binary_relation_exprt(x, ID_ge, zero_expr));
+
+  exprt radix_to_power_of_i;
+  exprt no_overflow;
+
+  for(std::size_t i=0; i<max_string_length; ++i)
   {
-    exprt sum=from_integer(0, type);
-    exprt first_value=get_numeric_value_from_character(chr, char_type, type);
-    equal_exprt premise=str.axiom_for_has_length(size);
+    /// We are counting backwards from the end of the string, i.e. i refers
+    /// to str[j] where j=str.length()-i-1
+    const constant_exprt i_expr=from_integer(i, index_type);
+    const minus_exprt j(
+      minus_exprt(str.length(), i_expr), from_integer(1, index_type));
 
-    for(std::size_t j=1; j<size; j++)
+    if(i==0)
     {
-      mult_exprt radix_sum(sum, radix);
-      if(j>=max_string_length-1)
-      {
-        // We have to be careful about overflows
-        div_exprt div(sum, radix);
-        implies_exprt no_overflow(premise, (equal_exprt(div, sum)));
-        axioms.push_back(no_overflow);
-      }
-
-      sum=plus_exprt_with_overflow_check(
-        radix_sum,
-        get_numeric_value_from_character(str[j], char_type, type));
-
-      mult_exprt first(first_value, radix);
-      if(j>=max_string_length-1)
-      {
-        // We have to be careful about overflows
-        div_exprt div_first(first, radix);
-        implies_exprt no_overflow_first(
-          and_exprt(starts_with_digit, premise),
-          equal_exprt(div_first, first_value));
-        axioms.push_back(no_overflow_first);
-      }
-      first_value=first;
+      no_overflow=true_exprt();
+      radix_to_power_of_i=from_integer(1, type);
+    }
+    else
+    {
+      exprt radix_to_power_of_i_minus_one=radix_to_power_of_i;
+      /// Note that power_exprt is probably designed for floating point. Also,
+      /// it doesn't work when the exponent isn't a constant, hence why this
+      /// loop is indexed by i instead of j. It is faster than
+      /// mult_exprt(radix_to_power_of_i, radix).
+      radix_to_power_of_i=power_exprt(radix, i_expr);
+      /// The first time there is overflow we will have that
+      /// radix^i/radix != radix^(i-1)
+      /// However, that condition may hold in future, so we have to be sure to
+      /// propagate the first time this fails to all higher values of i
+      no_overflow=and_exprt(
+        equal_exprt(
+          div_exprt(radix_to_power_of_i, radix), radix_to_power_of_i_minus_one),
+        no_overflow);
     }
 
-    // If the length is `size`, we add axioms:
-    // a1 : starts_with_digit => i=sum+first_value
-    // a2 : starts_with_plus => i=sum
-    // a3 : starts_with_minus => i=-sum
+    /// If we have already read all characters from the string then we use 0
+    /// instead of the value from str[j]
+    const binary_relation_exprt i_is_valid(i_expr, ID_lt, str.length());
+    const if_exprt digit_value(
+      i_is_valid,
+      get_numeric_value_from_character(str[j], char_type, type),
+      from_integer(0, type));
 
-    implies_exprt a1(
-      and_exprt(premise, starts_with_digit),
-      equal_exprt(i, plus_exprt(sum, first_value)));
-    axioms.push_back(a1);
+    /// when there is no overflow, str[j] = (x/radix^i)%radix
+    const equal_exprt contribution_of_str_j(
+      digit_value,
+      mod_exprt(div_exprt(x, radix_to_power_of_i), radix));
 
-    implies_exprt a2(and_exprt(premise, starts_with_plus), equal_exprt(i, sum));
-    axioms.push_back(a2);
-
-    implies_exprt a3(
-      and_exprt(premise, starts_with_minus),
-      equal_exprt(i, unary_minus_exprt(sum)));
-    axioms.push_back(a3);
+    axioms.push_back(implies_exprt(no_overflow, contribution_of_str_j));
+    axioms.push_back(implies_exprt(
+      not_exprt(no_overflow), equal_exprt(digit_value, zero_expr)));
   }
-  return i;
+
+  return if_exprt(equal_exprt(str[0], minus_char), unary_minus_exprt(x), x);
 }
 
 /// Check if a character is a digit with respect to the given radix, e.g. if the
@@ -541,7 +547,7 @@ exprt is_digit_with_radix(exprt chr, exprt radix)
 }
 
 /// Get the numeric value of a character, assuming that the radix is large
-/// enough
+/// enough. '+' and '-' yield 0.
 /// \param chr: the character to get the numeric value of
 /// \param char_type: the type to use for characters
 /// \param type: the type to use for the return value
@@ -555,16 +561,25 @@ exprt get_numeric_value_from_character(
   constant_exprt A_char=from_integer('A', char_type);
   constant_exprt ten_int=from_integer(10, char_type);
 
-  binary_relation_exprt upper_case(chr, ID_ge, A_char);
+  /// There are four cases, which occur in ASCII in the following order:
+  /// '+' and '-', digits, upper case letters, lower case letters
   binary_relation_exprt lower_case(chr, ID_ge, a_char);
+  binary_relation_exprt upper_case_or_lower_case(chr, ID_ge, A_char);
+  binary_relation_exprt upper_case_lower_case_or_digit(chr, ID_ge, zero_char);
 
+  /// return char >= 'a' ? (char - 'a' + 10) :
+  ///   char >= 'A' ? (char - 'A' + 10) :
+  ///     char >= '0' ? (char - '0') : 0
   return typecast_exprt(
     if_exprt(
       lower_case,
       plus_exprt(minus_exprt(chr, a_char), ten_int),
       if_exprt(
-        upper_case,
+        upper_case_or_lower_case,
         plus_exprt(minus_exprt(chr, A_char), ten_int),
-        minus_exprt(chr, zero_char))),
+        if_exprt(
+          upper_case_lower_case_or_digit,
+          minus_exprt(chr, zero_char),
+          from_integer(0, char_type)))),
     type);
 }
