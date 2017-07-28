@@ -22,3 +22,5 @@ main::1::m () -> {.age=00000000000000000000000000001010 @ [2]} @ []
 Should be?
 
 main::1::m () -> {.age=00000000000000000000000000001010 @ [2]} @ [2]
+
+tl;dr: Copying objects with subelements.
