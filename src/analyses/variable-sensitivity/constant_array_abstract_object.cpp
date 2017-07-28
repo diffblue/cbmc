@@ -210,7 +210,6 @@ void constant_array_abstract_objectt::output(
         }
       }
       out << "]";
-      // End outputting specific last_written_locations
 
       out << "\n";
     }
@@ -434,5 +433,30 @@ bool constant_array_abstract_objectt::eval_index(
   else
   {
     return false;
+  }
+}
+
+/*******************************************************************\
+
+Function: constant_array_abstract_objectt::update_sub_elements
+
+  Inputs:
+   locations - Locations to write
+
+ Outputs: None
+
+ Purpose: Updates write location for sub-elements.
+
+          For example, if a[2] = {5, 6}, this will update
+          the write location for objects 5 and 6 as well as a.
+
+\*******************************************************************/
+
+void constant_array_abstract_objectt::update_sub_elements(
+    const locationst &locations)
+{
+  for(auto &item: map)
+  {
+    item.second=item.second->update_last_written_locations(locations);
   }
 }

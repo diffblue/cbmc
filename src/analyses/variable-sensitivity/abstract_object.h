@@ -31,9 +31,8 @@
 #include <iosfwd>
 #include <algorithm>
 #include <goto-programs/goto_program.h>
-
+#include <set>
 #include <util/expr.h>
-
 
 class typet;
 class constant_exprt;
@@ -100,6 +99,9 @@ public:
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
+  typedef std::set<goto_programt::const_targett> locationst;
+
+
   abstract_object_pointert clone() const
   {
     return abstract_object_pointert(mutable_clone());
@@ -110,88 +112,20 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
-
-  virtual void update_sub_elements(const goto_programt::const_targett &location)
-  {
-    return;
-  }
-
-
-  abstract_object_pointert update_last_written_locations(const goto_programt::const_targett &location) const
-  {
-    internal_abstract_object_pointert clone=mutable_clone();
-    clone->last_written_locations.clear();
-    clone->last_written_locations.push_back(location);
-    clone->update_sub_elements(location);
-    return clone;
-  }
-
-  abstract_object_pointert update_last_written_locations(const std::vector<goto_programt::const_targett> &locations) const
-  {
-    internal_abstract_object_pointert clone=mutable_clone();
-    clone->last_written_locations.clear();
-    clone->last_written_locations=locations;
-    return clone;
-  }
-
-  // Cheap and dirty diff calculation.
-  // Moving to (unordered)_sets would allow reliance on built ins.
-  std::vector<goto_programt::const_targett> get_new_location_set(const abstract_object_pointert &other) const
-  {
-    std::vector<goto_programt::const_targett> locations=this->get_last_written_locations();
-    std::vector<goto_programt::const_targett> more_locations=other->get_last_written_locations();
-
-    for(auto add_location:more_locations)
-    {
-      bool found=false;
-      for(auto location:locations)
-      {
-        if(location->location_number == add_location->location_number)
-        {
-          found=true;
-          break;
-        }
-      }
-      if(found==false)
-      {
-        locations.push_back(add_location);
-      }
-    }
-
-    return locations;
-  }
-
-
-  // For mutable
-  void set_last_written_locations(const abstract_object_pointert &object)
-  {
-    last_written_locations.clear();
-    for(auto location: object->get_last_written_locations())
-    {
-      last_written_locations.push_back(location);
-    }
-  }
-
-  // For mutable
-  void set_last_written_locations(goto_programt::const_targett &location)
-  {
-    last_written_locations.clear();
-    last_written_locations.push_back(location);
-  }
-
-  std::vector<goto_programt::const_targett> get_last_written_locations() const
-  {
-    return last_written_locations;
-  }
+  abstract_object_pointert update_last_written_locations(
+      const locationst &locations) const;
+  void set_last_written_locations(const locationst &locations);
+  locationst get_last_written_locations() const;
 
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
-  std::vector<goto_programt::const_targett> last_written_locations;
+  locationst last_written_locations;
 
   abstract_object_pointert abstract_object_merge(
     const abstract_object_pointert other) const;
+  locationst get_location_union(const locationst &locations) const;
 protected:
   template<class T>
   using internal_sharing_ptrt=std::shared_ptr<T>;
@@ -203,6 +137,11 @@ protected:
   virtual internal_abstract_object_pointert mutable_clone() const
   {
     return internal_abstract_object_pointert(new abstract_objectt(*this));
+  }
+
+  virtual void update_sub_elements(const locationst &locations)
+  {
+    return;
   }
 
   bool top;

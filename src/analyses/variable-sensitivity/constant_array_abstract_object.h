@@ -73,13 +73,7 @@ private:
   abstract_object_pointert constant_array_merge(
     const constant_array_pointert other) const;
 
-  virtual void update_sub_elements(const goto_programt::const_targett &location) override
-  {
-    for(auto &item: map)
-    {
-      item.second=item.second->update_last_written_locations(location);
-    }
-  }
+  virtual void update_sub_elements(const locationst &locations) override;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_CONSTANT_ARRAY_ABSTRACT_OBJECT_H

@@ -37,6 +37,8 @@ public:
     const namespacet &ns,
     bool merge_write);
 
+  virtual void erase(const exprt &expr);
+
   virtual abstract_object_pointert abstract_object_factory(
     const typet &type,
     const namespacet &ns,
