@@ -193,7 +193,7 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
 
   while(in.good())
   {
-    unsigned char ch=in.get();
+    unsigned char ch=static_cast<unsigned char>(in.get());
     res|=(size_t(ch&0x7f))<<shift_distance;
     shift_distance+=7;
     if((ch&0x80)==0)
@@ -228,13 +228,13 @@ irep_idt irep_serializationt::read_gb_string(std::istream &in)
   char c;
   size_t length=0;
 
-  while((c = in.get()) != 0)
+  while((c = static_cast<char>(in.get())) != 0)
   {
     if(length>=read_buffer.size())
       read_buffer.resize(read_buffer.size()*2, 0);
 
     if(c=='\\') // escaped chars
-      read_buffer[length] = in.get();
+      read_buffer[length] = static_cast<char>(in.get());
     else
       read_buffer[length] = c;
 

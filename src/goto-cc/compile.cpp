@@ -328,7 +328,7 @@ bool compilet::is_elf_file(const std::string &file_name)
   {
     char buf[4];
     for(std::size_t i=0; i<4; i++)
-      buf[i] = in.get();
+      buf[i]=static_cast<char>(in.get());
     if(buf[0]==0x7f && buf[1]=='E' &&
         buf[2]=='L' && buf[3]=='F')
       return true;
