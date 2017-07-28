@@ -484,6 +484,4 @@ std::string as_string(
   default:
     throw "unknown statement";
   }
-
-  return "";
 }
