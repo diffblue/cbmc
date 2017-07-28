@@ -174,7 +174,8 @@ Function: abstract_environmentt::assign
 \*******************************************************************/
 
 bool abstract_environmentt::assign(
-  const exprt &expr, const abstract_object_pointert value, const namespacet &ns)
+  const exprt &expr, const abstract_object_pointert value, const namespacet &ns,
+  bool erase)
 {
   assert(value);
 
@@ -185,8 +186,6 @@ bool abstract_environmentt::assign(
     return !bottom_at_start;
   }
 
-  bool contains_dereference=false;
-
   abstract_object_pointert lhs_value=nullptr;
   // Build a stack of index, member and dereference accesses which
   // we will work through the relevant abstract objects
@@ -194,10 +193,6 @@ bool abstract_environmentt::assign(
   std::stack<exprt> stactions;    // I'm not a continuation, honest guv'
   while(s.id() != ID_symbol)
   {
-    if(s.id() == ID_dereference)
-    {
-      contains_dereference=true;
-    }
     if(s.id() == ID_index || s.id() == ID_member || s.id() == ID_dereference)
     {
       stactions.push(s);
@@ -225,18 +220,9 @@ bool abstract_environmentt::assign(
     }
   }
 
-  if(!contains_dereference)
-  {
-      lhs_value=lhs_value->update_last_written_locations(value);
-  }
-  // This ensures the entire symbol updates at each write
-  // (As requested by Thomas.)
-
   abstract_object_pointert final_value;
-
   // This is the root abstract object that is in the map of abstract objects
   // It might not have the same type as value if the above stack isn't empty
-
 
   if(!stactions.empty())
   {
@@ -265,17 +251,20 @@ bool abstract_environmentt::assign(
   if(s.id()==ID_symbol)
   {
     symbol_exprt symbol_expr=to_symbol_expr(s);
-    if(final_value->is_top())
+
+    if(erase)
     {
-      // We mustn't erase TOP now.  Lose information.
-//      map.erase(symbol_expr);
+      map.erase(symbol_expr);
+      return true;
     }
-    else
+
+    if(final_value != map[symbol_expr])
     {
-      map[symbol_expr]=final_value;
+      map[symbol_expr]=final_value->update_last_written_locations(value);
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 /*******************************************************************\
