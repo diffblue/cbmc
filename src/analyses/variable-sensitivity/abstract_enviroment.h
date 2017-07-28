@@ -27,8 +27,7 @@ public:
   virtual bool assign(
     const exprt &expr,
     const abstract_object_pointert value,
-    const namespacet &ns,
-    bool erase=false);
+    const namespacet &ns);
   virtual bool assume(const exprt &expr, const namespacet &ns);
 
   virtual abstract_object_pointert write(

@@ -67,11 +67,16 @@ void variable_sensitivity_domaint::transform(
   case DEAD:
     {
     // Assign to top is the same as removing
+      // TO DO: Erase
+//        map.erase(to_code_dead(instruction.code).symbol());
+//        return true;
+
+
     abstract_object_pointert top_object=
       abstract_state.abstract_object_factory(
         to_code_dead(instruction.code).symbol().type(), ns, true);
-    abstract_state.assign(
-      to_code_dead(instruction.code).symbol(), top_object, ns, true);
+//    abstract_state.assign(
+//      to_code_dead(instruction.code).symbol(), top_object, ns, true);
     }
     break;
 

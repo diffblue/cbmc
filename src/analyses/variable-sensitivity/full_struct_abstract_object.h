@@ -57,6 +57,13 @@ private:
   struct_mapt map;
 
 
+  virtual void update_sub_elements(const goto_programt::const_targett &location) override
+  {
+    for(auto &item: map)
+    {
+      item.second=item.second->update_last_written_locations(location);
+    }
+  }
 
   abstract_object_pointert merge_constant_structs(
     constant_struct_pointert other) const;
