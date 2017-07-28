@@ -309,6 +309,13 @@ abstract_object_pointert abstract_objectt::merge(
     op1->abstract_object_merge(op2):op1->merge(op2);
   // If no modifications, we will return the original pointer
   out_modifications=result!=op1;
+
+  std::vector<goto_programt::const_targett> get_merged_locations = op1->get_new_location_set(op2);
+  if(get_merged_locations.size() > op1->get_last_written_locations().size())
+  {
+    result=result->update_last_written_locations(get_merged_locations);
+  }
+
   return result;
 }
 

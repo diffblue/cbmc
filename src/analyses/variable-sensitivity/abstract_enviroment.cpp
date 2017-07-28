@@ -568,8 +568,9 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
 
         if(map[entry.first]->is_top())
         {
-          map.erase(entry.first);
-          modified=true;
+          // Don't remove TOP items.
+          //map.erase(entry.first);
+          //modified=true;
 #ifdef DEBUG
           std::cout << "Removing " << entry.first.get_identifier() << std::endl;
 #endif
@@ -590,8 +591,9 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       {
         // After calling erase, the iterator is no longer valid, so we increment
         // the iterator first and return a copy of the original iterator
-        map.erase(iter++);
-        modified=true;
+        // Don't erase
+        //map.erase(iter++);
+        //modified=true;
 
 #ifdef DEBUG
         std::cout << "Removing " << iter->first.get_identifier() << std::endl;

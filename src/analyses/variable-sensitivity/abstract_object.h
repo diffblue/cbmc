@@ -129,9 +129,48 @@ public:
     return clone;
   }
 
+  abstract_object_pointert update_last_written_locations(std::vector<goto_programt::const_targett> &locations) const
+  {
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->last_written_locations.clear();
+    for(auto location: locations)
+    {
+      clone->last_written_locations.push_back(location);
+    }
+    return clone;
+  }
+
+  // Cheap and dirty diff calculation.
+  // Moving to (unordered)_sets would allow reliance on built ins.
+  std::vector<goto_programt::const_targett> get_new_location_set(const abstract_object_pointert &other) const
+  {
+    std::vector<goto_programt::const_targett> locations = this->get_last_written_locations();
+    std::vector<goto_programt::const_targett> more_locations = other->get_last_written_locations();
+
+    for(auto add_location:more_locations)
+    {
+      bool found=false;
+      for(auto location:locations)
+      {
+        if(location->location_number == add_location->location_number)
+        {
+          found=true;
+          break;
+        }
+      }
+      if(found==false)
+      {
+        locations.push_back(add_location);
+      }
+    }
+
+    return locations;
+  }
+
+
+  // For mutable
   void set_last_written_locations(const abstract_object_pointert &object)
   {
-    std::cout << "* Setting last written locations\n";
     last_written_locations.clear();
     for(auto location: object->get_last_written_locations())
     {
