@@ -110,33 +110,19 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
-  abstract_object_pointert update_last_written_locations(goto_programt::const_targett &location) const
+  abstract_object_pointert update_last_written_locations(const goto_programt::const_targett &location) const
   {
-    internal_abstract_object_pointert clone = mutable_clone();
+    internal_abstract_object_pointert clone=mutable_clone();
     clone->last_written_locations.clear();
     clone->last_written_locations.push_back(location);
     return clone;
   }
 
-  abstract_object_pointert update_last_written_locations(const abstract_object_pointert &object) const
+  abstract_object_pointert update_last_written_locations(const std::vector<goto_programt::const_targett> &locations) const
   {
-    internal_abstract_object_pointert clone = mutable_clone();
+    internal_abstract_object_pointert clone=mutable_clone();
     clone->last_written_locations.clear();
-    for(auto location: object->get_last_written_locations())
-    {
-      clone->last_written_locations.push_back(location);
-    }
-    return clone;
-  }
-
-  abstract_object_pointert update_last_written_locations(std::vector<goto_programt::const_targett> &locations) const
-  {
-    internal_abstract_object_pointert clone = mutable_clone();
-    clone->last_written_locations.clear();
-    for(auto location: locations)
-    {
-      clone->last_written_locations.push_back(location);
-    }
+    clone->last_written_locations=locations;
     return clone;
   }
 
@@ -144,8 +130,8 @@ public:
   // Moving to (unordered)_sets would allow reliance on built ins.
   std::vector<goto_programt::const_targett> get_new_location_set(const abstract_object_pointert &other) const
   {
-    std::vector<goto_programt::const_targett> locations = this->get_last_written_locations();
-    std::vector<goto_programt::const_targett> more_locations = other->get_last_written_locations();
+    std::vector<goto_programt::const_targett> locations=this->get_last_written_locations();
+    std::vector<goto_programt::const_targett> more_locations=other->get_last_written_locations();
 
     for(auto add_location:more_locations)
     {
@@ -178,16 +164,11 @@ public:
     }
   }
 
-  bool contains_last_written_location(goto_programt::const_targett &find)
+  // For mutable
+  void set_last_written_locations(goto_programt::const_targett &location)
   {
-    for(auto location: last_written_locations)
-    {
-      if(location->location_number == find->location_number)
-      {
-        return true;
-      }
-    }
-    return false;
+    last_written_locations.clear();
+    last_written_locations.push_back(location);
   }
 
   std::vector<goto_programt::const_targett> get_last_written_locations() const
