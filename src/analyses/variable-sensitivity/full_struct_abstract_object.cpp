@@ -408,3 +408,28 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::update_sub_elements
+
+  Inputs:
+   locations - Locations to write
+
+ Outputs: None
+
+ Purpose: Updates write location for sub-elements.
+
+          For example, if a=b where a and b are structs, this will
+          update the write location for components too.
+
+\*******************************************************************/
+
+void full_struct_abstract_objectt::update_sub_elements(
+    const locationst &locations)
+{
+  for(auto &item: map)
+  {
+    item.second=item.second->update_last_written_locations(locations);
+  }
+}
