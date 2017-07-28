@@ -92,7 +92,7 @@ class trace_automatont
     init_nta();
 
     epsilon=goto_program.instructions.end();
-    epsilon++;
+    epsilon++; // TODO: This is illegal.
   }
 
   void add_path(patht &path);
