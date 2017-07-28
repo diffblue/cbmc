@@ -285,6 +285,25 @@ void full_struct_abstract_objectt::output(
     }
     out << "." << entry.first << "=";
     entry.second->output(out, ai, ns);
+
+    // Start outputting specific last_written_locations
+    out << " @ [";
+    bool comma=false;
+    for(auto loc: entry.second->get_last_written_locations())
+    {
+      if(!comma)
+      {
+        out << loc->location_number;
+        comma=true;
+      }
+      else
+      {
+        out << ", " << loc->location_number;
+      }
+    }
+    out << "]";
+    // End outputting specific last_written_locations
+
   }
   out << "}";
 }
@@ -387,5 +406,30 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
       assert(result->verify());
       return result;
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::update_sub_elements
+
+  Inputs:
+   locations - Locations to write
+
+ Outputs: None
+
+ Purpose: Updates write location for sub-elements.
+
+          For example, if a=b where a and b are structs, this will
+          update the write location for components too.
+
+\*******************************************************************/
+
+void full_struct_abstract_objectt::update_sub_elements(
+    const locationst &locations)
+{
+  for(auto &item: map)
+  {
+    item.second=item.second->update_last_written_locations(locations);
   }
 }

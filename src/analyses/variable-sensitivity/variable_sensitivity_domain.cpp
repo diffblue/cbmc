@@ -51,28 +51,34 @@ void variable_sensitivity_domaint::transform(
   switch(instruction.type)
   {
   case DECL:
-    // Creates a new variable, which should be top
-    // but we don't store top so ... no action required
+    {
+      const abstract_objectt::locationst write_location={ from };
+      abstract_object_pointert top_object=
+        abstract_state.abstract_object_factory(
+          to_code_decl(instruction.code).symbol().type(), ns, true)
+            ->update_last_written_locations(write_location);
+      abstract_state.assign(
+          to_code_decl(instruction.code).symbol(), top_object, ns);
+    }
+    // We now store top.
     break;
 
   case DEAD:
     {
-    // Assign to top is the same as removing
-    abstract_object_pointert top_object=
-      abstract_state.abstract_object_factory(
-        to_code_dead(instruction.code).symbol().type(), ns, true);
-    abstract_state.assign(
-      to_code_dead(instruction.code).symbol(), top_object, ns);
+      // Remove symbol from map, the only time this occurs now (keep TOP.)
+      abstract_state.erase(to_code_dead(instruction.code).symbol());
     }
     break;
 
   case ASSIGN:
     {
+      // TODO : check return values
       const code_assignt &inst = to_code_assign(instruction.code);
 
-      // TODO : check return values
-      abstract_object_pointert r = abstract_state.eval(inst.rhs(), ns);
-      abstract_state.assign(inst.lhs(), r, ns);
+      const abstract_objectt::locationst write_location={ from };
+      abstract_object_pointert rhs = abstract_state.eval(inst.rhs(), ns)
+          ->update_last_written_locations(write_location);
+      abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
 

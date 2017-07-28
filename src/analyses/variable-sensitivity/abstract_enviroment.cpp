@@ -252,16 +252,15 @@ bool abstract_environmentt::assign(
   if(s.id()==ID_symbol)
   {
     symbol_exprt symbol_expr=to_symbol_expr(s);
-    if(final_value->is_top())
+
+    if(final_value != map[symbol_expr])
     {
-      map.erase(symbol_expr);
-    }
-    else
-    {
-      map[symbol_expr]=final_value;
+      map[symbol_expr]=final_value
+          ->update_last_written_locations(value->get_last_written_locations());
+      return true;
     }
   }
-  return true;
+  return false;
 }
 
 /*******************************************************************\
@@ -552,14 +551,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
         modified|=object_modified;
         map[entry.first]=new_object;
 
-        if(map[entry.first]->is_top())
-        {
-          map.erase(entry.first);
-          modified=true;
-#ifdef DEBUG
-          std::cout << "Removing " << entry.first.get_identifier() << std::endl;
-#endif
-        }
+        // Write, even if TOP.
       }
       else
       {
@@ -567,27 +559,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       }
     }
 
-    // Remove all elements from the map that are not present in the map we are
-    // merging in since they must be top
-    const auto &end_iter=map.end();
-    for(auto iter=map.begin(); iter!=end_iter;)
-    {
-      if(env.map.find(iter->first)==env.map.cend())
-      {
-        // After calling erase, the iterator is no longer valid, so we increment
-        // the iterator first and return a copy of the original iterator
-        map.erase(iter++);
-        modified=true;
-
-#ifdef DEBUG
-        std::cout << "Removing " << iter->first.get_identifier() << std::endl;
-#endif
-      }
-      else
-      {
-        ++iter;
-      }
-    }
+    // Keep TOP items too.
 
     return modified;
   }
@@ -710,6 +682,24 @@ void abstract_environmentt::output(
     out << entry.first.get_identifier()
         << " (" << ") -> ";
     entry.second->output(out, ai, ns);
+
+    // Start outputting specific last_written_locations
+    out << " @ [";
+    bool comma=false;
+    for (auto location: entry.second->get_last_written_locations())
+    {
+      if(!comma)
+      {
+        out << location->location_number;
+        comma=true;
+      }
+      else
+      {
+        out << ", " << location->location_number;
+      }
+    }
+    out << "]";
+
     out << "\n";
   }
   out << "}\n";
@@ -746,4 +736,25 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // to the abstract object being compared against
   abstract_object_pointert eval_obj=abstract_object_factory(e.type(), e, ns);
   return eval_obj->expression_transform(e, *this, ns);
+}
+
+/*******************************************************************\
+
+Function: abstract_environmentt::erase
+
+  Inputs:  A symbol to delete from the map
+
+ Outputs:
+
+ Purpose:  Delete a symbol from the map.
+
+\*******************************************************************/
+
+void abstract_environmentt::erase(const exprt &expr)
+{
+  if(expr.id()==ID_symbol)
+  {
+    symbol_exprt symbol_expr=to_symbol_expr(expr);
+    map.erase(symbol_expr);
+  }
 }
