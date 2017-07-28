@@ -318,10 +318,6 @@ sharing_ptrt<pointer_abstract_objectt>
   }
   else
   {
-    sharing_ptrt<constant_pointer_abstract_objectt> copy=
-      sharing_ptrt<constant_pointer_abstract_objectt>(
-        new constant_pointer_abstract_objectt(*this));
-
     if(stack.empty())
     {
       // We should not be changing the type of an abstract object
@@ -354,6 +350,6 @@ sharing_ptrt<pointer_abstract_objectt>
 
       // but the pointer itself does not change!
     }
-    return copy;
+    return std::dynamic_pointer_cast<const constant_pointer_abstract_objectt>(shared_from_this());
   }
 }
