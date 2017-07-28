@@ -3531,6 +3531,8 @@ void smt2_convt::convert_with(const with_exprt &expr)
 
     // TODO: SMT2-ify
     SMT2_TODO("SMT2-ify");
+
+#if 0
     out << "(bvor ";
     out << "(band ";
 
@@ -3557,6 +3559,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     out << ")"; // bvshl
 
     out << ")"; // bvor
+#endif
   }
   else
     UNEXPECTEDCASE(

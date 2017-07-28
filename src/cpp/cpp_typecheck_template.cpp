@@ -338,9 +338,12 @@ void cpp_typecheckt::typecheck_class_template_member(
   else
   {
     return; // TODO
+
+#if 0
     error().source_location=cpp_name.source_location();
     error() << "bad template name" << eom;
     throw 0;
+#endif
   }
 
   // let's find the class template this function template belongs to.

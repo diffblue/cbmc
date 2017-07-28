@@ -461,13 +461,13 @@ symbolt acceleratet::make_symbol(std::string name, typet type)
 
 void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t)
 {
-  return;
-
+#if 0
   goto_programt::targett decl=program.insert_before(t);
   code_declt code(sym);
 
   decl->make_decl();
   decl->code=code;
+#endif
 }
 
 void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t, exprt init)

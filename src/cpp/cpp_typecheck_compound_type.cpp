@@ -850,9 +850,12 @@ void cpp_typecheckt::typecheck_friend_declaration(
   if(declaration.is_template())
   {
     return; // TODO
+
+#if 0
     error().source_location=declaration.type().source_location();
     error() << "friend template not supported" << eom;
     throw 0;
+#endif
   }
 
   // we distinguish these whether there is a declarator
