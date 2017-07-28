@@ -1034,7 +1034,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     for(size_t i=0; i<stack_map_entries; i++)
     {
       u1 frame_type=read_u1();
-      if(0<=frame_type && frame_type<=63)
+      if(frame_type<=63)
       {
         method.stack_map_table[i].type=methodt::stack_map_table_entryt::SAME;
         method.stack_map_table[i].locals.resize(0);
