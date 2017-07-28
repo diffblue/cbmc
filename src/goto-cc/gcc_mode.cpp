@@ -22,6 +22,7 @@ Author: CM Wintersteiger, 2006
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include <util/string2int.h>
 #include <util/invariant.h>
@@ -871,7 +872,12 @@ int gcc_modet::gcc_hybrid_binary()
       it!=output_files.end();
       it++)
   {
-    rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    int result=rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    if(result!=0)
+    {
+      error() << "Rename failed: " << std::strerror(errno) << eom;
+      return result;
+    }
   }
 
   std::string objcopy_cmd;
@@ -925,7 +931,13 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(objcopy_argv[0], objcopy_argv, "", "");
     }
 
-    remove(saved.c_str());
+    result=remove(saved.c_str());
+    if(result!=0)
+    {
+      error() << "Remove failed: " << std::strerror(errno) << eom;
+      return result;
+    }
+
     #elif defined(__APPLE__)
     // Mac
     if(result==0)
@@ -945,7 +957,12 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(lipo_argv[0], lipo_argv, "", "");
     }
 
-    remove(saved.c_str());
+    result=remove(saved.c_str());
+    if(result!=0)
+    {
+      error() << "Remove failed: " << std::strerror(errno) << eom;
+      return result;
+    }
 
     #else
     error() << "binary merging not implemented for this platform" << eom;
