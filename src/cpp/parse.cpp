@@ -201,7 +201,8 @@ class Parser // NOLINT(readability/identifiers)
 public:
   explicit Parser(cpp_parsert &_cpp_parser):
     lex(_cpp_parser.token_buffer),
-    parser(_cpp_parser)
+    parser(_cpp_parser),
+    max_errors(10)
   {
     root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;

@@ -328,11 +328,18 @@ public:
   std::multimap<irep_idt, source_locationt> id2loc;
   std::multimap<irep_idt, source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet &_symbol_table, goto_functionst &_goto_f,
-    messaget &_message)
-    :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true),
-      render_by_file(false), render_by_function(false), message(_message),
-      egraph(_message)
+  instrumentert(
+    symbol_tablet &_symbol_table,
+    goto_functionst &_goto_f,
+    messaget &_message):
+    ns(_symbol_table),
+    goto_functions(_goto_f),
+    render_po_aligned(true),
+    render_by_file(false),
+    render_by_function(false),
+    message(_message),
+    egraph(_message),
+    num_sccs(0)
   {
   }
 

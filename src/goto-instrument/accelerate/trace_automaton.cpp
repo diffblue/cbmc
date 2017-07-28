@@ -13,8 +13,11 @@ Author: Matt Lewis
 
 #include <utility>
 #include <iostream>
+#include <limits>
 
 #include "path.h"
+
+const statet automatont::no_state=std::numeric_limits<statet>::max();
 
 void trace_automatont::build()
 {
@@ -134,7 +137,7 @@ void trace_automatont::determinise()
   {
     state_sett t;
     pop_unmarked_dstate(t);
-    assert(find_dstate(t)!=no_state);
+    assert(find_dstate(t)!=automatont::no_state);
 
 
     // For each symbol a such that there is a transition
@@ -225,7 +228,7 @@ statet trace_automatont::add_dstate(state_sett &s)
 {
   statet state_num=find_dstate(s);
 
-  if(state_num!=no_state)
+  if(state_num!=automatont::no_state)
   {
     // We've added this state before.  Don't need to do it again.
     return state_num;
@@ -263,7 +266,7 @@ statet trace_automatont::find_dstate(state_sett &s)
 
   if(it==dstates.end())
   {
-    return no_state;
+    return automatont::no_state;
   }
   else
   {
@@ -304,8 +307,8 @@ void trace_automatont::add_dtrans(
   statet sidx=find_dstate(s);
   statet tidx=find_dstate(t);
 
-  assert(sidx!=no_state);
-  assert(tidx!=no_state);
+  assert(sidx!=automatont::no_state);
+  assert(tidx!=automatont::no_state);
 
   dta.add_trans(sidx, a, tidx);
 }

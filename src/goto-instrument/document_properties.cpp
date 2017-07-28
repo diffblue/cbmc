@@ -26,7 +26,8 @@ public:
     const goto_functionst &_goto_functions,
     std::ostream &_out):
     goto_functions(_goto_functions),
-    out(_out)
+    out(_out),
+    format(HTML)
   {
   }
 

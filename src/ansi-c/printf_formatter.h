@@ -25,7 +25,9 @@ public:
   void print(std::ostream &out);
   std::string as_string();
 
-  explicit printf_formattert(const namespacet &_ns):ns(_ns)
+  explicit printf_formattert(const namespacet &_ns):
+    ns(_ns),
+    format_pos(0)
   {
   }
 

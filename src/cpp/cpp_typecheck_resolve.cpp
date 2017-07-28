@@ -30,7 +30,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
-  cpp_typecheck(_cpp_typecheck)
+  cpp_typecheck(_cpp_typecheck),
+  original_scope(nullptr) // set in resolve_scope()
 {
 }
 

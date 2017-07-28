@@ -40,7 +40,8 @@ public:
     messaget(_message_handler),
     options(_options),
     symbol_table(_symbol_table),
-    ns(_symbol_table)
+    ns(_symbol_table),
+    ui(ui_message_handlert::uit::PLAIN)
   {
   }
 

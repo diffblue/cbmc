@@ -41,7 +41,8 @@ public:
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
-    character_preprocess(_character_preprocess)
+    character_preprocess(_character_preprocess),
+    method_has_this(false)
   {
   }
 
