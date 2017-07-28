@@ -51,7 +51,9 @@ public:
 
     void output(std::ostream &) const;
 
-    rulet():parameter_number(0)
+    rulet():
+      parameter_number(0)
+      // The other class members are initialized by taint_parser().
     {
     }
   };
