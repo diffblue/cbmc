@@ -51,6 +51,15 @@ void variable_sensitivity_domaint::transform(
   switch(instruction.type)
   {
   case DECL:
+    {
+      abstract_object_pointert top_object=
+        abstract_state.abstract_object_factory(
+          to_code_decl(instruction.code).symbol().type(), ns, true)->
+          update_last_written_locations(from);
+      abstract_state.assign(
+          to_code_decl(instruction.code).symbol(), top_object, ns);
+    }
+
     // Creates a new variable, which should be top
     // but we don't store top so ... no action required
     break;
@@ -62,7 +71,7 @@ void variable_sensitivity_domaint::transform(
       abstract_state.abstract_object_factory(
         to_code_dead(instruction.code).symbol().type(), ns, true);
     abstract_state.assign(
-      to_code_dead(instruction.code).symbol(), top_object, ns);
+      to_code_dead(instruction.code).symbol(), top_object, ns, true);
     }
     break;
 
