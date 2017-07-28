@@ -174,8 +174,7 @@ Function: abstract_environmentt::assign
 \*******************************************************************/
 
 bool abstract_environmentt::assign(
-  const exprt &expr, const abstract_object_pointert value, const namespacet &ns,
-  bool erase)
+  const exprt &expr, const abstract_object_pointert value, const namespacet &ns)
 {
   assert(value);
 
@@ -251,12 +250,6 @@ bool abstract_environmentt::assign(
   if(s.id()==ID_symbol)
   {
     symbol_exprt symbol_expr=to_symbol_expr(s);
-
-    if(erase)
-    {
-      map.erase(symbol_expr);
-      return true;
-    }
 
     if(final_value != map[symbol_expr])
     {

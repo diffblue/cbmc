@@ -110,11 +110,19 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
+
+  virtual void update_sub_elements(const goto_programt::const_targett &location)
+  {
+    return;
+  }
+
+
   abstract_object_pointert update_last_written_locations(const goto_programt::const_targett &location) const
   {
     internal_abstract_object_pointert clone=mutable_clone();
     clone->last_written_locations.clear();
     clone->last_written_locations.push_back(location);
+    clone->update_sub_elements(location);
     return clone;
   }
 
