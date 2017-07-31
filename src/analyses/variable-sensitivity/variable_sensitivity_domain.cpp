@@ -56,7 +56,7 @@ void variable_sensitivity_domaint::transform(
       abstract_object_pointert top_object=
         abstract_state.abstract_object_factory(
           to_code_decl(instruction.code).symbol().type(), ns, true)
-            ->update_last_written_locations(write_location);
+            ->update_last_written_locations(write_location, true);
       abstract_state.assign(
           to_code_decl(instruction.code).symbol(), top_object, ns);
     }
@@ -82,7 +82,7 @@ void variable_sensitivity_domaint::transform(
 
       const abstract_objectt::locationst write_location={ from };
       abstract_object_pointert rhs = abstract_state.eval(inst.rhs(), ns)
-          ->update_last_written_locations(write_location);
+          ->update_last_written_locations(write_location, true);
       abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
