@@ -114,7 +114,8 @@ public:
     bool &out_modifications);
 
   abstract_object_pointert update_last_written_locations(
-      const locationst &locations) const;
+      const locationst &locations,
+      const bool update_sub_elements) const;
   locationst get_last_written_locations() const;
 
 private:
