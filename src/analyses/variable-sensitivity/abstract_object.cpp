@@ -364,7 +364,6 @@ abstract_object_pointert abstract_objectt::update_last_written_locations(
 {
   internal_abstract_object_pointert clone=mutable_clone();
   clone->set_last_written_locations(locations);
-  clone->update_sub_elements(locations);
   return clone;
 }
 
@@ -410,6 +409,7 @@ Function: abstract_objectt::set_last_written_locations
 void abstract_objectt::set_last_written_locations(const locationst &locations)
 {
   last_written_locations=locations;
+  update_sub_elements(locations);
 }
 
 /*******************************************************************\

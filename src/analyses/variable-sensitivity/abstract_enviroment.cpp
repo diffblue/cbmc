@@ -682,26 +682,50 @@ void abstract_environmentt::output(
         << " (" << ") -> ";
     entry.second->output(out, ai, ns);
 
-    // Start outputting specific last_written_locations
-    out << " @ [";
-    bool comma=false;
-    for (auto location: entry.second->get_last_written_locations())
-    {
-      if(!comma)
-      {
-        out << location->location_number;
-        comma=true;
-      }
-      else
-      {
-        out << ", " << location->location_number;
-      }
-    }
-    out << "]";
-
+    out << " @ ";
+    output_last_written_locations(out,
+        entry.second->get_last_written_locations());
     out << "\n";
   }
   out << "}\n";
+}
+
+/*******************************************************************\
+
+Function: abstract_environmentt::output_last_written_location
+
+  Inputs:
+   object - the object to read information from
+   out - the stream to write to
+   ai - the abstract interpreter that contains this domain
+   ns - the current namespace
+
+ Outputs: None
+
+ Purpose: Print out all last written locations for a specified
+          object
+
+\*******************************************************************/
+
+void abstract_environmentt::output_last_written_locations(
+  std::ostream &out,
+  const abstract_objectt::locationst &locations)
+{
+  out << "[";
+  bool comma=false;
+  for (auto location: locations)
+  {
+    if(!comma)
+    {
+      out << location->location_number;
+      comma=true;
+    }
+    else
+    {
+      out << ", " << location->location_number;
+    }
+  }
+  out << "]";
 }
 
 /*******************************************************************\
