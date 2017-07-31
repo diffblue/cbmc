@@ -276,6 +276,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     main_jar_classes,
     lazy_methods_extra_entry_points,
     java_class_loader,
+    get_pointer_type_selector(),
     get_message_handler());
 
   return method_gather(symbol_table, lazy_methods, method_converter);

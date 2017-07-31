@@ -24,12 +24,14 @@ ci_lazy_methodst::ci_lazy_methodst(
   const std::vector<irep_idt> &main_jar_classes,
   const std::vector<irep_idt> &lazy_methods_extra_entry_points,
   java_class_loadert &java_class_loader,
+  const select_pointer_typet &pointer_type_selector,
   message_handlert &message_handler):
     messaget(message_handler),
     main_class(main_class),
     main_jar_classes(main_jar_classes),
     lazy_methods_extra_entry_points(lazy_methods_extra_entry_points),
-    java_class_loader(java_class_loader)
+    java_class_loader(java_class_loader),
+    pointer_type_selector(pointer_type_selector)
 {
   // build the class hierarclass_hierarchyy
   class_hierarchy(symbol_table);
@@ -266,7 +268,7 @@ void ci_lazy_methodst::initialize_needed_classes(
       if(param.type().id()==ID_pointer)
       {
         const pointer_typet &original_pointer=to_pointer_type(param.type());
-        initialize_needed_classes_from_pointer(
+        initialize_all_needed_classes_from_pointer(
           original_pointer, ns, lazy_methods);
       }
     }
@@ -278,6 +280,32 @@ void ci_lazy_methodst::initialize_needed_classes(
   lazy_methods.add_needed_class("java::java.lang.String");
   lazy_methods.add_needed_class("java::java.lang.Class");
   lazy_methods.add_needed_class("java::java.lang.Object");
+}
+
+/// Build up list of methods for types for a pointer and any types it
+/// might be subsituted for. See
+/// `initialize_needed_classes` for more details.
+/// \param pointer_type: The type to gather methods for.
+/// \param ns: global namespace
+/// \param [out] lazy_methods: Populated with all Java reference types whose
+///   references may be passed, directly or indirectly, to any of the functions
+///   in `entry_points
+void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
+  const pointer_typet &pointer_type,
+  const namespacet &ns,
+  ci_lazy_methods_neededt &lazy_methods)
+{
+  initialize_needed_classes_from_pointer(
+    pointer_type, ns, lazy_methods);
+
+  const pointer_typet &subbed_pointer_type=
+    pointer_type_selector.convert_pointer_type(pointer_type, ns);
+
+  if(subbed_pointer_type!=pointer_type)
+  {
+    initialize_needed_classes_from_pointer(
+      subbed_pointer_type, ns, lazy_methods);
+  }
 }
 
 /// Build up list of methods for types for a specific pointer type. See
@@ -440,7 +468,7 @@ void ci_lazy_methodst::gather_field_types(
       // Skip array primitive pointers, for example:
       if(field.type().subtype().id()!=ID_symbol)
         continue;
-      initialize_needed_classes_from_pointer(
+      initialize_all_needed_classes_from_pointer(
         to_pointer_type(field.type()), ns, lazy_methods);
     }
   }
