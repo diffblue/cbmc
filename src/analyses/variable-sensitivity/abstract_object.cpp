@@ -316,7 +316,7 @@ abstract_object_pointert abstract_objectt::merge(
   if(get_location_union.size() > op1->get_last_written_locations().size())
   {
     out_modifications=true;
-    result=result->update_last_written_locations(get_location_union);
+    result=result->update_last_written_locations(get_location_union, false);
   }
 
   return result;
@@ -360,10 +360,13 @@ Function: abstract_objectt::update_last_written_locations
 \*******************************************************************/
 
 abstract_object_pointert abstract_objectt::update_last_written_locations(
-    const locationst &locations) const
+    const locationst &locations,
+    bool update_sub_elements) const
 {
   internal_abstract_object_pointert clone=mutable_clone();
   clone->set_last_written_locations(locations);
+  if(update_sub_elements)
+    clone->update_sub_elements(locations);
   return clone;
 }
 
@@ -409,7 +412,6 @@ Function: abstract_objectt::set_last_written_locations
 void abstract_objectt::set_last_written_locations(const locationst &locations)
 {
   last_written_locations=locations;
-  update_sub_elements(locations);
 }
 
 /*******************************************************************\

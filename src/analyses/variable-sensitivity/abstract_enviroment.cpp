@@ -256,7 +256,8 @@ bool abstract_environmentt::assign(
     if(final_value != map[symbol_expr])
     {
       map[symbol_expr]=final_value
-          ->update_last_written_locations(value->get_last_written_locations());
+          ->update_last_written_locations(value->get_last_written_locations(),
+              false);
     }
   }
   return true;

@@ -457,6 +457,6 @@ void constant_array_abstract_objectt::update_sub_elements(
 {
   for(auto &item: map)
   {
-    item.second=item.second->update_last_written_locations(locations);
+    item.second=item.second->update_last_written_locations(locations, true);
   }
 }
