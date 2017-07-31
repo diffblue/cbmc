@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \********************************************************************/
 
+
 /// \file
 /// C++ Language Type Checking
 
@@ -19,21 +20,15 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   if(declaration.is_empty())
     return;
 
-  // Record the function bodies so we can check them later.
-  // This function is used recursively, so we save them.
-  method_bodiest old_method_bodies;
-  old_method_bodies.swap(method_bodies);
+  // The function bodies must not be checked here,
+  // but only at the very end when all declarations have been
+  // processed (or considering forward declarations at least)
 
   // templates are done in a dedicated function
   if(declaration.is_template())
     convert_template_declaration(declaration);
   else
     convert_non_template_declaration(declaration);
-
-  method_bodiest b;
-  b.swap(method_bodies);
-  typecheck_method_bodies(b);
-  method_bodies.swap(old_method_bodies);
 }
 
 void cpp_typecheckt::convert_anonymous_union(

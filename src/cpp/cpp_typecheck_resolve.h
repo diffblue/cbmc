@@ -116,8 +116,13 @@ protected:
     unsigned &args_distance,
     const cpp_typecheck_fargst &fargs);
 
+  void resolve_argument(
+    exprt &argument,
+    const cpp_typecheck_fargst &fargs);
+
   exprt do_builtin(
     const irep_idt &base_name,
+    const cpp_typecheck_fargst &fargs,
     const cpp_template_args_non_tct &template_args);
 
   void show_identifiers(

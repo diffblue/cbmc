@@ -54,6 +54,8 @@ void cpp_typecheckt::typecheck()
   for(auto &item : cpp_parse_tree.items)
     convert(item);
 
+  typecheck_method_bodies();
+
   static_and_dynamic_initialization();
 
   do_not_typechecked();
