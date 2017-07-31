@@ -330,6 +330,12 @@ static void gather_needed_globals(
       gather_needed_globals(*opit, symbol_table, needed);
 }
 
+static void initialize_needed_classes_from_pointer(
+  const pointer_typet &pointer_type,
+  const namespacet &ns,
+  const class_hierarchyt &ch,
+  ci_lazy_methodst &lazy_methods);
+
 /// See output
 /// \par parameters: `class_type`: root of class tree to search
 /// `ns`: global namespace
@@ -340,32 +346,62 @@ static void gather_needed_globals(
 static void gather_field_types(
   const typet &class_type,
   const namespacet &ns,
+  const class_hierarchyt &ch,
   ci_lazy_methodst &lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
   for(const auto &field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, lazy_methods);
+      gather_field_types(field.type(), ns, ch, lazy_methods);
     else if(field.type().id()==ID_pointer)
     {
       // Skip array primitive pointers, for example:
       if(field.type().subtype().id()!=ID_symbol)
         continue;
-      const auto &field_classid=
-        to_symbol_type(field.type().subtype()).get_identifier();
-      if(lazy_methods.add_needed_class(field_classid))
-        gather_field_types(field.type().subtype(), ns, lazy_methods);
+      initialize_needed_classes_from_pointer(
+        to_pointer_type(field.type()), ns, ch, lazy_methods);
     }
   }
 }
 
-/// See output
-/// \par parameters: `entry_points`: list of fully-qualified function names that
+/// Build up list of methods for types for a specific pointer type. See
+/// `initialize_needed_classes` for more details.
+/// \param pointer_type: The type to gather methods for.
+/// \param ns: global namespace
+/// \param ch: global class hierarchy
+/// \param [out] lazy_methods: Populated with all Java reference types whose
+///   references may be passed, directly or indirectly, to any of the functions
+///   in `entry_points
+static void initialize_needed_classes_from_pointer(
+  const pointer_typet &pointer_type,
+  const namespacet &ns,
+  const class_hierarchyt &ch,
+  ci_lazy_methodst &lazy_methods)
+{
+  const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
+  const auto &param_classid=class_type.get_identifier();
+  std::vector<irep_idt> class_and_parents=
+    ch.get_parents_trans(param_classid);
+
+  class_and_parents.push_back(param_classid);
+
+  for(const auto &classid : class_and_parents)
+    lazy_methods.add_needed_class(classid);
+
+  gather_field_types(
+    pointer_type.subtype(), ns, ch, lazy_methods);
+}
+
+/// Build up a list of methods whose type may be passed around reachable
+/// from the entry point.
+/// \param entry_points: list of fully-qualified function names that
 ///   we should assume are reachable
-/// `ns`: global namespace
-/// `ch`: global class hierarchy
-/// \return Populates `lazy_methods` with all Java reference types whose
+/// \param ns: global namespace
+/// \param ch: global class hierarchy
+/// \param pointer_type_selector: The pointer_type_selector used to find out
+///   what other classes may be used for pointers
+/// \param [out] lazy_methods: Populated with all Java reference types whose
 ///   references may be passed, directly or indirectly, to any of the functions
 ///   in `entry_points`.
 static void initialize_needed_classes(
@@ -382,14 +418,9 @@ static void initialize_needed_classes(
     {
       if(param.type().id()==ID_pointer)
       {
-        const auto &param_classid=
-          to_symbol_type(param.type().subtype()).get_identifier();
-        std::vector<irep_idt> class_and_parents=
-          ch.get_parents_trans(param_classid);
-        class_and_parents.push_back(param_classid);
-        for(const auto &classid : class_and_parents)
-          lazy_methods.add_needed_class(classid);
-        gather_field_types(param.type().subtype(), ns, lazy_methods);
+        const pointer_typet &original_pointer=to_pointer_type(param.type());
+        initialize_needed_classes_from_pointer(
+          original_pointer, ns, ch, lazy_methods);
       }
     }
   }
