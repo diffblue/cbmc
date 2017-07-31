@@ -546,7 +546,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   PRECONDITION(expr.type().id()==ID_pointer);
 
   const pointer_typet &replacement_pointer_type=
-    pointer_type_selector.convert_pointer_type(pointer_type);
+    pointer_type_selector.convert_pointer_type(pointer_type, ns);
 
   // If we are changing the pointer, we generate code for creating a pointer
   // to the substituted type instead
