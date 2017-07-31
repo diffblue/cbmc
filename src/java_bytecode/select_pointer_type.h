@@ -21,7 +21,7 @@ class select_pointer_typet
 public:
   virtual ~select_pointer_typet()=default;
   virtual pointer_typet convert_pointer_type(
-    const pointer_typet &pointer_type) const;
+    const pointer_typet &pointer_type, const namespacet &ns) const;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_SELECT_POINTER_TYPE_H
