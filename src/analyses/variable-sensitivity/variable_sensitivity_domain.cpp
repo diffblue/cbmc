@@ -66,7 +66,12 @@ void variable_sensitivity_domaint::transform(
   case DEAD:
     {
       // Remove symbol from map, the only time this occurs now (keep TOP.)
-      abstract_state.erase(to_code_dead(instruction.code).symbol());
+      // It should be the case that DEAD only provides symbols for deletion.
+      const exprt &expr=to_code_dead(instruction.code).symbol();
+      if(expr.id()==ID_symbol)
+      {
+        abstract_state.erase(to_symbol_expr(expr));
+      }
     }
     break;
 
