@@ -31,7 +31,7 @@ protected:
 
   bool parse_arguments(const argst &args, bool in_spec_file);
   void parse_specs();
-  void parse_specs_line(const std::string &line);
+  void parse_specs_line(const std::string &line, bool in_spec_file);
 };
 
 #endif // CPROVER_GOTO_CC_GCC_CMDLINE_H

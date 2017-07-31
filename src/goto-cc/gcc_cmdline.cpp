@@ -252,7 +252,7 @@ bool gcc_cmdlinet::parse_arguments(
         line.erase(0, line.find_first_not_of("\t "));
 
         if(!line.empty())
-          parse_specs_line(line);
+          parse_specs_line(line, false);
       }
 
       continue;
@@ -428,7 +428,7 @@ bool gcc_cmdlinet::parse_arguments(
 }
 
 /// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
-void gcc_cmdlinet::parse_specs_line(const std::string &line)
+void gcc_cmdlinet::parse_specs_line(const std::string &line, bool in_spec_file)
 {
   // initial whitespace has been stripped
   assert(!line.empty());
@@ -444,7 +444,7 @@ void gcc_cmdlinet::parse_specs_line(const std::string &line)
     args.push_back(line.substr(arg_start, arg_end-arg_start));
   }
 
-  parse_arguments(args, true);
+  parse_arguments(args, in_spec_file);
 }
 
 /// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
@@ -473,7 +473,7 @@ void gcc_cmdlinet::parse_specs()
              line=="*link:"))
       use_line=true;
     else if(use_line)
-      parse_specs_line(line);
+      parse_specs_line(line, true);
     else
     {
       // TODO need message interface
