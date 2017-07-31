@@ -143,7 +143,8 @@ void cpp_scopet::lookup(
   }
 
   if(!id_set.empty() &&
-     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE)
+    return; // done, upwards scopes are hidden
 
   // secondary scopes
   for(scope_listt::iterator
