@@ -133,9 +133,13 @@ codet character_refine_preprocesst::convert_digit_char(
   conversion_inputt &target)
 {
   const code_function_callt &function_call=target;
-  assert(function_call.arguments().size()==2);
+  PRECONDITION(function_call.arguments().size()>=1);
   const exprt &arg=function_call.arguments()[0];
-  const exprt &radix=function_call.arguments()[1];
+  // If there is no radix argument we set it to 36 which is the maximum possible
+  const exprt &radix=
+    function_call.arguments().size()>1?
+      function_call.arguments()[1]:
+      from_integer(36, arg.type());
   const exprt &result=function_call.lhs();
   const typet &type=result.type();
 
