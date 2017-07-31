@@ -66,8 +66,7 @@ protected:
 
   codet check_null_dereference(
     const exprt &expr,
-    const source_locationt &original_loc,
-    const bool assertion_enabled);
+    const source_locationt &original_loc);
 
   codet check_class_cast(
     const exprt &class1,
@@ -271,8 +270,7 @@ codet java_bytecode_instrumentt::check_class_cast(
 /// assertion checking the subtype relation
 codet java_bytecode_instrumentt::check_null_dereference(
   const exprt &expr,
-  const source_locationt &original_loc,
-  const bool assertion_enabled)
+  const source_locationt &original_loc)
 {
   const equal_exprt equal_expr(
     expr,
@@ -283,17 +281,12 @@ codet java_bytecode_instrumentt::check_null_dereference(
       equal_expr,
       original_loc, "java.lang.NullPointerException");
 
-  if(assertion_enabled)
-  {
-    code_assertt check((not_exprt(equal_expr)));
-    check.add_source_location()
-      .set_comment("Throw null");
-    check.add_source_location()
-      .set_property_class("null-pointer-exception");
-    return check;
-  }
-
-  return code_skipt();
+  code_assertt check((not_exprt(equal_expr)));
+  check.add_source_location()
+    .set_comment("Throw null");
+  check.add_source_location()
+    .set_property_class("null-pointer-exception");
+  return check;
 }
 
 /// Checks whether `length`>=0 and throws NegativeArraySizeException/
@@ -462,8 +455,7 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
       block.copy_to_operands(
         check_null_dereference(
           code_function_call.arguments()[0],
-          code_function_call.source_location(),
-          true));
+          code_function_call.source_location()));
     }
 
     for(const auto &arg : code_function_call.arguments())
@@ -528,8 +520,7 @@ codet java_bytecode_instrumentt::instrument_expr(
       result.copy_to_operands(
         check_null_dereference(
           expr.op0(),
-          expr.source_location(),
-          true));
+          expr.source_location()));
     }
     else if(statement==ID_java_new_array)
     {
@@ -558,8 +549,7 @@ codet java_bytecode_instrumentt::instrument_expr(
     codet null_dereference_check=
       check_null_dereference(
         dereference_expr.op0(),
-        dereference_expr.source_location(),
-        false);
+        dereference_expr.source_location());
     result.move_to_operands(null_dereference_check);
   }
 
