@@ -257,10 +257,9 @@ bool abstract_environmentt::assign(
     {
       map[symbol_expr]=final_value
           ->update_last_written_locations(value->get_last_written_locations());
-      return true;
     }
   }
-  return false;
+  return true;
 }
 
 /*******************************************************************\
@@ -746,15 +745,12 @@ Function: abstract_environmentt::erase
 
  Outputs:
 
- Purpose:  Delete a symbol from the map.
+ Purpose:  Delete a symbol from the map.  This is necessary if the
+           symbol falls out of scope and should no longer be tracked.
 
 \*******************************************************************/
 
-void abstract_environmentt::erase(const exprt &expr)
+void abstract_environmentt::erase(const symbol_exprt &expr)
 {
-  if(expr.id()==ID_symbol)
-  {
-    symbol_exprt symbol_expr=to_symbol_expr(expr);
-    map.erase(symbol_expr);
-  }
+    map.erase(expr);
 }

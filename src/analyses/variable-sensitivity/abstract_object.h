@@ -27,11 +27,12 @@
 
 
 #include <memory>
+#include <set>
 #include <map>
 #include <iosfwd>
 #include <algorithm>
+
 #include <goto-programs/goto_program.h>
-#include <set>
 #include <util/expr.h>
 
 class typet;
@@ -114,7 +115,6 @@ public:
 
   abstract_object_pointert update_last_written_locations(
       const locationst &locations) const;
-  void set_last_written_locations(const locationst &locations);
   locationst get_last_written_locations() const;
 
 private:
@@ -139,10 +139,10 @@ protected:
     return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
 
+  void set_last_written_locations(const locationst &locations);
+
   virtual void update_sub_elements(const locationst &locations)
-  {
-    return;
-  }
+  {}
 
   bool top;
 

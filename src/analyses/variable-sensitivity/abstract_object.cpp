@@ -385,7 +385,7 @@ Function: abstract_objectt::get_location_union
 
 abstract_objectt::locationst abstract_objectt::get_location_union(const locationst &locations) const
 {
-  locationst existing_locations=this->get_last_written_locations();
+  locationst existing_locations=get_last_written_locations();
   existing_locations.insert(locations.begin(), locations.end());
 
   return existing_locations;
