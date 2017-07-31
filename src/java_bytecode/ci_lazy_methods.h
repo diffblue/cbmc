@@ -22,6 +22,7 @@
 #include <java_bytecode/java_bytecode_parse_tree.h>
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/ci_lazy_methods_needed.h>
+#include <java_bytecode/select_pointer_type.h>
 
 class java_string_library_preprocesst;
 
@@ -47,6 +48,7 @@ public:
     const std::vector<irep_idt> &main_jar_classes,
     const std::vector<irep_idt> &lazy_methods_extra_entry_points,
     java_class_loadert &java_class_loader,
+    const select_pointer_typet &pointer_type_selector,
     message_handlert &message_handler);
 
   // not const since messaget
@@ -62,6 +64,11 @@ private:
 
   void initialize_needed_classes(
     const std::vector<irep_idt> &entry_points,
+    const namespacet &ns,
+    ci_lazy_methods_neededt &lazy_methods);
+
+  void initialize_all_needed_classes_from_pointer(
+    const pointer_typet &pointer_type,
     const namespacet &ns,
     ci_lazy_methods_neededt &lazy_methods);
 
@@ -104,6 +111,7 @@ private:
   std::vector<irep_idt> main_jar_classes;
   std::vector<irep_idt> lazy_methods_extra_entry_points;
   java_class_loadert &java_class_loader;
+  const select_pointer_typet &pointer_type_selector;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
