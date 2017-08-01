@@ -430,9 +430,14 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     PRECONDITION(value ||
       !refined_string_typet::is_refined_string_type(rhs.type()));
 
+    PRECONDITION(lhs.id()==ID_symbol || !is_char_array(rhs.type()));
+    PRECONDITION(lhs.id()==ID_symbol ||
+      !refined_string_typet::is_refined_string_type(rhs.type()));
+
+    // If lhs is not a symbol, let supert::set_to() handle it.
     if(lhs.id()!=ID_symbol)
     {
-      warning() << "ignoring " << from_expr(ns, "", expr) << eom;
+      non_string_axioms.push_back(std::make_pair(expr, value));
       return;
     }
 
