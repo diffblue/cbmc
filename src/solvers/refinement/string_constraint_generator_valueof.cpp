@@ -221,17 +221,16 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
       digit_constraints.push_back(is_number);
 
       // An overflow can happen when reaching the last index of a string of
-      // maximal size which is `max_size` for negative numbers and
-      // `max_size - 1` for positive numbers because of the absence of a `-`
+      // maximal size which is `max_size-1` for negative numbers and
+      // `max_size - 2` for positive numbers because of the absence of a `-`
       // sign.
-//      if(j>=max_size-2)
-//      {
-        // check for overflows if the size is big
+      if(j>=max_size-2)
+      {
         and_exprt no_overflow(
           equal_exprt(sum, div_exprt(radix_sum, radix)),
           binary_relation_exprt(new_sum, ID_ge, radix_sum));
         digit_constraints.push_back(no_overflow);
-//      }
+      }
       sum=new_sum;
     }
 
