@@ -287,22 +287,9 @@ void full_struct_abstract_objectt::output(
     entry.second->output(out, ai, ns);
 
     // Start outputting specific last_written_locations
-    out << " @ [";
-    bool comma=false;
-    for(auto loc: entry.second->get_last_written_locations())
-    {
-      if(!comma)
-      {
-        out << loc->location_number;
-        comma=true;
-      }
-      else
-      {
-        out << ", " << loc->location_number;
-      }
-    }
-    out << "]";
-    // End outputting specific last_written_locations
+    out << " @ ";
+    output_last_written_locations(out,
+        entry.second->get_last_written_locations());
 
   }
   out << "}";

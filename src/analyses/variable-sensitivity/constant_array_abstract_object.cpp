@@ -195,21 +195,9 @@ void constant_array_abstract_objectt::output(
       entry.second->output(out, ai, ns);
 
       // Start outputting specific last_written_locations
-      out << " @ [";
-      bool comma=false;
-      for(auto location: entry.second->get_last_written_locations())
-      {
-        if(!comma)
-        {
-          out << location->location_number;
-          comma=true;
-        }
-        else
-        {
-          out << ", " << location->location_number;
-        }
-      }
-      out << "]";
+      out << " @ ";
+      output_last_written_locations(out,
+          entry.second->get_last_written_locations());
 
       out << "\n";
     }

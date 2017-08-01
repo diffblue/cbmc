@@ -64,9 +64,6 @@ public:
 
   void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
-  static void output_last_written_locations(
-    std::ostream &out,
-    const abstract_objectt::locationst &locations);
 
   bool verify() const;
 

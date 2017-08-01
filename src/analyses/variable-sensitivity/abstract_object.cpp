@@ -432,3 +432,49 @@ abstract_objectt::locationst abstract_objectt::get_last_written_locations() cons
 {
   return last_written_locations;
 }
+
+/*******************************************************************\
+
+Function: abstract_objectt::output_last_written_location
+
+  Inputs:
+   object - the object to read information from
+   out - the stream to write to
+   ai - the abstract interpreter that contains this domain
+   ns - the current namespace
+
+ Outputs: None
+
+ Purpose: Print out all last written locations for a specified
+          object
+
+\*******************************************************************/
+
+void abstract_objectt::output_last_written_locations(
+  std::ostream &out,
+  const abstract_objectt::locationst &locations)
+{
+  out << "[";
+  bool comma=false;
+
+  std::set<unsigned> sorted_locations;
+  for(auto location: locations)
+  {
+    sorted_locations.insert(location->location_number);
+  }
+
+  for (auto location_number: sorted_locations)
+  {
+    if(!comma)
+    {
+      out << location_number;
+      comma=true;
+    }
+    else
+    {
+      out << ", " << location_number;
+    }
+  }
+  out << "]";
+}
+

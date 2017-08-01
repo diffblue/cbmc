@@ -118,6 +118,10 @@ public:
       const bool update_sub_elements) const;
   locationst get_last_written_locations() const;
 
+  static void output_last_written_locations(
+    std::ostream &out,
+    const abstract_objectt::locationst &locations);
+
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
