@@ -24,6 +24,7 @@ Date:   April 2017
 #include <util/string_expr.h>
 #include "java_types.h"
 #include "java_object_factory.h"
+#include "java_utils.h"
 
 #include "java_string_library_preprocess.h"
 
@@ -334,7 +335,8 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   {
     if(implements_java_char_sequence(p.type()))
     {
-      dereference_exprt deref(p, to_pointer_type(p.type()).subtype());
+      dereference_exprt deref=
+        checked_dereference(p, to_pointer_type(p.type()).subtype());
       process_single_operand(ops, deref, loc, symbol_table, init_code);
     }
     else if(is_java_char_array_pointer_type(p.type()))
@@ -371,14 +373,16 @@ exprt::operandst
   exprt op1=operands[1];
 
   assert(implements_java_char_sequence(op0.type()));
-  dereference_exprt deref0(op0, to_pointer_type(op0.type()).subtype());
+  dereference_exprt deref0=
+    checked_dereference(op0, to_pointer_type(op0.type()).subtype());
   process_single_operand(ops, deref0, loc, symbol_table, init_code);
 
   // TODO: Manage the case where we have a non-String Object (this should
   // probably be handled upstream. At any rate, the following code should be
   // protected with assertions on the type of op1.
   typecast_exprt tcast(op1, to_pointer_type(op0.type()));
-  dereference_exprt deref1(tcast, to_pointer_type(op0.type()).subtype());
+  dereference_exprt deref1=
+    checked_dereference(tcast, to_pointer_type(op0.type()).subtype());
   process_single_operand(ops, deref1, loc, symbol_table, init_code);
   return ops;
 }
@@ -466,9 +470,12 @@ string_exprt java_string_library_preprocesst::replace_char_array(
   code_blockt &code)
 {
   refined_string_typet ref_type=refined_string_type;
-  dereference_exprt array(array_pointer, array_pointer.type().subtype());
+  dereference_exprt array=
+    checked_dereference(array_pointer, array_pointer.type().subtype());
   exprt array_data=get_data(array, symbol_table);
   // `deref_array` is *(array_pointer->data)`
+  // No null-pointer-exception check here since all array structures
+  // have non-null data
   const typet &content_type=ref_type.get_content_type();
   dereference_exprt deref_array(array_data, array_data.type().subtype());
 
@@ -724,7 +731,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   symbol_tablet &symbol_table)
 {
   assert(implements_java_char_sequence(lhs.type()));
-  dereference_exprt deref(lhs, lhs.type().subtype());
+  dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
   code_blockt code;
 
@@ -741,7 +748,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   struct_rhs.copy_to_operands(rhs_length);
   struct_rhs.copy_to_operands(rhs_array);
   code.add(code_assignt(
-    dereference_exprt(lhs, lhs.type().subtype()), struct_rhs));
+    checked_dereference(lhs, lhs.type().subtype()), struct_rhs));
 
   return code;
 }
@@ -782,7 +789,7 @@ codet java_string_library_preprocesst::
     symbol_tablet &symbol_table)
 {
   assert(implements_java_char_sequence(lhs.type()));
-  dereference_exprt deref(lhs, lhs.type().subtype());
+  dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
   code_blockt code;
   exprt new_array=allocate_fresh_array(
@@ -816,7 +823,7 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   else
     deref_type=rhs.type().subtype();
 
-  dereference_exprt deref(rhs, deref_type);
+  dereference_exprt deref=checked_dereference(rhs, deref_type);
 
   // Fields of the string object
   exprt rhs_length=get_length(deref, symbol_table);
@@ -1170,7 +1177,7 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
   code.add(code_assignt(deref_data, string_expr.content()));
 
   // lhs->data = &data[0]
-  dereference_exprt deref_lhs(lhs, lhs.type().subtype());
+  dereference_exprt deref_lhs=checked_dereference(lhs, lhs.type().subtype());
   exprt lhs_data=get_data(deref_lhs, symbol_table);
   index_exprt first_elt(
     deref_data, from_integer(0, java_int_type()), java_char_type());
@@ -1519,7 +1526,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
 
   // class_identifier is this->@class_identifier
   member_exprt class_identifier(
-    dereference_exprt(this_obj, this_obj.type().subtype()),
+    checked_dereference(this_obj, this_obj.type().subtype()),
     "@class_identifier",
     string_typet());
 
@@ -1743,7 +1750,8 @@ codet java_string_library_preprocesst::make_string_length_code(
 
   code_typet::parameterst params=type.parameters();
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
-  dereference_exprt deref(arg_this, arg_this.type().subtype());
+  dereference_exprt deref=
+    checked_dereference(arg_this, arg_this.type().subtype());
 
   // Create a new string_exprt to be picked up by the solver
   string_exprt str_expr=fresh_string_expr(loc, symbol_table, code);

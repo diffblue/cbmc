@@ -524,9 +524,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
   exprt pointer2=
     typecast_exprt(pointer, java_reference_type(class_type));
 
-  dereference_exprt obj_deref(pointer2, class_type);
-  // tag it so it's easy to identify during instrumentation
-  obj_deref.set(ID_java_member_access, true);
+  dereference_exprt obj_deref=checked_dereference(pointer2, class_type);
 
   const member_exprt member_expr(
     obj_deref,
