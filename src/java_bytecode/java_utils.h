@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 
+#include <util/message.h>
+#include <util/std_expr.h>
 #include <util/symbol_table.h>
 #include <util/type.h>
 
@@ -61,5 +63,10 @@ irep_idt resolve_friendly_method_name(
   const std::string &friendly_name,
   const symbol_tablet &symbol_table,
   std::string &error);
+
+/// Dereference an expression and flag it for a null-pointer check
+/// \param expr: expression to dereference and check
+/// \param type: expected result type (typically expr.type().subtype())
+dereference_exprt checked_dereference(const exprt &expr, const typet &type);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

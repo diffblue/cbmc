@@ -566,6 +566,38 @@ void java_bytecode_instrumentt::operator()(exprt &expr)
   instrument_code(expr);
 }
 
+/// Instruments the code attached to `symbol` with
+/// runtime exceptions or corresponding assertions.
+/// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
+/// Otherwise, assertions are emitted.
+/// \par parameters: `symbol_table`: global symbol table (may gain exception type
+///   stubs and similar)
+/// `symbol`: the symbol to instrument
+/// `throw_runtime_exceptions`: flag determining whether we instrument the code
+/// with runtime exceptions or with assertions. The former applies if this flag
+/// is set to true.
+/// `max_array_length`: maximum array length; the only reason we need this is
+/// in order to be able to call the object factory to create exceptions.
+void java_bytecode_instrument(
+  symbol_tablet &symbol_table,
+  symbolt &symbol,
+  const bool throw_runtime_exceptions,
+  message_handlert &message_handler,
+  const size_t max_array_length,
+  const size_t max_tree_depth)
+{
+  java_bytecode_instrumentt instrument(
+    symbol_table,
+    throw_runtime_exceptions,
+    message_handler,
+    max_array_length,
+    max_tree_depth);
+  INVARIANT(
+    symbol.value.id()==ID_code,
+    "java_bytecode_instrument expects a code-typed symbol");
+  instrument(symbol.value);
+}
+
 /// Instruments all the code in the symbol_table with
 /// runtime exceptions or corresponding assertions.
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
