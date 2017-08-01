@@ -416,52 +416,45 @@ void string_refinementt::concretize_lengths()
 /// \par parameters: an expression and the value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
-  INVARIANT(
-    equality_propagation,
-    string_refinement_invariantt("set_to should only be called when equality "
-      "propagation is enabled"));
+  PRECONDITION(expr.type().id()==ID_bool);
+  PRECONDITION(equality_propagation);
 
   if(expr.id()==ID_equal)
   {
     equal_exprt eq_expr=to_equal_expr(expr);
-
-    if(eq_expr.lhs().type()!=eq_expr.rhs().type())
-    {
-      warning() << "ignoring " << from_expr(ns, "", expr)
-                << " [inconsistent types]" << eom;
-      debug() << "lhs has type: " << eq_expr.lhs().type().pretty(12) << eom;
-      debug() << "rhs has type: " << eq_expr.rhs().type().pretty(12) << eom;
-      return;
-    }
-
-    if(expr.type().id()!=ID_bool)
-    {
-      error() << "string_refinementt::set_to got non-boolean operand: "
-              << expr.pretty() << eom;
-      INVARIANT(
-        false,
-        string_refinement_invariantt("set_to should only be called with exprs "
-          "of type bool"));
-    }
-
-    // Preprocessing to remove function applications.
     const exprt &lhs=eq_expr.lhs();
-    debug() << "(sr::set_to) " << from_expr(ns, "", lhs)
-            << " = " << from_expr(ns, "", eq_expr.rhs()) << eom;
+    const exprt &rhs=eq_expr.rhs();
 
-    // TODO: See if this happens at all.
+    // The assignment of a string equality to false is not supported.
+    PRECONDITION(value || !is_char_array(rhs.type()));
+    PRECONDITION(value ||
+      !refined_string_typet::is_refined_string_type(rhs.type()));
+
     if(lhs.id()!=ID_symbol)
     {
       warning() << "ignoring " << from_expr(ns, "", expr) << eom;
       return;
     }
 
-    exprt subst_rhs=substitute_function_applications(eq_expr.rhs());
-    if(eq_expr.lhs().type()!=subst_rhs.type())
+    if(lhs.type()!=rhs.type())
     {
-      if(eq_expr.lhs().type().id() != ID_array ||
-         subst_rhs.type().id() != ID_array ||
-         eq_expr.lhs().type().subtype() != subst_rhs.type().subtype())
+      warning() << "ignoring " << from_expr(ns, "", expr)
+                << " [inconsistent types]" << eom;
+      debug() << "lhs has type: " << lhs.type().pretty(12) << eom;
+      debug() << "rhs has type: " << rhs.type().pretty(12) << eom;
+      return;
+    }
+
+    // Preprocessing to remove function applications.
+    debug() << "(sr::set_to) " << from_expr(ns, "", lhs)
+            << " = " << from_expr(ns, "", rhs) << eom;
+
+    const exprt subst_rhs=substitute_function_applications(rhs);
+    if(lhs.type()!=subst_rhs.type())
+    {
+      if(lhs.type().id()!=ID_array ||
+         subst_rhs.type().id()!=ID_array ||
+         lhs.type().subtype()!=subst_rhs.type().subtype())
       {
         warning() << "ignoring " << from_expr(ns, "", expr)
                   << " [inconsistent types after substitution]" << eom;
@@ -474,29 +467,22 @@ void string_refinementt::set_to(const exprt &expr, bool value)
       }
     }
 
-    if(value)
-    {
-      if(!add_axioms_for_string_assigns(lhs, subst_rhs))
-        return;
-    }
-    else
-    {
-      // TODO: Something should also be done if value is false.
-      INVARIANT(
-        !is_char_array(eq_expr.rhs().type()),
-        string_refinement_invariantt("set_to cannot set a char_array"));
-      INVARIANT(
-        !refined_string_typet::is_refined_string_type(eq_expr.rhs().type()),
-        string_refinement_invariantt("set_to cannot set a refined_string"));
-    }
+    if(value && !add_axioms_for_string_assigns(lhs, subst_rhs))
+      return;
 
-    non_string_axioms.push_back(std::make_pair(equal_exprt(lhs, subst_rhs),
-                                               value));
+    // Push the substituted equality to the list of axioms to be given to
+    // supert::set_to.
+    non_string_axioms.push_back(
+      std::make_pair(equal_exprt(lhs, subst_rhs), value));
   }
-  // We keep a list of the axioms to give to supert::set_to in order to
-  // substitute the symbols in dec_solve().
+  // Push the unmodified equality to the list of axioms to be given to
+  // supert::set_to.
   else
+  {
+    // TODO: Verify that the expression contains no string.
+    // This will be easy once exprt iterators will have been implemented.
     non_string_axioms.push_back(std::make_pair(expr, value));
+  }
 }
 
 /// use a refinement loop to instantiate universal axioms, call the sat solver,
