@@ -577,7 +577,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 /// \param chr: the character
 /// \param radix:  the radix
 /// \return an expression for the condition
-exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
+exprt is_digit_with_radix(const exprt &chr, const exprt &radix_char_type)
 {
   const typet &char_type=chr.type();
   const exprt zero_char=from_integer('0', char_type);
@@ -618,7 +618,7 @@ exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
 /// \param radix: the radix, which should be between 2 and 36 (default 36)
 /// \return an expression for the condition
 exprt is_digit_with_radix_lower_case(
-  exprt chr, exprt radix_char_type, unsigned long radix)
+  const exprt &chr, const exprt &radix_char_type, unsigned long radix)
 {
   const typet &char_type=chr.type();
   const exprt zero_char=from_integer('0', char_type);

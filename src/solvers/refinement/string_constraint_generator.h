@@ -365,9 +365,9 @@ private:
   string_exprt empty_string(const refined_string_typet &ref_type);
 };
 
-exprt is_digit_with_radix(exprt chr, exprt radix);
+exprt is_digit_with_radix(const exprt &chr, const exprt &radix);
 exprt is_digit_with_radix_lower_case(
-  exprt chr, exprt radix_char_type, unsigned long radix=36ul);
+  const exprt &chr, const exprt &radix_char_type, unsigned long radix=36ul);
 exprt get_numeric_value_from_character(
   const exprt &chr,
   const typet &char_type,
