@@ -1,12 +1,11 @@
 CORE
 test_contains.class
 --refine-strings --string-max-length 100
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 8.* SUCCESS$
 ^\[.*assertion.2\].* line 9.* SUCCESS$
-^\[.*assertion.3\].* line 12.* FAILURE$
-^\[.*assertion.4\].* line 13.* FAILURE$
-^VERIFICATION FAILED$
+^VERIFICATION SUCCESSFUL$
+--
 --
 Issue: diffblue/test-gen#201
