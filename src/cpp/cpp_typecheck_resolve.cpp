@@ -463,54 +463,44 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     }
   }
 
-  identifiers.clear();
+  old_identifiers.clear();
 
   // put in the top ones
   if(!distance_map.empty())
   {
-    std::size_t distance=distance_map.begin()->first;
-
-    for(std::multimap<std::size_t, exprt>::const_iterator
-        it=distance_map.begin();
-        it!=distance_map.end() && it->first==distance;
-        it++)
-      identifiers.push_back(it->second);
+    auto range = distance_map.equal_range(distance_map.begin()->first);
+    for(auto it = range.first; it != range.second; ++it)
+      old_identifiers.push_back(it->second);
   }
 
-  if(identifiers.size()>1 && fargs.in_use)
+  if(old_identifiers.size() > 1 && fargs.in_use)
   {
     // try to further disambiguate functions
 
-    for(resolve_identifierst::iterator
-        it1=identifiers.begin();
-        it1!=identifiers.end();
-        it1++)
+    for(resolve_identifierst::const_iterator old_it = old_identifiers.begin();
+        old_it != old_identifiers.end();
+        ++old_it)
     {
-      if(it1->type().id()!=ID_code)
-        continue;
+#if 0
+      std::cout << "I1: " << old_it->get(ID_identifier) << '\n';
+#endif
 
-      const code_typet &f1=
-        to_code_type(it1->type());
-
-      for(resolve_identifierst::iterator it2=
-          identifiers.begin();
-          it2!=identifiers.end();
-          ) // no it2++
+      if(old_it->type().id() != ID_code)
       {
-        if(it1 == it2)
-        {
-          it2++;
-          continue;
-        }
+        identifiers.push_back(*old_it);
+        continue;
+      }
 
-        if(it2->type().id()!=ID_code)
-        {
-          it2++;
-          continue;
-        }
+      const code_typet &f1 = to_code_type(old_it->type());
 
-        const code_typet &f2 =
-          to_code_type(it2->type());
+      for(resolve_identifierst::const_iterator resolve_it = old_it + 1;
+          resolve_it != old_identifiers.end();
+          ++resolve_it)
+      {
+        if(resolve_it->type().id() != ID_code)
+          continue;
+
+        const code_typet &f2 = to_code_type(resolve_it->type());
 
         // TODO: may fail when using ellipsis
         assert(f1.parameters().size() == f2.parameters().size());
@@ -562,14 +552,17 @@ void cpp_typecheck_resolvet::disambiguate_functions(
           }
         }
 
-        resolve_identifierst::iterator prev_it=it2;
-        it2++;
-
-        if(f1_better && !f2_better)
-          identifiers.erase(prev_it);
+        if(!f1_better || f2_better)
+          identifiers.push_back(*resolve_it);
       }
     }
   }
+  else
+  {
+    identifiers.swap(old_identifiers);
+  }
+
+  remove_duplicates(identifiers);
 }
 
 void cpp_typecheck_resolvet::make_constructors(
@@ -1566,8 +1559,8 @@ exprt cpp_typecheck_resolvet::resolve(
     std::cout << '\n';
 #endif
   }
-
-  remove_duplicates(new_identifiers);
+  else
+    remove_duplicates(new_identifiers);
 
 #ifdef DEBUG
   std::cout << "P4 " << base_name << " " << new_identifiers.size() << '\n';
