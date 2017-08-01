@@ -256,8 +256,8 @@ bool abstract_environmentt::assign(
     if(final_value != map[symbol_expr])
     {
       map[symbol_expr]=final_value
-          ->update_last_written_locations(value->get_last_written_locations(),
-              false);
+          ->update_last_written_locations(
+              value->get_last_written_locations(), false);
     }
   }
   return true;
@@ -684,8 +684,8 @@ void abstract_environmentt::output(
     entry.second->output(out, ai, ns);
 
     out << " @ ";
-    entry.second->output_last_written_locations(out,
-        entry.second->get_last_written_locations());
+    entry.second->output_last_written_locations(
+        out, entry.second->get_last_written_locations());
     out << "\n";
   }
   out << "}\n";
