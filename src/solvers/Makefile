@@ -166,6 +166,7 @@ SRC = $(BOOLEFORCE_SRC) \
       refinement/string_constraint_generator_indexof.cpp \
       refinement/string_constraint_generator_insert.cpp \
       refinement/string_constraint_generator_float.cpp \
+      refinement/string_constraint_generator_format.cpp \
       refinement/string_constraint_generator_main.cpp \
       refinement/string_constraint_generator_testing.cpp \
       refinement/string_constraint_generator_transformation.cpp \

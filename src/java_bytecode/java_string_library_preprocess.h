@@ -27,6 +27,9 @@ Date:   March 2017
 #include "character_refine_preprocess.h"
 #include "java_types.h"
 
+// Arbitrary limit of 10 arguments for the number of arguments to String.format
+#define MAX_FORMAT_ARGS 10
+
 class java_string_library_preprocesst:public messaget
 {
 public:
@@ -124,6 +127,11 @@ private:
     symbol_tablet &symbol_table);
 
   codet make_string_to_char_array_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
+
+  codet make_string_format_code(
     const code_typet &type,
     const source_locationt &loc,
     symbol_tablet &symbol_table);
@@ -316,6 +324,22 @@ private:
     const code_typet &type,
     const source_locationt &loc,
     symbol_tablet &symbol_table);
+
+  exprt make_argument_for_format(const exprt &argv,
+    int index,
+    const struct_typet &structured_type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table,
+    code_blockt &code);
+
+  exprt get_primitive_value_of_object(
+    const exprt &object,
+    irep_idt type_name,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table,
+    code_blockt &code);
+
+  exprt get_object_at_index(const exprt &argv, int index);
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
