@@ -435,7 +435,23 @@ int cbmc_parse_optionst::doit()
   //
 
   optionst options;
-  get_command_line_options(options);
+  try
+  {
+    get_command_line_options(options);
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  catch(const std::string error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
   eval_verbosity();
 
   //
