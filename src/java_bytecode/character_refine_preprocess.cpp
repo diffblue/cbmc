@@ -127,19 +127,22 @@ codet character_refine_preprocesst::convert_compare(conversion_inputt &target)
 
 
 /// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.digit:(CI)I
+/// the java method Character.digit:(CI)I. The function call has one character
+/// argument and an optional integer radix argument. If the radix is not given
+/// it is set to 36 by default.
 /// \param target: a position in a goto program
+/// \return code assigning the result of the Character.digit function to the
+///         left-hand-side of the given target
 codet character_refine_preprocesst::convert_digit_char(
   conversion_inputt &target)
 {
   const code_function_callt &function_call=target;
-  PRECONDITION(function_call.arguments().size()>=1);
+  const std::size_t nb_args=function_call.arguments().size();
+  PRECONDITION(nb_args==1 || nb_args==2);
   const exprt &arg=function_call.arguments()[0];
   // If there is no radix argument we set it to 36 which is the maximum possible
   const exprt &radix=
-    function_call.arguments().size()>1?
-      function_call.arguments()[1]:
-      from_integer(36, arg.type());
+    nb_args>1?function_call.arguments()[1]:from_integer(36, arg.type());
   const exprt &result=function_call.lhs();
   const typet &type=result.type();
 
