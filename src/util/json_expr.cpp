@@ -97,7 +97,7 @@ json_objectt json(const source_locationt &location)
     result["function"]=json_stringt(id2string(location.get_function()));
 
   if(!location.get_java_bytecode_index().empty())
-    result["bytecode_index"]=
+    result["bytecodeIndex"]=
       json_stringt(id2string(location.get_java_bytecode_index()));
 
   return result;
