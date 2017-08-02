@@ -14,6 +14,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
+#include <solvers/floatbv/float_bv.h>
+
+const exprt get_radix_from_optional_second_argument(
+  const function_application_exprt &f, const typet &type)
+{
+  return f.arguments().size()==1?
+    static_cast<exprt>(from_integer(10, type)):
+    static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
+}
+
 /// Add axioms corresponding to the String.valueOf(I) java function.
 /// \param expr: function application with one integer argument
 /// \return a new string expression
@@ -21,7 +31,10 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   const function_application_exprt &expr)
 {
   const refined_string_typet &ref_type=to_refined_string_type(expr.type());
-  return add_axioms_from_int(args(expr, 1)[0], MAX_INTEGER_LENGTH, ref_type);
+  PRECONDITION(expr.arguments().size()>=1);
+  const exprt &x=expr.arguments()[0];
+  const exprt radix=get_radix_from_optional_second_argument(expr, x.type());
+  return add_axioms_from_int(x, radix, MAX_INTEGER_LENGTH, ref_type);
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
@@ -31,7 +44,10 @@ string_exprt string_constraint_generatort::add_axioms_from_long(
   const function_application_exprt &expr)
 {
   const refined_string_typet &ref_type=to_refined_string_type(expr.type());
-  return add_axioms_from_int(args(expr, 1)[0], MAX_LONG_LENGTH, ref_type);
+  PRECONDITION(expr.arguments().size()>=1);
+  const exprt &x=expr.arguments()[0];
+  const exprt radix=get_radix_from_optional_second_argument(expr, x.type());
+  return add_axioms_from_int(x, radix, MAX_INTEGER_LENGTH, ref_type);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
@@ -93,32 +109,36 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
-/// \param i: a signed integer expression
+/// \param x: a signed integer expression
 /// \param max_size: a maximal size for the string representation
+/// \param radix: an expression for the radix
 /// \param ref_type: type for refined strings
 /// \return a string expression
 string_exprt string_constraint_generatort::add_axioms_from_int(
-  const exprt &i, size_t max_size, const refined_string_typet &ref_type)
+  const exprt &x,
+  const exprt radix,
+  size_t max_size,
+  const refined_string_typet &ref_type)
 {
-  PRECONDITION(i.type().id()==ID_signedbv);
+  max_size=33;
+  PRECONDITION(x.type().id()==ID_signedbv);
   PRECONDITION(max_size<std::numeric_limits<size_t>::max());
   string_exprt res=fresh_string(ref_type);
-  const typet &type=i.type();
-  exprt ten=from_integer(10, type);
+  const typet &type=x.type();
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
   exprt zero_char=constant_char('0', char_type);
-  exprt nine_char=constant_char('9', char_type);
+  exprt radix_char_type=typecast_exprt(radix, char_type);
   exprt minus_char=constant_char('-', char_type);
   exprt max=from_integer(max_size, index_type);
 
   // We add axioms:
-  // a1 : i < 0 => 1 <|res|<=max_size && res[0]='-'
-  // a2 : i >= 0 => 0 <|res|<=max_size-1 && '0'<=res[0]<='9'
-  // a3 : |res|>1 && '0'<=res[0]<='9' => res[0]!='0'
+  // a1 : x < 0 => 1 <|res|<=max_size && res[0]='-'
+  // a2 : x >= 0 => 0 <|res|<=max_size-1 && res[0] is a digit for the radix
+  // a3 : |res|>1 && res[0] is a digit for the radix => res[0]!='0'
   // a4 : |res|>1 && res[0]='-' => res[1]!='0'
 
-  binary_relation_exprt is_negative(i, ID_lt, from_integer(0, i.type()));
+  binary_relation_exprt is_negative(x, ID_lt, from_integer(0, type));
   and_exprt correct_length1(
     res.axiom_for_is_strictly_longer_than(1),
     res.axiom_for_is_shorter_than(max));
@@ -127,9 +147,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   axioms.push_back(a1);
 
   not_exprt is_positive(is_negative);
-  and_exprt starts_with_digit(
-    binary_relation_exprt(res[0], ID_ge, zero_char),
-    binary_relation_exprt(res[0], ID_le, nine_char));
+  exprt starts_with_digit=is_digit_with_radix_lower_case(res[0], radix_char_type);
   and_exprt correct_length2(
     res.axiom_for_is_strictly_longer_than(0),
     res.axiom_for_is_strictly_shorter_than(max));
@@ -149,49 +167,44 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   for(size_t size=1; size<=max_size; size++)
   {
     // For each possible size, we have:
-    // sum_0 = starts_with_digit ? res[0]-'0' : 0
-    // sum_j = 10 * sum_{j-1} + res[i] - '0'
+    // sum_0 = numeric value of res[0] (which is 0 if res[0] is '-')
+    // sum_j = radix * sum_{j-1} + numeric value of res[j]
     // and add axioms:
     // a5 : |res| == size =>
     //        forall 1 <= j < size.
     //          is_number && (j >= max_size-2 => no_overflow)
-    //     where is_number := '0' <= res[j] <= '9'
-    //     and no_overflow := sum_{j-1} = (10 * sum_{j-1} / 10)
+    //     where is_number := res[j] is a digit for the radix
+    //     and no_overflow := sum_{j-1} = (radix * sum_{j-1} / radix)
     //                        && sum_j >= sum_{j - 1}
     //         (the first part avoid overflows in multiplication and
     //          the second one in additions)
-    // a6 : |res| == size && '0' <= res[0] <= '9' => i == sum
-    // a7 : |res| == size && res[0] == '-' => i == -sum
+    // a6 : |res| == size && res[0] is a digit for radix => x == sum
+    // a7 : |res| == size && res[0] == '-' => x == -sum
 
     exprt::operandst digit_constraints;
-    exprt sum=if_exprt(
-      starts_with_digit,
-      typecast_exprt(minus_exprt(res[0], zero_char), type),
-      from_integer(0, type));
+    exprt sum=get_numeric_value_from_character(res[0], char_type, type);
 
     for(size_t j=1; j<size; j++)
     {
-      mult_exprt ten_sum(sum, ten);
-      // sum = 10 * sum + (res[j] - '0')
+      mult_exprt radix_sum(sum, radix);
+      // new_sum = radix * sum + (numeric value of res[j])
       exprt new_sum=plus_exprt(
-        ten_sum, typecast_exprt(minus_exprt(res[j], zero_char), type));
-      and_exprt is_number(
-        binary_relation_exprt(res[j], ID_ge, zero_char),
-        binary_relation_exprt(res[j], ID_le, nine_char));
+        radix_sum, get_numeric_value_from_character(res[j], char_type, type));
+      exprt is_number=is_digit_with_radix_lower_case(res[j], radix_char_type);
       digit_constraints.push_back(is_number);
 
       // An overflow can happen when reaching the last index of a string of
       // maximal size which is `max_size` for negative numbers and
-      // `max_size - 1` for positive numbers because of the abscence of a `-`
+      // `max_size - 1` for positive numbers because of the absence of a `-`
       // sign.
-      if(j>=max_size-2)
-      {
+//      if(j>=max_size-2)
+//      {
         // check for overflows if the size is big
         and_exprt no_overflow(
-          equal_exprt(sum, div_exprt(ten_sum, ten)),
-          binary_relation_exprt(new_sum, ID_ge, ten_sum));
+          equal_exprt(sum, div_exprt(radix_sum, radix)),
+          binary_relation_exprt(new_sum, ID_ge, radix_sum));
         digit_constraints.push_back(no_overflow);
-      }
+//      }
       sum=new_sum;
     }
 
@@ -200,12 +213,12 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
     axioms.push_back(a5);
 
     implies_exprt a6(
-      and_exprt(premise, starts_with_digit), equal_exprt(i, sum));
+      and_exprt(premise, starts_with_digit), equal_exprt(x, sum));
     axioms.push_back(a6);
 
     implies_exprt a7(
       and_exprt(premise, starts_with_minus),
-      equal_exprt(i, unary_minus_exprt(sum)));
+      equal_exprt(x, unary_minus_exprt(sum)));
     axioms.push_back(a7);
   }
 
@@ -510,10 +523,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   const string_exprt str=get_string_expr(f.arguments()[0]);
   const typet &type=f.type();
   PRECONDITION(type.id()==ID_signedbv);
-  const exprt radix=
-    f.arguments().size()==1?
-      static_cast<exprt>(from_integer(10, type)):
-      static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
+  const exprt radix=get_radix_from_optional_second_argument(f, type);
 
   const symbol_exprt x=fresh_symbol("abs_parsed_int", type);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
@@ -567,6 +577,40 @@ exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
     and_exprt(
       binary_relation_exprt(chr, ID_ge, A_char),
       binary_relation_exprt(chr, ID_lt, plus_exprt(A_char, radix_minus_ten))));
+
+  return if_exprt(
+    binary_relation_exprt(radix_char_type, ID_le, ten_char_type),
+    is_digit_when_radix_le_10,
+    is_digit_when_radix_gt_10);
+}
+
+/// Check if a character is a digit with respect to the given radix, e.g. if the
+/// radix is 10 then check if the character is in the range 0-9. For bases above
+/// 10 only lower case letters are allowed, not upper case.
+/// \param chr: the character
+/// \param radix:  the radix
+/// \return an expression for the condition
+exprt is_digit_with_radix_lower_case(exprt chr, exprt radix_char_type)
+{
+  const typet &char_type=chr.type();
+  exprt zero_char=from_integer('0', char_type);
+  exprt nine_char=from_integer('9', char_type);
+  exprt a_char=from_integer('a', char_type);
+  constant_exprt ten_char_type=from_integer(10, char_type);
+
+  and_exprt is_digit_when_radix_le_10(
+    binary_relation_exprt(chr, ID_ge, zero_char),
+    binary_relation_exprt(chr, ID_lt, plus_exprt(zero_char, radix_char_type)));
+
+  minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
+
+  or_exprt is_digit_when_radix_gt_10(
+    and_exprt(
+      binary_relation_exprt(chr, ID_ge, zero_char),
+      binary_relation_exprt(chr, ID_le, nine_char)),
+    and_exprt(
+      binary_relation_exprt(chr, ID_ge, a_char),
+      binary_relation_exprt(chr, ID_lt, plus_exprt(a_char, radix_minus_ten))));
 
   return if_exprt(
     binary_relation_exprt(radix_char_type, ID_le, ten_char_type),

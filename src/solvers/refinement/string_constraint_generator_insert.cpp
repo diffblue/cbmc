@@ -66,8 +66,9 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_int(
 {
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
   string_exprt s1=get_string_expr(args(f, 3)[0]);
+  const exprt &x=args(f, 3)[2];
   string_exprt s2=add_axioms_from_int(
-    args(f, 3)[2], MAX_INTEGER_LENGTH, ref_type);
+    x, from_integer(10, x.type()), MAX_INTEGER_LENGTH, ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 
@@ -81,7 +82,9 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_long(
 {
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
   string_exprt s1=get_string_expr(args(f, 3)[0]);
-  string_exprt s2=add_axioms_from_int(args(f, 3)[2], MAX_LONG_LENGTH, ref_type);
+  const exprt &x=args(f, 3)[2];
+  string_exprt s2=add_axioms_from_int(
+    x, from_integer(10, x.type()), MAX_LONG_LENGTH, ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
 

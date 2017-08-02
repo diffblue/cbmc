@@ -203,7 +203,10 @@ private:
   string_exprt add_axioms_from_literal(const function_application_exprt &f);
   string_exprt add_axioms_from_int(const function_application_exprt &f);
   string_exprt add_axioms_from_int(
-    const exprt &i, size_t max_size, const refined_string_typet &ref_type);
+    const exprt &x,
+    const exprt radix,
+    size_t max_size,
+    const refined_string_typet &ref_type);
   string_exprt add_axioms_from_int_hex(
     const exprt &i, const refined_string_typet &ref_type);
   string_exprt add_axioms_from_int_hex(const function_application_exprt &f);
@@ -359,6 +362,7 @@ private:
 };
 
 exprt is_digit_with_radix(exprt chr, exprt radix);
+exprt is_digit_with_radix_lower_case(exprt chr, exprt radix);
 exprt get_numeric_value_from_character(
   const exprt &chr, const typet &char_type, const typet &type);
 std::string utf16_constant_array_to_ascii(

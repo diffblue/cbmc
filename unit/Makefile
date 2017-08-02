@@ -23,6 +23,7 @@ SRC += unit_tests.cpp \
        analyses/call_graph.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
+      solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix_lower_case.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        # Empty last line
 
