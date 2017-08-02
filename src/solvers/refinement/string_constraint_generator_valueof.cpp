@@ -13,6 +13,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
+#include <util/simplify_expr.h>
+
+#include <cmath>
 
 #include <solvers/floatbv/float_bv.h>
 
@@ -34,7 +37,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   PRECONDITION(expr.arguments().size()>=1);
   const exprt &x=expr.arguments()[0];
   const exprt radix=get_radix_from_optional_second_argument(expr, x.type());
-  return add_axioms_from_int(x, radix, MAX_INTEGER_LENGTH, ref_type);
+  return add_axioms_from_int(x, radix, ref_type);
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
@@ -47,7 +50,7 @@ string_exprt string_constraint_generatort::add_axioms_from_long(
   PRECONDITION(expr.arguments().size()>=1);
   const exprt &x=expr.arguments()[0];
   const exprt radix=get_radix_from_optional_second_argument(expr, x.type());
-  return add_axioms_from_int(x, radix, MAX_INTEGER_LENGTH, ref_type);
+  return add_axioms_from_int(x, radix, ref_type);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
@@ -117,10 +120,29 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 string_exprt string_constraint_generatort::add_axioms_from_int(
   const exprt &x,
   const exprt radix,
-  size_t max_size,
   const refined_string_typet &ref_type)
 {
-  max_size=33;
+  /// If we cannot tell what the radix is then so we assume it is 2 to make sure
+  /// max_size will definitely be large enough
+  double radix_d=static_cast<double>(try_to_evaluate_expr_as_ul(radix, 2ul));
+  size_t max_size=calculate_max_string_length(x.type(), radix_d);
+
+  return add_axioms_from_int(x, radix, ref_type, max_size);
+}
+
+/// Add axioms enforcing that the string corresponds to the result
+/// of String.valueOf(I) or String.valueOf(J) Java functions applied
+/// on the integer expression.
+/// \param x: a signed integer expression
+/// \param max_size: a maximal size for the string representation
+/// \param ref_type: type for refined strings
+/// \return a string expression
+string_exprt string_constraint_generatort::add_axioms_from_int(
+  const exprt &x,
+  const exprt radix,
+  const refined_string_typet &ref_type,
+  size_t max_size)
+{
   PRECONDITION(x.type().id()==ID_signedbv);
   PRECONDITION(max_size<std::numeric_limits<size_t>::max());
   string_exprt res=fresh_string(ref_type);
@@ -131,6 +153,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   exprt radix_char_type=typecast_exprt(radix, char_type);
   exprt minus_char=constant_char('-', char_type);
   exprt max=from_integer(max_size, index_type);
+  unsigned long radix_ul=try_to_evaluate_expr_as_ul(radix, 36ul);
 
   // We add axioms:
   // a1 : x < 0 => 1 <|res|<=max_size && res[0]='-'
@@ -147,7 +170,8 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
   axioms.push_back(a1);
 
   not_exprt is_positive(is_negative);
-  exprt starts_with_digit=is_digit_with_radix_lower_case(res[0], radix_char_type);
+  exprt starts_with_digit=
+    is_digit_with_radix_lower_case(res[0], radix_char_type, radix_ul);
   and_exprt correct_length2(
     res.axiom_for_is_strictly_longer_than(0),
     res.axiom_for_is_strictly_shorter_than(max));
@@ -182,15 +206,18 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
     // a7 : |res| == size && res[0] == '-' => x == -sum
 
     exprt::operandst digit_constraints;
-    exprt sum=get_numeric_value_from_character(res[0], char_type, type);
+    exprt sum=
+      get_numeric_value_from_character(res[0], char_type, type, radix_ul);
 
     for(size_t j=1; j<size; j++)
     {
       mult_exprt radix_sum(sum, radix);
       // new_sum = radix * sum + (numeric value of res[j])
       exprt new_sum=plus_exprt(
-        radix_sum, get_numeric_value_from_character(res[j], char_type, type));
-      exprt is_number=is_digit_with_radix_lower_case(res[j], radix_char_type);
+        radix_sum,
+        get_numeric_value_from_character(res[j], char_type, type, radix_ul));
+      exprt is_number=
+        is_digit_with_radix_lower_case(res[j], radix_char_type, radix_ul);
       digit_constraints.push_back(is_number);
 
       // An overflow can happen when reaching the last index of a string of
@@ -554,20 +581,20 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
 {
   const typet &char_type=chr.type();
-  exprt zero_char=from_integer('0', char_type);
-  exprt nine_char=from_integer('9', char_type);
-  exprt a_char=from_integer('a', char_type);
-  exprt A_char=from_integer('A', char_type);
-  constant_exprt ten_char_type=from_integer(10, char_type);
+  const exprt zero_char=from_integer('0', char_type);
+  const exprt nine_char=from_integer('9', char_type);
+  const exprt a_char=from_integer('a', char_type);
+  const exprt A_char=from_integer('A', char_type);
+  const constant_exprt ten_char_type=from_integer(10, char_type);
 
-  and_exprt is_digit_when_radix_le_10(
+  const and_exprt is_digit_when_radix_le_10(
     binary_relation_exprt(chr, ID_ge, zero_char),
     binary_relation_exprt(
       chr, ID_lt, plus_exprt(zero_char, radix_char_type)));
 
-  minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
+  const minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
 
-  or_exprt is_digit_when_radix_gt_10(
+  const or_exprt is_digit_when_radix_gt_10(
     and_exprt(
       binary_relation_exprt(chr, ID_ge, zero_char),
       binary_relation_exprt(chr, ID_le, nine_char)),
@@ -588,34 +615,43 @@ exprt is_digit_with_radix(exprt chr, exprt radix_char_type)
 /// radix is 10 then check if the character is in the range 0-9. For bases above
 /// 10 only lower case letters are allowed, not upper case.
 /// \param chr: the character
-/// \param radix:  the radix
+/// \param radix_char_type:  the radix as an expression of the same type as chr
+/// \param radix: the radix, which should be between 2 and 36 (default 36)
 /// \return an expression for the condition
-exprt is_digit_with_radix_lower_case(exprt chr, exprt radix_char_type)
+exprt is_digit_with_radix_lower_case(
+  exprt chr, exprt radix_char_type, unsigned long radix)
 {
   const typet &char_type=chr.type();
-  exprt zero_char=from_integer('0', char_type);
-  exprt nine_char=from_integer('9', char_type);
-  exprt a_char=from_integer('a', char_type);
-  constant_exprt ten_char_type=from_integer(10, char_type);
+  const exprt zero_char=from_integer('0', char_type);
+  const exprt nine_char=from_integer('9', char_type);
+  const exprt a_char=from_integer('a', char_type);
+  const constant_exprt ten_char_type=from_integer(10, char_type);
 
-  and_exprt is_digit_when_radix_le_10(
+  const and_exprt is_digit_when_radix_le_10(
     binary_relation_exprt(chr, ID_ge, zero_char),
     binary_relation_exprt(chr, ID_lt, plus_exprt(zero_char, radix_char_type)));
 
-  minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
+  if(radix<=10)
+  {
+    return is_digit_when_radix_le_10;
+  }
+  else
+  {
+    const minus_exprt radix_minus_ten(radix_char_type, ten_char_type);
 
-  or_exprt is_digit_when_radix_gt_10(
-    and_exprt(
-      binary_relation_exprt(chr, ID_ge, zero_char),
-      binary_relation_exprt(chr, ID_le, nine_char)),
-    and_exprt(
-      binary_relation_exprt(chr, ID_ge, a_char),
-      binary_relation_exprt(chr, ID_lt, plus_exprt(a_char, radix_minus_ten))));
+    const or_exprt is_digit_when_radix_gt_10(
+      and_exprt(
+        binary_relation_exprt(chr, ID_ge, zero_char),
+        binary_relation_exprt(chr, ID_le, nine_char)),
+        and_exprt(
+          binary_relation_exprt(chr, ID_ge, a_char),
+          binary_relation_exprt(chr, ID_lt, plus_exprt(a_char, radix_minus_ten))));
 
-  return if_exprt(
-    binary_relation_exprt(radix_char_type, ID_le, ten_char_type),
-    is_digit_when_radix_le_10,
-    is_digit_when_radix_gt_10);
+    return if_exprt(
+      binary_relation_exprt(radix_char_type, ID_le, ten_char_type),
+      is_digit_when_radix_le_10,
+      is_digit_when_radix_gt_10);
+  }
 }
 
 /// Get the numeric value of a character, assuming that the radix is large
@@ -623,35 +659,100 @@ exprt is_digit_with_radix_lower_case(exprt chr, exprt radix_char_type)
 /// \param chr: the character to get the numeric value of
 /// \param char_type: the type to use for characters
 /// \param type: the type to use for the return value
+/// \param radix: the radix, which should be between 2 and 36 (default 36)
 /// \return an integer expression of the given type with the numeric value of
 ///   the char
 exprt get_numeric_value_from_character(
-  const exprt &chr, const typet &char_type, const typet &type)
+  const exprt &chr,
+  const typet &char_type,
+  const typet &type,
+  unsigned long radix)
 {
-  constant_exprt zero_char=from_integer('0', char_type);
-  constant_exprt a_char=from_integer('a', char_type);
-  constant_exprt A_char=from_integer('A', char_type);
-  constant_exprt ten_int=from_integer(10, char_type);
+  const constant_exprt zero_char=from_integer('0', char_type);
+  const constant_exprt ten_int=from_integer(10, char_type);
+  const constant_exprt a_char=from_integer('a', char_type);
+  const constant_exprt A_char=from_integer('A', char_type);
 
   /// There are four cases, which occur in ASCII in the following order:
   /// '+' and '-', digits, upper case letters, lower case letters
-  binary_relation_exprt lower_case(chr, ID_ge, a_char);
-  binary_relation_exprt upper_case_or_lower_case(chr, ID_ge, A_char);
-  binary_relation_exprt upper_case_lower_case_or_digit(chr, ID_ge, zero_char);
+  const binary_relation_exprt upper_case_lower_case_or_digit(
+    chr, ID_ge, zero_char);
 
-  /// return char >= 'a' ? (char - 'a' + 10) :
-  ///   char >= 'A' ? (char - 'A' + 10) :
-  ///     char >= '0' ? (char - '0') : 0
-  return typecast_exprt(
-    if_exprt(
-      lower_case,
-      plus_exprt(minus_exprt(chr, a_char), ten_int),
+  if(radix<=10)
+  {
+    /// return char >= '0' ? (char - '0') : 0
+    return typecast_exprt(
       if_exprt(
-        upper_case_or_lower_case,
-        plus_exprt(minus_exprt(chr, A_char), ten_int),
+        upper_case_lower_case_or_digit,
+        minus_exprt(chr, zero_char),
+        from_integer(0, char_type)),
+      type);
+  }
+  else
+  {
+    const binary_relation_exprt lower_case(chr, ID_ge, a_char);
+    const binary_relation_exprt upper_case_or_lower_case(chr, ID_ge, A_char);
+    /// return char >= 'a' ? (char - 'a' + 10) :
+    ///   char >= 'A' ? (char - 'A' + 10) :
+    ///     char >= '0' ? (char - '0') : 0
+    return typecast_exprt(
+      if_exprt(
+        lower_case,
+        plus_exprt(minus_exprt(chr, a_char), ten_int),
         if_exprt(
-          upper_case_lower_case_or_digit,
-          minus_exprt(chr, zero_char),
-          from_integer(0, char_type)))),
-    type);
+          upper_case_or_lower_case,
+          plus_exprt(minus_exprt(chr, A_char), ten_int),
+          if_exprt(
+            upper_case_lower_case_or_digit,
+            minus_exprt(chr, zero_char),
+            from_integer(0, char_type)))),
+      type);
+  }
+}
+
+/// Calculate the string length needed to represent any value of the given type
+/// using the given radix
+/// \param type: the type that we are considering values of
+/// \param radix: the radix we are using, as a double
+/// \return the maximum string length
+size_t calculate_max_string_length(const typet &type, double radix)
+{
+  double n_bits=static_cast<double>(to_bitvector_type(type).get_width());
+
+  /// If the type is signed then the maximum absolute value that needs to be
+  /// representable is one bit smaller
+  bool signed_type=type.id()==ID_signedbv;
+  /// Let m be the minimal number of characters needed.
+  /// For signed types, the longest string will be for -2^(n-1), so
+  ///   m = 1 + min{k: 2^(n-1) < r^k}
+  ///     = 1 + min{k: n-1 < k log_2(r)}
+  ///     = 1 + min{k: k > (n-1) / log_2(r)}
+  ///     = 1 + min{k: k > floor((n-1) / log_2(r))}
+  ///     = 1 + (1 + floor((n-1) / log_2(r)))
+  ///     = 2 + floor((n-1) / log_2(r))
+  /// For unsigned types, the longest string will be for (2^n)-1, so
+  ///   m = min{k: (2^n)-1 < r^k}
+  ///     = min{k: 2^n <= r^k}
+  ///     = min{k: n <= k log_2(r)}
+  ///     = min{k: k >= n / log_2(r)}
+  ///     = min{k: k >= ceil(n / log_2(r))}
+  ///     = ceil(n / log_2(r))
+  double max_string_length=signed_type?
+    floor(static_cast<double>(n_bits-1)/log2(radix))+2.0:
+    ceil(static_cast<double>(n_bits)/log2(radix));
+  return static_cast<size_t>(max_string_length);
+}
+
+/// If the expression is a constant expression then we get the value of it as
+/// an unsigned long. If not we return a default value.
+/// \param expr: input expression
+/// \param def: default value to return if we cannot evaluate expr
+/// \return the output as an unsigned long
+unsigned long try_to_evaluate_expr_as_ul(const exprt &expr, unsigned long def)
+{
+  symbol_tablet symtab;
+  const namespacet ns(symtab);
+  mp_integer mp_radix;
+  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
+  return to_integer_failed?def:integer2ulong(mp_radix);
 }
