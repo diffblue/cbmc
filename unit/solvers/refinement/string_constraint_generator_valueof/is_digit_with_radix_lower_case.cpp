@@ -15,7 +15,7 @@
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
 
-SCENARIO("is_digit_with_radix",
+SCENARIO("is_digit_with_radix_strict",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
   const typet char_type=unsignedbv_typet(16);
@@ -26,9 +26,9 @@ SCENARIO("is_digit_with_radix",
   {
     const constant_exprt radix=from_integer(10, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('0', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('0', char_type), radix), ns));
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('9', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('9', char_type), radix), ns));
     REQUIRE(false_exprt()==simplify_expr(
       is_digit_with_radix(from_integer('a', char_type), radix), ns));
   }
@@ -36,20 +36,22 @@ SCENARIO("is_digit_with_radix",
   {
     const constant_exprt radix=from_integer(8, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('7', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('7', char_type), radix), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('8', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('8', char_type), radix), ns));
   }
   WHEN("Radix 16")
   {
     const constant_exprt radix=from_integer(16, char_type);
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('a', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('5', char_type), radix), ns));
     REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('A', char_type), radix), ns));
-    REQUIRE(true_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('f', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('a', char_type), radix), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('g', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('A', char_type), radix), ns));
+    REQUIRE(true_exprt()==simplify_expr(
+      is_digit_with_radix_lower_case(from_integer('f', char_type), radix), ns));
+    REQUIRE(false_exprt()==simplify_expr(
+      is_digit_with_radix_lower_case(from_integer('g', char_type), radix), ns));
   }
 }

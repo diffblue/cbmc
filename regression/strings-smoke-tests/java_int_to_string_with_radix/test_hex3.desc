@@ -1,0 +1,8 @@
+CORE
+Test_hex3.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+assertion.* line 6 .* SUCCESS$
+assertion.* line 7 .* FAILURE$
+--
