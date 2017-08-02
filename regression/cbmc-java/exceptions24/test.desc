@@ -1,0 +1,12 @@
+CORE
+test.class
+--java-throw-runtime-exceptions
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+assertion at file test\.java line 9 function java::test\.main:\(\)V bytecode-index 10: FAILURE
+--
+^warning: ignoring
+--
+This test ensures that attempting a virtual call against a null pointer can produce a NullPointerException,
+even when there are no field accesses inside the method or inspection of its class identifier to trigger one.
