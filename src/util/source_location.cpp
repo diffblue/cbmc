@@ -56,7 +56,7 @@ std::string source_locationt::as_string(bool print_cwd) const
   {
     if(dest!="")
       dest+=' ';
-    dest+="bytecode_index "+id2string(bytecode);
+    dest+="bytecode-index "+id2string(bytecode);
   }
 
   return dest;

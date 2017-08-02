@@ -145,27 +145,27 @@ bool coverage_goalst::get_coverage_goals(
         // ensure minimal requirements for a goal entry
         PRECONDITION(
           (!each_goal["goal"].is_null()) ||
-          (!each_goal["sourceLocation"]["bytecode_index"].is_null()) ||
+          (!each_goal["sourceLocation"]["bytecodeIndex"].is_null()) ||
           (!each_goal["sourceLocation"]["file"].is_null() &&
            !each_goal["sourceLocation"]["function"].is_null() &&
            !each_goal["sourceLocation"]["line"].is_null()));
 
-        // check whether bytecode_index is provided for Java programs
+        // check whether bytecodeIndex is provided for Java programs
         if(mode==ID_java &&
-          each_goal["sourceLocation"]["bytecode_index"].is_null())
+          each_goal["sourceLocation"]["bytecodeIndex"].is_null())
         {
           messaget message(message_handler);
           message.error() << coverage_file
-                          << " file does not contain bytecode_index"
+                          << " file does not contain bytecodeIndex"
                           << messaget::eom;
           return true;
         }
 
-        if(!each_goal["sourceLocation"]["bytecode_index"].is_null())
+        if(!each_goal["sourceLocation"]["bytecodeIndex"].is_null())
         {
-          // get and set the bytecode_index
+          // get and set the bytecodeIndex
           irep_idt bytecode_index=
-            each_goal["sourceLocation"]["bytecode_index"].value;
+            each_goal["sourceLocation"]["bytecodeIndex"].value;
           source_location.set_java_bytecode_index(bytecode_index);
         }
 
@@ -1509,7 +1509,7 @@ bool instrument_cover_goals(
   if(cmdline.isset("existing-coverage"))
   {
     // get the mode to ensure invariants
-    // (e.g., bytecode_index for Java programs)
+    // (e.g., bytecodeIndex for Java programs)
     namespacet ns(symbol_table);
     const irep_idt &mode=ns.lookup(goto_functions.entry_point()).mode;
 
