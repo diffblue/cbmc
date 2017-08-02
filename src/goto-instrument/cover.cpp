@@ -108,7 +108,8 @@ public:
 bool coverage_goalst::get_coverage_goals(
   const std::string &coverage_file,
   message_handlert &message_handler,
-  coverage_goalst &goals)
+  coverage_goalst &goals,
+  const irep_idt &mode)
 {
   jsont json;
   source_locationt source_location;
@@ -132,24 +133,64 @@ bool coverage_goalst::get_coverage_goals(
     return true;
   }
 
-  for(const auto &goal : json.array)
+  // traverse the given JSON file
+  for(const auto &goals_in_json : json.array)
   {
-    // get the file of each existing goal
-    irep_idt file=goal["file"].value;
-    source_location.set_file(file);
-
-    // get the function of each existing goal
-    irep_idt function=goal["function"].value;
-    source_location.set_function(function);
-
-    // get the lines array
-    if(goal["lines"].is_array())
+    // get the set of goals
+    if(goals_in_json["goals"].is_array())
     {
-      for(const auto &line_json : goal["lines"].array)
+      // store the source location for each existing goal
+      for(const auto &each_goal : goals_in_json["goals"].array)
       {
-        // get the line of each existing goal
-        irep_idt line=line_json["number"].value;
-        source_location.set_line(line);
+        // ensure minimal requirements for a goal entry
+        PRECONDITION(
+          (!each_goal["goal"].is_null()) ||
+          (!each_goal["sourceLocation"]["bytecode_index"].is_null()) ||
+          (!each_goal["sourceLocation"]["file"].is_null() &&
+           !each_goal["sourceLocation"]["function"].is_null() &&
+           !each_goal["sourceLocation"]["line"].is_null()));
+
+        // check whether bytecode_index is provided for Java programs
+        if(mode==ID_java &&
+          each_goal["sourceLocation"]["bytecode_index"].is_null())
+        {
+          messaget message(message_handler);
+          message.error() << coverage_file
+                          << " file does not contain bytecode_index"
+                          << messaget::eom;
+          return true;
+        }
+
+        if(!each_goal["sourceLocation"]["bytecode_index"].is_null())
+        {
+          // get and set the bytecode_index
+          irep_idt bytecode_index=
+            each_goal["sourceLocation"]["bytecode_index"].value;
+          source_location.set_java_bytecode_index(bytecode_index);
+        }
+
+        if(!each_goal["sourceLocation"]["file"].is_null())
+        {
+          // get and set the file
+          irep_idt file=each_goal["sourceLocation"]["file"].value;
+          source_location.set_file(file);
+        }
+
+        if(!each_goal["sourceLocation"]["function"].is_null())
+        {
+          // get and set the function
+          irep_idt function=each_goal["sourceLocation"]["function"].value;
+          source_location.set_function(function);
+        }
+
+        if(!each_goal["sourceLocation"]["line"].is_null())
+        {
+          // get and set the line
+          irep_idt line=each_goal["sourceLocation"]["line"].value;
+          source_location.set_line(line);
+        }
+
+        // store the existing goal
         goals.add_goal(source_location);
       }
     }
@@ -157,25 +198,48 @@ bool coverage_goalst::get_coverage_goals(
   return false;
 }
 
+/// store existing goal
+/// \param goal: source location of the existing goal
 void coverage_goalst::add_goal(source_locationt goal)
 {
-  existing_goals.push_back(goal);
+  existing_goals[goal]=false;
+}
+
+/// check whether we have an existing goal that is uncovered
+/// \param msg: message to be printed about the uncovered goal
+void coverage_goalst::check_uncovered_goals(messaget &msg)
+{
+  for(const auto &existing_loc : existing_goals)
+  {
+    if(!existing_loc.second)
+    {
+      msg.warning()
+        << "Warning: existing goal in file "
+        << existing_loc.first.get_file()
+        << " line " << existing_loc.first.get_line()
+        << " function " << existing_loc.first.get_function()
+        << " is uncovered" << messaget::eom;
+    }
+  }
 }
 
 /// compare the value of the current goal to the existing ones
 /// \param source_loc: source location of the current goal
 /// \return true : if the current goal exists false : otherwise
-bool coverage_goalst::is_existing_goal(source_locationt source_loc) const
+bool coverage_goalst::is_existing_goal(source_locationt source_loc)
 {
   for(const auto &existing_loc : existing_goals)
   {
-    if((source_loc.get_file()==existing_loc.get_file()) &&
-       (source_loc.get_function()==existing_loc.get_function()) &&
-       (source_loc.get_line()==existing_loc.get_line()) &&
+    if((source_loc.get_file()==existing_loc.first.get_file()) &&
+       (source_loc.get_function()==existing_loc.first.get_function()) &&
+       (source_loc.get_line()==existing_loc.first.get_line()) &&
        (source_loc.get_java_bytecode_index().empty() ||
          (source_loc.get_java_bytecode_index()==
-           existing_loc.get_java_bytecode_index())))
-        return true;
+           existing_loc.first.get_java_bytecode_index())))
+    {
+      existing_goals[existing_loc.first]=true;
+      return true;
+    }
   }
   return false;
 }
@@ -989,7 +1053,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
-  const coverage_goalst &goals,
+  coverage_goalst &goals,
   bool function_only,
   bool ignore_trivial)
 {
@@ -1333,7 +1397,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
-  const coverage_goalst &goals,
+  coverage_goalst &goals,
   bool function_only,
   bool ignore_trivial)
 {
@@ -1444,11 +1508,17 @@ bool instrument_cover_goals(
   coverage_goalst existing_goals;
   if(cmdline.isset("existing-coverage"))
   {
-    msg.status() << "Check existing coverage goals" << messaget::eom;
+    // get the mode to ensure invariants
+    // (e.g., bytecode_index for Java programs)
+    namespacet ns(symbol_table);
+    const irep_idt &mode=ns.lookup(goto_functions.entry_point()).mode;
+
+    msg.status() << "Add existing coverage goals" << messaget::eom;
     // get file with covered test goals
     const std::string coverage=cmdline.get_value("existing-coverage");
     // get a coverage_goalst object
-    if(coverage_goalst::get_coverage_goals(coverage, msgh, existing_goals))
+    if(coverage_goalst::get_coverage_goals(
+       coverage, msgh, existing_goals, mode))
     {
       msg.error() << "get_coverage_goals failed" << messaget::eom;
       return true;
@@ -1467,6 +1537,10 @@ bool instrument_cover_goals(
       cmdline.isset("cover-function-only"),
       cmdline.isset("no-trivial-tests"));
   }
+
+  // check whether all existing goals have been covered
+  msg.status() << "Checking uncovered goals" << messaget::eom;
+  existing_goals.check_uncovered_goals(msg);
 
   if(cmdline.isset("cover-traces-must-terminate"))
   {
