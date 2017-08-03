@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "thread_instrumentation.h"
 
 #include <util/c_types.h>
 #include <ansi-c/string_constant.h>
-
-#include "thread_instrumentation.h"
 
 static bool has_start_thread(const goto_programt &goto_program)
 {
@@ -44,7 +43,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   binary_exprt get_may("get_may");
 
   // NULL is any
-  get_may.op0()=null_pointer_exprt(to_pointer_type(pointer_type(empty_typet())));
+  get_may.op0()=null_pointer_exprt(pointer_type(empty_typet()));
   get_may.op1()=address_of_exprt(mutex_locked_string);
 
   end->make_assertion(not_exprt(get_may));

@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_scope.h"
 
 #include <ostream>
-
-#include "ansi_c_scope.h"
 
 void ansi_c_scopet::print(std::ostream &out) const
 {

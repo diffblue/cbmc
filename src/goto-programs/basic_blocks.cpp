@@ -34,7 +34,7 @@ void basic_blocks(goto_programt &goto_program,
       it!=goto_program.instructions.end();
       ) // intentionally no it++
   {
-    // goto's and empty code are left unchanged
+    // gotos and empty code are left unchanged
     if(it->is_goto() || it->is_dead() ||
        it->is_assert() || it->is_assume() ||
        it->is_atomic_begin() || it->is_atomic_end() ||

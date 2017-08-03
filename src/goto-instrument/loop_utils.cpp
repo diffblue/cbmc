@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Helper functions for k-induction and loop invariants
 
+#include "loop_utils.h"
+
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
 #include <analyses/local_may_alias.h>
-
-#include "loop_utils.h"
 
 goto_programt::targett get_loop_exit(const loopt &loop)
 {

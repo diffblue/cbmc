@@ -9,10 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <ostream>
-
-
 #include "cpp_scopes.h"
+
+#include <ostream>
 
 cpp_scopet &cpp_scopest::new_block_scope()
 {

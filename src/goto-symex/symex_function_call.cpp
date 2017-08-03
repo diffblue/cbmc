@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
@@ -23,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex.h"
 
 bool goto_symext::get_unwind_recursion(
   const irep_idt &identifier,
@@ -139,7 +139,7 @@ void goto_symext::parameter_assignments(
   {
     // These are va_arg arguments; their types may differ from call to call
     unsigned va_count=0;
-    const symbolt *va_sym=0;
+    const symbolt *va_sym=nullptr;
     while(!ns.lookup(
         id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
         va_sym))

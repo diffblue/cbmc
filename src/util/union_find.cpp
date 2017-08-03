@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "union_find.h"
 
 #include <algorithm>
-
-#include "union_find.h"
 
 void unsigned_union_find::make_union(size_type j, size_type k)
 {
@@ -85,7 +84,7 @@ void unsigned_union_find::re_root(size_type old_root, size_type new_root)
   if(find(new_root)!=old_root)
     return;
 
-  // make sure we actually do s.th.
+  // make sure we actually do something
   assert(new_root!=old_root);
   assert(nodes[old_root].count>=2);
 

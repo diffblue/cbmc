@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cpp_internal_additions.h"
 
 #include <ostream>
 
 #include <util/config.h>
 
 #include <ansi-c/ansi_c_internal_additions.h>
-
-#include "cpp_internal_additions.h"
 
 std::string c2cpp(const std::string &s)
 {

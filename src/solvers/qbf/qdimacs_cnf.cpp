@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "qdimacs_cnf.h"
 
 #include <iostream>
 #include <cassert>
-
-#include "qdimacs_cnf.h"
 
 void qdimacs_cnft::write_qdimacs_cnf(std::ostream &out)
 {

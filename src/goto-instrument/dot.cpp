@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Dump Goto-Program as DOT Graph
 
+#include "dot.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
                           "compound=true;"\
                           "size=\"30,40\";"\
                           "ratio=compress;"
-
-#include "dot.h"
 
 class dott
 {

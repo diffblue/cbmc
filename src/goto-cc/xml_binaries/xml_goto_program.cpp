@@ -11,12 +11,12 @@ Date: June 2006
 /// \file
 /// Convert goto programs to xml structures and back.
 
+#include "xml_goto_program.h"
+
 #include <sstream>
 #include <iostream>
 
 #include <util/xml_irep.h>
-
-#include "xml_goto_program.h"
 
 /// constructs the xml structure according to the goto program and the namespace
 /// into the given xml object.

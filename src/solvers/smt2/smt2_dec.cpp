@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt2_dec.h"
 
 #include <cstdlib>
 
@@ -24,7 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 
-#include "smt2_dec.h"
 #include "smt2irep.h"
 
 std::string smt2_dect::decision_procedure_text() const

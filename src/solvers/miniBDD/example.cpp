@@ -11,9 +11,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// A minimalistic BDD library, following Bryant's original paper and Andersen's
 ///   lecture notes
 
-#include <iostream>
-
 #include "miniBDD.h"
+
+#include <iostream>
 
 int main()
 {

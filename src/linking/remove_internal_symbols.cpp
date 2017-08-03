@@ -9,14 +9,14 @@ Author: Daniel Kroening
 /// \file
 /// Remove symbols that are internal only
 
+#include "remove_internal_symbols.h"
+
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 #include <util/config.h>
-
-#include "remove_internal_symbols.h"
 
 void get_symbols_rec(
   const namespacet &ns,

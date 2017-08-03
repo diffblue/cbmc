@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "pointer_arithmetic.h"
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-
-#include "pointer_arithmetic.h"
 
 pointer_arithmetict::pointer_arithmetict(const exprt &src)
 {

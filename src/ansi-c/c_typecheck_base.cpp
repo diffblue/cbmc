@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Conversion / Type Checking
 
+#include "c_typecheck_base.h"
+
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
 
-#include "c_typecheck_base.h"
 #include "expr2c.h"
 #include "type2name.h"
 #include "c_storage_spec.h"
@@ -44,8 +45,6 @@ void c_typecheck_baset::move_symbol(symbolt &symbol, symbolt *&new_symbol)
 
 void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
 {
-  current_symbol_id=symbol.name;
-
   bool is_function=symbol.type.id()==ID_code;
 
   const typet &final_type=follow(symbol.type);
@@ -165,7 +164,7 @@ void c_typecheck_baset::typecheck_redefinition_type(
   const typet &final_old=follow(old_symbol.type);
   const typet &final_new=follow(new_symbol.type);
 
-  // see if we had s.th. incomplete before
+  // see if we had something incomplete before
   if(final_old.id()==ID_incomplete_struct ||
      final_old.id()==ID_incomplete_union ||
      final_old.id()==ID_incomplete_c_enum)
@@ -702,6 +701,7 @@ void c_typecheck_baset::typecheck_declaration(
 
       symbolt symbol;
       declaration.to_symbol(*d_it, symbol);
+      current_symbol=symbol;
 
       // now check other half of type
       typecheck_type(symbol.type);

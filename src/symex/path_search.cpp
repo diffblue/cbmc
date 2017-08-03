@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Path-based Symbolic Execution
 
+#include "path_search.h"
+
 #include <util/simplify_expr.h>
 #include <util/time_stopping.h>
 
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <path-symex/path_symex.h>
 #include <path-symex/build_goto_trace.h>
-
-#include "path_search.h"
 
 path_searcht::resultt path_searcht::operator()(
   const goto_functionst &goto_functions)

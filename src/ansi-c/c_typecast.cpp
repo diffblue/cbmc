@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_typecast.h"
 
 #include <algorithm>
 
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/simplify_expr.h>
 
-#include "c_typecast.h"
 #include "c_qualifiers.h"
 
 bool c_implicit_typecast(
@@ -715,7 +715,7 @@ void c_typecastt::do_typecast(exprt &expr, const typet &dest_type)
   if(src_type!=dest_type)
   {
     // C booleans are special; we produce the
-    // explicit comparision with zero.
+    // explicit comparison with zero.
     // Note that this requires ieee_float_notequal
     // in case of floating-point numbers.
 

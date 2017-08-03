@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "remove_function_pointers.h"
+
 #include <cassert>
 
 #include <util/fresh_symbol.h>
@@ -25,7 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "remove_skip.h"
-#include "remove_function_pointers.h"
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
 
@@ -49,7 +50,7 @@ protected:
   bool add_safety_assertion;
 
   // We can optionally halt the FP removal if we aren't able to use
-  // remove_const_function_pointerst to sucessfully narrow to a small
+  // remove_const_function_pointerst to successfully narrow to a small
   // subset of possible functions and just leave the function pointer
   // as it is.
   // This can be activated in goto-instrument using
@@ -315,7 +316,7 @@ void remove_function_pointerst::remove_function_pointer(
     if(only_resolve_const_fps)
     {
       // If this mode is enabled, we only remove function pointers
-      // that we can resolve either to an exact funciton, or an exact subset
+      // that we can resolve either to an exact function, or an exact subset
       // (e.g. a variable index in a constant array).
       // Since we haven't found functions, we would now resort to
       // replacing the function pointer with any function with a valid signature
@@ -374,10 +375,7 @@ void remove_function_pointerst::remove_function_pointer(
     t3->make_goto(t_final, true_exprt());
 
     // goto to call
-    address_of_exprt address_of;
-    address_of.object()=fun;
-    address_of.type()=pointer_typet();
-    address_of.type().subtype()=fun.type();
+    address_of_exprt address_of(fun, pointer_type(fun.type()));
 
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());

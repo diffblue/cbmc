@@ -1,0 +1,12 @@
+CORE
+dummy_parameter.c
+unreachable-string
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--- begin invariant violation report ---
+Unreachable
+Invariant check failed
+^(Backtrace)|(Backtraces not supported)$
+--
+^warning: ignoring
+^VERIFICATION SUCCESSFUL$

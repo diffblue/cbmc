@@ -14,6 +14,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
+#include <solvers/floatbv/float_bv.h>
+
 /// Add axioms corresponding to the String.valueOf(I) java function.
 /// \param expr: function application with one integer argument
 /// \return a new string expression

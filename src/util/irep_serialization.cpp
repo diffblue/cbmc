@@ -11,10 +11,11 @@ Date: May 2007
 /// \file
 /// binary irep conversions with hashing
 
+#include "irep_serialization.h"
+
 #include <sstream>
 #include <iostream>
 
-#include "irep_serialization.h"
 #include "string_hash.h"
 
 void irep_serializationt::write_irep(
@@ -159,7 +160,7 @@ std::size_t irep_serializationt::insert_on_read(
   return id;
 }
 
-/// outputs 4 characters for a long, most-significand byte first
+/// outputs 4 characters for a long, most-significant byte first
 /// \par parameters: an output stream and a number
 /// \return nothing
 void write_gb_word(std::ostream &out, std::size_t u)

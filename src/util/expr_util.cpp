@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 
 #include "expr_util.h"
+
 #include "expr.h"
 #include "fixedbv.h"
 #include "ieee_float.h"

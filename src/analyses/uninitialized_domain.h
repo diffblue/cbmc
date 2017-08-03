@@ -57,7 +57,7 @@ public:
     make_top();
   }
 
-  // returns true iff there is s.th. new
+  // returns true iff there is something new
   bool merge(
     const uninitialized_domaint &other,
     locationt from,

@@ -11,14 +11,14 @@ Date: April 2013
 /// \file
 /// Printing function call sequences for Ofer
 
+#include "call_sequences.h"
+
 #include <stack>
 #include <iostream>
 #include <unordered_set>
 
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
-
-#include "call_sequences.h"
 
 void show_call_sequences(
   const irep_idt &function,

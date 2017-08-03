@@ -1,0 +1,11 @@
+CORE
+main.cpp
+
+main\.cpp:3:  Do not use namespaces  \[readability/namespace\] \[4\]
+main\.cpp:5:  Do not use namespaces  \[readability/namespace\] \[4\]
+main\.cpp:9:  Do not use namespaces  \[readability/namespace\] \[4\]
+main\.cpp:13:  Do not use namespaces  \[readability/namespace\] \[4\]
+main\.cpp:19:  Do not use namespaces  \[readability/namespace\] \[4\]
+^EXIT=1$
+^SIGNAL=0$
+--

@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Dereferencing Operations on GOTO Programs
 
+#include "goto_program_dereference.h"
+
 #include <util/simplify_expr.h>
 #include <util/base_type.h>
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 #include <util/guard.h>
 #include <util/options.h>
-
-#include "goto_program_dereference.h"
 
 bool goto_program_dereferencet::has_failed_symbol(
   const exprt &expr,

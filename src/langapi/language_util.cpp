@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "language_util.h"
 
 #include <memory>
 
@@ -14,7 +15,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/language.h>
 #include <util/std_expr.h>
 
-#include "language_util.h"
 #include "mode.h"
 
 static languaget* get_language(
@@ -30,7 +30,7 @@ static languaget* get_language(
 
   languaget *ptr=get_language_from_mode(symbol->mode);
 
-  if(ptr==NULL)
+  if(ptr==nullptr)
     throw "symbol `"+id2string(symbol->name)+
       "' has unknown mode '"+id2string(symbol->mode)+"'";
 

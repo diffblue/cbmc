@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "dereference.h"
+
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -22,8 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include <util/c_types.h>
-
-#include "dereference.h"
 
 /// \par parameters: expression, to be dereferenced
 /// \return returns object after dereferencing
@@ -275,7 +275,7 @@ exprt dereferencet::dereference_typecast(
         plus_exprt(offset, typecast_exprt(op, offset.type()));
 
     exprt new_typecast=
-      typecast_exprt(integer, pointer_typet(type));
+      typecast_exprt(integer, pointer_type(type));
 
     return dereference_exprt(new_typecast, type);
   }
@@ -300,7 +300,7 @@ bool dereferencet::type_compatible(
   {
     if(to_struct_type(dereference_type).is_prefix_of(
          to_struct_type(object_type)))
-      return true; // ok, dreference_type is a prefix of object_type
+      return true; // ok, dereference_type is a prefix of object_type
   }
 
   // any code is ok

@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "lispexpr.h"
 
 #include <iostream>
-
-#include "lispexpr.h"
 
 std::string lispexprt::expr2string() const
 {

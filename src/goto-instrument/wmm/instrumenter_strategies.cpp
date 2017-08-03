@@ -11,11 +11,10 @@ Date: 2012
 /// \file
 /// Strategies for picking the abstract events to instrument
 
+#include "goto2graph.h"
+
 #include <string>
 #include <fstream>
-
-
-#include "goto2graph.h"
 
 #ifdef HAVE_GLPK
 #include <glpk.h>

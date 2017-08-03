@@ -11,10 +11,10 @@ Date: September 2011
 /// \file
 /// Volatile Variables
 
+#include "nondet_volatile.h"
+
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include "nondet_volatile.h"
 
 bool is_volatile(
   const symbol_tablet &symbol_table,

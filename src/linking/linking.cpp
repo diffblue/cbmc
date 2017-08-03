@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Linking
 
+#include "linking.h"
+
 #include <cassert>
 #include <stack>
 
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "linking.h"
 #include "linking_class.h"
 
 std::string linkingt::expr_to_string(

@@ -11,9 +11,9 @@ Date: March 2013
 /// \file
 /// Local variables whose address is taken
 
-#include <util/std_expr.h>
-
 #include "dirty.h"
+
+#include <util/std_expr.h>
 
 void dirtyt::build(const goto_functiont &goto_function)
 {

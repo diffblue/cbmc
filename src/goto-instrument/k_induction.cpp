@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// k-induction
 
+#include "k_induction.h"
+
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
@@ -18,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unwind.h"
 #include "loop_utils.h"
-#include "k_induction.h"
 
 class k_inductiont
 {
@@ -86,7 +87,7 @@ void k_inductiont::process_loop(
     modifiest modifies;
     get_modifies(local_may_alias, loop, modifies);
 
-    // build the havoc-ing code
+    // build the havocking code
     goto_programt havoc_code;
     build_havoc_code(loop_head, modifies, havoc_code);
 

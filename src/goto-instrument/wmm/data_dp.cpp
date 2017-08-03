@@ -11,9 +11,10 @@ Date: 2012
 /// \file
 /// data dependencies
 
+#include "data_dp.h"
+
 #include <util/message.h>
 
-#include "data_dp.h"
 #include "abstract_event.h"
 
 /// insertion

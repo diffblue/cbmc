@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "expr2java.h"
 
 #include <cassert>
 
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/expr2c_class.h>
 
 #include "java_types.h"
-#include "expr2java.h"
 
 std::string expr2javat::convert_code_function_call(
   const code_function_callt &src,
@@ -276,8 +276,8 @@ std::string expr2javat::convert_rec(
     const code_typet &code_type=to_code_type(src);
 
     // Java doesn't really have syntax for function types,
-    // so we make one up, loosley inspired by the syntax
-    // of lamda expressions.
+    // so we make one up, loosely inspired by the syntax
+    // of lambda expressions.
 
     std::string dest="";
 

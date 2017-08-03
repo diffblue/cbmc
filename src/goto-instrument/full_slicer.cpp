@@ -9,14 +9,15 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Slicing
 
+#include "full_slicer.h"
+#include "full_slicer_class.h"
+
 #include <util/find_symbols.h>
 #include <util/cprover_prefix.h>
 #ifdef DEBUG_FULL_SLICERT
 #endif
 
 #include <goto-programs/remove_skip.h>
-
-#include "full_slicer_class.h"
 
 void full_slicert::add_dependencies(
   const cfgt::nodet &node,

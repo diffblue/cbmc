@@ -9,6 +9,8 @@ Author: DiffBlue Limited. All rights reserved.
 /// \file
 /// C Nondet Symbol Factory
 
+#include "c_nondet_symbol_factory.h"
+
 #include <set>
 #include <sstream>
 
@@ -27,8 +29,6 @@ Author: DiffBlue Limited. All rights reserved.
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include "c_nondet_symbol_factory.h"
 
 /// Create a new temporary static symbol
 /// \param symbol_table: The symbol table to create the symbol in

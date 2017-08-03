@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Interpreter for GOTO Programs
 
+#include "interpreter_class.h"
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <string.h>
-
-#include "interpreter_class.h"
 
 /// reads a memory address and loads it into the dest variable marks cell as
 /// read before written if cell has never been written

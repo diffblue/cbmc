@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_declarator.h"
+
 #include <ostream>
 #include <cassert>
-
-#include "cpp_declarator.h"
 
 void cpp_declaratort::output(std::ostream &out) const
 {

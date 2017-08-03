@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "value_set_dereference.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -39,7 +41,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "value_set_dereference.h"
 #include "pointer_offset_sum.h"
 
 // global data, horrible
@@ -431,7 +432,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     else
     {
       // We need to use byte_extract.
-      // Won't do this without a committment to an endianness.
+      // Won't do this without a commitment to an endianness.
 
       if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
       {
@@ -775,7 +776,7 @@ bool value_set_dereferencet::memory_model(
       return memory_model_conversion(value, to_type, guard, offset);
   }
 
-  // otherwise, we will stich it together from bytes
+  // otherwise, we will stitch it together from bytes
 
   return memory_model_bytes(value, to_type, guard, offset);
 }
@@ -819,7 +820,7 @@ bool value_set_dereferencet::memory_model_bytes(
   if(from_type.id()==ID_code || to_type.id()==ID_code)
     return false;
 
-  // We won't do this without a committment to an endianness.
+  // We won't do this without a commitment to an endianness.
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
     return false;
 

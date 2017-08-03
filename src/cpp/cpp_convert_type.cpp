@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Conversion
 
+#include "cpp_convert_type.h"
+
 #include <cassert>
 
 #include <util/config.h>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 
-#include "cpp_convert_type.h"
 #include "cpp_declaration.h"
 #include "cpp_name.h"
 
@@ -250,8 +251,8 @@ void cpp_convert_typet::read_function_type(const typet &type)
         // see if it's an array type
         if(final_type.id()==ID_array)
         {
-          final_type.id(ID_pointer);
-          final_type.remove(ID_size);
+          // turn into pointer type
+          final_type=pointer_type(final_type.subtype());
         }
 
         code_typet::parametert new_parameter(final_type);

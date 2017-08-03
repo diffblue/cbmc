@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <util/std_types.h>
-
 #include "cpp_typecheck.h"
+
+#include <util/std_types.h>
 
 void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
 {

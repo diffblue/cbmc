@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Havoc Loops
 
+#include "havoc_loops.h"
+
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_skip.h>
 
 #include "function_modifies.h"
-#include "havoc_loops.h"
 
 class havoc_loopst
 {
@@ -111,7 +112,7 @@ void havoc_loopst::havoc_loop(
   modifiest modifies;
   get_modifies(loop, modifies);
 
-  // build the havoc-ing code
+  // build the havocking code
   goto_programt havoc_code;
   build_havoc_code(loop_head, modifies, havoc_code);
 

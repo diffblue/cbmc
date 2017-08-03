@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "find_macros.h"
 
 #include <stack>
 
-#include "find_macros.h"
 #include "expr.h"
 #include "namespace.h"
 #include "symbol.h"

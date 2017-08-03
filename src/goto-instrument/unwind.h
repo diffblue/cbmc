@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/json_expr.h>
 #include <goto-programs/goto_program.h>
 
+class goto_functionst;
+
 // -1: do not unwind loop
 typedef std::map<irep_idt, std::map<unsigned, int>> unwind_sett;
 

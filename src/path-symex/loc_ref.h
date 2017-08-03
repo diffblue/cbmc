@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_PATH_SYMEX_LOC_REF_H
 #define CPROVER_PATH_SYMEX_LOC_REF_H
 
-#include <iosfwd>
+#include <ostream>
 
 class loc_reft
 {

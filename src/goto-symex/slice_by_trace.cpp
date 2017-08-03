@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Slicer for symex traces
 
+#include "slice_by_trace.h"
+
 #include <cstring>
 #include <set>
 #include <fstream>
@@ -21,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/guard.h>
 
 #include <langapi/language_util.h>
-
-#include "slice_by_trace.h"
 
 void symex_slice_by_tracet::slice_by_trace(
   std::string trace_files,
@@ -187,9 +187,9 @@ void symex_slice_by_tracet::parse_events(std::string read_line)
 {
   if(read_line=="")
     return;
-  bool parity=strstr(read_line.c_str(), "!")==NULL;
-  bool universe=strstr(read_line.c_str(), "?")!=NULL;
-  bool has_values=strstr(read_line.c_str(), " ")!=NULL;
+  bool parity=strstr(read_line.c_str(), "!")==nullptr;
+  bool universe=strstr(read_line.c_str(), "?")!=nullptr;
+  bool has_values=strstr(read_line.c_str(), " ")!=nullptr;
   std::cout << "Trace: " << read_line << '\n';
   std::vector<irep_idt> value_v;
   if(has_values)

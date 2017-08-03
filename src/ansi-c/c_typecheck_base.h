@@ -61,7 +61,7 @@ protected:
   symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
-  irep_idt current_symbol_id;
+  symbolt current_symbol;
 
   typedef std::unordered_map<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;

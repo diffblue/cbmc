@@ -8,11 +8,9 @@ Revisions: Roberto Bruttomesso, roberto.bruttomesso@unisi.ch
 
 \*******************************************************************/
 
+#include "smt1_prop.h"
 
 #include <cassert>
-
-
-#include "smt1_prop.h"
 
 smt1_propt::smt1_propt(
   const std::string &benchmark,

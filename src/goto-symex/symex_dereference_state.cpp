@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
-#include <util/symbol_table.h>
-
 #include "symex_dereference_state.h"
+
+#include <util/symbol_table.h>
 
 void symex_dereference_statet::dereference_failure(
   const std::string &property,
@@ -43,7 +43,7 @@ bool symex_dereference_statet::has_failed_symbol(
         !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
-      symbolt *sym_ptr=0;
+      symbolt *sym_ptr=nullptr;
       symbol_exprt sym_expr=sym.symbol_expr();
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
@@ -64,7 +64,7 @@ bool symex_dereference_statet::has_failed_symbol(
         !ns.lookup(failed_symbol, symbol))
     {
       symbolt sym=*symbol;
-      symbolt *sym_ptr=0;
+      symbolt *sym_ptr=nullptr;
       symbol_exprt sym_expr=sym.symbol_expr();
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();

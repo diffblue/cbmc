@@ -9,6 +9,8 @@ Author: Thomas Kiley
 /// \file
 /// Goto Program
 
+#include "show_goto_functions_json.h"
+
 #include <iostream>
 #include <sstream>
 
@@ -21,9 +23,8 @@ Author: Thomas Kiley
 
 #include "goto_functions.h"
 #include "goto_model.h"
-#include "show_goto_functions_json.h"
 
-/// For outputing the GOTO program in a readable JSON format.
+/// For outputting the GOTO program in a readable JSON format.
 /// \param ns: the namespace to use to resolve names with
 show_goto_functions_jsont::show_goto_functions_jsont(const namespacet &ns):
   ns(ns)

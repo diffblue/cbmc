@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "rewrite_union.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 
 #include <util/c_types.h>
-
-#include "rewrite_union.h"
 
 static bool have_to_rewrite_union(
   const exprt &expr,

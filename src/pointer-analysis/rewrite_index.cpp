@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Pointer Dereferencing
 
-#include <util/std_expr.h>
-
 #include "rewrite_index.h"
+
+#include <util/std_expr.h>
 
 /// rewrite a[i] to *(a+i)
 dereference_exprt rewrite_index(const index_exprt &index_expr)

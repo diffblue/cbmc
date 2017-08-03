@@ -9,7 +9,7 @@ Author: Peter Schrammel
 /// \file
 /// Expressions in JSON
 
-#include <memory>
+#include "json_expr.h"
 
 #include "namespace.h"
 #include "expr.h"
@@ -23,7 +23,7 @@ Author: Peter Schrammel
 #include "language.h"
 #include <langapi/mode.h>
 
-#include "json_expr.h"
+#include <memory>
 
 static exprt simplify_json_expr(
   const exprt &src,

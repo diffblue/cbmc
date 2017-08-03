@@ -22,6 +22,7 @@ Date:   March 2017
 
 #include <util/ui_message.h>
 #include <util/std_code.h>
+#include <util/mp_arith.h>
 
 class character_refine_preprocesst:public messaget
 {

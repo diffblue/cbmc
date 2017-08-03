@@ -21,6 +21,8 @@ Date: April 2016
 
 #include <util/namespace.h>
 
+#include "goto-programs/goto_program.h"
+
 class goto_functionst;
 class goto_modelt;
 class goto_programt;

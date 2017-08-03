@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Subgoal Documentation
 
+#include "document_properties.h"
+
 #include <fstream>
 
 #include <util/string2int.h>
 
 #include <ansi-c/expr2c.h>
-
-#include "document_properties.h"
 
 #define MAXWIDTH 62
 

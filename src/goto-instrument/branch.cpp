@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Branch Instrumentation
 
+#include "branch.h"
+
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
 #include "function.h"
-#include "branch.h"
 
 void branch(
   symbol_tablet &symbol_table,

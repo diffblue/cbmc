@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
 #include <util/prefix.h>
 #include <util/string2int.h>
-
-#include "boolbv.h"
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {

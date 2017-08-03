@@ -9,9 +9,9 @@ Author: Peter Schrammel
 /// \file
 /// GOTO-DIFF Base Class
 
-#include <util/json_expr.h>
-
 #include "goto_diff.h"
+
+#include <util/json_expr.h>
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
 {
@@ -20,7 +20,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
     case ui_message_handlert::uit::PLAIN:
     {
       out << "total number of functions: " << total_functions_count << "\n";
-      out << "new functions: \n";
+      out << "new functions:\n";
       for(irep_id_sett::const_iterator it=new_functions.begin();
           it!=new_functions.end(); ++it)
       {
@@ -31,7 +31,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "modified functions: \n";
+      out << "modified functions:\n";
       for(irep_id_sett::const_iterator it=modified_functions.begin();
           it!=modified_functions.end(); ++it)
       {
@@ -42,12 +42,12 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "deleted functions: \n";
+      out << "deleted functions:\n";
       for(irep_id_sett::const_iterator it=deleted_functions.begin();
           it!=deleted_functions.end(); ++it)
       {
         const goto_programt &program=
-          goto_model2.goto_functions.function_map.at(*it).body;
+          goto_model1.goto_functions.function_map.at(*it).body;
         out << "  "
           << program.instructions.begin()->source_location.get_file()
           << ": " << *it << "\n";

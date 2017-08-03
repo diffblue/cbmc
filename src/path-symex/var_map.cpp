@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Variable Numbering
 
+#include "var_map.h"
+
 #include <ostream>
 
 #include <util/symbol.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
-
-#include "var_map.h"
 
 var_mapt::var_infot &var_mapt::operator()(
   const irep_idt &symbol,
@@ -84,7 +84,7 @@ void var_mapt::init(var_infot &var_info)
     }
     else
     {
-      const symbolt *symbol=0;
+      const symbolt *symbol=nullptr;
       if(ns.lookup(var_info.symbol, symbol))
         throw "var_mapt::init identifier \""
           +id2string(var_info.full_identifier)

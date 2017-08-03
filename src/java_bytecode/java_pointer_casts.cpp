@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Pointer Casts
 
+#include "java_pointer_casts.h"
+
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/namespace.h>
-
-#include "java_pointer_casts.h"
 
 /// dereference pointer expression
 /// \return dereferenced pointer

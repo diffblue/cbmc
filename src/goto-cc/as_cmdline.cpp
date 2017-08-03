@@ -9,12 +9,12 @@ Author: Michael Tautschnig
 /// \file
 /// A special command line object for GNU Assembler
 
+#include "as_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "as_cmdline.h"
 
 // non-as options
 const char *goto_as_options_with_argument[]=
@@ -23,7 +23,7 @@ const char *goto_as_options_with_argument[]=
   "--function",
   "--native-assembler",
   "--print-rejected-preprocessed-source",
-  NULL
+  nullptr
 };
 
 const char *as_options_without_argument[]=
@@ -42,6 +42,7 @@ const char *as_options_without_argument[]=
   "-K",
   "-L",
   "--keep-locals",
+  "-Qy",
   "-R",
   "--reduce-memory-overheads",
   "--statistics",
@@ -58,7 +59,7 @@ const char *as_options_without_argument[]=
   "--32", // i386
   "--64", // i386
   "-n", // i386
-  NULL
+  nullptr
 };
 
 const char *as_options_with_argument[]=
@@ -73,7 +74,7 @@ const char *as_options_with_argument[]=
   "-o",
   "-march", // i386
   "-mtune", // i386
-  NULL
+  nullptr
 };
 
 bool as_cmdlinet::parse(int argc, const char **argv)
@@ -103,7 +104,7 @@ bool as_cmdlinet::parse(int argc, const char **argv)
 
     // separated only, and also allow concatenation with "="
     for(const char **o=goto_as_options_with_argument;
-        *o!=NULL && !found;
+        *o!=nullptr && !found;
         ++o)
     {
       std::string os(*o);
@@ -169,7 +170,7 @@ bool as_cmdlinet::parse(int argc, const char **argv)
     }
 
     for(const char **o=as_options_with_argument;
-        *o!=NULL && !found;
+        *o!=nullptr && !found;
         ++o)
     {
       std::string os(*o);

@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "rename.h"
 
 #include <algorithm>
 
-#include "rename.h"
 #include "symbol.h"
 #include "expr.h"
 #include "namespace.h"

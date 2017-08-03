@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "prop_conv_store.h"
 
 #include <cassert>
-
-#include "prop_conv_store.h"
 
 void prop_conv_storet::set_to(const exprt &expr, bool value)
 {

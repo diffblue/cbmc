@@ -9,12 +9,12 @@ Author: Michael Tautschnig, michael.tautschnig@qmul.ac.uk
 /// \file
 /// Conversion between exprt and miniBDD
 
+#include "bdd_expr.h"
+
 #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
 #include <util/expr_util.h>
-
-#include "bdd_expr.h"
 
 mini_bddt bdd_exprt::from_expr_rec(const exprt &expr)
 {

@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "bmc.h"
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -40,7 +42,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
-#include "bmc.h"
 
 void bmct::do_unwind_module()
 {

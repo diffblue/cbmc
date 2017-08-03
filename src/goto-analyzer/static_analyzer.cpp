@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "static_analyzer.h"
 
 #include <fstream>
 
@@ -14,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml.h>
 
 #include <analyses/interval_domain.h>
-
-#include "static_analyzer.h"
 
 class static_analyzert:public messaget
 {

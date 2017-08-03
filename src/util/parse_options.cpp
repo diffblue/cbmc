@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "parse_options.h"
 
 #include <iostream>
 
@@ -17,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "cmdline.h"
-#include "parse_options.h"
 #include "signal_catcher.h"
 
 parse_options_baset::parse_options_baset(

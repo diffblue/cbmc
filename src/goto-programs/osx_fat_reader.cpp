@@ -9,10 +9,10 @@ Author:
 /// \file
 /// Read Mach-O
 
+#include "osx_fat_reader.h"
+
 #include <cassert>
 #include <cstdlib>
-
-#include "osx_fat_reader.h"
 
 #ifdef __APPLE__
 #include <mach-o/fat.h>

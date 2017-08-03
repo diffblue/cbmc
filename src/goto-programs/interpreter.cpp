@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Interpreter for GOTO Programs
 
+#include "interpreter.h"
+
 #include <cctype>
 #include <cstdio>
 #include <iostream>
@@ -24,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <json/json_parser.h>
 
-#include "interpreter.h"
 #include "interpreter_class.h"
 #include "remove_returns.h"
 
@@ -122,7 +123,7 @@ void interpretert::command()
 {
   #define BUFSIZE 100
   char command[BUFSIZE];
-  if(fgets(command, BUFSIZE-1, stdin)==NULL)
+  if(fgets(command, BUFSIZE-1, stdin)==nullptr)
   {
     done=true;
     return;

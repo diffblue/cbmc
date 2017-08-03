@@ -9,6 +9,8 @@ Author: CM Wintersteiger, 2006
 /// \file
 /// GCC Mode
 
+#include "gcc_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -22,6 +24,7 @@ Author: CM Wintersteiger, 2006
 #include <fstream>
 
 #include <util/string2int.h>
+#include <util/invariant.h>
 #include <util/tempdir.h>
 #include <util/config.h>
 #include <util/prefix.h>
@@ -32,7 +35,6 @@ Author: CM Wintersteiger, 2006
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "gcc_mode.h"
 
 static std::string compiler_name(
   const cmdlinet &cmdline,
@@ -136,7 +138,45 @@ gcc_modet::gcc_modet(
     }}, // NOLINTNEXTLINE(whitespace/braces)
     {"arm64", {
       "cortex-a57", "cortex-a72", "exynos-m1"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"hppa", {"1.0", "1.1", "2.0"}}, // NOLINTNEXTLINE(whitespace/braces)
+    // PowerPC
+    // https://en.wikipedia.org/wiki/List_of_PowerPC_processors
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc", {
+      "powerpc", "601", "602", "603", "603e", "604", "604e", "630",
+      // PowerPC G3 == 7xx series
+      "G3", "740", "750",
+      // PowerPC G4 == 74xx series
+      "G4", "7400", "7450",
+      // SoC and low power: https://en.wikipedia.org/wiki/PowerPC_400
+      "401", "403", "405", "405fp", "440", "440fp", "464", "464fp",
+      "476", "476fp",
+      // e series. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e300c2", "e300c3", "e500mc", "ec603e",
+      // https://en.wikipedia.org/wiki/Titan_(microprocessor)
+      "titan",
     }},
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc64", {
+      "powerpc64",
+      // First IBM 64-bit processor
+      "620",
+      "970", "G5"
+      // All IBM POWER processors are 64 bit, but POWER 8 is
+      // little-endian so not in this list.
+      // https://en.wikipedia.org/wiki/Ppc64
+      "power3", "power4", "power5", "power5+", "power6", "power6x",
+      "power7", "rs64",
+      // e series SoC chips. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e500mc64", "e5500", "e6500",
+      // https://en.wikipedia.org/wiki/IBM_A2
+      "a2",
+    }},
+    // The latest Power processors are little endian.
+    {"powerpc64le", {"powerpc64le", "power8"}},
     // There are two MIPS architecture series. The 'old' one comprises
     // MIPS I - MIPS V (where MIPS I and MIPS II are 32-bit
     // architectures, and the III, IV and V are 64-bit). The 'new'
@@ -214,17 +254,33 @@ gcc_modet::gcc_modet(
     {"ia64", {
       "itanium", "itanium1", "merced", "itanium2", "mckinley"
     }}, // NOLINTNEXTLINE(whitespace/braces)
+    // x86 and x86_64. See
+    // https://en.wikipedia.org/wiki/List_of_AMD_microprocessors
+    // https://en.wikipedia.org/wiki/List_of_Intel_microprocessors
     {"i386", {
-      "i386", "i486", "i586", "pentium", "pentium-mmx", "pentiumpro",
-      "i686", "pentium2", "pentium3", "pentium3m", "pentium-m",
-      "pentium4", "pentium4m", "prescott", "nocona", "core2", "nehalem",
-      "westmere", "sandybridge", "ivybridge", "haswell", "broadwell",
-      "bonnell", "silvermont", "k6", "k6-2", "k6-3", "athlon",
-      "athlon-tbird", "athlon-4", "athlon-xp", "athlon-mp", "k8",
-      "opteron", "athlon64", "athlon-fx", "k8-sse3", "opteron-sse3",
-      "athlon64-sse3", "amdfam10", "barcelona", "bdver1", "bdver2",
-      "bdver3", "bdver4", "btver1", "btver2", "winchip-c6", "winchip2",
-      "c3", "c3-2", "geode",
+      // Intel generic
+      "i386", "i486", "i586", "i686",
+      // AMD
+      "k6", "k6-2", "k6-3", "athlon" "athlon-tbird", "athlon-4",
+      "athlon-xp", "athlon-mp",
+      // Everything called "pentium" by GCC is 32 bits; the only 64-bit
+      // Pentium flag recognized by GCC is "nocona".
+      "pentium", "pentium-mmx", "pentiumpro" "pentium2", "pentium3",
+      "pentium3m", "pentium-m" "pentium4", "pentium4m", "prescott",
+      // Misc
+      "winchip-c6", "winchip2", "c3", "c3-2", "geode",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"x86_64", {
+      // Intel
+      "nocona", "core2", "nehalem" "westmere", "sandybridge", "knl",
+      "ivybridge", "haswell", "broadwell" "bonnell", "silvermont",
+      // AMD generic
+      "k8", "k8-sse3", "opteron", "athlon64", "athlon-fx",
+      "opteron-sse3" "athlon64-sse3", "amdfam10", "barcelona",
+      // AMD "bulldozer" (high power, family 15h)
+      "bdver1", "bdver2" "bdver3", "bdver4",
+      // AMD "bobcat" (low power, family 14h)
+      "btver1", "btver2",
     }},
   })
 {
@@ -265,10 +321,10 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
-  if((cmdline.isset('v') || cmdline.isset("version")) &&
-     cmdline.have_infile_arg()) // let the native tool print the version
+  if((cmdline.isset('v') && cmdline.have_infile_arg()) ||
+     (cmdline.isset("version") && !produce_hybrid_binary))
   {
-    // This a) prints the version and b) increases verbosity.
+    // "-v" a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
 
     if(act_as_ld)
@@ -282,6 +338,9 @@ int gcc_modet::doit()
 
   if(cmdline.isset("version"))
   {
+    if(produce_hybrid_binary)
+      return run_gcc();
+
     std::cout << '\n' <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
@@ -293,6 +352,9 @@ int gcc_modet::doit()
 
   if(cmdline.isset("dumpversion"))
   {
+    if(produce_hybrid_binary)
+      return run_gcc();
+
     std::cout << "3.4.4\n";
     return EX_OK;
   }
@@ -442,7 +504,7 @@ int gcc_modet::doit()
   else if(cmdline.isset('E'))
   {
     compiler.mode=compilet::PREPROCESS_ONLY;
-    assert(false);
+    UNREACHABLE;
   }
   else if(cmdline.isset("shared") ||
           cmdline.isset('r')) // really not well documented
@@ -464,7 +526,6 @@ int gcc_modet::doit()
     debug() << "Compiling and linking a library" << eom; break;
   case compilet::COMPILE_LINK_EXECUTABLE:
     debug() << "Compiling and linking an executable" << eom; break;
-  default: assert(false);
   }
 
   if(cmdline.isset("i386-win32") ||
@@ -718,15 +779,13 @@ int gcc_modet::preprocess(
   new_argv.push_back(src);
 
   // overwrite argv[0]
-  assert(new_argv.size()>=1);
+  INVARIANT(new_argv.size()>=1, "No program name in argv");
   new_argv[0]=native_tool_name.c_str();
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << '\n';
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
@@ -734,7 +793,7 @@ int gcc_modet::preprocess(
 /// run gcc or clang with original command line
 int gcc_modet::run_gcc()
 {
-  assert(!cmdline.parsed_argv.empty());
+  PRECONDITION(!cmdline.parsed_argv.empty());
 
   // build new argv
   std::vector<std::string> new_argv;
@@ -745,12 +804,10 @@ int gcc_modet::run_gcc()
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << '\n';
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
@@ -803,7 +860,7 @@ int gcc_modet::gcc_hybrid_binary()
   if(output_files.empty() ||
      (output_files.size()==1 &&
       output_files.front()=="/dev/null"))
-    return EX_OK;
+    return run_gcc();
 
   debug() << "Running " << native_tool_name
           << " to generate hybrid binary" << eom;
@@ -822,6 +879,11 @@ int gcc_modet::gcc_hybrid_binary()
   {
     objcopy_cmd=linker_name(cmdline, base_name);
     objcopy_cmd.erase(objcopy_cmd.size()-2);
+  }
+  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
+  {
+    objcopy_cmd=compiler_name(cmdline, base_name);
+    objcopy_cmd.erase(objcopy_cmd.size()-3);
   }
   objcopy_cmd+="objcopy";
 

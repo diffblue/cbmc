@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr_class.h"
 
 #include <cassert>
 
-#include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
 #include "ieee_float.h"

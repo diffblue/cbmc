@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_minisat.h"
 
 #include <cassert>
 #include <stack>
 
 #include <util/threeval.h>
-
-#include "satcheck_minisat.h"
 
 #include <Solver.h>
 #include <Proof.h>

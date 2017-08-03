@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "float_utils.h"
 
 #include <cassert>
 #include <algorithm>
 
 #include <util/arith_tools.h>
-
-#include "float_utils.h"
 
 void float_utilst::set_rounding_mode(const bvt &src)
 {

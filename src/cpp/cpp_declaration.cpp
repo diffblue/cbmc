@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <ostream>
-
 #include "cpp_declaration.h"
+
+#include <ostream>
 
 void cpp_declarationt::output(std::ostream &out) const
 {

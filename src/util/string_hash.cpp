@@ -1,13 +1,13 @@
 /*******************************************************************\
 
-Module: string hasing
+Module: string hashing
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// string hasing
+/// string hashing
 
 #include "string_hash.h"
 

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
@@ -14,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
 
-#include "boolbv.h"
 #include "flatten_byte_operators.h"
 
 bvt map_bv(const endianness_mapt &map, const bvt &src)

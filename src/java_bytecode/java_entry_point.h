@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 
 #include <util/irep.h>
+#include <util/symbol.h>
 #include <java_bytecode/select_pointer_type.h>
 
 #define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"

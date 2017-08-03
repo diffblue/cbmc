@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C++ Language Conversion
 
+#include "convert_float_literal.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -20,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 
 #include "parse_float.h"
-#include "convert_float_literal.h"
 
 exprt convert_float_literal(const std::string &src)
 {
@@ -47,7 +48,7 @@ exprt convert_float_literal(const std::string &src)
   // In ANSI-C, float literals are double by default,
   // unless marked with 'f'.
   // All of these can be complex as well.
-  // This can be overriden with
+  // This can be overridden with
   // config.ansi_c.single_precision_constant.
 
   if(is_float)

@@ -12,14 +12,15 @@ Date:   December 2014
 /// \file
 /// Remove 'asm' statements by compiling into suitable standard code
 
+#include "remove_asm.h"
+
 #include <sstream>
 
+#include <util/c_types.h>
 #include <util/std_expr.h>
 
 #include <ansi-c/string_constant.h>
 #include <assembler/assembler_parser.h>
-
-#include "remove_asm.h"
 
 class remove_asmt
 {
@@ -61,7 +62,8 @@ void remove_asmt::gcc_asm_function_call(
   code_function_callt function_call;
   function_call.lhs().make_nil();
 
-  const pointer_typet void_pointer=pointer_typet(void_typet());
+  const typet void_pointer=
+    pointer_type(void_typet());
 
   // outputs
   forall_operands(it, code.op1())

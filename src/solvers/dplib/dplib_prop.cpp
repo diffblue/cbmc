@@ -6,13 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "dplib_prop.h"
 
 #include <cassert>
 
 #include <set>
-
-
-#include "dplib_prop.h"
 
 dplib_propt::dplib_propt(std::ostream &_out):out(_out)
 {

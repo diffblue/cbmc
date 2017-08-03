@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <cstdlib>
 
 #include <util/std_types.h>
@@ -25,7 +27,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <linking/zero_initializer.h>
 
 #include "cpp_type2name.h"
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_exception_id.h"
 #include "expr2cpp.h"
@@ -470,7 +471,7 @@ struct operator_entryt
   { ID_notequal, "!=" },
   { ID_dereference, "*" },
   { ID_ptrmember, "->" },
-  { irep_idt(), NULL }
+  { irep_idt(), nullptr }
 };
 
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
@@ -504,7 +505,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     cpp_name.get_sub().back().set(ID_identifier, op_name);
     cpp_name.get_sub().back().add(ID_C_source_location)=expr.source_location();
 
-    // See if the struct decalares the cast operator as a member
+    // See if the struct declares the cast operator as a member
     bool found_in_struct=false;
     assert(!expr.operands().empty());
     typet t0(follow(expr.op0().type()));
@@ -721,9 +722,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // we take the address of the method.
     assert(expr.op0().id()==ID_member);
     exprt symb=cpp_symbol_expr(lookup(expr.op0().get(ID_component_name)));
-    exprt address(ID_address_of, typet(ID_pointer));
-    address.copy_to_operands(symb);
-    address.type().subtype()=symb.type();
+    address_of_exprt address(symb, pointer_type(symb.type()));
     address.set(ID_C_implicit, true);
     expr.op0().swap(address);
   }
@@ -756,7 +755,7 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   const bool is_ref=is_reference(expr.type());
   c_typecheck_baset::typecheck_expr_address_of(expr);
   if(is_ref)
-    expr.type()=reference_typet(expr.type().subtype());
+    expr.type()=reference_type(expr.type().subtype());
 }
 
 void cpp_typecheckt::typecheck_expr_throw(exprt &expr)
@@ -809,8 +808,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     expr.set(ID_size, to_array_type(expr.type()).size());
 
     // new actually returns a pointer, not an array
-    pointer_typet ptr_type;
-    ptr_type.subtype()=expr.type().subtype();
+    pointer_typet ptr_type=
+      pointer_type(expr.type().subtype());
     expr.type().swap(ptr_type);
   }
   else
@@ -820,8 +819,7 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
 
     expr.set(ID_statement, ID_cpp_new);
 
-    pointer_typet ptr_type;
-    ptr_type.subtype().swap(expr.type());
+    pointer_typet ptr_type=pointer_type(expr.type());
     expr.type().swap(ptr_type);
   }
 
@@ -1975,7 +1973,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     else
     {
       error().source_location=expr.source_location();
-      error() << "zero or one argument excpected" << eom;
+      error() << "zero or one argument expected" << eom;
       throw 0;
     }
 
@@ -2019,7 +2017,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       assert(bound.type().id()==ID_pointer);
       expr.arguments().insert(expr.arguments().begin(), bound);
 
-      // we don't need the object anymore
+      // we don't need the object any more
       expr.function().type().remove("#bound");
     }
 
@@ -2100,7 +2098,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         vtentry_member.swap(tmp);
       }
 
-      // Typcheck the expresssion as if it was not virtual
+      // Typecheck the expression as if it was not virtual
       // (add the this pointer)
 
       expr.type()=
@@ -2254,11 +2252,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       if(operand.type().id()!=ID_pointer &&
          operand.type()==argument.type().subtype())
       {
-        exprt tmp(ID_address_of, typet(ID_pointer));
-        tmp.type().subtype()=operand.type();
+        address_of_exprt tmp(operand, pointer_type(operand.type()));
         tmp.add_source_location()=operand.source_location();
-        tmp.move_to_operands(operand);
-        operand.swap(tmp);
+        operand=tmp;
       }
     }
   }
@@ -2670,10 +2666,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     else
     {
       assert(expr.op0().get_bool(ID_C_lvalue));
-      exprt address_of(ID_address_of, typet(ID_pointer));
-      address_of.copy_to_operands(expr.op0());
-      address_of.type().subtype()=address_of.op0().type();
-      expr.op0().swap(address_of);
+      expr.op0()=address_of_exprt(expr.op0());
     }
   }
 

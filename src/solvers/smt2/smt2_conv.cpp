@@ -9,19 +9,22 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// SMT Backend
 
+#include "smt2_conv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
-#include <util/std_types.h>
-#include <util/std_expr.h>
-#include <util/fixedbv.h>
-#include <util/pointer_offset_size.h>
-#include <util/ieee_float.h>
 #include <util/base_type.h>
-#include <util/string2int.h>
+#include <util/c_types.h>
+#include <util/expr_util.h>
+#include <util/fixedbv.h>
+#include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/config.h>
+#include <util/pointer_offset_size.h>
+#include <util/std_types.h>
+#include <util/std_expr.h>
+#include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -31,8 +34,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
 #include <solvers/floatbv/float_bv.h>
-
-#include "smt2_conv.h"
 
 // Mark different kinds of error condition
 // General
@@ -516,12 +517,14 @@ void smt2_convt::convert_address_of_rec(
       exprt new_index_expr=expr;
       new_index_expr.op1()=from_integer(0, index.type());
 
-      exprt address_of_expr(ID_address_of, pointer_typet());
-      address_of_expr.type().subtype()=array.type().subtype();
-      address_of_expr.copy_to_operands(new_index_expr);
+      address_of_exprt address_of_expr(
+        new_index_expr,
+        pointer_type(array.type().subtype()));
 
-      exprt plus_expr(ID_plus, address_of_expr.type());
-      plus_expr.copy_to_operands(address_of_expr, index);
+      plus_exprt plus_expr(
+        address_of_expr,
+        index,
+        address_of_expr.type());
 
       convert_expr(plus_expr);
     }

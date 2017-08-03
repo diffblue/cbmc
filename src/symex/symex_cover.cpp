@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symex Test Suite Generation
 
+#include "symex_parse_options.h"
+
 #include <iostream>
 
 #include <util/json_expr.h>
@@ -16,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
-
-#include "symex_parse_options.h"
 
 std::string symex_parse_optionst::get_test(const goto_tracet &goto_trace)
 {

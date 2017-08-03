@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert_class.h"
+
 #include <util/fresh_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -16,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 
 #include <util/c_types.h>
-
-#include "goto_convert_class.h"
 
 symbol_exprt goto_convertt::make_compound_literal(
   const exprt &expr,

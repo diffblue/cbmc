@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Conversion of Expressions
 
-#include <cctype>
-
 #include "parse_float.h"
+
+#include <cctype>
 
 void parse_float(
   const std::string &src,

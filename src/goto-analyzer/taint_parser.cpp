@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Taint Parser
 
+#include "taint_parser.h"
+
 #include <ostream>
 
 #include <util/string2int.h>
 
 #include <json/json_parser.h>
-
-#include "taint_parser.h"
 
 bool taint_parser(
   const std::string &file_name,

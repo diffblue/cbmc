@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Misc Utilities
 
+#include "c_misc.h"
+
 #include <cstdio>
 
 #ifdef _WIN32
@@ -16,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #define snprintf sprintf_s
 #endif
 #endif
-
-#include "c_misc.h"
 
 static void MetaChar(std::string &out, char c, bool inString)
 {

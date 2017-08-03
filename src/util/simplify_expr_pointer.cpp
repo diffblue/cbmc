@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr_class.h"
 
 #include <cassert>
 
 #include "c_types.h"
-#include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"

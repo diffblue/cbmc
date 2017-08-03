@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt2_parser.h"
 
 #include <istream>
 #include <ostream>
-
-#include "smt2_parser.h"
 
 bool smt2_parsert::is_simple_symbol_character(char ch)
 {

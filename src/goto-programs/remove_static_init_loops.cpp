@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Unwind loops in static initializers
 
+#include "remove_static_init_loops.h"
+
 #include <algorithm>
 
 #include <util/suffix.h>
 #include <util/string2int.h>
-
-#include "remove_static_init_loops.h"
 
 class remove_static_init_loopst
 {

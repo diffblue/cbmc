@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 
 #include "format_constant.h"
+
 #include "arith_tools.h"
 #include "fixedbv.h"
 #include "ieee_float.h"

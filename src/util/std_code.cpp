@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 
 #include "std_code.h"
+
 #include "std_expr.h"
 
 const irep_idt &code_declt::get_identifier() const

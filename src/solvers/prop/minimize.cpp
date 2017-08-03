@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Minimize some target function incrementally
 
+#include "minimize.h"
+
 #include <util/threeval.h>
 
 #include "literal_expr.h"
-#include "minimize.h"
 
 /// Add an objective
 void prop_minimizet::objective(

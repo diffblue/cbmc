@@ -17,6 +17,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 ///   Parameterized Array and Interval Automaton" by Guodong Li and Indradeep
 ///   Ghosh.
 
+#include <solvers/refinement/string_refinement.h>
+
 #include <sstream>
 #include <iomanip>
 #include <stack>
@@ -26,7 +28,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/refined_string_type.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/refinement/string_refinement.h>
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>

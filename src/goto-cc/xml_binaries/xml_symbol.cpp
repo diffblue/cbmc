@@ -11,8 +11,9 @@ Date: June 2006
 /// \file
 /// Compile and link source and object files.
 
-#include "xml_irep.h"
 #include "xml_symbol.h"
+
+#include "xml_irep.h"
 
 /// converts a symbol to an xml symbol node
 /// \par parameters: a symbol and an xml node

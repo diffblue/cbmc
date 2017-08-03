@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Internal Representation
 
+#include "irep.h"
+
 #include <ostream>
 
 #include "invariant.h"
-
 #include "string2int.h"
-#include "irep.h"
 #include "string_hash.h"
 #include "irep_hash.h"
 
@@ -426,7 +426,7 @@ bool irept::full_eq(const irept &other) const
   return true;
 }
 
-/// defines ordering on the internal represenation
+/// defines ordering on the internal representation
 bool irept::ordering(const irept &other) const
 {
   return compare(other)<0;
@@ -494,7 +494,7 @@ bool irept::ordering(const irept &other) const
   #endif
 }
 
-/// defines ordering on the internal represenation
+/// defines ordering on the internal representation
 int irept::compare(const irept &i) const
 {
   int r;
@@ -562,7 +562,7 @@ int irept::compare(const irept &i) const
   return 0;
 }
 
-/// defines ordering on the internal represenation
+/// defines ordering on the internal representation
 bool irept::operator<(const irept &other) const
 {
   return ordering(other);

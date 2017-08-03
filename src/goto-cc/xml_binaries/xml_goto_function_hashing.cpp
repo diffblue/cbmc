@@ -13,6 +13,7 @@ Date: July 2006
 /// Convert goto functions to xml structures and back (with irep hashing)
 
 #include "xml_goto_function_hashing.h"
+
 #include "xml_goto_program_hashing.h"
 
 /// takes a goto_function and creates an according xml structure

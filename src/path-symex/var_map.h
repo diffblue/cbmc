@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 #include <util/type.h>
+#include <util/std_expr.h>
 
 class var_mapt
 {

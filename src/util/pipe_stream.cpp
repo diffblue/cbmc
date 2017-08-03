@@ -9,12 +9,13 @@ Author:
 /// \file
 /// A stdin/stdout pipe as STL stream
 
+#include "pipe_stream.h"
+
 #include <cstdio>
 #include <istream>
 #include <vector>
 
 #include "unicode.h"
-#include "pipe_stream.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -158,12 +159,12 @@ int pipe_streamt::run()
         a_it++, i++)
        _argv[i]=strdup(a_it->c_str());
 
-    _argv[args.size()+1]=NULL;
+    _argv[args.size()+1]=nullptr;
 
     int result=execvp(executable.c_str(), _argv);
 
     if(result==-1)
-      perror(0);
+      perror(nullptr);
 
     return result;
   }
@@ -288,7 +289,7 @@ std::streamsize filedescriptor_streambuft::xsputn(
 /// read a character from the piped process
 std::streambuf::int_type filedescriptor_streambuft::underflow()
 {
-  if(gptr()==0)
+  if(gptr()==nullptr)
     return traits_type::eof();
 
   if(gptr()<egptr())
@@ -338,7 +339,7 @@ std::streamsize filedescriptor_streambuft::xsgetn(
 /// determine number of available characters in stream
 std::streamsize filedescriptor_streambuft::showmanyc()
 {
-  if(gptr()==0)
+  if(gptr()==nullptr)
     return 0;
 
   if(gptr()<egptr())

@@ -9,12 +9,12 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 /// \file
 /// Add constraints to equation encoding partial orders on events
 
+#include "partial_order_concurrency.h"
+
 #include <limits>
 
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
-
-#include "partial_order_concurrency.h"
 
 partial_order_concurrencyt::partial_order_concurrencyt(
   const namespacet &_ns):ns(_ns)

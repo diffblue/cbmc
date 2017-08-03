@@ -9,6 +9,8 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// \file
 /// Jsil Language
 
+#include "jsil_entry_point.h"
+
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/symbol_table.h>
@@ -17,8 +19,6 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include "jsil_entry_point.h"
 
 #define INITIALIZE CPROVER_PREFIX "initialize"
 

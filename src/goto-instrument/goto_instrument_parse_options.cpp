@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Main Module
 
+#include "goto_instrument_parse_options.h"
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -60,7 +62,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "goto_instrument_parse_options.h"
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
@@ -1127,7 +1128,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // add generic checks, if needed
   goto_check(ns, options, goto_functions);
 
-  // check for uninitalized local varibles
+  // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))
   {
     status() << "Adding checks for uninitialized local variables" << eom;
@@ -1338,7 +1339,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("havoc-loops"))
   {
-    status() << "Havocing loops" << eom;
+    status() << "Havocking loops" << eom;
     havoc_loops(goto_functions);
   }
 

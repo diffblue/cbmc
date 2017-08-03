@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <ostream>
-
 #include "template_map.h"
+
+#include <ostream>
 
 void template_mapt::apply(typet &type) const
 {

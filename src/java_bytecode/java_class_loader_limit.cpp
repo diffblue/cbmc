@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// limit class path loading
 
-#include <json/json_parser.h>
-
 #include "java_class_loader_limit.h"
+
+#include <json/json_parser.h>
 
 /// initializes class with either regex matcher or match set
 /// \par parameters: parameter from `java-cp-include-files`

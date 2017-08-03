@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_parser.h"
 
 #include <algorithm>
 #include <fstream>
@@ -20,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/string_constant.h>
 
-#include "java_bytecode_parser.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_types.h"
 #include "bytecode_info.h"
@@ -99,7 +99,7 @@ protected:
   {
     // pre-hash the mnemonics, so we do this only once
     bytecodes.resize(256);
-    for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
+    for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
     {
       assert(p->opcode<bytecodes.size());
       bytecodes[p->opcode].mnemonic=p->mnemonic;
@@ -433,7 +433,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Long:
     case CONSTANT_Double:
       it->number=read_u8();
-      // Eight-byte constants take up two entires
+      // Eight-byte constants take up two entries
       // in the constant_pool table, for annoying this programmer.
       if(it==constant_pool.end())
       {

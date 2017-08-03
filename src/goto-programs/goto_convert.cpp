@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert.h"
+
 #include <cassert>
 
 #include <util/cprover_prefix.h>
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 
-#include "goto_convert.h"
 #include "goto_convert_class.h"
 #include "destructor.h"
 
@@ -296,7 +297,7 @@ void goto_convertt::finish_guarded_gotos(goto_programt &dest)
     gg.gotoiter->guard=gg.guard;
     // goto_programt doesn't provide an erase operation,
     // perhaps for a good reason, so let's be cautious and just
-    // flatten the un-needed instructions into skips.
+    // flatten the unneeded instructions into skips.
     for(auto it=gg.ifiter, itend=gg.gotoiter; it!=itend; ++it)
       it->make_skip();
   }
@@ -711,9 +712,7 @@ void goto_convertt::convert_decl(
   if(destructor.is_not_nil())
   {
     // add "this"
-    exprt this_expr(ID_address_of, pointer_typet());
-    this_expr.type().subtype()=symbol.type;
-    this_expr.copy_to_operands(symbol_expr);
+    address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
     destructor.arguments().push_back(this_expr);
 
     targets.destructor_stack.push_back(destructor);

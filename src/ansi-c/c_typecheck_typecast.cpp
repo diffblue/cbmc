@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "c_typecheck_base.h"
 
 #include "c_typecast.h"
-#include "c_typecheck_base.h"
 
 void c_typecheck_baset::implicit_typecast(
   exprt &expr,
