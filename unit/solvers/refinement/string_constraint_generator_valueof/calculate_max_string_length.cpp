@@ -107,27 +107,36 @@ size_t expected_length(const int radix, const typet &type)
 SCENARIO("calculate_max_string_length",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
-  const int radixes[]={2, 8, 10, 16};
+  const unsigned long radixes[]={2, 8, 10, 16};
+  const unsigned long default_radix=2;
   const typet int_types[]={
     signedbv_typet(32),
     unsignedbv_typet(32),
     signedbv_typet(64),
     unsignedbv_typet(64)};
 
-  for(const int radix : radixes)
+  for(const typet &type : int_types)
   {
-    WHEN(std::string("radix = ")+std::to_string(radix))
+    WHEN(std::string("type = ")+type.pretty())
     {
-      for(const typet &type : int_types)
+      for(const unsigned long radix : radixes)
       {
-        WHEN(std::string("type = ")+type.pretty())
+        WHEN(std::string("radix = ")+std::to_string(radix))
         {
           size_t actual_value=max_printed_string_length(type, radix);
-          size_t expected_value=expected_length(radix, type);
-          /// Due to floating point rounding errors, we sometime get one more
-          /// than the actual value, which is perfectly fine for our purposes
-          REQUIRE(expected_value<=actual_value);
-          REQUIRE(expected_value+1>=actual_value);
+          WHEN(std::string("correct value")+type.pretty())
+          {
+            size_t expected_value=expected_length(radix, type);
+            /// Due to floating point rounding errors, we sometime get one more
+            /// than the actual value, which is perfectly fine for our purposes
+            REQUIRE(expected_value<=actual_value);
+            REQUIRE(expected_value+1>=actual_value);
+          }
+          WHEN(std::string("value is less than with default radix"))
+          {
+            size_t actual_value_for_default=max_printed_string_length(type, default_radix);
+            REQUIRE(actual_value<=actual_value_for_default);
+          }
         }
       }
     }

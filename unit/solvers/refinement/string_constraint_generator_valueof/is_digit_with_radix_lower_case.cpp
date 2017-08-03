@@ -15,7 +15,7 @@
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
 
-SCENARIO("is_digit_with_radix_strict",
+SCENARIO("is_digit_with_radix_lower_case",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
   const typet char_type=unsignedbv_typet(16);
@@ -30,7 +30,7 @@ SCENARIO("is_digit_with_radix_strict",
     REQUIRE(true_exprt()==simplify_expr(
       is_digit_with_radix_lower_case(from_integer('9', char_type), radix), ns));
     REQUIRE(false_exprt()==simplify_expr(
-      is_digit_with_radix(from_integer('a', char_type), radix), ns));
+      is_digit_with_radix_lower_case(from_integer('a', char_type), radix), ns));
   }
   WHEN("Radix 8")
   {
