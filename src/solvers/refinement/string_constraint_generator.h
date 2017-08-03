@@ -203,14 +203,14 @@ private:
   string_exprt add_axioms_from_literal(const function_application_exprt &f);
   string_exprt add_axioms_from_int(const function_application_exprt &f);
   string_exprt add_axioms_from_int(
-    const exprt &x,
-    const exprt radix,
-    const refined_string_typet &ref_type);
-  string_exprt add_axioms_from_int(
-    const exprt &x,
-    const exprt radix,
+    const exprt &input_int,
     const refined_string_typet &ref_type,
-    size_t max_size);
+    size_t max_size=0);
+  string_exprt add_axioms_from_int_with_radix(
+    const exprt &input_int,
+    const exprt &radix,
+    const refined_string_typet &ref_type,
+    size_t max_size=0);
   string_exprt add_axioms_from_int_hex(
     const exprt &i, const refined_string_typet &ref_type);
   string_exprt add_axioms_from_int_hex(const function_application_exprt &f);
@@ -373,8 +373,8 @@ exprt get_numeric_value_from_character(
   const typet &char_type,
   const typet &type,
   unsigned long radix=36ul);
-size_t calculate_max_string_length(const typet &type, const double radix);
-unsigned long try_to_evaluate_expr_as_ul(const exprt &expr, unsigned long def);
+size_t max_printed_string_length(const typet &type, unsigned long radix);
+unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
 std::string utf16_constant_array_to_ascii(
   const array_exprt &arr, unsigned length);
 
