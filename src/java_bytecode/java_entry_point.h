@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/select_pointer_type.h>
 
 #define JAVA_ENTRY_POINT_RETURN_SYMBOL "return'"
+#define JAVA_ENTRY_POINT_EXCEPTION_SYMBOL "uncaught_exception'"
 
 bool java_entry_point(
   class symbol_tablet &symbol_table,
