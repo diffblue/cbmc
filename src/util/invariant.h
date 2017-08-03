@@ -149,6 +149,9 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// \param params : (variadic) parameters to forward to ET's constructor
 ///  its backtrace member will be set before it is used.
 template<class ET, typename ...Params>
+#ifdef __GNUC__
+__attribute__((noreturn))
+#endif
 typename std::enable_if<std::is_base_of<invariant_failedt, ET>::value>::type
 invariant_violated_structured(
   const std::string &file,
@@ -171,6 +174,9 @@ invariant_violated_structured(
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant
 /// \param reason : brief description of the invariant violation.
+#ifdef __GNUC__
+__attribute__((noreturn))
+#endif
 inline void invariant_violated_string(
   const std::string &file,
   const std::string &function,
