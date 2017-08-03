@@ -89,10 +89,11 @@ protected:
     const typet &type,
     bool force_constant);
 
-  virtual void do_designated_initializer(
+  virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
-    const exprt &value,
+    const exprt &initializer_list,
+    exprt::operandst::const_iterator init_it,
     bool force_constant);
 
   designatort make_designator(const typet &type, const exprt &src);
