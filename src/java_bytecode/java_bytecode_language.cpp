@@ -689,7 +689,7 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 {
   java_internal_additions(symbol_table);
 
-  // Replace code of String methods calls by code we generate
+  // replace code of String methods calls by code we generate
   replace_string_methods(symbol_table);
 
   main_function_resultt res=
