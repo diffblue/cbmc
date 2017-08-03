@@ -1,0 +1,13 @@
+KNOWNBUG
+test.class
+--refine-strings --string-max-length 20 --verbosity 9
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 7.* SUCCESS$
+^\[.*assertion.2\].* line 9.* FAILURE$
+--
+^warning
+--
+Some type inconsistencies exist when adding equations to the solver.
+Issue: diffblue/test-gen#1202
+
