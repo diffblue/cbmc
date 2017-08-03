@@ -122,8 +122,7 @@ SCENARIO("calculate_max_string_length",
       {
         WHEN(std::string("type = ")+type.pretty())
         {
-          double radix_d=static_cast<double>(radix);
-          size_t actual_value=calculate_max_string_length(type, radix_d);
+          size_t actual_value=max_printed_string_length(type, radix);
           size_t expected_value=expected_length(radix, type);
           /// Due to floating point rounding errors, we sometime get one more
           /// than the actual value, which is perfectly fine for our purposes
