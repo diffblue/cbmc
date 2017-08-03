@@ -14,14 +14,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms to say that the returned string expression has length given by
-/// the second argument and whose characters are equal to those of the first
-/// argument for the positions which are defined in both strings
-/// \par parameters: function application with two arguments, the first of which
-///   is
-/// a string and the second an integer which should have same type has
-/// return by get_index_type()
-/// \return a new string expression
+/// add axioms to say that the returned string expression `res` has length `k`
+/// and characters at position `i` in `res` are equal to the character at
+/// position `i` in `s1` if `i` is smaller that the length of `s1`, otherwise
+/// it is the null character `\u0000`.
+/// \param f: function application with two arguments, the first of which
+///        is a string `s1` and the second an integer `k` which should have
+///        same type as the string length
+/// \return a new string expression `res`
 string_exprt string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
 {
@@ -32,8 +32,8 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
 
   // We add axioms:
   // a1 : |res|=k
-  // a2 : forall i<|s1|. i < |res|  ==> res[i] = s1[i]
-  // a3 : forall i<|s1|. i >= |res| ==> res[i] = 0
+  // a2 : forall i<|res|. i < |s1|  ==> res[i] = s1[i]
+  // a3 : forall i<|res|. i >= |s1| ==> res[i] = 0
 
   axioms.push_back(res.axiom_for_has_length(k));
 
@@ -41,8 +41,8 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
     "QA_index_set_length", ref_type.get_index_type());
   string_constraintt a2(
     idx,
-    s1.length(),
-    res.axiom_for_is_strictly_longer_than(idx),
+    res.length(),
+    s1.axiom_for_is_strictly_longer_than(idx),
     equal_exprt(s1[idx], res[idx]));
   axioms.push_back(a2);
 
@@ -50,8 +50,8 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
     "QA_index_set_length2", ref_type.get_index_type());
   string_constraintt a3(
     idx2,
-    s1.length(),
-    res.axiom_for_is_shorter_than(idx2),
+    res.length(),
+    s1.axiom_for_is_shorter_than(idx2),
     equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type())));
   axioms.push_back(a3);
 
