@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/language.h>
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/unicode.h>
 
 #include "language_ui.h"
@@ -124,6 +125,8 @@ bool language_uit::final()
     error() << "CONVERSION ERROR" << eom;
     return true;
   }
+
+  config.set_object_bits_from_symbol_table(symbol_table);
 
   return false;
 }

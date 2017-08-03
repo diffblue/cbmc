@@ -26,6 +26,7 @@ Author:
 #include <util/tempfile.h>
 #include <util/rename_symbol.h>
 #include <util/base_type.h>
+#include <util/config.h>
 
 #include <langapi/language_ui.h>
 
@@ -381,6 +382,9 @@ bool read_object_and_link(
       weak_symbols,
       linking.object_type_updates))
     return true;
+
+  // reading successful, let's update config
+  config.set_from_symbol_table(symbol_table);
 
   return false;
 }

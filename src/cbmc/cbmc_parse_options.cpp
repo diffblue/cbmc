@@ -448,7 +448,23 @@ int cbmc_parse_optionst::doit()
   //
 
   optionst options;
-  get_command_line_options(options);
+  try
+  {
+    get_command_line_options(options);
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  catch(const std::string error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
   eval_verbosity();
 
   //
@@ -677,9 +693,6 @@ int cbmc_parse_optionst::get_goto_program(
       }
     }
 
-    if(!binaries.empty())
-      config.set_from_symbol_table(symbol_table);
-
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table();
@@ -707,6 +720,8 @@ int cbmc_parse_optionst::get_goto_program(
       show_goto_functions(ns, get_ui(), goto_functions);
       return 0;
     }
+
+    status() << config.object_bits_info() << eom;
   }
 
   catch(const char *e)
@@ -1098,6 +1113,7 @@ void cbmc_parse_optionst::help()
     " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
     "\n"
     "Backend options:\n"
+    " --object-bits n              number of bits used for object addresses\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
