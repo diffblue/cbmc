@@ -422,6 +422,14 @@ void path_symext::assign_rec(
       var_state.value=propagate(ssa_rhs)?ssa_rhs:nil_exprt();
     }
   }
+  else if(ssa_lhs.id()==ID_typecast)
+  {
+    // dereferencing might yield a typecast
+    const exprt &new_lhs=to_typecast_expr(ssa_lhs).op();
+    typecast_exprt new_rhs(ssa_rhs, new_lhs.type());
+
+    assign_rec(state, guard, new_lhs, new_rhs);
+  }
   else if(ssa_lhs.id()==ID_member)
   {
     #ifdef DEBUG
@@ -541,14 +549,30 @@ void path_symext::assign_rec(
 
     assert(operands.size()==components.size());
 
-    for(std::size_t i=0; i<components.size(); i++)
+    if(ssa_rhs.id()==ID_struct &&
+       ssa_rhs.operands().size()==components.size())
     {
-      exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(
-          member_exprt(ssa_rhs, components[i].get_name(), components[i].type()),
-          state.var_map.ns);
-      assign_rec(state, guard, operands[i], new_rhs);
+      exprt::operandst::const_iterator lhs_it=operands.begin();
+      forall_operands(it, ssa_rhs)
+      {
+        assign_rec(state, guard, *lhs_it, *it);
+        ++lhs_it;
+      }
+    }
+    else
+    {
+      for(std::size_t i=0; i<components.size(); i++)
+      {
+        exprt new_rhs=
+          ssa_rhs.is_nil()?ssa_rhs:
+          simplify_expr(
+            member_exprt(
+              ssa_rhs,
+              components[i].get_name(),
+              components[i].type()),
+            state.var_map.ns);
+        assign_rec(state, guard, operands[i], new_rhs);
+      }
     }
   }
   else if(ssa_lhs.id()==ID_array)
@@ -564,36 +588,30 @@ void path_symext::assign_rec(
     const exprt::operandst &operands=ssa_lhs.operands();
 
     // split up into elements
-    for(std::size_t i=0; i<operands.size(); i++)
+    if(ssa_rhs.id()==ID_array &&
+       ssa_rhs.operands().size()==operands.size())
     {
-      exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(
-          index_exprt(
-            ssa_rhs,
-            from_integer(i, index_type()), array_type.subtype()),
-          state.var_map.ns);
-      assign_rec(state, guard, operands[i], new_rhs);
+      exprt::operandst::const_iterator lhs_it=operands.begin();
+      forall_operands(it, ssa_rhs)
+      {
+        assign_rec(state, guard, *lhs_it, *it);
+        ++lhs_it;
+      }
     }
-  }
-  else if(ssa_lhs.id()==ID_vector)
-  {
-    const vector_typet &vector_type=
-      to_vector_type(state.var_map.ns.follow(ssa_lhs.type()));
-
-    const exprt::operandst &operands=ssa_lhs.operands();
-
-    // split up into elements
-    for(std::size_t i=0; i<operands.size(); i++)
+    else
     {
-      exprt new_rhs=
-        ssa_rhs.is_nil()?ssa_rhs:
-        simplify_expr(
-          index_exprt(
-            ssa_rhs,
-            from_integer(i, index_type()), vector_type.subtype()),
-          state.var_map.ns);
-      assign_rec(state, guard, operands[i], new_rhs);
+      for(std::size_t i=0; i<operands.size(); i++)
+      {
+        exprt new_rhs=
+          ssa_rhs.is_nil()?ssa_rhs:
+          simplify_expr(
+            index_exprt(
+              ssa_rhs,
+              from_integer(i, index_type()),
+              array_type.subtype()),
+            state.var_map.ns);
+        assign_rec(state, guard, operands[i], new_rhs);
+      }
     }
   }
   else if(ssa_lhs.id()==ID_string_constant ||
