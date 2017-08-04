@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <path-symex/path_symex_state.h>
 
+#include <limits>
+
 class path_searcht:public safety_checkert
 {
 public:
@@ -26,11 +28,11 @@ public:
     safety_checkert(_ns),
     show_vcc(false),
     eager_infeasibility(false),
-    depth_limit(-1), // no limit
-    context_bound(-1),
-    branch_bound(-1),
-    unwind_limit(-1),
-    time_limit(-1),
+    depth_limit(std::numeric_limits<unsigned>::max()),
+    context_bound(std::numeric_limits<unsigned>::max()),
+    branch_bound(std::numeric_limits<unsigned>::max()),
+    unwind_limit(std::numeric_limits<unsigned>::max()),
+    time_limit(std::numeric_limits<unsigned>::max()),
     search_heuristic(search_heuristict::DFS)
   {
   }
@@ -132,11 +134,11 @@ protected:
   void initialize_property_map(
     const goto_functionst &goto_functions);
 
-  int depth_limit;
-  int context_bound;
-  int branch_bound;
-  int unwind_limit;
-  int time_limit;
+  unsigned depth_limit;
+  unsigned context_bound;
+  unsigned branch_bound;
+  unsigned unwind_limit;
+  unsigned time_limit;
 
   enum class search_heuristict { DFS, BFS, LOCS } search_heuristic;
 
