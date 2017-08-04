@@ -288,7 +288,7 @@ std::wstring utf8_to_utf16_little_endian(const std::string &in)
 
 /// \par parameters: String in UTF-16LE format
 /// \return String in US-ASCII format, with \uxxxx escapes for other characters
-std::string utf16_little_endian_to_ascii(const std::wstring &in)
+std::string utf16_little_endian_to_java(const std::wstring &in)
 {
   std::ostringstream result;
   const std::locale loc;

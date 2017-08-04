@@ -386,7 +386,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
 /// \param length: an unsigned value representing the length of the array
 /// \return String of length `length` represented by the array assuming each
 ///   field in `arr` represents a character.
-std::string utf16_constant_array_to_ascii(
+std::string utf16_constant_array_to_java(
   const array_exprt &arr, unsigned int length)
 {
   std::wstring out(length, '?');
@@ -399,7 +399,7 @@ std::string utf16_constant_array_to_ascii(
     INVARIANT(!conversion_failed, "constant should be convertible to unsigned");
     out[i]=c;
   }
-  return utf16_little_endian_to_ascii(out);
+  return utf16_little_endian_to_java(out);
 }
 
 /// Add axioms to specify the Java String.format function.
@@ -423,7 +423,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
      s1.content().id()==ID_array &&
      !to_unsigned_integer(to_constant_expr(s1.length()), length))
   {
-    std::string s=utf16_constant_array_to_ascii(
+    std::string s=utf16_constant_array_to_java(
       to_array_expr(s1.content()), length);
     // List of arguments after s
     std::vector<exprt> args(
