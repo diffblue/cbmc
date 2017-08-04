@@ -281,15 +281,15 @@ bool path_searcht::drop_state(const statet &state)
   }
 
   // depth limit
-  if(depth_limit>=0 && state.get_depth()>depth_limit)
+  if(state.get_depth()>=depth_limit)
     return true;
 
   // context bound
-  if(context_bound>=0 && state.get_no_thread_interleavings()>context_bound)
+  if(state.get_no_thread_interleavings()>=context_bound)
     return true;
 
   // branch bound
-  if(branch_bound>=0 && state.get_no_branches()>branch_bound)
+  if(state.get_no_branches()>=branch_bound)
     return true;
 
   // unwinding limit -- loops
@@ -298,7 +298,7 @@ bool path_searcht::drop_state(const statet &state)
     bool stop=false;
 
     for(const auto &loop_info : state.unwinding_map)
-      if(loop_info.second>unwind_limit)
+      if(loop_info.second>=unwind_limit)
       {
         stop=true;
         break;
@@ -324,7 +324,7 @@ bool path_searcht::drop_state(const statet &state)
     bool stop=false;
 
     for(const auto &rec_info : state.recursion_map)
-      if(rec_info.second>unwind_limit)
+      if(rec_info.second>=unwind_limit)
       {
         stop=true;
         break;
