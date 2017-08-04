@@ -293,7 +293,8 @@ bool path_searcht::drop_state(const statet &state)
     return true;
 
   // unwinding limit -- loops
-  if(unwind_limit>=0 && pc->is_backwards_goto())
+  if(unwind_limit!=std::numeric_limits<unsigned>::max() && 
+     pc->is_backwards_goto())
   {
     bool stop=false;
 
@@ -319,7 +320,8 @@ bool path_searcht::drop_state(const statet &state)
   }
 
   // unwinding limit -- recursion
-  if(unwind_limit>=0 && pc->is_function_call())
+  if(unwind_limit!=std::numeric_limits<unsigned>::max() &&
+     pc->is_function_call())
   {
     bool stop=false;
 
@@ -347,7 +349,7 @@ bool path_searcht::drop_state(const statet &state)
   }
 
   // search time limit (--max-search-time)
-  if(time_limit>=0 &&
+  if(time_limit!=std::numeric_limits<unsigned>::max() &&
      current_time().get_t()>start_time.get_t()+time_limit*1000)
     return true;
 
