@@ -149,12 +149,10 @@ exprt allocate_dynamic_object(
   std::vector<const symbolt *> &symbols_created,
   bool cast_needed=false);
 
-exprt allocate_dynamic_object_with_decl(
+void allocate_dynamic_object_with_decl(
   const exprt &target_expr,
-  const typet &allocate_type,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
-  code_blockt &output_code,
-  bool cast_needed=false);
+  code_blockt &output_code);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H
