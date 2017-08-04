@@ -109,8 +109,8 @@ static exprt unpack_rec(
   }
   else if(type.id()!=ID_empty)
   {
-    // a basic type; we turn that into logical right shift and
-    // extractbits while considering endianness
+    // a basic type; we turn that into extractbits while considering
+    // endianness
     mp_integer bits=pointer_offset_bits(type, ns);
     if(bits<0)
     {
@@ -121,17 +121,12 @@ static exprt unpack_rec(
         bits*=8;
     }
 
-    // cast to generic bit-vector
-    typecast_exprt src_tc(src, unsignedbv_typet(integer2size_t(bits)));
-
     for(mp_integer i=0; i<bits; i+=8)
     {
-      lshr_exprt right_shift(src_tc, from_integer(i, index_type()));
-
       extractbits_exprt extractbits(
-        right_shift,
-        from_integer(7, index_type()),
-        from_integer(0, index_type()),
+        src,
+        from_integer(i+7, index_type()),
+        from_integer(i, index_type()),
         unsignedbv_typet(8));
 
       if(little_endian)
@@ -283,6 +278,8 @@ exprt flatten_byte_extract(
       byte_extract_exprt tmp(unpacked);
       tmp.type()=comp.type();
       tmp.offset()=simplify_expr(new_offset, ns);
+
+      s.move_to_operands(tmp);
     }
 
     if(!failed)
