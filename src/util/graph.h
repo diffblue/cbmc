@@ -581,7 +581,7 @@ void grapht<N>::make_chordal()
 }
 
 /// Find a topological order of the nodes if graph is DAG, return empty list for
-/// non-DAG or empty graph. Uses Kahn's algorithm running in O(#edges+#nodes).
+/// non-DAG or empty graph. Uses Kahn's algorithm running in O(n_edges+n_nodes).
 template<class N>
 std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
 {
