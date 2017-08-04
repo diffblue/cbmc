@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Reading DIMACS CNF
 
+#include "read_dimacs_cnf.h"
+
 #include <istream>
 #include <cstdlib> // for abs()
 
 #include <util/string2int.h>
-
-#include "read_dimacs_cnf.h"
 
 // #define VERBOSE
 

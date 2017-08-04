@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert_class.h"
+
 #include <util/arith_tools.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <util/c_types.h>
-
-#include "goto_convert_class.h"
 
 bool goto_convertt::has_function_call(const exprt &expr)
 {
@@ -93,7 +93,7 @@ void goto_convertt::remove_assignment(
     else
     {
       error().source_location=expr.find_source_location();
-      error() << "assignment `" << statement << "' not yet supproted"
+      error() << "assignment `" << statement << "' not yet supported"
               << eom;
       throw 0;
     }
@@ -554,7 +554,7 @@ void goto_convertt::remove_statement_expression(
   // This is a gcc extension of the form ({ ....; expr; })
   // The value is that of the final expression.
   // The expression is copied into a temporary before the
-  // scope is destoyed.
+  // scope is destroyed.
 
   if(expr.operands().size()!=1)
   {

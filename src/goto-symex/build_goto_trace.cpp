@@ -11,6 +11,8 @@ Author: Daniel Kroening
 /// \file
 /// Traces of GOTO Programs
 
+#include "build_goto_trace.h"
+
 #include <cassert>
 
 #include <util/threeval.h>
@@ -21,8 +23,6 @@ Author: Daniel Kroening
 #include <solvers/prop/prop.h>
 
 #include "partial_order_concurrency.h"
-
-#include "build_goto_trace.h"
 
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
@@ -252,7 +252,9 @@ void build_goto_trace(
           symex_target_equationt::assignment_typet::PHI ||
         SSA_step.assignment_type==
           symex_target_equationt::assignment_typet::GUARD))
+    {
       continue;
+    }
 
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());
@@ -325,7 +327,7 @@ void build_goto_trace(
   }
 
   // Now assemble into a single goto_trace.
-  // This expoits sorted-ness of the map.
+  // This exploits sorted-ness of the map.
   for(auto &t_it : time_map)
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 

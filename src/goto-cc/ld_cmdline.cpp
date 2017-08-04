@@ -9,14 +9,14 @@ Author: Daniel Kroening, 2013
 /// \file
 /// A special command line object for the ld-like options
 
+#include "ld_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
 
-#include "ld_cmdline.h"
-
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 const char *goto_ld_options_with_argument[]=
@@ -24,7 +24,7 @@ const char *goto_ld_options_with_argument[]=
   "--verbosity",
   "--native-compiler",
   "--native-linker",
-  NULL
+  nullptr
 };
 
 const char *ld_options_with_argument[]=
@@ -99,7 +99,7 @@ const char *ld_options_with_argument[]=
   "--ios_version_min", // Apple only
   "--macosx_version_min", // Apple only
   "--install_name", // Apple only
-  NULL
+  nullptr
 };
 
 const char *ld_options_without_argument[]=
@@ -233,7 +233,7 @@ const char *ld_options_without_argument[]=
   "--dylib", // Apple only
   "--dylinker", // Apple only
   "--bundle", // Apple only
-  NULL
+  nullptr
 };
 
 bool ld_cmdlinet::parse(int argc, const char **argv)
@@ -262,7 +262,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     bool found=false;
 
     for(const char **o=goto_ld_options_with_argument;
-        *o!=NULL && !found;
+        *o!=nullptr && !found;
         ++o)
     {
       std::string os(*o);
@@ -299,7 +299,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
 
     // also store in cmdlinet
 
-    for(const char **o=ld_options_without_argument; *o!=NULL && !found; o++)
+    for(const char **o=ld_options_without_argument; *o!=nullptr && !found; o++)
     {
       std::string os(*o);
       // ld accepts all long options also as short option
@@ -316,7 +316,7 @@ bool ld_cmdlinet::parse(int argc, const char **argv)
     // 2) concatenated with '=' for long options
     // 3) separate
 
-    for(const char **o=ld_options_with_argument; *o!=NULL && !found; o++)
+    for(const char **o=ld_options_with_argument; *o!=nullptr && !found; o++)
     {
       std::string os(*o);
 

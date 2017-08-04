@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Field-insensitive, location-sensitive may-alias analysis
 
+#include "local_may_alias.h"
+
 #include <iterator>
 #include <algorithm>
 
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <langapi/language_util.h>
-
-#include "local_may_alias.h"
 
 /// \return return 'true' iff changed
 bool local_may_aliast::loc_infot::merge(const loc_infot &src)

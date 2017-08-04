@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
 #include <util/std_types.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 #include "c_bit_field_replacement_type.h"
 

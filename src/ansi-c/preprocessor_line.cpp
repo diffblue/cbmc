@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Conversion
 
+#include "preprocessor_line.h"
+
 #include <cctype>
 
 #include <util/string2int.h>
 #include <util/parser.h>
 
 #include "literals/unescape_string.h"
-#include "preprocessor_line.h"
 
 void preprocessor_line(
   const char *text,

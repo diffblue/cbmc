@@ -9,12 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Bytecode Conversion / Type Checking
 
+#include "java_bytecode_typecheck.h"
+
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
 
 #include "expr2java.h"
-#include "java_bytecode_typecheck.h"
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)
 {

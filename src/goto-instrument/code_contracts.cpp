@@ -11,6 +11,8 @@ Date: February 2016
 /// \file
 /// Verify and use annotated invariants and pre/post-conditions
 
+#include "code_contracts.h"
+
 #include <util/cprover_prefix.h>
 #include <util/fresh_symbol.h>
 #include <util/replace_symbol.h>
@@ -20,7 +22,6 @@ Date: February 2016
 #include <analyses/local_may_alias.h>
 
 #include "loop_utils.h"
-#include "code_contracts.h"
 
 class code_contractst
 {
@@ -103,7 +104,7 @@ static void check_apply_invariants(
   modifiest modifies;
   get_modifies(local_may_alias, loop, modifies);
 
-  // build the havoc-ing code
+  // build the havocking code
   goto_programt havoc_code;
 
   // assert the invariant

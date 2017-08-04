@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// CNF Generation
 
+#include "cnf_clause_list.h"
+
 #include <cassert>
 #include <ostream>
-
-#include "cnf_clause_list.h"
 
 void cnf_clause_listt::lcnf(const bvt &bv)
 {

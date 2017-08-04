@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_name.h"
 #include "cpp_template_args.h"
+#include "cpp_scopes.h"
 
 class cpp_typecheck_resolvet
 {

@@ -6,13 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_zcore.h"
 
 #include <cassert>
 #include <fstream>
 
 #include <util/string2int.h>
-
-#include "satcheck_zcore.h"
 
 #include <cstring>
 

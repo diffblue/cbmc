@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "config.h"
 
 #include <cstdlib>
 
 #include "namespace.h"
-#include "config.h"
 #include "symbol_table.h"
 #include "arith_tools.h"
 #include "cmdline.h"
@@ -744,7 +744,7 @@ bool configt::set(const cmdlinet &cmdline)
   ansi_c.arch="none";
   ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
   // NOLINTNEXTLINE(readability/casting)
-  ansi_c.NULL_is_zero=reinterpret_cast<size_t>((void*)0)==0;
+  ansi_c.NULL_is_zero=reinterpret_cast<size_t>(nullptr)==0;
 
   // Default is ROUND_TO_EVEN, justified by C99:
   // 1 At program startup the floating-point environment is initialized as
@@ -778,7 +778,7 @@ bool configt::set(const cmdlinet &cmdline)
   {
     // environment variable set?
     const char *CLASSPATH=getenv("CLASSPATH");
-    if(CLASSPATH!=NULL)
+    if(CLASSPATH!=nullptr)
       set_classpath(CLASSPATH);
     else
       set_classpath("."); // default

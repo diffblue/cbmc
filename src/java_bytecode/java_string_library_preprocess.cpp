@@ -199,7 +199,7 @@ void java_string_library_preprocesst::add_string_type(
   // Use a pointer-to-unbounded-array instead of a pointer-to-char.
   // Saves some casting in the string refinement algorithm but may
   // be unnecessary.
-  string_type.components()[2].type()=pointer_typet(
+  string_type.components()[2].type()=java_reference_type(
     array_typet(java_char_type(), infinity_exprt(string_length_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 

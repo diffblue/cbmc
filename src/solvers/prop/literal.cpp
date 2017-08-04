@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Literals
 
-#include <ostream>
-
 #include "literal.h"
+
+#include <ostream>
 
 std::ostream &operator << (std::ostream &out, literalt l)
 {

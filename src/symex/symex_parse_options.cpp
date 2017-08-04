@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symex Command Line Options Processing
 
+#include "symex_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -53,7 +55,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "path_search.h"
-#include "symex_parse_options.h"
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
@@ -354,7 +355,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
         return true;
       }
 
-      status() << "Instrumenting coverge goals" << eom;
+      status() << "Instrumenting coverage goals" << eom;
       instrument_cover_goals(symbol_table, goto_model.goto_functions, c);
       goto_model.goto_functions.update();
     }

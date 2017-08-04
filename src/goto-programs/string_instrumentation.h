@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_functions.h"
 
+class message_handlert;
+
 void string_instrumentation(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,

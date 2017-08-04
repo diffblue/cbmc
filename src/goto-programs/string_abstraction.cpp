@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// String Abstraction
 
+#include "string_abstraction.h"
+
 #include <cstring>
 
 #include <util/pointer_predicates.h>
@@ -21,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "pointer_arithmetic.h"
-#include "string_abstraction.h"
 
 bool string_abstractiont::build_wrap(
   const exprt &object,
@@ -206,7 +207,7 @@ void string_abstractiont::add_argument(
     const irep_idt &identifier)
 {
   typet final_type=is_ptr_argument(type)?
-    type:pointer_typet(type);
+                   type:pointer_type(type);
 
   str_args.push_back(code_typet::parametert(final_type));
   str_args.back().add_source_location()=fct_symbol.location;
@@ -688,7 +689,7 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
     // char* or void* or char[]
     if(is_char_type(eff_type.subtype()) ||
         eff_type.subtype().id()==ID_empty)
-      map_entry.first->second=pointer_typet(string_struct);
+      map_entry.first->second=pointer_type(string_struct);
     else
     {
       const typet &subt=build_abstraction_type_rec(eff_type.subtype(), known);
@@ -698,8 +699,7 @@ const typet &string_abstractiont::build_abstraction_type_rec(const typet &type,
           map_entry.first->second=
             array_typet(subt, to_array_type(eff_type).size());
         else
-          map_entry.first->second=
-            pointer_typet(subt);
+          map_entry.first->second=pointer_type(subt);
       }
     }
   }

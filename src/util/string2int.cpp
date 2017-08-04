@@ -6,13 +6,12 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+#include "string2int.h"
 
 #include <cerrno>
 #include <cstdlib>
 #include <limits>
 #include <cassert>
-
-#include "string2int.h"
 
 template <typename T>
 inline T str2number(const char *str, int base, bool safe)

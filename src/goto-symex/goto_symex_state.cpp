@@ -9,23 +9,24 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex_state.h"
+
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
 
+#include <util/base_exceptions.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
 #include <analyses/dirty.h>
 
-#include "goto_symex_state.h"
-
 goto_symex_statet::goto_symex_statet():
   depth(0),
-  symex_target(NULL),
+  symex_target(nullptr),
   atomic_section_id(0),
   record_events(true),
-  dirty(0)
+  dirty(nullptr)
 {
   threads.resize(1);
   new_frame();
@@ -125,8 +126,12 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
   {
     // propagate stuff with sizeof in it
     forall_operands(it, expr)
+    {
       if(it->find(ID_C_c_sizeof_type).is_not_nil())
         return true;
+      else if(!constant_propagation(*it))
+        return false;
+    }
 
     return true;
   }
@@ -537,7 +542,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // is it a shared object?
-  assert(dirty!=0);
+  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&
@@ -662,7 +667,8 @@ bool goto_symex_statet::l2_thread_read_encoding(
   expr=ssa_l1;
 
   // and record that
-  assert(symex_target!=NULL);
+  INVARIANT_STRUCTURED(
+    symex_target!=nullptr, nullptr_exceptiont, "symex_target is null");
   symex_target->shared_read(
     guard.as_expr(),
     expr,
@@ -681,7 +687,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
-  assert(dirty!=0);
+  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&

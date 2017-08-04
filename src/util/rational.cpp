@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Rational Numbers
 
+#include "rational.h"
+
 #include <algorithm>
 #include <ostream>
-
-#include "rational.h"
 
 rationalt &rationalt::operator+=(const rationalt &n)
 {

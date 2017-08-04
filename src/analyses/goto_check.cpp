@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// GOTO Programs
 
+#include "goto_check.h"
+
 #include <algorithm>
 
 #include <util/simplify_expr.h>
@@ -27,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 #include "local_bitvector_analysis.h"
-#include "goto_check.h"
 
 class goto_checkt
 {
@@ -36,7 +37,7 @@ public:
     const namespacet &_ns,
     const optionst &_options):
     ns(_ns),
-    local_bitvector_analysis(0)
+    local_bitvector_analysis(nullptr)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
@@ -1560,7 +1561,7 @@ void goto_checkt::goto_check(
 
           add_guarded_claim(
             not_eq_null,
-            "this is null on method invokation",
+            "this is null on method invocation",
             "pointer dereference",
             i.source_location,
             pointer,

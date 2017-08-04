@@ -11,9 +11,9 @@ Date: March 2013
 /// \file
 /// Local variables
 
-#include <util/std_expr.h>
-
 #include "locals.h"
+
+#include <util/std_expr.h>
 
 void localst::build(const goto_functiont &goto_function)
 {

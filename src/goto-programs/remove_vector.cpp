@@ -11,9 +11,9 @@ Date:   September 2014
 /// \file
 /// Remove 'vector' data type
 
-#include <util/arith_tools.h>
-
 #include "remove_vector.h"
+
+#include <util/arith_tools.h>
 
 static bool have_to_remove_vector(const typet &type);
 

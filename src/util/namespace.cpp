@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Namespace
 
+#include "namespace.h"
+
 #include <algorithm>
 
 #include <cassert>
@@ -17,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symbol_table.h"
 #include "prefix.h"
 #include "std_types.h"
-#include "namespace.h"
 
 unsigned get_max(
   const std::string &prefix,
@@ -126,10 +127,10 @@ unsigned namespacet::get_max(const std::string &prefix) const
 {
   unsigned m=0;
 
-  if(symbol_table1!=NULL)
+  if(symbol_table1!=nullptr)
     m=std::max(m, ::get_max(prefix, symbol_table1->symbols));
 
-  if(symbol_table2!=NULL)
+  if(symbol_table2!=nullptr)
     m=std::max(m, ::get_max(prefix, symbol_table2->symbols));
 
   return m;
@@ -141,7 +142,7 @@ bool namespacet::lookup(
 {
   symbol_tablet::symbolst::const_iterator it;
 
-  if(symbol_table1!=NULL)
+  if(symbol_table1!=nullptr)
   {
     it=symbol_table1->symbols.find(name);
 
@@ -152,7 +153,7 @@ bool namespacet::lookup(
     }
   }
 
-  if(symbol_table2!=NULL)
+  if(symbol_table2!=nullptr)
   {
     it=symbol_table2->symbols.find(name);
 

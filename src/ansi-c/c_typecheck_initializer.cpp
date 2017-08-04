@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Conversion / Type Checking
 
+#include "c_typecheck_base.h"
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/type_eq.h>
@@ -19,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include "c_typecheck_base.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
 
@@ -294,7 +295,7 @@ void c_typecheck_baset::designator_enter(
     }
     else
     {
-      // The default is to unitialize using the first member of the
+      // The default is to initialize using the first member of the
       // union.
       entry.size=1;
       entry.subtype=union_type.components().front().type();
@@ -571,7 +572,7 @@ void c_typecheck_baset::do_designated_initializer(
            full_type.id()==ID_vector);
 
     // we are initializing a compound type, and enter it!
-    // this may change the type, full_type might not be valid anymore
+    // this may change the type, full_type might not be valid any more
     const typet dest_type=full_type;
     designator_enter(type, designator);
 

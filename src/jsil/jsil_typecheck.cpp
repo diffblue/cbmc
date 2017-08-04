@@ -9,14 +9,14 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// \file
 /// Jsil Language
 
+#include "jsil_typecheck.h"
+
 #include <util/symbol_table.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 
 #include "expr2jsil.h"
 #include "jsil_types.h"
-
-#include "jsil_typecheck.h"
 
 std::string jsil_typecheckt::to_string(const exprt &expr)
 {
@@ -845,8 +845,8 @@ void jsil_typecheckt::typecheck_assign(code_assignt &code)
   make_type_compatible(code.op0(), code.op1().type(), false);
 }
 
-/// typecheking procedure declaration; any other symbols should have been
-/// typechecked during typecheking of procedure declaration
+/// typechecking procedure declaration; any other symbols should have been
+/// typechecked during typechecking of procedure declaration
 /// \par parameters: any symbol
 void jsil_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {

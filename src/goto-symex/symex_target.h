@@ -56,7 +56,12 @@ public:
 
   enum class assignment_typet
   {
-    STATE, HIDDEN, VISIBLE_ACTUAL_PARAMETER, HIDDEN_ACTUAL_PARAMETER, PHI, GUARD
+    STATE,
+    HIDDEN,
+    VISIBLE_ACTUAL_PARAMETER,
+    HIDDEN_ACTUAL_PARAMETER,
+    PHI,
+    GUARD,
   };
 
   // read event

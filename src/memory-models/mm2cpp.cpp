@@ -6,12 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "mm2cpp.h"
 
 #include <ostream>
 
 #include <util/std_code.h>
-
-#include "mm2cpp.h"
 
 class mm2cppt
 {

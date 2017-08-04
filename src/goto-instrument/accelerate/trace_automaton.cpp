@@ -9,10 +9,11 @@ Author: Matt Lewis
 /// \file
 /// Loop Acceleration
 
+#include "trace_automaton.h"
+
 #include <utility>
 #include <iostream>
 
-#include "trace_automaton.h"
 #include "path.h"
 
 void trace_automatont::build()

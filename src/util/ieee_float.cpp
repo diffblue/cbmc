@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ieee_float.h"
 
 // <cstdint> is yet to come
 #include <stdint.h>
@@ -18,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "std_types.h"
 #include "std_expr.h"
-#include "ieee_float.h"
 
 mp_integer ieee_float_spect::bias() const
 {
@@ -1268,6 +1268,6 @@ void ieee_floatt::next_representable(bool greater)
 
   unpack(old);
 
-  // sign change impossible (zero case caught earler)
+  // sign change impossible (zero case caught earlier)
   set_sign(old_sign);
 }

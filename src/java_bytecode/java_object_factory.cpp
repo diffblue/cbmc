@@ -13,7 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/fresh_symbol.h>
-#include <util/std_types.h>
+#include <util/c_types.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/namespace.h>
@@ -27,8 +27,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
-
 #include <java_bytecode/select_pointer_type.h>
+
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -178,7 +178,7 @@ exprt allocate_dynamic_object(
     // malloc expression
     exprt malloc_expr=side_effect_exprt(ID_malloc);
     malloc_expr.copy_to_operands(object_size);
-    typet result_type=pointer_typet(allocate_type);
+    typet result_type=pointer_type(allocate_type);
     malloc_expr.type()=result_type;
     // Create a symbol for the malloc expression so we can initialize
     // without having to do it potentially through a double-deref, which
@@ -186,7 +186,7 @@ exprt allocate_dynamic_object(
     symbolt &malloc_sym=new_tmp_symbol(
       symbol_table,
       loc,
-      pointer_typet(allocate_type),
+      pointer_type(allocate_type),
       "malloc_site");
     symbols_created.push_back(&malloc_sym);
     code_assignt assign=code_assignt(malloc_sym.symbol_expr(), malloc_expr);
@@ -881,9 +881,9 @@ void java_object_factoryt::gen_nondet_array_init(
   exprt length_expr=member_exprt(deref_expr, "length", comps[1].type());
   exprt init_array_expr=member_exprt(deref_expr, "data", comps[2].type());
 
-  if(init_array_expr.type()!=pointer_typet(element_type))
+  if(init_array_expr.type()!=pointer_type(element_type))
     init_array_expr=
-      typecast_exprt(init_array_expr, pointer_typet(element_type));
+      typecast_exprt(init_array_expr, pointer_type(element_type));
 
   // Interpose a new symbol, as the goto-symex stage can't handle array indexing
   // via a cast.

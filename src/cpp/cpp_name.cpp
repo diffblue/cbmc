@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_name.h"
+
 #include <cassert>
 #include <sstream>
-
-#include "cpp_name.h"
 
 irep_idt cpp_namet::get_base_name() const
 {

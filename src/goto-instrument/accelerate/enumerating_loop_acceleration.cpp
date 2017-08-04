@@ -9,9 +9,9 @@ Author: Matt Lewis
 /// \file
 /// Loop Acceleration
 
-#include <iostream>
-
 #include "enumerating_loop_acceleration.h"
+
+#include <iostream>
 
 bool enumerating_loop_accelerationt::accelerate(
   path_acceleratort &accelerator)

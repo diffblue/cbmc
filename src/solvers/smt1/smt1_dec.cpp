@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "smt1_dec.h"
 
 #include <cstdlib>
 
@@ -24,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/string2int.h>
 #include <util/prefix.h>
-
-#include "smt1_dec.h"
 
 std::string smt1_dect::decision_procedure_text() const
 {

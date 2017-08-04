@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Field-insensitive, location-sensitive may-alias analysis
 
+#include "local_bitvector_analysis.h"
+
 #include <iterator>
 #include <algorithm>
 
@@ -18,8 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <langapi/language_util.h>
-
-#include "local_bitvector_analysis.h"
 
 void local_bitvector_analysist::flagst::print(std::ostream &out) const
 {

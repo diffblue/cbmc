@@ -69,7 +69,6 @@ class optionst;
   "(java-throw-runtime-exceptions)" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
-  "(test-invariant-failure)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
 class cbmc_parse_optionst:

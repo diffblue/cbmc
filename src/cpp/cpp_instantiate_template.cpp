@@ -9,13 +9,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
+#include <util/base_exceptions.h>
 #include <util/simplify_expr.h>
 
 #include <util/c_types.h>
 
 #include "cpp_type2name.h"
-#include "cpp_typecheck.h"
 
 std::string cpp_typecheckt::template_suffix(
   const cpp_template_args_tct &template_args)
@@ -129,7 +131,8 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
-  assert(template_scope!=NULL);
+  INVARIANT_STRUCTURED(
+    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
   irep_idt identifier=
     id2string(template_scope->prefix)+
@@ -275,7 +278,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   cpp_scopet *template_scope=
     static_cast<cpp_scopet *>(cpp_scopes.id_map[template_symbol.name]);
 
-  if(template_scope==NULL)
+  if(template_scope==nullptr)
   {
     error().source_location=source_location;
     error() << "identifier: " << template_symbol.name << '\n'
@@ -283,7 +286,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
     throw 0;
   }
 
-  assert(template_scope!=NULL);
+  INVARIANT_STRUCTURED(
+    template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
 
   // produce new declaration
   cpp_declarationt new_decl=to_cpp_declaration(template_symbol.type);
@@ -332,7 +336,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
     if(id_set.size()==1)
     {
-      // It has already been instantianted!
+      // It has already been instantiated!
       const cpp_idt &cpp_id = **id_set.begin();
 
       assert(cpp_id.id_class == cpp_idt::id_classt::CLASS ||

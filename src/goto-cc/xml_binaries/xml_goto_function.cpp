@@ -11,9 +11,10 @@ Date: June 2006
 /// \file
 /// Convert goto functions to xml structures and back.
 
+#include "xml_goto_function.h"
+
 #include <util/xml_irep.h>
 
-#include "xml_goto_function.h"
 #include "xml_goto_program.h"
 
 /// takes a goto_function and creates an according xml structure

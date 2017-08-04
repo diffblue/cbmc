@@ -9,11 +9,11 @@ Author: Michael Tautschnig, tautschn@amazon.com
 /// \file
 /// Jsil Language
 
+#include "jsil_parse_tree.h"
+
 #include <util/symbol.h>
 
 #include "jsil_types.h"
-
-#include "jsil_parse_tree.h"
 
 static bool insert_at_label(
   const codet &code,

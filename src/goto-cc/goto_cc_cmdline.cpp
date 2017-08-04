@@ -11,6 +11,8 @@ Date:   April 2010
 /// \file
 /// Command line interpretation for goto-cc
 
+#include "goto_cc_cmdline.h"
+
 #include <cstring>
 #include <cassert>
 #include <iostream>
@@ -18,8 +20,6 @@ Date:   April 2010
 
 #include <util/prefix.h>
 #include <util/tempfile.h>
-
-#include "goto_cc_cmdline.h"
 
 goto_cc_cmdlinet::~goto_cc_cmdlinet()
 {
@@ -29,7 +29,7 @@ goto_cc_cmdlinet::~goto_cc_cmdlinet()
 
 bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
 {
-  for(std::size_t i=0; list[i]!=NULL; i++)
+  for(std::size_t i=0; list[i]!=nullptr; i++)
   {
     if(strcmp(option, list[i])==0)
       return true;
@@ -43,7 +43,7 @@ bool goto_cc_cmdlinet::prefix_in_list(
   const char **list,
   std::string &prefix)
 {
-  for(std::size_t i=0; list[i]!=NULL; i++)
+  for(std::size_t i=0; list[i]!=nullptr; i++)
   {
     if(strncmp(option, list[i], strlen(list[i]))==0)
     {

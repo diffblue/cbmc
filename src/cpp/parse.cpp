@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Parsing
 
+#include "cpp_parser.h"
+
 #include <cassert>
 #include <map>
 
@@ -20,7 +22,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/ansi_c_y.tab.h>
 
 #include "cpp_token_buffer.h"
-#include "cpp_parser.h"
 #include "cpp_member_spec.h"
 #include "cpp_enum_type.h"
 
@@ -47,7 +48,7 @@ struct indenter // NOLINT(readability/identifiers)
 class new_scopet
 {
 public:
-  new_scopet():kind(kindt::NONE), anon_count(0), parent(NULL)
+  new_scopet():kind(kindt::NONE), anon_count(0), parent(nullptr)
   {
   }
 
@@ -154,7 +155,7 @@ public:
 
   std::string full_name() const
   {
-    return (parent==NULL?"":(parent->full_name()+"::"))+
+    return (parent==nullptr?"":(parent->full_name()+"::"))+
            id2string(id);
   }
 
@@ -2763,7 +2764,7 @@ bool Parser::rDeclarator(
   std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 1\n";
   #endif
 
-  // we can have one or more declatator qualifiers
+  // we can have one or more declarator qualifiers
   if(!rDeclaratorQualifier())
     return false;
 
@@ -2777,7 +2778,7 @@ bool Parser::rDeclarator(
   if(!optPtrOperator(d_outer))
     return false;
 
-  // we can have another sequence of declatator qualifiers
+  // we can have another sequence of declarator qualifiers
   if(!rDeclaratorQualifier())
     return false;
 
@@ -6475,7 +6476,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_NULLPTR:
     lex.get_token(tk);
-    exp=constant_exprt(ID_NULL, pointer_typet(typet(ID_nullptr)));
+    exp=constant_exprt(ID_NULL, typet(ID_pointer, typet(ID_nullptr)));
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";

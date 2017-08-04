@@ -8,6 +8,7 @@ Date:
 
 \*******************************************************************/
 
+#include "signal_catcher.h"
 
 #if defined(_WIN32)
 #include <process.h>
@@ -17,8 +18,6 @@ Date:
 #endif
 
 #include <vector>
-
-#include "signal_catcher.h"
 
 // Here we have an instance of an ugly global object.
 // It keeps track of any child processes that we'll kill
@@ -42,7 +41,7 @@ void install_signal_catcher()
   sigfillset(&(act.sa_mask));
 
   // install signal handler
-  sigaction(SIGTERM, &act, NULL);
+  sigaction(SIGTERM, &act, nullptr);
   #endif
 }
 
@@ -58,7 +57,7 @@ void remove_signal_catcher()
   act.sa_flags=0;
   sigfillset(&(act.sa_mask));
 
-  sigaction(SIGTERM, &act, NULL);
+  sigaction(SIGTERM, &act, nullptr);
   #endif
 }
 

@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Writing DIMACS Files
 
+#include "cbmc_dimacs.h"
+
 #include <fstream>
 #include <iostream>
 
 #include <solvers/sat/dimacs_cnf.h>
-
-#include "cbmc_dimacs.h"
 
 bool cbmc_dimacst::write_dimacs(const std::string &filename)
 {

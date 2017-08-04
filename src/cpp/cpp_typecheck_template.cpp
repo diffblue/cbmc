@@ -9,10 +9,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
+#include <util/base_exceptions.h>
 #include <util/simplify_expr.h>
 
 #include "cpp_type2name.h"
-#include "cpp_typecheck.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_convert_type.h"
@@ -305,7 +307,7 @@ void cpp_typecheckt::typecheck_function_template(
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
-/// typecheck class tempalte members; these can be methods or static members
+/// typecheck class template members; these can be methods or static members
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
@@ -520,7 +522,7 @@ void cpp_typecheckt::convert_class_template_specialization(
     // currently we are more restrictive
     // than the standard
     error().source_location=cpp_name.source_location();
-    error() << "bad template-class-sepcialization name" << eom;
+    error() << "bad template-class-specialization name" << eom;
     throw 0;
   }
 
@@ -909,7 +911,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // these need to be typechecked in the scope of the template,
       // not in the current scope!
       cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-      assert(template_scope!=NULL);
+      INVARIANT_STRUCTURED(
+        template_scope!=nullptr, nullptr_exceptiont, "template_scope is null");
       cpp_scopes.go_to(*template_scope);
     }
 
@@ -953,13 +956,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
       typet type=parameter.type();
 
-      // First check the parameter type (might have ealier
+      // First check the parameter type (might have earlier
       // type parameters in it). Needs to be checked in scope
       // of template.
       {
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_idt *template_scope=cpp_scopes.id_map[template_symbol.name];
-        assert(template_scope!=NULL);
+        INVARIANT_STRUCTURED(
+          template_scope!=nullptr,
+          nullptr_exceptiont,
+          "template_scope is null");
         cpp_scopes.go_to(*template_scope);
         typecheck_type(type);
       }
@@ -1046,7 +1052,7 @@ void cpp_typecheckt::convert_template_declaration(
     typecheck_class_template(declaration);
     return;
   }
-  // maybe function template, maybe class template member, maye
+  // maybe function template, maybe class template member, maybe
   // template variable
   else
   {

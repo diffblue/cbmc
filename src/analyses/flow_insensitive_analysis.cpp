@@ -10,12 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Flow Insensitive Static Analysis
 
+#include "flow_insensitive_analysis.h"
+
 #include <cassert>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
-
-#include "flow_insensitive_analysis.h"
 
 exprt flow_insensitive_abstract_domain_baset::get_guard(
   locationt from,

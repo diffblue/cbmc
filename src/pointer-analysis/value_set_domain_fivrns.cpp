@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set Domain (Flow Insensitive, Validity Regions)
 
-#include <util/std_code.h>
-
 #include "value_set_domain_fivrns.h"
+
+#include <util/std_code.h>
 
 bool value_set_domain_fivrnst::transform(
   const namespacet &ns,

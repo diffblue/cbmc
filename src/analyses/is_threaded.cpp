@@ -11,8 +11,9 @@ Date: October 2012
 /// \file
 /// Over-approximate Concurrency for Threaded Goto Programs
 
-#include "ai.h"
 #include "is_threaded.h"
+
+#include "ai.h"
 
 class is_threaded_domaint:public ai_domain_baset
 {

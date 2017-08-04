@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "bv_cbmc.h"
 
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
-
-#include "bv_cbmc.h"
 
 bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {

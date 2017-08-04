@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// CBMC Command Line Option Processing
 
+#include "cbmc_parse_options.h"
+
 #include <fstream>
 #include <cstdlib> // exit()
 #include <iostream>
@@ -62,7 +64,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode/java_bytecode_language.h"
 
 #include "cbmc_solvers.h"
-#include "cbmc_parse_options.h"
 #include "bmc.h"
 #include "version.h"
 #include "xml_interface.h"
@@ -107,27 +108,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     usage_error();
     exit(1); // should contemplate EX_USAGE from sysexits.h
-  }
-
-  // Test only; do not use for input validation
-  if(cmdline.isset("test-invariant-failure"))
-  {
-    // Have to catch this as the default handling of uncaught exceptions
-    // on windows appears to be silent termination.
-    try
-    {
-      INVARIANT(0, "Test invariant failure");
-    }
-    catch (const invariant_failedt &e)
-    {
-      std::cerr << e.what();
-      exit(0); // should contemplate EX_OK from sysexits.h
-    }
-    catch (...)
-    {
-      error() << "Unexpected exception type\n";
-    }
-    exit(1);
   }
 
   if(cmdline.isset("program-only"))
@@ -624,7 +604,7 @@ int cbmc_parse_optionst::get_goto_program(
       languaget *language=get_language_from_filename(filename);
       language->get_language_options(cmdline);
 
-      if(language==NULL)
+      if(language==nullptr)
       {
         error() << "failed to figure out type of file `"
                 <<  filename << "'" << eom;
@@ -773,7 +753,7 @@ void cbmc_parse_optionst::preprocessing()
     languaget *ptr=get_language_from_filename(filename);
     ptr->get_language_options(cmdline);
 
-    if(ptr==NULL)
+    if(ptr==nullptr)
     {
       error() << "failed to figure out type of file" << eom;
       return;

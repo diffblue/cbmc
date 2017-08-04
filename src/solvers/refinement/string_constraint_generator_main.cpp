@@ -17,10 +17,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   Li and Indradeep Ghosh, which gives examples of constraints for several
 ///   functions.
 
+#include <solvers/refinement/string_constraint_generator.h>
+
 #include <ansi-c/string_constant.h>
 #include <java_bytecode/java_types.h>
 #include <solvers/refinement/string_refinement_invariant.h>
-#include <solvers/refinement/string_constraint_generator.h>
 #include <util/arith_tools.h>
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>

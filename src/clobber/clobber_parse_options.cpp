@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symex Command Line Options Processing
 
+#include "clobber_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -37,7 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "clobber_parse_options.h"
 // #include "clobber_instrumenter.h"
 
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
@@ -248,7 +249,7 @@ bool clobber_parse_optionst::get_goto_program(
       languaget *language=get_language_from_filename(filename);
       language->get_language_options(cmdline);
 
-      if(language==NULL)
+      if(language==nullptr)
       {
         error() << "failed to figure out type of file `" <<  filename << "'"
                 << eom;

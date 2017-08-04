@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
 
 #include <cassert>
 
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
 #include <util/simplify_expr.h>
-
-#include "boolbv.h"
 
 /// A method to detect equivalence between experts that can contain typecast
 bool expr_eq(const exprt &expr1, const exprt &expr2)

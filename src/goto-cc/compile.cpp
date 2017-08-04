@@ -11,6 +11,8 @@ Date: June 2006
 /// \file
 /// Compile and link source and object files.
 
+#include "compile.h"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -39,8 +41,6 @@ Date: June 2006
 #include <langapi/mode.h>
 
 #include <cbmc/version.h>
-
-#include "compile.h"
 
 #define DOTGRAPHSETTINGS  "color=black;" \
                           "orientation=portrait;" \
@@ -77,7 +77,7 @@ bool compilet::doit()
 
   add_compiler_specific_defines(config);
 
-  // Parse commandline for source and object file names
+  // Parse command line for source and object file names
   for(std::size_t i=0; i<_cmdline.args.size(); i++)
     if(add_input_file(_cmdline.args[i]))
       return true;
@@ -232,7 +232,7 @@ bool compilet::add_input_file(const std::string &file_name)
 
     stream=popen(cmd.str().c_str(), "r");
 
-    if(stream!=NULL)
+    if(stream!=nullptr)
     {
       std::string line;
       int ch; // fgetc returns an int, not char
@@ -472,7 +472,7 @@ bool compilet::parse(const std::string &file_name)
   else
     languagep=get_language_from_filename(file_name);
 
-  if(languagep==NULL)
+  if(languagep==nullptr)
   {
     error() << "failed to figure out type of file `" << file_name << "'" << eom;
     return true;
@@ -703,7 +703,7 @@ void compilet::convert_symbols(goto_functionst &dest)
     Forall_symbols(it, symbol_table.symbols)
       symbols.insert(it->first);
 
-    // the symbol table itertors aren't stable
+    // the symbol table iterators aren't stable
     for(symbols_sett::const_iterator
         it=symbols.begin();
         it!=symbols.end();

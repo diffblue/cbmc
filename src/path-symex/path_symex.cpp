@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Concrete Symbolic Transformer
 
+#include "path_symex.h"
+
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/string2int.h>
@@ -22,7 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <pointer-analysis/dereference.h>
 
-#include "path_symex.h"
 #include "path_symex_class.h"
 
 #ifdef DEBUG
@@ -248,7 +249,7 @@ void path_symext::symex_malloc(
 
   if(object_type.id()==ID_array)
   {
-    rhs.type()=pointer_typet(value_symbol.type.subtype());
+    rhs.type()=pointer_type(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
@@ -257,7 +258,7 @@ void path_symext::symex_malloc(
   else
   {
     rhs.op0()=value_symbol.symbol_expr();
-    rhs.type()=pointer_typet(value_symbol.type);
+    rhs.type()=pointer_type(value_symbol.type);
   }
 
   if(rhs.type()!=lhs.type())
@@ -869,7 +870,7 @@ void path_symext::do_goto(
   if(!guard.is_false())
   {
     // branch taken case
-    // copy the state into 'furhter_states'
+    // copy the state into 'further_states'
     further_states.push_back(state);
     further_states.back().record_step();
     state.history->branch=stept::BRANCH_TAKEN;

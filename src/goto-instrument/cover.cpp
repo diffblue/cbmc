@@ -11,6 +11,8 @@ Date: May 2016
 /// \file
 /// Coverage Instrumentation
 
+#include "cover.h"
+
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
@@ -23,8 +25,6 @@ Date: May 2016
 
 #include <json/json_parser.h>
 #include <util/message.h>
-
-#include "cover.h"
 
 class basic_blockst
 {
@@ -901,9 +901,9 @@ void minimize_mcdc_controlling(
      *
      * If in the end all elements ''x'' in ''controlling'' are
      * reserved, this means that current ''controlling'' set is
-     * minimum and the ''while'' loop should be breaked.
+     * minimum and the ''while'' loop should be broken out of.
      *
-     * Note:  implementaion here for the above procedure is
+     * Note:  implementation here for the above procedure is
      *        not (meant to be) optimal.
      **/
     for(auto &x : controlling)

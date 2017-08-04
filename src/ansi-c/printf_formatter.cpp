@@ -9,14 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// printf Formatting
 
+#include "printf_formatter.h"
+
 #include <cassert>
 #include <sstream>
 
 #include <util/c_types.h>
 #include <util/format_constant.h>
 #include <util/simplify_expr.h>
-
-#include "printf_formatter.h"
 
 const exprt printf_formattert::make_type(
   const exprt &src, const typet &dest)

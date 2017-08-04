@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// SMT Version 1 Backend
 
+#include "smt1_conv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -20,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/byte_operators.h>
 #include <util/config.h>
+#include <util/c_types.h>
 
 #include <ansi-c/string_constant.h>
 
@@ -29,8 +32,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/pointer_logic.h>
 #include <solvers/flattening/flatten_byte_operators.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
-
-#include "smt1_conv.h"
 
 void smt1_convt::print_assignment(std::ostream &out) const
 {
@@ -290,12 +291,14 @@ void smt1_convt::convert_address_of_rec(
       exprt new_index_expr=expr;
       new_index_expr.op1()=from_integer(0, index.type());
 
-      exprt address_of_expr(ID_address_of, pointer_typet());
-      address_of_expr.type().subtype()=array.type().subtype();
-      address_of_expr.copy_to_operands(new_index_expr);
+      address_of_exprt address_of_expr(
+        new_index_expr,
+        pointer_type(array.type().subtype()));
 
-      exprt plus_expr(ID_plus, address_of_expr.type());
-      plus_expr.copy_to_operands(address_of_expr, index);
+      plus_exprt plus_expr(
+        address_of_expr,
+        index,
+        address_of_expr.type());
 
       convert_expr(plus_expr, true);
     }

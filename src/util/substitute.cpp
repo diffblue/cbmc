@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "substitute.h"
 
 #include <cassert>
-
-#include "substitute.h"
 
 void substitute(
   std::string &dest,

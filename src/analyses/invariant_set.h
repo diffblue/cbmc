@@ -98,9 +98,9 @@ public:
   invariant_sett():
     threaded(false),
     is_false(false),
-    value_sets(NULL),
-    object_store(NULL),
-    ns(NULL)
+    value_sets(nullptr),
+    object_store(nullptr),
+    ns(nullptr)
   {
   }
 
@@ -108,7 +108,7 @@ public:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  // true = added s.th.
+  // true = added something
   bool make_union(const invariant_sett &other_invariants);
 
   void strengthen(const exprt &expr);
@@ -214,7 +214,7 @@ protected:
 
   void get_bounds(unsigned a, boundst &dest) const;
 
-  // true = added s.th.
+  // true = added something
   bool make_union_bounds_map(const bounds_mapt &other);
 
   void modifies(unsigned a);

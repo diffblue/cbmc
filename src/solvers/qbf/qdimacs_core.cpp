@@ -6,11 +6,10 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include "qdimacs_core.h"
 
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-
-#include "qdimacs_core.h"
 
 void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {

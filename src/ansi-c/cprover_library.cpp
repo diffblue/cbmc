@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cprover_library.h"
 
 #include <sstream>
 
 #include <util/config.h>
 
-#include "cprover_library.h"
 #include "ansi_c_language.h"
 
 struct cprover_library_entryt
@@ -38,7 +38,7 @@ std::string get_cprover_library_text(
   std::size_t count=0;
 
   for(cprover_library_entryt *e=cprover_library;
-      e->function!=NULL;
+      e->function!=nullptr;
       e++)
   {
     irep_idt id=e->function;

@@ -1,12 +1,13 @@
-
 DIRS = ansi-c \
        cbmc \
        cpp \
        cbmc-java \
        cbmc-java-inheritance \
        goto-analyzer \
+       goto-diff \
        goto-instrument \
        goto-instrument-typedef \
+       invariants \
        strings \
        strings-smoke-tests \
        test-script \

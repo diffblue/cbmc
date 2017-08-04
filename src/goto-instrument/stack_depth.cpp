@@ -11,6 +11,8 @@ Date: November 2011
 /// \file
 /// Stack depth checks
 
+#include "stack_depth.h"
+
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -18,8 +20,6 @@ Date: November 2011
 #include <util/cprover_prefix.h>
 
 #include <goto-programs/goto_functions.h>
-
-#include "stack_depth.h"
 
 symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 {

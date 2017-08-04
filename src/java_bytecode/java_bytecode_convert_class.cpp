@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// JAVA Bytecode Language Conversion
 
+#include "java_bytecode_convert_class.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
 
-#include "java_bytecode_convert_class.h"
 #include "java_root_class.h"
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
@@ -263,7 +264,7 @@ void java_bytecode_convert_classt::add_array_types()
     struct_type.components().push_back(comp1);
 
     struct_typet::componentt
-      comp2("data", pointer_typet(java_type_from_char(l)));
+      comp2("data", java_reference_type(java_type_from_char(l)));
     comp2.set_pretty_name("data");
     comp2.set_base_name("data");
     struct_type.components().push_back(comp2);

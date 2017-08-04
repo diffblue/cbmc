@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "memory_info.h"
 
 #ifdef __APPLE__
 #include <mach/task.h>
@@ -23,8 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include <ostream>
-
-#include "memory_info.h"
 
 void memory_info(std::ostream &out)
 {

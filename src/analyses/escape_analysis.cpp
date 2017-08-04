@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Field-insensitive, location-sensitive escape analysis
 
-#include <util/simplify_expr.h>
-
 #include "escape_analysis.h"
+
+#include <util/simplify_expr.h>
 
 bool escape_domaint::is_tracked(const symbol_exprt &symbol)
 {
@@ -371,7 +371,7 @@ void escape_domaint::check_lhs(
   {
     const irep_idt &identifier=to_symbol_expr(lhs).get_identifier();
 
-    // pointer with aleanup function?
+    // pointer with cleanup function?
     const escape_domaint::cleanup_mapt::const_iterator m_it=
       cleanup_map.find(identifier);
 

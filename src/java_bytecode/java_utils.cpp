@@ -6,15 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_utils.h"
+
+#include "java_root_class.h"
+#include "java_types.h"
+
 #include <util/invariant.h>
 #include <util/message.h>
 #include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/string_utils.h>
-
-#include "java_root_class.h"
-#include "java_utils.h"
-#include "java_types.h"
 
 bool java_is_array_type(const typet &type)
 {

@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include <solvers/prop/literal.h>
 
 #include <cassert>
 #include <fstream>
@@ -14,8 +15,6 @@ Author: CM Wintersteiger
 #include <util/std_expr.h>
 
 #include <langapi/language_util.h>
-
-#include <solvers/prop/literal.h>
 
 #include <cuddObj.hh> // CUDD Library
 

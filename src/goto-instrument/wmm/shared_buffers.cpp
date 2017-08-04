@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "shared_buffers.h"
 #include "fence.h"
-
 #include "../rw_set.h"
+
+#include <util/c_types.h>
 
 /// returns a unique id (for fresh variables)
 std::string shared_bufferst::unique(void)
@@ -53,7 +53,7 @@ const shared_bufferst::varst &shared_bufferst::operator()(
       object,
       symbol.base_name,
       "$read_delayed_var",
-      pointer_typet(symbol.type));
+      pointer_type(symbol.type));
 
   for(unsigned cnt=0; cnt<nb_threads; cnt++)
   {
@@ -120,7 +120,7 @@ void shared_bufferst::add_initialization(goto_programt &goto_program)
     assignment(goto_program, t, source_location, vars.second.read_delayed,
       false_exprt());
     assignment(goto_program, t, source_location, vars.second.read_delayed_var,
-      null_pointer_exprt(pointer_typet(vars.second.type)));
+      null_pointer_exprt(pointer_type(vars.second.type)));
 
     for(const auto &id : vars.second.r_buff0_thds)
       assignment(goto_program, t, source_location, id, false_exprt());
@@ -380,7 +380,7 @@ void shared_bufferst::det_flush(
   // We update (or not) the value in the memory
   assignment(goto_program, target, source_location, object, new_value_expr);
 
-  // We udpate the flags of the buffer
+  // We update the flags of the buffer
   // if buff0 used and mine, then it is no more used, as we flushed the last
   // write and -ws-> imposes not to have other writes in the buffer
   assignment(
@@ -1172,7 +1172,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
                     r_it->second.object, vars.type);
                   symbol_exprt new_read_expr=symbol_exprt(
                     vars.read_delayed_var,
-                  pointer_typet(vars.type));
+                    pointer_type(vars.type));
                   symbol_exprt read_delayed_expr=symbol_exprt(
                     vars.read_delayed, bool_typet());
 

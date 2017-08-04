@@ -13,6 +13,8 @@ Date: February 2013
 /// Range-based reaching definitions analysis (following Field- Sensitive
 ///   Program Dependence Analysis, Litvak et al., FSE 2010)
 
+#include "reaching_definitions.h"
+
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
 
@@ -20,8 +22,6 @@ Date: February 2013
 
 #include "is_threaded.h"
 #include "dirty.h"
-
-#include "reaching_definitions.h"
 
 void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 {
@@ -51,7 +51,10 @@ void rd_range_domaint::transform(
 {
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);
-  assert(rd!=0);
+  INVARIANT_STRUCTURED(
+    rd!=nullptr,
+    bad_cast_exceptiont,
+    "ai has type reaching_definitions_analysist");
 
   assert(bv_container);
 
@@ -67,7 +70,7 @@ void rd_range_domaint::transform(
   // cleanup parameters
   else if(from->is_end_function())
     transform_end_function(ns, from, to, *rd);
-  // lhs assignements
+  // lhs assignments
   else if(from->is_assign())
     transform_assign(ns, from, from, *rd);
   // initial (non-deterministic) value
@@ -298,7 +301,10 @@ void rd_range_domaint::transform_assign(
     const symbolt *symbol_ptr;
     if(ns.lookup(identifier, symbol_ptr))
       continue;
-    assert(symbol_ptr!=0);
+    INVARIANT_STRUCTURED(
+      symbol_ptr!=nullptr,
+      nullptr_exceptiont,
+      "Symbol is in symbol table");
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 
@@ -559,7 +565,7 @@ void rd_range_domaint::output(std::ostream &out) const
   }
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge_inner(
   values_innert &dest,
   const values_innert &other)
@@ -610,7 +616,7 @@ bool rd_range_domaint::merge_inner(
   return more;
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge(
   const rd_range_domaint &other,
   locationt from,
@@ -646,7 +652,7 @@ bool rd_range_domaint::merge(
   return changed;
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool rd_range_domaint::merge_shared(
   const rd_range_domaint &other,
   goto_programt::const_targett from,

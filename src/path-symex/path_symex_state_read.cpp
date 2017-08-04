@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// State of path-based symbolic simulator
 
+#include "path_symex_state.h"
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
 #include <pointer-analysis/dereference.h>
-
-#include "path_symex_state.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -359,7 +359,7 @@ exprt path_symex_statet::read_symbol_member_index(
         suffix="."+id2string(member_expr.get_component_name())+suffix;
       }
       else
-        return nil_exprt(); // includes unions, deliberatley
+        return nil_exprt(); // includes unions, deliberately
     }
     else if(current.id()==ID_index)
     {
@@ -430,7 +430,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
   // the loop avoids recursion
   while(true)
   {
-    const exprt *next=0;
+    const exprt *next=nullptr;
 
     if(current->id()==ID_symbol)
     {
@@ -452,7 +452,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
         next=&(member_expr.struct_op());
       }
       else
-        return false; // includes unions, deliberatley
+        return false; // includes unions, deliberately
     }
     else if(current->id()==ID_index)
     {
@@ -465,7 +465,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
       return false;
 
     // next round
-    assert(next!=0);
+    INVARIANT_STRUCTURED(next!=nullptr, nullptr_exceptiont, "next is null");
     current=next;
   }
 }

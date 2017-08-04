@@ -9,8 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Invariant Set
 
+#include "invariant_set.h"
+
 #include <iostream>
 
+#include <util/base_exceptions.h>
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/arith_tools.h>
@@ -21,8 +24,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <langapi/language_util.h>
-
-#include "invariant_set.h"
 
 void inv_object_storet::output(std::ostream &out) const
 {
@@ -144,7 +145,7 @@ bool invariant_sett::get_object(
   const exprt &expr,
   unsigned &n) const
 {
-  assert(object_store!=NULL);
+  PRECONDITION(object_store!=nullptr);
   return object_store->get(expr, n);
 }
 
@@ -315,7 +316,8 @@ void invariant_sett::output(
     return;
   }
 
-  assert(object_store!=NULL);
+  INVARIANT_STRUCTURED(
+    object_store!=nullptr, nullptr_exceptiont, "Object store is null");
 
   for(unsigned i=0; i<eq_set.size(); i++)
     if(eq_set.is_root(i) &&
@@ -899,7 +901,7 @@ std::string invariant_sett::to_string(
   unsigned a,
   const irep_idt &identifier) const
 {
-  assert(object_store!=NULL);
+  PRECONDITION(object_store!=nullptr);
   return object_store->to_string(a, identifier);
 }
 
@@ -1103,7 +1105,7 @@ void invariant_sett::apply_code(const codet &code)
   }
   else if(statement==ID_function_call)
   {
-    // may be a desaster
+    // may be a disaster
     make_true();
   }
   else if(statement==ID_cpp_delete ||

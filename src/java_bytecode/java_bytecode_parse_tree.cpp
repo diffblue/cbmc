@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_parse_tree.h"
 
 #include <ostream>
 
@@ -15,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 
 #include "expr2java.h"
-
-#include "java_bytecode_parse_tree.h"
 
 void java_bytecode_parse_treet::classt::swap(
   classt &other)

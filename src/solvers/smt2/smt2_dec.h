@@ -10,8 +10,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 #define CPROVER_SOLVERS_SMT2_SMT2_DEC_H
 
-/*! \defgroup gr_smt2 SMT-LIB 2.x Interface */
-
 #include <fstream>
 
 #include "smt2_conv.h"
@@ -33,7 +31,6 @@ protected:
 };
 
 /*! \brief Decision procedure interface for various SMT 2.x solvers
-    \ingroup gr_smt2
 */
 class smt2_dect:protected smt2_stringstreamt, public smt2_convt
 {

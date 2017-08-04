@@ -6,12 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "equality.h"
 
 #ifdef DEBUG
 #include <iostream>
 #endif
 
-#include "equality.h"
 #include "bv_utils.h"
 
 literalt equalityt::equality(const exprt &e1, const exprt &e2)

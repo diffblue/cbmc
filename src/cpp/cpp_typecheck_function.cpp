@@ -9,10 +9,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_template_type.h"
-#include "cpp_typecheck.h"
 #include "cpp_type2name.h"
 #include "cpp_util.h"
 

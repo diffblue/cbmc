@@ -12,9 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 
-/*! \defgroup goto_symex Symbolic execution of goto programs
-*/
-
 #include <util/options.h>
 #include <util/byte_operators.h>
 

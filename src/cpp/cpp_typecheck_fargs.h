@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 
 class cpp_typecheckt;
+class code_typet;
 
 class cpp_typecheck_fargst // for function overloading
 {

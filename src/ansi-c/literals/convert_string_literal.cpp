@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// C/C++ Language Conversion
 
+#include "convert_string_literal.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -18,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "../string_constant.h"
 
 #include "unescape_string.h"
-#include "convert_string_literal.h"
 
 std::basic_string<unsigned int> convert_one_string_literal(
   const std::string &src)

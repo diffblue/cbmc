@@ -1,20 +1,20 @@
 /*******************************************************************\
 
-Module: A special command line object to mimick ARM's armcc
+Module: A special command line object to mimic ARM's armcc
 
 Author: Daniel Kroening
 
 \*******************************************************************/
 
 /// \file
-/// A special command line object to mimick ARM's armcc
+/// A special command line object to mimic ARM's armcc
+
+#include "armcc_cmdline.h"
 
 #include <cstring>
 #include <iostream>
 
-#include "armcc_cmdline.h"
-
-/// parses the commandline options into a cmdlinet
+/// parses the command line options into a cmdlinet
 /// \par parameters: argument count, argument strings
 /// \return none
 // see
@@ -87,8 +87,8 @@ static const char *options_no_arg[]=
   "--no_implicit_include_searches",
   "--implicit_typename",
   "--no_implicit_typename",
-  "--nonstd_qualifider_deduction",
-  "--no_nonstd_qualifider_deduction",
+  "--nonstd_qualifier_deduction",
+  "--no_nonstd_qualifier_deduction",
   "--old_specializations",
   "--no_old_specializations",
   "--parse_templates",
@@ -192,7 +192,7 @@ static const char *options_no_arg[]=
   "--translate_gcc",
   "--translate_gld",
   "-W",
-  NULL
+  nullptr
 };
 
 static const char *options_with_prefix[]=
@@ -242,7 +242,7 @@ static const char *options_with_prefix[]=
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
   "--configure_extra_libraries=",
-  NULL
+  nullptr
 };
 
 static const char *options_with_arg[]=
@@ -262,7 +262,7 @@ static const char *options_with_arg[]=
   "-o",
   "--cpu",
   "--apcs",
-  NULL
+  nullptr
 };
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)

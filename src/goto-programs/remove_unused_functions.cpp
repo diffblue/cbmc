@@ -9,9 +9,9 @@ Author: CM Wintersteiger
 /// \file
 /// Unused function removal
 
-#include <util/message.h>
-
 #include "remove_unused_functions.h"
+
+#include <util/message.h>
 
 void remove_unused_functions(
   goto_functionst &functions,

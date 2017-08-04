@@ -51,7 +51,7 @@ public:
     string_literal.clear();
     pragma_pack.clear();
 
-    // setup global scope
+    // set up global scope
     scopes.clear();
     scopes.push_back(scopet());
   }

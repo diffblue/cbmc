@@ -46,7 +46,7 @@ public:
     irep_idt id;
     irep_idt function_identifier;
     irep_idt taint;
-    unsigned parameter_number; // the frist one is '1'
+    unsigned parameter_number; // the first one is '1'
     std::string message;
 
     void output(std::ostream &) const;

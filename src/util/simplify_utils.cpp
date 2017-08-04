@@ -6,10 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_utils.h"
 
 #include <algorithm>
-
-#include "simplify_utils.h"
 
 /// sort operands of an expression according to ordering defined by operator<
 /// \par parameters: operand list

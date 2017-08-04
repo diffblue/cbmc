@@ -9,6 +9,8 @@ Author: Michael Tautschnig
 /// \file
 /// Assembler Mode
 
+#include "as_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -30,8 +32,6 @@ Author: Michael Tautschnig
 #include <cbmc/version.h>
 
 #include "compile.h"
-
-#include "as_mode.h"
 
 static std::string assembler_name(
   const cmdlinet &cmdline,
@@ -173,11 +173,11 @@ int as_modet::doit()
       continue;
 
     // extract the preprocessed source from the file
-    std::ifstream is(arg_it->arg);
+    std::string infile=arg_it->arg=="-"?cmdline.stdin_file:arg_it->arg;
+    std::ifstream is(infile);
     if(!is.is_open())
     {
-      error() << "Failed to open input source " << arg_it->arg
-        << eom;
+      error() << "Failed to open input source " << infile << eom;
       return 1;
     }
 
@@ -205,7 +205,7 @@ int as_modet::doit()
 
         ++outputs;
         std::string new_name=
-          get_base_name(arg_it->arg, true)+"_"+
+          get_base_name(infile, true)+"_"+
           std::to_string(outputs)+".i";
         dest=temp_dir(new_name);
 

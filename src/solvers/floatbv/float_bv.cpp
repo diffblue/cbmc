@@ -6,14 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "float_bv.h"
 
 #include <cassert>
 #include <algorithm>
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
-
-#include "float_bv.h"
 
 exprt float_bvt::convert(const exprt &expr)
 {
@@ -104,7 +103,7 @@ ieee_float_spect float_bvt::get_spec(const exprt &expr)
 
 exprt float_bvt::abs(const exprt &op, const ieee_float_spect &spec)
 {
-  // we mask away the sign bit, which is the most significand bit
+  // we mask away the sign bit, which is the most significant bit
   std::string mask_str(spec.width(), '1');
   mask_str[0]='0';
 
@@ -150,7 +149,7 @@ exprt float_bvt::is_zero(
   const exprt &src,
   const ieee_float_spect &spec)
 {
-  // we mask away the sign bit, which is the most significand bit
+  // we mask away the sign bit, which is the most significant bit
   const floatbv_typet &type=to_floatbv_type(src.type());
   std::size_t width=type.get_width();
 
@@ -687,7 +686,7 @@ exprt float_bvt::div(
   // is there a remainder?
   exprt have_remainder=notequal_exprt(rem, from_integer(0, rem.type()));
 
-  // we throw this into the result, as least-significand bit,
+  // we throw this into the result, as least-significant bit,
   // to get the right rounding decision
   result.fraction=
     concatenation_exprt(

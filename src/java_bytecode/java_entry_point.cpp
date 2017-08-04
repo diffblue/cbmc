@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_entry_point.h"
 
 #include <algorithm>
 #include <set>
@@ -29,7 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/remove_exceptions.h>
 
-#include "java_entry_point.h"
 #include "java_object_factory.h"
 #include "java_types.h"
 #include "java_utils.h"
@@ -561,7 +561,7 @@ bool java_entry_point(
     exc_symbol.is_static_lifetime=true;
     exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
     exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
-    exc_symbol.type=typet(ID_pointer, empty_typet());
+    exc_symbol.type=java_reference_type(empty_typet());
     symbol_table.add(exc_symbol);
   }
 

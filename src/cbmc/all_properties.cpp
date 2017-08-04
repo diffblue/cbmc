@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "all_properties_class.h"
+
 #include <iostream>
 
 #include <util/time_stopping.h>
@@ -23,8 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/json_goto_trace.h>
 
 #include "bv_cbmc.h"
-
-#include "all_properties_class.h"
 
 void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
 {

@@ -10,14 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set Propagation (Flow Insensitive, Validity Regions)
 
+#include "value_set_analysis_fivrns.h"
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/xml_irep.h>
 #include <util/symbol_table.h>
 
 #include <langapi/language_util.h>
-
-#include "value_set_analysis_fivrns.h"
 
 void value_set_analysis_fivrnst::initialize(
   const goto_programt &goto_program)

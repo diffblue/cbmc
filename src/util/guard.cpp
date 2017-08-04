@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "guard.h"
+
 #include <ostream>
 
 #include "std_expr.h"
 #include "simplify_utils.h"
-#include "guard.h"
 
 void guardt::guard_expr(exprt &dest) const
 {

@@ -11,11 +11,11 @@ Date: July 2016
 /// \file
 /// Handling of functions without body
 
+#include "undefined_functions.h"
+
 #include <ostream>
 
 #include <goto-programs/goto_functions.h>
-
-#include "undefined_functions.h"
 
 void list_undefined_functions(
   const goto_functionst &goto_functions,

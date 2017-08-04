@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cout_message.h"
 
 #include <iostream>
 
@@ -17,7 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #include "unicode.h"
-#include "cout_message.h"
 
 cout_message_handlert::cout_message_handlert():
   stream_message_handlert(std::cout)

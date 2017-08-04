@@ -6,11 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "find_symbols.h"
 
 #include "std_types.h"
 #include "std_expr.h"
-
-#include "find_symbols.h"
 
 enum class kindt { F_TYPE, F_TYPE_NON_PTR, F_EXPR, F_BOTH };
 

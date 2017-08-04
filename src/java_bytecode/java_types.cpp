@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_types.h"
 
 #include <cassert>
 #include <cctype>
@@ -15,8 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/ieee_float.h>
-
-#include "java_types.h"
 
 typet java_int_type()
 {

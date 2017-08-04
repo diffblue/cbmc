@@ -11,9 +11,9 @@ Date: February 2012
 /// \file
 /// Fences for instrumentation
 
-#include <util/namespace.h>
-
 #include "fence.h"
+
+#include <util/namespace.h>
 
 bool is_fence(
   const goto_programt::instructiont &instruction,

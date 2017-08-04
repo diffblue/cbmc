@@ -11,12 +11,12 @@ Date: April 2016
 /// \file
 /// Class Hierarchy
 
+#include "class_hierarchy.h"
+
 #include <ostream>
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
-
-#include "class_hierarchy.h"
 
 /// Looks for all the struct types in the symbol table and construct a map from
 /// class names to a data structure that contains lists of parent and child

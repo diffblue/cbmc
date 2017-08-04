@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Misc Utilities
 
 #include "array_name.h"
+
 #include "expr.h"
 #include "namespace.h"
 #include "symbol.h"

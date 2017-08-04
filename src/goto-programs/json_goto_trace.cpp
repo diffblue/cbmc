@@ -11,6 +11,8 @@ Author: Daniel Kroening
 /// \file
 /// Traces of GOTO Programs
 
+#include "json_goto_trace.h"
+
 #include <cassert>
 
 #include <util/json_expr.h>
@@ -18,8 +20,6 @@ Author: Daniel Kroening
 #include <util/config.h>
 
 #include <langapi/language_util.h>
-
-#include "json_goto_trace.h"
 
 /// Replaces in src, expressions of the form pointer_offset(constant) by that
 /// constant.

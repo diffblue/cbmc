@@ -13,14 +13,22 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
-#include <util/namespace.h>
-#include <util/std_expr.h>
-#include <util/string2int.h>
-#include <util/prefix.h>
+#include "java_bytecode_convert_method.h"
+#include "java_bytecode_convert_method_class.h"
+#include "bytecode_info.h"
+#include "java_string_library_preprocess.h"
+#include "java_types.h"
+#include "java_utils.h"
+
 #include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
+#include <util/namespace.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/string2int.h>
 
 #include <linking/zero_initializer.h>
 
@@ -28,14 +36,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/class_hierarchy.h>
 #include <analyses/cfg_dominators.h>
-
-#include "java_bytecode_convert_method.h"
-#include "java_bytecode_convert_method_class.h"
-#include "bytecode_info.h"
-#include "java_types.h"
-#include "java_utils.h"
-#include "java_string_library_preprocess.h"
-#include "java_utils.h"
 
 #include <limits>
 #include <algorithm>
@@ -223,7 +223,7 @@ const exprt java_bytecode_convert_methodt::variable(
 
   if(var.symbol_expr.get_identifier().empty())
   {
-    // an un-named local variable
+    // an unnamed local variable
     irep_idt base_name="anonlocal::"+id2string(number)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
@@ -290,7 +290,8 @@ void java_bytecode_convert_method_lazy(
     code_typet &code_type=to_code_type(member_type);
     code_typet::parameterst &parameters=code_type.parameters();
     code_typet::parametert this_p;
-    const reference_typet object_ref_type(symbol_typet(class_symbol.name));
+    const reference_typet object_ref_type=
+      java_reference_type(symbol_typet(class_symbol.name));
     this_p.type()=object_ref_type;
     this_p.set_this();
     parameters.insert(parameters.begin(), this_p);
@@ -489,7 +490,7 @@ void java_bytecode_convert_methodt::convert(
 const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
   const irep_idt &statement)
 {
-  for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
+  for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
     if(statement==p->mnemonic)
       return *p;
 
@@ -521,7 +522,7 @@ static member_exprt to_member(const exprt &pointer, const exprt &fieldref)
   symbol_typet class_type(fieldref.get(ID_class));
 
   exprt pointer2=
-    typecast_exprt(pointer, pointer_typet(class_type));
+    typecast_exprt(pointer, java_reference_type(class_type));
 
   const dereference_exprt obj_deref(pointer2, class_type);
 
@@ -606,7 +607,7 @@ code_blockt &java_bytecode_convert_methodt::get_block_for_pcrange(
 ///   'allow_merge'
 /// which is always true except when called from get_block_for_pcrange
 /// \return See above, plus potential side-effects on 'tree' and 'this_block' as
-///   descibed in 'Purpose'
+///   described in 'Purpose'
 code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   block_tree_nodet &tree,
   code_blockt &this_block,
@@ -1330,7 +1331,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             else
               code_type.set(ID_java_super_method_call, true);
           }
-          pointer_typet object_ref_type(thistype);
+          reference_typet object_ref_type=java_reference_type(thistype);
           code_typet::parametert this_p(object_ref_type);
           this_p.set_this();
           this_p.set_base_name("this");
@@ -1478,7 +1479,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const member_exprt data_ptr(
         deref,
         "data",
-        pointer_typet(java_type_from_char(type_char)));
+        pointer_type(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       // tag it so it's easy to identify during instrumentation
@@ -1541,7 +1542,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const member_exprt data_ptr(
         deref,
         "data",
-        pointer_typet(java_type_from_char(type_char)));
+        pointer_type(java_type_from_char(type_char)));
 
       plus_exprt data_plus_offset(data_ptr, op[1], data_ptr.type());
       // tag it so it's easy to identify during instrumentation
@@ -1575,7 +1576,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         // these need to be references to java.lang.String
         results[0]=arg0;
         symbol_typet string_type("java::java.lang.String");
-        results[0].type()=pointer_typet(string_type);
+        results[0].type()=java_reference_type(string_type);
       }
       else if(arg0.id()==ID_type)
       {
@@ -1748,7 +1749,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
       code_ifthenelset code_branch;
-      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+      const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(number));
@@ -1762,7 +1763,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       assert(op.size()==1 && results.empty());
       irep_idt number=to_constant_expr(arg0).get_value();
       code_ifthenelset code_branch;
-      const typecast_exprt lhs(op[0], pointer_typet(empty_typet()));
+      const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(number));
@@ -2095,7 +2096,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // use temporary since the stack symbol might get duplicated
       assert(op.empty() && results.size()==1);
-      const pointer_typet ref_type(arg0.type());
+      const reference_typet ref_type=java_reference_type(arg0.type());
       exprt java_new_expr=side_effect_exprt(ID_java_new, ref_type);
 
       if(!i_it->source_location.get_line().empty())
@@ -2149,7 +2150,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       else
         element_type='a';
 
-      const pointer_typet ref_type=java_array_type(element_type);
+      const reference_typet ref_type=
+        java_array_type(element_type);
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.copy_to_operands(op[0]);
@@ -2181,7 +2183,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       op=pop(dimension);
       assert(results.size()==1);
 
-      const pointer_typet ref_type(arg0.type());
+      const reference_typet ref_type=
+        java_reference_type(arg0.type());
 
       side_effect_exprt java_new_array(ID_java_new_array, ref_type);
       java_new_array.operands()=op;
@@ -2289,7 +2292,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_typet type;
       type.return_type()=void_typet();
       type.parameters().resize(1);
-      type.parameters()[0].type()=reference_typet(void_typet());
+      type.parameters()[0].type()=java_reference_type(void_typet());
       code_function_callt call;
       call.function()=symbol_exprt("java::monitorenter", type);
       call.lhs().make_nil();
@@ -2303,7 +2306,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_typet type;
       type.return_type()=void_typet();
       type.parameters().resize(1);
-      type.parameters()[0].type()=reference_typet(void_typet());
+      type.parameters()[0].type()=java_reference_type(void_typet());
       code_function_callt call;
       call.function()=symbol_exprt("java::monitorexit", type);
       call.lhs().make_nil();
@@ -2734,8 +2737,8 @@ const bool java_bytecode_convert_methodt::is_method_inherited(
   return false;
 }
 
-/// create temporary variables if a write instruction can have undesired
-/// side-effects
+/// create temporary variables if a write instruction can have undesired side-
+/// effects
 void java_bytecode_convert_methodt::save_stack_entries(
   const std::string &tmp_var_prefix,
   const typet &tmp_var_type,
@@ -2776,8 +2779,7 @@ void java_bytecode_convert_methodt::save_stack_entries(
   }
 }
 
-/// actually create a temporary variable to hold the value of a stack
-/// entry
+/// actually create a temporary variable to hold the value of a stack entry
 void java_bytecode_convert_methodt::create_stack_tmp_var(
   const std::string &tmp_var_prefix,
   const typet &tmp_var_type,

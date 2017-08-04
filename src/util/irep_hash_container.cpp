@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Hashing IREPs
 
 #include "irep_hash_container.h"
+
 #include "irep.h"
 #include "irep_hash.h"
 

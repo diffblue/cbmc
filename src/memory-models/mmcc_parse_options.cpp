@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// mmcc Command Line Option Processing
 
+#include "mmcc_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -18,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mm_parser.h"
 #include "mm2cpp.h"
-#include "mmcc_parse_options.h"
 
 mmcc_parse_optionst::mmcc_parse_optionst(int argc, const char **argv):
   parse_options_baset(MMCC_OPTIONS, argc, argv)

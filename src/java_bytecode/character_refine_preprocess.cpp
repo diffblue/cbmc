@@ -13,9 +13,10 @@ Date:   March 2017
 /// Preprocess a goto-programs so that calls to the java Character library are
 ///   replaced by simple expressions.
 
+#include "character_refine_preprocess.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
-#include "character_refine_preprocess.h"
 
 /// converts based on a function on expressions
 /// \param expr_function: A reference to a function on expressions

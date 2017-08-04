@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "expr2c.h"
 
 #include <cassert>
 #include <cctype>
@@ -38,7 +39,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_misc.h"
 #include "c_qualifiers.h"
-#include "expr2c.h"
 #include "expr2c_class.h"
 
 /*
@@ -1965,7 +1965,7 @@ std::string expr2ct::convert_struct(
 /// \param src: The struct declaration expression
 /// precedence
 /// \param include_padding_components: Should the generated C code include the
-///   padding members added to structs for GOTOs benifit
+///   padding members added to structs for GOTOs benefit
 /// \return A string representation of the struct expression
 std::string expr2ct::convert_struct(
   const exprt &src,
@@ -2676,7 +2676,7 @@ std::string expr2ct::convert_code_decl(
 
   std::string dest=indent_str(indent);
 
-  const symbolt *symbol=0;
+  const symbolt *symbol=nullptr;
   if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
   {
     if(symbol->is_file_local &&

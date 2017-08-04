@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "std_types.h"
 
 #include "string2int.h"
 #include "arith_tools.h"
-#include "std_types.h"
 #include "std_expr.h"
 
 std::size_t fixedbv_typet::get_integer_bits() const

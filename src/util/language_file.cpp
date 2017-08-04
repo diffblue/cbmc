@@ -6,22 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "language_file.h"
 
 #include <fstream>
 
 #include "language.h"
-#include "language_file.h"
 
 language_filet::language_filet(const language_filet &rhs):
   modules(rhs.modules),
-  language(rhs.language==NULL?NULL:rhs.language->new_language()),
+  language(rhs.language==nullptr?nullptr:rhs.language->new_language()),
   filename(rhs.filename)
 {
 }
 
 language_filet::~language_filet()
 {
-  if(language!=NULL)
+  if(language!=nullptr)
     delete language;
 }
 

@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Weakest Preconditions
 
+#include "wp.h"
+
 // #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/base_type.h>
-
-#include "wp.h"
 
 bool has_nondet(const exprt &dest)
 {

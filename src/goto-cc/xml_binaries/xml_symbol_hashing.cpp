@@ -11,8 +11,9 @@ Date: July 2006
 /// \file
 /// XML-symbol conversions with irep hashing
 
-#include "xml_symbol_hashing.h"
 #include "xml_irep_hashing.h"
+
+#include "xml_symbol_hashing.h"
 
 /// converts a symbol to an xml symbol node
 /// \par parameters: a symbol and an xml node

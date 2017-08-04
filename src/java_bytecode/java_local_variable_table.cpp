@@ -10,6 +10,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// Java local variable table processing
 
 #include "java_bytecode_convert_method_class.h"
+
 #include "java_types.h"
 #include "java_utils.h"
 
@@ -93,7 +94,7 @@ struct procedure_local_cfg_baset<
   }
 };
 
-// Grab some class typdefs for brevity:
+// Grab some class typedefs for brevity:
 typedef java_bytecode_convert_methodt::holet
   holet;
 typedef java_bytecode_convert_methodt::local_variable_with_holest

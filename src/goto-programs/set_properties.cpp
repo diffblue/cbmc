@@ -9,11 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Set Properties
 
+#include "set_properties.h"
+
 #include <algorithm>
 #include <unordered_set>
-
-
-#include "set_properties.h"
 
 void set_properties(
   goto_programt &goto_program,

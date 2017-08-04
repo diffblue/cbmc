@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Program Transformation
 
+#include "goto_convert_class.h"
+
 #include <cassert>
 
 #include <util/cprover_prefix.h>
@@ -21,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 
 #include "goto_convert.h"
-#include "goto_convert_class.h"
 #include "destructor.h"
 
 static bool is_empty(const goto_programt &goto_program)
@@ -554,9 +555,7 @@ void goto_convertt::convert_decl(
   if(destructor.is_not_nil())
   {
     // add "this"
-    exprt this_expr(ID_address_of, pointer_typet());
-    this_expr.type().subtype()=symbol.type;
-    this_expr.copy_to_operands(symbol_expr);
+    address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
     destructor.arguments().push_back(this_expr);
 
     targets.destructor_stack.push_back(destructor);

@@ -10,9 +10,9 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set Domain (Flow Insensitive)
 
-#include <util/std_code.h>
-
 #include "value_set_domain_fi.h"
+
+#include <util/std_code.h>
 
 bool value_set_domain_fit::transform(
   const namespacet &ns,

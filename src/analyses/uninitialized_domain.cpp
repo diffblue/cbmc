@@ -11,10 +11,10 @@ Date: January 2010
 /// \file
 /// Detection for Uninitialized Local Variables
 
+#include "uninitialized_domain.h"
+
 #include <util/std_expr.h>
 #include <util/std_code.h>
-
-#include "uninitialized_domain.h"
 
 void uninitialized_domaint::transform(
   locationt from,
@@ -75,7 +75,7 @@ void uninitialized_domaint::output(
   }
 }
 
-/// \return returns true iff there is s.th. new
+/// \return returns true iff there is something new
 bool uninitialized_domaint::merge(
   const uninitialized_domaint &other,
   locationt from,

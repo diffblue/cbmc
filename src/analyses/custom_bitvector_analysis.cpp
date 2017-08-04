@@ -9,10 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Field-insensitive, location-sensitive bitvector analysis
 
+#include "custom_bitvector_analysis.h"
+
 #include <util/xml_expr.h>
 #include <util/simplify_expr.h>
-
-#include "custom_bitvector_analysis.h"
 
 #include <iostream>
 

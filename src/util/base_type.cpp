@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Base Type Computation
 
+#include "base_type.h"
+
 #include <cassert>
 #include <set>
 
 #include "std_types.h"
-#include "base_type.h"
 #include "namespace.h"
 #include "symbol.h"
 

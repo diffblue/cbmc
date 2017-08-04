@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// ANSI-C Language Type Checking
 
+#include "c_typecheck_base.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -24,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 
 #include "c_typecast.h"
-#include "c_typecheck_base.h"
 #include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "string_constant.h"
@@ -350,7 +351,7 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // This is C11.
     // The operand is already typechecked. Depending
-    // on it's type, we return one of the generic associatios.
+    // on its type, we return one of the generic associations.
 
     if(expr.operands().size()!=1)
     {
@@ -833,11 +834,10 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
 
     if(expr.type().id()==ID_code) // function designator
     { // special case: this is sugar for &f
-      exprt tmp(ID_address_of, pointer_type(expr.type()));
+      address_of_exprt tmp(expr, pointer_type(expr.type()));
       tmp.set("#implicit", true);
       tmp.add_source_location()=expr.source_location();
-      tmp.move_to_operands(expr);
-      expr.swap(tmp);
+      expr=tmp;
     }
   }
 }
@@ -1777,11 +1777,10 @@ void c_typecheck_baset::typecheck_expr_function_identifier(exprt &expr)
 {
   if(expr.type().id()==ID_code)
   {
-    exprt tmp(ID_address_of, pointer_type(expr.type()));
+    address_of_exprt tmp(expr, pointer_type(expr.type()));
     tmp.set(ID_C_implicit, true);
     tmp.add_source_location()=expr.source_location();
-    tmp.move_to_operands(expr);
-    expr.swap(tmp);
+    expr=tmp;
   }
 }
 
@@ -2420,7 +2419,7 @@ exprt c_typecheck_baset::do_special_functions(
 
     exprt tmp;
 
-    // the followin means "don't know"
+    // the following means "don't know"
     if(arg1==0 || arg1==1)
     {
       tmp=from_integer(-1, size_type());
@@ -2755,7 +2754,7 @@ bool c_typecheck_baset::gcc_vector_types_compatible(
   if(s0!=s1)
     return false;
 
-  // comparse subtype
+  // compare subtype
   if((type0.subtype().id()==ID_signedbv ||
       type0.subtype().id()==ID_unsignedbv) &&
      (type1.subtype().id()==ID_signedbv ||

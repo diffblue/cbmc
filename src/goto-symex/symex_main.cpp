@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
+#include "goto_symex.h"
+
 #include <cassert>
 
 #include <util/std_expr.h>
@@ -17,8 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_symbol.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex.h"
 
 void goto_symext::symex_transition(
   statet &state,
@@ -158,7 +158,7 @@ void goto_symext::operator()(
   }
 
   delete state.dirty;
-  state.dirty=0;
+  state.dirty=nullptr;
 }
 
 /// symex starting from given program

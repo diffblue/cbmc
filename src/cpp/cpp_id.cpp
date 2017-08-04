@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_id.h"
+
 #include <ostream>
 
-#include "cpp_id.h"
 #include "cpp_scope.h"
 
 cpp_idt::cpp_idt():
@@ -23,7 +24,7 @@ cpp_idt::cpp_idt():
   id_class(id_classt::UNKNOWN),
   this_expr(static_cast<const exprt &>(get_nil_irep())),
   compound_counter(0),
-  parent(NULL)
+  parent(nullptr)
 {
 }
 

@@ -8,6 +8,7 @@ Date: April 2010
 
 \*******************************************************************/
 
+#include "goto_rw.h"
 
 #include <limits>
 #include <algorithm>
@@ -23,8 +24,6 @@ Date: April 2010
 #include <goto-programs/goto_functions.h>
 
 #include <pointer-analysis/goto_program_dereference.h>
-
-#include "goto_rw.h"
 
 range_domain_baset::~range_domain_baset()
 {
@@ -464,9 +463,10 @@ void rw_range_sett::add(
 {
   objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
     insert(
-      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+      std::pair<const irep_idt&, range_domain_baset*>(
+        identifier, nullptr)).first;
 
-  if(entry->second==0)
+  if(entry->second==nullptr)
     entry->second=new range_domaint();
 
   static_cast<range_domaint*>(entry->second)->push_back(
@@ -664,9 +664,10 @@ void rw_guarded_range_set_value_sett::add(
 {
   objectst::iterator entry=(mode==get_modet::LHS_W ? w_range_set : r_range_set).
     insert(
-      std::pair<const irep_idt&, range_domain_baset*>(identifier, 0)).first;
+      std::pair<const irep_idt&, range_domain_baset*>(
+        identifier, nullptr)).first;
 
-  if(entry->second==0)
+  if(entry->second==nullptr)
     entry->second=new guarded_range_domaint();
 
   static_cast<guarded_range_domaint*>(entry->second)->insert(

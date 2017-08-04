@@ -9,13 +9,13 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// XML Interface
 
+#include "xml_interface.h"
+
 #include <iostream>
 
 #include <util/message.h>
 
 #include <xmllang/xml_parser.h>
-
-#include "xml_interface.h"
 
 /// XML User Interface
 void xml_interfacet::get_xml_options(cmdlinet &cmdline)

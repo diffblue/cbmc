@@ -9,17 +9,19 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <algorithm>
 
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <util/std_types.h>
+#include <util/c_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_type2name.h"
 #include "cpp_declarator_converter.h"
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "cpp_name.h"
 
@@ -108,7 +110,7 @@ void cpp_typecheckt::typecheck_compound_type(
   // get the tag name
   bool has_tag=type.find(ID_tag).is_not_nil();
   irep_idt base_name;
-  cpp_scopet *dest_scope=NULL;
+  cpp_scopet *dest_scope=nullptr;
   bool has_body=type.find(ID_body).is_not_nil();
   bool tag_only_declaration=type.get_bool(ID_C_tag_only_declaration);
 
@@ -148,7 +150,7 @@ void cpp_typecheckt::typecheck_compound_type(
   }
 
   // The identifier 'tag-X' matches what the C front-end does!
-  // The hypen is deliberate to avoid collisions with other
+  // The hyphen is deliberate to avoid collisions with other
   // identifiers.
   const irep_idt symbol_name=
     dest_scope->prefix+
@@ -544,7 +546,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // add a virtual-table pointer
         struct_typet::componentt compo;
-        compo.type()=pointer_typet(symbol_typet(vt_name));
+        compo.type()=pointer_type(symbol_typet(vt_name));
         compo.set_name(id2string(symbol.name) +"::@vtable_pointer");
         compo.set(ID_base_name, "@vtable_pointer");
         compo.set(
@@ -566,7 +568,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
       // add an entry to the virtual table
       struct_typet::componentt vt_entry;
-      vt_entry.type()=pointer_typet(component.type());
+      vt_entry.type()=pointer_type(component.type());
       vt_entry.set_name(id2string(vtit->first)+"::"+virtual_name);
       vt_entry.set(ID_base_name, virtual_name);
       vt_entry.set(ID_pretty_name, virtual_name);
@@ -1079,7 +1081,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       ID_public, false, false, false);
   }
 
-  // setup virtual tables before doing the constructors
+  // set up virtual tables before doing the constructors
   if(symbol.type.id()==ID_struct)
     do_virtual_table(symbol);
 
@@ -1352,7 +1354,7 @@ void cpp_typecheckt::add_this_to_method_type(
   if(has_volatile(method_qualifier))
     subtype.set(ID_C_volatile, true);
 
-  parameter.type()=pointer_typet(subtype);
+  parameter.type()=pointer_type(subtype);
 }
 
 void cpp_typecheckt::add_anonymous_members_to_scope(
@@ -1382,7 +1384,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
     if(comp.get_anonymous())
     {
       const symbolt &symbol=lookup(comp.type().get(ID_identifier));
-      // recrusive call
+      // recursive call
       add_anonymous_members_to_scope(symbol);
     }
     else

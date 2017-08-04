@@ -9,6 +9,8 @@ Author: Vincent Nimal
 /// \file
 /// Constant Function Pointer Propagation
 
+#include "propagate_const_function_pointers.h"
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -22,8 +24,6 @@ Author: Vincent Nimal
 #include <map>
 #include <list>
 #include <cassert>
-
-#include "propagate_const_function_pointers.h"
 
 class const_function_pointer_propagationt
 {
@@ -308,7 +308,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       {
       }
 
-      message.debug() << "callsite targetted: " << (*callsite)->source_location
+      message.debug() << "callsite targeted: " << (*callsite)->source_location
         << " function: " << const_function.get_identifier() << messaget::eom;
 
       assert(it->source_location==(*callsite)->source_location);

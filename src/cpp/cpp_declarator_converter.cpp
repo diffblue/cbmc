@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_declarator_converter.h"
+
 #include <util/source_location.h>
 #include <util/std_types.h>
 
 #include <util/c_types.h>
 
 #include "cpp_type2name.h"
-#include "cpp_declarator_converter.h"
 #include "cpp_typecheck.h"
 
 cpp_declarator_convertert::cpp_declarator_convertert(

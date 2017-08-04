@@ -9,12 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
+#include "goto_symex.h"
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
-
-#include "goto_symex.h"
 
 exprt goto_symext::make_auto_object(const typet &type)
 {
@@ -66,8 +66,9 @@ void goto_symext::initialize_auto_object(
     {
       // could be NULL nondeterministically
 
-      address_of_exprt address_of_expr=
-        address_of_exprt(make_auto_object(type.subtype()));
+      address_of_exprt address_of_expr(
+        make_auto_object(type.subtype()),
+        pointer_type);
 
       if_exprt rhs(
         side_effect_expr_nondett(bool_typet()),

@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "merge_irep.h"
 
 #include "irep_hash.h"
-#include "merge_irep.h"
 
 std::size_t to_be_merged_irept::hash() const
 {

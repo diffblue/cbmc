@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
@@ -16,7 +18,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <ansi-c/c_sizeof.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
 /// Initialize an object with a value
