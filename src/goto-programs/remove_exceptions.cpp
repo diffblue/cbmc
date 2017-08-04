@@ -56,17 +56,23 @@ protected:
     const goto_functionst::function_mapt::iterator &,
     const goto_programt::instructionst::iterator &);
 
+  void add_exception_dispatch_sequence(
+    const goto_functionst::function_mapt::iterator &,
+    const goto_programt::instructionst::iterator &instr_it,
+    const stack_catcht &stack_catch,
+    const std::vector<exprt> &locals);
+
   void instrument_throw(
     const goto_functionst::function_mapt::iterator &,
     const goto_programt::instructionst::iterator &,
     const stack_catcht &,
-    std::vector<exprt> &);
+    const std::vector<exprt> &);
 
   void instrument_function_call(
     const goto_functionst::function_mapt::iterator &,
     const goto_programt::instructionst::iterator &,
     const stack_catcht &,
-    std::vector<exprt> &);
+    const std::vector<exprt> &);
 
   void instrument_exceptions(
     const goto_functionst::function_mapt::iterator &);
@@ -230,30 +236,83 @@ void remove_exceptionst::instrument_exception_handler(
   instr_it->make_skip();
 }
 
-/// finds the instruction where the exceptional output is set or the end of the
-/// function if no such output exists
-static goto_programt::targett get_exceptional_output(
-  goto_programt &goto_program)
+/// Emit the code:
+/// if (exception instanceof ExnA) then goto handlera
+/// else if (exception instanceof ExnB) then goto handlerb
+/// else goto universal_handler or (dead locals; function exit)
+/// \param function_id: function instr_it belongs to
+/// \param instr_it: throw or call instruction that may be an
+///   exception source
+/// \param stack_catch: exception handlers currently registered
+/// \param locals: local variables to kill on a function-exit edge
+void remove_exceptionst::add_exception_dispatch_sequence(
+  const goto_functionst::function_mapt::iterator &func_it,
+  const goto_programt::instructionst::iterator &instr_it,
+  const remove_exceptionst::stack_catcht &stack_catch,
+  const std::vector<exprt> &locals)
 {
-  Forall_goto_program_instructions(it, goto_program)
+  const irep_idt &function_id=func_it->first;
+  goto_programt &goto_program=func_it->second.body;
+
+  // Unless we have a universal exception handler, jump to end of function
+  // if not caught:
+  goto_programt::targett default_target=goto_program.get_end_function();
+
+  // Jump to the universal handler or function end, as appropriate.
+  // This will appear after the GOTO-based dynamic dispatch below
+  goto_programt::targett default_dispatch=goto_program.insert_after(instr_it);
+  default_dispatch->make_goto();
+  default_dispatch->source_location=instr_it->source_location;
+  default_dispatch->function=instr_it->function;
+
+  // find the symbol corresponding to the caught exceptions
+  const symbolt &exc_symbol=
+        symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+  symbol_exprt exc_thrown=exc_symbol.symbol_expr();
+
+  // add GOTOs implementing the dynamic dispatch of the
+  // exception handlers
+  for(std::size_t i=stack_catch.size(); i-->0;)
   {
-    const irep_idt &statement=it->code.get_statement();
-    if(statement==ID_output)
+    for(std::size_t j=stack_catch[i].size(); j-->0;)
     {
-      DATA_INVARIANT(
-        it->code.operands().size()>=2,
-        "output expected to have at least 2 operands");
-      const exprt &expr=it->code.op1();
-      DATA_INVARIANT(
-        expr.id()==ID_symbol,
-        "identifier expected to be a symbol");
-      const symbol_exprt &symbol=to_symbol_expr(expr);
-      if(id2string(symbol.get_identifier()).find(EXC_SUFFIX)
-         !=std::string::npos)
-        return it;
+      goto_programt::targett new_state_pc=
+        stack_catch[i][j].second;
+      if(stack_catch[i][j].first==irep_idt())
+      {
+        // Universal handler. Highest on the stack takes
+        // precedence, so overwrite any we've already seen:
+        default_target=new_state_pc;
+      }
+      else
+      {
+        // Normal exception handler, make an instanceof check.
+        goto_programt::targett t_exc=goto_program.insert_after(instr_it);
+        t_exc->make_goto(new_state_pc);
+        t_exc->source_location=instr_it->source_location;
+        t_exc->function=instr_it->function;
+
+        // use instanceof to check that this is the correct handler
+        symbol_typet type(stack_catch[i][j].first);
+        type_exprt expr(type);
+
+        binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);
+        t_exc->guard=check;
+      }
     }
   }
-  return goto_program.get_end_function();
+
+  default_dispatch->set_target(default_target);
+
+  // add dead instructions
+  for(const auto &local : locals)
+  {
+    goto_programt::targett t_dead=goto_program.insert_after(instr_it);
+    t_dead->make_dead();
+    t_dead->code=code_deadt(local);
+    t_dead->source_location=instr_it->source_location;
+    t_dead->function=instr_it->function;
+  }
 }
 
 /// instruments each throw with conditional GOTOS to the  corresponding
@@ -262,7 +321,7 @@ void remove_exceptionst::instrument_throw(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
-  std::vector<exprt> &locals)
+  const std::vector<exprt> &locals)
 {
   PRECONDITION(instr_it->type==THROW);
 
@@ -278,61 +337,13 @@ void remove_exceptionst::instrument_throw(
   if(assertion_error)
     return;
 
-  goto_programt &goto_program=func_it->second.body;
-  const irep_idt &function_id=func_it->first;
+  add_exception_dispatch_sequence(
+    func_it, instr_it, stack_catch, locals);
 
-  // find the end of the function
-  goto_programt::targett exceptional_output=
-    get_exceptional_output(goto_program);
-  if(exceptional_output!=instr_it)
-  {
-    // jump to the end of the function
-    // this will appear after the GOTO-based dynamic dispatch below
-    goto_programt::targett t_end=goto_program.insert_after(instr_it);
-    t_end->make_goto(exceptional_output);
-    t_end->source_location=instr_it->source_location;
-    t_end->function=instr_it->function;
-  }
-
-
-  // find the symbol corresponding to the caught exceptions
+  // find the symbol where the thrown exception should be stored:
   const symbolt &exc_symbol=
-        symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+        symbol_table.lookup(id2string(func_it->first)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
-
-  // add GOTOs implementing the dynamic dispatch of the
-  // exception handlers
-  for(std::size_t i=stack_catch.size(); i-->0;)
-  {
-    for(std::size_t j=stack_catch[i].size(); j-->0;)
-    {
-      goto_programt::targett new_state_pc=
-        stack_catch[i][j].second;
-
-      // find handler
-      goto_programt::targett t_exc=goto_program.insert_after(instr_it);
-      t_exc->make_goto(new_state_pc);
-      t_exc->source_location=instr_it->source_location;
-      t_exc->function=instr_it->function;
-
-      // use instanceof to check that this is the correct handler
-      symbol_typet type(stack_catch[i][j].first);
-      type_exprt expr(type);
-
-      binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);
-      t_exc->guard=check;
-    }
-  }
-
-  // add dead instructions
-  for(const auto &local : locals)
-  {
-    goto_programt::targett t_dead=goto_program.insert_after(instr_it);
-    t_dead->make_dead();
-    t_dead->code=code_deadt(local);
-    t_dead->source_location=instr_it->source_location;
-    t_dead->function=instr_it->function;
-  }
 
   // add the assignment with the appropriate cast
   code_assignt assignment(typecast_exprt(exc_thrown, exc_expr.type()),
@@ -348,7 +359,7 @@ void remove_exceptionst::instrument_function_call(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
   const stack_catcht &stack_catch,
-  std::vector<exprt> &locals)
+  const std::vector<exprt> &locals)
 {
   PRECONDITION(instr_it->type==FUNCTION_CALL);
 
@@ -366,61 +377,23 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  if(symbol_table.has_symbol(id2string(callee_id)+EXC_SUFFIX) &&
-     symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
+  const irep_idt &callee_inflight_exception=id2string(callee_id)+EXC_SUFFIX;
+  const irep_idt &local_inflight_exception=id2string(function_id)+EXC_SUFFIX;
+
+  if(symbol_table.has_symbol(callee_inflight_exception) &&
+     symbol_table.has_symbol(local_inflight_exception))
   {
-    // we may have an escaping exception
-    const symbolt &callee_exc_symbol=
-      symbol_table.lookup(id2string(callee_id)+EXC_SUFFIX);
-    symbol_exprt callee_exc=callee_exc_symbol.symbol_expr();
+    add_exception_dispatch_sequence(
+      func_it, instr_it, stack_catch, locals);
 
-    // find the end of the function
-    goto_programt::targett exceptional_output=
-      get_exceptional_output(goto_program);
-    if(exceptional_output!=instr_it)
-    {
-      // jump to the end of the function
-      // this will appear after the GOTO-based dynamic dispatch below
-      goto_programt::targett t_end=goto_program.insert_after(instr_it);
-      t_end->make_goto(exceptional_output);
-      t_end->source_location=instr_it->source_location;
-      t_end->function=instr_it->function;
-    }
-
-    for(std::size_t i=stack_catch.size(); i-->0;)
-    {
-      for(std::size_t j=stack_catch[i].size(); j-->0;)
-      {
-        goto_programt::targett new_state_pc;
-        new_state_pc=stack_catch[i][j].second;
-        goto_programt::targett t_exc=goto_program.insert_after(instr_it);
-        t_exc->make_goto(new_state_pc);
-        t_exc->source_location=instr_it->source_location;
-        t_exc->function=instr_it->function;
-        // use instanceof to check that this is the correct handler
-        symbol_typet type(stack_catch[i][j].first);
-        type_exprt expr(type);
-        binary_predicate_exprt check_instanceof(
-          callee_exc,
-          ID_java_instanceof,
-          expr);
-        t_exc->guard=check_instanceof;
-      }
-    }
-
-    // add dead instructions
-    for(const auto &local : locals)
-    {
-      goto_programt::targett t_dead=goto_program.insert_after(instr_it);
-      t_dead->make_dead();
-      t_dead->code=code_deadt(local);
-      t_dead->source_location=instr_it->source_location;
-      t_dead->function=instr_it->function;
-    }
+    const symbol_exprt callee_inflight_exception_expr=
+      symbol_table.lookup(callee_inflight_exception).symbol_expr();
+    const symbol_exprt local_inflight_exception_expr=
+      symbol_table.lookup(local_inflight_exception).symbol_expr();
 
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(
-      callee_exc,
+      local_inflight_exception_expr,
       null_pointer_exprt(pointer_type(empty_typet())));
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_goto(next_it);
@@ -430,14 +403,12 @@ void remove_exceptionst::instrument_function_call(
 
     // after each function call g() in function f
     // adds f#exception_value=g#exception_value;
-    const symbolt &caller=
-      symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
-    const symbol_exprt &lhs_expr=caller.symbol_expr();
-
     goto_programt::targett t=goto_program.insert_after(instr_it);
     t->make_assignment();
     t->source_location=instr_it->source_location;
-    t->code=code_assignt(lhs_expr, callee_exc);
+    t->code=code_assignt(
+      local_inflight_exception_expr,
+      callee_inflight_exception_expr);
     t->function=instr_it->function;
   }
 }
