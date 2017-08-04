@@ -178,7 +178,7 @@ private:
 /// allocate_object() and also in the library preprocessing for allocating
 /// strings.
 /// \param target_expr: expression to which the necessary memory will be
-///   allocated
+///   allocated, its type should be pointer to `allocate_type`
 /// \param allocate_type: type of the object allocated
 /// \param symbol_table: symbol table
 /// \param loc: location in the source
@@ -243,31 +243,27 @@ exprt allocate_dynamic_object(
 /// and which takes care of creating the associated declarations.
 /// \param target_expr: expression to which the necessary memory will be
 ///   allocated
-/// \param allocate_type: type of the object allocated
 /// \param symbol_table: symbol table
 /// \param loc: location in the source
 /// \param output_code: code block to which the necessary code is added
-/// \param cast_needed: Boolean flags saying where we need to cast the malloc
-///   site
-/// \return Expression representing the malloc site allocated.
-exprt allocate_dynamic_object_with_decl(
+void allocate_dynamic_object_with_decl(
   const exprt &target_expr,
-  const typet &allocate_type,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
-  code_blockt &output_code,
-  bool cast_needed)
+  code_blockt &output_code)
 {
   std::vector<const symbolt *> symbols_created;
-
-  exprt result=allocate_dynamic_object(
+  code_blockt tmp_block;
+  const typet &allocate_type=target_expr.type().subtype();
+  // We will not use the malloc site and can safely ignore it
+  (void) allocate_dynamic_object(
     target_expr,
     allocate_type,
     symbol_table,
     loc,
     output_code,
     symbols_created,
-    cast_needed);
+    false);
 
   // Add the following code to output_code for each symbol that's been created:
   //   <type> <identifier>;
@@ -278,7 +274,8 @@ exprt allocate_dynamic_object_with_decl(
     output_code.add(decl);
   }
 
-  return result;
+  for(const exprt &code : tmp_block.operands())
+    output_code.add(to_code(code));
 }
 
 /// Installs a new symbol in the symbol table, pushing the corresponding symbolt
