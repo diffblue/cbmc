@@ -703,7 +703,7 @@ void java_bytecode_parsert::rbytecode(
     case 'b': // a signed byte
       {
         s1 c=read_u1();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       }
       address+=1;
 
@@ -712,8 +712,8 @@ void java_bytecode_parsert::rbytecode(
     case 'o': // two byte branch offset, signed
       {
         s2 offset=read_u2();
-        instruction
-          .args.push_back(from_integer(address+offset, integer_typet()));
+        instruction.args.push_back(
+          from_integer(address+offset, signedbv_typet(16)));
       }
       address+=2;
       break;
@@ -721,8 +721,8 @@ void java_bytecode_parsert::rbytecode(
     case 'O': // four byte branch offset, signed
       {
         s4 offset=read_u4();
-        instruction
-          .args.push_back(from_integer(address+offset, integer_typet()));
+        instruction.args.push_back(
+          from_integer(address+offset, signedbv_typet(32)));
       }
       address+=4;
       break;
@@ -730,7 +730,7 @@ void java_bytecode_parsert::rbytecode(
     case 'v': // local variable index (one byte)
       {
         u1 v=read_u1();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
       }
       address+=1;
       break;
@@ -740,17 +740,17 @@ void java_bytecode_parsert::rbytecode(
       if(wide_instruction)
       {
         u2 v=read_u2();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
         s2 c=read_u2();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(16)));
         address+=4;
       }
       else // local variable index (one byte) plus one signed byte
       {
         u1 v=read_u1();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
         s1 c=read_u1();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
         address+=2;
       }
       break;
@@ -760,9 +760,9 @@ void java_bytecode_parsert::rbytecode(
         u2 c=read_u2();
         instruction.args.push_back(constant(c));
         u1 b1=read_u1();
-        instruction.args.push_back(from_integer(b1, integer_typet()));
+        instruction.args.push_back(from_integer(b1, unsignedbv_typet(8)));
         u1 b2=read_u1();
-        instruction.args.push_back(from_integer(b2, integer_typet()));
+        instruction.args.push_back(from_integer(b2, unsignedbv_typet(8)));
       }
       address+=4;
       break;
@@ -776,8 +776,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args
-          .push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args.push_back(
+          from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // number of pairs
@@ -788,9 +788,10 @@ void java_bytecode_parsert::rbytecode(
         {
           s4 match=read_u4();
           s4 offset=read_u4();
-          instruction.args.push_back(from_integer(match, integer_typet()));
-          instruction.args
-            .push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args.push_back(
+            from_integer(match, signedbv_typet(32)));
+          instruction.args.push_back(
+            from_integer(base_offset+offset, signedbv_typet(32)));
           address+=8;
         }
       }
@@ -805,8 +806,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args
-          .push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args.push_back(
+          from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // now low value
@@ -821,9 +822,9 @@ void java_bytecode_parsert::rbytecode(
         for(s4 i=low_value; i<=high_value; i++)
         {
           s4 offset=read_u4();
-          instruction.args.push_back(from_integer(i, integer_typet()));
-          instruction.args
-            .push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args.push_back(from_integer(i, signedbv_typet(32)));
+          instruction.args.push_back(
+            from_integer(base_offset+offset, signedbv_typet(32)));
           address+=4;
         }
       }
@@ -834,7 +835,8 @@ void java_bytecode_parsert::rbytecode(
         u2 c=read_u2(); // constant-pool index
         instruction.args.push_back(constant(c));
         u1 dimensions=read_u1(); // number of dimensions
-        instruction.args.push_back(from_integer(dimensions, integer_typet()));
+        instruction.args.push_back(
+          from_integer(dimensions, unsignedbv_typet(8)));
         address+=3;
       }
       break;
@@ -862,7 +864,7 @@ void java_bytecode_parsert::rbytecode(
     case 's': // a signed short
       {
         s2 s=read_u2();
-        instruction.args.push_back(from_integer(s, integer_typet()));
+        instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;
       break;
