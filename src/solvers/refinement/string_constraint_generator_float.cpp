@@ -201,7 +201,7 @@ string_exprt string_constraint_generatort::add_axioms_for_string_of_float(
   mod_exprt integer_part(round_expr_to_zero(f), max_non_exponent_notation);
   // We should not need more than 8 characters to represent the integer
   // part of the float.
-  string_exprt integer_part_str=add_axioms_from_int(integer_part, 8, ref_type);
+  string_exprt integer_part_str=add_axioms_from_int(integer_part, ref_type, 8);
 
   return add_axioms_for_concat(integer_part_str, fractional_part_str);
 }
@@ -407,7 +407,7 @@ string_exprt string_constraint_generatort::
   dec_significand_int=round_expr_to_zero(dec_significand);
 
   string_exprt string_expr_integer_part=
-    add_axioms_from_int(dec_significand_int, 3, ref_type);
+    add_axioms_from_int(dec_significand_int, ref_type, 3);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -437,8 +437,8 @@ string_exprt string_constraint_generatort::
     from_integer('E', ref_type.get_char_type()));
 
   // exponent_string = string_of_int(decimal_exponent)
-  string_exprt exponent_string=add_axioms_from_int(
-    decimal_exponent, 3, ref_type);
+  string_exprt exponent_string=
+    add_axioms_from_int(decimal_exponent, ref_type, 3);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
   return add_axioms_for_concat(string_expr_with_E, exponent_string);

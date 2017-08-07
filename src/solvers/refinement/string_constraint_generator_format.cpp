@@ -263,8 +263,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
   switch(fs.conversion)
   {
   case format_specifiert::DECIMAL_INTEGER:
-    return add_axioms_from_int(
-      get_component_in_struct(arg, ID_int), MAX_INTEGER_LENGTH, ref_type);
+    return add_axioms_from_int(get_component_in_struct(arg, ID_int), ref_type);
   case format_specifiert::HEXADECIMAL_INTEGER:
     return add_axioms_from_int_hex(
       get_component_in_struct(arg, ID_int), ref_type);
@@ -284,7 +283,7 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
     return get_string_expr(get_component_in_struct(arg, "string_expr"));
   case format_specifiert::HASHCODE:
     return add_axioms_from_int(
-      get_component_in_struct(arg, "hashcode"), MAX_INTEGER_LENGTH, ref_type);
+      get_component_in_struct(arg, "hashcode"), ref_type);
   case format_specifiert::LINE_SEPARATOR:
     // TODO: the constant should depend on the system: System.lineSeparator()
     return add_axioms_for_constant("\n", ref_type);
