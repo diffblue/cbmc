@@ -948,6 +948,12 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     throw 0;
   }
 
+  if(type.id()==ID_empty &&
+     expr.operands().size()==1 &&
+     expr.op0().id()==ID_dereference &&
+     expr.op0().op0().type()==pointer_type(void_type()))
+    type=char_type();
+
   exprt new_expr=size_of_expr(type, *this);
 
   if(new_expr.is_nil())
