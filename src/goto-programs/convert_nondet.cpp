@@ -88,7 +88,7 @@ static goto_programt::targett insert_nondet_init_code(
     source_loc,
     true,
     allocation_typet::DYNAMIC,
-    !nullable,
+    nullable,
     max_nondet_array_length,
     max_nondet_tree_depth,
     update_in_placet::NO_UPDATE_IN_PLACE);
