@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr2c.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdio>
@@ -88,6 +89,9 @@ static std::string clean_identifier(const irep_idt &id)
       else if(*it2=='-')
         *it2='_';
   }
+
+  // rewrite . as used in ELF section names
+  std::replace(dest.begin(), dest.end(), '.', '_');
 
   return dest;
 }
