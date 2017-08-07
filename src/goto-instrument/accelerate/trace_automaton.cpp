@@ -287,7 +287,7 @@ statet automatont::add_state()
  */
 void automatont::add_trans(statet s, goto_programt::targett a, statet t)
 {
-  assert(s < transitions.size());
+  assert(s<transitions.size());
   transitionst &trans=transitions[s];
 
   trans.insert(std::make_pair(a, t));
@@ -312,7 +312,7 @@ void trace_automatont::add_dtrans(
 
 void automatont::move(statet s, goto_programt::targett a, state_sett &t)
 {
-  assert(s < transitions.size());
+  assert(s<transitions.size());
 
   transitionst &trans=transitions[s];
 
@@ -339,7 +339,7 @@ void trace_automatont::get_transitions(sym_mapt &transitions)
 {
   automatont::transition_tablet &dtrans=dta.transitions;
 
-  for(std::size_t i=0; i < dtrans.size(); ++i)
+  for(std::size_t i=0; i<dtrans.size(); ++i)
   {
     automatont::transitionst &dta_transitions=dtrans[i];
 
@@ -362,7 +362,7 @@ void automatont::reverse(goto_programt::targett epsilon)
 
   old_table.swap(transitions);
 
-  for(std::size_t i=0; i < old_table.size(); i++)
+  for(std::size_t i=0; i<old_table.size(); i++)
   {
     transitions.push_back(transitionst());
   }
@@ -396,7 +396,7 @@ void automatont::reverse(goto_programt::targett epsilon)
 
   init_state=new_init;
 
-  for(std::size_t i=0; i < old_table.size(); i++)
+  for(std::size_t i=0; i<old_table.size(); i++)
   {
     transitionst &trans=old_table[i];
 
@@ -444,7 +444,7 @@ void automatont::trim()
   }
   while(!new_states.empty());
 
-  for(std::size_t i=0; i < num_states; i++)
+  for(std::size_t i=0; i<num_states; i++)
   {
     if(reachable.find(i)==reachable.end())
     {
@@ -476,7 +476,7 @@ void automatont::output(std::ostream &str)
 
   str << '\n';
 
-  for(unsigned int i=0; i < transitions.size(); ++i)
+  for(unsigned int i=0; i<transitions.size(); ++i)
   {
     for(const auto &trans : transitions[i])
     {
