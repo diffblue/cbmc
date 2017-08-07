@@ -15,6 +15,8 @@ Author: Matt Lewis
 #include <iostream>
 #include <limits>
 
+#include <util/invariant.h>
+
 #include "path.h"
 
 const statet automatont::no_state=std::numeric_limits<statet>::max();
@@ -137,7 +139,9 @@ void trace_automatont::determinise()
   {
     state_sett t;
     pop_unmarked_dstate(t);
-    assert(find_dstate(t)!=automatont::no_state);
+    INVARIANT(
+      find_dstate(t)!=automatont::no_state,
+      "Removed state has actually been removed");
 
 
     // For each symbol a such that there is a transition
@@ -237,8 +241,9 @@ statet trace_automatont::add_dstate(state_sett &s)
   state_num=dta.add_state();
   dstates[s]=state_num;
   unmarked_dstates.push_back(s);
-
-  assert(dstates.find(s)!=dstates.end());
+  INVARIANT(
+    dstates.find(s)!=dstates.end(),
+    "Added state has actually been added");
 
   for(state_sett::iterator it=s.begin();
       it!=s.end();
@@ -290,7 +295,7 @@ statet automatont::add_state()
  */
 void automatont::add_trans(statet s, goto_programt::targett a, statet t)
 {
-  assert(s<transitions.size());
+  PRECONDITION(s<transitions.size());
   transitionst &trans=transitions[s];
 
   trans.insert(std::make_pair(a, t));
@@ -305,17 +310,17 @@ void trace_automatont::add_dtrans(
   state_sett &t)
 {
   statet sidx=find_dstate(s);
-  statet tidx=find_dstate(t);
+  CHECK_RETURN(sidx!=automatont::no_state);
 
-  assert(sidx!=automatont::no_state);
-  assert(tidx!=automatont::no_state);
+  statet tidx=find_dstate(t);
+  CHECK_RETURN(tidx!=automatont::no_state);
 
   dta.add_trans(sidx, a, tidx);
 }
 
 void automatont::move(statet s, goto_programt::targett a, state_sett &t)
 {
-  assert(s<transitions.size());
+  PRECONDITION(s<transitions.size());
 
   transitionst &trans=transitions[s];
 

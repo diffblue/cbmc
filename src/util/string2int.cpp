@@ -11,7 +11,8 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #include <cerrno>
 #include <cstdlib>
 #include <limits>
-#include <cassert>
+
+#include "invariant.h"
 
 template <typename T>
 inline T str2number(const char *str, int base, bool safe)
@@ -28,22 +29,22 @@ inline T str2number(const char *str, int base, bool safe)
 
   if(safe)
   {
-    assert(0==errno);
+    CHECK_RETURN(0==errno);
     errno=errno_bak;
-    assert(endptr!=str);
+    CHECK_RETURN(endptr!=str);
     if(std::numeric_limits<T>::min()==0)
     {
       // unsigned
-      assert(val>=0);
-      assert(
+      CHECK_RETURN(val>=0);
+      CHECK_RETURN(
         (unsigned long long)(T)val<=
         (unsigned long long)std::numeric_limits<T>::max());
     }
     else
     {
       // signed
-      assert(val<=(long long)std::numeric_limits<T>::max());
-      assert(val>=(long long)std::numeric_limits<T>::min());
+      CHECK_RETURN(val<=(long long)std::numeric_limits<T>::max());
+      CHECK_RETURN(val>=(long long)std::numeric_limits<T>::min());
     }
   }
 
