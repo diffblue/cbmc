@@ -49,8 +49,7 @@ void initialize_string_container()
 
   for(unsigned i=0; irep_ids_table[i]!=nullptr; i++)
   {
-    unsigned x;
-    x=string_container[irep_ids_table[i]];
+    unsigned x=get_string_container()[irep_ids_table[i]];
     assert(x==i); // sanity check
   }
 }
