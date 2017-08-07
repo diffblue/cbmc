@@ -30,12 +30,14 @@ public:
     symbol_tablet &_symbol_table,
     const bool _throw_runtime_exceptions,
     message_handlert &_message_handler,
-    const size_t _max_array_length):
+    const size_t _max_array_length,
+    const size_t _max_tree_depth):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     throw_runtime_exceptions(_throw_runtime_exceptions),
     message_handler(_message_handler),
-    max_array_length(_max_array_length)
+    max_array_length(_max_array_length),
+    max_tree_depth(_max_tree_depth)
     {
     }
 
@@ -46,6 +48,7 @@ protected:
   const bool throw_runtime_exceptions;
   message_handlert &message_handler;
   const size_t max_array_length;
+  const size_t max_tree_depth;
 
   codet throw_exception(
     const exprt &cond,
@@ -550,13 +553,15 @@ void java_bytecode_instrument(
   symbol_tablet &symbol_table,
   const bool throw_runtime_exceptions,
   message_handlert &message_handler,
-  const size_t max_array_length)
+  const size_t max_array_length,
+  const size_t max_tree_depth)
 {
   java_bytecode_instrumentt instrument(
     symbol_table,
     throw_runtime_exceptions,
     message_handler,
-    max_array_length);
+    max_array_length,
+    max_tree_depth);
 
   Forall_symbols(s_it, symbol_table.symbols)
   {

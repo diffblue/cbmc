@@ -51,9 +51,11 @@ class java_object_factoryt
 {
   std::vector<const symbolt *> &symbols_created;
   const source_locationt &loc;
+  /// Maximum value for the non-deterministically-choosen length of an array.
+  const size_t max_nondet_array_length;
+  const size_t max_nondet_tree_depth;
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
   bool assume_non_null;
-  size_t max_nondet_array_length;
   symbol_tablet &symbol_table;
   namespacet ns;
 
@@ -61,11 +63,6 @@ class java_object_factoryt
   /// to replace pointers to interface types with pointers to concrete
   /// implementations.
   const select_pointer_typet &pointer_type_selector;
-
-  void set_null(
-    const exprt &expr,
-    const pointer_typet &ptr_type);
-
 
   code_assignt get_null_assignment(
     const exprt &expr,
@@ -76,6 +73,7 @@ class java_object_factoryt
     const exprt &expr,
     const typet &target_type,
     allocation_typet alloc_type,
+    size_t depth,
     update_in_placet update_in_place);
 
   void allocate_nondet_length_array(
@@ -90,12 +88,14 @@ public:
     const source_locationt &loc,
     bool _assume_non_null,
     size_t _max_nondet_array_length,
+    size_t _max_nondet_tree_depth,
     symbol_tablet &_symbol_table,
     const select_pointer_typet &pointer_type_selector):
       symbols_created(_symbols_created),
       loc(loc),
       assume_non_null(_assume_non_null),
       max_nondet_array_length(_max_nondet_array_length),
+      max_nondet_tree_depth(_max_nondet_tree_depth),
       symbol_table(_symbol_table),
       ns(_symbol_table),
       pointer_type_selector(pointer_type_selector)
@@ -110,6 +110,7 @@ public:
   void gen_nondet_array_init(
     code_blockt &assignments,
     const exprt &expr,
+    size_t depth,
     update_in_placet);
 
   void gen_nondet_init(
@@ -119,8 +120,9 @@ public:
     irep_idt class_identifier,
     bool skip_classid,
     allocation_typet alloc_type,
-    bool override,
+    bool override_,
     const typet &override_type,
+    size_t depth,
     update_in_placet);
 
 private:
@@ -130,6 +132,7 @@ private:
     const irep_idt &class_identifier,
     allocation_typet alloc_type,
     const pointer_typet &pointer_type,
+    size_t depth,
     const update_in_placet &update_in_place);
 
   void gen_nondet_struct_init(
@@ -140,12 +143,14 @@ private:
     bool skip_classid,
     allocation_typet alloc_type,
     const struct_typet &struct_type,
+    size_t depth,
     const update_in_placet &update_in_place);
 
   symbol_exprt gen_nondet_subtype_pointer_init(
     code_blockt &assignments,
     allocation_typet alloc_type,
-    const pointer_typet &substitute_pointer_type);
+    const pointer_typet &substitute_pointer_type,
+    size_t depth);
 };
 
 /// Generates code for allocating a dynamic object. This is used in
@@ -174,7 +179,7 @@ exprt allocate_dynamic_object(
 
   if(allocate_type.id()!=ID_empty)
   {
-    assert(!object_size.is_nil() && "size of Java objects should be known");
+    INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
     exprt malloc_expr=side_effect_exprt(ID_malloc);
     malloc_expr.copy_to_operands(object_size);
@@ -339,9 +344,11 @@ void java_object_factoryt::gen_pointer_target_init(
   const exprt &expr,
   const typet &target_type,
   allocation_typet alloc_type,
+  size_t depth,
   update_in_placet update_in_place)
 {
-  assert(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
+  PRECONDITION(expr.type().id()==ID_pointer);
+  PRECONDITION(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
 
   if(target_type.id()==ID_struct &&
      has_prefix(
@@ -351,6 +358,7 @@ void java_object_factoryt::gen_pointer_target_init(
     gen_nondet_array_init(
       assignments,
       expr,
+      depth+1,
       update_in_place);
   }
   else
@@ -363,6 +371,9 @@ void java_object_factoryt::gen_pointer_target_init(
         expr,
         target_type,
         alloc_type);
+      INVARIANT(
+        target.type().id()==ID_pointer,
+        "We expect an address-of object");
     }
     else
     {
@@ -379,12 +390,13 @@ void java_object_factoryt::gen_pointer_target_init(
     gen_nondet_init(
       assignments,
       init_expr,
-      false,
-      "",
-      false,
+      false,   // is_sub
+      "",      // class_identifier
+      false,   // skip_classid
       alloc_type,
-      false,
-      typet(),
+      false,   // override
+      typet(), // override type immaterial
+      depth+1,
       update_in_place);
   }
 }
@@ -457,8 +469,11 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const irep_idt &class_identifier,
   allocation_typet alloc_type,
   const pointer_typet &pointer_type,
+  size_t depth,
   const update_in_placet &update_in_place)
 {
+  PRECONDITION(expr.type().id()==ID_pointer);
+
   const pointer_typet &replacement_pointer_type=
     pointer_type_selector.convert_pointer_type(pointer_type);
 
@@ -469,7 +484,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
     const symbol_exprt real_pointer_symbol=gen_nondet_subtype_pointer_init(
       assignments,
       alloc_type,
-      replacement_pointer_type);
+      replacement_pointer_type,
+      depth);
 
     // Having created a pointer to object of type replacement_pointer_type
     // we now assign it back to the original pointer with a cast
@@ -489,8 +505,10 @@ void java_object_factoryt::gen_nondet_pointer_init(
     const struct_typet &struct_type=to_struct_type(subtype);
     const irep_idt &struct_tag=struct_type.get_tag();
 
-    // If this is a recursive type of some kind, set null.
-    if(!recursion_set_entry.insert_entry(struct_tag))
+    // If this is a recursive type of some kind AND the depth is exceeded, set
+    // the pointer to null.
+    if(!recursion_set_entry.insert_entry(struct_tag) &&
+      depth>=max_nondet_tree_depth)
     {
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
@@ -512,6 +530,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
       expr,
       subtype,
       alloc_type,
+      depth,
       update_in_placet::MUST_UPDATE_IN_PLACE);
   }
 
@@ -529,6 +548,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     expr,
     subtype,
     alloc_type,
+    depth,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
@@ -588,7 +608,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
   else
   {
     INVARIANT(update_in_place==update_in_placet::MAY_UPDATE_IN_PLACE,
-      "No update and must update should have already been resolved");
+      "No-update and must-update should have already been resolved");
 
     code_ifthenelset update_check;
     update_check.cond()=side_effect_expr_nondett(bool_typet());
@@ -614,7 +634,8 @@ void java_object_factoryt::gen_nondet_pointer_init(
 symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   code_blockt &assignments,
   allocation_typet alloc_type,
-  const pointer_typet &replacement_pointer)
+  const pointer_typet &replacement_pointer,
+  size_t depth)
 {
   symbolt new_symbol=new_tmp_symbol(symbol_table, loc, replacement_pointer);
 
@@ -622,12 +643,13 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   gen_nondet_init(
     assignments,
     new_symbol.symbol_expr(),
-    false,
-    "",
-    false,
+    false,   // is_sub
+    "",      // class_identifier
+    false,   // skip_classid
     alloc_type,
-    false,
-    typet(),
+    false,   // override
+    typet(), // override_type
+    depth,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   return new_symbol.symbol_expr();
@@ -658,8 +680,12 @@ void java_object_factoryt::gen_nondet_struct_init(
   bool skip_classid,
   allocation_typet alloc_type,
   const struct_typet &struct_type,
+  size_t depth,
   const update_in_placet &update_in_place)
 {
+  PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
+  PRECONDITION(struct_type.id()==ID_struct);
+
   typedef struct_typet::componentst componentst;
   const irep_idt &struct_tag=struct_type.get_tag();
 
@@ -715,10 +741,11 @@ void java_object_factoryt::gen_nondet_struct_init(
         me,
         _is_sub,
         class_identifier,
-        false,
+        false,   // skip_classid
         alloc_type,
-        false,
-        typet(),
+        false,   // override
+        typet(), // override_type
+        depth,
         substruct_in_place);
     }
   }
@@ -749,12 +776,14 @@ void java_object_factoryt::gen_nondet_init(
   irep_idt class_identifier,
   bool skip_classid,
   allocation_typet alloc_type,
-  bool override,
+  bool override_,
   const typet &override_type,
+  size_t depth,
   update_in_placet update_in_place)
 {
   const typet &type=
-    override ? ns.follow(override_type) : ns.follow(expr.type());
+    override_ ? ns.follow(override_type) : ns.follow(expr.type());
+
 
   if(type.id()==ID_pointer)
   {
@@ -766,6 +795,7 @@ void java_object_factoryt::gen_nondet_init(
       class_identifier,
       alloc_type,
       pointer_type,
+      depth,
       update_in_place);
   }
   else if(type.id()==ID_struct)
@@ -779,6 +809,7 @@ void java_object_factoryt::gen_nondet_init(
       skip_classid,
       alloc_type,
       struct_type,
+      depth,
       update_in_place);
   }
   else
@@ -820,12 +851,13 @@ void java_object_factoryt::allocate_nondet_length_array(
   gen_nondet_init(
     assignments,
     length_sym_expr,
-    false,
+    false,   // is_sub
     irep_idt(),
-    false,
-    allocation_typet::LOCAL, // Doesn't matter, as type is primitive
-    false,
-    typet(),
+    false,   // skip_classid
+    allocation_typet::LOCAL, // immaterial, type is primitive
+    false,   // override
+    typet(), // override type is immaterial
+    0,       // depth is immaterial
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Insert assumptions to bound its length:
@@ -852,13 +884,15 @@ void java_object_factoryt::allocate_nondet_length_array(
 void java_object_factoryt::gen_nondet_array_init(
   code_blockt &assignments,
   const exprt &expr,
+  size_t depth,
   update_in_placet update_in_place)
 {
-  assert(expr.type().id()==ID_pointer);
-  assert(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
+  PRECONDITION(expr.type().id()==ID_pointer);
+  PRECONDITION(expr.type().subtype().id()==ID_symbol);
+  PRECONDITION(update_in_place!=update_in_placet::MAY_UPDATE_IN_PLACE);
+
   const typet &type=ns.follow(expr.type().subtype());
   const struct_typet &struct_type=to_struct_type(type);
-  assert(expr.type().subtype().id()==ID_symbol);
   const typet &element_type=
     static_cast<const typet &>(expr.type().subtype().find(ID_C_element_type));
 
@@ -952,13 +986,14 @@ void java_object_factoryt::gen_nondet_array_init(
   gen_nondet_init(
     assignments,
     arraycellref,
-    false,
-    irep_idt(),
-    false,
+    false, // is_sub
+    irep_idt(), // class_identifier
+    false, // skip_classid
     // These are variable in number, so use dynamic allocator:
     allocation_typet::DYNAMIC,
-    true,
+    true,  // override
     element_type,
+    depth,
     child_update_in_place);
 
   exprt java_one=from_integer(1, java_int_type());
@@ -1016,6 +1051,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   allocation_typet alloc_type,
   const source_locationt &loc,
   const select_pointer_typet &pointer_type_selector)
@@ -1035,7 +1071,7 @@ exprt object_factory(
 
   symbolt *main_symbol_ptr;
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
-  assert(!moving_symbol_failed);
+  CHECK_RETURN(!moving_symbol_failed);
 
   std::vector<const symbolt *> symbols_created;
   symbols_created.push_back(main_symbol_ptr);
@@ -1044,18 +1080,20 @@ exprt object_factory(
     loc,
     !allow_null,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     symbol_table,
     pointer_type_selector);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
     object,
-    false,
-    "",
-    false,
+    false,   // is_sub
+    "",      // class_identifier
+    false,   // skip_classid
     alloc_type,
-    false,
-    typet(),
+    false,   // override
+    typet(), // override_type is immaterial
+    0,       // initial depth
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   declare_created_symbols(symbols_created, loc, init_code);
@@ -1094,6 +1132,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
@@ -1104,18 +1143,20 @@ void gen_nondet_init(
     loc,
     assume_non_null,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     symbol_table,
     pointer_type_selector);
   code_blockt assignments;
   state.gen_nondet_init(
     assignments,
     expr,
-    false,
-    "",
+    false,   // is_sub
+    "",      // class_identifier
     skip_classid,
     alloc_type,
-    false,
-    typet(),
+    false,   // override
+    typet(), // override_type is immaterial
+    0,       // initial depth
     update_in_place);
 
   declare_created_symbols(symbols_created, loc, init_code);
@@ -1130,6 +1171,7 @@ exprt object_factory(const typet &type,
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   allocation_typet alloc_type,
   const source_locationt &location)
 {
@@ -1141,6 +1183,7 @@ exprt object_factory(const typet &type,
     allow_null,
     symbol_table,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     alloc_type,
     location,
     pointer_type_selector);
@@ -1155,6 +1198,7 @@ void gen_nondet_init(const exprt &expr,
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   update_in_placet update_in_place)
 {
   select_pointer_typet pointer_type_selector;
@@ -1167,6 +1211,7 @@ void gen_nondet_init(const exprt &expr,
     alloc_type,
     assume_non_null,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     pointer_type_selector,
     update_in_place);
 }

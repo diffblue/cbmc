@@ -24,10 +24,13 @@ class message_handlert;
 /// \param symbol_table: The symbol table to query/update.
 /// \param message_handler: For error logging.
 /// \param max_nondet_array_length: The maximum length of any new arrays.
+/// \param max_nondet_tree_depth: Maximum depth for object hierarchy on input
+///   parameterers.
 void convert_nondet(
   goto_functionst &goto_functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length);
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth);
 
 #endif
