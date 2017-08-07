@@ -63,7 +63,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  bool assume_non_null,
+  bool allow_null,
   size_t max_nondet_array_length,
   size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector,
@@ -76,7 +76,7 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  bool assume_non_null,
+  bool allow_null,
   size_t max_nondet_array_length,
   size_t max_nondet_tree_depth,
   update_in_placet update_in_place);
