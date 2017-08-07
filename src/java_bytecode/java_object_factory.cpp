@@ -550,15 +550,17 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-  // Determine whether the pointer can be null.
-  // In particular the array field of a String should not be null.
+  // Determine whether the pointer can be null. In particular:
+  // - the 'data' of a String should not be null.
+  // - the pointers inside the java.lang.Class class shall not be null
   bool not_null=
     !allow_null ||
     ((class_identifier=="java.lang.String" ||
       class_identifier=="java.lang.StringBuilder" ||
       class_identifier=="java.lang.StringBuffer" ||
       class_identifier=="java.lang.CharSequence") &&
-     subtype.id()==ID_array);
+     subtype.id()==ID_array) ||
+    class_identifier=="java.lang.Class";
 
   // Alternatively, if this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
