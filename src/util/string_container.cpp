@@ -25,17 +25,6 @@ bool string_ptrt::operator==(const string_ptrt &other) const
   return len==0 || memcmp(s, other.s, len)==0;
 }
 
-void initialize_string_container();
-
-string_containert::string_containert()
-{
-  // pre-allocate empty string -- this gets index 0
-  get("");
-
-  // allocate strings
-  initialize_string_container();
-}
-
 string_containert::~string_containert()
 {
 }

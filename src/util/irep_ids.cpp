@@ -43,13 +43,15 @@ const char *irep_ids_table[]=
 
 #include "irep_ids.def" // NOLINT(build/include)
 
-void initialize_string_container()
+string_containert::string_containert()
 {
-  // this is called by the constructor of string_containert
+  // pre-allocate empty string -- this gets index 0
+  get("");
 
+  // allocate strings
   for(unsigned i=0; irep_ids_table[i]!=nullptr; i++)
   {
-    unsigned x=get_string_container()[irep_ids_table[i]];
+    unsigned x=operator[](irep_ids_table[i]);
     assert(x==i); // sanity check
   }
 }
