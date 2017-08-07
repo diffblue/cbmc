@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_string_library_preprocess.h"
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
+#define MAX_NONDET_TREE_DEPTH 5
 
 class symbolt;
 
@@ -65,7 +66,8 @@ public:
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
     max_user_array_length(0),
     lazy_methods_mode(lazy_methods_modet::LAZY_METHODS_MODE_EAGER),
-    string_refinement_enabled(false)
+    string_refinement_enabled(false),
+    max_nondet_tree_depth(MAX_NONDET_TREE_DEPTH)
     {}
 
   bool from_expr(
@@ -104,6 +106,7 @@ protected:
   java_class_loadert java_class_loader;
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
   size_t max_nondet_array_length;   // maximal length for non-det array creation
+  size_t max_nondet_tree_depth;     // maximal depth for object tree in non-det creation
   size_t max_user_array_length;     // max size for user code created arrays
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;

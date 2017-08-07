@@ -90,6 +90,7 @@ void java_static_lifetime_init(
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
   unsigned max_nondet_array_length,
+  unsigned max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector)
 {
   symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
@@ -132,6 +133,7 @@ void java_static_lifetime_init(
           allow_null,
           symbol_table,
           max_nondet_array_length,
+          max_nondet_tree_depth,
           allocation_typet::GLOBAL,
           source_location,
           pointer_type_selector);
@@ -154,6 +156,7 @@ exprt::operandst java_build_arguments(
   symbol_tablet &symbol_table,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector)
 {
   const code_typet::parameterst &parameters=
@@ -162,32 +165,37 @@ exprt::operandst java_build_arguments(
   exprt::operandst main_arguments;
   main_arguments.resize(parameters.size());
 
+  bool is_default_entry_point(config.main.empty());
+  bool is_main=is_default_entry_point;
+
+  // if walks like a duck and quacks like a duck, it is a duck!
+  if(!is_main)
+  {
+    bool named_main=has_suffix(config.main, ".main");
+    const typet &string_array_type=
+      java_type_from_string("[Ljava.lang.String;");
+    bool has_correct_type=
+      to_code_type(function.type).return_type().id()==ID_empty &&
+      (!to_code_type(function.type).has_this()) &&
+      parameters.size()==1 &&
+      parameters[0].type().full_eq(string_array_type);
+    is_main=(named_main && has_correct_type);
+  }
+
   for(std::size_t param_number=0;
       param_number<parameters.size();
       param_number++)
   {
-    bool is_this=(param_number==0) &&
-                 parameters[param_number].get_this();
-    bool is_default_entry_point(config.main.empty());
-    bool is_main=is_default_entry_point;
-    if(!is_main)
-    {
-      bool named_main=has_suffix(config.main, ".main");
-      const typet &string_array_type=
-        java_type_from_string("[Ljava.lang.String;");
-      bool has_correct_type=
-        to_code_type(function.type).return_type().id()==ID_empty &&
-        (!to_code_type(function.type).has_this()) &&
-        parameters.size()==1 &&
-        parameters[0].type().full_eq(string_array_type);
-      is_main=(named_main && has_correct_type);
-    }
-
     const code_typet::parametert &p=parameters[param_number];
     const irep_idt base_name=p.get_base_name().empty()?
       ("argument#"+std::to_string(param_number)):p.get_base_name();
 
-    bool allow_null=(!is_main) && (!is_this) && !assume_init_pointers_not_null;
+    // true iff this parameter is the `this` pointer of the method, which cannot
+    // be null
+    bool is_this=(param_number==0) && parameters[param_number].get_this();
+
+    bool allow_null=
+      !assume_init_pointers_not_null && !is_main && !is_this;
 
     main_arguments[param_number]=
       object_factory(
@@ -197,6 +205,7 @@ exprt::operandst java_build_arguments(
         allow_null,
         symbol_table,
         max_nondet_array_length,
+        max_nondet_tree_depth,
         allocation_typet::LOCAL,
         function.location,
         pointer_type_selector);
@@ -480,6 +489,7 @@ bool java_entry_point(
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector)
 {
   // check if the entry point is already there
@@ -504,6 +514,7 @@ bool java_entry_point(
     symbol.location,
     assume_init_pointers_not_null,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     pointer_type_selector);
 
   code_blockt init_code;
@@ -572,6 +583,7 @@ bool java_entry_point(
       symbol_table,
       assume_init_pointers_not_null,
       max_nondet_array_length,
+      max_nondet_tree_depth,
       pointer_type_selector);
   call_main.arguments()=main_arguments;
 

@@ -16,7 +16,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/select_pointer_type.h>
 
 /// Selects the kind of allocation used by java_object_factory et al.
-enum class allocation_typet {
+enum class allocation_typet
+{
   /// Allocate global objects
   GLOBAL,
   /// Allocate local stacked objects
@@ -32,6 +33,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   allocation_typet alloc_type,
   const source_locationt &location,
   const select_pointer_typet &pointer_type_selector);
@@ -43,6 +45,7 @@ exprt object_factory(
   bool allow_null,
   symbol_tablet &symbol_table,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   allocation_typet alloc_type,
   const source_locationt &location);
 
@@ -62,6 +65,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place);
 
@@ -74,6 +78,7 @@ void gen_nondet_init(
   allocation_typet alloc_type,
   bool assume_non_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   update_in_placet update_in_place);
 
 exprt allocate_dynamic_object(

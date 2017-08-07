@@ -42,6 +42,9 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   if(cmd.isset("java-max-input-array-length"))
     max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
+  if(cmd.isset("java-max-input-tree-depth"))
+    max_nondet_tree_depth=
+      std::stoi(cmd.get_value("java-max-input-tree-depth"));
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
   if(cmd.isset("lazy-methods-context-sensitive"))
@@ -449,7 +452,8 @@ bool java_bytecode_languaget::typecheck(
     symbol_table,
     throw_runtime_exceptions,
     get_message_handler(),
-    max_nondet_array_length);
+    max_nondet_array_length,
+    max_nondet_tree_depth);
 
   // now typecheck all
   if(java_bytecode_typecheck(
@@ -683,9 +687,6 @@ void java_bytecode_languaget::replace_string_methods(
 
 bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 {
-  /*
-  if(c_final(symbol_table, message_handler)) return true;
-  */
   java_internal_additions(symbol_table);
 
   // Replace code of String methods calls by code we generate
@@ -696,17 +697,17 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   if(res.stop_convert)
     return res.error_found;
 
-  symbolt entry=res.main_function;
-
+  // generate the test harness in __CPROVER__start and a call the entry point
   select_pointer_typet pointer_type_selector;
-  return(
+  return
     java_entry_point(
       symbol_table,
       main_class,
       get_message_handler(),
       assume_inputs_non_null,
       max_nondet_array_length,
-      pointer_type_selector));
+      max_nondet_tree_depth,
+      pointer_type_selector);
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)

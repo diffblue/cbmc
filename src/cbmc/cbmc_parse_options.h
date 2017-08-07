@@ -61,9 +61,12 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
-  "(java-max-vla-length):(java-unwind-enum-static)" \
+  "(java-max-vla-length):" \
+  "(java-unwind-enum-static)" \
   "(java-cp-include-files):" \
   "(java-throw-runtime-exceptions)" \
+  "(java-max-input-array-length):" \
+  "(java-max-input-tree-depth):" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
