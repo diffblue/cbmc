@@ -203,9 +203,8 @@ void remove_exceptionst::instrument_exception_handler(
   PRECONDITION(instr_it->type==CATCH);
 
   // retrieve the exception variable
-  const auto &code_expr=to_code_expression(instr_it->code).expression();
   const exprt &thrown_exception_local=
-    to_side_effect_expr_landingpad(code_expr).catch_expr();
+    to_code_landingpad(instr_it->code).catch_expr();
   irep_idt thrown_exception_global=id2string(function_id)+EXC_SUFFIX;
 
   if(symbol_table.has_symbol(thrown_exception_global))
@@ -436,15 +435,14 @@ void remove_exceptionst::instrument_exceptions(
     // Is it a handler push/pop or catch landing-pad?
     else if(instr_it->type==CATCH)
     {
+      const irep_idt &statement=instr_it->code.get_statement();
       // Is it an exception landing pad (start of a catch block)?
-      if(instr_it->code.get_statement()==ID_expression &&
-         instr_it->code.op0().id()==ID_side_effect &&
-         to_side_effect_expr(instr_it->code.op0()).get_statement()==
-         ID_exception_landingpad)
+      if(statement==ID_exception_landingpad)
       {
         instrument_exception_handler(func_it, instr_it);
       }
-      else if(instr_it->targets.empty()) // pop exception handler
+      // Is it a catch handler pop?
+      else if(statement==ID_pop_catch)
       {
         // pop the local vars stack
         if(!stack_locals.empty())
@@ -464,7 +462,8 @@ void remove_exceptionst::instrument_exceptions(
 #endif
         }
       }
-      else // push exception handler
+      // Is it a catch handler push?
+      else if(statement==ID_push_catch)
       {
         stack_locals.push_back(locals);
         locals.clear();
@@ -475,9 +474,14 @@ void remove_exceptionst::instrument_exceptions(
           stack_catch.back();
 
         // copy targets
-        const irept::subt &exception_list=
-          instr_it->code.find(ID_exception_list).get_sub();
+        const code_push_catcht::exception_listt &exception_list=
+          to_code_push_catch(instr_it->code).exception_list();
+
+        // The target list can be empty if `finish_catch_push_targets` found that
+        // the targets were unreachable (in which case no exception can truly
+        // be thrown at runtime)
         INVARIANT(
+          instr_it->targets.size()==0 ||
           exception_list.size()==instr_it->targets.size(),
           "`exception_list` should contain current instruction's targets");
 
@@ -486,9 +490,15 @@ void remove_exceptionst::instrument_exceptions(
         for(auto target : instr_it->targets)
         {
           last_exception.push_back(
-            std::make_pair(exception_list[i].id(), target));
+            std::make_pair(exception_list[i].get_tag(), target));
           i++;
         }
+      }
+      else
+      {
+        INVARIANT(
+          false,
+          "CATCH opcode should be one of push-catch, pop-catch, landingpad");
       }
       instr_it->make_skip();
     }

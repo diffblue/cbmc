@@ -97,12 +97,6 @@ protected:
     side_effect_exprt &expr,
     goto_programt &dest,
     bool result_is_used);
-  void remove_push_catch(
-    side_effect_exprt &expr,
-    goto_programt &dest);
-  void remove_exception_landingpad(
-    side_effect_exprt &expr,
-    goto_programt &dest);
   void remove_assignment(
     side_effect_exprt &expr,
     goto_programt &dest,
@@ -246,10 +240,6 @@ protected:
   void convert_msc_try_except(const codet &code, goto_programt &dest);
   void convert_msc_leave(const codet &code, goto_programt &dest);
   void convert_try_catch(const codet &code, goto_programt &dest);
-  void convert_java_try_catch(const codet &code, goto_programt &dest);
-  void convert_java_exception_landingpad(
-    const codet &code,
-    goto_programt &dest);
   void convert_CPROVER_try_catch(const codet &code, goto_programt &dest);
   void convert_CPROVER_try_finally(const codet &code, goto_programt &dest);
   void convert_CPROVER_throw(const codet &code, goto_programt &dest);

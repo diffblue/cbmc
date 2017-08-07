@@ -636,34 +636,6 @@ void goto_convertt::remove_statement_expression(
   static_cast<exprt &>(expr)=tmp_symbol_expr;
 }
 
-void goto_convertt::remove_push_catch(
-  side_effect_exprt &expr,
-  goto_programt &dest)
-{
-  // we only get here for ID_push_catch, which is only used for Java
-  convert_java_try_catch(code_expressiont(expr), dest);
-
-  // the result can't be used, these are void
-  expr.make_nil();
-}
-
-/// Lower a side_effect_exprt describing an exception
-/// landing-pad (catch site) into GOTO code
-/// \param expr: expression to convert
-/// \param [out] dest: code appended to this GOTO program
-void goto_convertt::remove_exception_landingpad(
-  side_effect_exprt &expr,
-  goto_programt &dest)
-{
-  PRECONDITION(expr.get_statement()==ID_exception_landingpad);
-
-  // Similar to the above, only currently used in Java.
-  convert_java_exception_landingpad(code_expressiont(expr), dest);
-
-  // the result can't be used, these are void
-  expr.make_nil();
-}
-
 void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -724,10 +696,6 @@ void goto_convertt::remove_side_effect(
     // the result can't be used, these are void
     expr.make_nil();
   }
-  else if(statement==ID_push_catch)
-    remove_push_catch(expr, dest);
-  else if(statement==ID_exception_landingpad)
-    remove_exception_landingpad(expr, dest);
   else
   {
     error().source_location=expr.find_source_location();

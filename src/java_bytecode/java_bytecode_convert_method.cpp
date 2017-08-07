@@ -1240,8 +1240,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           "caught_exception",
           pointer_typet(catch_type));
       stack.push_back(catch_var);
-      side_effect_expr_landingpadt catch_expr(catch_var);
-      catch_instruction=code_expressiont(catch_expr);
+      code_landingpadt catch_statement(catch_var);
+      catch_instruction=catch_statement;
     }
 
     exprt::operandst op=pop(bytecode_info.pop);
@@ -2386,23 +2386,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // add the actual PUSH-CATCH instruction
       if(!exception_ids.empty())
       {
-        // add the exception ids
-        side_effect_expr_catcht catch_push_expr;
-        irept result(ID_exception_list);
-        result.get_sub().resize(exception_ids.size());
+        code_push_catcht catch_push;
+        INVARIANT(
+          exception_ids.size()==handler_labels.size(),
+          "Exception tags and handler labels should be 1-to-1");
+        code_push_catcht::exception_listt &exception_list=
+          catch_push.exception_list();
         for(size_t i=0; i<exception_ids.size(); ++i)
-          result.get_sub()[i].id(exception_ids[i]);
-        catch_push_expr.set(ID_exception_list, result);
-
-        // add the labels corresponding to the handlers
-        irept labels(ID_label);
-        labels.get_sub().resize(handler_labels.size());
-        for(size_t i=0; i<handler_labels.size(); ++i)
-          labels.get_sub()[i].id(handler_labels[i]);
-        catch_push_expr.set(ID_label, labels);
+        {
+          exception_list.push_back(
+            code_push_catcht::exception_list_entryt(
+              exception_ids[i],
+              handler_labels[i]));
+        }
 
         code_blockt try_block;
-        code_expressiont catch_push(catch_push_expr);
         try_block.move_to_operands(catch_push);
         try_block.move_to_operands(c);
         c=try_block;
@@ -2442,11 +2440,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // another CATCH-POP for the same try-catch
           start_pc=exception_row.start_pc;
           // add CATCH_POP instruction
-          side_effect_expr_catcht catch_pop_expr;
+          code_pop_catcht catch_pop;
           code_blockt end_try_block;
-          code_expressiont catch_pop(catch_pop_expr);
-          catch_pop.set(ID_exception_list, get_nil_irep());
-          catch_pop.set(ID_label, get_nil_irep());
           end_try_block.move_to_operands(c);
           end_try_block.move_to_operands(catch_pop);
           c=end_try_block;

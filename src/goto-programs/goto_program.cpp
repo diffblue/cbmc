@@ -158,41 +158,42 @@ std::ostream &goto_programt::output_instruction(
 
   case CATCH:
   {
-    if(instruction.code.get_statement()==ID_expression &&
-       instruction.code.op0().id()==ID_side_effect)
+    if(instruction.code.get_statement()==ID_exception_landingpad)
     {
-      const auto &landingpad=
-        to_side_effect_expr_landingpad(instruction.code.op0());
+      const auto &landingpad=to_code_landingpad(instruction.code);
       out << "EXCEPTION LANDING PAD ("
           << from_type(ns, identifier, landingpad.catch_expr().type())
           << ' '
           << from_expr(ns, identifier, landingpad.catch_expr())
           << ")";
     }
-    else if(instruction.code.get_statement()==ID_catch)
+    else if(instruction.code.get_statement()==ID_push_catch)
     {
-      if(!instruction.targets.empty())
-      {
-        out << "CATCH-PUSH ";
+      out << "CATCH-PUSH ";
 
-        unsigned i=0;
-        const irept::subt &exception_list=
-          instruction.code.find(ID_exception_list).get_sub();
-        assert(instruction.targets.size()==exception_list.size());
-        for(instructiont::targetst::const_iterator
-              gt_it=instruction.targets.begin();
-            gt_it!=instruction.targets.end();
-            gt_it++,
-              i++)
-        {
-          if(gt_it!=instruction.targets.begin())
-            out << ", ";
-          out << exception_list[i].id() << "->"
-              << (*gt_it)->target_number;
-        }
+      unsigned i=0;
+      const irept::subt &exception_list=
+        instruction.code.find(ID_exception_list).get_sub();
+      assert(instruction.targets.size()==exception_list.size());
+      for(instructiont::targetst::const_iterator
+            gt_it=instruction.targets.begin();
+          gt_it!=instruction.targets.end();
+          gt_it++,
+            i++)
+      {
+        if(gt_it!=instruction.targets.begin())
+          out << ", ";
+        out << exception_list[i].id() << "->"
+            << (*gt_it)->target_number;
       }
-      else
-        out << "CATCH-POP";
+    }
+    else if(instruction.code.get_statement()==ID_pop_catch)
+    {
+      out << "CATCH-POP";
+    }
+    else
+    {
+      out << "! unexpected CATCH opcode " << instruction.code.get_statement();
     }
 
     out << '\n';
