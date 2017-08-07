@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_util.h"
 
+/// \param source_location: source location for generated code
 /// \param object: non-typechecked object
 /// \param operands: non-typechecked operands
 /// \return typechecked code
