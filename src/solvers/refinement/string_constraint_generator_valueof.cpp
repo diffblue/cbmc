@@ -137,7 +137,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
-/// \param x: a signed integer expression
+/// \param input_int: a signed integer expression
 /// \param radix: the radix to use
 /// \param ref_type: type for refined strings
 /// \param max_size: a maximal size for the string representation (default 0,
@@ -734,7 +734,7 @@ exprt get_numeric_value_from_character(
 /// using the given radix. Due to floating point rounding errors we sometimes
 /// return a value 1 larger than needed, which is fine for our purposes.
 /// \param type: the type that we are considering values of
-/// \param radix: the radix we are using, as a double
+/// \param ul_radix: the radix we are using, as a double
 /// \return the maximum string length
 size_t max_printed_string_length(const typet &type, unsigned long ul_radix)
 {
