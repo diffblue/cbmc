@@ -375,7 +375,7 @@ exprt get_numeric_value_from_character(
   unsigned long radix=36ul);
 size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
 unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
-std::string utf16_constant_array_to_ascii(
+std::string utf16_constant_array_to_java(
   const array_exprt &arr, unsigned length);
 
 #endif

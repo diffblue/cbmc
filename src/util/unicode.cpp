@@ -272,7 +272,7 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
 
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-16BE format
-std::wstring utf8_to_utf16_big_endian(const std::string& in)
+std::wstring utf8_to_utf16_big_endian(const std::string &in)
 {
   bool swap_bytes=is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
@@ -280,7 +280,7 @@ std::wstring utf8_to_utf16_big_endian(const std::string& in)
 
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-16LE format
-std::wstring utf8_to_utf16_little_endian(const std::string& in)
+std::wstring utf8_to_utf16_little_endian(const std::string &in)
 {
   bool swap_bytes=!is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
@@ -288,21 +288,30 @@ std::wstring utf8_to_utf16_little_endian(const std::string& in)
 
 /// \par parameters: String in UTF-16LE format
 /// \return String in US-ASCII format, with \uxxxx escapes for other characters
-std::string utf16_little_endian_to_ascii(const std::wstring& in)
+std::string utf16_little_endian_to_java(const std::wstring &in)
 {
   std::ostringstream result;
-  std::locale loc;
-  for(const auto c : in)
+  const std::locale loc;
+  for(const auto ch : in)
   {
-    if(c<=255 && isprint(c, loc))
-      result << (unsigned char)c;
+    if(ch=='\n')
+      result << "\\n";
+    else if(ch=='\r')
+      result << "\\r";
+    else if(ch<=255 && isprint(ch, loc))
+    {
+      const auto uch=static_cast<unsigned char>(ch);
+      if(uch=='"')
+        result << '\\';
+      result << uch;
+    }
     else
     {
       result << "\\u"
              << std::hex
              << std::setw(4)
              << std::setfill('0')
-             << (unsigned int)c;
+             << static_cast<unsigned int>(ch);
     }
   }
   return result.str();
