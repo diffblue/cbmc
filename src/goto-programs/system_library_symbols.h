@@ -13,6 +13,7 @@ Author: Thomas Kiley
 #define CPROVER_GOTO_PROGRAMS_SYSTEM_LIBRARY_SYMBOLS_H
 
 #include <list>
+#include <map>
 #include <set>
 #include <string>
 #include <util/irep.h>
@@ -24,7 +25,12 @@ class typet;
 class system_library_symbolst
 {
 public:
-  system_library_symbolst();
+  explicit system_library_symbolst(bool init);
+
+  system_library_symbolst():
+    system_library_symbolst(true) // NOLINT(runtime/explicit)
+  {
+  }
 
   bool is_symbol_internal_symbol(
     const symbolt &symbol,

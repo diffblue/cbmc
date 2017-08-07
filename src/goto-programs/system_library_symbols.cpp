@@ -17,10 +17,11 @@ Author: Thomas Kiley
 #include <util/type.h>
 #include <sstream>
 
-system_library_symbolst::system_library_symbolst():
+system_library_symbolst::system_library_symbolst(bool init):
   use_all_headers(false)
 {
-  init_system_library_map();
+  if(init)
+    init_system_library_map();
 }
 
 /// To generate a map of header file names -> list of symbols The symbol names
@@ -220,13 +221,7 @@ void system_library_symbolst::init_system_library_map()
   {
     "__error", "__errno_location", "__errno"
   };
-  add_to_system_library("errno.c", errno_syms);
-
-  std::list<irep_idt> noop_syms=
-  {
-    "__noop"
-  };
-  add_to_system_library("noop.c", noop_syms);
+  add_to_system_library("errno.h", errno_syms);
 
 #if 0
   // sys/types.h
