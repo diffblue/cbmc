@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstring>
 
-string_containert string_container;
-
 string_ptrt::string_ptrt(const char *_s):s(_s), len(strlen(_s))
 {
 }
@@ -86,4 +84,11 @@ unsigned string_containert::get(const std::string &s)
   string_vector.push_back(&string_list.back());
 
   return r;
+}
+
+/// Get a reference to the global string container.
+string_containert &get_string_container()
+{
+  static string_containert ret;
+  return ret;
 }
