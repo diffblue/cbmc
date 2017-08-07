@@ -46,13 +46,13 @@ public:
 
   // this one is not safe for static objects
   // NOLINTNEXTLINE(runtime/explicit)
-  dstringt(const char *s):no(string_container[s])
+  dstringt(const char *s):no(get_string_container()[s])
   {
   }
 
   // this one is not safe for static objects
   // NOLINTNEXTLINE(runtime/explicit)
-  dstringt(const std::string &s):no(string_container[s])
+  dstringt(const std::string &s):no(get_string_container()[s])
   {
   }
 
@@ -152,12 +152,12 @@ private:
 
   // the reference returned is guaranteed to be stable
   const std::string &as_string() const
-  { return string_container.get_string(no); }
+  { return get_string_container().get_string(no); }
 };
 
 // the reference returned is guaranteed to be stable
 inline const std::string &as_string(const dstringt &s)
-{ return string_container.get_string(s.get_no()); }
+{ return get_string_container().get_string(s.get_no()); }
 
 // NOLINTNEXTLINE(readability/identifiers)
 struct dstring_hash
