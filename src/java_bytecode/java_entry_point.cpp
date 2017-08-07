@@ -645,38 +645,32 @@ bool java_entry_point(
   code_blockt call_block;
 
   // Push a universal exception handler:
-  side_effect_expr_catcht push_universal_handler;
-  irept catch_type_list(ID_exception_list);
-  irept catch_target_list(ID_label);
   // Catch all exceptions:
   // This is equivalent to catching Throwable, but also works if some of
   // the class hierarchy is missing so that we can't determine that
   // the thrown instance is an indirect child of Throwable
-  catch_type_list.get_sub().push_back(irept());
-  catch_target_list.get_sub().push_back(irept(toplevel_catch.get_label()));
-  push_universal_handler.set(ID_exception_list, catch_type_list);
-  push_universal_handler.set(ID_label, catch_target_list);
+  code_push_catcht push_universal_handler(
+    irep_idt(), toplevel_catch.get_label());
+  irept catch_type_list(ID_exception_list);
+  irept catch_target_list(ID_label);
 
-  call_block.copy_to_operands(code_expressiont(push_universal_handler));
+  call_block.move_to_operands(push_universal_handler);
 
   // we insert the call to the method AFTER the argument initialization code
   call_block.move_to_operands(call_main);
 
   // Pop the handler:
-  side_effect_expr_catcht pop_handler;
-  pop_handler.set(ID_exception_list, get_nil_irep());
-  pop_handler.set(ID_label, get_nil_irep());
-
-  //call_block.copy_to_operands(code_expressiont(pop_handler));
+  code_pop_catcht pop_handler;
+  call_block.move_to_operands(pop_handler);
   init_code.move_to_operands(call_block);
 
   // Normal return: skip the exception handler:
   init_code.copy_to_operands(code_gotot(after_catch.get_label()));
 
   // Exceptional return: catch and assign to exc_symbol.
-  side_effect_expr_landingpadt landingpad(exc_symbol.symbol_expr());
+  code_landingpadt landingpad(exc_symbol.symbol_expr());
   init_code.copy_to_operands(toplevel_catch);
-  init_code.copy_to_operands(code_expressiont(landingpad));
+  init_code.move_to_operands(landingpad);
 
   // Converge normal and exceptional return:
   init_code.move_to_operands(after_catch);
