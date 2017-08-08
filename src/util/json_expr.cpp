@@ -23,6 +23,8 @@ Author: Peter Schrammel
 #include "config.h"
 #include "identifier.h"
 #include "language.h"
+#include "invariant.h"
+
 #include <langapi/mode.h>
 
 static exprt simplify_json_expr(
@@ -243,8 +245,8 @@ json_objectt json(
       type;
 
     std::string type_string;
-    if(lang->from_type(underlying_type, type_string, ns))
-      assert(false && "unknown type");
+    bool error=lang->from_type(underlying_type, type_string, ns);
+    CHECK_RETURN(!error);
 
     std::string value_string;
     lang->from_expr(expr, value_string, ns);
@@ -312,7 +314,9 @@ json_objectt json(
       {
         const irep_idt &ptr_id=to_symbol_expr(simpl_expr).get_identifier();
         identifiert identifier(id2string(ptr_id));
-        assert(!identifier.components.empty());
+        DATA_INVARIANT(
+          !identifier.components.empty(),
+          "pointer identifier should have non-empty components");
         result["data"]=json_stringt(identifier.components.back());
       }
     }
@@ -364,7 +368,9 @@ json_objectt json(
     {
       const struct_typet &struct_type=to_struct_type(type);
       const struct_typet::componentst &components=struct_type.components();
-      assert(components.size()==expr.operands().size());
+      DATA_INVARIANT(
+        components.size()==expr.operands().size(),
+        "number of struct components should match with its type");
 
       json_arrayt &members=result["members"].make_array();
       for(unsigned m=0; m<expr.operands().size(); m++)
@@ -379,11 +385,10 @@ json_objectt json(
   {
     result["name"]=json_stringt("union");
 
-    assert(expr.operands().size()==1);
-
+    const union_exprt &union_expr=to_union_expr(expr);
     json_objectt &e=result["member"].make_object();
-    e["value"]=json(expr.op0(), ns, mode);
-    e["name"]=json_stringt(id2string(to_union_expr(expr).get_component_name()));
+    e["value"]=json(union_expr.op(), ns, mode);
+    e["name"]=json_stringt(id2string(union_expr.get_component_name()));
   }
   else
     result["name"]=json_stringt("unknown");
