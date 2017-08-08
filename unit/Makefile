@@ -27,6 +27,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix_lower_case.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
+       solvers/refinement/string_refinement/substitute_array_list.cpp \
        # Empty last line
 
 INCLUDES= -I ../src/ -I.
