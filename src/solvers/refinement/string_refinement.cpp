@@ -1623,16 +1623,20 @@ std::vector<exprt> string_refinementt::instantiate_not_contains(
     axiom, index_set0, index_set1, generator);
 }
 
-/// replace array-lists by 'with' expressions
-/// \par parameters: an expression containing array-list expressions
+/// Replace array-lists by 'with' expressions.
+/// For instance `array-list [ 0 , x , 1 , y ]` is replaced by
+/// `ARRAYOF(0) WITH [0:=x] WITH [1:=y]`.
+/// Indexes exceeding the maximal string length are ignored.
+/// \param expr: an expression containing array-list expressions
+/// \param string_max_length: maximum length allowed for strings
 /// \return an expression containing no array-list
-exprt string_refinementt::substitute_array_lists(exprt expr) const
+exprt substitute_array_lists(exprt expr, size_t string_max_length)
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
   {
     // TODO: only copy when necessary
-    exprt op(expr.operands()[i]);
-    expr.operands()[i]=substitute_array_lists(op);
+    exprt op=(expr.operands()[i]);
+    expr.operands()[i]=substitute_array_lists(op, string_max_length);
   }
 
   if(expr.id()=="array-list")
@@ -1643,18 +1647,17 @@ exprt string_refinementt::substitute_array_lists(exprt expr) const
         "operands"));
     typet &char_type=expr.operands()[1].type();
     array_typet arr_type(char_type, infinity_exprt(char_type));
-    array_of_exprt new_arr(from_integer(0, char_type),
-                           arr_type);
+    exprt ret_expr=array_of_exprt(from_integer(0, char_type), arr_type);
 
-    with_exprt ret_expr(new_arr,
-                        expr.operands()[0],
-                        expr.operands()[1]);
-
-    for(size_t i=1; i<expr.operands().size()/2; i++)
+    for(size_t i=0; i<expr.operands().size()/2; i++)
     {
-      ret_expr=with_exprt(ret_expr,
-                          expr.operands()[i*2],
-                          expr.operands()[i*2+1]);
+      const exprt &index=expr.operands()[i*2];
+      const exprt &value=expr.operands()[i*2+1];
+      mp_integer index_value;
+      bool not_constant=to_integer(index, index_value);
+      if(not_constant ||
+         (index_value>=0 && index_value<string_max_length))
+        ret_expr=with_exprt(ret_expr, index, value);
     }
     return ret_expr;
   }
@@ -1692,7 +1695,7 @@ exprt string_refinementt::get(const exprt &expr) const
 
   ecopy=supert::get(ecopy);
 
-  return substitute_array_lists(ecopy);
+  return substitute_array_lists(ecopy, generator.max_string_length);
 }
 
 /// Creates a solver with `axiom` as the only formula added and runs it. If it

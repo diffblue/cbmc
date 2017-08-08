@@ -136,8 +136,6 @@ private:
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);
 
-  exprt substitute_array_lists(exprt) const;
-
   exprt compute_inverse_function(
     const exprt &qvar, const exprt &val, const exprt &f);
 
@@ -163,6 +161,8 @@ private:
 
   std::string string_of_array(const array_exprt &arr);
 };
+
+exprt substitute_array_lists(exprt expr, size_t string_max_length);
 
 /// Utility function for concretization of strings. Copies concretized values to
 /// the left to initialize the unconcretized indices of concrete_array.
