@@ -202,6 +202,17 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[2].type()=java_reference_type(
     array_typet(java_char_type(), infinity_exprt(string_length_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
+  if(class_name!="java.lang.CharSequence")
+  {
+    string_type.add_base(symbol_typet("java::java.io.Serializable"));
+    string_type.add_base(symbol_typet("java::java.lang.CharSequence"));
+  }
+  if(class_name=="java.lang.String")
+    string_type.add_base(symbol_typet("java::java.lang.Comparable"));
+
+  if(class_name=="java.lang.StringBuilder" ||
+     class_name=="java.lang.StringBuffer")
+    string_type.add_base(symbol_typet("java::java.lang.AbstractStringBuilder"));
 
   symbolt tmp_string_symbol;
   tmp_string_symbol.name="java::"+id2string(class_name);
