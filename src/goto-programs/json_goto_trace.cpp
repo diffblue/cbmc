@@ -13,11 +13,10 @@ Author: Daniel Kroening
 
 #include "json_goto_trace.h"
 
-#include <cassert>
-
 #include <util/json_expr.h>
 #include <util/arith_tools.h>
 #include <util/config.h>
+#include <util/invariant.h>
 
 #include <langapi/language_util.h>
 
@@ -194,7 +193,9 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        assert(step.full_lhs.is_not_nil());
+        DATA_INVARIANT(
+          step.full_lhs.is_not_nil(),
+          "full_lhs in assignment must not be nil");
         exprt simplified=simplify_array_access(step.full_lhs);
         full_lhs_string=from_expr(ns, identifier, simplified);
 
@@ -214,7 +215,9 @@ void convert(
         }
         else
         {
-          assert(step.full_lhs_value.is_not_nil());
+          DATA_INVARIANT(
+            step.full_lhs_value.is_not_nil(),
+            "full_lhs_value in assignment must not be nil");
           full_lhs_value=json(step.full_lhs_value, ns);
         }
 
