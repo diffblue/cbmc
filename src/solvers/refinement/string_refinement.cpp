@@ -29,6 +29,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_refinement_invariant.h>
+#include <solvers/refinement/string_constraint_instantiation.h>
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
@@ -606,8 +607,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
         debug()<< "constraint " << i << eom;
-        std::list<exprt> lemmas;
-        instantiate_not_contains(not_contains_axioms[i], lemmas);
+        const std::vector<exprt> lemmas=
+          instantiate_not_contains(not_contains_axioms[i]);
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
@@ -1603,60 +1604,23 @@ exprt string_refinementt::instantiate(
   return implies_exprt(bounds, instance);
 }
 
-/// instantiate a quantified formula representing `not_contains` by substituting
-/// the quantifiers and generating axioms
-/// \par parameters: a quantified formula representing `not_contains`, and a
-/// list to which to add the created lemmas to
-void string_refinementt::instantiate_not_contains(
-  const string_not_contains_constraintt &axiom, std::list<exprt> &new_lemmas)
+/// Instantiates a quantified formula representing `not_contains` by
+/// substituting the quantifiers and generating axioms.
+/// \param [in] axiom: the axiom to instantiate
+/// \return the lemmas produced through instantiation
+std::vector<exprt> string_refinementt::instantiate_not_contains(
+  const string_not_contains_constraintt &axiom)
 {
-  exprt s0=axiom.s0();
-  exprt s1=axiom.s1();
+  const string_exprt s0=to_string_expr(axiom.s0());
+  const string_exprt s1=to_string_expr(axiom.s1());
 
   debug() << "instantiate not contains " << from_expr(ns, "", s0) << " : "
           << from_expr(ns, "", s1) << eom;
-  expr_sett index_set0=index_set[to_string_expr(s0).content()];
-  expr_sett index_set1=index_set[to_string_expr(s1).content()];
+  const expr_sett index_set0=index_set[s0.content()];
+  const expr_sett index_set1=index_set[s1.content()];
 
-  for(auto it0 : index_set0)
-    for(auto it1 : index_set1)
-    {
-      debug() << from_expr(ns, "", it0) << " : " << from_expr(ns, "", it1)
-              << eom;
-      exprt val=minus_exprt(it0, it1);
-      exprt witness=generator.get_witness_of(axiom, val);
-      and_exprt prem_and_is_witness(
-        axiom.premise(),
-        equal_exprt(witness, it1));
-
-      not_exprt differ(
-        equal_exprt(
-          to_string_expr(s0)[it0],
-          to_string_expr(s1)[it1]));
-      exprt lemma=implies_exprt(prem_and_is_witness, differ);
-
-      new_lemmas.push_back(lemma);
-      // we put bounds on the witnesses:
-      // 0 <= v <= |s0| - |s1| ==> 0 <= v+w[v] < |s0| && 0 <= w[v] < |s1|
-      exprt zero=from_integer(0, val.type());
-      binary_relation_exprt c1(zero, ID_le, plus_exprt(val, witness));
-      binary_relation_exprt c2
-        (to_string_expr(s0).length(), ID_gt, plus_exprt(val, witness));
-      binary_relation_exprt c3(to_string_expr(s1).length(), ID_gt, witness);
-      binary_relation_exprt c4(zero, ID_le, witness);
-
-      minus_exprt diff(
-        to_string_expr(s0).length(),
-        to_string_expr(s1).length());
-
-      and_exprt premise(
-        binary_relation_exprt(zero, ID_le, val),
-        binary_relation_exprt(diff, ID_ge, val));
-      exprt witness_bounds=implies_exprt(
-        premise,
-        and_exprt(and_exprt(c1, c2), and_exprt(c3, c4)));
-      new_lemmas.push_back(witness_bounds);
-    }
+  return ::instantiate_not_contains(
+    axiom, index_set0, index_set1, generator);
 }
 
 /// replace array-lists by 'with' expressions

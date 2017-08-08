@@ -171,6 +171,7 @@ SRC = $(BOOLEFORCE_SRC) \
       refinement/string_constraint_generator_testing.cpp \
       refinement/string_constraint_generator_transformation.cpp \
       refinement/string_constraint_generator_valueof.cpp \
+      refinement/string_constraint_instantiation.cpp \
       sat/cnf.cpp \
       sat/cnf_clause_list.cpp \
       sat/dimacs_cnf.cpp \

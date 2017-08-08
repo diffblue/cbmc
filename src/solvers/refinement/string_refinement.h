@@ -133,9 +133,8 @@ private:
   exprt instantiate(
     const string_constraintt &axiom, const exprt &str, const exprt &val);
 
-  void instantiate_not_contains(
-    const string_not_contains_constraintt &axiom,
-    std::list<exprt> &new_lemmas);
+  std::vector<exprt> instantiate_not_contains(
+    const string_not_contains_constraintt &axiom);
 
   exprt substitute_array_lists(exprt) const;
 
