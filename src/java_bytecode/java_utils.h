@@ -52,4 +52,16 @@ void merge_source_location_rec(
 /// \return Returns true if 'id' identifies a string literal symbol
 bool is_java_string_literal_id(const irep_idt &id);
 
+/// Resolves a user-friendly method name (like packagename.Class.method)
+/// into an internal name (like java::packagename.Class.method:()V)
+/// The input may also have a type descriptor suffix to resolve ambiguity.
+/// On error, returns irep_idt() and sets error.
+/// \param friendly_name: user-friendly method name
+/// \param symbol_table: global symbol table
+/// \param [out] error: gets error description on failure
+irep_idt resolve_friendly_method_name(
+  const std::string &friendly_name,
+  const symbol_tablet &symbol_table,
+  std::string &error);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

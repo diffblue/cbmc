@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_entry_point.h"
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
+#include "java_utils.h"
 
 #include "expr2java.h"
 
@@ -53,6 +54,13 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
     lazy_methods_mode=LAZY_METHODS_MODE_CONTEXT_INSENSITIVE;
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
+
+  const std::list<std::string> &extra_entry_points=
+    cmd.get_values("lazy-methods-extra-entry-point");
+  lazy_methods_extra_entry_points.insert(
+    lazy_methods_extra_entry_points.end(),
+    extra_entry_points.begin(),
+    extra_entry_points.end());
 
   if(cmd.isset("java-cp-include-files"))
   {
@@ -463,6 +471,54 @@ bool java_bytecode_languaget::typecheck(
   return false;
 }
 
+/// Translates the given list of method names from human-readable to
+/// internal syntax.
+/// Expands any wildcards (entries ending in '.*') in the given method
+/// list to include all non-static methods defined on the given class.
+/// \param [in, out] methods: List of methods to expand. Any wildcard entries
+///   will be deleted and the expanded entries appended to the end.
+/// \param symbol_table: global symbol table
+static void resolve_method_names(
+  std::vector<irep_idt> &methods,
+  const symbol_tablet &symbol_table)
+{
+  std::vector<irep_idt> new_methods;
+  for(const irep_idt &method : methods)
+  {
+    const std::string &method_str=id2string(method);
+    if(!has_suffix(method_str, ".*"))
+    {
+      std::string error_message;
+      irep_idt internal_name=
+        resolve_friendly_method_name(
+          method_str,
+          symbol_table,
+          error_message);
+      if(internal_name==irep_idt())
+        throw "entry point "+error_message;
+      new_methods.push_back(internal_name);
+    }
+    else
+    {
+      irep_idt classname="java::"+method_str.substr(0, method_str.length()-2);
+      if(!symbol_table.has_symbol(classname))
+        throw "wildcard entry point '"+method_str+"': unknown class";
+
+      for(const auto &name_symbol : symbol_table.symbols)
+      {
+        if(name_symbol.second.type.id()!=ID_code)
+          continue;
+        if(!to_code_type(name_symbol.second.type).has_this())
+          continue;
+        if(has_prefix(id2string(name_symbol.first), id2string(classname)))
+          new_methods.push_back(name_symbol.first);
+      }
+    }
+  }
+
+  methods=std::move(new_methods);
+}
+
 /// Uses a simple context-insensitive ('ci') analysis to determine which methods
 /// may be reachable from the main entry point. In brief, static methods are
 /// reachable if we find a callsite in another reachable site, while virtual
@@ -511,6 +567,15 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   }
   else
     method_worklist2.push_back(main_function.main_function.name);
+
+  // Add any extra entry points specified; we should elaborate these in the
+  // same way as the main function.
+  std::vector<irep_idt> extra_entry_points=lazy_methods_extra_entry_points;
+  resolve_method_names(extra_entry_points, symbol_table);
+  method_worklist2.insert(
+    method_worklist2.begin(),
+    extra_entry_points.begin(),
+    extra_entry_points.end());
 
   std::set<irep_idt> needed_classes;
 

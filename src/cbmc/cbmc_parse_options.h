@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+
 #include "xml_interface.h"
 
 class bmct;
@@ -64,14 +66,9 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
-  "(java-max-vla-length):" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
-  "(java-cp-include-files):" \
-  "(java-throw-runtime-exceptions)" \
-  "(java-max-input-array-length):" \
-  "(java-max-input-tree-depth):" \
   "(localize-faults)(localize-faults-method):" \
-  "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
 class cbmc_parse_optionst:
