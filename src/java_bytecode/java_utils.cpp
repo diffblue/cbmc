@@ -108,3 +108,66 @@ void merge_source_location_rec(
   for(exprt &op : expr.operands())
     merge_source_location_rec(op, source_location);
 }
+
+bool is_java_string_literal_id(const irep_idt &id)
+{
+  return has_prefix(id2string(id), JAVA_STRING_LITERAL_PREFIX);
+}
+
+irep_idt resolve_friendly_method_name(
+  const std::string &friendly_name,
+  const symbol_tablet &symbol_table,
+  std::string &error)
+{
+  std::string qualified_name="java::"+friendly_name;
+  if(friendly_name.rfind(':')==std::string::npos)
+  {
+    std::string prefix=qualified_name+':';
+    std::set<irep_idt> matches;
+
+    for(const auto &s : symbol_table.symbols)
+      if(has_prefix(id2string(s.first), prefix) &&
+         s.second.type.id()==ID_code)
+        matches.insert(s.first);
+
+    if(matches.empty())
+    {
+      error="'"+friendly_name+"' not found";
+      return irep_idt();
+    }
+    else if(matches.size()>1)
+    {
+      std::ostringstream message;
+      message << "'"+friendly_name+"' is ambiguous between:";
+
+      // Trim java:: prefix so we can recommend an appropriate input:
+      for(const auto &s : matches)
+        message << "\n  " << id2string(s).substr(6);
+
+      error=message.str();
+      return irep_idt();
+    }
+    else
+    {
+      return *matches.begin();
+    }
+  }
+  else
+  {
+    auto findit=symbol_table.symbols.find(qualified_name);
+    if(findit==symbol_table.symbols.end())
+    {
+      error="'"+friendly_name+"' not found";
+      return irep_idt();
+    }
+    else if(findit->second.type.id()!=ID_code)
+    {
+      error="'"+friendly_name+"' not a function";
+      return irep_idt();
+    }
+    else
+    {
+      return findit->first;
+    }
+  }
+}

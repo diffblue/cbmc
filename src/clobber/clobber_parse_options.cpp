@@ -536,6 +536,8 @@ void clobber_parse_optionst::help()
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
     "\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --show-properties            show the properties\n"

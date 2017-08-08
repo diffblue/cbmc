@@ -1068,22 +1068,9 @@ void cbmc_parse_optionst::help()
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-assume-inputs-non-null test harness makes input arguments not null\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-max-input-array-length N maximum allowed length for an array passed as input\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-max-input-tree-depth N   object references are (deterministically) set to null in the object\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    "                                 hierarchy of input parameters when their depth is >= N and the object\n"
-    "                                 type happens twice in the tree branch\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-max-vla-length        limit the length of user-code-created arrays\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-throw-runtime-exceptions make implicit runtime exceptions explicit\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    // This one is handled by cbmc_parse_options not by the Java frontend,
+    // hence its presence here:
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"

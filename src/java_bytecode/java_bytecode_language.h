@@ -16,6 +16,32 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader.h"
 #include "java_string_library_preprocess.h"
 
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
+  "(java-assume-inputs-non-null)"                 \
+  "(java-throw-runtime-exceptions)"               \
+  "(java-max-input-array-length):"                \
+  "(java-max-input-tree-depth):"                  \
+  "(java-max-vla-length):"                        \
+  "(java-cp-include-files):"                      \
+  "(lazy-methods)"                                \
+  "(lazy-methods-extra-entry-point):"
+
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
+  " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"       \
+  "                                  entry point with null\n"                                   \
+  " --java-throw-runtime-exceptions  make implicit runtime exceptions explicit\n"               \
+  " --java-max-input-array-length N  limit input array size to <= N\n"                          \
+  " --java-max-input-tree-depth N    object references are (deterministically) set to null in\n"\
+  "                                  the object\n"                                              \
+  " --java-max-vla-length            limit the length of user-code-created arrays\n"            \
+  " --java-cp-include-files          regexp or JSON list of files to load (with '@' prefix)\n"  \
+  " --lazy-methods                   only translate methods that appear to be reachable from\n" \
+  "                                  the --function entry point or main class\n"                \
+  " --lazy-methods-extra-entry-point METHODNAME\n"                                              \
+  "                                  treat METHODNAME as a possible program entry point for\n"  \
+  "                                  the purpose of lazy method loading\n"                      \
+  "                                  A '.*' wildcard is allowed to specify all class members\n"
+
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
 #define MAX_NONDET_TREE_DEPTH 5
 
@@ -110,6 +136,7 @@ protected:
   size_t max_user_array_length;     // max size for user code created arrays
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
+  std::vector<irep_idt> lazy_methods_extra_entry_points;
   bool string_refinement_enabled;
   bool throw_runtime_exceptions;
   java_string_library_preprocesst string_preprocess;
