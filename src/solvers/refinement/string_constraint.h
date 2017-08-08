@@ -24,6 +24,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <util/refined_string_type.h>
+#include <util/string_expr.h>
 #include <langapi/language_util.h>
 
 /*! \brief Universally quantified string constraint
@@ -138,12 +139,20 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
   return static_cast<string_constraintt &>(expr);
 }
 
+/// Used for debug printing.
+/// \param [in] ns: namespace for `from_expr`
+/// \param [in] identifier: identifier for `from_expr`
+/// \param [in] expr: constraint to render
+/// \return rendered string
 inline static std::string from_expr(
   const namespacet &ns,
   const irep_idt &identifier,
   const string_constraintt &expr)
 {
-  return from_expr(ns, identifier, expr.premise())+" => "+
+  return "forall "+from_expr(ns, identifier, expr.univ_var())+" in ["+
+    from_expr(ns, identifier, expr.lower_bound())+", "+
+    from_expr(ns, identifier, expr.upper_bound())+"). "+
+    from_expr(ns, identifier, expr.premise())+" => "+
     from_expr(ns, identifier, expr.body());
 }
 
@@ -203,6 +212,26 @@ public:
     return to_string_expr(operands()[6]);
   }
 };
+
+/// Used for debug printing.
+/// \param [in] ns: namespace for `from_expr`
+/// \param [in] identifier: identifier for `from_expr`
+/// \param [in] expr: constraint to render
+/// \return rendered string
+inline static std::string from_expr(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const string_not_contains_constraintt &expr)
+{
+  return "forall x in ["+
+    from_expr(ns, identifier, expr.univ_lower_bound())+", "+
+    from_expr(ns, identifier, expr.univ_upper_bound())+"). "+
+    from_expr(ns, identifier, expr.premise())+" => ("+
+    "exists y in ["+from_expr(ns, identifier, expr.exists_lower_bound())+", "+
+    from_expr(ns, identifier, expr.exists_upper_bound())+"). "+
+    from_expr(ns, identifier, expr.s0())+"[x+y] != "+
+    from_expr(ns, identifier, expr.s1())+"[y])";
+}
 
 inline const string_not_contains_constraintt
 &to_string_not_contains_constraint(const exprt &expr)
