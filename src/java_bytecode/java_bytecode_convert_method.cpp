@@ -1052,6 +1052,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
        i_it->statement=="checkcast" ||
        i_it->statement=="newarray" ||
        i_it->statement=="anewarray" ||
+       i_it->statement=="idiv" ||
+       i_it->statement=="ldiv" ||
+       i_it->statement=="irem" ||
+       i_it->statement=="lrem" ||
        i_it->statement==patternt("?astore") ||
        i_it->statement==patternt("?aload") ||
        i_it->statement=="invokestatic" ||
