@@ -298,10 +298,16 @@ std::string utf16_little_endian_to_java(const std::wstring &in)
       result << "\\n";
     else if(ch=='\r')
       result << "\\r";
+    else if(ch=='\f')
+      result << "\\f";
+    else if(ch=='\b')
+      result << "\\b";
+    else if(ch=='\t')
+      result << "\\t";
     else if(ch<=255 && isprint(ch, loc))
     {
       const auto uch=static_cast<unsigned char>(ch);
-      if(uch=='"')
+      if(uch=='"' || uch=='\\')
         result << '\\';
       result << uch;
     }
