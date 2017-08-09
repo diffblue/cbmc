@@ -12,15 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
-#include <util/endianness_map.h>
 #include <util/std_expr.h>
 #include <util/throw_with_nested.h>
 
 #include "bv_conversion_exceptions.h"
+#include "bv_endianness_map.h"
 #include "flatten_byte_extract_exceptions.h"
 #include "flatten_byte_operators.h"
 
-bvt map_bv(const endianness_mapt &map, const bvt &src)
+bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 {
   assert(map.number_of_bits()==src.size());
 
@@ -95,11 +95,11 @@ bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 
   // first do op0
 
-  endianness_mapt op_map(op.type(), little_endian, ns);
+  bv_endianness_mapt op_map(op.type(), little_endian, ns, boolbv_width);
   const bvt op_bv=map_bv(op_map, convert_bv(op));
 
   // do result
-  endianness_mapt result_map(expr.type(), little_endian, ns);
+  bv_endianness_mapt result_map(expr.type(), little_endian, ns, boolbv_width);
   bvt bv;
   bv.resize(width);
 

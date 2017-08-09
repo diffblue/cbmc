@@ -37,6 +37,10 @@ public:
     build(type, little_endian);
   }
 
+  explicit endianness_mapt(const namespacet &_ns) : ns(_ns)
+  {
+  }
+
   size_t map_bit(size_t bit) const
   {
     assert(bit<map.size());
@@ -58,8 +62,8 @@ protected:
   const namespacet &ns;
   std::vector<size_t> map; // bit-nr to bit-nr
 
-  void build_little_endian(const typet &type);
-  void build_big_endian(const typet &type);
+  virtual void build_little_endian(const typet &type);
+  virtual void build_big_endian(const typet &type);
 };
 
 inline std::ostream &operator<<(
