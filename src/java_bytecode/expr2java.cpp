@@ -397,10 +397,10 @@ std::string expr2javat::convert_with_precedence(
   {
     const exprt &catch_expr=
       to_code_landingpad(to_code(src)).catch_expr();
-    return "catch_landingpad(" +
-      convert(catch_expr.type()) +
-      ' ' +
-      convert(catch_expr) +
+    return "catch_landingpad("+
+      convert(catch_expr.type())+
+      ' '+
+      convert(catch_expr)+
       ')';
   }
   else if(src.id()==ID_unassigned)

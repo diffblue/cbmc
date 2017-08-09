@@ -1223,7 +1223,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(cur_pc==it->handler_pc)
       {
         if(catch_type!=typet() || it->catch_type==symbol_typet())
+        {
           catch_type=symbol_typet("java::java.lang.Throwable");
+          break;
+        }
         else
           catch_type=it->catch_type;
       }

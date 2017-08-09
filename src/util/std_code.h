@@ -1229,17 +1229,13 @@ public:
   }
 };
 
-static inline code_push_catcht &
-to_code_push_catch(
-  codet &code)
+static inline code_push_catcht &to_code_push_catch(codet &code)
 {
   assert(code.get_statement()==ID_push_catch);
   return static_cast<code_push_catcht &>(code);
 }
 
-static inline const code_push_catcht &
-to_code_push_catch(
-  const codet &code)
+static inline const code_push_catcht &to_code_push_catch(const codet &code)
 {
   assert(code.get_statement()==ID_push_catch);
   return static_cast<const code_push_catcht &>(code);
@@ -1256,15 +1252,13 @@ public:
   }
 };
 
-static inline code_pop_catcht &to_code_pop_catch(
-  codet &code)
+static inline code_pop_catcht &to_code_pop_catch(codet &code)
 {
   assert(code.get_statement()==ID_pop_catch);
   return static_cast<code_pop_catcht &>(code);
 }
 
-static inline const code_pop_catcht &to_code_pop_catch(
-  const codet &code)
+static inline const code_pop_catcht &to_code_pop_catch(const codet &code)
 {
   assert(code.get_statement()==ID_pop_catch);
   return static_cast<const code_pop_catcht &>(code);
@@ -1301,9 +1295,7 @@ static inline code_landingpadt &to_code_landingpad(codet &code)
   return static_cast<code_landingpadt &>(code);
 }
 
-static inline const code_landingpadt &
-to_code_landingpad(
-  const codet &code)
+static inline const code_landingpadt &to_code_landingpad(const codet &code)
 {
   assert(code.get_statement()==ID_exception_landingpad);
   return static_cast<const code_landingpadt &>(code);
