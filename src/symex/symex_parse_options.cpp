@@ -304,6 +304,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // Java throw and catch -> explicit exceptional return variables:
+    // This introduces instanceof, so order is important:
     remove_exceptions(goto_model);
     // Java instanceof -> clsid comparison:
     remove_instanceof(goto_model);

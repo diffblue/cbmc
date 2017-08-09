@@ -356,6 +356,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove Java throw and catch
+    // This introduces instanceof, so order is important:
     remove_exceptions(goto_model);
     // remove rtti
     remove_instanceof(goto_model);
