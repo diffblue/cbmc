@@ -67,4 +67,8 @@ void java_bytecode_typecheckt::typecheck_code(codet &code)
         a_it++)
       typecheck_expr(*a_it);
   }
+  else if(statement==ID_assert || statement==ID_assume)
+  {
+    typecheck_expr(code.op0());
+  }
 }
