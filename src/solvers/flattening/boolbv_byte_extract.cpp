@@ -38,8 +38,12 @@ bvt map_bv(const bv_endianness_mapt &map, const bvt &src)
 bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   // array logic does not handle byte operators, thus lower when operating on
-  // unbounded arrays
-  if(is_unbounded_array(expr.op().type()))
+  // unbounded arrays; similarly, byte extracts over pointers are not to be
+  // handled here
+  if(
+    is_unbounded_array(expr.op().type()) ||
+    has_subtype(expr.type(), ID_pointer, ns) ||
+    has_subtype(expr.op().type(), ID_pointer, ns))
   {
     return convert_bv(lower_byte_extract(expr, ns));
   }
