@@ -21,6 +21,8 @@ Author: Peter Schrammel
 #include "config.h"
 #include "identifier.h"
 #include "language.h"
+#include "invariant.h"
+
 #include <langapi/mode.h>
 
 #include <memory>
@@ -228,6 +230,27 @@ json_objectt json(
 
   if(expr.id()==ID_constant)
   {
+    std::unique_ptr<languaget> lang;
+    if(mode==ID_unknown)
+      lang=std::unique_ptr<languaget>(get_default_language());
+    else
+    {
+      lang=std::unique_ptr<languaget>(get_language_from_mode(mode));
+      if(!lang)
+        lang=std::unique_ptr<languaget>(get_default_language());
+    }
+
+    const typet &underlying_type=
+      type.id()==ID_c_bit_field?type.subtype():
+      type;
+
+    std::string type_string;
+    bool error=lang->from_type(underlying_type, type_string, ns);
+    CHECK_RETURN(!error);
+
+    std::string value_string;
+    lang->from_expr(expr, value_string, ns);
+
     const constant_exprt &constant_expr=to_constant_expr(expr);
     if(type.id()==ID_unsignedbv ||
        type.id()==ID_signedbv ||
@@ -238,32 +261,8 @@ json_objectt json(
       result["name"]=json_stringt("integer");
       result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["width"]=json_numbert(std::to_string(width));
-
-      const typet &underlying_type=
-        type.id()==ID_c_bit_field?type.subtype():
-        type;
-
-      std::unique_ptr<languaget> lang;
-      if(mode==ID_unknown)
-        lang=std::unique_ptr<languaget>(get_default_language());
-      else
-      {
-        lang=std::unique_ptr<languaget>(get_language_from_mode(mode));
-        if(!lang)
-          lang=std::unique_ptr<languaget>(get_default_language());
-      }
-
-      std::string type_string;
-      if(!lang->from_type(underlying_type, type_string, ns))
-        result["type"]=json_stringt(type_string);
-      else
-        assert(false && "unknown type");
-
-      mp_integer i;
-      if(!to_integer(expr, i))
-        result["data"]=json_stringt(integer2string(i));
-      else
-        assert(false && "could not convert data to integer");
+      result["type"]=json_stringt(type_string);
+      result["data"]=json_stringt(value_string);
     }
     else if(type.id()==ID_c_enum)
     {
@@ -271,12 +270,7 @@ json_objectt json(
       result["binary"]=json_stringt(id2string(constant_expr.get_value()));
       result["width"]=json_numbert(type.subtype().get_string(ID_width));
       result["type"]=json_stringt("enum");
-
-      mp_integer i;
-      if(!to_integer(expr, i))
-        result["data"]=json_stringt(integer2string(i));
-      else
-        assert(false && "could not convert data to integer");
+      result["data"]=json_stringt(value_string);
     }
     else if(type.id()==ID_c_enum_tag)
     {
@@ -309,17 +303,20 @@ json_objectt json(
     else if(type.id()==ID_pointer)
     {
       result["name"]=json_stringt("pointer");
+      result["type"]=json_stringt(type_string);
       exprt simpl_expr=simplify_json_expr(expr, ns);
       if(simpl_expr.get(ID_value)==ID_NULL ||
          // remove typecast on NULL
          (simpl_expr.id()==ID_constant && simpl_expr.type().id()==ID_pointer &&
           simpl_expr.op0().get(ID_value)==ID_NULL))
-        result["data"]=json_stringt("NULL");
+        result["data"]=json_stringt(value_string);
       else if(simpl_expr.id()==ID_symbol)
       {
         const irep_idt &ptr_id=to_symbol_expr(simpl_expr).get_identifier();
         identifiert identifier(id2string(ptr_id));
-        assert(!identifier.components.empty());
+        DATA_INVARIANT(
+          !identifier.components.empty(),
+          "pointer identifier should have non-empty components");
         result["data"]=json_stringt(identifier.components.back());
       }
     }
@@ -332,11 +329,10 @@ json_objectt json(
     else if(type.id()==ID_c_bool)
     {
       result["name"]=json_stringt("integer");
-      result["type"]=json_stringt("_Bool");
+      result["width"]=json_numbert(type.get_string(ID_width));
+      result["type"]=json_stringt(type_string);
       result["binary"]=json_stringt(expr.get_string(ID_value));
-      mp_integer b;
-      to_integer(to_constant_expr(expr), b);
-      result["data"]=json_stringt(integer2string(b));
+      result["data"]=json_stringt(value_string);
     }
     else if(type.id()==ID_string)
     {
@@ -372,7 +368,9 @@ json_objectt json(
     {
       const struct_typet &struct_type=to_struct_type(type);
       const struct_typet::componentst &components=struct_type.components();
-      assert(components.size()==expr.operands().size());
+      DATA_INVARIANT(
+        components.size()==expr.operands().size(),
+        "number of struct components should match with its type");
 
       json_arrayt &members=result["members"].make_array();
       for(unsigned m=0; m<expr.operands().size(); m++)
@@ -387,11 +385,10 @@ json_objectt json(
   {
     result["name"]=json_stringt("union");
 
-    assert(expr.operands().size()==1);
-
+    const union_exprt &union_expr=to_union_expr(expr);
     json_objectt &e=result["member"].make_object();
-    e["value"]=json(expr.op0(), ns, mode);
-    e["name"]=json_stringt(id2string(to_union_expr(expr).get_component_name()));
+    e["value"]=json(union_expr.op(), ns, mode);
+    e["name"]=json_stringt(id2string(union_expr.get_component_name()));
   }
   else
     result["name"]=json_stringt("unknown");

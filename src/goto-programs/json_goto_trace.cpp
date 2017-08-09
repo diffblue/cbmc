@@ -13,11 +13,10 @@ Author: Daniel Kroening
 
 #include "json_goto_trace.h"
 
-#include <cassert>
-
 #include <util/json_expr.h>
 #include <util/arith_tools.h>
 #include <util/config.h>
+#include <util/invariant.h>
 
 #include <langapi/language_util.h>
 
@@ -194,7 +193,9 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        assert(step.full_lhs.is_not_nil());
+        DATA_INVARIANT(
+          step.full_lhs.is_not_nil(),
+          "full_lhs in assignment must not be nil");
         exprt simplified=simplify_array_access(step.full_lhs);
         full_lhs_string=from_expr(ns, identifier, simplified);
 
@@ -214,7 +215,9 @@ void convert(
         }
         else
         {
-          assert(step.full_lhs_value.is_not_nil());
+          DATA_INVARIANT(
+            step.full_lhs_value.is_not_nil(),
+            "full_lhs_value in assignment must not be nil");
           full_lhs_value=json(step.full_lhs_value, ns);
         }
 
@@ -251,6 +254,7 @@ void convert(
           mode=ID_unknown;
         else
           mode=function_name->mode;
+        json_output["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -276,6 +280,15 @@ void convert(
         json_input["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_input["inputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
+        json_input["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_input["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -283,7 +296,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
