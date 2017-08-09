@@ -23,6 +23,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <numeric>
 #include <stack>
 #include <util/expr_iterator.h>
+#include <util/expr_util.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
@@ -340,8 +341,8 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       // function applications can be ignored because they will be replaced
       // in the convert_function_application step of dec_solve
     }
-    else if(lhs.type().id() != ID_pointer &&
-      has_char_pointer_subtype(lhs.type()))
+    else if(
+      lhs.type().id() != ID_pointer && has_char_pointer_subtype(lhs.type(), ns))
     {
       if(rhs.type().id() == ID_struct)
       {
@@ -432,7 +433,7 @@ static void add_string_equation_to_symbol_resolution(
   {
     symbol_resolve.make_union(eq.lhs(), eq.rhs());
   }
-  else if(has_string_subtype(eq.lhs().type()))
+  else if(has_subtype(eq.lhs().type(), ID_string, ns))
   {
     if(eq.rhs().type().id() == ID_struct)
     {
@@ -484,8 +485,9 @@ union_find_replacet string_identifiers_resolution_from_equations(
       for(const auto &expr : rhs_strings)
         equation_map.add(i, expr);
     }
-    else if(eq.lhs().type().id() != ID_pointer &&
-       has_string_subtype(eq.lhs().type()))
+    else if(
+      eq.lhs().type().id() != ID_pointer &&
+      has_subtype(eq.lhs().type(), ID_string, ns))
     {
       std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
 

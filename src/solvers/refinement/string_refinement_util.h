@@ -35,34 +35,13 @@ bool is_char_array_type(const typet &type, const namespacet &ns);
 bool is_char_pointer_type(const typet &type);
 
 /// \param type: a type
-/// \param pred: a predicate
-/// \return true if one of the subtype of `type` satisfies predicate `pred`.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-///         For instance in the type `t` defined by
-///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
-///         `double` and `bool` are subtypes of `t`.
-bool has_subtype(
-  const typet &type,
-  const std::function<bool(const typet &)> &pred);
-
-/// \param type: a type
+/// \param ns: namespace
 /// \return true if a subtype of `type` is an pointer of characters.
 ///         The meaning of "subtype" is in the algebraic datatype sense:
 ///         for example, the subtypes of a struct are the types of its
 ///         components, the subtype of a pointer is the type it points to,
 ///         etc...
-bool has_char_pointer_subtype(const typet &type);
-
-/// \param type: a type
-/// \return true if a subtype of `type` is string_typet.
-///         The meaning of "subtype" is in the algebraic datatype sense:
-///         for example, the subtypes of a struct are the types of its
-///         components, the subtype of a pointer is the type it points to,
-///         etc...
-bool has_string_subtype(const typet &type);
+bool has_char_pointer_subtype(const typet &type, const namespacet &ns);
 
 /// \param expr: an expression
 /// \param ns: namespace

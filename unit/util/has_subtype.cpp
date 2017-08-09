@@ -1,7 +1,6 @@
 /*******************************************************************\
 
- Module: Unit tests for has_subtype in
-   solvers/refinement/string_refinement.cpp
+ Module: Unit tests for has_subtype in expr_util.cpp
 
  Author: Diffblue Ltd.
 
@@ -10,7 +9,10 @@
 #include <testing-utils/catch.hpp>
 
 #include <util/c_types.h>
-#include <solvers/refinement/string_refinement.h>
+#include <util/expr_util.h>
+#include <util/namespace.h>
+#include <util/symbol_table.h>
+
 #include <java_bytecode/java_types.h>
 
 // Curryfied version of type comparison.
@@ -23,12 +25,15 @@ static std::function<bool(const typet &)> is_type(const typet &t1)
 
 SCENARIO("has_subtype", "[core][solvers][refinement][string_refinement]")
 {
+  const symbol_tablet symbol_table;
+  const namespacet ns(symbol_table);
+
   const typet char_type = java_char_type();
   const typet int_type = java_int_type();
   const typet bool_type = java_boolean_type();
 
-  REQUIRE(has_subtype(char_type, is_type(char_type)));
-  REQUIRE_FALSE(has_subtype(char_type, is_type(int_type)));
+  REQUIRE(has_subtype(char_type, is_type(char_type), ns));
+  REQUIRE_FALSE(has_subtype(char_type, is_type(int_type), ns));
 
   GIVEN("a struct with char and int fields")
   {
@@ -37,12 +42,12 @@ SCENARIO("has_subtype", "[core][solvers][refinement][string_refinement]")
     struct_type.components().emplace_back("int_field", int_type);
     THEN("char and int are subtypes")
     {
-      REQUIRE(has_subtype(struct_type, is_type(char_type)));
-      REQUIRE(has_subtype(struct_type, is_type(int_type)));
+      REQUIRE(has_subtype(struct_type, is_type(char_type), ns));
+      REQUIRE(has_subtype(struct_type, is_type(int_type), ns));
     }
     THEN("bool is not a subtype")
     {
-      REQUIRE_FALSE(has_subtype(struct_type, is_type(bool_type)));
+      REQUIRE_FALSE(has_subtype(struct_type, is_type(bool_type), ns));
     }
   }
 
@@ -51,11 +56,11 @@ SCENARIO("has_subtype", "[core][solvers][refinement][string_refinement]")
     pointer_typet ptr_type = pointer_type(char_type);
     THEN("char is a subtype")
     {
-      REQUIRE(has_subtype(ptr_type, is_type(char_type)));
+      REQUIRE(has_subtype(ptr_type, is_type(char_type), ns));
     }
     THEN("int is not a subtype")
     {
-      REQUIRE_FALSE(has_subtype(ptr_type, is_type(int_type)));
+      REQUIRE_FALSE(has_subtype(ptr_type, is_type(int_type), ns));
     }
   }
 }

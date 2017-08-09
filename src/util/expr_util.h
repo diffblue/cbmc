@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep.h"
 
+#include <functional>
+
 class exprt;
 class symbol_exprt;
 class update_exprt;
@@ -43,6 +45,26 @@ exprt boolean_negate(const exprt &);
 
 /// returns true if the expression has a subexpression with given ID
 bool has_subexpr(const exprt &, const irep_idt &);
+
+/// returns true if any of the contained types satisfies pred
+/// \param type: a type
+/// \param pred: a predicate
+/// \param ns: namespace for symbol type lookups
+/// \return true if one of the subtype of `type` satisfies predicate `pred`.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+///         For instance in the type `t` defined by
+///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
+///         `double` and `bool` are subtypes of `t`.
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &)> &pred,
+  const namespacet &ns);
+
+/// returns true if any of the contained types is id
+bool has_subtype(const typet &, const irep_idt &id, const namespacet &);
 
 /// lift up an if_exprt one level
 if_exprt lift_if(const exprt &, std::size_t operand_number);
