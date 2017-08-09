@@ -27,6 +27,8 @@ class empty_edget
 {
 };
 
+/// This class represents a node in a directed graph.
+/// See \ref grapht for more information.
 template<class E=empty_edget>
 class graph_nodet
 {
@@ -59,7 +61,7 @@ public:
   }
 };
 
-// a node type with an extra bit
+/// A node type with an extra bit
 template<class E>
 class visited_nodet:public graph_nodet<E>
 {
@@ -74,8 +76,7 @@ public:
   }
 };
 
-// compute intersection of two edge sets,
-// in linear time
+/// Compute intersection of two edge sets, in linear time
 template<class E>
 void intersection(
   const typename graph_nodet<E>::edgest &a,
@@ -101,7 +102,32 @@ void intersection(
   }
 }
 
-// a generic graph class with a parametric node type
+/// A generic directed graph with a parametric node type.
+///
+/// The nodes of the graph are stored in the only field of the class, a
+/// std::vector named `nodes`. Nodes are instances of class graph_nodet<E> or a
+/// subclass of it. Graph edges contain a payload object of parametric type E
+/// (which has to be default-constructible).  By default E is instantiated with
+/// an empty class (empty_edget).
+///
+/// Each node is identified by its offset inside the `nodes` vector. The
+/// incoming and outgoing edges of a node are stored as std::maps in the fields
+/// `in` and `out` of the graph_nodet<E>. These maps associate a node identifier
+/// (the offset) to the edge payload (of type E).
+///
+/// In fact, observe that two instances of E are stored per edge of the graph.
+/// For instance, assume that we want to create a graph with two nodes, A and B,
+/// and one edge from A to B, labelled by object e. We achieve this by inserting
+/// the pair (offsetof(B),e) in the map `A.out` and the pair (offsetof(A),e) in
+/// the map `B.in`.
+///
+/// Nodes are inserted in the graph using grapht::add_node(), which returns the
+/// identifier (offset) of the inserted node. Edges between nodes are created
+/// by grapht::add_edge(a,b), where `a` and `b` are the identifiers of nodes.
+/// Method `add_edges` adds a default-constructed payload object of type E.
+/// Adding a payload objet `e` to an edge seems to be only possibly by manually
+/// inserting `e` in the std::maps `in` and `out` of the two nodes associated to
+/// the edge.
 template<class N=graph_nodet<empty_edget> >
 class grapht
 {

@@ -8,9 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ieee_float.h"
 
-// <cstdint> is yet to come
-#include <stdint.h>
-
+#include <cstdint>
 #include <ostream>
 #include <cassert>
 #include <cmath>

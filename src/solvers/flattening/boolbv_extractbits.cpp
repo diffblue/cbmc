@@ -17,15 +17,6 @@ bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
   if(width==0)
     return conversion_failed(expr);
 
-  const irep_idt &type_id=expr.type().id();
-
-  if(type_id!=ID_signedbv &&
-     type_id!=ID_unsignedbv &&
-     type_id!=ID_c_enum &&
-     type_id!=ID_c_enum_tag &&
-     type_id!=ID_bv)
-    return conversion_failed(expr);
-
   if(expr.operands().size()!=3)
   {
     error().source_location=expr.find_source_location();

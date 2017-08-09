@@ -31,6 +31,31 @@ struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
   I PC;
 };
 
+/// A multi-procedural control flow graph (CFG) whose nodes store references to
+/// instructions in a GOTO program.
+///
+/// An instance of cfg_baset<T> is a directed graph whose nodes inherit from a
+/// user-provided type T and store a pointer to an instruction of some
+/// goto program in the field `PC`. The field `PC` of every node points to the
+/// original GOTO instruction that gave rise to the node, and the field
+/// cfg_baset::entry_map maps every GOTO instruction to some CFG node.
+///
+/// The CFG is constructed on the operator() from either one goto_programt or
+/// multiple goto_programt objects (stored in a goto_functionst).  The edges of
+/// the CFG are created on the method compute_edges(), and notably include:
+///
+/// - Edges from location A to B if both A and B belong to the same
+///   goto_programt and A can flow into B.
+/// - An edge from each FUNCTION_CALL instruction and the first instruction of
+///   the called function, when that function body is available and its body is
+///   non-empty.
+/// - For each FUNCTION_CALL instruction found, an edge between the exit point
+///   of the called function and the instruction immediately after the
+///   FUNCTION_CALL, when the function body is available and its body is
+///   non-empty.
+///
+///   Note that cfg_baset is the base class of many other subclasses and the
+///   specific edges constructed by operator() can be different in those.
 template<class T,
          typename P=const goto_programt,
          typename I=goto_programt::const_targett>
