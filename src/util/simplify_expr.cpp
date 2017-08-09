@@ -2230,8 +2230,7 @@ bool simplify_exprt::simplify_node(exprt &expr)
     result=simplify_mod(expr) && result;
   else if(expr.id()==ID_bitnot)
     result=simplify_bitnot(expr) && result;
-  else if(expr.id()==ID_bitnot ||
-          expr.id()==ID_bitand ||
+  else if(expr.id()==ID_bitand ||
           expr.id()==ID_bitor ||
           expr.id()==ID_bitxor)
     result=simplify_bitwise(expr) && result;
