@@ -27,6 +27,54 @@ Date:   December 2016
 
 #include <analyses/uncaught_exceptions_analysis.h>
 
+/// Lowers high-level exception descriptions into low-level operations suitable
+/// for symex and other analyses that don't understand the THROW or CATCH GOTO
+/// instructions.
+///
+/// The instructions affected by the lowering are:
+///
+/// THROW, whose operand must be a code_expressiont wrapping a
+/// side_effect_expr_throwt. This starts propagating an exception, aborting
+/// functions until a suitable catch point is found.
+///
+/// CATCH with a code_push_catcht operand, which commences a region in which
+/// exceptions should be caught, commonly a try block.
+/// It specifies one or more exception tags to handle
+/// (in instruction->code.exception_list()) and a corresponding GOTO program
+/// target for each (in instruction->targets).
+/// Thrown instructions are currently always matched to tags using
+/// java_instanceof, so a language frontend wanting to use this class
+/// must use exceptions with a Java-compatible structure.
+///
+/// CATCH with a code_pop_catcht operand terminates a try-block begun by
+/// a code_push_catcht. At present the try block consists of the instructions
+/// between the push and the pop *in program order*, not according to dynamic
+/// control flow, so goto_convert_exceptions must ensure that control-flow
+/// within the try block does not leave this range.
+///
+/// CATCH with a code_landingpadt operand marks a point where exceptional
+/// control flow terminates and normal control flow resumes, typically the top
+/// of a catch or finally block, and the target of a code_push_catcht
+/// describing the correponding try block. It gives an lvalue expression that
+/// should be assigned the caught exception, typically a local variable.
+///
+/// FUNCTION_CALL instructions are also affected: if the callee may abort
+/// due to an escaping instruction, a dispatch sequence is inserted to check
+/// whether the callee aborted and propagate the exception further if so.
+///
+/// Exception propagation is implemented using a global variable per function
+/// (named function_name#exception_value) that carries a reference to an
+/// in-flight exception, or is null during normal control flow.
+/// THROW assigns it a reference to the thrown instance; CALL instructions
+/// copy between the exception_value for the callee and caller, catch_push
+/// and catch_pop instructions indicate how they should be checked to dispatch
+/// the right exception type to the right catch block, and landingpad
+/// instructions copy back to an ordinary local variable (or other expression)
+/// and set #exception_value back to null, indicating the exception has been
+/// caught and normal control flow resumed.
+///
+/// Note that remove_exceptions introduces java_instanceof comparisons at
+/// present, so a remove_instanceof may be necessary after it completes.
 class remove_exceptionst
 {
   typedef std::vector<std::pair<
