@@ -38,6 +38,8 @@ then
   doxygen=doxygen
   doxygenlogdir="doc/html"
   doxygenlog="$doxygenlogdir/doxygen.log"
+  suppress_warnings=(
+    "warning: Included by graph for .* not generated, too many nodes. Consider increasing DOT_GRAPH_MAX_NODES.")
   if ! $doxygen --version &>/dev/null
   then
     echo "Lint script could not be found in the $script_folder directory"
@@ -45,7 +47,8 @@ then
     exit 1
   else
     mkdir -p $doxygenlogdir && cd src && $doxygen &> ../$doxygenlog && cd ..
-    cmd='cat $doxygenlog'
+    suppress_warnings_regex=$(IFS="|" ; echo "${suppress_warnings[*]}")
+    cmd='grep -Ev "$suppress_warnings_regex" $doxygenlog'
   fi
 else
   echo "Mode $mode not recognized"
