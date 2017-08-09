@@ -835,16 +835,21 @@ bool cbmc_parse_optionst::process_goto_program(
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we
     // don't have an instance of that here.
-    const auto max_nondet_array_length=
+    const size_t max_nondet_array_length=
       cmdline.isset("java-max-input-array-length")
-        ? std::stoi(cmdline.get_value("java-max-input-array-length"))
+        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
         : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    const size_t max_nondet_tree_depth=
+      cmdline.isset("java-max-input-tree-depth")
+        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+        : MAX_NONDET_TREE_DEPTH;
     replace_java_nondet(goto_functions);
     convert_nondet(
       goto_functions,
       symbol_table,
       ui_message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      max_nondet_tree_depth);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -1069,14 +1074,26 @@ void cbmc_parse_optionst::help()
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-assume-inputs-non-null test harness makes input arguments not null\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-max-input-array-length N maximum allowed length for an array passed as input\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --java-max-input-tree-depth N   object references are (deterministically) set to null in the object\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    "                                 hierarchy of input parameters when their depth is >= N and the object\n"
+    "                                 type happens twice in the tree branch\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --java-max-vla-length        limit the length of user-code-created arrays\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-throw-runtime-exceptions Make implicit runtime exceptions explicit"
+    " --java-throw-runtime-exceptions make implicit runtime exceptions explicit\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
     " --program-only               only show program expression\n"

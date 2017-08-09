@@ -33,7 +33,8 @@ static goto_programt::targett insert_nondet_init_code(
   const goto_programt::targett &target,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth)
 {
   // Return if the instruction isn't an assignment
   const auto next_instr=std::next(target);
@@ -87,8 +88,9 @@ static goto_programt::targett insert_nondet_init_code(
     source_loc,
     true,
     allocation_typet::DYNAMIC,
-    !nullable,
+    nullable,
     max_nondet_array_length,
+    max_nondet_tree_depth,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Convert this code into goto instructions
@@ -113,7 +115,8 @@ static void convert_nondet(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth)
 {
   for(auto instruction_iterator=goto_program.instructions.begin(),
         end=goto_program.instructions.end();
@@ -124,7 +127,8 @@ static void convert_nondet(
       instruction_iterator,
       symbol_table,
       message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      max_nondet_tree_depth);
   }
 }
 
@@ -134,7 +138,8 @@ void convert_nondet(
   goto_functionst &goto_functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length)
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth)
 {
   for(auto &goto_program : goto_functions.function_map)
   {
@@ -142,7 +147,8 @@ void convert_nondet(
       goto_program.second.body,
       symbol_table,
       message_handler,
-      max_nondet_array_length);
+      max_nondet_array_length,
+      max_nondet_tree_depth);
   }
 
   goto_functions.compute_location_numbers();

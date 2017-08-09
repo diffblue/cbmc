@@ -14,7 +14,7 @@ public class test {
   }
 
   public void next_pointers_not_null() {
-    // Not currently achievable due to recursive types
+    // Should be possible to hit with --java-max-input-tree-depth >= 2
     assert(false);
   }
 

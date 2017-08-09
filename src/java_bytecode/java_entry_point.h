@@ -22,6 +22,7 @@ bool java_entry_point(
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector);
 
 typedef struct
@@ -31,6 +32,7 @@ typedef struct
   bool stop_convert;
 } main_function_resultt;
 
+/// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,
   const irep_idt &main_class,
