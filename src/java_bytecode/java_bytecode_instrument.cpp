@@ -274,16 +274,9 @@ codet java_bytecode_instrumentt::check_null_dereference(
   const source_locationt &original_loc,
   const bool assertion_enabled)
 {
-  exprt local_expr=expr;
-  empty_typet voidt;
-  pointer_typet voidptr(voidt);
-
-  if(local_expr.type()!=voidptr)
-    local_expr.make_typecast(voidptr);
-
   const equal_exprt equal_expr(
-    local_expr,
-    null_pointer_exprt(voidptr));
+    expr,
+    null_pointer_exprt(to_pointer_type(expr.type())));
 
   if(throw_runtime_exceptions)
     return throw_exception(
