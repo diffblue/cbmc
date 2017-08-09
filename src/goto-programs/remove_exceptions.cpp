@@ -54,23 +54,23 @@ protected:
 
   void instrument_exception_handler(
     const goto_functionst::function_mapt::iterator &,
-    const goto_programt::instructionst::iterator &);
+    const goto_programt::targett &);
 
   void add_exception_dispatch_sequence(
     const goto_functionst::function_mapt::iterator &,
-    const goto_programt::instructionst::iterator &instr_it,
+    const goto_programt::targett &instr_it,
     const stack_catcht &stack_catch,
     const std::vector<exprt> &locals);
 
   void instrument_throw(
     const goto_functionst::function_mapt::iterator &,
-    const goto_programt::instructionst::iterator &,
+    const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<exprt> &);
 
   void instrument_function_call(
     const goto_functionst::function_mapt::iterator &,
-    const goto_programt::instructionst::iterator &,
+    const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<exprt> &);
 
@@ -188,14 +188,14 @@ void remove_exceptionst::add_exceptional_returns(
 
 /// Translates an exception landing-pad into instructions that copy the
 /// in-flight exception pointer to a nominated expression, then clear the
-/// in-flight exception, hence marking it caught.
+/// in-flight exception (i.e. null the pointer), hence marking it caught.
 /// \param func_it: iterator pointing to the function containing this
 ///   landingpad instruction
 /// \param instr_it [in, out]: iterator pointing to the landingpad instruction.
 ///   Will be overwritten.
 void remove_exceptionst::instrument_exception_handler(
   const goto_functionst::function_mapt::iterator &func_it,
-  const goto_programt::instructionst::iterator &instr_it)
+  const goto_programt::targett &instr_it)
 {
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
@@ -236,8 +236,8 @@ void remove_exceptionst::instrument_exception_handler(
 }
 
 /// Emit the code:
-/// if (exception instanceof ExnA) then goto handlera
-/// else if (exception instanceof ExnB) then goto handlerb
+/// if (exception instanceof ExnA) then goto handlerA
+/// else if (exception instanceof ExnB) then goto handlerB
 /// else goto universal_handler or (dead locals; function exit)
 /// \param function_id: function instr_it belongs to
 /// \param instr_it: throw or call instruction that may be an
@@ -246,7 +246,7 @@ void remove_exceptionst::instrument_exception_handler(
 /// \param locals: local variables to kill on a function-exit edge
 void remove_exceptionst::add_exception_dispatch_sequence(
   const goto_functionst::function_mapt::iterator &func_it,
-  const goto_programt::instructionst::iterator &instr_it,
+  const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
@@ -266,7 +266,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
   // find the symbol corresponding to the caught exceptions
   const symbolt &exc_symbol=
-        symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add GOTOs implementing the dynamic dispatch of the
@@ -277,7 +277,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
     {
       goto_programt::targett new_state_pc=
         stack_catch[i][j].second;
-      if(stack_catch[i][j].first==irep_idt())
+      if(stack_catch[i][j].first.empty())
       {
         // Universal handler. Highest on the stack takes
         // precedence, so overwrite any we've already seen:
@@ -318,7 +318,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 /// exception handlers
 void remove_exceptionst::instrument_throw(
   const goto_functionst::function_mapt::iterator &func_it,
-  const goto_programt::instructionst::iterator &instr_it,
+  const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
@@ -356,7 +356,7 @@ void remove_exceptionst::instrument_throw(
 /// GOTOS to the corresponding exception handlers
 void remove_exceptionst::instrument_function_call(
   const goto_functionst::function_mapt::iterator &func_it,
-  const goto_programt::instructionst::iterator &instr_it,
+  const goto_programt::targett &instr_it,
   const stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
@@ -366,7 +366,7 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &function_id=func_it->first;
 
   // save the address of the next instruction
-  goto_programt::instructionst::iterator next_it=instr_it;
+  goto_programt::targett next_it=instr_it;
   next_it++;
 
   code_function_callt &function_call=to_code_function_call(instr_it->code);
@@ -481,7 +481,7 @@ void remove_exceptionst::instrument_exceptions(
         // the targets were unreachable (in which case no exception can truly
         // be thrown at runtime)
         INVARIANT(
-          instr_it->targets.size()==0 ||
+          instr_it->targets.empty() ||
           exception_list.size()==instr_it->targets.size(),
           "`exception_list` should contain current instruction's targets");
 

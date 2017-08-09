@@ -178,8 +178,7 @@ std::ostream &goto_programt::output_instruction(
       for(instructiont::targetst::const_iterator
             gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
-          gt_it++,
-            i++)
+          gt_it++, i++)
       {
         if(gt_it!=instruction.targets.begin())
           out << ", ";
@@ -193,7 +192,7 @@ std::ostream &goto_programt::output_instruction(
     }
     else
     {
-      out << "! unexpected CATCH opcode " << instruction.code.get_statement();
+      UNREACHABLE;
     }
 
     out << '\n';
