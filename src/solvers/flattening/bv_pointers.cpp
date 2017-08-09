@@ -433,21 +433,6 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     return bv;
   }
-  else if(expr.id()==ID_lshr ||
-          expr.id()==ID_shl)
-  {
-    return SUB::convert_shift(to_shift_expr(expr));
-  }
-  else if(expr.id()==ID_bitand ||
-          expr.id()==ID_bitor ||
-          expr.id()==ID_bitnot)
-  {
-    return convert_bitwise(expr);
-  }
-  else if(expr.id()==ID_concatenation)
-  {
-    return SUB::convert_concatenation(to_concatenation_expr(expr));
-  }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
