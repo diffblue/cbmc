@@ -297,13 +297,8 @@ void gather_methods_lazilyt::initialize_needed_classes_from_pointer(
 {
   const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
   const auto &param_classid=class_type.get_identifier();
-  std::vector<irep_idt> class_and_parents=
-    class_hierarchy.get_parents_trans(param_classid);
 
-  class_and_parents.push_back(param_classid);
-
-  for(const auto &classid : class_and_parents)
-    lazy_methods.add_needed_class(classid);
+  lazy_methods.add_needed_class(param_classid);
 
   gather_field_types(pointer_type.subtype(), ns, lazy_methods);
 }
@@ -360,6 +355,15 @@ void gather_methods_lazilyt::get_virtual_method_targets(
 
   auto old_size=needed_methods.size();
 
+  const irep_idt &self_method=
+    get_virtual_method_target(
+      needed_classes, call_basename, call_class, symbol_table);
+
+  if(!self_method.empty())
+  {
+    needed_methods.push_back(self_method);
+  }
+
   auto child_classes=class_hierarchy.get_children_trans(call_class);
   for(const auto &child_class : child_classes)
   {
@@ -371,36 +375,6 @@ void gather_methods_lazilyt::get_virtual_method_targets(
         symbol_table);
     if(!child_method.empty())
       needed_methods.push_back(child_method);
-  }
-
-  irep_idt parent_class_id=call_class;
-  while(1)
-  {
-    auto parent_method=
-      get_virtual_method_target(
-        needed_classes,
-        call_basename,
-        parent_class_id,
-        symbol_table);
-    if(!parent_method.empty())
-    {
-      needed_methods.push_back(parent_method);
-      break;
-    }
-    else
-    {
-      auto findit=class_hierarchy.class_map.find(parent_class_id);
-      if(findit==class_hierarchy.class_map.end())
-        break;
-      else
-      {
-        const auto &entry=findit->second;
-        if(entry.parents.empty())
-          break;
-        else
-          parent_class_id=entry.parents[0];
-      }
-    }
   }
 
   if(needed_methods.size()==old_size)
@@ -494,9 +468,41 @@ irep_idt gather_methods_lazilyt::get_virtual_method_target(
   // Program-wide, is this class ever instantiated?
   if(!needed_classes.count(classname))
     return irep_idt();
-  auto methodid=id2string(classname)+"."+id2string(call_basename);
+  auto methodid=build_virtual_method_name(classname, call_basename);
   if(symbol_table.has_symbol(methodid))
     return methodid;
   else
+  {
+    // no method found for this specific classs, but a call to this class
+    // will be resolved in one of its base classes so we should work up the
+    // heirarchy to see if one resovles
+    class_hierarchyt::idst parent_classes=
+      class_hierarchy.get_parents_trans(classname);
+    for(const irep_idt &parent_class_id : parent_classes)
+    {
+      auto parent_method_id=
+        build_virtual_method_name(parent_class_id, call_basename);
+      if(symbol_table.has_symbol(parent_method_id))
+      {
+        return parent_method_id;
+      }
+    }
     return irep_idt();
+  }
+}
+
+
+/// Build a method name as found in a GOTO symbol table equivalent to the name
+/// of a concrete call of method component_method_name on class class_name
+/// \param component_method_name: The name of the function
+/// \param class_name: The class the implementation would be found on.
+/// \return A name for looking up in the symbol table for classes `class_name`'s
+///   implementation of `component_name`
+irep_idt gather_methods_lazilyt::build_virtual_method_name(
+  const irep_idt &class_name, const irep_idt &component_method_name)
+{
+  // Verify the parameters are called in the correct order.
+  PRECONDITION(id2string(class_name).find("::")!=std::string::npos);
+  PRECONDITION(id2string(component_method_name).find("(")!=std::string::npos);
+  return id2string(class_name)+'.'+id2string(component_method_name);
 }
