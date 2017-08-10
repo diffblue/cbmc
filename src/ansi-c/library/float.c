@@ -67,3 +67,19 @@ inline int _isnan(double x)
 {
   return __CPROVER_isnand(x);
 }
+
+/* FUNCTION: __builtin_flt_rounds */
+
+extern int __CPROVER_rounding_mode;
+
+inline int __builtin_flt_rounds(void)
+{
+  // This is a clang builtin for FLT_ROUNDS
+  // The magic numbers are C99 and different from the
+  // x86 encoding that CPROVER uses.
+  return __CPROVER_rounding_mode==0?1: // to nearest
+         __CPROVER_rounding_mode==1?3: // downward
+         __CPROVER_rounding_mode==2?2: // upward
+         __CPROVER_rounding_mode==3?0: // to zero
+         -1;
+}
