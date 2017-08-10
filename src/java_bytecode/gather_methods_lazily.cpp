@@ -348,12 +348,15 @@ void gather_methods_lazilyt::get_virtual_method_targets(
   symbol_tablet &symbol_table)
 {
   const auto &called_function=c.function();
-  assert(called_function.id()==ID_virtual_function);
+  PRECONDITION(called_function.id()==ID_virtual_function);
 
   const auto &call_class=called_function.get(ID_C_class);
-  assert(!call_class.empty());
+  INVARIANT(
+    !call_class.empty(), "All virtual calls should be aimed at a class");
   const auto &call_basename=called_function.get(ID_component_name);
-  assert(!call_basename.empty());
+  INVARIANT(
+    !call_basename.empty(),
+    "Virtual function must have a reasonable name after removing class");
 
   auto old_size=needed_methods.size();
 
