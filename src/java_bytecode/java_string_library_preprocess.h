@@ -173,8 +173,7 @@ private:
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
-  void process_single_operand(
-    exprt::operandst &processed_ops,
+  exprt convert_exprt_to_string_exprt(
     const exprt &deref,
     const source_locationt &loc,
     symbol_tablet &symbol_table,

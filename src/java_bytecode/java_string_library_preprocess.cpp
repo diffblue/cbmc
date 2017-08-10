@@ -287,32 +287,27 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
   return process_operands(ops, loc, symbol_table, init_code);
 }
 
-/// Creates a string_exprt from the input exprt and adds it to processed_ops
-/// \param processed_ops: the list of processed operands to populate
-/// \param op_to_process: a list of expressions
+/// Creates a string_exprt from the input exprt representing a char sequence
+/// \param op_to_process: an operand of a type which implements char sequence
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
 /// \param init_code: code block, in which declaration of some arguments may be
 ///   added
-void java_string_library_preprocesst::process_single_operand(
-  exprt::operandst &processed_ops,
+/// \return the processed operand
+exprt java_string_library_preprocesst::convert_exprt_to_string_exprt(
   const exprt &op_to_process,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
   code_blockt &init_code)
 {
-  member_exprt length(
-    op_to_process, "length", string_length_type());
-  member_exprt data(op_to_process, "data", string_data_type(symbol_table));
-  dereference_exprt deref_data(data, data.type().subtype());
+  PRECONDITION(implements_java_char_sequence(op_to_process.type()));
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, init_code);
+  init_code.add(code_assign_java_string_to_string_expr(
+    string_expr, op_to_process, symbol_table));
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, init_code);
   init_code.add(code_declt(string_expr_sym));
-  init_code.add(code_assignt(string_expr.length(), length));
-  init_code.add(
-    code_assignt(string_expr.content(), deref_data));
   init_code.add(code_assignt(string_expr_sym, string_expr));
-  processed_ops.push_back(string_expr);
+  return string_expr;
 }
 
 /// for each expression that is of a type implementing strings, we declare a new
@@ -336,19 +331,12 @@ exprt::operandst java_string_library_preprocesst::process_operands(
   for(const auto &p : operands)
   {
     if(implements_java_char_sequence(p.type()))
-    {
-      dereference_exprt deref=
-        checked_dereference(p, to_pointer_type(p.type()).subtype());
-      process_single_operand(ops, deref, loc, symbol_table, init_code);
-    }
+      ops.push_back(
+        convert_exprt_to_string_exprt(p, loc, symbol_table, init_code));
     else if(is_java_char_array_pointer_type(p.type()))
-    {
       ops.push_back(replace_char_array(p, loc, symbol_table, init_code));
-    }
     else
-    {
       ops.push_back(p);
-    }
   }
   return ops;
 }
@@ -370,22 +358,19 @@ exprt::operandst
   code_blockt &init_code)
 {
   PRECONDITION(operands.size()==2);
-  exprt::operandst ops;
   const exprt &op0=operands[0];
-  const exprt &op1=operands[1];
   PRECONDITION(implements_java_char_sequence(op0.type()));
 
-  dereference_exprt deref0=
-    checked_dereference(op0, to_pointer_type(op0.type()).subtype());
-  process_single_operand(ops, deref0, loc, symbol_table, init_code);
+  exprt::operandst ops;
+  ops.push_back(
+    convert_exprt_to_string_exprt(op0, loc, symbol_table, init_code));
 
   // TODO: Manage the case where we have a non-String Object (this should
   // probably be handled upstream. At any rate, the following code should be
   // protected with assertions on the type of op1.
-  typecast_exprt tcast(op1, to_pointer_type(op0.type()));
-  dereference_exprt deref1=
-    checked_dereference(tcast, to_pointer_type(op0.type()).subtype());
-  process_single_operand(ops, deref1, loc, symbol_table, init_code);
+  typecast_exprt tcast(operands[1], to_pointer_type(op0.type()));
+  ops.push_back(
+    convert_exprt_to_string_exprt(tcast, loc, symbol_table, init_code));
   return ops;
 }
 
