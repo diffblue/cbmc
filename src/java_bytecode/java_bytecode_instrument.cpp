@@ -66,8 +66,7 @@ protected:
 
   codet check_null_dereference(
     const exprt &expr,
-    const source_locationt &original_loc,
-    const bool assertion_enabled);
+    const source_locationt &original_loc);
 
   codet check_class_cast(
     const exprt &class1,
@@ -271,36 +270,23 @@ codet java_bytecode_instrumentt::check_class_cast(
 /// assertion checking the subtype relation
 codet java_bytecode_instrumentt::check_null_dereference(
   const exprt &expr,
-  const source_locationt &original_loc,
-  const bool assertion_enabled)
+  const source_locationt &original_loc)
 {
-  exprt local_expr=expr;
-  empty_typet voidt;
-  pointer_typet voidptr(voidt);
-
-  if(local_expr.type()!=voidptr)
-    local_expr.make_typecast(voidptr);
-
   const equal_exprt equal_expr(
-    local_expr,
-    null_pointer_exprt(voidptr));
+    expr,
+    null_pointer_exprt(to_pointer_type(expr.type())));
 
   if(throw_runtime_exceptions)
     return throw_exception(
       equal_expr,
       original_loc, "java.lang.NullPointerException");
 
-  if(assertion_enabled)
-  {
-    code_assertt check((not_exprt(equal_expr)));
-    check.add_source_location()
-      .set_comment("Throw null");
-    check.add_source_location()
-      .set_property_class("null-pointer-exception");
-    return check;
-  }
-
-  return code_skipt();
+  code_assertt check((not_exprt(equal_expr)));
+  check.add_source_location()
+    .set_comment("Throw null");
+  check.add_source_location()
+    .set_property_class("null-pointer-exception");
+  return check;
 }
 
 /// Checks whether `length`>=0 and throws NegativeArraySizeException/
@@ -460,6 +446,18 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
     add_expr_instrumentation(block, code_function_call.lhs());
     add_expr_instrumentation(block, code_function_call.function());
 
+    const code_typet &function_type=
+      to_code_type(code_function_call.function().type());
+
+    // Check for a null this-argument of a virtual call:
+    if(function_type.has_this())
+    {
+      block.copy_to_operands(
+        check_null_dereference(
+          code_function_call.arguments()[0],
+          code_function_call.source_location()));
+    }
+
     for(const auto &arg : code_function_call.arguments())
       add_expr_instrumentation(block, arg);
 
@@ -522,8 +520,7 @@ codet java_bytecode_instrumentt::instrument_expr(
       result.copy_to_operands(
         check_null_dereference(
           expr.op0(),
-          expr.source_location(),
-          true));
+          expr.source_location()));
     }
     else if(statement==ID_java_new_array)
     {
@@ -544,23 +541,16 @@ codet java_bytecode_instrumentt::instrument_expr(
         expr.op1(),
         expr.source_location()));
   }
-  else if(expr.id()==ID_member &&
+  else if(expr.id()==ID_dereference &&
           expr.get_bool(ID_java_member_access))
   {
-    // this corresponds to either getfield or putfield
-    // so we must check null pointer dereference
-    const member_exprt &member_expr=to_member_expr(expr);
-    if(member_expr.op0().id()==ID_dereference)
-    {
-      const dereference_exprt dereference_expr=
-        to_dereference_expr(member_expr.op0());
-      codet null_dereference_check=
-        check_null_dereference(
-          dereference_expr.op0(),
-          dereference_expr.source_location(),
-          false);
-      result.move_to_operands(null_dereference_check);
-    }
+    // Check pointer non-null before access:
+    const dereference_exprt dereference_expr=to_dereference_expr(expr);
+    codet null_dereference_check=
+      check_null_dereference(
+        dereference_expr.op0(),
+        dereference_expr.source_location());
+    result.move_to_operands(null_dereference_check);
   }
 
   if(result==code_blockt())
@@ -600,9 +590,19 @@ void java_bytecode_instrument(
     max_array_length,
     max_tree_depth);
 
-  Forall_symbols(s_it, symbol_table.symbols)
+  std::vector<irep_idt> symbols_to_instrument;
+  forall_symbols(s_it, symbol_table.symbols)
   {
     if(s_it->second.value.id()==ID_code)
-      instrument(s_it->second.value);
+      symbols_to_instrument.push_back(s_it->first);
+  }
+
+  // instrument(...) can add symbols to the table, so it's
+  // not safe to hold a reference to a symbol across a call.
+  for(const auto &symbol : symbols_to_instrument)
+  {
+    exprt value=symbol_table.lookup(symbol).value;
+    instrument(value);
+    symbol_table.lookup(symbol).value=value;
   }
 }

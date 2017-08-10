@@ -1,0 +1,12 @@
+CORE
+test.class
+--java-throw-runtime-exceptions
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+assertion at file test\.java line 9 function java::test\.main:\(\)V bytecode-index 12: FAILURE
+--
+^warning: ignoring
+--
+This test checks that accessing an array member, cf. a getfield or setfield bytecode,
+can produce a NullPointerException.
