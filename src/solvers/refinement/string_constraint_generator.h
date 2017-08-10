@@ -73,8 +73,6 @@ public:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);
   string_exprt get_string_expr(const exprt &expr);
-  string_exprt convert_java_string_to_string_exprt(
-    const exprt &underlying);
   plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
   // Maps unresolved symbols to the string_exprt that was created for them
@@ -198,8 +196,6 @@ private:
   string_exprt add_axioms_for_insert_double(
     const function_application_exprt &f);
   string_exprt add_axioms_for_insert_float(const function_application_exprt &f);
-  string_exprt add_axioms_for_insert_char_array(
-    const function_application_exprt &f);
   string_exprt add_axioms_from_literal(const function_application_exprt &f);
   string_exprt add_axioms_from_int(const function_application_exprt &f);
   string_exprt add_axioms_from_int(
@@ -222,12 +218,6 @@ private:
   string_exprt add_axioms_from_char(const function_application_exprt &f);
   string_exprt add_axioms_from_char(
     const exprt &i, const refined_string_typet &ref_type);
-  string_exprt add_axioms_from_char_array(const function_application_exprt &f);
-  string_exprt add_axioms_from_char_array(
-    const exprt &length,
-    const exprt &data,
-    const exprt &offset,
-    const exprt &count);
   exprt add_axioms_for_index_of(
     const string_exprt &str,
     const exprt &c,
@@ -296,13 +286,8 @@ private:
     const string_exprt &expr);
   string_exprt add_axioms_for_trim(const function_application_exprt &expr);
 
-  // Add axioms corresponding to the String.valueOf([CII) function
-  // TODO: not working correctly at the moment
-  string_exprt add_axioms_for_value_of(const function_application_exprt &f);
-
   string_exprt add_axioms_for_code_point(
     const exprt &code_point, const refined_string_typet &ref_type);
-  string_exprt add_axioms_for_java_char_array(const exprt &char_array);
   exprt add_axioms_for_char_pointer(const function_application_exprt &fun);
   string_exprt add_axioms_for_if(const if_exprt &expr);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);

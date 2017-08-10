@@ -145,31 +145,6 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
   }
 }
 
-/// create a new string_exprt as a conversion of a java string
-/// \par parameters: a java string
-/// \return a string expression
-string_exprt string_constraint_generatort::convert_java_string_to_string_exprt(
-    const exprt &jls)
-{
-  PRECONDITION(jls.id()==ID_struct);
-
-  exprt length(to_struct_expr(jls).op1());
-  // TODO: Add assertion on the type.
-  // assert(length.type()==refined_string_typet::index_type());
-  exprt java_content(to_struct_expr(jls).op2());
-  if(java_content.id()==ID_address_of)
-  {
-    java_content=to_address_of_expr(java_content).object();
-  }
-  else
-  {
-    java_content=dereference_exprt(java_content, java_content.type());
-  }
-  refined_string_typet type(java_int_type(), java_char_type());
-
-  return string_exprt(length, java_content, type);
-}
-
 /// adds standard axioms about the length of the string and its content: * its
 /// length should be positive * it should not exceed max_string_length * if
 /// force_printable_characters is true then all characters should belong to the
@@ -333,8 +308,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     function_application_exprt new_expr(expr);
     // TODO: This part needs some improvement.
     // Stripping the symbol name is not a very robust process.
-    new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
-    new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
+    new_expr.function()=symbol_exprt(str_id.substr(0, pos+4));
+    new_expr.type()=refined_string_typet(java_int_type(), java_char_type());
 
     auto res_it=function_application_cache.insert(std::make_pair(new_expr,
                                                                  nil_exprt()));
@@ -353,8 +328,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   if(pos!=std::string::npos)
   {
     function_application_exprt new_expr(expr);
-    new_expr.function() = symbol_exprt(str_id.substr(0, pos+4));
-    new_expr.type() = refined_string_typet(java_int_type(), java_char_type());
+    new_expr.function()=symbol_exprt(str_id.substr(0, pos+4));
+    new_expr.type()=refined_string_typet(java_int_type(), java_char_type());
 
     auto res_it=function_application_cache.insert(std::make_pair(new_expr,
                                                                  nil_exprt()));
@@ -452,10 +427,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_insert_double(expr);
   else if(id==ID_cprover_string_insert_float_func)
     res=add_axioms_for_insert_float(expr);
-#if 0
-  else if(id==ID_cprover_string_insert_char_array_func)
-    res=add_axioms_for_insert_char_array(expr);
-#endif
   else if(id==ID_cprover_string_substring_func)
     res=add_axioms_for_substring(expr);
   else if(id==ID_cprover_string_trim_func)
@@ -466,8 +437,6 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res=add_axioms_for_to_upper_case(expr);
   else if(id==ID_cprover_string_char_set_func)
     res=add_axioms_for_char_set(expr);
-  else if(id==ID_cprover_string_value_of_func)
-    res=add_axioms_for_value_of(expr);
   else if(id==ID_cprover_string_empty_string_func)
     res=add_axioms_for_empty_string(expr);
   else if(id==ID_cprover_string_copy_func)
@@ -540,23 +509,6 @@ string_exprt string_constraint_generatort::add_axioms_for_copy(
   }
 }
 
-/// add axioms corresponding to the String.valueOf([C) java function
-/// \par parameters: an expression corresponding to a java object of type char
-///   array
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_for_java_char_array(
-  const exprt &char_array)
-{
-  string_exprt res=fresh_string(
-    refined_string_typet(java_int_type(), java_char_type()));
-  exprt arr=to_address_of_expr(char_array).object();
-  exprt len=member_exprt(arr, "length", res.length().type());
-  exprt cont=member_exprt(arr, "data", res.content().type());
-  res.length()=len;
-  res.content()=cont;
-  return res;
-}
-
 /// for an expression of the form `array[0]` returns `array`
 /// \par parameters: an expression of type char
 /// \return an array expression
@@ -584,71 +536,6 @@ exprt string_constraint_generatort::add_axioms_for_length(
 {
   string_exprt str=get_string_expr(args(f, 1)[0]);
   return str.length();
-}
-
-/// add axioms stating that the content of the returned string equals to the
-/// content of the array argument, starting at offset and with `count`
-/// characters
-/// \par parameters: a length expression, an array expression, a offset index,
-///   and a
-/// count index
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_char_array(
-  const exprt &length,
-  const exprt &data,
-  const exprt &offset,
-  const exprt &count)
-{
-  UNREACHABLE; // deprecated, we should use add_axioms_for_substring instead
-  const typet &char_type=to_array_type(data.type()).subtype();
-  const typet &index_type=length.type();
-  refined_string_typet ref_type(index_type, char_type);
-  string_exprt str=fresh_string(ref_type);
-
-  // We add axioms:
-  // a1 : forall q < count. str[q] = data[q+offset]
-  // a2 : |str| = count
-
-  symbol_exprt qvar=fresh_univ_index("QA_string_of_char_array", index_type);
-  exprt char_in_tab=data;
-  PRECONDITION(char_in_tab.id()==ID_index);
-  char_in_tab.op1()=plus_exprt_with_overflow_check(qvar, offset);
-
-  string_constraintt a1(qvar, count, equal_exprt(str[qvar], char_in_tab));
-  axioms.push_back(a1);
-  axioms.push_back(equal_exprt(str.length(), count));
-
-  return str;
-}
-
-/// add axioms corresponding to the String.<init>:(I[CII) and
-/// String.<init>:(I[C) java functions
-/// function application with 2 arguments and 2 additional optional
-/// \param arguments: length, char array, offset and count
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_char_array(
-  const function_application_exprt &f)
-{
-  UNREACHABLE; // deprecated, we should use add_axioms_for_substring instead
-  exprt offset;
-  exprt count;
-  if(f.arguments().size()==4)
-  {
-    offset=f.arguments()[2];
-    count=f.arguments()[3];
-  }
-  else
-  {
-    INVARIANT(
-      f.arguments().size()==2,
-      string_refinement_invariantt("f must have 2 or 4 arguments and the case "
-        "of 4 arguments is already handled"));
-    count=f.arguments()[0];
-    offset=from_integer(0, count.type());
-  }
-  const exprt &tab_length=f.arguments()[0];
-  const exprt &data=f.arguments()[1];
-  return add_axioms_from_char_array(tab_length, data, offset, count);
 }
 
 /// expression true exactly when the index is positive

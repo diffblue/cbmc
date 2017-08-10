@@ -27,7 +27,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int(
 {
   const refined_string_typet &ref_type=to_refined_string_type(expr.type());
   PRECONDITION(expr.arguments().size()>=1);
-  if (expr.arguments().size()==1)
+  if(expr.arguments().size()==1)
   {
     return add_axioms_from_int(expr.arguments()[0], ref_type);
   }
@@ -48,7 +48,7 @@ string_exprt string_constraint_generatort::add_axioms_from_long(
 {
   const refined_string_typet &ref_type=to_refined_string_type(expr.type());
   PRECONDITION(expr.arguments().size()>=1);
-  if (expr.arguments().size()==1)
+  if(expr.arguments().size()==1)
   {
     return add_axioms_from_int(expr.arguments()[0], ref_type);
   }
@@ -377,46 +377,6 @@ string_exprt string_constraint_generatort::add_axioms_from_char(
   return res;
 }
 
-/// Add axioms corresponding to the String.valueOf([C) and String.valueOf([CII)
-/// functions.
-/// \param f: function application with one or three arguments
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_for_value_of(
-  const function_application_exprt &f)
-{
-  const function_application_exprt::argumentst &args=f.arguments();
-  if(args.size()==3)
-  {
-    const refined_string_typet &ref_type=to_refined_string_type(f.type());
-    string_exprt res=fresh_string(ref_type);
-    exprt char_array=args[0];
-    exprt offset=args[1];
-    exprt count=args[2];
-
-    // We add axioms:
-    // a1 : |res| = count
-    // a2 : forall idx<count, str[idx+offset]=res[idx]
-
-    string_exprt str=add_axioms_for_java_char_array(char_array);
-    axioms.push_back(res.axiom_for_has_length(count));
-
-    symbol_exprt idx=fresh_univ_index(
-      "QA_index_value_of", ref_type.get_index_type());
-    equal_exprt eq(str[plus_exprt(idx, offset)], res[idx]);
-    string_constraintt a2(idx, count, eq);
-    axioms.push_back(a2);
-    return res;
-  }
-  else
-  {
-    INVARIANT(
-      args.size()==1,
-      string_refinement_invariantt("f can only have 1 or 3 arguments and the "
-        "case of 3 has been handled"));
-    return add_axioms_for_java_char_array(args[0]);
-  }
-}
-
 /// Add axioms making the return value true if the given string is a correct
 /// number in the given radix
 /// \param str: string expression
@@ -428,8 +388,6 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   const typet &char_type=ref_type.get_char_type();
   const typet &index_type=ref_type.get_index_type();
-  exprt zero_char=constant_char('0', char_type);
-  exprt nine_char=constant_char('9', char_type);
   exprt minus_char=constant_char('-', char_type);
   exprt plus_char=constant_char('+', char_type);
 
@@ -665,7 +623,8 @@ exprt is_digit_with_radix_lower_case(
         binary_relation_exprt(chr, ID_le, nine_char)),
         and_exprt(
           binary_relation_exprt(chr, ID_ge, a_char),
-          binary_relation_exprt(chr, ID_lt, plus_exprt(a_char, radix_minus_ten))));
+          binary_relation_exprt(
+            chr, ID_lt, plus_exprt(a_char, radix_minus_ten))));
 
     return if_exprt(
       binary_relation_exprt(radix_char_type, ID_le, ten_char_type),
