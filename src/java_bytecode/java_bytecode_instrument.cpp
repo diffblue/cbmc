@@ -600,9 +600,19 @@ void java_bytecode_instrument(
     max_array_length,
     max_tree_depth);
 
-  Forall_symbols(s_it, symbol_table.symbols)
+  std::vector<irep_idt> symbols_to_instrument;
+  forall_symbols(s_it, symbol_table.symbols)
   {
     if(s_it->second.value.id()==ID_code)
-      instrument(s_it->second.value);
+      symbols_to_instrument.push_back(s_it->first);
+  }
+
+  // instrument(...) can add symbols to the table, so it's
+  // not safe to hold a reference to a symbol across a call.
+  for(const auto &symbol : symbols_to_instrument)
+  {
+    exprt value=symbol_table.lookup(symbol).value;
+    instrument(value);
+    symbol_table.lookup(symbol).value=value;
   }
 }
