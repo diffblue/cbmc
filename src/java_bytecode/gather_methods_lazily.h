@@ -93,6 +93,10 @@ private:
     const irep_idt &classname,
     const symbol_tablet &symbol_table);
 
+  static irep_idt build_virtual_method_name(
+    const irep_idt &class_name,
+    const irep_idt &component_method_name);
+
   class_hierarchyt class_hierarchy;
   const irep_idt main_class;
   const std::vector<irep_idt> main_jar_classes;
