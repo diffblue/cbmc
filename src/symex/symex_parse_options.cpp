@@ -602,6 +602,9 @@ void symex_parse_optionst::help()
     " --round-to-zero              IEEE floating point rounding mode\n"
     " --function name              set main function name\n"
     "\n"
+    "Java Bytecode frontend options:\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK
     " --no-assertions              ignore user assertions\n"

@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+
 #include "path_search.h"
 
 class goto_functionst;
@@ -47,7 +49,8 @@ class optionst;
   "(drop-unused-functions)" \
   OPT_SHOW_GOTO_FUNCTIONS \
   "(property):(trace)(show-trace)(stop-on-fail)(eager-infeasibility)" \
-  "(no-simplify)(no-unwinding-assertions)(no-propagation)"
+  "(no-simplify)(no-unwinding-assertions)(no-propagation)" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS
   // the last line is for CBMC-regression testing only
 
 class symex_parse_optionst:

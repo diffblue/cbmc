@@ -337,75 +337,27 @@ main_function_resultt get_main_symbol(
     // Add java:: prefix
     std::string main_identifier="java::"+config.main;
 
-    symbol_tablet::symbolst::const_iterator s_it;
+    std::string error_message;
+    irep_idt main_symbol_id=
+      resolve_friendly_method_name(config.main, symbol_table, error_message);
 
-    // Does it have a type signature? (':' suffix)
-    if(config.main.rfind(':')==std::string::npos)
+    if(main_symbol_id==irep_idt())
     {
-      std::string prefix=main_identifier+':';
-      std::set<irep_idt> matches;
-
-      for(const auto &s : symbol_table.symbols)
-        if(has_prefix(id2string(s.first), prefix) &&
-           s.second.type.id()==ID_code)
-          matches.insert(s.first);
-
-      if(matches.empty())
-      {
-        message.error() << "main symbol `" << config.main
-                        << "' not found" << messaget::eom;
-        res.main_function=symbol;
-        res.error_found=true;
-        res.stop_convert=true;
-        return res;
-      }
-      else if(matches.size()==1)
-      {
-        s_it=symbol_table.symbols.find(*matches.begin());
-        assert(s_it!=symbol_table.symbols.end());
-      }
-      else
-      {
-        message.error() << "main symbol `" << config.main
-                        << "' is ambiguous:\n";
-
-        for(const auto &s : matches)
-          message.error() << "  " << s << '\n';
-
-        message.error() << messaget::eom;
-        res.main_function=symbol;
-        res.error_found=true;
-        res.stop_convert=true;
-        return res;
-      }
-    }
-    else
-    {
-      // just look it up
-      s_it=symbol_table.symbols.find(main_identifier);
-
-      if(s_it==symbol_table.symbols.end())
-      {
-        message.error() << "main symbol `" << config.main
-                        << "' not found" << messaget::eom;
-        res.main_function=symbol;
-        res.error_found=true;
-        res.stop_convert=true;
-        return res;
-      }
-    }
-    // function symbol
-    symbol=s_it->second;
-
-    if(symbol.type.id()!=ID_code)
-    {
-      message.error() << "main symbol `" << config.main
-                      << "' not a function" << messaget::eom;
+      message.error() << "main symbol resolution failed: "
+                      << error_message << messaget::eom;
       res.main_function=symbol;
       res.error_found=true;
       res.stop_convert=true;
       return res;
     }
+
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find(main_symbol_id);
+    INVARIANT(
+      s_it!=symbol_table.symbols.end(),
+      "resolve_friendly_method_name should return a symbol-table identifier");
+
+    symbol=s_it->second;
 
     // check if it has a body
     if(symbol.value.is_nil() && !allow_no_body)
