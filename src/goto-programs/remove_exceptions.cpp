@@ -70,7 +70,7 @@ Date:   December 2016
 /// and catch_pop instructions indicate how they should be checked to dispatch
 /// the right exception type to the right catch block, and landingpad
 /// instructions copy back to an ordinary local variable (or other expression)
-/// and set #exception_value back to null, indicating the exception has been
+/// and set \#exception_value back to null, indicating the exception has been
 /// caught and normal control flow resumed.
 ///
 /// Note that remove_exceptions introduces java_instanceof comparisons at
@@ -287,7 +287,7 @@ void remove_exceptionst::instrument_exception_handler(
 /// if (exception instanceof ExnA) then goto handlerA
 /// else if (exception instanceof ExnB) then goto handlerB
 /// else goto universal_handler or (dead locals; function exit)
-/// \param function_id: function instr_it belongs to
+/// \param func_it: iterator pointing to function instr_it belongs to
 /// \param instr_it: throw or call instruction that may be an
 ///   exception source
 /// \param stack_catch: exception handlers currently registered
