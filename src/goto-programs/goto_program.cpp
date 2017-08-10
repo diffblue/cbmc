@@ -157,7 +157,17 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case CATCH:
-    if(!instruction.targets.empty())
+  {
+    if(instruction.code.get_statement()==ID_exception_landingpad)
+    {
+      const auto &landingpad=to_code_landingpad(instruction.code);
+      out << "EXCEPTION LANDING PAD ("
+          << from_type(ns, identifier, landingpad.catch_expr().type())
+          << ' '
+          << from_expr(ns, identifier, landingpad.catch_expr())
+          << ")";
+    }
+    else if(instruction.code.get_statement()==ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
@@ -166,10 +176,9 @@ std::ostream &goto_programt::output_instruction(
         instruction.code.find(ID_exception_list).get_sub();
       assert(instruction.targets.size()==exception_list.size());
       for(instructiont::targetst::const_iterator
-          gt_it=instruction.targets.begin();
+            gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
-          gt_it++,
-          i++)
+          gt_it++, i++)
       {
         if(gt_it!=instruction.targets.begin())
           out << ", ";
@@ -177,11 +186,18 @@ std::ostream &goto_programt::output_instruction(
             << (*gt_it)->target_number;
       }
     }
-    else
+    else if(instruction.code.get_statement()==ID_pop_catch)
+    {
       out << "CATCH-POP";
+    }
+    else
+    {
+      UNREACHABLE;
+    }
 
     out << '\n';
     break;
+  }
 
   case ATOMIC_BEGIN:
     out << "ATOMIC_BEGIN" << '\n';

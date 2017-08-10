@@ -1206,27 +1206,45 @@ codet java_bytecode_convert_methodt::convert_instructions(
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
 
+    typet catch_type;
+
+    // Find catch blocks that begin here. For now we assume if more than
+    // one catch targets the same bytecode then we must be indifferent to
+    // its type and just call it a Throwable.
     auto it=method.exception_table.begin();
     for(; it!=method.exception_table.end(); ++it)
     {
       if(cur_pc==it->handler_pc)
       {
-        // at the beginning of a handler, clear the stack and
-        // push the corresponding exceptional return variable
-        stack.clear();
-        auxiliary_symbolt new_symbol;
-        new_symbol.is_static_lifetime=true;
-        // generate the name of the exceptional return variable
-        const std::string &exceptional_var_name=
-          id2string(method_name)+
-          EXC_SUFFIX;
-        new_symbol.base_name=exceptional_var_name;
-        new_symbol.name=exceptional_var_name;
-        new_symbol.type=typet(ID_pointer, empty_typet());
-        new_symbol.mode=ID_java;
-        symbol_table.add(new_symbol);
-        stack.push_back(new_symbol.symbol_expr());
+        if(catch_type!=typet() || it->catch_type==symbol_typet())
+        {
+          catch_type=symbol_typet("java::java.lang.Throwable");
+          break;
+        }
+        else
+          catch_type=it->catch_type;
       }
+    }
+
+    codet catch_instruction;
+
+    if(catch_type!=typet())
+    {
+      // at the beginning of a handler, clear the stack and
+      // push the corresponding exceptional return variable
+      // We also create a catch exception instruction that
+      // precedes the catch block, and which remove_exceptionst
+      // will transform into something like:
+      // catch_var = GLOBAL_THROWN_EXCEPTION;
+      // GLOBAL_THROWN_EXCEPTION = null;
+      stack.clear();
+      symbol_exprt catch_var=
+        tmp_variable(
+          "caught_exception",
+          pointer_typet(catch_type));
+      stack.push_back(catch_var);
+      code_landingpadt catch_statement(catch_var);
+      catch_instruction=catch_statement;
     }
 
     exprt::operandst op=pop(bytecode_info.pop);
@@ -2371,23 +2389,21 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // add the actual PUSH-CATCH instruction
       if(!exception_ids.empty())
       {
-        // add the exception ids
-        side_effect_expr_catcht catch_push_expr;
-        irept result(ID_exception_list);
-        result.get_sub().resize(exception_ids.size());
+        code_push_catcht catch_push;
+        INVARIANT(
+          exception_ids.size()==handler_labels.size(),
+          "Exception tags and handler labels should be 1-to-1");
+        code_push_catcht::exception_listt &exception_list=
+          catch_push.exception_list();
         for(size_t i=0; i<exception_ids.size(); ++i)
-          result.get_sub()[i].id(exception_ids[i]);
-        catch_push_expr.set(ID_exception_list, result);
-
-        // add the labels corresponding to the handlers
-        irept labels(ID_label);
-        labels.get_sub().resize(handler_labels.size());
-        for(size_t i=0; i<handler_labels.size(); ++i)
-          labels.get_sub()[i].id(handler_labels[i]);
-        catch_push_expr.set(ID_label, labels);
+        {
+          exception_list.push_back(
+            code_push_catcht::exception_list_entryt(
+              exception_ids[i],
+              handler_labels[i]));
+        }
 
         code_blockt try_block;
-        code_expressiont catch_push(catch_push_expr);
         try_block.move_to_operands(catch_push);
         try_block.move_to_operands(c);
         c=try_block;
@@ -2427,16 +2443,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
           // another CATCH-POP for the same try-catch
           start_pc=exception_row.start_pc;
           // add CATCH_POP instruction
-          side_effect_expr_catcht catch_pop_expr;
+          code_pop_catcht catch_pop;
           code_blockt end_try_block;
-          code_expressiont catch_pop(catch_pop_expr);
-          catch_pop.set(ID_exception_list, get_nil_irep());
-          catch_pop.set(ID_label, get_nil_irep());
           end_try_block.move_to_operands(c);
           end_try_block.move_to_operands(catch_pop);
           c=end_try_block;
         }
       }
+    }
+
+    // Finally if this is the beginning of a catch block (already determined
+    // before the big bytecode switch), insert the exception 'landing pad'
+    // instruction before the actual instruction:
+    if(catch_instruction!=codet())
+    {
+      c.make_block();
+      c.operands().insert(c.operands().begin(), catch_instruction);
     }
 
     if(!i_it->source_location.get_line().empty())

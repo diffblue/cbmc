@@ -307,11 +307,9 @@ void java_record_outputs(
   codet output(ID_output);
   output.operands().resize(2);
 
-  assert(symbol_table.has_symbol(id2string(function.name)+EXC_SUFFIX));
-
   // retrieve the exception variable
   const symbolt exc_symbol=symbol_table.lookup(
-    id2string(function.name)+EXC_SUFFIX);
+    JAVA_ENTRY_POINT_EXCEPTION_SYMBOL);
 
   output.op0()=address_of_exprt(
     index_exprt(string_constantt(exc_symbol.base_name),
@@ -613,17 +611,19 @@ bool java_entry_point(
     call_main.lhs()=return_symbol.symbol_expr();
   }
 
-  if(!symbol_table.has_symbol(id2string(symbol.name)+EXC_SUFFIX))
-  {
-    // add the exceptional return value
-    auxiliary_symbolt exc_symbol;
-    exc_symbol.mode=ID_java;
-    exc_symbol.is_static_lifetime=true;
-    exc_symbol.name=id2string(symbol.name)+EXC_SUFFIX;
-    exc_symbol.base_name=id2string(symbol.name)+EXC_SUFFIX;
-    exc_symbol.type=java_reference_type(empty_typet());
-    symbol_table.add(exc_symbol);
-  }
+  // add the exceptional return value
+  auxiliary_symbolt exc_symbol;
+  exc_symbol.mode=ID_java;
+  exc_symbol.name=JAVA_ENTRY_POINT_EXCEPTION_SYMBOL;
+  exc_symbol.base_name=exc_symbol.name;
+  exc_symbol.type=java_reference_type(empty_typet());
+  symbol_table.add(exc_symbol);
+
+  // Zero-initialise the top-level exception catch variable:
+  init_code.copy_to_operands(
+    code_assignt(
+      exc_symbol.symbol_expr(),
+      null_pointer_exprt(to_pointer_type(exc_symbol.type))));
 
   // create code that allocates the objects used as test arguments and
   // non-deterministically initializes them
@@ -638,8 +638,42 @@ bool java_entry_point(
       pointer_type_selector);
   call_main.arguments()=main_arguments;
 
+  // Create target labels for the toplevel exception handler:
+  code_labelt toplevel_catch("toplevel_catch", code_skipt());
+  code_labelt after_catch("after_catch", code_skipt());
+
+  code_blockt call_block;
+
+  // Push a universal exception handler:
+  // Catch all exceptions:
+  // This is equivalent to catching Throwable, but also works if some of
+  // the class hierarchy is missing so that we can't determine that
+  // the thrown instance is an indirect child of Throwable
+  code_push_catcht push_universal_handler(
+    irep_idt(), toplevel_catch.get_label());
+  irept catch_type_list(ID_exception_list);
+  irept catch_target_list(ID_label);
+
+  call_block.move_to_operands(push_universal_handler);
+
   // we insert the call to the method AFTER the argument initialization code
-  init_code.move_to_operands(call_main);
+  call_block.move_to_operands(call_main);
+
+  // Pop the handler:
+  code_pop_catcht pop_handler;
+  call_block.move_to_operands(pop_handler);
+  init_code.move_to_operands(call_block);
+
+  // Normal return: skip the exception handler:
+  init_code.copy_to_operands(code_gotot(after_catch.get_label()));
+
+  // Exceptional return: catch and assign to exc_symbol.
+  code_landingpadt landingpad(exc_symbol.symbol_expr());
+  init_code.copy_to_operands(toplevel_catch);
+  init_code.move_to_operands(landingpad);
+
+  // Converge normal and exceptional return:
+  init_code.move_to_operands(after_catch);
 
   // declare certain (which?) variables as test outputs
   java_record_outputs(symbol, main_arguments, init_code, symbol_table);
