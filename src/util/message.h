@@ -236,50 +236,50 @@ public:
     return m;
   }
 
-  mstreamt &get_mstream(unsigned message_level)
+  mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
     return mstream;
   }
 
-  mstreamt &error()
+  mstreamt &error() const
   {
     return get_mstream(M_ERROR);
   }
 
-  mstreamt &warning()
+  mstreamt &warning() const
   {
     return get_mstream(M_WARNING);
   }
 
-  mstreamt &result()
+  mstreamt &result() const
   {
     return get_mstream(M_RESULT);
   }
 
-  mstreamt &status()
+  mstreamt &status() const
   {
     return get_mstream(M_STATUS);
   }
 
-  mstreamt &statistics()
+  mstreamt &statistics() const
   {
     return get_mstream(M_STATISTICS);
   }
 
-  mstreamt &progress()
+  mstreamt &progress() const
   {
     return get_mstream(M_PROGRESS);
   }
 
-  mstreamt &debug()
+  mstreamt &debug() const
   {
     return get_mstream(M_DEBUG);
   }
 
 protected:
   message_handlert *message_handler;
-  mstreamt mstream;
+  mutable mstreamt mstream;
 };
 
 #endif // CPROVER_UTIL_MESSAGE_H
