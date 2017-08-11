@@ -29,15 +29,11 @@ public:
   java_bytecode_instrumentt(
     symbol_tablet &_symbol_table,
     const bool _throw_runtime_exceptions,
-    message_handlert &_message_handler,
-    const size_t _max_array_length,
-    const size_t _max_tree_depth):
+    message_handlert &_message_handler):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     throw_runtime_exceptions(_throw_runtime_exceptions),
-    message_handler(_message_handler),
-    max_array_length(_max_array_length),
-    max_tree_depth(_max_tree_depth)
+    message_handler(_message_handler)
     {
     }
 
@@ -47,8 +43,6 @@ protected:
   symbol_tablet &symbol_table;
   const bool throw_runtime_exceptions;
   message_handlert &message_handler;
-  const size_t max_array_length;
-  const size_t max_tree_depth;
 
   codet throw_exception(
     const exprt &cond,
@@ -566,29 +560,52 @@ void java_bytecode_instrumentt::operator()(exprt &expr)
   instrument_code(expr);
 }
 
-/// Instruments all the code in the symbol_table with
+/// Instruments the code attached to `symbol` with
 /// runtime exceptions or corresponding assertions.
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `symbol_table`: the symbol table to instrument
-/// `throw_runtime_exceptions`: flag determining whether we instrument the code
-/// with runtime exceptions or with assertions. The former applies if this flag
-/// is set to true.
-/// `max_array_length`: maximum array length; the only reason we need this is
-/// in order to be able to call the object factory to create exceptions.
-void java_bytecode_instrument(
+/// \param symbol_table: global symbol table (may gain exception type stubs and
+///   similar)
+/// \param symbol: the symbol to instrument
+/// \param throw_runtime_exceptions: flag determining whether we instrument the
+///   code with runtime exceptions or with assertions. The former applies if
+///   this flag is set to true.
+/// \param message_handler: stream to report status and warnings
+void java_bytecode_instrument_symbol(
   symbol_tablet &symbol_table,
+  symbolt &symbol,
   const bool throw_runtime_exceptions,
-  message_handlert &message_handler,
-  const size_t max_array_length,
-  const size_t max_tree_depth)
+  message_handlert &message_handler)
 {
   java_bytecode_instrumentt instrument(
     symbol_table,
     throw_runtime_exceptions,
-    message_handler,
-    max_array_length,
-    max_tree_depth);
+    message_handler);
+  INVARIANT(
+    symbol.value.id()==ID_code,
+    "java_bytecode_instrument expects a code-typed symbol");
+  instrument(symbol.value);
+}
+
+/// Instruments all the code in the symbol_table with
+/// runtime exceptions or corresponding assertions.
+/// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
+/// Otherwise, assertions are emitted.
+/// \param symbol_table: global symbol table, all of whose code members
+///   will be annotated (may gain exception type stubs and similar)
+/// \param throw_runtime_exceptions: flag determining whether we instrument the
+///   code with runtime exceptions or with assertions. The former applies if
+///   this flag is set to true.
+/// \param message_handler: stream to report status and warnings
+void java_bytecode_instrument(
+  symbol_tablet &symbol_table,
+  const bool throw_runtime_exceptions,
+  message_handlert &message_handler)
+{
+  java_bytecode_instrumentt instrument(
+    symbol_table,
+    throw_runtime_exceptions,
+    message_handler);
 
   std::vector<irep_idt> symbols_to_instrument;
   forall_symbols(s_it, symbol_table.symbols)
@@ -600,9 +617,5 @@ void java_bytecode_instrument(
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
-  {
-    exprt value=symbol_table.lookup(symbol).value;
-    instrument(value);
-    symbol_table.lookup(symbol).value=value;
-  }
+    instrument(symbol_table.lookup(symbol).value);
 }
