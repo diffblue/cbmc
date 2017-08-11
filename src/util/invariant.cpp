@@ -129,7 +129,7 @@ std::string invariant_failedt::get_invariant_failed_message(
       << " function " << function
       << " line " << line << '\n'
       << "Reason: " << reason
-      << "Backtrace:\n"
+      << "\nBacktrace:\n"
       << backtrace << '\n';
   return out.str();
 }
