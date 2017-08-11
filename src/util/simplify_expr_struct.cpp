@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include "byte_operators.h"
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -167,8 +168,7 @@ bool simplify_exprt::simplify_member(exprt &expr)
       plus_exprt final_offset(struct_offset, member_offset);
       simplify_node(final_offset);
 
-      exprt result(op.id(), expr.type());
-      result.copy_to_operands(op.op0(), final_offset);
+      byte_extract_exprt result(op.id(), op.op0(), final_offset, expr.type());
       expr.swap(result);
 
       simplify_rec(expr);

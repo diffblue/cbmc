@@ -147,7 +147,8 @@ exprt dereferencet::read_object(
   }
 
   // give up and use byte_extract
-  return binary_exprt(object, byte_extract_id(), simplified_offset, dest_type);
+  return byte_extract_exprt(
+    byte_extract_id(), object, simplified_offset, dest_type);
 }
 
 exprt dereferencet::dereference_rec(

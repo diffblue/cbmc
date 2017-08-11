@@ -148,10 +148,8 @@ exprt goto_symext::address_arithmetic(
     object_descriptor_exprt ode;
     ode.build(expr, ns);
 
-    byte_extract_exprt be(byte_extract_id());
-    be.type()=expr.type();
-    be.op()=ode.root_object();
-    be.offset()=ode.offset();
+    const byte_extract_exprt be(
+      byte_extract_id(), ode.root_object(), ode.offset(), expr.type());
 
     // recursive call
     result=address_arithmetic(be, state, guard, keep_array);
@@ -206,10 +204,11 @@ exprt goto_symext::address_arithmetic(
 
     if(offset>0)
     {
-      byte_extract_exprt be(byte_extract_id());
-      be.type()=expr.type();
-      be.op()=to_ssa_expr(expr).get_l1_object();
-      be.offset()=from_integer(offset, index_type());
+      const byte_extract_exprt be(
+        byte_extract_id(),
+        to_ssa_expr(expr).get_l1_object(),
+        from_integer(offset, index_type()),
+        expr.type());
 
       result=address_arithmetic(be, state, guard, keep_array);
 

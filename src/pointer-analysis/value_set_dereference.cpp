@@ -441,10 +441,11 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       }
       else
       {
-        exprt byte_extract(byte_extract_id(), dereference_type);
-        byte_extract.copy_to_operands(
-          symbol_expr, pointer_offset(pointer_expr));
-        result.value=byte_extract;
+        result.value = byte_extract_exprt(
+          byte_extract_id(),
+          symbol_expr,
+          pointer_offset(pointer_expr),
+          dereference_type);
       }
     }
   }
@@ -852,8 +853,7 @@ bool value_set_dereferencet::memory_model_bytes(
   else
   {
     // no, use 'byte_extract'
-    result=exprt(byte_extract_id(), to_type);
-    result.copy_to_operands(value, offset);
+    result = byte_extract_exprt(byte_extract_id(), value, offset, to_type);
   }
 
   value=result;
