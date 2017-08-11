@@ -1,0 +1,14 @@
+CORE
+dummy_parameter.c
+irep
+^EXIT=(0|127|134|137)$
+^SIGNAL=0$
+--- begin invariant violation report ---
+Invariant check failed
+error with irep
+pointer
+0: empty
+^(Backtrace)|(Backtraces not supported)$
+--
+^warning: ignoring
+^VERIFICATION SUCCESSFUL$
