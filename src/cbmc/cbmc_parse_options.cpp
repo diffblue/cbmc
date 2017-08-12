@@ -793,11 +793,16 @@ bool cbmc_parse_optionst::process_goto_program(
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we
     // don't have an instance of that here.
-    const size_t max_nondet_array_length=
+    object_factory_parameterst factory_params;
+    factory_params.max_nondet_array_length=
       cmdline.isset("java-max-input-array-length")
         ? std::stoul(cmdline.get_value("java-max-input-array-length"))
         : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    const size_t max_nondet_tree_depth=
+    factory_params.max_nondet_string_length=
+      cmdline.isset("string-max-input-length")
+        ? std::stoul(cmdline.get_value("string-max-input-length"))
+        : MAX_NONDET_STRING_LENGTH;
+    factory_params.max_nondet_tree_depth=
       cmdline.isset("java-max-input-tree-depth")
         ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
         : MAX_NONDET_TREE_DEPTH;
@@ -807,8 +812,7 @@ bool cbmc_parse_optionst::process_goto_program(
     convert_nondet(
       goto_model,
       get_message_handler(),
-      max_nondet_array_length,
-      max_nondet_tree_depth);
+      factory_params);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -1067,7 +1071,8 @@ void cbmc_parse_optionst::help()
     " --refine-strings             use string refinement (experimental)\n"
     " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
     " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
-    " --string-max-length          add constraint on the length of strings (experimental)\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings\n" // NOLINT(*)
+    " --string-max-input-length    add constraint on the length of input strings\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)
