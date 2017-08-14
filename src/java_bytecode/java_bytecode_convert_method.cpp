@@ -1421,6 +1421,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
           id2string(arg0.get(ID_C_class)).substr(6)+"."+
           id2string(symbol.base_name)+"()";
         symbol.type=arg0.type();
+        // ensure there is some access specification
+        if(symbol.type.get(ID_access).empty())
+          symbol.type.set(ID_access, ID_default);
         symbol.value.make_nil();
         symbol.mode=ID_java;
         assign_parameter_names(
@@ -2752,9 +2755,8 @@ const bool java_bytecode_convert_methodt::is_method_inherited(
         return true;
       // methods with the default access modifier are only
       // accessible within the same package.
-      else if(access==ID_default &&
-              java_class_to_package(id2string(parent))==classpackage)
-        return true;
+      else if(access==ID_default)
+        return java_class_to_package(id2string(parent))==classpackage;
       else if(access==ID_private)
         continue;
       else
