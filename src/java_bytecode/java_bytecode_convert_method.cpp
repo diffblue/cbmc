@@ -2792,10 +2792,10 @@ bool java_bytecode_convert_methodt::is_method_inherited(
     {
       return true;
     }
+
     // methods with the default access modifier are only
     // accessible within the same package.
-
-    else if(access==ID_default)
+    if(access==ID_default)
     {
       const std::string &class_package=
         java_class_to_package(id2string(classname));
@@ -2803,7 +2803,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
         java_class_to_package(id2string(resolved_call.get_class_identifier()));
       return method_package==class_package;
     }
-    else if(access==ID_private)
+
+    if(access==ID_private)
     {
       // This is somewhat contentious: previously this code would keep walking
       // up the parent if it found a private function. But this isn't what Java
@@ -2811,8 +2812,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
       // virtual signuate and blocks access to the parent class
       return false;
     }
-    else
-      INVARIANT(false, "Unexpected access modifier.");
+
+    INVARIANT(false, "Unexpected access modifier.");
   }
 
   return false;
