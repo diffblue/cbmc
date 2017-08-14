@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "class_hierarchy.h"
 #include "class_identifier.h"
 
+#include <goto-programs/resolve_concrete_function_call.h>
+
 #include <util/c_types.h>
 #include <util/prefix.h>
 #include <util/type_eq.h>
@@ -258,32 +260,26 @@ void remove_virtual_functionst::get_functions(
 {
   const irep_idt class_id=function.get(ID_C_class);
   const irep_idt component_name=function.get(ID_component_name);
-  assert(!class_id.empty());
+  INVARIANT(!class_id.empty(), "All virtual functions must have a class");
+
+  resolve_concrete_function_callt get_virtual_call_target(
+    symbol_table, class_hierarchy);
+  const resolve_concrete_function_callt::concrete_function_callt &
+    resolved_call=get_virtual_call_target(class_id, component_name);
   functiont root_function;
 
-  // Start from current class, go to parents until something
-  // is found.
-  irep_idt c=class_id;
-  while(!c.empty())
+  if(resolved_call.is_valid())
   {
-    exprt method=get_method(c, component_name);
-    if(method.is_not_nil())
-    {
-      root_function.class_id=c;
-      root_function.symbol_expr=to_symbol_expr(method);
-      root_function.symbol_expr.set(ID_C_class, c);
-      break; // abort
-    }
+    root_function.class_id=resolved_call.get_class_identifier();
 
-    const class_hierarchyt::idst &parents=
-      class_hierarchy.class_map[c].parents;
+    const symbolt &called_symbol=
+      symbol_table.lookup(resolved_call.get_virtual_method_name());
 
-    if(parents.empty())
-      break;
-    c=parents.front();
+    root_function.symbol_expr=called_symbol.symbol_expr();
+    root_function.symbol_expr.set(
+      ID_C_class, resolved_call.get_class_identifier());
   }
-
-  if(root_function.class_id.empty())
+  else
   {
     // No definition here; this is an abstract function.
     root_function.class_id=class_id;
@@ -306,8 +302,9 @@ exprt remove_virtual_functionst::get_method(
   const irep_idt &class_id,
   const irep_idt &component_name) const
 {
-  irep_idt id=id2string(class_id)+"."+
-              id2string(component_name);
+  const irep_idt &id=
+    resolve_concrete_function_callt::build_virtual_method_name(
+      class_id, component_name);
 
   const symbolt *symbol;
   if(ns.lookup(id, symbol))
