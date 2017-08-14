@@ -48,7 +48,8 @@ public:
 
   void operator()(const java_bytecode_parse_treet &parse_tree)
   {
-    add_array_types();
+    // add array types to the symbol table
+    add_array_types(symbol_table);
 
     bool loading_success=parse_tree.loading_successful;
     if(loading_success)
@@ -74,12 +75,21 @@ protected:
   lazy_methods_modet lazy_methods_mode;
   java_string_library_preprocesst &string_preprocess;
 
+  /// This field will be initialized to false, and set to true when
+  /// add_array_types() is executed. It serves as a sentinel to make sure that
+  /// the code using this class calls add_array_types() at least once.
+  static bool add_array_types_executed;
+
   // conversion
   void convert(const classt &c);
   void convert(symbolt &class_symbol, const fieldt &f);
 
-  void add_array_types();
+  // see definition below for more info
+  static void add_array_types(symbol_tablet &symbol_table);
 };
+
+// initialization of static field
+bool java_bytecode_convert_classt::add_array_types_executed=false;
 
 void java_bytecode_convert_classt::convert(const classt &c)
 {
@@ -242,10 +252,16 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-/// Register in the symbol table new symbols for the objects
+/// Register in the \p symbol_table new symbols for the objects
 /// java::array[X] where X is byte, float, int, char...
-void java_bytecode_convert_classt::add_array_types()
+void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 {
+  // this method only adds stuff to the symbol table, no need to execute it more
+  // than once
+  if(add_array_types_executed)
+    return;
+  add_array_types_executed=true;
+
   const std::string letters="ijsbcfdza";
 
   for(const char l : letters)

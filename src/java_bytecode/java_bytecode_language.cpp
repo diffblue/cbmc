@@ -180,7 +180,8 @@ bool java_bytecode_languaget::typecheck(
   if(string_refinement_enabled)
     string_preprocess.initialize_conversion_table();
 
-  // first convert all
+  // first generate a new struct symbol for each class and a new function symbol
+  // for every method
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
       c_it!=java_class_loader.class_map.end();

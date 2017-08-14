@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_language.h"
 
+/// See class \ref java_bytecode_convert_classt
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
