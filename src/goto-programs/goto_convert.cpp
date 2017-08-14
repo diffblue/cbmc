@@ -1217,6 +1217,7 @@ void goto_convertt::convert_switch(
   //   default: Pd;
   // }
   // --------------------
+  // location
   // x: if(v==x) goto X;
   // y: if(v==y) goto Y;
   //    goto d;
@@ -1224,6 +1225,11 @@ void goto_convertt::convert_switch(
   // Y: Py;
   // d: Pd;
   // z: ;
+
+  // we first add a 'location' node for the switch statement,
+  // which would otherwise not be recorded
+  dest.add_instruction()->make_location(
+    code.source_location());
 
   // get the location of the end of the body, but
   // default to location of switch, if none

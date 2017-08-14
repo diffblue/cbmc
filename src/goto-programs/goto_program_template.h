@@ -222,6 +222,8 @@ public:
     void make_goto() { clear(GOTO); }
     void make_return() { clear(RETURN); }
     void make_skip() { clear(SKIP); }
+    void make_location(const source_locationt &l)
+    { clear(LOCATION); source_location=l; }
     void make_throw() { clear(THROW); }
     void make_catch() { clear(CATCH); }
     void make_assertion(const guardT &g) { clear(ASSERT); guard=g; }
