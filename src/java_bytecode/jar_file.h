@@ -23,6 +23,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_class_loader_limit.h"
 
+/// An in-memory representation of a JAR file, consisting of a handler to a zip
+/// file (field \ref zip) and a map from file names inside the zip file to the
+/// index they occupy in the root directory (field \ref filtered_jar).
+///
+/// Both fields are initialize by a call to open(). Method get_entry() reads a
+/// file from the zip and returns it.
 class jar_filet:public messaget
 {
 public:
@@ -34,25 +40,49 @@ public:
 
   ~jar_filet();
 
-  void open(java_class_loader_limitt &, const std::string &);
+  /// Initializes \ref zip to store the JAR file pointed by \p filepath and
+  /// loads the map \ref filtered_jar with the .class names allowed by \p limit.
+  void open(java_class_loader_limitt &limit, const std::string &filepath);
 
-  // Test for error; 'true' means we are good.
+  /// Test for error; 'true' means we are good.
   explicit operator bool() const { return mz_ok; }
 
-  // map internal index to real index in jar central directory
+  /// Reads the \ref zip field and returns a string storing the data contained
+  /// in file \p name.
+  std::string get_entry(const irep_idt &name);
+
+  /// Maps the names of the files stored in the JAR file to the index they
+  /// occupy (starting from 0) in the JAR central directory.  Populated by
+  /// method open() above.
   typedef std::map<irep_idt, size_t> filtered_jart;
   filtered_jart filtered_jar;
-
-  std::string get_entry(const irep_idt &);
 
   typedef std::map<std::string, std::string> manifestt;
   manifestt get_manifest();
 
 protected:
+
+  /// A handle representing the zip file
   mz_zip_archive zip;
+
+  /// True iff the \ref zip field has been correctly initialized with a JAR file
   bool mz_ok;
 };
 
+/// A pool of jar_filet objects, indexed by the filesystem path name used to
+/// load that jar_filet.
+///
+/// The state of the class is maintained by the field \ref file_map, a std::map
+/// associating the path of a .jar file with its in-memory representation.
+/// A call to
+///
+/// ```
+///   operator()(limit, path)
+/// ```
+///
+/// will either return a previously loaded jar_filet, if it is found in the map,
+/// or will load that file (using jar_filet::open) and return a newly created
+/// jar_filet.
 class jar_poolt:public messaget
 {
 public:
