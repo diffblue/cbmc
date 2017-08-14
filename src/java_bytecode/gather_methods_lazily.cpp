@@ -15,6 +15,8 @@
 #include <util/suffix.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 
+#include <goto-programs/resolve_concrete_function_call.h>
+
 
 gather_methods_lazilyt::gather_methods_lazilyt(
   const symbol_tablet &symbol_table,
@@ -468,41 +470,14 @@ irep_idt gather_methods_lazilyt::get_virtual_method_target(
   // Program-wide, is this class ever instantiated?
   if(!needed_classes.count(classname))
     return irep_idt();
-  auto methodid=build_virtual_method_name(classname, call_basename);
-  if(symbol_table.has_symbol(methodid))
-    return methodid;
+
+  resolve_concrete_function_callt call_resolver(symbol_table, class_hierarchy);
+  const resolve_concrete_function_callt ::concrete_function_callt &
+    resolved_call=call_resolver(classname, call_basename);
+
+  if(resolved_call.is_valid())
+    return resolved_call.get_virtual_method_name();
   else
-  {
-    // no method found for this specific classs, but a call to this class
-    // will be resolved in one of its base classes so we should work up the
-    // heirarchy to see if one resovles
-    class_hierarchyt::idst parent_classes=
-      class_hierarchy.get_parents_trans(classname);
-    for(const irep_idt &parent_class_id : parent_classes)
-    {
-      auto parent_method_id=
-        build_virtual_method_name(parent_class_id, call_basename);
-      if(symbol_table.has_symbol(parent_method_id))
-      {
-        return parent_method_id;
-      }
-    }
     return irep_idt();
-  }
 }
 
-
-/// Build a method name as found in a GOTO symbol table equivalent to the name
-/// of a concrete call of method component_method_name on class class_name
-/// \param component_method_name: The name of the function
-/// \param class_name: The class the implementation would be found on.
-/// \return A name for looking up in the symbol table for classes `class_name`'s
-///   implementation of `component_name`
-irep_idt gather_methods_lazilyt::build_virtual_method_name(
-  const irep_idt &class_name, const irep_idt &component_method_name)
-{
-  // Verify the parameters are called in the correct order.
-  PRECONDITION(id2string(class_name).find("::")!=std::string::npos);
-  PRECONDITION(id2string(component_method_name).find("(")!=std::string::npos);
-  return id2string(class_name)+'.'+id2string(component_method_name);
-}
