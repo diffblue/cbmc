@@ -100,9 +100,9 @@ private:
     const irep_idt &component_method_name);
 
   class_hierarchyt class_hierarchy;
-  const irep_idt main_class;
-  const std::vector<irep_idt> main_jar_classes;
-  const std::vector<irep_idt> lazy_methods_extra_entry_points;
+  irep_idt main_class;
+  std::vector<irep_idt> main_jar_classes;
+  std::vector<irep_idt> lazy_methods_extra_entry_points;
   java_class_loadert &java_class_loader;
 };
 
