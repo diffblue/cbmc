@@ -188,6 +188,8 @@ void java_class_loadert::read_jar_file(
   if(jar_map.find(file)!=jar_map.end())
     return;
 
+  // read the .jar file, store it in memory and return a jar_filet representing
+  // it
   jar_filet &jar_file=jar_pool(class_loader_limit, id2string(file));
 
   if(!jar_file)
@@ -198,8 +200,9 @@ void java_class_loadert::read_jar_file(
 
   debug() << "adding JAR file `" << file << "'" << eom;
 
+  // create a new entry in the map and initialize using the list of file names
+  // that were retained in the jar_filet by the class_loader_limit filter
   auto &jm=jar_map[file];
-
   for(auto &jar_entry : jar_file.filtered_jar)
   {
     std::string file_name=id2string(jar_entry.first);
