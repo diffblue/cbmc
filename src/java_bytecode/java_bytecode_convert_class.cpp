@@ -237,6 +237,8 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
+/// Register in the symbol table new symbols for the objects
+/// java::array[X] where X is byte, float, int, char...
 void java_bytecode_convert_classt::add_array_types()
 {
   const std::string letters="ijsbcfdza";
