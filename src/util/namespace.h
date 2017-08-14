@@ -52,8 +52,19 @@ public:
   const typet &follow_tag(const struct_tag_typet &src) const;
   const typet &follow_tag(const c_enum_tag_typet &src) const;
 
-  // these do the actual lookup
+  /// Returns the maximum integer n such that there is a symbol (in some of the
+  /// symbol tables) whose name is of the form "AB" where A is \p prefix and B
+  /// is n.  Symbols where B is not a number count as if B was equal to 0.
+  /// The intended use case is finding the next available symbol name for a
+  /// sequence of auto-generated symbols.
   virtual unsigned get_max(const std::string &prefix) const=0;
+
+  /// Searches for a symbol named \p name. Iff found, set \p symbol to point to
+  /// the symbol and return false; else \p symbol is unmodified and `true` is
+  /// returned. With multiple symbol tables, `symbol_table1` is searched first
+  /// and then symbol_table2.
+  /// \return False iff the requested symbol is found in at least one of the
+  /// tables.
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const=0;
 };
 
@@ -84,8 +95,11 @@ public:
 
   using namespace_baset::lookup;
 
-  // these do the actual lookup
+  /// See namespace_baset::lookup(). Note that \ref namespacet has two symbol
+  /// tables.
   virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const;
+
+  /// See documentation for namespace_baset::get_max().
   virtual unsigned get_max(const std::string &prefix) const;
 
   const symbol_tablet &get_symbol_table() const
