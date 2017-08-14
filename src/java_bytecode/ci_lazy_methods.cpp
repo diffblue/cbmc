@@ -48,14 +48,12 @@ ci_lazy_methodst::ci_lazy_methodst(
 /// \param symbol_table: global symbol table
 /// \param [out] lazy_methods: map from method names to relevant symbol and
 ///   parsed-method objects.
+/// \param method_converter: Function for converting methods on demand.
 /// \return Returns false on success
 bool ci_lazy_methodst::operator()(
   symbol_tablet &symbol_table,
   lazy_methodst &lazy_methods,
-  std::function<void(
-    const symbolt &,
-    const java_bytecode_parse_treet::methodt &,
-    ci_lazy_methods_neededt)> method_converter)
+  method_convertert method_converter)
 {
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
@@ -117,7 +115,7 @@ bool ci_lazy_methodst::operator()(
   std::set<irep_idt> methods_already_populated;
   std::vector<const code_function_callt *> virtual_callsites;
 
-  bool any_new_methods;
+  bool any_new_methods=false;
   do
   {
     any_new_methods=false;
@@ -251,9 +249,6 @@ void ci_lazy_methodst::resolve_method_names(
 /// \param entry_points: list of fully-qualified function names that
 ///   we should assume are reachable
 /// \param ns: global namespace
-/// \param ch: global class hierarchy
-/// \param pointer_type_selector: The pointer_type_selector used to find out
-///   what other classes may be used for pointers
 /// \param [out] lazy_methods: Populated with all Java reference types whose
 ///   references may be passed, directly or indirectly, to any of the functions
 ///   in `entry_points`.
@@ -289,7 +284,6 @@ void ci_lazy_methodst::initialize_needed_classes(
 /// `initialize_needed_classes` for more details.
 /// \param pointer_type: The type to gather methods for.
 /// \param ns: global namespace
-/// \param ch: global class hierarchy
 /// \param [out] lazy_methods: Populated with all Java reference types whose
 ///   references may be passed, directly or indirectly, to any of the functions
 ///   in `entry_points
@@ -308,7 +302,7 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
 
 /// Get places where virtual functions are called.
 /// \param e: expression tree to search
-/// \param [out] results: filled with pointers to each function call within
+/// \param [out] result: filled with pointers to each function call within
 ///   e that calls a virtual function.
 void ci_lazy_methodst::gather_virtual_callsites(
   const exprt &e,
@@ -367,10 +361,10 @@ void ci_lazy_methodst::get_virtual_method_targets(
     needed_methods.push_back(self_method);
   }
 
-  auto child_classes=class_hierarchy.get_children_trans(call_class);
+  const auto child_classes=class_hierarchy.get_children_trans(call_class);
   for(const auto &child_class : child_classes)
   {
-    auto child_method=
+    const auto child_method=
       get_virtual_method_target(
         needed_classes,
         call_basename,
@@ -410,7 +404,8 @@ void ci_lazy_methodst::gather_needed_globals(
     // on an opaque type (i.e. we don't have the class definition at this point)
     // and will be created during the typecheck phase.
     // We don't mark it as 'needed' as it doesn't exist yet to keep.
-    auto findit=symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
+    const auto findit=
+      symbol_table.symbols.find(to_symbol_expr(e).get_identifier());
     if(findit!=symbol_table.symbols.end() &&
        findit->second.is_static_lifetime)
     {

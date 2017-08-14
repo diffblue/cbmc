@@ -33,6 +33,11 @@ typedef std::pair<
 typedef std::map<irep_idt, lazy_method_valuet>
   lazy_methodst;
 
+typedef std::function<void(
+  const symbolt &,
+  const java_bytecode_parse_treet::methodt &,
+  ci_lazy_methods_neededt)> method_convertert;
+
 class ci_lazy_methodst:public messaget
 {
 public:
@@ -48,10 +53,7 @@ public:
   bool operator()(
     symbol_tablet &symbol_table,
     lazy_methodst &lazy_methods,
-    std::function<void(
-      const symbolt &,
-      const java_bytecode_parse_treet::methodt &,
-      ci_lazy_methods_neededt)> method_converter);
+    method_convertert method_converter);
 
 private:
   void resolve_method_names(
