@@ -144,6 +144,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
   symbolt *class_symbol;
 
   // add before we do members
+  debug() << "Adding symbol: class '" << c.name << "'" << eom;
   if(symbol_table.move(new_symbol, class_symbol))
   {
     error() << "failed to add class symbol " << new_symbol.name << eom;
@@ -152,7 +153,10 @@ void java_bytecode_convert_classt::convert(const classt &c)
 
   // now do fields
   for(const auto &field : c.fields)
+  {
+    debug() << "Adding symbol:  field '" << field.name << "'" << eom;
     convert(*class_symbol, field);
+  }
 
   // now do methods
   for(const auto &method : c.methods)
@@ -163,6 +167,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
       ":"+method.signature;
     // Always run the lazy pre-stage, as it symbol-table
     // registers the function.
+    debug() << "Adding symbol:  method '" << method_identifier << "'" << eom;
     java_bytecode_convert_method_lazy(
       *class_symbol,
       method_identifier,

@@ -57,7 +57,6 @@ public:
   manifestt get_manifest();
 
 protected:
-
   /// A handle representing the zip file
   mz_zip_archive zip;
 

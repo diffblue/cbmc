@@ -707,7 +707,8 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
     {
       if(p<(*findstart) || p>=findlim_block_start_address)
       {
-        debug() << "Warning: refusing to create lexical block spanning "
+        debug() << "Generating codet:  "
+                << "warning: refusing to create lexical block spanning "
                 << (*findstart) << "-" << findlim_block_start_address
                 << " due to incoming edge " << p << " -> "
                 << checkit->first << eom;
@@ -729,7 +730,8 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   code_blockt &newblock=to_code_block(newlabel.code());
   auto nblocks=std::distance(findstart, findlim);
   assert(nblocks>=2);
-  debug() << "Combining " << std::distance(findstart, findlim)
+  debug() << "Generating codet:  combining "
+          << std::distance(findstart, findlim)
           << " blocks for addresses " << (*findstart) << "-"
           << findlim_block_start_address << eom;
 
@@ -1437,6 +1439,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
           symbol.name,
           symbol_table);
 
+        debug()
+          << "Generating codet:  new opaque symbol: method '"
+          << symbol.name << "'" << eom;
         symbol_table.add(symbol);
       }
 
