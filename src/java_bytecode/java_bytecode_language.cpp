@@ -29,7 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
 #include "java_utils.h"
-#include "gather_methods_lazily.h"
+#include <java_bytecode/ci_lazy_methods.h>
 
 #include "expr2java.h"
 
@@ -258,7 +258,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   const auto method_converter=[&](
     const symbolt &symbol,
     const java_bytecode_parse_treet::methodt &method,
-    ci_lazy_methodst new_lazy_methods)
+    ci_lazy_methods_neededt new_lazy_methods)
   {
     java_bytecode_convert_method(
       symbol,
@@ -266,11 +266,11 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
       symbol_table,
       get_message_handler(),
       max_user_array_length,
-      safe_pointer<ci_lazy_methodst>::create_non_null(&new_lazy_methods),
+      safe_pointer<ci_lazy_methods_neededt>::create_non_null(&new_lazy_methods),
       string_preprocess);
   };
 
-  gather_methods_lazilyt method_gather(
+  ci_lazy_methodst method_gather(
     symbol_table,
     main_class,
     main_jar_classes,

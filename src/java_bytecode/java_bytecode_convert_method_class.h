@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/cfg_dominators.h>
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_convert_class.h"
-#include "ci_lazy_methods.h"
+#include <java_bytecode/ci_lazy_methods_needed.h>
 
 #include <vector>
 #include <list>
@@ -35,7 +35,7 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    safe_pointer<ci_lazy_methodst> _lazy_methods,
+    safe_pointer<ci_lazy_methods_neededt> _lazy_methods,
     java_string_library_preprocesst &_string_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
@@ -60,7 +60,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
-  safe_pointer<ci_lazy_methodst> lazy_methods;
+  safe_pointer<ci_lazy_methods_neededt> lazy_methods;
 
   /// Fully qualified name of the method under translation.
   /// Initialized by `convert`.
