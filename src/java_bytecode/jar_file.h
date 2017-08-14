@@ -103,9 +103,9 @@ public:
   }
 
 protected:
+  /// A map from filesystem paths to jar_filet objects
   typedef std::map<std::string, jar_filet> file_mapt;
   file_mapt file_map;
-  std::string java_cp_include_files;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAR_FILE_H
