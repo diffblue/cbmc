@@ -1,49 +1,28 @@
 language: cpp
 
-matrix:
+jobs:
   include:
 
-    # Alpine Linux with musl-libc using g++
-    - os: linux
-      sudo: required
-      compiler: gcc
-      cache: ccache
-      services:
-        - docker
-      before_install:
-        - docker pull diffblue/cbmc-builder:alpine-0.0.1
-      env:
-        - PRE_COMMAND="docker run -v ${TRAVIS_BUILD_DIR}:/cbmc -v ${HOME}/.ccache:/root/.ccache diffblue/cbmc-builder:alpine-0.0.1"
-        - COMPILER="ccache g++"
+    - &linter-stage
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      env: NAME="CPP-LINT"
+      install:
+      script: scripts/travis_lint.sh
+      before_cache:
 
-    # OS X using g++
-    - os: osx
-      sudo: false
-      compiler: gcc
-      cache: ccache
-      before_install:
-          #we create symlink to non-ccache gcc, to be used in tests
-        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
-        - ccache -M 1G
-      env: COMPILER=g++
-
-    # OS X using clang++
-    - os: osx
-      sudo: false
-      compiler: clang
-      cache: ccache
-      before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
-        - ccache -M 1G
-      env:
-        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
-        - CCACHE_CPP2=yes
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      env: NAME="DOXYGEN-CHECK"
+      addons:
+        apt:
+          packages:
+            - doxygen
+      install:
+      script: scripts/travis_doxygen.sh
+      before_cache:
 
     # Ubuntu Linux with glibc using g++-5
-    - os: linux
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      os: linux
       sudo: false
       compiler: gcc
       cache: ccache
@@ -60,8 +39,51 @@ matrix:
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env: COMPILER="g++-5"
 
+    # Alpine Linux with musl-libc using g++
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      sudo: required
+      compiler: gcc
+      cache: ccache
+      services:
+        - docker
+      before_install:
+        - docker pull diffblue/cbmc-builder:alpine-0.0.1
+      env:
+        - PRE_COMMAND="docker run -v ${TRAVIS_BUILD_DIR}:/cbmc -v ${HOME}/.ccache:/root/.ccache diffblue/cbmc-builder:alpine-0.0.1"
+        - COMPILER="ccache g++"
+
+    # OS X using g++
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      before_install:
+          #we create symlink to non-ccache gcc, to be used in tests
+        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - ccache -M 1G
+      env: COMPILER=g++
+
+    # OS X using clang++
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      sudo: false
+      compiler: clang
+      cache: ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+        - ccache -M 1G
+      env:
+        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
+
     # Ubuntu Linux with glibc using g++-5, debug mode
-    - os: linux
+    - stage: Test different OS/CXX/Flags
+      os: linux
       sudo: false
       compiler: gcc
       cache: ccache
@@ -82,7 +104,8 @@ matrix:
       script: echo "Not running any tests for a debug build."
 
     # Ubuntu Linux with glibc using clang++-3.7
-    - os: linux
+    - stage: Test different OS/CXX/Flags
+      os: linux
       sudo: false
       compiler: clang
       cache: ccache
@@ -105,7 +128,8 @@ matrix:
         - CCACHE_CPP2=yes
 
     # Ubuntu Linux with glibc using clang++-3.7, debug mode
-    - os: linux
+    - stage: Test different OS/CXX/Flags
+      os: linux
       sudo: false
       compiler: clang
       cache: ccache
@@ -129,25 +153,8 @@ matrix:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
-    - env: NAME="CPP-LINT"
-      install:
-      script: scripts/travis_lint.sh
-      before_cache:
-
-    - env: NAME="DOXYGEN-CHECK"
-      addons:
-        apt:
-          packages:
-            - doxygen
-      install:
-      script: scripts/travis_doxygen.sh
-      before_cache:
-
   allow_failures:
-    - env: NAME="CPP-LINT"
-      install:
-      script: scripts/travis_lint.sh
-      before_cache:
+    - <<: *linter-stage
 
 install:
   - COMMAND="make -C src minisat2-download" &&
