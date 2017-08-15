@@ -19,7 +19,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "type.h"
 #include "mp_arith.h"
+// #define USE_LOCAL_REPLACE_MAP
+#ifdef USE_LOCAL_REPLACE_MAP
 #include "replace_expr.h"
+#endif
 
 class bswap_exprt;
 class byte_extract_exprt;
@@ -154,7 +157,9 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
+#ifdef USE_LOCAL_REPLACE_MAP
   replace_mapt local_replace_map;
+#endif
 };
 
 #endif // CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H

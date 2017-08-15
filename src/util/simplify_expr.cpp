@@ -1067,7 +1067,7 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
       result=false;
     }
 
-    #if 0
+#ifdef USE_LOCAL_REPLACE_MAP
     replace_mapt map_before(local_replace_map);
 
     // a ? b : c  --> a ? b[a/true] : c
@@ -1109,10 +1109,10 @@ bool simplify_exprt::simplify_if_preorder(if_exprt &expr)
     result=simplify_rec(falsevalue) && result;
 
     local_replace_map.swap(map_before);
-    #else
+#else
     result=simplify_rec(truevalue) && result;
     result=simplify_rec(falsevalue) && result;
-    #endif
+#endif
   }
   else
   {
@@ -2382,6 +2382,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
   if(!simplify_node(tmp))
     result=false;
 
+#ifdef USE_LOCAL_REPLACE_MAP
   #if 1
   replace_mapt::const_iterator it=local_replace_map.find(tmp);
   if(it!=local_replace_map.end())
@@ -2397,6 +2398,7 @@ bool simplify_exprt::simplify_rec(exprt &expr)
     result=false;
   }
   #endif
+#endif
 
   if(!result)
   {
