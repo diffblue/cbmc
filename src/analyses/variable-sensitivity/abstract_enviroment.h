@@ -13,6 +13,7 @@
 #include <memory>
 #include <stack>
 #include <iosfwd>
+#include <vector>
 
 #include <util/std_expr.h>
 #include <util/message.h>
@@ -66,6 +67,10 @@ public:
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
   bool verify() const;
+
+  static std::vector<symbol_exprt> modified_symbols(
+    const abstract_environmentt &first,
+    const abstract_environmentt &second);
 
 protected:
   bool bottom;
