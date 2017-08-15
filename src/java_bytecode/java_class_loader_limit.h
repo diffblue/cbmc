@@ -25,16 +25,18 @@ class java_class_loader_limitt:public messaget
   bool regex_match;
   std::smatch string_matcher;
 
-  void setup_class_load_limit(std::string &);
- public:
+  void setup_class_load_limit(const std::string &);
+
+public:
   explicit java_class_loader_limitt(
     message_handlert &_message_handler,
-    std::string &java_cp_include_files) :
-  messaget(_message_handler),
+    const std::string &java_cp_include_files):
+    messaget(_message_handler),
     regex_match(false)
   {
     setup_class_load_limit(java_cp_include_files);
   }
+
   bool load_class_file(const irep_idt &class_file_name);
 };
 
