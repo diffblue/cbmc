@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 #include <goto-programs/remove_exceptions.h>
 #include <goto-programs/class_hierarchy.h>
+#include <goto-programs/resolve_concrete_function_call.h>
 #include <analyses/cfg_dominators.h>
 
 #include <limits>
@@ -1412,7 +1413,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // inherit a definition from a super-class, create a stub.
       irep_idt id=arg0.get(ID_identifier);
       if(symbol_table.symbols.find(id)==symbol_table.symbols.end() &&
-         !(is_virtual && is_method_inherited(arg0.get(ID_C_class), id)))
+         !(is_virtual && is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
       {
         symbolt symbol;
         symbol.name=id;
@@ -2692,7 +2693,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<ci_lazy_methodst> lazy_methods,
+  safe_pointer<ci_lazy_methods_neededt> lazy_methods,
   java_string_library_preprocesst &string_preprocess)
 {
   static const std::unordered_set<std::string> methods_to_ignore
@@ -2728,39 +2729,49 @@ void java_bytecode_convert_method(
   java_bytecode_convert_method(class_symbol, method);
 }
 
-const bool java_bytecode_convert_methodt::is_method_inherited(
+bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname, const irep_idt &methodid) const
 {
-  class_hierarchyt ch;
-  namespacet ns(symbol_table);
-  ch(symbol_table);
+  resolve_concrete_function_callt call_resolver(symbol_table);
+  const resolve_concrete_function_callt ::concrete_function_callt &
+    resolved_call=call_resolver(classname, methodid);
 
-  std::string stripped_methodid(id2string(methodid));
-  stripped_methodid.erase(0, classname.size());
-
-  const std::string &classpackage=java_class_to_package(id2string(classname));
-  const auto &parents=ch.get_parents_trans(classname);
-  for(const auto &parent : parents)
+  if(resolved_call.is_valid())
   {
-    const irep_idt id=id2string(parent)+stripped_methodid;
-    const symbolt *symbol;
-    if(!ns.lookup(id, symbol) &&
-       symbol->type.id()==ID_code)
+    const symbolt &function_symbol=
+      symbol_table.lookup(resolved_call.get_virtual_method_name());
+
+    INVARIANT(function_symbol.type.id()==ID_code, "Function must be code");
+
+    const auto &access=function_symbol.type.get(ID_access);
+    if(access==ID_public || access==ID_protected)
     {
-      const auto &access=symbol->type.get(ID_access);
-      if(access==ID_public || access==ID_protected)
-        return true;
-      // methods with the default access modifier are only
-      // accessible within the same package.
-      else if(access==ID_default &&
-              java_class_to_package(id2string(parent))==classpackage)
-        return true;
-      else if(access==ID_private)
-        continue;
-      else
-        INVARIANT(false, "Unexpected access modifier.");
+      return true;
     }
+
+    // methods with the default access modifier are only
+    // accessible within the same package.
+    if(access==ID_default)
+    {
+      const std::string &class_package=
+        java_class_to_package(id2string(classname));
+      const std::string &method_package=
+        java_class_to_package(id2string(resolved_call.get_class_identifier()));
+      return method_package==class_package;
+    }
+
+    if(access==ID_private)
+    {
+      // This is somewhat contentious: previously this code would keep walking
+      // up the parent if it found a private function. But this isn't what Java
+      // appears to do. If a private method is found then that becomes the
+      // virtual signuate and blocks access to the parent class
+      return false;
+    }
+
+    INVARIANT(false, "Unexpected access modifier.");
   }
+
   return false;
 }
 
