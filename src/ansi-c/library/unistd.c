@@ -1,10 +1,12 @@
 /* FUNCTION: sleep */
 
+unsigned __VERIFIER_nondet_unsigned();
+
 unsigned int sleep(unsigned int seconds)
 {
   __CPROVER_HIDE:;
   // do nothing, but return nondet value
-  unsigned remaining_time;
+  unsigned remaining_time=__VERIFIER_nondet_unsigned();
 
   if(remaining_time>seconds) remaining_time=seconds;
 
@@ -23,6 +25,8 @@ inline unsigned int _sleep(unsigned int seconds)
 
 /* FUNCTION: unlink */
 
+int __VERIFIER_nondet_int();
+
 int unlink(const char *s)
 {
   __CPROVER_HIDE:;
@@ -30,7 +34,7 @@ int unlink(const char *s)
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s), "unlink zero-termination");
   #endif
-  int retval;
+  int retval=__VERIFIER_nondet_int();
   return retval;
 }
 
@@ -46,10 +50,12 @@ extern struct __CPROVER_pipet __CPROVER_pipes[];
 extern const int __CPROVER_pipe_offset;
 extern unsigned __CPROVER_pipe_count;
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 int pipe(int fildes[2])
 {
   __CPROVER_HIDE:;
-  char error;
+  __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error)
   {
     errno=error==1 ? EMFILE : ENFILE;
@@ -102,6 +108,8 @@ int close(int fildes)
 
 /* FUNCTION: _close */
 
+int close(int fildes);
+
 inline int _close(int fildes)
 {
   __CPROVER_HIDE:;
@@ -126,12 +134,14 @@ extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
+ssize_t __VERIFIER_nondet_ssize_t();
+
 ssize_t write(int fildes, const void *buf, size_t nbyte)
 {
   __CPROVER_HIDE:;
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
   {
-    ssize_t retval;
+    ssize_t retval=__VERIFIER_nondet_ssize_t();
     __CPROVER_assume(retval>=-1 && retval<=(ssize_t)nbyte);
     return retval;
   }
@@ -192,12 +202,15 @@ extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+ssize_t __VERIFIER_nondet_ssize_t();
+
 ssize_t read(int fildes, void *buf, size_t nbyte)
 {
   __CPROVER_HIDE:;
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
   {
-    ssize_t nread;
+    ssize_t nread=__VERIFIER_nondet_ssize_t();
     __CPROVER_assume(0<=nread && (size_t)nread<=nbyte);
 
 #if 0
@@ -212,7 +225,7 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
     __CPROVER_array_replace((char*)buf, nondet_bytes);
 #endif
 
-    __CPROVER_bool error;
+    __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
     return error ? -1 : nread;
   }
 
