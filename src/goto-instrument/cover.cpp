@@ -129,6 +129,58 @@ public:
     return block_infos.at(block_nr).source_location;
   }
 
+  /// Select an instruction to be instrumented for each basic block such that
+  /// the java bytecode indices for each basic block is unique
+  /// \param goto_program The goto program
+  void select_unique_java_bytecode_indices(const goto_programt &goto_program)
+  {
+    std::set<unsigned> blocks_seen;
+    std::set<irep_idt> bytecode_indices_seen;
+
+    forall_goto_program_instructions(it, goto_program)
+    {
+      unsigned block_nr=block_of(it);
+      if(blocks_seen.find(block_nr)!=blocks_seen.end())
+        continue;
+
+      INVARIANT(block_nr<block_infos.size(), "block number out of range");
+      block_infot &block_info=block_infos.at(block_nr);
+      if(block_info.representative_inst==goto_program.instructions.end())
+      {
+        if(!it->source_location.get_java_bytecode_index().empty())
+        {
+          // search for a representative
+          if(bytecode_indices_seen.insert(
+               it->source_location.get_java_bytecode_index()).second)
+          {
+            block_info.representative_inst=it;
+            block_info.source_location=it->source_location;
+            update_covered_lines(block_info);
+            blocks_seen.insert(block_nr);
+          }
+        }
+      }
+      else if(it==block_info.representative_inst)
+      {
+        // check the existing representative
+        if(!it->source_location.get_java_bytecode_index().empty())
+        {
+          if(bytecode_indices_seen.insert(
+               it->source_location.get_java_bytecode_index()).second)
+          {
+            blocks_seen.insert(block_nr);
+          }
+          else
+          {
+            // clash, reset to search for a new one
+            block_info.representative_inst=goto_program.instructions.end();
+            block_info.source_location=source_locationt::nil();
+          }
+        }
+      }
+    }
+  }
+
   void output(std::ostream &out)
   {
     for(block_mapt::const_iterator
@@ -1145,6 +1197,7 @@ void instrument_cover_goals(
 
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
+  basic_blocks.select_unique_java_bytecode_indices(goto_program);
 
   const irep_idt coverage_criterion=as_string(criterion);
   const irep_idt property_class="coverage";
