@@ -181,6 +181,43 @@ public:
     }
   }
 
+  /// Output warnings about ignored blocks
+  /// \param goto_program The goto program
+  /// \param message_handler The message handler
+  void report_block_anomalies(
+    const goto_programt &goto_program,
+    message_handlert &message_handler)
+  {
+    messaget msg(message_handler);
+    std::set<unsigned> blocks_seen;
+    forall_goto_program_instructions(it, goto_program)
+    {
+      unsigned block_nr=block_of(it);
+      const block_infot &block_info=block_infos.at(block_nr);
+
+      if(blocks_seen.insert(block_nr).second &&
+         block_info.representative_inst==goto_program.instructions.end())
+      {
+        msg.warning() << "Ignoring block " << (block_nr+1) << " location "
+                      << it->location_number << " "
+                      << it->source_location
+                      << " (bytecode-index already instrumented)"
+                      << messaget::eom;
+      }
+      else if(block_info.representative_inst==it &&
+              block_info.source_location.is_nil())
+      {
+        msg.warning() << "Ignoring block " << (block_nr+1) << " location "
+                      << it->location_number << " "
+                      << it->function
+                      << " (missing source location)"
+                      << messaget::eom;
+      }
+      // The location numbers printed here are those
+      // before the coverage instrumentation.
+    }
+  }
+
   void output(std::ostream &out)
   {
     for(block_mapt::const_iterator
@@ -1140,6 +1177,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
+  message_handlert &message_handler,
   bool function_only)
 {
   coverage_goalst goals; // empty already covered goals
@@ -1147,6 +1185,7 @@ void instrument_cover_goals(
     symbol_table,
     goto_program,
     criterion,
+    message_handler,
     goals,
     function_only,
     false);
@@ -1182,6 +1221,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
+  message_handlert &message_handler,
   coverage_goalst &goals,
   bool function_only,
   bool ignore_trivial)
@@ -1198,6 +1238,7 @@ void instrument_cover_goals(
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
   basic_blocks.select_unique_java_bytecode_indices(goto_program);
+  basic_blocks.report_block_anomalies(goto_program, message_handler);
 
   const irep_idt coverage_criterion=as_string(criterion);
   const irep_idt property_class="coverage";
@@ -1529,6 +1570,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
+  message_handlert &message_handler,
   coverage_goalst &goals,
   bool function_only,
   bool ignore_trivial)
@@ -1544,6 +1586,7 @@ void instrument_cover_goals(
       symbol_table,
       f_it->second.body,
       criterion,
+      message_handler,
       goals,
       function_only,
       ignore_trivial);
@@ -1554,6 +1597,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
+  message_handlert &message_handler,
   bool function_only)
 {
   // empty set of existing goals
@@ -1562,6 +1606,7 @@ void instrument_cover_goals(
     symbol_table,
     goto_functions,
     criterion,
+    message_handler,
     goals,
     function_only,
     false);
@@ -1571,9 +1616,9 @@ bool instrument_cover_goals(
   const cmdlinet &cmdline,
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  message_handlert &msgh)
+  message_handlert &message_handler)
 {
-  messaget msg(msgh);
+  messaget msg(message_handler);
   std::list<std::string> criteria_strings=cmdline.get_values("cover");
   std::set<coverage_criteriont> criteria;
   bool keep_assertions=false;
@@ -1650,7 +1695,7 @@ bool instrument_cover_goals(
     const std::string coverage=cmdline.get_value("existing-coverage");
     // get a coverage_goalst object
     if(coverage_goalst::get_coverage_goals(
-       coverage, msgh, existing_goals, mode))
+       coverage, message_handler, existing_goals, mode))
     {
       msg.error() << "get_coverage_goals failed" << messaget::eom;
       return true;
@@ -1665,6 +1710,7 @@ bool instrument_cover_goals(
       symbol_table,
       goto_functions,
       criterion,
+      message_handler,
       existing_goals,
       cmdline.isset("cover-function-only"),
       cmdline.isset("no-trivial-tests"));
