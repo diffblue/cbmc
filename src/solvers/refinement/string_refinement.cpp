@@ -1088,17 +1088,14 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
 /// \return a Boolean
 bool string_refinementt::check_axioms()
 {
-  debug() << "string_refinementt::check_axioms: ==============="
-          << "===========================================" << eom;
-  debug() << "string_refinementt::check_axioms: build the"
-          << " interpretation from the model of the prop_solver" << eom;
+  debug() << "string_refinementt::check_axioms:" << eom;
   debug_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
 
-  debug() << "there are " << universal_axioms.size()
-          << " universal axioms" << eom;
+  debug() << "string_refinement::check_axioms: " << universal_axioms.size()
+          << " universal axioms:" << eom;
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
     const string_constraintt &axiom=universal_axioms[i];
@@ -1112,20 +1109,32 @@ bool string_refinementt::check_axioms()
       univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
-    debug() << "(string_refinementt::check_axioms) Adding negated constraint: "
-            << from_expr(ns, "", negaxiom) << eom;
-    substitute_array_access(negaxiom);
+
+    debug() << "  - axiom:\n"
+            << "     " << from_expr(ns, "", axiom) << eom;
+    debug() << "  - axiom_in_model:\n"
+            << "     " << from_expr(ns, "", axiom_in_model) << eom;
+    debug() << "  - negated_axiom:\n"
+            << "     " << from_expr(ns, "", negaxiom) << eom;
+
+    substitute_array_access(negaxiom, true);
+
+    debug() << "  - negated_axiom_without_array_access:\n"
+            << "     " << from_expr(ns, "", negaxiom) << eom;
+
     exprt witness;
 
     bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
 
     if(is_sat)
     {
-      debug() << "string constraint can be violated for "
+      debug() << "  - violated_for: "
               << univ_var.get_identifier()
               << " = " << from_expr(ns, "", witness) << eom;
       violated[i]=witness;
     }
+    else
+      debug() << "  - correct" << eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
