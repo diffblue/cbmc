@@ -87,6 +87,8 @@ inline void *calloc(__CPROVER_size_t nmemb, __CPROVER_size_t size)
 
 #undef malloc
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 inline void *malloc(__CPROVER_size_t malloc_size)
 {
   // realistically, malloc may return NULL,
@@ -99,19 +101,21 @@ inline void *malloc(__CPROVER_size_t malloc_size)
   __CPROVER_deallocated=(malloc_res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc;
+  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?malloc_res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
-  __CPROVER_bool record_may_leak;
+  __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak=record_may_leak?malloc_res:__CPROVER_memory_leak;
 
   return malloc_res;
 }
 
 /* FUNCTION: __builtin_alloca */
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 {
@@ -123,7 +127,7 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // record the object size for non-determistic bounds checking
-  __CPROVER_bool record_malloc;
+  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?alloca_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
@@ -134,6 +138,8 @@ inline void *__builtin_alloca(__CPROVER_size_t alloca_size)
 /* FUNCTION: free */
 
 #undef free
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void free(void *ptr)
 {
@@ -158,7 +164,7 @@ inline void free(void *ptr)
                      "free called for new[] object");
 
     // non-deterministically record as deallocated
-    __CPROVER_bool record;
+    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     if(record) __CPROVER_deallocated=ptr;
 
     // detect memory leaks
@@ -301,6 +307,9 @@ inline long atol(const char *nptr)
 #define __CPROVER_LIMITS_H_INCLUDED
 #endif
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+__CPROVER_size_t __VERIFIER_nondet___CPROVER_size_t();
+
 inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
 
 inline char *getenv(const char *name)
@@ -321,18 +330,17 @@ inline char *getenv(const char *name)
 
   #else
 
-  __CPROVER_bool found;
+  __CPROVER_bool found=__VERIFIER_nondet___CPROVER_bool();
   if(!found) return 0;
 
-  char *buffer;
-  __CPROVER_size_t buf_size;
+  __CPROVER_size_t buf_size=__VERIFIER_nondet___CPROVER_size_t();
 
   // It's reasonable to assume this won't exceed the signed
   // range in practice, but in principle, this could exceed
   // the range.
 
   __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  buffer=(char *)__builtin_alloca(buf_size);
+  char *buffer=(char *)__builtin_alloca(buf_size);
   buffer[buf_size-1]=0;
 
   return buffer;
@@ -387,11 +395,13 @@ inline void *valloc(__CPROVER_size_t malloc_size)
 
 /* FUNCTION: random */
 
+long __VERIFIER_nondet_long();
+
 long random(void)
 {
   // We return a non-deterministic value instead of a random one.
   __CPROVER_HIDE:;
-  long result;
+  long result=__VERIFIER_nondet_long();
   __CPROVER_assume(result>=0 && result<=2147483647);
   return result;
 }

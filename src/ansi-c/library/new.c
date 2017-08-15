@@ -1,5 +1,7 @@
 /* FUNCTION: __new */
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 inline void *__new(__typeof__(sizeof(int)) malloc_size)
 {
   // The constructor call is done by the front-end.
@@ -12,19 +14,21 @@ inline void *__new(__typeof__(sizeof(int)) malloc_size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // non-derministically record the object size for bounds checking
-  __CPROVER_bool record_malloc;
+  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?malloc_size:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?0:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
-  __CPROVER_bool record_may_leak;
+  __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
 
   return res;
 }
 
 /* FUNCTION: __new_array */
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
 {
@@ -38,13 +42,13 @@ inline void *__new_array(__CPROVER_size_t count, __CPROVER_size_t size)
   __CPROVER_deallocated=(res==__CPROVER_deallocated)?0:__CPROVER_deallocated;
 
   // non-deterministically record the object size for bounds checking
-  __CPROVER_bool record_malloc;
+  __CPROVER_bool record_malloc=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_malloc_object=record_malloc?res:__CPROVER_malloc_object;
   __CPROVER_malloc_size=record_malloc?size*count:__CPROVER_malloc_size;
   __CPROVER_malloc_is_new_array=record_malloc?1:__CPROVER_malloc_is_new_array;
 
   // detect memory leaks
-  __CPROVER_bool record_may_leak;
+  __CPROVER_bool record_may_leak=__VERIFIER_nondet___CPROVER_bool();
   __CPROVER_memory_leak=record_may_leak?res:__CPROVER_memory_leak;
 
   return res;
@@ -62,6 +66,8 @@ inline void *__placement_new(__typeof__(sizeof(int)) malloc_size, void *p)
 }
 
 /* FUNCTION: __delete */
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void __delete(void *ptr)
 {
@@ -85,12 +91,14 @@ inline void __delete(void *ptr)
                      "delete of array object");
 
     // non-deterministically record as deallocated
-    __CPROVER_bool record;
+    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }
 
 /* FUNCTION: __delete_array */
+
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
 
 inline void __delete_array(void *ptr)
 {
@@ -114,7 +122,7 @@ inline void __delete_array(void *ptr)
                      "delete[] of non-array object");
 
     // non-deterministically record as deallocated
-    __CPROVER_bool record;
+    __CPROVER_bool record=__VERIFIER_nondet___CPROVER_bool();
     __CPROVER_deallocated=record?ptr:__CPROVER_deallocated;
   }
 }
