@@ -301,6 +301,8 @@ inline long atol(const char *nptr)
 #define __CPROVER_LIMITS_H_INCLUDED
 #endif
 
+inline void *__builtin_alloca(__CPROVER_size_t alloca_size);
+
 inline char *getenv(const char *name)
 {
   __CPROVER_HIDE:;
@@ -330,7 +332,7 @@ inline char *getenv(const char *name)
   // the range.
 
   __CPROVER_assume(1<=buf_size && buf_size<=SSIZE_MAX);
-  buffer=(char *)__CPROVER_malloc(buf_size);
+  buffer=(char *)__builtin_alloca(buf_size);
   buffer[buf_size-1]=0;
 
   return buffer;
