@@ -295,9 +295,10 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
   const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
   const auto &param_classid=class_type.get_identifier();
 
-  lazy_methods.add_needed_class(param_classid);
-
-  gather_field_types(pointer_type.subtype(), ns, lazy_methods);
+  if(lazy_methods.add_needed_class(param_classid))
+  {
+    gather_field_types(pointer_type.subtype(), ns, lazy_methods);
+  }
 }
 
 /// Get places where virtual functions are called.
