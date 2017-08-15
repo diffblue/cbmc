@@ -741,3 +741,42 @@ void abstract_environmentt::erase(const symbol_exprt &expr)
 {
     map.erase(expr);
 }
+
+/*******************************************************************\
+
+Function: abstract_environmentt::environment_diff
+
+  Inputs:  Two abstract_environmentt's that need to be intersected for,
+           so that we can find symbols that have changed between
+           different domains.
+
+ Outputs:  An std::vector containing the symbols that are present in
+           both environments.
+
+ Purpose:  For our implementation of variable sensitivity domains, we
+           need to be able to efficiently find symbols that have changed
+           between different domains. To do this, we need to be able
+           to quickly find which symbols have new written locations,
+           which we do by finding the intersection between two different
+           domains (environments).
+
+\*******************************************************************/
+
+std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
+  const abstract_environmentt &first, const abstract_environmentt &second)
+{
+  std::vector<symbol_exprt> symbols_diff;
+  for (const auto &entry : first.map)
+  {
+    const auto second_entry = second.map.find(entry.first);
+    if (second_entry != second.map.end())
+    {
+      if (entry.second->get_last_written_locations() !=
+          second_entry->second->get_last_written_locations())
+      {
+        symbols_diff.push_back(entry.first);
+      }
+    }
+  }
+  return symbols_diff;
+}
