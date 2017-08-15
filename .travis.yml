@@ -37,7 +37,7 @@ jobs:
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env: COMPILER="g++-5"
+      env: COMPILER="ccache g++-5"
 
     # Alpine Linux with musl-libc using g++
     - stage: Test different OS/CXX/Flags
@@ -64,7 +64,7 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
-      env: COMPILER=g++
+      env: COMPILER="ccache g++"
 
     # OS X using clang++
     - stage: Test different OS/CXX/Flags
@@ -97,7 +97,7 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env:
-        - COMPILER="g++-5"
+        - COMPILER="ccache g++-5"
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
