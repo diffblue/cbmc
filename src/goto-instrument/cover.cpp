@@ -59,6 +59,7 @@ public:
         if(increase_block_nr)
         {
           block_infos.push_back(block_infot());
+          block_infos.back().representative_inst=it;
           block_infos.back().source_location=source_locationt::nil();
           current_block=block_infos.size()-1;
         }
@@ -76,11 +77,15 @@ public:
       if(!line.empty())
         block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
 
+      // set representative program location to instrument
       if(!it->source_location.is_nil() &&
          !it->source_location.get_file().empty() &&
          !it->source_location.get_line().empty() &&
          block_info.source_location.is_nil())
+      {
+        block_info.representative_inst=it; // update
         block_info.source_location=it->source_location;
+      }
 
       next_is_target=
 #if 0
@@ -116,6 +121,9 @@ public:
 
   struct block_infot
   {
+    /// the program location to instrument for this block
+    goto_programt::const_targett representative_inst;
+
     /// the source location representative for this block
     // (we need a separate copy of source locations because we attach
     //  the line number ranges to them)
@@ -129,13 +137,28 @@ public:
   typedef std::vector<block_infot> block_infost;
   block_infost block_infos;
 
-  inline unsigned operator[](goto_programt::const_targett t)
+  /// \param t a goto instruction
+  /// \return the block number of the block
+  ///         the given goto instruction is part of
+  unsigned block_of(goto_programt::const_targett t)
   {
-    return block_map[t];
+    block_mapt::const_iterator it=block_map.find(t);
+    INVARIANT(it!=block_map.end(), "instruction must be part of a block");
+    return it->second;
   }
 
   /// \param block_nr a block number
-  /// \return the source location corresponding to the given block number
+  /// \return  the instruction selected for
+  ///   instrumentation representative of the given block
+  goto_programt::const_targett instruction_of(unsigned block_nr)
+  {
+    INVARIANT(block_nr<block_infos.size(), "block number out of range");
+    return block_infos.at(block_nr).representative_inst;
+  }
+
+  /// \param block_nr a block number
+  /// \return  the source location selected for
+  ///   instrumentation representative of the given block
   const source_locationt &source_location_of(
     unsigned block_nr)
   {
@@ -1111,14 +1134,13 @@ void instrument_cover_goals(
   if(ignore_trivial && program_is_trivial(goto_program))
     return;
 
-  const namespacet ns(symbol_table);
-  basic_blockst basic_blocks(goto_program);
-  std::set<unsigned> blocks_done;
-
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
      goto_program.instructions.front().source_location.is_built_in())
     return;
+
+  const namespacet ns(symbol_table);
+  basic_blockst basic_blocks(goto_program);
 
   const irep_idt coverage_criterion=as_string(criterion);
   const irep_idt property_class="coverage";
@@ -1177,10 +1199,12 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       {
-        unsigned block_nr=basic_blocks[i_it];
-        if(blocks_done.insert(block_nr).second)
+        unsigned block_nr=basic_blocks.block_of(i_it);
+        goto_programt::const_targett in_t=basic_blocks.instruction_of(block_nr);
+        // we only instrument the selected instruction
+        if(in_t==i_it)
         {
-          std::string b=std::to_string(block_nr);
+          std::string b=std::to_string(block_nr+1); // start with 1
           std::string id=id2string(i_it->function)+"#"+b;
           source_locationt source_location=
             basic_blocks.source_location_of(block_nr);
@@ -1234,7 +1258,8 @@ void instrument_cover_goals(
       if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
          !i_it->source_location.is_built_in())
       {
-        std::string b=std::to_string(basic_blocks[i_it]);
+        std::string b=
+          std::to_string(basic_blocks.block_of(i_it)+1); // start with 1
         std::string true_comment=
           "function "+id2string(i_it->function)+" block "+b+" branch true";
         std::string false_comment=
