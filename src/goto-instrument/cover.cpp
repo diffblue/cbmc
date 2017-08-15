@@ -11,6 +11,7 @@ Date: May 2016
 /// \file
 /// Coverage Instrumentation
 
+
 #include "cover.h"
 
 #include <algorithm>
@@ -32,23 +33,54 @@ public:
   explicit basic_blockst(const goto_programt &_goto_program)
   {
     bool next_is_target=true;
-    unsigned block_count=0;
+    unsigned current_block=0;
 
     forall_goto_program_instructions(it, _goto_program)
     {
+      // Is it a potential beginning of a block?
       if(next_is_target || it->is_target())
-        block_count++;
+      {
+        // We keep the block number if this potential block
+        // is a continuation of a previous block through
+        // unconditional forward gotos; otherwise we increase the
+        // block number.
+        bool increase_block_nr=true;
+        if(it->incoming_edges.size()==1)
+        {
+          goto_programt::targett in_t=*it->incoming_edges.begin();
+          if(in_t->is_goto() &&
+             !in_t->is_backwards_goto() &&
+             in_t->guard.is_true())
+          {
+            current_block=block_map[in_t];
+            increase_block_nr=false;
+          }
+        }
+        if(increase_block_nr)
+        {
+          block_infos.push_back(block_infot());
+          block_infos.back().source_location=source_locationt::nil();
+          current_block=block_infos.size()-1;
+        }
+      }
 
+      INVARIANT(
+        current_block<block_infos.size(),
+        "current block number out of range");
+      block_infot &block_info=block_infos.at(current_block);
+
+      block_map[it]=current_block;
+
+      // update lines belonging to block
       const irep_idt &line=it->source_location.get_line();
       if(!line.empty())
-        block_line_cover_map[block_count]
-          .insert(unsafe_string2unsigned(id2string(line)));
-
-      block_map[it]=block_count;
+        block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
 
       if(!it->source_location.is_nil() &&
-         source_location_map.find(block_count)==source_location_map.end())
-        source_location_map[block_count]=it->source_location;
+         !it->source_location.get_file().empty() &&
+         !it->source_location.get_line().empty() &&
+         block_info.source_location.is_nil())
+        block_info.source_location=it->source_location;
 
       next_is_target=
 #if 0
@@ -62,16 +94,19 @@ public:
     // create list of covered lines as CSV string and set as property of source
     // location of basic block, compress to ranges if applicable
     format_number_ranget format_lines;
-    for(const auto &cover_set : block_line_cover_map)
+    for(auto &block_info : block_infos)
     {
-      INVARIANT(!cover_set.second.empty(),
+      if(block_info.source_location.is_nil())
+        continue;
+
+      const auto &cover_set=block_info.lines;
+      INVARIANT(!cover_set.empty(),
         "covered lines set must not be empty");
       std::vector<unsigned>
-        line_list{cover_set.second.begin(), cover_set.second.end()};
+        line_list{cover_set.begin(), cover_set.end()};
 
       std::string covered_lines=format_lines(line_list);
-      source_location_map[cover_set.first]
-        .set_basic_block_covered_lines(covered_lines);
+      block_info.source_location.set_basic_block_covered_lines(covered_lines);
     }
   }
 
@@ -79,18 +114,33 @@ public:
   typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
   block_mapt block_map;
 
-  // map block numbers to source code locations
-  typedef std::map<unsigned, source_locationt> source_location_mapt;
-  source_location_mapt source_location_map;
+  struct block_infot
+  {
+    /// the source location representative for this block
+    // (we need a separate copy of source locations because we attach
+    //  the line number ranges to them)
+    source_locationt source_location;
 
-  // map block numbers to set of line numbers
-  typedef std::map<unsigned, std::unordered_set<unsigned> >
-    block_line_cover_mapt;
-  block_line_cover_mapt block_line_cover_map;
+    // map block numbers to source code locations
+    /// the set of lines belonging to this block
+    std::unordered_set<unsigned> lines;
+  };
+
+  typedef std::vector<block_infot> block_infost;
+  block_infost block_infos;
 
   inline unsigned operator[](goto_programt::const_targett t)
   {
     return block_map[t];
+  }
+
+  /// \param block_nr a block number
+  /// \return the source location corresponding to the given block number
+  const source_locationt &source_location_of(
+    unsigned block_nr)
+  {
+    INVARIANT(block_nr<block_infos.size(), "block number out of range");
+    return block_infos.at(block_nr).source_location;
   }
 
   void output(std::ostream &out)
@@ -1133,7 +1183,7 @@ void instrument_cover_goals(
           std::string b=std::to_string(block_nr);
           std::string id=id2string(i_it->function)+"#"+b;
           source_locationt source_location=
-            basic_blocks.source_location_map[block_nr];
+            basic_blocks.source_location_of(block_nr);
 
           // check whether the current goal already exists
           if(!goals.is_existing_goal(source_location) &&
