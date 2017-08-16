@@ -575,8 +575,7 @@ exprt java_string_library_preprocesst::allocate_fresh_string(
 {
   exprt str=fresh_string(type, loc, symbol_table);
   code.add(code_declt(str));
-  (void) allocate_dynamic_object_with_decl(
-    str, str.type().subtype(), symbol_table, loc, code, false);
+  allocate_dynamic_object_with_decl(str, symbol_table, loc, code);
   return str;
 }
 
@@ -594,8 +593,7 @@ exprt java_string_library_preprocesst::allocate_fresh_array(
 {
   exprt array=fresh_array(type, loc, symbol_table);
   code.add(code_declt(array));
-  (void) allocate_dynamic_object_with_decl(
-    array, array.type().subtype(), symbol_table, loc, code, false);
+  allocate_dynamic_object_with_decl(array, symbol_table, loc, code);
   return array;
 }
 
@@ -1389,10 +1387,9 @@ exprt java_string_library_preprocesst::make_argument_for_format(
   // arg_i = argv[index]
   exprt obj=get_object_at_index(argv, index);
   symbolt object_symbol=get_fresh_aux_symbol(
-    obj.type(), "tmp_object", "tmp_object", loc, ID_java, symbol_table);
+    obj.type(), "tmp_format_obj", "tmp_format_obj", loc, ID_java, symbol_table);
   symbol_exprt arg_i=object_symbol.symbol_expr();
-  (void) allocate_dynamic_object_with_decl(
-    arg_i, obj.type(), symbol_table, loc, code, false);
+  allocate_dynamic_object_with_decl(arg_i, symbol_table, loc, code);
   code.add(code_assignt(arg_i, obj));
   code.add(code_assumet(not_exprt(equal_exprt(
     arg_i, null_pointer_exprt(to_pointer_type(arg_i.type()))))));
