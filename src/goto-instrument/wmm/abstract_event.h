@@ -45,7 +45,18 @@ public:
   bool RWcumul;
   bool RRcumul;
 
-  abstract_eventt()
+  abstract_eventt():
+    operation(operationt::Write),
+    thread(0),
+    id(0),
+    local(false),
+    WRfence(false),
+    WWfence(false),
+    RRfence(false),
+    RWfence(false),
+    WWcumul(false),
+    RWcumul(false),
+    RRcumul(false)
   {
   }
 
