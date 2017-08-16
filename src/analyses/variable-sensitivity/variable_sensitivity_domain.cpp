@@ -17,6 +17,8 @@ Date: April 2016
 #include "variable_sensitivity_domain.h"
 #include <util/cprover_prefix.h>
 
+#define DEBUG
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -275,6 +277,11 @@ bool variable_sensitivity_domaint::merge(
             << from->location_number << " --> "
             << to->location_number << std::endl;
   #endif
+
+  if(from->location_number==13 && to->location_number==58)
+  {
+
+  }
 
   // Use the abstract_environment merge
   bool any_changes=abstract_state.merge(b.abstract_state);
