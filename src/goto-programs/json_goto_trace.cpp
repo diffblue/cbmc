@@ -140,7 +140,7 @@ void convert(
 
   for(const auto &step : goto_trace.steps)
   {
-    const source_locationt &source_location=step.pc->source_location;
+    const source_locationt &source_location=step.get_pc()->source_location;
 
     jsont json_location;
 
@@ -156,13 +156,13 @@ void convert(
       {
         irep_idt property_id;
 
-        if(step.pc->is_assert())
+        if(step.get_pc()->is_assert())
           property_id=source_location.get_property_id();
-        else if(step.pc->is_goto()) // unwinding, we suspect
+        else if(step.get_pc()->is_goto()) // unwinding, we suspect
         {
           property_id=
-            id2string(step.pc->source_location.get_function())+
-            ".unwind."+std::to_string(step.pc->loop_number);
+            id2string(step.get_pc()->source_location.get_function())+
+            ".unwind."+std::to_string(step.get_pc()->loop_number);
         }
 
         json_objectt &json_failure=dest_array.push_back().make_object();

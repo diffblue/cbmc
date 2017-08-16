@@ -260,12 +260,12 @@ void show_goto_trace(
       {
         out << "\n";
         out << "Violated property:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
+        if(!step.get_pc()->source_location.is_nil())
+          out << "  " << step.get_pc()->source_location << "\n";
         out << "  " << step.comment << "\n";
 
-        if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+        if(step.get_pc()->is_assert())
+          out << "  " << from_expr(ns, "", step.get_pc()->guard) << "\n";
 
         out << "\n";
       }
@@ -276,11 +276,11 @@ void show_goto_trace(
       {
         out << "\n";
         out << "Violated assumption:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
+        if(!step.get_pc()->source_location.is_nil())
+          out << "  " << step.get_pc()->source_location << "\n";
 
-        if(step.pc->is_assume())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+        if(step.get_pc()->is_assume())
+          out << "  " << from_expr(ns, "", step.get_pc()->guard) << "\n";
 
         out << "\n";
       }
@@ -293,16 +293,17 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
+      if(step.get_pc()->is_assign() ||
+         step.get_pc()->is_return() || // returns have a lhs!
+         step.get_pc()->is_function_call() ||
+         (step.get_pc()->is_other() && step.lhs_object.is_not_nil()))
       {
         if(prev_step_nr!=step.step_nr || first_step)
         {
           first_step=false;
           prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
+          show_state_header(
+            out, step, step.get_pc()->source_location, step.step_nr);
         }
 
         // see if the full lhs is something clean
@@ -320,7 +321,8 @@ void show_goto_trace(
       {
         first_step=false;
         prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, step, step.get_pc()->source_location, step.step_nr);
       }
 
       trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
@@ -336,7 +338,8 @@ void show_goto_trace(
       }
       else
       {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        show_state_header(
+          out, step, step.get_pc()->source_location, step.step_nr);
         out << "  OUTPUT " << step.io_id << ":";
 
         for(std::list<exprt>::const_iterator
@@ -357,7 +360,8 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
+      show_state_header(
+        out, step, step.get_pc()->source_location, step.step_nr);
       out << "  INPUT " << step.io_id << ":";
 
       for(std::list<exprt>::const_iterator
