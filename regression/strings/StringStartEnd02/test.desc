@@ -1,6 +1,6 @@
 CORE
 StringStartEnd02.class
---refine-strings --unwind 30
+--refine-strings --unwind 30 --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion\.1\] .* line 13 .* FAILURE$
