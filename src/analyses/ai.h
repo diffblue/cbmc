@@ -394,6 +394,18 @@ protected:
     return it->second;
   }
 
+  /// Takes a state \p src, gets another state from the \p to location
+  /// source_state (param)
+  /// dest_state (built from to)
+  /// Merge the source state into the destination state
+  ///
+
+  ///
+  /// \param src
+  /// \param from
+  /// \param to
+  /// \return
+  ///
   bool merge(const statet &src, locationt from, locationt to) override
   {
     statet &dest=get_state(to);

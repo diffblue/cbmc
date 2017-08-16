@@ -514,6 +514,9 @@ Function: abstract_environmentt::merge
 
 \*******************************************************************/
 
+
+#include <iostream>
+
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
   // Use the sharing_map's "iterative over all differences" functionality
@@ -534,6 +537,14 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   }
   else
   {
+    std::vector<symbol_exprt> modified_symbols=
+      abstract_environmentt::modified_symbols(*this, env);
+
+    for(const symbol_exprt &x : modified_symbols)
+    {
+      std::cout << x.get_identifier() << std::endl;
+    }
+
     // For each element in the intersection of map and env.map merge
     // If the result of the merge is top, remove from the map
     bool modified=false;
@@ -541,17 +552,24 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
     {
       if(map.find(entry.first)!=map.end())
       {
-        bool object_modified=false;
-        abstract_object_pointert new_object=
-          abstract_objectt::merge(
-            map[entry.first],
-            entry.second,
-            object_modified);
+        if(
+           std::find(
+            modified_symbols.begin(),
+            modified_symbols.end(),
+            entry.first)!=modified_symbols.cend())
+        {
+          bool object_modified=false;
+          abstract_object_pointert new_object=
+            abstract_objectt::merge(
+              map[entry.first],
+              entry.second,
+              object_modified);
 
-        modified|=object_modified;
-        map[entry.first]=new_object;
+          modified|=object_modified;
+          map[entry.first]=new_object;
 
-        // Write, even if TOP.
+          // Write, even if TOP.
+        }
       }
       else
       {
@@ -771,9 +789,47 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
     const auto second_entry = second.map.find(entry.first);
     if (second_entry != second.map.end())
     {
-      if (entry.second->get_last_written_locations() !=
-          second_entry->second->get_last_written_locations())
+      // for the last written write locations to match
+      // each location in one must be equal to precisely one location
+      // in the other
+      // Since a set can assume at most one match
+
+      const auto location_matcher=
+        [&](
+            goto_programt::const_targett instruction,
+            goto_programt::const_targett other_instruction)
+        {
+          return other_instruction->location_number==instruction->location_number;
+        };
+
+
+      const abstract_objectt::locationst &a=entry.second->get_last_written_locations();
+      const abstract_objectt::locationst &b=second_entry->second->get_last_written_locations();
+
+      abstract_objectt::locationst intersection;
+      std::set_intersection(
+        a.cbegin(),
+        a.cend(),
+        b.cbegin(),
+        b.cend(),
+        std::inserter(intersection, intersection.end()),
+        location_matcher);
+      bool all_matched=
+        intersection.size()==a.size() && intersection.size()==b.size();
+
+      if (!all_matched)
       {
+        goto_programt::instructiont last_written_locations=**entry.second->get_last_written_locations().begin();
+        goto_programt::instructiont last_written_locations2=**second_entry->second->get_last_written_locations().begin();
+
+        if(last_written_locations.source_location==last_written_locations2.source_location)
+        {
+          std::cout <<
+            entry.first.get_identifier() << ":" <<
+            last_written_locations.location_number << " vs"
+            << last_written_locations2.location_number << std::endl;
+        }
+
         symbols_diff.push_back(entry.first);
       }
     }

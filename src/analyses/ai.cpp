@@ -398,6 +398,21 @@ bool ai_baset::do_function_call(
 
   assert(!goto_function.body.instructions.empty());
 
+  bool any_changes=false;
+  {
+    // do edge from end of function to instruction after call
+    const statet &starting_state=get_state(l_call);
+
+    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
+
+    /// Merge 25 into 26
+    /// Source state is 25 (src = get_state(25)
+    /// Destination state is 26 (i.e to = 26)
+
+    // src, from, to
+    any_changes|=merge(*tmp_state, l_call, l_return);
+  }
+
   // This is the edge from call site to function head.
 
   {
@@ -438,8 +453,10 @@ bool ai_baset::do_function_call(
     tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
-    return merge(*tmp_state, l_end, l_return);
+    any_changes|=merge(*tmp_state, l_end, l_return);
   }
+
+  return any_changes;
 }
 
 bool ai_baset::do_function_call_rec(
