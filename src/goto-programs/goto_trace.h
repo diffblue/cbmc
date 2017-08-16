@@ -90,8 +90,6 @@ public:
   enum class assignment_typet { STATE, ACTUAL_PARAMETER };
   assignment_typet assignment_type;
 
-  goto_programt::const_targett pc;
-
   // this transition done by given thread number
   unsigned thread_nr;
 
@@ -142,6 +140,22 @@ public:
     full_lhs_value.make_nil();
     cond_expr.make_nil();
   }
+
+  goto_programt::const_targett get_pc() const { return pc; }
+
+  /// We don't have a way of enforcing this, but \p pc_ must *not* be a
+  /// singular iterator!
+  void set_pc(goto_programt::const_targett pc_)
+  {
+    pc=std::move(pc_);
+    is_pc_set=true;
+  }
+
+  bool get_is_pc_set() const { return is_pc_set; }
+
+private:
+  goto_programt::const_targett pc;
+  bool is_pc_set{false};
 };
 
 /*! \brief TO_BE_DOCUMENTED

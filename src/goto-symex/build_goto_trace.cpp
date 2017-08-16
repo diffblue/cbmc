@@ -263,7 +263,7 @@ void build_goto_trace(
       end_ptr=&goto_trace_step;
 
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
-    goto_trace_step.pc=SSA_step.source.pc;
+    goto_trace_step.set_pc(SSA_step.source.pc);
     goto_trace_step.comment=SSA_step.comment;
     if(SSA_step.ssa_lhs.is_not_nil())
       goto_trace_step.lhs_object=
