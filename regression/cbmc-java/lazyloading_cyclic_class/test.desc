@@ -1,0 +1,7 @@
+CORE
+test.class
+--lazy-methods --verbosity 10 --function test.test
+^EXIT=0$
+^SIGNAL=0$
+elaborate java::Base\.f:\(\)V
+--
