@@ -31,6 +31,7 @@ SRC = arith_tools.cpp \
       irep_hash_container.cpp \
       irep_ids.cpp \
       irep_serialization.cpp \
+      invariant_utils.cpp \
       json.cpp \
       json_expr.cpp \
       json_irep.cpp \
