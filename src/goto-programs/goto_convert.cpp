@@ -281,6 +281,9 @@ void goto_convertt::finish_guarded_gotos(goto_programt &dest)
     // Simplify: remove whatever code was generated for the condition
     // and attach the original guard to the goto instruction.
     gg.gotoiter->guard=gg.guard;
+    // inherit the source location (otherwise the guarded goto will
+    // have the source location of the else branch)
+    gg.gotoiter->source_location=gg.ifiter->source_location;
     // goto_programt doesn't provide an erase operation,
     // perhaps for a good reason, so let's be cautious and just
     // flatten the unneeded instructions into skips.
