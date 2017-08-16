@@ -196,13 +196,12 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(goto_trace_stept());
+    steps.push_back(goto_trace_stept(SSA_step.source.pc));
     goto_trace_stept &goto_trace_step=steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
 
     goto_trace_step.thread_nr=SSA_step.source.thread_nr;
-    goto_trace_step.pc=SSA_step.source.pc;
     goto_trace_step.comment=SSA_step.comment;
     if(SSA_step.ssa_lhs.is_not_nil())
       goto_trace_step.lhs_object=

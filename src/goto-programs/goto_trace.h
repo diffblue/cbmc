@@ -87,8 +87,6 @@ public:
   enum class assignment_typet { STATE, ACTUAL_PARAMETER };
   assignment_typet assignment_type;
 
-  goto_programt::const_targett pc;
-
   // this transition done by given thread number
   unsigned thread_nr;
 
@@ -123,14 +121,15 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
-  goto_trace_stept():
+  explicit goto_trace_stept(goto_programt::const_targett pc_):
     step_nr(0),
     type(typet::NONE),
     hidden(false),
     assignment_type(assignment_typet::STATE),
     thread_nr(0),
     cond_value(false),
-    formatted(false)
+    formatted(false),
+    pc(std::move(pc_))
   {
     lhs_object.make_nil();
     lhs_object_value.make_nil();
@@ -138,6 +137,11 @@ public:
     full_lhs_value.make_nil();
     cond_expr.make_nil();
   }
+
+  goto_programt::const_targett get_pc() const { return pc; }
+
+private:
+  goto_programt::const_targett pc;
 };
 
 /*! \brief TO_BE_DOCUMENTED
