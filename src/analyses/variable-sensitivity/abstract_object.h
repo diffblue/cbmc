@@ -68,6 +68,7 @@ class namespacet;
  * merge then it merges, otherwise it calls the parent merge.
  */
 
+
 template<class T>
 using sharing_ptrt=std::shared_ptr<const T>; // NOLINT(*)
 
