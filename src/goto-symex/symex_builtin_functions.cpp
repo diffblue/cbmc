@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
-
+#include <util/invariant_utils.h>
 #include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
@@ -371,7 +371,8 @@ void goto_symext::symex_cpp_new(
   if(code.type().id()!=ID_pointer)
     throw "new expected to return pointer";
 
-  do_array=(code.get(ID_statement)==ID_cpp_new_array);
+  do_array=(code.get(ID_statement)==ID_cpp_new_array ||
+            code.get(ID_statement)==ID_java_new_array);
 
   dynamic_counter++;
 
@@ -384,7 +385,13 @@ void goto_symext::symex_cpp_new(
              "dynamic_"+count_string+"_value";
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
-  symbol.mode=ID_cpp;
+  if(code.get(ID_statement)==ID_cpp_new_array ||
+     code.get(ID_statement)==ID_cpp_new)
+    symbol.mode=ID_cpp;
+  else if(code.get(ID_statement)==ID_java_new_array)
+    symbol.mode=ID_java;
+  else
+    INVARIANT_WITH_IREP(false, "Unexpected side effect expression", code);
 
   if(do_array)
   {
