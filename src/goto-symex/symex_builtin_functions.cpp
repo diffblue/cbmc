@@ -361,6 +361,11 @@ void goto_symext::symex_output(
   target.output(state.guard.as_expr(), state.source, output_id, args);
 }
 
+/// Handles side effects of type 'new' for C++ and 'new array'
+/// for C++ and Java language modes
+/// \param state: Symex state
+/// \param lhs: left-hand side of assignment
+/// \param code: right-hand side containing side effect
 void goto_symext::symex_cpp_new(
   statet &state,
   const exprt &lhs,
