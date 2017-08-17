@@ -278,7 +278,7 @@ bool variable_sensitivity_domaint::merge(
             << to->location_number << std::endl;
   #endif
 
-  if(from->location_number==13 && to->location_number==58)
+  if(from->location_number==43)
   {
 
   }
@@ -475,7 +475,7 @@ void variable_sensitivity_domaint::transform_function_call(
 
         // Evaluate the expression that is being
         // passed into the function call (called_arg)
-        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns);
+        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns)->update_last_written_locations({ from }, true);
 
         // Assign the evaluated value to the symbol associated with the
         // parameter of the function

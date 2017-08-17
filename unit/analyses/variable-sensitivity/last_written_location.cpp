@@ -119,7 +119,7 @@ SCENARIO("Constructing two environments to make sure we correctly identify modif
 	THEN("The modified symbols between the two domains should be none") {
 	  auto changed_vals = abstract_environmentt::modified_symbols(
             env, second_env);
-	  REQUIRE(changed_vals.size() == 0);
+          REQUIRE(changed_vals.size() == 0);
 	}
       }
     }
