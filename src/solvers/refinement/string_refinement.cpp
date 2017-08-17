@@ -955,9 +955,10 @@ void string_refinementt::substitute_array_access(exprt &expr) const
         "above"));
     array_exprt &array_expr=to_array_expr(index_expr.array());
 
-    INVARIANT(
-      !array_expr.operands().empty(),
-      string_refinement_invariantt("the array expression should not be empty"));
+    // Empty arrays do not need to be substituted.
+    if(array_expr.operands().empty())
+      return;
+
     size_t last_index=array_expr.operands().size()-1;
 
     const typet &char_type=index_expr.array().type().subtype();
