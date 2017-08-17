@@ -786,7 +786,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
   std::vector<symbol_exprt> symbols_diff;
   for (const auto &entry : first.map)
   {
-    const auto second_entry = second.map.find(entry.first);
+    const auto &second_entry = second.map.find(entry.first);
     if (second_entry != second.map.end())
     {
       // for the last written write locations to match
@@ -794,42 +794,72 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
       // in the other
       // Since a set can assume at most one match
 
+#if 0
       const auto location_matcher=
         [&](
             goto_programt::const_targett instruction,
             goto_programt::const_targett other_instruction)
         {
-          return other_instruction->location_number==instruction->location_number;
+          return other_instruction->location_number<instruction->location_number;
         };
+#endif
 
 
       const abstract_objectt::locationst &a=entry.second->get_last_written_locations();
       const abstract_objectt::locationst &b=second_entry->second->get_last_written_locations();
 
+      class location_ordert
+      {
+      public:
+        bool operator()(
+          goto_programt::const_targett instruction,
+          goto_programt::const_targett other_instruction)
+        {
+          return instruction->location_number<other_instruction->location_number;
+        }
+      };
+
+      typedef std::set<goto_programt::const_targett, location_ordert> sorted_locationst;
+
+      sorted_locationst lhs_location;
+      for(const auto &entry:a)
+      {
+        lhs_location.insert(entry);
+      }
+
+
+      sorted_locationst rhs_location;
+      for(const auto &entry:a)
+      {
+        rhs_location.insert(entry);
+      }
+
       abstract_objectt::locationst intersection;
       std::set_intersection(
-        a.cbegin(),
-        a.cend(),
-        b.cbegin(),
-        b.cend(),
+        lhs_location.cbegin(),
+        lhs_location.cend(),
+        rhs_location.cbegin(),
+        rhs_location.cend(),
         std::inserter(intersection, intersection.end()),
-        location_matcher);
+        location_ordert());
       bool all_matched=
         intersection.size()==a.size() && intersection.size()==b.size();
 
+      std::cout << entry.first.get_identifier() << ": {";
+      for(const auto &entry:lhs_location)
+      {
+        std::cout << entry->location_number << ", ";
+      }
+
+      std::cout << " } vs { ";
+      for(const auto &entry:rhs_location)
+      {
+        std::cout << entry->location_number << ", ";
+      }
+      std::cout << " }" << std::endl;
+
       if (!all_matched)
       {
-        goto_programt::instructiont last_written_locations=**entry.second->get_last_written_locations().begin();
-        goto_programt::instructiont last_written_locations2=**second_entry->second->get_last_written_locations().begin();
-
-        if(last_written_locations.source_location==last_written_locations2.source_location)
-        {
-          std::cout <<
-            entry.first.get_identifier() << ":" <<
-            last_written_locations.location_number << " vs"
-            << last_written_locations2.location_number << std::endl;
-        }
-
         symbols_diff.push_back(entry.first);
       }
     }

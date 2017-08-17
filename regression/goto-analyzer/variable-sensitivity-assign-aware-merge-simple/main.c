@@ -2,7 +2,7 @@
 
 int global;
 
-void simple_function()
+void simple_function(void)
 {
   int j = 0;
 }
@@ -36,19 +36,25 @@ void pointer_test()
 {
   int i = 0;
   int j = 1;
-  simple_function(&i, 10);
-  __CPROVER_assert(j==1, "j==1");
-  __CPROVER_assert(i==10, "i==10");
-
   pointer_function(&i, 10);
 
   __CPROVER_assert(j==1, "j==1");
   __CPROVER_assert(i==10, "i==10");
 
+  j=2;
+  pointer_function(&i, 10);
+
+  __CPROVER_assert(j==2, "j==2");
+  __CPROVER_assert(i==10, "i==10");
+
+  j=3;
   pointer_function(&i, 11);
 
-  __CPROVER_assert(j==1, "j==1");
+  __CPROVER_assert(j==3, "j==3");
   __CPROVER_assert(i==11, "i==11"); // unknown since value has top for pointer_function
+
+  j=4;
+  pointer_function(&i, 11);
 }
 
 void global_test()
