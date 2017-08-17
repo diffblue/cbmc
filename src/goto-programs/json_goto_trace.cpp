@@ -17,6 +17,7 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/invariant.h>
+#include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
 
@@ -64,42 +65,11 @@ void remove_pointer_offsets(exprt &src, const symbol_exprt &array_symbol)
       remove_pointer_offsets(op, array_symbol);
 }
 
-/// Simplify the expression in index as much as possible to try to get an
-/// unsigned constant.
-/// \param idx: an expression representing an index in an array
-/// \param out: a reference to an unsigned value of type size_t, which will hold
-///   the result of the simplification if it is successful
-/// \return Boolean flag that is true if the `idx` expression could not be
-///   simplified into a unsigned constant value.
-bool simplify_index(const exprt &idx, std::size_t &out)
-{
-  if(idx.id()==ID_constant)
-  {
-    std::string value_str(id2string(to_constant_expr(idx).get_value()));
-    mp_integer int_value=binary2integer(value_str, false);
-    if(int_value>std::numeric_limits<std::size_t>::max())
-      return true;
-    out=int_value.to_long();
-    return false;
-  }
-  else if(idx.id()==ID_plus)
-  {
-    std::size_t l, r;
-    if(!simplify_index(idx.op0(), l) && !simplify_index(idx.op1(), r))
-    {
-      out=l+r;
-      return false;
-    }
-  }
-
-  return true;
-}
-
 /// Simplify an expression before putting it in the json format
 /// \param src: an expression potentialy containing array accesses (index_expr)
 /// \return an expression similar in meaning to src but where array accesses
 ///   have been simplified
-exprt simplify_array_access(const exprt &src)
+exprt simplify_array_access(const exprt &src, const namespacet &ns)
 {
   if(src.id()==ID_index && to_index_expr(src).array().id()==ID_symbol)
   {
@@ -108,6 +78,7 @@ exprt simplify_array_access(const exprt &src)
     exprt simplified_index=to_index_expr(src).index();
     // We remove potential appearances of `pointer_offset(array_symbol)`
     remove_pointer_offsets(simplified_index, array_symbol);
+    simplified_index=simplify_expr(simplified_index, ns);
     return index_exprt(array_symbol, simplified_index);
   }
   else if(src.id()==ID_index && to_index_expr(src).array().id()==ID_array)
@@ -117,8 +88,10 @@ exprt simplify_array_access(const exprt &src)
     remove_pointer_offsets(index);
 
     // We look for an actual integer value for the index
-    std::size_t i;
-    if(!simplify_index(index, i))
+    index=simplify_expr(index, ns);
+    unsigned i;
+    if(index.id()==ID_constant &&
+       !to_unsigned_integer(to_constant_expr(index), i))
       return to_index_expr(src).array().operands()[i];
   }
   return src;
@@ -196,7 +169,7 @@ void convert(
         DATA_INVARIANT(
           step.full_lhs.is_not_nil(),
           "full_lhs in assignment must not be nil");
-        exprt simplified=simplify_array_access(step.full_lhs);
+        exprt simplified=simplify_array_access(step.full_lhs, ns);
         full_lhs_string=from_expr(ns, identifier, simplified);
 
         const symbolt *symbol;
@@ -210,7 +183,8 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
-          exprt simplified=simplify_array_access(step.full_lhs_value);
+          exprt simplified=simplify_array_access(step.full_lhs_value, ns);
+
           full_lhs_value=json(simplified, ns, symbol->mode);
         }
         else
