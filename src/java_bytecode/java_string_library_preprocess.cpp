@@ -2300,6 +2300,12 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.Integer.toString:(II)Ljava/lang/String;"]=
       ID_cprover_string_of_int_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::java.lang.Long.toString:(J)Ljava/lang/String;"]=
+      ID_cprover_string_of_int_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::java.lang.Long.toString:(JI)Ljava/lang/String;"]=
+      ID_cprover_string_of_int_func;
   conversion_table
     ["java::java.lang.Object.getClass:()Ljava/lang/Class;"]=
       std::bind(
