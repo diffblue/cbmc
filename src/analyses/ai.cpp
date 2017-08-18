@@ -331,6 +331,8 @@ bool ai_baset::visit_edge(
   return false;
 }
 
+#include <iostream>
+
 bool ai_baset::do_function_call(
   const irep_idt &calling_function_id,
   locationt l_call,
@@ -366,19 +368,6 @@ bool ai_baset::do_function_call(
     "By analysis time, all functions should have bodies");
 
   bool any_changes=false;
-  {
-    // do edge from end of function to instruction after call
-    const statet &starting_state=get_state(l_call);
-
-    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
-
-    /// Merge 25 into 26
-    /// Source state is 25 (src = get_state(25)
-    /// Destination state is 26 (i.e to = 26)
-
-    // src, from, to
-    any_changes|=merge(*tmp_state, l_call, l_return);
-  }
 
   // This is the edge from call site to function head.
 
@@ -386,6 +375,13 @@ bool ai_baset::do_function_call(
     locationt l_begin=goto_function.body.instructions.begin();
 
     working_sett working_set; // Redundant; fixpoint will add l_begin
+
+    std::cout << "BEFORE MERGING" << std::endl;
+    tmp_state->output(std::cout, *this, ns);
+    statet &dest=get_state(l_begin);
+    dest.output(std::cout, *this, ns);
+
+    std::cout << "-------------" << std::endl;
 
     // Do the edge from the call site to the beginning of the function
     bool new_data = visit_edge(
@@ -395,6 +391,23 @@ bool ai_baset::do_function_call(
     if(new_data)
       fixedpoint(f_it->first, goto_function.body, goto_functions, ns);
   }
+
+#if 0
+  {
+    // do edge from end of function to instruction after call
+    locationt l_begin=goto_function.body.instructions.begin();
+    const statet &starting_state=get_state(l_begin);
+
+    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
+
+    /// Merge 25 into 26
+    /// Source state is 25 (src = get_state(25)
+    /// Destination state is 26 (i.e to = 26)
+
+    // src, from, to
+    any_changes|=merge(*tmp_state, l_begin, l_return);
+  }
+#endif
 
   // This is the edge from function end to return site.
 
@@ -406,10 +419,21 @@ bool ai_baset::do_function_call(
     // do edge from end of function to instruction after call
     const statet &end_state=get_state(l_end);
 
+    locationt l_begin=goto_function.body.instructions.begin();
+    const statet &start_state=get_state(l_begin);
+
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
     working_sett working_set; // Redundant; visit will add l_return
+
+    // We want to get a state that has only the changes from the function
+    //const auto &symbols=get_modified_symbols(start_state, end_state);
+
+
+    // First merge from before the function to the end to restore anything that
+    // hasn't been changed
+    merge(*tmp_state, l_begin, l_end);
 
     any_changes|=visit_edge(
       f_it->first, l_end, calling_function_id, l_return, ns, working_set);
