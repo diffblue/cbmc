@@ -374,6 +374,8 @@ bool ai_baset::visit(
   return new_data;
 }
 
+#include <iostream>
+
 bool ai_baset::do_function_call(
   locationt l_call, locationt l_return,
   const goto_functionst &goto_functions,
@@ -399,19 +401,6 @@ bool ai_baset::do_function_call(
   assert(!goto_function.body.instructions.empty());
 
   bool any_changes=false;
-  {
-    // do edge from end of function to instruction after call
-    const statet &starting_state=get_state(l_call);
-
-    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
-
-    /// Merge 25 into 26
-    /// Source state is 25 (src = get_state(25)
-    /// Destination state is 26 (i.e to = 26)
-
-    // src, from, to
-    any_changes|=merge(*tmp_state, l_call, l_return);
-  }
 
   // This is the edge from call site to function head.
 
@@ -427,6 +416,13 @@ bool ai_baset::do_function_call(
 
     bool new_data=false;
 
+    std::cout << "BEFORE MERGING" << std::endl;
+    tmp_state->output(std::cout, *this, ns);
+    statet &dest=get_state(l_begin);
+    dest.output(std::cout, *this, ns);
+
+    std::cout << "-------------" << std::endl;
+
     // merge the new stuff
     if(merge(*tmp_state, l_call, l_begin))
       new_data=true;
@@ -435,6 +431,23 @@ bool ai_baset::do_function_call(
     if(new_data)
       fixedpoint(goto_function.body, goto_functions, ns);
   }
+
+#if 0
+  {
+    // do edge from end of function to instruction after call
+    locationt l_begin=goto_function.body.instructions.begin();
+    const statet &starting_state=get_state(l_begin);
+
+    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
+
+    /// Merge 25 into 26
+    /// Source state is 25 (src = get_state(25)
+    /// Destination state is 26 (i.e to = 26)
+
+    // src, from, to
+    any_changes|=merge(*tmp_state, l_begin, l_return);
+  }
+#endif
 
   // This is the edge from function end to return site.
 
@@ -446,11 +459,22 @@ bool ai_baset::do_function_call(
     // do edge from end of function to instruction after call
     const statet &end_state=get_state(l_end);
 
+    locationt l_begin=goto_function.body.instructions.begin();
+    const statet &start_state=get_state(l_begin);
+
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
     std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
     tmp_state->transform(l_end, l_return, *this, ns);
+
+    // We want to get a state that has only the changes from the function
+    //const auto &symbols=get_modified_symbols(start_state, end_state);
+
+
+    // First merge from before the function to the end to restore anything that
+    // hasn't been changed
+    merge(*tmp_state, l_begin, l_end);
 
     // Propagate those
     any_changes|=merge(*tmp_state, l_end, l_return);

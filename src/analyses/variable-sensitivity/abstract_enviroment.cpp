@@ -815,7 +815,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
           goto_programt::const_targett instruction,
           goto_programt::const_targett other_instruction)
         {
-          return instruction->location_number<other_instruction->location_number;
+          return instruction->location_number>other_instruction->location_number;
         }
       };
 
@@ -829,7 +829,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
 
 
       sorted_locationst rhs_location;
-      for(const auto &entry:a)
+      for(const auto &entry:b)
       {
         rhs_location.insert(entry);
       }
@@ -842,8 +842,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
         rhs_location.cend(),
         std::inserter(intersection, intersection.end()),
         location_ordert());
-      bool all_matched=
-        intersection.size()==a.size() && intersection.size()==b.size();
+      bool all_matched=intersection.size()==a.size();
 
       std::cout << entry.first.get_identifier() << ": {";
       for(const auto &entry:lhs_location)
