@@ -1100,7 +1100,14 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // or an expression for a pointer or scalar.
     // We produce a compound_literal expression.
     exprt tmp(ID_compound_literal, expr.type());
-    tmp.move_to_operands(op);
+    tmp.copy_to_operands(op);
+
+    // handle the case of TYPE being an array with unspecified size
+    if(op.id()==ID_array &&
+       expr.type().id()==ID_array &&
+       to_array_type(expr.type()).size().is_nil())
+      tmp.type()=op.type();
+
     expr=tmp;
     expr.set(ID_C_lvalue, true); // these are l-values
     return;
