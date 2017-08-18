@@ -817,6 +817,7 @@ IREP_ID_ONE(skip_initialize)
 IREP_ID_ONE(basic_block_covered_lines)
 IREP_ID_ONE(is_nondet_nullable)
 IREP_ID_ONE(array_replace)
+IREP_ID_ONE(switch_case_number)
 IREP_ID_ONE(java_array_access)
 IREP_ID_ONE(java_member_access)
 

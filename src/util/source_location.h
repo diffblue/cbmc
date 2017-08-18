@@ -70,6 +70,11 @@ public:
     return get(ID_comment);
   }
 
+  const irep_idt &get_case_number() const
+  {
+    return get(ID_switch_case_number);
+  }
+
   const irep_idt &get_java_bytecode_index() const
   {
     return get(ID_java_bytecode_index);
@@ -128,6 +133,12 @@ public:
   void set_comment(const irep_idt &comment)
   {
     set(ID_comment, comment);
+  }
+
+  // for switch case number
+  void set_case_number(const irep_idt &number)
+  {
+    set(ID_switch_case_number, number);
   }
 
   void set_java_bytecode_index(const irep_idt &index)
