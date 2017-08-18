@@ -133,3 +133,26 @@ TEST_CASE("Iterate over a 3-level tree, mutate - set all types to ID_symbol")
     REQUIRE(expr.get().id()==ID_symbol);
   }
 }
+
+TEST_CASE("next_sibling_or_parent, next sibling")
+{
+  std::vector<exprt> input(4);
+  input[1].operands()={ input[3] };
+  input[2].id(ID_int);
+  input[0].operands()={ input[1], input[2] };
+  auto it=input[0].depth_begin();
+  it++;
+  it.next_sibling_or_parent();
+  REQUIRE(*it==input[2]);
+}
+
+TEST_CASE("next_sibling_or_parent, next parent ")
+{
+  std::vector<exprt> input(3);
+  input[1].operands()={ input[2] };
+  input[0].operands()={ input[1] };
+  auto it=input[0].depth_begin();
+  it++;
+  it.next_sibling_or_parent();
+  REQUIRE(it==input[0].depth_end());
+}
