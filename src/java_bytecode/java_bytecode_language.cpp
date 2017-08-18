@@ -132,23 +132,25 @@ bool java_bytecode_languaget::parse(
   }
   else if(has_suffix(path, ".jar"))
   {
+    // build an object to potentially limit which classes are loaded
     java_class_loader_limitt class_loader_limit(
       get_message_handler(),
       java_cp_include_files);
     if(config.java.main_class.empty())
     {
-      // Does it have a main class set in the manifest?
+      // load the .jar file and retrieve its manifest
       jar_filet::manifestt manifest=
         java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 
+      // if the manifest declares a Main-Class line, we got a main class
       if(manifest_main_class!="")
         main_class=manifest_main_class;
     }
     else
       main_class=config.java.main_class;
 
-    // Do we have one now?
+    // do we have one now?
     if(main_class.empty())
     {
       status() << "JAR file without entry point: loading class files" << eom;
@@ -178,7 +180,8 @@ bool java_bytecode_languaget::typecheck(
   if(string_refinement_enabled)
     string_preprocess.initialize_conversion_table();
 
-  // first convert all
+  // first generate a new struct symbol for each class and a new function symbol
+  // for every method
   for(java_class_loadert::class_mapt::const_iterator
       c_it=java_class_loader.class_map.begin();
       c_it!=java_class_loader.class_map.end();
@@ -186,8 +189,6 @@ bool java_bytecode_languaget::typecheck(
   {
     if(c_it->second.parsed_class.name.empty())
       continue;
-
-    debug() << "Generating class/member symbols: " << c_it->first << eom;
 
     if(java_bytecode_convert_class(
          c_it->second,

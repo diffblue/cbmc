@@ -67,11 +67,15 @@ protected:
   const char *p;
 };
 
-/// See above
-/// \par parameters: `ftype`: Function type whose parameters should be named
-/// `name_prefix`: Prefix for parameter names, typically the parent function's
-///   name.
-/// `symbol_table`: Global symbol table
+/// Iterates through the parameters of the function type \p ftype, finds a new
+/// new name for each parameter and renames them in `ftype.parameters()` as
+/// well as in the \p symbol_table.
+/// \param[in,out] ftype:
+///   Function type whose parameters should be named.
+/// \param name_prefix:
+///   Prefix for parameter names, typically the parent function's name.
+/// \param[in,out] symbol_table:
+///   Global symbol table.
 /// \return Assigns parameter names (side-effects on `ftype`) to function stub
 ///   parameters, which are initially nameless as method conversion hasn't
 ///   happened. Also creates symbols in `symbol_table`.
@@ -703,7 +707,8 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
     {
       if(p<(*findstart) || p>=findlim_block_start_address)
       {
-        debug() << "Warning: refusing to create lexical block spanning "
+        debug() << "Generating codet:  "
+                << "warning: refusing to create lexical block spanning "
                 << (*findstart) << "-" << findlim_block_start_address
                 << " due to incoming edge " << p << " -> "
                 << checkit->first << eom;
@@ -725,7 +730,8 @@ code_blockt &java_bytecode_convert_methodt::get_or_create_block_for_pcrange(
   code_blockt &newblock=to_code_block(newlabel.code());
   auto nblocks=std::distance(findstart, findlim);
   assert(nblocks>=2);
-  debug() << "Combining " << std::distance(findstart, findlim)
+  debug() << "Generating codet:  combining "
+          << std::distance(findstart, findlim)
           << " blocks for addresses " << (*findstart) << "-"
           << findlim_block_start_address << eom;
 
@@ -1409,8 +1415,22 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       assert(arg0.id()==ID_virtual_function);
 
-      // if we don't have a definition for the called symbol, and we won't
-      // inherit a definition from a super-class, create a stub.
+      // If we don't have a definition for the called symbol, and we won't
+      // inherit a definition from a super-class, we create a new symbol and
+      // insert it in the symbol table. The name and type of the method are
+      // derived from the information we have in the call.
+      // We fix the access attribute to ID_public, because of the following
+      // reasons:
+      // - We don't know the orignal access attribute and since the .class file
+      //   unavailable, we have no way to know.
+      // - Whatever it was, we assume that the bytecode we are translating
+      //   compiles correctly, so such a method has to be accessible from this
+      //   method.
+      // - We will never generate code that calls that method unless we
+      //   translate bytecode that calls that method. As a result we will never
+      //   generate code that may wrongly assume that such a method is
+      //   accessible if we assume that its access attribute is "more
+      //   accessible" than it actually is.
       irep_idt id=arg0.get(ID_identifier);
       if(symbol_table.symbols.find(id)==symbol_table.symbols.end() &&
          !(is_virtual && is_method_inherited(arg0.get(ID_C_class), arg0.get(ID_component_name))))
@@ -1422,6 +1442,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
           id2string(arg0.get(ID_C_class)).substr(6)+"."+
           id2string(symbol.base_name)+"()";
         symbol.type=arg0.type();
+        symbol.type.set(ID_access, ID_public);
         symbol.value.make_nil();
         symbol.mode=ID_java;
         assign_parameter_names(
@@ -1429,6 +1450,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
           symbol.name,
           symbol_table);
 
+        debug()
+          << "Generating codet:  new opaque symbol: method '"
+          << symbol.name << "'" << eom;
         symbol_table.add(symbol);
       }
 
@@ -2729,12 +2753,19 @@ void java_bytecode_convert_method(
   java_bytecode_convert_method(class_symbol, method);
 }
 
+/// Returns true iff method \p methodid from class \p classname is
+/// a method inherited from a class (and not an interface!) from which
+/// \p classname inherits, either directly or indirectly.
 bool java_bytecode_convert_methodt::is_method_inherited(
   const irep_idt &classname, const irep_idt &methodid) const
 {
   resolve_concrete_function_callt call_resolver(symbol_table);
   const resolve_concrete_function_callt ::concrete_function_callt &
     resolved_call=call_resolver(classname, methodid);
+
+  // resolved_call is a pair (class-name, method-name) found by walking the
+  // chain of class inheritance (not interfaces!) and stopping on the first
+  // class that contains a method of equal name and type to `methodid`
 
   if(resolved_call.is_valid())
   {
@@ -2746,6 +2777,8 @@ bool java_bytecode_convert_methodt::is_method_inherited(
     const auto &access=function_symbol.type.get(ID_access);
     if(access==ID_public || access==ID_protected)
     {
+      // since the method is public, it is a public method of `classname`, it is
+      // inherited
       return true;
     }
 
@@ -2762,10 +2795,12 @@ bool java_bytecode_convert_methodt::is_method_inherited(
 
     if(access==ID_private)
     {
-      // This is somewhat contentious: previously this code would keep walking
-      // up the parent if it found a private function. But this isn't what Java
-      // appears to do. If a private method is found then that becomes the
-      // virtual signuate and blocks access to the parent class
+      // We return false because the method found by the call_resolver above
+      // proves that `methodid` cannot be inherited (assuming that the original
+      // Java code compiles). This is because, as we walk the inheritance chain
+      // for `classname` from Object to `classname`, a method can only become
+      // "more accessible". So, if the last occurrence is private, all others
+      // before must be private as well, and none is inherited in `classname`.
       return false;
     }
 

@@ -9,11 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "jar_file.h"
 
 #include <cstring>
-#include <cassert>
 #include <unordered_set>
 
 #include <json/json_parser.h>
 #include <util/suffix.h>
+#include <util/invariant.h>
 
 void jar_filet::open(
   java_class_loader_limitt &class_loader_limit,
@@ -33,12 +33,25 @@ void jar_filet::open(
 
     for(std::size_t i=0; i<number_of_files; i++)
     {
+      // get the length of the filename, including the trailing \0
       mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
       char *filename_char=new char[filename_length+1];
+      INVARIANT(filename_length>=1, "buffer size must include trailing \\0");
+
+      // read and convert to std::string
       mz_uint filename_len=
         mz_zip_reader_get_filename(&zip, i, filename_char, filename_length);
-      assert(filename_length==filename_len);
+      INVARIANT(
+        filename_length==filename_len,
+        "buffer size was incorrectly pre-computed");
       std::string file_name(filename_char);
+#if DEBUG
+      debug()
+        << "jar_filet.open: idx " << i
+        << " len " << filename_len
+        << " filename '" << filename_char << "'" << eom;
+#endif
+      INVARIANT(file_name.size()==filename_len-1, "no \\0 found in file name");
 
       // non-class files are loaded in any case
       bool add_file=!has_suffix(file_name, ".class");
