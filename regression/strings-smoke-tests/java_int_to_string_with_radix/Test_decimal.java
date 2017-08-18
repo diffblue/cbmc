@@ -1,9 +1,13 @@
 public class Test_decimal
 {
-    public static void main()
+    public static void main(Boolean b)
     {
         String s = Integer.toString(-27, 10);
-        assert(s.equals("-27"));
-        assert(!s.equals("-27"));
+        if (b) {
+            assert(s.equals("-27"));
+        }
+        else {
+            assert(!s.equals("-27"));
+        }
     }
 }
