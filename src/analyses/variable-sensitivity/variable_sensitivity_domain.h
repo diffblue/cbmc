@@ -92,6 +92,8 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const override;
 
+  void output(std::ostream &out) const;
+
   virtual bool merge(
     const variable_sensitivity_domaint &b,
     locationt from,
@@ -104,6 +106,11 @@ public:
   bool is_bottom() const override;
   bool is_top() const override;
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const variable_sensitivity_domaint &other)
+  {
+    return abstract_environmentt::modified_symbols(abstract_state, other.abstract_state);
+  }
+
 private:
   void transform_function_call(
     locationt from,
@@ -114,6 +121,9 @@ private:
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
   abstract_environmentt abstract_state;
+
+  const ai_domain_baset &pre_function_state;
+  const ai_domain_baset &head_function_state;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
