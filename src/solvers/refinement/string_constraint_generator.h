@@ -33,9 +33,10 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  string_constraint_generatort():
+  string_constraint_generatort(namespacet _ns):
     max_string_length(std::numeric_limits<size_t>::max()),
-    force_printable_characters(false)
+    force_printable_characters(false),
+    ns(_ns)
   { }
 
   // Constraints on the maximal length of strings
@@ -107,6 +108,7 @@ private:
   const std::size_t MAX_DOUBLE_LENGTH=30;
 
   std::map<function_application_exprt, exprt> function_application_cache;
+  namespacet ns;
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
@@ -305,16 +307,21 @@ private:
   exprt add_axioms_for_offset_by_code_point(
     const function_application_exprt &f);
 
-  exprt add_axioms_for_characters_in_integer_string(
-    const symbol_exprt& x,
-    const typet& type,
-    const typet& char_type,
-    const typet& index_type,
-    const string_exprt& str,
+  void add_axioms_for_characters_in_integer_string(
+    const exprt &input_int,
+    const typet &type,
+    const bool strict_formatting,
+    const string_exprt &str,
     const std::size_t max_string_length,
-    const exprt& radix);
+    const exprt &radix,
+    const unsigned long radix_ul);
   void add_axioms_for_correct_number_format(
-    const string_exprt &str, const exprt &radix, std::size_t max_size);
+    const exprt &input_int,
+    const string_exprt &str,
+    const exprt &radix_as_char,
+    const unsigned long radix_ul,
+    const std::size_t max_size,
+    const bool strict_formatting);
   exprt add_axioms_for_parse_int(const function_application_exprt &f);
   exprt add_axioms_for_to_char_array(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
@@ -348,19 +355,22 @@ private:
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
   bool is_constant_string(const string_exprt &expr) const;
   string_exprt empty_string(const refined_string_typet &ref_type);
+  unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
 };
 
-exprt is_digit_with_radix(const exprt &chr, const exprt &radix);
-exprt is_digit_with_radix_lower_case(
-  const exprt &chr, const exprt &radix_char_type, unsigned long radix=36ul);
+exprt is_digit_with_radix(
+  const exprt &chr,
+  const bool strict_formatting,
+  const exprt &radix_as_char,
+  const unsigned long radix_ul);
 exprt get_numeric_value_from_character(
   const exprt &chr,
   const typet &char_type,
   const typet &type,
-  unsigned long radix=36ul);
+  const bool strict_formatting,
+  unsigned long radix_ul);
 size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
-unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
-std::string utf16_constant_array_to_ascii(
+std::string utf16_constant_array_to_java(
   const array_exprt &arr, unsigned length);
 
 #endif
