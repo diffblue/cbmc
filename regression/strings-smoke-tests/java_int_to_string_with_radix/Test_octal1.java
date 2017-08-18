@@ -1,9 +1,13 @@
 public class Test_octal1
 {
-    public static void main()
+    public static void main(Boolean b)
     {
         String s = Integer.toString(-23, 8);
-        assert(s.equals("-27"));
-        assert(!s.equals("-27"));
+        if (b) {
+            assert(s.equals("-27"));
+        }
+        else {
+            assert(!s.equals("-27"));
+        }
     }
 }
