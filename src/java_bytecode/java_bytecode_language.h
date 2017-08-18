@@ -10,11 +10,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
+#include <memory>
+
 #include <util/language.h>
 #include <util/cmdline.h>
 
 #include "java_class_loader.h"
 #include "java_string_library_preprocess.h"
+
+#include <java_bytecode/select_pointer_type.h>
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
   "(java-assume-inputs-non-null)"                 \
@@ -87,11 +91,19 @@ public:
   void show_parse(std::ostream &out) override;
 
   virtual ~java_bytecode_languaget();
+  java_bytecode_languaget(
+    std::unique_ptr<select_pointer_typet> pointer_type_selector):
+      max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
+      max_nondet_tree_depth(MAX_NONDET_TREE_DEPTH),
+      max_user_array_length(0),
+      pointer_type_selector(std::move(pointer_type_selector))
+  {}
+
   java_bytecode_languaget():
-    max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
-    max_nondet_tree_depth(MAX_NONDET_TREE_DEPTH),
-    max_user_array_length(0)
-    {}
+    java_bytecode_languaget(
+      std::unique_ptr<select_pointer_typet>(new select_pointer_typet()))
+  {}
+
 
   bool from_expr(
     const exprt &expr,
@@ -123,6 +135,7 @@ public:
 
 protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);
+  const select_pointer_typet &get_pointer_type_selector() const;
 
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
@@ -138,6 +151,9 @@ protected:
   bool throw_runtime_exceptions;
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
+
+private:
+  const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
 };
 
 languaget *new_java_bytecode_language();

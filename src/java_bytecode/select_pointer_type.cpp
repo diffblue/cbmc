@@ -19,7 +19,7 @@
 /// \param pointer_type: The pointer type replace
 /// \return A pointer type where the subtype may have been modified
 pointer_typet select_pointer_typet::convert_pointer_type(
-  const pointer_typet &pointer_type) const
+  const pointer_typet &pointer_type, const namespacet &ns) const
 {
   return  pointer_type;
 }

@@ -276,9 +276,17 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     main_jar_classes,
     lazy_methods_extra_entry_points,
     java_class_loader,
+    get_pointer_type_selector(),
     get_message_handler());
 
   return method_gather(symbol_table, lazy_methods, method_converter);
+}
+
+const select_pointer_typet &
+  java_bytecode_languaget::get_pointer_type_selector() const
+{
+  PRECONDITION(pointer_type_selector.get()!=nullptr);
+  return *pointer_type_selector;
 }
 
 /// Provide feedback to `language_filest` so that when asked for a lazy method,
@@ -364,7 +372,6 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
     return res.error_found;
 
   // generate the test harness in __CPROVER__start and a call the entry point
-  select_pointer_typet pointer_type_selector;
   return
     java_entry_point(
       symbol_table,
@@ -373,7 +380,7 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
       assume_inputs_non_null,
       max_nondet_array_length,
       max_nondet_tree_depth,
-      pointer_type_selector);
+      get_pointer_type_selector());
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)
