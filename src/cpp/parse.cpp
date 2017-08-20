@@ -2001,7 +2001,7 @@ bool Parser::optCvQualify(typet &cv)
     if(t==TOK_CONSTEXPR ||
        t==TOK_CONST || t==TOK_VOLATILE || t==TOK_RESTRICT ||
        t==TOK_PTR32 || t==TOK_PTR64 ||
-       t==TOK_GCC_ATTRIBUTE)
+       t==TOK_GCC_ATTRIBUTE || t==TOK_GCC_ASM)
     {
       cpp_tokent tk;
       lex.get_token(tk);
@@ -2047,6 +2047,18 @@ bool Parser::optCvQualify(typet &cv)
 
       case TOK_GCC_ATTRIBUTE:
         if(!rAttribute(cv))
+          return false;
+        break;
+
+      case TOK_GCC_ASM:
+        // asm post-declarator
+        // this is stuff like
+        // int x __asm("asd")=1, y;
+        if(lex.get_token(tk)!='(')
+          return false;
+        if(!rString(tk))
+          return false;
+        if(lex.get_token(tk)!=')')
           return false;
         break;
 
@@ -2815,22 +2827,6 @@ bool Parser::rDeclaratorWithInit(
     if(!rDeclarator(declarator, kDeclarator, false,
                     should_be_declarator, is_statement))
       return false;
-
-    // asm post-declarator
-    if(lex.LookAhead(0)==TOK_GCC_ASM)
-    {
-      // this is stuff like
-      // int x __asm("asd")=1, y;
-      cpp_tokent tk;
-      lex.get_token(tk); // TOK_GCC_ASM
-
-      if(lex.get_token(tk)!='(')
-        return false;
-      if(!rString(tk))
-        return false;
-      if(lex.get_token(tk)!=')')
-        return false;
-    }
 
     int t=lex.LookAhead(0);
     if(t=='=')
