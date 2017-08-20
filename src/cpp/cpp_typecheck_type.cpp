@@ -260,6 +260,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
   else if(type.id()==ID_nullptr)
   {
   }
+  else if(type.id()==ID_already_typechecked)
+  {
+    c_typecheck_baset::typecheck_type(type);
+  }
   else
   {
     error().source_location=type.source_location();

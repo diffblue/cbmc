@@ -384,6 +384,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
     return;
   }
 
+  // mark as 'already typechecked'
+  make_already_typechecked(type);
+
   codet new_code(ID_decl_block);
   new_code.reserve_operands(declaration.declarators().size());
 
