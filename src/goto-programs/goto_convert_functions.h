@@ -21,20 +21,25 @@ Date: June 2003
 void goto_convert(
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  message_handlert &message_handler);
+  message_handlert &);
 
-// convert it all!
+// confusing, will go away
 void goto_convert(
   symbol_tablet &symbol_table,
   goto_modelt &dest,
-  message_handlert &message_handler);
+  message_handlert &);
+
+// convert it all!
+void goto_convert(
+  goto_modelt &,
+  message_handlert &);
 
 // just convert a specific function
 void goto_convert(
   const irep_idt &identifier,
   symbol_tablet &symbol_table,
   goto_functionst &functions,
-  message_handlert &message_handler);
+  message_handlert &);
 
 class goto_convert_functionst:public goto_convertt
 {
@@ -52,7 +57,7 @@ public:
 protected:
   goto_functionst &functions;
 
-  static bool hide(const goto_programt &goto_program);
+  static bool hide(const goto_programt &);
 
   //
   // function calls
