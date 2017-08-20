@@ -15,3 +15,6 @@ struct __member_pointer_traits_imp<_Rp (_Class::*)() const>
 {
 };
 
+int main(int argc, char* argv[])
+{
+}

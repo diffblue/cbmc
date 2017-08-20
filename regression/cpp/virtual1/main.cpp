@@ -1,4 +1,6 @@
-#include <stdio.h>
+#include <cassert>
+#include <cstdio>
+
 class base
 {
 public:
@@ -26,7 +28,7 @@ int main (void)
     base* D = new derived;
     int a = D->func();
     delete D;
-    __CPROVER_assert(a == 2, "Property 1");
+    assert(a == 2);
     return a;
 }
 

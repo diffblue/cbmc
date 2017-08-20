@@ -1,3 +1,5 @@
+#include <cassert>
+
 int const C=10;
 
 int main()

@@ -1,3 +1,5 @@
+#include <cassert>
+
 struct A
 {
   bool func() { return false; }

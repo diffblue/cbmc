@@ -1,3 +1,5 @@
+#include <cassert>
+
 // V depends on Ty
 template<typename Ty, Ty V>
 class T

@@ -55,6 +55,6 @@ class X
 
 int main(int argc, char* argv[])
 {
-  X<> x;
+  X<true> x;
   return x.val()?0:1;
 }

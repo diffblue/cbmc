@@ -6,3 +6,8 @@ public :
 
 template<>
 int c<char>::f00(const char*);
+
+int main(int argc, char* argv[])
+{
+  return 0;
+}

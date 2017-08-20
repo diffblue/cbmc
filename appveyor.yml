@@ -90,6 +90,9 @@ test_script:
     rmdir /s /q cpp\Decltype1
     rmdir /s /q cpp\Decltype2
     rmdir /s /q cpp\Function_Overloading1
+    rmdir /s /q cpp\Resolver10
+    rmdir /s /q cpp\Resolver11
+    rmdir /s /q cpp\Template_Parameters1
     rmdir /s /q cpp\enum2
     rmdir /s /q cpp\enum7
     rmdir /s /q cpp\enum8
