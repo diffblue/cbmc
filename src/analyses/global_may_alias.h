@@ -53,6 +53,11 @@ public:
     locationt from,
     locationt to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const global_may_alias_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
   /// Clear list of aliases, and mark domain as bottom.
   void make_bottom() final override
   {
