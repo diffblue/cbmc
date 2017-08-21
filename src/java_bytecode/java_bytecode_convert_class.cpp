@@ -292,6 +292,11 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     comp2.set_base_name("data");
     struct_type.components().push_back(comp2);
 
+    INVARIANT(
+      is_valid_java_array(struct_type),
+      "Constructed a new type representing a Java Array "
+      "object that doesn't match expectations");
+
     symbolt symbol;
     symbol.name=symbol_type.get_identifier();
     symbol.base_name=symbol_type.get(ID_C_base_name);
