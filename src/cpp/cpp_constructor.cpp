@@ -41,7 +41,7 @@ codet cpp_typecheckt::cpp_constructor(
   {
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
-    // In the general case, a program is not allow to use this form of
+    // In the general case, a program is not allowed to use this form of
     // construct. This way of initializing an array is used internally only.
     // The purpose of the tag #array_ini is to rule out ill-formed
     // programs.

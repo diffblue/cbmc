@@ -884,7 +884,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
   for(auto &sub_it : declaration.declarators())
   {
-    bool has_value=sub_it.value().is_not_nil();
+    bool has_value = sub_it.value().is_not_nil();
 
     if(!has_value)
     {

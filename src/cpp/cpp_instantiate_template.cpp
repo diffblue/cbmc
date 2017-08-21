@@ -443,8 +443,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       convert(method_decl);
     }
 
-    const symbolt &new_symb=
-      lookup(new_decl.type().get(ID_identifier));
+    const symbolt &new_symb = lookup(new_decl.type().get(ID_identifier));
 
     return new_symb;
   }
