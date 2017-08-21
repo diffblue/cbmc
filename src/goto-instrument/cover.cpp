@@ -277,13 +277,15 @@ bool coverage_goalst::get_coverage_goals(
   coverage_goalst &goals,
   const irep_idt &mode)
 {
+  messaget message(message_handler);
   jsont json;
   source_locationt source_location;
+
+  message.status() << "Load existing coverage goals\n";
 
   // check coverage file
   if(parse_json(coverage_file, message_handler, json))
   {
-    messaget message(message_handler);
     message.error() << coverage_file << " file is not a valid json file"
                     << messaget::eom;
     return true;
@@ -292,7 +294,6 @@ bool coverage_goalst::get_coverage_goals(
   // make sure that we have an array of elements
   if(!json.is_array())
   {
-    messaget message(message_handler);
     message.error() << "expecting an array in the " <<  coverage_file
                     << " file, but got "
                     << json << messaget::eom;
@@ -352,7 +353,10 @@ bool coverage_goalst::get_coverage_goals(
 
     // store the existing goal
     goals.add_goal(source_location);
+    message.status() << "  " << source_location << "\n";
   }
+  message.status() << messaget::eom;
+
   return false;
 }
 
@@ -363,20 +367,18 @@ void coverage_goalst::add_goal(source_locationt goal)
   existing_goals[goal]=false;
 }
 
-/// check whether we have an existing goal that is uncovered
-/// \param msg: message to be printed about the uncovered goal
-void coverage_goalst::check_uncovered_goals(messaget &msg)
+/// check whether we have an existing goal that does not match
+/// an instrumented goal
+/// \param msg: Message stream
+void coverage_goalst::check_existing_goals(messaget &msg)
 {
   for(const auto &existing_loc : existing_goals)
   {
     if(!existing_loc.second)
     {
       msg.warning()
-        << "Warning: existing goal in file "
-        << existing_loc.first.get_file()
-        << " line " << existing_loc.first.get_line()
-        << " function " << existing_loc.first.get_function()
-        << " is uncovered" << messaget::eom;
+        << "Warning: unmatched existing goal "
+        << existing_loc.first << messaget::eom;
     }
   }
 }
@@ -1682,14 +1684,13 @@ bool instrument_cover_goals(
     namespacet ns(symbol_table);
     const irep_idt &mode=ns.lookup(goto_functions.entry_point()).mode;
 
-    msg.status() << "Add existing coverage goals" << messaget::eom;
     // get file with covered test goals
     const std::string coverage=cmdline.get_value("existing-coverage");
     // get a coverage_goalst object
     if(coverage_goalst::get_coverage_goals(
        coverage, message_handler, existing_goals, mode))
     {
-      msg.error() << "get_coverage_goals failed" << messaget::eom;
+      msg.error() << "Loading existing coverage goals failed" << messaget::eom;
       return true;
     }
   }
@@ -1708,9 +1709,8 @@ bool instrument_cover_goals(
       cmdline.isset("no-trivial-tests"));
   }
 
-  // check whether all existing goals have been covered
-  msg.status() << "Checking uncovered goals" << messaget::eom;
-  existing_goals.check_uncovered_goals(msg);
+  // check whether all existing goals match with instrumented goals
+  existing_goals.check_existing_goals(msg);
 
   if(cmdline.isset("cover-traces-must-terminate"))
   {
