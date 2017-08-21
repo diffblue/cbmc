@@ -81,6 +81,12 @@ public:
     return std::vector<symbol_exprt>();
   }
 
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     uninitialized_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
 private:
   tvt has_values;
 

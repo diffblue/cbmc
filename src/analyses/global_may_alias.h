@@ -50,6 +50,12 @@ public:
     return std::vector<symbol_exprt>();
   }
 
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     global_may_alias_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void make_bottom() final override
   {
     aliases.clear();

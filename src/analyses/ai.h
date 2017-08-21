@@ -329,6 +329,7 @@ protected:
   virtual bool merge(const statet &src, locationt from, locationt to)=0;
 
   virtual std::vector<symbol_exprt> get_modified_symbols(const statet &src, const statet &other)=0;
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, const statet &source_domain, statet &target_domain, const namespacet ns)=0;
   // for concurrent fixedpoint
   virtual bool merge_shared(
     const statet &src,
@@ -419,6 +420,12 @@ protected:
   {
     return static_cast<const domainT &>(src).get_modified_symbols(
       static_cast<const domainT &>(other));
+  }
+
+  void restore_domain(std::vector<symbol_exprt> modified_symbols, const statet &source_domain, statet &target_domain, const namespacet ns) override
+  {
+    static_cast<const domainT &>(source_domain).restore_domain(
+        modified_symbols, static_cast<domainT &>(target_domain), ns);
   }
 
   statet *make_temporary_state(const statet &s) override

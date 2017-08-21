@@ -60,6 +60,12 @@ public:
     return std::vector<symbol_exprt>();
   }
 
+  void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     interval_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   // no states
   void make_bottom() final override
   {

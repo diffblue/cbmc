@@ -111,6 +111,9 @@ public:
     return abstract_environmentt::modified_symbols(abstract_state, other.abstract_state);
   }
 
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols,  
+    variable_sensitivity_domaint &target, const namespacet &ns) const;
+
 private:
   void transform_function_call(
     locationt from,
