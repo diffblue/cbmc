@@ -300,66 +300,58 @@ bool coverage_goalst::get_coverage_goals(
   }
 
   // traverse the given JSON file
-  for(const auto &goals_in_json : json.array)
+  for(const auto &each_goal : json.array)
   {
-    // get the set of goals
-    if(goals_in_json["goals"].is_array())
+    // ensure minimal requirements for a goal entry
+    PRECONDITION(
+      (!each_goal["goal"].is_null()) ||
+      (!each_goal["sourceLocation"]["bytecodeIndex"].is_null()) ||
+      (!each_goal["sourceLocation"]["file"].is_null() &&
+       !each_goal["sourceLocation"]["function"].is_null() &&
+       !each_goal["sourceLocation"]["line"].is_null()));
+
+    // check whether bytecodeIndex is provided for Java programs
+    if(mode==ID_java &&
+       each_goal["sourceLocation"]["bytecodeIndex"].is_null())
     {
-      // store the source location for each existing goal
-      for(const auto &each_goal : goals_in_json["goals"].array)
-      {
-        // ensure minimal requirements for a goal entry
-        PRECONDITION(
-          (!each_goal["goal"].is_null()) ||
-          (!each_goal["sourceLocation"]["bytecodeIndex"].is_null()) ||
-          (!each_goal["sourceLocation"]["file"].is_null() &&
-           !each_goal["sourceLocation"]["function"].is_null() &&
-           !each_goal["sourceLocation"]["line"].is_null()));
-
-        // check whether bytecodeIndex is provided for Java programs
-        if(mode==ID_java &&
-          each_goal["sourceLocation"]["bytecodeIndex"].is_null())
-        {
-          messaget message(message_handler);
-          message.error() << coverage_file
-                          << " file does not contain bytecodeIndex"
-                          << messaget::eom;
-          return true;
-        }
-
-        if(!each_goal["sourceLocation"]["bytecodeIndex"].is_null())
-        {
-          // get and set the bytecodeIndex
-          irep_idt bytecode_index=
-            each_goal["sourceLocation"]["bytecodeIndex"].value;
-          source_location.set_java_bytecode_index(bytecode_index);
-        }
-
-        if(!each_goal["sourceLocation"]["file"].is_null())
-        {
-          // get and set the file
-          irep_idt file=each_goal["sourceLocation"]["file"].value;
-          source_location.set_file(file);
-        }
-
-        if(!each_goal["sourceLocation"]["function"].is_null())
-        {
-          // get and set the function
-          irep_idt function=each_goal["sourceLocation"]["function"].value;
-          source_location.set_function(function);
-        }
-
-        if(!each_goal["sourceLocation"]["line"].is_null())
-        {
-          // get and set the line
-          irep_idt line=each_goal["sourceLocation"]["line"].value;
-          source_location.set_line(line);
-        }
-
-        // store the existing goal
-        goals.add_goal(source_location);
-      }
+      messaget message(message_handler);
+      message.error() << coverage_file
+                      << " file does not contain bytecodeIndex"
+                      << messaget::eom;
+      return true;
     }
+
+    if(!each_goal["sourceLocation"]["bytecodeIndex"].is_null())
+    {
+      // get and set the bytecodeIndex
+      irep_idt bytecode_index=
+        each_goal["sourceLocation"]["bytecodeIndex"].value;
+      source_location.set_java_bytecode_index(bytecode_index);
+    }
+
+    if(!each_goal["sourceLocation"]["file"].is_null())
+    {
+      // get and set the file
+      irep_idt file=each_goal["sourceLocation"]["file"].value;
+      source_location.set_file(file);
+    }
+
+    if(!each_goal["sourceLocation"]["function"].is_null())
+    {
+      // get and set the function
+      irep_idt function=each_goal["sourceLocation"]["function"].value;
+      source_location.set_function(function);
+    }
+
+    if(!each_goal["sourceLocation"]["line"].is_null())
+    {
+      // get and set the line
+      irep_idt line=each_goal["sourceLocation"]["line"].value;
+      source_location.set_line(line);
+    }
+
+    // store the existing goal
+    goals.add_goal(source_location);
   }
   return false;
 }
