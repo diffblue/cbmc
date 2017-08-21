@@ -4398,6 +4398,16 @@ bool Parser::rClassSpec(typet &spec)
   {
     if(!optAlignas(spec))
       return false;
+
+    if(lex.LookAhead(0)==TOK_GCC_ATTRIBUTE)
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+
+      if(!rAttribute(spec))
+        return false;
+    }
+
     irept name;
 
     if(!rName(name))
