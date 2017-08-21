@@ -235,8 +235,8 @@ string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
   // no_trailing_zero: forall j:[2, max_size[. !(|res| = j+1 && res[j] = '0')
   // a3 : int_expr = sum_j 10^j (j < |res| ? res[j] - '0' : 0)
 
-  and_exprt a1(res.axiom_for_is_strictly_longer_than(1),
-               res.axiom_for_is_shorter_than(max));
+  and_exprt a1(res.axiom_for_length_gt(1),
+               res.axiom_for_length_le(max));
   axioms.push_back(a1);
 
   equal_exprt starts_with_dot(res[0], from_integer('.', char_type));

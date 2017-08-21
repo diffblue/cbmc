@@ -222,8 +222,8 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
 
   size_t max_size=8;
   axioms.push_back(
-    and_exprt(res.axiom_for_is_strictly_longer_than(0),
-              res.axiom_for_is_shorter_than(max_size)));
+    and_exprt(res.axiom_for_length_gt(0),
+              res.axiom_for_length_le(max_size)));
 
   for(size_t size=1; size<=max_size; size++)
   {
@@ -322,8 +322,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
     is_digit_with_radix(chr, strict_formatting, radix_as_char, radix_ul);
 
   // |str| > 0
-  const exprt non_empty=
-    str.axiom_for_is_longer_than(from_integer(1, index_type));
+  const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
   axioms.push_back(non_empty);
 
   if(strict_formatting)
@@ -343,11 +342,11 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
-    str.axiom_for_is_longer_than(from_integer(2, index_type)));
+    str.axiom_for_length_ge(from_integer(2, index_type)));
   axioms.push_back(contains_digit);
 
   // |str| <= max_size
-  axioms.push_back(str.axiom_for_is_shorter_than(max_size));
+  axioms.push_back(str.axiom_for_length_le(max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -356,7 +355,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   {
     /// index < length => is_digit_with_radix(str[index], radix)
     const implies_exprt character_at_index_is_digit(
-      str.axiom_for_is_longer_than(from_integer(index+1, index_type)),
+      str.axiom_for_length_ge(from_integer(index+1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
     axioms.push_back(character_at_index_is_digit);
