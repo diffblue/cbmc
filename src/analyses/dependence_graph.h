@@ -85,6 +85,12 @@ public:
     return std::vector<symbol_exprt>();
   }
 
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+    dep_graph_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void transform(
     const irep_idt &function_from,
     goto_programt::const_targett from,

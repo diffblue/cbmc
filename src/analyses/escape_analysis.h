@@ -51,6 +51,12 @@ public:
     return std::vector<symbol_exprt>();
   }
 
+ virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     escape_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void make_bottom() final override
   {
     cleanup_map.clear();
