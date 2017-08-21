@@ -139,38 +139,3 @@ string_exprt string_constraint_generatort::add_axioms_for_insert_float(
   string_exprt s2=add_axioms_for_string_of_float(args(f, 3)[2], ref_type);
   return add_axioms_for_insert(s1, s2, args(f, 3)[1]);
 }
-
-/// add axioms corresponding to the StringBuilder.insert:(I[CII) and
-/// StringBuilder.insert:(I[C) java functions
-/// \par parameters: function application with 4 arguments plus two optional
-///   arguments:
-/// a string, an offset index, a length, data array, an offset and a
-/// count
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_for_insert_char_array(
-  const function_application_exprt &f)
-{
-  exprt offset;
-  exprt count;
-  if(f.arguments().size()==6)
-  {
-    offset=f.arguments()[4];
-    count=f.arguments()[5];
-  }
-  else
-  {
-    INVARIANT(
-      f.arguments().size()==4,
-      string_refinement_invariantt("f must have 4 or 6 arguments and the case "
-        "of 6 arguments is already handled"));
-    count=f.arguments()[2];
-    offset=from_integer(0, count.type());
-  }
-
-  string_exprt str=get_string_expr(f.arguments()[0]);
-  const exprt &length=f.arguments()[2];
-  const exprt &data=f.arguments()[3];
-  string_exprt arr=add_axioms_from_char_array(
-    length, data, offset, count);
-  return add_axioms_for_insert(str, arr, f.arguments()[1]);
-}
