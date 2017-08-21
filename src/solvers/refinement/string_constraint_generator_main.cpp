@@ -131,7 +131,7 @@ string_exprt string_constraint_generatort::fresh_string(
 /// \return a string expression
 string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
 {
-  PRECONDITION(refined_string_typet::is_refined_string_type(expr.type()));
+  PRECONDITION(is_refined_string_type(expr.type()));
 
   if(expr.id()==ID_symbol)
   {
@@ -180,7 +180,7 @@ void string_constraint_generatort::add_default_axioms(
 string_exprt string_constraint_generatort::add_axioms_for_refined_string(
   const exprt &string)
 {
-  PRECONDITION(refined_string_typet::is_refined_string_type(string.type()));
+  PRECONDITION(is_refined_string_type(string.type()));
   refined_string_typet type=to_refined_string_type(string.type());
 
   // Function applications should have been removed before
@@ -246,11 +246,9 @@ string_exprt string_constraint_generatort::add_axioms_for_refined_string(
 string_exprt string_constraint_generatort::add_axioms_for_if(
   const if_exprt &expr)
 {
-  PRECONDITION(
-    refined_string_typet::is_refined_string_type(expr.true_case().type()));
+  PRECONDITION(is_refined_string_type(expr.true_case().type()));
   string_exprt t=get_string_expr(expr.true_case());
-  PRECONDITION(
-    refined_string_typet::is_refined_string_type(expr.false_case().type()));
+  PRECONDITION(is_refined_string_type(expr.false_case().type()));
   string_exprt f=get_string_expr(expr.false_case());
   const refined_string_typet &ref_type=to_refined_string_type(t.type());
   const typet &index_type=ref_type.get_index_type();

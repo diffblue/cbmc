@@ -56,7 +56,7 @@ string_exprt string_constraint_generatort::add_axioms_for_empty_string(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().empty());
-  PRECONDITION(refined_string_typet::is_refined_string_type(f.type()));
+  PRECONDITION(is_refined_string_type(f.type()));
   const refined_string_typet &ref_type=to_refined_string_type(f.type());
   return empty_string(ref_type);
 }
