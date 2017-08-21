@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/source_location.h>
 #include <util/symbol.h>
 
+#include <ansi-c/builtin_factory.h>
 #include <ansi-c/c_typecast.h>
 
 #include "expr2cpp.h"
@@ -320,4 +321,9 @@ void cpp_typecheckt::clean_up()
       struct_union_type.components().swap(data_members);
     }
   }
+}
+
+bool cpp_typecheckt::builtin_factory(const irep_idt &identifier)
+{
+  return ::builtin_factory(identifier, symbol_table, get_message_handler());
 }

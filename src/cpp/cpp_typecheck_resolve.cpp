@@ -1407,8 +1407,20 @@ exprt cpp_typecheck_resolvet::resolve(
     qualified?cpp_scopet::QUALIFIED:cpp_scopet::RECURSIVE;
 
   if(template_args.is_nil())
+  {
     cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, lookup_kind, id_set);
+
+    if(id_set.empty() && !cpp_typecheck.builtin_factory(base_name))
+    {
+      cpp_idt &builtin_id =
+        cpp_typecheck.cpp_scopes.get_root_scope().insert(base_name);
+      builtin_id.identifier = base_name;
+      builtin_id.id_class = cpp_idt::id_classt::SYMBOL;
+
+      id_set.insert(&builtin_id);
+    }
+  }
   else
     cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, lookup_kind, cpp_idt::id_classt::TEMPLATE, id_set);

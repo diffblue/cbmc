@@ -346,6 +346,8 @@ protected:
       _method_symbol, template_map, instantiation_stack));
   }
 
+  bool builtin_factory(const irep_idt &);
+
   // types
 
   void typecheck_type(typet &type);
