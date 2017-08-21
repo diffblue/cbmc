@@ -3402,7 +3402,7 @@ bool Parser::rOperatorName(irept &name)
   case '<':
   case '>':
   case ',':
-    operator_id=irep_idt(std::string(static_cast<char>(t), 1));
+    operator_id = std::string(1, static_cast<char>(t));
     break;
 
   case TOK_MULTASSIGN: operator_id="*="; break;
