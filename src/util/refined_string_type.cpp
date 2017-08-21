@@ -16,8 +16,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   `content` of type `content_type`. This module also defines functions to
 ///   recognise the C and java string types.
 
-#include <util/cprover_prefix.h>
-
 #include "refined_string_type.h"
 
 refined_string_typet::refined_string_typet(
@@ -29,13 +27,3 @@ refined_string_typet::refined_string_typet(
   components().emplace_back("content", char_array);
   set_tag(CPROVER_PREFIX"refined_string_type");
 }
-
-/// \par parameters: a type
-/// \return Boolean telling whether the input is a refined string type
-bool refined_string_typet::is_refined_string_type(const typet &type)
-{
-  return
-    type.id()==ID_struct &&
-    to_struct_type(type).get_tag()==CPROVER_PREFIX"refined_string_type";
-}
-
