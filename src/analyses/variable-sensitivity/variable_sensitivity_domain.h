@@ -106,7 +106,7 @@ public:
   bool is_bottom() const override;
   bool is_top() const override;
 
-  virtual std::vector<symbol_exprt> get_modified_symbols(const variable_sensitivity_domaint &other)
+  virtual std::vector<symbol_exprt> get_modified_symbols(const variable_sensitivity_domaint &other) const
   {
     return abstract_environmentt::modified_symbols(abstract_state, other.abstract_state);
   }
@@ -121,9 +121,6 @@ private:
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
   abstract_environmentt abstract_state;
-
-  const ai_domain_baset &pre_function_state;
-  const ai_domain_baset &head_function_state;
 };
 
 #endif // CPROVER_ANALYSES_VARIABLE_SENSITIVITY_VARIABLE_SENSITIVITY_DOMAIN_H
