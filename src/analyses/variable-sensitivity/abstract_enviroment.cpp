@@ -537,14 +537,6 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
   }
   else
   {
-    std::vector<symbol_exprt> modified_symbols=
-      abstract_environmentt::modified_symbols(*this, env);
-
-    for(const symbol_exprt &x : modified_symbols)
-    {
-      std::cout << x.get_identifier() << std::endl;
-    }
-
     // For each element in the intersection of map and env.map merge
     // If the result of the merge is top, remove from the map
     bool modified=false;
@@ -552,24 +544,20 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
     {
       if(map.find(entry.first)!=map.end())
       {
-        if(
-           std::find(
-            modified_symbols.begin(),
-            modified_symbols.end(),
-            entry.first)!=modified_symbols.cend())
-        {
-          bool object_modified=false;
-          abstract_object_pointert new_object=
-            abstract_objectt::merge(
-              map[entry.first],
-              entry.second,
-              object_modified);
+        bool object_modified=false;
+        abstract_object_pointert new_object=
+          abstract_objectt::merge(
+            map[entry.first],
+            entry.second,
+            object_modified);
 
-          modified|=object_modified;
-          map[entry.first]=new_object;
+        modified|=object_modified;
+        map[entry.first]=new_object;
 
-          // Write, even if TOP.
-        }
+        // Write, even if TOP. Since we now track the write locations of an
+        // object, even if it is TOP we still have useful information about it.
+        // This is used for when we want to find out what has been modified
+        // between two locations (even if we don't know what has been written).
       }
       else
       {
