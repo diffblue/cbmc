@@ -1,6 +1,5 @@
 SRC = language_ui.cpp \
       language_util.cpp \
-      languages.cpp \
       mode.cpp \
       # Empty last line
 INCLUDES= -I ..

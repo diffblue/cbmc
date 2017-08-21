@@ -24,10 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 
 #include <langapi/mode.h>
-#include <langapi/languages.h>
 #include <langapi/language_util.h>
-
-#include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
@@ -222,8 +219,6 @@ void bmct::show_program()
 {
   unsigned count=1;
 
-  languagest languages(ns, new_ansi_c_language());
-
   std::cout << "\n" << "Program constraints:" << "\n";
 
   for(const auto &step : equation.SSA_steps)
@@ -233,13 +228,14 @@ void bmct::show_program()
 
     if(step.is_assignment())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") " << string_value << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -248,14 +244,15 @@ void bmct::show_program()
     }
     else if(step.is_assert())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -264,14 +261,15 @@ void bmct::show_program()
     }
     else if(step.is_assume())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -280,8 +278,8 @@ void bmct::show_program()
     }
     else if(step.is_constraint())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
@@ -289,15 +287,16 @@ void bmct::show_program()
     }
     else if(step.is_shared_read() || step.is_shared_write())
     {
-      std::string string_value;
-      languages.from_expr(step.ssa_lhs, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.ssa_lhs);
       std::cout << "(" << count << ") SHARED_"
                 << (step.is_shared_write()?"WRITE":"READ")
                 << "(" << string_value <<")\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
