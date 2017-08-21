@@ -842,7 +842,8 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
         rhs_location.cend(),
         std::inserter(intersection, intersection.end()),
         location_ordert());
-      bool all_matched=intersection.size()==a.size();
+      bool all_matched=intersection.size()==a.size() &&
+        intersection.size()==b.size();
 
       std::cout << entry.first.get_identifier() << ": {";
       for(const auto &entry:lhs_location)
