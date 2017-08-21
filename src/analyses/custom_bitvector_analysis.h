@@ -70,6 +70,11 @@ public:
     locationt from,
     locationt to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const custom_bitvector_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
   typedef unsigned long long bit_vectort;
 
   typedef std::map<irep_idt, bit_vectort> bitst;

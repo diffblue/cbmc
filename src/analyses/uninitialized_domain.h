@@ -75,6 +75,12 @@ public:
     locationt from,
     locationt to);
 
+
+  virtual std::vector<symbol_exprt> get_modified_symbols(const uninitialized_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
 private:
   tvt has_values;
 

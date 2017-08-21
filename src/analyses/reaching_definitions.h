@@ -176,6 +176,11 @@ public:
     locationt from,
     locationt to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const rd_range_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
   bool merge_shared(
     const rd_range_domaint &other,
     locationt from,

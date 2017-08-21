@@ -37,6 +37,11 @@ public:
     return !is_threaded_set.empty();
   }
 
+  std::vector<symbol_exprt> get_modified_symbols(const is_threadedt &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
 protected:
   typedef std::set<goto_programt::const_targett> is_threaded_sett;
   is_threaded_sett is_threaded_set;

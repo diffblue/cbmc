@@ -41,6 +41,11 @@ public:
     return changed;
   }
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const invariant_set_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
   void output(
     std::ostream &out,
     const ai_baset &ai,

@@ -55,6 +55,11 @@ public:
     return join(b);
   }
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const interval_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
   // no states
   void make_bottom() final override
   {
