@@ -54,7 +54,10 @@ void pointer_test()
   __CPROVER_assert(i==11, "i==11"); // unknown since value has top for pointer_function
 
   j=4;
-  pointer_function(&i, 11);
+  pointer_function(&i, 478);
+
+  __CPROVER_assert(j==4, "j==3");
+  __CPROVER_assert(i==11, "i==11"); // unknown since value has top for pointer_function
 }
 
 void global_test()
