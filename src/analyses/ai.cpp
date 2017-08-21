@@ -473,17 +473,19 @@ bool ai_baset::do_function_call(
 
 
 
+
+
+    // Propagate those
+    any_changes|=merge(*tmp_state, l_end, l_return);
+
     std::cout << "Function call " << f_it->first << " complete, modified symbols:" << std::endl;
-    const auto &modified_symbols=get_modified_symbols(start_state, end_state);
+    const auto &modified_symbols=get_modified_symbols(start_state, *tmp_state);
 
     for(const auto &modified_symbol:modified_symbols)
     {
       std::cout << "\t" << modified_symbol.get_identifier() << "\n";
     }
     std::cout << std::endl;
-
-    // Propagate those
-    any_changes|=merge(*tmp_state, l_end, l_return);
   }
 
   return any_changes;
