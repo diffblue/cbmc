@@ -41,6 +41,7 @@ string_refinementt::string_refinementt(
   use_counter_example(false),
   do_concretizing(false),
   initial_loop_bound(refinement_bound),
+  generator(_ns),
   non_empty_string(false)
 { }
 

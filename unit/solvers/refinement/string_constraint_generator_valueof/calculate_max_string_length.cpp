@@ -12,8 +12,9 @@
 #include <solvers/refinement/string_constraint_generator.h>
 #include <util/std_types.h>
 
-
-size_t expected_length(const int radix, const typet &type)
+/// Get the string length needed to print any value of the given type with the
+/// given radix.
+static size_t expected_length(const int radix, const typet &type)
 {
   std::string longest("");
   if(radix==2)
@@ -108,7 +109,6 @@ SCENARIO("calculate_max_string_length",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
   const unsigned long radixes[]={2, 8, 10, 16};
-  const unsigned long default_radix=2;
   const typet int_types[]={
     signedbv_typet(32),
     unsignedbv_typet(32),
@@ -134,7 +134,7 @@ SCENARIO("calculate_max_string_length",
           }
           WHEN(std::string("value is less than with default radix"))
           {
-            size_t actual_value_for_default=max_printed_string_length(type, default_radix);
+            size_t actual_value_for_default=max_printed_string_length(type, 0);
             REQUIRE(actual_value<=actual_value_for_default);
           }
         }

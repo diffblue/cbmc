@@ -1,9 +1,13 @@
 public class Test_hex2
 {
-    public static void main()
+    public static void main(Boolean b)
     {
         String s = Integer.toString(Integer.MAX_VALUE, 16);
-        assert(s.equals("7fffffff"));
-        assert(!s.equals("7fffffff"));
+        if (b) {
+            assert(s.equals("7fffffff"));
+        }
+        else {
+            assert(!s.equals("7fffffff"));
+        }
     }
 }
