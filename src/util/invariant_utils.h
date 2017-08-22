@@ -6,8 +6,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
-#ifndef CPROVER_UTIL_INVARIANT_TYPES_H
-#define CPROVER_UTIL_INVARIANT_TYPES_H
+#ifndef CPROVER_UTIL_INVARIANT_UTILS_H
+#define CPROVER_UTIL_INVARIANT_UTILS_H
 
 #include "invariant.h"
 
@@ -45,4 +45,4 @@ std::string pretty_print_invariant_with_irep(
 #define DATA_INVARIANT_WITH_IREP(CONDITION, DESCRIPTION, IREP) \
   INVARIANT_WITH_IREP((CONDITION), (DESCRIPTION), (IREP))
 
-#endif
+#endif // CPROVER_UTIL_INVARIANT_UTILS_H
