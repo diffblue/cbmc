@@ -42,41 +42,46 @@ enum class coverage_criteriont
   PATH, MCDC, ASSERTION, COVER };
 
 bool consider_goals(
-  const goto_programt &goto_program,
-  coverage_goalst &goals);
+  const goto_programt &,
+  coverage_goalst &);
 
 void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  const symbol_tablet &,
+  goto_functionst &,
   coverage_criteriont,
   bool function_only=false);
 
 void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_programt &goto_program,
+  const symbol_tablet &,
+  goto_programt &,
   coverage_criteriont,
   bool function_only=false);
 
 void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  const symbol_tablet &,
+  goto_functionst &,
   coverage_criteriont,
-  coverage_goalst &goals,
+  coverage_goalst &,
   bool function_only=false,
   bool ignore_trivial=false);
 
 void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_programt &goto_program,
+  const symbol_tablet &,
+  goto_programt &,
   coverage_criteriont,
   coverage_goalst &goals,
   bool function_only=false,
   bool ignore_trivial=false);
 
 bool instrument_cover_goals(
-  const cmdlinet &cmdline,
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  message_handlert &msgh);
+  const cmdlinet &,
+  const symbol_tablet &,
+  goto_functionst &,
+  message_handlert &);
+
+bool instrument_cover_goals(
+  const cmdlinet &,
+  goto_modelt &,
+  message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COVER_H

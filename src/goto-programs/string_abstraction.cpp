@@ -82,6 +82,16 @@ void string_abstraction(
   string_abstraction(dest);
 }
 
+void string_abstraction(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  string_abstraction(
+    goto_model.symbol_table,
+    message_handler,
+    goto_model.goto_functions);
+}
+
 string_abstractiont::string_abstractiont(
   symbol_tablet &_symbol_table,
   message_handlert &_message_handler):

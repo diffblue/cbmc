@@ -235,8 +235,6 @@ static void replace_java_nondet(goto_programt &goto_program)
   }
 }
 
-
-
 void replace_java_nondet(goto_functionst &goto_functions)
 {
   for(auto &goto_program : goto_functions.function_map)
@@ -248,3 +246,9 @@ void replace_java_nondet(goto_functionst &goto_functions)
 
   remove_skip(goto_functions);
 }
+
+void replace_java_nondet(goto_modelt &goto_model)
+{
+  replace_java_nondet(goto_model.goto_functions);
+}
+

@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Program Transformation
 
 #include "remove_skip.h"
+#include "goto_model.h"
 
 static bool is_skip(goto_programt::instructionst::iterator it)
 {
@@ -160,3 +161,9 @@ void remove_skip(goto_functionst &goto_functions)
   Forall_goto_functions(f_it, goto_functions)
     remove_skip(f_it->second.body);
 }
+
+void remove_skip(goto_modelt &goto_model)
+{
+  remove_skip(goto_model.goto_functions);
+}
+

@@ -13,15 +13,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/config.h>
+#include <util/message.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
-#include <util/message.h>
-#include <util/arith_tools.h>
-#include <util/config.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/format_strings.h>
-#include <util/c_types.h>
+#include <goto-programs/goto_model.h>
+
 
 exprt is_zero_string(
   const exprt &what,
@@ -168,6 +170,16 @@ void string_instrumentation(
 {
   string_instrumentationt string_instrumentation(symbol_table, message_handler);
   string_instrumentation(dest);
+}
+
+void string_instrumentation(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  string_instrumentation(
+    goto_model.symbol_table,
+    message_handler,
+    goto_model.goto_functions);
 }
 
 void string_instrumentationt::operator()(goto_functionst &dest)

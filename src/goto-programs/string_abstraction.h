@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/std_expr.h>
 
-#include "goto_functions.h"
+#include "goto_model.h"
 
 class string_abstractiont:public messaget
 {
@@ -171,13 +171,12 @@ protected:
 // keep track of length of strings
 
 void string_abstraction(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_programt &dest);
+  goto_modelt &,
+  message_handlert &);
 
 void string_abstraction(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_functionst &dest);
+  symbol_tablet &,
+  message_handlert &,
+  goto_functionst &);
 
 #endif // CPROVER_GOTO_PROGRAMS_STRING_ABSTRACTION_H
