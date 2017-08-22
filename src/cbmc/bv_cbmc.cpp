@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
+#include <util/invariant_utils.h>
 
 bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {

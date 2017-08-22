@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/json_expr.h>
+#include <util/invariant_utils.h>
 
 void bmct::show_vcc_plain(std::ostream &out)
 {
@@ -150,7 +151,7 @@ void bmct::show_vcc()
   {
     of.open(filename);
     if(!of)
-      throw "failed to open file "+filename;
+      throw system_exceptiont("failed to open file "+filename);
   }
 
   std::ostream &out=have_file?of:std::cout;

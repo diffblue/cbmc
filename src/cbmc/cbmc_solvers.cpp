@@ -206,8 +206,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   {
     if(solver==smt1_dect::solvert::GENERIC)
     {
-      error() << "please use --outfile" << eom;
-      throw 0;
+      throw user_exceptiont("please use --outfile");
     }
 
     smt1_dect *smt1_dec=
@@ -245,8 +244,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
 
     if(!out)
     {
-      error() << "failed to open " << filename << eom;
-      throw 0;
+      IO_EXCEPTION_WITH_FILENAME("failed to open", filename);
     }
 
     smt1_convt *smt1_conv=
