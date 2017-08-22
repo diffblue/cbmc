@@ -1,0 +1,43 @@
+#!/bin/bash
+_cbmc_autocomplete()
+{
+  #list of all switches cbmc has. IMPORTANT: in the template file, this variable must be defined on line 5.
+  local switches=""
+  #word on which the cursor is
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  #previous word (in case it is a switch with a parameter)
+  local prev=${COMP_WORDS[COMP_CWORD-1]}
+ 
+  #check if the command before cursor is a switch that takes parameters, if yes,
+  #offer a choice of parameters
+  case "$prev" in
+   --cover) #for coverage we list the options explicitly
+     COMPREPLY=( $( compgen -W "assertion path branch location decision condition mcdc cover" -- $cur ) )
+     return 0
+     ;;
+   --mm) #for memory models we list the options explicitly
+     COMPREPLY=( $( compgen -W "sc tso pso" -- $cur ) )
+     return 0
+     ;;
+   --arch) #for architecture we list the options explicitly
+     COMPREPLY=( $( compgen -W "i386 x86_64" -- $cur ) )
+     return 0
+     ;;
+   -I|--classpath|-cp|--outfile|--existing-coverage|--graphml-cex)
+     #a switch that takes a file parameter of which we don't know an extension
+     #TODO probably we can do more for -I, --classpath, -cp
+     COMPREPLY=( $(compgen -f -- $cur) )
+     return 0
+     ;;
+  esac
+ 
+  #complete a switch from a standard list, if the parameter under cursor starts with a hyphen
+  if [[ "$cur" == -* ]]; then
+     COMPREPLY=( $( compgen -W "$switches" -- $cur ) )
+     return 0
+  fi
+
+  #if none of the above applies, offer directories and files that we can analyze
+  COMPREPLY=( $(compgen -G '*.class|*.jar|*.cpp|*.cc|*.c\+\+|*.ii|*.cxx|*.c|*.i|*.gb' -- $cur) )
+}
+complete -F _cbmc_autocomplete cbmc
