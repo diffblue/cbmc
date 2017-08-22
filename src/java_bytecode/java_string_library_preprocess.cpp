@@ -302,10 +302,9 @@ exprt java_string_library_preprocesst::convert_exprt_to_string_exprt(
 {
   PRECONDITION(implements_java_char_sequence(op_to_process.type()));
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, init_code);
-  init_code.add(code_assign_java_string_to_string_expr(
-    string_expr, op_to_process, symbol_table));
+  code_assign_java_string_to_string_expr(
+    string_expr, op_to_process, symbol_table, init_code);
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, init_code);
-  init_code.add(code_declt(string_expr_sym));
   init_code.add(code_assignt(string_expr_sym, string_expr));
   return string_expr;
 }
@@ -781,13 +780,16 @@ codet java_string_library_preprocesst::
 /// \param lhs: a string expression
 /// \param rhs: an expression representing a java string
 /// \param symbol_table: symbol table
-/// \return return the following code:
+/// \param code: code block that gets appended the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~
 /// lhs.length=rhs->length
 /// lhs.data=*(rhs->data)
 /// ~~~~~~~~~~~~~~~~~~~~~~
-codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
-  const string_exprt &lhs, const exprt &rhs, symbol_tablet &symbol_table)
+void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
+  const string_exprt &lhs,
+  const exprt &rhs,
+  symbol_tablet &symbol_table,
+  code_blockt &code)
 {
   PRECONDITION(implements_java_char_sequence(rhs.type()));
 
@@ -806,7 +808,6 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   dereference_exprt rhs_data(member_data, member_data.type().subtype());
 
   // Assignments
-  code_blockt code;
   code.add(code_assignt(lhs.length(), rhs_length));
 
   // We always assume data of a String is not null
@@ -814,7 +815,6 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
     member_data, null_pointer_exprt(to_pointer_type(member_data.type()))));
   code.add(code_assumet(data_not_null));
   code.add(code_assignt(lhs.content(), rhs_data));
-  return code;
 }
 
 /// \param lhs: an expression representing a java string
@@ -1140,8 +1140,8 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
 
   // string_expr = {this->length, this->data}
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, code);
-  code.add(code_assign_java_string_to_string_expr(
-    string_expr, string_argument, symbol_table));
+  code_assign_java_string_to_string_expr(
+    string_expr, string_argument, symbol_table, code);
   exprt string_expr_sym=fresh_string_expr_symbol(
     loc, symbol_table, code);
   code.add(code_assignt(string_expr_sym, string_expr));
@@ -1391,8 +1391,11 @@ exprt java_string_library_preprocesst::make_argument_for_format(
       pointer_typet string_pointer=
         java_reference_type(symbol_typet("java::java.lang.String"));
       typecast_exprt arg_i_as_string(arg_i, string_pointer);
-      code_not_null.add(code_assign_java_string_to_string_expr(
-        to_string_expr(field_expr), arg_i_as_string, symbol_table));
+      code_assign_java_string_to_string_expr(
+        to_string_expr(field_expr),
+        arg_i_as_string,
+        symbol_table,
+        code_not_null);
       exprt arg_i_string_expr_sym=fresh_string_expr_symbol(
         loc, symbol_table, code_not_null);
       code_not_null.add(code_assignt(
@@ -1651,8 +1654,7 @@ codet java_string_library_preprocesst::make_copy_string_code(
   // Assign the argument to string_expr
   code_typet::parametert op=type.parameters()[0];
   symbol_exprt arg0(op.get_identifier(), op.type());
-  code.add(code_assign_java_string_to_string_expr(
-    string_expr, arg0, symbol_table));
+  code_assign_java_string_to_string_expr(string_expr, arg0, symbol_table, code);
 
   // Assign string_expr to string_expr_sym
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, code);
@@ -1693,8 +1695,7 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
   // Assign argument to a string_expr
   code_typet::parameterst params=type.parameters();
   symbol_exprt arg1(params[1].get_identifier(), params[1].type());
-  code.add(code_assign_java_string_to_string_expr(
-    string_expr, arg1, symbol_table));
+  code_assign_java_string_to_string_expr(string_expr, arg1, symbol_table, code);
 
   // Assign string_expr to symbol to keep track of it
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, code);
@@ -1735,8 +1736,8 @@ codet java_string_library_preprocesst::make_string_length_code(
   string_exprt str_expr=fresh_string_expr(loc, symbol_table, code);
 
   // Assign this to str_expr
-  code.add(
-    code_assign_java_string_to_string_expr(str_expr, arg_this, symbol_table));
+  code_assign_java_string_to_string_expr(
+    str_expr, arg_this, symbol_table, code);
 
   // Assign str_expr to str_expr_sym for that expression to be present in the
   // symbol table in order to be processed by the string solver

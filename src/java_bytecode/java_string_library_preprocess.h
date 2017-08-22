@@ -285,8 +285,11 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
-  codet code_assign_java_string_to_string_expr(
-    const string_exprt &lhs, const exprt &rhs, symbol_tablet &symbol_table);
+  void code_assign_java_string_to_string_expr(
+    const string_exprt &lhs,
+    const exprt &rhs,
+    symbol_tablet &symbol_table,
+    code_blockt &code);
 
   codet code_assign_string_literal_to_string_expr(
     const string_exprt &lhs,
