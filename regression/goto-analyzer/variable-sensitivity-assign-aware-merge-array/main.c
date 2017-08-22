@@ -7,7 +7,7 @@ void param_test(int array[])
     array[1] = 5;
     // TODO: This is marked as "unknown" when running analysis of param_test and global_test. Doesn't seem correct
     // as array[1] is being assigned one line above?
-    __CPROVER_assert(a[1]==5,  "a[1]==5");
+    __CPROVER_assert(array[1]==5,  "array[1]==5");
 }
 
 void global_test()
@@ -31,5 +31,15 @@ void pass_param()
     // The theme here is that global array initialisation assertions are marked as "unknown". Why?
     __CPROVER_assert(c[8]==8,  "c[8]==8");
     
-    param_test(&a);
+    param_test(a);
+
+    __CPROVER_assert(a[1]==5,  "a[1]==5");
+
+    __CPROVER_assert(b[0]==0,  "b[0]==0");
+    __CPROVER_assert(b[4]==4,  "b[4]==4");
+    __CPROVER_assert(b[8]==8,  "b[8]==8");
+
+    __CPROVER_assert(b[1]==1,  "b[1]==1");
+    param_test(b);
+     __CPROVER_assert(b[1]==5,  "b[1]==5");
 }
