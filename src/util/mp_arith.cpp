@@ -10,14 +10,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cstdlib>
 #include <cctype>
-#include <cassert>
 
 #include <sstream>
 #include <ostream>
 #include <limits>
 
 #include "arith_tools.h"
-
+#include "invariant.h"
 
 typedef BigInt::ullong_t ullong_t; // NOLINT(readability/identifiers)
 typedef BigInt::llong_t llong_t; // NOLINT(readability/identifiers)
@@ -192,23 +191,21 @@ const mp_integer binary2integer(const std::string &n, bool is_signed)
 
 mp_integer::ullong_t integer2ulong(const mp_integer &n)
 {
-  assert(n.is_ulong());
+  PRECONDITION(n.is_ulong());
   return n.to_ulong();
 }
 
 std::size_t integer2size_t(const mp_integer &n)
 {
-  assert(n>=0);
+  PRECONDITION(n>=0 && n<=std::numeric_limits<std::size_t>::max());
   mp_integer::ullong_t ull=integer2ulong(n);
-  assert(ull <= std::numeric_limits<std::size_t>::max());
-  return (std::size_t)ull;
+  return (std::size_t) ull;
 }
 
 unsigned integer2unsigned(const mp_integer &n)
 {
-  assert(n>=0);
+  PRECONDITION(n>=0 && n<=std::numeric_limits<unsigned>::max());
   mp_integer::ullong_t ull=integer2ulong(n);
-  assert(ull <= std::numeric_limits<unsigned>::max());
   return (unsigned)ull;
 }
 
@@ -217,6 +214,7 @@ unsigned integer2unsigned(const mp_integer &n)
 /// (currently long long)
 mp_integer bitwise_or(const mp_integer &a, const mp_integer &b)
 {
+  PRECONDITION(a.is_ulong() && b.is_ulong());
   ullong_t result=a.to_ulong()|b.to_ulong();
   return result;
 }
@@ -226,6 +224,7 @@ mp_integer bitwise_or(const mp_integer &a, const mp_integer &b)
 /// (currently long long)
 mp_integer bitwise_and(const mp_integer &a, const mp_integer &b)
 {
+  PRECONDITION(a.is_ulong() && b.is_ulong());
   ullong_t result=a.to_ulong()&b.to_ulong();
   return result;
 }
@@ -235,6 +234,7 @@ mp_integer bitwise_and(const mp_integer &a, const mp_integer &b)
 /// (currently long long)
 mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
 {
+  PRECONDITION(a.is_ulong() && b.is_ulong());
   ullong_t result=a.to_ulong()^b.to_ulong();
   return result;
 }
@@ -244,6 +244,7 @@ mp_integer bitwise_xor(const mp_integer &a, const mp_integer &b)
 /// (currently long long)
 mp_integer bitwise_neg(const mp_integer &a)
 {
+  PRECONDITION(a.is_ulong());
   ullong_t result=~a.to_ulong();
   return result;
 }
@@ -256,6 +257,7 @@ mp_integer arith_left_shift(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_long() && b.is_ulong());
   ullong_t shift=b.to_ulong();
   if(shift>true_size && a!=mp_integer(0))
     throw "shift value out of range";
@@ -276,6 +278,7 @@ mp_integer arith_right_shift(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_long() && b.is_ulong());
   llong_t number=a.to_long();
   ullong_t shift=b.to_ulong();
   if(shift>true_size)
@@ -295,6 +298,7 @@ mp_integer logic_left_shift(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_long() && b.is_ulong());
   ullong_t shift=b.to_ulong();
   if(shift>true_size && a!=mp_integer(0))
     throw "shift value out of range";
@@ -320,6 +324,7 @@ mp_integer logic_right_shift(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_long() && b.is_ulong());
   ullong_t shift=b.to_ulong();
   if(shift>true_size)
     throw "shift value out of range";
@@ -336,6 +341,7 @@ mp_integer rotate_right(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_ulong() && b.is_ulong());
   ullong_t number=a.to_ulong();
   ullong_t shift=b.to_ulong();
   if(shift>true_size)
@@ -355,6 +361,7 @@ mp_integer rotate_left(
   const mp_integer &b,
   std::size_t true_size)
 {
+  PRECONDITION(a.is_ulong() && b.is_ulong());
   ullong_t number=a.to_ulong();
   ullong_t shift=b.to_ulong();
   if(shift>true_size)
