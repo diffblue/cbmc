@@ -8,6 +8,7 @@ SRC = basic_blocks.cpp \
       elf_reader.cpp \
       format_strings.cpp \
       initialize_goto_model.cpp \
+      get_goto_model.cpp \
       goto_asm.cpp \
       goto_clean_expr.cpp \
       goto_convert.cpp \
