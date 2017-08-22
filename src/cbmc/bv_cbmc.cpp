@@ -10,16 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
-#include <util/invariant_utils.h>
+#include <util/exception_utils.h>
 
 bvt bv_cbmct::convert_waitfor(const exprt &expr)
 {
   if(expr.operands().size()!=4)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "waitfor expected to have four operands" << eom;
-    throw 0;
-  }
+    throw input_src_exceptiont(
+      expr.find_source_location(),
+      "waitfor expected to have four operands");
 
   exprt new_cycle;
   const exprt &old_cycle=expr.op0();
@@ -31,11 +29,9 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
 
   mp_integer bound_value;
   if(to_integer(bound, bound_value))
-  {
-    error().source_location=expr.find_source_location();
-    error() << "waitfor bound must be a constant" << eom;
-    throw 0;
-  }
+    throw input_src_exceptiont(
+      expr.find_source_location(),
+      "waitfor bound must be a constant");
 
   {
     // constraint: new_cycle>=old_cycle
@@ -136,11 +132,9 @@ bvt bv_cbmct::convert_waitfor(const exprt &expr)
 bvt bv_cbmct::convert_waitfor_symbol(const exprt &expr)
 {
   if(expr.operands().size()!=1)
-  {
-    error().source_location=expr.find_source_location();
-    error() << "waitfor_symbol expected to have one operand" << eom;
-    throw 0;
-  }
+    throw input_src_exceptiont(
+      expr.find_source_location(),
+      "waitfor_symbol expected to have one operand");
 
   exprt result;
   const exprt &bound=expr.op0();

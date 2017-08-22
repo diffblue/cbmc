@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/json_expr.h>
-#include <util/invariant_utils.h>
+#include <util/exception_utils.h>
 
 void bmct::show_vcc_plain(std::ostream &out)
 {

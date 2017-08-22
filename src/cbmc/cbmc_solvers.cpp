@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <util/unicode.h>
+#include <util/exception_utils.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
@@ -205,9 +206,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
   if(filename=="")
   {
     if(solver==smt1_dect::solvert::GENERIC)
-    {
-      throw user_exceptiont("please use --outfile");
-    }
+      throw ui_exceptiont("please use --outfile");
 
     smt1_dect *smt1_dec=
       new smt1_dect(
@@ -243,9 +242,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
     #endif
 
     if(!out)
-    {
-      IO_EXCEPTION_WITH_FILENAME("failed to open", filename);
-    }
+      throw system_exceptiont("failed to open "+filename);
 
     smt1_convt *smt1_conv=
       new smt1_convt(
@@ -271,10 +268,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
   if(filename=="")
   {
     if(solver==smt2_dect::solvert::GENERIC)
-    {
-      error() << "please use --outfile" << eom;
-      throw 0;
-    }
+      throw ui_exceptiont("please use --outfile");
 
     smt2_dect *smt2_dec=
       new smt2_dect(
@@ -316,10 +310,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     #endif
 
     if(!*out)
-    {
-      error() << "failed to open " << filename << eom;
-      throw 0;
-    }
+      throw system_exceptiont("failed to open " +filename);
 
     smt2_convt *smt2_conv=
       new smt2_convt(
@@ -342,10 +333,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 void cbmc_solverst::no_beautification()
 {
   if(options.get_bool_option("beautify"))
-  {
-    error() << "sorry, this solver does not support beautification" << eom;
-    throw 0;
-  }
+    throw ui_exceptiont("sorry, this solver does not support beautification");
 }
 
 void cbmc_solverst::no_incremental_check()
@@ -353,8 +341,6 @@ void cbmc_solverst::no_incremental_check()
   if(options.get_bool_option("all-properties") ||
      options.get_option("cover")!="" ||
      options.get_option("incremental-check")!="")
-  {
-    error() << "sorry, this solver does not support incremental solving" << eom;
-    throw 0;
-  }
+    throw ui_exceptiont(
+      "sorry, this solver does not support incremental solving");
 }
