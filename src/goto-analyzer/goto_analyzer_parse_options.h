@@ -72,8 +72,6 @@ protected:
   bool set_properties();
 
   void eval_verbosity();
-
-  bool has_entry_point;
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H

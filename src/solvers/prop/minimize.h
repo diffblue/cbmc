@@ -24,7 +24,10 @@ class prop_minimizet:public messaget
 {
 public:
   explicit prop_minimizet(prop_convt &_prop_conv):
+    _iterations(0),
+    _number_satisfied(0),
     _number_objectives(0),
+    _value(0),
     prop_conv(_prop_conv)
   {
   }

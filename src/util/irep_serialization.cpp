@@ -51,12 +51,12 @@ void irep_serializationt::reference_convert(
   std::istream &in,
   irept &irep)
 {
-  std::size_t id = read_gb_word(in);
+  std::size_t id=read_gb_word(in);
 
-  if(id < ireps_container.ireps_on_read.size() &&
+  if(id<ireps_container.ireps_on_read.size() &&
      ireps_container.ireps_on_read[id].first)
   {
-    irep = ireps_container.ireps_on_read[id].second;
+    irep=ireps_container.ireps_on_read[id].second;
   }
   else
   {
@@ -193,7 +193,7 @@ std::size_t irep_serializationt::read_gb_word(std::istream &in)
 
   while(in.good())
   {
-    unsigned char ch=in.get();
+    unsigned char ch=static_cast<unsigned char>(in.get());
     res|=(size_t(ch&0x7f))<<shift_distance;
     shift_distance+=7;
     if((ch&0x80)==0)
@@ -228,15 +228,15 @@ irep_idt irep_serializationt::read_gb_string(std::istream &in)
   char c;
   size_t length=0;
 
-  while((c = in.get()) != 0)
+  while((c=static_cast<char>(in.get()))!=0)
   {
     if(length>=read_buffer.size())
       read_buffer.resize(read_buffer.size()*2, 0);
 
     if(c=='\\') // escaped chars
-      read_buffer[length] = in.get();
+      read_buffer[length]=static_cast<char>(in.get());
     else
-      read_buffer[length] = c;
+      read_buffer[length]=c;
 
     length++;
   }
@@ -270,7 +270,7 @@ void irep_serializationt::write_string_ref(
 /// \return a string
 irep_idt irep_serializationt::read_string_ref(std::istream &in)
 {
-  std::size_t id = read_gb_word(in);
+  std::size_t id=read_gb_word(in);
 
   if(id>=ireps_container.string_rev_map.size())
     ireps_container.string_rev_map.resize(1+id*2,
@@ -283,7 +283,7 @@ irep_idt irep_serializationt::read_string_ref(std::istream &in)
   else
   {
     irep_idt s=read_gb_string(in);
-    ireps_container.string_rev_map[id] =
+    ireps_container.string_rev_map[id]=
       std::pair<bool, irep_idt>(true, s);
     return ireps_container.string_rev_map[id].second;
   }

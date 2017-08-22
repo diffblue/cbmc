@@ -29,8 +29,12 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
   if(expr.id()==ID_code)
     return typecheck_code(to_code(expr));
 
-  if(expr.id()==ID_typecast && expr.type().id()==ID_pointer)
-    expr=make_clean_pointer_cast(expr, expr.type(), ns);
+  if(expr.id()==ID_typecast &&
+     expr.type().id()==ID_pointer)
+    expr=make_clean_pointer_cast(
+      expr,
+      to_pointer_type(expr.type()),
+      ns);
 
   // do operands recursively
   Forall_operands(it, expr)

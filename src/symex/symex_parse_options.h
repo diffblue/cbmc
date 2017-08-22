@@ -32,7 +32,7 @@ class optionst;
 #define SYMEX_OPTIONS \
   "(function):" \
   "D:I:" \
-  "(depth):(context-bound):(branch-bound):(unwind):" \
+  "(depth):(context-bound):(branch-bound):(unwind):(max-search-time):" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \

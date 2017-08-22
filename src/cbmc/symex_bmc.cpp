@@ -22,6 +22,7 @@ symex_bmct::symex_bmct(
   symex_targett &_target):
   goto_symext(_ns, _new_symbol_table, _target),
   record_coverage(false),
+  max_unwind(0),
   max_unwind_is_set(false),
   symex_coverage(_ns)
 {

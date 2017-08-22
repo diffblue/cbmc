@@ -313,7 +313,11 @@ protected:
       continue_set(false),
       default_set(false),
       throw_set(false),
-      leave_set(false)
+      leave_set(false),
+      break_stack_size(0),
+      continue_stack_size(0),
+      throw_stack_size(0),
+      leave_stack_size(0)
     {
     }
 

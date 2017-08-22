@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
+#include <util/invariant.h>
 #include <util/string2int.h>
 #include <util/expr_util.h>
 #include <util/base_type.h>
@@ -858,16 +859,24 @@ bool value_set_dereferencet::memory_model_bytes(
   {
     // upper bound
     {
-      mp_integer from_width=pointer_offset_size(from_type, ns);
-      if(from_width<=0)
-        throw "unknown or invalid type size:\n"+from_type.pretty();
+      exprt from_width=size_of_expr(from_type, ns);
+      INVARIANT(
+        from_width.is_not_nil(),
+        "unknown or invalid type size:\n"+from_type.pretty());
 
-      mp_integer to_width=
-        to_type.id()==ID_empty?0: pointer_offset_size(to_type, ns);
-      if(to_width<0)
-        throw "unknown or invalid type size:\n"+to_type.pretty();
+      exprt to_width=
+        to_type.id()==ID_empty?
+        from_integer(0, size_type()):size_of_expr(to_type, ns);
+      INVARIANT(
+        to_width.is_not_nil(),
+        "unknown or invalid type size:\n"+to_type.pretty());
+      INVARIANT(
+        from_width.type()==to_width.type(),
+        "type mismatch on result of size_of_expr");
 
-      exprt bound=from_integer(from_width-to_width, offset.type());
+      minus_exprt bound(from_width, to_width);
+      if(bound.type()!=offset.type())
+        bound.make_typecast(offset.type());
 
       binary_relation_exprt
         offset_upper_bound(offset, ID_gt, bound);

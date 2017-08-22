@@ -113,6 +113,7 @@ public:
 
   path_symex_stept():
     branch(NON_BRANCH),
+    thread_nr(0),
     guard(nil_exprt()),
     ssa_rhs(nil_exprt()),
     full_lhs(nil_exprt()),

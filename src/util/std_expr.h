@@ -3721,8 +3721,9 @@ public:
 
   bool value_is_zero_string() const;
 
-  static constant_exprt integer_constant(unsigned);
+  static constant_exprt integer_constant(unsigned v);
 };
+
 
 /*! \brief Cast a generic exprt to a \ref constant_exprt
  *

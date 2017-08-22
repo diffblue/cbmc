@@ -33,6 +33,8 @@ public:
     symbol_table(_symbol_table),
     ns(_symbol_table),
     goto_functions(_goto_functions),
+    stack_pointer(0),
+    done(false),
     stop_on_assertion(false)
   {
     show=true;

@@ -1545,7 +1545,7 @@ gcc_attribute_list:
           gcc_attribute
         | gcc_attribute_list ',' gcc_attribute
         {
-          $$=merge($1, $2);
+          $$=merge($1, $3);
         }
         ;          
 

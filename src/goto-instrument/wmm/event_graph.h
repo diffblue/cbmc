@@ -345,6 +345,9 @@ protected:
 
 public:
   explicit event_grapht(messaget &_message):
+    max_var(0),
+    max_po_trans(0),
+    ignore_arrays(false),
     filter_thin_air(true),
     filter_uniproc(true),
     message(_message)

@@ -17,7 +17,9 @@ bv_refinementt::bv_refinementt(
   bv_pointerst(_ns, _prop),
   max_node_refinement(5),
   do_array_refinement(true),
-  do_arithmetic_refinement(true)
+  do_arithmetic_refinement(true),
+  progress(false),
+  ui(ui_message_handlert::uit::PLAIN)
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());

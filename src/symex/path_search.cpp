@@ -68,9 +68,9 @@ path_searcht::resultt path_searcht::operator()(
       statet &state=tmp_queue.front();
 
       // record we have seen it
-      loc_data[state.get_pc().loc_number].visited=true;
+      loc_data[state.pc().loc_number].visited=true;
 
-      debug() << "Loc: #" << state.get_pc().loc_number
+      debug() << "Loc: #" << state.pc().loc_number
               << ", queue: " << queue.size()
               << ", depth: " << state.get_depth();
       for(const auto &s : queue)
@@ -102,10 +102,13 @@ path_searcht::resultt path_searcht::operator()(
 
       if(number_of_steps%1000==0)
       {
+        time_periodt running_time=current_time()-start_time;
         status() << "Queue " << queue.size()
-                 << " thread " << state.get_current_thread()
+                 << " thread " << state.get_current_thread()+1
                  << '/' << state.threads.size()
-                 << " PC " << state.pc() << messaget::eom;
+                 << " PC " << state.pc()
+                 << " [" << number_of_steps << " steps, "
+                 << running_time << "s]" << messaget::eom;
       }
 
       // an error, possibly?
@@ -264,33 +267,91 @@ bool path_searcht::drop_state(const statet &state)
 {
   goto_programt::const_targett pc=state.get_instruction();
 
+  const source_locationt &source_location=pc->source_location;
+
+  if(!source_location.is_nil() &&
+     last_source_location!=source_location)
+  {
+    debug() << "SYMEX at file " << source_location.get_file()
+            << " line " << source_location.get_line()
+            << " function " << source_location.get_function()
+            << eom;
+
+    last_source_location=source_location;
+  }
+
   // depth limit
-  if(depth_limit_set && state.get_depth()>depth_limit)
+  if(state.get_depth()>=depth_limit)
     return true;
 
   // context bound
-  if(context_bound_set && state.get_no_thread_interleavings()>context_bound)
+  if(state.get_no_thread_interleavings()>=context_bound)
     return true;
 
   // branch bound
-  if(branch_bound_set && state.get_no_branches()>branch_bound)
+  if(state.get_no_branches()>=branch_bound)
     return true;
 
   // unwinding limit -- loops
-  if(unwind_limit_set && state.get_instruction()->is_backwards_goto())
+  if(unwind_limit!=std::numeric_limits<unsigned>::max() && 
+     pc->is_backwards_goto())
   {
+    bool stop=false;
+
     for(const auto &loop_info : state.unwinding_map)
-      if(loop_info.second>unwind_limit)
-        return true;
+      if(loop_info.second>=unwind_limit)
+      {
+        stop=true;
+        break;
+      }
+
+    const irep_idt id=goto_programt::loop_id(pc);
+    path_symex_statet::unwinding_mapt::const_iterator entry=
+      state.unwinding_map.find(state.pc());
+    debug() << (stop?"Not unwinding":"Unwinding")
+      << " loop " << id << " iteration "
+      << (entry==state.unwinding_map.end()?-1:entry->second)
+      << " (" << unwind_limit << " max)"
+      << " " << source_location
+      << " thread " << state.get_current_thread() << eom;
+
+    if(stop)
+      return true;
   }
 
   // unwinding limit -- recursion
-  if(unwind_limit_set && state.get_instruction()->is_function_call())
+  if(unwind_limit!=std::numeric_limits<unsigned>::max() &&
+     pc->is_function_call())
   {
+    bool stop=false;
+
     for(const auto &rec_info : state.recursion_map)
-      if(rec_info.second>unwind_limit)
-        return true;
+      if(rec_info.second>=unwind_limit)
+      {
+        stop=true;
+        break;
+      }
+
+    exprt function=to_code_function_call(pc->code).function();
+    const irep_idt id=function.get(ID_identifier); // could be nil
+    path_symex_statet::recursion_mapt::const_iterator entry=
+      state.recursion_map.find(id);
+    if(entry!=state.recursion_map.end())
+      debug() << (stop?"Not unwinding":"Unwinding")
+        << " recursion " << id << " iteration "
+        << entry->second
+        << " (" << unwind_limit << " max)"
+        << " " << source_location
+        << " thread " << state.get_current_thread() << eom;
+
+    if(stop)
+      return true;
   }
+
+  // search time limit (--max-search-time)
+  if(time_limit!=std::numeric_limits<unsigned>::max() &&
+     current_time().get_t()>start_time.get_t()+time_limit*1000)
+    return true;
 
   if(pc->is_assume() &&
      simplify_expr(pc->guard, ns).is_false())

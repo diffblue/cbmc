@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
@@ -187,6 +188,10 @@ int symex_parse_optionst::doit()
       path_search.set_unwind_limit(
         unsafe_string2unsigned(cmdline.get_value("unwind")));
 
+    if(cmdline.isset("max-search-time"))
+      path_search.set_time_limit(
+        safe_string2unsigned(cmdline.get_value("max-search-time")));
+
     if(cmdline.isset("dfs"))
       path_search.set_dfs();
 
@@ -301,6 +306,12 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // remove stuff
     remove_complex(goto_model);
     remove_vector(goto_model);
+    // remove function pointers
+    status() << "Removal of function pointers and virtual functions" << eom;
+    remove_function_pointers(
+      get_message_handler(),
+      goto_model,
+      cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // Java throw and catch -> explicit exceptional return variables:
@@ -616,6 +627,7 @@ void symex_parse_optionst::help()
     " --depth nr                   limit search depth\n"
     " --context-bound nr           limit number of context switches\n"
     " --branch-bound nr            limit number of branches taken\n"
+    " --max-search-time s          limit search to approximately s seconds\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

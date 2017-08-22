@@ -18,12 +18,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 #include <util/type.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 class var_mapt
 {
 public:
   explicit var_mapt(const namespacet &_ns):
-    ns(_ns), shared_count(0), local_count(0), nondet_count(0), dynamic_count(0)
+    ns(_ns.get_symbol_table(), new_symbols),
+    shared_count(0),
+    local_count(0),
+    nondet_count(0),
+    dynamic_count(0)
   {
   }
 
@@ -93,7 +98,8 @@ public:
 
   void init(var_infot &var_info);
 
-  const namespacet &ns;
+  const namespacet ns;
+  symbol_tablet new_symbols;
 
   void output(std::ostream &) const;
 

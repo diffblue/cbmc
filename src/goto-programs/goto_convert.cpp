@@ -362,21 +362,13 @@ void goto_convertt::convert_switch_case(
   const code_switch_caset &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "switch-case statement expected to have two operands"
-            << eom;
-    throw 0;
-  }
-
   goto_programt tmp;
   convert(code.code(), tmp);
 
   goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
-  // default?
+  // is a default target given?
 
   if(code.is_default())
     targets.set_default(target);
@@ -1215,6 +1207,7 @@ void goto_convertt::convert_switch(
   //   default: Pd;
   // }
   // --------------------
+  // location
   // x: if(v==x) goto X;
   // y: if(v==y) goto Y;
   //    goto d;
@@ -1223,13 +1216,19 @@ void goto_convertt::convert_switch(
   // d: Pd;
   // z: ;
 
-  if(code.operands().size()<2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "switch takes at least two operands" << eom;
-    throw 0;
-  }
+  // we first add a 'location' node for the switch statement,
+  // which would otherwise not be recorded
+  dest.add_instruction()->make_location(
+    code.source_location());
 
+  // get the location of the end of the body, but
+  // default to location of switch, if none
+  source_locationt body_end_location=
+    code.body().get_statement()==ID_block?
+      to_code_block(code.body()).end_location():
+      code.source_location();
+
+  // do the value we switch over
   exprt argument=code.value();
 
   goto_programt sideeffects;
@@ -1242,7 +1241,7 @@ void goto_convertt::convert_switch(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
-  z->source_location=code.source_location();
+  z->source_location=body_end_location;
 
   // set the new targets -- continue stays as is
   targets.set_break(z);
@@ -1251,10 +1250,7 @@ void goto_convertt::convert_switch(
   targets.cases_map.clear();
 
   goto_programt tmp;
-
-  forall_operands(it, code)
-    if(it!=code.operands().begin())
-      convert(to_code(*it), tmp);
+  convert(code.body(), tmp);
 
   goto_programt tmp_cases;
 

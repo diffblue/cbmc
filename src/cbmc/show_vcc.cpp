@@ -15,10 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 
 #include <langapi/mode.h>
-#include <langapi/languages.h>
 #include <langapi/language_util.h>
-
-#include <ansi-c/ansi_c_language.h>
 
 #include <util/json.h>
 #include <util/json_expr.h>
@@ -26,8 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 void bmct::show_vcc_plain(std::ostream &out)
 {
   out << "\n" << "VERIFICATION CONDITIONS:" << "\n" << "\n";
-
-  languagest languages(ns, new_ansi_c_language());
 
   bool has_threads=equation.has_threads();
 
@@ -57,8 +52,8 @@ void bmct::show_vcc_plain(std::ostream &out)
       {
         if(!p_it->ignore)
         {
-          std::string string_value;
-          languages.from_expr(p_it->cond_expr, string_value);
+          std::string string_value=
+            from_expr(ns, "", p_it->cond_expr);
           out << "{-" << count << "} " << string_value << "\n";
 
           #if 0
@@ -73,8 +68,8 @@ void bmct::show_vcc_plain(std::ostream &out)
 
     out << "|--------------------------" << "\n";
 
-    std::string string_value;
-    languages.from_expr(s_it->cond_expr, string_value);
+    std::string string_value=
+      from_expr(ns, "", s_it->cond_expr);
     out << "{" << 1 << "} " << string_value << "\n";
 
     out << "\n";
@@ -86,8 +81,6 @@ void bmct::show_vcc_json(std::ostream &out)
   json_objectt json_result;
 
   json_arrayt &json_vccs=json_result["vccs"].make_array();
-
-  languagest languages(ns, new_ansi_c_language());
 
   bool has_threads=equation.has_threads();
 
@@ -125,14 +118,14 @@ void bmct::show_vcc_json(std::ostream &out)
          p_it->is_constraint()) &&
          !p_it->ignore)
       {
-        std::string string_value;
-        languages.from_expr(p_it->cond_expr, string_value);
+        std::string string_value=
+          from_expr(ns, "", p_it->cond_expr);
         json_constraints.push_back(json_stringt(string_value));
       }
     }
 
-    std::string string_value;
-    languages.from_expr(s_it->cond_expr, string_value);
+    std::string string_value=
+      from_expr(ns, "", s_it->cond_expr);
     object["expression"]=json_stringt(string_value);
   }
 

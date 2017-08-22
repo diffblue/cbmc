@@ -42,7 +42,8 @@ public:
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     string_preprocess(_string_preprocess),
-    slots_for_parameters(0)
+    slots_for_parameters(0),
+    method_has_this(false)
   {
   }
 
