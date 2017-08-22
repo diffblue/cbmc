@@ -42,7 +42,7 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
   string_constraintt a2(
     idx,
     res.length(),
-    s1.axiom_for_is_strictly_longer_than(idx),
+    s1.axiom_for_length_gt(idx),
     equal_exprt(s1[idx], res[idx]));
   axioms.push_back(a2);
 
@@ -51,7 +51,7 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
   string_constraintt a3(
     idx2,
     res.length(),
-    s1.axiom_for_is_shorter_than(idx2),
+    s1.axiom_for_length_le(idx2),
     equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type())));
   axioms.push_back(a3);
 
@@ -120,7 +120,7 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   axioms.push_back(a2);
 
   // Warning: check what to do if the string is not long enough
-  axioms.push_back(str.axiom_for_is_longer_than(end));
+  axioms.push_back(str.axiom_for_length_ge(end));
 
   symbol_exprt idx=fresh_univ_index("QA_index_substring", index_type);
   string_constraintt a4(idx,
@@ -156,21 +156,21 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
   // a8 : forall n<|s1|, s[idx+n]=s1[n]
   // a9 : (s[m]>' ' &&s[m+|s1|-1]>' ') || m=|s|
 
-  exprt a1=str.axiom_for_is_longer_than(
+  exprt a1=str.axiom_for_length_ge(
     plus_exprt_with_overflow_check(idx, res.length()));
   axioms.push_back(a1);
 
   binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
   axioms.push_back(a2);
 
-  exprt a3=str.axiom_for_is_longer_than(idx);
+  exprt a3=str.axiom_for_length_ge(idx);
   axioms.push_back(a3);
 
-  exprt a4=res.axiom_for_is_longer_than(
+  exprt a4=res.axiom_for_length_ge(
     from_integer(0, index_type));
   axioms.push_back(a4);
 
-  exprt a5=res.axiom_for_is_shorter_than(str);
+  exprt a5=res.axiom_for_length_le(str);
   axioms.push_back(a5);
 
   symbol_exprt n=fresh_univ_index("QA_index_trim", index_type);

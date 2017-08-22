@@ -162,7 +162,7 @@ void string_refinementt::add_symbol_to_symbol_map(
                rhs.id()==ID_array_of ||
                rhs.id()==ID_if ||
                (rhs.id()==ID_struct &&
-                refined_string_typet::is_refined_string_type(rhs.type())));
+                is_refined_string_type(rhs.type())));
 
   // We insert the mapped value of the rhs, if it exists.
   auto it=symbol_resolve.find(rhs);
@@ -279,7 +279,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
       return true;
     }
   }
-  if(refined_string_typet::is_refined_string_type(rhs.type()))
+  if(is_refined_string_type(rhs.type()))
   {
     exprt refined_rhs=generator.add_axioms_for_refined_string(rhs);
     add_symbol_to_symbol_map(lhs, refined_rhs);
@@ -302,7 +302,7 @@ bool string_refinementt::add_axioms_for_string_assigns(
 ///          last value that has been initialized.
 void string_refinementt::concretize_string(const exprt &expr)
 {
-  if(refined_string_typet::is_refined_string_type(expr.type()))
+  if(is_refined_string_type(expr.type()))
   {
     string_exprt str=to_string_expr(expr);
     exprt length=get(str.length());
@@ -392,7 +392,7 @@ void string_refinementt::concretize_lengths()
 {
   for(const auto &it : symbol_resolve)
   {
-    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    if(is_refined_string_type(it.second.type()))
     {
       string_exprt str=to_string_expr(it.second);
       exprt length=get(str.length());
@@ -403,7 +403,7 @@ void string_refinementt::concretize_lengths()
   }
   for(const auto &it : generator.created_strings)
   {
-    if(refined_string_typet::is_refined_string_type(it.type()))
+    if(is_refined_string_type(it.type()))
     {
       string_exprt str=to_string_expr(it);
       exprt length=get(str.length());
@@ -429,12 +429,10 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     // The assignment of a string equality to false is not supported.
     PRECONDITION(value || !is_char_array(rhs.type()));
-    PRECONDITION(value ||
-      !refined_string_typet::is_refined_string_type(rhs.type()));
+    PRECONDITION(value || !is_refined_string_type(rhs.type()));
 
     PRECONDITION(lhs.id()==ID_symbol || !is_char_array(rhs.type()));
-    PRECONDITION(lhs.id()==ID_symbol ||
-      !refined_string_typet::is_refined_string_type(rhs.type()));
+    PRECONDITION(lhs.id()==ID_symbol || !is_refined_string_type(rhs.type()));
 
     // If lhs is not a symbol, let supert::set_to() handle it.
     if(lhs.id()!=ID_symbol)
@@ -811,7 +809,7 @@ void string_refinementt::debug_model()
   const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
-    if(refined_string_typet::is_refined_string_type(it.second.type()))
+    if(is_refined_string_type(it.second.type()))
     {
       debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
       string_exprt refined=to_string_expr(it.second);
@@ -1684,8 +1682,7 @@ exprt string_refinementt::get(const exprt &expr) const
     if(it!=found_length.end())
       return get_array(ecopy, it->second);
   }
-  else if(refined_string_typet::is_refined_string_type(ecopy.type()) &&
-          ecopy.id()==ID_struct)
+  else if(is_refined_string_type(ecopy.type()) && ecopy.id()==ID_struct)
   {
     const string_exprt &string=to_string_expr(ecopy);
     const exprt &content=string.content();

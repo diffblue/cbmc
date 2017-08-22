@@ -252,7 +252,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   else
   {
     INVARIANT(
-      refined_string_typet::is_refined_string_type(c.type()),
+      is_refined_string_type(c.type()),
       string_refinement_invariantt("c can only be a (un)signedbv or a refined "
         "string and the (un)signedbv case is already handled"));
     string_exprt sub=get_string_expr(c);
