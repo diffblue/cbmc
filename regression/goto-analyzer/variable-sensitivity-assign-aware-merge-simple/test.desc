@@ -1,3 +1,14 @@
 CORE
 main.c
---function simple
+--function pointer_test --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[pointer_test.assertion.1\] file main.c line 41 function pointer_test, j==1: Success$
+^\[pointer_test.assertion.2\] file main.c line 42 function pointer_test, i==10: Success$
+^\[pointer_test.assertion.3\] file main.c line 47 function pointer_test, j==2: Success$
+^\[pointer_test.assertion.4\] file main.c line 48 function pointer_test, i==10: Success$
+^\[pointer_test.assertion.5\] file main.c line 53 function pointer_test, j==3: Success$
+^\[pointer_test.assertion.6\] file main.c line 54 function pointer_test, i==11: Unknown$
+^\[pointer_test.assertion.7\] file main.c line 59 function pointer_test, j==4: Success$
+^\[pointer_test.assertion.8\] file main.c line 60 function pointer_test, i==11: Unknown$
+--
