@@ -173,6 +173,13 @@ private:
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
+  friend exprt convert_exprt_to_string_exprt_unit_test(
+      java_string_library_preprocesst &preprocess,
+      const exprt &deref,
+      const source_locationt &loc,
+      symbol_tablet &symbol_table,
+      code_blockt &init_code);
+
   exprt convert_exprt_to_string_exprt(
     const exprt &deref,
     const source_locationt &loc,
