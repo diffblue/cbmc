@@ -28,20 +28,21 @@ bool java_is_array_type(const typet &type)
 
 unsigned java_local_variable_slots(const typet &t)
 {
+
+  // Even on a 64-bit platform, Java pointers occupy one slot:
+  if(t.id()==ID_pointer)
+    return 1;
+
   unsigned bitwidth;
 
   bitwidth=t.get_unsigned_int(ID_width);
   INVARIANT(
-    bitwidth==0 ||
     bitwidth==8 ||
     bitwidth==16 ||
     bitwidth==32 ||
     bitwidth==64,
     "all types constructed in java_types.cpp encode JVM types "
     "with these bit widths");
-  INVARIANT(
-    bitwidth!=0 || t.id()==ID_pointer,
-    "if bitwidth is 0, then this a reference to a class, which is 1 slot");
 
   return bitwidth==64 ? 2 : 1;
 }
