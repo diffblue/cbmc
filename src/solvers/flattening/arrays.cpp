@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arrays.h"
 
-#include <iostream>
-
 #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
@@ -19,6 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 arrayst::arrayst(
   const namespacet &_ns,
@@ -48,7 +50,9 @@ literalt arrayst::record_array_equality(
   if(!base_type_eq(op0.type(), op1.type(), ns))
   {
     prop.error() << equality.pretty() << messaget::eom;
-    DATA_INVARIANT(false, "record_array_equality got equality without matching types");
+    DATA_INVARIANT(
+      false,
+      "record_array_equality got equality without matching types");
   }
 
   DATA_INVARIANT(
@@ -133,7 +137,9 @@ void arrayst::collect_arrays(const exprt &a)
     if(!base_type_eq(array_type, update_expr.old().type(), ns))
     {
       prop.error() << a.pretty() << messaget::eom;
-      DATA_INVARIANT(false, "collect_arrays got 'update' without matching types");
+      DATA_INVARIANT(
+        false,
+        "collect_arrays got 'update' without matching types");
     }
 
     arrays.make_union(a, update_expr.old());
@@ -291,7 +297,7 @@ void arrayst::add_array_Ackermann_constraints()
 {
   // this is quadratic!
 
-#if 0
+#ifdef DEBUG
   std::cout << "arrays.size(): " << arrays.size() << '\n';
 #endif
 
@@ -300,7 +306,7 @@ void arrayst::add_array_Ackermann_constraints()
   {
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
-#if 0
+#ifdef DEBUG
     std::cout << "index_set.size(): " << index_set.size() << '\n';
 #endif
 
