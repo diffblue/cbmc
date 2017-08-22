@@ -1,0 +1,8 @@
+CORE
+main.c
+--function global_test --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[global_test.assertion.1\] file main.c line 67 function global_test, global==42: Success$
+^\[global_test.assertion.2\] file main.c line 70 function global_test, global==50: Unknown$
+--
