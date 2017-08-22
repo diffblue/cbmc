@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <java_bytecode/java_parse_options.h>
+
 #include "xml_interface.h"
 
 class bmct;
@@ -60,7 +62,7 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
   "(java-max-vla-length):(java-unwind-enum-static)" \
-  "(java-cp-include-files):" \
+  OPT_JAVA_INCLUDE_FILES \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
