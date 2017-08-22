@@ -7,6 +7,7 @@ Author: Daniel Kroening, kroening@kroening.com
 \*******************************************************************/
 
 #include "parse_options.h"
+#include "exception_utils.h"
 
 #include <iostream>
 
@@ -64,4 +65,32 @@ int parse_options_baset::main()
   install_signal_catcher();
 
   return doit();
+}
+
+int parse_optionst::main()
+{
+  // catch all exceptions here so that this code is not duplicated
+  // for each tool
+  try
+  {
+    return parse_options_baset::main();
+  }
+  catch(const system_exceptiont &e)
+  {
+    message.error() << e.what() << messaget::eom;
+  }
+  catch(const input_src_exceptiont &e)
+  {
+    message.error().source_location=e.source_location;
+    message.error() << e.what() << messaget::eom;
+  }
+  catch(const ui_exceptiont &e)
+  {
+    message.error() << e.what() << messaget::eom;
+  }
+  catch(const invariant_failedt &e)
+  {
+    message.error() << e.what() << messaget::eom;
+  }
+  return 6;
 }

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 
 #include "cmdline.h"
+#include "message.h"
 
 class parse_options_baset
 {
@@ -33,6 +34,25 @@ public:
 private:
   void unknown_option_msg();
   bool parse_result;
+};
+
+class parse_optionst: public parse_options_baset
+{
+public:
+  parse_optionst(
+    const std::string &optstring,
+    int argc,
+    const char **argv,
+    message_handlert &message_handler):
+    parse_options_baset(optstring, argc, argv),
+    message(message_handler)
+  {
+  }
+
+  int main() override;
+
+protected:
+  messaget message;
 };
 
 #endif // CPROVER_UTIL_PARSE_OPTIONS_H

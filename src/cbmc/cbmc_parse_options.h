@@ -72,7 +72,7 @@ class optionst;
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
 class cbmc_parse_optionst:
-  public parse_options_baset,
+  public parse_optionst,
   public xml_interfacet,
   public language_uit
 {
