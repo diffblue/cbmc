@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 
 #include <util/options.h>
+#include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
@@ -25,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/aig_prop.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <langapi/language_ui.h>
 #include <goto-symex/symex_target_equation.h>
 
 #include "bv_cbmc.h"
@@ -123,7 +123,7 @@ public:
   {
   }
 
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
 protected:
   const optionst &options;
@@ -131,7 +131,7 @@ protected:
   namespacet ns;
 
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 
   std::unique_ptr<solvert> get_default();
   std::unique_ptr<solvert> get_dimacs();

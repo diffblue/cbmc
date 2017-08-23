@@ -57,7 +57,7 @@ public:
   // additional stuff
   expr_listt bmc_constraints;
 
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
   virtual resultt operator()(
@@ -75,7 +75,7 @@ protected:
   prop_convt &prop_conv;
 
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);

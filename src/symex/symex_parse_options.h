@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 
-#include <langapi/language_ui.h>
-
 #include <analyses/goto_check.h>
 
 #include <java_bytecode/java_bytecode_language.h>

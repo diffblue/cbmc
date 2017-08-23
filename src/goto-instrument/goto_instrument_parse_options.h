@@ -15,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/remove_const_function_pointers.h>
@@ -82,7 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit();
@@ -90,7 +89,7 @@ public:
 
   goto_instrument_parse_optionst(int argc, const char **argv):
     parse_options_baset(GOTO_INSTRUMENT_OPTIONS, argc, argv),
-    language_uit(cmdline, ui_message_handler),
+    messaget(ui_message_handler),
     ui_message_handler(cmdline, "goto-instrument"),
     function_pointer_removal_done(false),
     partial_inlining_done(false),

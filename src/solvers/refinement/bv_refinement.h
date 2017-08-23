@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
-#include <langapi/language_ui.h>
+#include <util/ui_message.h>
 
 #include <solvers/flattening/bv_pointers.h>
 
@@ -114,7 +114,7 @@ private:
 
 protected:
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
