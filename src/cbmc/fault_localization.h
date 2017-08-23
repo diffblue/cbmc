@@ -15,7 +15,6 @@ Author: Peter Schrammel
 #include <util/namespace.h>
 #include <util/options.h>
 #include <util/threeval.h>
-#include <langapi/language_ui.h>
 
 #include <goto-symex/symex_target_equation.h>
 

@@ -18,6 +18,8 @@ Date: June 2006
 
 #include "goto_cc_mode.h"
 
+#include <set>
+
 class gcc_modet:public goto_cc_modet
 {
 public:

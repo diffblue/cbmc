@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <langapi/language_ui.h>
-
 #include <analyses/goto_check.h>
 
 #include <java_bytecode/java_bytecode_language.h>

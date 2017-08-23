@@ -14,9 +14,9 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_GOTO_CC_MODE_H
 #define CPROVER_GOTO_CC_GOTO_CC_MODE_H
 
-#include <langapi/language_ui.h>
-
 #include "goto_cc_cmdline.h"
+
+#include <util/message.h>
 
 class goto_cc_modet:public messaget
 {

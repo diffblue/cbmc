@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
-#include <langapi/language_ui.h>
+#include <util/ui_message.h>
 
 #include <solvers/flattening/bv_pointers.h>
 
@@ -42,7 +42,7 @@ public:
 
   using bv_pointerst::is_in_conflict;
 
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
 protected:
   resultt prop_solve();
@@ -113,7 +113,7 @@ protected:
   bvt parent_assumptions;
 
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
