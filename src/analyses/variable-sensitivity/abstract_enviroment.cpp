@@ -852,5 +852,14 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
       }
     }
   }
+
+  for(const auto &entry : second.map)
+  {
+    const auto &second_entry = first.map.find(entry.first);
+    if (second_entry==first.map.end())
+    {
+      symbols_diff.push_back(entry.first);
+    }
+  }
   return symbols_diff;
 }
