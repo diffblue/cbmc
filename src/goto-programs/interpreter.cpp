@@ -249,7 +249,7 @@ void interpretert::step()
   steps.add_step(goto_trace_stept());
   goto_trace_stept &trace_step=steps.get_last_step();
   trace_step.thread_nr=thread_id;
-  trace_step.set_pc(pc);
+  trace_step.pc=pc;
   switch(pc->type)
   {
   case GOTO:
