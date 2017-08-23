@@ -3720,8 +3720,6 @@ public:
   }
 
   bool value_is_zero_string() const;
-
-  static constant_exprt integer_constant(unsigned v);
 };
 
 
