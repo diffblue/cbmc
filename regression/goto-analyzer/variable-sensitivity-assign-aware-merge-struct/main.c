@@ -11,10 +11,9 @@ void param_function(struct human a_human)
     __CPROVER_assert(a_human.height==1.80,  "a_human.height==1.80"); 
 }
 
-void param_function_mod(struct human *a_human)
+void param_function_val(struct human *a_human, int val)
 {
-    a_human->age = 10; 
-    __CPROVER_assert(a_human->age==10,  "a_human.age==10");
+    a_human->age = val; 
 }
 
 
@@ -25,10 +24,15 @@ void pass_param()
     human_instance.height = 1.80f;
     __CPROVER_assert(human_instance.age==24,  "human_instance.age==24");
     __CPROVER_assert(human_instance.height==1.80f,  "human_instance.height==1.80"); 
-    param_function_mod(&human_instance);
+    param_function_val(&human_instance, 10);
 
     __CPROVER_assert(human_instance.age==10,  "human_instance.age==10");
     __CPROVER_assert(human_instance.age==24,  "human_instance.age==24");
+    __CPROVER_assert(human_instance.height==1.80f,  "human_instance.height==1.80");
+
+    param_function_val(&human_instance, 32);
+    __CPROVER_assert(human_instance.age==32,  "human_instance.age==32");
+    __CPROVER_assert(human_instance.age==10,  "human_instance.age==10");
     __CPROVER_assert(human_instance.height==1.80f,  "human_instance.height==1.80");
 }
 
