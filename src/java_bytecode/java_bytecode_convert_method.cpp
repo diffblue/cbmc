@@ -1252,7 +1252,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt catch_var=
         tmp_variable(
           "caught_exception",
-          pointer_typet(catch_type));
+          java_reference_type(catch_type));
       stack.push_back(catch_var);
       code_landingpadt catch_statement(catch_var);
       catch_instruction=catch_statement;

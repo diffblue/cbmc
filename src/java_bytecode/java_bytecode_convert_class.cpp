@@ -306,12 +306,12 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
       id2string(symbol_type.get_identifier())+".clone:()Ljava/lang/Object;";
     code_typet clone_type;
     clone_type.return_type()=
-      pointer_typet(symbol_typet("java::java.lang.Object"));
+      java_reference_type(symbol_typet("java::java.lang.Object"));
     code_typet::parametert this_param;
     this_param.set_identifier(id2string(clone_name)+"::this");
     this_param.set_base_name("this");
     this_param.set_this();
-    this_param.type()=pointer_typet(symbol_type);
+    this_param.type()=java_reference_type(symbol_type);
     clone_type.parameters().push_back(this_param);
 
     parameter_symbolt this_symbol;
@@ -328,7 +328,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     local_symbol.name=local_name;
     local_symbol.base_name="cloned_array";
     local_symbol.pretty_name=local_symbol.base_name;
-    local_symbol.type=pointer_typet(symbol_type);
+    local_symbol.type=java_reference_type(symbol_type);
     local_symbol.mode=ID_java;
     symbol_table.add(local_symbol);
     const auto &local_symexpr=local_symbol.symbol_expr();
@@ -340,7 +340,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
 
     side_effect_exprt java_new_array(
       ID_java_new_array,
-      pointer_typet(symbol_type));
+      java_reference_type(symbol_type));
     dereference_exprt old_array(this_symbol.symbol_expr(), symbol_type);
     dereference_exprt new_array(local_symexpr, symbol_type);
     member_exprt old_length(old_array, comp1.get_name(), comp1.type());
