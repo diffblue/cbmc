@@ -23,13 +23,6 @@
 /// \return true if \a base is of type \a T
 template<typename T> bool check_expr_type(const exprt &base);
 
-template<typename T> struct remove_constt;
-template<typename T> struct remove_constt<const T> { using type=T; };
-template<typename T> struct ptr_typet;
-template<typename T> struct ptr_typet<T *> { using type=T; };
-template<typename T> struct ref_typet;
-template<typename T> struct ref_typet<T &> { using type=T; };
-
 
 /// \brief Cast a constant pointer to a generic exprt to a specific derived
 ///   class
@@ -42,7 +35,7 @@ T expr_dynamic_cast(const exprt *base)
 {
   return expr_dynamic_cast<
     T,
-    typename remove_constt<typename ptr_typet<T>::type>::type,
+    typename std::remove_const<typename std::remove_pointer<T>::type>::type,
     const exprt>(base);
 }
 
@@ -54,7 +47,10 @@ T expr_dynamic_cast(const exprt *base)
 template<typename T>
 T expr_dynamic_cast(exprt *base)
 {
-  return expr_dynamic_cast<T, typename ptr_typet<T>::type, exprt>(base);
+  return expr_dynamic_cast<
+    T,
+    typename std::remove_const<typename std::remove_pointer<T>::type>::type,
+    exprt>(base);
 }
 
 /// \brief Cast a pointer to a generic exprt to a specific derived class
@@ -66,6 +62,9 @@ T expr_dynamic_cast(exprt *base)
 template<typename T, typename TUnderlying, typename TExpr>
 T expr_dynamic_cast(TExpr *base)
 {
+  static_assert(
+    std::is_pointer<T>::value,
+    "Tried to convert exprt * to non-pointer type");
   static_assert(
     std::is_base_of<exprt, TUnderlying>::value,
     "The template argument T must be derived from exprt.");
@@ -89,7 +88,7 @@ T expr_dynamic_cast(const exprt &base)
 {
   return expr_dynamic_cast<
     T,
-    typename remove_constt<typename ref_typet<T>::type>::type,
+    typename std::remove_const<typename std::remove_reference<T>::type>::type,
     const exprt>(base);
 }
 
@@ -101,7 +100,10 @@ T expr_dynamic_cast(const exprt &base)
 template<typename T>
 T expr_dynamic_cast(exprt &base)
 {
-  return expr_dynamic_cast<T, typename ref_typet<T>::type, exprt>(base);
+  return expr_dynamic_cast<
+    T,
+    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    exprt>(base);
 }
 
 /// \brief Cast a reference to a generic exprt to a specific derived class
@@ -113,6 +115,9 @@ T expr_dynamic_cast(exprt &base)
 template<typename T, typename TUnderlying, typename TExpr>
 T expr_dynamic_cast(TExpr &base)
 {
+  static_assert(
+    std::is_reference<T>::value,
+    "Tried to convert exprt & to non-reference type");
   static_assert(
     std::is_base_of<exprt, TUnderlying>::value,
     "The template argument T must be derived from exprt.");
