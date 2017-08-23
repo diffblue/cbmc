@@ -1075,7 +1075,7 @@ void instrument_cover_goals(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    std::string curr_function = id2string(i_it->function);
+    std::string curr_function=id2string(i_it->function);
 
     // if the --cover-function-only flag is set, then we only add coverage
     // instrumentation for the entry function
