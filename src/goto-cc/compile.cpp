@@ -632,7 +632,8 @@ bool compilet::parse_source(const std::string &file_name)
     return true;
 
   if((has_suffix(file_name, ".class") ||
-      has_suffix(file_name, ".jar")) &&
+      has_suffix(file_name, ".jar") ||
+      has_suffix(file_name, ".war")) &&
      final())
     return true;
 
