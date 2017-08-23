@@ -346,7 +346,7 @@ sharing_ptrt<pointer_abstract_objectt>
         environment.eval(value, ns);
       abstract_object_pointert modified_value=
         environment.write(pointed_value, new_value, stack, ns, merging_write);
-        environment.assign(value, modified_value, ns);
+      environment.assign(value, modified_value, ns);
 
       // but the pointer itself does not change!
     }

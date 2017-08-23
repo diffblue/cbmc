@@ -182,7 +182,6 @@ sharing_ptrt<struct_abstract_objectt>
         member_expr.compound().type(), false, true));
   }
 
-  // we only handle one level currently
   if(!stack.empty())
   {
     internal_sharing_ptrt<full_struct_abstract_objectt> copy(
