@@ -692,7 +692,7 @@ void interpretert::execute_assign()
 
 /// sets the memory at address with the given rhs value (up to sizeof(rhs))
 void interpretert::assign(
-  mp_integer address,
+  const mp_integer &address,
   const mp_vectort &rhs)
 {
   for(size_t i=0; i<rhs.size(); i++)
