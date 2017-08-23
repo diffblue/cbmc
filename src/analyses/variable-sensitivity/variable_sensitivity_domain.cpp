@@ -370,6 +370,17 @@ bool variable_sensitivity_domaint::is_top() const
   return abstract_state.is_top();
 }
 
+/// Get symbols that have been modified since this domain and other
+/// \param other: The domain that things may have been modified in
+/// \return A list of symbols whose write location is different
+std::vector<symbol_exprt>
+  variable_sensitivity_domaint::get_modified_symbols(
+    const variable_sensitivity_domaint &other) const
+{
+  return abstract_environmentt::modified_symbols(
+    abstract_state, other.abstract_state);
+}
+
 /*******************************************************************\
 
 Function: variable_sensitivity_domaint::transform_function_call
@@ -532,34 +543,58 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
   ignored_internal_function.cend();
 }
 
+/// Perform a context aware merge of the changes that have been applied
+/// between function_start and the current state. Anything that has not been
+/// modified will be taken from the \p function_call domain.
+/// \param function_call: The local of the merge - values from here will be
+///   taken if they have not been modified
+/// \param function_start: THe base of the merge - changes that have been made
+///   between here and this will be retained.
+/// \param ns: The global namespace
 void variable_sensitivity_domaint::merge_three_way_function_return(
+  const ai_domain_baset &function_call,
   const ai_domain_baset &function_start,
   const ai_domain_baset &function_end,
   const namespacet &ns)
 {
-//  const variable_sensitivity_domaint &cast_function_call_site=
-//    static_cast<const variable_sensitivity_domaint &>(function_call_site);
+  // TODO(tkiley): flag to turn of the context aware merge
+  if(true)
+  {
+    const variable_sensitivity_domaint &cast_function_call=
+      static_cast<const variable_sensitivity_domaint &>(function_call);
 
-  const variable_sensitivity_domaint &cast_function_start=
-    static_cast<const variable_sensitivity_domaint &>(function_start);
+    const variable_sensitivity_domaint &cast_function_start=
+      static_cast<const variable_sensitivity_domaint &>(function_start);
 
-  const variable_sensitivity_domaint &cast_function_end=
-    static_cast<const variable_sensitivity_domaint &>(function_end);
+    const variable_sensitivity_domaint &cast_function_end=
+      static_cast<const variable_sensitivity_domaint &>(function_end);
 
-  const std::vector<symbol_exprt> &modified_symbols=
-    cast_function_start.get_modified_symbols(cast_function_end);
+    const std::vector<symbol_exprt> &modified_symbols=
+      cast_function_start.get_modified_symbols(cast_function_end);
 
-  apply_domain(modified_symbols, cast_function_end, ns);
+    abstract_state=cast_function_call.abstract_state;
+    apply_domain(modified_symbols, cast_function_end, ns);
+  }
+  else
+  {
+    ai_domain_baset::merge_three_way_function_return(
+      function_call, function_start, function_end, ns);
+  }
 }
 
+/// Given a domain and some symbols, apply those symbols values
+/// to the current domain
+/// \param modified_symbols: The symbols to write
+/// \param source: The domain to take the values from
+/// \param ns: The global namespace
 void variable_sensitivity_domaint::apply_domain(
   std::vector<symbol_exprt> modified_symbols,
   const variable_sensitivity_domaint &source,
   const namespacet &ns)
 {
-    for (const auto &symbol : modified_symbols)
-    {
-        auto value = source.abstract_state.eval(symbol, ns);
-        this->abstract_state.assign(symbol, value, ns);
-    }
+  for (const auto &symbol : modified_symbols)
+  {
+    abstract_object_pointert value=source.abstract_state.eval(symbol, ns);
+    abstract_state.assign(symbol, value, ns);
+  }
 }
