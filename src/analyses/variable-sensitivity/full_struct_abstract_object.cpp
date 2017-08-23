@@ -182,11 +182,13 @@ sharing_ptrt<struct_abstract_objectt>
         member_expr.compound().type(), false, true));
   }
 
+  internal_sharing_ptrt<full_struct_abstract_objectt> copy(
+    new full_struct_abstract_objectt(*this));
+
+  copy->set_last_written_locations(value->get_last_written_locations());
+
   if(!stack.empty())
   {
-    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
-      new full_struct_abstract_objectt(*this));
-
     abstract_object_pointert starting_value;
     irep_idt c=member_expr.get_component_name();
     if(map.find(c)==map.cend())
@@ -208,8 +210,6 @@ sharing_ptrt<struct_abstract_objectt>
   }
   else
   {
-    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
-      new full_struct_abstract_objectt(*this));
 
 #ifdef DEBUG
     std::cout << "Setting component" << std::endl;
@@ -244,7 +244,6 @@ sharing_ptrt<struct_abstract_objectt>
     else
     {
       copy->map[c]=value;
-
       copy->top=false;
       assert(!copy->is_bottom());
     }
