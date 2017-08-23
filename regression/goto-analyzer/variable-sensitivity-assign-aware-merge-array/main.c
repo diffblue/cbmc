@@ -50,5 +50,7 @@ void pass_param()
     __CPROVER_assert(b[1]==1,  "b[1]==1");
     param_test_val(b, 6);
      __CPROVER_assert(b[1]==5,  "b[1]==5");
+     __CPROVER_assert(b[1]==6,  "b[1]==6");
      __CPROVER_assert(b[0]==0,  "b[0]==0");
+     __CPROVER_assert(b[8]==8,  "b[8]==8");
 }

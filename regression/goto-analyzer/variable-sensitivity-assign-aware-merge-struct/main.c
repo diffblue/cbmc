@@ -28,6 +28,7 @@ void pass_param()
     param_function_mod(&human_instance);
 
     __CPROVER_assert(human_instance.age==10,  "human_instance.age==10");
+    __CPROVER_assert(human_instance.age==24,  "human_instance.age==24");
     __CPROVER_assert(human_instance.height==1.80f,  "human_instance.height==1.80");
 }
 
