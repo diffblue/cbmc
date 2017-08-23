@@ -3,9 +3,12 @@ main.c
 --function pass_param --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[pass_param.assertion.1\] file main.c line 26 function pass_param, human_instance.age==24: Success$
-^\[pass_param.assertion.2\] file main.c line 27 function pass_param, human_instance.height==1.80: Success$
-^\[pass_param.assertion.3\] file main.c line 30 function pass_param, human_instance.age==10: Success$
-^\[pass_param.assertion.4\] file main.c line 31 function pass_param, human_instance.age==24: Failure \(if reachable\)$
-^\[pass_param.assertion.5\] file main.c line 32 function pass_param, human_instance.height==1.80: Success$
+^\[pass_param.assertion.1\] .* human_instance.age==24: Success$
+^\[pass_param.assertion.2\] .* human_instance.height==1.80: Success$
+^\[pass_param.assertion.3\] .* human_instance.age==10: Success$
+^\[pass_param.assertion.4\] .* human_instance.age==24: Failure \(if reachable\)$
+^\[pass_param.assertion.5\] .* human_instance.height==1.80: Success$
+^\[pass_param.assertion.6\] .* human_instance.age==32: Unknown$
+^\[pass_param.assertion.7\] .* human_instance.age==10: Unknown$
+^\[pass_param.assertion.8\] .* human_instance.height==1.80: Success$
 --
