@@ -261,6 +261,18 @@ void fileutl_create_directory(std::string const &pathname)
   }
 }
 
+void fileutl_delete_directory(std::string const &pathname)
+{
+  if(fileutl_is_directory(pathname))
+  {
+# if defined(WIN32)
+    os::system((std::string("rd /s /q \") + pathname + "\"").c_str());
+#else
+    std::system((std::string("rm -rf \"") + pathname + "\"").c_str());
+#endif
+  }
+}
+
 std::string fileutl_concatenate_file_paths(
   std::string const &left_path,
   std::string const &right_path)

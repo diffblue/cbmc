@@ -39,6 +39,7 @@ std::string fileutl_parse_path_in_pathname(std::string const &file_pathname);
 std::string fileutl_remove_extension(std::string const &filename);
 
 void fileutl_create_directory(std::string const &pathname);
+void fileutl_delete_directory(std::string const &pathname);
 
 std::string fileutl_concatenate_file_paths(
   std::string const &left_path,
