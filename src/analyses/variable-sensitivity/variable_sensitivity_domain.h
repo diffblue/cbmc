@@ -99,6 +99,11 @@ public:
     locationt from,
     locationt to);
 
+  void merge_three_way_function_return(
+    const ai_domain_baset &function_start,
+    const ai_domain_baset &function_end,
+    const namespacet &ns) override;
+
   bool ai_simplify(
     exprt &condition,
     const namespacet &ns) const override;
@@ -106,13 +111,16 @@ public:
   bool is_bottom() const override;
   bool is_top() const override;
 
-  virtual std::vector<symbol_exprt> get_modified_symbols(const variable_sensitivity_domaint &other) const
+  std::vector<symbol_exprt> get_modified_symbols(const variable_sensitivity_domaint &other) const
   {
     return abstract_environmentt::modified_symbols(abstract_state, other.abstract_state);
   }
 
-  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols,  
-    variable_sensitivity_domaint &target, const namespacet &ns) const;
+
+  virtual void apply_domain(
+    std::vector<symbol_exprt> modified_symbols,
+    const variable_sensitivity_domaint &target,
+    const namespacet &ns);
 
 private:
   void transform_function_call(

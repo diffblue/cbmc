@@ -529,16 +529,37 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
   };
 
   return ignored_internal_function.find(function_id)!=
-    ignored_internal_function.cend();
+  ignored_internal_function.cend();
 }
 
-void variable_sensitivity_domaint::restore_domain(std::vector<symbol_exprt> modified_symbols,   
-  variable_sensitivity_domaint &target,
-  const namespacet &ns) const
+void variable_sensitivity_domaint::merge_three_way_function_return(
+  const ai_domain_baset &function_start,
+  const ai_domain_baset &function_end,
+  const namespacet &ns)
+{
+//  const variable_sensitivity_domaint &cast_function_call_site=
+//    static_cast<const variable_sensitivity_domaint &>(function_call_site);
+
+  const variable_sensitivity_domaint &cast_function_start=
+    static_cast<const variable_sensitivity_domaint &>(function_start);
+
+  const variable_sensitivity_domaint &cast_function_end=
+    static_cast<const variable_sensitivity_domaint &>(function_end);
+
+  const std::vector<symbol_exprt> &modified_symbols=
+    cast_function_start.get_modified_symbols(cast_function_end);
+
+  apply_domain(modified_symbols, cast_function_end, ns);
+}
+
+void variable_sensitivity_domaint::apply_domain(
+  std::vector<symbol_exprt> modified_symbols,
+  const variable_sensitivity_domaint &source,
+  const namespacet &ns)
 {
     for (const auto &symbol : modified_symbols)
     {
-        auto value = abstract_state.eval(symbol, ns);
-        target.abstract_state.assign(symbol, value, ns);
+        auto value = source.abstract_state.eval(symbol, ns);
+        this->abstract_state.assign(symbol, value, ns);
     }
 }
