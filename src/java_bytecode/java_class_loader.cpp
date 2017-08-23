@@ -109,7 +109,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   for(const auto &cp : config.java.classpath)
   {
     // in a JAR?
-    if(has_suffix(cp, ".jar"))
+    if(has_suffix(cp, ".jar") || has_suffix(cp, ".war"))
     {
       read_jar_file(class_loader_limit, cp);
 
@@ -119,7 +119,7 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
 
       if(jm_it!=jm.entries.end())
       {
-        debug() << "Getting class `" << class_name << "' from JAR "
+        debug() << "Getting class `" << class_name << "' from {J,W}AR "
                 << cp << eom;
 
         std::string data=jar_pool(class_loader_limit, cp)
