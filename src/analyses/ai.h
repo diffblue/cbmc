@@ -106,13 +106,15 @@ public:
     exprt &condition,
     const namespacet &ns) const;
 
+  // Applies the changes between the start and end to the domain
   virtual void merge_three_way_function_return(
+    const ai_domain_baset &function_call,
     const ai_domain_baset &function_start,
     const ai_domain_baset &function_end,
     const namespacet &ns)
   {
-    // Do nothing - the result of the merge is to take
-    // all the changes in the "remote" version
+    // Take the state at the end of the function as a over-approximation
+    // of applying the changes in the function
   }
 
 };
