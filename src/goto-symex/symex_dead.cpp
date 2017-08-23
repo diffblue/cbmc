@@ -45,12 +45,7 @@ void goto_symext::symex_dead(statet &state)
     exprt rhs;
 
     if(failed.is_not_nil())
-    {
-      address_of_exprt address_of_expr;
-      address_of_expr.object()=failed;
-      address_of_expr.type()=code.op0().type();
-      rhs=address_of_expr;
-    }
+      rhs=address_of_exprt(failed, to_pointer_type(code.op0().type()));
     else
       rhs=exprt(ID_invalid);
 

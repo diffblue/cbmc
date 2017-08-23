@@ -78,7 +78,8 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
         {
-          pointer_typet pointer_type;
+          pointer_typet pointer_type=
+            to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
             from_integer(step_size*index+address, index_type()), pointer_type);
@@ -114,7 +115,8 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
-            pointer_typet pointer_type;
+            pointer_typet pointer_type=
+              to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
               from_integer(address+offset, index_type()), pointer_type);

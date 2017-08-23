@@ -103,8 +103,8 @@ codet java_bytecode_instrumentt::throw_exception(
       get_message_handler());
   }
 
-  pointer_typet exc_ptr_type;
-  exc_ptr_type.subtype()=symbol_typet(exc_class_name);
+  pointer_typet exc_ptr_type=
+    pointer_type(symbol_typet(exc_class_name));
 
   // Allocate and throw an instance of the exception class:
 
