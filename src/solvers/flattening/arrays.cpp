@@ -8,8 +8,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arrays.h"
 
-#include <iostream>
-
 #include <langapi/language_util.h>
 
 #include <util/std_expr.h>
@@ -19,6 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/namespace.h>
 
 #include <solvers/prop/prop.h>
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 arrayst::arrayst(
   const namespacet &_ns,
@@ -295,7 +297,7 @@ void arrayst::add_array_Ackermann_constraints()
 {
   // this is quadratic!
 
-#if 0
+#ifdef DEBUG
   std::cout << "arrays.size(): " << arrays.size() << '\n';
 #endif
 
@@ -304,7 +306,7 @@ void arrayst::add_array_Ackermann_constraints()
   {
     const index_sett &index_set=index_map[arrays.find_number(i)];
 
-#if 0
+#ifdef DEBUG
     std::cout << "index_set.size(): " << index_set.size() << '\n';
 #endif
 
