@@ -164,7 +164,8 @@ void symex_parse_optionst::report_cover(
                 json_objectt json_input;
                 json_input["id"]=json_stringt(id2string(step.io_id));
                 if(step.io_args.size()==1)
-                  json_input["value"]=json(step.io_args.front(), ns);
+                  json_input["value"]=
+                    json(step.io_args.front(), ns, ID_unknown);
                 json_test.push_back(json_input);
               }
             }

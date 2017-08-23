@@ -192,7 +192,7 @@ void convert(
           DATA_INVARIANT(
             step.full_lhs_value.is_not_nil(),
             "full_lhs_value in assignment must not be nil");
-          full_lhs_value=json(step.full_lhs_value, ns);
+          full_lhs_value=json(step.full_lhs_value, ns, ID_unknown);
         }
 
         json_assignment["value"]=full_lhs_value;
