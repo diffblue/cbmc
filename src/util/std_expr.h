@@ -83,7 +83,7 @@ template<> inline bool check_expr_type<transt>(const exprt &base)
 {
   return base.id()==ID_trans;
 }
-template<> inline void validate_expr<transt>(const transt &value)
+inline void validate_expr(const transt &value)
 {
   validate_operands(value, 3, "Transition systems must have three operands");
 }
@@ -232,7 +232,7 @@ template<> inline bool check_expr_type<symbol_exprt>(const exprt &base)
 {
   return base.id()==ID_symbol;
 }
-template<> inline void validate_expr<symbol_exprt>(const symbol_exprt &value)
+inline void validate_expr(const symbol_exprt &value)
 {
   validate_operands(value, 0, "Symbols must not have operands");
 }
@@ -373,7 +373,7 @@ template<> inline bool check_expr_type<abs_exprt>(const exprt &base)
 {
   return base.id()==ID_abs;
 }
-template<> inline void validate_expr<abs_exprt>(const abs_exprt &value)
+inline void validate_expr(const abs_exprt &value)
 {
   validate_operands(value, 1, "Absolute value must have one operand");
 }
@@ -436,8 +436,7 @@ template<> inline bool check_expr_type<unary_minus_exprt>(const exprt &base)
 {
   return base.id()==ID_unary_minus;
 }
-template<>
-inline void validate_expr<unary_minus_exprt>(const unary_minus_exprt &value)
+inline void validate_expr(const unary_minus_exprt &value)
 {
   validate_operands(value, 1, "Unary minus must have one operand");
 }
@@ -819,7 +818,7 @@ template<> inline bool check_expr_type<plus_exprt>(const exprt &base)
 {
   return base.id()==ID_plus;
 }
-template<> inline void validate_expr<plus_exprt>(const plus_exprt &value)
+inline void validate_expr(const plus_exprt &value)
 {
   validate_operands(value, 2, "Plus must have two or more operands", true);
 }
@@ -877,7 +876,7 @@ template<> inline bool check_expr_type<minus_exprt>(const exprt &base)
 {
   return base.id()==ID_minus;
 }
-template<> inline void validate_expr<minus_exprt>(const minus_exprt &value)
+inline void validate_expr(const minus_exprt &value)
 {
   validate_operands(value, 2, "Minus must have two or more operands", true);
 }
@@ -935,7 +934,7 @@ template<> inline bool check_expr_type<mult_exprt>(const exprt &base)
 {
   return base.id()==ID_mult;
 }
-template<> inline void validate_expr<mult_exprt>(const mult_exprt &value)
+inline void validate_expr(const mult_exprt &value)
 {
   validate_operands(value, 2, "Multiply must have two or more operands", true);
 }
@@ -993,7 +992,7 @@ template<> inline bool check_expr_type<div_exprt>(const exprt &base)
 {
   return base.id()==ID_div;
 }
-template<> inline void validate_expr<div_exprt>(const div_exprt &value)
+inline void validate_expr(const div_exprt &value)
 {
   validate_operands(value, 2, "Divide must have two operands");
 }
@@ -1047,7 +1046,7 @@ template<> inline bool check_expr_type<mod_exprt>(const exprt &base)
 {
   return base.id()==ID_mod;
 }
-template<> inline void validate_expr<mod_exprt>(const mod_exprt &value)
+inline void validate_expr(const mod_exprt &value)
 {
   validate_operands(value, 2, "Modulo must have two operands");
 }
@@ -1101,7 +1100,7 @@ template<> inline bool check_expr_type<rem_exprt>(const exprt &base)
 {
   return base.id()==ID_rem;
 }
-template<> inline void validate_expr<rem_exprt>(const rem_exprt &value)
+inline void validate_expr(const rem_exprt &value)
 {
   validate_operands(value, 2, "Remainder must have two operands");
 }
@@ -1155,7 +1154,7 @@ template<> inline bool check_expr_type<power_exprt>(const exprt &base)
 {
   return base.id()==ID_power;
 }
-template<> inline void validate_expr<power_exprt>(const power_exprt &value)
+inline void validate_expr(const power_exprt &value)
 {
   validate_operands(value, 2, "Power must have two operands");
 }
@@ -1214,9 +1213,7 @@ template<> inline bool check_expr_type<factorial_power_exprt>(
 {
   return base.id()==ID_factorial_power;
 }
-template<>
-inline void validate_expr<factorial_power_exprt>(
-  const factorial_power_exprt &value)
+inline void validate_expr(const factorial_power_exprt &value)
 {
   validate_operands(value, 2, "Factorial power must have two operands");
 }
@@ -1268,7 +1265,7 @@ template<> inline bool check_expr_type<equal_exprt>(const exprt &base)
 {
   return base.id()==ID_equal;
 }
-template<> inline void validate_expr<equal_exprt>(const equal_exprt &value)
+inline void validate_expr(const equal_exprt &value)
 {
   validate_operands(value, 2, "Equality must have two operands");
 }
@@ -1324,8 +1321,7 @@ template<> inline bool check_expr_type<notequal_exprt>(const exprt &base)
 {
   return base.id()==ID_notequal;
 }
-template<>
-inline void validate_expr<notequal_exprt>(const notequal_exprt &value)
+inline void validate_expr(const notequal_exprt &value)
 {
   validate_operands(value, 2, "Inequality must have two operands");
 }
@@ -1417,7 +1413,7 @@ template<> inline bool check_expr_type<index_exprt>(const exprt &base)
 {
   return base.id()==ID_index;
 }
-template<> inline void validate_expr<index_exprt>(const index_exprt &value)
+inline void validate_expr(const index_exprt &value)
 {
   validate_operands(value, 2, "Array index must have two operands");
 }
@@ -1484,8 +1480,7 @@ template<> inline bool check_expr_type<array_of_exprt>(const exprt &base)
 {
   return base.id()==ID_array_of;
 }
-template<>
-inline void validate_expr<array_of_exprt>(const array_of_exprt &value)
+inline void validate_expr(const array_of_exprt &value)
 {
   validate_operands(value, 1, "'Array of' must have one operand");
 }
@@ -1662,7 +1657,7 @@ template<> inline bool check_expr_type<union_exprt>(const exprt &base)
 {
   return base.id()==ID_union;
 }
-template<> inline void validate_expr<union_exprt>(const union_exprt &value)
+inline void validate_expr(const union_exprt &value)
 {
   validate_operands(value, 1, "Union constructor must have one operand");
 }
@@ -1790,7 +1785,7 @@ template<> inline bool check_expr_type<complex_exprt>(const exprt &base)
 {
   return base.id()==ID_complex;
 }
-template<> inline void validate_expr<complex_exprt>(const complex_exprt &value)
+inline void validate_expr(const complex_exprt &value)
 {
   validate_operands(value, 2, "Complex constructor must have two operands");
 }
@@ -1883,9 +1878,7 @@ inline bool check_expr_type<object_descriptor_exprt>(const exprt &base)
 {
   return base.id()==ID_object_descriptor;
 }
-template<>
-inline void validate_expr<object_descriptor_exprt>(
-  const object_descriptor_exprt &value)
+inline void validate_expr(const object_descriptor_exprt &value)
 {
   validate_operands(value, 2, "Object descriptor must have two operands");
 }
@@ -1962,9 +1955,7 @@ template<> inline bool check_expr_type<dynamic_object_exprt>(const exprt &base)
 {
   return base.id()==ID_dynamic_object;
 }
-template<>
-inline void validate_expr<dynamic_object_exprt>(
-  const dynamic_object_exprt &value)
+inline void validate_expr(const dynamic_object_exprt &value)
 {
   validate_operands(value, 2, "Dynamic object must have two operands");
 }
@@ -2032,8 +2023,7 @@ template<> inline bool check_expr_type<typecast_exprt>(const exprt &base)
 {
   return base.id()==ID_typecast;
 }
-template<>
-inline void validate_expr<typecast_exprt>(const typecast_exprt &value)
+inline void validate_expr(const typecast_exprt &value)
 {
   validate_operands(value, 1, "Typecast must have one operand");
 }
@@ -2112,9 +2102,7 @@ inline bool check_expr_type<floatbv_typecast_exprt>(const exprt &base)
 {
   return base.id()==ID_floatbv_typecast;
 }
-template<>
-inline void validate_expr<floatbv_typecast_exprt>(
-  const floatbv_typecast_exprt &value)
+inline void validate_expr(const floatbv_typecast_exprt &value)
 {
   validate_operands(value, 2, "Float typecast must have two operands");
 }
@@ -2198,7 +2186,7 @@ template<> inline bool check_expr_type<and_exprt>(const exprt &base)
 {
   return base.id()==ID_and;
 }
-// template<> inline void validate_expr<and_exprt>(const and_exprt &value)
+// inline void validate_expr(const and_exprt &value)
 // {
 //   validate_operands(value, 2, "And must have two or more operands", true);
 // }
@@ -2250,7 +2238,7 @@ template<> inline bool check_expr_type<implies_exprt>(const exprt &base)
 {
   return base.id()==ID_implies;
 }
-template<> inline void validate_expr<implies_exprt>(const implies_exprt &value)
+inline void validate_expr(const implies_exprt &value)
 {
   validate_operands(value, 2, "Implies must have two operands");
 }
@@ -2334,7 +2322,7 @@ template<> inline bool check_expr_type<or_exprt>(const exprt &base)
 {
   return base.id()==ID_or;
 }
-// template<> inline void validate_expr<or_exprt>(const or_exprt &value)
+// inline void validate_expr(const or_exprt &value)
 // {
 //   validate_operands(value, 2, "Or must have two or more operands", true);
 // }
@@ -2388,7 +2376,7 @@ template<> inline bool check_expr_type<bitnot_exprt>(const exprt &base)
 {
   return base.id()==ID_bitnot;
 }
-// template<> inline void validate_expr<bitnot_exprt>(const bitnot_exprt &value)
+// inline void validate_expr(const bitnot_exprt &value)
 // {
 //   validate_operands(value, 1, "Bit-wise not must have one operand");
 // }
@@ -2445,7 +2433,7 @@ template<> inline bool check_expr_type<bitor_exprt>(const exprt &base)
 {
   return base.id()==ID_bitor;
 }
-// template<> inline void validate_expr<bitor_exprt>(const bitor_exprt &value)
+// inline void validate_expr(const bitor_exprt &value)
 // {
 //   validate_operands(
 //     value,
@@ -2505,7 +2493,7 @@ template<> inline bool check_expr_type<bitxor_exprt>(const exprt &base)
 {
   return base.id()==ID_bitxor;
 }
-// template<> inline void validate_expr<bitxor_exprt>(const bitxor_exprt &value)
+// inline void validate_expr(const bitxor_exprt &value)
 // {
 //   validate_operands(
 //     value,
@@ -2566,7 +2554,7 @@ template<> inline bool check_expr_type<bitand_exprt>(const exprt &base)
 {
   return base.id()==ID_bitand;
 }
-// template<> inline void validate_expr<bitand_exprt>(const bitand_exprt &value)
+// inline void validate_expr(const bitand_exprt &value)
 // {
 //   validate_operands(
 //     value,
@@ -2654,7 +2642,7 @@ inline shift_exprt &to_shift_expr(exprt &expr)
 // {
 //   return true;
 // }
-// template<> inline void validate_expr<shift_exprt>(const shift_exprt &value)
+// inline void validate_expr(const shift_exprt &value)
 // {
 //   validate_operands(value, 2, "Shifts must have two operands");
 // }
@@ -2797,8 +2785,7 @@ template<> inline bool check_expr_type<replication_exprt>(const exprt &base)
 {
   return base.id()==ID_replication;
 }
-template<>
-inline void validate_expr<replication_exprt>(const replication_exprt &value)
+inline void validate_expr(const replication_exprt &value)
 {
   validate_operands(value, 2, "Bit-wise replication must have two operands");
 }
@@ -2879,8 +2866,7 @@ template<> inline bool check_expr_type<extractbit_exprt>(const exprt &base)
 {
   return base.id()==ID_extractbit;
 }
-template<>
-inline void validate_expr<extractbit_exprt>(const extractbit_exprt &value)
+inline void validate_expr(const extractbit_exprt &value)
 {
   validate_operands(value, 2, "Extract bit must have two operands");
 }
@@ -2978,8 +2964,7 @@ template<> inline bool check_expr_type<extractbits_exprt>(const exprt &base)
 {
   return base.id()==ID_extractbits;
 }
-template<>
-inline void validate_expr<extractbits_exprt>(const extractbits_exprt &value)
+inline void validate_expr(const extractbits_exprt &value)
 {
   validate_operands(value, 3, "Extract bits must have three operands");
 }
@@ -3039,8 +3024,7 @@ template<> inline bool check_expr_type<address_of_exprt>(const exprt &base)
 {
   return base.id()==ID_address_of;
 }
-template<>
-inline void validate_expr<address_of_exprt>(const address_of_exprt &value)
+inline void validate_expr(const address_of_exprt &value)
 {
   validate_operands(value, 1, "Address of must have one operand");
 }
@@ -3103,7 +3087,7 @@ template<> inline bool check_expr_type<not_exprt>(const exprt &base)
 {
   return base.id()==ID_not;
 }
-template<> inline void validate_expr<not_exprt>(const not_exprt &value)
+inline void validate_expr(const not_exprt &value)
 {
   validate_operands(value, 1, "Not must have one operand");
 }
@@ -3183,8 +3167,7 @@ template<> inline bool check_expr_type<dereference_exprt>(const exprt &base)
 {
   return base.id()==ID_dereference;
 }
-template<>
-inline void validate_expr<dereference_exprt>(const dereference_exprt &value)
+inline void validate_expr(const dereference_exprt &value)
 {
   validate_operands(value, 1, "Dereference must have one operand");
 }
@@ -3282,7 +3265,7 @@ template<> inline bool check_expr_type<if_exprt>(const exprt &base)
 {
   return base.id()==ID_if;
 }
-template<> inline void validate_expr<if_exprt>(const if_exprt &value)
+inline void validate_expr(const if_exprt &value)
 {
   validate_operands(value, 3, "If-then-else must have three operands");
 }
@@ -3375,7 +3358,7 @@ template<> inline bool check_expr_type<with_exprt>(const exprt &base)
 {
   return base.id()==ID_with;
 }
-template<> inline void validate_expr<with_exprt>(const with_exprt &value)
+inline void validate_expr(const with_exprt &value)
 {
   validate_operands(
     value,
@@ -3439,8 +3422,7 @@ template<> inline bool check_expr_type<index_designatort>(const exprt &base)
 {
   return base.id()==ID_index_designator;
 }
-template<>
-inline void validate_expr<index_designatort>(const index_designatort &value)
+inline void validate_expr(const index_designatort &value)
 {
   validate_operands(value, 1, "Index designator must have one operand");
 }
@@ -3496,8 +3478,7 @@ template<> inline bool check_expr_type<member_designatort>(const exprt &base)
 {
   return base.id()==ID_member_designator;
 }
-template<>
-inline void validate_expr<member_designatort>(const member_designatort &value)
+inline void validate_expr(const member_designatort &value)
 {
   validate_operands(value, 0, "Member designator must not have operands");
 }
@@ -3599,7 +3580,7 @@ template<> inline bool check_expr_type<update_exprt>(const exprt &base)
 {
   return base.id()==ID_update;
 }
-template<> inline void validate_expr<update_exprt>(const update_exprt &value)
+inline void validate_expr(const update_exprt &value)
 {
   validate_operands(
     value,
@@ -3694,8 +3675,7 @@ template<> inline bool check_expr_type<array_update_exprt>(const exprt &base)
 {
   return base.id()==ID_array_update;
 }
-template<>
-inline void validate_expr<array_update_exprt>(const array_update_exprt &value)
+inline void validate_expr(const array_update_exprt &value)
 {
   validate_operands(value, 3, "Array update must have three operands");
 }
@@ -3829,7 +3809,7 @@ template<> inline bool check_expr_type<member_exprt>(const exprt &base)
 {
   return base.id()==ID_member;
 }
-template<> inline void validate_expr<member_exprt>(const member_exprt &value)
+inline void validate_expr(const member_exprt &value)
 {
   validate_operands(value, 1, "Extract member must have one operand");
 }
@@ -3881,7 +3861,7 @@ template<> inline bool check_expr_type<isnan_exprt>(const exprt &base)
 {
   return base.id()==ID_isnan;
 }
-template<> inline void validate_expr<isnan_exprt>(const isnan_exprt &value)
+inline void validate_expr(const isnan_exprt &value)
 {
   validate_operands(value, 1, "Is NaN must have one operand");
 }
@@ -3937,7 +3917,7 @@ template<> inline bool check_expr_type<isinf_exprt>(const exprt &base)
 {
   return base.id()==ID_isinf;
 }
-template<> inline void validate_expr<isinf_exprt>(const isinf_exprt &value)
+inline void validate_expr(const isinf_exprt &value)
 {
   validate_operands(value, 1, "Is infinite must have one operand");
 }
@@ -3989,8 +3969,7 @@ template<> inline bool check_expr_type<isfinite_exprt>(const exprt &base)
 {
   return base.id()==ID_isfinite;
 }
-template<>
-inline void validate_expr<isfinite_exprt>(const isfinite_exprt &value)
+inline void validate_expr(const isfinite_exprt &value)
 {
   validate_operands(value, 1, "Is finite must have one operand");
 }
@@ -4042,8 +4021,7 @@ template<> inline bool check_expr_type<isnormal_exprt>(const exprt &base)
 {
   return base.id()==ID_isnormal;
 }
-template<>
-inline void validate_expr<isnormal_exprt>(const isnormal_exprt &value)
+inline void validate_expr(const isnormal_exprt &value)
 {
   validate_operands(value, 1, "Is normal must have one operand");
 }
@@ -4100,9 +4078,7 @@ inline bool check_expr_type<ieee_float_equal_exprt>(const exprt &base)
 {
   return base.id()==ID_ieee_float_equal;
 }
-template<>
-inline void validate_expr<ieee_float_equal_exprt>(
-  const ieee_float_equal_exprt &value)
+inline void validate_expr(const ieee_float_equal_exprt &value)
 {
   validate_operands(value, 2, "IEEE equality must have two operands");
 }
@@ -4161,9 +4137,7 @@ inline bool check_expr_type<ieee_float_notequal_exprt>(const exprt &base)
 {
   return base.id()==ID_ieee_float_notequal;
 }
-template<>
-inline void validate_expr<ieee_float_notequal_exprt>(
-  const ieee_float_notequal_exprt &value)
+inline void validate_expr(const ieee_float_notequal_exprt &value)
 {
   validate_operands(value, 2, "IEEE inequality must have two operands");
 }
@@ -4469,9 +4443,7 @@ inline bool check_expr_type<function_application_exprt>(const exprt &base)
 {
   return base.id()==ID_function_application;
 }
-template<>
-inline void validate_expr<function_application_exprt>(
-  const function_application_exprt &value)
+inline void validate_expr(const function_application_exprt &value)
 {
   validate_operands(value, 2, "Function application must have two operands");
 }
@@ -4635,7 +4607,7 @@ template<> inline bool check_expr_type<let_exprt>(const exprt &base)
 {
   return base.id()==ID_let;
 }
-template<> inline void validate_expr<let_exprt>(const let_exprt &value)
+inline void validate_expr(const let_exprt &value)
 {
   validate_operands(value, 3, "Let must have three operands");
 }

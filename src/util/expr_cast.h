@@ -13,19 +13,15 @@
 #include "expr.h"
 
 
-/// \brief Check whether a reference to a generic \ref exprt is of a specific derived class
+/// \brief Check whether a reference to a generic \ref exprt is of a specific
+///   derived class.
+///
 ///   Implement template specializations of this function to enable casting
+///
 /// \tparam T The exprt-derived class to check for
 /// \param base Reference to a generic \ref exprt
 /// \return true if \a base is of type \a T
 template<typename T> bool check_expr_type(const exprt &base);
-
-/// \brief Check whether a reference to a generic \ref exprt is of a specific derived class
-///   Implement template specializations of this function to enable casting
-/// \tparam T The exprt-derived class to check for
-/// \param base Reference to a generic \ref exprt
-/// \return true if \a base is of type \a T
-template<typename T> void validate_expr(const T &value) { }
 
 template<typename T> struct remove_constt;
 template<typename T> struct remove_constt<const T> { using type=T; };
@@ -35,10 +31,12 @@ template<typename T> struct ref_typet;
 template<typename T> struct ref_typet<T &> { using type=T; };
 
 
-/// \brief Cast a constant pointer to a generic exprt to a specific derived class
+/// \brief Cast a constant pointer to a generic exprt to a specific derived
+///   class
 /// \tparam T The exprt-derived class to cast to
 /// \param base Pointer to a generic \ref exprt
-/// \return Pointer to object of type \a T or null if \a base is not an instance of \a T
+/// \return Pointer to object of type \a T or null if \a base is not an
+///   instance of \a T
 template<typename T>
 T expr_dynamic_cast(const exprt *base)
 {
@@ -51,7 +49,8 @@ T expr_dynamic_cast(const exprt *base)
 /// \brief Cast a pointer to a generic exprt to a specific derived class
 /// \tparam T The exprt-derived class to cast to
 /// \param base Pointer to a generic \ref exprt
-/// \return Pointer to object of type \a T or null if \a base is not an instance of \a T
+/// \return Pointer to object of type \a T or null if \a base is not an
+///   instance of \a T
 template<typename T>
 T expr_dynamic_cast(exprt *base)
 {
@@ -75,11 +74,12 @@ T expr_dynamic_cast(TExpr *base)
   if(!check_expr_type<TUnderlying>(*base))
     return nullptr;
   T value=static_cast<T>(base);
-  validate_expr<TUnderlying>(*value);
+  validate_expr(*value);
   return value;
 }
 
-/// \brief Cast a constant reference to a generic exprt to a specific derived class
+/// \brief Cast a constant reference to a generic exprt to a specific derived
+///   class
 /// \tparam T The exprt-derived class to cast to
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
@@ -119,7 +119,7 @@ T expr_dynamic_cast(TExpr &base)
   if(!check_expr_type<TUnderlying>(base))
     throw std::bad_cast();
   T value=static_cast<T>(base);
-  validate_expr<TUnderlying>(value);
+  validate_expr(value);
   return value;
 }
 
