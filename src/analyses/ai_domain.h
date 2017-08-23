@@ -120,6 +120,15 @@ public:
     else
       return true_exprt();
   }
+
+  virtual void merge_three_way_function_return(
+    const ai_domain_baset &function_start,
+    const ai_domain_baset &function_end,
+    const namespacet &ns)
+  {
+    // Do nothing - the result of the merge is to take
+    // all the changes in the "remote" version
+  }
 };
 
 #endif
