@@ -6516,6 +6516,9 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
   if Search(r'_builtin_headers(_[a-z0-9_-]+)?\.h$', filename):
     return
 
+  if Search(r'regression/.*\.cpp', filename):
+    return
+
   if not ProcessConfigOverrides(filename):
     _RestoreFilters()
     return
