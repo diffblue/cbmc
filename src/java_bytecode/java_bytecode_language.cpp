@@ -98,7 +98,7 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 
 std::set<std::string> java_bytecode_languaget::extensions() const
 {
-  return { "class", "jar" };
+  return { "class", "jar", "war" };
 }
 
 void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
@@ -130,7 +130,7 @@ bool java_bytecode_languaget::parse(
     // override main_class
     main_class=java_class_loadert::file_to_class_name(path);
   }
-  else if(has_suffix(path, ".jar"))
+  else if(has_suffix(path, ".jar") || has_suffix(path, ".war"))
   {
     // build an object to potentially limit which classes are loaded
     java_class_loader_limitt class_loader_limit(
