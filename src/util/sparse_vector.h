@@ -12,9 +12,10 @@ Author: Romain Brenguier
 #ifndef CPROVER_UTIL_SPARSE_VECTOR_H
 #define CPROVER_UTIL_SPARSE_VECTOR_H
 
+#include "invariant.h"
+
 #include <cstdint>
 #include <map>
-#include <assert.h>
 
 template<class T> class sparse_vectort
 {
@@ -29,13 +30,13 @@ public:
 
   const T &operator[](uint64_t idx) const
   {
-    assert(idx<_size && "index out of range");
+    INVARIANT(idx<_size, "index out of range");
     return underlying[idx];
   }
 
   T &operator[](uint64_t idx)
   {
-    assert(idx<_size && "index out of range");
+    INVARIANT(idx<_size, "index out of range");
     return underlying[idx];
   }
 
@@ -46,7 +47,7 @@ public:
 
   void resize(uint64_t new_size)
   {
-    assert(new_size>=_size && "sparse vector can't be shrunk (yet)");
+    INVARIANT(new_size>=_size, "sparse vector can't be shrunk (yet)");
     _size=new_size;
   }
 

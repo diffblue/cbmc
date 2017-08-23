@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <stack>
 
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/sparse_vector.h>
 
 #include "goto_functions.h"
@@ -113,7 +114,7 @@ protected:
     auto lower_bound=inverse_memory_map.lower_bound(address);
     if(lower_bound->first!=address)
     {
-      assert(lower_bound!=inverse_memory_map.begin());
+      CHECK_RETURN(lower_bound!=inverse_memory_map.begin());
       --lower_bound;
     }
     return *lower_bound;
@@ -131,7 +132,7 @@ protected:
 
   std::size_t base_address_to_alloc_size(std::size_t address) const
   {
-    assert(address_to_offset(address)==0);
+    PRECONDITION(address_to_offset(address)==0);
     auto upper_bound=inverse_memory_map.upper_bound(address);
     std::size_t next_alloc_address=
       upper_bound==inverse_memory_map.end() ?
