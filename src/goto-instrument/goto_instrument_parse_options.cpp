@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
 #include <goto-programs/slice_global_inits.h>
+#include <goto-programs/show_symbol_table.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -467,7 +468,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table(goto_model, get_ui());
+      ::show_symbol_table(goto_model, get_ui());
       return 0;
     }
 
