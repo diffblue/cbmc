@@ -54,6 +54,7 @@ void jar_filet::open(
       INVARIANT(file_name.size()==filename_len-1, "no \\0 found in file name");
 
       // remove WAR class prefix
+      // cf. https://en.wikipedia.org/wiki/WAR_(file_format)
       const std::string war_class_prefix("WEB-INF/classes/");
       if(has_prefix(file_name, war_class_prefix))
         file_name=file_name.substr(war_class_prefix.length());
