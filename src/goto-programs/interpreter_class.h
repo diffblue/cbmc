@@ -161,12 +161,18 @@ protected:
   public:
     memory_cellt() :
     value(0),
-    initialized(0)
+    initialized(initializedt::UNKNOWN)
     {}
     mp_integer value;
     // Initialized is annotated even during reads
+    enum class initializedt
+    {
+      UNKNOWN,
+      WRITTEN_BEFORE_READ,
+      READ_BEFORE_WRITTEN
+    };
     // Set to 1 when written-before-read, -1 when read-before-written
-    mutable char initialized;
+    mutable initializedt initialized;
   };
 
   typedef sparse_vectort<memory_cellt> memoryt;

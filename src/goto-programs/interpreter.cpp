@@ -503,7 +503,9 @@ exprt interpretert::get_value(
     }
     return result;
   }
-  if(use_non_det && (memory[offset].initialized>=0))
+  if(use_non_det &&
+     memory[offset].initialized!=
+     memory_cellt::initializedt::WRITTEN_BEFORE_READ)
     return side_effect_expr_nondett(type);
   mp_vectort rhs;
   rhs.push_back(memory[offset].value);
@@ -681,7 +683,8 @@ void interpretert::execute_assign()
       size_t size=get_size(code_assign.lhs().type());
       for(size_t i=0; i<size; i++)
       {
-        memory[address+i].initialized=-1;
+        memory[address+i].initialized=
+          memory_cellt::initializedt::READ_BEFORE_WRITTEN;
       }
     }
   }
@@ -706,8 +709,8 @@ void interpretert::assign(
                  << "\n" << eom;
       }
       cell.value=rhs[i];
-      if(cell.initialized==0)
-        cell.initialized=1;
+      if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
+        cell.initialized=memory_cellt::initializedt::WRITTEN_BEFORE_READ;
     }
   }
 }

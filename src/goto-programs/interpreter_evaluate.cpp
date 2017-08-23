@@ -36,8 +36,8 @@ void interpretert::read(
     {
       const memory_cellt &cell=memory[integer2size_t(address+i)];
       value=cell.value;
-      if(cell.initialized==0)
-        cell.initialized=-1;
+      if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
+        cell.initialized=memory_cellt::initializedt::READ_BEFORE_WRITTEN;
     }
     else
       value=0;
@@ -64,8 +64,8 @@ void interpretert::read_unbounded(
     {
       const memory_cellt &cell=memory[integer2size_t(address+i)];
       value=cell.value;
-      if(cell.initialized==0)
-        cell.initialized=-1;
+      if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
+        cell.initialized=memory_cellt::initializedt::READ_BEFORE_WRITTEN;
     }
     else
       value=0;
@@ -86,7 +86,7 @@ void interpretert::allocate(
     {
       memory_cellt &cell=memory[integer2size_t(address+i)];
       cell.value=0;
-      cell.initialized=0;
+      cell.initialized=memory_cellt::initializedt::UNKNOWN;
     }
   }
 }
@@ -96,8 +96,9 @@ void interpretert::clear_input_flags()
 {
   for(auto &cell : memory)
   {
-    if(cell.second.initialized>0)
-      cell.second.initialized=0;
+    if(cell.second.initialized==
+       memory_cellt::initializedt::WRITTEN_BEFORE_READ)
+      cell.second.initialized=memory_cellt::initializedt::UNKNOWN;
   }
 }
 
