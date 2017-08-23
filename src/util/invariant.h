@@ -142,7 +142,7 @@ void report_exception_to_stderr(const invariant_failedt &);
 /// Takes a backtrace, gives it to the reason structure, then aborts, printing
 /// reason.what() (which therefore includes the backtrace).
 /// In future this may throw `reason` instead of aborting.
-/// \param ET : (template type parameter), type of exception to construct
+/// Template parameter ET: type of exception to construct
 /// \param file : C string giving the name of the file.
 /// \param function : C string giving the name of the function.
 /// \param line : The line number of the invariant

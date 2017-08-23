@@ -361,6 +361,11 @@ void goto_symext::symex_output(
   target.output(state.guard.as_expr(), state.source, output_id, args);
 }
 
+/// Handles side effects of type 'new' for C++ and 'new array'
+/// for C++ and Java language modes
+/// \param state: Symex state
+/// \param lhs: left-hand side of assignment
+/// \param code: right-hand side containing side effect
 void goto_symext::symex_cpp_new(
   statet &state,
   const exprt &lhs,
@@ -397,7 +402,6 @@ void goto_symext::symex_cpp_new(
   else
     symbol.type=code.type().subtype();
 
-  // symbol.type.set("#active", symbol_expr(active_symbol));
   symbol.type.set("#dynamic", true);
 
   new_symbol_table.add(symbol);
@@ -425,7 +429,10 @@ void goto_symext::symex_cpp_delete(
   statet &state,
   const codet &code)
 {
-  // bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
+  // TODO
+  #if 0
+  bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
+  #endif
 }
 
 void goto_symext::symex_trace(
