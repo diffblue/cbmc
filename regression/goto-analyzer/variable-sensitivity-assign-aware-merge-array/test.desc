@@ -3,17 +3,9 @@ main.c
 --function pass_param --variable --pointers --arrays --structs --verify
 ^EXIT=0$
 ^SIGNAL=0$
-^\[pass_param.assertion.1\] file main.c line 35 function pass_param, b\[0\]==0: Success$
-^\[pass_param.assertion.2\] file main.c line 36 function pass_param, b\[4\]==4: Success$
-^\[pass_param.assertion.3\] file main.c line 37 function pass_param, b\[8\]==8: Success$
-^\[pass_param.assertion.4\] file main.c line 40 function pass_param, c\[8\]==8: Unknown$
-^\[pass_param.assertion.5\] file main.c line 44 function pass_param, b\[1\]==5: Success$
-^\[pass_param.assertion.6\] file main.c line 46 function pass_param, b\[0\]==0: Success$
-^\[pass_param.assertion.7\] file main.c line 47 function pass_param, b\[4\]==4: Success$
-^\[pass_param.assertion.8\] file main.c line 48 function pass_param, b\[8\]==8: Success$
-^\[pass_param.assertion.9\] file main.c line 50 function pass_param, b\[1\]==1: Failure \(if reachable\)$
-^\[pass_param.assertion.10\] file main.c line 52 function pass_param, b\[1\]==5: Unknown$
-^\[pass_param.assertion.11\] file main.c line 53 function pass_param, b\[1\]==6: Unknown$
-^\[pass_param.assertion.12\] file main.c line 54 function pass_param, b\[0\]==0: Success$
-^\[pass_param.assertion.13\] file main.c line 55 function pass_param, b\[8\]==8: Success$
+\[pass_param\.assertion\.1\] .* b\[0\]==0: Success
+\[pass_param\.assertion\.2\] .* b\[1\]==5: Success
+\[pass_param\.assertion\.3\] .* b\[1\]==5: Unknown
+\[pass_param\.assertion\.4\] .* b\[1\]==6: Unknown
+\[pass_param\.assertion\.5\] .* b\[0\]==0: Success
 --
