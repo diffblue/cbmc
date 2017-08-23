@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// reads a memory address and loads it into the dest variable marks cell as
 /// read before written if cell has never been written
 void interpretert::read(
-  mp_integer address,
+  const mp_integer &address,
   mp_vectort &dest) const
 {
   // copy memory region
@@ -47,7 +47,7 @@ void interpretert::read(
 }
 
 void interpretert::read_unbounded(
-  mp_integer address,
+  const mp_integer &address,
   mp_vectort &dest) const
 {
   // copy memory region
@@ -76,7 +76,7 @@ void interpretert::read_unbounded(
 
 /// reserves memory block of size at address
 void interpretert::allocate(
-  mp_integer address,
+  const mp_integer &address,
   size_t size)
 {
   // clear memory region
@@ -148,7 +148,7 @@ bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
 /// \return Offset into a vector of interpreter values; returns true on error
 bool interpretert::byte_offset_to_memory_offset(
   const typet &source_type,
-  mp_integer offset,
+  const mp_integer &offset,
   mp_integer &result)
 {
   if(source_type.id()==ID_struct)
@@ -228,7 +228,7 @@ bool interpretert::byte_offset_to_memory_offset(
 /// \return The corresponding byte offset. Returns true on error
 bool interpretert::memory_offset_to_byte_offset(
   const typet &source_type,
-  mp_integer cell_offset,
+  const mp_integer &full_cell_offset,
   mp_integer &result)
 {
   if(source_type.id()==ID_struct)
@@ -237,6 +237,7 @@ bool interpretert::memory_offset_to_byte_offset(
     const struct_typet::componentst &components=st.components();
     member_offset_iterator offsets(st, ns);
     mp_integer previous_member_sizes;
+    mp_integer cell_offset=full_cell_offset;
     for(; offsets->first<components.size() && offsets->second!=-1; ++offsets)
     {
       const auto &component_type=components[offsets->first].type();
@@ -278,13 +279,14 @@ bool interpretert::memory_offset_to_byte_offset(
     mp_integer elem_count;
     if(count_type_leaves(at.subtype(), elem_count))
       return true;
-    mp_integer this_idx=cell_offset/elem_count;
+    mp_integer this_idx=full_cell_offset/elem_count;
     if(this_idx>=array_size_vec[0])
       return true;
     mp_integer subtype_result;
     bool ret=
-      memory_offset_to_byte_offset(at.subtype(),
-        cell_offset%elem_count,
+      memory_offset_to_byte_offset(
+        at.subtype(),
+        full_cell_offset%elem_count,
         subtype_result);
     result=subtype_result+(elem_size*this_idx);
     return ret;
@@ -293,7 +295,7 @@ bool interpretert::memory_offset_to_byte_offset(
   {
     // Primitive type.
     result=0;
-    return cell_offset!=0;
+    return full_cell_offset!=0;
   }
 }
 
