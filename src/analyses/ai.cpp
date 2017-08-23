@@ -376,13 +376,6 @@ bool ai_baset::do_function_call(
 
     working_sett working_set; // Redundant; fixpoint will add l_begin
 
-    std::cout << "BEFORE MERGING" << std::endl;
-    tmp_state->output(std::cout, *this, ns);
-    statet &dest=get_state(l_begin);
-    dest.output(std::cout, *this, ns);
-
-    std::cout << "-------------" << std::endl;
-
     // Do the edge from the call site to the beginning of the function
     bool new_data = visit_edge(
       calling_function_id, l_call, f_it->first, l_begin, ns, working_set);
@@ -392,25 +385,8 @@ bool ai_baset::do_function_call(
       fixedpoint(f_it->first, goto_function.body, goto_functions, ns);
   }
 
-#if 0
-  {
-    // do edge from end of function to instruction after call
-    locationt l_begin=goto_function.body.instructions.begin();
-    const statet &starting_state=get_state(l_begin);
-
-    std::unique_ptr<statet> tmp_state(make_temporary_state(starting_state));
-
-    /// Merge 25 into 26
-    /// Source state is 25 (src = get_state(25)
-    /// Destination state is 26 (i.e to = 26)
-
-    // src, from, to
-    any_changes|=merge(*tmp_state, l_begin, l_return);
-  }
-#endif
 
   // This is the edge from function end to return site.
-
   {
     // get location at end of the procedure we have called
     locationt l_end=--goto_function.body.instructions.end();
@@ -427,48 +403,13 @@ bool ai_baset::do_function_call(
 
     working_sett working_set; // Redundant; visit will add l_return
 
-    // We want to get a state that has only the changes from the function
-    //const auto &symbols=get_modified_symbols(start_state, end_state);
+    std::unique_ptr<statet> pre_merge_tmp_state(make_temporary_state(*tmp_state));
 
+    // We try to
+    tmp_state->merge_three_way_function_return(
+      get_state(l_call), get_state(l_begin), *pre_merge_tmp_state, ns);
 
-
-
-
-    // Propagate those
-    //any_changes|=merge(get_state(l_call), l_end, l_return);
-
-#if 0
-    std::cout << "Function call " << f_it->first << " complete, modified symbols:" << std::endl;
-#endif
-    //const auto &modified_symbols=get_modified_symbols(start_state, *tmp_state);
-
-#if 0
-    for(const auto &modified_symbol:modified_symbols)
-    {
-      std::cout << "\t" << modified_symbol.get_identifier() << "\n";
-    }
-    std::cout << std::endl;
-#endif
-
-    // ------------
-    // END_FUNCTION
-    // ------------
-
-    // 3 way merge normally has BASE, LOCAL and REMOTE
-    // We take the changes applied between BASE and REMOTE and re-apply them to
-    // local
-    // This would look like:
-    // BASE: function_begin
-    // REMOTE: function_end
-    // LOCAL: function_call
-
-
-    std::unique_ptr<statet> tmp_return_state(make_temporary_state(get_state(l_call)));
-    tmp_return_state->merge_three_way_function_return(
-      get_state(l_begin), get_state(l_end), ns);
-
-    any_changes|=merge(*tmp_return_state, l_end, l_return);
-    //restore_domain(modified_symbols, *tmp_state, get_state(l_return), ns);
+    any_changes|=merge(*tmp_state, l_end, l_return);
   }
 
   return any_changes;

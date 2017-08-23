@@ -833,6 +833,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
       bool all_matched=intersection.size()==a.size() &&
         intersection.size()==b.size();
 
+#if 0
       std::cout << entry.first.get_identifier() << ": {";
       for(const auto &entry:lhs_location)
       {
@@ -845,6 +846,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
         std::cout << entry->location_number << ", ";
       }
       std::cout << " }" << std::endl;
+#endif
 
       if (!all_matched)
       {
