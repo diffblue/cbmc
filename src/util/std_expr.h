@@ -2638,10 +2638,9 @@ inline shift_exprt &to_shift_expr(exprt &expr)
   return static_cast<shift_exprt &>(expr);
 }
 
-// template<> inline bool check_expr_type<shift_exprt>(const exprt &base)
-// {
-//   return true;
-// }
+// The to_*_expr function for this type doesn't do any checks before casting,
+// therefore the implementation is essentially a static_cast.
+// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
 // inline void validate_expr(const shift_exprt &value)
 // {
 //   validate_operands(value, 2, "Shifts must have two operands");
@@ -4223,11 +4222,9 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
   return static_cast<ieee_float_op_exprt &>(expr);
 }
 
-// template<>
-// inline bool check_expr_type<ieee_float_op_exprt>(const exprt &base)
-// {
-//   return true;
-// }
+// The to_*_expr function for this type doesn't do any checks before casting,
+// therefore the implementation is essentially a static_cast.
+// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
 // template<>
 // inline void validate_expr<ieee_float_op_exprt>(
 //   const ieee_float_op_exprt &value)
