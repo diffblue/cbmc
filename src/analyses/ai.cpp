@@ -460,7 +460,7 @@ bool ai_baset::do_function_call(
     const statet &end_state=get_state(l_end);
 
     locationt l_begin=goto_function.body.instructions.begin();
-    const statet &start_state=get_state(l_begin);
+    //const statet &start_state=get_state(l_begin);
 
     if(end_state.is_bottom())
       return false; // function exit point not reachable
@@ -476,18 +476,40 @@ bool ai_baset::do_function_call(
 
 
     // Propagate those
-    any_changes|=merge(get_state(l_call), l_end, l_return);
+    //any_changes|=merge(get_state(l_call), l_end, l_return);
 
+#if 0
     std::cout << "Function call " << f_it->first << " complete, modified symbols:" << std::endl;
-    const auto &modified_symbols=get_modified_symbols(start_state, *tmp_state);
+#endif
+    //const auto &modified_symbols=get_modified_symbols(start_state, *tmp_state);
 
+#if 0
     for(const auto &modified_symbol:modified_symbols)
     {
       std::cout << "\t" << modified_symbol.get_identifier() << "\n";
     }
     std::cout << std::endl;
+#endif
 
-    restore_domain(modified_symbols, *tmp_state, get_state(l_return), ns);
+    // ------------
+    // END_FUNCTION
+    // ------------
+
+    // 3 way merge normally has BASE, LOCAL and REMOTE
+    // We take the changes applied between BASE and REMOTE and re-apply them to
+    // local
+    // This would look like:
+    // BASE: function_begin
+    // REMOTE: function_end
+    // LOCAL: function_call
+
+
+    std::unique_ptr<statet> tmp_return_state(make_temporary_state(get_state(l_call)));
+    tmp_return_state->merge_three_way_function_return(
+      get_state(l_begin), get_state(l_end), ns);
+
+    any_changes|=merge(*tmp_return_state, l_end, l_return);
+    //restore_domain(modified_symbols, *tmp_state, get_state(l_return), ns);
   }
 
   return any_changes;
