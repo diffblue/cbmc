@@ -1,0 +1,11 @@
+CORE
+main.c
+--function test_non_terminating --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+[test_non_terminating.assertion.1] .* one_val==5: Success
+[test_non_terminating.assertion.2] .* second_val==6: Success
+[test_non_terminating.assertion.3] .* one_val==10: Success \(unreachable\)
+[test_non_terminating.assertion.4] .* second_val==12: Success \(unreachable\)
+[test_non_terminating.assertion.5] .* second_val==13: Success \(unreachable\)
+--
