@@ -16,6 +16,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 
 class goto_functionst;
 class symbol_tablet;
+class goto_modelt;
 class message_handlert;
 
 /// Replace calls to nondet library functions with an internal nondet
@@ -27,10 +28,16 @@ class message_handlert;
 /// \param max_nondet_tree_depth: Maximum depth for object hierarchy on input
 ///   parameterers.
 void convert_nondet(
-  goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth);
+  goto_functionst &,
+  symbol_tablet &,
+  message_handlert &,
+  std::size_t max_nondet_array_length,
+  std::size_t max_nondet_tree_depth);
+
+void convert_nondet(
+  goto_modelt &,
+  message_handlert &,
+  std::size_t max_nondet_array_length,
+  std::size_t max_nondet_tree_depth);
 
 #endif

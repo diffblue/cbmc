@@ -9,15 +9,16 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 /// \file
 /// Convert side_effect_expr_nondett expressions
 
-#include "goto-programs/convert_nondet.h"
-#include "goto-programs/goto_convert.h"
-#include "goto-programs/goto_model.h"
-#include "goto-programs/remove_skip.h"
+#include "convert_nondet.h"
+#include "goto_convert.h"
+#include "goto_model.h"
+#include "remove_skip.h"
+
+#include <java_bytecode/java_object_factory.h> // gen_nondet_init
+
+#include <util/irep_ids.h>
 
 #include <memory>
-#include "java_bytecode/java_object_factory.h" // gen_nondet_init
-
-#include "util/irep_ids.h"
 
 /// Checks an instruction to see whether it contains an assignment from
 /// side_effect_expr_nondet.  If so, replaces the instruction with a range of
@@ -111,7 +112,7 @@ static goto_programt::targett insert_nondet_init_code(
 /// \param symbol_table: The global symbol table.
 /// \param message_handler: Handles logging.
 /// \param max_nondet_array_length: Maximum size of new nondet arrays.
-static void convert_nondet(
+void convert_nondet(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
@@ -131,8 +132,6 @@ static void convert_nondet(
       max_nondet_tree_depth);
   }
 }
-
-
 
 void convert_nondet(
   goto_functionst &goto_functions,
@@ -154,4 +153,18 @@ void convert_nondet(
   goto_functions.compute_location_numbers();
 
   remove_skip(goto_functions);
+}
+
+void convert_nondet(
+  goto_modelt &goto_model,
+  message_handlert &message_handler,
+  size_t max_nondet_array_length,
+  size_t max_nondet_tree_depth)
+{
+  convert_nondet(
+    goto_model.goto_functions,
+    goto_model.symbol_table,
+    message_handler,
+    max_nondet_array_length,
+    max_nondet_tree_depth);
 }

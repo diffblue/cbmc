@@ -1572,3 +1572,15 @@ bool instrument_cover_goals(
   goto_functions.update();
   return false;
 }
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  return instrument_cover_goals(
+    cmdline,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
+}
