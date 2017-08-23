@@ -53,6 +53,11 @@ void jar_filet::open(
 #endif
       INVARIANT(file_name.size()==filename_len-1, "no \\0 found in file name");
 
+      // remove WAR class prefix
+      const std::string war_class_prefix("WEB-INF/classes/");
+      if(has_prefix(file_name, war_class_prefix))
+        file_name=file_name.substr(war_class_prefix.length());
+
       // non-class files are loaded in any case
       bool add_file=!has_suffix(file_name, ".class");
       // load .class file only if they match regex / are in match set
