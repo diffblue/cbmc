@@ -137,7 +137,7 @@ void variable_sensitivity_domaint::transform(
 
     for(const auto &param : type.parameters())
     {
-      // Bottom the arguments to the function
+      // Top the arguments to the function
       abstract_state.assign(
         symbol_exprt(param.get_identifier(), param.type()),
         abstract_state.abstract_object_factory(param.type(), ns, true, false),
