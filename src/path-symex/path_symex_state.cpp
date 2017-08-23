@@ -41,12 +41,6 @@ path_symex_statet initial_state(
   return s;
 }
 
-loc_reft path_symex_statet::get_pc() const
-{
-  assert(current_thread<threads.size());
-  return threads[current_thread].pc;
-}
-
 void path_symex_statet::output(const threadt &thread, std::ostream &out) const
 {
   out << "  PC: " << thread.pc << '\n';

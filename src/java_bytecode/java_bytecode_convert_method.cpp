@@ -216,9 +216,11 @@ const exprt java_bytecode_convert_methodt::variable(
   size_t address,
   java_bytecode_convert_methodt::variable_cast_argumentt do_cast)
 {
-  irep_idt number=to_constant_expr(arg).get_value();
+  mp_integer number;
+  bool ret=to_integer(to_constant_expr(arg), number);
+  CHECK_RETURN(!ret);
 
-  std::size_t number_int=safe_string2size_t(id2string(number));
+  std::size_t number_int=integer2size_t(number);
   typet t=java_type_from_char(type_char);
   variablest &var_list=variables[number_int];
 
@@ -229,7 +231,7 @@ const exprt java_bytecode_convert_methodt::variable(
   if(var.symbol_expr.get_identifier().empty())
   {
     // an unnamed local variable
-    irep_idt base_name="anonlocal::"+id2string(number)+type_char;
+    irep_idt base_name="anonlocal::"+std::to_string(number_int)+type_char;
     irep_idt identifier=id2string(current_method)+"::"+id2string(base_name);
 
     symbol_exprt result(identifier, t);
@@ -1092,8 +1094,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(!i_it->args.empty());
 
-      const unsigned target=safe_string2unsigned(
-        id2string(to_constant_expr(i_it->args[0]).get_value()));
+      unsigned target;
+      bool ret=to_unsigned_integer(to_constant_expr(i_it->args[0]), target);
+      DATA_INVARIANT(!ret, "target expected to be unsigned integer");
       targets.insert(target);
 
       a_entry.first->second.successors.push_back(target);
@@ -1117,8 +1120,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         if(is_label)
         {
-          const unsigned target=safe_string2unsigned(
-            id2string(to_constant_expr(arg).get_value()));
+          unsigned target;
+          bool ret=to_unsigned_integer(to_constant_expr(arg), target);
+          DATA_INVARIANT(!ret, "target expected to be unsigned integer");
           targets.insert(target);
           a_entry.first->second.successors.push_back(target);
         }
@@ -1205,9 +1209,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
        statement[statement.size()-2]=='_' &&
        isdigit(statement[statement.size()-1]))
     {
-      arg0=constant_exprt(
-        std::string(id2string(statement), statement.size()-1, 1),
-        integer_typet());
+      arg0=
+        from_integer(
+          string2integer(
+            std::string(id2string(statement), statement.size()-1, 1)),
+          java_int_type());
       statement=std::string(id2string(statement), 0, statement.size()-2);
     }
 
@@ -1648,16 +1654,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement=="goto" || statement=="goto_w")
     {
       assert(op.empty() && results.empty());
-      irep_idt number=to_constant_expr(arg0).get_value();
-      code_gotot code_goto(label(number));
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "goto argument should be an integer");
+      code_gotot code_goto(label(integer2string(number)));
       c=code_goto;
     }
     else if(statement=="jsr" || statement=="jsr_w")
     {
       // As 'goto', except we must also push the subroutine return address:
       assert(op.empty() && results.size()==1);
-      irep_idt number=to_constant_expr(arg0).get_value();
-      code_gotot code_goto(label(number));
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "jsr argument should be an integer");
+      code_gotot code_goto(label(integer2string(number)));
       c=code_goto;
       results[0]=
         from_integer(
@@ -1717,9 +1727,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
           ieee_float_spect::double_precision());
 
         ieee_floatt value(spec);
-        const typet &arg_type(arg0.type());
-        if(ID_integer==arg_type.id())
-          value.from_integer(arg0.get_int(ID_value));
+        if(arg0.type().id()!=ID_floatbv)
+        {
+          mp_integer number;
+          bool ret=to_integer(to_constant_expr(arg0), number);
+          DATA_INVARIANT(!ret, "failed to convert constant");
+          value.from_integer(number);
+        }
         else
           value.from_expr(to_constant_expr(arg0));
 
@@ -1727,23 +1741,29 @@ codet java_bytecode_convert_methodt::convert_instructions(
       }
       else
       {
-        const unsigned value(arg0.get_unsigned_int(ID_value));
+        mp_integer value;
+        bool ret=to_integer(to_constant_expr(arg0), value);
+        DATA_INVARIANT(!ret, "failed to convert constant");
         const typet type=java_type_from_char(statement[0]);
         results[0]=from_integer(value, type);
       }
     }
     else if(statement==patternt("?ipush"))
     {
-      assert(results.size()==1);
-      mp_integer int_value;
-      bool ret=to_integer(to_constant_expr(arg0), int_value);
-      INVARIANT(!ret, "?ipush argument should be an integer");
-      results[0]=from_integer(int_value, java_int_type());
+      PRECONDITION(results.size()==1);
+      DATA_INVARIANT(
+        arg0.id()==ID_constant,
+        "ipush argument expected to be constant");
+      results[0]=arg0;
+      if(arg0.type()!=java_int_type())
+        results[0].make_typecast(java_int_type());
     }
     else if(statement==patternt("if_?cmp??"))
     {
-      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==2 && results.empty());
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "if_?cmp?? argument should be an integer");
 
       code_ifthenelset code_branch;
       const irep_idt cmp_op=get_if_cmp_operator(statement);
@@ -1758,7 +1778,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 
       code_branch.cond()=condition;
       code_branch.cond().add_source_location()=i_it->source_location;
-      code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case()=code_gotot(label(integer2string(number)));
       code_branch.then_case().add_source_location()=i_it->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
@@ -1775,15 +1795,17 @@ codet java_bytecode_convert_methodt::convert_instructions(
         statement=="ifle"?ID_le:
         (assert(false), "");
 
-      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "if?? argument should be an integer");
 
       code_ifthenelset code_branch;
       code_branch.cond()=
         binary_relation_exprt(op[0], id, from_integer(0, op[0].type()));
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.cond().add_source_location().set_function(method_id);
-      code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case()=code_gotot(label(integer2string(number)));
       code_branch.then_case().add_source_location()=i_it->source_location;
       code_branch.then_case().add_source_location().set_function(method_id);
       code_branch.add_source_location()=i_it->source_location;
@@ -1793,13 +1815,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
     else if(statement==patternt("ifnonnull"))
     {
-      irep_idt number=to_constant_expr(arg0).get_value();
       assert(op.size()==1 && results.empty());
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "ifnonnull argument should be an integer");
       code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
-      code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case()=code_gotot(label(integer2string(number)));
       code_branch.then_case().add_source_location()=i_it->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
@@ -1808,12 +1832,14 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("ifnull"))
     {
       assert(op.size()==1 && results.empty());
-      irep_idt number=to_constant_expr(arg0).get_value();
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg0), number);
+      INVARIANT(!ret, "ifnull argument should be an integer");
       code_ifthenelset code_branch;
       const typecast_exprt lhs(op[0], java_reference_type(empty_typet()));
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
-      code_branch.then_case()=code_gotot(label(number));
+      code_branch.then_case()=code_gotot(label(integer2string(number)));
       code_branch.then_case().add_source_location()=i_it->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
@@ -1835,9 +1861,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_assignt code_assign;
       code_assign.lhs()=
         variable(arg0, 'i', i_it->address, NO_CAST);
+      exprt arg1_int_type=arg1;
+      if(arg1.type()!=java_int_type())
+        arg1_int_type.make_typecast(java_int_type());
       code_assign.rhs()=plus_exprt(
         variable(arg0, 'i', i_it->address, CAST_AS_NEEDED),
-        typecast_exprt(arg1, java_int_type()));
+        arg1_int_type);
       block.copy_to_operands(code_assign);
       c=block;
     }
@@ -1874,10 +1903,16 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const std::size_t width=type.get_size_t(ID_width);
       typet target=unsignedbv_typet(width);
 
-      const typecast_exprt lhs(op[0], target);
-      const typecast_exprt rhs(op[1], target);
+      exprt lhs=op[0];
+      if(lhs.type()!=target)
+        lhs.make_typecast(target);
+      exprt rhs=op[1];
+      if(rhs.type()!=target)
+        rhs.make_typecast(target);
 
-      results[0]=typecast_exprt(lshr_exprt(lhs, rhs), op[0].type());
+      results[0]=lshr_exprt(lhs, rhs);
+      if(results[0].type()!=op[0].type())
+        results[0].make_typecast(op[0].type());
     }
     else if(statement==patternt("?add"))
     {
@@ -2137,7 +2172,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?2?")) // i2c etc.
     {
       assert(op.size()==1 && results.size()==1);
-      results[0]=typecast_exprt(op[0], java_type_from_char(statement[2]));
+      typet type=java_type_from_char(statement[2]);
+      results[0]=op[0];
+      if(results[0].type()!=type)
+        results[0].make_typecast(type);
     }
     else if(statement=="new")
     {
@@ -2224,8 +2262,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       // The first argument is the type, the second argument is the number of
       // dimensions.  The size of each dimension is on the stack.
-      irep_idt number=to_constant_expr(arg1).get_value();
-      std::size_t dimension=safe_string2size_t(id2string(number));
+      mp_integer number;
+      bool ret=to_integer(to_constant_expr(arg1), number);
+      INVARIANT(!ret, "multianewarray argument should be an integer");
+      std::size_t dimension=integer2size_t(number);
 
       op=pop(dimension);
       assert(results.size()==1);
@@ -2293,8 +2333,10 @@ codet java_bytecode_convert_methodt::convert_instructions(
           code_switch_caset code_case;
           code_case.add_source_location()=i_it->source_location;
 
-          irep_idt number=to_constant_expr(*a_it).get_value();
-          code_case.code()=code_gotot(label(number));
+          mp_integer number;
+          bool ret=to_integer(to_constant_expr(*a_it), number);
+          DATA_INVARIANT(!ret, "case label expected to be integer");
+          code_case.code()=code_gotot(label(integer2string(number)));
           code_case.code().add_source_location()=i_it->source_location;
 
           if(a_it==i_it->args.begin())
@@ -2303,7 +2345,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
           {
             instructiont::argst::const_iterator prev=a_it;
             prev--;
-            code_case.case_op()=typecast_exprt(*prev, op[0].type());
+            code_case.case_op()=*prev;
+            if(code_case.case_op().type()!=op[0].type())
+              code_case.case_op().make_typecast(op[0].type());
             code_case.case_op().add_source_location()=i_it->source_location;
           }
 

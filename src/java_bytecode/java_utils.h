@@ -6,16 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
-#include <util/type.h>
 #include <util/symbol_table.h>
 #include <util/message.h>
 #include <util/std_expr.h>
 
 #include "java_bytecode_parse_tree.h"
-
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
+
+#include <util/type.h>
 
 bool java_is_array_type(const typet &type);
 

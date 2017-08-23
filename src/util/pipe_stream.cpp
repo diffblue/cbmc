@@ -23,9 +23,9 @@ Author:
 #else
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
 #include <cstring>
+#include <csignal>
 #endif
 
 #define READ_BUFFER_SIZE 1024

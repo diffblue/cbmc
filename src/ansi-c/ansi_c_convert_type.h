@@ -53,6 +53,7 @@ public:
 
   explicit ansi_c_convert_typet(message_handlert &_message_handler):
     messaget(_message_handler)
+    // class members are initialized by calling read()
   {
   }
 

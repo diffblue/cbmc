@@ -107,6 +107,9 @@ Here a few minimalistic coding rules for the CPROVER source tree.
   include in the source file. For example, given `foo.h` and `foo.cpp`, the
   line `#include "foo.h"` should precede all other include statements in
   `foo.cpp`.
+- Use the C++ versions of C headers (e.g. `cmath` instead of `math.h`).
+  Some of the C headers use macros instead of functions which can have
+  unexpected consequences.
 
 # Makefiles
 - Each source file should appear on a separate line

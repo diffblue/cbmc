@@ -21,6 +21,7 @@ Author: Michael Tautschnig
 
 #include <fstream>
 #include <iostream>
+#include <cstring>
 
 #include <util/run.h>
 #include <util/string2int.h>
@@ -293,10 +294,16 @@ int as_modet::as_hybrid_binary()
           << " to generate hybrid binary" << eom;
 
   // save the goto-cc output file
-  rename(output_file.c_str(),
-         (output_file+".goto-cc-saved").c_str());
+  int result=rename(
+    output_file.c_str(),
+    (output_file+".goto-cc-saved").c_str());
+  if(result!=0)
+  {
+    error() << "Rename failed: " << std::strerror(errno) << eom;
+    return result;
+  }
 
-  int result=run_as();
+  result=run_as();
 
   // merge output from as with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
@@ -329,7 +336,13 @@ int as_modet::as_hybrid_binary()
     result=run(objcopy_argv[0], objcopy_argv, "", "");
   }
 
-  remove(saved.c_str());
+  result=remove(saved.c_str());
+  if(result!=0)
+  {
+    error() << "Remove failed: " << std::strerror(errno) << eom;
+    return result;
+  }
+
   #elif defined(__APPLE__)
   // Mac
   if(result==0)
@@ -349,7 +362,12 @@ int as_modet::as_hybrid_binary()
     result=run(lipo_argv[0], lipo_argv, "", "");
   }
 
-  remove(saved.c_str());
+  result=remove(saved.c_str());
+  if(result!=0)
+  {
+    error() << "Remove failed: " << std::strerror(errno) << eom;
+    return result;
+  }
 
   #else
   error() << "binary merging not implemented for this platform" << eom;

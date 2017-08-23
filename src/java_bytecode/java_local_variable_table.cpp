@@ -14,6 +14,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_types.h"
 #include "java_utils.h"
 
+#include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/string2int.h>
 
 #include <climits>
@@ -179,12 +181,13 @@ static bool is_store_to_slot(
   if(!(prevstatement.size()>=1 && prevstatement.substr(1, 5)=="store"))
     return false;
 
-  std::string storeslot;
+  unsigned storeslotidx;
   if(inst.args.size()==1)
   {
     // Store with an argument:
     const auto &arg=inst.args[0];
-    storeslot=id2string(to_constant_expr(arg).get_value());
+    bool ret=to_unsigned_integer(to_constant_expr(arg), storeslotidx);
+    CHECK_RETURN(!ret);
   }
   else
   {
@@ -192,12 +195,12 @@ static bool is_store_to_slot(
     INVARIANT(
       prevstatement[6]=='_' && prevstatement.size()==8,
       "expected store instruction looks like store_0, store_1...");
-    storeslot=prevstatement[7];
+    std::string storeslot(1, prevstatement[7]);
     INVARIANT(
       isdigit(storeslot[0]),
       "store_? instructions should end in a digit");
+    storeslotidx=safe_string2unsigned(storeslot);
   }
-  auto storeslotidx=safe_string2unsigned(storeslot);
   return storeslotidx==slotidx;
 }
 

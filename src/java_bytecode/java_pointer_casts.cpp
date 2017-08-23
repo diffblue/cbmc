@@ -80,14 +80,12 @@ static const exprt &look_through_casts(const exprt &in)
 /// \return cleaned up typecast expression
 exprt make_clean_pointer_cast(
   const exprt &rawptr,
-  const typet &target_type,
+  const pointer_typet &target_type,
   const namespacet &ns)
 {
-  assert(
-    target_type.id()==ID_pointer &&
-    "Non-pointer target in make_clean_pointer_cast?");
-
   const exprt &ptr=look_through_casts(rawptr);
+
+  PRECONDITION(ptr.type().id()==ID_pointer);
 
   if(ptr.type()==target_type)
     return ptr;

@@ -27,7 +27,9 @@ typedef std::set<statet> state_sett;
 class automatont
 {
  public:
-  automatont():num_states(0)
+  automatont():
+    init_state(no_state),
+    num_states(0)
   {
   }
 
@@ -69,6 +71,8 @@ class automatont
     init_state=that.init_state;
   }
 
+  static const statet no_state;
+
 // protected:
   typedef std::multimap<goto_programt::targett, statet> transitionst;
   typedef std::pair<transitionst::iterator, transitionst::iterator>
@@ -76,8 +80,7 @@ class automatont
   typedef std::vector<transitionst> transition_tablet;
 
   statet init_state;
-  statet accept_state;
-  statet num_states;
+  unsigned num_states;
   transition_tablet transitions;
   state_sett accept_states;
 };
@@ -92,14 +95,14 @@ class trace_automatont
     init_nta();
 
     epsilon=goto_program.instructions.end();
-    epsilon++;
+    epsilon++; // TODO: This is illegal.
   }
 
   void add_path(patht &path);
 
   void build();
 
-  int init_state()
+  statet init_state()
   {
     return dta.init_state;
   }
@@ -115,7 +118,7 @@ class trace_automatont
 
   void get_transitions(sym_mapt &transitions);
 
-  int num_states()
+  unsigned num_states()
   {
     return dta.num_states;
   }
@@ -140,7 +143,6 @@ class trace_automatont
   void minimise();
   void reverse();
 
-  static const statet no_state = -1;
   statet add_dstate(state_sett &s);
   statet find_dstate(state_sett &s);
   void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);

@@ -158,17 +158,17 @@ bool polynomial_acceleratort::accelerate(
     }
   }
 
+#if 0
   if(polynomials.empty())
   {
     // return false;
   }
 
-  /*
   if (!utils.check_inductive(polynomials, assigns)) {
     // They're not inductive :-(
     return false;
   }
-  */
+#endif
 
   substitutiont stashed;
   stash_polynomials(program, polynomials, stashed, body);
@@ -459,6 +459,7 @@ bool polynomial_acceleratort::fit_const(
 {
   return false;
 
+#if 0
   scratch_programt program(symbol_table);
 
   program.append(body);
@@ -497,6 +498,7 @@ bool polynomial_acceleratort::fit_const(
   }
 
   return false;
+#endif
 }
 
 void polynomial_acceleratort::assert_for_values(

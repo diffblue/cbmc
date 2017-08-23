@@ -42,7 +42,7 @@ public:
     return value;
   }
 
-  tvt()
+  tvt():value(tv_enumt::TV_UNKNOWN)
   {
   }
 

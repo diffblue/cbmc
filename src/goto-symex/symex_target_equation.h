@@ -216,7 +216,7 @@ public:
     ssa_exprt ssa_lhs;
     exprt ssa_full_lhs, original_full_lhs;
     exprt ssa_rhs;
-    assignment_typet assignment_type=assignment_typet::STATE;
+    assignment_typet assignment_type;
 
     // for ASSUME/ASSERT/GOTO/CONSTRAINT
     exprt cond_expr;
@@ -247,6 +247,7 @@ public:
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
+      assignment_type(assignment_typet::STATE),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       cond_literal(const_literal(false)),
       formatted(false),

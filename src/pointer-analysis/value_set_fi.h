@@ -26,7 +26,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class value_set_fit
 {
 public:
-  value_set_fit()
+  value_set_fit():
+  changed(false)
+  // to_function, to_target_index are set by set_to()
+  // from_function, from_target_index are set by set_from()
   {
   }
 

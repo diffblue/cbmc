@@ -22,6 +22,8 @@ class cover_goalst:public messaget
 {
 public:
   explicit cover_goalst(prop_convt &_prop_conv):
+    _number_covered(0),
+    _iterations(0),
     prop_conv(_prop_conv)
   {
   }

@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// initializes class with either regex matcher or match set
 /// \par parameters: parameter from `java-cp-include-files`
 void java_class_loader_limitt::setup_class_load_limit(
-  std::string &java_cp_include_files)
+  const std::string &java_cp_include_files)
 {
   if(java_cp_include_files.empty())
     throw "class regexp cannot be empty, `get_language_options` not called?";

@@ -110,12 +110,18 @@ void delete_directory(const std::string &path)
       std::string sub_path=path+"/"+ent->d_name;
 
       struct stat stbuf;
-      stat(sub_path.c_str(), &stbuf);
+      int result=stat(sub_path.c_str(), &stbuf);
+      if(result!=0)
+        throw std::string("Stat failed: ")+std::strerror(errno);
 
       if(S_ISDIR(stbuf.st_mode))
         delete_directory(sub_path);
       else
-        remove(sub_path.c_str());
+      {
+        result=remove(sub_path.c_str());
+        if(result!=0)
+          throw std::string("Remove failed: ")+std::strerror(errno);
+      }
     }
     closedir(dir);
   }

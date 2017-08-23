@@ -247,7 +247,14 @@ exprt path_symex_statet::instantiate_rec(
     {
       irep_idt id="symex::nondet"+std::to_string(var_map.nondet_count);
       var_map.nondet_count++;
-      return symbol_exprt(id, src.type());
+
+      auxiliary_symbolt nondet_symbol;
+      nondet_symbol.name=id;
+      nondet_symbol.base_name=id;
+      nondet_symbol.type=src.type();
+      var_map.new_symbols.add(nondet_symbol);
+
+      return nondet_symbol.symbol_expr();
     }
     else
       throw "instantiate_rec: unexpected side effect "+id2string(statement);

@@ -26,7 +26,8 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   is_template_parameter(false),
   is_friend(false),
   linkage_spec(_cpp_typecheck.current_linkage_spec),
-  cpp_typecheck(_cpp_typecheck)
+  cpp_typecheck(_cpp_typecheck),
+  is_code(false)
 {
 }
 
