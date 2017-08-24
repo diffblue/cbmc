@@ -771,6 +771,7 @@ Function: abstract_environmentt::environment_diff
 std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
   const abstract_environmentt &first, const abstract_environmentt &second)
 {
+  // Find all symbols who have different write locations in each map
   std::vector<symbol_exprt> symbols_diff;
   for (const auto &entry : first.map)
   {
@@ -782,19 +783,10 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
       // in the other
       // Since a set can assume at most one match
 
-#if 0
-      const auto location_matcher=
-        [&](
-            goto_programt::const_targett instruction,
-            goto_programt::const_targett other_instruction)
-        {
-          return other_instruction->location_number<instruction->location_number;
-        };
-#endif
-
-
-      const abstract_objectt::locationst &a=entry.second->get_last_written_locations();
-      const abstract_objectt::locationst &b=second_entry->second->get_last_written_locations();
+      const abstract_objectt::locationst &first_write_locations=
+        entry.second->get_last_written_locations();
+      const abstract_objectt::locationst &second_write_locations=
+        second_entry->second->get_last_written_locations();
 
       class location_ordert
       {
@@ -803,21 +795,23 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
           goto_programt::const_targett instruction,
           goto_programt::const_targett other_instruction)
         {
-          return instruction->location_number>other_instruction->location_number;
+          return instruction->location_number>
+            other_instruction->location_number;
         }
       };
 
-      typedef std::set<goto_programt::const_targett, location_ordert> sorted_locationst;
+      typedef std::set<goto_programt::const_targett, location_ordert>
+        sorted_locationst;
 
       sorted_locationst lhs_location;
-      for(const auto &entry:a)
+      for(const auto &entry:first_write_locations)
       {
         lhs_location.insert(entry);
       }
 
 
       sorted_locationst rhs_location;
-      for(const auto &entry:b)
+      for(const auto &entry:second_write_locations)
       {
         rhs_location.insert(entry);
       }
@@ -830,23 +824,8 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
         rhs_location.cend(),
         std::inserter(intersection, intersection.end()),
         location_ordert());
-      bool all_matched=intersection.size()==a.size() &&
-        intersection.size()==b.size();
-
-#if 0
-      std::cout << entry.first.get_identifier() << ": {";
-      for(const auto &entry:lhs_location)
-      {
-        std::cout << entry->location_number << ", ";
-      }
-
-      std::cout << " } vs { ";
-      for(const auto &entry:rhs_location)
-      {
-        std::cout << entry->location_number << ", ";
-      }
-      std::cout << " }" << std::endl;
-#endif
+      bool all_matched=intersection.size()==first_write_locations.size() &&
+        intersection.size()==second_write_locations.size();
 
       if (!all_matched)
       {
@@ -855,6 +834,7 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
     }
   }
 
+  // Add any symbols that are only in the second map
   for(const auto &entry : second.map)
   {
     const auto &second_entry = first.map.find(entry.first);
