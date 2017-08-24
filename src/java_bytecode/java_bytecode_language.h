@@ -139,6 +139,7 @@ public:
 protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);
   const select_pointer_typet &get_pointer_type_selector() const;
+  void load_from_archive_files(const std::string &);
 
   irep_idt main_class;
   std::vector<irep_idt> main_jar_classes;
