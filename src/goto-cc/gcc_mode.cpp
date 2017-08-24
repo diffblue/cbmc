@@ -333,6 +333,14 @@ int gcc_modet::doit()
 
   unsigned int verbosity=1;
 
+  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
+    verbosity=2;
+
+  if(cmdline.isset("verbosity"))
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+
+  gcc_message_handler.set_verbosity(verbosity);
+
   bool act_as_bcc=
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
@@ -380,14 +388,6 @@ int gcc_modet::doit()
     std::cout << "3.4.4\n";
     return EX_OK;
   }
-
-  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
-    verbosity=2;
-
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  gcc_message_handler.set_verbosity(verbosity);
 
   if(act_as_ld)
   {
