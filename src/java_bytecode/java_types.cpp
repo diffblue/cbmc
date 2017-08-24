@@ -340,9 +340,6 @@ bool is_valid_java_array(const struct_typet &type)
 
   bool base_component_valid=true;
   base_component_valid&=base_class_component.get_name()=="@java.lang.Object";
-  base_component_valid&=base_class_component.type().id()==ID_struct;
-  base_component_valid&=
-    base_class_component.type().get_string(ID_tag)=="java.lang.Object";
 
   bool length_component_valid=true;
   const struct_union_typet::componentt length_component=
