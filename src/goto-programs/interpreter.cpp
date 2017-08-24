@@ -890,8 +890,10 @@ typet interpretert::concretize_type(const typet &type)
     {
       result() << "Concretized array with size " << computed_size[0]
                << eom;
-      return array_typet(type.subtype(),
-             constant_exprt::integer_constant(computed_size[0].to_ulong()));
+      return
+        array_typet(
+          type.subtype(),
+          from_integer(computed_size[0], integer_typet()));
     }
     else
     {
