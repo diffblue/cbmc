@@ -9,7 +9,8 @@ SRC = unit_tests.cpp \
       analyses/variable-sensitivity/constant_abstract_value/merge.cpp \
       analyses/variable-sensitivity/constant_array_abstract_object/merge.cpp \
       analyses/variable-sensitivity/full_struct_abstract_object/merge.cpp \
-       analyses/variable-sensitivity/write_stack.cpp \
+      analyses/variable-sensitivity/write_stack.cpp \
+      analyses/variable-sensitivity/last_written_location.cpp \
       # Empty last line
 
 INCLUDES= -I ../src/ -I.

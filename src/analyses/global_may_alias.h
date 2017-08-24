@@ -44,6 +44,18 @@ public:
     locationt from,
     locationt to);
 
+
+  virtual std::vector<symbol_exprt> get_modified_symbols(const global_may_alias_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     global_may_alias_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void make_bottom() final override
   {
     aliases.clear();

@@ -44,6 +44,17 @@ public:
            old_is_threaded!=is_threaded;
   }
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const is_threaded_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     is_threaded_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void transform(
     locationt from,
     locationt to,

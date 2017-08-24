@@ -56,7 +56,7 @@ private:
   typedef std::map<irep_idt, abstract_object_pointert> struct_mapt;
   struct_mapt map;
 
-
+  virtual void update_sub_elements(const locationst &locations) override;
 
   abstract_object_pointert merge_constant_structs(
     constant_struct_pointert other) const;

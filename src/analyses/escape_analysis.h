@@ -44,6 +44,17 @@ public:
     locationt from,
     locationt to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const escape_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
+ virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     escape_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void make_bottom() final override
   {
     cleanup_map.clear();

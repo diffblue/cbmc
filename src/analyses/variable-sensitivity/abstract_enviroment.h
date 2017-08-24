@@ -13,6 +13,7 @@
 #include <memory>
 #include <stack>
 #include <iosfwd>
+#include <vector>
 
 #include <util/std_expr.h>
 #include <util/message.h>
@@ -36,6 +37,8 @@ public:
     std::stack<exprt> remaining_stack,
     const namespacet &ns,
     bool merge_write);
+
+  void erase(const symbol_exprt &expr);
 
   virtual abstract_object_pointert abstract_object_factory(
     const typet &type,
@@ -64,6 +67,10 @@ public:
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;
 
   bool verify() const;
+
+  static std::vector<symbol_exprt> modified_symbols(
+    const abstract_environmentt &first,
+    const abstract_environmentt &second);
 
 protected:
   bool bottom;

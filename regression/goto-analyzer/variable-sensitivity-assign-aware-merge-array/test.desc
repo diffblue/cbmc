@@ -1,0 +1,11 @@
+CORE
+main.c
+--function pass_param --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+\[pass_param\.assertion\.1\] .* b\[0\]==0: Success
+\[pass_param\.assertion\.2\] .* b\[1\]==5: Success
+\[pass_param\.assertion\.3\] .* b\[1\]==5: Unknown
+\[pass_param\.assertion\.4\] .* b\[1\]==6: Unknown
+\[pass_param\.assertion\.5\] .* b\[0\]==0: Success
+--

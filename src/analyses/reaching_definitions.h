@@ -176,6 +176,17 @@ public:
     locationt from,
     locationt to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const rd_range_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+     rd_range_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   bool merge_shared(
     const rd_range_domaint &other,
     locationt from,

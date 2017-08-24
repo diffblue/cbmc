@@ -51,28 +51,39 @@ void variable_sensitivity_domaint::transform(
   switch(instruction.type)
   {
   case DECL:
-    // Creates a new variable, which should be top
-    // but we don't store top so ... no action required
+    {
+      const abstract_objectt::locationst write_location={ from };
+      abstract_object_pointert top_object=
+        abstract_state.abstract_object_factory(
+          to_code_decl(instruction.code).symbol().type(), ns, true)
+            ->update_last_written_locations(write_location, true);
+      abstract_state.assign(
+          to_code_decl(instruction.code).symbol(), top_object, ns);
+    }
+    // We now store top.
     break;
 
   case DEAD:
     {
-    // Assign to top is the same as removing
-    abstract_object_pointert top_object=
-      abstract_state.abstract_object_factory(
-        to_code_dead(instruction.code).symbol().type(), ns, true);
-    abstract_state.assign(
-      to_code_dead(instruction.code).symbol(), top_object, ns);
+      // Remove symbol from map, the only time this occurs now (keep TOP.)
+      // It should be the case that DEAD only provides symbols for deletion.
+      const exprt &expr=to_code_dead(instruction.code).symbol();
+      if(expr.id()==ID_symbol)
+      {
+        abstract_state.erase(to_symbol_expr(expr));
+      }
     }
     break;
 
   case ASSIGN:
     {
+      // TODO : check return values
       const code_assignt &inst = to_code_assign(instruction.code);
 
-      // TODO : check return values
-      abstract_object_pointert r = abstract_state.eval(inst.rhs(), ns);
-      abstract_state.assign(inst.lhs(), r, ns);
+      const abstract_objectt::locationst write_location={ from };
+      abstract_object_pointert rhs = abstract_state.eval(inst.rhs(), ns)
+          ->update_last_written_locations(write_location, true);
+      abstract_state.assign(inst.lhs(), rhs, ns);
     }
     break;
 
@@ -124,12 +135,14 @@ void variable_sensitivity_domaint::transform(
 
     for(const auto &param : type.parameters())
     {
-      // Bottom the arguments to the function
+      // Top the arguments to the function
       abstract_state.assign(
         symbol_exprt(param.get_identifier(), param.type()),
         abstract_state.abstract_object_factory(param.type(), ns, true, false),
         ns);
     }
+
+
     break;
   }
 
@@ -348,6 +361,17 @@ bool variable_sensitivity_domaint::is_top() const
   return abstract_state.is_top();
 }
 
+/// Get symbols that have been modified since this domain and other
+/// \param other: The domain that things may have been modified in
+/// \return A list of symbols whose write location is different
+std::vector<symbol_exprt>
+  variable_sensitivity_domaint::get_modified_symbols(
+    const variable_sensitivity_domaint &other) const
+{
+  return abstract_environmentt::modified_symbols(
+    abstract_state, other.abstract_state);
+}
+
 /*******************************************************************\
 
 Function: variable_sensitivity_domaint::transform_function_call
@@ -457,7 +481,7 @@ void variable_sensitivity_domaint::transform_function_call(
 
         // Evaluate the expression that is being
         // passed into the function call (called_arg)
-        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns);
+        abstract_object_pointert param_val=abstract_state.eval(called_arg, ns)->update_last_written_locations({ from }, true);
 
         // Assign the evaluated value to the symbol associated with the
         // parameter of the function
@@ -507,5 +531,61 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
   };
 
   return ignored_internal_function.find(function_id)!=
-    ignored_internal_function.cend();
+  ignored_internal_function.cend();
+}
+
+/// Perform a context aware merge of the changes that have been applied
+/// between function_start and the current state. Anything that has not been
+/// modified will be taken from the \p function_call domain.
+/// \param function_call: The local of the merge - values from here will be
+///   taken if they have not been modified
+/// \param function_start: THe base of the merge - changes that have been made
+///   between here and this will be retained.
+/// \param ns: The global namespace
+void variable_sensitivity_domaint::merge_three_way_function_return(
+  const ai_domain_baset &function_call,
+  const ai_domain_baset &function_start,
+  const ai_domain_baset &function_end,
+  const namespacet &ns)
+{
+  // TODO(tkiley): flag to turn of the context aware merge
+  if(true)
+  {
+    const variable_sensitivity_domaint &cast_function_call=
+      static_cast<const variable_sensitivity_domaint &>(function_call);
+
+    const variable_sensitivity_domaint &cast_function_start=
+      static_cast<const variable_sensitivity_domaint &>(function_start);
+
+    const variable_sensitivity_domaint &cast_function_end=
+      static_cast<const variable_sensitivity_domaint &>(function_end);
+
+    const std::vector<symbol_exprt> &modified_symbols=
+      cast_function_start.get_modified_symbols(cast_function_end);
+
+    abstract_state=cast_function_call.abstract_state;
+    apply_domain(modified_symbols, cast_function_end, ns);
+  }
+  else
+  {
+    ai_domain_baset::merge_three_way_function_return(
+      function_call, function_start, function_end, ns);
+  }
+}
+
+/// Given a domain and some symbols, apply those symbols values
+/// to the current domain
+/// \param modified_symbols: The symbols to write
+/// \param source: The domain to take the values from
+/// \param ns: The global namespace
+void variable_sensitivity_domaint::apply_domain(
+  std::vector<symbol_exprt> modified_symbols,
+  const variable_sensitivity_domaint &source,
+  const namespacet &ns)
+{
+  for (const auto &symbol : modified_symbols)
+  {
+    abstract_object_pointert value=source.abstract_state.eval(symbol, ns);
+    abstract_state.assign(symbol, value, ns);
+  }
 }

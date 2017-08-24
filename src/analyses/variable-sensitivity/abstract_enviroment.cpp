@@ -252,13 +252,12 @@ bool abstract_environmentt::assign(
   if(s.id()==ID_symbol)
   {
     symbol_exprt symbol_expr=to_symbol_expr(s);
-    if(final_value->is_top())
+
+    if(final_value != map[symbol_expr])
     {
-      map.erase(symbol_expr);
-    }
-    else
-    {
-      map[symbol_expr]=final_value;
+      map[symbol_expr]=final_value
+          ->update_last_written_locations(
+              value->get_last_written_locations(), false);
     }
   }
   return true;
@@ -515,6 +514,9 @@ Function: abstract_environmentt::merge
 
 \*******************************************************************/
 
+
+#include <iostream>
+
 bool abstract_environmentt::merge(const abstract_environmentt &env)
 {
   // Use the sharing_map's "iterative over all differences" functionality
@@ -552,14 +554,10 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
         modified|=object_modified;
         map[entry.first]=new_object;
 
-        if(map[entry.first]->is_top())
-        {
-          map.erase(entry.first);
-          modified=true;
-#ifdef DEBUG
-          std::cout << "Removing " << entry.first.get_identifier() << std::endl;
-#endif
-        }
+        // Write, even if TOP. Since we now track the write locations of an
+        // object, even if it is TOP we still have useful information about it.
+        // This is used for when we want to find out what has been modified
+        // between two locations (even if we don't know what has been written).
       }
       else
       {
@@ -567,27 +565,7 @@ bool abstract_environmentt::merge(const abstract_environmentt &env)
       }
     }
 
-    // Remove all elements from the map that are not present in the map we are
-    // merging in since they must be top
-    const auto &end_iter=map.end();
-    for(auto iter=map.begin(); iter!=end_iter;)
-    {
-      if(env.map.find(iter->first)==env.map.cend())
-      {
-        // After calling erase, the iterator is no longer valid, so we increment
-        // the iterator first and return a copy of the original iterator
-        map.erase(iter++);
-        modified=true;
-
-#ifdef DEBUG
-        std::cout << "Removing " << iter->first.get_identifier() << std::endl;
-#endif
-      }
-      else
-      {
-        ++iter;
-      }
-    }
+    // Keep TOP items too.
 
     return modified;
   }
@@ -710,6 +688,10 @@ void abstract_environmentt::output(
     out << entry.first.get_identifier()
         << " (" << ") -> ";
     entry.second->output(out, ai, ns);
+
+    out << " @ ";
+    entry.second->output_last_written_locations(
+        out, entry.second->get_last_written_locations());
     out << "\n";
   }
   out << "}\n";
@@ -746,4 +728,120 @@ abstract_object_pointert abstract_environmentt::eval_expression(
   // to the abstract object being compared against
   abstract_object_pointert eval_obj=abstract_object_factory(e.type(), e, ns);
   return eval_obj->expression_transform(e, *this, ns);
+}
+
+/*******************************************************************\
+
+Function: abstract_environmentt::erase
+
+  Inputs:  A symbol to delete from the map
+
+ Outputs:
+
+ Purpose:  Delete a symbol from the map.  This is necessary if the
+           symbol falls out of scope and should no longer be tracked.
+
+\*******************************************************************/
+
+void abstract_environmentt::erase(const symbol_exprt &expr)
+{
+    map.erase(expr);
+}
+
+/*******************************************************************\
+
+Function: abstract_environmentt::environment_diff
+
+  Inputs:  Two abstract_environmentt's that need to be intersected for,
+           so that we can find symbols that have changed between
+           different domains.
+
+ Outputs:  An std::vector containing the symbols that are present in
+           both environments.
+
+ Purpose:  For our implementation of variable sensitivity domains, we
+           need to be able to efficiently find symbols that have changed
+           between different domains. To do this, we need to be able
+           to quickly find which symbols have new written locations,
+           which we do by finding the intersection between two different
+           domains (environments).
+
+\*******************************************************************/
+
+std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
+  const abstract_environmentt &first, const abstract_environmentt &second)
+{
+  // Find all symbols who have different write locations in each map
+  std::vector<symbol_exprt> symbols_diff;
+  for (const auto &entry : first.map)
+  {
+    const auto &second_entry = second.map.find(entry.first);
+    if (second_entry != second.map.end())
+    {
+      // for the last written write locations to match
+      // each location in one must be equal to precisely one location
+      // in the other
+      // Since a set can assume at most one match
+
+      const abstract_objectt::locationst &first_write_locations=
+        entry.second->get_last_written_locations();
+      const abstract_objectt::locationst &second_write_locations=
+        second_entry->second->get_last_written_locations();
+
+      class location_ordert
+      {
+      public:
+        bool operator()(
+          goto_programt::const_targett instruction,
+          goto_programt::const_targett other_instruction)
+        {
+          return instruction->location_number>
+            other_instruction->location_number;
+        }
+      };
+
+      typedef std::set<goto_programt::const_targett, location_ordert>
+        sorted_locationst;
+
+      sorted_locationst lhs_location;
+      for(const auto &entry:first_write_locations)
+      {
+        lhs_location.insert(entry);
+      }
+
+
+      sorted_locationst rhs_location;
+      for(const auto &entry:second_write_locations)
+      {
+        rhs_location.insert(entry);
+      }
+
+      abstract_objectt::locationst intersection;
+      std::set_intersection(
+        lhs_location.cbegin(),
+        lhs_location.cend(),
+        rhs_location.cbegin(),
+        rhs_location.cend(),
+        std::inserter(intersection, intersection.end()),
+        location_ordert());
+      bool all_matched=intersection.size()==first_write_locations.size() &&
+        intersection.size()==second_write_locations.size();
+
+      if (!all_matched)
+      {
+        symbols_diff.push_back(entry.first);
+      }
+    }
+  }
+
+  // Add any symbols that are only in the second map
+  for(const auto &entry : second.map)
+  {
+    const auto &second_entry = first.map.find(entry.first);
+    if (second_entry==first.map.end())
+    {
+      symbols_diff.push_back(entry.first);
+    }
+  }
+  return symbols_diff;
 }

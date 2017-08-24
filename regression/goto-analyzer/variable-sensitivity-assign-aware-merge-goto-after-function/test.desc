@@ -1,0 +1,9 @@
+CORE
+main.c
+--function test_param_function --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+[test_param_function.assertion.1] .* a==5: Success
+[test_param_function.assertion.2] .* a==10: Unknown
+[test_param_function.assertion.3] .* b==7: Success
+--

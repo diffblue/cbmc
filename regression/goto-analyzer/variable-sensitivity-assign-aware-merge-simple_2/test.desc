@@ -1,0 +1,11 @@
+CORE
+main.c
+--function simple_test --variable --pointers --arrays --structs --verify
+^EXIT=0$
+^SIGNAL=0$
+^\[simple_test.assertion.1\] file main.c line 25 function simple_test, i==0: Success$
+^\[simple_test.assertion.2\] file main.c line 26 function simple_test, global==0: Success$
+^\[simple_test.assertion.3\] file main.c line 31 function simple_test, i==1: Success$
+^\[simple_test.assertion.4\] file main.c line 32 function simple_test, global==2: Success$
+
+--

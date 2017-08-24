@@ -182,12 +182,13 @@ sharing_ptrt<struct_abstract_objectt>
         member_expr.compound().type(), false, true));
   }
 
-  // we only handle one level currently
+  internal_sharing_ptrt<full_struct_abstract_objectt> copy(
+    new full_struct_abstract_objectt(*this));
+
+  copy->set_last_written_locations(value->get_last_written_locations());
+
   if(!stack.empty())
   {
-    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
-      new full_struct_abstract_objectt(*this));
-
     abstract_object_pointert starting_value;
     irep_idt c=member_expr.get_component_name();
     if(map.find(c)==map.cend())
@@ -209,8 +210,6 @@ sharing_ptrt<struct_abstract_objectt>
   }
   else
   {
-    internal_sharing_ptrt<full_struct_abstract_objectt> copy(
-      new full_struct_abstract_objectt(*this));
 
 #ifdef DEBUG
     std::cout << "Setting component" << std::endl;
@@ -245,7 +244,6 @@ sharing_ptrt<struct_abstract_objectt>
     else
     {
       copy->map[c]=value;
-
       copy->top=false;
       assert(!copy->is_bottom());
     }
@@ -285,6 +283,12 @@ void full_struct_abstract_objectt::output(
     }
     out << "." << entry.first << "=";
     entry.second->output(out, ai, ns);
+
+    // Start outputting specific last_written_locations
+    out << " @ ";
+    output_last_written_locations(out,
+        entry.second->get_last_written_locations());
+
   }
   out << "}";
 }
@@ -387,5 +391,30 @@ abstract_object_pointert full_struct_abstract_objectt::merge_constant_structs(
       assert(result->verify());
       return result;
     }
+  }
+}
+
+/*******************************************************************\
+
+Function: full_struct_abstract_objectt::update_sub_elements
+
+  Inputs:
+   locations - Locations to write
+
+ Outputs: None
+
+ Purpose: Updates write location for sub-elements.
+
+          For example, if a=b where a and b are structs, this will
+          update the write location for components too.
+
+\*******************************************************************/
+
+void full_struct_abstract_objectt::update_sub_elements(
+    const locationst &locations)
+{
+  for(auto &item: map)
+  {
+    item.second=item.second->update_last_written_locations(locations, true);
   }
 }

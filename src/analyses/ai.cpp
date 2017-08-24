@@ -374,6 +374,8 @@ bool ai_baset::visit(
   return new_data;
 }
 
+#include <iostream>
+
 bool ai_baset::do_function_call(
   locationt l_call, locationt l_return,
   const goto_functionst &goto_functions,
@@ -398,6 +400,8 @@ bool ai_baset::do_function_call(
 
   assert(!goto_function.body.instructions.empty());
 
+  bool any_changes=false;
+
   // This is the edge from call site to function head.
 
   {
@@ -421,8 +425,8 @@ bool ai_baset::do_function_call(
       fixedpoint(goto_function.body, goto_functions, ns);
   }
 
-  // This is the edge from function end to return site.
 
+  // This is the edge from function end to return site.
   {
     // get location at end of the procedure we have called
     locationt l_end=--goto_function.body.instructions.end();
@@ -431,15 +435,25 @@ bool ai_baset::do_function_call(
     // do edge from end of function to instruction after call
     const statet &end_state=get_state(l_end);
 
+    locationt l_begin=goto_function.body.instructions.begin();
+    //const statet &start_state=get_state(l_begin);
+
     if(end_state.is_bottom())
       return false; // function exit point not reachable
 
     std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
     tmp_state->transform(l_end, l_return, *this, ns);
 
-    // Propagate those
-    return merge(*tmp_state, l_end, l_return);
+    std::unique_ptr<statet> pre_merge_tmp_state(make_temporary_state(*tmp_state));
+
+    // We try to
+    tmp_state->merge_three_way_function_return(
+      get_state(l_call), get_state(l_begin), *pre_merge_tmp_state, ns);
+
+    any_changes|=merge(*tmp_state, l_end, l_return);
   }
+
+  return any_changes;
 }
 
 bool ai_baset::do_function_call_rec(

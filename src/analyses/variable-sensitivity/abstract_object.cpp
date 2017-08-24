@@ -309,6 +309,16 @@ abstract_object_pointert abstract_objectt::merge(
     op1->abstract_object_merge(op2):op1->merge(op2);
   // If no modifications, we will return the original pointer
   out_modifications=result!=op1;
+
+  locationst get_location_union = op1->get_location_union(
+      op2->get_last_written_locations());
+  // If the union is larger than the initial set, then update.
+  if(get_location_union.size() > op1->get_last_written_locations().size())
+  {
+    out_modifications=true;
+    result=result->update_last_written_locations(get_location_union, false);
+  }
+
   return result;
 }
 
@@ -332,4 +342,139 @@ bool abstract_objectt::should_use_base_merge(
   return is_top() || other->is_bottom() || other->is_top();
 }
 
+/*******************************************************************\
+
+Function: abstract_objectt::update_last_written_locations
+
+  Inputs:
+   Set of locations to be written.
+
+ Outputs:
+   An abstract_object_pointer pointing to the cloned, updated object.
+
+ Purpose: Creates a mutable clone of the current object, and updates
+          the last written location map with the provided location(s).
+
+          For immutable objects.
+
+\*******************************************************************/
+
+abstract_object_pointert abstract_objectt::update_last_written_locations(
+    const locationst &locations,
+    bool update_sub_elements) const
+{
+  internal_abstract_object_pointert clone=mutable_clone();
+  clone->set_last_written_locations(locations);
+  if(update_sub_elements)
+    clone->update_sub_elements(locations);
+  return clone;
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::get_location_union
+
+  Inputs:
+   Set of locations unioned
+
+ Outputs:
+   The union of the two sets
+
+ Purpose: Takes the location set of the current object, and unions it
+          with the provided set.
+
+\*******************************************************************/
+
+abstract_objectt::locationst abstract_objectt::get_location_union(const locationst &locations) const
+{
+  locationst existing_locations=get_last_written_locations();
+  existing_locations.insert(locations.begin(), locations.end());
+
+  return existing_locations;
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::set_last_written_locations
+
+  Inputs:
+   Set of locations to be written
+
+ Outputs:
+   Void
+
+ Purpose: Writes the provided set to the object.
+
+          For mutable objects.
+
+\*******************************************************************/
+
+void abstract_objectt::set_last_written_locations(const locationst &locations)
+{
+  last_written_locations=locations;
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::get_last_written_locations
+
+  Inputs:
+   None
+
+ Outputs:
+   Set of locations for the provided object.
+
+ Purpose: Getter for last_written_locations
+
+\*******************************************************************/
+
+abstract_objectt::locationst abstract_objectt::get_last_written_locations() const
+{
+  return last_written_locations;
+}
+
+/*******************************************************************\
+
+Function: abstract_objectt::output_last_written_location
+
+  Inputs:
+   object - the object to read information from
+   out - the stream to write to
+   ai - the abstract interpreter that contains this domain
+   ns - the current namespace
+
+ Outputs: None
+
+ Purpose: Print out all last written locations for a specified
+          object
+
+\*******************************************************************/
+
+void abstract_objectt::output_last_written_locations(
+  std::ostream &out,
+  const abstract_objectt::locationst &locations)
+{
+  out << "[";
+  bool comma=false;
+
+  std::set<unsigned> sorted_locations;
+  for(auto location: locations)
+  {
+    sorted_locations.insert(location->location_number);
+  }
+
+  for (auto location_number: sorted_locations)
+  {
+    if(!comma)
+    {
+      out << location_number;
+      comma=true;
+    }
+    else
+    {
+      out << ", " << location_number;
+    }
+  }
+  out << "]";
+}
 

@@ -80,6 +80,17 @@ public:
     goto_programt::const_targett from,
     goto_programt::const_targett to);
 
+  virtual std::vector<symbol_exprt> get_modified_symbols(const dep_graph_domaint &other) const
+  {
+    return std::vector<symbol_exprt>();
+  }
+
+  virtual void restore_domain(std::vector<symbol_exprt> modified_symbols, 
+    dep_graph_domaint &target_domain, const namespacet ns) const
+  {
+    
+  }
+
   void transform(
     goto_programt::const_targett from,
     goto_programt::const_targett to,
