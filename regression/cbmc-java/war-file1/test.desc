@@ -1,8 +1,9 @@
 CORE
 sample.war
---function mypackage.Hello.doGet
+--function mypackage.Hello.doGet --cover location
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL
+\*\* 25 of 26 covered
 --
-^warning: ignoring
+--
+war file source https://tomcat.apache.org/tomcat-6.0-doc/appdev/sample/
