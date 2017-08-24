@@ -74,19 +74,37 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
            java_cp_include_files.substr(1),
            get_message_handler(),
            json_cp_config))
-        throw "cannot read JSON input configuration for JAR loading";
+        throw "cannot read JSON input configuration for JAR/WAR loading";
 
       if(!json_cp_config.is_object())
         throw "the JSON file has a wrong format";
-      jsont include_files=json_cp_config["jar"];
-      if(!include_files.is_array())
-         throw "the JSON file has a wrong format";
-
-      // add jars from JSON config file to classpath
-      for(const jsont &file_entry : include_files.array)
+      jsont include_jar_files=json_cp_config["jar"];
+      if(!include_jar_files.is_null())
       {
-        assert(file_entry.is_string() && has_suffix(file_entry.value, ".jar"));
-        config.java.classpath.push_back(file_entry.value);
+        if(!include_jar_files.is_array())
+          throw "the JSON file has a wrong format";
+
+        // add jars from JSON config file to classpath
+        for(const jsont &file_entry : include_jar_files.array)
+        {
+          assert(file_entry.is_string() &&
+                 has_suffix(file_entry.value, ".jar"));
+          config.java.classpath.push_back(file_entry.value);
+        }
+      }
+      jsont include_war_files=json_cp_config["war"];
+      if(!include_war_files.is_null())
+      {
+        if(!include_war_files.is_array())
+          throw "the JSON file has a wrong format";
+
+        // add wars from JSON config file to classpath
+        for(const jsont &file_entry : include_war_files.array)
+        {
+          assert(file_entry.is_string() &&
+                 has_suffix(file_entry.value, ".war"));
+          config.java.classpath.push_back(file_entry.value);
+        }
       }
     }
   }

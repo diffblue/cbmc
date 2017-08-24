@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <json/json_parser.h>
 #include <util/suffix.h>
+#include <util/suffix.h>
 #include <util/invariant.h>
 
 void jar_filet::open(
