@@ -90,6 +90,8 @@ protected:
 
   void report(irep_idt goal_id);
 
+  xmlt report_xml(irep_idt goal_id);
+
   // override bmc_all_propertiest
   virtual void report(const cover_goalst &cover_goals);
 
