@@ -236,6 +236,18 @@ bool java_bytecode_languaget::typecheck(
        symbol_table, get_message_handler(), string_refinement_enabled))
     return true;
 
+  // remember the main class, if any
+  if(!main_class.empty())
+  {
+    symbolt main_class_symbol;
+    main_class_symbol.name="java_main_class";
+    main_class_symbol.base_name=main_class_symbol.name;
+    main_class_symbol.value.id(ID_string_constant);
+    main_class_symbol.value.set(ID_value, main_class);
+    main_class_symbol.mode=ID_java;
+    symbol_table.move(main_class_symbol);
+  }
+
   return false;
 }
 
@@ -368,7 +380,7 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   replace_string_methods(symbol_table);
 
   main_function_resultt res=
-    get_main_symbol(symbol_table, main_class, get_message_handler());
+    get_main_symbol(symbol_table, get_message_handler());
   if(res.stop_convert)
     return res.error_found;
 
@@ -376,7 +388,6 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
   return
     java_entry_point(
       symbol_table,
-      main_class,
       get_message_handler(),
       assume_inputs_non_null,
       max_nondet_array_length,

@@ -322,7 +322,6 @@ void java_record_outputs(
 
 main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,
-  const irep_idt &main_class,
   message_handlert &message_handler,
   bool allow_no_body)
 {
@@ -362,7 +361,7 @@ main_function_resultt get_main_symbol(
     // check if it has a body
     if(symbol.value.is_nil() && !allow_no_body)
     {
-      message.error() << "main method `" << main_class
+      message.error() << "main method `" << symbol.display_name()
                       << "' has no body" << messaget::eom;
       res.main_function=symbol;
       res.error_found=true;
@@ -375,14 +374,19 @@ main_function_resultt get_main_symbol(
     // no function given, we look for the main class
     assert(config.main=="");
 
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find("java_main_class");
+
     // are we given a main class?
-    if(main_class.empty())
+    if(s_it==symbol_table.symbols.end())
     {
       res.main_function=symbol;
       res.error_found=false;
       res.stop_convert=true;
       return res; // silently ignore
     }
+
+    irep_idt main_class=s_it->second.value.get(ID_value);
 
     std::string entry_method=
       id2string(main_class)+".main";
@@ -478,7 +482,6 @@ main_function_resultt get_main_symbol(
 /// \returns true if error occurred on entry point search
 bool java_entry_point(
   symbol_tablet &symbol_table,
-  const irep_idt &main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
@@ -492,7 +495,7 @@ bool java_entry_point(
 
   messaget message(message_handler);
   main_function_resultt res=
-    get_main_symbol(symbol_table, main_class, message_handler);
+    get_main_symbol(symbol_table, message_handler);
   if(res.stop_convert)
     return res.stop_convert;
   symbolt symbol=res.main_function;

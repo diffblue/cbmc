@@ -61,7 +61,8 @@ bool ci_lazy_methodst::operator()(
   std::vector<irep_idt> method_worklist2;
 
   auto main_function=
-    get_main_symbol(symbol_table, main_class, get_message_handler(), true);
+    get_main_symbol(symbol_table, get_message_handler(), true);
+
   if(main_function.stop_convert)
   {
     // Failed, mark all functions in the given main class(es)

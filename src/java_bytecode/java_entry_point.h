@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool java_entry_point(
   class symbol_tablet &symbol_table,
-  const irep_idt &main_class,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   size_t max_nondet_array_length,
@@ -36,7 +35,6 @@ typedef struct
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(
   symbol_tablet &symbol_table,
-  const irep_idt &main_class,
   message_handlert &,
   bool allow_no_body=false);
 
