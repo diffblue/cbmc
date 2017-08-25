@@ -170,18 +170,6 @@ extractbits_exprt::extractbits_exprt(
   lower()=integer_constant(_lower);
 }
 
-/*******************************************************************\
-
-Function: address_of_exprt::address_of_exprt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 address_of_exprt::address_of_exprt(const exprt &_op):
   unary_exprt(ID_address_of, _op, pointer_type(_op.type()))
 {

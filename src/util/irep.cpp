@@ -692,19 +692,8 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
   return result;
 }
 
-/*******************************************************************\
-
-  Function: irept::serialize
-
-  Inputs:
-    serializer: The serializer to read from/write to
-
-  Outputs:
-
-  Purpose:
-    Serializes this instance to/from the given serializer.
-
-\*******************************************************************/
+/// Serializes this instance to/from the given serializer.
+/// \param serializer: The serializer to read from/write to
 void irept::serialize(serializert &serializer)
 {
   serializer.serialize("id", write().data);

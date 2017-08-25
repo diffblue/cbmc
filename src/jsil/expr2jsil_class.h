@@ -7,6 +7,9 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
+/// \file
+/// Jsil Language
+
 #ifndef CPROVER_JSIL_EXPR2JSIL_CLASS_H
 #define CPROVER_JSIL_EXPR2JSIL_CLASS_H
 

@@ -6,6 +6,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Overlay-map
+
 #ifndef CPROVER_UTIL_OVERLAY_MAP_H
 #define CPROVER_UTIL_OVERLAY_MAP_H
 

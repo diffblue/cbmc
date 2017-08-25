@@ -356,22 +356,11 @@ std::string fileutl_get_relative_path(
   return result;
 }
 
-/*******************************************************************\
-
-  Function: make_valid_filename
-
-  Inputs:
-    file_name: The file name to sanitize.
-
-  Outputs:
-
-  Purpose:
-    Replaces invalid characters in a file name using a hard-coded list of
-    replacements.
-    This is not designed to operate on path names and will replace folder
-    seperator characters.
-
-\*******************************************************************/
+/// Replaces invalid characters in a file name using a hard-coded list of
+/// replacements.
+/// This is not designed to operate on path names and will replace folder
+/// seperator characters.
+/// \param file_name: The file name to sanitize.
 std::string make_valid_filename(std::string file_name)
 {
   std::replace(file_name.begin(), file_name.end(), '#', '_');

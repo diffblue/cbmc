@@ -90,48 +90,38 @@ private:
   map_from_edges_to_call_locationst map_from_edges_to_call_locations;
 };
 
-/*******************************************************************\
-
-Function: inverted_partial_topological_order
-
-  Inputs: See purpose
-
- Outputs: See purpose
-
- Purpose:
-
-For DAG call graphs it computes an inverted topological order of all
-functions in the call graph. Otherwise, it computes only a partial
-inverted topological order (all loops are broken at some (randomly)
-chosen edge to get a DAG). The topolocical order is stored in the
-'output' vector.
-
-Since the algorithm is implemented using DFS, those 'breaks' are
-implemented naturally by a set of processed (vidited) functions.
-
-The function actually performs only one DFS from a passed 'start_function'.
-So, to get whole inverted (partial) topological order of all functions in
-the call graph, this function has to be called for all functions in the
-program.
-
-NOTE: The order is 'inverted'. It means that
-
-Typical usage:
- // Let's assume there is 'goto_modelt GM' and 'call_grapht CG'
- std::vector<irep_idt>  result; // Here we will store the topological order.
- {
-   std::unordered_set<irep_idt, dstring_hash>  processed;
-   for (const auto &elem : GM.goto_functions.function_map)
-     partial_topological_order(CG, elem.first, processed, result);
-   // Now we reverse the result to get the classic (partial)
-   // topological order instead of the inverted one.
-   std::reverse(result.begin(), result.end());
- }
- std::cout << "A (partial) topological order of my call graph is: ";
- for (const irep_idt &fn_name : result)
-   std::cout << fn_name << ", ";
-
-\*******************************************************************/
+/// For DAG call graphs it computes an inverted topological order of all
+/// functions in the call graph. Otherwise, it computes only a partial
+/// inverted topological order (all loops are broken at some (randomly)
+/// chosen edge to get a DAG). The topolocical order is stored in the
+/// 'output' vector.
+///
+/// Since the algorithm is implemented using DFS, those 'breaks' are
+/// implemented naturally by a set of processed (vidited) functions.
+///
+/// The function actually performs only one DFS from a passed 'start_function'.
+/// So, to get whole inverted (partial) topological order of all functions in
+/// the call graph, this function has to be called for all functions in the
+/// program.
+///
+/// NOTE: The order is 'inverted'. It means that
+///
+/// Typical usage:
+///  // Let's assume there is 'goto_modelt GM' and 'call_grapht CG'
+///  std::vector<irep_idt>  result; // Here we will store the topological order.
+///  {
+///    std::unordered_set<irep_idt, dstring_hash>  processed;
+///    for (const auto &elem : GM.goto_functions.function_map)
+///      partial_topological_order(CG, elem.first, processed, result);
+///    // Now we reverse the result to get the classic (partial)
+///    // topological order instead of the inverted one.
+///    std::reverse(result.begin(), result.end());
+///  }
+///  std::cout << "A (partial) topological order of my call graph is: ";
+///  for (const irep_idt &fn_name : result)
+///    std::cout << fn_name << ", ";
+/// \par parameters: See purpose
+/// \return See purpose
 void inverted_partial_topological_order(
   const call_grapht &call_graph,
   const irep_idt &start_function,

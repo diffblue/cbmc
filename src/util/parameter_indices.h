@@ -6,6 +6,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Parameter indexing
+
 #ifndef CPROVER_UTIL_PARAMETER_INDICES_H
 #define CPROVER_UTIL_PARAMETER_INDICES_H
 

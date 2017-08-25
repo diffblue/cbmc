@@ -10,6 +10,9 @@ Date: April 2017
 
 \*******************************************************************/
 
+/// \file
+/// Dynamic object name
+
 #include "dynamic_object_name.h"
 
 // We use std::string concatenation regularly with this string

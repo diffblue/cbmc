@@ -95,13 +95,7 @@ std::string as_string(
   const namespacet &ns,
   const goto_programt::instructiont &);
 
-/*******************************************************************\
-  Class: instruction_iterator_hashert
-
-  Purpose:
-    Function class to get hash of GOTO program instruction iterator
-
-\*******************************************************************/
+/// Function class to get hash of GOTO program instruction iterator
 class instruction_iterator_hashert
 {
 public:

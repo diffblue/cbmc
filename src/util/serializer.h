@@ -8,6 +8,9 @@ Purpose: Generic serialization of object hierarchies.
 
 \*******************************************************************/
 
+/// \file
+/// Serializer
+
 #ifndef CPROVER_UTIL_SERIALIZER_H
 #define CPROVER_UTIL_SERIALIZER_H
 
@@ -25,18 +28,11 @@ Purpose: Generic serialization of object hierarchies.
 #endif
 
 
-/*******************************************************************\
-
-Class: serializer_traitst
-
-Purpose:
-  A base class for classes that define traits that can be attached to a
-  serializer.
-  This is used to augment the behaviour of a family of serializers, typically
-  by passing data that is required for serializing a particular type of object
-  through to a sub-object serialization routine.
-
-\*******************************************************************/
+/// A base class for classes that define traits that can be attached to a
+/// serializer.
+/// This is used to augment the behaviour of a family of serializers, typically
+/// by passing data that is required for serializing a particular type of object
+/// through to a sub-object serialization routine.
 class serializer_traitst
 {
 public:
@@ -45,18 +41,11 @@ public:
 };
 
 
-/*******************************************************************\
-
-Class: serializert
-
-Purpose:
-  A base class for all serializers.
-  This is used to implement serialization by being passed to the serialize
-  method of classes to be serialized.
-  Defines pure virtual methods for serializing basic types.
-  Implements methods for serializing collection types.
-
-\*******************************************************************/
+/// A base class for all serializers.
+/// This is used to implement serialization by being passed to the serialize
+/// method of classes to be serialized.
+/// Defines pure virtual methods for serializing basic types.
+/// Implements methods for serializing collection types.
 class serializert
 {
   /////////////////////////////////////////////////////////////////////////////
