@@ -26,14 +26,14 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
-class string_constraint_generatort: messaget
+class string_constraint_generatort final: messaget
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  string_constraint_generatort(namespacet _ns):
+  explicit string_constraint_generatort(namespacet _ns):
     max_string_length(std::numeric_limits<size_t>::max()),
     force_printable_characters(false),
     ns(_ns)
@@ -91,21 +91,19 @@ public:
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
-  static constant_exprt constant_char(int i, const typet &char_type);
-
-
   // Used by format function
   class format_specifiert;
 
 private:
+  static constant_exprt constant_char(int i, const typet &char_type);
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
   // that is -2147483648 so takes 11 characters to write.
   // The long with the longest string is Long.MIN_VALUE which is -2^63,
   // approximately -9.223372037*10^18 so takes 20 characters to write.
-  const std::size_t MAX_INTEGER_LENGTH=11;
-  const std::size_t MAX_LONG_LENGTH=20;
-  const std::size_t MAX_FLOAT_LENGTH=15;
-  const std::size_t MAX_DOUBLE_LENGTH=30;
+  constexpr static const std::size_t MAX_INTEGER_LENGTH=11;
+  constexpr static const std::size_t MAX_LONG_LENGTH=20;
+  constexpr static const std::size_t MAX_FLOAT_LENGTH=15;
+  constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
 
   std::map<function_application_exprt, exprt> function_application_cache;
   namespacet ns;
@@ -346,7 +344,6 @@ private:
     return args;
   }
 
-private:
   // Helper functions
   exprt int_of_hex_char(const exprt &chr) const;
   exprt is_high_surrogate(const exprt &chr) const;
@@ -363,13 +360,16 @@ exprt is_digit_with_radix(
   const bool strict_formatting,
   const exprt &radix_as_char,
   const unsigned long radix_ul);
+
 exprt get_numeric_value_from_character(
   const exprt &chr,
   const typet &char_type,
   const typet &type,
   const bool strict_formatting,
   unsigned long radix_ul);
+
 size_t max_printed_string_length(const typet &type, unsigned long ul_radix);
+
 std::string utf16_constant_array_to_java(
   const array_exprt &arr, unsigned length);
 
