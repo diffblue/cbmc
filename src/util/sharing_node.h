@@ -64,7 +64,7 @@ public:
     d.k=std::make_shared<key_type>(k);
 
     _sn_assert(d.m==nullptr);
-    d.m.reset(new mapped_type(m));
+    d.m=std::make_shared<mapped_type>(m);
   }
 
   sharing_nodet(const self_type &other)
@@ -266,7 +266,7 @@ protected:
       if(d.is_leaf())
       {
         _sn_assert(m==nullptr);
-        m.reset(new mapped_type(*d.m));
+        m=std::make_shared<mapped_type>(*d.m);
       }
     }
 
@@ -277,7 +277,7 @@ protected:
     }
 
     std::shared_ptr<key_type> k;
-    std::unique_ptr<mapped_type> m;
+    std::shared_ptr<mapped_type> m;
 
     subt sub;
     containert con;
@@ -339,8 +339,8 @@ protected:
 
 template <class keyT, class valueT, class predT, bool no_sharing>
 std::shared_ptr<typename sharing_nodet<keyT, valueT, predT, no_sharing>::dt>
-  sharing_nodet<keyT, valueT, predT, no_sharing>::empty_data(
-    new sharing_nodet<keyT, valueT, predT, no_sharing>::dt());
+  sharing_nodet<keyT, valueT, predT, no_sharing>::empty_data=
+    std::make_shared<sharing_nodet<keyT, valueT, predT, no_sharing>::dt>();
 
 template <class keyT, class valueT, class predT, bool no_sharing>
 sharing_nodet<keyT, valueT, predT, no_sharing>

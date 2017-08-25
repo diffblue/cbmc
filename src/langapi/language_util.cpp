@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "mode.h"
 
-static languaget* get_language(
+static std::unique_ptr<languaget> get_language(
   const namespacet &ns,
   const irep_idt &identifier)
 {
@@ -28,7 +28,7 @@ static languaget* get_language(
      symbol->mode=="")
     return get_default_language();
 
-  languaget *ptr=get_language_from_mode(symbol->mode);
+  std::unique_ptr<languaget> ptr=get_language_from_mode(symbol->mode);
 
   if(ptr==nullptr)
     throw "symbol `"+id2string(symbol->name)+

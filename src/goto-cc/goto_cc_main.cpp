@@ -45,7 +45,9 @@ int main(int argc, const char **argv)
 #endif
 {
   #ifdef _MSC_VER
-  const char **argv=narrow_argv(argc, argv_wide);
+  auto vec=narrow_argv(argc, argv_wide);
+  auto narrow=to_c_str_array(std::begin(vec), std::end(vec));
+  auto argv=narrow.data();
   #endif
 
   if(argv==nullptr || argc<1)

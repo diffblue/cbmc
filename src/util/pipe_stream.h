@@ -15,6 +15,7 @@ Author:
 #include <iostream>
 #include <string>
 #include <list>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -43,7 +44,7 @@ public:
 
 protected:
   HANDLE proc_in, proc_out;
-  char *in_buffer;
+  std::vector<char> in_buffer;
 
   int_type overflow(int_type);
   std::streamsize xsputn(const char *, std::streamsize);

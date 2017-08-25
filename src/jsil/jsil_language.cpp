@@ -101,9 +101,9 @@ void jsil_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-languaget *new_jsil_language()
+std::unique_ptr<languaget> new_jsil_language()
 {
-  return new jsil_languaget;
+  return util_make_unique<jsil_languaget>();
 }
 
 bool jsil_languaget::from_expr(

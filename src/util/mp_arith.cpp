@@ -8,12 +8,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mp_arith.h"
 
-#include <cstdlib>
+#include <cassert>
 #include <cctype>
-
-#include <sstream>
-#include <ostream>
+#include <cstdlib>
 #include <limits>
+#include <ostream>
+#include <sstream>
+#include <vector>
 
 #include "arith_tools.h"
 #include "invariant.h"
@@ -79,12 +80,10 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
   }
 
   std::size_t len = a.digits(2) + 2;
-  char *buffer=new char[len];
-  char *s = a.as_string(buffer, len, 2);
+  std::vector<char> buffer(len);
+  char *s = a.as_string(buffer.data(), len, 2);
 
   std::string result(s);
-
-  delete[] buffer;
 
   if(result.size()<width)
   {
@@ -107,12 +106,10 @@ const std::string integer2binary(const mp_integer &n, std::size_t width)
 const std::string integer2string(const mp_integer &n, unsigned base)
 {
   unsigned len = n.digits(base) + 2;
-  char *buffer=new char[len];
-  char *s = n.as_string(buffer, len, base);
+  std::vector<char> buffer(len);
+  char *s = n.as_string(buffer.data(), len, base);
 
   std::string result(s);
-
-  delete[] buffer;
 
   return result;
 }
