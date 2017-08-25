@@ -369,12 +369,12 @@ exprt::operandst
   symbol_tablet &symbol_table,
   code_blockt &init_code)
 {
-  assert(operands.size()==2);
+  PRECONDITION(operands.size()==2);
   exprt::operandst ops;
-  exprt op0=operands[0];
-  exprt op1=operands[1];
+  const exprt &op0=operands[0];
+  const exprt &op1=operands[1];
+  PRECONDITION(implements_java_char_sequence(op0.type()));
 
-  assert(implements_java_char_sequence(op0.type()));
   dereference_exprt deref0=
     checked_dereference(op0, to_pointer_type(op0.type()).subtype());
   process_single_operand(ops, deref0, loc, symbol_table, init_code);
@@ -396,21 +396,16 @@ exprt::operandst
 typet java_string_library_preprocesst::get_data_type(
   const typet &type, const symbol_tablet &symbol_table)
 {
+  PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
   if(type.id()==ID_symbol)
   {
     symbolt sym=symbol_table.lookup(to_symbol_type(type).get_identifier());
-    assert(sym.type.id()!=ID_symbol);
+    CHECK_RETURN(sym.type.id()!=ID_symbol);
     return get_data_type(sym.type, symbol_table);
   }
-  else
-  {
-    assert(type.id()==ID_struct);
-    const struct_typet &struct_type=to_struct_type(type);
-    for(auto component : struct_type.components())
-      if(component.get_name()=="data")
-        return component.type();
-    assert(false && "type does not contain data component");
-  }
+  // else type id is ID_struct
+  const struct_typet &struct_type=to_struct_type(type);
+  return struct_type.component_type("data");
 }
 
 /// Finds the type of the length component
@@ -420,21 +415,16 @@ typet java_string_library_preprocesst::get_data_type(
 typet java_string_library_preprocesst::get_length_type(
   const typet &type, const symbol_tablet &symbol_table)
 {
+  PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
   if(type.id()==ID_symbol)
   {
     symbolt sym=symbol_table.lookup(to_symbol_type(type).get_identifier());
-    assert(sym.type.id()!=ID_symbol);
+    CHECK_RETURN(sym.type.id()!=ID_symbol);
     return get_length_type(sym.type, symbol_table);
   }
-  else
-  {
-    assert(type.id()==ID_struct);
-    const struct_typet &struct_type=to_struct_type(type);
-    for(auto component : struct_type.components())
-      if(component.get_name()=="length")
-        return component.type();
-    assert(false && "type does not contain length component");
-  }
+  // else type id is ID_struct
+  const struct_typet &struct_type=to_struct_type(type);
+  return struct_type.component_type("length");
 }
 
 /// access length member
@@ -730,7 +720,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   const exprt &rhs_length,
   symbol_tablet &symbol_table)
 {
-  assert(implements_java_char_sequence(lhs.type()));
+  PRECONDITION(implements_java_char_sequence(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
   code_blockt code;
@@ -788,7 +778,7 @@ codet java_string_library_preprocesst::
     const source_locationt &loc,
     symbol_tablet &symbol_table)
 {
-  assert(implements_java_char_sequence(lhs.type()));
+  PRECONDITION(implements_java_char_sequence(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
   code_blockt code;
@@ -814,7 +804,7 @@ codet java_string_library_preprocesst::
 codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   const string_exprt &lhs, const exprt &rhs, symbol_tablet &symbol_table)
 {
-  assert(implements_java_char_sequence(rhs.type()));
+  PRECONDITION(implements_java_char_sequence(rhs.type()));
 
   typet deref_type;
   if(rhs.type().subtype().id()==ID_symbol)
@@ -903,7 +893,7 @@ codet java_string_library_preprocesst::make_float_to_string_code(
 {
   // Getting the argument
   code_typet::parameterst params=type.parameters();
-  assert(params.size()==1 && "wrong number of parameters in Float.toString");
+  PRECONDITION(params.size()==1);
   exprt arg=symbol_exprt(params[0].get_identifier(), params[0].type());
 
   // Holder for output code
@@ -1012,7 +1002,10 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   string_expr_list.push_back(neg_simple_notation);
 
   // Combining all cases
-  assert(string_expr_list.size()==condition_list.size());
+  INVARIANT(
+    string_expr_list.size()==condition_list.size(),
+    "number of created strings should correspond to number of conditions");
+
   // We do not check the condition of the first element in the list as it
   // will be reached only if all other conditions are not satisfied.
   codet tmp_code=code_assign_string_expr_to_java_string(
@@ -1059,7 +1052,7 @@ codet java_string_library_preprocesst::make_init_function_from_call(
   code_typet::parameterst params=type.parameters();
 
   // The first parameter is the object to be initialized
-  assert(!params.empty());
+  PRECONDITION(!params.empty());
   exprt arg_this=symbol_exprt(params[0].get_identifier(), params[0].type());
   if(ignore_first_arg)
     params.erase(params.begin());
@@ -1100,11 +1093,11 @@ codet java_string_library_preprocesst::
     symbol_tablet &symbol_table)
 {
   // This is similar to assign functions except we return a pointer to `this`
+  code_typet::parameterst params=type.parameters();
+  PRECONDITION(!params.empty());
   code_blockt code;
   code.add(make_assign_function_from_call(
     function_name, type, loc, symbol_table));
-  code_typet::parameterst params=type.parameters();
-  assert(!params.empty());
   exprt arg_this=symbol_exprt(params[0].get_identifier(), params[0].type());
   code.add(code_returnt(arg_this));
   return code;
@@ -1151,10 +1144,10 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
     symbol_tablet &symbol_table)
 {
   code_blockt code;
-  assert(!type.parameters().empty());
+  PRECONDITION(!type.parameters().empty());
   const code_typet::parametert &p=type.parameters()[0];
   symbol_exprt string_argument(p.get_identifier(), p.type());
-  assert(implements_java_char_sequence(string_argument.type()));
+  PRECONDITION(implements_java_char_sequence(string_argument.type()));
 
   // lhs = new java::array[char]
   exprt lhs=allocate_fresh_array(
