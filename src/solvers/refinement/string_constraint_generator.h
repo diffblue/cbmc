@@ -26,7 +26,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
-class string_constraint_generatort final: messaget
+class string_constraint_generatort final
 {
 public:
   // This module keeps a list of axioms. It has methods which generate
@@ -95,6 +95,7 @@ public:
   class format_specifiert;
 
 private:
+  messaget m_message;
   static constant_exprt constant_char(int i, const typet &char_type);
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
   // that is -2147483648 so takes 11 characters to write.

@@ -313,10 +313,12 @@ string_exprt string_constraint_generatort::add_axioms_for_format_specifier(
   case format_specifiert::DATE_TIME:
     // TODO: DateTime not implemented
     // For all these unimplemented cases we return a non-deterministic string
-    warning() << "unimplemented format specifier: " << fs.conversion << eom;
+    m_message.warning() << "unimplemented format specifier: " << fs.conversion
+                        << m_message.eom;
     return fresh_string(ref_type);
   default:
-    error() << "invalid format specifier: " << fs.conversion << eom;
+    m_message.error() << "invalid format specifier: " << fs.conversion
+                      << m_message.eom;
     INVARIANT(
       false, "format specifier must belong to [bBhHsScCdoxXeEfgGaAtT%n]");
     throw 0;
@@ -432,8 +434,8 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
   }
   else
   {
-    warning() << "ignoring format function with non constant first argument"
-              << eom;
+    m_message.warning() << "ignoring format function with non constant first argument"
+              << m_message.eom;
     return fresh_string(ref_type);
   }
 }
