@@ -818,13 +818,13 @@ void string_refinementt::debug_model()
     }
   }
 
-  for(auto it : generator.boolean_symbols)
+  for(const auto it : generator.get_boolean_symbols())
   {
       debug() << " - " << it.get_identifier() << ": "
               << from_expr(ns, "", supert::get(it)) << eom;
   }
 
-  for(auto it : generator.index_symbols)
+  for(const auto it : generator.get_index_symbols())
   {
      debug() << " - " << it.get_identifier() << ": "
              << from_expr(ns, "", supert::get(it)) << eom;

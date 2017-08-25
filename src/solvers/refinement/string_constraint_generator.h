@@ -46,10 +46,10 @@ public:
   std::vector<exprt> axioms;
 
   // Boolean symbols for the results of some string functions
-  std::vector<symbol_exprt> boolean_symbols;
+  const std::vector<symbol_exprt> get_boolean_symbols() const;
 
-  // Symbols used in existential quantifications
-  std::vector<symbol_exprt> index_symbols;
+  /// Symbols used in existential quantifications
+  const std::vector<symbol_exprt>& get_index_symbols() const;
 
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
@@ -92,6 +92,8 @@ public:
 
 private:
   messaget m_message;
+  std::vector<symbol_exprt> boolean_symbols;
+  std::vector<symbol_exprt> index_symbols;
   static constant_exprt constant_char(int i, const typet &char_type);
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
   // that is -2147483648 so takes 11 characters to write.
