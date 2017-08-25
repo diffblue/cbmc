@@ -1059,6 +1059,10 @@ void java_object_factoryt::gen_nondet_array_init(
   // Otherwise we're updating the array in place, and use the
   // existing array allocation and length.
 
+  INVARIANT(
+    is_valid_java_array(struct_type),
+    "Java struct array does not conform to expectations");
+
   dereference_exprt deref_expr(expr, expr.type().subtype());
   const auto &comps=struct_type.components();
   exprt length_expr=member_exprt(deref_expr, "length", comps[1].type());
