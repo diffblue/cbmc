@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Test-Suite Generation with BMC
+
+#include "bmc.h"
+
 #include <iostream>
 
 #include <util/time_stopping.h>
@@ -21,20 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 
-#include "bmc.h"
 #include "bv_cbmc.h"
-
-/*******************************************************************\
-
-   Class: bmc_covert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 class bmc_covert:
   public cover_goalst::observert,
@@ -77,7 +69,7 @@ public:
     std::string description;
     source_locationt source_location;
 
-    // if satisified, we compute a goto_trace
+    // if satisfied, we compute a goto_trace
     bool satisfied;
 
     goalt(
@@ -149,18 +141,6 @@ protected:
   bmct &bmc;
 };
 
-/*******************************************************************\
-
-Function: bmc_covert::satisfying_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmc_covert::satisfying_assignment()
 {
   tests.push_back(testt());
@@ -209,18 +189,6 @@ void bmc_covert::satisfying_assignment()
   show_goto_trace(std::cout, bmc.ns, test.goto_trace);
   #endif
 }
-
-/*******************************************************************\
-
-Function: bmc_covert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool bmc_covert::operator()()
 {
@@ -309,7 +277,7 @@ bool bmc_covert::operator()()
 
   switch(bmc.ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       status() << "\n** coverage results:" << eom;
 
@@ -334,7 +302,7 @@ bool bmc_covert::operator()()
       break;
     }
 
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       for(const auto &goal_pair : goal_map)
       {
@@ -386,7 +354,7 @@ bool bmc_covert::operator()()
       break;
     }
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &goals_array=json_result["goals"].make_array();
@@ -452,7 +420,7 @@ bool bmc_covert::operator()()
                << (cover_goals.iterations()==1?"":"s")
                << eom;
 
-  if(bmc.ui==ui_message_handlert::PLAIN)
+  if(bmc.ui==ui_message_handlert::uit::PLAIN)
   {
     std::cout << "Test suite:" << '\n';
 
@@ -463,18 +431,7 @@ bool bmc_covert::operator()()
   return false;
 }
 
-/*******************************************************************\
-
-Function: bmct::cover
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
+/// Try to cover all goals
 bool bmct::cover(
   const goto_functionst &goto_functions,
   const optionst::value_listt &criteria)

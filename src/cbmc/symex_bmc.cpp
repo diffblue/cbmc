@@ -6,24 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Bounded Model Checking for ANSI-C
+
+#include "symex_bmc.h"
+
 #include <limits>
 
 #include <util/source_location.h>
 #include <util/simplify_expr.h>
-
-#include "symex_bmc.h"
-
-/*******************************************************************\
-
-Function: symex_bmct::symex_bmct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symex_bmct::symex_bmct(
   const namespacet &_ns,
@@ -31,23 +22,13 @@ symex_bmct::symex_bmct(
   symex_targett &_target):
   goto_symext(_ns, _new_symbol_table, _target),
   record_coverage(false),
+  max_unwind(0),
   max_unwind_is_set(false),
   symex_coverage(_ns)
 {
 }
 
-/*******************************************************************\
-
-Function: symex_bmct::symex_step
-
-  Inputs:
-
- Outputs:
-
- Purpose: show progress
-
-\*******************************************************************/
-
+/// show progress
 void symex_bmct::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
@@ -65,6 +46,7 @@ void symex_bmct::symex_step(
   }
 
   const goto_programt::const_targett cur_pc=state.source.pc;
+  const guardt cur_guard=state.guard;
 
   if(!state.guard.is_false() &&
      state.source.pc->is_assume() &&
@@ -84,29 +66,24 @@ void symex_bmct::symex_step(
   goto_symext::symex_step(goto_functions, state);
 
   if(record_coverage &&
-     // is the instruction being executed
-     !state.guard.is_false() &&
      // avoid an invalid iterator in state.source.pc
      (!cur_pc->is_end_function() ||
-      cur_pc->function!=goto_functions.entry_point()) &&
-     // ignore transition to next instruction when goto points elsewhere
-     (!cur_pc->is_goto() ||
-      cur_pc->get_target()==state.source.pc ||
-      !cur_pc->guard.is_true()))
-    symex_coverage.covered(cur_pc, state.source.pc);
+      cur_pc->function!=goto_functions.entry_point()))
+  {
+    // forward goto will effectively be covered via phi function,
+    // which does not invoke symex_step; as symex_step is called
+    // before merge_gotos, also state.guard will be false (we have
+    // taken an impossible transition); thus we synthesize a
+    // transition from the goto instruction to its target to make
+    // sure the goto is considered covered
+    if(cur_pc->is_goto() &&
+       cur_pc->get_target()!=state.source.pc &&
+       cur_pc->guard.is_true())
+      symex_coverage.covered(cur_pc, cur_pc->get_target());
+    else if(!state.guard.is_false())
+      symex_coverage.covered(cur_pc, state.source.pc);
+  }
 }
-
-/*******************************************************************\
-
-Function: symex_bmct::merge_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_bmct::merge_goto(
   const statet::goto_statet &goto_state,
@@ -126,18 +103,6 @@ void symex_bmct::merge_goto(
      !prev_pc->guard.is_true())
     symex_coverage.covered(prev_pc, state.source.pc);
 }
-
-/*******************************************************************\
-
-Function: symex_bmct::get_unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
@@ -179,18 +144,6 @@ bool symex_bmct::get_unwind(
 
   return abort;
 }
-
-/*******************************************************************\
-
-Function: symex_bmct::get_unwind_recursion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool symex_bmct::get_unwind_recursion(
   const irep_idt &id,
@@ -236,18 +189,6 @@ bool symex_bmct::get_unwind_recursion(
 
   return abort;
 }
-
-/*******************************************************************\
-
-Function: symex_bmct::no_body
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_bmct::no_body(const irep_idt &identifier)
 {

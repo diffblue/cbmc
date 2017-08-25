@@ -8,6 +8,9 @@ Date: February 2006
 
 \*******************************************************************/
 
+/// \file
+/// Race Detection for Threaded Goto Programs
+
 #ifndef CPROVER_GOTO_INSTRUMENT_RW_SET_H
 #define CPROVER_GOTO_INSTRUMENT_RW_SET_H
 
@@ -263,13 +266,13 @@ protected:
 
   void track_deref(const entryt &entry, bool read)
   {
-    if(dereferencing && dereferenced.size()==0)
+    if(dereferencing && dereferenced.empty())
     {
       dereferenced.insert(dereferenced.begin(), entry);
       if(read)
         set_reads.insert(entry.object);
     }
-    else if(dereferencing && dereferenced.size()>0)
+    else if(dereferencing && !dereferenced.empty())
       dereferenced_from.insert(
         std::make_pair(entry.object, dereferenced.front().object));
   }

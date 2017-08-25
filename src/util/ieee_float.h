@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_IEEE_FLOAT_H
 #define CPROVER_UTIL_IEEE_FLOAT_H
 
@@ -110,12 +111,12 @@ public:
   // ROUND_TO_EVEN is also known as "round to nearest, ties to even", and
   // is the IEEE default.
   // The numbering below is what x86 uses in the control word.
-  typedef enum
+  enum rounding_modet
   {
     ROUND_TO_EVEN=0, ROUND_TO_MINUS_INF=1,
     ROUND_TO_PLUS_INF=2,  ROUND_TO_ZERO=3,
     UNKNOWN, NONDETERMINISTIC
-  } rounding_modet;
+  };
 
   rounding_modet rounding_mode;
 
@@ -237,7 +238,7 @@ public:
   void from_double(const double d);
   void from_float(const float f);
 
-  // perfroms conversions from IEEE float-point format
+  // performs conversions from IEEE float-point format
   // to something else
   double to_double() const;
   float to_float() const;
@@ -267,7 +268,7 @@ public:
   constant_exprt to_expr() const;
   void from_expr(const constant_exprt &expr);
 
-  // the usual opertors
+  // the usual operators
   ieee_floatt &operator/=(const ieee_floatt &other);
   ieee_floatt &operator*=(const ieee_floatt &other);
   ieee_floatt &operator+=(const ieee_floatt &other);

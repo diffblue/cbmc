@@ -8,6 +8,11 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// Initialize command line arguments
+
+#include "model_argc_argv.h"
+
 #include <sstream>
 
 #include <util/cprover_prefix.h>
@@ -24,20 +29,6 @@ Date: April 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
 
-#include "model_argc_argv.h"
-
-/*******************************************************************\
-
-Function: model_argc_argv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool model_argc_argv(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -47,7 +38,7 @@ bool model_argc_argv(
   messaget message(message_handler);
   const namespacet ns(symbol_table);
 
-  const symbolt *init_symbol=0;
+  const symbolt *init_symbol=nullptr;
   if(ns.lookup(CPROVER_PREFIX "initialize", init_symbol))
   {
     message.error() << "Linking not done, missing "

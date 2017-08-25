@@ -8,8 +8,12 @@ Date: October 2012
 
 \*******************************************************************/
 
-#include "ai.h"
+/// \file
+/// Over-approximate Concurrency for Threaded Goto Programs
+
 #include "is_threaded.h"
+
+#include "ai.h"
 
 class is_threaded_domaint:public ai_domain_baset
 {
@@ -77,18 +81,6 @@ public:
     is_threaded=false;
   }
 };
-
-/*******************************************************************\
-
-Function: is_threadedt::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void is_threadedt::compute(const goto_functionst &goto_functions)
 {

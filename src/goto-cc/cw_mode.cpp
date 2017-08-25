@@ -6,6 +6,11 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+/// \file
+/// Command line option container
+
+#include "cw_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -21,21 +26,9 @@ Author: CM Wintersteiger, 2006
 #include <util/prefix.h>
 #include <util/config.h>
 
-#include "cw_mode.h"
 #include "compile.h"
 
-/*******************************************************************\
-
-Function: cw_modet::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: does it.
-
-\*******************************************************************/
-
+/// does it.
 int cw_modet::doit()
 {
   if(cmdline.isset('?') || cmdline.isset("help"))
@@ -46,7 +39,7 @@ int cw_modet::doit()
 
   unsigned int verbosity=1;
 
-  compilet compiler(cmdline);
+  compilet compiler(cmdline, message_handler, cmdline.isset("Werror"));
 
   #if 0
   bool act_as_ld=
@@ -141,7 +134,7 @@ int cw_modet::doit()
         it!=config.ansi_c.defines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Undefines:\n";
@@ -149,7 +142,7 @@ int cw_modet::doit()
         it!=config.ansi_c.undefines.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Preprocessor Options:\n";
@@ -157,7 +150,7 @@ int cw_modet::doit()
         it!=config.ansi_c.preprocessor_options.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Include Paths:\n";
@@ -165,7 +158,7 @@ int cw_modet::doit()
         it!=config.ansi_c.include_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Library Paths:\n";
@@ -173,31 +166,20 @@ int cw_modet::doit()
         it!=compiler.library_paths.end();
         it++)
     {
-      std::cout << "  " << (*it) << std::endl;
+      std::cout << "  " << (*it) << '\n';
     }
 
     std::cout << "Output file (object): "
-              << compiler.output_file_object << std::endl;
+              << compiler.output_file_object << '\n';
     std::cout << "Output file (executable): "
-              << compiler.output_file_executable << std::endl;
+              << compiler.output_file_executable << '\n';
   }
 
   // Parse input program, convert to goto program, write output
   return compiler.doit() ? EX_USAGE : EX_OK;
 }
 
-/*******************************************************************\
-
-Function: cw_modet::help_mode
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void cw_modet::help_mode()
 {
   std::cout << "goto-cw understands the options of "

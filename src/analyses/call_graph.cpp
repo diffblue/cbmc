@@ -6,40 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Call Graphs
+
 #include "call_graph.h"
-#include <util/std_expr.h>
-#include <util/xml.h>
 #include <algorithm>
 #include <iterator>
-
-
-/*******************************************************************\
-
-Function: call_grapht::call_grapht
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_expr.h>
+#include <util/xml.h>
 
 call_grapht::call_grapht()
 {
 }
-
-/*******************************************************************\
-
-Function: call_grapht::call_grapht
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 call_grapht::call_grapht(const goto_functionst &goto_functions)
 {
@@ -49,18 +27,6 @@ call_grapht::call_grapht(const goto_functionst &goto_functions)
     add(f_it->first, body);
   }
 }
-
-/*******************************************************************\
-
-Function: call_grapht::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void call_grapht::add(
   const irep_idt &function,
@@ -77,18 +43,6 @@ void call_grapht::add(
   }
 }
 
-/*******************************************************************\
-
-Function: call_grapht::swap
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void call_grapht::swap(call_grapht &other)
 {
   std::swap(graph, other.graph);
@@ -96,37 +50,12 @@ void call_grapht::swap(call_grapht &other)
             other.map_from_edges_to_call_locations);
 }
 
-
-/*******************************************************************\
-
-Function: call_grapht::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void call_grapht::add(
   const irep_idt &caller,
   const irep_idt &callee)
 {
   graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
 }
-
-/*******************************************************************\
-
-Function: call_grapht::add
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void call_grapht::add(
   const irep_idt &caller,
@@ -149,19 +78,6 @@ void call_grapht::add(
     call_sites.cbegin(), call_sites.cend(),
     std::back_inserter(map_from_edges_to_call_locations[{caller, callee}]));
 }
-
-
-/*******************************************************************\
-
-Function: call_grapht::output_dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void call_grapht::output_dot(std::ostream &out) const
 {
@@ -186,19 +102,6 @@ void call_grapht::output_dot(std::ostream &out) const
   out << "}\n";
 }
 
-
-/*******************************************************************\
-
-Function: call_grapht::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void call_grapht::output(std::ostream &out) const
 {
   for(const auto &edge : graph)
@@ -206,18 +109,6 @@ void call_grapht::output(std::ostream &out) const
     out << edge.first << " -> " << edge.second << "\n";
   }
 }
-
-/*******************************************************************\
-
-Function: call_grapht::output_xml
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void call_grapht::output_xml(std::ostream &out) const
 {
@@ -492,18 +383,6 @@ void find_leaves_below_function(
   find_leaves_below_function(call_graph, function, to_avoid, output);
 }
 
-/*******************************************************************\
-
-Function: find_direct_or_indirect_callees_of_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void find_direct_or_indirect_callees_of_function(
   const call_grapht &call_graph,
   const irep_idt &function,
@@ -513,18 +392,6 @@ void find_direct_or_indirect_callees_of_function(
   find_leaves_below_function(call_graph, function, output, leaves);
   output.insert(leaves.cbegin(), leaves.cend());
 }
-
-/*******************************************************************\
-
-Function: find_nearest_common_callees
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_nearest_common_callees(
   const call_grapht &call_graph,

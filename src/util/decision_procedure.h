@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Decision Procedure Interface
+
 #ifndef CPROVER_UTIL_DECISION_PROCEDURE_H
 #define CPROVER_UTIL_DECISION_PROCEDURE_H
 
@@ -39,7 +42,7 @@ public:
   { set_to(expr, false); }
 
   // solve the problem
-  typedef enum { D_SATISFIABLE, D_UNSATISFIABLE, D_ERROR } resultt;
+  enum class resultt { D_SATISFIABLE, D_UNSATISFIABLE, D_ERROR };
 
   // will eventually be protected, use below call operator
   virtual resultt dec_solve()=0;

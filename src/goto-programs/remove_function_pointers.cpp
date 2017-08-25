@@ -6,33 +6,29 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Program Transformation
+
+#include "remove_function_pointers.h"
+
 #include <cassert>
 
 #include <util/fresh_symbol.h>
 #include <util/replace_expr.h>
 #include <util/source_location.h>
 #include <util/std_expr.h>
-#include <util/config.h>
 #include <util/type_eq.h>
 #include <util/message.h>
 #include <util/base_type.h>
 #include <ansi-c/c_qualifiers.h>
 #include <analyses/does_remove_const.h>
+#include <util/invariant.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "remove_skip.h"
-#include "remove_function_pointers.h"
 #include "compute_called_functions.h"
 #include "remove_const_function_pointers.h"
-
-/*******************************************************************\
-
-   Class: remove_function_pointerst
-
- Purpose:
-
-\*******************************************************************/
 
 class remove_function_pointerst:public messaget
 {
@@ -54,7 +50,7 @@ protected:
   bool add_safety_assertion;
 
   // We can optionally halt the FP removal if we aren't able to use
-  // remove_const_function_pointerst to sucessfully narrow to a small
+  // remove_const_function_pointerst to successfully narrow to a small
   // subset of possible functions and just leave the function pointer
   // as it is.
   // This can be activated in goto-instrument using
@@ -94,18 +90,6 @@ protected:
   }
 };
 
-/*******************************************************************\
-
-Function: remove_function_pointerst::remove_function_pointerst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 remove_function_pointerst::remove_function_pointerst(
   message_handlert &_message_handler,
   symbol_tablet &_symbol_table,
@@ -124,18 +108,6 @@ remove_function_pointerst::remove_function_pointerst(
   forall_goto_functions(f_it, goto_functions)
     type_map[f_it->first]=f_it->second.type;
 }
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::arg_is_type_compatible
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool remove_function_pointerst::arg_is_type_compatible(
   const typet &call_type,
@@ -168,18 +140,6 @@ bool remove_function_pointerst::arg_is_type_compatible(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::is_type_compatible
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool remove_function_pointerst::is_type_compatible(
   bool return_value_used,
@@ -231,18 +191,6 @@ bool remove_function_pointerst::is_type_compatible(
   return true;
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointerst::fix_argument_types
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_function_pointerst::fix_argument_types(
   code_function_callt &function_call)
 {
@@ -267,18 +215,6 @@ void remove_function_pointerst::fix_argument_types(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: remove_function_pointerst::fix_return_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_function_pointerst::fix_return_type(
   code_function_callt &function_call,
@@ -319,18 +255,6 @@ void remove_function_pointerst::fix_return_type(
     old_lhs, typecast_exprt(tmp_symbol_expr, old_lhs.type()));
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointerst::remove_function_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_function_pointerst::remove_function_pointer(
   goto_programt &goto_program,
   goto_programt::targett target)
@@ -370,14 +294,15 @@ void remove_function_pointerst::remove_function_pointer(
   else
   {
     remove_const_function_pointerst fpr(
-    get_message_handler(), pointer, ns, symbol_table);
+    get_message_handler(), ns, symbol_table);
 
-    found_functions=fpr(functions);
+    found_functions=fpr(pointer, functions);
 
-    // Either found_functions is true therefore the functions should not
-    // be empty
-    // Or found_functions is false therefore the functions should be empty
-    assert(found_functions != functions.empty());
+    // if found_functions is false, functions should be empty
+    // however, it is possible for found_functions to be true and functions
+    // to be empty (this happens if the pointer can only resolve to the null
+    // pointer)
+    CHECK_RETURN(found_functions || functions.empty());
 
     if(functions.size()==1)
     {
@@ -391,7 +316,7 @@ void remove_function_pointerst::remove_function_pointer(
     if(only_resolve_const_fps)
     {
       // If this mode is enabled, we only remove function pointers
-      // that we can resolve either to an exact funciton, or an exact subset
+      // that we can resolve either to an exact function, or an exact subset
       // (e.g. a variable index in a constant array).
       // Since we haven't found functions, we would now resort to
       // replacing the function pointer with any function with a valid signature
@@ -450,10 +375,7 @@ void remove_function_pointerst::remove_function_pointer(
     t3->make_goto(t_final, true_exprt());
 
     // goto to call
-    address_of_exprt address_of;
-    address_of.object()=fun;
-    address_of.type()=pointer_typet();
-    address_of.type().subtype()=fun.type();
+    address_of_exprt address_of(fun, pointer_type(fun.type()));
 
     if(address_of.type()!=pointer.type())
       address_of.make_typecast(pointer.type());
@@ -510,18 +432,6 @@ void remove_function_pointerst::remove_function_pointer(
                << functions.size() << " possible targets" << eom;
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointerst::remove_function_pointers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool remove_function_pointerst::remove_function_pointers(
   goto_programt &goto_program)
 {
@@ -549,18 +459,6 @@ bool remove_function_pointerst::remove_function_pointers(
   return did_something;
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointerst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_function_pointerst::operator()(goto_functionst &functions)
 {
   bool did_something=false;
@@ -580,18 +478,6 @@ void remove_function_pointerst::operator()(goto_functionst &functions)
     functions.compute_location_numbers();
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool remove_function_pointers(message_handlert &_message_handler,
   symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
@@ -610,18 +496,6 @@ bool remove_function_pointers(message_handlert &_message_handler,
   return rfp.remove_function_pointers(goto_program);
 }
 
-/*******************************************************************\
-
-Function: remove_function_pointers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void remove_function_pointers(
   message_handlert &_message_handler,
   symbol_tablet &symbol_table,
@@ -639,18 +513,6 @@ void remove_function_pointers(
 
   rfp(goto_functions);
 }
-
-/*******************************************************************\
-
-Function: remove_function_pointers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void remove_function_pointers(message_handlert &_message_handler,
   goto_modelt &goto_model,

@@ -6,21 +6,12 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <util/message.h>
+/// \file
+/// Unused function removal
 
 #include "remove_unused_functions.h"
 
-/*******************************************************************\
-
-Function: remove_unused_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/message.h>
 
 void remove_unused_functions(
   goto_functionst &functions,
@@ -42,7 +33,7 @@ void remove_unused_functions(
 
   messaget message(message_handler);
 
-  if(unused_functions.size()>0)
+  if(!unused_functions.empty())
   {
     message.statistics()
       << "Dropping " << unused_functions.size() << " of " <<
@@ -53,18 +44,6 @@ void remove_unused_functions(
   for(const auto &f : unused_functions)
     functions.function_map.erase(f);
 }
-
-/*******************************************************************\
-
-Function: find_used_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void find_used_functions(
   const irep_idt &start,

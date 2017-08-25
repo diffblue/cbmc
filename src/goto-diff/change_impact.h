@@ -8,11 +8,14 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// Data and control-dependencies of syntactic diff
+
 #ifndef CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
 #define CPROVER_GOTO_DIFF_CHANGE_IMPACT_H
 
 class goto_modelt;
-typedef enum {FORWARD, BACKWARD, BOTH} impact_modet;
+enum class impact_modet { FORWARD, BACKWARD, BOTH };
 
 void change_impact(
   const goto_modelt &model_old,

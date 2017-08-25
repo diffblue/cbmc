@@ -37,6 +37,8 @@ jsil_y.tab.h: jsil_y.tab.cpp
 jsil_lex.yy.cpp: scanner.l
 	$(LEX) -Pyyjsil -o$@ scanner.l
 
+generated_files: jsil_lex.yy.cpp jsil_y.tab.cpp jsil_y.tab.h
+
 # extra dependencies
 jsil_y.tab$(OBJEXT): jsil_y.tab.cpp jsil_y.tab.h
 jsil_lex.yy$(OBJEXT): jsil_y.tab.cpp jsil_lex.yy.cpp jsil_y.tab.h

@@ -6,25 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Conversion
+
+#include "preprocessor_line.h"
+
 #include <cctype>
 
 #include <util/string2int.h>
 #include <util/parser.h>
 
 #include "literals/unescape_string.h"
-#include "preprocessor_line.h"
-
-/*******************************************************************\
-
-Function: preprocessor_line
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void preprocessor_line(
   const char *text,

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Generate Equation using Symbolic Execution
+
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 
@@ -170,34 +173,41 @@ public:
     sourcet source;
     goto_trace_stept::typet type;
 
-    bool is_assert() const          { return type==goto_trace_stept::ASSERT; }
-    bool is_assume() const          { return type==goto_trace_stept::ASSUME; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_assignment() const      { return type==goto_trace_stept::ASSIGNMENT; }
-    bool is_goto() const            { return type==goto_trace_stept::GOTO; }
+    bool is_assert() const          { return type==goto_trace_stept::typet::ASSERT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_constraint() const      { return type==goto_trace_stept::CONSTRAINT; }
-    bool is_location() const        { return type==goto_trace_stept::LOCATION; }
-    bool is_output() const          { return type==goto_trace_stept::OUTPUT; }
-    bool is_decl() const            { return type==goto_trace_stept::DECL; }
+    bool is_assume() const          { return type==goto_trace_stept::typet::ASSUME; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_function_call() const   { return type==goto_trace_stept::FUNCTION_CALL; }
+    bool is_assignment() const      { return type==goto_trace_stept::typet::ASSIGNMENT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_function_return() const { return type==goto_trace_stept::FUNCTION_RETURN; }
+    bool is_goto() const            { return type==goto_trace_stept::typet::GOTO; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_shared_read() const     { return type==goto_trace_stept::SHARED_READ; }
+    bool is_constraint() const      { return type==goto_trace_stept::typet::CONSTRAINT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_shared_write() const    { return type==goto_trace_stept::SHARED_WRITE; }
-    bool is_spawn() const           { return type==goto_trace_stept::SPAWN; }
+    bool is_location() const        { return type==goto_trace_stept::typet::LOCATION; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_memory_barrier() const  { return type==goto_trace_stept::MEMORY_BARRIER; }
+    bool is_output() const          { return type==goto_trace_stept::typet::OUTPUT; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_atomic_begin() const    { return type==goto_trace_stept::ATOMIC_BEGIN; }
+    bool is_decl() const            { return type==goto_trace_stept::typet::DECL; }
     // NOLINTNEXTLINE(whitespace/line_length)
-    bool is_atomic_end() const      { return type==goto_trace_stept::ATOMIC_END; }
+    bool is_function_call() const   { return type==goto_trace_stept::typet::FUNCTION_CALL; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_function_return() const { return type==goto_trace_stept::typet::FUNCTION_RETURN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_shared_read() const     { return type==goto_trace_stept::typet::SHARED_READ; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_shared_write() const    { return type==goto_trace_stept::typet::SHARED_WRITE; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_spawn() const           { return type==goto_trace_stept::typet::SPAWN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_memory_barrier() const  { return type==goto_trace_stept::typet::MEMORY_BARRIER; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_atomic_begin() const    { return type==goto_trace_stept::typet::ATOMIC_BEGIN; }
+    // NOLINTNEXTLINE(whitespace/line_length)
+    bool is_atomic_end() const      { return type==goto_trace_stept::typet::ATOMIC_END; }
 
     // we may choose to hide
-    bool hidden;
+    bool hidden=false;
 
     exprt guard;
     literalt guard_literal;
@@ -215,7 +225,7 @@ public:
 
     // for INPUT/OUTPUT
     irep_idt format_string, io_id;
-    bool formatted;
+    bool formatted=false;
     std::list<exprt> io_args;
     std::list<exprt> converted_io_args;
 
@@ -223,13 +233,13 @@ public:
     irep_idt identifier;
 
     // for SHARED_READ/SHARED_WRITE and ATOMIC_BEGIN/ATOMIC_END
-    unsigned atomic_section_id;
+    unsigned atomic_section_id=0;
 
     // for slicing
-    bool ignore;
+    bool ignore=false;
 
     SSA_stept():
-      type(goto_trace_stept::NONE),
+      type(goto_trace_stept::typet::NONE),
       hidden(false),
       guard(static_cast<const exprt &>(get_nil_irep())),
       guard_literal(const_literal(false)),
@@ -237,6 +247,7 @@ public:
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
+      assignment_type(assignment_typet::STATE),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       cond_literal(const_literal(false)),
       formatted(false),

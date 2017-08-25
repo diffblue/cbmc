@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_FORMAT_SPEC_H
 #define CPROVER_UTIL_FORMAT_SPEC_H
 
@@ -23,14 +24,14 @@ public:
   // eE: SCIENTIFIC
   // gG: AUTOMATIC
 
-  typedef enum { DECIMAL, SCIENTIFIC, AUTOMATIC } stylet;
+  enum class stylet { DECIMAL, SCIENTIFIC, AUTOMATIC };
   stylet style;
 
   format_spect():
     min_width(0),
     precision(6),
     zero_padding(false),
-    style(AUTOMATIC)
+    style(stylet::AUTOMATIC)
   {
   }
 
@@ -44,12 +45,12 @@ public:
 
   static format_spect scientific()
   {
-    return format_spect(SCIENTIFIC);
+    return format_spect(stylet::SCIENTIFIC);
   }
 
   static format_spect automatic()
   {
-    return format_spect(AUTOMATIC);
+    return format_spect(stylet::AUTOMATIC);
   }
 };
 

@@ -6,28 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as C/C++ Source
+
+#include "goto_program2code.h"
+
 #include <sstream>
 
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/find_symbols.h>
 #include <util/arith_tools.h>
 #include <util/type_eq.h>
-
-#include "goto_program2code.h"
-
-/*******************************************************************\
-
-Function: skip_typecast
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 static const exprt &skip_typecast(const exprt &expr)
 {
@@ -36,18 +28,6 @@ static const exprt &skip_typecast(const exprt &expr)
 
   return skip_typecast(to_typecast_expr(expr).op());
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::operator()
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::operator()()
 {
@@ -75,18 +55,6 @@ void goto_program2codet::operator()()
 
   cleanup_code(toplevel_block, ID_nil);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::build_loop_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::build_loop_map()
 {
@@ -124,18 +92,6 @@ void goto_program2codet::build_loop_map()
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::build_dead_map
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::build_dead_map()
 {
   dead_map.clear();
@@ -147,18 +103,6 @@ void goto_program2codet::build_dead_map()
         target->location_number;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::scan_for_varargs
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::scan_for_varargs()
 {
   va_list_expr.clear();
@@ -166,14 +110,23 @@ void goto_program2codet::scan_for_varargs()
   forall_goto_program_instructions(target, goto_program)
     if(target->is_assign())
     {
+      const exprt &l=to_code_assign(target->code).lhs();
       const exprt &r=to_code_assign(target->code).rhs();
 
+      // find va_arg_next
       if(r.id()==ID_side_effect &&
          to_side_effect_expr(r).get_statement()==ID_gcc_builtin_va_arg_next)
       {
         assert(r.has_operands());
         va_list_expr.insert(r.op0());
       }
+      // try our modelling of va_start
+      else if(l.type().id()==ID_pointer &&
+              l.type().get(ID_C_typedef)=="va_list" &&
+              l.id()==ID_symbol &&
+              r.id()==ID_typecast &&
+              to_typecast_expr(r).op().id()==ID_address_of)
+        va_list_expr.insert(l);
     }
 
   if(!va_list_expr.empty())
@@ -199,18 +152,6 @@ void goto_program2codet::scan_for_varargs()
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_instruction
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_instruction(
     goto_programt::const_targett target,
@@ -316,18 +257,6 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_labels
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::convert_labels(
     goto_programt::const_targett target,
     codet &dest)
@@ -370,18 +299,6 @@ void goto_program2codet::convert_labels(
     latest_block->copy_to_operands(code_skipt());
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_assign(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -396,18 +313,6 @@ goto_programt::const_targett goto_program2codet::convert_assign(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign_varargs
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_assign_varargs(
     goto_programt::const_targett target,
@@ -479,9 +384,7 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
       static_cast<typet const&>(r.find(ID_C_va_arg_type));
 
     dereference_exprt deref(
-      typecast_exprt(
-        from_integer(0, signedbv_typet(config.ansi_c.pointer_width)),
-        pointer_typet(va_arg_type)),
+      null_pointer_exprt(pointer_type(va_arg_type)),
       va_arg_type);
 
     type_of.arguments().push_back(deref);
@@ -504,18 +407,6 @@ goto_programt::const_targett goto_program2codet::convert_assign_varargs(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_assign_rec
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::convert_assign_rec(
     const code_assignt &assign,
     codet &dest)
@@ -530,7 +421,7 @@ void goto_program2codet::convert_assign_rec(
     {
       index_exprt index(
           assign.lhs(),
-          from_integer(i++, signedbv_typet(config.ansi_c.pointer_width)),
+          from_integer(i++, index_type()),
           type.subtype());
       convert_assign_rec(code_assignt(index, *it), dest);
     }
@@ -538,18 +429,6 @@ void goto_program2codet::convert_assign_rec(
   else
     dest.copy_to_operands(assign);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_return
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_return(
     goto_programt::const_targett target,
@@ -580,18 +459,6 @@ goto_programt::const_targett goto_program2codet::convert_return(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_decl
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_decl(
     goto_programt::const_targett target,
@@ -655,18 +522,6 @@ goto_programt::const_targett goto_program2codet::convert_decl(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_do_while
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_do_while(
     goto_programt::const_targett target,
     goto_programt::const_targett loop_end,
@@ -692,18 +547,6 @@ goto_programt::const_targett goto_program2codet::convert_do_while(
   return target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -722,22 +565,10 @@ goto_programt::const_targett goto_program2codet::convert_goto(
   else if(!target->guard.is_true())
     return convert_goto_switch(target, upper_bound, dest);
   else if(!loop_last_stack.empty())
-    return convert_goto_break_continue(target, dest);
+    return convert_goto_break_continue(target, upper_bound, dest);
   else
     return convert_goto_goto(target, dest);
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_while
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_while(
     goto_programt::const_targett target,
@@ -837,18 +668,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_while(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::get_cases
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::get_cases(
   goto_programt::const_targett target,
@@ -952,18 +771,6 @@ goto_programt::const_targett goto_program2codet::get_cases(
   return cases_it;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::set_block_end_points
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 bool goto_program2codet::set_block_end_points(
   goto_programt::const_targett upper_bound,
   const cfg_dominatorst &dominators,
@@ -996,7 +803,14 @@ bool goto_program2codet::set_block_end_points(
 
       // ignore dead instructions for the following checks
       if(n.dominators.empty())
+      {
+        // simplification may have figured out that a case is unreachable
+        // this is possibly getting too weird, abort to be safe
+        if(case_end==it->case_start)
+          return true;
+
         continue;
+      }
 
       // find the last instruction dominated by the case start
       if(n.dominators.find(it->case_start)==n.dominators.end())
@@ -1013,18 +827,6 @@ bool goto_program2codet::set_block_end_points(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::remove_default
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 bool goto_program2codet::remove_default(
   const cfg_dominatorst &dominators,
@@ -1087,18 +889,6 @@ bool goto_program2codet::remove_default(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_switch
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_goto_switch(
     goto_programt::const_targett target,
@@ -1279,18 +1069,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
   return max_target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_if
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto_if(
     goto_programt::const_targett target,
     goto_programt::const_targett upper_bound,
@@ -1336,7 +1114,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
        upper_bound->location_number < end_if->location_number))
   {
     if(!loop_last_stack.empty())
-      return convert_goto_break_continue(target, dest);
+      return convert_goto_break_continue(target, upper_bound, dest);
     else
       return convert_goto_goto(target, dest);
   }
@@ -1367,20 +1145,9 @@ goto_programt::const_targett goto_program2codet::convert_goto_if(
   return --target;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_break_continue
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
     goto_programt::const_targett target,
+    goto_programt::const_targett upper_bound,
     codet &dest)
 {
   assert(!loop_last_stack.empty());
@@ -1390,7 +1157,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   // 1: ...
   goto_programt::const_targett next=target;
   for(++next;
-      next!=goto_program.instructions.end();
+      next!=upper_bound && next!=goto_program.instructions.end();
       ++next)
   {
     cfg_dominatorst::cfgt::entry_mapt::const_iterator i_entry=
@@ -1467,18 +1234,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_break_continue(
   return convert_goto_goto(target, dest);
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_goto_goto
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_goto_goto(
   goto_programt::const_targett target,
   codet &dest)
@@ -1537,18 +1292,6 @@ goto_programt::const_targett goto_program2codet::convert_goto_goto(
 
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_start_thread
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_start_thread(
     goto_programt::const_targett target,
@@ -1635,7 +1378,7 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
     // we don't bother setting the type
     f.lhs()=cf.lhs();
     f.function()=symbol_exprt("pthread_create", code_typet());
-    exprt n=null_pointer_exprt(pointer_typet(empty_typet()));
+    exprt n=null_pointer_exprt(pointer_type(empty_typet()));
     f.arguments().push_back(n);
     f.arguments().push_back(n);
     f.arguments().push_back(cf.function());
@@ -1668,18 +1411,6 @@ goto_programt::const_targett goto_program2codet::convert_start_thread(
   return thread_end;
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::convert_throw
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 goto_programt::const_targett goto_program2codet::convert_throw(
     goto_programt::const_targett target,
     codet &dest)
@@ -1688,18 +1419,6 @@ goto_programt::const_targett goto_program2codet::convert_throw(
   assert(false);
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::convert_catch
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 goto_programt::const_targett goto_program2codet::convert_catch(
     goto_programt::const_targett target,
@@ -1710,18 +1429,6 @@ goto_programt::const_targett goto_program2codet::convert_catch(
   assert(false);
   return target;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::add_local_types
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::add_local_types(const typet &type)
 {
@@ -1778,18 +1485,6 @@ void goto_program2codet::add_local_types(const typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::cleanup_code(
     codet &code,
     const irep_idt parent_stmt)
@@ -1817,6 +1512,11 @@ void goto_program2codet::cleanup_code(
       cleanup_expr(to_array_type(code.op0().type()).size(), true);
 
     add_local_types(code.op0().type());
+
+    const irep_idt &typedef_str=code.op0().type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      code.op0().type().remove(ID_C_typedef);
 
     return;
   }
@@ -1877,18 +1577,6 @@ void goto_program2codet::cleanup_code(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_function_call
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::cleanup_function_call(
   const exprt &function,
   code_function_callt::argumentst &arguments)
@@ -1918,18 +1606,6 @@ void goto_program2codet::cleanup_function_call(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code_block
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_code_block(
     codet &code,
@@ -1984,18 +1660,6 @@ void goto_program2codet::cleanup_code_block(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::remove_const
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::remove_const(typet &type)
 {
   if(type.get_bool(ID_C_constant))
@@ -2030,18 +1694,6 @@ void goto_program2codet::remove_const(typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: has_labels
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 static bool has_labels(const codet &code)
 {
   if(code.get_statement()==ID_label)
@@ -2053,18 +1705,6 @@ static bool has_labels(const codet &code)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: move_label_ifthenelse
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 static bool move_label_ifthenelse(
     exprt &expr,
@@ -2090,18 +1730,6 @@ static bool move_label_ifthenelse(
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_code_ifthenelse
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void goto_program2codet::cleanup_code_ifthenelse(
   codet &code,
@@ -2199,18 +1827,6 @@ void goto_program2codet::cleanup_code_ifthenelse(
     code=code_skipt();
 }
 
-/*******************************************************************\
-
-Function: goto_program2codet::cleanup_expr
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 {
   // we might have to do array -> pointer conversions
@@ -2257,6 +1873,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     add_local_types(t);
     expr=typecast_exprt(expr, t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_array ||
           expr.id()==ID_vector)
@@ -2269,6 +1890,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
 
     expr.make_typecast(t);
     add_local_types(t);
+
+    const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+    if(!typedef_str.empty() &&
+       typedef_names.find(typedef_str)==typedef_names.end())
+      expr.type().remove(ID_C_typedef);
   }
   else if(expr.id()==ID_side_effect)
   {
@@ -2383,6 +2009,11 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
     else
     {
       add_local_types(expr.type());
+
+      const irep_idt &typedef_str=expr.type().get(ID_C_typedef);
+      if(!typedef_str.empty() &&
+         typedef_names.find(typedef_str)==typedef_names.end())
+        expr.type().remove(ID_C_typedef);
 
       assert(expr.type().id()!=ID_union &&
              expr.type().id()!=ID_struct);

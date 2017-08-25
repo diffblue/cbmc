@@ -1,0 +1,10 @@
+CORE
+main.c
+--remove-function-body foo --remove-function-body bar
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^bar
+^foo

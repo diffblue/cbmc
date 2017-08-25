@@ -6,21 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/expr.h>
-
 #include "c_storage_spec.h"
 
-/*******************************************************************\
-
-Function: c_storage_spect::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/expr.h>
 
 void c_storage_spect::read(const typet &type)
 {

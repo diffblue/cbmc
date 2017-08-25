@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Logic
+
 #ifndef CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
 #define CPROVER_SOLVERS_FLATTENING_POINTER_LOGIC_H
 
@@ -14,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/numbering.h>
 
 #define BV_ADDR_BITS 8
+
+class namespacet;
 
 class pointer_logict
 {

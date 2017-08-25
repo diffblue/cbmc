@@ -6,6 +6,9 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 
@@ -37,7 +40,7 @@ public:
     symex(ns, symbol_table, equation),
     satcheck(new satcheckt),
     satchecker(ns, *satcheck),
-    z3(ns, "accelerate", "", "", smt2_dect::Z3),
+    z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
     checker(&z3) // checker(&satchecker)
   {
   }

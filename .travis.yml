@@ -134,6 +134,15 @@ matrix:
       script: scripts/travis_lint.sh
       before_cache:
 
+    - env: NAME="DOXYGEN-CHECK"
+      addons:
+        apt:
+          packages:
+            - doxygen
+      install:
+      script: scripts/travis_doxygen.sh
+      before_cache:
+
   allow_failures:
     - env: NAME="CPP-LINT"
       install:
@@ -152,9 +161,9 @@ install:
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test" &&
+    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\"" &&
     eval ${PRE_COMMAND} ${COMMAND}
-  - COMMAND="make -C unit CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2" &&
+  - COMMAND="make -C unit CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C unit test" && eval ${PRE_COMMAND} ${COMMAND}
 

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_SHARED_BUFFERS_H
 
@@ -221,7 +222,7 @@ public:
 protected:
   class symbol_tablet &symbol_table;
 
-  // number of threads interferring
+  // number of threads interfering
   unsigned nb_threads;
 
   // instrumentations (not to be instrumented again)

@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cctype>
+/// \file
+/// Conversion of Expressions
 
 #include "parse_float.h"
 
-/*******************************************************************\
-
-Function: convert_ct::parse_float
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <cctype>
 
 void parse_float(
   const std::string &src,

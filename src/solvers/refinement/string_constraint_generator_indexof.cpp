@@ -7,21 +7,17 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generates string constraints for the family of indexOf and lastIndexOf java
+///   functions
+
 #include <solvers/refinement/string_constraint_generator.h>
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_index_of
-
-  Inputs: a string expression, a character expression and an integer expression
-
- Outputs: a integer expression
-
- Purpose: add axioms that the returned value is either -1 or greater than
-          from_index and the character at that position equals to c
-
-\*******************************************************************/
-
+/// add axioms that the returned value is either -1 or greater than from_index
+/// and the character at that position equals to c
+/// \par parameters: a string expression, a character expression and an integer
+///   expression
+/// \return a integer expression
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const string_exprt &str, const exprt &c, const exprt &from_index)
 {
@@ -69,19 +65,10 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   return index;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_index_of_string
-
-  Inputs: two string expressions and an integer expression
-
- Outputs: a integer expression
-
- Purpose: add axioms stating that the returned value is either -1 or greater
-          than from_index and the string beggining there has prefix substring
-
-\*******************************************************************/
-
+/// add axioms stating that the returned value is either -1 or greater than
+/// from_index and the string beggining there has prefix substring
+/// \par parameters: two string expressions and an integer expression
+/// \return a integer expression
 exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const string_exprt &str,
   const string_exprt &substring,
@@ -155,20 +142,10 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   return offset;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_index_of
-
-  Inputs: function application with 2 or 3 arguments
-
- Outputs: a integer expression
-
- Purpose: add axioms corresponding to the String.indexOf:(C),
-          String.indexOf:(CI), String.indexOf:(String), and
-          String.indexOf:(String,I) java functions
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.indexOf:(C), String.indexOf:(CI),
+/// String.indexOf:(String), and String.indexOf:(String,I) java functions
+/// \par parameters: function application with 2 or 3 arguments
+/// \return a integer expression
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
@@ -249,20 +226,11 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   return index;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_last_index_of
-
-  Inputs: function application with 2 or 3 arguments
-
- Outputs: a integer expression
-
- Purpose: add axioms corresponding to the String.lastIndexOf:(C),
-          String.lastIndexOf:(CI), String.lastIndexOf:(String), and
-          String.lastIndexOf:(String,I) java functions
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.lastIndexOf:(C),
+/// String.lastIndexOf:(CI), String.lastIndexOf:(String), and
+/// String.lastIndexOf:(String,I) java functions
+/// \par parameters: function application with 2 or 3 arguments
+/// \return a integer expression
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {

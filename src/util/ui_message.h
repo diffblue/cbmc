@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_UI_MESSAGE_H
 #define CPROVER_UTIL_UI_MESSAGE_H
 
@@ -14,10 +15,14 @@ Author: Daniel Kroening, kroening@kroening.com
 class ui_message_handlert:public message_handlert
 {
 public:
-  typedef enum { PLAIN, XML_UI, JSON_UI } uit;
+  enum class uit { PLAIN, XML_UI, JSON_UI };
 
   ui_message_handlert(uit, const std::string &program);
   ui_message_handlert(const class cmdlinet &, const std::string &program);
+  ui_message_handlert():
+    _ui(uit::PLAIN)
+  {
+  }
 
   virtual ~ui_message_handlert();
 
@@ -30,6 +35,8 @@ public:
   {
     _ui=__ui;
   }
+
+  virtual void flush(unsigned level);
 
 protected:
   uit _ui;

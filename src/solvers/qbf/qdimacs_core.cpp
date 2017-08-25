@@ -6,22 +6,10 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-#include <util/std_expr.h>
-
 #include "qdimacs_core.h"
 
-/*******************************************************************\
-
-Function: qdimacs_coret::simplify_extractbits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/arith_tools.h>
+#include <util/std_expr.h>
 
 void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {
@@ -75,7 +63,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
               value_string[value.to_ulong()]='1';
 
               #if 0
-              std::cout << "[" << value << "]=1" << std::endl;
+              std::cout << "[" << value << "]=1\n";
               #endif
 
               continue;
@@ -100,7 +88,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
         new_operands.push_back(equality_exprt(it->first, new_value));
 
         #if 0
-        std::cout << "FINAL: " << value_string << std::endl;
+        std::cout << "FINAL: " << value_string << '\n';
         #endif
 
         expr.operands()=new_operands;

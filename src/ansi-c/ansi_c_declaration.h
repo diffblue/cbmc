@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-CC Language Type Checking
+
 #ifndef CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 #define CPROVER_ANSI_C_ANSI_C_DECLARATION_H
 

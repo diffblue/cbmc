@@ -6,23 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "qbf_skizzo.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
-
-#include "qbf_skizzo.h"
-
-/*******************************************************************\
-
-Function: qbf_skizzot::qbf_skizzot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qbf_skizzot::qbf_skizzot()
 {
@@ -30,33 +18,9 @@ qbf_skizzot::qbf_skizzot()
   break_lines=false;
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzot::~qbf_skizzot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_skizzot::~qbf_skizzot()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_skizzot::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt qbf_skizzot::l_get(literalt a) const
 {
@@ -64,40 +28,16 @@ tvt qbf_skizzot::l_get(literalt a) const
   return tvt(false);
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzot::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string qbf_skizzot::solver_text()
 {
   return "Skizzo";
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzot::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 propt::resultt qbf_skizzot::prop_solve()
 {
   // sKizzo crashes on empty instances
   if(no_clauses()==0)
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
 
   {
     messaget::status() <<
@@ -156,20 +96,20 @@ propt::resultt qbf_skizzot::prop_solve()
     if(!result_found)
     {
       messaget::error() << "Skizzo failed: unknown result" << eom;
-      return P_ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
     messaget::status() << "Skizzo: TRUE" << eom;
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   }
   else
   {
     messaget::status() << "Skizzo: FALSE" << eom;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
 
-  return P_ERROR;
+  return resultt::P_ERROR;
 }

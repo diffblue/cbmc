@@ -8,6 +8,9 @@ Date: January 2010
 
 \*******************************************************************/
 
+/// \file
+/// Detection for Uninitialized Local Variables
+
 #ifndef CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H
 #define CPROVER_GOTO_INSTRUMENT_UNINITIALIZED_H
 

@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Get a Goto Program
+
+#include "initialize_goto_model.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -18,19 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
-#include "initialize_goto_model.h"
-
-/*******************************************************************\
-
-Function: initialize_goto_model
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool initialize_goto_model(
   goto_modelt &goto_model,
@@ -90,9 +82,12 @@ bool initialize_goto_model(
         lf.filename=filename;
         lf.language=get_language_from_filename(filename);
 
-        if(lf.language==NULL)
+        if(lf.language==nullptr)
         {
-          msg.error("failed to figure out type of file", filename);
+          source_locationt location;
+          location.set_file(filename);
+          msg.error().source_location=location;
+          msg.error() << "failed to figure out type of file" << messaget::eom;
           return true;
         }
 

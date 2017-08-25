@@ -1,0 +1,10 @@
+CORE
+main.c
+--dump-c
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test should be run via chain.sh, which will try to recompile the dumped C
+code. Missing/incomplete typedef output would cause a failure.

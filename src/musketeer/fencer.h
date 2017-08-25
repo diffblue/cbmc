@@ -6,6 +6,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// Fence inference
+
 #ifndef CPROVER_MUSKETEER_FENCER_H
 #define CPROVER_MUSKETEER_FENCER_H
 

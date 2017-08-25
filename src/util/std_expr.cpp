@@ -6,46 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "std_expr.h"
+
 #include <cassert>
 
 #include "arith_tools.h"
 #include "byte_operators.h"
-#include "config.h"
+#include "c_types.h"
 #include "namespace.h"
 #include "pointer_offset_size.h"
-
 #include "std_types.h"
-#include "std_expr.h"
-
-/*******************************************************************\
-
-Function: constant_exprt::value_is_zero_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool constant_exprt::value_is_zero_string() const
 {
   const std::string val=id2string(get_value());
   return val.find_first_not_of('0')==std::string::npos;
 }
-
-/*******************************************************************\
-
-Function: disjunction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt disjunction(const exprt::operandst &op)
 {
@@ -71,18 +47,6 @@ unsigned int dynamic_object_exprt::get_instance() const
   return std::stoul(id2string(to_constant_expr(op0()).get_value()));
 }
 
-/*******************************************************************\
-
-Function: conjunction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt conjunction(const exprt::operandst &op)
 {
   if(op.empty())
@@ -97,25 +61,12 @@ exprt conjunction(const exprt::operandst &op)
   }
 }
 
-/*******************************************************************\
-
-Function: build_object_descriptor_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: Build an object_descriptor_exprt from a given expr
-
-\*******************************************************************/
-
+/// Build an object_descriptor_exprt from a given expr
 static void build_object_descriptor_rec(
   const namespacet &ns,
   const exprt &expr,
   object_descriptor_exprt &dest)
 {
-  const signedbv_typet index_type(config.ansi_c.pointer_width);
-
   if(expr.id()==ID_index)
   {
     const index_exprt &index=to_index_expr(expr);
@@ -127,8 +78,8 @@ static void build_object_descriptor_rec(
 
     dest.offset()=
       plus_exprt(dest.offset(),
-                 mult_exprt(typecast_exprt(index.index(), index_type),
-                            typecast_exprt(sub_size, index_type)));
+                 mult_exprt(typecast_exprt(index.index(), index_type()),
+                            typecast_exprt(sub_size, index_type())));
   }
   else if(expr.id()==ID_member)
   {
@@ -142,7 +93,7 @@ static void build_object_descriptor_rec(
 
     dest.offset()=
       plus_exprt(dest.offset(),
-                 typecast_exprt(offset, index_type));
+                 typecast_exprt(offset, index_type()));
   }
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
@@ -156,7 +107,7 @@ static void build_object_descriptor_rec(
     dest.offset()=
       plus_exprt(dest.offset(),
                  typecast_exprt(to_byte_extract_expr(expr).offset(),
-                                index_type));
+                                index_type()));
   }
   else if(expr.id()==ID_typecast)
   {
@@ -168,18 +119,7 @@ static void build_object_descriptor_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: object_descriptor_exprt::build
-
-  Inputs:
-
- Outputs:
-
- Purpose: Build an object_descriptor_exprt from a given expr
-
-\*******************************************************************/
-
+/// Build an object_descriptor_exprt from a given expr
 void object_descriptor_exprt::build(
   const exprt &expr,
   const namespacet &ns)
@@ -188,81 +128,33 @@ void object_descriptor_exprt::build(
   object()=expr;
 
   if(offset().id()==ID_unknown)
-    offset()=from_integer(0, signedbv_typet(config.ansi_c.pointer_width));
+    offset()=from_integer(0, index_type());
 
   build_object_descriptor_rec(ns, expr, *this);
 
   assert(root_object().type().id()!=ID_empty);
 }
 
-/*******************************************************************\
-
-Function: constant_exprt::integer_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-constant_exprt constant_exprt::integer_constant(unsigned v)
+static constant_exprt integer_constant(unsigned v)
 {
   return constant_exprt(std::to_string(v), integer_typet());
 }
-
-/*******************************************************************\
-
-Function: shift_exprt::shift_exprt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 shift_exprt::shift_exprt(
   const exprt &_src,
   const irep_idt &_id,
   const std::size_t _distance):
-  binary_exprt(_src, _id, constant_exprt::integer_constant(_distance))
+  binary_exprt(_src, _id, integer_constant(_distance))
 {
 }
-
-/*******************************************************************\
-
-Function: extractbit_exprt::extractbit_exprt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 extractbit_exprt::extractbit_exprt(
   const exprt &_src,
   const std::size_t _index):
   binary_predicate_exprt(
-    _src, ID_extractbit, constant_exprt::integer_constant(_index))
+    _src, ID_extractbit, integer_constant(_index))
 {
 }
-
-/*******************************************************************\
-
-Function: extractbit_exprt::extractbits_exprt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 extractbits_exprt::extractbits_exprt(
   const exprt &_src,
@@ -274,6 +166,23 @@ extractbits_exprt::extractbits_exprt(
   assert(_upper>=_lower);
   operands().resize(3);
   src()=_src;
-  upper()=constant_exprt::integer_constant(_upper);
-  lower()=constant_exprt::integer_constant(_lower);
+  upper()=integer_constant(_upper);
+  lower()=integer_constant(_lower);
+}
+
+/*******************************************************************\
+
+Function: address_of_exprt::address_of_exprt
+
+  Inputs:
+
+ Outputs:
+
+ Purpose:
+
+\*******************************************************************/
+
+address_of_exprt::address_of_exprt(const exprt &_op):
+  unary_exprt(ID_address_of, _op, pointer_type(_op.type()))
+{
 }

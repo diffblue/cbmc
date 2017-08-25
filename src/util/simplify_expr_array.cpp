@@ -6,27 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr_class.h"
+
 #include <cassert>
 
-#include "simplify_expr_class.h"
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"
 #include "replace_expr.h"
 #include "arith_tools.h"
 #include "pointer_offset_size.h"
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_index(exprt &expr)
 {

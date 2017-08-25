@@ -6,22 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <algorithm>
-#include <ostream>
+/// \file
+/// Rational Numbers
 
 #include "rational.h"
 
-/*******************************************************************\
-
-Function: rationalt::operator+=
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <algorithm>
+#include <ostream>
 
 rationalt &rationalt::operator+=(const rationalt &n)
 {
@@ -32,18 +23,6 @@ rationalt &rationalt::operator+=(const rationalt &n)
   return *this;
 }
 
-/*******************************************************************\
-
-Function: rationalt::operator-=
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rationalt &rationalt::operator-=(const rationalt &n)
 {
   rationalt tmp(n);
@@ -53,35 +32,11 @@ rationalt &rationalt::operator-=(const rationalt &n)
   return *this;
 }
 
-/*******************************************************************\
-
-Function: rationalt::operator-=
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rationalt &rationalt::operator-()
 {
   numerator.negate();
   return *this;
 }
-
-/*******************************************************************\
-
-Function: rationalt::operator*=
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 rationalt &rationalt::operator*=(const rationalt &n)
 {
@@ -91,18 +46,6 @@ rationalt &rationalt::operator*=(const rationalt &n)
   return *this;
 }
 
-/*******************************************************************\
-
-Function: rationalt::operator/=
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 rationalt &rationalt::operator/=(const rationalt &n)
 {
   assert(!n.numerator.is_zero());
@@ -111,18 +54,6 @@ rationalt &rationalt::operator/=(const rationalt &n)
   normalize();
   return *this;
 }
-
-/*******************************************************************\
-
-Function: rationalt::normalize
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rationalt::normalize()
 {
@@ -144,18 +75,6 @@ void rationalt::normalize()
   }
 }
 
-/*******************************************************************\
-
-Function: rationalt::same_denominator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rationalt::same_denominator(rationalt &n)
 {
   if(denominator==n.denominator)
@@ -169,35 +88,11 @@ void rationalt::same_denominator(rationalt &n)
   n.denominator=t;
 }
 
-/*******************************************************************\
-
-Function: rationalt::invert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rationalt::invert()
 {
   assert(numerator!=0);
   std::swap(numerator, denominator);
 }
-
-/*******************************************************************\
-
-Function: inverse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 rationalt inverse(const rationalt &n)
 {
@@ -205,18 +100,6 @@ rationalt inverse(const rationalt &n)
   tmp.invert();
   return tmp;
 }
-
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &operator<<(std::ostream &out, const rationalt &a)
 {

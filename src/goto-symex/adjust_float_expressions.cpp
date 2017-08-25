@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "adjust_float_expressions.h"
+
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/std_expr.h>
@@ -14,20 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 
 #include <goto-programs/goto_model.h>
-
-#include "adjust_float_expressions.h"
-
-/*******************************************************************\
-
-Function: have_to_adjust_float_expressions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static bool have_to_adjust_float_expressions(
   const exprt &expr,
@@ -84,19 +75,8 @@ static bool have_to_adjust_float_expressions(
   return false;
 }
 
-/*******************************************************************\
-
-Function: adjust_float_expressions
-
-  Inputs:
-
- Outputs:
-
- Purpose: This adds the rounding mode to floating-point operations,
-          including those in vectors and complex numbers.
-
-\*******************************************************************/
-
+/// This adds the rounding mode to floating-point operations, including those in
+/// vectors and complex numbers.
 void adjust_float_expressions(
   exprt &expr,
   const namespacet &ns)
@@ -199,18 +179,6 @@ void adjust_float_expressions(
   }
 }
 
-/*******************************************************************\
-
-Function: adjust_float_expressions
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 static void adjust_float_expressions(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
@@ -222,18 +190,6 @@ static void adjust_float_expressions(
   }
 }
 
-/*******************************************************************\
-
-Function: adjust_float_expressions
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void adjust_float_expressions(
   goto_functionst &goto_functions,
   const namespacet &ns)
@@ -241,18 +197,6 @@ void adjust_float_expressions(
   Forall_goto_functions(it, goto_functions)
     adjust_float_expressions(it->second, ns);
 }
-
-/*******************************************************************\
-
-Function: adjust_float_expressions
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
 
 void adjust_float_expressions(goto_modelt &goto_model)
 {

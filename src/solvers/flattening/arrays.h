@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Theory of Arrays with Extensionality
+
 #ifndef CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 #define CPROVER_SOLVERS_FLATTENING_ARRAYS_H
 
@@ -68,14 +71,15 @@ protected:
   index_mapt index_map;
 
   // adds array constraints lazily
-  typedef enum lazy_type
+  enum class lazy_typet
   {
     ARRAY_ACKERMANN,
     ARRAY_WITH,
     ARRAY_IF,
     ARRAY_OF,
     ARRAY_TYPECAST
-  } lazy_typet;
+  };
+
   struct lazy_constraintt
   {
     lazy_typet type;
@@ -101,8 +105,6 @@ protected:
     const index_sett &index_set, const array_equalityt &array_equality);
   void add_array_constraints(
     const index_sett &index_set, const exprt &expr);
-  void add_array_constraints(
-    const index_sett &index_set, const array_equalityt &array_equality);
   void add_array_constraints_if(
     const index_sett &index_set, const if_exprt &exprt);
   void add_array_constraints_with(

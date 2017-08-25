@@ -8,6 +8,9 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// Unified diff (using LCSS) of goto functions
+
 #ifndef CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
 #define CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
 
@@ -17,6 +20,8 @@ Date: April 2016
 #include <vector>
 
 #include <util/namespace.h>
+
+#include "goto-programs/goto_program.h"
 
 class goto_functionst;
 class goto_modelt;

@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "equality.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
 
-#include "equality.h"
 #include "bv_utils.h"
-
-/*******************************************************************\
-
-Function: equalityt::equality
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt equalityt::equality(const exprt &e1, const exprt &e2)
 {
@@ -32,18 +21,6 @@ literalt equalityt::equality(const exprt &e1, const exprt &e2)
   else
     return equality2(e2, e1);
 }
-
-/*******************************************************************\
-
-Function: equalityt::equality2
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt equalityt::equality2(const exprt &e1, const exprt &e2)
 {
@@ -111,36 +88,12 @@ literalt equalityt::equality2(const exprt &e1, const exprt &e2)
   return l;
 }
 
-/*******************************************************************\
-
-Function: equalityt::add_equality_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void equalityt::add_equality_constraints()
 {
   for(typemapt::const_iterator it=typemap.begin();
       it!=typemap.end(); it++)
     add_equality_constraints(it->second);
 }
-
-/*******************************************************************\
-
-Function: equalityt::add_equality_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void equalityt::add_equality_constraints(const typestructt &typestruct)
 {

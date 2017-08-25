@@ -6,22 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-#include <util/std_types.h>
-
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_array_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/arith_tools.h>
+#include <util/std_types.h>
 
 bvt boolbvt::convert_array_of(const array_of_exprt &expr)
 {
@@ -36,7 +24,14 @@ bvt boolbvt::convert_array_of(const array_of_exprt &expr)
   std::size_t width=boolbv_width(array_type);
 
   if(width==0)
-    return conversion_failed(expr);
+  {
+    // A zero-length array is acceptable;
+    // an element with unknown size is not.
+    if(boolbv_width(array_type.subtype())==0)
+      return conversion_failed(expr);
+    else
+      return bvt();
+  }
 
   const exprt &array_size=array_type.size();
 

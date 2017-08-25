@@ -6,11 +6,14 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
+#include "cone_of_influence.h"
+
 #include <iostream>
 
 #include <ansi-c/expr2c.h>
-
-#include "cone_of_influence.h"
 
 void cone_of_influencet::cone_of_influence(
   const expr_sett &targets,
@@ -44,17 +47,17 @@ void cone_of_influencet::cone_of_influence(
     cone_map[rit->location_number]=next;
 
 #ifdef DEBUG
-    std::cout << "Previous cone: " << std::endl;
+    std::cout << "Previous cone: \n";
 
     for(const auto &expr : curr)
       std::cout << expr2c(expr, ns) << " ";
 
-    std::cout << std::endl << "Current cone: " << std::endl;
+    std::cout << "\nCurrent cone: \n";
 
     for(const auto &expr : next)
       std::cout << expr2c(expr, ns) << " ";
 
-    std::cout << std::endl;
+    std::cout << '\n';
 #endif
   }
 

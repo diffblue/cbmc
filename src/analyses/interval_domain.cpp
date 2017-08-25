@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interval Domain
+
+#include "interval_domain.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -13,20 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
-
-#include "interval_domain.h"
-
-/*******************************************************************\
-
-Function: interval_domaint::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::output(
   std::ostream &out,
@@ -63,18 +54,6 @@ void interval_domaint::output(
     out << "\n";
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::transform
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::transform(
   locationt from,
@@ -127,22 +106,20 @@ void interval_domaint::transform(
   }
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::merge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool interval_domaint::merge(
-  const interval_domaint &b,
-  locationt from,
-  locationt to)
+/// Sets *this to the mathematical join between the two domains. This can be
+/// thought of as an abstract version of union; *this is increased so that it
+/// contains all of the values that are represented by b as well as its original
+/// intervals. The result is an overapproximation, for example:
+/// "[0,1]".join("[3,4]") --> "[0,4]" includes 2 which isn't in [0,1] or [3,4].
+///
+///          Join is used in several places, the most significant being
+///          merge, which uses it to bring together two different paths
+///          of analysis.
+/// \par parameters: The interval domain, b, to join to this domain.
+/// \return True if the join increases the set represented by *this, False if
+///   there is no change.
+bool interval_domaint::join(
+  const interval_domaint &b)
 {
   if(b.bottom)
     return false;
@@ -157,8 +134,8 @@ bool interval_domaint::merge(
   for(int_mapt::iterator it=int_map.begin();
       it!=int_map.end(); ) // no it++
   {
-    //search for the variable that needs to be merged
-    //containers have different size and variable order
+    // search for the variable that needs to be merged
+    // containers have different size and variable order
     const int_mapt::const_iterator b_it=b.int_map.find(it->first);
     if(b_it==b.int_map.end())
     {
@@ -199,35 +176,11 @@ bool interval_domaint::merge(
   return result;
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void interval_domaint::assign(const code_assignt &code_assign)
 {
   havoc_rec(code_assign.lhs());
   assume_rec(code_assign.lhs(), ID_equal, code_assign.rhs());
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::havoc_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::havoc_rec(const exprt &lhs)
 {
@@ -250,18 +203,6 @@ void interval_domaint::havoc_rec(const exprt &lhs)
     havoc_rec(to_typecast_expr(lhs).op());
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &lhs, irep_idt id, const exprt &rhs)
@@ -377,36 +318,12 @@ void interval_domaint::assume_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void interval_domaint::assume(
   const exprt &cond,
   const namespacet &ns)
 {
   assume_rec(simplify_expr(cond, ns), false);
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::assume_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_domaint::assume_rec(
   const exprt &cond,
@@ -453,18 +370,6 @@ void interval_domaint::assume_rec(
         assume_rec(*it, true);
   }
 }
-
-/*******************************************************************\
-
-Function: interval_domaint::make_expression
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt interval_domaint::make_expression(const symbol_exprt &src) const
 {
@@ -526,4 +431,59 @@ exprt interval_domaint::make_expression(const symbol_exprt &src) const
   }
   else
     return true_exprt();
+}
+
+/// Uses the abstract state to simplify a given expression using context-
+/// specific information.
+/// \par parameters: The expression to simplify.
+/// \return A simplified version of the expression.
+/*
+ * This implementation is aimed at reducing assertions to true, particularly
+ * range checks for arrays and other bounds checks.
+ *
+ * Rather than work with the various kinds of exprt directly, we use assume,
+ * join and is_bottom.  It is sufficient for the use case and avoids duplicating
+ * functionality that is in assume anyway.
+ *
+ * As some expressions (1<=a && a<=2) can be represented exactly as intervals
+ * and some can't (a<1 || a>2), the way these operations are used varies
+ * depending on the structure of the expression to try to give the best results.
+ * For example negating a disjunction makes it easier for assume to handle.
+ */
+
+bool interval_domaint::ai_simplify(
+  exprt &condition,
+  const namespacet &ns) const
+{
+  bool unchanged=true;
+  interval_domaint d(*this);
+
+  // merge intervals to properly handle conjunction
+  if(condition.id()==ID_and)              // May be directly representable
+  {
+    interval_domaint a;
+    a.make_top();                         // a is everything
+    a.assume(condition, ns);              // Restrict a to an over-approximation
+                                          //  of when condition is true
+    if(!a.join(d))                        // If d (this) is included in a...
+    {                                     // Then the condition is always true
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+  else if(condition.id()==ID_symbol)
+  {
+    // TODO: we have to handle symbol expression
+  }
+  else                                    // Less likely to be representable
+  {
+    d.assume(not_exprt(condition), ns);   // Restrict to when condition is false
+    if(d.is_bottom())                     // If there there are none...
+    {                                     // Then the condition is always true
+      unchanged=condition.is_true();
+      condition.make_true();
+    }
+  }
+
+  return unchanged;
 }

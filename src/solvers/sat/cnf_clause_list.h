@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CNF Generation
+
 #ifndef CPROVER_SOLVERS_SAT_CNF_CLAUSE_LIST_H
 #define CPROVER_SOLVERS_SAT_CNF_CLAUSE_LIST_H
 
@@ -33,7 +36,7 @@ public:
     return tvt::unknown();
   }
 
-  virtual resultt prop_solve() { return P_ERROR; }
+  virtual resultt prop_solve() { return resultt::P_ERROR; }
 
   virtual size_t no_clauses() const { return clauses.size(); }
 

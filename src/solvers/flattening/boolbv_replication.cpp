@@ -6,21 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_replication
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/arith_tools.h>
 
 bvt boolbvt::convert_replication(const replication_exprt &expr)
 {

@@ -6,22 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/std_expr.h>
+/// \file
+/// Pointer Dereferencing
 
 #include "rewrite_index.h"
 
-/*******************************************************************\
+#include <util/std_expr.h>
 
-Function: rewrite_index
-
-  Inputs:
-
- Outputs:
-
- Purpose: rewrite a[i] to *(a+i)
-
-\*******************************************************************/
-
+/// rewrite a[i] to *(a+i)
 dereference_exprt rewrite_index(const index_exprt &index_expr)
 {
   dereference_exprt result;

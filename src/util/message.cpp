@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "message.h"
-
-/*******************************************************************\
-
-Function: message_handlert::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void message_handlert::print(
   unsigned level,
@@ -65,77 +54,15 @@ void message_handlert::print(
   print(level, dest);
 }
 
-/*******************************************************************\
-
-Function: messaget::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void messaget::print(unsigned level, const std::string &message)
-{
-  if(message_handler!=NULL)
-    message_handler->print(level, message);
-}
-
-/*******************************************************************\
-
-Function: messaget::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void messaget::print(
+void message_handlert::print(
   unsigned level,
-  const std::string &message,
-  int sequence_number,
-  const source_locationt &location)
+  const std::string &message)
 {
-  if(message_handler!=NULL)
-    message_handler->print(level, message, sequence_number,
-                           location);
+  if(level>=message_count.size())
+    message_count.resize(level+1, 0);
+  ++message_count[level];
 }
 
-/*******************************************************************\
-
-Function: message_clientt::~message_clientt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-message_clientt::~message_clientt()
+messaget::~messaget()
 {
-}
-
-/*******************************************************************\
-
-Function: message_clientt::set_message_handler
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-void message_clientt::set_message_handler(
-  message_handlert &_message_handler)
-{
-  message_handler=&_message_handler;
 }

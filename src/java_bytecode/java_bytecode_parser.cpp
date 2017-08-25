@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_bytecode_parser.h"
+
 #include <algorithm>
 #include <fstream>
 #include <map>
@@ -19,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/string_constant.h>
 
-#include "java_bytecode_parser.h"
 #include "java_bytecode_parse_tree.h"
 #include "java_types.h"
 #include "bytecode_info.h"
@@ -98,7 +99,7 @@ protected:
   {
     // pre-hash the mnemonics, so we do this only once
     bytecodes.resize(256);
-    for(const bytecode_infot *p=bytecode_info; p->mnemonic!=0; p++)
+    for(const bytecode_infot *p=bytecode_info; p->mnemonic!=nullptr; p++)
     {
       assert(p->opcode<bytecodes.size());
       bytecodes[p->opcode].mnemonic=p->mnemonic;
@@ -200,18 +201,6 @@ protected:
 #define VTYPE_INFO_OBJECT      7
 #define VTYPE_INFO_UNINIT      8
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool java_bytecode_parsert::parse()
 {
   try
@@ -239,18 +228,6 @@ bool java_bytecode_parsert::parse()
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rClassFile
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 #define ACC_PUBLIC       0x0001
 #define ACC_PRIVATE      0x0002
@@ -329,18 +306,6 @@ void java_bytecode_parsert::rClassFile()
   parse_tree.loading_successful=true;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::get_class_refs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::get_class_refs()
 {
   // Get the class references for the benefit of a dependency
@@ -383,18 +348,6 @@ void java_bytecode_parsert::get_class_refs()
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::get_class_refs_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::get_class_refs_rec(const typet &src)
 {
   if(src.id()==ID_code)
@@ -426,18 +379,6 @@ void java_bytecode_parsert::get_class_refs_rec(const typet &src)
   else if(src.id()==ID_pointer)
     get_class_refs_rec(src.subtype());
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rconstant_pool
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::rconstant_pool()
 {
@@ -489,7 +430,7 @@ void java_bytecode_parsert::rconstant_pool()
     case CONSTANT_Long:
     case CONSTANT_Double:
       it->number=read_u8();
-      // Eight-byte constants take up two entires
+      // Eight-byte constants take up two entries
       // in the constant_pool table, for annoying this programmer.
       if(it==constant_pool.end())
       {
@@ -658,18 +599,6 @@ void java_bytecode_parsert::rconstant_pool()
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rinterfaces
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rinterfaces(classt &parsed_class)
 {
   u2 interfaces_count=read_u2();
@@ -678,18 +607,6 @@ void java_bytecode_parsert::rinterfaces(classt &parsed_class)
     parsed_class.implements
       .push_back(constant(read_u2()).type().get(ID_C_base_name));
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rfields
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::rfields(classt &parsed_class)
 {
@@ -721,18 +638,6 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
       rfield_attribute(field);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rbytecode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 #define T_BOOLEAN 4
 #define T_CHAR    5
@@ -798,7 +703,7 @@ void java_bytecode_parsert::rbytecode(
     case 'b': // a signed byte
       {
         s1 c=read_u1();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
       }
       address+=1;
 
@@ -807,8 +712,8 @@ void java_bytecode_parsert::rbytecode(
     case 'o': // two byte branch offset, signed
       {
         s2 offset=read_u2();
-        instruction
-          .args.push_back(from_integer(address+offset, integer_typet()));
+        instruction.args.push_back(
+          from_integer(address+offset, signedbv_typet(16)));
       }
       address+=2;
       break;
@@ -816,8 +721,8 @@ void java_bytecode_parsert::rbytecode(
     case 'O': // four byte branch offset, signed
       {
         s4 offset=read_u4();
-        instruction
-          .args.push_back(from_integer(address+offset, integer_typet()));
+        instruction.args.push_back(
+          from_integer(address+offset, signedbv_typet(32)));
       }
       address+=4;
       break;
@@ -825,7 +730,7 @@ void java_bytecode_parsert::rbytecode(
     case 'v': // local variable index (one byte)
       {
         u1 v=read_u1();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
       }
       address+=1;
       break;
@@ -835,17 +740,17 @@ void java_bytecode_parsert::rbytecode(
       if(wide_instruction)
       {
         u2 v=read_u2();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(16)));
         s2 c=read_u2();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(16)));
         address+=4;
       }
       else // local variable index (one byte) plus one signed byte
       {
         u1 v=read_u1();
-        instruction.args.push_back(from_integer(v, integer_typet()));
+        instruction.args.push_back(from_integer(v, unsignedbv_typet(8)));
         s1 c=read_u1();
-        instruction.args.push_back(from_integer(c, integer_typet()));
+        instruction.args.push_back(from_integer(c, signedbv_typet(8)));
         address+=2;
       }
       break;
@@ -855,9 +760,9 @@ void java_bytecode_parsert::rbytecode(
         u2 c=read_u2();
         instruction.args.push_back(constant(c));
         u1 b1=read_u1();
-        instruction.args.push_back(from_integer(b1, integer_typet()));
+        instruction.args.push_back(from_integer(b1, unsignedbv_typet(8)));
         u1 b2=read_u1();
-        instruction.args.push_back(from_integer(b2, integer_typet()));
+        instruction.args.push_back(from_integer(b2, unsignedbv_typet(8)));
       }
       address+=4;
       break;
@@ -871,8 +776,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args
-          .push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args.push_back(
+          from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // number of pairs
@@ -883,9 +788,10 @@ void java_bytecode_parsert::rbytecode(
         {
           s4 match=read_u4();
           s4 offset=read_u4();
-          instruction.args.push_back(from_integer(match, integer_typet()));
-          instruction.args
-            .push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args.push_back(
+            from_integer(match, signedbv_typet(32)));
+          instruction.args.push_back(
+            from_integer(base_offset+offset, signedbv_typet(32)));
           address+=8;
         }
       }
@@ -900,8 +806,8 @@ void java_bytecode_parsert::rbytecode(
 
         // now default value
         s4 default_value=read_u4();
-        instruction.args
-          .push_back(from_integer(base_offset+default_value, integer_typet()));
+        instruction.args.push_back(
+          from_integer(base_offset+default_value, signedbv_typet(32)));
         address+=4;
 
         // now low value
@@ -916,9 +822,9 @@ void java_bytecode_parsert::rbytecode(
         for(s4 i=low_value; i<=high_value; i++)
         {
           s4 offset=read_u4();
-          instruction.args.push_back(from_integer(i, integer_typet()));
-          instruction.args
-            .push_back(from_integer(base_offset+offset, integer_typet()));
+          instruction.args.push_back(from_integer(i, signedbv_typet(32)));
+          instruction.args.push_back(
+            from_integer(base_offset+offset, signedbv_typet(32)));
           address+=4;
         }
       }
@@ -929,7 +835,8 @@ void java_bytecode_parsert::rbytecode(
         u2 c=read_u2(); // constant-pool index
         instruction.args.push_back(constant(c));
         u1 dimensions=read_u1(); // number of dimensions
-        instruction.args.push_back(from_integer(dimensions, integer_typet()));
+        instruction.args.push_back(
+          from_integer(dimensions, unsignedbv_typet(8)));
         address+=3;
       }
       break;
@@ -957,7 +864,7 @@ void java_bytecode_parsert::rbytecode(
     case 's': // a signed short
       {
         s2 s=read_u2();
-        instruction.args.push_back(from_integer(s, integer_typet()));
+        instruction.args.push_back(from_integer(s, signedbv_typet(16)));
       }
       address+=2;
       break;
@@ -974,18 +881,6 @@ void java_bytecode_parsert::rbytecode(
     throw 0;
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rmethod_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::rmethod_attribute(methodt &method)
 {
@@ -1055,18 +950,6 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
     skip_bytes(attribute_length);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rfield_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rfield_attribute(fieldt &field)
 {
   u2 attribute_name_index=read_u2();
@@ -1082,18 +965,6 @@ void java_bytecode_parsert::rfield_attribute(fieldt &field)
   else
     skip_bytes(attribute_length);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rcode_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::rcode_attribute(methodt &method)
 {
@@ -1163,7 +1034,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     for(size_t i=0; i<stack_map_entries; i++)
     {
       u1 frame_type=read_u1();
-      if(0<=frame_type && frame_type<=63)
+      if(frame_type<=63)
       {
         method.stack_map_table[i].type=methodt::stack_map_table_entryt::SAME;
         method.stack_map_table[i].locals.resize(0);
@@ -1299,18 +1170,6 @@ void java_bytecode_parsert::read_verification_type_info(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rRuntimeAnnotation_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rRuntimeAnnotation_attribute(
   annotationst &annotations)
 {
@@ -1324,18 +1183,6 @@ void java_bytecode_parsert::rRuntimeAnnotation_attribute(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rRuntimeAnnotation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rRuntimeAnnotation(
   annotationt &annotation)
 {
@@ -1343,18 +1190,6 @@ void java_bytecode_parsert::rRuntimeAnnotation(
   annotation.type=type_entry(type_index);
   relement_value_pairs(annotation.element_value_pairs);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::relement_value_pairs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::relement_value_pairs(
   annotationt::element_value_pairst &element_value_pairs)
@@ -1370,18 +1205,6 @@ void java_bytecode_parsert::relement_value_pairs(
     relement_value_pair(element_value_pair);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::relement_value_pair
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_parsert::relement_value_pair(
   annotationt::element_value_pairt &element_value_pair)
@@ -1442,18 +1265,6 @@ void java_bytecode_parsert::relement_value_pair(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rclass_attribute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
 {
   u2 attribute_name_index=read_u2();
@@ -1502,18 +1313,6 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
     skip_bytes(attribute_length);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rmethods
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_parsert::rmethods(classt &parsed_class)
 {
   u2 methods_count=read_u2();
@@ -1521,18 +1320,6 @@ void java_bytecode_parsert::rmethods(classt &parsed_class)
   for(std::size_t j=0; j<methods_count; j++)
     rmethod(parsed_class);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parsert::rmethod
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 #define ACC_PUBLIC     0x0001
 #define ACC_PRIVATE    0x0002
@@ -1578,18 +1365,6 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
     rmethod_attribute(method);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool java_bytecode_parse(
   std::istream &istream,
   java_bytecode_parse_treet &parse_tree,
@@ -1605,18 +1380,6 @@ bool java_bytecode_parse(
 
   return parser_result;
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_parse(
   const std::string &file,

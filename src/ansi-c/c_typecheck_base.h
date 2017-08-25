@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Type Checking
+
 #ifndef CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 #define CPROVER_ANSI_C_C_TYPECHECK_BASE_H
 
@@ -32,7 +35,10 @@ public:
     namespacet(_symbol_table),
     symbol_table(_symbol_table),
     module(_module),
-    mode("C")
+    mode(ID_C),
+    break_is_allowed(false),
+    continue_is_allowed(false),
+    case_is_allowed(false)
   {
   }
 
@@ -45,7 +51,10 @@ public:
     namespacet(_symbol_table1, _symbol_table2),
     symbol_table(_symbol_table1),
     module(_module),
-    mode("C")
+    mode(ID_C),
+    break_is_allowed(false),
+    continue_is_allowed(false),
+    case_is_allowed(false)
   {
   }
 
@@ -58,7 +67,7 @@ protected:
   symbol_tablet &symbol_table;
   const irep_idt module;
   const irep_idt mode;
-  irep_idt current_symbol_id;
+  symbolt current_symbol;
 
   typedef std::unordered_map<irep_idt, typet, irep_id_hash> id_type_mapt;
   id_type_mapt parameter_map;
@@ -86,10 +95,11 @@ protected:
     const typet &type,
     bool force_constant);
 
-  virtual void do_designated_initializer(
+  virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
-    const exprt &value,
+    const exprt &initializer_list,
+    exprt::operandst::const_iterator init_it,
     bool force_constant);
 
   designatort make_designator(const typet &type, const exprt &src);

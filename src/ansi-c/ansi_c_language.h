@@ -6,18 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 #define CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
-
-/*! \defgroup gr_ansi_c ANSI-C front-end */
 
 #include <util/language.h>
 
 #include "ansi_c_parse_tree.h"
 
-/*! \brief TO_BE_DOCUMENTED
-    \ingroup gr_ansi_c
-*/
 class ansi_c_languaget:public languaget
 {
 public:

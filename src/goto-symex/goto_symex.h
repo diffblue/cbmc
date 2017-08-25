@@ -6,11 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
-
-/*! \defgroup goto_symex Symbolic execution of goto programs
-*/
 
 #include <util/options.h>
 #include <util/byte_operators.h>
@@ -152,6 +152,16 @@ protected:
   irep_idt guard_identifier;
 
   // symex
+  virtual void symex_transition(
+    statet &state,
+    goto_programt::const_targett to,
+    bool is_backwards_goto=false);
+  virtual void symex_transition(statet &state)
+  {
+    goto_programt::const_targett next=state.source.pc;
+    ++next;
+    symex_transition(state, next);
+  }
 
   virtual void symex_goto(statet &state);
   virtual void symex_start_thread(statet &state);

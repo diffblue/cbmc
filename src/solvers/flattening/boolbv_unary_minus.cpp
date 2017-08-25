@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <util/std_types.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_unary_minus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 {
@@ -52,7 +41,7 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
   if(op_width==0 || op_width!=width)
     return conversion_failed(expr);
 
-  if(bvtype==IS_UNKNOWN &&
+  if(bvtype==bvtypet::IS_UNKNOWN &&
      (type.id()==ID_vector || type.id()==ID_complex))
   {
     const typet &subtype=ns.follow(type.subtype());
@@ -98,21 +87,21 @@ bvt boolbvt::convert_unary_minus(const unary_exprt &expr)
 
     return bv;
   }
-  else if(bvtype==IS_FIXED && op_bvtype==IS_FIXED)
+  else if(bvtype==bvtypet::IS_FIXED && op_bvtype==bvtypet::IS_FIXED)
   {
     if(no_overflow)
       return bv_utils.negate_no_overflow(op_bv);
     else
       return bv_utils.negate(op_bv);
   }
-  else if(bvtype==IS_FLOAT && op_bvtype==IS_FLOAT)
+  else if(bvtype==bvtypet::IS_FLOAT && op_bvtype==bvtypet::IS_FLOAT)
   {
     assert(!no_overflow);
     float_utilst float_utils(prop, to_floatbv_type(expr.type()));
     return float_utils.negate(op_bv);
   }
-  else if((op_bvtype==IS_SIGNED || op_bvtype==IS_UNSIGNED) &&
-          (bvtype==IS_SIGNED || bvtype==IS_UNSIGNED))
+  else if((op_bvtype==bvtypet::IS_SIGNED || op_bvtype==bvtypet::IS_UNSIGNED) &&
+          (bvtype==bvtypet::IS_SIGNED || bvtype==bvtypet::IS_UNSIGNED))
   {
     if(no_overflow)
       prop.l_set_to(bv_utils.overflow_negate(op_bv), false);

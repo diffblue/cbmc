@@ -8,6 +8,9 @@ Date: Feb 2013
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object for the ld-like options
+
 #ifndef CPROVER_GOTO_CC_LD_CMDLINE_H
 #define CPROVER_GOTO_CC_LD_CMDLINE_H
 

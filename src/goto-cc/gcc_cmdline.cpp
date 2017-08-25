@@ -6,6 +6,11 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object for the gcc-like options
+
+#include "gcc_cmdline.h"
+
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -13,20 +18,9 @@ Author: CM Wintersteiger, 2006
 
 #include <util/prefix.h>
 
-#include "gcc_cmdline.h"
-
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse
-
-  Inputs: argument count, argument strings
-
- Outputs: none
-
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
-
+/// parses the command line options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 // non-gcc options
 const char *goto_cc_options_with_separated_argument[]=
 {
@@ -35,7 +29,7 @@ const char *goto_cc_options_with_separated_argument[]=
   "--native-compiler",
   "--native-linker",
   "--print-rejected-preprocessed-source",
-  NULL
+  nullptr
 };
 
 // non-gcc options
@@ -58,7 +52,7 @@ const char *goto_cc_options_without_argument[]=
   "--no-arch",
   "--partial-inlining",
   "-?",
-  NULL
+  nullptr
 };
 
 // separated or concatenated
@@ -81,7 +75,7 @@ const char *gcc_options_with_argument[]=
   "-U",
   "-u", // goes to linker
   "-T", // goes to linker
-  NULL
+  nullptr
 };
 
 const char *gcc_options_with_separated_argument[]=
@@ -96,6 +90,9 @@ const char *gcc_options_with_separated_argument[]=
   "-isysroot",
   "-imultilib",
   "-imultiarch",
+  "-mcpu",
+  "-mtune",
+  "-march",
   "-Xpreprocessor",
   "-Xassembler",
   "-Xlinker",
@@ -110,7 +107,7 @@ const char *gcc_options_with_separated_argument[]=
   "-current_version", // on the Mac
   "-compatibility_version",  // on the Mac
   "-z",
-  NULL
+  nullptr
 };
 
 const char *gcc_options_with_concatenated_argument[]=
@@ -118,7 +115,7 @@ const char *gcc_options_with_concatenated_argument[]=
   "-d",
   "-g",
   "-A",
-  NULL
+  nullptr
 };
 
 const char *gcc_options_without_argument[]=
@@ -188,6 +185,9 @@ const char *gcc_options_without_argument[]=
   "-MP",
   "-MD",
   "-MMD",
+  "-mno-unaligned-access",
+  "-mthumb",
+  "-mthumb-interwork",
   "-nostdinc",
   "-P",
   "-remap",
@@ -209,7 +209,7 @@ const char *gcc_options_without_argument[]=
   "-EB",
   "-EL",
   "-fast", // Apple only
-  NULL
+  nullptr
 };
 
 bool gcc_cmdlinet::parse(int argc, const char **argv)
@@ -229,18 +229,6 @@ bool gcc_cmdlinet::parse(int argc, const char **argv)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_arguments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool gcc_cmdlinet::parse_arguments(
   const argst &args,
@@ -294,7 +282,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // separated only, and also allow concatenation with "="
       for(const char **o=goto_cc_options_with_separated_argument;
-          *o!=NULL && !found;
+          *o!=nullptr && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -366,7 +354,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // separated only, and also allow concatenation with "="
       for(const char **o=gcc_options_with_separated_argument;
-          *o!=NULL && !found;
+          *o!=nullptr && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -392,7 +380,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // concatenated _or_ separated, e.g., -I
       for(const char **o=gcc_options_with_argument;
-          *o!=NULL && !found;
+          *o!=nullptr && !found;
           ++o)
       {
         if(argv_i==*o) // separated
@@ -417,7 +405,7 @@ bool gcc_cmdlinet::parse_arguments(
 
       // concatenated only
       for(const char **o=gcc_options_with_concatenated_argument;
-          *o!=NULL && !found;
+          *o!=nullptr && !found;
           ++o)
       {
         if(has_prefix(argv_i, *o)) // concatenated
@@ -431,7 +419,7 @@ bool gcc_cmdlinet::parse_arguments(
       {
         // unrecognized option
         std::cerr << "Warning: uninterpreted gcc option '" << argv_i
-                  << "'" << std::endl;
+                  << "'\n";
       }
     }
   }
@@ -439,19 +427,7 @@ bool gcc_cmdlinet::parse_arguments(
   return false;
 }
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_specs_line
-
-  Inputs:
-
- Outputs:
-
- Purpose: Parse GCC spec files
-          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
-
-\*******************************************************************/
-
+/// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
 void gcc_cmdlinet::parse_specs_line(const std::string &line)
 {
   // initial whitespace has been stripped
@@ -471,19 +447,7 @@ void gcc_cmdlinet::parse_specs_line(const std::string &line)
   parse_arguments(args, true);
 }
 
-/*******************************************************************\
-
-Function: gcc_cmdlinet::parse_specs
-
-  Inputs:
-
- Outputs:
-
- Purpose: Parse GCC spec files
-          https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
-
-\*******************************************************************/
-
+/// Parse GCC spec files https://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html
 void gcc_cmdlinet::parse_specs()
 {
   const std::string &specs_file_name=get_value("specs");

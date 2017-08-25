@@ -6,23 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <limits>
 
 #include <util/arith_tools.h>
-
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_shift
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_shift(const binary_exprt &expr)
 {
@@ -53,11 +41,11 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   bv_utilst::shiftt shift;
 
   if(expr.id()==ID_shl)
-    shift=bv_utilst::LEFT;
+    shift=bv_utilst::shiftt::LEFT;
   else if(expr.id()==ID_ashr)
-    shift=bv_utilst::ARIGHT;
+    shift=bv_utilst::shiftt::ARIGHT;
   else if(expr.id()==ID_lshr)
-    shift=bv_utilst::LRIGHT;
+    shift=bv_utilst::shiftt::LRIGHT;
   else
     throw "unexpected shift operator";
 

@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_class_loader.h"
+
 #include <stack>
 #include <map>
 #include <fstream>
@@ -15,20 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 
 #include "java_bytecode_parser.h"
-#include "java_class_loader.h"
 #include "jar_file.h"
-
-/*******************************************************************\
-
-Function: java_class_loadert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 java_bytecode_parse_treet &java_class_loadert::operator()(
   const irep_idt &class_name)
@@ -72,36 +61,12 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   return class_map[class_name];
 }
 
-/*******************************************************************\
-
-Function: java_class_loadert::set_java_cp_include_files
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_class_loadert::set_java_cp_include_files(
   std::string &_java_cp_include_files)
 {
   java_cp_include_files=_java_cp_include_files;
   jar_pool.set_message_handler(get_message_handler());
 }
-
-/*******************************************************************\
-
-Function: java_class_loadert::get_parse_tree
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   java_class_loader_limitt &class_loader_limit,
@@ -196,18 +161,6 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   return parse_tree;
 }
 
-/*******************************************************************\
-
-Function: java_class_loadert::load_entire_jar
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_class_loadert::load_entire_jar(
   java_class_loader_limitt &class_loader_limit,
   const std::string &file)
@@ -223,18 +176,6 @@ void java_class_loadert::load_entire_jar(
 
   jar_files.pop_front();
 }
-
-/*******************************************************************\
-
-Function: java_class_loadert::read_jar_file
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_class_loadert::read_jar_file(
   java_class_loader_limitt &class_loader_limit,
@@ -271,18 +212,6 @@ void java_class_loadert::read_jar_file(
   }
 }
 
-/*******************************************************************\
-
-Function: java_class_loadert::file_to_class_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string java_class_loadert::file_to_class_name(const std::string &file)
 {
   std::string result=file;
@@ -309,18 +238,6 @@ std::string java_class_loadert::file_to_class_name(const std::string &file)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: java_class_loadert::class_name_to_file
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
 {

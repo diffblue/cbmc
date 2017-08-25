@@ -6,9 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cassert>
+/// \file
+/// Internal Representation
 
 #include "irep_ids.h"
+
+#include <cassert>
+
 #include "string_container.h"
 
 const char *irep_ids_table[]=
@@ -18,7 +22,7 @@ const char *irep_ids_table[]=
 
 #include "irep_ids.def"
 
-  NULL,
+  nullptr,
 };
 
 #ifdef USE_DSTRING
@@ -39,23 +43,11 @@ const char *irep_ids_table[]=
 
 #include "irep_ids.def" // NOLINT(build/include)
 
-/*******************************************************************\
-
-Function: initialize_string_container
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void initialize_string_container()
 {
   // this is called by the constructor of string_containert
 
-  for(unsigned i=0; irep_ids_table[i]!=NULL; i++)
+  for(unsigned i=0; irep_ids_table[i]!=nullptr; i++)
   {
     unsigned x;
     x=string_container[irep_ids_table[i]];

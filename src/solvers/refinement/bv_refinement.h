@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Abstraction Refinement Loop
+
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
@@ -48,7 +51,11 @@ protected:
   struct approximationt
   {
   public:
-    explicit approximationt(std::size_t _id_nr):id_nr(_id_nr)
+    explicit approximationt(std::size_t _id_nr):
+      no_operands(0),
+      under_state(0),
+      over_state(0),
+      id_nr(_id_nr)
     {
     }
 
@@ -63,10 +70,6 @@ protected:
 
     // the kind of under- or over-approximation
     unsigned under_state, over_state;
-
-    approximationt():under_state(0), over_state(0)
-    {
-    }
 
     std::string as_string() const;
 

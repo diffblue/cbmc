@@ -6,10 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "java_utils.h"
+
 #include <util/prefix.h>
 #include <util/std_types.h>
-
-#include "java_utils.h"
 
 bool java_is_array_type(const typet &type)
 {

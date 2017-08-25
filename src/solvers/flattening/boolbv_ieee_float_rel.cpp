@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <util/std_types.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_ieee_float_rel
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
 {
@@ -42,14 +31,14 @@ literalt boolbvt::convert_ieee_float_rel(const exprt &expr)
     const bvt &bv1=convert_bv(op1);
 
     if(bv0.size()==bv1.size() && !bv0.empty() &&
-       bvtype0==IS_FLOAT && bvtype1==IS_FLOAT)
+       bvtype0==bvtypet::IS_FLOAT && bvtype1==bvtypet::IS_FLOAT)
     {
       float_utilst float_utils(prop, to_floatbv_type(op0.type()));
 
       if(rel==ID_ieee_float_equal)
-        return float_utils.relation(bv0, float_utilst::EQ, bv1);
+        return float_utils.relation(bv0, float_utilst::relt::EQ, bv1);
       else if(rel==ID_ieee_float_notequal)
-        return !float_utils.relation(bv0, float_utilst::EQ, bv1);
+        return !float_utils.relation(bv0, float_utilst::relt::EQ, bv1);
       else
         return SUB::convert_rest(expr);
     }

@@ -6,23 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "postcondition.h"
+
 #include <util/find_symbols.h>
 #include <util/std_expr.h>
 
 #include "goto_symex_state.h"
-#include "postcondition.h"
-
-/*******************************************************************\
-
-   Class: postconditiont
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 class postconditiont
 {
@@ -55,18 +47,6 @@ protected:
   bool is_used(const exprt &expr, const irep_idt &identifier);
 };
 
-/*******************************************************************\
-
-Function: postcondition
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void postcondition(
   const namespacet &ns,
   const value_sett &value_set,
@@ -85,18 +65,6 @@ void postcondition(
       return;
   }
 }
-
-/*******************************************************************\
-
-Function: postconditiont::is_used_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool postconditiont::is_used_address_of(
   const exprt &expr,
@@ -128,18 +96,6 @@ bool postconditiont::is_used_address_of(
   return false;
 }
 
-/*******************************************************************\
-
-Function: postconditiont::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void postconditiont::compute(exprt &dest)
 {
   // weaken due to assignment
@@ -148,18 +104,6 @@ void postconditiont::compute(exprt &dest)
   // strengthen due to assignment
   strengthen(dest);
 }
-
-/*******************************************************************\
-
-Function: postconditiont::strengthen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void postconditiont::weaken(exprt &dest)
 {
@@ -183,18 +127,6 @@ void postconditiont::weaken(exprt &dest)
   // otherwise, no weakening needed
 }
 
-/*******************************************************************\
-
-Function: postconditiont::strengthen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void postconditiont::strengthen(exprt &dest)
 {
   const irep_idt &lhs_identifier=SSA_step.ssa_lhs.get_object_name();
@@ -215,18 +147,6 @@ void postconditiont::strengthen(exprt &dest)
       dest=and_exprt(dest, equality);
   }
 }
-
-/*******************************************************************\
-
-Function: postconditiont::is_used
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool postconditiont::is_used(
   const exprt &expr,

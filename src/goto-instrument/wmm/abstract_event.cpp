@@ -8,28 +8,19 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// abstract events
+
 #include "abstract_event.h"
-
-/*******************************************************************\
-
-Function: abstract_eventt::unsafe_pair_lwfence_param
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt &next,
   memory_modelt model,
   bool lwsync_met) const
 {
   /* pairs with fences are not properly pairs */
-  if(operation==Fence || next.operation==Fence
-    || operation==Lwfence || next.operation==Lwfence
-    || operation==ASMfence || next.operation==ASMfence)
+  if(operation==operationt::Fence || next.operation==operationt::Fence
+    || operation==operationt::Lwfence || next.operation==operationt::Lwfence
+    || operation==operationt::ASMfence || next.operation==operationt::ASMfence)
     return false;
 
   /* pairs of shared variables */
@@ -39,40 +30,64 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt &next,
   switch(model)
   {
   case TSO:
-    return (thread==next.thread && operation==Write && next.operation==Read);
+    return (thread==next.thread &&
+            operation==operationt::Write &&
+            next.operation==operationt::Read);
 
   case PSO:
-    return (thread==next.thread && operation==Write
+    return (thread==next.thread && operation==operationt::Write
       /* lwsyncWW -> mfenceWW */
-      && !(operation==Write && next.operation==Write && lwsync_met));
+      && !(operation==operationt::Write &&
+           next.operation==operationt::Write &&
+           lwsync_met));
 
   case RMO:
     return
       thread==next.thread &&
       /* lwsyncWW -> mfenceWW */
-      !(operation==Write && next.operation==Write && lwsync_met) &&
+      !(operation==operationt::Write &&
+        next.operation==operationt::Write &&
+        lwsync_met) &&
       /* lwsyncRW -> mfenceRW */
-      !(operation==Read && next.operation==Write && lwsync_met) &&
+      !(operation==operationt::Read &&
+        next.operation==operationt::Write &&
+        lwsync_met) &&
       /* lwsyncRR -> mfenceRR */
-      !(operation==Read && next.operation==Read && lwsync_met) &&
+      !(operation==operationt::Read &&
+        next.operation==operationt::Read &&
+        lwsync_met) &&
       /* if posWW, wsi maintained by the processor */
-      !(variable==next.variable && operation==Write && next.operation==Write) &&
+      !(variable==next.variable &&
+        operation==operationt::Write &&
+        next.operation==operationt::Write) &&
       /* if posRW, fri maintained by the processor */
-      !(variable==next.variable && operation==Read && next.operation==Write);
+      !(variable==next.variable &&
+        operation==operationt::Read &&
+        next.operation==operationt::Write);
 
   case Power:
     return ((thread==next.thread
       /* lwsyncWW -> mfenceWW */
-      && !(operation==Write && next.operation==Write && lwsync_met)
+      && !(operation==operationt::Write &&
+           next.operation==operationt::Write &&
+           lwsync_met)
       /* lwsyncRW -> mfenceRW */
-      && !(operation==Read && next.operation==Write && lwsync_met)
+      && !(operation==operationt::Read &&
+           next.operation==operationt::Write &&
+           lwsync_met)
       /* lwsyncRR -> mfenceRR */
-      && !(operation==Read && next.operation==Read && lwsync_met)
+      && !(operation==operationt::Read &&
+           next.operation==operationt::Read &&
+           lwsync_met)
       /* if posWW, wsi maintained by the processor */
-      && (variable!=next.variable || operation!=Write || next.operation!=Write))
+      && (variable!=next.variable ||
+          operation!=operationt::Write ||
+          next.operation!=operationt::Write))
       /* rfe */
-      || (thread!=next.thread && operation==Write && next.operation==Read
-        && variable==next.variable));
+      || (thread!=next.thread &&
+          operation==operationt::Write &&
+          next.operation==operationt::Read &&
+          variable==next.variable));
 
   case Unknown:
     {
@@ -83,26 +98,17 @@ bool abstract_eventt::unsafe_pair_lwfence_param(const abstract_eventt &next,
   return true;
 }
 
-/*******************************************************************\
-
-Function: abstract_eventt::unsafe_pair_asm
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool abstract_eventt::unsafe_pair_asm(const abstract_eventt &next,
   memory_modelt model,
   unsigned char met) const
 {
   /* pairs with fences are not properly pairs */
-  if(operation==Fence || next.operation==Fence
-    || operation==Lwfence || next.operation==Lwfence
-    || operation==ASMfence || next.operation==ASMfence)
+  if(operation==operationt::Fence ||
+     next.operation==operationt::Fence ||
+     operation==operationt::Lwfence ||
+     next.operation==operationt::Lwfence ||
+     operation==operationt::ASMfence ||
+     next.operation==operationt::ASMfence)
     return false;
 
   /* pairs of shared variables */
@@ -112,31 +118,38 @@ bool abstract_eventt::unsafe_pair_asm(const abstract_eventt &next,
   switch(model)
   {
   case TSO:
-    return (thread==next.thread && operation==Write && next.operation==Read
-      && (met&1)==0);
+    return (thread==next.thread &&
+            operation==operationt::Write &&
+            next.operation==operationt::Read &&
+            (met&1)==0);
   case PSO:
-    return (thread==next.thread && operation==Write
-      && (met&3)==0);
+    return (thread==next.thread &&
+            operation==operationt::Write &&
+            (met&3)==0);
   case RMO:
     return
       thread==next.thread &&
       (met&15)==0 &&
       /* if posWW, wsi maintained by the processor */
-      !(variable==next.variable && operation==Write && next.operation==Write) &&
+      !(variable==next.variable &&
+        operation==operationt::Write &&
+          next.operation==operationt::Write) &&
       /* if posRW, fri maintained by the processor */
-      !(variable==next.variable && operation==Read && next.operation==Write);
+      !(variable==next.variable &&
+        operation==operationt::Read &&
+        next.operation==operationt::Write);
   case Power:
     return
       (thread==next.thread &&
        (met&15)==0 &&
        /* if posWW, wsi maintained by the processor */
        (variable!=next.variable ||
-        operation!=Write ||
-        next.operation!=Write)) ||
+        operation!=operationt::Write ||
+        next.operation!=operationt::Write)) ||
       /* rfe */
       (thread!=next.thread &&
-       operation==Write &&
-       next.operation==Read &&
+       operation==operationt::Write &&
+       next.operation==operationt::Read &&
        variable==next.variable);
 
   case Unknown:

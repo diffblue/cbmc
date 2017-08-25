@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "dplib_dec.h"
+
 #include <cstring>
 #include <cassert>
 
@@ -26,20 +28,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/prefix.h>
 #include <util/string2int.h>
 
-#include "dplib_dec.h"
-
-/*******************************************************************\
-
-Function: dplib_temp_filet::dplib_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 dplib_temp_filet::dplib_temp_filet()
 {
   temp_out_filename="dplib_dec_out_"+std::to_string(getpid())+".tmp";
@@ -48,18 +36,6 @@ dplib_temp_filet::dplib_temp_filet()
     temp_out_filename.c_str(),
     std::ios_base::out | std::ios_base::trunc);
 }
-
-/*******************************************************************\
-
-Function: dplib_temp_filet::~dplib_temp_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 dplib_temp_filet::~dplib_temp_filet()
 {
@@ -72,22 +48,10 @@ dplib_temp_filet::~dplib_temp_filet()
     unlink(temp_result_filename.c_str());
 }
 
-/*******************************************************************\
-
-Function: dplib_dect::dec_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 decision_proceduret::resultt dplib_dect::dec_solve()
 {
-  dplib_prop.out << "QUERY FALSE;" << std::endl;
-  dplib_prop.out << "COUNTERMODEL;" << std::endl;
+  dplib_prop.out << "QUERY FALSE;\n";
+  dplib_prop.out << "COUNTERMODEL;\n";
 
   post_process();
 
@@ -106,18 +70,6 @@ decision_proceduret::resultt dplib_dect::dec_solve()
 
   return read_dplib_result();
 }
-
-/*******************************************************************\
-
-Function: dplib_dect::read_assert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dplib_dect::read_assert(std::istream &in, std::string &line)
 {
@@ -151,8 +103,7 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     std::string value=std::string(line, pos, pos2-pos);
 
     #if 0
-    std::cout << ">" << identifier << "< = >" << value << "<";
-    std::cout << std::endl;
+    std::cout << ">" << identifier << "< = >" << value << "<\n";
     #endif
   }
   else
@@ -177,18 +128,6 @@ void dplib_dect::read_assert(std::istream &in, std::string &line)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: dplib_dect::read_dplib_result
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt dplib_dect::read_dplib_result()
 {

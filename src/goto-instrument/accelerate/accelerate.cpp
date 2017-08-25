@@ -6,6 +6,11 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
+#include "accelerate.h"
+
 #include <analyses/natural_loops.h>
 
 #include <goto-programs/goto_functions.h>
@@ -19,7 +24,6 @@ Author: Matt Lewis
 #include <iostream>
 #include <list>
 
-#include "accelerate.h"
 #include "path.h"
 #include "polynomial_accelerator.h"
 #include "enumerating_loop_acceleration.h"
@@ -95,7 +99,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   {
     // For now, only accelerate innermost loops.
 #ifdef DEBUG
-    std::cout << "Not accelerating an outer loop" << std::endl;
+    std::cout << "Not accelerating an outer loop\n";
 #endif
     return 0;
   }
@@ -130,8 +134,7 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
     {
       // We have some underapproximated variables -- just punt for now.
 #ifdef DEBUG
-      std::cout << "Not inserting accelerator because of underapproximation"
-                << std::endl;
+      std::cout << "Not inserting accelerator because of underapproximation\n";
 #endif
 
       continue;
@@ -141,12 +144,12 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
     num_accelerated++;
 
 #ifdef DEBUG
-    std::cout << "Accelerated path:" << std::endl;
+    std::cout << "Accelerated path:\n";
     output_path(accelerator.path, program, ns, std::cout);
 
     std::cout << "Accelerator has "
               << accelerator.pure_accelerator.instructions.size()
-              << " instructions" << std::endl;
+              << " instructions\n";
 #endif
   }
 
@@ -159,8 +162,8 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   loop.insert(new_inst);
 
 
-  std::cout << "Overflow loc is " << overflow_loc->location_number << std::endl;
-  std::cout << "Back jump is " << back_jump->location_number << std::endl;
+  std::cout << "Overflow loc is " << overflow_loc->location_number << '\n';
+  std::cout << "Back jump is " << back_jump->location_number << '\n';
 
   for(std::list<path_acceleratort>::iterator it=accelerators.begin();
       it!=accelerators.end();
@@ -291,7 +294,7 @@ void acceleratet::restrict_traces()
     {
 #ifdef DEBUG
       namespacet ns(symbol_table);
-      std::cout << "Restricting path:" << std::endl;
+      std::cout << "Restricting path:\n";
       output_path(it->subsumed, program, ns, std::cout);
 #endif
 
@@ -307,13 +310,13 @@ void acceleratet::restrict_traces()
 
 #ifdef DEBUG
       namespacet ns(symbol_table);
-      std::cout << "Restricting path:" << std::endl;
+      std::cout << "Restricting path:\n";
       output_path(double_accelerator, program, ns, std::cout);
 #endif
     automaton.add_path(double_accelerator);
   }
 
-  std::cout << "Building trace automaton..." << std::endl;
+  std::cout << "Building trace automaton...\n";
 
   automaton.build();
   insert_automaton(automaton);
@@ -342,7 +345,7 @@ void acceleratet::set_dirty_vars(path_acceleratort &accelerator)
 
 #ifdef DEBUG
     std::cout << "Setting dirty flag " << expr2c(dirty_var, ns)
-      << " for " << expr2c(*it, ns) << std::endl;
+      << " for " << expr2c(*it, ns) << '\n';
 #endif
 
     accelerator.pure_accelerator.add_instruction(ASSIGN)->code =
@@ -434,7 +437,7 @@ bool acceleratet::is_underapproximate(path_acceleratort &accelerator)
     }
 
 #ifdef DEBUG
-    std::cout << "Underapproximate variable: " << expr2c(*it, ns) << std::endl;
+    std::cout << "Underapproximate variable: " << expr2c(*it, ns) << '\n';
 #endif
     return true;
   }
@@ -458,13 +461,13 @@ symbolt acceleratet::make_symbol(std::string name, typet type)
 
 void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t)
 {
-  return;
-
+#if 0
   goto_programt::targett decl=program.insert_before(t);
   code_declt code(sym);
 
   decl->make_decl();
   decl->code=code;
+#endif
 }
 
 void acceleratet::decl(symbol_exprt &sym, goto_programt::targett t, exprt init)
@@ -497,7 +500,7 @@ void acceleratet::insert_automaton(trace_automatont &automaton)
     << "Inserting trace automaton with "
     << automaton.num_states() << " states, "
     << accept_states.size() << " accepting states and "
-    << transitions.size() << " transitions" << std::endl;
+    << transitions.size() << " transitions\n";
 
   // Declare the variables we'll use to encode the state machine.
   goto_programt::targett t=program.instructions.begin();
@@ -633,13 +636,13 @@ int acceleratet::accelerate_loops()
 
   if(num_accelerated > 0)
   {
-    std::cout << "Engaging crush mode..." << std::endl;
+    std::cout << "Engaging crush mode...\n";
 
     restrict_traces();
     // add_dirty_checks();
     program.update();
 
-    std::cout << "Crush mode engaged." << std::endl;
+    std::cout << "Crush mode engaged.\n";
   }
 
   return num_accelerated;
@@ -653,7 +656,7 @@ void accelerate_functions(
 {
   Forall_goto_functions(it, functions)
   {
-    std::cout << "Accelerating function " << it->first << std::endl;
+    std::cout << "Accelerating function " << it->first << '\n';
     acceleratet accelerate(it->second.body, functions, symbol_table, use_z3);
 
     int num_accelerated=accelerate.accelerate_loops();
@@ -661,7 +664,7 @@ void accelerate_functions(
     if(num_accelerated > 0)
     {
       std::cout << "Added " << num_accelerated
-                << " accelerator(s)" << std::endl;
+                << " accelerator(s)\n";
     }
   }
 }

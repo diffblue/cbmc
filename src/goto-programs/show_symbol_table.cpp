@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show the symbol table
+
+#include "show_symbol_table.h"
+
 #include <iostream>
 #include <memory>
 
@@ -13,35 +18,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 
 #include "goto_model.h"
-#include "show_symbol_table.h"
-
-/*******************************************************************\
-
-Function: show_symbol_table_xml_ui
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_symbol_table_xml_ui()
 {
 }
-
-/*******************************************************************\
-
-Function: show_symbol_table_plain
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_symbol_table_plain(
   const goto_modelt &goto_model,
@@ -68,7 +48,7 @@ void show_symbol_table_plain(
     else
     {
       ptr=get_language_from_mode(symbol.mode);
-      if(ptr==NULL)
+      if(ptr==nullptr)
         throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 
@@ -130,29 +110,17 @@ void show_symbol_table_plain(
   }
 }
 
-/*******************************************************************\
-
-Function: show_symbol_table
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_symbol_table(
   const goto_modelt &goto_model,
   ui_message_handlert::uit ui)
 {
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     show_symbol_table_plain(goto_model, std::cout);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     show_symbol_table_xml_ui();
     break;
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// C/C++ Language Conversion
+
 #ifndef CPROVER_ANSI_C_LITERALS_CONVERT_STRING_LITERAL_H
 #define CPROVER_ANSI_C_LITERALS_CONVERT_STRING_LITERAL_H
 

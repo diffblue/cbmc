@@ -6,12 +6,16 @@ Author:
 
 \*******************************************************************/
 
+/// \file
+/// A stdin/stdout pipe as STL stream
+
+#include "pipe_stream.h"
+
 #include <cstdio>
 #include <istream>
 #include <vector>
 
 #include "unicode.h"
-#include "pipe_stream.h"
 
 #ifdef _WIN32
 #include <io.h>
@@ -19,25 +23,14 @@ Author:
 #else
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
 #include <cstring>
+#include <csignal>
 #endif
 
 #define READ_BUFFER_SIZE 1024
 
-/*******************************************************************\
-
-Function: pipe_streamt::pipe_streamt
-
-  Inputs:
-
- Outputs:
-
- Purpose: Constructor for external process
-
-\*******************************************************************/
-
+/// Constructor for external process
 pipe_streamt::pipe_streamt(
   const std::string &_executable,
   const std::list<std::string> &_args):
@@ -50,19 +43,9 @@ pipe_streamt::pipe_streamt(
   #endif
 }
 
-/*******************************************************************\
-
-Function: pipe_streamt::run
-
-  Inputs:
-
- Outputs: Returns -1 if an error occurs.
-
- Purpose: Starts an external process. A new process is forked and
-          run returns immediately.
-
-\*******************************************************************/
-
+/// Starts an external process. A new process is forked and run returns
+/// immediately.
+/// \return Returns -1 if an error occurs.
 #ifdef _WIN32
 
 int pipe_streamt::run()
@@ -176,12 +159,12 @@ int pipe_streamt::run()
         a_it++, i++)
        _argv[i]=strdup(a_it->c_str());
 
-    _argv[args.size()+1]=NULL;
+    _argv[args.size()+1]=nullptr;
 
     int result=execvp(executable.c_str(), _argv);
 
     if(result==-1)
-      perror(0);
+      perror(nullptr);
 
     return result;
   }
@@ -204,18 +187,7 @@ int pipe_streamt::run()
 
 #endif
 
-/*******************************************************************\
-
-Function: pipe_streamt::wait
-
-  Inputs:
-
- Outputs:
-
- Purpose: Wait for the process to terminate
-
-\*******************************************************************/
-
+/// Wait for the process to terminate
 int pipe_streamt::wait()
 {
   #ifdef _WIN32
@@ -242,18 +214,7 @@ int pipe_streamt::wait()
   #endif
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::filedescriptor_streambuft
-
-  Inputs:
-
- Outputs:
-
- Purpose: Constructor
-
-\*******************************************************************/
-
+/// Constructor
 filedescriptor_streambuft::filedescriptor_streambuft():
   #ifdef _WIN32
   proc_in(INVALID_HANDLE_VALUE),
@@ -267,18 +228,7 @@ filedescriptor_streambuft::filedescriptor_streambuft():
   setg(in_buffer, in_buffer, in_buffer);
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::~filedescriptor_streambuft
-
-  Inputs:
-
- Outputs:
-
- Purpose: Destructor
-
-\*******************************************************************/
-
+/// Destructor
 filedescriptor_streambuft::~filedescriptor_streambuft()
 {
   #ifdef _WIN32
@@ -302,18 +252,7 @@ filedescriptor_streambuft::~filedescriptor_streambuft()
   delete in_buffer;
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::overflow
-
-  Inputs:
-
- Outputs:
-
- Purpose: write one character to the piped process
-
-\*******************************************************************/
-
+/// write one character to the piped process
 std::streambuf::int_type filedescriptor_streambuft::overflow(
   std::streambuf::int_type character)
 {
@@ -334,18 +273,7 @@ std::streambuf::int_type filedescriptor_streambuft::overflow(
   return character;
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::xsputn
-
-  Inputs:
-
- Outputs:
-
- Purpose: write a number of character to the piped process
-
-\*******************************************************************/
-
+/// write a number of character to the piped process
 std::streamsize filedescriptor_streambuft::xsputn(
   const char* str, std::streamsize count)
 {
@@ -358,21 +286,10 @@ std::streamsize filedescriptor_streambuft::xsputn(
 #endif
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::underflow
-
-  Inputs:
-
- Outputs:
-
- Purpose: read a character from the piped process
-
-\*******************************************************************/
-
+/// read a character from the piped process
 std::streambuf::int_type filedescriptor_streambuft::underflow()
 {
-  if(gptr()==0)
+  if(gptr()==nullptr)
     return traits_type::eof();
 
   if(gptr()<egptr())
@@ -396,18 +313,7 @@ std::streambuf::int_type filedescriptor_streambuft::underflow()
   return traits_type::to_int_type(*gptr());
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::xsgetn
-
-  Inputs:
-
- Outputs:
-
- Purpose: read a number of characters from the piped process
-
-\*******************************************************************/
-
+/// read a number of characters from the piped process
 std::streamsize filedescriptor_streambuft::xsgetn(
   char *target, std::streamsize count)
 {
@@ -430,21 +336,10 @@ std::streamsize filedescriptor_streambuft::xsgetn(
   return (available + xsgetn(target+available, count-available));
 }
 
-/*******************************************************************\
-
-Function: filedescriptor_streambuft::showmanyc
-
-  Inputs:
-
- Outputs:
-
- Purpose: determine number of available characters in stream
-
-\*******************************************************************/
-
+/// determine number of available characters in stream
 std::streamsize filedescriptor_streambuft::showmanyc()
 {
-  if(gptr()==0)
+  if(gptr()==nullptr)
     return 0;
 
   if(gptr()<egptr())
@@ -452,12 +347,6 @@ std::streamsize filedescriptor_streambuft::showmanyc()
 
   return 0;
 }
-
-/*******************************************************************\
-
-   Brief demonstration of the pipe_streamt class
-
-\*******************************************************************/
 
 #ifdef UNIT
 
@@ -472,13 +361,13 @@ int main(int argc, char** argv)
   if(process.run() < 0)
     return -1;
 
-  process << "xxx\n" << std::endl;
+  process << "xxx\n\n";
 
   char token;
   for(int i=0; i<3; ++i)
   {
     process >> token;
-    std::cout << "Answer: " << token << std::endl;
+    std::cout << "Answer: " << token << '\n';
   }
 
   return process.wait();

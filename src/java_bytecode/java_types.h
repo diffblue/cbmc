@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 #define CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 
@@ -21,9 +22,10 @@ typet java_float_type();
 typet java_double_type();
 typet java_boolean_type();
 reference_typet java_reference_type(const typet &subtype);
+reference_typet java_lang_object_type();
 symbol_typet java_classname(const std::string &);
 
-pointer_typet java_array_type(const char subtype);
+reference_typet java_array_type(const char subtype);
 
 bool is_reference_type(char t);
 

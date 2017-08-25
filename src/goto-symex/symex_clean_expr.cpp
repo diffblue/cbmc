@@ -6,26 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
+#include "goto_symex.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/base_type.h>
 
-#include <ansi-c/c_types.h>
-
-#include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::process_array_expr_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/c_types.h>
 
 void goto_symext::process_array_expr_rec(
   exprt &expr,
@@ -58,6 +49,14 @@ void goto_symext::process_array_expr_rec(
     expr.swap(tmp);
     process_array_expr_rec(expr, type);
   }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    // pick the root object
+    exprt tmp=to_byte_extract_expr(expr).op();
+    expr.swap(tmp);
+    process_array_expr_rec(expr, type);
+  }
   else if(expr.id()==ID_symbol &&
           expr.get_bool(ID_C_SSA_symbol) &&
           to_ssa_expr(expr).get_original_expr().id()==ID_index)
@@ -69,7 +68,10 @@ void goto_symext::process_array_expr_rec(
   }
   else
     Forall_operands(it, expr)
-      process_array_expr_rec(*it, it->type());
+    {
+      typet t=it->type();
+      process_array_expr_rec(*it, t);
+    }
 
   if(!base_type_eq(expr.type(), type, ns))
   {
@@ -81,18 +83,6 @@ void goto_symext::process_array_expr_rec(
     expr.swap(be);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::process_array_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::process_array_expr(exprt &expr)
 {
@@ -129,6 +119,14 @@ void goto_symext::process_array_expr(exprt &expr)
     expr.swap(tmp);
     process_array_expr(expr);
   }
+  else if(expr.id()==ID_byte_extract_little_endian ||
+          expr.id()==ID_byte_extract_big_endian)
+  {
+    // pick the root object
+    exprt tmp=to_byte_extract_expr(expr).op();
+    expr.swap(tmp);
+    process_array_expr(expr);
+  }
   else if(expr.id()==ID_symbol &&
           expr.get_bool(ID_C_SSA_symbol) &&
           to_ssa_expr(expr).get_original_expr().id()==ID_index)
@@ -142,18 +140,6 @@ void goto_symext::process_array_expr(exprt &expr)
     Forall_operands(it, expr)
       process_array_expr(*it);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::replace_array_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::replace_array_equal(exprt &expr)
 {
@@ -179,18 +165,6 @@ void goto_symext::replace_array_equal(exprt &expr)
   Forall_operands(it, expr)
     replace_array_equal(*it);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::clean_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::clean_expr(
   exprt &expr,

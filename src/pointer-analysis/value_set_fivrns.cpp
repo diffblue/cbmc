@@ -7,6 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
+/// \file
+/// Value Set (Flow Insensitive, Validity Regions)
+
+#include "value_set_fivrns.h"
+
 #include <cassert>
 #include <ostream>
 
@@ -19,9 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com,
 #include <util/arith_tools.h>
 
 #include <langapi/language_util.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
-#include "value_set_fivrns.h"
 #include "dynamic_object_name.h"
 
 const value_set_fivrnst::object_map_dt value_set_fivrnst::object_map_dt::blank;
@@ -52,18 +56,6 @@ static const char *alloc_adapter_prefix="alloc_adaptor::";
       (it)++) \
     if((map).is_valid_at((it)->first, from_function, from_target_index)) /* NOLINT(*) */
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::output(
   const namespacet &ns,
   std::ostream &out) const
@@ -74,18 +66,6 @@ void value_set_fivrnst::output(
       v_it++)
     output_entry(v_it->second, ns, out);
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::output_entry
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::output_entry(
   const entryt &e,
@@ -117,7 +97,7 @@ void value_set_fivrnst::output_entry(
   const object_mapt &object_map=e.object_map;
 
   out << display_name << " = { ";
-  if(object_map.read().size()!=0)
+  if(!object_map.read().empty())
     out << "\n      ";
 
   std::size_t width=0;
@@ -183,7 +163,7 @@ void value_set_fivrnst::output_entry(
     if(vr != object_map.read().validity_ranges.end())
     {
       if(vr->second.empty())
-        std::cout << "        Empty validity record" << std::endl;
+        std::cout << "        Empty validity record\n";
       else
       {
         for(object_map_dt::vrange_listt::const_iterator vit =
@@ -197,13 +177,13 @@ void value_set_fivrnst::output_entry(
               from_target_index>=vit->from &&
               from_target_index<=vit->to)
             out << " (*)";
-          out << std::endl;
+          out << '\n';
         }
       }
     }
     else
     {
-      out << "        No validity information" << std::endl;
+      out << "        No validity information\n";
     }
     #endif
 
@@ -220,18 +200,6 @@ void value_set_fivrnst::output_entry(
 
   out << " } \n";
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt value_set_fivrnst::to_expr(object_map_dt::const_iterator it) const
 {
@@ -253,18 +221,6 @@ exprt value_set_fivrnst::to_expr(object_map_dt::const_iterator it) const
   return od;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::make_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::make_union(
   object_mapt &dest,
   const object_mapt &src) const
@@ -279,18 +235,6 @@ bool value_set_fivrnst::make_union(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::make_valid_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fivrnst::make_valid_union(
   object_mapt &dest,
@@ -307,18 +251,6 @@ bool value_set_fivrnst::make_valid_union(
   return result;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::copy_objects
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::copy_objects(
   object_mapt &dest,
   const object_mapt &src) const
@@ -332,18 +264,6 @@ void value_set_fivrnst::copy_objects(
                                      from_target_index));
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::get_value_set(
   const exprt &expr,
@@ -359,21 +279,9 @@ void value_set_fivrnst::get_value_set(
   #if 0
   for(std::list<exprt>::const_iterator it=value_set.begin();
       it!=value_set.end(); it++)
-    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "GET_VALUE_SET: " << from_expr(ns, "", *it) << '\n';
   #endif
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::get_value_set(
   const exprt &expr,
@@ -386,18 +294,6 @@ void value_set_fivrnst::get_value_set(
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_value_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::get_value_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -406,9 +302,9 @@ void value_set_fivrnst::get_value_set_rec(
   const namespacet &ns) const
 {
   #if 0
-  std::cout << "GET_VALUE_SET_REC EXPR: " << expr << std::endl;
-  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << std::endl;
-  std::cout << std::endl;
+  std::cout << "GET_VALUE_SET_REC EXPR: " << expr << '\n';
+  std::cout << "GET_VALUE_SET_REC SUFFIX: " << suffix << '\n';
+  std::cout << '\n';
   #endif
 
   if(expr.id()==ID_unknown || expr.id()==ID_invalid)
@@ -560,18 +456,18 @@ void value_set_fivrnst::get_value_set_rec(
     if(expr.type().id()==ID_pointer)
     {
       // find the pointer operand
-      const exprt *ptr_operand=NULL;
+      const exprt *ptr_operand=nullptr;
 
       forall_operands(it, expr)
         if(it->type().id()==ID_pointer)
         {
-          if(ptr_operand==NULL)
+          if(ptr_operand==nullptr)
             ptr_operand=&(*it);
           else
             throw "more than one pointer operand in pointer arithmetic";
         }
 
-      if(ptr_operand==NULL)
+      if(ptr_operand==nullptr)
         throw "pointer type sum expected to have pointer operand";
 
       object_mapt pointer_expr_set;
@@ -687,18 +583,6 @@ void value_set_fivrnst::get_value_set_rec(
   insert_from(dest, exprt(ID_unknown, original_type));
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::dereference_rec(
   const exprt &src,
   exprt &dest) const
@@ -717,18 +601,6 @@ void value_set_fivrnst::dereference_rec(
     dest=src;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_reference_set
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::get_reference_set(
   const exprt &expr,
   expr_sett &dest,
@@ -741,18 +613,6 @@ void value_set_fivrnst::get_reference_set(
     dest.insert(to_expr(it));
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::get_reference_set_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::get_reference_set_rec(
   const exprt &expr,
   object_mapt &dest,
@@ -760,7 +620,7 @@ void value_set_fivrnst::get_reference_set_rec(
 {
   #if 0
   std::cout << "GET_REFERENCE_SET_REC EXPR: " << from_expr(ns, "", expr)
-            << std::endl;
+            << '\n';
   #endif
 
   if(expr.id()==ID_symbol ||
@@ -785,7 +645,7 @@ void value_set_fivrnst::get_reference_set_rec(
     #if 0
     for(expr_sett::const_iterator it=value_set.begin();
         it!=value_set.end(); it++)
-      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << std::endl;
+      std::cout << "VALUE_SET: " << from_expr(ns, "", *it) << '\n';
     #endif
 
     return;
@@ -903,18 +763,6 @@ void value_set_fivrnst::get_reference_set_rec(
   insert_from(dest, exprt(ID_unknown, expr.type()));
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::assign(
   const exprt &lhs,
   const exprt &rhs,
@@ -922,9 +770,9 @@ void value_set_fivrnst::assign(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN LHS: " << lhs << std::endl;
-  std::cout << "ASSIGN LTYPE: " << ns.follow(lhs.type()) << std::endl;
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << std::endl;
+  std::cout << "ASSIGN LHS: " << lhs << '\n';
+  std::cout << "ASSIGN LTYPE: " << ns.follow(lhs.type()) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
   #endif
 
   if(rhs.id()==ID_if)
@@ -1033,7 +881,7 @@ void value_set_fivrnst::assign(
       if(rhs.id()==ID_array_of)
       {
         assert(rhs.operands().size()==1);
-//        std::cout << "AOF: " << rhs.op0() << std::endl;
+//        std::cout << "AOF: " << rhs.op0() << '\n';
         assign(lhs_index, rhs.op0(), ns, add_to_sets);
       }
       else if(rhs.id()==ID_array ||
@@ -1072,18 +920,6 @@ void value_set_fivrnst::assign(
     assign_rec(lhs, values_rhs, "", ns, add_to_sets);
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_free
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::do_free(
   const exprt &op,
@@ -1169,18 +1005,6 @@ void value_set_fivrnst::do_free(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::assign_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::assign_rec(
   const exprt &lhs,
   const object_mapt &values_rhs,
@@ -1189,12 +1013,12 @@ void value_set_fivrnst::assign_rec(
   bool add_to_sets)
 {
   #if 0
-  std::cout << "ASSIGN_REC LHS: " << lhs << std::endl;
-  std::cout << "ASSIGN_REC SUFFIX: " << suffix << std::endl;
+  std::cout << "ASSIGN_REC LHS: " << lhs << '\n';
+  std::cout << "ASSIGN_REC SUFFIX: " << suffix << '\n';
 
   for(object_map_dt::const_iterator it=values_rhs.read().begin();
       it!=values_rhs.read().end(); it++)
-    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << std::endl;
+    std::cout << "ASSIGN_REC RHS: " << to_expr(it) << '\n';
   #endif
 
   if(lhs.id()==ID_symbol)
@@ -1320,18 +1144,6 @@ void value_set_fivrnst::assign_rec(
     throw "assign NYI: `"+lhs.id_string()+"'";
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::do_function_call(
   const irep_idt &function,
   const exprt::operandst &arguments,
@@ -1360,7 +1172,7 @@ void value_set_fivrnst::do_function_call(
                                  "argument$"+std::to_string(i);
     add_var(identifier, "");
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
-//    std::cout << arguments[i] << std::endl;
+//    std::cout << arguments[i] << '\n';
 
     assign(dummy_lhs, arguments[i], ns, true);
 
@@ -1399,18 +1211,6 @@ void value_set_fivrnst::do_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::do_end_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_fivrnst::do_end_function(
   const exprt &lhs,
   const namespacet &ns)
@@ -1425,18 +1225,6 @@ void value_set_fivrnst::do_end_function(
 
   assign(lhs, rhs, ns);
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::apply_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_fivrnst::apply_code(
   const exprt &code,
@@ -1481,7 +1269,7 @@ void value_set_fivrnst::apply_code(
   }
   else if(statement==ID_expression)
   {
-    // can be ignored, we don't expect sideeffects here
+    // can be ignored, we don't expect side effects here
   }
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)
@@ -1537,18 +1325,6 @@ void value_set_fivrnst::apply_code(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::insert_to(
   object_mapt &dest,
   unsigned n,
@@ -1557,7 +1333,7 @@ bool value_set_fivrnst::insert_to(
   object_map_dt &map = dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
+//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
     map[n]=object;
     map.set_valid_at(n, to_function, to_target_index);
@@ -1565,7 +1341,7 @@ bool value_set_fivrnst::insert_to(
   }
   else
   {
-//    std::cout << "UPD " << n << std::endl;
+//    std::cout << "UPD " << n << '\n';
     objectt &old=map[n];
 
     bool res = map.set_valid_at(n, to_function, to_target_index);
@@ -1590,18 +1366,6 @@ bool value_set_fivrnst::insert_to(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::insert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::insert_from(
   object_mapt &dest,
   unsigned n,
@@ -1610,7 +1374,7 @@ bool value_set_fivrnst::insert_from(
   object_map_dt &map = dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << std::endl;
+//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
     map[n]=object;
     map.set_valid_at(n, from_function, from_target_index);
@@ -1618,7 +1382,7 @@ bool value_set_fivrnst::insert_from(
   }
   else
   {
-//    std::cout << "UPD " << n << std::endl;
+//    std::cout << "UPD " << n << '\n';
     objectt &old=map[n];
 
     bool res = map.set_valid_at(n, from_function, from_target_index);
@@ -1642,18 +1406,6 @@ bool value_set_fivrnst::insert_from(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_fivrnst::object_map_dt::set_valid_at
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_fivrnst::object_map_dt::set_valid_at(
   unsigned inx,
@@ -1726,18 +1478,6 @@ bool value_set_fivrnst::object_map_dt::set_valid_at(
   return true;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::object_map_dt::is_valid_at
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_fivrnst::object_map_dt::is_valid_at(
   unsigned inx,
   unsigned f,
@@ -1745,7 +1485,7 @@ bool value_set_fivrnst::object_map_dt::is_valid_at(
 {
   #if 0
     std::cout << "IS_VALID_AT: " << inx << ", " << f << ", line " << line <<
-      std::endl;
+      '\n';
   #endif
 
   validity_rangest::const_iterator vrs = validity_ranges.find(inx);
@@ -1769,19 +1509,7 @@ bool value_set_fivrnst::object_map_dt::is_valid_at(
   return false;
 }
 
-/*******************************************************************\
-
-Function: value_set_fivrnst::handover
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-bool value_set_fivrnst::handover(void)
+bool value_set_fivrnst::handover()
 {
   bool changed=false;
 
@@ -1797,10 +1525,10 @@ bool value_set_fivrnst::handover(void)
 
     if(t_it==temporary_values.end())
     {
-//      std::cout << "OLD VALUES FOR: " << ident << std::endl;
+//      std::cout << "OLD VALUES FOR: " << ident << '\n';
       Forall_valid_objects(o_it, state_map.write())
       {
-//        std::cout << "STILL VALID: " << to_expr(o_it) << std::endl;
+//        std::cout << "STILL VALID: " << to_expr(o_it) << '\n';
         if(state_map.write().set_valid_at(o_it->first,
                                           to_function, to_target_index))
           changed = true;
@@ -1808,7 +1536,7 @@ bool value_set_fivrnst::handover(void)
     }
     else
     {
-//      std::cout << "NEW VALUES FOR: " << ident << std::endl;
+//      std::cout << "NEW VALUES FOR: " << ident << '\n';
       if(make_union(state_map, t_it->second.object_map))
         changed = true;
     }

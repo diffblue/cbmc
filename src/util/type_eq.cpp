@@ -6,24 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cassert>
+/// \file
+/// Type Checking
 
 #include "type_eq.h"
+
+#include <cassert>
+
 #include "type.h"
 #include "symbol.h"
 #include "namespace.h"
-
-/*******************************************************************\
-
-Function: type_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool type_eq(const typet &type1, const typet &type2, const namespacet &ns)
 {

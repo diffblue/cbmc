@@ -6,6 +6,11 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// Constant Function Pointer Propagation
+
+#include "propagate_const_function_pointers.h"
+
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
@@ -19,8 +24,6 @@ Author: Vincent Nimal
 #include <map>
 #include <list>
 #include <cassert>
-
-#include "propagate_const_function_pointers.h"
 
 class const_function_pointer_propagationt
 {
@@ -140,25 +143,15 @@ public:
   }
 };
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: 'it' pointing to the callsite to update, 'function' the function
-          actually called, 'stack_scope' the place where the constant was
-          defined in the call stack
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: 'it' pointing to the callsite to update, 'function' the
+///   function
+/// actually called, 'stack_scope' the place where the constant was
+/// defined in the call stack
 void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   const symbol_exprt &const_function,
   unsigned stack_scope)
 {
-  assert(callsite_stack.size()>0);
+  assert(!callsite_stack.empty());
 
   /* for the reconstruction of the {call,callsite}_stacks after the
      duplication */
@@ -216,8 +209,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
         it!=function_dup.body.instructions.end(); ++it)
         it->function=function_new_id;
 
-      assert(goto_functions.function_map[function_new_id].
-             body.instructions.size()>0);
+      assert(goto_functions.function_map[function_new_id].body.empty());
 
       /* removes in definition the argument leading to the const_function */
       code_typet::parameterst &args=function_dup.type.parameters();
@@ -316,7 +308,7 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
       {
       }
 
-      message.debug() << "callsite targetted: " << (*callsite)->source_location
+      message.debug() << "callsite targeted: " << (*callsite)->source_location
         << " function: " << const_function.get_identifier() << messaget::eom;
 
       assert(it->source_location==(*callsite)->source_location);
@@ -341,19 +333,8 @@ void const_function_pointer_propagationt::dup_caller_and_inline_callee(
   callsite_stack.swap(new_callsite_stack);
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose: adds const pointers (instantiated here or propagated) passed
-          as arguments in the map
-
-\*******************************************************************/
-
+/// adds const pointers (instantiated here or propagated) passed as arguments in
+/// the map
 void const_function_pointer_propagationt::arg_stackt::add_args(
   const symbol_exprt &const_function,
   goto_programt::instructionst::iterator it)
@@ -431,18 +412,6 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_function_pointer_propagationt::arg_stackt::remove_args()
 {
   /* remove the parameter names */
@@ -452,18 +421,6 @@ void const_function_pointer_propagationt::arg_stackt::remove_args()
     cfpp.message.debug() << "SET: remove " << *arg_it << messaget::eom;
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_function_pointer_propagationt::propagate(
   const irep_idt &function_id)
@@ -584,18 +541,6 @@ void const_function_pointer_propagationt::propagate(
 
   functions_met.erase(function_id);
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void propagate_const_function_pointers(
   symbol_tablet &symbol_table,

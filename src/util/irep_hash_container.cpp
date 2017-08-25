@@ -6,21 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Hashing IREPs
+
 #include "irep_hash_container.h"
+
 #include "irep.h"
 #include "irep_hash.h"
-
-/*******************************************************************\
-
-Function: irep_hash_container_baset::number
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 size_t irep_hash_container_baset::number(const irept &irep)
 {
@@ -40,18 +32,6 @@ size_t irep_hash_container_baset::number(const irept &irep)
   return id;
 }
 
-/*******************************************************************\
-
-Function: irep_hash_container_baset::vector_hasht::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 size_t irep_hash_container_baset::vector_hasht::operator()(
   const packedt &p) const
 {
@@ -60,18 +40,6 @@ size_t irep_hash_container_baset::vector_hasht::operator()(
     result=hash_combine(result, elem);
   return result;
 }
-
-/*******************************************************************\
-
-Function: irep_hash_container_baset::pack
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void irep_hash_container_baset::pack(
   const irept &irep,

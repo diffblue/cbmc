@@ -8,6 +8,11 @@ Date: March 2016
 
 \*******************************************************************/
 
+/// \file
+/// Record and print code coverage of symbolic execution
+
+#include "symex_coverage.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,8 +25,6 @@ Date: March 2016
 
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_returns.h>
-
-#include "symex_coverage.h"
 
 class coverage_recordt
 {
@@ -91,18 +94,6 @@ protected:
     coverage_lines_mapt &dest);
 };
 
-/*******************************************************************\
-
-Function: rate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static std::string rate(
   std::size_t covered,
   std::size_t total,
@@ -129,17 +120,16 @@ static std::string rate(
   return oss.str();
 }
 
-/*******************************************************************\
-
-Function: goto_program_coverage_recordt::goto_program_coverage_recordt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+static std::string rate_detailed(
+  std::size_t covered,
+  std::size_t total,
+  bool per_cent=false)
+{
+  std::ostringstream oss;
+  oss << rate(covered, total, per_cent)
+      << " (" << covered << '/' << total << ')';
+  return oss.str();
+}
 
 goto_program_coverage_recordt::goto_program_coverage_recordt(
   const namespacet &ns,
@@ -187,7 +177,7 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
                     from_type(ns, gf_it->first, sig_type));
 
   xml.set_attribute("line-rate",
-                    rate(lines_covered, lines_total));
+                    rate_detailed(lines_covered, lines_total));
   xml.set_attribute("branch-rate",
                     rate(branches_covered, branches_total));
 
@@ -219,25 +209,12 @@ goto_program_coverage_recordt::goto_program_coverage_recordt(
         condition.set_attribute("coverage", rate(taken, 2, true));
       }
 
-      std::ostringstream oss;
-      oss << rate(total_taken, number*2, true)
-          << " (" << total_taken << '/' << number*2 << ')';
-      line.set_attribute("condition-coverage", oss.str());
+      line.set_attribute(
+        "condition-coverage",
+        rate_detailed(total_taken, number*2, true));
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_program_coverage_recordt::compute_coverage_lines
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_program_coverage_recordt::compute_coverage_lines(
     const goto_programt &goto_program,
@@ -279,9 +256,9 @@ void goto_program_coverage_recordt::compute_coverage_lines(
     {
       if(!(c_entry->second.size()==1 || is_branch))
       {
-        std::cerr << it->location_number << std::endl;
+        std::cerr << it->location_number << '\n';
         for(const auto &cov : c_entry->second)
-          std::cerr << cov.second.succ->location_number << std::endl;
+          std::cerr << cov.second.succ->location_number << '\n';
       }
       assert(c_entry->second.size()==1 || is_branch);
 
@@ -292,7 +269,8 @@ void goto_program_coverage_recordt::compute_coverage_lines(
         if(entry.first->second.hits==0)
           ++lines_covered;
 
-        entry.first->second.hits+=cov.second.num_executions;
+        if(cov.second.num_executions>entry.first->second.hits)
+          entry.first->second.hits=cov.second.num_executions;
 
         if(is_branch)
         {
@@ -320,18 +298,6 @@ void goto_program_coverage_recordt::compute_coverage_lines(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: symex_coveraget::compute_overall_coverage
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_coveraget::compute_overall_coverage(
   const goto_functionst &goto_functions,
@@ -409,18 +375,6 @@ void symex_coveraget::compute_overall_coverage(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_coveraget::build_cobertura
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_coveraget::build_cobertura(
   const goto_functionst &goto_functions,
   xmlt &xml_coverage) const
@@ -462,18 +416,6 @@ void symex_coveraget::build_cobertura(
   package.set_attribute("complexity", "0.0");
 }
 
-/*******************************************************************\
-
-Function: symex_coveraget::output_report
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool symex_coveraget::output_report(
   const goto_functionst &goto_functions,
   std::ostream &os) const
@@ -488,18 +430,6 @@ bool symex_coveraget::output_report(
 
   return !os.good();
 }
-
-/*******************************************************************\
-
-Function: symex_coveraget::output_report
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool symex_coveraget::generate_report(
   const goto_functionst &goto_functions,

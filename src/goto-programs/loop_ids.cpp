@@ -6,26 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Loop IDs
+
+#include "loop_ids.h"
+
 #include <iostream>
 
 #include <util/xml.h>
 #include <util/xml_expr.h>
 #include <util/json.h>
 #include <util/json_expr.h>
-
-#include "loop_ids.h"
-
-/*******************************************************************\
-
-Function: show_loop_ids
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_loop_ids(
   ui_message_handlert::uit ui,
@@ -34,25 +25,13 @@ void show_loop_ids(
   show_loop_ids(ui, goto_model.goto_functions);
 }
 
-/*******************************************************************\
-
-Function: show_loop_ids
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_programt &goto_program)
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       forall_goto_program_instructions(it, goto_program)
       {
@@ -69,7 +48,7 @@ void show_loop_ids(
       }
       break;
     }
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       forall_goto_program_instructions(it, goto_program)
       {
@@ -87,7 +66,7 @@ void show_loop_ids(
       }
       break;
     }
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       assert(false); // use function below
   }
 }
@@ -97,7 +76,7 @@ void show_loop_ids_json(
   const goto_programt &goto_program,
   json_arrayt &loops)
 {
-  assert(ui==ui_message_handlert::JSON_UI); // use function above
+  assert(ui==ui_message_handlert::uit::JSON_UI); // use function above
 
   forall_goto_program_instructions(it, goto_program)
   {
@@ -113,30 +92,18 @@ void show_loop_ids_json(
   }
 }
 
-/*******************************************************************\
-
-Function: show_loop_ids
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_loop_ids(
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::PLAIN:
+    case ui_message_handlert::uit::XML_UI:
       forall_goto_functions(it, goto_functions)
         show_loop_ids(ui, it->second.body);
       break;
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       json_objectt json_result;
       json_arrayt &loops=json_result["loops"].make_array();
 

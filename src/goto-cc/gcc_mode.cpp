@@ -6,6 +6,11 @@ Author: CM Wintersteiger, 2006
 
 \*******************************************************************/
 
+/// \file
+/// GCC Mode
+
+#include "gcc_mode.h"
+
 #ifdef _WIN32
 #define EX_OK 0
 #define EX_USAGE 64
@@ -17,8 +22,10 @@ Author: CM Wintersteiger, 2006
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <cstring>
 
 #include <util/string2int.h>
+#include <util/invariant.h>
 #include <util/tempdir.h>
 #include <util/config.h>
 #include <util/prefix.h>
@@ -29,19 +36,6 @@ Author: CM Wintersteiger, 2006
 #include <cbmc/version.h>
 
 #include "compile.h"
-#include "gcc_mode.h"
-
-/*******************************************************************\
-
-Function: compiler_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static std::string compiler_name(
   const cmdlinet &cmdline,
@@ -73,18 +67,6 @@ static std::string compiler_name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: linker_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static std::string linker_name(
   const cmdlinet &cmdline,
   const std::string &base_name)
@@ -105,18 +87,6 @@ static std::string linker_name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::gcc_modet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 gcc_modet::gcc_modet(
   goto_cc_cmdlinet &_cmdline,
   const std::string &_base_name,
@@ -124,21 +94,198 @@ gcc_modet::gcc_modet(
   goto_cc_modet(_cmdline, _base_name, gcc_message_handler),
   produce_hybrid_binary(_produce_hybrid_binary),
   act_as_ld(base_name=="ld" ||
-            base_name.find("goto-ld")!=std::string::npos)
+            base_name.find("goto-ld")!=std::string::npos),
+
+  // Keys are architectures specified in configt::set_arch().
+  // Values are lists of GCC architectures that can be supplied as
+  // arguments to the -march, -mcpu, and -mtune flags (see the GCC
+  // manual https://gcc.gnu.org/onlinedocs/).
+  arch_map(
+  {
+    // ARM information taken from the following:
+    //
+    // the "ARM core timeline" table on this page:
+    // https://en.wikipedia.org/wiki/List_of_ARM_microarchitectures
+    //
+    // articles on particular core groups, e.g.
+    // https://en.wikipedia.org/wiki/ARM9
+    //
+    // The "Cores" table on this page:
+    // https://en.wikipedia.org/wiki/ARM_architecture
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"arm", {
+      "strongarm", "strongarm110", "strongarm1100", "strongarm1110",
+      "arm2", "arm250", "arm3", "arm6", "arm60", "arm600", "arm610",
+      "arm620", "fa526", "fa626", "fa606te", "fa626te", "fmp626",
+      "xscale", "iwmmxt", "iwmmxt2", "xgene1"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"armhf", {
+      "armv7", "arm7m", "arm7d", "arm7dm", "arm7di", "arm7dmi",
+      "arm70", "arm700", "arm700i", "arm710", "arm710c", "arm7100",
+      "arm720", "arm7500", "arm7500fe", "arm7tdmi", "arm7tdmi-s",
+      "arm710t", "arm720t", "arm740t", "mpcore", "mpcorenovfp",
+      "arm8", "arm810", "arm9", "arm9e", "arm920", "arm920t",
+      "arm922t", "arm946e-s", "arm966e-s", "arm968e-s", "arm926ej-s",
+      "arm940t", "arm9tdmi", "arm10tdmi", "arm1020t", "arm1026ej-s",
+      "arm10e", "arm1020e", "arm1022e", "arm1136j-s", "arm1136jf-s",
+      "arm1156t2-s", "arm1156t2f-s", "arm1176jz-s", "arm1176jzf-s",
+      "cortex-a5", "cortex-a7", "cortex-a8", "cortex-a9",
+      "cortex-a12", "cortex-a15", "cortex-a53", "cortex-r4",
+      "cortex-r4f", "cortex-r5", "cortex-r7", "cortex-m7",
+      "cortex-m4", "cortex-m3", "cortex-m1", "cortex-m0",
+      "cortex-m0plus", "cortex-m1.small-multiply",
+      "cortex-m0.small-multiply", "cortex-m0plus.small-multiply",
+      "marvell-pj4", "ep9312", "fa726te",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"arm64", {
+      "cortex-a57", "cortex-a72", "exynos-m1"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"hppa", {"1.0", "1.1", "2.0"}}, // NOLINTNEXTLINE(whitespace/braces)
+    // PowerPC
+    // https://en.wikipedia.org/wiki/List_of_PowerPC_processors
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc", {
+      "powerpc", "601", "602", "603", "603e", "604", "604e", "630",
+      // PowerPC G3 == 7xx series
+      "G3", "740", "750",
+      // PowerPC G4 == 74xx series
+      "G4", "7400", "7450",
+      // SoC and low power: https://en.wikipedia.org/wiki/PowerPC_400
+      "401", "403", "405", "405fp", "440", "440fp", "464", "464fp",
+      "476", "476fp",
+      // e series. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e300c2", "e300c3", "e500mc", "ec603e",
+      // https://en.wikipedia.org/wiki/Titan_(microprocessor)
+      "titan",
+    }},
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"powerpc64", {
+      "powerpc64",
+      // First IBM 64-bit processor
+      "620",
+      "970", "G5"
+      // All IBM POWER processors are 64 bit, but POWER 8 is
+      // little-endian so not in this list.
+      // https://en.wikipedia.org/wiki/Ppc64
+      "power3", "power4", "power5", "power5+", "power6", "power6x",
+      "power7", "rs64",
+      // e series SoC chips. x00 are 32-bit, x50 are 64-bit. See e.g.
+      // https://en.wikipedia.org/wiki/PowerPC_e6500
+      "e500mc64", "e5500", "e6500",
+      // https://en.wikipedia.org/wiki/IBM_A2
+      "a2",
+    }},
+    // The latest Power processors are little endian.
+    {"powerpc64le", {"powerpc64le", "power8"}},
+    // There are two MIPS architecture series. The 'old' one comprises
+    // MIPS I - MIPS V (where MIPS I and MIPS II are 32-bit
+    // architectures, and the III, IV and V are 64-bit). The 'new'
+    // architecture series comprises MIPS32 and MIPS64. Source: [0].
+    //
+    // CPROVER's names for these are in configt::this_architecture(),
+    // in particular note the preprocessor variable names. MIPS
+    // processors can run in little-endian or big-endian mode; [1]
+    // gives more information on particular processors. Particular
+    // processors and their architectures are at [2]. This means that
+    // we cannot use the processor flags alone to decide which CPROVER
+    // name to use; we also need to check for the -EB or -EL flags to
+    // decide whether little- or big-endian code should be generated.
+    // Therefore, the keys in this part of the map don't directly map
+    // to CPROVER architectures.
+    //
+    // [0] https://en.wikipedia.org/wiki/MIPS_architecture
+    // [1] https://www.debian.org/ports/mips/
+    // [2] https://en.wikipedia.org/wiki/List_of_MIPS_architecture_processors
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"mips64n", {
+      "loongson2e", "loongson2f", "loongson3a", "mips64", "mips64r2",
+      "mips64r3", "mips64r5", "mips64r6 4kc", "5kc", "5kf", "20kc",
+      "octeon", "octeon+", "octeon2", "octeon3", "sb1", "vr4100",
+      "vr4111", "vr4120", "vr4130", "vr4300", "vr5000", "vr5400",
+      "vr5500", "sr71000", "xlp",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips32n", {
+      "mips32", "mips32r2", "mips32r3", "mips32r5", "mips32r6",
+      // https://www.imgtec.com/mips/classic/
+      "4km", "4kp", "4ksc", "4kec", "4kem", "4kep", "4ksd", "24kc",
+      "24kf2_1", "24kf1_1", "24kec", "24kef2_1", "24kef1_1", "34kc",
+      "34kf2_1", "34kf1_1", "34kn", "74kc", "74kf2_1", "74kf1_1",
+      "74kf3_2", "1004kc", "1004kf2_1", "1004kf1_1", "m4k", "m14k",
+      "m14kc", "m14ke", "m14kec",
+      // https://en.wikipedia.org/wiki/List_of_MIPS_architecture_processors
+      "p5600", "xlr",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips32o", {
+      "mips1", "mips2", "r2000", "r3000",
+      "r6000", // Not a mistake, r4000 came out _after_ this
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"mips64o", {
+      "mips3", "mips4", "r4000", "r4400", "r4600", "r4650", "r4700",
+      "r8000", "rm7000", "rm9000", "r10000", "r12000", "r14000",
+      "r16000",
+    }},
+    // These are IBM mainframes. s390 is 32-bit; s390x is 64-bit [0].
+    // Search that page for s390x and note that 32-bit refers to
+    // everything "prior to 2000's z900 model".  The list of model
+    // numbers is at [1].
+    // [0] https://en.wikipedia.org/wiki/Linux_on_z_Systems
+    // [1] https://en.wikipedia.org/wiki/IBM_System_z
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"s390", {
+      "z900", "z990", "g5", "g6",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"s390x", {
+      "z9-109", "z9-ec", "z10", "z196", "zEC12", "z13"
+    }},
+    // SPARC
+    // In the "Implementations" table of [0], everything with an arch
+    // version up to V8 is 32-bit. V9 and onward are 64-bit.
+    // [0] https://en.wikipedia.org/wiki/SPARC
+    // NOLINTNEXTLINE(whitespace/braces)
+    {"sparc", {
+      "v7", "v8", "leon", "leon3", "leon3v7", "cypress", "supersparc",
+      "hypersparc", "sparclite", "f930", "f934", "sparclite86x",
+      "tsc701",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"sparc64", {
+      "v9", "ultrasparc", "ultrasparc3", "niagara", "niagara2",
+      "niagara3", "niagara4",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"ia64", {
+      "itanium", "itanium1", "merced", "itanium2", "mckinley"
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    // x86 and x86_64. See
+    // https://en.wikipedia.org/wiki/List_of_AMD_microprocessors
+    // https://en.wikipedia.org/wiki/List_of_Intel_microprocessors
+    {"i386", {
+      // Intel generic
+      "i386", "i486", "i586", "i686",
+      // AMD
+      "k6", "k6-2", "k6-3", "athlon" "athlon-tbird", "athlon-4",
+      "athlon-xp", "athlon-mp",
+      // Everything called "pentium" by GCC is 32 bits; the only 64-bit
+      // Pentium flag recognized by GCC is "nocona".
+      "pentium", "pentium-mmx", "pentiumpro" "pentium2", "pentium3",
+      "pentium3m", "pentium-m" "pentium4", "pentium4m", "prescott",
+      // Misc
+      "winchip-c6", "winchip2", "c3", "c3-2", "geode",
+    }}, // NOLINTNEXTLINE(whitespace/braces)
+    {"x86_64", {
+      // Intel
+      "nocona", "core2", "nehalem" "westmere", "sandybridge", "knl",
+      "ivybridge", "haswell", "broadwell" "bonnell", "silvermont",
+      // AMD generic
+      "k8", "k8-sse3", "opteron", "athlon64", "athlon-fx",
+      "opteron-sse3" "athlon64-sse3", "amdfam10", "barcelona",
+      // AMD "bulldozer" (high power, family 15h)
+      "bdver1", "bdver2" "bdver3", "bdver4",
+      // AMD "bobcat" (low power, family 14h)
+      "btver1", "btver2",
+    }},
+  })
 {
 }
-
-/*******************************************************************\
-
-Function: gcc_modet::needs_preprocessing
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool gcc_modet::needs_preprocessing(const std::string &file)
 {
@@ -154,18 +301,7 @@ bool gcc_modet::needs_preprocessing(const std::string &file)
     return false;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: does it.
-
-\*******************************************************************/
-
+/// does it.
 int gcc_modet::doit()
 {
   if(cmdline.isset('?') ||
@@ -186,10 +322,10 @@ int gcc_modet::doit()
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
 
-  if((cmdline.isset('v') || cmdline.isset("version")) &&
-     cmdline.have_infile_arg()) // let the native tool print the version
+  if((cmdline.isset('v') && cmdline.have_infile_arg()) ||
+     (cmdline.isset("version") && !produce_hybrid_binary))
   {
-    // This a) prints the version and b) increases verbosity.
+    // "-v" a) prints the version and b) increases verbosity.
     // Compilation continues, don't exit!
 
     if(act_as_ld)
@@ -203,6 +339,9 @@ int gcc_modet::doit()
 
   if(cmdline.isset("version"))
   {
+    if(produce_hybrid_binary)
+      return run_gcc();
+
     std::cout << '\n' <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
       "CBMC version: " CBMC_VERSION << '\n' <<
@@ -214,11 +353,14 @@ int gcc_modet::doit()
 
   if(cmdline.isset("dumpversion"))
   {
-    std::cout << "3.4.4" << std::endl;
+    if(produce_hybrid_binary)
+      return run_gcc();
+
+    std::cout << "3.4.4\n";
     return EX_OK;
   }
 
-  if(cmdline.isset("Wall"))
+  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
     verbosity=2;
 
   if(cmdline.isset("verbosity"))
@@ -286,6 +428,51 @@ int gcc_modet::doit()
   else if(cmdline.isset("little-endian") || cmdline.isset("mlittle"))
     config.ansi_c.endianness=configt::ansi_ct::endiannesst::IS_LITTLE_ENDIAN;
 
+  if(cmdline.isset("mthumb") || cmdline.isset("mthumb-interwork"))
+    config.ansi_c.set_arch_spec_arm("armhf");
+
+  // -mcpu sets both the arch and tune, but should only be used if
+  // neither -march nor -mtune are passed on the command line.
+  std::string target_cpu=
+    cmdline.isset("march") ? cmdline.get_value("march") :
+    cmdline.isset("mtune") ? cmdline.get_value("mtune") :
+    cmdline.isset("mcpu")  ? cmdline.get_value("mcpu")  : "";
+
+  if(target_cpu!="")
+  {
+    // Work out what CPROVER architecture we should target.
+    for(auto &pair : arch_map)
+      for(auto &processor : pair.second)
+        if(processor==target_cpu)
+        {
+          if(pair.first.find("mips")==std::string::npos)
+            config.set_arch(pair.first);
+          else
+          {
+            // Targeting a MIPS processor. MIPS is special; we also need
+            // to know the endianness. -EB (big-endian) is the default.
+            if(cmdline.isset("EL"))
+            {
+              if(pair.first=="mips32o")
+                config.set_arch("mipsel");
+              else if(pair.first=="mips32n")
+                config.set_arch("mipsn32el");
+              else
+                config.set_arch("mips64el");
+            }
+            else
+            {
+              if(pair.first=="mips32o")
+                config.set_arch("mips");
+              else if(pair.first=="mips32n")
+                config.set_arch("mipsn32");
+              else
+                config.set_arch("mips64");
+            }
+          }
+        }
+  }
+
   // -fshort-wchar makes wchar_t "short unsigned int"
   if(cmdline.isset("fshort-wchar"))
   {
@@ -303,8 +490,11 @@ int gcc_modet::doit()
     config.ansi_c.double_width=config.ansi_c.single_width;
 
   // determine actions to be undertaken
-  compilet compiler(cmdline);
-  compiler.set_message_handler(get_message_handler());
+  compilet compiler(cmdline,
+                    gcc_message_handler,
+                    cmdline.isset("Werror") &&
+                    cmdline.isset("Wextra") &&
+                    !cmdline.isset("Wno-error"));
 
   if(act_as_ld)
     compiler.mode=compilet::LINK_LIBRARY;
@@ -315,7 +505,7 @@ int gcc_modet::doit()
   else if(cmdline.isset('E'))
   {
     compiler.mode=compilet::PREPROCESS_ONLY;
-    assert(false);
+    UNREACHABLE;
   }
   else if(cmdline.isset("shared") ||
           cmdline.isset('r')) // really not well documented
@@ -337,7 +527,6 @@ int gcc_modet::doit()
     debug() << "Compiling and linking a library" << eom; break;
   case compilet::COMPILE_LINK_EXECUTABLE:
     debug() << "Compiling and linking an executable" << eom; break;
-  default: assert(false);
   }
 
   if(cmdline.isset("i386-win32") ||
@@ -523,18 +712,7 @@ int gcc_modet::doit()
   return EX_OK;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose: call gcc for preprocessing
-
-\*******************************************************************/
-
+/// call gcc for preprocessing
 int gcc_modet::preprocess(
   const std::string &language,
   const std::string &src,
@@ -602,34 +780,21 @@ int gcc_modet::preprocess(
   new_argv.push_back(src);
 
   // overwrite argv[0]
-  assert(new_argv.size()>=1);
+  INVARIANT(new_argv.size()>=1, "No program name in argv");
   new_argv[0]=native_tool_name.c_str();
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << std::endl;
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::run_gcc
-
-  Inputs:
-
- Outputs:
-
- Purpose: run gcc or clang with original command line
-
-\*******************************************************************/
-
+/// run gcc or clang with original command line
 int gcc_modet::run_gcc()
 {
-  assert(!cmdline.parsed_argv.empty());
+  PRECONDITION(!cmdline.parsed_argv.empty());
 
   // build new argv
   std::vector<std::string> new_argv;
@@ -640,27 +805,13 @@ int gcc_modet::run_gcc()
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
 
-  #if 0
-  std::cout << "RUN:";
+  debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
-    std::cout << " " << new_argv[i];
-  std::cout << std::endl;
-  #endif
+    debug() << " " << new_argv[i];
+  debug() << eom;
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
-
-/*******************************************************************\
-
-Function: gcc_modet::gcc_hybrid_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 int gcc_modet::gcc_hybrid_binary()
 {
@@ -710,7 +861,7 @@ int gcc_modet::gcc_hybrid_binary()
   if(output_files.empty() ||
      (output_files.size()==1 &&
       output_files.front()=="/dev/null"))
-    return EX_OK;
+    return run_gcc();
 
   debug() << "Running " << native_tool_name
           << " to generate hybrid binary" << eom;
@@ -721,7 +872,12 @@ int gcc_modet::gcc_hybrid_binary()
       it!=output_files.end();
       it++)
   {
-    rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    int result=rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    if(result!=0)
+    {
+      error() << "Rename failed: " << std::strerror(errno) << eom;
+      return result;
+    }
   }
 
   std::string objcopy_cmd;
@@ -729,6 +885,11 @@ int gcc_modet::gcc_hybrid_binary()
   {
     objcopy_cmd=linker_name(cmdline, base_name);
     objcopy_cmd.erase(objcopy_cmd.size()-2);
+  }
+  else if(has_suffix(compiler_name(cmdline, base_name), "-gcc"))
+  {
+    objcopy_cmd=compiler_name(cmdline, base_name);
+    objcopy_cmd.erase(objcopy_cmd.size()-3);
   }
   objcopy_cmd+="objcopy";
 
@@ -770,7 +931,13 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(objcopy_argv[0], objcopy_argv, "", "");
     }
 
-    remove(saved.c_str());
+    result=remove(saved.c_str());
+    if(result!=0)
+    {
+      error() << "Remove failed: " << std::strerror(errno) << eom;
+      return result;
+    }
+
     #elif defined(__APPLE__)
     // Mac
     if(result==0)
@@ -790,7 +957,12 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(lipo_argv[0], lipo_argv, "", "");
     }
 
-    remove(saved.c_str());
+    result=remove(saved.c_str());
+    if(result!=0)
+    {
+      error() << "Remove failed: " << std::strerror(errno) << eom;
+      return result;
+    }
 
     #else
     error() << "binary merging not implemented for this platform" << eom;
@@ -800,18 +972,6 @@ int gcc_modet::gcc_hybrid_binary()
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: gcc_modet::asm_output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 int gcc_modet::asm_output(
   bool act_as_bcc,
@@ -897,18 +1057,7 @@ int gcc_modet::asm_output(
   return EX_OK;
 }
 
-/*******************************************************************\
-
-Function: gcc_modet::help_mode
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void gcc_modet::help_mode()
 {
   if(act_as_ld)

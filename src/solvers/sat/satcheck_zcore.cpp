@@ -6,58 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "satcheck_zcore.h"
+
 #include <cassert>
 #include <fstream>
 
 #include <util/string2int.h>
 
-#include "satcheck_zcore.h"
-
 #include <cstring>
-
-/*******************************************************************\
-
-Function: satcheck_zcoret::satcheck_zcoret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 satcheck_zcoret::satcheck_zcoret()
 {
 }
 
-/*******************************************************************\
-
-Function: satcheck_zcoret::~satcheck_zcoret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 satcheck_zcoret::~satcheck_zcoret()
 {
 }
-
-/*******************************************************************\
-
-Function: satcheck_zcoret::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt satcheck_zcoret::l_get(literalt a) const
 {
@@ -65,34 +29,10 @@ tvt satcheck_zcoret::l_get(literalt a) const
   return tvt(tvt::tv_enumt::TV_UNKNOWN);
 }
 
-/*******************************************************************\
-
-Function: satcheck_zcoret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string satcheck_zcoret::solver_text()
 {
   return "ZCore";
 }
-
-/*******************************************************************\
-
-Function: satcheck_zcoret::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt satcheck_zcoret::prop_solve()
 {

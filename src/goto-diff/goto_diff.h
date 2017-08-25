@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// GOTO-DIFF Base Class
+
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_H
 
@@ -28,7 +31,7 @@ public:
     messaget(_message_handler),
     goto_model1(_goto_model1),
     goto_model2(_goto_model2),
-    ui(ui_message_handlert::PLAIN),
+    ui(ui_message_handlert::uit::PLAIN),
     total_functions_count(0)
      {}
 

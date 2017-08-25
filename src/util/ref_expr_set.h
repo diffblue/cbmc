@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set
+
 #ifndef CPROVER_UTIL_REF_EXPR_SET_H
 #define CPROVER_UTIL_REF_EXPR_SET_H
 
@@ -32,7 +35,7 @@ public:
 
   bool empty() const
   {
-    if(d==NULL)
+    if(d==nullptr)
       return true;
     return d->expr_set.empty();
   }
@@ -49,13 +52,13 @@ public:
 
   bool make_union(const ref_expr_sett &s2)
   {
-    if(s2.d==NULL)
+    if(s2.d==nullptr)
       return false;
 
     if(s2.d==d)
       return false;
 
-    if(d==NULL)
+    if(d==nullptr)
     {
       copy_from(s2);
       return true;

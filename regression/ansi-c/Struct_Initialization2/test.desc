@@ -1,0 +1,10 @@
+CORE
+main.c
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+variable-length arrays in the middle of a struct are not permitted

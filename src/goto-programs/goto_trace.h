@@ -8,6 +8,9 @@ Date: July 2005
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
 
@@ -33,38 +36,55 @@ class goto_trace_stept
 public:
   unsigned step_nr;
 
-  bool is_assignment() const      { return type==ASSIGNMENT; }
-  bool is_assume() const          { return type==ASSUME; }
-  bool is_assert() const          { return type==ASSERT; }
-  bool is_goto() const            { return type==GOTO; }
-  bool is_constraint() const      { return type==CONSTRAINT; }
-  bool is_function_call() const   { return type==FUNCTION_CALL; }
-  bool is_function_return() const { return type==FUNCTION_RETURN; }
-  bool is_location() const        { return type==LOCATION; }
-  bool is_output() const          { return type==OUTPUT; }
-  bool is_input() const           { return type==INPUT; }
-  bool is_decl() const            { return type==DECL; }
-  bool is_dead() const            { return type==DEAD; }
-  bool is_shared_read() const     { return type==SHARED_READ; }
-  bool is_shared_write() const    { return type==SHARED_WRITE; }
-  bool is_spawn() const           { return type==SPAWN; }
-  bool is_memory_barrier() const  { return type==MEMORY_BARRIER; }
-  bool is_atomic_begin() const    { return type==ATOMIC_BEGIN; }
-  bool is_atomic_end() const      { return type==ATOMIC_END; }
+  bool is_assignment() const      { return type==typet::ASSIGNMENT; }
+  bool is_assume() const          { return type==typet::ASSUME; }
+  bool is_assert() const          { return type==typet::ASSERT; }
+  bool is_goto() const            { return type==typet::GOTO; }
+  bool is_constraint() const      { return type==typet::CONSTRAINT; }
+  bool is_function_call() const   { return type==typet::FUNCTION_CALL; }
+  bool is_function_return() const { return type==typet::FUNCTION_RETURN; }
+  bool is_location() const        { return type==typet::LOCATION; }
+  bool is_output() const          { return type==typet::OUTPUT; }
+  bool is_input() const           { return type==typet::INPUT; }
+  bool is_decl() const            { return type==typet::DECL; }
+  bool is_dead() const            { return type==typet::DEAD; }
+  bool is_shared_read() const     { return type==typet::SHARED_READ; }
+  bool is_shared_write() const    { return type==typet::SHARED_WRITE; }
+  bool is_spawn() const           { return type==typet::SPAWN; }
+  bool is_memory_barrier() const  { return type==typet::MEMORY_BARRIER; }
+  bool is_atomic_begin() const    { return type==typet::ATOMIC_BEGIN; }
+  bool is_atomic_end() const      { return type==typet::ATOMIC_END; }
 
-  typedef enum { NONE, ASSIGNMENT, ASSUME, ASSERT, GOTO,
-                 LOCATION, INPUT, OUTPUT, DECL, DEAD,
-                 FUNCTION_CALL, FUNCTION_RETURN,
-                 CONSTRAINT,
-                 SHARED_READ, SHARED_WRITE,
-                 SPAWN, MEMORY_BARRIER, ATOMIC_BEGIN, ATOMIC_END } typet;
+  enum class typet
+  {
+    NONE,
+    ASSIGNMENT,
+    ASSUME,
+    ASSERT,
+    GOTO,
+    LOCATION,
+    INPUT,
+    OUTPUT,
+    DECL,
+    DEAD,
+    FUNCTION_CALL,
+    FUNCTION_RETURN,
+    CONSTRAINT,
+    SHARED_READ,
+    SHARED_WRITE,
+    SPAWN,
+    MEMORY_BARRIER,
+    ATOMIC_BEGIN,
+    ATOMIC_END
+  };
+
   typet type;
 
   // we may choose to hide a step
   bool hidden;
 
   // we categorize
-  typedef enum { STATE, ACTUAL_PARAMETER } assignment_typet;
+  enum class assignment_typet { STATE, ACTUAL_PARAMETER };
   assignment_typet assignment_type;
 
   goto_programt::const_targett pc;
@@ -105,9 +125,9 @@ public:
 
   goto_trace_stept():
     step_nr(0),
-    type(NONE),
+    type(typet::NONE),
     hidden(false),
-    assignment_type(STATE),
+    assignment_type(assignment_typet::STATE),
     thread_nr(0),
     cond_value(false),
     formatted(false)

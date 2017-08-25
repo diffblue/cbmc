@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
+#include "all_properties_class.h"
+
 #include <iostream>
 
 #include <util/time_stopping.h>
@@ -20,20 +25,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/json_goto_trace.h>
 
 #include "bv_cbmc.h"
-
-#include "all_properties_class.h"
-
-/*******************************************************************\
-
-Function: bmc_all_propertiest::goal_covered
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
 {
@@ -60,18 +51,6 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: bmc_all_propertiest::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmc_all_propertiest::operator()()
 {
@@ -140,7 +119,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   decision_proceduret::resultt result=cover_goals();
 
-  if(result==decision_proceduret::D_ERROR)
+  if(result==decision_proceduret::resultt::D_ERROR)
   {
     error=true;
     for(auto &g : goal_map)
@@ -166,7 +145,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   report(cover_goals);
 
   if(error)
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
 
   bool safe=(cover_goals.number_covered()==0);
 
@@ -175,26 +154,14 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
   else
     bmc.report_failure(); // legacy, might go away
 
-  return safe?safety_checkert::SAFE:safety_checkert::UNSAFE;
+  return safe?safety_checkert::resultt::SAFE:safety_checkert::resultt::UNSAFE;
 }
-
-/*******************************************************************\
-
-Function: bmc_all_propertiest::report()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 {
   switch(bmc.ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     {
       status() << "\n** Results:" << eom;
 
@@ -222,7 +189,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     }
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       for(const auto &g : goal_map)
       {
@@ -238,7 +205,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
       break;
     }
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["result"].make_array();
@@ -262,18 +229,6 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
     break;
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::all_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmct::all_properties(
   const goto_functionst &goto_functions,

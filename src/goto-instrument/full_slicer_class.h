@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Program Slicing
+
 #ifndef CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H
 #define CPROVER_GOTO_INSTRUMENT_FULL_SLICER_CLASS_H
 
@@ -31,14 +34,6 @@ echo 'digraph g {' > c.dot ; cat c.goto | \
   echo '}' >> c.dot ; tred c.dot > c-red.dot ; \
   dot -Tpdf -oc-red.pdf c-red.dot
 #endif
-
-/*******************************************************************\
-
-   Class: full_slicert
-
- Purpose:
-
-\*******************************************************************/
 
 class full_slicert
 {

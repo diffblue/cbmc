@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_PROP_PROP_CONV_STORE_H
 #define CPROVER_SOLVERS_PROP_PROP_CONV_STORE_H
 
@@ -20,7 +21,7 @@ public:
 
   struct constraintt
   {
-    typedef enum { NONE, CONVERT, SET_TO } typet;
+    enum class typet { NONE, CONVERT, SET_TO };
     typet type;
 
     exprt expr;

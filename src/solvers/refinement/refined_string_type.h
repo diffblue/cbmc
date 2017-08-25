@@ -10,6 +10,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Type for string expressions used by the string solver. These string
+///   expressions contain a field `length`, of type `index_type`, a field
+///   `content` of type `content_type`. This module also defines functions to
+///   recognise the C and java string types.
+
 #ifndef CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
 #define CPROVER_SOLVERS_REFINEMENT_REFINED_STRING_TYPE_H
 

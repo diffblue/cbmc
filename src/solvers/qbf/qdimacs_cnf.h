@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
 #define CPROVER_SOLVERS_QBF_QDIMACS_CNF_H
 
@@ -32,11 +33,11 @@ public:
   class quantifiert
   {
   public:
-    typedef enum { NONE, EXISTENTIAL, UNIVERSAL } typet;
+    enum class typet { NONE, EXISTENTIAL, UNIVERSAL };
     typet type;
     unsigned var_no;
 
-    quantifiert():type(NONE), var_no(0)
+    quantifiert():type(typet::NONE), var_no(0)
     {
     }
 
@@ -51,7 +52,7 @@ public:
 
     size_t hash() const
     {
-      return var_no^(type<<24);
+      return var_no^(static_cast<int>(type)<<24);
     }
   };
 
@@ -71,12 +72,12 @@ public:
 
   void add_existential_quantifier(const literalt l)
   {
-    add_quantifier(quantifiert(quantifiert::EXISTENTIAL, l));
+    add_quantifier(quantifiert(quantifiert::typet::EXISTENTIAL, l));
   }
 
   void add_universal_quantifier(const literalt l)
   {
-    add_quantifier(quantifiert(quantifiert::UNIVERSAL, l));
+    add_quantifier(quantifiert(quantifiert::typet::UNIVERSAL, l));
   }
 
   bool is_quantified(const literalt l) const;

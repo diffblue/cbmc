@@ -6,72 +6,28 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Abstract interface to support a programming language
+
 #include "language.h"
+
 #include "expr.h"
-
-/*******************************************************************\
-
-Function: languaget::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool languaget::final(symbol_tablet &symbol_table, bool generate_start_function)
 {
   return false;
 }
 
-/*******************************************************************\
-
-Function: languaget::interfaces
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool languaget::interfaces(symbol_tablet &symbol_table)
 {
   return false;
 }
-
-/*******************************************************************\
-
-Function: languaget::dependencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void languaget::dependencies(
   const std::string &module,
   std::set<std::string> &modules)
 {
 }
-
-/*******************************************************************\
-
-Function: languaget::from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool languaget::from_expr(
   const exprt &expr,
@@ -82,18 +38,6 @@ bool languaget::from_expr(
   return false;
 }
 
-/*******************************************************************\
-
-Function: languaget::from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool languaget::from_type(
   const typet &type,
   std::string &code,
@@ -102,18 +46,6 @@ bool languaget::from_type(
   code=type.pretty();
   return false;
 }
-
-/*******************************************************************\
-
-Function: languaget::type_to_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool languaget::type_to_name(
   const typet &type,

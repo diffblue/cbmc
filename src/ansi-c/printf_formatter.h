@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// printf Formatting
+
 #ifndef CPROVER_ANSI_C_PRINTF_FORMATTER_H
 #define CPROVER_ANSI_C_PRINTF_FORMATTER_H
 
@@ -22,7 +25,9 @@ public:
   void print(std::ostream &out);
   std::string as_string();
 
-  explicit printf_formattert(const namespacet &_ns):ns(_ns)
+  explicit printf_formattert(const namespacet &_ns):
+    ns(_ns),
+    format_pos(0)
   {
   }
 

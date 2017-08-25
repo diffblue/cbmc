@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_ERROR_H
 #define CPROVER_UTIL_ERROR_H
 

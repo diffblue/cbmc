@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 #define CPROVER_SOLVERS_FLATTENING_BV_UTILS_H
 
@@ -27,7 +28,7 @@ class bv_utilst
 public:
   explicit bv_utilst(propt &_prop):prop(_prop) { }
 
-  typedef enum { SIGNED, UNSIGNED } representationt;
+  enum class representationt { SIGNED, UNSIGNED };
 
   bvt build_constant(const mp_integer &i, std::size_t width);
 
@@ -67,7 +68,7 @@ public:
   literalt overflow_sub(const bvt &op0, const bvt &op1, representationt rep);
   literalt carry_out(const bvt &op0, const bvt &op1, literalt carry_in);
 
-  typedef enum { LEFT, LRIGHT, ARIGHT } shiftt;
+  enum class shiftt { LEFT, LRIGHT, ARIGHT };
   bvt shift(const bvt &op, const shiftt shift, std::size_t distance);
   bvt shift(const bvt &op, const shiftt shift, const bvt &distance);
 
@@ -173,12 +174,12 @@ public:
 
   bvt sign_extension(const bvt &bv, std::size_t new_size)
   {
-    return extension(bv, new_size, SIGNED);
+    return extension(bv, new_size, representationt::SIGNED);
   }
 
   bvt zero_extension(const bvt &bv, std::size_t new_size)
   {
-    return extension(bv, new_size, UNSIGNED);
+    return extension(bv, new_size, representationt::UNSIGNED);
   }
 
   bvt zeros(std::size_t new_size) const

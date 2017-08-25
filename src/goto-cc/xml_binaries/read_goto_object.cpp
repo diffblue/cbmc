@@ -8,6 +8,11 @@ Date: June 2006
 
 \*******************************************************************/
 
+/// \file
+/// Read goto object files.
+
+#include "read_goto_object.h"
+
 #include <xmllang/xml_parser.h>
 #include <util/namespace.h>
 #include <util/base_type.h>
@@ -17,24 +22,13 @@ Date: June 2006
 
 #include <langapi/mode.h>
 
-#include "read_goto_object.h"
 #include "xml_goto_function_hashing.h"
 #include "xml_irep_hashing.h"
 #include "xml_symbol_hashing.h"
 
-/*******************************************************************\
-
-Function: read_goto_object
-
-  Inputs: input stream, symbol_table, functions
-
- Outputs: true on error, false otherwise
-
- Purpose: reads a goto object xml file back into a symbol and a
-          function table
-
-\*******************************************************************/
-
+/// reads a goto object xml file back into a symbol and a function table
+/// \par parameters: input stream, symbol_table, functions
+/// \return true on error, false otherwise
 bool read_goto_object(
   std::istream &in,
   const std::string &filename,
@@ -96,13 +90,13 @@ bool read_goto_object(
         {
           symbolt symbol;
           symbolconverter.convert(*sym_it, symbol);
-          // std::cout << "Adding Symbol: " << symbol.name << std::endl;
+          // std::cout << "Adding Symbol: " << symbol.name << '\n';
           if(!symbol.is_type &&
              symbol.type.id()=="code")
           {
             // makes sure there is an empty function
             // for this symbol. if we got code for it,
-            // it will be added lateron.
+            // it will be added later on.
             functions.function_map[symbol.name].type=
               to_code_type(symbol.type);
           }
@@ -117,7 +111,7 @@ bool read_goto_object(
             fun_it++)
         {
           std::string fname = fun_it->get_attribute("name");
-          // std::cout << "Adding function body: " << fname << std::endl;
+          // std::cout << "Adding function body: " << fname << '\n';
           goto_functionst::goto_functiont &f = functions.function_map[fname];
           gfconverter.convert(*fun_it, f);
         }

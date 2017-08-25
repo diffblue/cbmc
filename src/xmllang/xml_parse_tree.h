@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_XMLLANG_XML_PARSE_TREE_H
 #define CPROVER_XMLLANG_XML_PARSE_TREE_H
 

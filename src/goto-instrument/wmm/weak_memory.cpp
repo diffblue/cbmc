@@ -8,6 +8,9 @@ Date: September 2011
 
 \*******************************************************************/
 
+/// \file
+/// Weak Memory Instrumentation for Threaded Goto Programs
+
 /*
  * Strategy: we first overapproximate all the read/write sequences of
  * the program executions with a read/write graph. We then detect the
@@ -15,6 +18,8 @@ Date: September 2011
  * of the program. We finally insert the corresponding instrumentations
  * in the program.
  */
+
+#include "weak_memory.h"
 
 #include <set>
 
@@ -26,22 +31,10 @@ Date: September 2011
 
 #include "../rw_set.h"
 
-#include "weak_memory.h"
 #include "shared_buffers.h"
 #include "goto2graph.h"
 
-/*******************************************************************\
-
-Function: introduce_temporaries
-
-  Inputs:
-
- Outputs:
-
- Purpose: all access to shared variables is pushed into assignments
-
-\*******************************************************************/
-
+/// all access to shared variables is pushed into assignments
 void introduce_temporaries(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
@@ -109,18 +102,6 @@ void introduce_temporaries(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: weak_memory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void weak_memory(
   memory_modelt model,
@@ -209,7 +190,7 @@ void weak_memory(
       <<" cycles found"<<messaget::eom;
 
     /* if no cycle, no need to instrument */
-    if(instrumenter.set_of_cycles.size() == 0)
+    if(instrumenter.set_of_cycles.empty())
     {
       message.status()<<"program safe -- no need to instrument"<<messaget::eom;
       return;

@@ -65,7 +65,14 @@ inline FILE *fopen(const char *filename, const char *mode)
   FILE *fopen_result;
 
   _Bool fopen_error;
+
+  #if !defined(__linux__) || defined(__GLIBC__)
   fopen_result=fopen_error?NULL:malloc(sizeof(FILE));
+  #else
+  // libraries need to expose the definition of FILE; this is the
+  // case for musl
+  fopen_result=fopen_error?NULL:malloc(sizeof(int));
+  #endif
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(fopen_result, "open");
@@ -97,6 +104,11 @@ inline FILE* freopen(const char *filename, const char *mode, FILE *f)
 #ifndef __CPROVER_STDIO_H_INCLUDED
 #include <stdio.h>
 #define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
 #endif
 
 inline int fclose(FILE *stream)
@@ -135,10 +147,47 @@ inline FILE *fdopen(int handle, const char *mode)
     "fdopen zero-termination of 2nd argument");
   #endif
 
+  #if !defined(__linux__) || defined(__GLIBC__)
+  FILE *f=malloc(sizeof(FILE));
+  #else
+  // libraries need to expose the definition of FILE; this is the
+  // case for musl
+  FILE *f=malloc(sizeof(int));
+  #endif
+
+  return f;
+}
+
+/* FUNCTION: _fdopen */
+
+// This is for Apple
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
+#ifdef __APPLE__
+inline FILE *_fdopen(int handle, const char *mode)
+{
+  __CPROVER_HIDE:;
+  (void)handle;
+  (void)*mode;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_is_zero_string(mode),
+    "fdopen zero-termination of 2nd argument");
+  #endif
+
   FILE *f=malloc(sizeof(FILE));
 
   return f;
 }
+#endif
 
 /* FUNCTION: fgets */
 
@@ -147,7 +196,7 @@ inline FILE *fdopen(int handle, const char *mode)
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-inline char *fgets(char *str, int size, FILE *stream)
+char *fgets(char *str, int size, FILE *stream)
 {
   __CPROVER_HIDE:;
   __CPROVER_bool error;
@@ -168,6 +217,16 @@ inline char *fgets(char *str, int size, FILE *stream)
     __CPROVER_assume(resulting_size<size);
     __CPROVER_is_zero_string(str)=!error;
     __CPROVER_zero_string_length(str)=resulting_size;
+  }
+  #else
+  if(size>0)
+  {
+    int str_length;
+    __CPROVER_assume(str_length>=0 && str_length<size);
+    char contents_nondet[str_length];
+    __CPROVER_array_replace(str, contents_nondet);
+    if(!error)
+      str[str_length]='\0';
   }
   #endif
 
@@ -734,4 +793,44 @@ inline int vfprintf(FILE *stream, const char *restrict format, va_list arg)
   #endif
 
   return result;
+}
+
+/* FUNCTION: vasprintf */
+
+#ifndef __CPROVER_STDIO_H_INCLUDED
+#include <stdio.h>
+#define __CPROVER_STDIO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDARG_H_INCLUDED
+#include <stdarg.h>
+#define __CPROVER_STDARG_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_STDLIB_H_INCLUDED
+#include <stdlib.h>
+#define __CPROVER_STDLIB_H_INCLUDED
+#endif
+
+inline int vasprintf(char **ptr, const char *fmt, va_list ap)
+{
+  (void)*fmt;
+  (void)ap;
+
+  int result_buffer_size;
+  if(result_buffer_size<=0)
+    return -1;
+
+  *ptr=malloc(result_buffer_size);
+  for(int i=0; i<result_buffer_size; ++i)
+  {
+    char c;
+    (*ptr)[i]=c;
+    if(c=='\0')
+      break;
+  }
+
+  __CPROVER_assume(i<result_buffer_size);
+
+  return i;
 }

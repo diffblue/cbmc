@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/unicode.h>
+/// \file
+/// Main Module
 
 #include "goto_instrument_parse_options.h"
 
-/*******************************************************************\
-
-Function: main
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/unicode.h>
 
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)

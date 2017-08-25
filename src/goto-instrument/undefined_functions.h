@@ -8,10 +8,15 @@ Date: July 2016
 
 \*******************************************************************/
 
+/// \file
+/// Handling of functions without body
+
 #ifndef CPROVER_UNDEFINED_FUNCTIONS_H
 #define CPROVER_UNDEFINED_FUNCTIONS_H
 
 #include <iosfwd>
+
+class namespacet;
 
 class goto_functionst;
 

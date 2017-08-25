@@ -6,6 +6,7 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+
 #include <cassert>
 #include <fstream>
 
@@ -15,18 +16,6 @@ Author: CM Wintersteiger
 
 /*! \cond */
 // FIX FOR THE CUDD LIBRARY
-
-/*******************************************************************\
-
-Function: DD::getNode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 inline DdNode *DD::getNode() const
 {
@@ -38,18 +27,6 @@ inline DdNode *DD::getNode() const
 
 #include "qbf_skizzo_core.h"
 
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::qbf_skizzo_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_skizzo_coret::qbf_skizzo_coret():
   qbf_bdd_certificatet()
 {
@@ -58,50 +35,14 @@ qbf_skizzo_coret::qbf_skizzo_coret():
   qbf_tmp_file="sKizzo.qdimacs";
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::~qbf_skizzo_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_skizzo_coret::~qbf_skizzo_coret()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const std::string qbf_skizzo_coret::solver_text()
 {
   return "Skizzo/Core";
 }
-
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 propt::resultt qbf_skizzo_coret::prop_solve()
 {
@@ -189,51 +130,15 @@ propt::resultt qbf_skizzo_coret::prop_solve()
   }
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool qbf_skizzo_coret::is_in_core(literalt l) const
 {
   throw "nyi";
 }
 
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::m_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qdimacs_coret::modeltypet qbf_skizzo_coret::m_get(literalt a) const
 {
   throw "nyi";
 }
-
-/*******************************************************************\
-
-Function: qbf_skizzo_coret::get_certificate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool qbf_skizzo_coret::get_certificate(void)
 {

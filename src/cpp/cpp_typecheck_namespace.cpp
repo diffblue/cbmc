@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/source_location.h>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/source_location.h>
 
 void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 {

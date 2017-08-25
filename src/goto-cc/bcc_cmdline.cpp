@@ -6,24 +6,15 @@ Author: Michael Tautschnig
 
 \*******************************************************************/
 
+/// \file
+/// A special command line object for Bruce's C Compiler
+
+#include "bcc_cmdline.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/prefix.h>
-
-#include "bcc_cmdline.h"
-
-/*******************************************************************\
- 
-Function: bcc_cmdlinet::parse
- 
-  Inputs: argument count, argument strings
- 
- Outputs: none
- 
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
 
 // non-bcc options
 const char *goto_bcc_options_with_argument[]=
@@ -33,7 +24,7 @@ const char *goto_bcc_options_with_argument[]=
   "--native-compiler",
   "--native-linker",
   "--print-rejected-preprocessed-source",
-  NULL
+  nullptr
 };
 
 const char *bcc_options_without_argument[]=
@@ -55,7 +46,7 @@ const char *bcc_options_without_argument[]=
   "-x",
   "-W",
   "-ansi",
-  NULL
+  nullptr
 };
 
 const char *bcc_options_with_argument[]=
@@ -73,7 +64,7 @@ const char *bcc_options_with_argument[]=
   "-T",
   "-Q",
   "-t",
-  NULL
+  nullptr
 };
 
 bool bcc_cmdlinet::parse(int argc, const char **argv)
@@ -96,7 +87,7 @@ bool bcc_cmdlinet::parse(int argc, const char **argv)
 
     // separated only, and also allow concatenation with "="
     for(const char **o=goto_bcc_options_with_argument;
-        *o!=NULL && !found;
+        *o!=nullptr && !found;
         ++o)
     {
       std::string os(*o);
@@ -134,7 +125,7 @@ bool bcc_cmdlinet::parse(int argc, const char **argv)
     }
 
     for(const char **o=bcc_options_with_argument;
-        *o!=NULL && !found;
+        *o!=nullptr && !found;
         ++o)
     {
       std::string os(*o);
@@ -162,7 +153,7 @@ bool bcc_cmdlinet::parse(int argc, const char **argv)
     {
       // unrecognized option
       std::cerr << "Warning: uninterpreted bcc option '" << argv_i
-                << "'" << std::endl;
+                << "'\n";
     }
   }
 

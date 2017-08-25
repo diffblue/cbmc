@@ -6,8 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Conversion / Type Checking
+
+#include "c_typecheck_base.h"
+
 #include <util/arith_tools.h>
-#include <util/config.h>
+#include <util/c_types.h>
 #include <util/type_eq.h>
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
@@ -16,22 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <linking/zero_initializer.h>
 
-#include "c_types.h"
-#include "c_typecheck_base.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::do_initializer(
   exprt &initializer,
@@ -60,19 +51,7 @@ void c_typecheck_baset::do_initializer(
   initializer=result;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose: initialize something of type `type' with given
-          value `value'
-
-\*******************************************************************/
-
+/// initialize something of type `type' with given value `value'
 exprt c_typecheck_baset::do_initializer_rec(
   const exprt &value,
   const typet &type,
@@ -230,18 +209,6 @@ exprt c_typecheck_baset::do_initializer_rec(
   return result;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::do_initializer(symbolt &symbol)
 {
   // this one doesn't need initialization
@@ -285,25 +252,11 @@ void c_typecheck_baset::do_initializer(symbolt &symbol)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::designator_enter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void c_typecheck_baset::designator_enter(
   const typet &type,
   designatort &designator)
 {
-  designatort::entryt entry;
-  entry.type=type;
-  entry.index=0;
+  designatort::entryt entry(type);
 
   const typet &full_type=follow(type);
 
@@ -313,6 +266,8 @@ void c_typecheck_baset::designator_enter(
 
     entry.size=struct_type.components().size();
     entry.subtype.make_nil();
+    // only a top-level struct may end with a variable-length array
+    entry.vla_permitted=designator.empty();
 
     for(struct_typet::componentst::const_iterator
         it=struct_type.components().begin();
@@ -340,7 +295,7 @@ void c_typecheck_baset::designator_enter(
     }
     else
     {
-      // The default is to unitialize using the first member of the
+      // The default is to initialize using the first member of the
       // union.
       entry.size=1;
       entry.subtype=union_type.components().front().type();
@@ -394,24 +349,18 @@ void c_typecheck_baset::designator_enter(
   designator.push_entry(entry);
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_designated_initializer
-
-  Inputs: pre-initialized result, designator
-
- Outputs: sets result
-
- Purpose:
-
-\*******************************************************************/
-
-void c_typecheck_baset::do_designated_initializer(
+/// \param pre:initialized result, designator
+/// \return sets result
+exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
   exprt &result,
   designatort &designator,
-  const exprt &value,
+  const exprt &initializer_list,
+  exprt::operandst::const_iterator init_it,
   bool force_constant)
 {
+  // copy the value, we may need to adjust it
+  exprt value=*init_it;
+
   assert(!designator.empty());
 
   if(value.id()==ID_designated_initializer)
@@ -425,8 +374,10 @@ void c_typecheck_baset::do_designated_initializer(
 
     assert(!designator.empty());
 
-    return do_designated_initializer(
-      result, designator, value.op0(), force_constant);
+    // discard the return value
+    do_designated_initializer(
+      result, designator, value, value.operands().begin(), force_constant);
+    return ++init_it;
   }
 
   exprt *dest=&result;
@@ -558,7 +509,7 @@ void c_typecheck_baset::do_designated_initializer(
 
       assert(full_type==follow(dest->type()));
 
-      return; // done
+      return ++init_it; // done
     }
 
     // union? The component in the zero initializer might
@@ -592,7 +543,7 @@ void c_typecheck_baset::do_designated_initializer(
     if(value.id()==ID_initializer_list)
     {
       *dest=do_initializer_rec(value, type, force_constant);
-      return; // done
+      return ++init_it; // done
     }
     else if(value.id()==ID_string_constant)
     {
@@ -604,7 +555,7 @@ void c_typecheck_baset::do_designated_initializer(
           follow(full_type.subtype()).id()==ID_unsignedbv))
       {
         *dest=do_initializer_rec(value, type, force_constant);
-        return; // done
+        return ++init_it; // done
       }
     }
     else if(follow(value.type())==full_type)
@@ -617,7 +568,7 @@ void c_typecheck_baset::do_designated_initializer(
          full_type.id()==ID_vector)
       {
         *dest=value;
-        return; // done
+        return ++init_it; // done
       }
     }
 
@@ -627,36 +578,52 @@ void c_typecheck_baset::do_designated_initializer(
            full_type.id()==ID_vector);
 
     // we are initializing a compound type, and enter it!
-    // this may change the type, full_type might not be valid anymore
+    // this may change the type, full_type might not be valid any more
     const typet dest_type=full_type;
+    const bool vla_permitted=designator.back().vla_permitted;
     designator_enter(type, designator);
 
+    // GCC permits (though issuing a warning with -Wall) composite
+    // types built from flat initializer lists
     if(dest->operands().empty())
     {
-      err_location(value);
-      error() << "cannot initialize type `"
-              << to_string(dest_type) << "' using value `"
-              << to_string(value) << "'" << eom;
-      throw 0;
+      warning().source_location=value.find_source_location();
+      warning() << "initialisation of " << full_type.id()
+                << " requires initializer list, found "
+                << value.id() << " instead" << eom;
+
+      // in case of a variable-length array consume all remaining
+      // initializer elements
+      if(vla_permitted &&
+         dest_type.id()==ID_array &&
+         (to_array_type(dest_type).size().is_zero() ||
+          to_array_type(dest_type).size().is_nil()))
+      {
+        value.id(ID_initializer_list);
+        value.operands().clear();
+        for( ; init_it!=initializer_list.operands().end(); ++init_it)
+          value.copy_to_operands(*init_it);
+        *dest=do_initializer_rec(value, dest_type, force_constant);
+
+        return init_it;
+      }
+      else
+      {
+        err_location(value);
+        error() << "cannot initialize type `"
+          << to_string(dest_type) << "' using value `"
+          << to_string(value) << "'" << eom;
+        throw 0;
+      }
     }
 
     dest=&(dest->op0());
 
     // we run into another loop iteration
   }
+
+  return ++init_it;
 }
-
-/*******************************************************************\
-
-Function: c_typecheck_baset::increment_designator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void c_typecheck_baset::increment_designator(designatort &designator)
 {
@@ -706,18 +673,6 @@ void c_typecheck_baset::increment_designator(designatort &designator)
   }
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::make_designator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 designatort c_typecheck_baset::make_designator(
   const typet &src_type,
   const exprt &src)
@@ -730,8 +685,7 @@ designatort c_typecheck_baset::make_designator(
   forall_operands(it, src)
   {
     const exprt &d_op=*it;
-    designatort::entryt entry;
-    entry.type=type;
+    designatort::entryt entry(type);
     const typet &full_type=follow(entry.type);
 
     if(full_type.id()==ID_array)
@@ -865,18 +819,6 @@ designatort c_typecheck_baset::make_designator(
   return designator;
 }
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::do_initializer_list
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt c_typecheck_baset::do_initializer_list(
   const exprt &value,
   const typet &type,
@@ -947,10 +889,12 @@ exprt c_typecheck_baset::do_initializer_list(
 
   designator_enter(type, current_designator);
 
-  forall_operands(it, value)
+  const exprt::operandst &operands=value.operands();
+  for(exprt::operandst::const_iterator it=operands.begin();
+      it!=operands.end(); ) // no ++it
   {
-    do_designated_initializer(
-      result, current_designator, *it, force_constant);
+    it=do_designated_initializer(
+      result, current_designator, value, it, force_constant);
 
     // increase designator -- might go up
     increment_designator(current_designator);

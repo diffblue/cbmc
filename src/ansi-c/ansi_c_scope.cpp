@@ -6,21 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ostream>
-
 #include "ansi_c_scope.h"
 
-/*******************************************************************\
-
-Function: ansi_c_scopet::print
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <ostream>
 
 void ansi_c_scopet::print(std::ostream &out) const
 {
@@ -29,7 +17,7 @@ void ansi_c_scopet::print(std::ostream &out) const
   for(const auto &name : name_map)
   {
     out << "  ID: " << name.first
-        << " CLASS: " << name.second.id_class
+        << " CLASS: " << static_cast<int>(name.second.id_class)
         << "\n";
   }
 }

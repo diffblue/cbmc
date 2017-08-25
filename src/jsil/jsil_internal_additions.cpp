@@ -6,27 +6,18 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
+/// \file
+/// Jsil Language
+
+#include "jsil_internal_additions.h"
+
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 #include <util/symbol_table.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "jsil_types.h"
-
-#include "jsil_internal_additions.h"
-
-/*******************************************************************\
-
-Function: jsil_internal_additions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void jsil_internal_additions(symbol_tablet &dest)
 {
@@ -52,7 +43,7 @@ void jsil_internal_additions(symbol_tablet &dest)
     symbolt symbol;
     symbol.base_name="__CPROVER_malloc_object";
     symbol.name=CPROVER_PREFIX "malloc_object";
-    symbol.type=pointer_typet(empty_typet());
+    symbol.type=pointer_type(empty_typet());
     symbol.mode=ID_C;
     symbol.is_lvalue=true;
     symbol.is_state_var=true;
@@ -90,7 +81,7 @@ void jsil_internal_additions(symbol_tablet &dest)
     dest.add(symbol);
   }
 
-  // add empty symbol used for decl statemements
+  // add empty symbol used for decl statements
 
   {
     symbolt symbol;

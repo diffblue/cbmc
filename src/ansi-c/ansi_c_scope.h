@@ -6,13 +6,22 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANSI_C_ANSI_C_SCOPE_H
 #define CPROVER_ANSI_C_ANSI_C_SCOPE_H
 
 #include <util/irep.h>
 
-typedef enum { ANSI_C_UNKNOWN, ANSI_C_SYMBOL, ANSI_C_TYPEDEF,
-               ANSI_C_TAG, ANSI_C_LOCAL_LABEL } ansi_c_id_classt;
+enum class ansi_c_id_classt
+{
+  ANSI_C_UNKNOWN,
+  ANSI_C_SYMBOL,
+  ANSI_C_TYPEDEF,
+  ANSI_C_TAG,
+  ANSI_C_LOCAL_LABEL
+};
+
+std::ostream &operator<<(std::ostream &os, ansi_c_id_classt c);
 
 class ansi_c_identifiert
 {
@@ -20,7 +29,7 @@ public:
   ansi_c_id_classt id_class;
   irep_idt base_name, prefixed_name;
 
-  ansi_c_identifiert():id_class(ANSI_C_UNKNOWN)
+  ansi_c_identifiert():id_class(ansi_c_id_classt::ANSI_C_UNKNOWN)
   {
   }
 };

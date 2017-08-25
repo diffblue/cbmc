@@ -6,25 +6,14 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include "qbf_qube_core.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
+#include <cstring>
 
 #include <util/mp_arith.h>
-
-#include "qbf_qube_core.h"
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::qbf_qube_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
 {
@@ -32,55 +21,19 @@ qbf_qube_coret::qbf_qube_coret() : qdimacs_coret()
   qbf_tmp_file="qube.qdimacs";
 }
 
-/*******************************************************************\
-
-Function: qbf_qube_coret::~qbf_qube_coret
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qube_coret::~qbf_qube_coret()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const std::string qbf_qube_coret::solver_text()
 {
   return "QuBE w/ toplevel assignments";
 }
 
-/*******************************************************************\
-
-Function: qbf_qube_coret::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 propt::resultt qbf_qube_coret::prop_solve()
 {
   if(no_clauses()==0)
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
 
   {
     messaget::status() << "QuBE: "
@@ -146,53 +99,40 @@ propt::resultt qbf_qube_coret::prop_solve()
     if(!result_found)
     {
       messaget::error() << "QuBE failed: unknown result" << eom;
-      return P_ERROR;
+      return resultt::P_ERROR;
     }
   }
 
-  remove(result_tmp_file.c_str());
-  remove(qbf_tmp_file.c_str());
+  int remove_result=remove(result_tmp_file.c_str());
+  if(remove_result!=0)
+  {
+    messaget::error() << "Remove failed: " << std::strerror(errno) << eom;
+    return resultt::P_ERROR;
+  }
+
+  remove_result=remove(qbf_tmp_file.c_str());
+  if(remove_result!=0)
+  {
+    messaget::error() << "Remove failed: " << std::strerror(errno) << eom;
+    return resultt::P_ERROR;
+  }
 
   if(result)
   {
     messaget::status() << "QuBE: TRUE" << eom;
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   }
   else
   {
     messaget::status() << "QuBE: FALSE" << eom;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::is_in_core
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool qbf_qube_coret::is_in_core(literalt l) const
 {
   throw "not supported";
 }
-
-/*******************************************************************\
-
-Function: qbf_qube_coret::m_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qdimacs_coret::modeltypet qbf_qube_coret::m_get(literalt a) const
 {

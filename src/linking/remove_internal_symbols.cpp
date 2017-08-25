@@ -6,26 +6,17 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Remove symbols that are internal only
+
+#include "remove_internal_symbols.h"
+
 #include <util/symbol_table.h>
 #include <util/namespace.h>
 #include <util/find_symbols.h>
 #include <util/std_types.h>
 #include <util/cprover_prefix.h>
 #include <util/config.h>
-
-#include "remove_internal_symbols.h"
-
-/*******************************************************************\
-
-Function: get_symbols_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_symbols_rec(
   const namespacet &ns,
@@ -70,25 +61,15 @@ void get_symbols_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_internal_symbols
-
-  Inputs: symbol table
-
- Outputs: symbol table, with internal symbols removed
-
- Purpose: A symbol is EXPORTED if it is a
-          * non-static function with body that is not extern inline
-          * symbol used in an EXPORTED symbol
-          * type used in an EXPORTED symbol
-
-          Read
-          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
-          on "extern inline"
-
-\*******************************************************************/
-
+/// A symbol is EXPORTED if it is a * non-static function with body that is not
+/// extern inline * symbol used in an EXPORTED symbol * type used in an EXPORTED
+/// symbol
+///
+///          Read
+///          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
+///          on "extern inline"
+/// \par parameters: symbol table
+/// \return symbol table, with internal symbols removed
 void remove_internal_symbols(
   symbol_tablet &symbol_table)
 {

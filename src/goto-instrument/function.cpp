@@ -6,27 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Function Entering and Exiting
+
+#include "function.h"
+
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
-
-#include "function.h"
-
-/*******************************************************************\
-
-Function: function_to_call
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 code_function_callt function_to_call(
   symbol_tablet &symbol_table,
@@ -41,7 +32,7 @@ code_function_callt function_to_call(
   if(s_it==symbol_table.symbols.end())
   {
     // not there
-    pointer_typet p(char_type());
+    typet p=pointer_type(char_type());
     p.subtype().set(ID_C_constant, true);
 
     code_typet function_type;
@@ -87,18 +78,6 @@ code_function_callt function_to_call(
   return call;
 }
 
-/*******************************************************************\
-
-Function: function_enter
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void function_enter(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
@@ -125,18 +104,6 @@ void function_enter(
     t->function=f_it->first;
   }
 }
-
-/*******************************************************************\
-
-Function: function_exit
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void function_exit(
   symbol_tablet &symbol_table,

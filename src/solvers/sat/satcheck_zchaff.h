@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_SAT_SATCHECK_ZCHAFF_H
 #define CPROVER_SOLVERS_SAT_SATCHECK_ZCHAFF_H
 
@@ -37,7 +38,7 @@ public:
 protected:
   CSolver *solver;
 
-  typedef enum { INIT, SAT, UNSAT, ERROR } statust;
+  enum statust { INIT, SAT, UNSAT, ERROR };
   statust status;
 };
 

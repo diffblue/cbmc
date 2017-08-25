@@ -6,36 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_extractbits
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/arith_tools.h>
 
 bvt boolbvt::convert_extractbits(const extractbits_exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
 
   if(width==0)
-    return conversion_failed(expr);
-
-  const irep_idt &type_id=expr.type().id();
-
-  if(type_id!=ID_signedbv &&
-     type_id!=ID_unsignedbv &&
-     type_id!=ID_c_enum &&
-     type_id!=ID_c_enum_tag &&
-     type_id!=ID_bv)
     return conversion_failed(expr);
 
   if(expr.operands().size()!=3)

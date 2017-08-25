@@ -6,42 +6,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "rename.h"
+
 #include <algorithm>
 
-#include "rename.h"
 #include "symbol.h"
 #include "expr.h"
 #include "namespace.h"
 
-/*******************************************************************\
-
-Function: get_new_name
-
-  Inputs: symbol to be renamed, namespace
-
- Outputs: new symbol
-
- Purpose: automated variable renaming
-
-\*******************************************************************/
-
+/// automated variable renaming
+/// \par parameters: symbol to be renamed, namespace
+/// \return new symbol
 void get_new_name(symbolt &symbol, const namespacet &ns)
 {
   get_new_name(symbol.name, ns);
 }
 
-/*******************************************************************\
-
-Function: get_new_name
-
-  Inputs: symbol to be renamed, namespace
-
- Outputs: new symbol
-
- Purpose: automated variable renaming
-
-\*******************************************************************/
-
+/// automated variable renaming
+/// \par parameters: symbol to be renamed, namespace
+/// \return new symbol
 void get_new_name(irep_idt &new_name, const namespacet &ns)
 {
   const symbolt *symbol;
@@ -53,19 +36,9 @@ void get_new_name(irep_idt &new_name, const namespacet &ns)
   new_name=prefix+std::to_string(ns.get_max(prefix)+1);
 }
 
-/*******************************************************************\
-
-Function: rename
-
-  Inputs: expression, old name, new name
-
- Outputs: modifies the expression
-          returns false iff something was renamed
-
- Purpose: automated variable renaming
-
-\*******************************************************************/
-
+/// automated variable renaming
+/// \par parameters: expression, old name, new name
+/// \return modifies the expression returns false iff something was renamed
 bool rename(exprt &expr, const irep_idt &old_name,
             const irep_idt &new_name)
 {

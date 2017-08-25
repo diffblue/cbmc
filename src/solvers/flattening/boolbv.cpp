@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <cassert>
 #include <map>
 #include <set>
@@ -22,22 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/string_constant.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
 
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool boolbvt::literal(
   const exprt &expr,
@@ -123,18 +112,6 @@ bool boolbvt::literal(
   throw "found no literal for expression";
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_bv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const bvt &boolbvt::convert_bv(const exprt &expr)
 {
   // check cache first
@@ -165,18 +142,6 @@ const bvt &boolbvt::convert_bv(const exprt &expr)
   return cache_result.first->second;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::conversion_failed
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::conversion_failed(const exprt &expr)
 {
   ignoring(expr);
@@ -185,18 +150,6 @@ bvt boolbvt::conversion_failed(const exprt &expr)
   std::size_t width=boolbv_width(expr.type());
   return prop.new_variables(width);
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_bitvector
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_bitvector(const exprt &expr)
 {
@@ -354,18 +307,6 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   return conversion_failed(expr);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_lambda
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_lambda(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
@@ -413,18 +354,6 @@ bvt boolbvt::convert_lambda(const exprt &expr)
   return bv;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_bv_literals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_bv_literals(const exprt &expr)
 {
   std::size_t width=boolbv_width(expr.type());
@@ -445,18 +374,6 @@ bvt boolbvt::convert_bv_literals(const exprt &expr)
 
   return bv;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_symbol(const exprt &expr)
 {
@@ -493,18 +410,6 @@ bvt boolbvt::convert_symbol(const exprt &expr)
 }
 
 
-/*******************************************************************\
-
-Function: boolbvt::convert_function_application
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_function_application(
   const function_application_exprt &expr)
 {
@@ -515,18 +420,6 @@ bvt boolbvt::convert_function_application(
   return prop.new_variables(boolbv_width(expr.type()));
 }
 
-
-/*******************************************************************\
-
-Function: boolbvt::convert_rest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt boolbvt::convert_rest(const exprt &expr)
 {
@@ -608,7 +501,7 @@ literalt boolbvt::convert_rest(const exprt &expr)
 
     const bvt &bv=convert_bv(operands[0]);
 
-    if(bv.size()<1)
+    if(bv.empty())
       throw "sign operator takes one non-empty operand";
 
     if(operands[0].type().id()==ID_signedbv)
@@ -694,18 +587,6 @@ literalt boolbvt::convert_rest(const exprt &expr)
   return SUB::convert_rest(expr);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::boolbv_set_equality_to_true
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
 {
   if(!equality_propagation)
@@ -737,18 +618,6 @@ bool boolbvt::boolbv_set_equality_to_true(const equal_exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void boolbvt::set_to(const exprt &expr, bool value)
 {
   if(expr.type().id()!=ID_bool)
@@ -770,18 +639,6 @@ void boolbvt::set_to(const exprt &expr, bool value)
   return SUB::set_to(expr, value);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::make_bv_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
 {
   dest=exprt(ID_bv_literals, type);
@@ -792,18 +649,6 @@ void boolbvt::make_bv_expr(const typet &type, const bvt &bv, exprt &dest)
   for(std::size_t i=0; i<bv.size(); i++)
     bv_sub[i].id(std::to_string(bv[i].get()));
 }
-
-/*******************************************************************\
-
-Function: boolbvt::make_bv_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
 {
@@ -825,18 +670,6 @@ void boolbvt::make_free_bv_expr(const typet &type, exprt &dest)
   make_bv_expr(type, bv, dest);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::is_unbounded_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool boolbvt::is_unbounded_array(const typet &type) const
 {
   if(type.id()==ID_symbol)
@@ -845,7 +678,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(type.id()!=ID_array)
     return false;
 
-  if(unbounded_array==U_ALL)
+  if(unbounded_array==unbounded_arrayt::U_ALL)
     return true;
 
   const exprt &size=to_array_type(type).size();
@@ -854,24 +687,12 @@ bool boolbvt::is_unbounded_array(const typet &type) const
   if(to_integer(size, s))
     return true;
 
-  if(unbounded_array==U_AUTO)
+  if(unbounded_array==unbounded_arrayt::U_AUTO)
     if(s>1000) // magic number!
       return true;
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::print_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbvt::print_assignment(std::ostream &out) const
 {
@@ -883,18 +704,6 @@ void boolbvt::print_assignment(std::ostream &out) const
         << it->second.get_value(prop) << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: boolbvt::build_offset_map
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbvt::build_offset_map(const struct_typet &src, offset_mapt &dest)
 {

@@ -6,21 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ansi-c/string_constant.h>
-
 #include "thread_instrumentation.h"
 
-/*******************************************************************\
-
-Function: has_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/c_types.h>
+#include <ansi-c/string_constant.h>
 
 static bool has_start_thread(const goto_programt &goto_program)
 {
@@ -30,18 +19,6 @@ static bool has_start_thread(const goto_programt &goto_program)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: thread_exit_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void thread_exit_instrumentation(goto_programt &goto_program)
 {
@@ -66,7 +43,7 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   binary_exprt get_may("get_may");
 
   // NULL is any
-  get_may.op0()=constant_exprt(ID_NULL, pointer_typet(empty_typet()));
+  get_may.op0()=null_pointer_exprt(pointer_type(empty_typet()));
   get_may.op1()=address_of_exprt(mutex_locked_string);
 
   end->make_assertion(not_exprt(get_may));
@@ -75,18 +52,6 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   end->source_location.set_comment("mutexes must not be locked on thread exit");
   end->function=function;
 }
-
-/*******************************************************************\
-
-Function: thread_exit_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void thread_exit_instrumentation(goto_functionst &goto_functions)
 {
@@ -116,18 +81,6 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
     thread_exit_instrumentation(goto_functions.function_map[fkt].body);
   }
 }
-
-/*******************************************************************\
-
-Function: mutex_init_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void mutex_init_instrumentation(
   const symbol_tablet &symbol_table,
@@ -164,18 +117,6 @@ void mutex_init_instrumentation(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: mutex_init_instrumentation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void mutex_init_instrumentation(
   const symbol_tablet &symbol_table,

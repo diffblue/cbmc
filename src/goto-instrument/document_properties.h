@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Documentation of Properties
+
 #ifndef CPROVER_GOTO_INSTRUMENT_DOCUMENT_PROPERTIES_H
 #define CPROVER_GOTO_INSTRUMENT_DOCUMENT_PROPERTIES_H
 

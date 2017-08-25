@@ -1,0 +1,12 @@
+CORE
+main.c
+--print-internal-representation
+^EXIT=0$
+^SIGNAL=0$
+^  \* identifier: __CPROVER_initialize$
+^      \* identifier: main::1::x$
+^      \* identifier: main::1::y$
+--
+--
+Ensures that the output from pretty() is printed when
+--print-internal-representation is passed to goto-instrument.

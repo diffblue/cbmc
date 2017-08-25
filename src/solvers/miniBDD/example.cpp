@@ -7,9 +7,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <iostream>
+/// \file
+/// A minimalistic BDD library, following Bryant's original paper and Andersen's
+///   lecture notes
 
 #include "miniBDD.h"
+
+#include <iostream>
 
 int main()
 {

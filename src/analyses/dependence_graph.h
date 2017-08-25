@@ -9,6 +9,9 @@ Date: August 2013
 
 \*******************************************************************/
 
+/// \file
+/// Field-Sensitive Program Dependence Analysis, Litvak et al., FSE 2010
+
 #ifndef CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 #define CPROVER_ANALYSES_DEPENDENCE_GRAPH_H
 
@@ -24,27 +27,21 @@ class dependence_grapht;
 class dep_edget
 {
 public:
-  typedef enum
-  {
-    NONE,
-    CTRL,
-    DATA,
-    BOTH
-  } kindt;
+  enum class kindt { NONE, CTRL, DATA, BOTH };
 
   void add(kindt _kind)
   {
     switch(kind)
     {
-      case NONE:
+      case kindt::NONE:
         kind=_kind;
         break;
-      case DATA:
-      case CTRL:
+      case kindt::DATA:
+      case kindt::CTRL:
         if(kind!=_kind)
-          kind=BOTH;
+          kind=kindt::BOTH;
         break;
-      case BOTH:
+      case kindt::BOTH:
         break;
     }
   }
@@ -93,7 +90,11 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final;
 
-  void make_top() final
+  jsont output_json(
+    const ai_baset &ai,
+    const namespacet &ns) const override;
+
+  void make_top() final override
   {
     assert(node_id!=std::numeric_limits<node_indext>::max());
 

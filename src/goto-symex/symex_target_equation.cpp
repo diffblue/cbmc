@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "symex_target_equation.h"
+
 #include <cassert>
 
 #include <util/std_expr.h>
@@ -16,53 +21,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/prop/literal_expr.h>
 
 #include "goto_symex_state.h"
-#include "symex_target_equation.h"
-
-/*******************************************************************\
-
-Function: symex_target_equationt::symex_target_equationt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symex_target_equationt::symex_target_equationt(
   const namespacet &_ns):ns(_ns)
 {
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::~symex_target_equationt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 symex_target_equationt::~symex_target_equationt()
 {
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::shared_read
-
-  Inputs:
-
- Outputs:
-
- Purpose: read from a shared variable
-
-\*******************************************************************/
-
+/// read from a shared variable
 void symex_target_equationt::shared_read(
   const exprt &guard,
   const ssa_exprt &ssa_object,
@@ -74,25 +43,14 @@ void symex_target_equationt::shared_read(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_READ;
+  SSA_step.type=goto_trace_stept::typet::SHARED_READ;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::shared_write
-
-  Inputs:
-
- Outputs:
-
- Purpose: write to a sharedvariable
-
-\*******************************************************************/
-
+/// write to a sharedvariable
 void symex_target_equationt::shared_write(
   const exprt &guard,
   const ssa_exprt &ssa_object,
@@ -104,25 +62,14 @@ void symex_target_equationt::shared_write(
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::SHARED_WRITE;
+  SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::spawn
-
-  Inputs:
-
- Outputs:
-
- Purpose: spawn a new thread
-
-\*******************************************************************/
-
+/// spawn a new thread
 void symex_target_equationt::spawn(
   const exprt &guard,
   const sourcet &source)
@@ -130,23 +77,11 @@ void symex_target_equationt::spawn(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::SPAWN;
+  SSA_step.type=goto_trace_stept::typet::SPAWN;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
-
-/*******************************************************************\
-
-Function: symex_target_equationt::memory_barrier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_target_equationt::memory_barrier(
   const exprt &guard,
@@ -155,24 +90,13 @@ void symex_target_equationt::memory_barrier(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::MEMORY_BARRIER;
+  SSA_step.type=goto_trace_stept::typet::MEMORY_BARRIER;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::atomic_begin
-
-  Inputs:
-
- Outputs:
-
- Purpose: start an atomic section
-
-\*******************************************************************/
-
+/// start an atomic section
 void symex_target_equationt::atomic_begin(
   const exprt &guard,
   unsigned atomic_section_id,
@@ -181,25 +105,14 @@ void symex_target_equationt::atomic_begin(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_BEGIN;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::atomic_end
-
-  Inputs:
-
- Outputs:
-
- Purpose: end an atomic section
-
-\*******************************************************************/
-
+/// end an atomic section
 void symex_target_equationt::atomic_end(
   const exprt &guard,
   unsigned atomic_section_id,
@@ -208,25 +121,14 @@ void symex_target_equationt::atomic_end(
   SSA_steps.push_back(SSA_stept());
   SSA_stept &SSA_step=SSA_steps.back();
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::ATOMIC_END;
+  SSA_step.type=goto_trace_stept::typet::ATOMIC_END;
   SSA_step.atomic_section_id=atomic_section_id;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose: write to a variable
-
-\*******************************************************************/
-
+/// write to a variable
 void symex_target_equationt::assignment(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
@@ -249,26 +151,15 @@ void symex_target_equationt::assignment(
   SSA_step.assignment_type=assignment_type;
 
   SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-  SSA_step.type=goto_trace_stept::ASSIGNMENT;
-  SSA_step.hidden=(assignment_type!=STATE &&
-                   assignment_type!=VISIBLE_ACTUAL_PARAMETER);
+  SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE &&
+                   assignment_type!=assignment_typet::VISIBLE_ACTUAL_PARAMETER);
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::decl
-
-  Inputs:
-
- Outputs:
-
- Purpose: declare a fresh variable
-
-\*******************************************************************/
-
+/// declare a fresh variable
 void symex_target_equationt::decl(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
@@ -284,9 +175,9 @@ void symex_target_equationt::decl(
   SSA_step.ssa_lhs=ssa_lhs;
   SSA_step.ssa_full_lhs=ssa_lhs;
   SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
-  SSA_step.type=goto_trace_stept::DECL;
+  SSA_step.type=goto_trace_stept::typet::DECL;
   SSA_step.source=source;
-  SSA_step.hidden=(assignment_type!=STATE);
+  SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
@@ -295,18 +186,7 @@ void symex_target_equationt::decl(
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::dead
-
-  Inputs:
-
- Outputs:
-
- Purpose: declare a fresh variable
-
-\*******************************************************************/
-
+/// declare a fresh variable
 void symex_target_equationt::dead(
   const exprt &guard,
   const ssa_exprt &ssa_lhs,
@@ -315,18 +195,7 @@ void symex_target_equationt::dead(
   // we currently don't record these
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::location
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record a location
-
-\*******************************************************************/
-
+/// just record a location
 void symex_target_equationt::location(
   const exprt &guard,
   const sourcet &source)
@@ -335,24 +204,13 @@ void symex_target_equationt::location(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::LOCATION;
+  SSA_step.type=goto_trace_stept::typet::LOCATION;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::function_call
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record a location
-
-\*******************************************************************/
-
+/// just record a location
 void symex_target_equationt::function_call(
   const exprt &guard,
   const irep_idt &identifier,
@@ -362,25 +220,14 @@ void symex_target_equationt::function_call(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_CALL;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::function_return
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record a location
-
-\*******************************************************************/
-
+/// just record a location
 void symex_target_equationt::function_return(
   const exprt &guard,
   const irep_idt &identifier,
@@ -390,25 +237,14 @@ void symex_target_equationt::function_return(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::FUNCTION_RETURN;
+  SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
   SSA_step.source=source;
   SSA_step.identifier=identifier;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record output
-
-\*******************************************************************/
-
+/// just record output
 void symex_target_equationt::output(
   const exprt &guard,
   const sourcet &source,
@@ -419,7 +255,7 @@ void symex_target_equationt::output(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -427,18 +263,7 @@ void symex_target_equationt::output(
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::output_fmt
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record formatted output
-
-\*******************************************************************/
-
+/// just record formatted output
 void symex_target_equationt::output_fmt(
   const exprt &guard,
   const sourcet &source,
@@ -450,7 +275,7 @@ void symex_target_equationt::output_fmt(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::OUTPUT;
+  SSA_step.type=goto_trace_stept::typet::OUTPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=output_id;
@@ -460,18 +285,7 @@ void symex_target_equationt::output_fmt(
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::input
-
-  Inputs:
-
- Outputs:
-
- Purpose: just record input
-
-\*******************************************************************/
-
+/// just record input
 void symex_target_equationt::input(
   const exprt &guard,
   const sourcet &source,
@@ -482,7 +296,7 @@ void symex_target_equationt::input(
   SSA_stept &SSA_step=SSA_steps.back();
 
   SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::INPUT;
+  SSA_step.type=goto_trace_stept::typet::INPUT;
   SSA_step.source=source;
   SSA_step.io_args=args;
   SSA_step.io_id=input_id;
@@ -490,18 +304,7 @@ void symex_target_equationt::input(
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::assumption
-
-  Inputs:
-
- Outputs:
-
- Purpose: record an assumption
-
-\*******************************************************************/
-
+/// record an assumption
 void symex_target_equationt::assumption(
   const exprt &guard,
   const exprt &cond,
@@ -512,24 +315,13 @@ void symex_target_equationt::assumption(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSUME;
+  SSA_step.type=goto_trace_stept::typet::ASSUME;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::assertion
-
-  Inputs:
-
- Outputs:
-
- Purpose: record an assertion
-
-\*******************************************************************/
-
+/// record an assertion
 void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
@@ -541,25 +333,14 @@ void symex_target_equationt::assertion(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::ASSERT;
+  SSA_step.type=goto_trace_stept::typet::ASSERT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::goto_instruction
-
-  Inputs:
-
- Outputs:
-
- Purpose: record a goto instruction
-
-\*******************************************************************/
-
+/// record a goto instruction
 void symex_target_equationt::goto_instruction(
   const exprt &guard,
   const exprt &cond,
@@ -570,24 +351,13 @@ void symex_target_equationt::goto_instruction(
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::GOTO;
+  SSA_step.type=goto_trace_stept::typet::GOTO;
   SSA_step.source=source;
 
   merge_ireps(SSA_step);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::constraint
-
-  Inputs:
-
- Outputs:
-
- Purpose: record a constraint
-
-\*******************************************************************/
-
+/// record a constraint
 void symex_target_equationt::constraint(
   const exprt &cond,
   const std::string &msg,
@@ -599,24 +369,12 @@ void symex_target_equationt::constraint(
 
   SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::CONSTRAINT;
+  SSA_step.type=goto_trace_stept::typet::CONSTRAINT;
   SSA_step.source=source;
   SSA_step.comment=msg;
 
   merge_ireps(SSA_step);
 }
-
-/*******************************************************************\
-
-Function: symex_target_equationt::convert
-
-  Inputs: converter
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_target_equationt::convert(
   prop_convt &prop_conv)
@@ -631,18 +389,9 @@ void symex_target_equationt::convert(
   convert_constraints(prop_conv);
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_assignments
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts assignments
-
-\*******************************************************************/
-
+/// converts assignments
+/// \par parameters: decision procedure
+/// \return -
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure) const
 {
@@ -653,18 +402,8 @@ void symex_target_equationt::convert_assignments(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_decls
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts declarations
-
-\*******************************************************************/
-
+/// converts declarations
+/// \return -
 void symex_target_equationt::convert_decls(
   prop_convt &prop_conv) const
 {
@@ -679,18 +418,8 @@ void symex_target_equationt::convert_decls(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_guards
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts guards
-
-\*******************************************************************/
-
+/// converts guards
+/// \return -
 void symex_target_equationt::convert_guards(
   prop_convt &prop_conv)
 {
@@ -703,18 +432,8 @@ void symex_target_equationt::convert_guards(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_assumptions
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts assumptions
-
-\*******************************************************************/
-
+/// converts assumptions
+/// \return -
 void symex_target_equationt::convert_assumptions(
   prop_convt &prop_conv)
 {
@@ -730,18 +449,8 @@ void symex_target_equationt::convert_assumptions(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_goto_instructions
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts goto instructions
-
-\*******************************************************************/
-
+/// converts goto instructions
+/// \return -
 void symex_target_equationt::convert_goto_instructions(
   prop_convt &prop_conv)
 {
@@ -757,18 +466,9 @@ void symex_target_equationt::convert_goto_instructions(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_constraints
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts constraints
-
-\*******************************************************************/
-
+/// converts constraints
+/// \par parameters: decision procedure
+/// \return -
 void symex_target_equationt::convert_constraints(
   decision_proceduret &decision_procedure) const
 {
@@ -784,18 +484,8 @@ void symex_target_equationt::convert_constraints(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_assertions
-
-  Inputs: converter
-
- Outputs: -
-
- Purpose: converts assertions
-
-\*******************************************************************/
-
+/// converts assertions
+/// \return -
 void symex_target_equationt::convert_assertions(
   prop_convt &prop_conv)
 {
@@ -861,18 +551,9 @@ void symex_target_equationt::convert_assertions(
   prop_conv.set_to_true(disjunction(disjuncts));
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::convert_io
-
-  Inputs: decision procedure
-
- Outputs: -
-
- Purpose: converts I/O
-
-\*******************************************************************/
-
+/// converts I/O
+/// \par parameters: decision procedure
+/// \return -
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
@@ -903,18 +584,6 @@ void symex_target_equationt::convert_io(
 }
 
 
-/*******************************************************************\
-
-Function: symex_target_equationt::merge_ireps
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 {
   merge_irep(SSA_step.guard);
@@ -932,18 +601,6 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
   // converted_io_args is merged in convert_io
 }
 
-/*******************************************************************\
-
-Function: symex_target_equationt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_target_equationt::output(std::ostream &out) const
 {
   for(const auto &step : SSA_steps)
@@ -952,18 +609,6 @@ void symex_target_equationt::output(std::ostream &out) const
     out << "--------------\n";
   }
 }
-
-/*******************************************************************\
-
-Function: symex_target_equationt::SSA_stept::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_target_equationt::SSA_stept::output(
   const namespacet &ns,
@@ -974,96 +619,96 @@ void symex_target_equationt::SSA_stept::output(
     out << "Thread " << source.thread_nr;
 
     if(source.pc->source_location.is_not_nil())
-      out << " " << source.pc->source_location << std::endl;
+      out << " " << source.pc->source_location << '\n';
     else
-      out << std::endl;
+      out << '\n';
   }
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << std::endl; break;
-  case goto_trace_stept::LOCATION:
-    out << "LOCATION" << std::endl; break;
-  case goto_trace_stept::INPUT:
-    out << "INPUT" << std::endl; break;
-  case goto_trace_stept::OUTPUT:
-    out << "OUTPUT" << std::endl; break;
+  case goto_trace_stept::typet::ASSERT:
+    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
+  case goto_trace_stept::typet::ASSUME:
+    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
+  case goto_trace_stept::typet::LOCATION:
+    out << "LOCATION" << '\n'; break;
+  case goto_trace_stept::typet::INPUT:
+    out << "INPUT" << '\n'; break;
+  case goto_trace_stept::typet::OUTPUT:
+    out << "OUTPUT" << '\n'; break;
 
-  case goto_trace_stept::DECL:
-    out << "DECL" << std::endl;
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+  case goto_trace_stept::typet::DECL:
+    out << "DECL" << '\n';
+    out << from_expr(ns, "", ssa_lhs) << '\n';
     break;
 
-  case goto_trace_stept::ASSIGNMENT:
+  case goto_trace_stept::typet::ASSIGNMENT:
     out << "ASSIGNMENT (";
     switch(assignment_type)
     {
-    case HIDDEN: out << "HIDDEN"; break;
-    case STATE: out << "STATE"; break;
-    case VISIBLE_ACTUAL_PARAMETER: out << "VISIBLE_ACTUAL_PARAMETER"; break;
-    case HIDDEN_ACTUAL_PARAMETER: out << "HIDDEN_ACTUAL_PARAMETER"; break;
-    case PHI: out << "PHI"; break;
-    case GUARD: out << "GUARD"; break;
+    case assignment_typet::HIDDEN:
+      out << "HIDDEN";
+      break;
+    case assignment_typet::STATE:
+      out << "STATE";
+      break;
+    case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
+      out << "VISIBLE_ACTUAL_PARAMETER";
+      break;
+    case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
+      out << "HIDDEN_ACTUAL_PARAMETER";
+      break;
+    case assignment_typet::PHI:
+      out << "PHI";
+      break;
+    case assignment_typet::GUARD:
+      out << "GUARD";
+      break;
     default:
       {
       }
     }
 
-    out << ")" << std::endl;
+    out << ")\n";
     break;
 
-  case goto_trace_stept::DEAD:
-    out << "DEAD" << std::endl; break;
-  case goto_trace_stept::FUNCTION_CALL:
-    out << "FUNCTION_CALL" << std::endl; break;
-  case goto_trace_stept::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN" << std::endl; break;
-  case goto_trace_stept::CONSTRAINT:
-    out << "CONSTRAINT" << std::endl; break;
-  case goto_trace_stept::SHARED_READ:
-    out << "SHARED READ" << std::endl; break;
-  case goto_trace_stept::SHARED_WRITE:
-    out << "SHARED WRITE" << std::endl; break;
-  case goto_trace_stept::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN" << std::endl; break;
-  case goto_trace_stept::ATOMIC_END:
-    out << "AUTOMIC_END" << std::endl; break;
-  case goto_trace_stept::SPAWN:
-    out << "SPAWN" << std::endl; break;
-  case goto_trace_stept::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER" << std::endl; break;
-  case goto_trace_stept::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO" << std::endl; break;
+  case goto_trace_stept::typet::DEAD:
+    out << "DEAD\n"; break;
+  case goto_trace_stept::typet::FUNCTION_CALL:
+    out << "FUNCTION_CALL\n"; break;
+  case goto_trace_stept::typet::FUNCTION_RETURN:
+    out << "FUNCTION_RETURN\n"; break;
+  case goto_trace_stept::typet::CONSTRAINT:
+    out << "CONSTRAINT\n"; break;
+  case goto_trace_stept::typet::SHARED_READ:
+    out << "SHARED READ\n"; break;
+  case goto_trace_stept::typet::SHARED_WRITE:
+    out << "SHARED WRITE\n"; break;
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+    out << "ATOMIC_BEGIN\n"; break;
+  case goto_trace_stept::typet::ATOMIC_END:
+    out << "AUTOMIC_END\n"; break;
+  case goto_trace_stept::typet::SPAWN:
+    out << "SPAWN\n"; break;
+  case goto_trace_stept::typet::MEMORY_BARRIER:
+    out << "MEMORY_BARRIER\n"; break;
+  case goto_trace_stept::typet::GOTO:
+    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
 
   default: assert(false);
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << std::endl;
+    out << from_expr(ns, "", cond_expr) << '\n';
 
   if(is_assert() || is_constraint())
-    out << comment << std::endl;
+    out << comment << '\n';
 
   if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << std::endl;
+    out << from_expr(ns, "", ssa_lhs) << '\n';
 
-  out << "Guard: " << from_expr(ns, "", guard) << std::endl;
+  out << "Guard: " << from_expr(ns, "", guard) << '\n';
 }
-
-/*******************************************************************\
-
-Function: operator <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &operator<<(
   std::ostream &out,
@@ -1072,18 +717,6 @@ std::ostream &operator<<(
   equation.output(out);
   return out;
 }
-
-/*******************************************************************\
-
-Function: operator <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &operator<<(
   std::ostream &out,

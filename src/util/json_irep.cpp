@@ -6,46 +6,28 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Util
+
+#include "json_irep.h"
+
 #include "irep.h"
 #include "json.h"
-#include "json_irep.h"
 
 #include <algorithm>
 
-/*******************************************************************\
-
-Function: json_irept::json_irept
-
-  Inputs:
-   include_comments - when writing JSON, should the comments
-                      sub tree be included.
-
- Outputs:
-
- Purpose: To convert to JSON from an irep structure by recurssively
-          generating JSON for the different sub trees.
-
-\*******************************************************************/
-
+/// To convert to JSON from an irep structure by recursively generating JSON
+/// for the different sub trees.
+/// \param include_comments: when writing JSON, should the comments
+/// sub tree be included.
 json_irept::json_irept(bool include_comments):
   include_comments(include_comments)
 {}
 
-/*******************************************************************\
-
-Function: json_irept::convert_from_irep
-
-  Inputs:
-   irep - The irep structure to turn into json
-   json - The json object to be filled up.
-
- Outputs:
-
- Purpose: To convert to JSON from an irep structure by recurssively
-          generating JSON for the different sub trees.
-
-\*******************************************************************/
-
+/// To convert to JSON from an irep structure by recursively generating JSON
+/// for the different sub trees.
+/// \param irep: The irep structure to turn into json
+/// \param json: The json object to be filled up.
 void json_irept::convert_from_irep(const irept &irep, jsont &json) const
 {
   json_objectt &irep_object=json.make_object();
@@ -60,30 +42,18 @@ void json_irept::convert_from_irep(const irept &irep, jsont &json) const
   }
 }
 
-/*******************************************************************\
-
-Function: json_irept::convert_sub_tree
-
-  Inputs:
-   sub_tree_id - the name to give the subtree in the parent object
-   sub_trees - the list of subtrees to parse
-   parent - the parent JSON object who should be added to
-
- Outputs:
-
- Purpose: To convert to JSON from a list of ireps that are in an
-          unlabelled subtree. The parent JSON object will get a key
-          called sub_tree_id and the value shall be an array of JSON
-          objects generated from each of the sub trees
-
-\*******************************************************************/
-
+/// To convert to JSON from a list of ireps that are in an unlabelled subtree.
+/// The parent JSON object will get a key called sub_tree_id and the value shall
+/// be an array of JSON objects generated from each of the sub trees
+/// \param sub_tree_id: the name to give the subtree in the parent object
+/// \param sub_trees: the list of subtrees to parse
+/// \param parent: the parent JSON object who should be added to
 void json_irept::convert_sub_tree(
   const std::string &sub_tree_id,
   const irept::subt &sub_trees,
   json_objectt &parent) const
 {
-  if(sub_trees.size()>0)
+  if(!sub_trees.empty())
   {
     json_arrayt sub_objects;
     for(const irept &sub_tree : sub_trees)
@@ -96,31 +66,19 @@ void json_irept::convert_sub_tree(
   }
 }
 
-/*******************************************************************\
-
-Function: json_irept::convert_named_sub_tree
-
-  Inputs:
-   sub_tree_id - the name to give the subtree in the parent object
-   sub_trees - the map of subtrees to parse
-   parent - the parent JSON object who should be added to
-
- Outputs:
-
- Purpose: To convert to JSON from a map of ireps that are in a
-          named subtree. The parent JSON object will get a key
-          called sub_tree_id and the value shall be a JSON object
-          whose keys shall be the name of the sub tree and the value
-          will be the object generated from the sub tree.
-
-\*******************************************************************/
-
+/// To convert to JSON from a map of ireps that are in a named subtree. The
+/// parent JSON object will get a key called sub_tree_id and the value shall be
+/// a JSON object whose keys shall be the name of the sub tree and the value
+/// will be the object generated from the sub tree.
+/// \param sub_tree_id: the name to give the subtree in the parent object
+/// \param sub_trees: the map of subtrees to parse
+/// \param parent: the parent JSON object who should be added to
 void json_irept::convert_named_sub_tree(
   const std::string &sub_tree_id,
   const irept::named_subt &sub_trees,
   json_objectt &parent) const
 {
-  if(sub_trees.size()>0)
+  if(!sub_trees.empty())
   {
     json_objectt sub_objects;
     for(const auto &sub_tree : sub_trees)
@@ -133,18 +91,9 @@ void json_irept::convert_named_sub_tree(
   }
 }
 
-/*******************************************************************\
-
-Function: json_irept::convert_from_json
-
-  Inputs: input - json object to convert
-
- Outputs: result - irep equivalent of input
-
- Purpose: Deserialize a JSON irep representation.
-
-\*******************************************************************/
-
+/// Deserialize a JSON irep representation.
+/// \param input: json object to convert
+/// \return result - irep equivalent of input
 void json_irept::convert_from_json(const jsont &in, irept &out) const
 {
   std::vector<std::string> have_keys;

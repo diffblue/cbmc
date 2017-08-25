@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAR File Reading
+
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
@@ -23,7 +26,11 @@ Author: Daniel Kroening, kroening@kroening.com
 class jar_filet:public messaget
 {
 public:
-  jar_filet():mz_ok(false) { }
+  jar_filet():
+    mz_ok(false)
+    // `zip` will be initialized by open()
+  {
+  }
 
   ~jar_filet();
 

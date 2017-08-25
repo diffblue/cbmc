@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// IREP Hash Container
+
 #ifndef CPROVER_UTIL_IREP_HASH_CONTAINER_H
 #define CPROVER_UTIL_IREP_HASH_CONTAINER_H
 

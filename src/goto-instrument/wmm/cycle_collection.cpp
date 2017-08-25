@@ -8,22 +8,15 @@ Date: 2012
 
 \*******************************************************************/
 
-#include <util/message.h>
+/// \file
+/// collection of cycles in graph of abstract events
 
 #include "event_graph.h"
 
-/*******************************************************************\
+#include <util/message.h>
 
-Function: event_grapht::graph_explorert::filter_thin_air
-
-  Inputs:
-
- Outputs:
-
- Purpose: after the collection, eliminates the executions forbidden
-          by an indirect thin-air
-
-\*******************************************************************/
+/// after the collection, eliminates the executions forbidden by an indirect
+/// thin-air
 void event_grapht::graph_explorert::filter_thin_air(
   std::set<critical_cyclet> &set_of_cycles)
 {
@@ -54,18 +47,7 @@ void event_grapht::graph_explorert::filter_thin_air(
 #endif
 }
 
-/*******************************************************************\
-
-Function: event_grapht::graph_explorert::collect_cycles
-
-  Inputs:
-
- Outputs:
-
- Purpose: Tarjan 1972 adapted and modified for events
-
-\*******************************************************************/
-
+/// Tarjan 1972 adapted and modified for events
 void event_grapht::graph_explorert::collect_cycles(
   std::set<critical_cyclet> &set_of_cycles,
   memory_modelt model)
@@ -74,7 +56,7 @@ void event_grapht::graph_explorert::collect_cycles(
   for(std::size_t i=0; i<egraph.size(); i++)
     mark[i]=false;
 
-  std::list<event_idt>* order=0;
+  std::list<event_idt>* order=nullptr;
   /* on Power, rfe pairs are also potentially unsafe */
   switch(model)
   {
@@ -123,20 +105,8 @@ void event_grapht::graph_explorert::collect_cycles(
     filter_thin_air(set_of_cycles);
 }
 
-/*******************************************************************\
-
-Function: event_grapht::graph_explorert::extract_cycle
-
-  Inputs:
-
- Outputs:
-
- Purpose: extracts a (whole, unreduced) cycle from the stack.
-          Note: it may not be a real cycle yet -- we cannot check
-          the size before a call to this function.
-
-\*******************************************************************/
-
+/// extracts a (whole, unreduced) cycle from the stack. Note: it may not be a
+/// real cycle yet -- we cannot check the size before a call to this function.
 event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
   event_idt vertex,
   event_idt source,
@@ -176,18 +146,8 @@ event_grapht::critical_cyclet event_grapht::graph_explorert::extract_cycle(
   return new_cycle;
 }
 
-/*******************************************************************\
-
-Function: event_grapht::graph_explorert::backtrack
-
-  Inputs: get_po_only: used for po-transitivity
-
- Outputs:
-
- Purpose: see event_grapht::collect_cycles
-
-\*******************************************************************/
-
+/// see event_grapht::collect_cycles
+/// \param get_po_only: used for po-transitivity
 bool event_grapht::graph_explorert::backtrack(
   std::set<critical_cyclet> &set_of_cycles,
   event_idt source,
@@ -263,7 +223,7 @@ bool event_grapht::graph_explorert::backtrack(
   if(!this_vertex.local)
   {
     /* only the lwsyncWR can be interpreted as poWR (i.e., skip of the fence) */
-    if(lwfence_met && this_vertex.operation!=abstract_eventt::Read)
+    if(lwfence_met && this_vertex.operation!=abstract_eventt::operationt::Read)
       return false; // {no_comm=true;get_com_only=false;}//return false;
 
     bool has_to_be_unsafe_updated=false;
@@ -274,9 +234,9 @@ bool event_grapht::graph_explorert::backtrack(
        id2string(this_vertex.variable).find("[]")==std::string::npos)
     {
       /* no more than 4 events per thread */
-      if(this_vertex.operation!=abstract_eventt::Fence &&
-         this_vertex.operation!=abstract_eventt::Lwfence &&
-         this_vertex.operation!=abstract_eventt::ASMfence)
+      if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+         this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+         this_vertex.operation!=abstract_eventt::operationt::ASMfence)
       {
         if(events_per_thread[this_vertex.thread]==4)
           return false;
@@ -295,13 +255,16 @@ bool event_grapht::graph_explorert::backtrack(
         point_stack.pop();
         const event_idt preprevious=point_stack.top();
         point_stack.push(previous);
-        if(!egraph[preprevious].unsafe_pair(this_vertex, model)
-          && !(this_vertex.operation==abstract_eventt::Fence
-            || egraph[preprevious].operation==abstract_eventt::Fence
-            || this_vertex.operation==abstract_eventt::Lwfence
-            || egraph[preprevious].operation==abstract_eventt::Lwfence
-            || this_vertex.operation==abstract_eventt::ASMfence
-            || egraph[preprevious].operation==abstract_eventt::ASMfence))
+        if(!egraph[preprevious].unsafe_pair(this_vertex, model) &&
+           !(this_vertex.operation==abstract_eventt::operationt::Fence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::Fence ||
+             this_vertex.operation==abstract_eventt::operationt::Lwfence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::Lwfence ||
+             this_vertex.operation==abstract_eventt::operationt::ASMfence ||
+             egraph[preprevious].operation==
+               abstract_eventt::operationt::ASMfence))
           return false;
       }
     }
@@ -316,14 +279,15 @@ bool event_grapht::graph_explorert::backtrack(
        not taken into account) */
     if(!point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence &&
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence &&
        this_vertex.variable==egraph[point_stack.top()].variable)
     {
       if(same_var_pair ||
-         (this_vertex.operation==abstract_eventt::Read &&
-          egraph[point_stack.top()].operation==abstract_eventt::Read))
+         (this_vertex.operation==abstract_eventt::operationt::Read &&
+          egraph[point_stack.top()].operation==
+            abstract_eventt::operationt::Read))
       {
         events_per_thread[this_vertex.thread]--;
         return false; // {no_comm=true;get_com_only=false;} //return false;
@@ -339,18 +303,18 @@ bool event_grapht::graph_explorert::backtrack(
     /* constraint 1.b */
     if(!point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence &&
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence &&
        this_vertex.variable!=egraph[point_stack.top()].variable)
     {
       same_var_pair_updated=false;
     }
 
     /* constraint 2: per variable, either W W, R W, W R, or R W R */
-    if(this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence)
+    if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence)
     {
       const unsigned char nb_writes=writes_per_variable[this_vertex.variable];
       const unsigned char nb_reads=reads_per_variable[this_vertex.variable];
@@ -360,7 +324,7 @@ bool event_grapht::graph_explorert::backtrack(
         events_per_thread[this_vertex.thread]--;
         return false; // {no_comm=true;get_com_only=false;} //return false;
       }
-      else if(this_vertex.operation==abstract_eventt::Write)
+      else if(this_vertex.operation==abstract_eventt::operationt::Write)
       {
         if(nb_writes==2)
         {
@@ -370,7 +334,7 @@ bool event_grapht::graph_explorert::backtrack(
         else
           writes_per_variable[this_vertex.variable]++;
       }
-      else if(this_vertex.operation==abstract_eventt::Read)
+      else if(this_vertex.operation==abstract_eventt::operationt::Read)
       {
         if(nb_reads==2)
         {
@@ -522,11 +486,11 @@ bool event_grapht::graph_explorert::backtrack(
     point_stack.pop();
 
     /* removes variable access */
-    if(this_vertex.operation!=abstract_eventt::Fence &&
-       this_vertex.operation!=abstract_eventt::Lwfence &&
-       this_vertex.operation!=abstract_eventt::ASMfence)
+    if(this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       this_vertex.operation!=abstract_eventt::operationt::Lwfence &&
+       this_vertex.operation!=abstract_eventt::operationt::ASMfence)
     {
-      if(this_vertex.operation==abstract_eventt::Write)
+      if(this_vertex.operation==abstract_eventt::operationt::Write)
         writes_per_variable[this_vertex.variable]--;
       else
         reads_per_variable[this_vertex.variable]--;
@@ -544,32 +508,34 @@ bool event_grapht::graph_explorert::backtrack(
        (po_trans > 1 || po_trans==0) &&
        !point_stack.empty() &&
        egraph.are_po_ordered(point_stack.top(), vertex) &&
-       this_vertex.operation!=abstract_eventt::Fence &&
-       (this_vertex.operation!=abstract_eventt::Lwfence ||
-        egraph[point_stack.top()].operation==abstract_eventt::Write) &&
-       (this_vertex.operation!=abstract_eventt::ASMfence ||
+       this_vertex.operation!=abstract_eventt::operationt::Fence &&
+       (this_vertex.operation!=abstract_eventt::operationt::Lwfence ||
+        egraph[point_stack.top()].operation==
+          abstract_eventt::operationt::Write) &&
+       (this_vertex.operation!=abstract_eventt::operationt::ASMfence ||
         !this_vertex.WRfence ||
-        egraph[point_stack.top()].operation==abstract_eventt::Write))
+        egraph[point_stack.top()].operation==
+          abstract_eventt::operationt::Write))
     {
       skip_tracked.insert(vertex);
 
       std::stack<event_idt> tmp;
 
-      while(marked_stack.size()>0 && marked_stack.top()!=vertex)
+      while(!marked_stack.empty() && marked_stack.top()!=vertex)
       {
         tmp.push(marked_stack.top());
         mark[marked_stack.top()]=false;
         marked_stack.pop();
       }
 
-      if(marked_stack.size()>0)
+      if(!marked_stack.empty())
       {
         assert(marked_stack.top()==vertex);
         mark[vertex]=true;
       }
       else
       {
-        while(tmp.size()>0)
+        while(!tmp.empty())
         {
           marked_stack.push(tmp.top());
           mark[tmp.top()]=true;
@@ -590,11 +556,13 @@ bool event_grapht::graph_explorert::backtrack(
       /* skip lwfence by po-transition only if we consider a WR */
       // TO CHECK
       const bool is_lwfence=
-        (this_vertex.operation==abstract_eventt::Lwfence &&
-         egraph[point_stack.top()].operation==abstract_eventt::Write) ||
-        (this_vertex.operation==abstract_eventt::ASMfence &&
+        (this_vertex.operation==abstract_eventt::operationt::Lwfence &&
+         egraph[point_stack.top()].operation==
+           abstract_eventt::operationt::Write) ||
+        (this_vertex.operation==abstract_eventt::operationt::ASMfence &&
          (!this_vertex.WRfence &&
-          egraph[point_stack.top()].operation==abstract_eventt::Write));
+          egraph[point_stack.top()].operation==
+            abstract_eventt::operationt::Write));
 
       for(wmm_grapht::edgest::const_iterator w_it=
           egraph.po_out(vertex).begin();

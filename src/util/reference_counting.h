@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Reference Counting
+
 #ifndef CPROVER_UTIL_REFERENCE_COUNTING_H
 #define CPROVER_UTIL_REFERENCE_COUNTING_H
 
@@ -16,7 +19,7 @@ template<typename T>
 class reference_counting
 {
 public:
-  reference_counting():d(NULL)
+  reference_counting():d(nullptr)
   {
   }
 
@@ -28,12 +31,12 @@ public:
   // copy constructor
   reference_counting(const reference_counting &other):d(other.d)
   {
-    if(d!=NULL)
+    if(d!=nullptr)
     {
       assert(d->ref_count!=0);
       d->ref_count++;
       #ifdef REFERENCE_COUNTING_DEBUG
-      std::cout << "COPY " << d << " " << d->ref_count << std::endl;
+      std::cout << "COPY " << d << " " << d->ref_count << '\n';
       #endif
     }
   }
@@ -47,7 +50,7 @@ public:
   ~reference_counting()
   {
     remove_ref(d);
-    d=NULL;
+    d=nullptr;
   }
 
   void swap(reference_counting &other)
@@ -58,12 +61,12 @@ public:
   void clear()
   {
     remove_ref(d);
-    d=NULL;
+    d=nullptr;
   }
 
   const T &read() const
   {
-    if(d==NULL)
+    if(d==nullptr)
       return T::blank;
     return *d;
   }
@@ -101,7 +104,7 @@ protected:
 
     remove_ref(d);
     d=other.d;
-    if(d!=NULL)
+    if(d!=nullptr)
       d->ref_count++;
   }
 
@@ -115,20 +118,20 @@ public:
 template<class T>
 void reference_counting<T>::remove_ref(dt *old_d)
 {
-  if(old_d==NULL)
+  if(old_d==nullptr)
     return;
 
   assert(old_d->ref_count!=0);
 
   #ifdef REFERENCE_COUNTING_DEBUG
-  std::cout << "R: " << old_d << " " << old_d->ref_count << std::endl;
+  std::cout << "R: " << old_d << " " << old_d->ref_count << '\n';
   #endif
 
   old_d->ref_count--;
   if(old_d->ref_count==0)
   {
     #ifdef REFERENCE_COUNTING_DEBUG
-    std::cout << "DELETING " << old_d << std::endl;
+    std::cout << "DELETING " << old_d << '\n';
     old_d->clear();
     std::cout << "DEALLOCATING " << old_d << "\n";
     #endif
@@ -145,15 +148,15 @@ template<class T>
 void reference_counting<T>::detatch()
 {
   #ifdef REFERENCE_COUNTING_DEBUG
-  std::cout << "DETATCH1: " << d << std::endl;
+  std::cout << "DETATCH1: " << d << '\n';
   #endif
 
-  if(d==NULL)
+  if(d==nullptr)
   {
     d=new dt;
 
     #ifdef REFERENCE_COUNTING_DEBUG
-    std::cout << "ALLOCATED " << d << std::endl;
+    std::cout << "ALLOCATED " << d << '\n';
     #endif
   }
   else if(d->ref_count>1)
@@ -162,7 +165,7 @@ void reference_counting<T>::detatch()
     d=new dt(*old_d);
 
     #ifdef REFERENCE_COUNTING_DEBUG
-    std::cout << "ALLOCATED " << d << std::endl;
+    std::cout << "ALLOCATED " << d << '\n';
     #endif
 
     d->ref_count=1;
@@ -172,7 +175,7 @@ void reference_counting<T>::detatch()
   assert(d->ref_count==1);
 
   #ifdef REFERENCE_COUNTING_DEBUG
-  std::cout << "DETATCH2: " << d << std::endl;
+  std::cout << "DETATCH2: " << d << '\n'
   #endif
 }
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump C from Goto Program
+
 #ifndef CPROVER_GOTO_INSTRUMENT_DUMP_C_H
 #define CPROVER_GOTO_INSTRUMENT_DUMP_C_H
 
@@ -14,12 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 void dump_c(
   const goto_functionst &src,
   const bool use_system_headers,
+  const bool use_all_headers,
   const namespacet &ns,
   std::ostream &out);
 
 void dump_cpp(
   const goto_functionst &src,
   const bool use_system_headers,
+  const bool use_all_headers,
   const namespacet &ns,
   std::ostream &out);
 

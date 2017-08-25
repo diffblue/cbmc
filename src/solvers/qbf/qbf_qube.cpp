@@ -6,23 +6,11 @@ Author: CM Wintersteiger
 
 \*******************************************************************/
 
+#include "qbf_qube.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <fstream>
-
-#include "qbf_qube.h"
-
-/*******************************************************************\
-
-Function: qbf_qubet::qbf_qubet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 qbf_qubet::qbf_qubet()
 {
@@ -30,33 +18,9 @@ qbf_qubet::qbf_qubet()
   break_lines=false;
 }
 
-/*******************************************************************\
-
-Function: qbf_qubet::~qbf_qubet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 qbf_qubet::~qbf_qubet()
 {
 }
-
-/*******************************************************************\
-
-Function: qbf_qubet::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 tvt qbf_qubet::l_get(literalt a) const
 {
@@ -64,40 +28,16 @@ tvt qbf_qubet::l_get(literalt a) const
   return tvt(false);
 }
 
-/*******************************************************************\
-
-Function: qbf_qubet::solver_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const std::string qbf_qubet::solver_text()
 {
   return "QuBE";
 }
 
-/*******************************************************************\
-
-Function: qbf_qubet::prop_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 propt::resultt qbf_qubet::prop_solve()
 {
   // sKizzo crashes on empty instances
   if(no_clauses()==0)
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
 
   {
     messaget::status() <<
@@ -156,20 +96,20 @@ propt::resultt qbf_qubet::prop_solve()
     if(!result_found)
     {
       messaget::error() << "QuBE failed: unknown result" << eom;
-      return P_ERROR;
+      return resultt::P_ERROR;
     }
   }
 
   if(result)
   {
     messaget::status() << "QuBE: TRUE" << eom;
-    return P_SATISFIABLE;
+    return resultt::P_SATISFIABLE;
   }
   else
   {
     messaget::status() << "QuBE: FALSE" << eom;
-    return P_UNSATISFIABLE;
+    return resultt::P_UNSATISFIABLE;
   }
 
-  return P_ERROR;
+  return resultt::P_ERROR;
 }

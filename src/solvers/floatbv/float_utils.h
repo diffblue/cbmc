@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
 #define CPROVER_SOLVERS_FLOATBV_FLOAT_UTILS_H
 
@@ -132,7 +133,7 @@ public:
   bvt conversion(const bvt &src, const ieee_float_spect &dest_spec);
 
   // relations
-  typedef enum { LT, LE, EQ, GT, GE } relt;
+  enum class relt { LT, LE, EQ, GT, GE };
   literalt relation(const bvt &src1, relt rel, const bvt &src2);
 
   // constants

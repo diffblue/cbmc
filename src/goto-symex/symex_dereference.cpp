@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
+#include "goto_symex.h"
+
 #include <util/pointer_offset_size.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -15,22 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/rewrite_index.h>
 #include <langapi/language_util.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
-#include "goto_symex.h"
 #include "symex_dereference_state.h"
-
-/*******************************************************************\
-
-Function: goto_symext::dereference_rec_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::dereference_rec_address_of(
   exprt &expr,
@@ -72,18 +64,6 @@ void goto_symext::dereference_rec_address_of(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::is_index_member_symbol_if
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool goto_symext::is_index_member_symbol_if(const exprt &expr)
 {
   // Could be member, could be if, could be index.
@@ -109,18 +89,7 @@ bool goto_symext::is_index_member_symbol_if(const exprt &expr)
     return false;
 }
 
-/*******************************************************************\
-
-Function: goto_symext::address_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose: Evaluate an ID_address_of expression
-
-\*******************************************************************/
-
+/// Evaluate an ID_address_of expression
 exprt goto_symext::address_arithmetic(
   const exprt &expr,
   statet &state,
@@ -153,7 +122,7 @@ exprt goto_symext::address_arithmetic(
     }
 
     // do (expr.type() *)(((char *)op)+offset)
-    result=typecast_exprt(result, pointer_typet(char_type()));
+    result=typecast_exprt(result, pointer_type(char_type()));
 
     // there could be further dereferencing in the offset
     exprt offset=be.offset();
@@ -163,14 +132,14 @@ exprt goto_symext::address_arithmetic(
 
     // treat &array as &array[0]
     const typet &expr_type=ns.follow(expr.type());
-    pointer_typet dest_type;
+    typet dest_type_subtype;
 
     if(expr_type.id()==ID_array && !keep_array)
-      dest_type.subtype()=expr_type.subtype();
+      dest_type_subtype=expr_type.subtype();
     else
-      dest_type.subtype()=expr_type;
+      dest_type_subtype=expr_type;
 
-    result=typecast_exprt(result, dest_type);
+    result=typecast_exprt(result, pointer_type(dest_type_subtype));
   }
   else if(expr.id()==ID_index ||
           expr.id()==ID_member)
@@ -253,22 +222,10 @@ exprt goto_symext::address_arithmetic(
 
   const typet &expr_type=ns.follow(expr.type());
   assert((expr_type.id()==ID_array && !keep_array) ||
-         base_type_eq(pointer_typet(expr_type), result.type(), ns));
+         base_type_eq(pointer_type(expr_type), result.type(), ns));
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: goto_symext::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::dereference_rec(
   exprt &expr,
@@ -297,13 +254,15 @@ void goto_symext::dereference_rec(
       symex_dereference_state,
       language_mode);
 
-    // std::cout << "**** " << from_expr(ns, "", tmp1) << std::endl;
+    // std::cout << "**** " << from_expr(ns, "", tmp1) << '\n';
     exprt tmp2=
       dereference.dereference(
         tmp1,
         guard,
-        write?value_set_dereferencet::WRITE:value_set_dereferencet::READ);
-    // std::cout << "**** " << from_expr(ns, "", tmp2) << std::endl;
+        write?
+          value_set_dereferencet::modet::WRITE:
+          value_set_dereferencet::modet::READ);
+    // std::cout << "**** " << from_expr(ns, "", tmp2) << '\n';
 
     expr.swap(tmp2);
 
@@ -322,7 +281,7 @@ void goto_symext::dereference_rec(
     index_exprt index_expr=to_index_expr(expr);
 
     address_of_exprt address_of_expr(index_expr.array());
-    address_of_expr.type()=pointer_typet(expr.type());
+    address_of_expr.type()=pointer_type(expr.type());
 
     dereference_exprt tmp;
     tmp.pointer()=plus_exprt(address_of_expr, index_expr.index());
@@ -359,7 +318,7 @@ void goto_symext::dereference_rec(
        to_address_of_expr(tc_op).object().type().id()==ID_array &&
        base_type_eq(
          expr.type(),
-         pointer_typet(to_address_of_expr(tc_op).object().type().subtype()),
+         pointer_type(to_address_of_expr(tc_op).object().type().subtype()),
          ns))
     {
       expr=
@@ -381,18 +340,6 @@ void goto_symext::dereference_rec(
       dereference_rec(*it, state, guard, write);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::dereference(
   exprt &expr,

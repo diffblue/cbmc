@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Language Conversion
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_CLASS_H
 
@@ -32,11 +35,14 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    safe_pointer<ci_lazy_methodst> _lazy_methods):
+    safe_pointer<ci_lazy_methodst> _lazy_methods,
+    const character_refine_preprocesst &_character_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
-    lazy_methods(_lazy_methods)
+    lazy_methods(_lazy_methods),
+    character_preprocess(_character_preprocess),
+    method_has_this(false)
   {
   }
 
@@ -59,6 +65,7 @@ protected:
   irep_idt method_id;
   irep_idt current_method;
   typet method_return_type;
+  character_refine_preprocesst character_preprocess;
 
 public:
   struct holet
@@ -93,11 +100,11 @@ public:
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
 
-  typedef enum instruction_sizet
+  enum instruction_sizet
   {
     INST_INDEX=2,
     INST_INDEX_CONST=3
-  } instruction_sizet;
+  };
 
   codet get_array_bounds_check(
     const exprt &arraystruct,
@@ -215,6 +222,19 @@ protected:
     const code_typet &);
 
   const bytecode_infot &get_bytecode_info(const irep_idt &statement);
+
+  enum class bytecode_write_typet { VARIABLE, ARRAY_REF, STATIC_FIELD, FIELD};
+  void save_stack_entries(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    const bytecode_write_typet,
+    const irep_idt &);
+  void create_stack_tmp_var(
+    const std::string &,
+    const typet &,
+    code_blockt &,
+    exprt &);
 };
 
 #endif

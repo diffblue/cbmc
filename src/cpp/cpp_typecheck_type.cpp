@@ -6,29 +6,23 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
+#include "cpp_typecheck.h"
+
 #include <util/source_location.h>
+#include <util/simplify_expr.h>
+#include <util/c_types.h>
 
 #include <ansi-c/c_qualifiers.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_convert_type.h"
 #include "expr2cpp.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_type(typet &type)
 {
-  assert(type.id()!=irep_idt());
+  assert(!type.id().empty());
   assert(type.is_not_nil());
 
   try
@@ -59,7 +53,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     exprt symbol_expr=resolve(
       cpp_name,
-      cpp_typecheck_resolvet::TYPE,
+      cpp_typecheck_resolvet::wantt::TYPE,
       cpp_typecheck_fargst());
 
     if(symbol_expr.id()!=ID_type)
@@ -114,8 +108,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
           // Add 'this' to the parameters
           exprt a0(ID_parameter);
           a0.set(ID_C_base_name, ID_this);
-          a0.type().id(ID_pointer);
-          a0.type().subtype() = class_object;
+          a0.type()=pointer_type(class_object);
           parameters.insert(parameters.begin(), a0);
         }
       }
@@ -126,7 +119,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
     exprt &size_expr=to_array_type(type).size();
 
     if(size_expr.is_not_nil())
+    {
       typecheck_expr(size_expr);
+      simplify(size_expr, *this);
+    }
 
     typecheck_type(type.subtype());
 
@@ -209,7 +205,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
         exprt symbol_expr=resolve(
           to_cpp_name(static_cast<const irept &>(tmp_type)),
-          cpp_typecheck_resolvet::BOTH,
+          cpp_typecheck_resolvet::wantt::BOTH,
           fargs);
 
         type=symbol_expr.type();

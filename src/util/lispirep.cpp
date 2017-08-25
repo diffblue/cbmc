@@ -6,27 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "lispirep.h"
+
 #include "irep.h"
 #include "lispexpr.h"
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void lisp2irep(const lispexprt &src, irept &dest)
 {
   dest.make_nil();
 
-  if(src.type!=lispexprt::List || src.size()<1)
+  if(src.type!=lispexprt::List || src.empty())
     return;
 
   dest.id(src[0].value);
@@ -65,7 +55,7 @@ void irep2lisp(const irept &src, lispexprt &dest)
   id.value=src.id_string();
   dest.push_back(id);
 
-  // reserve objects for extra performace
+  // reserve objects for extra performance
 
   forall_irep(it, src.get_sub())
   {

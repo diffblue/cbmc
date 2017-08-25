@@ -6,22 +6,13 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <cassert>
-#include <sstream>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_name.h"
 
-/*******************************************************************\
-
-Function: cpp_namet::get_base_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <cassert>
+#include <sstream>
 
 irep_idt cpp_namet::get_base_name() const
 {
@@ -49,18 +40,6 @@ irep_idt cpp_namet::get_base_name() const
   return irep_idt();
 }
 
-/*******************************************************************\
-
-Function: cpp_namet::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 #if 0
 void cpp_namet::convert(
   std::string &identifier,
@@ -77,7 +56,7 @@ void cpp_namet::convert(
     else if(id==ID_template_args)
     {
       std::stringstream ss;
-      ss << location() << std::endl;
+      ss << location() << '\n';
       ss << "no template arguments allowed here";
       throw ss.str();
     }
@@ -93,18 +72,6 @@ void cpp_namet::convert(
   }
 }
 #endif
-
-/*******************************************************************\
-
-Function: cpp_namet::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string cpp_namet::to_string() const
 {

@@ -6,26 +6,17 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#include <util/std_expr.h>
-#include <util/simplify_expr.h>
+/// \file
+/// Memory model for partial order concurrency
 
 #include "memory_model_tso.h"
 
-/*******************************************************************\
-
-Function: memory_model_tsot::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_expr.h>
+#include <util/simplify_expr.h>
 
 void memory_model_tsot::operator()(symex_target_equationt &equation)
 {
-  print(8, "Adding TSO constraints");
+  statistics() << "Adding TSO constraints" << eom;
 
   build_event_lists(equation);
   build_clock_type(equation);
@@ -38,35 +29,11 @@ void memory_model_tsot::operator()(symex_target_equationt &equation)
 #endif
 }
 
-/*******************************************************************\
-
-Function: memory_model_tsot::before
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt memory_model_tsot::before(event_it e1, event_it e2)
 {
   return partial_order_concurrencyt::before(
     e1, e2, AX_SC_PER_LOCATION | AX_PROPAGATION);
 }
-
-/*******************************************************************\
-
-Function: memory_model_tsot::program_order_is_relaxed
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool memory_model_tsot::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
@@ -83,18 +50,6 @@ bool memory_model_tsot::program_order_is_relaxed(
   // write to read program order is relaxed
   return e1->is_shared_write() && e2->is_shared_read();
 }
-
-/*******************************************************************\
-
-Function: memory_model_tsot::program_order
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void memory_model_tsot::program_order(
   symex_target_equationt &equation)

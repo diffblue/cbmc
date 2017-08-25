@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Generate Equation using Symbolic Execution
+
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_H
 
@@ -51,10 +54,15 @@ public:
     }
   };
 
-  typedef enum
+  enum class assignment_typet
   {
-    STATE, HIDDEN, VISIBLE_ACTUAL_PARAMETER, HIDDEN_ACTUAL_PARAMETER, PHI, GUARD
-  } assignment_typet;
+    STATE,
+    HIDDEN,
+    VISIBLE_ACTUAL_PARAMETER,
+    HIDDEN_ACTUAL_PARAMETER,
+    PHI,
+    GUARD,
+  };
 
   // read event
   virtual void shared_read(

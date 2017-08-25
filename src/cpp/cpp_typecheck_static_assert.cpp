@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/std_types.h>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_types.h>
 
 void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
 {

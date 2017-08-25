@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H
 
@@ -142,7 +145,7 @@ public:
     }
   } propagation;
 
-  typedef enum { L0=0, L1=1, L2=2 } levelt;
+  enum levelt { L0=0, L1=1, L2=2 };
 
   // performs renaming _up to_ the given level
   void rename(exprt &expr, const namespacet &ns, levelt level=L2);

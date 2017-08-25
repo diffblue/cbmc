@@ -6,32 +6,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Variable Numbering
+
+#include "var_map.h"
+
 #include <ostream>
 
 #include <util/symbol.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
-#include "var_map.h"
-
-/*******************************************************************\
-
-Function: var_mapt::var_infot::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 var_mapt::var_infot &var_mapt::operator()(
   const irep_idt &symbol,
   const irep_idt &suffix,
   const typet &type)
 {
-  assert(symbol!=irep_idt());
+  assert(!symbol.empty());
 
   std::string full_identifier=
     id2string(symbol)+id2string(suffix);
@@ -52,18 +43,6 @@ var_mapt::var_infot &var_mapt::operator()(
 
   return result.first->second;
 }
-
-/*******************************************************************\
-
-Function: var_mapt::var_infot::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void var_mapt::var_infot::output(std::ostream &out) const
 {
@@ -89,18 +68,6 @@ void var_mapt::var_infot::output(std::ostream &out) const
   out << "\n";
 }
 
-/*******************************************************************\
-
-Function: var_mapt::init
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void var_mapt::init(var_infot &var_info)
 {
   if(has_prefix(id2string(var_info.symbol), "symex_dynamic::"))
@@ -117,7 +84,7 @@ void var_mapt::init(var_infot &var_info)
     }
     else
     {
-      const symbolt *symbol=0;
+      const symbolt *symbol=nullptr;
       if(ns.lookup(var_info.symbol, symbol))
         throw "var_mapt::init identifier \""
           +id2string(var_info.full_identifier)
@@ -141,35 +108,11 @@ void var_mapt::init(var_infot &var_info)
     var_info.number=local_count++;
 }
 
-/*******************************************************************\
-
-Function: var_mapt::var_infot::ssa_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 irep_idt var_mapt::var_infot::ssa_identifier() const
 {
   return id2string(full_identifier)+
          "#"+std::to_string(ssa_counter);
 }
-
-/*******************************************************************\
-
-Function: var_mapt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void var_mapt::output(std::ostream &out) const
 {

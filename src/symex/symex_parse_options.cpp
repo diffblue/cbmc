@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symex Command Line Options Processing
+
+#include "symex_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -31,6 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
@@ -49,19 +55,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <path-symex/locs.h>
 
 #include "path_search.h"
-#include "symex_parse_options.h"
-
-/*******************************************************************\
-
-Function: symex_parse_optionst::symex_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
@@ -69,18 +62,6 @@ symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   ui_message_handler(cmdline, "Symex " CBMC_VERSION)
 {
 }
-
-/*******************************************************************\
-
-Function: symex_parse_optionst::eval_verbosity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_parse_optionst::eval_verbosity()
 {
@@ -98,18 +79,6 @@ void symex_parse_optionst::eval_verbosity()
 
   ui_message_handler.set_verbosity(v);
 }
-
-/*******************************************************************\
-
-Function: symex_parse_optionst::get_command_line_options
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void symex_parse_optionst::get_command_line_options(optionst &options)
 {
@@ -145,23 +114,12 @@ void symex_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_values("error-label"));
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int symex_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -229,6 +187,10 @@ int symex_parse_optionst::doit()
       path_search.set_unwind_limit(
         unsafe_string2unsigned(cmdline.get_value("unwind")));
 
+    if(cmdline.isset("max-search-time"))
+      path_search.set_time_limit(
+        safe_string2unsigned(cmdline.get_value("max-search-time")));
+
     if(cmdline.isset("dfs"))
       path_search.set_dfs();
 
@@ -260,12 +222,12 @@ int symex_parse_optionst::doit()
       // do actual symex, for assertion checking
       switch(path_search(goto_model.goto_functions))
       {
-      case safety_checkert::SAFE:
+      case safety_checkert::resultt::SAFE:
         report_properties(path_search.property_map);
         report_success();
         return 0;
 
-      case safety_checkert::UNSAFE:
+      case safety_checkert::resultt::UNSAFE:
         report_properties(path_search.property_map);
         report_failure();
         return 10;
@@ -296,18 +258,6 @@ int symex_parse_optionst::doit()
   #endif
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool symex_parse_optionst::set_properties()
 {
   try
@@ -337,18 +287,6 @@ bool symex_parse_optionst::set_properties()
   return false;
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::process_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool symex_parse_optionst::process_goto_program(const optionst &options)
 {
   try
@@ -367,6 +305,12 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // remove stuff
     remove_complex(goto_model);
     remove_vector(goto_model);
+    // remove function pointers
+    status() << "Removal of function pointers and virtual functions" << eom;
+    remove_function_pointers(
+      get_message_handler(),
+      goto_model,
+      cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // Java throw and catch -> explicit exceptional return variables:
@@ -417,7 +361,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
         return true;
       }
 
-      status() << "Instrumenting coverge goals" << eom;
+      status() << "Instrumenting coverage goals" << eom;
       instrument_cover_goals(symbol_table, goto_model.goto_functions, c);
       goto_model.goto_functions.update();
     }
@@ -463,22 +407,10 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
   return false;
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::report_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_parse_optionst::report_properties(
   const path_searcht::property_mapt &property_map)
 {
-  if(get_ui()==ui_message_handlert::PLAIN)
+  if(get_ui()==ui_message_handlert::uit::PLAIN)
     status() << "\n** Results:" << eom;
 
   for(path_searcht::property_mapt::const_iterator
@@ -486,7 +418,7 @@ void symex_parse_optionst::report_properties(
       it!=property_map.end();
       it++)
   {
-    if(get_ui()==ui_message_handlert::XML_UI)
+    if(get_ui()==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml_result("result");
       xml_result.set_attribute("claim", id2string(it->first));
@@ -542,33 +474,21 @@ void symex_parse_optionst::report_properties(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::report_success
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -577,18 +497,6 @@ void symex_parse_optionst::report_success()
   }
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::show_counterexample
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
 {
@@ -596,12 +504,12 @@ void symex_parse_optionst::show_counterexample(
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << '\n' << "Counterexample:" << '\n';
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, error_trace, xml);
@@ -614,33 +522,21 @@ void symex_parse_optionst::show_counterexample(
   }
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::report_failure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void symex_parse_optionst::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -649,18 +545,7 @@ void symex_parse_optionst::report_failure()
   }
 }
 
-/*******************************************************************\
-
-Function: symex_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void symex_parse_optionst::help()
 {
   std::cout <<
@@ -733,6 +618,7 @@ void symex_parse_optionst::help()
     " --depth nr                   limit search depth\n"
     " --context-bound nr           limit number of context switches\n"
     " --branch-bound nr            limit number of branches taken\n"
+    " --max-search-time s          limit search to approximately s seconds\n"
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"

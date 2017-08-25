@@ -17,6 +17,7 @@ SRC = all_properties.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -59,24 +60,9 @@ ifneq ($(wildcard ../bv_refinement/Makefile),)
   CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
 endif
 
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
-
 ifneq ($(wildcard ../jsil/Makefile),)
   OBJ += ../jsil/jsil$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_JSIL
-endif
-
-ifneq ($(wildcard ../specc/Makefile),)
-  OBJ += ../specc/specc$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_SPECC
-endif
-
-ifneq ($(wildcard ../php/Makefile),)
-  OBJ += ../php/php$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_PHP
 endif
 
 ###############################################################################

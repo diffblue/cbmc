@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
+#include "bmc.h"
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -19,10 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 
 #include <langapi/mode.h>
-#include <langapi/languages.h>
 #include <langapi/language_util.h>
-
-#include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
@@ -37,36 +39,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "counterexample_beautification.h"
 #include "fault_localization.h"
-#include "bmc.h"
-
-/*******************************************************************\
-
-Function: bmct::do_unwind_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::do_unwind_module()
 {
   // this is a hook for hw-cbmc
 }
-
-/*******************************************************************\
-
-Function: bmct::error_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::error_trace()
 {
@@ -77,12 +54,12 @@ void bmct::error_trace()
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     std::cout << "\n" << "Counterexample:" << "\n";
     show_goto_trace(std::cout, ns, goto_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
@@ -90,7 +67,7 @@ void bmct::error_trace()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_arrayt &result_array=json_result["results"].make_array();
@@ -109,18 +86,7 @@ void bmct::error_trace()
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::output_graphml
-
-  Inputs:
-
- Outputs:
-
- Purpose: outputs witnesses in graphml format
-
-\*******************************************************************/
-
+/// outputs witnesses in graphml format
 void bmct::output_graphml(
   resultt result,
   const goto_functionst &goto_functions)
@@ -130,9 +96,9 @@ void bmct::output_graphml(
     return;
 
   graphml_witnesst graphml_witness(ns);
-  if(result==UNSAFE)
+  if(result==resultt::UNSAFE)
     graphml_witness(safety_checkert::error_trace);
-  else if(result==SAFE)
+  else if(result==resultt::SAFE)
     graphml_witness(equation);
   else
     return;
@@ -145,18 +111,6 @@ void bmct::output_graphml(
     write_graphml(graphml_witness.graph(), out);
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::do_conversion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::do_conversion()
 {
@@ -177,18 +131,6 @@ void bmct::do_conversion()
       prop_conv.set_to_true(*it);
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::run_decision_procedure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt
 bmct::run_decision_procedure(prop_convt &prop_conv)
@@ -217,28 +159,16 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
   return dec_result;
 }
 
-/*******************************************************************\
-
-Function: bmct::report_success
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
@@ -247,7 +177,7 @@ void bmct::report_success()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
@@ -257,28 +187,16 @@ void bmct::report_success()
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::report_failure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::report_failure()
 {
   result() << "VERIFICATION FAILED" << eom;
 
   switch(ui)
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
@@ -287,7 +205,7 @@ void bmct::report_failure()
     }
     break;
 
-  case ui_message_handlert::JSON_UI:
+  case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");
@@ -297,23 +215,9 @@ void bmct::report_failure()
   }
 }
 
-/*******************************************************************\
-
-Function: bmct::show_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bmct::show_program()
 {
   unsigned count=1;
-
-  languagest languages(ns, new_ansi_c_language());
 
   std::cout << "\n" << "Program constraints:" << "\n";
 
@@ -324,13 +228,14 @@ void bmct::show_program()
 
     if(step.is_assignment())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") " << string_value << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -339,14 +244,15 @@ void bmct::show_program()
     }
     else if(step.is_assert())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -355,14 +261,15 @@ void bmct::show_program()
     }
     else if(step.is_assume())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -371,8 +278,8 @@ void bmct::show_program()
     }
     else if(step.is_constraint())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
@@ -380,15 +287,16 @@ void bmct::show_program()
     }
     else if(step.is_shared_read() || step.is_shared_write())
     {
-      std::string string_value;
-      languages.from_expr(step.ssa_lhs, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.ssa_lhs);
       std::cout << "(" << count << ") SHARED_"
                 << (step.is_shared_write()?"WRITE":"READ")
                 << "(" << string_value <<")\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -397,18 +305,6 @@ void bmct::show_program()
     }
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::run
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmct::run(
   const goto_functionst &goto_functions)
@@ -426,7 +322,7 @@ safety_checkert::resultt bmct::run(
   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   symex.set_message_handler(get_message_handler());
@@ -464,7 +360,7 @@ safety_checkert::resultt bmct::run(
     message.error().source_location=symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
@@ -473,13 +369,13 @@ safety_checkert::resultt bmct::run(
     message.error().source_location=symex.last_source_location;
     message.error() << error_str << messaget::eom;
 
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   statistics() << "size of program expression: "
@@ -534,13 +430,13 @@ safety_checkert::resultt bmct::run(
        symex.output_coverage_report(goto_functions, cov_out))
     {
       error() << "Failed to write symex coverage report" << eom;
-      return safety_checkert::ERROR;
+      return safety_checkert::resultt::ERROR;
     }
 
     if(options.get_bool_option("show-vcc"))
     {
       show_vcc();
-      return safety_checkert::SAFE; // to indicate non-error
+      return safety_checkert::resultt::SAFE; // to indicate non-error
     }
 
     if(!options.get_list_option("cover").empty())
@@ -548,7 +444,7 @@ safety_checkert::resultt bmct::run(
       const optionst::value_listt criteria=
         options.get_list_option("cover");
       return cover(goto_functions, criteria)?
-        safety_checkert::ERROR:safety_checkert::SAFE;
+        safety_checkert::resultt::ERROR:safety_checkert::resultt::SAFE;
     }
 
     if(options.get_option("localize-faults")!="")
@@ -563,14 +459,14 @@ safety_checkert::resultt bmct::run(
        symex.remaining_vccs==0)
     {
       report_success();
-      output_graphml(SAFE, goto_functions);
-      return safety_checkert::SAFE;
+      output_graphml(resultt::SAFE, goto_functions);
+      return safety_checkert::resultt::SAFE;
     }
 
     if(options.get_bool_option("program-only"))
     {
       show_program();
-      return safety_checkert::SAFE;
+      return safety_checkert::resultt::SAFE;
     }
 
     return decide(goto_functions, prop_conv);
@@ -579,33 +475,21 @@ safety_checkert::resultt bmct::run(
   catch(std::string &error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
   {
     error() << error_str << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return safety_checkert::ERROR;
+    return safety_checkert::resultt::ERROR;
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::decide
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 safety_checkert::resultt bmct::decide(
   const goto_functionst &goto_functions,
@@ -619,30 +503,18 @@ safety_checkert::resultt bmct::decide(
     return all_properties(goto_functions, prop_conv);
 }
 
-/*******************************************************************\
-
-Function: bmct::stop_on_fail
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 safety_checkert::resultt bmct::stop_on_fail(
   const goto_functionst &goto_functions,
   prop_convt &prop_conv)
 {
   switch(run_decision_procedure(prop_conv))
   {
-  case decision_proceduret::D_UNSATISFIABLE:
+  case decision_proceduret::resultt::D_UNSATISFIABLE:
     report_success();
-    output_graphml(SAFE, goto_functions);
-    return SAFE;
+    output_graphml(resultt::SAFE, goto_functions);
+    return resultt::SAFE;
 
-  case decision_proceduret::D_SATISFIABLE:
+  case decision_proceduret::resultt::D_SATISFIABLE:
     if(options.get_bool_option("trace"))
     {
       if(options.get_bool_option("beautify"))
@@ -650,34 +522,22 @@ safety_checkert::resultt bmct::stop_on_fail(
           dynamic_cast<bv_cbmct &>(prop_conv), equation, ns);
 
       error_trace();
-      output_graphml(UNSAFE, goto_functions);
+      output_graphml(resultt::UNSAFE, goto_functions);
     }
 
     report_failure();
-    return UNSAFE;
+    return resultt::UNSAFE;
 
   default:
     if(options.get_bool_option("dimacs") ||
        options.get_option("outfile")!="")
-      return SAFE;
+      return resultt::SAFE;
 
     error() << "decision procedure failed" << eom;
 
-    return ERROR;
+    return resultt::ERROR;
   }
 }
-
-/*******************************************************************\
-
-Function: bmct::setup_unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bmct::setup_unwind()
 {

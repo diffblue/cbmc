@@ -6,28 +6,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 
 #include <linking/zero_initializer.h>
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/c_sizeof.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::convert_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose: Initialize an object with a value
-
-\*******************************************************************/
-
+/// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
   // this is needed for template arguments that are types
@@ -110,7 +103,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
       exprt resolved_expr=resolve(
         to_cpp_name(static_cast<irept &>(symbol.value.op0())),
-        cpp_typecheck_resolvet::BOTH, fargs);
+        cpp_typecheck_resolvet::wantt::BOTH, fargs);
 
       assert(symbol.type.subtype() == resolved_expr.type());
 
@@ -178,18 +171,6 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       ops);
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::zero_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::zero_initializer(
   const exprt &object,

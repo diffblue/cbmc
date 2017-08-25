@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -13,20 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/byte_operators.h>
 #include <util/endianness_map.h>
 
-#include "boolbv.h"
 #include "flatten_byte_operators.h"
-
-/*******************************************************************\
-
-Function: map_bv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt map_bv(const endianness_mapt &map, const bvt &src)
 {
@@ -44,18 +33,6 @@ bvt map_bv(const endianness_mapt &map, const bvt &src)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_byte_extract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_byte_extract(const byte_extract_exprt &expr)
 {

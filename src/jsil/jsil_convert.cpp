@@ -6,11 +6,15 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
+/// \file
+/// Jsil Language Conversion
+
+#include "jsil_convert.h"
+
 #include <util/message.h>
 #include <util/symbol_table.h>
 
 #include "jsil_parse_tree.h"
-#include "jsil_convert.h"
 
 class jsil_convertt:public messaget
 {
@@ -30,18 +34,6 @@ protected:
 
   bool convert_code(const symbolt &symbol, codet &code);
 };
-
-/*******************************************************************\
-
-Function: jsil_convertt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
 {
@@ -73,18 +65,6 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: jsil_convertt::convert_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 {
@@ -136,18 +116,6 @@ bool jsil_convertt::convert_code(const symbolt &symbol, codet &code)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: jsil_convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_convert(
   const jsil_parse_treet &parse_tree,

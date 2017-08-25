@@ -8,6 +8,11 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// Data and control-dependencies of syntactic diff
+
+#include "change_impact.h"
+
 #include <iostream>
 
 #include <goto-programs/goto_model.h>
@@ -16,7 +21,6 @@ Date: April 2016
 
 #include "unified_diff.h"
 
-#include "change_impact.h"
 #if 0
   struct cfg_nodet
   {
@@ -46,18 +50,6 @@ Date: April 2016
 #endif
     queue.push(entry);
   }
-
-/*******************************************************************\
-
-Function: full_slicert::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void full_slicert::operator()(
   goto_functionst &goto_functions,
@@ -144,18 +136,6 @@ void full_slicert::operator()(
 }
 
 
-/*******************************************************************\
-
-Function: full_slicert::fixedpoint
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void full_slicert::fixedpoint(
   goto_functionst &goto_functions,
   queuet &queue,
@@ -206,18 +186,6 @@ void full_slicert::fixedpoint(
 }
 
 
-/*******************************************************************\
-
-Function: full_slicert::add_dependencies
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void full_slicert::add_dependencies(
   const cfgt::nodet &node,
   queuet &queue,
@@ -260,7 +228,7 @@ protected:
   dependence_grapht old_dep_graph;
   dependence_grapht new_dep_graph;
 
-  typedef enum
+  enum mod_flagt
   {
     SAME=0,
     NEW=1<<0,
@@ -269,7 +237,7 @@ protected:
     DEL_DATA_DEP=1<<3,
     NEW_CTRL_DEP=1<<4,
     DEL_CTRL_DEP=1<<5
-  } mod_flagt;
+  };
 
   typedef std::map<goto_programt::const_targett, unsigned>
     goto_program_change_impactt;
@@ -319,18 +287,6 @@ protected:
       goto_programt::const_targett &target) const;
 };
 
-/*******************************************************************\
-
-Function: change_impactt::change_impactt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 change_impactt::change_impactt(
     const goto_modelt &model_old,
     const goto_modelt &model_new,
@@ -356,18 +312,6 @@ change_impactt::change_impactt(
   // compute program dependence graph of new code
   new_dep_graph(new_goto_functions, ns_new);
 }
-
-/*******************************************************************\
-
-Function: change_impactt::change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impactt::change_impact(const irep_idt &function)
 {
@@ -401,18 +345,6 @@ void change_impactt::change_impact(const irep_idt &function)
     new_change_impact[function]);
 }
 
-/*******************************************************************\
-
-Function: change_impactt::change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void change_impactt::change_impact(
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
@@ -445,13 +377,15 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             old_dep_graph[old_dep_graph[o_it].get_node_id()];
 
-          if(impact_mode==BACKWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::BACKWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_back(
               d_node,
               old_dep_graph,
               old_change_impact,
               true);
-          if(impact_mode==FORWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::FORWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_forward(
               d_node,
               old_dep_graph,
@@ -468,13 +402,15 @@ void change_impactt::change_impact(
           const dependence_grapht::nodet &d_node=
             new_dep_graph[new_dep_graph[n_it].get_node_id()];
 
-          if(impact_mode==BACKWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::BACKWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_back(
               d_node,
               new_dep_graph,
               new_change_impact,
               false);
-          if(impact_mode==FORWARD || impact_mode==BOTH)
+          if(impact_mode==impact_modet::FORWARD ||
+             impact_mode==impact_modet::BOTH)
             propogate_dep_forward(
               d_node,
               new_dep_graph,
@@ -488,18 +424,6 @@ void change_impactt::change_impact(
   }
 }
 
-
-/*******************************************************************\
-
-Function: change_impactt::propogate_dep_forward
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impactt::propogate_dep_forward(
   const dependence_grapht::nodet &d_node,
@@ -518,8 +442,8 @@ void change_impactt::propogate_dep_forward(
     if((change_impact[src->function][src] &data_flag)
         || (change_impact[src->function][src] &ctrl_flag))
       continue;
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;
@@ -527,18 +451,6 @@ void change_impactt::propogate_dep_forward(
         change_impact, del);
   }
 }
-
-/*******************************************************************\
-
-Function: change_impactt::propogate_dep_back
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impactt::propogate_dep_back(
   const dependence_grapht::nodet &d_node,
@@ -559,8 +471,8 @@ void change_impactt::propogate_dep_back(
     {
       continue;
     }
-    if(it->second.get() == dep_edget::DATA
-        || it->second.get() == dep_edget::BOTH)
+    if(it->second.get() == dep_edget::kindt::DATA
+        || it->second.get() == dep_edget::kindt::BOTH)
       change_impact[src->function][src] |= data_flag;
     else
       change_impact[src->function][src] |= ctrl_flag;
@@ -569,18 +481,6 @@ void change_impactt::propogate_dep_back(
         change_impact, del);
   }
 }
-
-/*******************************************************************\
-
-Function: change_impactt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impactt::operator()()
 {
@@ -652,18 +552,6 @@ void change_impactt::operator()()
   }
 }
 
-/*******************************************************************\
-
-Function: change_impact::output_change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void change_impactt::output_change_impact(
   const irep_idt &function,
   const goto_program_change_impactt &c_i,
@@ -708,18 +596,6 @@ void change_impactt::output_change_impact(
     output_instruction(prefix, goto_program, ns, function, target);
   }
 }
-
-/*******************************************************************\
-
-Function: change_impact::output_change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impactt::output_change_impact(
   const irep_idt &function,
@@ -837,18 +713,6 @@ void change_impactt::output_change_impact(
   }
 }
 
-/*******************************************************************\
-
-Function: change_impactt::output_instruction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void change_impactt::output_instruction(char prefix,
     const goto_programt &goto_program,
     const namespacet &ns,
@@ -863,7 +727,7 @@ void change_impactt::output_instruction(char prefix,
     const irep_idt &line=target->source_location.get_line();
     if(!file.empty() && !line.empty())
       std::cout << prefix << " " << id2string(file)
-                << " " << id2string(line) << std::endl;
+                << " " << id2string(line) << '\n';
   }
   else
   {
@@ -871,18 +735,6 @@ void change_impactt::output_instruction(char prefix,
     goto_program.output_instruction(ns, function, std::cout, target);
   }
 }
-
-/*******************************************************************\
-
-Function: change_impact
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void change_impact(
   const goto_modelt &model_old,

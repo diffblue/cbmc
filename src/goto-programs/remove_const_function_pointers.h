@@ -6,6 +6,9 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_CONST_FUNCTION_POINTERS_H
 
@@ -24,11 +27,10 @@ public:
   typedef std::list<exprt> expressionst;
   remove_const_function_pointerst(
     message_handlert &message_handler,
-    const exprt &base_expression,
     const namespacet &ns,
     const symbol_tablet &symbol_table);
 
-  bool operator()(functionst &out_functions);
+  bool operator()(const exprt &base_expression, functionst &out_functions);
 
 private:
   exprt replace_const_symbols(const exprt &expression) const;
@@ -90,7 +92,6 @@ private:
   exprt get_component_value(
     const struct_exprt &struct_expr, const member_exprt &member_expr);
 
-  const exprt original_expression;
   const namespacet &ns;
   const symbol_tablet &symbol_table;
 };

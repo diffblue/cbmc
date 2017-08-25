@@ -22,6 +22,8 @@ extern char *yyansi_ctext;
 
 #include "parser_static.inc"
 
+#include "literals/convert_integer_literal.h"
+
 #include "ansi_c_y.tab.h"
 
 // statements have right recursion, deep nesting of statements thus
@@ -265,7 +267,8 @@ identifier:
           irep_idt value=stack($2).get(ID_value);
           stack($$).set(ID_C_base_name, value);
           stack($$).set(ID_identifier, value);
-          stack($$).set(ID_C_id_class, ANSI_C_SYMBOL);
+          stack($$).set(
+            ID_C_id_class, static_cast<int>(ansi_c_id_classt::ANSI_C_SYMBOL));
         }
         ;
 
@@ -422,6 +425,17 @@ offsetof_member_designator:
           $$=$1;
           set($2, ID_index);
           mto($2, $3);
+          mto($$, $2);
+        }
+        | offsetof_member_designator TOK_ARROW member_name
+        {
+          $$=$1;
+          set($2, ID_index);
+          exprt tmp=convert_integer_literal("0");
+          stack($2).move_to_operands(tmp);
+          mto($$, $2);
+          set($2, ID_member);
+          stack($2).set(ID_component_name, stack($3).get(ID_C_base_name));
           mto($$, $2);
         }
         ;
@@ -1531,7 +1545,7 @@ gcc_attribute_list:
           gcc_attribute
         | gcc_attribute_list ',' gcc_attribute
         {
-          $$=merge($1, $2);
+          $$=merge($1, $3);
         }
         ;          
 
@@ -2387,7 +2401,7 @@ gcc_local_label_statement:
             irep_idt base_name=it->get(ID_identifier);
             irep_idt id="label-"+id2string(base_name);
             ansi_c_parsert::identifiert &i=PARSER.current_scope().name_map[id];
-            i.id_class=ANSI_C_LOCAL_LABEL;
+            i.id_class=ansi_c_id_classt::ANSI_C_LOCAL_LABEL;
             i.prefixed_name=PARSER.current_scope().prefix+id2string(id);
             i.base_name=base_name;
           }

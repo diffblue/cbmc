@@ -8,6 +8,11 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
+#include "goto_trace.h"
+
 #include <cassert>
 #include <ostream>
 
@@ -17,20 +22,6 @@ Author: Daniel Kroening
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
 
-#include "goto_trace.h"
-
-/*******************************************************************\
-
-Function: goto_tracet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_tracet::output(
   const class namespacet &ns,
   std::ostream &out) const
@@ -38,18 +29,6 @@ void goto_tracet::output(
   for(const auto &step : steps)
     step.output(ns, out);
 }
-
-/*******************************************************************\
-
-Function: goto_tracet::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_trace_stept::output(
   const namespacet &ns,
@@ -59,24 +38,25 @@ void goto_trace_stept::output(
 
   switch(type)
   {
-  case goto_trace_stept::ASSERT: out << "ASSERT"; break;
-  case goto_trace_stept::ASSUME: out << "ASSUME"; break;
-  case goto_trace_stept::LOCATION: out << "LOCATION"; break;
-  case goto_trace_stept::ASSIGNMENT: out << "ASSIGNMENT"; break;
-  case goto_trace_stept::GOTO: out << "GOTO"; break;
-  case goto_trace_stept::DECL: out << "DECL"; break;
-  case goto_trace_stept::OUTPUT: out << "OUTPUT"; break;
-  case goto_trace_stept::INPUT: out << "INPUT"; break;
-  case goto_trace_stept::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
-  case goto_trace_stept::ATOMIC_END: out << "ATOMIC_END"; break;
-  case goto_trace_stept::SHARED_READ: out << "SHARED_READ"; break;
-  case goto_trace_stept::SHARED_WRITE: out << "SHARED WRITE"; break;
-  case goto_trace_stept::FUNCTION_CALL: out << "FUNCTION CALL"; break;
-  case goto_trace_stept::FUNCTION_RETURN: out << "FUNCTION RETURN"; break;
+  case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
+  case goto_trace_stept::typet::ASSUME: out << "ASSUME"; break;
+  case goto_trace_stept::typet::LOCATION: out << "LOCATION"; break;
+  case goto_trace_stept::typet::ASSIGNMENT: out << "ASSIGNMENT"; break;
+  case goto_trace_stept::typet::GOTO: out << "GOTO"; break;
+  case goto_trace_stept::typet::DECL: out << "DECL"; break;
+  case goto_trace_stept::typet::OUTPUT: out << "OUTPUT"; break;
+  case goto_trace_stept::typet::INPUT: out << "INPUT"; break;
+  case goto_trace_stept::typet::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
+  case goto_trace_stept::typet::ATOMIC_END: out << "ATOMIC_END"; break;
+  case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
+  case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
+  case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
+  case goto_trace_stept::typet::FUNCTION_RETURN:
+    out << "FUNCTION RETURN"; break;
   default: assert(false);
   }
 
-  if(type==ASSERT || type==ASSUME || type==GOTO)
+  if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
     out << " (" << cond_value << ")";
 
   if(hidden)
@@ -132,18 +112,6 @@ void goto_trace_stept::output(
 
   out << "\n";
 }
-
-/*******************************************************************\
-
-Function: trace_value_binary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string trace_value_binary(
   const exprt &expr,
@@ -208,18 +176,6 @@ std::string trace_value_binary(
   return "?";
 }
 
-/*******************************************************************\
-
-Function: trace_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void trace_value(
   std::ostream &out,
   const namespacet &ns,
@@ -250,18 +206,6 @@ void trace_value(
       << "\n";
 }
 
-/*******************************************************************\
-
-Function: show_state_header
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_state_header(
   std::ostream &out,
   const goto_trace_stept &state,
@@ -280,18 +224,6 @@ void show_state_header(
   out << "----------------------------------------------------" << "\n";
 }
 
-/*******************************************************************\
-
-Function: is_index_member_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool is_index_member_symbol(const exprt &src)
 {
   if(src.id()==ID_index)
@@ -303,18 +235,6 @@ bool is_index_member_symbol(const exprt &src)
   else
     return false;
 }
-
-/*******************************************************************\
-
-Function: show_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_goto_trace(
   std::ostream &out,
@@ -332,7 +252,7 @@ void show_goto_trace(
 
     switch(step.type)
     {
-    case goto_trace_stept::ASSERT:
+    case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
         out << "\n";
@@ -348,7 +268,7 @@ void show_goto_trace(
       }
       break;
 
-    case goto_trace_stept::ASSUME:
+    case goto_trace_stept::typet::ASSUME:
       if(!step.cond_value)
       {
         out << "\n";
@@ -363,13 +283,13 @@ void show_goto_trace(
       }
       break;
 
-    case goto_trace_stept::LOCATION:
+    case goto_trace_stept::typet::LOCATION:
       break;
 
-    case goto_trace_stept::GOTO:
+    case goto_trace_stept::typet::GOTO:
       break;
 
-    case goto_trace_stept::ASSIGNMENT:
+    case goto_trace_stept::typet::ASSIGNMENT:
       if(step.pc->is_assign() ||
          step.pc->is_return() || // returns have a lhs!
          step.pc->is_function_call() ||
@@ -392,7 +312,7 @@ void show_goto_trace(
       }
       break;
 
-    case goto_trace_stept::DECL:
+    case goto_trace_stept::typet::DECL:
       if(prev_step_nr!=step.step_nr || first_step)
       {
         first_step=false;
@@ -403,7 +323,7 @@ void show_goto_trace(
       trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
       break;
 
-    case goto_trace_stept::OUTPUT:
+    case goto_trace_stept::typet::OUTPUT:
       if(step.formatted)
       {
         printf_formattert printf_formatter(ns);
@@ -433,7 +353,7 @@ void show_goto_trace(
       }
       break;
 
-    case goto_trace_stept::INPUT:
+    case goto_trace_stept::typet::INPUT:
       show_state_header(out, step, step.pc->source_location, step.step_nr);
       out << "  INPUT " << step.io_id << ":";
 
@@ -453,21 +373,21 @@ void show_goto_trace(
       out << "\n";
       break;
 
-    case goto_trace_stept::FUNCTION_CALL:
-    case goto_trace_stept::FUNCTION_RETURN:
-    case goto_trace_stept::SPAWN:
-    case goto_trace_stept::MEMORY_BARRIER:
-    case goto_trace_stept::ATOMIC_BEGIN:
-    case goto_trace_stept::ATOMIC_END:
-    case goto_trace_stept::DEAD:
+    case goto_trace_stept::typet::FUNCTION_CALL:
+    case goto_trace_stept::typet::FUNCTION_RETURN:
+    case goto_trace_stept::typet::SPAWN:
+    case goto_trace_stept::typet::MEMORY_BARRIER:
+    case goto_trace_stept::typet::ATOMIC_BEGIN:
+    case goto_trace_stept::typet::ATOMIC_END:
+    case goto_trace_stept::typet::DEAD:
       break;
 
-    case goto_trace_stept::CONSTRAINT:
+    case goto_trace_stept::typet::CONSTRAINT:
       assert(false);
       break;
 
-    case goto_trace_stept::SHARED_READ:
-    case goto_trace_stept::SHARED_WRITE:
+    case goto_trace_stept::typet::SHARED_READ:
+    case goto_trace_stept::typet::SHARED_WRITE:
       assert(false);
       break;
 

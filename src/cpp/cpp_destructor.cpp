@@ -6,24 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
-
-#include <ansi-c/c_types.h>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
 
-/*******************************************************************\
+#include <util/arith_tools.h>
 
-Function: cpp_typecheckt::cpp_destructor
+#include <util/c_types.h>
 
-  Inputs:
-
- Outputs: typechecked code
-
- Purpose:
-
-\*******************************************************************/
-
+/// \return typechecked code
 codet cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const typet &type,
@@ -150,10 +142,7 @@ codet cpp_typecheckt::cpp_destructor(
     assert(tmp_this.id()==ID_address_of
            && tmp_this.op0().id()=="new_object");
 
-    exprt address_of(ID_address_of, typet(ID_pointer));
-    address_of.type().subtype()=object.type();
-    address_of.copy_to_operands(object);
-    tmp_this.swap(address_of);
+    tmp_this=address_of_exprt(object, pointer_type(object.type()));
 
     new_code.swap(initializer);
   }

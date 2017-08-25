@@ -6,26 +6,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
+#include "cpp_declarator_converter.h"
+
 #include <util/source_location.h>
 #include <util/std_types.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
 #include "cpp_type2name.h"
-#include "cpp_declarator_converter.h"
 #include "cpp_typecheck.h"
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::cpp_declarator_convertert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 cpp_declarator_convertert::cpp_declarator_convertert(
   class cpp_typecheckt &_cpp_typecheck):
@@ -34,21 +26,10 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   is_template_parameter(false),
   is_friend(false),
   linkage_spec(_cpp_typecheck.current_linkage_spec),
-  cpp_typecheck(_cpp_typecheck)
+  cpp_typecheck(_cpp_typecheck),
+  is_code(false)
 {
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symbolt &cpp_declarator_convertert::convert(
   const typet &declaration_type,
@@ -100,7 +81,7 @@ symbolt &cpp_declarator_convertert::convert(
   get_final_identifier();
 
   // first see if it is a member
-  if(scope->id_class==cpp_idt::CLASS && !is_friend)
+  if(scope->id_class==cpp_idt::id_classt::CLASS && !is_friend)
   {
     // it's a member! it must be declared already
 
@@ -160,7 +141,7 @@ symbolt &cpp_declarator_convertert::convert(
       exprt symbol_expr=
         cpp_typecheck.resolve(
           name,
-          cpp_typecheck_resolvet::TYPE,
+          cpp_typecheck_resolvet::wantt::TYPE,
           cpp_typecheck_fargst());
 
       if(symbol_expr.id()!=ID_type ||
@@ -238,31 +219,19 @@ symbolt &cpp_declarator_convertert::convert(
       cpp_scopet::id_sett id_set;
 
       scope->lookup_identifier(
-        symbol.name, cpp_idt::TEMPLATE_PARAMETER, id_set);
+        symbol.name, cpp_idt::id_classt::TEMPLATE_PARAMETER, id_set);
 
       if(id_set.empty())
       {
         cpp_idt &identifier=
           cpp_typecheck.cpp_scopes.put_into_scope(symbol, *scope);
-        identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
+        identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
       }
     }
 
     return symbol;
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::combine_types
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_declarator_convertert::combine_types(
   const source_locationt &source_location,
@@ -346,18 +315,6 @@ void cpp_declarator_convertert::combine_types(
   throw 0;
 }
 
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::enforce_rules
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_declarator_convertert::enforce_rules(const symbolt &symbol)
 {
   // enforce rules for operator overloading
@@ -366,18 +323,6 @@ void cpp_declarator_convertert::enforce_rules(const symbolt &symbol)
   // enforce rules about main()
   main_function_rules(symbol);
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::handle_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_declarator_convertert::handle_initializer(
   symbolt &symbol,
@@ -431,18 +376,6 @@ void cpp_declarator_convertert::handle_initializer(
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::get_final_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_declarator_convertert::get_final_identifier()
 {
   std::string identifier=id2string(base_name);
@@ -488,18 +421,6 @@ void cpp_declarator_convertert::get_final_identifier()
     scope->prefix+
     identifier;
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::convert_new_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symbolt &cpp_declarator_convertert::convert_new_symbol(
   const cpp_storage_spect &storage_spec,
@@ -618,13 +539,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
     cpp_typecheck.cpp_scopes.put_into_scope(*new_symbol, *scope, is_friend);
 
   if(is_template)
-    identifier.id_class=cpp_idt::TEMPLATE;
+    identifier.id_class=cpp_idt::id_classt::TEMPLATE;
   else if(is_template_parameter)
-    identifier.id_class=cpp_idt::TEMPLATE_PARAMETER;
+    identifier.id_class=cpp_idt::id_classt::TEMPLATE_PARAMETER;
   else if(is_typedef)
-    identifier.id_class=cpp_idt::TYPEDEF;
+    identifier.id_class=cpp_idt::id_classt::TYPEDEF;
   else
-    identifier.id_class=cpp_idt::SYMBOL;
+    identifier.id_class=cpp_idt::id_classt::SYMBOL;
 
   // do the value
   if(!new_symbol->is_type)
@@ -640,18 +561,6 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 
   return *new_symbol;
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::get_pretty_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 irep_idt cpp_declarator_convertert::get_pretty_name()
 {
@@ -680,34 +589,10 @@ irep_idt cpp_declarator_convertert::get_pretty_name()
   return scope->prefix+id2string(base_name);
 }
 
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::operator_overloading_rules
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_declarator_convertert::operator_overloading_rules(
   const symbolt &symbol)
 {
 }
-
-/*******************************************************************\
-
-Function: cpp_declarator_convertert::main_function_rules
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_declarator_convertert::main_function_rules(
   const symbolt &symbol)

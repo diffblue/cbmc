@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
@@ -14,20 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/simplify_expr.h>
 
-#include "boolbv.h"
 #include "boolbv_type.h"
-
-/*******************************************************************\
-
-Function: boolbvt::get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt boolbvt::get(const exprt &expr) const
 {
@@ -76,18 +65,6 @@ exprt boolbvt::get(const exprt &expr) const
   return SUB::get(expr);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::bv_get_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt boolbvt::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
@@ -119,7 +96,7 @@ exprt boolbvt::bv_get_rec(
 
   bvtypet bvtype=get_bvtype(type);
 
-  if(bvtype==IS_UNKNOWN)
+  if(bvtype==bvtypet::IS_UNKNOWN)
   {
     if(type.id()==ID_array)
     {
@@ -265,7 +242,7 @@ exprt boolbvt::bv_get_rec(
 
   switch(bvtype)
   {
-  case IS_UNKNOWN:
+  case bvtypet::IS_UNKNOWN:
     if(type.id()==ID_string)
     {
       mp_integer int_value=binary2integer(value, false);
@@ -279,7 +256,7 @@ exprt boolbvt::bv_get_rec(
     }
     break;
 
-  case IS_RANGE:
+  case bvtypet::IS_RANGE:
     {
       mp_integer int_value=binary2integer(value, false);
       mp_integer from=string2integer(type.get_string(ID_from));
@@ -291,7 +268,7 @@ exprt boolbvt::bv_get_rec(
     break;
 
   default:
-  case IS_C_ENUM:
+  case bvtypet::IS_C_ENUM:
     constant_exprt value_expr(type);
     value_expr.set_value(value);
     return value_expr;
@@ -300,36 +277,12 @@ exprt boolbvt::bv_get_rec(
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: boolbvt::bv_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt boolbvt::bv_get(const bvt &bv, const typet &type) const
 {
   std::vector<bool> unknown;
   unknown.resize(bv.size(), false);
   return bv_get_rec(bv, unknown, 0, type);
 }
-
-/*******************************************************************\
-
-Function: boolbvt::bv_get_cache
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt boolbvt::bv_get_cache(const exprt &expr) const
 {
@@ -343,18 +296,6 @@ exprt boolbvt::bv_get_cache(const exprt &expr) const
 
   return bv_get(it->second, expr.type());
 }
-
-/*******************************************************************\
-
-Function: boolbvt::bv_get_unbounded_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 {
@@ -472,18 +413,6 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::get_value
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer boolbvt::get_value(
   const bvt &bv,

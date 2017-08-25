@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set (Flow Insensitive, Sharing)
+
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_FI_H
 
@@ -25,7 +28,10 @@ Author: Daniel Kroening, kroening@kroening.com
 class value_set_fit
 {
 public:
-  value_set_fit()
+  value_set_fit():
+  changed(false)
+  // to_function, to_target_index are set by set_to()
+  // from_function, from_target_index are set by set_from()
   {
   }
 
@@ -236,13 +242,13 @@ public:
 
   bool changed;
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(object_mapt &dest, const object_mapt &src) const;
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(const valuest &new_values);
 
-  // true = added s.th. new
+  // true = added something new
   bool make_union(const value_set_fit &new_values)
   {
     return make_union(new_values.values);

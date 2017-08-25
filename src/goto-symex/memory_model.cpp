@@ -6,21 +6,12 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
-#include <util/std_expr.h>
+/// \file
+/// Memory model for partial order concurrency
 
 #include "memory_model.h"
 
-/*******************************************************************\
-
-Function: memory_model_baset::memory_model_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_expr.h>
 
 memory_model_baset::memory_model_baset(const namespacet &_ns):
   partial_order_concurrencyt(_ns),
@@ -28,33 +19,9 @@ memory_model_baset::memory_model_baset(const namespacet &_ns):
 {
 }
 
-/*******************************************************************\
-
-Function: memory_model_baset::~memory_model_baset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 memory_model_baset::~memory_model_baset()
 {
 }
-
-/*******************************************************************\
-
-Function: memory_model_baset::nondet_bool_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 symbol_exprt memory_model_baset::nondet_bool_symbol(
   const std::string &prefix)
@@ -63,18 +30,6 @@ symbol_exprt memory_model_baset::nondet_bool_symbol(
     "memory_model::choice_"+prefix+std::to_string(var_cnt++),
     bool_typet());
 }
-
-/*******************************************************************\
-
-Function: memory_model_baset::po
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool memory_model_baset::po(event_it e1, event_it e2)
 {
@@ -87,18 +42,6 @@ bool memory_model_baset::po(event_it e1, event_it e2)
     return false;
   }
 }
-
-/*******************************************************************\
-
-Function: memory_model_baset::read_from
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void memory_model_baset::read_from(symex_target_equationt &equation)
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Concrete Goto Program
+
 #ifndef CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 #define CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H
 
@@ -17,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /*! \brief A specialization of goto_program_templatet over
            goto programs in which instructions have codet type.
-    \ingroup gr_goto_programs
 */
 class goto_programt:public goto_program_templatet<codet, exprt>
 {

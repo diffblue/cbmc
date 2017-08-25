@@ -198,14 +198,19 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
   {
     ssize_t nread;
-    size_t i;
     __CPROVER_assume(0<=nread && (size_t)nread<=nbyte);
 
+#if 0
+    size_t i;
     for(i=0; i<nbyte; i++)
     {
       char nondet_char;
       ((char *)buf)[i]=nondet_char;
     }
+#else
+    char nondet_bytes[nbyte];
+    __CPROVER_array_replace((char*)buf, nondet_bytes);
+#endif
 
     __CPROVER_bool error;
     return error ? -1 : nread;

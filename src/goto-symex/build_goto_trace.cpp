@@ -8,6 +8,11 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+/// \file
+/// Traces of GOTO Programs
+
+#include "build_goto_trace.h"
+
 #include <cassert>
 
 #include <util/threeval.h>
@@ -18,20 +23,6 @@ Author: Daniel Kroening
 #include <solvers/prop/prop.h>
 
 #include "partial_order_concurrency.h"
-
-#include "build_goto_trace.h"
-
-/*******************************************************************\
-
-Function: build_full_lhs_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt build_full_lhs_rec(
   const prop_convt &prop_conv,
@@ -110,18 +101,6 @@ exprt build_full_lhs_rec(
   return src_original;
 }
 
-/*******************************************************************\
-
-Function: adjust_lhs_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt adjust_lhs_object(
   const prop_convt &prop_conv,
   const namespacet &ns,
@@ -129,18 +108,6 @@ exprt adjust_lhs_object(
 {
   return nil_exprt();
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,
@@ -220,9 +187,13 @@ void build_goto_trace(
 
     // drop PHI and GUARD assignments altogether
     if(it->is_assignment() &&
-       (SSA_step.assignment_type==symex_target_equationt::PHI ||
-        SSA_step.assignment_type==symex_target_equationt::GUARD))
+       (SSA_step.assignment_type==
+          symex_target_equationt::assignment_typet::PHI ||
+        SSA_step.assignment_type==
+          symex_target_equationt::assignment_typet::GUARD))
+    {
       continue;
+    }
 
     goto_tracet::stepst &steps=time_map[current_time];
     steps.push_back(goto_trace_stept());
@@ -247,10 +218,12 @@ void build_goto_trace(
 
     goto_trace_step.assignment_type=
       (it->is_assignment()&&
-       (SSA_step.assignment_type==symex_targett::VISIBLE_ACTUAL_PARAMETER ||
-        SSA_step.assignment_type==symex_targett::HIDDEN_ACTUAL_PARAMETER))?
-      goto_trace_stept::ACTUAL_PARAMETER:
-      goto_trace_stept::STATE;
+       (SSA_step.assignment_type==
+          symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
+        SSA_step.assignment_type==
+          symex_targett::assignment_typet::HIDDEN_ACTUAL_PARAMETER))?
+      goto_trace_stept::assignment_typet::ACTUAL_PARAMETER:
+      goto_trace_stept::assignment_typet::STATE;
 
     if(SSA_step.original_full_lhs.is_not_nil())
       goto_trace_step.full_lhs=
@@ -290,7 +263,7 @@ void build_goto_trace(
   }
 
   // Now assemble into a single goto_trace.
-  // This expoits sorted-ness of the map.
+  // This exploits sorted-ness of the map.
   for(auto &t_it : time_map)
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 
@@ -311,18 +284,6 @@ void build_goto_trace(
   for(auto &s_it : goto_trace.steps)
     s_it.step_nr=++step_nr;
 }
-
-/*******************************************************************\
-
-Function: build_goto_trace
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void build_goto_trace(
   const symex_target_equationt &target,

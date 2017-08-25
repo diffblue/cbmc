@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_SAT_RESOLUTION_PROOF_H
 #define CPROVER_SOLVERS_SAT_RESOLUTION_PROOF_H
 
