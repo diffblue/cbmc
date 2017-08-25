@@ -43,13 +43,13 @@ public:
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
-  std::list<exprt> axioms;
+  std::vector<exprt> axioms;
 
   // Boolean symbols for the results of some string functions
-  std::list<symbol_exprt> boolean_symbols;
+  std::vector<symbol_exprt> boolean_symbols;
 
   // Symbols used in existential quantifications
-  std::list<symbol_exprt> index_symbols;
+  std::vector<symbol_exprt> index_symbols;
 
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
