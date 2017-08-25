@@ -33,17 +33,13 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  explicit string_constraint_generatort(namespacet _ns):
-    max_string_length(std::numeric_limits<size_t>::max()),
-    force_printable_characters(false),
-    ns(_ns)
-  { }
+  explicit string_constraint_generatort(namespacet _ns): ns(_ns) { }
 
   // Constraints on the maximal length of strings
-  size_t max_string_length;
+  size_t max_string_length=std::numeric_limits<size_t>::max();
 
   // Should we add constraints on the characters
-  bool force_printable_characters;
+  bool force_printable_characters=false;
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
