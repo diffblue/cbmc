@@ -43,13 +43,13 @@ public:
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
-  std::vector<exprt> axioms;
+  const std::vector<exprt> &get_axioms() const;
 
   // Boolean symbols for the results of some string functions
-  const std::vector<symbol_exprt> get_boolean_symbols() const;
+  const std::vector<symbol_exprt> &get_boolean_symbols() const;
 
   /// Symbols used in existential quantifications
-  const std::vector<symbol_exprt>& get_index_symbols() const;
+  const std::vector<symbol_exprt> &get_index_symbols() const;
 
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
@@ -73,7 +73,6 @@ public:
   plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
   // Maps unresolved symbols to the string_exprt that was created for them
-  std::map<irep_idt, string_exprt> unresolved_symbols;
 
   // Set of strings that have been created by the generator
   std::set<string_exprt> created_strings;
@@ -92,6 +91,8 @@ public:
 
 private:
   messaget m_message;
+  std::vector<exprt> axioms;
+  std::map<irep_idt, string_exprt> unresolved_symbols;
   std::vector<symbol_exprt> boolean_symbols;
   std::vector<symbol_exprt> index_symbols;
   static constant_exprt constant_char(int i, const typet &char_type);
@@ -105,7 +106,7 @@ private:
   constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
 
   std::map<function_application_exprt, exprt> function_application_cache;
-  namespacet ns;
+  const namespacet ns;
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 

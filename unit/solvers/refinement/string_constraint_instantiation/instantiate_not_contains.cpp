@@ -152,7 +152,7 @@ SCENARIO("instantiate_not_contains",
     exprt res=generator.add_axioms_for_function_application(func);
     std::string axioms;
     std::vector<string_not_contains_constraintt> nc_axioms;
-    for(auto &axiom : generator.axioms)
+    for(exprt axiom : generator.get_axioms())
     {
       simplify(axiom, ns);
       if(axiom.id()==ID_string_constraint)

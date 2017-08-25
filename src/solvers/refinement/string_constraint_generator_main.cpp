@@ -28,6 +28,11 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 unsigned string_constraint_generatort::next_symbol_id=1;
 
+const std::vector<exprt> &string_constraint_generatort::get_axioms() const
+{
+  return this->axioms;
+}
+
 const std::vector<symbol_exprt>
 &string_constraint_generatort::get_index_symbols() const
 {
@@ -35,9 +40,9 @@ const std::vector<symbol_exprt>
 }
 
 const std::vector<symbol_exprt>
-string_constraint_generatort::get_boolean_symbols() const
+&string_constraint_generatort::get_boolean_symbols() const
 {
-  return boolean_symbols;
+  return this->boolean_symbols;
 }
 
 /// generate constant character expression with character type.

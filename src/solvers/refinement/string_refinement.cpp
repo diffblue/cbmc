@@ -496,7 +496,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(pair.first, pair.second);
   }
 
-  for(exprt &axiom : generator.axioms)
+  for(exprt axiom : generator.get_axioms())
   {
     replace_expr(symbol_resolve, axiom);
     if(axiom.id()==ID_string_constraint)
