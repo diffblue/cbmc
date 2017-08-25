@@ -1252,7 +1252,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
       symbol_exprt catch_var=
         tmp_variable(
           "caught_exception",
-          pointer_typet(catch_type));
+          java_reference_type(catch_type));
       stack.push_back(catch_var);
       code_landingpadt catch_statement(catch_var);
       catch_instruction=catch_statement;
@@ -1673,7 +1673,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
         from_integer(
           std::next(i_it)->address,
           unsignedbv_typet(64));
-      results[0].type()=pointer_typet(void_typet(), 64);
+      results[0].type()=pointer_type(void_typet());
     }
     else if(statement=="ret")
     {
@@ -1698,7 +1698,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
             from_integer(
               jsr_ret_targets[idx],
               unsignedbv_typet(64));
-          address_ptr.type()=pointer_typet(void_typet(), 64);
+          address_ptr.type()=pointer_type(void_typet());
           branch.cond()=equal_exprt(retvar, address_ptr);
           branch.cond().add_source_location()=i_it->source_location;
           branch.then_case()=g;

@@ -13,6 +13,7 @@ Date:   June 2017
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
+#include <util/c_types.h>
 
 #include <goto-programs/goto_functions.h>
 
@@ -221,8 +222,7 @@ codet java_bytecode_instrumentt::check_class_cast(
   binary_predicate_exprt class_cast_check(
     class1, ID_java_instanceof, class2);
 
-  empty_typet voidt;
-  pointer_typet voidptr(voidt);
+  pointer_typet voidptr=pointer_type(empty_typet());
   exprt null_check_op=class1;
   if(null_check_op.type()!=voidptr)
     null_check_op.make_typecast(voidptr);

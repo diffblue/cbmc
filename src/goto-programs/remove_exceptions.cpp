@@ -218,7 +218,7 @@ void remove_exceptionst::add_exceptional_returns(
 
       // initialize the exceptional return with NULL
       symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
-      null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+      null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
       goto_programt::targett t_null=
         goto_program.insert_before(goto_program.instructions.begin());
       t_null->make_assignment();

@@ -700,7 +700,7 @@ void goto_convertt::do_java_new_array(
   if(given_element_type.is_not_nil())
   {
     allocate_data_type=
-      pointer_typet(static_cast<const typet &>(given_element_type));
+      pointer_type(static_cast<const typet &>(given_element_type));
   }
   else
     allocate_data_type=data.type();

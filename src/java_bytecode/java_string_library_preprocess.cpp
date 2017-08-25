@@ -22,6 +22,8 @@ Date:   April 2017
 #include <util/fresh_symbol.h>
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
+#include <util/c_types.h>
+
 #include "java_types.h"
 #include "java_object_factory.h"
 #include "java_utils.h"
@@ -1168,7 +1170,7 @@ codet java_string_library_preprocesst::make_string_to_char_array_code(
 
   // data = new char[]
   exprt data=allocate_fresh_array(
-    pointer_typet(string_expr.content().type()), loc, symbol_table, code);
+    java_reference_type(string_expr.content().type()), loc, symbol_table, code);
 
   // *data = string_expr.content
   dereference_exprt deref_data(data, data.type().subtype());
@@ -1280,7 +1282,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
       struct_type.get_component("value");
     if(!value_comp.is_nil())
     {
-      pointer_typet pointer_type(struct_type);
+      pointer_typet pointer_type=::pointer_type(struct_type);
       dereference_exprt deref(
         typecast_exprt(object, pointer_type), pointer_type.subtype());
       member_exprt deref_value(deref, value_comp.get_name(), value_comp.type());
@@ -1308,7 +1310,7 @@ exprt java_string_library_preprocesst::get_object_at_index(
   int index)
 {
   dereference_exprt deref_objs(argv, argv.type().subtype());
-  pointer_typet empty_pointer((empty_typet()));
+  pointer_typet empty_pointer=pointer_type(empty_typet());
   pointer_typet pointer_of_pointer;
   pointer_of_pointer.copy_to_subtypes(empty_pointer);
   member_exprt data_member(deref_objs, "data", pointer_of_pointer);
@@ -1409,7 +1411,8 @@ exprt java_string_library_preprocesst::make_argument_for_format(
 
     if(name=="string_expr")
     {
-      pointer_typet string_pointer(symbol_typet("java::java.lang.String"));
+      pointer_typet string_pointer=
+        java_reference_type(symbol_typet("java::java.lang.String"));
       typecast_exprt arg_i_as_string(arg_i, string_pointer);
       code_not_null.add(code_assign_java_string_to_string_expr(
         to_string_expr(field_expr), arg_i_as_string, symbol_table));
@@ -1515,7 +1518,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   code_blockt code;
 
   // > Class class1;
-  pointer_typet class_type(symbol_table.lookup("java::java.lang.Class").type);
+  pointer_typet class_type=
+    java_reference_type(symbol_table.lookup("java::java.lang.Class").type);
   symbolt class1_sym=get_fresh_aux_symbol(
     class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
   symbol_exprt class1=class1_sym.symbol_expr();
@@ -1551,8 +1555,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   code.add(code_assignt(string_expr_sym1, string_expr1));
 
   // string1 = (String*) string_expr
-  pointer_typet string_ptr_type(
-    symbol_table.lookup("java::java.lang.String").type);
+  pointer_typet string_ptr_type=
+    java_reference_type(symbol_table.lookup("java::java.lang.String").type);
   exprt string1=allocate_fresh_string(string_ptr_type, loc, symbol_table, code);
   code.add(
     code_assign_string_expr_to_new_java_string(
