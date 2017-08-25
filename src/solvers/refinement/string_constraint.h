@@ -144,7 +144,7 @@ extern inline string_constraintt &to_string_constraint(exprt &expr)
 /// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
-inline static std::string from_expr(
+inline std::string from_expr(
   const namespacet &ns,
   const irep_idt &identifier,
   const string_constraintt &expr)
@@ -218,7 +218,7 @@ public:
 /// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
-inline static std::string from_expr(
+inline std::string from_expr(
   const namespacet &ns,
   const irep_idt &identifier,
   const string_not_contains_constraintt &expr)
