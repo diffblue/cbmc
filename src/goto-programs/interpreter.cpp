@@ -1049,18 +1049,6 @@ exprt interpretert::get_value(const irep_idt &id)
   return get_value(get_type, integer2size_t(whole_lhs_object_address));
 }
 
-void interpreter(
-  const symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  message_handlert &message_handler)
-{
-  interpretert interpreter(
-    symbol_table,
-    goto_functions,
-    message_handler);
-  interpreter();
-}
-
 /// Prints the current state of the memory map Since messaget mdofifies class
 /// members, print functions are nonconst
 void interpretert::print_memory(bool input_flags)
@@ -1079,3 +1067,15 @@ void interpretert::print_memory(bool input_flags)
     debug() << eom;
   }
 }
+
+void interpreter(
+  const goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  interpretert interpreter(
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
+  interpreter();
+}
+

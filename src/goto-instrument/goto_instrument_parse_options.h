@@ -116,7 +116,12 @@ protected:
   bool partial_inlining_done;
   bool remove_returns_done;
 
-  goto_functionst goto_functions;
+  goto_modelt goto_model;
+
+  ui_message_handlert::uit get_ui()
+  {
+    return ui_message_handler.get_ui();
+  }
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H

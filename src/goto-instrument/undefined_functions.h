@@ -17,14 +17,12 @@ Date: July 2016
 #include <iosfwd>
 
 class namespacet;
-
-class goto_functionst;
+class goto_modelt;
 
 void list_undefined_functions(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
-  std::ostream &os);
+  const goto_modelt &,
+  std::ostream &);
 
-void undefined_function_abort_path(goto_functionst &goto_functions);
+void undefined_function_abort_path(goto_modelt &);
 
 #endif

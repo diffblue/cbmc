@@ -17,11 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "function.h"
 
 void branch(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const irep_idt &id)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     // don't instrument our internal functions
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
@@ -53,7 +52,7 @@ void branch(
 
         goto_programt::targett t1=body.insert_after(i_it);
         t1->make_function_call(
-          function_to_call(symbol_table, id, "taken"));
+          function_to_call(goto_model.symbol_table, id, "taken"));
         t1->function=f_it->first;
 
         goto_programt::targett t2=body.insert_after(t1);
@@ -62,7 +61,7 @@ void branch(
 
         goto_programt::targett t3=body.insert_after(t2);
         t3->make_function_call(
-          function_to_call(symbol_table, id, "not-taken"));
+          function_to_call(goto_model.symbol_table, id, "not-taken"));
         t3->function=f_it->first;
         i_it->targets.clear();
         i_it->targets.push_back(t3);

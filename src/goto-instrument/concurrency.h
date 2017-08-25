@@ -15,11 +15,8 @@ Date: February 2006
 #define CPROVER_GOTO_INSTRUMENT_CONCURRENCY_H
 
 #include <pointer-analysis/value_sets.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
-void concurrency(
-  value_setst &value_sets,
-  class symbol_tablet &symbol_table,
-  goto_functionst &goto_functions);
+void concurrency(value_setst &, goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CONCURRENCY_H

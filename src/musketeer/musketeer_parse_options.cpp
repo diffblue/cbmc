@@ -85,11 +85,11 @@ int goto_fence_inserter_parse_optionst::doit()
   {
     register_languages();
 
-    goto_functionst goto_functions;
+    goto_modelt goto_model;
 
-    get_goto_program(goto_functions);
+    get_goto_program(goto_model);
 
-    instrument_goto_program(goto_functions);
+    instrument_goto_program(goto_model);
 
     // write new binary?
     if(cmdline.args.size()==2)
@@ -97,7 +97,7 @@ int goto_fence_inserter_parse_optionst::doit()
       status() << "Writing GOTO program to " << cmdline.args[1] << eom;
 
       if(write_goto_binary(
-        cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
+        cmdline.args[1], goto_model, get_message_handler()))
         return 1;
       else
         return 0;
@@ -132,17 +132,17 @@ int goto_fence_inserter_parse_optionst::doit()
 }
 
 void goto_fence_inserter_parse_optionst::get_goto_program(
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   status() << "Reading GOTO program from " << cmdline.args[0] << eom;
 
-  if(read_goto_binary(cmdline.args[0],
-    symbol_table, goto_functions, get_message_handler()))
+  if(read_goto_binary(
+       cmdline.args[0], goto_model, get_message_handler()))
     throw 0;
 }
 
 void goto_fence_inserter_parse_optionst::instrument_goto_program(
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   optionst options;
 
@@ -155,9 +155,9 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 
   // we add the library, as some analyses benefit
 
-  link_to_library(symbol_table, goto_functions, ui_message_handler);
+  link_to_library(goto_model, ui_message_handler);
 
-  namespacet ns(symbol_table);
+  namespacet ns(goto_model.symbol_table);
 
   if( cmdline.isset("mm")
       || cmdline.isset("all-shared")
@@ -171,27 +171,26 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
       status() << "remove soundly function pointers" << eom;
       remove_function_pointers(
         get_message_handler(),
-        symbol_table,
-        goto_functions,
+        goto_model,
         cmdline.isset("pointer-check"));
     }
 
     if(cmdline.isset("async"))
     {
       status() << "Replace pthread_creates by __CPROVER_ASYNC_0:" << eom;
-      replace_async(ns, goto_functions);
-      goto_functions.update();
+      replace_async(goto_model);
+      goto_model.goto_functions.update();
     }
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, get_message_handler());
 
     if(cmdline.isset("const-function-pointer-propagation"))
     {
       /* propagate const pointers to functions */
       status() << "Propagate Constant Function Pointers" << eom;
-      propagate_const_function_pointers(symbol_table, goto_functions,
+      propagate_const_function_pointers(goto_model,
         get_message_handler());
     }
 
@@ -201,8 +200,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     status() << "Function Pointer Removal" << eom;
     remove_function_pointers(
       get_message_handler(),
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.isset("pointer-check");
 #endif
 
@@ -214,18 +212,18 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 #endif
 
 #ifndef LOCAL_MAY
-    value_set_analysis(goto_functions);
+    value_set_analysis(goto_model.goto_functions);
 #endif
 
     status() << "Removing asm code" << eom;
-    remove_asm(symbol_table, goto_functions);
-    goto_functions.update();
+    remove_asm(goto_model);
+    goto_model.goto_functions.update();
 
     if(cmdline.isset("all-shared"))
     {
       status() << "Shared variables accesses detection" << eom;
-      fence_all_shared(get_message_handler(), value_set_analysis, symbol_table,
-        goto_functions);
+      fence_all_shared(get_message_handler(), value_set_analysis,
+        goto_model);
       // simple analysis, coupled with script to insert;
       // does not transform the goto-binary
       return;
@@ -234,7 +232,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     {
       status() << "Shared variables accesses detection (CF)" << eom;
       fence_all_shared_aeg(get_message_handler(), value_set_analysis,
-        symbol_table, goto_functions);
+        goto_model);
       // simple analysis, coupled with script to insert;
       // does not transform the goto-binary
       return;
@@ -243,8 +241,8 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
     {
       status() << "Detection of variables declared volatile" << eom;
 
-      fence_volatile(get_message_handler(), value_set_analysis, symbol_table,
-        goto_functions);
+      fence_volatile(get_message_handler(), value_set_analysis,
+        goto_model);
       // simple analysis, coupled with script to insert;
       // does not transform the goto-binary
       return;
@@ -263,8 +261,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
 
       fence_pensieve(
         value_set_analysis,
-        symbol_table,
-        goto_functions,
+        goto_model,
         unwind_loops,
         max_po_trans,
         !cmdline.isset("no-po-rendering"),
@@ -282,7 +279,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
       memory_modelt model;
 
       status() << "Fence detection for " << mm
-        << " via critical cycles and ILP" << eom;
+               << " via critical cycles and ILP" << eom;
 
       // strategy of instrumentation
       instrumentation_strategyt inst_strategy;
@@ -355,8 +352,7 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
         fence_weak_memory(
           model,
           value_set_analysis,
-          symbol_table,
-          goto_functions,
+          goto_model,
           cmdline.isset("scc"),
           inst_strategy,
           unwind_loops,
@@ -378,16 +374,16 @@ void goto_fence_inserter_parse_optionst::instrument_goto_program(
   }
 
   // add failed symbols
-  add_failed_symbols(symbol_table);
+  add_failed_symbols(goto_model.symbol_table);
 
   // recalculate numbers, etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 
   // add loop ids
-  goto_functions.compute_loop_numbers();
+  goto_model.goto_functions.compute_loop_numbers();
 
   // label the assertions
-  label_properties(goto_functions);
+  label_properties(goto_model);
 }
 
 /// display command line help

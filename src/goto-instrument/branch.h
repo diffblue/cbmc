@@ -12,11 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_BRANCH_H
 #define CPROVER_GOTO_INSTRUMENT_BRANCH_H
 
-#include <goto-programs/goto_functions.h>
+#include <util/irep.h>
+
+class goto_modelt;
 
 void branch(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &,
   const irep_idt &id);
 
 #endif // CPROVER_GOTO_INSTRUMENT_BRANCH_H

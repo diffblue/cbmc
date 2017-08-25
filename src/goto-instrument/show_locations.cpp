@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
+#include <goto-programs/goto_model.h>
+
 void show_locations(
   ui_message_handlert::uit ui,
   const irep_idt function_id,
@@ -64,11 +66,8 @@ void show_locations(
 
 void show_locations(
   ui_message_handlert::uit ui,
-  const goto_functionst &goto_functions)
+  const goto_modelt &goto_model)
 {
-  for(goto_functionst::function_mapt::const_iterator
-      it=goto_functions.function_map.begin();
-      it!=goto_functions.function_map.end();
-      it++)
-    show_locations(ui, it->first, it->second.body);
+  for(const auto &f : goto_model.goto_functions.function_map)
+    show_locations(ui, f.first, f.second.body);
 }

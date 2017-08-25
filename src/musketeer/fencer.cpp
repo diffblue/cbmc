@@ -25,8 +25,7 @@ Author: Vincent Nimal
 void fence_weak_memory(
   memory_modelt model,
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   bool SCC,
   instrumentation_strategyt event_strategy,
   unsigned unwinding_bound,
@@ -50,10 +49,10 @@ void fence_weak_memory(
   message.status() << "--------" << messaget::eom;
 
   // all access to shared variables is pushed into assignments
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
       f_it->first!=goto_functionst::entry_point())
-      introduce_temporaries(value_sets, symbol_table, f_it->first,
+      introduce_temporaries(value_sets, goto_model.symbol_table, f_it->first,
         f_it->second.body,
 #ifdef LOCAL_MAY
         f_it->second,
@@ -62,7 +61,7 @@ void fence_weak_memory(
   message.status() << "Temporary variables added" << messaget::eom;
 
   unsigned max_thds = 0;
-  instrumentert instrumenter(symbol_table, goto_functions, message);
+  instrumentert instrumenter(goto_model, message);
   max_thds=instrumenter.goto2graph_cfg(value_sets, model,
     no_dependencies, duplicate_body);
   ++max_thds;
@@ -167,11 +166,10 @@ void fence_weak_memory(
      from here*/
 
   /* removes potential skips */
-  Forall_goto_functions(f_it, goto_functions)
-    remove_skip(f_it->second.body);
+  remove_skip(goto_model);
 
   // update counters etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 
   // prints the whole abstract graph
   if(print_graph)

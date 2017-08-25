@@ -400,9 +400,7 @@ void code_contractst::operator()()
   goto_functions.update();
 }
 
-void code_contracts(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void code_contracts(goto_modelt &goto_model)
 {
-  code_contractst(symbol_table, goto_functions)();
+  code_contractst(goto_model.symbol_table, goto_model.goto_functions)();
 }

@@ -18,8 +18,7 @@ Author: Vincent Nimal
 #include <util/namespace.h>
 #include <util/message.h>
 
-#include <goto-programs/goto_functions.h>
-#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
 
 #include <map>
 #include <list>
@@ -142,10 +141,11 @@ protected:
   };
 
 public:
-  const_function_pointer_propagationt(symbol_tablet &_symbol_table,
-    goto_functionst &_goto_functions, messaget &_message)
-    :symbol_table(_symbol_table), goto_functions(_goto_functions),
-      ns(_symbol_table), message(_message)
+  const_function_pointer_propagationt(
+    goto_modelt &_goto_model, messaget &_message):
+    symbol_table(_goto_model.symbol_table),
+    goto_functions(_goto_model.goto_functions),
+    ns(_goto_model.symbol_table), message(_message)
   {}
 
   /* Note that it only propagates from MAIN, following the CFG, without
@@ -556,13 +556,12 @@ void const_function_pointer_propagationt::propagate(
 }
 
 void propagate_const_function_pointers(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   messaget message(message_handler);
-  const_function_pointer_propagationt propagation(symbol_table,
-    goto_functions, message);
+  const_function_pointer_propagationt propagation(
+    goto_model, message);
   propagation.propagate();
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }

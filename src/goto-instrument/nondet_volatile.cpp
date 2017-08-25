@@ -119,12 +119,10 @@ void nondet_volatile(
   }
 }
 
-void nondet_volatile(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void nondet_volatile(goto_modelt &goto_model)
 {
-  Forall_goto_functions(f_it, goto_functions)
-    nondet_volatile(symbol_table, f_it->second.body);
+  Forall_goto_functions(f_it, goto_model.goto_functions)
+    nondet_volatile(goto_model.symbol_table, f_it->second.body);
 
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }

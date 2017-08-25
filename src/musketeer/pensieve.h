@@ -16,14 +16,12 @@ Author: Vincent Nimal
 #include <goto-instrument/wmm/weak_memory.h>
 
 class value_setst;
-class goto_functionst;
-class symbol_tablet;
+class goto_modelt;
 class message_handlert;
 
 void fence_pensieve(
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &,
   unsigned unwinding_bound,
   unsigned max_po_trans,
   bool render_po,

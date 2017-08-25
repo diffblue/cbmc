@@ -15,8 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <langapi/language_ui.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 
@@ -52,7 +50,7 @@ class optionst;
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit() override;
@@ -72,6 +70,11 @@ protected:
   bool set_properties();
 
   void eval_verbosity();
+
+  ui_message_handlert::uit get_ui()
+  {
+    return ui_message_handler.get_ui();
+  }
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H

@@ -14,12 +14,10 @@ Date: December 2012
 #ifndef CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H
 #define CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
-void count_eloc(const goto_functionst &goto_functions);
-
-void list_eloc(const goto_functionst &goto_functions);
-
-void print_path_lengths(const goto_functionst &goto_functions);
+void count_eloc(const goto_modelt &);
+void list_eloc(const goto_modelt &);
+void print_path_lengths(const goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H

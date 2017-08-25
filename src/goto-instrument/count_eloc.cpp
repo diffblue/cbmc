@@ -26,10 +26,10 @@ typedef std::unordered_map<irep_idt, linest, irep_id_hash> filest;
 typedef std::unordered_map<irep_idt, filest, irep_id_hash> working_dirst;
 
 static void collect_eloc(
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   working_dirst &dest)
 {
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     forall_goto_program_instructions(it, f_it->second.body)
     {
@@ -43,12 +43,12 @@ static void collect_eloc(
   }
 }
 
-void count_eloc(const goto_functionst &goto_functions)
+void count_eloc(const goto_modelt &goto_model)
 {
   std::size_t eloc=0;
 
   working_dirst eloc_map;
-  collect_eloc(goto_functions, eloc_map);
+  collect_eloc(goto_model, eloc_map);
 
   for(const std::pair<irep_idt, filest> &files : eloc_map)
     for(const std::pair<irep_idt, linest> &lines : files.second)
@@ -57,10 +57,10 @@ void count_eloc(const goto_functionst &goto_functions)
   std::cout << "Effective lines of code: " << eloc << '\n';
 }
 
-void list_eloc(const goto_functionst &goto_functions)
+void list_eloc(const goto_modelt &goto_model)
 {
   working_dirst eloc_map;
-  collect_eloc(goto_functions, eloc_map);
+  collect_eloc(goto_model, eloc_map);
 
   for(const std::pair<irep_idt, filest> &files : eloc_map)
     for(const std::pair<irep_idt, linest> &lines : files.second)
@@ -74,13 +74,13 @@ void list_eloc(const goto_functionst &goto_functions)
     }
 }
 
-void print_path_lengths(const goto_functionst &goto_functions)
+void print_path_lengths(const goto_modelt &goto_model)
 {
-  const irep_idt &entry_point=goto_functions.entry_point();
+  const irep_idt &entry_point=goto_model.goto_functions.entry_point();
   goto_functionst::function_mapt::const_iterator start=
-    goto_functions.function_map.find(entry_point);
+    goto_model.goto_functions.function_map.find(entry_point);
 
-  if(start==goto_functions.function_map.end() ||
+  if(start==goto_model.goto_functions.function_map.end() ||
      !start->second.body_available())
   {
     std::cout << "No entry point found, path length undefined\n";
@@ -98,7 +98,7 @@ void print_path_lengths(const goto_functionst &goto_functions)
 
   typedef cfg_baset<visited_cfg_nodet> cfgt;
   cfgt cfg;
-  cfg(goto_functions);
+  cfg(goto_model.goto_functions);
 
   const goto_programt &start_program=start->second.body;
 
@@ -113,7 +113,7 @@ void print_path_lengths(const goto_functionst &goto_functions)
             << " instructions\n";
 
   std::size_t n_loops=0, loop_ins=0;
-  forall_goto_functions(gf_it, goto_functions)
+  forall_goto_functions(gf_it, goto_model.goto_functions)
     forall_goto_program_instructions(i_it, gf_it->second.body)
       // loops or recursion
       if(i_it->is_backwards_goto() ||

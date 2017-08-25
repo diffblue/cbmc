@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/options.h>
+#include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
@@ -23,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <langapi/language_ui.h>
+
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/safety_checker.h>
 

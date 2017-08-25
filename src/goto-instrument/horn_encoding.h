@@ -14,11 +14,10 @@ Author:
 
 #include <iosfwd>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 void horn_encoding(
-  const goto_functionst &,
-  const namespacet &,
+  const goto_modelt &,
   std::ostream &out);
 
 #endif // CPROVER_GOTO_INSTRUMENT_HORN_ENCODING_H

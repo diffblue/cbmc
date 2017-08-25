@@ -19,14 +19,12 @@ Author: Vincent Nimal
 
 class message_handlert;
 class value_setst;
-class goto_functionst;
-class symbol_tablet;
+class goto_modelt;
 
 void fence_weak_memory(
   memory_modelt model,
-  value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  value_setst &,
+  goto_modelt &,
   bool SCC,
   instrumentation_strategyt event_strategy,
   unsigned unwinding_bound,
@@ -42,7 +40,7 @@ void fence_weak_memory(
   bool hide_internals,
   bool print_graph,
   infer_modet mode,
-  message_handlert &message_handler,
+  message_handlert &,
   bool ignore_arrays);
 
 #endif // CPROVER_MUSKETEER_FENCER_H

@@ -12,17 +12,14 @@ Date: December 2013
 #ifndef CPROVER_MUSKETEER_REPLACE_ASYNC_H
 #define CPROVER_MUSKETEER_REPLACE_ASYNC_H
 
-#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
 #include <util/std_code.h>
 
-class goto_functionst;
-class namespacet;
-
-void replace_async(
-  const namespacet &ns,
-  goto_functionst &goto_functions)
+void replace_async(goto_modelt &goto_model)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  const namespacet ns(goto_model.symbol_table);
+
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     goto_programt &program=f_it->second.body;
 

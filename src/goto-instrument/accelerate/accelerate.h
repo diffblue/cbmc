@@ -30,13 +30,12 @@ class acceleratet
 {
  public:
   acceleratet(goto_programt &_program,
-              goto_functionst &_goto_functions,
-              symbol_tablet &_symbol_table,
-              bool _use_z3) :
+              goto_modelt &_goto_model,
+              bool _use_z3):
       program(_program),
-      goto_functions(_goto_functions),
-      symbol_table(_symbol_table),
-      ns(symbol_table),
+      goto_functions(_goto_model.goto_functions),
+      symbol_table(_goto_model.symbol_table),
+      ns(_goto_model.symbol_table),
       utils(symbol_table, goto_functions),
       use_z3(_use_z3)
   {
@@ -117,8 +116,7 @@ class acceleratet
 };
 
 void accelerate_functions(
-  goto_functionst &functions,
-  symbol_tablet &ns,
+  goto_modelt &,
   bool use_z3);
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H

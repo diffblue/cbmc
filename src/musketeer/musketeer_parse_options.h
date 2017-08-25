@@ -16,7 +16,7 @@ Author:
 #include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 #define GOTO_FENCE_INSERTER_OPTIONS \
   "(scc)(one-event-per-cycle)(verbosity):" \
@@ -47,11 +47,9 @@ protected:
 
   virtual void register_languages();
 
-  void get_goto_program(
-    goto_functionst &goto_functions);
+  void get_goto_program(goto_modelt &);
 
-  void instrument_goto_program(
-    goto_functionst &goto_functions);
+  void instrument_goto_program(goto_modelt &);
 
   void set_verbosity();
 };

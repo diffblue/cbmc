@@ -650,14 +650,13 @@ int acceleratet::accelerate_loops()
 
 
 void accelerate_functions(
-  goto_functionst &functions,
-  symbol_tablet &symbol_table,
+  goto_modelt &goto_model,
   bool use_z3)
 {
-  Forall_goto_functions(it, functions)
+  Forall_goto_functions(it, goto_model.goto_functions)
   {
     std::cout << "Accelerating function " << it->first << '\n';
-    acceleratet accelerate(it->second.body, functions, symbol_table, use_z3);
+    acceleratet accelerate(it->second.body, goto_model, use_z3);
 
     int num_accelerated=accelerate.accelerate_loops();
 

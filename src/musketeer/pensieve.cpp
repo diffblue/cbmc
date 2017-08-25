@@ -18,8 +18,7 @@ Author: Vincent Nimal
 
 void fence_pensieve(
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   unsigned unwinding_bound,
   unsigned input_max_po_trans,
   bool render_po,
@@ -33,10 +32,10 @@ void fence_pensieve(
   message.status() << "--------" << messaget::eom;
 
   // all access to shared variables is pushed into assignments
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->first!=CPROVER_PREFIX "initialize" &&
       f_it->first!=goto_functionst::entry_point())
-      introduce_temporaries(value_sets, symbol_table, f_it->first,
+      introduce_temporaries(value_sets, goto_model.symbol_table, f_it->first,
         f_it->second.body,
 #ifdef LOCAL_MAY
         f_it->second,
@@ -46,7 +45,7 @@ void fence_pensieve(
 
   unsigned max_thds = 0;
 
-  instrumenter_pensievet instrumenter(symbol_table, goto_functions, message);
+  instrumenter_pensievet instrumenter(goto_model, message);
   max_thds=instrumenter.goto2graph_cfg(value_sets, Power, true, no_loop);
   message.status() << "Abstract event graph computed" << messaget::eom;
 
@@ -56,7 +55,7 @@ void fence_pensieve(
     instrumenter.set_parameters_collection(max_thds);
 
   /* necessary for correct printings */
-  namespacet ns(symbol_table);
+  namespacet ns(goto_model.symbol_table);
 
   if(naive_mode)
     instrumenter.collect_pairs_naive(ns);
@@ -64,9 +63,9 @@ void fence_pensieve(
     instrumenter.collect_pairs(ns);
 
   /* removes potential skips */
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     remove_skip(f_it->second.body);
 
   // update counters etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }

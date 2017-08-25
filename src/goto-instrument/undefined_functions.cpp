@@ -15,22 +15,25 @@ Date: July 2016
 
 #include <ostream>
 
-#include <goto-programs/goto_functions.h>
+#include <util/invariant.h>
+
+#include <goto-programs/goto_model.h>
 
 void list_undefined_functions(
-  const goto_functionst &goto_functions,
-  const namespacet &ns,
+  const goto_modelt &goto_model,
   std::ostream &os)
 {
-  forall_goto_functions(it, goto_functions)
+  const namespacet ns(goto_model.symbol_table);
+
+  forall_goto_functions(it, goto_model.goto_functions)
     if(!ns.lookup(it->first).is_macro &&
        !it->second.body_available())
       os << it->first << '\n';
 }
 
-void undefined_function_abort_path(goto_functionst &goto_functions)
+void undefined_function_abort_path(goto_modelt &goto_model)
 {
-  Forall_goto_functions(it, goto_functions)
+  Forall_goto_functions(it, goto_model.goto_functions)
     Forall_goto_program_instructions(iit, it->second.body)
     {
       goto_programt::instructiont &ins=*iit;
@@ -47,8 +50,10 @@ void undefined_function_abort_path(goto_functionst &goto_functions)
         to_symbol_expr(call.function()).get_identifier();
 
       goto_functionst::function_mapt::const_iterator entry=
-        goto_functions.function_map.find(function);
-      assert(entry!=goto_functions.function_map.end());
+        goto_model.goto_functions.function_map.find(function);
+      DATA_INVARIANT(
+        entry!=goto_model.goto_functions.function_map.end(),
+        "called function must be in function_map");
 
       if(entry->second.body_available())
         continue;

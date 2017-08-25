@@ -108,10 +108,11 @@ public:
   explicit simple_insertiont(
     messaget &_message,
     value_setst &_value_sets,
-    const symbol_tablet &_symbol_table,
-    const goto_functionst &_goto_functions)
-    :message(_message), value_sets(_value_sets), symbol_table(_symbol_table),
-      ns(_symbol_table), goto_functions(_goto_functions)
+    const goto_modelt &_goto_model):
+    message(_message), value_sets(_value_sets),
+    symbol_table(_goto_model.symbol_table),
+    ns(_goto_model.symbol_table),
+    goto_functions(_goto_model.goto_functions)
   {}
 
   virtual ~simple_insertiont() {}
@@ -133,9 +134,8 @@ public:
   fence_all_sharedt(
     messaget &_message,
     value_setst &_value_sets,
-    const symbol_tablet &_symbol_table,
-    const goto_functionst &_goto_functions)
-    :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
+    const goto_modelt &_goto_model):
+    simple_insertiont(_message, _value_sets, _goto_model)
   {}
 };
 
@@ -155,9 +155,8 @@ public:
   fence_all_shared_aegt(
     messaget &_message,
     value_setst &_value_sets,
-    const symbol_tablet &_symbol_table,
-    const goto_functionst &_goto_functions)
-    :fence_all_sharedt(_message, _value_sets, _symbol_table, _goto_functions)
+    const goto_modelt &_goto_model):
+    fence_all_sharedt(_message, _value_sets, _goto_model)
   {}
 };
 
@@ -172,9 +171,8 @@ public:
   fence_volatilet(
     messaget &_message,
     value_setst &_value_sets,
-    const symbol_tablet &_symbol_table,
-    const goto_functionst &_goto_functions)
-    :simple_insertiont(_message, _value_sets, _symbol_table, _goto_functions)
+    const goto_modelt &_goto_model):
+    simple_insertiont(_message, _value_sets, _goto_model)
   {}
 };
 
@@ -565,35 +563,29 @@ void fence_all_shared_aegt::fence_all_shared_aeg_explore(
 void fence_all_shared(
   message_handlert &message_handler,
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   messaget message(message_handler);
-  fence_all_sharedt instrumenter(message, value_sets, symbol_table,
-    goto_functions);
+  fence_all_sharedt instrumenter(message, value_sets, goto_model);
   instrumenter.do_it();
 }
 
 void fence_all_shared_aeg(
   message_handlert &message_handler,
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   messaget message(message_handler);
-  fence_all_shared_aegt instrumenter(message, value_sets, symbol_table,
-    goto_functions);
+  fence_all_shared_aegt instrumenter(message, value_sets, goto_model);
   instrumenter.do_it();
 }
 
 void fence_volatile(
   message_handlert &message_handler,
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   messaget message(message_handler);
-  fence_volatilet instrumenter(message, value_sets, symbol_table,
-    goto_functions);
+  fence_volatilet instrumenter(message, value_sets, goto_model);
   instrumenter.do_it();
 }
