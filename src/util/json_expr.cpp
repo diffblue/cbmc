@@ -84,6 +84,10 @@ json_objectt json(const source_locationt &location)
 {
   json_objectt result;
 
+  if(!location.get_working_directory().empty())
+    result["workingDirectory"]=
+      json_stringt(id2string(location.get_working_directory()));
+
   if(!location.get_file().empty())
     result["file"]=json_stringt(id2string(location.get_file()));
 
