@@ -2776,6 +2776,7 @@ void java_bytecode_convert_method(
     "nondetDouble",
     "nondetWithNull",
     "nondetWithoutNull",
+    "notModelled",
   };
 
   if(std::regex_match(
