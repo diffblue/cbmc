@@ -21,7 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <java_bytecode/java_bytecode_language.h>
 #include <jsil/jsil_language.h>
 
-#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/get_goto_model.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
@@ -58,7 +58,7 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv):
   parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "GOTO-ANALYZER " CBMC_VERSION)
 {
 }
@@ -160,8 +160,14 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
+  try
+  {
+    goto_model=get_goto_model(cmdline, get_message_handler());
+  }
+  catch(...)
+  {
     return 6;
+  }
 
   if(process_goto_program(options))
     return 6;

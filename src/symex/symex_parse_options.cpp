@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
 
-#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/get_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
@@ -59,7 +59,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "Symex " CBMC_VERSION)
 {
 }
@@ -137,8 +137,14 @@ int symex_parse_optionst::doit()
 
   eval_verbosity();
 
-  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
+  try
+  {
+    goto_model=get_goto_model(cmdline, get_message_handler());
+  }
+  catch(...)
+  {
     return 6;
+  }
 
   if(process_goto_program(options))
     return 6;
@@ -341,41 +347,15 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
 
     if(cmdline.isset("cover"))
     {
-      std::string criterion=cmdline.get_value("cover");
-
-      coverage_criteriont c;
-
-      if(criterion=="assertion" || criterion=="assertions")
-        c=coverage_criteriont::ASSERTION;
-      else if(criterion=="path" || criterion=="paths")
-        c=coverage_criteriont::PATH;
-      else if(criterion=="branch" || criterion=="branches")
-        c=coverage_criteriont::BRANCH;
-      else if(criterion=="location" || criterion=="locations")
-        c=coverage_criteriont::LOCATION;
-      else if(criterion=="decision" || criterion=="decisions")
-        c=coverage_criteriont::DECISION;
-      else if(criterion=="condition" || criterion=="conditions")
-        c=coverage_criteriont::CONDITION;
-      else if(criterion=="mcdc")
-        c=coverage_criteriont::MCDC;
-      else if(criterion=="cover")
-        c=coverage_criteriont::COVER;
-      else
-      {
-        error() << "unknown coverage criterion" << eom;
-        return true;
-      }
-
       status() << "Instrumenting coverage goals" << eom;
-      instrument_cover_goals(symbol_table, goto_model.goto_functions, c);
-      goto_model.goto_functions.update();
+      if(instrument_cover_goals(cmdline, goto_model, get_message_handler()))
+        return true;
     }
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_model.goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return true;
     }
 

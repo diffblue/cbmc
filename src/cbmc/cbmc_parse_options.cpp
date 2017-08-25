@@ -25,7 +25,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/c_preprocess.h>
 
+#include <goto-programs/convert_nondet.h>
+#include <goto-programs/get_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/goto_inline.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/loop_ids.h>
+#include <goto-programs/mm_io.h>
+#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
@@ -35,20 +42,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_static_init_loops.h>
-#include <goto-programs/mm_io.h>
-#include <goto-programs/goto_inline.h>
-#include <goto-programs/show_properties.h>
+#include <goto-programs/replace_java_nondet.h>
 #include <goto-programs/set_properties.h>
-#include <goto-programs/read_goto_binary.h>
+#include <goto-programs/show_goto_functions.h>
+#include <goto-programs/show_symbol_table.h>
+#include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-#include <goto-programs/loop_ids.h>
-#include <goto-programs/link_to_library.h>
-#include <goto-programs/remove_skip.h>
-#include <goto-programs/show_goto_functions.h>
-#include <goto-programs/replace_java_nondet.h>
-#include <goto-programs/convert_nondet.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -71,7 +73,7 @@ Author: Daniel Kroening, kroening@kroening.com
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS, argc, argv),
   xml_interfacet(cmdline),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
 {
 }
@@ -82,7 +84,7 @@ cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   const std::string &extra_options):
   parse_options_baset(CBMC_OPTIONS+extra_options, argc, argv),
   xml_interfacet(cmdline),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
 {
 }
@@ -470,7 +472,7 @@ int cbmc_parse_optionst::doit()
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(ui_message_handler)?8:0;
+    return test_c_preprocessor(get_message_handler())?8:0;
 
   if(cmdline.isset("preprocess"))
   {
@@ -478,12 +480,56 @@ int cbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  goto_functionst goto_functions;
+  if(cmdline.isset("show-parse-tree"))
+  {
+    if(cmdline.args.size()!=1 ||
+       is_goto_binary(cmdline.args[0]))
+    {
+      error() << "Please give exactly one source file" << eom;
+      return 6;
+    }
 
-  expr_listt bmc_constraints;
+    std::string filename=cmdline.args[0];
 
-  int get_goto_program_ret=
-    get_goto_program(options, bmc_constraints, goto_functions);
+    #ifdef _MSC_VER
+    std::ifstream infile(widen(filename));
+    #else
+    std::ifstream infile(filename);
+    #endif
+
+    if(!infile)
+    {
+      error() << "failed to open input file `"
+              << filename << "'" << eom;
+      return 6;
+    }
+
+    std::unique_ptr<languaget> language=
+      get_language_from_filename(filename);
+
+    if(language==nullptr)
+    {
+      error() << "failed to figure out type of file `"
+              <<  filename << "'" << eom;
+      return 6;
+    }
+
+    language->get_language_options(cmdline);
+    language->set_message_handler(get_message_handler());
+
+    status() << "Parsing " << filename << eom;
+
+    if(language->parse(infile, filename))
+    {
+      error() << "PARSING ERROR" << eom;
+      return 6;
+    }
+
+    language->show_parse(std::cout);
+    return 0;
+  }
+
+  int get_goto_program_ret=get_goto_program(options);
 
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
@@ -491,26 +537,28 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("show-claims") || // will go away
      cmdline.isset("show-properties")) // use this one
   {
-    const namespacet ns(symbol_table);
-    show_properties(ns, get_ui(), goto_functions);
+    show_properties(goto_model, ui_message_handler.get_ui());
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  if(set_properties(goto_functions))
+  if(set_properties())
     return 7; // should contemplate EX_USAGE from sysexits.h
 
   // unwinds <clinit> loops to number of enum elements
   // side effect: add this as explicit unwind to unwind set
   if(options.get_bool_option("java-unwind-enum-static"))
     remove_static_init_loops(
-      symbol_table,
-      goto_functions,
+      goto_model.symbol_table,
+      goto_model.goto_functions,
       options,
-      ui_message_handler);
+      get_message_handler());
 
   // get solver
-  cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
-  cbmc_solvers.set_ui(get_ui());
+  cbmc_solverst cbmc_solvers(
+    options,
+    goto_model.symbol_table,
+    get_message_handler());
+  cbmc_solvers.set_ui(ui_message_handler.get_ui());
 
   std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
 
@@ -527,21 +575,25 @@ int cbmc_parse_optionst::doit()
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
 
-  bmct bmc(options, symbol_table, ui_message_handler, prop_conv);
+  bmct bmc(
+    options,
+    goto_model.symbol_table,
+    get_message_handler(),
+    prop_conv);
 
   // do actual BMC
-  return do_bmc(bmc, goto_functions);
+  return do_bmc(bmc);
 }
 
-bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)
+bool cbmc_parse_optionst::set_properties()
 {
   try
   {
     if(cmdline.isset("claim")) // will go away
-      ::set_properties(goto_functions, cmdline.get_values("claim"));
+      ::set_properties(goto_model, cmdline.get_values("claim"));
 
     if(cmdline.isset("property")) // use this one
-      ::set_properties(goto_functions, cmdline.get_values("property"));
+      ::set_properties(goto_model, cmdline.get_values("property"));
   }
 
   catch(const char *e)
@@ -565,9 +617,7 @@ bool cbmc_parse_optionst::set_properties(goto_functionst &goto_functions)
 }
 
 int cbmc_parse_optionst::get_goto_program(
-  const optionst &options,
-  expr_listt &bmc_constraints, // for get_modules
-  goto_functionst &goto_functions)
+  const optionst &options)
 {
   if(cmdline.args.empty())
   {
@@ -577,127 +627,28 @@ int cbmc_parse_optionst::get_goto_program(
 
   try
   {
-    if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1 ||
-         is_goto_binary(cmdline.args[0]))
-      {
-        error() << "Please give exactly one source file" << eom;
-        return 6;
-      }
-
-      std::string filename=cmdline.args[0];
-
-      #ifdef _MSC_VER
-      std::ifstream infile(widen(filename));
-      #else
-      std::ifstream infile(filename);
-      #endif
-
-      if(!infile)
-      {
-        error() << "failed to open input file `"
-                << filename << "'" << eom;
-        return 6;
-      }
-
-      std::unique_ptr<languaget> language=get_language_from_filename(filename);
-      language->get_language_options(cmdline);
-
-      if(language==nullptr)
-      {
-        error() << "failed to figure out type of file `"
-                <<  filename << "'" << eom;
-        return 6;
-      }
-
-      language->set_message_handler(get_message_handler());
-
-      status() << "Parsing " << filename << eom;
-
-      if(language->parse(infile, filename))
-      {
-        error() << "PARSING ERROR" << eom;
-        return 6;
-      }
-
-      language->show_parse(std::cout);
-      return 0;
-    }
-
-    cmdlinet::argst binaries;
-    binaries.reserve(cmdline.args.size());
-
-    for(cmdlinet::argst::iterator
-        it=cmdline.args.begin();
-        it!=cmdline.args.end();
-        ) // no ++it
-    {
-      if(is_goto_binary(*it))
-      {
-        binaries.push_back(*it);
-        it=cmdline.args.erase(it);
-        continue;
-      }
-
-      ++it;
-    }
-
-    if(!cmdline.args.empty())
-    {
-      if(parse())
-        return 6;
-      if(typecheck())
-        return 6;
-      int get_modules_ret=get_modules(bmc_constraints);
-      if(get_modules_ret!=-1)
-        return get_modules_ret;
-      if(binaries.empty() && final())
-        return 6;
-
-      // we no longer need any parse trees or language files
-      clear_parse();
-    }
-
-    for(const auto &bin : binaries)
-    {
-      status() << "Reading GOTO program from file " << eom;
-
-      if(read_object_and_link(
-        bin,
-        symbol_table,
-        goto_functions,
-        get_message_handler()))
-      {
-        return 6;
-      }
-    }
+    goto_model=get_goto_model(cmdline, get_message_handler());
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table();
+      show_symbol_table(goto_model, ui_message_handler.get_ui());
       return 0;
     }
 
-    status() << "Generating GOTO Program" << eom;
-
-    goto_convert(symbol_table, goto_functions, ui_message_handler);
-
-    if(process_goto_program(options, goto_functions))
+    if(process_goto_program(options))
       return 6;
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(ui_message_handler.get_ui(), goto_model);
       return 0;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      namespacet ns(symbol_table);
-      show_goto_functions(ns, get_ui(), goto_functions);
+      show_goto_functions(goto_model, ui_message_handler.get_ui());
       return 0;
     }
 
@@ -786,49 +737,44 @@ void cbmc_parse_optionst::preprocessing()
 }
 
 bool cbmc_parse_optionst::process_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
+  const optionst &options)
 {
   try
   {
-    namespacet ns(symbol_table);
-
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(symbol_table, goto_functions);
+    remove_asm(goto_model);
 
     // add the library
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
+    link_to_library(goto_model, get_message_handler());
 
     if(cmdline.isset("string-abstraction"))
-      string_instrumentation(
-        symbol_table, get_message_handler(), goto_functions);
+      string_instrumentation(goto_model, get_message_handler());
 
     // remove function pointers
     status() << "Removal of function pointers and virtual functions" << eom;
     remove_function_pointers(
       get_message_handler(),
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(symbol_table, goto_functions);
+    remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof)
-    remove_exceptions(symbol_table, goto_functions);
+    remove_exceptions(goto_model);
     // Similar removal of RTTI inspection:
-    remove_instanceof(symbol_table, goto_functions);
+    remove_instanceof(goto_model);
 
-    mm_io(symbol_table, goto_functions);
+    mm_io(goto_model);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, get_message_handler());
 
     // remove returns, gcc vectors, complex
-    remove_returns(symbol_table, goto_functions);
-    remove_vector(symbol_table, goto_functions);
-    remove_complex(symbol_table, goto_functions);
-    rewrite_union(goto_functions, ns);
+    remove_returns(goto_model);
+    remove_vector(goto_model);
+    remove_complex(goto_model);
+    rewrite_union(goto_model);
 
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we
@@ -841,20 +787,21 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("java-max-input-tree-depth")
         ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
         : MAX_NONDET_TREE_DEPTH;
-    replace_java_nondet(goto_functions);
+
+    replace_java_nondet(goto_model);
+
     convert_nondet(
-      goto_functions,
-      symbol_table,
-      ui_message_handler,
+      goto_model,
+      get_message_handler(),
       max_nondet_array_length,
       max_nondet_tree_depth);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
+    goto_check(options, goto_model);
 
     // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_functions, ns);
+    adjust_float_expressions(goto_model);
 
     // ignore default/user-specified initialization
     // of variables with static lifetime
@@ -862,46 +809,44 @@ bool cbmc_parse_optionst::process_goto_program(
     {
       status() << "Adding nondeterministic initialization "
                   "of static/global variables" << eom;
-      nondet_static(ns, goto_functions);
+      nondet_static(goto_model);
     }
 
     if(cmdline.isset("string-abstraction"))
     {
       status() << "String Abstraction" << eom;
       string_abstraction(
-        symbol_table,
-        get_message_handler(),
-        goto_functions);
+        goto_model,
+        get_message_handler());
     }
 
     // add failed symbols
     // needs to be done before pointer analysis
-    add_failed_symbols(symbol_table);
+    add_failed_symbols(goto_model.symbol_table);
 
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     // add loop ids
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.compute_loop_numbers();
 
     if(cmdline.isset("drop-unused-functions"))
     {
       // Entry point will have been set before and function pointers removed
       status() << "Removing unused functions" << eom;
-      remove_unused_functions(goto_functions, ui_message_handler);
+      remove_unused_functions(goto_model, get_message_handler());
     }
 
     // remove skips such that trivial GOTOs are deleted and not considered
     // for coverage annotation:
-    remove_skip(goto_functions);
+    remove_skip(goto_model);
 
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
       if(instrument_cover_goals(
            cmdline,
-           symbol_table,
-           goto_functions,
+           goto_model,
            get_message_handler()))
         return true;
     }
@@ -911,21 +856,21 @@ bool cbmc_parse_optionst::process_goto_program(
     // before using the argument of the "property" option.
     // Do not re-label after using the property slicer because
     // this would cause the property identifiers to change.
-    label_properties(goto_functions);
+    label_properties(goto_model);
 
     // full slice?
     if(cmdline.isset("full-slice"))
     {
       status() << "Performing a full slice" << eom;
       if(cmdline.isset("property"))
-        property_slicer(goto_functions, ns, cmdline.get_values("property"));
+        property_slicer(goto_model, cmdline.get_values("property"));
       else
-        full_slicer(goto_functions, ns);
+        full_slicer(goto_model);
     }
 
     // remove any skips introduced since coverage instrumentation
-    remove_skip(goto_functions);
-    goto_functions.update();
+    remove_skip(goto_model);
+    goto_model.goto_functions.update();
   }
 
   catch(const char *e)
@@ -955,16 +900,14 @@ bool cbmc_parse_optionst::process_goto_program(
 }
 
 /// invoke main modules
-int cbmc_parse_optionst::do_bmc(
-  bmct &bmc,
-  const goto_functionst &goto_functions)
+int cbmc_parse_optionst::do_bmc(bmct &bmc)
 {
-  bmc.set_ui(get_ui());
+  bmc.set_ui(ui_message_handler.get_ui());
 
   int result=6;
 
   // do actual BMC
-  switch(bmc.run(goto_functions))
+  switch(bmc.run(goto_model.goto_functions))
   {
     case safety_checkert::resultt::SAFE:
       result=0;

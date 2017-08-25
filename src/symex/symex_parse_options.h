@@ -55,7 +55,7 @@ class optionst;
 
 class symex_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit();
@@ -80,6 +80,11 @@ protected:
   void eval_verbosity();
 
   std::string get_test(const goto_tracet &goto_trace);
+
+  ui_message_handlert::uit get_ui() const
+  {
+    return ui_message_handler.get_ui();
+  }
 };
 
 #endif // CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H

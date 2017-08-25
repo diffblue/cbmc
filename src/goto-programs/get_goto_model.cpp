@@ -114,6 +114,12 @@ goto_modelt get_goto_model(
 {
   messaget message(message_handler);
 
+  if(cmdline.args.empty())
+  {
+    message.error() << "Please provide a program" << messaget::eom;
+    throw 0;
+  }
+
   goto_modelt goto_model;
 
   // categorize
