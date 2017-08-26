@@ -40,12 +40,12 @@ string_exprt string_constraint_generatort::add_axioms_for_constant(
     exprt idx=from_integer(i, ref_type.get_index_type());
     exprt c=from_integer(str[i], ref_type.get_char_type());
     equal_exprt lemma(res[idx], c);
-    axioms.push_back(lemma);
+    m_axioms.push_back(lemma);
   }
 
   exprt s_length=from_integer(str.size(), ref_type.get_index_type());
 
-  axioms.push_back(res.axiom_for_has_length(s_length));
+  m_axioms.push_back(res.axiom_for_has_length(s_length));
   return res;
 }
 

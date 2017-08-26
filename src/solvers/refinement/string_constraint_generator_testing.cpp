@@ -34,7 +34,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     isprefix,
     str.axiom_for_length_ge(plus_exprt_with_overflow_check(
       prefix.length(), offset)));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_isprefix", index_type);
   string_constraintt a2(
@@ -43,7 +43,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     isprefix,
     equal_exprt(str[plus_exprt_with_overflow_check(qvar, offset)],
                 prefix[qvar]));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_isprefix", index_type);
   and_exprt witness_diff(
@@ -59,7 +59,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     witness_diff);
 
   implies_exprt a3(not_exprt(isprefix), s0_notpref_s1);
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
   return isprefix;
 }
 
@@ -99,8 +99,8 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
 
   symbol_exprt is_empty=fresh_boolean("is_empty");
   string_exprt s0=get_string_expr(args(f, 1)[0]);
-  axioms.push_back(implies_exprt(is_empty, s0.axiom_for_has_length(0)));
-  axioms.push_back(implies_exprt(s0.axiom_for_has_length(0), is_empty));
+  m_axioms.push_back(implies_exprt(is_empty, s0.axiom_for_has_length(0)));
+  m_axioms.push_back(implies_exprt(s0.axiom_for_has_length(0), is_empty));
   return typecast_exprt(is_empty, f.type());
 }
 
@@ -133,14 +133,14 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   //       &&s1[witness]!=s0[witness + s0.length-s1.length]
 
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_suffix", index_type);
   exprt qvar_shifted=plus_exprt(
     qvar, minus_exprt(s1.length(), s0.length()));
   string_constraintt a2(
     qvar, s0.length(), issuffix, equal_exprt(s0[qvar], s1[qvar_shifted]));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_suffix", index_type);
   exprt shifted=plus_exprt(
@@ -155,7 +155,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
         axiom_for_is_positive_index(witness))));
   implies_exprt a3(not_exprt(issuffix), constr3);
 
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
   return tc_issuffix;
 }
 
@@ -202,7 +202,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   //         exists witness < |s1|. s1[witness] != s0[witness + startpos])
 
   implies_exprt a1(contains, s0.axiom_for_length_ge(s1));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt startpos=fresh_exist_index("startpos_contains", index_type);
   minus_exprt length_diff(s0.length(), s1.length());
@@ -210,18 +210,18 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     axiom_for_is_positive_index(startpos),
     binary_relation_exprt(startpos, ID_le, length_diff));
   implies_exprt a2(contains, bounds);
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   implies_exprt a3(
     not_exprt(contains),
     equal_exprt(startpos, from_integer(-1, index_type)));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
   exprt qvar_shifted=plus_exprt(qvar, startpos);
   string_constraintt a4(
     qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
-  axioms.push_back(a4);
+  m_axioms.push_back(a4);
 
   // We rewrite axiom a4 as:
   // forall startpos <= |s0|-|s1|.  (!contains && |s0| >= |s1|)
@@ -234,7 +234,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     s1.length(),
     s0,
     s1);
-  axioms.push_back(a5);
+  m_axioms.push_back(a5);
 
   return typecast_exprt(contains, f.type());
 }

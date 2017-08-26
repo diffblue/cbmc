@@ -46,20 +46,20 @@ string_exprt string_constraint_generatort::add_axioms_for_concat_substr(
   exprt res_length=plus_exprt_with_overflow_check(
     s1.length(), minus_exprt(end_index, start_index));
   implies_exprt a1(prem, equal_exprt(res.length(), res_length));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   implies_exprt a2(not_exprt(prem), equal_exprt(res.length(), s1.length()));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt idx=fresh_univ_index("QA_index_concat", res.length().type());
   string_constraintt a3(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   symbol_exprt idx2=fresh_univ_index("QA_index_concat2", res.length().type());
   equal_exprt res_eq(
     res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start_index, idx2)]);
   string_constraintt a4(idx2, minus_exprt(end_index, start_index), res_eq);
-  axioms.push_back(a4);
+  m_axioms.push_back(a4);
 
   return res;
 }

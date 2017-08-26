@@ -29,12 +29,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot& info):
   max_string_length(info.string_max_length),
-  force_printable_characters(info.string_printable),
+  m_force_printable_characters(info.string_printable),
   ns(*info.ns) { }
 
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {
-  return this->axioms;
+  return m_axioms;
 }
 
 const std::vector<symbol_exprt>
@@ -52,7 +52,7 @@ const std::vector<symbol_exprt>
 const std::set<string_exprt>
 &string_constraint_generatort::get_created_strings() const
 {
-  return this->created_strings;
+  return m_created_strings;
 }
 
 /// generate constant character expression with character type.
@@ -133,7 +133,7 @@ plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
   implies_exprt no_overflow(equal_exprt(neg1, neg2),
                             equal_exprt(neg1, neg_sum));
 
-  axioms.push_back(no_overflow);
+  m_axioms.push_back(no_overflow);
 
   return sum;
 }
@@ -147,7 +147,7 @@ string_exprt string_constraint_generatort::fresh_string(
   symbol_exprt length=fresh_symbol("string_length", type.get_index_type());
   symbol_exprt content=fresh_symbol("string_content", type.get_content_type());
   string_exprt str(length, content, type);
-  created_strings.insert(str);
+  m_created_strings.insert(str);
   add_default_axioms(str);
   return str;
 }
@@ -182,12 +182,12 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
 void string_constraint_generatort::add_default_axioms(
   const string_exprt &s)
 {
-  axioms.push_back(
+  m_axioms.push_back(
     s.axiom_for_length_ge(from_integer(0, s.length().type())));
   if(max_string_length!=std::numeric_limits<size_t>::max())
-    axioms.push_back(s.axiom_for_length_le(max_string_length));
+    m_axioms.push_back(s.axiom_for_length_le(max_string_length));
 
-  if(force_printable_characters)
+  if(m_force_printable_characters)
   {
     symbol_exprt qvar=fresh_univ_index("printable", s.length().type());
     exprt chr=s[qvar];
@@ -195,7 +195,7 @@ void string_constraint_generatort::add_default_axioms(
       binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
       binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
     string_constraintt sc(qvar, s.length(), printable);
-    axioms.push_back(sc);
+    m_axioms.push_back(sc);
   }
 }
 
@@ -281,18 +281,18 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
   const typet &index_type=ref_type.get_index_type();
   string_exprt res=fresh_string(ref_type);
 
-  axioms.push_back(
+  m_axioms.push_back(
     implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
   string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
-  axioms.push_back(sc1);
-  axioms.push_back(
+  m_axioms.push_back(sc1);
+  m_axioms.push_back(
     implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
   string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
-  axioms.push_back(sc2);
+  m_axioms.push_back(sc2);
   return res;
 }
 
@@ -614,7 +614,7 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   string_exprt str=get_string_expr(args(f, 2)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   symbol_exprt char_sym=fresh_symbol("char", ref_type.get_char_type());
-  axioms.push_back(equal_exprt(char_sym, str[args(f, 2)[1]]));
+  m_axioms.push_back(equal_exprt(char_sym, str[args(f, 2)[1]]));
   return char_sym;
 }
 

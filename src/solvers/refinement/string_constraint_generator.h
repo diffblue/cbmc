@@ -344,12 +344,12 @@ private:
   constexpr static const std::size_t MAX_LONG_LENGTH=20;
   constexpr static const std::size_t MAX_FLOAT_LENGTH=15;
   constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
-  std::set<string_exprt> created_strings;
+  std::set<string_exprt> m_created_strings;
   unsigned m_symbol_count=0;
   const messaget m_message;
-  const bool force_printable_characters;
+  const bool m_force_printable_characters;
 
-  std::vector<exprt> axioms;
+  std::vector<exprt> m_axioms;
   std::map<irep_idt, string_exprt> unresolved_symbols;
   std::vector<symbol_exprt> boolean_symbols;
   std::vector<symbol_exprt> index_symbols;

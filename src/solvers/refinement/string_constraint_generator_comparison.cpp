@@ -39,11 +39,11 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   //       || (witness<s1.length &&s1[witness]!=s2[witness])
 
   implies_exprt a1(eq, s1.axiom_for_has_same_length_as(s2));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_equal", index_type);
   string_constraintt a2(qvar, s1.length(), eq, equal_exprt(s1[qvar], s2[qvar]));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_unequal", index_type);
   exprt zero=from_integer(0, index_type);
@@ -55,7 +55,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
     notequal_exprt(s1.length(), s2.length()),
     equal_exprt(witness, from_integer(-1, index_type)));
   implies_exprt a3(not_exprt(eq), or_exprt(diff_length, witnessing));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   return tc_eq;
 }
@@ -117,13 +117,13 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   // a3 : !eq => |s1|!=s2 || (0 <=witness<|s1| &&!char_equal_ignore_case)
 
   implies_exprt a1(eq, s1.axiom_for_has_same_length_as(s2));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_equal_ignore_case", index_type);
   exprt constr2=character_equals_ignore_case(
     s1[qvar], s2[qvar], char_a, char_A, char_Z);
   string_constraintt a2(qvar, s1.length(), eq, constr2);
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index(
     "witness_unequal_ignore_case", index_type);
@@ -139,7 +139,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
     or_exprt(
       notequal_exprt(s1.length(), s2.length()),
       and_exprt(bound_witness, witness_diff)));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   return tc_eq;
 }
@@ -177,7 +177,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
         and_exprt(
           str.axiom_for_length_gt(i),
           axiom_for_is_positive_index(i))));
-    axioms.push_back(or_exprt(c1, or_exprt(c2, c3)));
+    m_axioms.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return hash;
 }
@@ -211,11 +211,11 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 
   equal_exprt res_null=equal_exprt(res, from_integer(0, return_type));
   implies_exprt a1(res_null, s1.axiom_for_has_same_length_as(s2));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   symbol_exprt i=fresh_univ_index("QA_compare_to", index_type);
   string_constraintt a2(i, s1.length(), res_null, equal_exprt(s1[i], s2[i]));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   symbol_exprt x=fresh_exist_index("index_compare_to", index_type);
   equal_exprt ret_char_diff(
@@ -242,12 +242,12 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
     and_exprt(
       binary_relation_exprt(x, ID_ge, from_integer(0, return_type)),
       or_exprt(cond1, cond2)));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   symbol_exprt i2=fresh_univ_index("QA_compare_to", index_type);
   string_constraintt a4(
     i2, x, not_exprt(res_null), equal_exprt(s1[i2], s2[i2]));
-  axioms.push_back(a4);
+  m_axioms.push_back(a4);
 
   return res;
 }
@@ -279,7 +279,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
     disj=or_exprt(
       disj, equal_exprt(intern, it.second));
 
-  axioms.push_back(disj);
+  m_axioms.push_back(disj);
 
 
   // WARNING: the specification may be incomplete or incorrect
@@ -287,7 +287,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
     if(it.second!=str)
     {
       symbol_exprt i=fresh_exist_index("index_intern", index_type);
-      axioms.push_back(
+      m_axioms.push_back(
         or_exprt(
           equal_exprt(it.second, intern),
           or_exprt(
