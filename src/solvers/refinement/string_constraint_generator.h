@@ -67,9 +67,7 @@ public:
     return index_exprt(witness.at(c), univ_val);
   }
 
-  static unsigned next_symbol_id;
-
-  static symbol_exprt fresh_symbol(
+  symbol_exprt fresh_symbol(
     const irep_idt &prefix, const typet &type=bool_typet());
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
@@ -96,6 +94,8 @@ public:
   class format_specifiert;
 
 private:
+  unsigned m_symbol_count=0;
+
   const messaget m_message;
   const bool force_printable_characters;
 

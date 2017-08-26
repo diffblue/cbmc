@@ -26,8 +26,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/pointer_predicates.h>
 #include <util/ssa_expr.h>
 
-unsigned string_constraint_generatort::next_symbol_id=1;
-
 string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot& info):
   max_string_length(info.string_max_length),
@@ -71,7 +69,7 @@ symbol_exprt string_constraint_generatort::fresh_symbol(
   const irep_idt &prefix, const typet &type)
 {
   std::ostringstream buf;
-  buf << "string_refinement#" << prefix << "#" << (next_symbol_id++);
+  buf << "string_refinement#" << prefix << "#" << ++m_symbol_count;
   irep_idt name(buf.str());
   return symbol_exprt(name, type);
 }
