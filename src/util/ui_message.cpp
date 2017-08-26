@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml.h"
 #include "json.h"
 #include "xml_expr.h"
+#include "json_expr.h"
 #include "cout_message.h"
 #include "cmdline.h"
 
@@ -219,11 +220,9 @@ void ui_message_handlert::json_ui_msg(
 
   json_objectt result;
 
-  #if 0
   if(location.is_not_nil() &&
      !location.get_file().empty())
-    result.new_element(xml(location));
-  #endif
+    result["sourceLocation"] = json(location);
 
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);
