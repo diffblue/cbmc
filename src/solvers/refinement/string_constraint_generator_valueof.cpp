@@ -189,7 +189,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_with_radix(
 /// \param chr: a character expression in the following set:
 ///   0123456789abcdef
 /// \return an integer expression
-exprt string_constraint_generatort::int_of_hex_char(const exprt &chr) const
+exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 {
   exprt zero_char=constant_char('0', chr.type());
   exprt nine_char=constant_char('9', chr.type());

@@ -163,7 +163,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
 /// \param expr: a string expression
 /// \return a Boolean
 bool string_constraint_generatort::is_constant_string(
-  const string_exprt &expr) const
+  const string_exprt &expr)
 {
   if(expr.id()!=ID_struct ||
      expr.operands().size()!=2 ||
