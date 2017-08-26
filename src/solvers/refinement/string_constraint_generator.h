@@ -33,6 +33,9 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
+  // Used by format function
+  class format_specifiert;
+
   /// Arguments pack for the string_constraint_generator constructor
   struct infot
   {
@@ -69,31 +72,29 @@ public:
 
   symbol_exprt fresh_symbol(
     const irep_idt &prefix, const typet &type=bool_typet());
-  symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
-  symbol_exprt fresh_boolean(const irep_idt &prefix);
-  string_exprt fresh_string(const refined_string_typet &type);
-  string_exprt get_string_expr(const exprt &expr);
-  plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
   // Maps unresolved symbols to the string_exprt that was created for them
 
   // Set of strings that have been created by the generator
   std::set<string_exprt> created_strings;
 
-  string_exprt find_or_add_string_of_symbol(
-    const symbol_exprt &sym,
-    const refined_string_typet &ref_type);
-
   string_exprt add_axioms_for_refined_string(const exprt &expr);
 
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
-  // Used by format function
-  class format_specifiert;
-
 private:
+  symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
+  symbol_exprt fresh_boolean(const irep_idt &prefix);
+  string_exprt fresh_string(const refined_string_typet &type);
+  string_exprt get_string_expr(const exprt &expr);
+  plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
+
+  string_exprt find_or_add_string_of_symbol(
+    const symbol_exprt &sym,
+    const refined_string_typet &ref_type);
+
   unsigned m_symbol_count=0;
 
   const messaget m_message;
