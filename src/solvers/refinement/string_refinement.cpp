@@ -71,13 +71,7 @@ string_refinementt::string_refinementt(const infot &info, bool):
   do_concretizing(info.trace),
   initial_loop_bound(info.refinement_bound),
   generator(generator_info(info)),
-  non_empty_string(info.string_non_empty)
-{
-  this->set_ui(ui);
-  this->max_node_refinement=info.max_node_refinement;
-  this->do_array_refinement=info.refine_arrays;
-  this->do_arithmetic_refinement=info.refine_arithmetic;
-}
+  non_empty_string(info.string_non_empty) { }
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
