@@ -31,10 +31,21 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 class string_refinementt: public bv_refinementt
 {
 public:
-  string_refinementt(
-    const namespacet &_ns,
-    propt &_prop,
-    unsigned refinement_bound);
+  /// string_refinementt constructor arguments
+  struct infot
+  {
+    const namespacet *ns=nullptr;
+    propt *prop=nullptr;
+    const language_uit::uit *ui=nullptr;
+    unsigned refinement_bound=0;
+    size_t string_max_length=std::numeric_limits<size_t>::max();
+    /// Make non deterministic character arrays have at least one character
+    bool string_non_empty=false;
+    bool trace=false;
+    /// Make non-deterministic characters printable
+    bool string_printable=false;
+  };
+  explicit string_refinementt(const infot &);
 
   void set_mode();
 
@@ -42,11 +53,7 @@ public:
   bool use_counter_example;
 
   // Should we concretize strings when the solver finished
-  bool do_concretizing;
-
-  void set_max_string_length(size_t i);
-  void enforce_non_empty_string();
-  void enforce_printable_characters();
+  const bool do_concretizing;
 
   virtual std::string decision_procedure_text() const override
   {
@@ -68,12 +75,13 @@ protected:
 private:
   // Base class
   typedef bv_refinementt supert;
+  string_refinementt(const infot &, bool);
 
   unsigned initial_loop_bound;
 
   string_constraint_generatort generator;
 
-  bool non_empty_string;
+  const bool non_empty_string;
   expr_sett nondet_arrays;
 
   // Simple constraints that have been given to the solver

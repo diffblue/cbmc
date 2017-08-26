@@ -167,21 +167,20 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
 /// \return a solver for cbmc
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
 {
+  string_refinementt::infot info;
+  info.ns=&ns;
   auto prop=util_make_unique<satcheck_no_simplifiert>();
   prop->set_message_handler(get_message_handler());
-
-  auto string_refinement=util_make_unique<string_refinementt>(
-    ns, *prop, MAX_NB_REFINEMENT);
-  string_refinement->set_ui(ui);
-
-  string_refinement->do_concretizing=options.get_bool_option("trace");
+  info.prop=prop.get();
+  info.refinement_bound=MAX_NB_REFINEMENT;
+  info.ui=&ui;
   if(options.get_bool_option("string-max-length"))
-    string_refinement->set_max_string_length(
-      options.get_signed_int_option("string-max-length"));
-  if(options.get_bool_option("string-non-empty"))
-    string_refinement->enforce_non_empty_string();
-  if(options.get_bool_option("string-printable"))
-    string_refinement->enforce_printable_characters();
+    info.string_max_length=options.get_signed_int_option("string-max-length");
+  info.string_non_empty=options.get_bool_option("string-non-empty");
+  info.trace=options.get_bool_option("trace");
+  info.string_printable=options.get_bool_option("string-printable");
+
+  auto string_refinement=util_make_unique<string_refinementt>(info);
 
   if(options.get_option("max-node-refinement")!="")
     string_refinement->max_node_refinement=

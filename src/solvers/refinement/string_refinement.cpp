@@ -34,41 +34,29 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
-string_refinementt::string_refinementt(
-  const namespacet &_ns,
-  propt &_prop,
-  unsigned refinement_bound):
-  supert(_ns, _prop),
+static bool validate(const string_refinementt::infot &info)
+{
+  INVARIANT(info.ns, "Should not be null");
+  INVARIANT(info.prop, "Should not be null");
+  INVARIANT(info.ui, "Should not be null");
+  return true;
+}
+
+string_refinementt::string_refinementt(const infot &info, bool):
+  supert(*info.ns, *info.prop),
   use_counter_example(false),
-  do_concretizing(false),
-  initial_loop_bound(refinement_bound),
-  generator(_ns),
-  non_empty_string(false)
-{ }
-
-/// Add constraints on the size of strings used in the program.
-/// \param i: maximum length which is allowed for strings.
-/// by default the strings length has no other limit
-/// than the maximal integer according to the type of their
-/// length, for instance 2^31-1 for Java.
-void string_refinementt::set_max_string_length(size_t i)
+  do_concretizing(info.trace),
+  initial_loop_bound(info.refinement_bound),
+  generator(*info.ns),
+  non_empty_string(info.string_non_empty)
 {
-  generator.max_string_length=i;
+  this->set_ui(ui);
+  generator.max_string_length=info.string_max_length;
+  generator.force_printable_characters=info.string_printable;
 }
 
-/// Add constraints on the size of nondet character arrays to ensure they have
-/// length at least 1
-void string_refinementt::enforce_non_empty_string()
-{
-  non_empty_string=true;
-}
-
-/// Add constraints on characters used in the program to ensure they are
-/// printable
-void string_refinementt::enforce_printable_characters()
-{
-  generator.force_printable_characters=true;
-}
+string_refinementt::string_refinementt(const infot &info):
+  string_refinementt(info, validate(info)) { }
 
 /// display the current index set, for debugging
 void string_refinementt::display_index_set()
