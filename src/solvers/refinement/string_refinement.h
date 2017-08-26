@@ -39,9 +39,9 @@ public:
     const language_uit::uit *ui=nullptr;
     unsigned refinement_bound=0;
     size_t string_max_length=std::numeric_limits<size_t>::max();
-    /// Make non deterministic character arrays have at least one character
+    /// Make non-deterministic character arrays have at least one character
     bool string_non_empty=false;
-    // Should we concretize strings when the solver finished
+    // Concretize strings after solver is finished
     bool trace=false;
     /// Make non-deterministic characters printable
     bool string_printable=false;
@@ -52,17 +52,12 @@ public:
 
   explicit string_refinementt(const infot &);
 
-  void set_mode();
-
-  // Should we use counter examples at each iteration?
   const bool use_counter_example=false;
 
   virtual std::string decision_procedure_text() const override
   {
     return "string refinement loop with "+prop.solver_text();
   }
-
-  static exprt is_positive(const exprt &x);
 
   exprt get(const exprt &expr) const override;
 
