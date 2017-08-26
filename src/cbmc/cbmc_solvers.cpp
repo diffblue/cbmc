@@ -179,20 +179,14 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
   info.string_non_empty=options.get_bool_option("string-non-empty");
   info.trace=options.get_bool_option("trace");
   info.string_printable=options.get_bool_option("string-printable");
-
-  auto string_refinement=util_make_unique<string_refinementt>(info);
-
-  if(options.get_option("max-node-refinement")!="")
-    string_refinement->max_node_refinement=
+  if(options.get_bool_option("max-node-refinement"))
+    info.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");
-
-  string_refinement->do_array_refinement=
-    options.get_bool_option("refine-arrays");
-  string_refinement->do_arithmetic_refinement=
-    options.get_bool_option("refine-arithmetic");
+  info.refine_arrays=options.get_bool_option("refine-arrays");
+  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
 
   return util_make_unique<solvert>(
-    std::move(string_refinement), std::move(prop));
+    util_make_unique<string_refinementt>(info), std::move(prop));
 }
 
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt1(

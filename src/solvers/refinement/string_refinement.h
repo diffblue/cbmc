@@ -28,7 +28,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define MAX_NB_REFINEMENT 100
 
-class string_refinementt: public bv_refinementt
+class string_refinementt final: public bv_refinementt
 {
 public:
   /// string_refinementt constructor arguments
@@ -41,19 +41,21 @@ public:
     size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Make non deterministic character arrays have at least one character
     bool string_non_empty=false;
+    // Should we concretize strings when the solver finished
     bool trace=false;
     /// Make non-deterministic characters printable
     bool string_printable=false;
+    unsigned max_node_refinement=5;
+    bool refine_arrays=false;
+    bool refine_arithmetic=false;
   };
+
   explicit string_refinementt(const infot &);
 
   void set_mode();
 
   // Should we use counter examples at each iteration?
-  bool use_counter_example;
-
-  // Should we concretize strings when the solver finished
-  const bool do_concretizing;
+  const bool use_counter_example=false;
 
   virtual std::string decision_procedure_text() const override
   {
@@ -65,17 +67,18 @@ public:
   exprt get(const exprt &expr) const override;
 
 protected:
+  decision_proceduret::resultt dec_solve() override;
+
+private:
+  const bool do_concretizing;
+  // Base class
+  typedef bv_refinementt supert;
+
   typedef std::set<exprt> expr_sett;
   typedef std::list<exprt> exprt_listt;
 
-  decision_proceduret::resultt dec_solve() override;
-
-  bvt convert_bool_bv(const exprt &boole, const exprt &orig);
-
-private:
-  // Base class
-  typedef bv_refinementt supert;
   string_refinementt(const infot &, bool);
+  bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
   unsigned initial_loop_bound;
 

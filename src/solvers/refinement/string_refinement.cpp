@@ -53,6 +53,9 @@ string_refinementt::string_refinementt(const infot &info, bool):
   this->set_ui(ui);
   generator.max_string_length=info.string_max_length;
   generator.force_printable_characters=info.string_printable;
+  this->max_node_refinement=info.max_node_refinement;
+  this->do_array_refinement=info.refine_arrays;
+  this->do_arithmetic_refinement=info.refine_arithmetic;
 }
 
 string_refinementt::string_refinementt(const infot &info):
