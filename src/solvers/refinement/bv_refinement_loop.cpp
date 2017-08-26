@@ -12,23 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-bv_refinementt::bv_refinementt(
-  const namespacet &_ns, propt &_prop):
-  bv_pointerst(_ns, _prop),
-  max_node_refinement(5),
-  do_array_refinement(true),
-  do_arithmetic_refinement(true),
+bv_refinementt::bv_refinementt(const infot &info):
+  bv_pointerst(*info.ns, *info.prop),
+  max_node_refinement(info.max_node_refinement),
+  do_array_refinement(info.refine_arrays),
+  do_arithmetic_refinement(info.refine_arithmetic),
   progress(false),
-  ui(ui_message_handlert::uit::PLAIN)
+  ui(*info.ui)
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());
   PRECONDITION(prop.has_set_to());
   PRECONDITION(prop.has_is_in_conflict());
-}
-
-bv_refinementt::~bv_refinementt()
-{
 }
 
 decision_proceduret::resultt bv_refinementt::dec_solve()

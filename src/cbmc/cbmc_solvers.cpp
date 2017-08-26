@@ -146,20 +146,22 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
 
   prop->set_message_handler(get_message_handler());
 
-  auto bv_refinement=util_make_unique<bv_refinementt>(ns, *prop);
-  bv_refinement->set_ui(ui);
+  bv_refinementt::infot info;
+  info.ns=&ns;
+  info.prop=prop.get();
+  info.ui=&ui;
 
   // we allow setting some parameters
-  if(options.get_option("max-node-refinement")!="")
-    bv_refinement->max_node_refinement =
+  if(options.get_bool_option("max-node-refinement"))
+    info.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");
 
-  bv_refinement->do_array_refinement =
-    options.get_bool_option("refine-arrays");
-  bv_refinement->do_arithmetic_refinement =
-    options.get_bool_option("refine-arithmetic");
+  info.refine_arrays=options.get_bool_option("refine-arrays");
+  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
 
-  return util_make_unique<solvert>(std::move(bv_refinement), std::move(prop));
+  return util_make_unique<solvert>(
+    util_make_unique<bv_refinementt>(info),
+    std::move(prop));
 }
 
 /// the string refinement adds to the bit vector refinement specifications for

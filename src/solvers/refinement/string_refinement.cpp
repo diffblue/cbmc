@@ -42,6 +42,19 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
+static bv_refinementt::infot bv_refinement_info(
+  const string_refinementt::infot &in)
+{
+  bv_refinementt::infot out;
+  out.ns=in.ns;
+  out.prop=in.prop;
+  out.ui=in.ui;
+  out.max_node_refinement=in.max_node_refinement;
+  out.refine_arrays=in.refine_arrays;
+  out.refine_arithmetic=in.refine_arithmetic;
+  return out;
+}
+
 static string_constraint_generatort::infot
 generator_info(const string_refinementt::infot &in)
 {
@@ -53,7 +66,7 @@ generator_info(const string_refinementt::infot &in)
 }
 
 string_refinementt::string_refinementt(const infot &info, bool):
-  supert(*info.ns, *info.prop),
+  supert(bv_refinement_info(info)),
   use_counter_example(false),
   do_concretizing(info.trace),
   initial_loop_bound(info.refinement_bound),
@@ -1751,8 +1764,14 @@ bool string_refinementt::is_axiom_sat(
   const exprt &axiom, const symbol_exprt& var, exprt &witness)
 {
   satcheck_no_simplifiert sat_check;
-  supert solver(ns, sat_check);
-  solver.set_ui(ui);
+  supert::infot info;
+  info.ns=&ns;
+  info.prop=&sat_check;
+  info.refine_arithmetic=true;
+  info.refine_arrays=true;
+  info.max_node_refinement=5;
+  info.ui=&ui;
+  supert solver(info);
   solver << axiom;
 
   switch(solver())

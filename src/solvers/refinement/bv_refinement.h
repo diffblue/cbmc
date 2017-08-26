@@ -21,8 +21,20 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_refinementt:public bv_pointerst
 {
 public:
-  bv_refinementt(const namespacet &_ns, propt &_prop);
-  ~bv_refinementt();
+  struct infot
+  {
+    const namespacet *ns=nullptr;
+    propt *prop=nullptr;
+    const language_uit::uit *ui=nullptr;
+    /// Max number of times we refine a formula node
+    unsigned max_node_refinement=5;
+    /// Enable array refinement
+    bool refine_arrays=true;
+    /// Enable arithmetic refinement
+    bool refine_arithmetic=true;
+  };
+
+  bv_refinementt(const infot &info);
 
   virtual decision_proceduret::resultt dec_solve();
 
