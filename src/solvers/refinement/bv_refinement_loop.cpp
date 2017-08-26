@@ -91,17 +91,16 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   // this puts the underapproximations into effect
   bvt assumptions=parent_assumptions;
 
-  for(approximationst::const_iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
+  for(const approximationt &approximation : approximations)
   {
     assumptions.insert(
       assumptions.end(),
-      a_it->over_assumptions.begin(), a_it->over_assumptions.end());
+      approximation.over_assumptions.begin(),
+      approximation.over_assumptions.end());
     assumptions.insert(
       assumptions.end(),
-      a_it->under_assumptions.begin(), a_it->under_assumptions.end());
+      approximation.under_assumptions.begin(),
+      approximation.under_assumptions.end());
   }
 
   prop.set_assumptions(assumptions);
@@ -122,22 +121,16 @@ void bv_refinementt::check_SAT()
 
   arrays_overapproximated();
 
-  for(approximationst::iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
-    check_SAT(*a_it);
+  for(approximationt &approximation : this->approximations)
+    check_SAT(approximation);
 }
 
 void bv_refinementt::check_UNSAT()
 {
   progress=false;
 
-  for(approximationst::iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
-    check_UNSAT(*a_it);
+  for(approximationt &approximation : this->approximations)
+    check_UNSAT(approximation);
 }
 
 void bv_refinementt::set_to(const exprt &expr, bool value)

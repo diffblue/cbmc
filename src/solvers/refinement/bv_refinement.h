@@ -91,8 +91,6 @@ private:
     std::size_t id_nr;
   };
 
-  typedef std::list<approximationt> approximationst;
-
   resultt prop_solve();
   approximationt &add_approximation(const exprt &expr, bvt &bv);
   bool is_in_conflict(approximationt &approximation);
@@ -113,7 +111,7 @@ private:
   const bool do_array_refinement;
   const bool do_arithmetic_refinement;
   bool progress;
-  std::list<approximationt> approximations;
+  std::vector<approximationt> approximations;
   bvt parent_assumptions;
 
 protected:
