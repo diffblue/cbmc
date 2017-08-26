@@ -28,6 +28,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 unsigned string_constraint_generatort::next_symbol_id=1;
 
+string_constraint_generatort::string_constraint_generatort(
+  const string_constraint_generatort::infot& info):
+  max_string_length(info.string_max_length),
+  force_printable_characters(info.string_printable),
+  ns(*info.ns) { }
+
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {
   return this->axioms;

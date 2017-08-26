@@ -33,13 +33,19 @@ public:
   // string constraints for different string functions and add them
   // to the axiom list.
 
-  explicit string_constraint_generatort(namespacet _ns): ns(_ns) { }
+  /// Arguments pack for the string_constraint_generator constructor
+  struct infot
+  {
+    const namespacet *ns=nullptr;
+    /// Max length of non-deterministic strings
+    size_t string_max_length=std::numeric_limits<size_t>::max();
+    /// Prefer printable characters in non-deterministic strings
+    bool string_printable=false;
+  };
 
-  // Constraints on the maximal length of strings
-  size_t max_string_length=std::numeric_limits<size_t>::max();
+  explicit string_constraint_generatort(const infot& info);
 
-  // Should we add constraints on the characters
-  bool force_printable_characters=false;
+  const size_t max_string_length;
 
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
@@ -90,7 +96,9 @@ public:
   class format_specifiert;
 
 private:
-  messaget m_message;
+  const messaget m_message;
+  const bool force_printable_characters;
+
   std::vector<exprt> axioms;
   std::map<irep_idt, string_exprt> unresolved_symbols;
   std::vector<symbol_exprt> boolean_symbols;

@@ -36,10 +36,20 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 static bool validate(const string_refinementt::infot &info)
 {
-  INVARIANT(info.ns, "Should not be null");
-  INVARIANT(info.prop, "Should not be null");
-  INVARIANT(info.ui, "Should not be null");
+  PRECONDITION(info.ns);
+  PRECONDITION(info.prop);
+  PRECONDITION(info.ui);
   return true;
+}
+
+static string_constraint_generatort::infot
+generator_info(const string_refinementt::infot &in)
+{
+  string_constraint_generatort::infot out;
+  out.ns=in.ns;
+  out.string_max_length=in.string_max_length;
+  out.string_printable=in.string_printable;
+  return out;
 }
 
 string_refinementt::string_refinementt(const infot &info, bool):
@@ -47,12 +57,10 @@ string_refinementt::string_refinementt(const infot &info, bool):
   use_counter_example(false),
   do_concretizing(info.trace),
   initial_loop_bound(info.refinement_bound),
-  generator(*info.ns),
+  generator(generator_info(info)),
   non_empty_string(info.string_non_empty)
 {
   this->set_ui(ui);
-  generator.max_string_length=info.string_max_length;
-  generator.force_printable_characters=info.string_printable;
   this->max_node_refinement=info.max_node_refinement;
   this->do_array_refinement=info.refine_arrays;
   this->do_arithmetic_refinement=info.refine_arithmetic;
