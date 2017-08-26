@@ -30,7 +30,7 @@ string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot& info):
   max_string_length(info.string_max_length),
   m_force_printable_characters(info.string_printable),
-  ns(*info.ns) { }
+  m_ns(*info.ns) { }
 
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {
@@ -40,13 +40,13 @@ const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 const std::vector<symbol_exprt>
 &string_constraint_generatort::get_index_symbols() const
 {
-  return this->index_symbols;
+  return m_index_symbols;
 }
 
 const std::vector<symbol_exprt>
 &string_constraint_generatort::get_boolean_symbols() const
 {
-  return this->boolean_symbols;
+  return m_boolean_symbols;
 }
 
 const std::set<string_exprt>
@@ -96,7 +96,7 @@ symbol_exprt string_constraint_generatort::fresh_exist_index(
   const irep_idt &prefix, const typet &type)
 {
   symbol_exprt s=fresh_symbol(prefix, type);
-  index_symbols.push_back(s);
+  m_index_symbols.push_back(s);
   return s;
 }
 
@@ -107,7 +107,7 @@ symbol_exprt string_constraint_generatort::fresh_boolean(
   const irep_idt &prefix)
 {
   symbol_exprt b=fresh_symbol(prefix, bool_typet());
-  boolean_symbols.push_back(b);
+  m_boolean_symbols.push_back(b);
   return b;
 }
 
@@ -307,7 +307,7 @@ string_exprt string_constraint_generatort::find_or_add_string_of_symbol(
 {
   irep_idt id=sym.get_identifier();
   string_exprt str=fresh_string(ref_type);
-  auto entry=unresolved_symbols.insert(std::make_pair(id, str));
+  auto entry=m_unresolved_symbols.insert(std::make_pair(id, str));
   return entry.first->second;
 }
 
@@ -336,7 +336,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     new_expr.function()=symbol_exprt(str_id.substr(0, pos+4));
     new_expr.type()=refined_string_typet(java_int_type(), java_char_type());
 
-    auto res_it=function_application_cache.insert(std::make_pair(new_expr,
+    auto res_it=m_function_application_cache.insert(std::make_pair(new_expr,
                                                                  nil_exprt()));
     if(res_it.second)
     {
@@ -356,7 +356,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     new_expr.function()=symbol_exprt(str_id.substr(0, pos+4));
     new_expr.type()=refined_string_typet(java_int_type(), java_char_type());
 
-    auto res_it=function_application_cache.insert(std::make_pair(new_expr,
+    auto res_it=m_function_application_cache.insert(std::make_pair(new_expr,
                                                                  nil_exprt()));
     if(res_it.second)
     {
@@ -372,8 +372,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   // TODO: improve efficiency of this test by either ordering test by frequency
   // or using a map
 
-  auto res_it=function_application_cache.find(expr);
-  if(res_it!=function_application_cache.end() && res_it->second!=nil_exprt())
+  auto res_it=m_function_application_cache.find(expr);
+  if(res_it!=m_function_application_cache.end() && res_it->second!=nil_exprt())
     return res_it->second;
 
   exprt res;
@@ -503,7 +503,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     msg+=id2string(id);
     DATA_INVARIANT(false, string_refinement_invariantt(msg));
   }
-  function_application_cache[expr]=res;
+  m_function_application_cache[expr]=res;
   return res;
 }
 

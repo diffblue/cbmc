@@ -530,7 +530,7 @@ unsigned long string_constraint_generatort::to_integer_or_default(
   const exprt &expr, unsigned long def)
 {
   mp_integer mp_radix;
-  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
+  bool to_integer_failed=to_integer(simplify_expr(expr, m_ns), mp_radix);
   return to_integer_failed?def:integer2ulong(mp_radix);
 }
 

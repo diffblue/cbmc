@@ -350,20 +350,17 @@ private:
   const bool m_force_printable_characters;
 
   std::vector<exprt> m_axioms;
-  std::map<irep_idt, string_exprt> unresolved_symbols;
-  std::vector<symbol_exprt> boolean_symbols;
-  std::vector<symbol_exprt> index_symbols;
-  std::map<function_application_exprt, exprt> function_application_cache;
-  const namespacet ns;
+  std::map<irep_idt, string_exprt> m_unresolved_symbols;
+  std::vector<symbol_exprt> m_boolean_symbols;
+  std::vector<symbol_exprt> m_index_symbols;
+  std::map<function_application_exprt, exprt> m_function_application_cache;
+  const namespacet m_ns;
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.
-  std::map<string_exprt, exprt> hash_code_of_string;
+  std::map<string_exprt, exprt> m_hash_code_of_string;
 
   // Pool used for the intern method
-  std::map<string_exprt, symbol_exprt> intern_of_string;
-
-  // Tells which language is used. C and Java are supported
-  irep_idt mode;
+  std::map<string_exprt, symbol_exprt> m_intern_of_string;
 };
 
 exprt is_digit_with_radix(

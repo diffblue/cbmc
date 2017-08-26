@@ -155,7 +155,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   typet return_type=f.type();
   typet index_type=str.length().type();
 
-  auto pair=hash_code_of_string.insert(
+  auto pair=m_hash_code_of_string.insert(
     std::make_pair(str, fresh_symbol("hash", return_type)));
   exprt hash=pair.first->second;
 
@@ -165,7 +165,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   //   c3: (|str|==|s| && exists i<|s|. s[i]!=str[i])
 
   // WARNING: the specification may be incomplete
-  for(auto it : hash_code_of_string)
+  for(auto it : m_hash_code_of_string)
   {
     symbol_exprt i=fresh_exist_index("index_hash", index_type);
     equal_exprt c1(it.second, hash);
@@ -265,7 +265,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
 
   typet index_type=str.length().type();
 
-  auto pair=intern_of_string.insert(
+  auto pair=m_intern_of_string.insert(
     std::make_pair(str, fresh_symbol("pool", return_type)));
   symbol_exprt intern=pair.first->second;
 
@@ -275,7 +275,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   //    || (|str|==|s| &&exists i<|s|. s[i]!=str[i])
 
   exprt disj=false_exprt();
-  for(auto it : intern_of_string)
+  for(auto it : m_intern_of_string)
     disj=or_exprt(
       disj, equal_exprt(intern, it.second));
 
@@ -283,7 +283,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
 
 
   // WARNING: the specification may be incomplete or incorrect
-  for(auto it : intern_of_string)
+  for(auto it : m_intern_of_string)
     if(it.second!=str)
     {
       symbol_exprt i=fresh_exist_index("index_intern", index_type);
