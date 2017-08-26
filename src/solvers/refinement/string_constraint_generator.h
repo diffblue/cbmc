@@ -48,8 +48,6 @@ public:
 
   explicit string_constraint_generatort(const infot& info);
 
-  const size_t max_string_length;
-
   // Axioms are of three kinds: universally quantified string constraint,
   // not contains string constraints and simple formulas.
   const std::vector<exprt> &get_axioms() const;
@@ -62,9 +60,6 @@ public:
 
   // Set of strings that have been created by the generator
   const std::set<string_exprt> &get_created_strings() const;
-
-  // Used to store information about witnesses for not_contains constraints
-  std::map<string_not_contains_constraintt, symbol_exprt> witness;
 
   exprt get_witness_of(
     const string_not_contains_constraintt &c,
@@ -86,8 +81,6 @@ public:
 
 private:
 
-  std::set<string_exprt> created_strings;
-
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);
@@ -98,27 +91,7 @@ private:
     const symbol_exprt &sym,
     const refined_string_typet &ref_type);
 
-  unsigned m_symbol_count=0;
-
-  const messaget m_message;
-  const bool force_printable_characters;
-
-  std::vector<exprt> axioms;
-  std::map<irep_idt, string_exprt> unresolved_symbols;
-  std::vector<symbol_exprt> boolean_symbols;
-  std::vector<symbol_exprt> index_symbols;
   static constant_exprt constant_char(int i, const typet &char_type);
-  // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
-  // that is -2147483648 so takes 11 characters to write.
-  // The long with the longest string is Long.MIN_VALUE which is -2^63,
-  // approximately -9.223372037*10^18 so takes 20 characters to write.
-  constexpr static const std::size_t MAX_INTEGER_LENGTH=11;
-  constexpr static const std::size_t MAX_LONG_LENGTH=20;
-  constexpr static const std::size_t MAX_FLOAT_LENGTH=15;
-  constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
-
-  std::map<function_application_exprt, exprt> function_application_cache;
-  const namespacet ns;
 
   static irep_idt extract_java_string(const symbol_exprt &s);
 
@@ -142,9 +115,6 @@ private:
   // The specification is partial: the actual value is not actually computed
   // but we ensure that hash codes of equal strings are equal.
   exprt add_axioms_for_hash_code(const function_application_exprt &f);
-  // To each string on which hash_code was called we associate a symbol
-  // representing the return value of the hash_code function.
-  std::map<string_exprt, exprt> hash_code_of_string;
 
   exprt add_axioms_for_is_empty(const function_application_exprt &f);
   exprt add_axioms_for_is_prefix(
@@ -341,12 +311,6 @@ private:
   // string pointers
   symbol_exprt add_axioms_for_intern(const function_application_exprt &f);
 
-  // Pool used for the intern method
-  std::map<string_exprt, symbol_exprt> intern_of_string;
-
-  // Tells which language is used. C and Java are supported
-  irep_idt mode;
-
   // assert that the number of argument is equal to nb and extract them
   static const function_application_exprt::argumentst &args(
     const function_application_exprt &expr, size_t nb)
@@ -365,6 +329,41 @@ private:
   static bool is_constant_string(const string_exprt &expr);
   static string_exprt empty_string(const refined_string_typet &ref_type);
   unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
+
+  // MEMBERS
+public:
+  // Used to store information about witnesses for not_contains constraints
+  const size_t max_string_length;
+  std::map<string_not_contains_constraintt, symbol_exprt> witness;
+private:
+  // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
+  // that is -2147483648 so takes 11 characters to write.
+  // The long with the longest string is Long.MIN_VALUE which is -2^63,
+  // approximately -9.223372037*10^18 so takes 20 characters to write.
+  constexpr static const std::size_t MAX_INTEGER_LENGTH=11;
+  constexpr static const std::size_t MAX_LONG_LENGTH=20;
+  constexpr static const std::size_t MAX_FLOAT_LENGTH=15;
+  constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
+  std::set<string_exprt> created_strings;
+  unsigned m_symbol_count=0;
+  const messaget m_message;
+  const bool force_printable_characters;
+
+  std::vector<exprt> axioms;
+  std::map<irep_idt, string_exprt> unresolved_symbols;
+  std::vector<symbol_exprt> boolean_symbols;
+  std::vector<symbol_exprt> index_symbols;
+  std::map<function_application_exprt, exprt> function_application_cache;
+  const namespacet ns;
+  // To each string on which hash_code was called we associate a symbol
+  // representing the return value of the hash_code function.
+  std::map<string_exprt, exprt> hash_code_of_string;
+
+  // Pool used for the intern method
+  std::map<string_exprt, symbol_exprt> intern_of_string;
+
+  // Tells which language is used. C and Java are supported
+  irep_idt mode;
 };
 
 exprt is_digit_with_radix(
