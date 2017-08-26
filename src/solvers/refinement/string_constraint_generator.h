@@ -60,6 +60,9 @@ public:
   /// Symbols used in existential quantifications
   const std::vector<symbol_exprt> &get_index_symbols() const;
 
+  // Set of strings that have been created by the generator
+  const std::set<string_exprt> &get_created_strings() const;
+
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 
@@ -76,15 +79,15 @@ public:
 
   // Maps unresolved symbols to the string_exprt that was created for them
 
-  // Set of strings that have been created by the generator
-  std::set<string_exprt> created_strings;
-
   string_exprt add_axioms_for_refined_string(const exprt &expr);
 
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
 private:
+
+  std::set<string_exprt> created_strings;
+
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);

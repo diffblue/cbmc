@@ -49,6 +49,12 @@ const std::vector<symbol_exprt>
   return this->boolean_symbols;
 }
 
+const std::set<string_exprt>
+&string_constraint_generatort::get_created_strings() const
+{
+  return this->created_strings;
+}
+
 /// generate constant character expression with character type.
 /// \par parameters: integer representing a character, and a type for
 ///   characters;
