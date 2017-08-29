@@ -37,7 +37,7 @@ static void build_ssa_identifier_rec(
 
     mp_integer idx;
     if(to_integer(to_constant_expr(index.index()), idx))
-      assert(false);
+      UNREACHABLE;
 
     os << '[' << idx << ']';
   }
@@ -68,7 +68,7 @@ static void build_ssa_identifier_rec(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(

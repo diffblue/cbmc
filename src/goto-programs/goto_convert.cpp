@@ -849,7 +849,7 @@ void goto_convertt::convert_cpp_delete(
   else if(code.get_statement()==ID_cpp_delete)
     delete_identifier="__delete";
   else
-    assert(false);
+    UNREACHABLE;
 
   if(destructor.is_not_nil())
   {
@@ -868,7 +868,7 @@ void goto_convertt::convert_cpp_delete(
       convert(tmp_code, dest);
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   // now do "free"
@@ -1802,7 +1802,7 @@ void goto_convertt::generate_ifthenelse(
      true_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
-    // if(some) { label: assert(0); }
+    // if(some) { label: assert(false); }
     true_case.instructions.back().guard=boolean_negate(guard);
     dest.destructive_append(true_case);
     true_case.instructions.clear();
@@ -1815,7 +1815,7 @@ void goto_convertt::generate_ifthenelse(
      false_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
-    // if(some) ... else { label: assert(0); }
+    // if(some) ... else { label: assert(false); }
     false_case.instructions.back().guard=guard;
     dest.destructive_append(false_case);
     false_case.instructions.clear();

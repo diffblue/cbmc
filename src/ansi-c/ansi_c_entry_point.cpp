@@ -305,7 +305,7 @@ bool ansi_c_entry_point(
           max=to_unsignedbv_type(envp_size_symbol.type).largest();
         }
         else
-          assert(false);
+          UNREACHABLE;
 
         exprt max_minus_one=from_integer(max-1, envp_size_symbol.type);
 
@@ -431,7 +431,7 @@ bool ansi_c_entry_point(
       }
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
   else
   {

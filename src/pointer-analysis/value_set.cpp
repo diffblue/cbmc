@@ -1492,7 +1492,7 @@ void value_sett::apply_code(
   else if(statement==ID_function_call)
   {
     // shouldn't be here
-    assert(false);
+    UNREACHABLE;
   }
   else if(statement==ID_assign ||
           statement==ID_init)

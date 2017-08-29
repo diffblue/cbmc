@@ -708,7 +708,7 @@ void goto_rw(goto_programt::const_targett target,
   switch(target->type)
   {
   case NO_INSTRUCTION_TYPE:
-    assert(false);
+    UNREACHABLE;
     break;
 
   case GOTO:

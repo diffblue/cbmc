@@ -40,7 +40,7 @@ unsigned fence_insertert::fence_cost(fence_typet f) const
     case Ctlfence:
       return 1;
   }
-  assert(false);
+  UNREACHABLE;
   return 0;
 }
 
@@ -769,7 +769,7 @@ void fence_insertert::solve()
       break;
     case GLP_UNDEF:
       instrumenter.message.result() << "Solution undefined" << messaget::eom;
-      assert(0);
+      UNREACHABLE;
     case GLP_FEAS:
       instrumenter.message.result() << "Solution feasible, "
                                     << "yet not proven optimal, "
@@ -779,7 +779,7 @@ void fence_insertert::solve()
     case GLP_NOFEAS:
       instrumenter.message.result()
         << "No feasible solution, the system is UNSAT" << messaget::eom;
-      assert(0);
+      UNREACHABLE;
   }
 
   event_grapht &egraph=instrumenter.egraph;
@@ -964,7 +964,7 @@ std::string fence_insertert::to_string(fence_typet f) const
     case Branching: return "branching";
     case Ctlfence: return "ctlfence";
   }
-  assert(0);
+  UNREACHABLE;
 }
 
 inline unsigned fence_insertert::col_to_var(unsigned u) const
@@ -983,7 +983,7 @@ inline fence_insertert::fence_typet fence_insertert::col_to_fence(unsigned u)
     case 3: return Branching;
     case 4: return Ctlfence;
   }
-  assert(0);
+  UNREACHABLE;
 }
 
 inline unsigned fence_insertert::var_fence_to_col(fence_typet f, unsigned var)
@@ -997,7 +997,7 @@ inline unsigned fence_insertert::var_fence_to_col(fence_typet f, unsigned var)
     case Branching: return (var-1)*fence_options+3;
     case Ctlfence: return (var-1)*fence_options+4;
   }
-  assert(0);
+  UNREACHABLE;
 }
 
 void fence_insertert::compute_fence_options()
@@ -1103,5 +1103,5 @@ typet fence_insertert::type_component(
     return type;
   }
 
-  assert(0);
+  UNREACHABLE;
 }

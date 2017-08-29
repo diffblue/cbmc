@@ -121,7 +121,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         symbol.value.type().add("to-member") = resolved_expr.op0().type();
       }
       else
-        assert(false);
+        UNREACHABLE;
 
       if(symbol.type != symbol.value.type())
       {

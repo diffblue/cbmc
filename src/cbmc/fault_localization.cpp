@@ -71,7 +71,7 @@ fault_localizationt::get_failed_property()
        bmc.prop_conv.l_get(it->cond_literal).is_false())
       return it;
 
-  assert(false);
+  UNREACHABLE;
   return bmc.equation.SSA_steps.end();
 }
 

@@ -183,7 +183,7 @@ codet cpp_typecheckt::cpp_constructor(
   }
   else if(tmp_type.id()==ID_union)
   {
-    assert(0); // Todo: union
+    UNREACHABLE; // Todo: union
   }
   else if(tmp_type.id()==ID_struct)
   {
@@ -301,7 +301,7 @@ codet cpp_typecheckt::cpp_constructor(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   codet nil;
   nil.make_nil();

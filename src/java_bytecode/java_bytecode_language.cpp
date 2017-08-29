@@ -142,7 +142,7 @@ bool java_bytecode_languaget::parse(
       java_class_loader.add_jar_file(path);
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   if(!main_class.empty())
   {

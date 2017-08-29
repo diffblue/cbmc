@@ -678,7 +678,7 @@ void ieee_floatt::divide_and_round(
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
   }
 }
