@@ -38,7 +38,6 @@ static bool validate(const string_refinementt::infot &info)
 {
   PRECONDITION(info.ns);
   PRECONDITION(info.prop);
-  PRECONDITION(info.ui);
   return true;
 }
 
@@ -1764,7 +1763,7 @@ bool string_refinementt::is_axiom_sat(
   info.refine_arithmetic=true;
   info.refine_arrays=true;
   info.max_node_refinement=5;
-  info.ui=&ui;
+  info.ui=ui;
   supert solver(info);
   solver << axiom;
 

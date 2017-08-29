@@ -18,7 +18,7 @@ bv_refinementt::bv_refinementt(const infot &info):
   do_array_refinement(info.refine_arrays),
   do_arithmetic_refinement(info.refine_arithmetic),
   progress(false),
-  ui(*info.ui)
+  ui(info.ui)
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());

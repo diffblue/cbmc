@@ -149,7 +149,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=prop.get();
-  info.ui=&ui;
+  info.ui=ui;
 
   // we allow setting some parameters
   if(options.get_bool_option("max-node-refinement"))
@@ -175,7 +175,7 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
   prop->set_message_handler(get_message_handler());
   info.prop=prop.get();
   info.refinement_bound=MAX_NB_REFINEMENT;
-  info.ui=&ui;
+  info.ui=ui;
   if(options.get_bool_option("string-max-length"))
     info.string_max_length=options.get_signed_int_option("string-max-length");
   info.string_non_empty=options.get_bool_option("string-non-empty");

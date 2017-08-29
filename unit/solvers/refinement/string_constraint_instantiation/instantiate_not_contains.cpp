@@ -122,8 +122,8 @@ decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=&sat_check;
-  const auto ui = language_uit::uit::PLAIN;
-  info.ui=&ui;
+  const auto ui=language_uit::uit::PLAIN;
+  info.ui=ui;
   bv_refinementt solver(info);
   solver << expr;
   return solver();

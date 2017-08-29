@@ -36,7 +36,7 @@ public:
   {
     const namespacet *ns=nullptr;
     propt *prop=nullptr;
-    const language_uit::uit *ui=nullptr;
+    language_uit::uit ui=language_uit::uit::PLAIN;
     unsigned refinement_bound=0;
     size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Make non-deterministic character arrays have at least one character

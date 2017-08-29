@@ -25,7 +25,7 @@ public:
   {
     const namespacet *ns=nullptr;
     propt *prop=nullptr;
-    const language_uit::uit *ui=nullptr;
+    language_uit::uit ui=language_uit::uit::PLAIN;
     /// Max number of times we refine a formula node
     unsigned max_node_refinement=5;
     /// Enable array refinement
