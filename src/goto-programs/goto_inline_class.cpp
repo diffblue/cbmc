@@ -46,13 +46,8 @@ void goto_inlinet::parameter_assignments(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it2=parameter_types.begin();
-      it2!=parameter_types.end();
-      it2++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it2;
-
     // this is the type the n-th argument should be
     const typet &par_type=ns.follow(parameter.type());
 
@@ -174,13 +169,8 @@ void goto_inlinet::parameter_destruction(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it=parameter_types.begin();
-      it!=parameter_types.end();
-      it++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it;
-
     const irep_idt &identifier=parameter.get_identifier();
 
     if(identifier.empty())
@@ -374,8 +364,8 @@ void goto_inlinet::insert_function_body(
   end.type=LOCATION;
 
   if(adjust_function)
-    Forall_goto_program_instructions(i_it, body)
-      i_it->function=target->function;
+    for(auto &instruction : body.instructions)
+      instruction.function=target->function;
 
   replace_return(body, lhs, constrain);
 
@@ -737,10 +727,8 @@ void goto_inlinet::goto_inline_nontransitive(
 
   recursion_set.insert(identifier);
 
-  for(call_listt::const_iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
-    const callt &call=*c_it;
     const bool transitive=call.second;
 
     const inline_mapt &new_inline_map=
@@ -792,8 +780,7 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   goto_programt::targetst call_list;
 
-  for(goto_programt::targett i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end(); i_it++)
+  Forall_goto_program_instructions(i_it, goto_program)
   {
     if(is_call(i_it))
       call_list.push_back(i_it);
@@ -804,15 +791,14 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   recursion_set.insert(identifier);
 
-  for(goto_programt::targetst::iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
     expand_function_call(
       goto_program,
       inline_mapt(),
       true,
       force_full,
-      *c_it);
+      call);
   }
 
   recursion_set.erase(identifier);
@@ -855,17 +841,15 @@ bool goto_inlinet::check_inline_map(
 
   int ln=-1;
 
-  for(call_listt::const_iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
-    const callt &call=*c_it;
     const goto_programt::const_targett target=call.first;
 
-#if 0
+    #if 0
     // might not hold if call was previously inlined
     if(target->function!=identifier)
       return false;
-#endif
+    #endif
 
     // location numbers increasing
     if(static_cast<int>(target->location_number)<=ln)
@@ -897,11 +881,10 @@ void goto_inlinet::output_inline_map(
 {
   assert(check_inline_map(inline_map));
 
-  for(inline_mapt::const_iterator it=inline_map.begin();
-      it!=inline_map.end(); it++)
+  for(const auto &it : inline_map)
   {
-    const irep_idt id=it->first;
-    const call_listt &call_list=it->second;
+    const irep_idt id=it.first;
+    const call_listt &call_list=it.second;
 
     out << "Function: " << id << "\n";
 
@@ -918,10 +901,8 @@ void goto_inlinet::output_inline_map(
 
       const goto_programt &goto_program=goto_function.body;
 
-      for(call_listt::const_iterator c_it=call_list.begin();
-          c_it!=call_list.end(); c_it++)
+      for(const auto &call : call_list)
       {
-        const callt &call=*c_it;
         const goto_programt::const_targett target=call.first;
         bool transitive=call.second;
 
@@ -959,10 +940,9 @@ void goto_inlinet::goto_inline_logt::cleanup(
 void goto_inlinet::goto_inline_logt::cleanup(
   const goto_functionst::function_mapt &function_map)
 {
-  for(goto_functionst::function_mapt::const_iterator it=
-        function_map.begin(); it!=function_map.end(); it++)
+  for(const auto &it : function_map)
   {
-    const goto_functiont &goto_function=it->second;
+    const goto_functiont &goto_function=it.second;
 
     if(!goto_function.body_available())
       continue;
@@ -1043,13 +1023,12 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
   json_objectt json_result;
   json_arrayt &json_inlined=json_result["inlined"].make_array();
 
-  for(log_mapt::const_iterator it=log_map.begin();
-      it!=log_map.end(); it++)
+  for(const auto &it : log_map)
   {
     json_objectt &object=json_inlined.push_back().make_object();
 
-    goto_programt::const_targett start=it->first;
-    const goto_inline_log_infot &info=it->second;
+    goto_programt::const_targett start=it.first;
+    const goto_inline_log_infot &info=it.second;
     goto_programt::const_targett end=info.end;
 
     assert(start->location_number<=end->location_number);
