@@ -70,9 +70,6 @@ public:
   languaget *new_language() override
   { return new ansi_c_languaget; }
 
-  bool wrap_entry_point_in_while()
-  { return wrap_entry_point; }
-
   std::string id() const override { return "C"; }
   std::string description() const override { return "ANSI-C 99"; }
   std::set<std::string> extensions() const override;
@@ -82,6 +79,9 @@ public:
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
+
+  bool wrap_entry_point_in_while() const
+  { return wrap_entry_point; }
 
 private:
   bool wrap_entry_point;

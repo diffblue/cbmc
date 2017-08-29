@@ -88,7 +88,7 @@ public:
 
   void modules_provided(std::set<std::string> &modules) override;
 
-  bool wrap_entry_point_in_while()
+  bool wrap_entry_point_in_while() const
   { return wrap_entry_point; }
 
 protected:

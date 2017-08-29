@@ -8,8 +8,8 @@ Date: August 2017
 
 \*******************************************************************/
 
-#ifndef WRAP_ENTRY_POINT_H
-#define WRAP_ENTRY_POINT_H
+#ifndef CPROVER_LANGAPI_WRAP_ENTRY_POINT_H
+#define CPROVER_LANGAPI_WRAP_ENTRY_POINT_H
 
 #include <util/std_code.h>
 
@@ -23,4 +23,4 @@ Date: August 2017
 code_whilet wrap_entry_point_in_while(
   code_function_callt &call_main);
 
-#endif // WRAP_ENTRY_POINT_H
+#endif // CPROVER_LANGAPI_WRAP_ENTRY_POINT_H

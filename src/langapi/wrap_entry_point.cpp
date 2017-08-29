@@ -20,8 +20,8 @@ code_whilet wrap_entry_point_in_while(code_function_callt &call_main)
   exprt true_expr;
   code_whilet while_expr;
   true_expr.make_true();
-  while_expr.cond() = true_expr;
-  while_expr.body() = call_main;
+  while_expr.cond()=true_expr;
+  while_expr.body()=call_main;
 
   return while_expr;
 }

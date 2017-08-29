@@ -447,10 +447,13 @@ bool ansi_c_entry_point(
         message_handler);
   }
 
-  if (wrap_entry_point) {
-    auto wrapped_main = wrap_entry_point_in_while(call_main);
+  if(wrap_entry_point)
+  {
+    code_whilet wrapped_main=wrap_entry_point_in_while(call_main);
     init_code.move_to_operands(wrapped_main);
-  } else {
+  }
+  else
+  {
     init_code.move_to_operands(call_main);
   }
 
