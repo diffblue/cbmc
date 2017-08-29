@@ -117,7 +117,7 @@ unsigned_union_find::size_type unsigned_union_find::get_other(size_type a)
     if(find(i)==a && i!=a)
       return i;
 
-//  assert(false);
+//  UNREACHABLE;
   return 0;
 }
 

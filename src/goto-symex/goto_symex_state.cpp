@@ -304,7 +304,7 @@ static void assert_l1_renaming(const exprt &expr)
   if(check_renaming_l1(expr))
   {
     std::cerr << expr.pretty() << '\n';
-    assert(false);
+    UNREACHABLE;
   }
   #else
   (void)expr;
@@ -317,7 +317,7 @@ static void assert_l2_renaming(const exprt &expr)
   if(check_renaming(expr))
   {
     std::cerr << expr.pretty() << '\n';
-    assert(false);
+    UNREACHABLE;
   }
   #else
   (void)expr;
@@ -439,7 +439,7 @@ void goto_symex_statet::set_ssa_indices(
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 

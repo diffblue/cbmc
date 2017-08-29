@@ -378,11 +378,11 @@ void c_typecastt::implicit_typecast_arithmetic(
     }
     return;
 
-  case BOOL:       assert(false); // should always be promoted to int
-  case CHAR:       assert(false); // should always be promoted to int
-  case UCHAR:      assert(false); // should always be promoted to int
-  case SHORT:      assert(false); // should always be promoted to int
-  case USHORT:     assert(false); // should always be promoted to int
+  case BOOL:       UNREACHABLE; // should always be promoted to int
+  case CHAR:       UNREACHABLE; // should always be promoted to int
+  case UCHAR:      UNREACHABLE; // should always be promoted to int
+  case SHORT:      UNREACHABLE; // should always be promoted to int
+  case USHORT:     UNREACHABLE; // should always be promoted to int
   case INT:        new_type=signed_int_type(); break;
   case UINT:       new_type=unsigned_int_type(); break;
   case LONG:       new_type=signed_long_int_type(); break;

@@ -56,7 +56,7 @@ public:
       }
 
       // make some poor compilers happy
-      assert(false);
+      UNREACHABLE;
       return "";
     }
 

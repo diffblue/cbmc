@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "endianness_map.h"
 
 #include <ostream>
-#include <cassert>
 
+#include "invariant.h"
 #include "std_types.h"
 #include "pointer_offset_size.h"
 #include "arith_tools.h"
@@ -64,7 +64,7 @@ void endianness_mapt::build_big_endian(const typet &src)
   {
     // these do get re-ordered!
     mp_integer bits=pointer_offset_bits(src, ns); // error is -1
-    assert(bits>=0);
+    CHECK_RETURN(bits>=0);
 
     size_t bits_int=integer2size_t(bits), base=map.size();
 
@@ -107,7 +107,7 @@ void endianness_mapt::build_big_endian(const typet &src)
 
     mp_integer s;
     if(to_integer(vector_type.size(), s))
-      assert(false);
+      CHECK_RETURN(false);
 
     while(s>0)
     {

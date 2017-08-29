@@ -15,6 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool decision_proceduret::in_core(const exprt &expr)
 {
-  assert(false);
+  UNREACHABLE;
   return true;
 }

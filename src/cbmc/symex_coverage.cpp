@@ -247,7 +247,7 @@ void goto_program_coverage_recordt::compute_coverage_lines(
       branches_total+=2;
       if(!entry.first->second.conditions.insert(
           {it, coverage_conditiont()}).second)
-        assert(false);
+        UNREACHABLE;
     }
 
     symex_coveraget::coveraget::const_iterator c_entry=

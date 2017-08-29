@@ -114,7 +114,7 @@ void expr2ct::get_shorthands(const exprt &expr)
     ns_collision[symbol->location.get_function()].insert(sh);
 
     if(!shorthands.insert(std::make_pair(*it, sh)).second)
-      assert(false);
+      UNREACHABLE;
   }
 
   for(find_symbols_sett::const_iterator

@@ -472,7 +472,7 @@ void goto_symext::symex_assign_byte_extract(
   else if(lhs.id()==ID_byte_extract_big_endian)
     new_rhs.id(ID_byte_update_big_endian);
   else
-    assert(false);
+    UNREACHABLE;
 
   new_rhs.copy_to_operands(lhs.op(), lhs.offset(), rhs);
   new_rhs.type()=lhs.op().type();

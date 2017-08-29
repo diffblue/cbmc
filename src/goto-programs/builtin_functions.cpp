@@ -221,7 +221,7 @@ void goto_convertt::do_printf(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void goto_convertt::do_scanf(
@@ -326,7 +326,7 @@ void goto_convertt::do_scanf(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void goto_convertt::do_input(
@@ -833,7 +833,7 @@ void goto_convertt::cpp_new_initializer(
       convert(to_code(initializer), dest);
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 }
 
@@ -1396,7 +1396,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="__builtin_unreachable")
   {
-    // says something like assert(false);
+    // says something like UNREACHABLE;
   }
   else if(identifier==ID_gcc_builtin_va_arg)
   {

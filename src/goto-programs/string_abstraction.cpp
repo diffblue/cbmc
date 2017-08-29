@@ -481,7 +481,7 @@ goto_programt::targett string_abstractiont::abstract(
 
   case RETURN:
     // use remove_returns
-    assert(false);
+    UNREACHABLE;
     break;
 
   case END_FUNCTION:
@@ -498,7 +498,7 @@ goto_programt::targett string_abstractiont::abstract(
   case LOCATION:
     break;
   case NO_INSTRUCTION_TYPE:
-    assert(false);
+    UNREACHABLE;
     break;
   }
 
@@ -647,7 +647,7 @@ exprt string_abstractiont::build(
 
   exprt str_struct;
   if(build_wrap(pointer, str_struct, write))
-    assert(false);
+    UNREACHABLE;
 
   exprt result=member(str_struct, what);
 
