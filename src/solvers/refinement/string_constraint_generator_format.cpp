@@ -434,8 +434,9 @@ string_exprt string_constraint_generatort::add_axioms_for_format(
   }
   else
   {
-    m_message.warning() << "ignoring format function with non constant first argument"
-              << m_message.eom;
+    m_message.warning()
+      << "ignoring format function with non constant first argument"
+      << m_message.eom;
     return fresh_string(ref_type);
   }
 }

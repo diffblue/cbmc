@@ -34,7 +34,7 @@ public:
     bool refine_arithmetic=true;
   };
 
-  bv_refinementt(const infot &info);
+  explicit bv_refinementt(const infot &info);
 
   decision_proceduret::resultt dec_solve() override;
 
