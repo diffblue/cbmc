@@ -108,6 +108,7 @@ graphs in DOT format.
 #include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
+#include <langapi/wrap_entry_point.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
@@ -149,6 +150,7 @@ class optionst;
   "(unwind-bounds)" \
   "(unwind-bounds-threshold):" \
   "(unwindset)" \
+  WRAP_ENTRY_POINT_IN_WHILE_TRUE \
   "(functions-ignore)" \
   "(functions-full)"
 
