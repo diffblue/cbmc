@@ -203,9 +203,7 @@ void cfg_baset<T, P, I>::compute_edges_goto(
      !instruction.guard.is_true())
     this->add_edge(entry, entry_map[next_PC]);
 
-  for(const auto &t : instruction.targets)
-    if(t!=goto_program.instructions.end())
-      this->add_edge(entry, entry_map[t]);
+  this->add_edge(entry, entry_map[instruction.get_target()]);
 }
 
 template<class T, typename P, typename I>
@@ -260,9 +258,7 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
     next_PC,
     entry);
 
-  for(const auto &t : instruction.targets)
-    if(t!=goto_program.instructions.end())
-      this->add_edge(entry, this->entry_map[t]);
+  this->add_edge(entry, this->entry_map[instruction.get_target()]);
 }
 
 template<class T, typename P, typename I>

@@ -212,12 +212,9 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case START_THREAD:
-    out << "START THREAD ";
-
-    if(instruction.targets.size()==1)
-      out << instruction.targets.front()->target_number;
-
-    out << '\n';
+    out << "START THREAD "
+        << instruction.get_target()->target_number
+        << '\n';
     break;
 
   case END_THREAD:

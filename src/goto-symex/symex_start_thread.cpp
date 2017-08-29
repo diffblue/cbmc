@@ -32,7 +32,7 @@ void goto_symext::symex_start_thread(statet &state)
     throw "start_thread expects one target";
 
   goto_programt::const_targett thread_target=
-    instruction.targets.front();
+    instruction.get_target();
 
   // put into thread vector
   std::size_t t=state.threads.size();
