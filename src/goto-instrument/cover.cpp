@@ -17,6 +17,7 @@ Date: May 2016
 #include <algorithm>
 #include <iterator>
 #include <unordered_set>
+#include <regex>
 
 #include <util/format_number_range.h>
 #include <util/prefix.h>
@@ -1567,13 +1568,21 @@ void instrument_cover_goals(
   message_handlert &message_handler,
   coverage_goalst &goals,
   bool function_only,
-  bool ignore_trivial)
+  bool ignore_trivial,
+  const std::string &cover_include_pattern)
 {
+  std::smatch string_matcher;
+  std::regex regex_matcher(cover_include_pattern);
+  bool do_include_pattern_match=!cover_include_pattern.empty();
+
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==goto_functions.entry_point() ||
        f_it->first==(CPROVER_PREFIX "initialize") ||
-       f_it->second.is_hidden())
+       f_it->second.is_hidden() ||
+       (do_include_pattern_match &&
+        !std::regex_match(
+          id2string(f_it->first), string_matcher, regex_matcher)))
       continue;
 
     instrument_cover_goals(
@@ -1603,7 +1612,8 @@ void instrument_cover_goals(
     message_handler,
     goals,
     function_only,
-    false);
+    false,
+    "");
 }
 
 bool instrument_cover_goals(
@@ -1706,7 +1716,8 @@ bool instrument_cover_goals(
       message_handler,
       existing_goals,
       cmdline.isset("cover-function-only"),
-      cmdline.isset("no-trivial-tests"));
+      cmdline.isset("no-trivial-tests"),
+      cmdline.get_value("cover-include-pattern"));
   }
 
   // check whether all existing goals match with instrumented goals

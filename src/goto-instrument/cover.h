@@ -66,7 +66,8 @@ void instrument_cover_goals(
   message_handlert &message_handler,
   coverage_goalst &,
   bool function_only=false,
-  bool ignore_trivial=false);
+  bool ignore_trivial=false,
+  const std::string &cover_inclue_pattern="");
 
 void instrument_cover_goals(
   const symbol_tablet &,
