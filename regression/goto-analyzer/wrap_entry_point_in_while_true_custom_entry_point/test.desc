@@ -1,0 +1,15 @@
+CORE
+main.c
+--show-goto-functions --wrap-entry-point-in-while --function skipWhitespace
+^EXIT=6$
+^SIGNAL=0$
+^     1: IF FALSE THEN GOTO 2$
+^        // 18 file main.c line 1
+^        skipWhitespace\(\);$
+^        // 19 file main.c line 1$
+^        return' = skipWhitespace#return_value;$
+^        // 20 file main.c line 1$
+^        dead skipWhitespace#return_value;$
+^        // 21 no location$
+^        GOTO 1$
+--

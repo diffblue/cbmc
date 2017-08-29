@@ -1,0 +1,15 @@
+CORE
+main.c
+--show-goto-functions --wrap-entry-point-in-while
+^EXIT=6$
+^SIGNAL=0$
+^     1: IF FALSE THEN GOTO 2$
+^        // 22 file main.c line 1$
+^        main\(argc', argv'\);$
+^        // 23 file main.c line 1$
+^        return' = main#return_value;$
+^        // 24 file main.c line 1$
+^        dead main#return_value;$
+^        // 25 no location$
+^        GOTO 1$
+--
