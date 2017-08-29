@@ -57,11 +57,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
+#include <ansi-c/ansi_c_language.h>
+
 #include "cbmc_solvers.h"
 #include "cbmc_parse_options.h"
 #include "bmc.h"
 #include "version.h"
 #include "xml_interface.h"
+
+
 
 cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
   parse_options_baset(CBMC_OPTIONS, argc, argv),
@@ -180,6 +184,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "localize-faults-method",
       cmdline.get_value("localize-faults-method"));
   }
+
+  if (cmdline.isset("wrap-entry-point-in-while"))
+    options.set_option("wrap-entry-point-in-while", true);
 
   if(cmdline.isset("unwind"))
     options.set_option("unwind", cmdline.get_value("unwind"));
@@ -597,7 +604,6 @@ int cbmc_parse_optionst::get_goto_program(
       }
 
       language->set_message_handler(get_message_handler());
-
       status() << "Parsing " << filename << eom;
 
       if(language->parse(infile, filename))

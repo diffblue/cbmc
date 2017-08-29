@@ -22,6 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_languaget:public languaget
 {
 public:
+  virtual void get_language_options(
+    const cmdlinet &) override;
+
   bool preprocess(
     std::istream &instream,
     const std::string &path,
@@ -67,6 +70,9 @@ public:
   languaget *new_language() override
   { return new ansi_c_languaget; }
 
+  bool wrap_entry_point_in_while()
+  { return wrap_entry_point; }
+
   std::string id() const override { return "C"; }
   std::string description() const override { return "ANSI-C 99"; }
   std::set<std::string> extensions() const override;
@@ -76,6 +82,9 @@ public:
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
+
+private:
+  bool wrap_entry_point;
 };
 
 languaget *new_ansi_c_language();

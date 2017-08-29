@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <linking/static_lifetime_init.h>
 
 #include "ansi_c_entry_point.h"
+#include "ansi_c_language.h"
 #include "c_nondet_symbol_factory.h"
 
 exprt::operandst build_function_environment(
@@ -121,7 +122,8 @@ void record_function_outputs(
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
   const std::string &standard_main,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool wrap_entry_point)
 {
   // check if entry point is already there
   if(symbol_table.symbols.find(goto_functionst::entry_point())!=
@@ -444,7 +446,12 @@ bool ansi_c_entry_point(
         message_handler);
   }
 
-  init_code.move_to_operands(call_main);
+  if (wrap_entry_point) {
+    auto wrapped_main = wrap_entry_point_in_while(call_main);
+    init_code.move_to_operands(wrapped_main);
+  } else {
+    init_code.move_to_operands(call_main);
+  }
 
   // TODO: add read/modified (recursively in call graph) globals as INPUT/OUTPUT
 
@@ -470,4 +477,17 @@ bool ansi_c_entry_point(
   }
 
   return false;
+}
+
+// Build and return a while(true) statement nesting the function call
+// passed as a parameter.
+code_whilet wrap_entry_point_in_while(code_function_callt &call_main)
+{
+  exprt true_expr;
+  code_whilet while_expr;
+  true_expr.make_true();
+  while_expr.cond() = true_expr;
+  while_expr.body() = call_main;
+
+  return while_expr;
 }

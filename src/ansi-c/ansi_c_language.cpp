@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/cmdline.h>
 
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
@@ -25,6 +26,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_preprocess.h"
 #include "ansi_c_internal_additions.h"
 #include "type2name.h"
+
+void ansi_c_languaget::get_language_options(const cmdlinet &cmd)
+{
+    if (cmd.isset("wrap-entry-point-in-while"))
+    {
+      wrap_entry_point = true;
+    }
+}
 
 std::set<std::string> ansi_c_languaget::extensions() const
 {
@@ -126,7 +135,8 @@ bool ansi_c_languaget::typecheck(
 
 bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+  if(ansi_c_entry_point(symbol_table, "main", get_message_handler(),
+                        wrap_entry_point_in_while()))
     return true;
 
   return false;
@@ -211,7 +221,6 @@ bool ansi_c_languaget::to_expr(
      expr.type().id()==ID_empty &&
      expr.operands().size()==1)
     expr=expr.op0();
-
   return result;
 }
 
