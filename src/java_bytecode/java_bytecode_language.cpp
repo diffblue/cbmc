@@ -138,8 +138,7 @@ bool java_bytecode_languaget::parse(
       java_cp_include_files);
     if(config.java.main_class.empty())
     {
-      // load the .jar file and retrieve its manifest
-      jar_filet::manifestt manifest=
+      auto manifest=
         java_class_loader.jar_pool(class_loader_limit, path).get_manifest();
       std::string manifest_main_class=manifest["Main-Class"];
 

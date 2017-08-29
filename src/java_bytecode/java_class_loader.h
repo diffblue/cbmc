@@ -53,9 +53,11 @@ public:
   typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
   class_mapt class_map;
 
-  /// Maps .jar filesystem paths to jar_filet objects (stored inside).
-  /// Responsible for loading new jar files when they are first referenced.
-  jar_poolt jar_pool;
+  /// Load jar archive(from cache if already loaded)
+  /// \param limit
+  /// \param filename name of the file
+  jar_filet &jar_pool(java_class_loader_limitt &limit,
+                      const std::string &filename);
 
   /// An object of this class represents the information of _a single JAR file_
   /// that is relevant for a class loader: a map associating logical class names
@@ -90,6 +92,8 @@ public:
   /// java_class_loader_limitt::setup_class_load_limit() for further
   /// information.
   std::string java_cp_include_files;
+private:
+  std::map<std::string, jar_filet> m_archives;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

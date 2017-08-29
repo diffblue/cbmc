@@ -1,144 +1,100 @@
 /*******************************************************************\
 
-Module:
+Module: Jar file reader
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Diffblue Ltd
 
 \*******************************************************************/
 
 #include "jar_file.h"
-
-#include <cstring>
-#include <unordered_set>
-
-#include <json/json_parser.h>
+#include <cctype>
 #include <util/suffix.h>
 #include <util/invariant.h>
+#include "java_class_loader_limit.h"
 
-void jar_filet::open(
-  java_class_loader_limitt &class_loader_limit,
-  const std::string &filename)
+jar_filet::jar_filet(
+  java_class_loader_limitt &limit,
+  const std::string &filename):
+  m_zip_archive(filename)
 {
-  if(!mz_ok)
+  const size_t file_count=m_zip_archive.get_num_files();
+  for(size_t index=0; index<file_count; index++)
   {
-    memset(&zip, 0, sizeof(zip));
-    mz_bool mz_open=mz_zip_reader_init_file(&zip, filename.c_str(), 0);
-    mz_ok=mz_open==MZ_TRUE;
+    const auto filename=m_zip_archive.get_filename(index);
+    if(!has_suffix(filename, ".class") || limit.load_class_file(filename))
+      m_name_to_index.emplace(filename, index);
   }
+}
 
-  if(mz_ok)
+// VS: No default move constructors or assigns
+
+jar_filet::jar_filet(jar_filet &&other):
+  m_zip_archive(std::move(other.m_zip_archive)),
+  m_name_to_index((other.m_name_to_index)) {}
+
+jar_filet &jar_filet::operator=(jar_filet &&other)
+{
+  m_zip_archive=std::move(other.m_zip_archive);
+  m_name_to_index=std::move(other.m_name_to_index);
+  return *this;
+}
+
+std::string jar_filet::get_entry(const std::string &name)
+{
+  const auto entry=m_name_to_index.find(name);
+  INVARIANT(entry!=m_name_to_index.end(), "File doesn't exist");
+  try
   {
-    std::size_t number_of_files=
-      mz_zip_reader_get_num_files(&zip);
+    return m_zip_archive.extract(entry->second);
+  }
+  catch(const std::runtime_error &)
+  {
+    return "";
+  }
+}
 
-    for(std::size_t i=0; i<number_of_files; i++)
+static bool is_space(const char ch)
+{
+  return std::isspace(ch);
+}
+
+/// Remove leading and trailing whitespace characters from string
+static std::string trim(
+  const std::string::const_iterator begin,
+  const std::string::const_iterator end)
+{
+  const auto out_begin=std::find_if_not(begin, end, is_space);
+  const auto out_end=std::find_if_not(
+    std::string::const_reverse_iterator(end),
+    std::string::const_reverse_iterator(out_begin),
+    is_space).base();
+  return { out_begin, out_end };
+}
+
+std::unordered_map<std::string, std::string> jar_filet::get_manifest()
+{
+  std::unordered_map<std::string, std::string> out;
+  const auto entry=m_name_to_index.find("META-INF/MANIFEST.MF");
+  if(entry!=m_name_to_index.end())
+  {
+    std::istringstream in(this->get_entry(entry->first));
+    std::string line;
+    while(std::getline(in, line))
     {
-      // get the length of the filename, including the trailing \0
-      mz_uint filename_length=mz_zip_reader_get_filename(&zip, i, nullptr, 0);
-      std::vector<char> filename_char(filename_length+1);
-      INVARIANT(filename_length>=1, "buffer size must include trailing \\0");
-
-      // read and convert to std::string
-      mz_uint filename_len=
-        mz_zip_reader_get_filename(
-          &zip, i, filename_char.data(), filename_length);
-      INVARIANT(
-        filename_length==filename_len,
-        "buffer size was incorrectly pre-computed");
-      std::string file_name(filename_char.data());
-#if DEBUG
-      debug()
-        << "jar_filet.open: idx " << i
-        << " len " << filename_len
-        << " filename '" << std::string(filename_char.data()) << "'" << eom;
-#endif
-      INVARIANT(file_name.size()==filename_len-1, "no \\0 found in file name");
-
-      // non-class files are loaded in any case
-      bool add_file=!has_suffix(file_name, ".class");
-      // load .class file only if they match regex / are in match set
-      add_file|=class_loader_limit.load_class_file(file_name);
-      if(add_file)
-      {
-        if(has_suffix(file_name, ".class"))
-          status() << "read class file " << file_name
-                   << " from " << filename << eom;
-        filtered_jar[file_name]=i;
-      }
+      const auto key_end=std::find(line.cbegin(), line.cend(), ':');
+      if(key_end!=line.cend())
+        out.emplace(
+          trim(line.cbegin(), key_end),
+          trim(std::next(key_end), line.cend()));
     }
   }
+  return out;
 }
 
-jar_filet::~jar_filet()
+std::vector<std::string> jar_filet::filenames() const
 {
-  if(mz_ok)
-  {
-    mz_zip_reader_end(&zip);
-    mz_ok=false;
-  }
-}
-
-std::string jar_filet::get_entry(const irep_idt &name)
-{
-  if(!mz_ok)
-    return std::string("");
-
-  std::string dest;
-
-  auto entry=filtered_jar.find(name);
-  assert(entry!=filtered_jar.end());
-
-  size_t real_index=entry->second;
-  mz_zip_archive_file_stat file_stat;
-  memset(&file_stat, 0, sizeof(file_stat));
-  mz_bool stat_ok=mz_zip_reader_file_stat(&zip, real_index, &file_stat);
-  if(stat_ok!=MZ_TRUE)
-    return std::string();
-  std::vector<char> buffer;
-  size_t bufsize=file_stat.m_uncomp_size;
-  buffer.resize(bufsize);
-  mz_bool read_ok=
-    mz_zip_reader_extract_to_mem(&zip, real_index, buffer.data(), bufsize, 0);
-  if(read_ok!=MZ_TRUE)
-    return std::string();
-
-  dest.insert(dest.end(), buffer.begin(), buffer.end());
-
-  return dest;
-}
-
-jar_filet::manifestt jar_filet::get_manifest()
-{
-  auto entry=filtered_jar.find("META-INF/MANIFEST.MF");
-  if(entry==filtered_jar.end())
-    return manifestt();
-
-  std::string dest=get_entry(entry->first);
-  std::istringstream in(dest);
-
-  manifestt manifest;
-
-  std::string line;
-  while(std::getline(in, line))
-  {
-    std::size_t pos=line.find(':');
-    if(pos==std::string::npos)
-      continue;
-    std::string key=line.substr(0, pos);
-
-    // skip spaces
-    pos++;
-    while(pos<line.size() && line[pos]==' ') pos++;
-
-    std::string value=line.substr(pos, std::string::npos);
-
-    // trim off \r
-    if(!value.empty() && *value.rbegin()=='\r')
-      value.resize(value.size()-1);
-
-    // store
-    manifest[key]=value;
-  }
-
-  return manifest;
+  std::vector<std::string> out;
+  for(const auto &pair : m_name_to_index)
+    out.emplace_back(pair.first);
+  return out;
 }
