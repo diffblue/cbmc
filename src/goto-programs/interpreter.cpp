@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 #include <string.h>
 
+#include <util/invariant.h>
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 #include <util/ieee_float.h>
@@ -380,7 +381,9 @@ void interpretert::execute_other()
   const irep_idt &statement=pc->code.get_statement();
   if(statement==ID_expression)
   {
-    assert(pc->code.operands().size()==1);
+    DATA_INVARIANT(
+      pc->code.operands().size()==1,
+      "expression statement expected to have one operand");
     mp_vectort rhs;
     evaluate(pc->code.op0(), rhs);
   }
@@ -409,7 +412,7 @@ void interpretert::execute_other()
 
 void interpretert::execute_decl()
 {
-  assert(pc->code.get_statement()==ID_decl);
+  PRECONDITION(pc->code.get_statement()==ID_decl);
 }
 
 /// retrieves the member at offset
@@ -515,7 +518,7 @@ exprt interpretert::get_value(
   std::size_t offset)
 {
   const typet real_type=ns.follow(type);
-  assert(!rhs.empty());
+  PRECONDITION(!rhs.empty());
 
   if(real_type.id()==ID_struct)
   {
@@ -807,7 +810,6 @@ void interpretert::execute_function_call()
       const code_typet::parametert &a=parameters[i];
       exprt symbol_expr(ID_symbol, a.type());
       symbol_expr.set(ID_identifier, a.get_identifier());
-      assert(i<argument_values.size());
       assign(evaluate_address(symbol_expr), argument_values[i]);
     }
 
@@ -822,8 +824,8 @@ void interpretert::execute_function_call()
     if(it!=function_input_vars.end())
     {
       mp_vectort value;
-      assert(!it->second.empty());
-      assert(!it->second.front().return_assignments.empty());
+      PRECONDITION(!it->second.empty());
+      PRECONDITION(!it->second.front().return_assignments.empty());
       evaluate(it->second.front().return_assignments.back().value, value);
       if(return_value_address>0)
       {
@@ -1013,7 +1015,8 @@ size_t interpretert::get_size(const typet &type)
       // overflow behaviour.
       exprt size_const=from_integer(i[0], size_expr.type());
       mp_integer size_mp;
-      assert(!to_integer(size_const, size_mp));
+      bool ret=to_integer(size_const, size_mp);
+      CHECK_RETURN(!ret);
       return subtype_size*integer2unsigned(size_mp);
     }
     return subtype_size;
