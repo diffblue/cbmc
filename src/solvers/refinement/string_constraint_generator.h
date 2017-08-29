@@ -79,9 +79,9 @@ public:
   exprt add_axioms_for_function_application(
     const function_application_exprt &expr);
 
-private:
-
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
+
+private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   string_exprt fresh_string(const refined_string_typet &type);
   string_exprt get_string_expr(const exprt &expr);
