@@ -24,6 +24,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <stack>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
 #include <util/simplify_expr.h>
@@ -1085,6 +1086,32 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   and_exprt negaxiom(premise, not_exprt(axiom.body()));
 
   return negaxiom;
+}
+
+/// Result of the solver `supert` should not be interpreted literally for char
+/// arrays as not all indices are present in the index set.
+/// In the given expression, we populate arrays at the indices for which the
+/// solver has no constraint by copying values to the left.
+/// For example an expression `ARRAY_OF(0) WITH [1:=2] WITH [4:=3]` would
+/// be interpreted as `{ 2, 2, 3, 3, 3}`.
+/// \param expr: expression to interpret
+/// \param string_max_length: maximum size of arrays to consider
+/// \return the interpreted expression
+exprt concretize_arrays_in_expression(exprt expr, std::size_t string_max_length)
+{
+  auto it=expr.depth_begin();
+  const auto end=expr.depth_end();
+  while(it!=end)
+  {
+    if(it->id()==ID_with && it->type().id()==ID_array)
+    {
+      it.mutate()=fill_in_array_with_expr(*it, string_max_length);
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+  return expr;
 }
 
 /// return true if the current model satisfies all the axioms
