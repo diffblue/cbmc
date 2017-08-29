@@ -863,6 +863,42 @@ exprt string_refinementt::substitute_array_with_expr(
   }
 }
 
+/// Fill an array represented by a list of with_expr by propagating values to
+/// the left. For instance `ARRAY_OF(12) WITH[2:=24] WITH[4:=42]` will give
+/// `{ 24, 24, 24, 42, 42 }`
+/// \param expr: an array expression in the form
+///   `ARRAY_OF(x) WITH [i0:=v0] ... WITH [iN:=vN]`
+/// \param string_max_length: bound on the length of strings
+/// \return an array expression with filled in values, or expr if it is simply
+///   an `ARRAY_OF(x)` expression
+exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
+{
+  PRECONDITION(expr.type().id()==ID_array);
+  PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
+
+  // Nothing to do for empty array
+  if(expr.id()==ID_array_of)
+    return expr;
+
+  // Map of the parts of the array that are initialized
+  std::map<std::size_t, exprt> initial_map;
+
+  for(exprt it=expr; it.id()==ID_with; it=to_with_expr(it).old())
+  {
+    // Add to `initial_map` all the pairs (index,value) contained in `WITH`
+    // statements
+    const with_exprt with_expr=to_with_expr(it);
+    const exprt &then_expr=with_expr.new_value();
+    const auto index=expr_cast<std::size_t>(with_expr.where());
+    if(index<string_max_length)
+      initial_map.emplace(index, then_expr);
+  }
+
+  array_exprt result(to_array_type(expr.type()));
+  result.operands()=fill_in_map_as_vector(initial_map);
+  return result;
+}
+
 /// create an equivalent expression where array accesses and 'with' expressions
 /// are replaced by 'if' expressions, in particular:
 ///  * for an array access `arr[x]`, where:
