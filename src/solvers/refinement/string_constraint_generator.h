@@ -26,6 +26,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/refined_string_type.h>
 #include <solvers/refinement/string_constraint.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+#define CBMC_CONSTEXPR constexpr
+#else
+#define CBMC_CONSTEXPR
+#endif
+
 class string_constraint_generatort final
 {
 public:
@@ -340,10 +346,10 @@ private:
   // that is -2147483648 so takes 11 characters to write.
   // The long with the longest string is Long.MIN_VALUE which is -2^63,
   // approximately -9.223372037*10^18 so takes 20 characters to write.
-  constexpr static const std::size_t MAX_INTEGER_LENGTH=11;
-  constexpr static const std::size_t MAX_LONG_LENGTH=20;
-  constexpr static const std::size_t MAX_FLOAT_LENGTH=15;
-  constexpr static const std::size_t MAX_DOUBLE_LENGTH=30;
+  CBMC_CONSTEXPR static const std::size_t MAX_INTEGER_LENGTH=11;
+  CBMC_CONSTEXPR static const std::size_t MAX_LONG_LENGTH=20;
+  CBMC_CONSTEXPR static const std::size_t MAX_FLOAT_LENGTH=15;
+  CBMC_CONSTEXPR static const std::size_t MAX_DOUBLE_LENGTH=30;
   std::set<string_exprt> m_created_strings;
   unsigned m_symbol_count=0;
   const messaget m_message;
