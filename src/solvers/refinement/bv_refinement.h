@@ -93,7 +93,7 @@ private:
 
   resultt prop_solve();
   approximationt &add_approximation(const exprt &expr, bvt &bv);
-  bool is_in_conflict(approximationt &approximation);
+  bool conflicts_with(approximationt &approximation);
   void check_SAT(approximationt &approximation);
   void check_UNSAT(approximationt &approximation);
   void initialize(approximationt &approximation);

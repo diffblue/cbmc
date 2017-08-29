@@ -373,7 +373,7 @@ void bv_refinementt::check_SAT(approximationt &a)
 void bv_refinementt::check_UNSAT(approximationt &a)
 {
   // part of the conflict?
-  if(!is_in_conflict(a))
+  if(!this->conflicts_with(a))
     return;
 
   status() << "Found assumption for `" << a.as_string()
@@ -458,7 +458,7 @@ void bv_refinementt::check_UNSAT(approximationt &a)
 }
 
 /// check if an under-approximation is part of the conflict
-bool bv_refinementt::is_in_conflict(approximationt &a)
+bool bv_refinementt::conflicts_with(approximationt &a)
 {
   for(std::size_t i=0; i<a.under_assumptions.size(); i++)
     if(prop.is_in_conflict(a.under_assumptions[i]))
