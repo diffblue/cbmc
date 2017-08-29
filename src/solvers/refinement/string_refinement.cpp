@@ -848,6 +848,7 @@ exprt string_refinementt::substitute_array_with_expr(
     exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
     const typet &type=then_expr.type();
     CHECK_RETURN(else_expr.type()==type);
+    CHECK_RETURN(index.type()==with_expr.where().type());
     return if_exprt(
       equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
   }
