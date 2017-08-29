@@ -313,84 +313,55 @@ std::size_t expr_cast<std::size_t>(const exprt& val_expr)
 /// force the solver to pick concrete values for each character, and fill the
 /// maps `found_length` and `found_content`.
 ///
-///          The way this is done is by looking for the length of the string,
-///          then for each `i` in the index set, look at the value found by
-///          the solver and put it in the `result` table.
-///          For indexes that are not present in the index set, we put the
-///          same value as the next index that is present in the index set.
-///          We do so by traversing the array backward, remembering the
-///          last value that has been initialized.
+/// The way this is done is by looking for the length of the string,
+/// then for each `i` in the index set, look at the value found by
+/// the solver and put it in the `result` table.
+/// For indexes that are not present in the index set, we put the
+/// same value as the next index that is present in the index set.
+/// We do so by traversing the array backward, remembering the
+/// last value that has been initialized.
 void string_refinementt::concretize_string(const exprt &expr)
 {
   if(is_refined_string_type(expr.type()))
   {
-    string_exprt str=to_string_expr(expr);
-    exprt length=get(str.length());
+    const string_exprt str=to_string_expr(expr);
+    const exprt length=get(str.length());
     exprt content=str.content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
-    mp_integer found_length;
-    if(!to_integer(length, found_length))
+    const auto string_length=expr_cast<std::size_t>(length);
+    INVARIANT(
+      string_length<=generator.max_string_length,
+      string_refinement_invariantt("string length must be less than the max "
+        "length"));
+    if(index_set[str.content()].empty())
+      return;
+
+    std::map<std::size_t, exprt> map;
+
+    for(const auto &i : index_set[str.content()])
     {
-      INVARIANT(
-        found_length.is_long(),
-        string_refinement_invariantt("the length of a string should be a "
-          "long"));
-      INVARIANT(
-        found_length>=0,
-        string_refinement_invariantt("the length of a string should be >= 0"));
-      size_t concretize_limit=found_length.to_long();
-      INVARIANT(
-        concretize_limit<=generator.max_string_length,
-        string_refinement_invariantt("string length must be less than the max "
-          "length"));
-      exprt content_expr=str.content();
-      std::vector<exprt> result;
-
-      if(index_set[str.content()].empty())
-        return;
-
-      // Use the last index as the default character value
-      exprt last_concretized=simplify_expr(
-        get(str[minus_exprt(length, from_integer(1, length.type()))]), ns);
-      result.resize(concretize_limit, last_concretized);
-
-      // Keep track of the indexes for which we have actual values
-      std::set<size_t> initialized;
-
-      for(const auto &i : index_set[str.content()])
+      const exprt simple_i=simplify_expr(get(i), ns);
+      mp_integer mpi_index;
+      bool conversion_failure=to_integer(simple_i, mpi_index);
+      if(!conversion_failure && mpi_index>=0 && mpi_index<string_length)
       {
-        mp_integer mp_index;
-        exprt simple_i=simplify_expr(get(i), ns);
-        if(to_integer(simple_i, mp_index) ||
-           mp_index<0 ||
-           mp_index>=concretize_limit)
-        {
-          debug() << "concretize_string: ignoring out of bound index: "
-                  << from_expr(ns, "", simple_i) << eom;
-        }
-        else
-        {
-          // Add an entry in the result vector
-          size_t index=mp_index.to_long();
-          exprt str_i=simplify_expr(str[simple_i], ns);
-          exprt value=simplify_expr(get(str_i), ns);
-          result[index]=value;
-          initialized.insert(index);
-        }
+        const exprt str_i=simplify_expr(str[simple_i], ns);
+        const exprt value=simplify_expr(get(str_i), ns);
+        std::size_t index=mpi_index.to_long();
+        map.emplace(index, value);
       }
-
-      // Pad the concretized values to the left to assign the uninitialized
-      // values of result. The indices greater than concretize_limit are
-      // already assigned to last_concretized.
-      pad_vector(result, initialized, last_concretized);
-
-      array_exprt arr(to_array_type(content.type()));
-      arr.operands()=result;
-      debug() << "Concretized " << from_expr(ns, "", content_expr)
-              << " = " << from_expr(ns, "", arr) << eom;
-      found_content[content]=arr;
+      else
+      {
+        debug() << "concretize_string: ignoring out of bound index: "
+                << from_expr(ns, "", simple_i) << eom;
+      }
     }
+    array_exprt arr(to_array_type(content.type()));
+    arr.operands()=fill_in_map_as_vector(map);
+    debug() << "Concretized " << from_expr(ns, "", str.content())
+            << " = " << from_expr(ns, "", arr) << eom;
+    found_content[content]=arr;
   }
 }
 
@@ -735,61 +706,37 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
     return empty_ret;
   }
 
-  std::vector<unsigned> concrete_array(n);
-
   if(arr_val.id()=="array-list")
   {
-    std::set<unsigned> initialized;
+    DATA_INVARIANT(
+      arr_val.operands().size()%2==0,
+      string_refinement_invariantt("and index expression must be on a symbol, "
+                                   "with, array_of, if, or array, and all "
+                                   "cases besides array are handled above"));
+    std::map<std::size_t, exprt> initial_map;
     for(size_t i=0; i<arr_val.operands().size()/2; i++)
     {
       exprt index=arr_val.operands()[i*2];
       unsigned idx;
-      if(!to_unsigned_integer(to_constant_expr(index), idx))
-      {
-        if(idx<n)
-        {
-          exprt value=arr_val.operands()[i*2+1];
-          to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
-          initialized.insert(idx);
-        }
-      }
+      if(!to_unsigned_integer(to_constant_expr(index), idx) && idx<n)
+        initial_map[idx]=arr_val.operands()[i*2+1];
     }
 
     // Pad the concretized values to the left to assign the uninitialized
     // values of result.
-    pad_vector(concrete_array, initialized, concrete_array[n-1]);
+    ret.operands()=fill_in_map_as_vector(initial_map);
+    return ret;
   }
   else if(arr_val.id()==ID_array)
   {
+    // copy the `n` first elements of `arr_val`
     for(size_t i=0; i<arr_val.operands().size() && i<n; i++)
-    {
-      unsigned c;
-      exprt op=arr_val.operands()[i];
-      if(op.id()==ID_constant)
-      {
-        to_unsigned_integer(to_constant_expr(op), c);
-        concrete_array[i]=c;
-      }
-    }
+      ret.move_to_operands(arr_val.operands()[i]);
+    return ret;
   }
-  else
-  {
-#if 0
-    debug() << "unable to get array-list value of " << from_expr(ns, "", arr)
-            << " of size " << n << eom;
-#endif
-    return array_of_exprt(from_integer(0, char_type), ret_type);
-  }
-
-  for(size_t i=0; i<n; i++)
-  {
-    exprt c_expr=from_integer(concrete_array[i], char_type);
-    ret.move_to_operands(c_expr);
-  }
-
-  return ret;
+  // default return value is an array of `0`s
+  return array_of_exprt(from_integer(0, char_type), ret_type);
 }
-
 
 /// get a model of an array of unknown size and infer the size if possible
 /// \par parameters: an expression representing an array
