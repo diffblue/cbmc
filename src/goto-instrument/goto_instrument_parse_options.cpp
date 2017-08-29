@@ -1554,6 +1554,7 @@ void goto_instrument_parse_optionst::help()
     " --log <file>                 log in json format which code segments were inlined, use with --function-inline\n" // NOLINT(*)
     " --remove-function-pointers   replace function pointers by case statement over function calls\n" // NOLINT(*)
     HELP_REMOVE_CONST_FUNCTION_POINTERS
+    HELP_WRAP_ENTRY_POINT_IN_WHILE_TRUE
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)

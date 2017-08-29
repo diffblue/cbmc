@@ -757,6 +757,7 @@ void goto_analyzer_parse_optionst::help()
     " --gcc                        use GCC as preprocessor\n"
     #endif
     " --no-library                 disable built-in abstract C library\n"
+    HELP_WRAP_ENTRY_POINT_IN_WHILE_TRUE
     "\n"
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"

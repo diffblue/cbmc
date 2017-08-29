@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
+#include <langapi/wrap_entry_point.h>
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/remove_const_function_pointers.h>
@@ -78,6 +79,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):" \
+  WRAP_ENTRY_POINT_IN_WHILE_TRUE \
   "(remove-calls-nobody)"
 
 class goto_instrument_parse_optionst:
