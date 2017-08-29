@@ -77,7 +77,7 @@ void goto_inline(
 
       Forall_goto_program_instructions(i_it, goto_program)
       {
-        if(!goto_inlinet::is_call(i_it))
+        if(!i_it->is_function_call())
           continue;
 
         call_list.push_back(goto_inlinet::callt(i_it, false));
@@ -164,14 +164,13 @@ void goto_partial_inline(
 
     Forall_goto_program_instructions(i_it, goto_program)
     {
-      if(!goto_inlinet::is_call(i_it))
+      if(!i_it->is_function_call())
         continue;
 
       exprt lhs;
       exprt function_expr;
       exprt::operandst arguments;
-      exprt constrain;
-      goto_inlinet::get_call(i_it, lhs, function_expr, arguments, constrain);
+      goto_inlinet::get_call(i_it, lhs, function_expr, arguments);
 
       if(function_expr.id()!=ID_symbol)
         // Can't handle pointers to functions
@@ -199,7 +198,7 @@ void goto_partial_inline(
       if(goto_function.is_inlined() ||
          goto_program.instructions.size()<=smallfunc_limit)
       {
-        assert(goto_inlinet::is_call(i_it));
+        assert(i_it->is_function_call());
         call_list.push_back(goto_inlinet::callt(i_it, false));
       }
     }
@@ -273,7 +272,7 @@ void goto_function_inline(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(!goto_inlinet::is_call(i_it))
+    if(!i_it->is_function_call())
       continue;
 
     call_list.push_back(goto_inlinet::callt(i_it, true));
@@ -318,7 +317,7 @@ jsont goto_function_inline_and_log(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(!goto_inlinet::is_call(i_it))
+    if(!i_it->is_function_call())
       continue;
 
     call_list.push_back(goto_inlinet::callt(i_it, true));

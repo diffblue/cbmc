@@ -34,7 +34,7 @@ void goto_inlinet::parameter_assignments(
   const exprt::operandst &arguments, // arguments of call
   goto_programt &dest)
 {
-  assert(is_call(target));
+  assert(target->is_function_call());
   assert(dest.empty());
 
   const source_locationt &source_location=target->source_location;
@@ -160,7 +160,7 @@ void goto_inlinet::parameter_destruction(
   const code_typet &code_type, // type of called function
   goto_programt &dest)
 {
-  assert(is_call(target));
+  assert(target->is_function_call());
   assert(dest.empty());
 
   const source_locationt &source_location=target->source_location;
@@ -195,8 +195,7 @@ void goto_inlinet::parameter_destruction(
 
 void goto_inlinet::replace_return(
   goto_programt &dest, // inlining this
-  const exprt &lhs, // lhs in caller
-  const exprt &constrain)
+  const exprt &lhs) // lhs in caller
 {
   for(goto_programt::instructionst::iterator
       it=dest.instructions.begin();
@@ -230,14 +229,6 @@ void goto_inlinet::replace_return(
         assignment->code=code_assign;
         assignment->source_location=it->source_location;
         assignment->function=it->function;
-
-        if(constrain.is_not_nil() && !constrain.is_true())
-        {
-          codet constrain(ID_bp_constrain);
-          constrain.reserve_operands(2);
-          constrain.move_to_operands(assignment->code);
-          constrain.copy_to_operands(constrain);
-        }
 
         dest.insert_before_swap(it, *assignment);
         it++;
@@ -276,20 +267,8 @@ void goto_inlinet::replace_return(
            code_assign.rhs().type())
           code_assign.rhs().make_typecast(code_assign.lhs().type());
 
-        if(constrain.is_not_nil() && !constrain.is_true())
-        {
-          codet constrain(ID_bp_constrain);
-          constrain.reserve_operands(2);
-          constrain.move_to_operands(code_assign);
-          constrain.copy_to_operands(constrain);
-          it->code=constrain;
-          it->type=OTHER;
-        }
-        else
-        {
-          it->code=code_assign;
-          it->type=ASSIGN;
-        }
+        it->code=code_assign;
+        it->type=ASSIGN;
 
         it++;
       }
@@ -346,10 +325,9 @@ void goto_inlinet::insert_function_body(
   goto_programt::targett target,
   const exprt &lhs,
   const symbol_exprt &function,
-  const exprt::operandst &arguments,
-  const exprt &constrain)
+  const exprt::operandst &arguments)
 {
-  assert(is_call(target));
+  assert(target->is_function_call());
   assert(!dest.empty());
   assert(goto_function.body_available());
 
@@ -367,7 +345,7 @@ void goto_inlinet::insert_function_body(
     for(auto &instruction : body.instructions)
       instruction.function=target->function;
 
-  replace_return(body, lhs, constrain);
+  replace_return(body, lhs);
 
   goto_programt tmp1;
   parameter_assignments(
@@ -448,7 +426,7 @@ void goto_inlinet::insert_function_nobody(
   const symbol_exprt &function,
   const exprt::operandst &arguments)
 {
-  assert(is_call(target));
+  assert(target->is_function_call());
   assert(!dest.empty());
 
   const irep_idt identifier=function.get_identifier();
@@ -501,7 +479,7 @@ void goto_inlinet::expand_function_call(
   const bool force_full,
   goto_programt::targett target)
 {
-  assert(is_call(target));
+  assert(target->is_function_call());
   assert(!dest.empty());
   assert(!transitive || inline_map.empty());
 
@@ -513,9 +491,8 @@ void goto_inlinet::expand_function_call(
   exprt lhs;
   exprt function_expr;
   exprt::operandst arguments;
-  exprt constrain;
 
-  get_call(target, lhs, function_expr, arguments, constrain);
+  get_call(target, lhs, function_expr, arguments);
 
   if(function_expr.id()!=ID_symbol)
     return;
@@ -576,8 +553,7 @@ void goto_inlinet::expand_function_call(
         target,
         lhs,
         function,
-        arguments,
-        constrain);
+        arguments);
 
       progress() << "Inserting " << identifier << " into caller" << eom;
       progress() << "Number of instructions: "
@@ -609,8 +585,7 @@ void goto_inlinet::expand_function_call(
         target,
         lhs,
         function,
-        arguments,
-        constrain);
+        arguments);
     }
   }
   else // no body available
@@ -623,45 +598,15 @@ void goto_inlinet::get_call(
   goto_programt::const_targett it,
   exprt &lhs,
   exprt &function,
-  exprt::operandst &arguments,
-  exprt &constrain)
+  exprt::operandst &arguments)
 {
-  assert(is_call(it));
+  assert(it->is_function_call());
 
-  if(it->is_function_call())
-  {
-    const code_function_callt &call=to_code_function_call(it->code);
+  const code_function_callt &call=to_code_function_call(it->code);
 
-    lhs=call.lhs();
-    function=call.function();
-    arguments=call.arguments();
-    constrain=static_cast<const exprt &>(get_nil_irep());
-  }
-  else
-  {
-    assert(is_bp_call(it));
-
-    lhs=it->code.op0().op0();
-    function=to_symbol_expr(it->code.op0().op1().op0());
-    arguments=it->code.op0().op1().op1().operands();
-    constrain=it->code.op1();
-  }
-}
-
-bool goto_inlinet::is_call(goto_programt::const_targett it)
-{
-  return it->is_function_call() || is_bp_call(it);
-}
-
-bool goto_inlinet::is_bp_call(goto_programt::const_targett it)
-{
-  if(!it->is_other())
-    return false;
-
-  return it->code.get(ID_statement)==ID_bp_constrain &&
-    it->code.operands().size()==2 &&
-    it->code.op0().operands().size()==2 &&
-    it->code.op0().op1().get(ID_statement)==ID_function_call;
+  lhs=call.lhs();
+  function=call.function();
+  arguments=call.arguments();
 }
 
 void goto_inlinet::goto_inline(
@@ -782,7 +727,7 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(is_call(i_it))
+    if(i_it->is_function_call())
       call_list.push_back(i_it);
   }
 
@@ -855,7 +800,7 @@ bool goto_inlinet::check_inline_map(
     if(static_cast<int>(target->location_number)<=ln)
       return false;
 
-    if(!is_call(target))
+    if(!target->is_function_call())
       return false;
 
     ln=target->location_number;
