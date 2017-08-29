@@ -24,6 +24,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <stack>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
 #include <util/simplify_expr.h>
@@ -289,88 +290,79 @@ bool string_refinementt::add_axioms_for_string_assigns(
   return true;
 }
 
+/// Convert exprt to a specific type. Throw bad_cast if conversion
+/// cannot be performed
+/// Generic case doesn't exist, specialize for different types accordingly
+/// TODO: this should go to util
+template<typename T>
+T expr_cast(const exprt&);
+
+template<>
+std::size_t expr_cast<std::size_t>(const exprt& val_expr)
+{
+  mp_integer val_mb;
+  if(to_integer(val_expr, val_mb))
+    throw std::bad_cast();
+  if(!val_mb.is_long())
+    throw std::bad_cast();
+  if(val_mb<0)
+    throw std::bad_cast();
+  return val_mb.to_long();
+}
+
 /// If the expression is of type string, then adds constants to the index set to
 /// force the solver to pick concrete values for each character, and fill the
 /// maps `found_length` and `found_content`.
 ///
-///          The way this is done is by looking for the length of the string,
-///          then for each `i` in the index set, look at the value found by
-///          the solver and put it in the `result` table.
-///          For indexes that are not present in the index set, we put the
-///          same value as the next index that is present in the index set.
-///          We do so by traversing the array backward, remembering the
-///          last value that has been initialized.
+/// The way this is done is by looking for the length of the string,
+/// then for each `i` in the index set, look at the value found by
+/// the solver and put it in the `result` table.
+/// For indexes that are not present in the index set, we put the
+/// same value as the next index that is present in the index set.
+/// We do so by traversing the array backward, remembering the
+/// last value that has been initialized.
 void string_refinementt::concretize_string(const exprt &expr)
 {
   if(is_refined_string_type(expr.type()))
   {
-    string_exprt str=to_string_expr(expr);
-    exprt length=get(str.length());
+    const string_exprt str=to_string_expr(expr);
+    const exprt length=get(str.length());
     exprt content=str.content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
-    mp_integer found_length;
-    if(!to_integer(length, found_length))
+    const auto string_length=expr_cast<std::size_t>(length);
+    INVARIANT(
+      string_length<=generator.max_string_length,
+      string_refinement_invariantt("string length must be less than the max "
+        "length"));
+    if(index_set[str.content()].empty())
+      return;
+
+    std::map<std::size_t, exprt> map;
+
+    for(const auto &i : index_set[str.content()])
     {
-      INVARIANT(
-        found_length.is_long(),
-        string_refinement_invariantt("the length of a string should be a "
-          "long"));
-      INVARIANT(
-        found_length>=0,
-        string_refinement_invariantt("the length of a string should be >= 0"));
-      size_t concretize_limit=found_length.to_long();
-      INVARIANT(
-        concretize_limit<=generator.max_string_length,
-        string_refinement_invariantt("string length must be less than the max "
-          "length"));
-      exprt content_expr=str.content();
-      std::vector<exprt> result;
-
-      if(index_set[str.content()].empty())
-        return;
-
-      // Use the last index as the default character value
-      exprt last_concretized=simplify_expr(
-        get(str[minus_exprt(length, from_integer(1, length.type()))]), ns);
-      result.resize(concretize_limit, last_concretized);
-
-      // Keep track of the indexes for which we have actual values
-      std::set<size_t> initialized;
-
-      for(const auto &i : index_set[str.content()])
+      const exprt simple_i=simplify_expr(get(i), ns);
+      mp_integer mpi_index;
+      bool conversion_failure=to_integer(simple_i, mpi_index);
+      if(!conversion_failure && mpi_index>=0 && mpi_index<string_length)
       {
-        mp_integer mp_index;
-        exprt simple_i=simplify_expr(get(i), ns);
-        if(to_integer(simple_i, mp_index) ||
-           mp_index<0 ||
-           mp_index>=concretize_limit)
-        {
-          debug() << "concretize_string: ignoring out of bound index: "
-                  << from_expr(ns, "", simple_i) << eom;
-        }
-        else
-        {
-          // Add an entry in the result vector
-          size_t index=mp_index.to_long();
-          exprt str_i=simplify_expr(str[simple_i], ns);
-          exprt value=simplify_expr(get(str_i), ns);
-          result[index]=value;
-          initialized.insert(index);
-        }
+        const exprt str_i=simplify_expr(str[simple_i], ns);
+        const exprt value=simplify_expr(get(str_i), ns);
+        std::size_t index=mpi_index.to_long();
+        map.emplace(index, value);
       }
-
-      // Pad the concretized values to the left to assign the uninitialized
-      // values of result. The indices greater than concretize_limit are
-      // already assigned to last_concretized.
-      pad_vector(result, initialized, last_concretized);
-
-      array_exprt arr(to_array_type(content.type()));
-      arr.operands()=result;
-      debug() << "Concretized " << from_expr(ns, "", content_expr)
-              << " = " << from_expr(ns, "", arr) << eom;
-      found_content[content]=arr;
+      else
+      {
+        debug() << "concretize_string: ignoring out of bound index: "
+                << from_expr(ns, "", simple_i) << eom;
+      }
     }
+    array_exprt arr(to_array_type(content.type()));
+    arr.operands()=fill_in_map_as_vector(map);
+    debug() << "Concretized " << from_expr(ns, "", str.content())
+            << " = " << from_expr(ns, "", arr) << eom;
+    found_content[content]=arr;
   }
 }
 
@@ -715,61 +707,37 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
     return empty_ret;
   }
 
-  std::vector<unsigned> concrete_array(n);
-
   if(arr_val.id()=="array-list")
   {
-    std::set<unsigned> initialized;
+    DATA_INVARIANT(
+      arr_val.operands().size()%2==0,
+      string_refinement_invariantt("and index expression must be on a symbol, "
+                                   "with, array_of, if, or array, and all "
+                                   "cases besides array are handled above"));
+    std::map<std::size_t, exprt> initial_map;
     for(size_t i=0; i<arr_val.operands().size()/2; i++)
     {
       exprt index=arr_val.operands()[i*2];
       unsigned idx;
-      if(!to_unsigned_integer(to_constant_expr(index), idx))
-      {
-        if(idx<n)
-        {
-          exprt value=arr_val.operands()[i*2+1];
-          to_unsigned_integer(to_constant_expr(value), concrete_array[idx]);
-          initialized.insert(idx);
-        }
-      }
+      if(!to_unsigned_integer(to_constant_expr(index), idx) && idx<n)
+        initial_map[idx]=arr_val.operands()[i*2+1];
     }
 
     // Pad the concretized values to the left to assign the uninitialized
     // values of result.
-    pad_vector(concrete_array, initialized, concrete_array[n-1]);
+    ret.operands()=fill_in_map_as_vector(initial_map);
+    return ret;
   }
   else if(arr_val.id()==ID_array)
   {
+    // copy the `n` first elements of `arr_val`
     for(size_t i=0; i<arr_val.operands().size() && i<n; i++)
-    {
-      unsigned c;
-      exprt op=arr_val.operands()[i];
-      if(op.id()==ID_constant)
-      {
-        to_unsigned_integer(to_constant_expr(op), c);
-        concrete_array[i]=c;
-      }
-    }
+      ret.move_to_operands(arr_val.operands()[i]);
+    return ret;
   }
-  else
-  {
-#if 0
-    debug() << "unable to get array-list value of " << from_expr(ns, "", arr)
-            << " of size " << n << eom;
-#endif
-    return array_of_exprt(from_integer(0, char_type), ret_type);
-  }
-
-  for(size_t i=0; i<n; i++)
-  {
-    exprt c_expr=from_integer(concrete_array[i], char_type);
-    ret.move_to_operands(c_expr);
-  }
-
-  return ret;
+  // default return value is an array of `0`s
+  return array_of_exprt(from_integer(0, char_type), ret_type);
 }
-
 
 /// get a model of an array of unknown size and infer the size if possible
 /// \par parameters: an expression representing an array
@@ -881,6 +849,7 @@ exprt string_refinementt::substitute_array_with_expr(
     exprt else_expr=substitute_array_with_expr(with_expr.old(), index);
     const typet &type=then_expr.type();
     CHECK_RETURN(else_expr.type()==type);
+    CHECK_RETURN(index.type()==with_expr.where().type());
     return if_exprt(
       equal_exprt(index, with_expr.where()), then_expr, else_expr, type);
   }
@@ -893,6 +862,42 @@ exprt string_refinementt::substitute_array_with_expr(
         "expressions, and expr is 'with' is handled above"));
     return to_array_of_expr(expr).what();
   }
+}
+
+/// Fill an array represented by a list of with_expr by propagating values to
+/// the left. For instance `ARRAY_OF(12) WITH[2:=24] WITH[4:=42]` will give
+/// `{ 24, 24, 24, 42, 42 }`
+/// \param expr: an array expression in the form
+///   `ARRAY_OF(x) WITH [i0:=v0] ... WITH [iN:=vN]`
+/// \param string_max_length: bound on the length of strings
+/// \return an array expression with filled in values, or expr if it is simply
+///   an `ARRAY_OF(x)` expression
+exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
+{
+  PRECONDITION(expr.type().id()==ID_array);
+  PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
+
+  // Nothing to do for empty array
+  if(expr.id()==ID_array_of)
+    return expr;
+
+  // Map of the parts of the array that are initialized
+  std::map<std::size_t, exprt> initial_map;
+
+  for(exprt it=expr; it.id()==ID_with; it=to_with_expr(it).old())
+  {
+    // Add to `initial_map` all the pairs (index,value) contained in `WITH`
+    // statements
+    const with_exprt with_expr=to_with_expr(it);
+    const exprt &then_expr=with_expr.new_value();
+    const auto index=expr_cast<std::size_t>(with_expr.where());
+    if(index<string_max_length)
+      initial_map.emplace(index, then_expr);
+  }
+
+  array_exprt result(to_array_type(expr.type()));
+  result.operands()=fill_in_map_as_vector(initial_map);
+  return result;
 }
 
 /// create an equivalent expression where array accesses and 'with' expressions
@@ -924,8 +929,7 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 
     if(index_expr.array().id()==ID_with)
     {
-      expr=substitute_array_with_expr(
-        index_expr.array(), index_expr.index());
+      expr=substitute_array_with_expr(index_expr.array(), index_expr.index());
       return;
     }
 
@@ -1084,21 +1088,44 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   return negaxiom;
 }
 
+/// Result of the solver `supert` should not be interpreted literally for char
+/// arrays as not all indices are present in the index set.
+/// In the given expression, we populate arrays at the indices for which the
+/// solver has no constraint by copying values to the left.
+/// For example an expression `ARRAY_OF(0) WITH [1:=2] WITH [4:=3]` would
+/// be interpreted as `{ 2, 2, 3, 3, 3}`.
+/// \param expr: expression to interpret
+/// \param string_max_length: maximum size of arrays to consider
+/// \return the interpreted expression
+exprt concretize_arrays_in_expression(exprt expr, std::size_t string_max_length)
+{
+  auto it=expr.depth_begin();
+  const auto end=expr.depth_end();
+  while(it!=end)
+  {
+    if(it->id()==ID_with && it->type().id()==ID_array)
+    {
+      it.mutate()=fill_in_array_with_expr(*it, string_max_length);
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+  return expr;
+}
+
 /// return true if the current model satisfies all the axioms
 /// \return a Boolean
 bool string_refinementt::check_axioms()
 {
-  debug() << "string_refinementt::check_axioms: ==============="
-          << "===========================================" << eom;
-  debug() << "string_refinementt::check_axioms: build the"
-          << " interpretation from the model of the prop_solver" << eom;
+  debug() << "string_refinementt::check_axioms:" << eom;
   debug_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
 
-  debug() << "there are " << universal_axioms.size()
-          << " universal axioms" << eom;
+  debug() << "string_refinement::check_axioms: " << universal_axioms.size()
+          << " universal axioms:" << eom;
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
     const string_constraintt &axiom=universal_axioms[i];
@@ -1112,20 +1139,36 @@ bool string_refinementt::check_axioms()
       univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
-    debug() << "(string_refinementt::check_axioms) Adding negated constraint: "
-            << from_expr(ns, "", negaxiom) << eom;
-    substitute_array_access(negaxiom);
+
+    debug() << "  "<< i << ".\n"
+            << "    - axiom:\n"
+            << "       " << from_expr(ns, "", axiom) << eom;
+    debug() << "    - axiom_in_model:\n"
+            << "       " << from_expr(ns, "", axiom_in_model) << eom;
+    debug() << "    - negated_axiom:\n"
+            << "       " << from_expr(ns, "", negaxiom) << eom;
+
+    exprt with_concretized_arrays=concretize_arrays_in_expression(
+      negaxiom, generator.max_string_length);
+    debug() << "    - negated_axiom_with_concretized_array_access:\n"
+            << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
+
+    substitute_array_access(with_concretized_arrays);
+    debug() << "    - negated_axiom_without_array_access:\n"
+            << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
     exprt witness;
 
-    bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
+    bool is_sat=is_axiom_sat(with_concretized_arrays, univ_var, witness);
 
     if(is_sat)
     {
-      debug() << "string constraint can be violated for "
+      debug() << "  - violated_for: "
               << univ_var.get_identifier()
               << " = " << from_expr(ns, "", witness) << eom;
       violated[i]=witness;
     }
+    else
+      debug() << "  - correct" << eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation

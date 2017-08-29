@@ -1,6 +1,6 @@
 CORE
 test_case.class
---refine-strings
+--refine-strings --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* file test_case.java line 10 .* SUCCESS$
