@@ -289,6 +289,26 @@ bool string_refinementt::add_axioms_for_string_assigns(
   return true;
 }
 
+/// Convert exprt to a specific type. Throw bad_cast if conversion
+/// cannot be performed
+/// Generic case doesn't exist, specialize for different types accordingly
+/// TODO: this should go to util
+template<typename T>
+T expr_cast(const exprt&);
+
+template<>
+std::size_t expr_cast<std::size_t>(const exprt& val_expr)
+{
+  mp_integer val_mb;
+  if(to_integer(val_expr, val_mb))
+    throw std::bad_cast();
+  if(!val_mb.is_long())
+    throw std::bad_cast();
+  if(val_mb<0)
+    throw std::bad_cast();
+  return val_mb.to_long();
+}
+
 /// If the expression is of type string, then adds constants to the index set to
 /// force the solver to pick concrete values for each character, and fill the
 /// maps `found_length` and `found_content`.
