@@ -747,7 +747,9 @@ bool goto_inlinet::check_inline_map(
   if(call_list.empty())
     return true;
 
+  #if 0
   int ln=-1;
+  #endif
 
   for(const auto &call : call_list)
   {
@@ -757,16 +759,18 @@ bool goto_inlinet::check_inline_map(
     // might not hold if call was previously inlined
     if(target->function!=identifier)
       return false;
-    #endif
 
     // location numbers increasing
     if(static_cast<int>(target->location_number)<=ln)
       return false;
+    #endif
 
     if(!target->is_function_call())
       return false;
 
+    #if 0
     ln=target->location_number;
+    #endif
   }
 
   return true;
