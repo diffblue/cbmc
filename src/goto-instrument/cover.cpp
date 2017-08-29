@@ -1582,7 +1582,9 @@ void instrument_cover_goals(
        f_it->second.is_hidden() ||
        (do_include_pattern_match &&
         !std::regex_match(
-          id2string(f_it->first), string_matcher, regex_matcher)))
+          id2string(f_it->first), string_matcher, regex_matcher)) ||
+       // ignore Java array built-ins
+       has_prefix(id2string(f_it->first), "java::array"))
       continue;
 
     instrument_cover_goals(
