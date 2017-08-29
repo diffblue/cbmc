@@ -928,8 +928,7 @@ void string_refinementt::substitute_array_access(exprt &expr) const
 
     if(index_expr.array().id()==ID_with)
     {
-      expr=substitute_array_with_expr(
-        index_expr.array(), index_expr.index());
+      expr=substitute_array_with_expr(index_expr.array(), index_expr.index());
       return;
     }
 
