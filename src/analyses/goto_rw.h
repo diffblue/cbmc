@@ -91,8 +91,8 @@ public:
   const_iterator end() const { return data.end(); }
   const_iterator cend() const { return data.end(); }
 
-  template <typename T>
-  void push_back(T &&v) { data.push_back(std::forward<T>(v)); }
+  void push_back(const sub_typet::value_type &v) { data.push_back(v); }
+  void push_back(sub_typet::value_type &&v) { data.push_back(std::move(v)); }
 };
 
 class array_exprt;
@@ -304,8 +304,15 @@ public:
   const_iterator end() const { return data.end(); }
   const_iterator cend() const { return data.end(); }
 
-  template<typename T>
-  iterator insert(T &&v) { return data.insert(std::forward<T>(v)); }
+  iterator insert(const sub_typet::value_type &v)
+  {
+    return data.insert(v);
+  }
+
+  iterator insert(sub_typet::value_type &&v)
+  {
+    return data.insert(std::move(v));
+  }
 };
 
 class rw_guarded_range_set_value_sett:public rw_range_set_value_sett
