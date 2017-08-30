@@ -1,6 +1,6 @@
 FUTURE
 StringBuilderChars01.class
---refine-strings --unwind 100
+--refine-strings --string-max-length 1000 --unwind 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

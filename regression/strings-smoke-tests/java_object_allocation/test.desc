@@ -1,6 +1,6 @@
 CORE
 test.class
---refine-strings --show-goto-functions
+--refine-strings --string-max-length 1000 --show-goto-functions
 // Enable multi-line checking
 activate-multi-line-match
 EXIT=0
