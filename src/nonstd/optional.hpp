@@ -516,7 +516,7 @@ private:
     typedef struct { align_as_type data[ 1 + ( sizeof(value_type) - 1 ) / sizeof(align_as_type) ]; } aligned_storage_t;
     aligned_storage_t data;
 
-#   undef optional_ALIGN_AS
+#undef optional_ALIGN_AS
 
 #endif // optional_CONFIG_MAX_ALIGN_HACK
 
@@ -735,8 +735,7 @@ public:
 
     optional_constexpr value_type const && operator *() const optional_refref_qual
     {
-        assert( has_value() );
-        return std::move( contained.value() );
+      return assert( has_value() ), std::move( contained.value() );
     }
 
     optional_constexpr14 value_type && operator *() optional_refref_qual
@@ -1071,7 +1070,7 @@ using namespace optional_lite;
 namespace std {
 
 template< class T >
-class hash< nonstd::optional<T> >
+struct hash< nonstd::optional<T> >
 {
 public:
     std::size_t operator()( nonstd::optional<T> const & v ) const optional_noexcept
