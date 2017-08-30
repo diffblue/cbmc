@@ -2110,6 +2110,15 @@ codet java_bytecode_convert_methodt::convert_instructions(
           lazy_methods->add_needed_class(
             to_symbol_type(arg0.type()).get_identifier());
         }
+        else if(arg0.type().id()==ID_pointer)
+        {
+          const auto &pointer_type=to_pointer_type(arg0.type());
+          if(pointer_type.subtype().id()==ID_symbol)
+          {
+            lazy_methods->add_needed_class(
+              to_symbol_type(pointer_type.subtype()).get_identifier());
+          }
+        }
         else if(is_assertions_disabled_field)
         {
           lazy_methods->add_needed_class(arg0.get_string(ID_class));
