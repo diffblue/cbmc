@@ -127,6 +127,43 @@ jobs:
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
 
+    # Run Coverity
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      sudo: required
+      compiler: gcc
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - libwww-perl
+            - g++-5
+        coverity_scan:
+          project:
+            name: "diffblue/cbmc"
+            description: "Travis build of ${TRAVIS_COMMIT}"
+          notification_email: "coverity-scan@diffblue.com"
+          build_command_prepend: "make -C src minisat2-download"
+          build_command: "make -C src -j2"
+          branch_pattern: "develop"
+      before_install:
+        - |
+          if [[ "${TRAVIS_EVENT_TYPE}" != "cron" ]]
+          then
+            echo "This is not a cron build and build is not needed."
+            travis_terminate 0
+          fi
+        - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
+        - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
+        - g++ --version
+      # Coverity runs as part of before_script
+      env:
+        - NAME="COVERITY_SCAN"
+        - COMPILER="ccache g++"
+      script: echo "This is coverity build. No need for tests."
+
   allow_failures:
     - <<: *linter-stage
 
