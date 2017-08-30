@@ -38,20 +38,20 @@ const std::vector<exprt> &string_constraint_generatort::get_axioms() const
   return m_axioms;
 }
 
-const std::vector<symbol_exprt>
-&string_constraint_generatort::get_index_symbols() const
+const std::vector<symbol_exprt> &
+string_constraint_generatort::get_index_symbols() const
 {
   return m_index_symbols;
 }
 
-const std::vector<symbol_exprt>
-&string_constraint_generatort::get_boolean_symbols() const
+const std::vector<symbol_exprt> &
+string_constraint_generatort::get_boolean_symbols() const
 {
   return m_boolean_symbols;
 }
 
-const std::set<string_exprt>
-&string_constraint_generatort::get_created_strings() const
+const std::set<string_exprt> &
+string_constraint_generatort::get_created_strings() const
 {
   return m_created_strings;
 }
