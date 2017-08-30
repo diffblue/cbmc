@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Object Identifiers
+
 #include "object_id.h"
 
-/*******************************************************************\
-
-Function: get_objects_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
-typedef enum { LHS_R, LHS_W, READ } get_modet;
+enum class get_modet { LHS_R, LHS_W, READ };
 
 void get_objects_rec(
   get_modet mode,
@@ -30,18 +21,18 @@ void get_objects_rec(
 {
   if(expr.id()==ID_symbol)
   {
-    if(mode==LHS_W || mode==READ)
+    if(mode==get_modet::LHS_W || mode==get_modet::READ)
       dest.insert(object_idt(to_symbol_expr(expr)));
   }
   else if(expr.id()==ID_index)
   {
     const index_exprt &index_expr=to_index_expr(expr);
 
-    if(mode==LHS_R || mode==READ)
-      get_objects_rec(READ, index_expr.index(), dest, "");
+    if(mode==get_modet::LHS_R || mode==get_modet::READ)
+      get_objects_rec(get_modet::READ, index_expr.index(), dest, "");
 
-    if(mode==LHS_R)
-      get_objects_rec(READ, index_expr.array(), dest, "[]"+suffix);
+    if(mode==get_modet::LHS_R)
+      get_objects_rec(get_modet::READ, index_expr.array(), dest, "[]"+suffix);
     else
       get_objects_rec(mode, index_expr.array(), dest, "[]"+suffix);
   }
@@ -49,8 +40,8 @@ void get_objects_rec(
   {
     const if_exprt &if_expr=to_if_expr(expr);
 
-    if(mode==LHS_R || mode==READ)
-      get_objects_rec(READ, if_expr.cond(), dest, "");
+    if(mode==get_modet::LHS_R || mode==get_modet::READ)
+      get_objects_rec(get_modet::READ, if_expr.cond(), dest, "");
 
     get_objects_rec(mode, if_expr.true_case(), dest, suffix);
     get_objects_rec(mode, if_expr.false_case(), dest, suffix);
@@ -67,99 +58,39 @@ void get_objects_rec(
     const dereference_exprt &dereference_expr=
       to_dereference_expr(expr);
 
-    if(mode==LHS_R || mode==READ)
-      get_objects_rec(READ, dereference_expr.pointer(), dest, "");
+    if(mode==get_modet::LHS_R || mode==get_modet::READ)
+      get_objects_rec(get_modet::READ, dereference_expr.pointer(), dest, "");
   }
   else
   {
-    if(mode==LHS_R || mode==READ)
+    if(mode==get_modet::LHS_R || mode==get_modet::READ)
       forall_operands(it, expr)
-        get_objects_rec(READ, *it, dest, "");
+        get_objects_rec(get_modet::READ, *it, dest, "");
   }
 }
 
-/*******************************************************************\
-
-Function: get_objects
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void get_objects(const exprt &expr, object_id_sett &dest)
 {
-  get_objects_rec(READ, expr, dest, "");
+  get_objects_rec(get_modet::READ, expr, dest, "");
 }
-
-/*******************************************************************\
-
-Function: get_objects_r
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_objects_r(const code_assignt &assign, object_id_sett &dest)
 {
-  get_objects_rec(LHS_R, assign.lhs(), dest, "");
-  get_objects_rec(READ, assign.rhs(), dest, "");
+  get_objects_rec(get_modet::LHS_R, assign.lhs(), dest, "");
+  get_objects_rec(get_modet::READ, assign.rhs(), dest, "");
 }
-
-/*******************************************************************\
-
-Function: get_objects_w
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_objects_w(const code_assignt &assign, object_id_sett &dest)
 {
-  get_objects_rec(LHS_W, assign.lhs(), dest, "");
+  get_objects_rec(get_modet::LHS_W, assign.lhs(), dest, "");
 }
-
-/*******************************************************************\
-
-Function: get_objects_w_lhs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_objects_w(const exprt &lhs, object_id_sett &dest)
 {
-  get_objects_rec(LHS_W, lhs, dest, "");
+  get_objects_rec(get_modet::LHS_W, lhs, dest, "");
 }
-
-/*******************************************************************\
-
-Function: get_objects_r_lhs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_objects_r_lhs(const exprt &lhs, object_id_sett &dest)
 {
-  get_objects_rec(LHS_R, lhs, dest, "");
+  get_objects_rec(get_modet::LHS_R, lhs, dest, "");
 }

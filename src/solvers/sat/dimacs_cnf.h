@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_SAT_DIMACS_CNF_H
 #define CPROVER_SOLVERS_SAT_DIMACS_CNF_H
 
@@ -50,7 +51,7 @@ public:
 
   virtual resultt prop_solve()
   {
-    return P_ERROR;
+    return resultt::P_ERROR;
   }
 
   virtual tvt l_get(literalt) const

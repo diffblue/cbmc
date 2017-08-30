@@ -6,23 +6,15 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#include <util/std_types.h>
-#include <util/std_expr.h>
+/// \file
+/// Modified expression replacement for constant propagator
 
 #include "replace_symbol_ext.h"
 
-/*******************************************************************\
+#include <util/std_types.h>
+#include <util/std_expr.h>
 
-Function: replace_symbol_extt::replace
-
-  Inputs:
-
- Outputs:
-
- Purpose: does not replace object in address_of expressions
-
-\*******************************************************************/
-
+/// does not replace object in address_of expressions
 bool replace_symbol_extt::replace(exprt &dest) const
 {
   bool result=true;

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Field-sensitive, location-insensitive points-to analysis
+
 #ifndef CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 #define CPROVER_GOTO_INSTRUMENT_POINTS_TO_H
 
@@ -15,14 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/cfg.h>
 
 #include "object_id.h"
-
-/*******************************************************************\
-
-   Class: points_tot
-
- Purpose:
-
-\*******************************************************************/
 
 class points_tot
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as C/C++ Source
+
 #ifndef CPROVER_GOTO_INSTRUMENT_DUMP_C_CLASS_H
 #define CPROVER_GOTO_INSTRUMENT_DUMP_C_CLASS_H
 
@@ -22,12 +25,14 @@ public:
   dump_ct(
     const goto_functionst &_goto_functions,
     const bool use_system_headers,
+    const bool use_all_headers,
     const namespacet &_ns,
     language_factoryt factory):
     goto_functions(_goto_functions),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
-    language(factory())
+    language(factory()),
+    use_all_headers(use_all_headers)
   {
     if(use_system_headers)
       init_system_library_map();
@@ -45,6 +50,7 @@ protected:
   symbol_tablet copied_symbol_table;
   const namespacet ns;
   languaget *language;
+  const bool use_all_headers;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;
@@ -59,12 +65,32 @@ protected:
     declared_enum_constants_mapt;
   declared_enum_constants_mapt declared_enum_constants;
 
+  struct typedef_infot
+  {
+    irep_idt typedef_name;
+    std::string type_decl_str;
+    bool early;
+    std::unordered_set<irep_idt, irep_id_hash> dependencies;
+
+    explicit typedef_infot(const irep_idt &name):
+      typedef_name(name),
+      type_decl_str(""),
+      early(false)
+    {
+    }
+  };
+  typedef std::map<irep_idt, typedef_infot> typedef_mapt;
+  typedef_mapt typedef_map;
+  typedef std::unordered_map<typet, irep_idt, irep_hash> typedef_typest;
+  typedef_typest typedef_types;
+
   void init_system_library_map();
 
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);
 
   bool ignore(const symbolt &symbol);
+  bool ignore(const typet &type);
 
   static std::string indent(const unsigned n)
   {
@@ -84,6 +110,14 @@ protected:
 
     return d_str.substr(0, d_str.size()-1);
   }
+
+  void collect_typedefs(const typet &type, bool early);
+  void collect_typedefs_rec(
+    const typet &type,
+    bool early,
+    std::unordered_set<irep_idt, irep_id_hash> &dependencies);
+  void gather_global_typedefs();
+  void dump_typedefs(std::ostream &os) const;
 
   void convert_compound_declaration(
       const symbolt &symbol,

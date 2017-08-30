@@ -8,6 +8,11 @@ Date: February 2006
 
 \*******************************************************************/
 
+/// \file
+/// Race Detection for Threaded Goto Programs
+
+#include "race_check.h"
+
 #include <util/std_expr.h>
 #include <util/guard.h>
 #include <util/symbol_table.h>
@@ -20,7 +25,6 @@ Date: February 2006
 #include <pointer-analysis/value_sets.h>
 #include <goto-programs/remove_skip.h>
 
-#include "race_check.h"
 #include "rw_set.h"
 
 #ifdef LOCAL_MAY
@@ -64,18 +68,6 @@ protected:
   symbol_tablet &symbol_table;
 };
 
-/*******************************************************************\
-
-Function: w_guardst::get_guard_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
 {
   const irep_idt identifier=id2string(object)+"$w_guard";
@@ -100,18 +92,6 @@ const symbolt &w_guardst::get_guard_symbol(const irep_idt &object)
   return *symbol_ptr;
 }
 
-/*******************************************************************\
-
-Function: w_guardst::add_initialization
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void w_guardst::add_initialization(goto_programt &goto_program) const
 {
   goto_programt::targett t=goto_program.instructions.begin();
@@ -132,18 +112,6 @@ void w_guardst::add_initialization(goto_programt &goto_program) const
   }
 }
 
-/*******************************************************************\
-
-Function: comment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string comment(const rw_set_baset::entryt &entry, bool write)
 {
   std::string result;
@@ -156,18 +124,6 @@ std::string comment(const rw_set_baset::entryt &entry, bool write)
   result+=id2string(entry.object);
   return result;
 }
-
-/*******************************************************************\
-
-Function: is_shared
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool is_shared(
   const namespacet &ns,
@@ -189,18 +145,6 @@ bool is_shared(
   return symbol.is_shared();
 }
 
-/*******************************************************************\
-
-Function: race_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool has_shared_entries(
   const namespacet &ns,
   const rw_set_baset &rw_set)
@@ -221,18 +165,6 @@ bool has_shared_entries(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: race_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void race_check(
   value_setst &value_sets,
@@ -339,18 +271,6 @@ void race_check(
   remove_skip(goto_program);
 }
 
-/*******************************************************************\
-
-Function: race_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void race_check(
   value_setst &value_sets,
   symbol_tablet &symbol_table,
@@ -371,18 +291,6 @@ void race_check(
   w_guards.add_initialization(goto_program);
   goto_program.update();
 }
-
-/*******************************************************************\
-
-Function: race_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void race_check(
   value_setst &value_sets,

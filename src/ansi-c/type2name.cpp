@@ -6,13 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// Type Naming for C
+
+#include "type2name.h"
+
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
-
-#include "type2name.h"
 
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
   symbol_numbert;
@@ -21,18 +24,6 @@ static std::string type2name(
   const typet &type,
   const namespacet &ns,
   symbol_numbert &symbol_number);
-
-/*******************************************************************\
-
-Function: type2name_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static std::string type2name_symbol(
   const typet &type,
@@ -90,18 +81,6 @@ static std::string type2name_symbol(
   return result;
 }
 
-/*******************************************************************\
-
-Function: type2name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 static bool parent_is_sym_check=false;
 static std::string type2name(
   const typet &type,
@@ -131,7 +110,7 @@ static std::string type2name(
   if(!type.source_location().get_function().empty())
     result+='l';
 
-  if(type.id()==irep_idt())
+  if(type.id().empty())
     throw "empty type encountered";
   else if(type.id()==ID_empty)
     result+='V';
@@ -278,36 +257,12 @@ static std::string type2name(
   return result;
 }
 
-/*******************************************************************\
-
-Function: type2name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string type2name(const typet &type, const namespacet &ns)
 {
   parent_is_sym_check=true;
   symbol_numbert symbol_number;
   return type2name(type, ns, symbol_number);
 }
-
-/*******************************************************************\
-
-Function: type2name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string type2name(const typet &type)
 {

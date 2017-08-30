@@ -6,26 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "bv_pointers.h"
+
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/threeval.h>
-
-#include "bv_pointers.h"
-
-/*******************************************************************\
-
-Function: bv_pointerst::convert_rest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
 {
@@ -92,24 +81,13 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
-      return bv_utils.rel(bv0, expr.id(), bv1, bv_utilst::UNSIGNED);
+      return bv_utils.rel(
+        bv0, expr.id(), bv1, bv_utilst::representationt::UNSIGNED);
     }
   }
 
   return SUB::convert_rest(expr);
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::bv_pointerst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bv_pointerst::bv_pointerst(
   const namespacet &_ns,
@@ -121,18 +99,6 @@ bv_pointerst::bv_pointerst(
   offset_bits=config.ansi_c.pointer_width-object_bits;
   bits=config.ansi_c.pointer_width;
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::convert_address_of_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool bv_pointerst::convert_address_of_rec(
   const exprt &expr,
@@ -184,6 +150,7 @@ bool bv_pointerst::convert_address_of_rec(
     // get size
     mp_integer size=
       pointer_offset_size(array_type.subtype(), ns);
+    assert(size>0);
 
     offset_arithmetic(bv, size, index);
     assert(bv.size()==bits);
@@ -204,6 +171,7 @@ bool bv_pointerst::convert_address_of_rec(
       mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
         member_expr.get_component_name(), ns);
+      assert(offset>=0);
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -246,22 +214,13 @@ bool bv_pointerst::convert_address_of_rec(
   return true;
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::convert_pointer_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 {
   if(!is_ptr(expr.type()))
     throw "convert_pointer_type got non-pointer type";
+
+  // make sure the config hasn't been changed
+  assert(bits==config.ansi_c.pointer_width);
 
   if(expr.id()==ID_symbol)
   {
@@ -374,7 +333,12 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
         count++;
         bv=convert_bv(*it);
         assert(bv.size()==bits);
-        size=pointer_offset_size(it->type().subtype(), ns);
+
+        typet pointer_sub_type=it->type().subtype();
+        if(pointer_sub_type.id()==ID_empty)
+          pointer_sub_type=char_type();
+        size=pointer_offset_size(pointer_sub_type, ns);
+        assert(size>0);
       }
     }
 
@@ -399,8 +363,8 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       }
 
       bv_utilst::representationt rep=
-        it->type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                     bv_utilst::UNSIGNED;
+        it->type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                     bv_utilst::representationt::UNSIGNED;
 
       bvt op=convert_bv(*it);
 
@@ -448,6 +412,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
+    assert(element_size>0);
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -477,18 +442,6 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   return conversion_failed(expr);
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::convert_bitvector
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt bv_pointerst::convert_bitvector(const exprt &expr)
 {
   if(is_ptr(expr.type()))
@@ -516,12 +469,14 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
+    assert(element_size>0);
 
     if(element_size!=1)
     {
       bvt element_size_bv=
         bv_utils.build_constant(element_size, bv.size());
-      bv=bv_utils.divider(bv, element_size_bv, bv_utilst::SIGNED);
+      bv=bv_utils.divider(
+        bv, element_size_bv, bv_utilst::representationt::SIGNED);
     }
 
     return bv;
@@ -601,18 +556,6 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   return SUB::convert_bitvector(expr);
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::bv_get_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt bv_pointerst::bv_get_rec(
   const bvt &bv,
   const std::vector<bool> &unknown,
@@ -667,18 +610,6 @@ exprt bv_pointerst::bv_get_rec(
   return result;
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::encode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_pointerst::encode(std::size_t addr, bvt &bv)
 {
   bv.resize(bits);
@@ -691,18 +622,6 @@ void bv_pointerst::encode(std::size_t addr, bvt &bv)
   for(std::size_t i=0; i<object_bits; i++)
     bv[offset_bits+i]=const_literal((addr&(std::size_t(1)<<i))!=0);
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::offset_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
 {
@@ -718,18 +637,6 @@ void bv_pointerst::offset_arithmetic(bvt &bv, const mp_integer &x)
     bv[i]=tmp[i];
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::offset_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_pointerst::offset_arithmetic(
   bvt &bv,
   const mp_integer &factor,
@@ -738,25 +645,13 @@ void bv_pointerst::offset_arithmetic(
   bvt bv_index=convert_bv(index);
 
   bv_utilst::representationt rep=
-    index.type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                   bv_utilst::UNSIGNED;
+    index.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                   bv_utilst::representationt::UNSIGNED;
 
   bv_index=bv_utils.extension(bv_index, offset_bits, rep);
 
   offset_arithmetic(bv, factor, bv_index);
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::offset_arithmetic
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_pointerst::offset_arithmetic(
   bvt &bv,
@@ -782,18 +677,6 @@ void bv_pointerst::offset_arithmetic(
     bv[i]=bv_tmp[i];
 }
 
-/*******************************************************************\
-
-Function: bv_pointerst::add_addr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 {
   std::size_t a=pointer_logic.add_object(expr);
@@ -803,18 +686,6 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 
   encode(a, bv);
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::do_postponed
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_pointerst::do_postponed(
   const postponedt &postponed)
@@ -911,18 +782,6 @@ void bv_pointerst::do_postponed(
   else
     assert(false);
 }
-
-/*******************************************************************\
-
-Function: bv_pointerst::post_process
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void bv_pointerst::post_process()
 {

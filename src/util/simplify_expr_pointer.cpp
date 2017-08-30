@@ -6,9 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "simplify_expr_class.h"
+
 #include <cassert>
 
-#include "simplify_expr_class.h"
+#include "c_types.h"
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -19,18 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "threeval.h"
 #include "prefix.h"
 #include "pointer_predicates.h"
-
-/*******************************************************************\
-
-Function: is_dereference_integer_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static bool is_dereference_integer_object(
   const exprt &expr,
@@ -61,18 +51,6 @@ static bool is_dereference_integer_object(
   return false;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_address_of_arg
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_address_of_arg(exprt &expr)
 {
   if(expr.id()==ID_index)
@@ -100,11 +78,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
         {
-          unsignedbv_typet int_type(config.ansi_c.pointer_width);
           pointer_typet pointer_type;
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
-            from_integer(step_size*index+address, int_type), pointer_type);
+            from_integer(step_size*index+address, index_type()), pointer_type);
           exprt new_expr=dereference_exprt(typecast_expr, expr.type());
           expr=new_expr;
           result=true;
@@ -137,11 +114,10 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
-            unsignedbv_typet int_type(config.ansi_c.pointer_width);
             pointer_typet pointer_type;
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
-              from_integer(address+offset, int_type), pointer_type);
+              from_integer(address+offset, index_type()), pointer_type);
             exprt new_expr=dereference_exprt(typecast_expr, expr.type());
             expr=new_expr;
             result=true;
@@ -192,18 +168,6 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_address_of(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -245,18 +209,6 @@ bool simplify_exprt::simplify_address_of(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_pointer_offset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 {
@@ -384,18 +336,19 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
     if(ptr_expr.size()!=1 || int_expr.empty())
       return true;
 
-    typet pointer_type=ptr_expr.front().type();
+    typet pointer_sub_type=ptr_expr.front().type().subtype();
+    if(pointer_sub_type.id()==ID_empty)
+      pointer_sub_type=char_type();
 
     mp_integer element_size=
-      pointer_offset_size(pointer_type.subtype(), ns);
+      pointer_offset_size(pointer_sub_type, ns);
 
-    if(element_size==0)
+    if(element_size<0)
       return true;
 
     // this might change the type of the pointer!
-    exprt pointer_offset(ID_pointer_offset, expr.type());
-    pointer_offset.copy_to_operands(ptr_expr.front());
-    simplify_node(pointer_offset);
+    exprt pointer_offset_expr=pointer_offset(ptr_expr.front());
+    simplify_node(pointer_offset_expr);
 
     exprt sum;
 
@@ -416,7 +369,7 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     simplify_node(product);
 
-    expr=binary_exprt(pointer_offset, ID_plus, product, expr.type());
+    expr=binary_exprt(pointer_offset_expr, ID_plus, product, expr.type());
 
     simplify_node(expr);
 
@@ -434,18 +387,6 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_inequality_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
@@ -488,18 +429,6 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   return true;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_inequality_pointer_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
@@ -532,18 +461,6 @@ bool simplify_exprt::simplify_inequality_pointer_object(exprt &expr)
   return false;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_pointer_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_pointer_object(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -571,18 +488,6 @@ bool simplify_exprt::simplify_pointer_object(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_dynamic_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_dynamic_object(exprt &expr)
 {
@@ -640,18 +545,6 @@ bool simplify_exprt::simplify_dynamic_object(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_invalid_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
 {
   if(expr.operands().size()!=1)
@@ -681,18 +574,6 @@ bool simplify_exprt::simplify_invalid_pointer(exprt &expr)
   return result;
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::objects_equal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
 {
   if(a==b)
@@ -717,18 +598,6 @@ tvt simplify_exprt::objects_equal(const exprt &a, const exprt &b)
   return tvt::unknown();
 }
 
-/*******************************************************************\
-
-Function: simplify_exprt::objects_equal_address_of
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 {
   if(a==b)
@@ -752,18 +621,6 @@ tvt simplify_exprt::objects_equal_address_of(const exprt &a, const exprt &b)
 
   return tvt::unknown();
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_object_size
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_object_size(exprt &expr)
 {
@@ -810,18 +667,6 @@ bool simplify_exprt::simplify_object_size(exprt &expr)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: simplify_exprt::simplify_good_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool simplify_exprt::simplify_good_pointer(exprt &expr)
 {

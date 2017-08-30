@@ -6,25 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Base Type Computation
+
+#include "base_type.h"
+
 #include <cassert>
 #include <set>
 
 #include "std_types.h"
-#include "base_type.h"
 #include "namespace.h"
 #include "symbol.h"
-
-/*******************************************************************\
-
-Function: base_type_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void base_type_rec(
   typet &type, const namespacet &ns, std::set<irep_idt> &symb)
@@ -84,35 +76,11 @@ void base_type_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: base_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void base_type(typet &type, const namespacet &ns)
 {
   std::set<irep_idt> symb;
   base_type_rec(type, ns, symb);
 }
-
-/*******************************************************************\
-
-Function: base_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void base_type(exprt &expr, const namespacet &ns)
 {
@@ -122,18 +90,6 @@ void base_type(exprt &expr, const namespacet &ns)
     base_type(*it, ns);
 }
 
-/*******************************************************************\
-
-Function: base_type_eqt::base_type_eq_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool base_type_eqt::base_type_eq_rec(
   const typet &type1,
   const typet &type2)
@@ -142,8 +98,8 @@ bool base_type_eqt::base_type_eq_rec(
     return true;
 
   #if 0
-  std::cout << "T1: " << type1.pretty() << std::endl;
-  std::cout << "T2: " << type2.pretty() << std::endl;
+  std::cout << "T1: " << type1.pretty() << '\n';
+  std::cout << "T2: " << type2.pretty() << '\n';
   #endif
 
   // loop avoidance
@@ -282,18 +238,6 @@ bool base_type_eqt::base_type_eq_rec(
   return tmp1==tmp2;
 }
 
-/*******************************************************************\
-
-Function: base_type_eqt::base_type_eq_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool base_type_eqt::base_type_eq_rec(
   const exprt &expr1,
   const exprt &expr2)
@@ -323,18 +267,6 @@ bool base_type_eqt::base_type_eq_rec(
   return true;
 }
 
-/*******************************************************************\
-
-Function: base_type_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool base_type_eq(
   const typet &type1,
   const typet &type2,
@@ -343,18 +275,6 @@ bool base_type_eq(
   base_type_eqt base_type_eq(ns);
   return base_type_eq.base_type_eq(type1, type2);
 }
-
-/*******************************************************************\
-
-Function: base_type_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool base_type_eq(
   const exprt &expr1,

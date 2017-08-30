@@ -6,34 +6,25 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
+#include "path_symex_state.h"
+
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
 
 #include <pointer-analysis/dereference.h>
-
-#include "path_symex_state.h"
 
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
 #endif
 
-/*******************************************************************\
-
-Function: path_symex_statet::read
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::read(const exprt &src, bool propagate)
 {
   #ifdef DEBUG
-  // std::cout << "path_symex_statet::read " << src.pretty() << std::endl;
+  // std::cout << "path_symex_statet::read " << src.pretty() << '\n';
   #endif
 
   // This has three phases!
@@ -49,29 +40,17 @@ exprt path_symex_statet::read(const exprt &src, bool propagate)
   exprt tmp5=simplify_expr(tmp4, var_map.ns);
 
   #ifdef DEBUG
-  // std::cout << " ==> " << tmp.pretty() << std::endl;
+  // std::cout << " ==> " << tmp.pretty() << '\n';
   #endif
 
   return tmp5;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::expand_structs_and_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
 {
   #ifdef DEBUG
   std::cout << "expand_structs_and_arrays: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   const typet &src_type=var_map.ns.follow(src.type());
@@ -180,18 +159,6 @@ exprt path_symex_statet::expand_structs_and_arrays(const exprt &src)
   return src;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::array_theory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
 {
   // top-level constant-sized arrays only right now
@@ -244,25 +211,13 @@ exprt path_symex_statet::array_theory(const exprt &src, bool propagate)
   return src;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::instantiate_rec(
   const exprt &src,
   bool propagate)
 {
   #ifdef DEBUG
   std::cout << "instantiate_rec: "
-            << from_expr(var_map.ns, "", src) << std::endl;
+            << from_expr(var_map.ns, "", src) << '\n';
   #endif
 
   // check whether this is a symbol(.member|[index])*
@@ -292,7 +247,14 @@ exprt path_symex_statet::instantiate_rec(
     {
       irep_idt id="symex::nondet"+std::to_string(var_map.nondet_count);
       var_map.nondet_count++;
-      return symbol_exprt(id, src.type());
+
+      auxiliary_symbolt nondet_symbol;
+      nondet_symbol.name=id;
+      nondet_symbol.base_name=id;
+      nondet_symbol.type=src.type();
+      var_map.new_symbols.add(nondet_symbol);
+
+      return nondet_symbol.symbol_expr();
     }
     else
       throw "instantiate_rec: unexpected side effect "+id2string(statement);
@@ -347,18 +309,6 @@ exprt path_symex_statet::instantiate_rec(
 
   return src2;
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::read_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::read_symbol_member_index(
   const exprt &src,
@@ -416,7 +366,7 @@ exprt path_symex_statet::read_symbol_member_index(
         suffix="."+id2string(member_expr.get_component_name())+suffix;
       }
       else
-        return nil_exprt(); // includes unions, deliberatley
+        return nil_exprt(); // includes unions, deliberately
     }
     else if(current.id()==ID_index)
     {
@@ -451,7 +401,7 @@ exprt path_symex_statet::read_symbol_member_index(
 
   #ifdef DEBUG
   std::cout << "read_symbol_member_index_rec " << identifier
-            << " var_info " << var_info.full_identifier << std::endl;
+            << " var_info " << var_info.full_identifier << '\n';
   #endif
 
   // warning: reference is not stable
@@ -464,7 +414,7 @@ exprt path_symex_statet::read_symbol_member_index(
   else
   {
     // we do some SSA symbol
-    if(var_state.ssa_symbol.get_identifier()==irep_idt())
+    if(var_state.ssa_symbol.get_identifier().empty())
     {
       // produce one
       var_state.ssa_symbol=var_info.ssa_symbol();
@@ -473,18 +423,6 @@ exprt path_symex_statet::read_symbol_member_index(
     return var_state.ssa_symbol;
   }
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::is_symbol_member_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool path_symex_statet::is_symbol_member_index(const exprt &src) const
 {
@@ -499,7 +437,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
   // the loop avoids recursion
   while(true)
   {
-    const exprt *next=0;
+    const exprt *next=nullptr;
 
     if(current->id()==ID_symbol)
     {
@@ -521,7 +459,7 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
         next=&(member_expr.struct_op());
       }
       else
-        return false; // includes unions, deliberatley
+        return false; // includes unions, deliberately
     }
     else if(current->id()==ID_index)
     {
@@ -534,22 +472,10 @@ bool path_symex_statet::is_symbol_member_index(const exprt &src) const
       return false;
 
     // next round
-    assert(next!=0);
+    INVARIANT_STRUCTURED(next!=nullptr, nullptr_exceptiont, "next is null");
     current=next;
   }
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::array_index_as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string path_symex_statet::array_index_as_string(const exprt &src) const
 {
@@ -561,18 +487,6 @@ std::string path_symex_statet::array_index_as_string(const exprt &src) const
   else
     return "[*]";
 }
-
-/*******************************************************************\
-
-Function: path_symex_statet::dereference_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt path_symex_statet::dereference_rec(
   const exprt &src,
@@ -610,24 +524,12 @@ exprt path_symex_statet::dereference_rec(
   return src2;
 }
 
-/*******************************************************************\
-
-Function: path_symex_statet::instantiate_rec_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt path_symex_statet::instantiate_rec_address(
   const exprt &src,
   bool propagate)
 {
   #ifdef DEBUG
-  std::cout << "instantiate_rec_address: " << src.id() << std::endl;
+  std::cout << "instantiate_rec_address: " << src.id() << '\n';
   #endif
 
   if(src.id()==ID_symbol)
@@ -687,7 +589,7 @@ exprt path_symex_statet::instantiate_rec_address(
   {
     // this shouldn't really happen
     #ifdef DEBUG
-    std::cout << "SRC: " << src.pretty() << std::endl;
+    std::cout << "SRC: " << src.pretty() << '\n';
     #endif
     throw "address of unexpected `"+src.id_string()+"'";
   }

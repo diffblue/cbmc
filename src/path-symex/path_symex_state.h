@@ -6,8 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// State of path-based symbolic simulator
+
 #ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_STATE_H
 #define CPROVER_PATH_SYMEX_PATH_SYMEX_STATE_H
+
+#include <util/invariant.h>
 
 #include "locs.h"
 #include "var_map.h"
@@ -108,11 +113,9 @@ public:
     current_thread=_thread;
   }
 
-  loc_reft get_pc() const;
-
   goto_programt::const_targett get_instruction() const
   {
-    return locs[get_pc()].target;
+    return locs[pc()].target;
   }
 
   bool is_executable() const
@@ -142,6 +145,7 @@ public:
 
   loc_reft pc() const
   {
+    PRECONDITION(current_thread<threads.size());
     return threads[current_thread].pc;
   }
 

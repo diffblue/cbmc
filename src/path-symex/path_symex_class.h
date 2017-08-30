@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Concrete Symbolic Transformer
+
 #ifndef CPROVER_PATH_SYMEX_PATH_SYMEX_CLASS_H
 #define CPROVER_PATH_SYMEX_PATH_SYMEX_CLASS_H
 

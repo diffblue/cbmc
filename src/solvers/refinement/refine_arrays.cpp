@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "bv_refinement.h"
+
 #ifdef DEBUG
 #include <iostream>
 #include <langapi/language_util.h>
@@ -14,21 +16,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/find_symbols.h>
 
-#include "bv_refinement.h"
 #include <solvers/sat/satcheck.h>
 
-/*******************************************************************\
-
-Function: bv_refinementt::post_process_arrays
-
-  Inputs:
-
- Outputs:
-
- Purpose: generate array constraints
-
-\*******************************************************************/
-
+/// generate array constraints
 void bv_refinementt::post_process_arrays()
 {
   collect_indices();
@@ -43,18 +33,7 @@ void bv_refinementt::post_process_arrays()
   freeze_lazy_constraints();
 }
 
-/*******************************************************************\
-
-Function: bv_refinementt::arrays_overapproximated
-
-  Inputs:
-
- Outputs:
-
- Purpose: check whether counterexample is spurious
-
-\*******************************************************************/
-
+/// check whether counterexample is spurious
 void bv_refinementt::arrays_overapproximated()
 {
   if(!do_array_refinement)
@@ -67,7 +46,7 @@ void bv_refinementt::arrays_overapproximated()
   {
     satcheck_no_simplifiert sat_check;
     bv_pointerst solver(ns, sat_check);
-    solver.unbounded_array=bv_pointerst::U_ALL;
+    solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
 
     exprt current=(*it).lazy;
 
@@ -101,12 +80,12 @@ void bv_refinementt::arrays_overapproximated()
     exprt simplified=get(current);
     solver << simplified;
 
-    switch(sat_check.prop_solve())
+    switch(static_cast<decision_proceduret::resultt>(sat_check.prop_solve()))
     {
-    case decision_proceduret::D_SATISFIABLE:
+    case decision_proceduret::resultt::D_SATISFIABLE:
       ++it;
       break;
-    case decision_proceduret::D_UNSATISFIABLE:
+    case decision_proceduret::resultt::D_UNSATISFIABLE:
       prop.l_set_to_true(convert(current));
       nb_active++;
       lazy_array_constraints.erase(it++);
@@ -125,18 +104,7 @@ void bv_refinementt::arrays_overapproximated()
 }
 
 
-/*******************************************************************\
-
-Function: bv_refinementt::freeze_lazy_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose: freeze symbols for incremental solving
-
-\*******************************************************************/
-
+/// freeze symbols for incremental solving
 void bv_refinementt::freeze_lazy_constraints()
 {
   if(!lazy_arrays)

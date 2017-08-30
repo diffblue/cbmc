@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_LANGUAGE_H
 
@@ -13,8 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 
 #include "java_class_loader.h"
+#include "character_refine_preprocess.h"
 
 #define MAX_NONDET_ARRAY_LENGTH_DEFAULT 5
+
+class symbolt;
 
 enum lazy_methods_modet
 {
@@ -56,8 +60,11 @@ public:
 
   virtual ~java_bytecode_languaget();
   java_bytecode_languaget():
+    assume_inputs_non_null(false),
     max_nondet_array_length(MAX_NONDET_ARRAY_LENGTH_DEFAULT),
-    max_user_array_length(0)
+    max_user_array_length(0),
+    lazy_methods_mode(lazy_methods_modet::LAZY_METHODS_MODE_EAGER),
+    string_refinement_enabled(false)
     {}
 
   bool from_expr(
@@ -103,6 +110,7 @@ protected:
   lazy_methodst lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
+  character_refine_preprocesst character_preprocess;
   std::string java_cp_include_files;
 };
 

@@ -6,23 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Container for C-Strings
+
 #include "dstring.h"
 #include "serializer.h"
 
 
-/*******************************************************************\
-
-  Function: dstring::serialize
-
-  Inputs:
-    serializer: The serializer to read from/write to
-
-  Outputs:
-
-  Purpose:
-    Serializes this instance to/from the given serializer.
-
-\*******************************************************************/
+/// Serializes this instance to/from the given serializer.
+/// \param serializer: The serializer to read from/write to
 void dstringt::serialize(serializert &serializer)
 {
   if(serializer.is_for_reading())

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Type Checking
+
 #ifndef CPROVER_ANSI_C_DESIGNATOR_H
 #define CPROVER_ANSI_C_DESIGNATOR_H
 
@@ -21,9 +24,11 @@ public:
   {
     size_t index;
     size_t size;
+    bool vla_permitted;
     typet type, subtype;
 
-    entryt():index(0), size(0)
+    explicit entryt(const typet &type):
+      index(0), size(0), vla_permitted(false), type(type)
     {
     }
   };

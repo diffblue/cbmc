@@ -6,51 +6,31 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "goto_symex_state.h"
+
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
 
+#include <util/base_exceptions.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
 #include <analyses/dirty.h>
 
-#include "goto_symex_state.h"
-
-/*******************************************************************\
-
-Function: goto_symex_statet::goto_symex_statet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 goto_symex_statet::goto_symex_statet():
   depth(0),
-  symex_target(NULL),
+  symex_target(nullptr),
   atomic_section_id(0),
   record_events(true),
-  dirty(0)
+  dirty(nullptr)
 {
   threads.resize(1);
   new_frame();
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::initialize
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::initialize(const goto_functionst &goto_functions)
 {
@@ -66,18 +46,6 @@ void goto_symex_statet::initialize(const goto_functionst &goto_functions)
   top().end_of_function=--body.instructions.end();
   top().calling_location.pc=top().end_of_function;
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level0t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::level0t::operator()(
   ssa_exprt &ssa_expr,
@@ -98,7 +66,7 @@ void goto_symex_statet::level0t::operator()(
 
   if(ns.lookup(obj_identifier, s))
   {
-    std::cerr << "level0: failed to find " << obj_identifier << std::endl;
+    std::cerr << "level0: failed to find " << obj_identifier << '\n';
     abort();
   }
 
@@ -110,18 +78,6 @@ void goto_symex_statet::level0t::operator()(
   // rename!
   ssa_expr.set_level_0(thread_nr);
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::level1t::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
 {
@@ -139,19 +95,8 @@ void goto_symex_statet::level1t::operator()(ssa_exprt &ssa_expr)
   ssa_expr.set_level_1(it->second.second);
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::constant_propagation
-
-  Inputs:
-
- Outputs:
-
- Purpose: This function determines what expressions are to
-          be propagated as "constants"
-
-\*******************************************************************/
-
+/// This function determines what expressions are to be propagated as
+/// "constants"
 bool goto_symex_statet::constant_propagation(const exprt &expr) const
 {
   if(expr.is_constant())
@@ -181,8 +126,12 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
   {
     // propagate stuff with sizeof in it
     forall_operands(it, expr)
+    {
       if(it->find(ID_C_c_sizeof_type).is_not_nil())
         return true;
+      else if(!constant_propagation(*it))
+        return false;
+    }
 
     return true;
   }
@@ -240,19 +189,7 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
   return false;
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::constant_propagation_reference
-
-  Inputs:
-
- Outputs:
-
- Purpose: this function determines which reference-typed
-          expressions are constant
-
-\*******************************************************************/
-
+/// this function determines which reference-typed expressions are constant
 bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
 {
   if(expr.id()==ID_symbol)
@@ -277,18 +214,7 @@ bool goto_symex_statet::constant_propagation_reference(const exprt &expr) const
   return false;
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose: write to a variable
-
-\*******************************************************************/
-
+/// write to a variable
 static bool check_renaming(const exprt &expr);
 
 static bool check_renaming(const typet &type)
@@ -375,7 +301,7 @@ static void assert_l1_renaming(const exprt &expr)
   #if 1
   if(check_renaming_l1(expr))
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     assert(false);
   }
   #else
@@ -388,7 +314,7 @@ static void assert_l2_renaming(const exprt &expr)
   #if 1
   if(check_renaming(expr))
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     assert(false);
   }
   #else
@@ -455,23 +381,11 @@ void goto_symex_statet::assignment(
   }
 
   #if 0
-  std::cout << "Assigning " << l1_identifier << std::endl;
+  std::cout << "Assigning " << l1_identifier << '\n';
   value_set.output(ns, std::cout);
-  std::cout << "**********************" << std::endl;
+  std::cout << "**********************\n";
   #endif
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::propagationt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::propagationt::operator()(exprt &expr)
 {
@@ -493,18 +407,6 @@ void goto_symex_statet::propagationt::operator()(exprt &expr)
       operator()(*it);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::set_ssa_indices
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::set_ssa_indices(
   ssa_exprt &ssa_expr,
@@ -538,18 +440,6 @@ void goto_symex_statet::set_ssa_indices(
     assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::rename(
   exprt &expr,
@@ -642,18 +532,7 @@ void goto_symex_statet::rename(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::l2_thread_read_encoding
-
-  Inputs:
-
- Outputs:
-
- Purpose: thread encoding
-
-\*******************************************************************/
-
+/// thread encoding
 bool goto_symex_statet::l2_thread_read_encoding(
   ssa_exprt &expr,
   const namespacet &ns)
@@ -663,7 +542,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // is it a shared object?
-  assert(dirty!=0);
+  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&
@@ -759,7 +638,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
       ssa_l1.get_original_expr(),
       tmp,
       source,
-      symex_targett::PHI);
+      symex_targett::assignment_typet::PHI);
 
     set_ssa_indices(ssa_l1, ns, L2);
     expr=ssa_l1;
@@ -788,7 +667,8 @@ bool goto_symex_statet::l2_thread_read_encoding(
   expr=ssa_l1;
 
   // and record that
-  assert(symex_target!=NULL);
+  INVARIANT_STRUCTURED(
+    symex_target!=nullptr, nullptr_exceptiont, "symex_target is null");
   symex_target->shared_read(
     guard.as_expr(),
     expr,
@@ -798,18 +678,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   return true;
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::l2_thread_write_encoding
-
-  Inputs:
-
- Outputs:
-
- Purpose: thread encoding
-
-\*******************************************************************/
-
+/// thread encoding
 bool goto_symex_statet::l2_thread_write_encoding(
   const ssa_exprt &expr,
   const namespacet &ns)
@@ -818,7 +687,7 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
-  assert(dirty!=0);
+  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
   if(obj_identifier=="goto_symex::\\guard" ||
      (!ns.lookup(obj_identifier).is_shared() &&
@@ -845,18 +714,6 @@ bool goto_symex_statet::l2_thread_write_encoding(
   // do we have threads?
   return threads.size()>1;
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::rename_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::rename_address(
   exprt &expr,
@@ -935,18 +792,6 @@ void goto_symex_statet::rename_address(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::rename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symex_statet::rename(
   typet &type,
   const irep_idt &l1_identifier,
@@ -1018,18 +863,6 @@ void goto_symex_statet::rename(
     l1_type_entry.first->second=type;
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::get_original_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symex_statet::get_original_name(exprt &expr) const
 {
   get_original_name(expr.type());
@@ -1041,18 +874,6 @@ void goto_symex_statet::get_original_name(exprt &expr) const
     Forall_operands(it, expr)
       get_original_name(*it);
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::get_original_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::get_original_name(typet &type) const
 {
@@ -1082,18 +903,6 @@ void goto_symex_statet::get_original_name(typet &type) const
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symex_statet::get_l1_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symex_statet::get_l1_name(exprt &expr) const
 {
   // do not reset the type !
@@ -1105,18 +914,6 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
     Forall_operands(it, expr)
       get_l1_name(*it);
 }
-
-/*******************************************************************\
-
-Function: goto_symex_statet::switch_to_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symex_statet::switch_to_thread(unsigned t)
 {

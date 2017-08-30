@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ostream>
+/// \file
+/// Goto Program Template
 
 #include "goto_program_template.h"
 
-/*******************************************************************\
-
-Function: operator<<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <ostream>
 
 std::ostream &operator<<(std::ostream &out, goto_program_instruction_typet t)
 {

@@ -8,6 +8,9 @@ Date: June 2003
 
 \*******************************************************************/
 
+/// \file
+/// Remove Indirect Function Calls
+
 #ifndef CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 #define CPROVER_GOTO_PROGRAMS_REMOVE_FUNCTION_POINTERS_H
 

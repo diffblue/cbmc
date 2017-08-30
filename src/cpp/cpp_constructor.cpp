@@ -6,26 +6,21 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
+#include "cpp_typecheck.h"
+
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 
-#include "cpp_typecheck.h"
 #include "cpp_util.h"
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::cpp_constructor
-
-  Inputs: non-typchecked object, non-typechecked operands
-
- Outputs: typechecked code
-
- Purpose:
-
-\*******************************************************************/
-
+/// \param object: non-typechecked object
+/// \param operands: non-typechecked operands
+/// \return typechecked code
 codet cpp_typecheckt::cpp_constructor(
   const source_locationt &source_location,
   const exprt &object,
@@ -47,8 +42,8 @@ codet cpp_typecheckt::cpp_constructor(
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
     // In the general case, a program is not allow to use this form of
-    // construct. This way of initializing an array is used internaly only.
-    // The purpose of the tag #arra_ini is to rule out ill-formed
+    // construct. This way of initializing an array is used internally only.
+    // The purpose of the tag #array_ini is to rule out ill-formed
     // programs.
 
     if(!operands.empty() && !operands.front().get_bool("#array_ini"))
@@ -294,10 +289,7 @@ codet cpp_typecheckt::cpp_constructor(
     assert(tmp_this.id()==ID_address_of
            && tmp_this.op0().id()=="new_object");
 
-    exprt address_of(ID_address_of, typet(ID_pointer));
-    address_of.type().subtype()=object_tc.type();
-    address_of.copy_to_operands(object_tc);
-    tmp_this.swap(address_of);
+    tmp_this=address_of_exprt(object_tc);
 
     if(block.operands().empty())
       return to_code(initializer);
@@ -314,18 +306,6 @@ codet cpp_typecheckt::cpp_constructor(
   nil.make_nil();
   return nil;
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::new_temporary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::new_temporary(
   const source_locationt &source_location,
@@ -358,18 +338,6 @@ void cpp_typecheckt::new_temporary(
 
   temporary.swap(tmp_object_expr);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::new_temporary
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::new_temporary(
   const source_locationt &source_location,

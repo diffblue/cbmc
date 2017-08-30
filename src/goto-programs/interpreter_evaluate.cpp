@@ -6,26 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interpreter for GOTO Programs
+
+#include "interpreter_class.h"
+
 #include <cassert>
 #include <iostream>
 
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
-
-#include "interpreter_class.h"
-
-/*******************************************************************\
-
-Function: interpretert::evaluate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interpretert::read(
   mp_integer address,
@@ -46,18 +37,6 @@ void interpretert::read(
     ++address;
   }
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interpretert::evaluate(
   const exprt &expr,
@@ -165,7 +144,7 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_or)
   {
-    if(expr.operands().size()<1)
+    if(expr.operands().empty())
       throw id2string(expr.id())+" expects at least one operand";
 
     bool result=false;
@@ -209,7 +188,7 @@ void interpretert::evaluate(
   }
   else if(expr.id()==ID_and)
   {
-    if(expr.operands().size()<1)
+    if(expr.operands().empty())
       throw id2string(expr.id())+" expects at least one operand";
 
     bool result=true;
@@ -423,20 +402,8 @@ void interpretert::evaluate(
 
   std::cout << "!! failed to evaluate expression: "
             << from_expr(ns, function->first, expr)
-            << std::endl;
+            << '\n';
 }
-
-/*******************************************************************\
-
-Function: interpretert::evaluate_address
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mp_integer interpretert::evaluate_address(const exprt &expr) const
 {
@@ -507,7 +474,7 @@ mp_integer interpretert::evaluate_address(const exprt &expr) const
 
   std::cout << "!! failed to evaluate address: "
             << from_expr(ns, function->first, expr)
-            << std::endl;
+            << '\n';
 
   return 0;
 }

@@ -6,6 +6,9 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generic expression / type pretty-printer
+
 #ifndef CPROVER_LANGAPI_PRETTY_PRINTER_H
 #define CPROVER_LANGAPI_PRETTY_PRINTER_H
 

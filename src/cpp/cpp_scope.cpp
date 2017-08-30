@@ -6,20 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include "cpp_typecheck.h"
+/// \file
+/// C++ Language Type Checking
+
 #include "cpp_scope.h"
 
-/*******************************************************************\
-
-Function: cpp_scopet::operator <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include "cpp_typecheck.h"
 
 std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 {
@@ -33,18 +25,6 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 
   return out;
 }
-
-/*******************************************************************\
-
-Function: cpp_scopet::lookup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_scopet::lookup(
   const irep_idt &base_name,
@@ -109,18 +89,6 @@ void cpp_scopet::lookup(
     get_parent().lookup(base_name, kind, id_set);
 }
 
-/*******************************************************************\
-
-Function: cpp_scopet::lookup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_scopet::lookup(
   const irep_idt &base_name,
   lookup_kindt kind,
@@ -131,11 +99,11 @@ void cpp_scopet::lookup(
   // are looking for templates!
 
   #if 0
-  std::cout << "B: " << base_name <<  std::endl;
-  std::cout << "K: " << kind << std::endl;
-  std::cout << "I: " << id_class << std::endl;
+  std::cout << "B: " << base_name << '\n';
+  std::cout << "K: " << kind << '\n';
+  std::cout << "I: " << id_class << '\n';
   std::cout << "THIS: " << this->base_name << " " << this->id_class
-            << " " << this->identifier << std::endl;
+            << " " << this->identifier << '\n';
   #endif
 
   cpp_id_mapt::iterator
@@ -175,7 +143,7 @@ void cpp_scopet::lookup(
   }
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // secondary scopes
   for(scope_listt::iterator
@@ -194,24 +162,12 @@ void cpp_scopet::lookup(
     return; // done
 
   if(!id_set.empty() &&
-     id_class!=TEMPLATE) return; // done, upwards scopes are hidden
+     id_class!=id_classt::TEMPLATE) return; // done, upwards scopes are hidden
 
   // ask parent, recursive call
   if(!is_root_scope())
     get_parent().lookup(base_name, kind, id_class, id_set);
 }
-
-/*******************************************************************\
-
-Function: cpp_scopet::lookup_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_scopet::lookup_identifier(
   const irep_idt &identifier,
@@ -241,18 +197,6 @@ void cpp_scopet::lookup_identifier(
   #endif
 }
 
-/*******************************************************************\
-
-Function: cpp_scopet::new_scope
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
 {
   cpp_idt &id=insert(new_scope_name);
@@ -264,18 +208,6 @@ cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
   return (cpp_scopet &)id;
 }
 
-
-/*******************************************************************\
-
-Function: cpp_scopet::contains
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool cpp_scopet::contains(const irep_idt &base_name)
 {

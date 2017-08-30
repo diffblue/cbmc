@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/arith_tools.h>
+/// \file
+/// ANSI-C Conversion / Type Checking
 
 #include "c_typecheck_base.h"
 
-/*******************************************************************\
-
-Function: c_typecheck_baset::add_argc_argv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/arith_tools.h>
 
 void c_typecheck_baset::add_argc_argv(const symbolt &main_symbol)
 {

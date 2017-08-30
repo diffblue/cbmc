@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+#include "mode.h"
+
 #include <list>
 #include <memory>
 #include <set>
@@ -15,8 +17,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #endif
 
 #include <util/language.h>
-
-#include "mode.h"
 
 struct language_entryt
 {
@@ -28,18 +28,6 @@ struct language_entryt
 typedef std::list<language_entryt> languagest;
 languagest languages;
 
-/*******************************************************************\
-
-Function: register_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void register_language(language_factoryt factory)
 {
   languages.push_back(language_entryt());
@@ -49,18 +37,6 @@ void register_language(language_factoryt factory)
   languages.back().mode=l->id();
 }
 
-/*******************************************************************\
-
-Function: get_language_from_mode
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 languaget *get_language_from_mode(const irep_idt &mode)
 {
   for(languagest::const_iterator it=languages.begin();
@@ -69,33 +45,21 @@ languaget *get_language_from_mode(const irep_idt &mode)
     if(mode==it->mode)
       return it->factory();
 
-  return NULL;
+  return nullptr;
 }
-
-/*******************************************************************\
-
-Function: get_language_from_filename
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 languaget *get_language_from_filename(const std::string &filename)
 {
   std::size_t ext_pos=filename.rfind('.');
 
   if(ext_pos==std::string::npos)
-    return NULL;
+    return nullptr;
 
   std::string extension=
     std::string(filename, ext_pos+1, std::string::npos);
 
   if(extension=="")
-    return NULL;
+    return nullptr;
 
   for(languagest::const_iterator
       l_it=languages.begin();
@@ -115,20 +79,8 @@ languaget *get_language_from_filename(const std::string &filename)
     #endif
   }
 
-  return NULL;
+  return nullptr;
 }
-
-/*******************************************************************\
-
-Function: get_default_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 languaget *get_default_language()
 {

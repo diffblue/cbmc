@@ -8,38 +8,17 @@ Date:
 
 \*******************************************************************/
 
-#include <sstream>
-#include <cassert>
+/// \file
+/// Time Stopping
 
 #include "timer.h"
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <sstream>
+#include <cassert>
 
 timert::~timert()
 {
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void timert::start()
 {
@@ -50,18 +29,6 @@ void timert::start()
   nr_starts++;
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void timert::stop()
 {
   assert(started);
@@ -70,18 +37,6 @@ void timert::stop()
   _latest_time = current_time() - _start_time;
   _total_time += _latest_time;
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void timert::clear()
 {

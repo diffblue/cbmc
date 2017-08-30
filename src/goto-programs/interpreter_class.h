@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interpreter for GOTO Programs
+
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_CLASS_H
 
@@ -23,7 +26,9 @@ public:
     const goto_functionst &_goto_functions):
     symbol_table(_symbol_table),
     ns(_symbol_table),
-    goto_functions(_goto_functions)
+    goto_functions(_goto_functions),
+    stack_pointer(0),
+    done(false)
   {
   }
 

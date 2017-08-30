@@ -32,7 +32,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher.
    On Debian-like distributions, do
 
-   apt-get install g++-6 gcc flex bison make git libwww-perl patch
+   apt-get install g++ gcc flex bison make git libwww-perl patch
 
    On Red Hat/Fedora or derivates, do
 
@@ -44,13 +44,7 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
    git clone https://github.com/diffblue/cbmc cbmc-git
 
-2) On Debian, do
-
-   cd cbmc-git/src
-   make minisat2-download
-   make CXX=g++-6
-
-   On Ubuntu, or other distributions with recent g++, do
+2) On Debian or Ubuntu, do
 
    cd cbmc-git/src
    make minisat2-download

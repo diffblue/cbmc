@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_PROP_AIG_PROP_H
 #define CPROVER_SOLVERS_PROP_AIG_PROP_H
 
@@ -57,7 +58,7 @@ public:
   { assert(0); return tvt::unknown(); }
 
   resultt prop_solve() override
-  { assert(0); return P_ERROR; }
+  { assert(0); return resultt::P_ERROR; }
 
 protected:
   aigt &dest;

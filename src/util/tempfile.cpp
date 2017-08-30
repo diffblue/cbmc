@@ -6,6 +6,8 @@ Author: Daniel Kroening
 
 \*******************************************************************/
 
+#include "tempfile.h"
+
 #ifdef _WIN32
 #include <process.h>
 #include <sys/stat.h>
@@ -32,21 +34,8 @@ Author: Daniel Kroening
 #include <sys/time.h>
 #endif
 
-#include "tempfile.h"
-
-/*******************************************************************\
-
-Function: my_mkstemps
-
-  Inputs:
-
- Outputs:
-
- Purpose: Substitute for mkstemps (OpenBSD standard) for Windows,
-          where it is unavailable.
-
-\*******************************************************************/
-
+/// Substitute for mkstemps (OpenBSD standard) for Windows, where it is
+/// unavailable.
 #ifdef _WIN32
 #define mkstemps my_mkstemps
 int my_mkstemps(char *template_str, int suffix_len)
@@ -55,7 +44,10 @@ int my_mkstemps(char *template_str, int suffix_len)
 
   std::size_t template_length=strlen(template_str);
 
-  if(suffix_len+6>template_length)
+  if(suffix_len<0)
+    return -1;
+
+  if(static_cast<std::size_t>(suffix_len+6)>template_length)
     return -1; // suffix too long
 
   char *XXXXXX_pos=
@@ -92,18 +84,6 @@ int my_mkstemps(char *template_str, int suffix_len)
 }
 #endif
 
-/*******************************************************************\
-
-Function: get_temporary_file
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string get_temporary_file(
   const std::string &prefix,
   const std::string &suffix)
@@ -127,7 +107,7 @@ std::string get_temporary_file(
   #else
   std::string dir="/tmp/";
   const char *TMPDIR_env=getenv("TMPDIR");
-  if(TMPDIR_env!=0)
+  if(TMPDIR_env!=nullptr)
     dir=TMPDIR_env;
   if(*dir.rbegin()!='/')
     dir+='/';
@@ -150,19 +130,8 @@ std::string get_temporary_file(
   return result;
 }
 
-/*******************************************************************\
-
-Function: temporary_filet::~temporary_filet
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 temporary_filet::~temporary_filet()
 {
-  unlink(name.c_str());
+  if(!name.empty())
+    unlink(name.c_str());
 }

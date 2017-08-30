@@ -6,24 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <cassert>
 
 #include <util/prefix.h>
 #include <util/string2int.h>
-
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_overflow
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt boolbvt::convert_overflow(const exprt &expr)
 {
@@ -42,8 +30,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       return SUB::convert_rest(expr);
 
     bv_utilst::representationt rep=
-      expr.op0().type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                          bv_utilst::UNSIGNED;
+      expr.op0().type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                          bv_utilst::representationt::UNSIGNED;
 
     return expr.id()==ID_overflow_minus?
       bv_utils.overflow_sub(bv0, bv1, rep):
@@ -65,8 +53,8 @@ literalt boolbvt::convert_overflow(const exprt &expr)
       throw "operand size mismatch on overflow-*";
 
     bv_utilst::representationt rep=
-      operands[0].type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                           bv_utilst::UNSIGNED;
+      operands[0].type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                           bv_utilst::representationt::UNSIGNED;
 
     if(operands[0].type()!=operands[1].type())
       throw "operand type mismatch on overflow-*";
@@ -81,7 +69,7 @@ literalt boolbvt::convert_overflow(const exprt &expr)
 
     bvt result=bv_utils.multiplier(bv0, bv1, rep);
 
-    if(rep==bv_utilst::UNSIGNED)
+    if(rep==bv_utilst::representationt::UNSIGNED)
     {
       bvt bv_overflow;
       bv_overflow.reserve(old_size);

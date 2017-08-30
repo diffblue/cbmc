@@ -8,23 +8,14 @@ Date: May 2007
 
 \*******************************************************************/
 
-#include <iostream>
-
-#include <util/string2int.h>
+/// \file
+/// goto_programt -> irep conversion
 
 #include "goto_program_irep.h"
 
-/*******************************************************************\
+#include <iostream>
 
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/string2int.h>
 
 void convert(const goto_programt::instructiont &instruction, irept &irep)
 {
@@ -62,18 +53,6 @@ void convert(const goto_programt::instructiont &instruction, irept &irep)
   }
 }
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(
   const irept &irep,
   goto_programt::instructiont &instruction)
@@ -94,18 +73,6 @@ void convert(
     instruction.labels.push_back(lsub.id());
 }
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void convert(const goto_programt &program, irept &irep)
 {
   irep.id("goto-program");
@@ -116,18 +83,6 @@ void convert(const goto_programt &program, irept &irep)
     convert(*it, irep.get_sub().back());
   }
 }
-
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void convert(const irept &irep, goto_programt &program)
 {
@@ -179,7 +134,7 @@ void convert(const irept &irep, goto_programt &program)
       if(fit==program.instructions.end())
       {
         std::cout << "Warning: could not resolve target link "
-                  << "during irep->goto_program translation." << std::endl;
+                  << "during irep->goto_program translation.\n";
         throw 0;
       }
     }

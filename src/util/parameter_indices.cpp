@@ -6,21 +6,15 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Parameter indexing
+
 #include "parameter_indices.h"
 
-/*******************************************************************\
-
-Function: get_parameter_indices
-
-  Inputs: Code type
-
- Outputs: Map from parameter name to position
-
- Purpose: Make a map useful for mapping from symbol expressions to
-          actual or formal parameter indices.
-
-\*******************************************************************/
-
+/// Make a map useful for mapping from symbol expressions to actual or formal
+/// parameter indices.
+/// \par parameters: Code type
+/// \return Map from parameter name to position
 std::map<irep_idt, std::size_t> get_parameter_indices(const code_typet &fn_type)
 {
   std::map<irep_idt, std::size_t>  parameter_indices;

@@ -8,6 +8,9 @@ Date: 2012
 
 \*******************************************************************/
 
+/// \file
+/// Instrumenter
+
 #ifndef CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
 #define CPROVER_GOTO_INSTRUMENT_WMM_GOTO2GRAPH_H
 
@@ -255,18 +258,18 @@ protected:
       }
     }
 
-    // TODO: move the visitor outside, and inherit
+    /// TODO: move the visitor outside, and inherit
     virtual void visit_cfg_function(
-      /* value_sets and options */
+      /// value_sets and options
       value_setst &value_sets,
       memory_modelt model,
       bool no_dependencies,
       loop_strategyt duplicate_body,
-      /* functino to analyse */
+      /// function to analyse
       const irep_idt &function,
-      /* incoming edges */
+      /// incoming edges
       const std::set<nodet> &initial_vertex,
-      /* outcoming edges */
+      /// outcoming edges
       std::set<nodet> &ending_vertex);
 
     bool inline local(const irep_idt &i);
@@ -325,11 +328,18 @@ public:
   std::multimap<irep_idt, source_locationt> id2loc;
   std::multimap<irep_idt, source_locationt> id2cycloc;
 
-  instrumentert(symbol_tablet &_symbol_table, goto_functionst &_goto_f,
-    messaget &_message)
-    :ns(_symbol_table), goto_functions(_goto_f), render_po_aligned(true),
-      render_by_file(false), render_by_function(false), message(_message),
-      egraph(_message)
+  instrumentert(
+    symbol_tablet &_symbol_table,
+    goto_functionst &_goto_f,
+    messaget &_message):
+    ns(_symbol_table),
+    goto_functions(_goto_f),
+    render_po_aligned(true),
+    render_by_file(false),
+    render_by_function(false),
+    message(_message),
+    egraph(_message),
+    num_sccs(0)
   {
   }
 

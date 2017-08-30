@@ -9,21 +9,16 @@ Date: July 2006
 
 \*******************************************************************/
 
+/// \file
+/// Convert goto functions to xml structures and back (with irep hashing)
+
 #include "xml_goto_function_hashing.h"
+
 #include "xml_goto_program_hashing.h"
 
-/*******************************************************************\
-
-Function: xml_goto_function_convertt::convert
-
-  Inputs: goto_function and an xml node
-
- Outputs: none
-
- Purpose: takes a goto_function and creates an according xml structure
-
-\*******************************************************************/
-
+/// takes a goto_function and creates an according xml structure
+/// \par parameters: goto_function and an xml node
+/// \return none
 void xml_goto_function_convertt::convert(
   const goto_functionst::goto_functiont &function,
   xmlt &xml)
@@ -33,19 +28,10 @@ void xml_goto_function_convertt::convert(
     gpconverter.convert(function.body, xml);
 }
 
-/*******************************************************************\
-
-Function: xml_goto_function_convertt::convert
-
-  Inputs: xml structure and a goto_function to fill
-
- Outputs: none
-
- Purpose: constructs the goto_function according to the information
-          in the xml structure.
-
-\*******************************************************************/
-
+/// constructs the goto_function according to the information in the xml
+/// structure.
+/// \par parameters: xml structure and a goto_function to fill
+/// \return none
 void xml_goto_function_convertt::convert(
   const xmlt &xml,
   goto_functionst::goto_functiont &function)
@@ -53,6 +39,5 @@ void xml_goto_function_convertt::convert(
   xml_goto_program_convertt gpconverter(ireps_container);
   function.body.clear();
   gpconverter.convert(xml, function.body);
-  function.body_available = function.body.instructions.size()>0;
   // don't forget to fix the functions type via the symbol table!
 }

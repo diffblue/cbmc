@@ -7,6 +7,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Loop unwinding
+
+#include "unwind.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -15,20 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string_utils.h>
 #include <goto-programs/goto_functions.h>
 
-#include "unwind.h"
 #include "loop_utils.h"
-
-/*******************************************************************\
-
-Function: parse_unwindset
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void parse_unwindset(const std::string &us, unwind_sett &unwind_set)
 {
@@ -63,18 +55,6 @@ void parse_unwindset(const std::string &us, unwind_sett &unwind_set)
     unwind_set[func][loop_id]=loop_bound;
   }
 }
-
-/*******************************************************************\
-
-Function: copy_segment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_unwindt::copy_segment(
   const goto_programt::const_targett start,
@@ -130,18 +110,6 @@ void goto_unwindt::copy_segment(
   }
 }
 
-/*******************************************************************\
-
-Function: unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_unwindt::unwind(
   goto_programt &goto_program,
   const goto_programt::const_targett loop_head,
@@ -153,18 +121,6 @@ void goto_unwindt::unwind(
   unwind(goto_program, loop_head, loop_exit, k, unwind_strategy,
          iteration_points);
 }
-
-/*******************************************************************\
-
-Function: unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_unwindt::unwind(
   goto_programt &goto_program,
@@ -180,7 +136,7 @@ void goto_unwindt::unwind(
   // rest program after unwound part
   goto_programt rest_program;
 
-  if(unwind_strategy==PARTIAL)
+  if(unwind_strategy==unwind_strategyt::PARTIAL)
   {
     goto_programt::targett t=rest_program.add_instruction();
     unwind_log.insert(t, loop_head->location_number);
@@ -190,7 +146,7 @@ void goto_unwindt::unwind(
     t->function=loop_head->function;
     t->location_number=loop_head->location_number;
   }
-  else if(unwind_strategy==CONTINUE)
+  else if(unwind_strategy==unwind_strategyt::CONTINUE)
   {
     copy_segment(loop_head, loop_exit, rest_program);
   }
@@ -216,9 +172,9 @@ void goto_unwindt::unwind(
 
     goto_programt::targett new_t=rest_program.add_instruction();
 
-    if(unwind_strategy==ASSERT)
+    if(unwind_strategy==unwind_strategyt::ASSERT)
       new_t->make_assertion(exit_cond);
-    else if(unwind_strategy==ASSUME)
+    else if(unwind_strategy==unwind_strategyt::ASSUME)
       new_t->make_assumption(exit_cond);
     else
       assert(false);
@@ -334,18 +290,6 @@ void goto_unwindt::unwind(
   goto_program.destructive_insert(loop_exit, copies);
 }
 
-/*******************************************************************\
-
-Function: get_k
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 int goto_unwindt::get_k(
   const irep_idt func,
   const unsigned loop_id,
@@ -368,18 +312,6 @@ int goto_unwindt::get_k(
 
   return k;
 }
-
-/*******************************************************************\
-
-Function: unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_unwindt::unwind(
   goto_programt &goto_program,
@@ -430,18 +362,6 @@ void goto_unwindt::unwind(
   }
 }
 
-/*******************************************************************\
-
-Function: operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_unwindt::operator()(
   goto_functionst &goto_functions,
   const unwind_sett &unwind_set,
@@ -458,7 +378,7 @@ void goto_unwindt::operator()(
       continue;
 
 #ifdef DEBUG
-    std::cout << "Function: " << it->first << std::endl;
+    std::cout << "Function: " << it->first << '\n';
 #endif
 
     goto_programt &goto_program=goto_function.body;
@@ -466,18 +386,6 @@ void goto_unwindt::operator()(
     unwind(goto_program, unwind_set, k, unwind_strategy);
   }
 }
-
-/*******************************************************************\
-
-Function: show_log_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 // call after calling goto_functions.update()!
 jsont goto_unwindt::unwind_logt::output_log_json() const

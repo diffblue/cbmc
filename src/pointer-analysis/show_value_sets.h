@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show Value Sets
+
 #ifndef CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H
 #define CPROVER_POINTER_ANALYSIS_SHOW_VALUE_SETS_H
 

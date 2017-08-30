@@ -6,16 +6,21 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Language Conversion
+
+#include "java_bytecode_convert_class.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
 
-#include "java_bytecode_convert_class.h"
 #include "java_root_class.h"
 #include "java_types.h"
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_language.h"
 
+#include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
@@ -30,13 +35,15 @@ public:
     size_t _max_array_length,
     lazy_methodst& _lazy_methods,
     lazy_methods_modet _lazy_methods_mode,
-    bool _string_refinement_enabled):
+    bool _string_refinement_enabled,
+    const character_refine_preprocesst &_character_preprocess):
     messaget(_message_handler),
     symbol_table(_symbol_table),
     max_array_length(_max_array_length),
     lazy_methods(_lazy_methods),
     lazy_methods_mode(_lazy_methods_mode),
-    string_refinement_enabled(_string_refinement_enabled)
+    string_refinement_enabled(_string_refinement_enabled),
+    character_preprocess(_character_preprocess)
   {
   }
 
@@ -62,6 +69,7 @@ protected:
   lazy_methodst &lazy_methods;
   lazy_methods_modet lazy_methods_mode;
   bool string_refinement_enabled;
+  character_refine_preprocesst character_preprocess;
 
   // conversion
   void convert(const classt &c);
@@ -71,18 +79,6 @@ protected:
   void add_array_types();
   void add_string_type();
 };
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_classt::convert(const classt &c)
 {
@@ -166,7 +162,8 @@ void java_bytecode_convert_classt::convert(const classt &c)
         method,
         symbol_table,
         get_message_handler(),
-        max_array_length);
+        max_array_length,
+        character_preprocess);
     }
     else
     {
@@ -179,18 +176,6 @@ void java_bytecode_convert_classt::convert(const classt &c)
   if(c.extends.empty())
     java_root_class(*class_symbol);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::generate_class_stub
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_classt::generate_class_stub(
   const irep_idt &class_name)
@@ -225,18 +210,6 @@ void java_bytecode_convert_classt::generate_class_stub(
     java_root_class(*class_symbol);
   }
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
@@ -299,18 +272,6 @@ void java_bytecode_convert_classt::convert(
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::add_array_types
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void java_bytecode_convert_classt::add_array_types()
 {
   const std::string letters="ijsbcfdza";
@@ -334,7 +295,7 @@ void java_bytecode_convert_classt::add_array_types()
     struct_type.components().push_back(comp1);
 
     struct_typet::componentt
-      comp2("data", pointer_typet(java_type_from_char(l)));
+      comp2("data", pointer_type(java_type_from_char(l)));
     struct_type.components().push_back(comp2);
 
     symbolt symbol;
@@ -346,18 +307,6 @@ void java_bytecode_convert_classt::add_array_types()
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_class
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool java_bytecode_convert_class(
   const java_bytecode_parse_treet &parse_tree,
   symbol_tablet &symbol_table,
@@ -365,7 +314,8 @@ bool java_bytecode_convert_class(
   size_t max_array_length,
   lazy_methodst &lazy_methods,
   lazy_methods_modet lazy_methods_mode,
-  bool string_refinement_enabled)
+  bool string_refinement_enabled,
+  const character_refine_preprocesst &character_preprocess)
 {
   java_bytecode_convert_classt java_bytecode_convert_class(
     symbol_table,
@@ -373,7 +323,8 @@ bool java_bytecode_convert_class(
     max_array_length,
     lazy_methods,
     lazy_methods_mode,
-    string_refinement_enabled);
+    string_refinement_enabled,
+    character_preprocess);
 
   try
   {
@@ -398,15 +349,8 @@ bool java_bytecode_convert_class(
   return true;
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_convert_classt::add_string_type
-
- Purpose: Implements the java.lang.String type in the case that
-          we provide an internal implementation.
-
-\*******************************************************************/
-
+/// Implements the java.lang.String type in the case that we provide an internal
+/// implementation.
 void java_bytecode_convert_classt::add_string_type()
 {
   class_typet string_type;
@@ -423,7 +367,7 @@ void java_bytecode_convert_classt::add_string_type()
   // Use a pointer-to-unbounded-array instead of a pointer-to-char.
   // Saves some casting in the string refinement algorithm but may
   // be unnecessary.
-  string_type.components()[2].type()=pointer_typet(
+  string_type.components()[2].type()=pointer_type(
     array_typet(java_char_type(), infinity_exprt(java_int_type())));
   string_type.add_base(symbol_typet("java::java.lang.Object"));
 
@@ -449,9 +393,9 @@ void java_bytecode_convert_classt::add_string_type()
   string_equals_type.return_type()=java_boolean_type();
   code_typet::parametert thisparam;
   thisparam.set_this();
-  thisparam.type()=pointer_typet(symbol_typet(string_symbol.name));
+  thisparam.type()=java_reference_type(symbol_typet(string_symbol.name));
   code_typet::parametert otherparam;
-  otherparam.type()=pointer_typet(symbol_typet("java::java.lang.Object"));
+  otherparam.type()=java_reference_type(symbol_typet("java::java.lang.Object"));
   string_equals_type.parameters().push_back(thisparam);
   string_equals_type.parameters().push_back(otherparam);
   string_equals_symbol.type=std::move(string_equals_type);

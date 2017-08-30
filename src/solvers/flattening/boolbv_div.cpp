@@ -6,21 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/std_types.h>
-
 #include "boolbv.h"
 
-/*******************************************************************\
-
-Function: boolbvt::convert_div
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_types.h>
 
 bvt boolbvt::convert_div(const div_exprt &expr)
 {
@@ -59,7 +47,7 @@ bvt boolbvt::convert_div(const div_exprt &expr)
     op0.insert(op0.begin(), zeros.begin(), zeros.end());
     op1=bv_utils.sign_extension(op1, op1.size()+fraction_bits);
 
-    bv_utils.divider(op0, op1, res, rem, bv_utilst::SIGNED);
+    bv_utils.divider(op0, op1, res, rem, bv_utilst::representationt::SIGNED);
 
     // cut it down again
     res.resize(width);
@@ -67,8 +55,8 @@ bvt boolbvt::convert_div(const div_exprt &expr)
   else
   {
     bv_utilst::representationt rep=
-      expr.type().id()==ID_signedbv?bv_utilst::SIGNED:
-                                   bv_utilst::UNSIGNED;
+      expr.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
+                                    bv_utilst::representationt::UNSIGNED;
 
     bv_utils.divider(op0, op1, res, rem, rep);
   }

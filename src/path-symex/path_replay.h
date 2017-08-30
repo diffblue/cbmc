@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dense Data Structure for Path Replay
+
 #ifndef CPROVER_PATH_SYMEX_PATH_REPLAY_H
 #define CPROVER_PATH_SYMEX_PATH_REPLAY_H
 

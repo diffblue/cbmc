@@ -6,22 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "rational.h"
-#include "std_types.h"
+/// \file
+/// Rational Numbers
 
 #include "rational_tools.h"
 
-/*******************************************************************\
-
-Function: power10
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include "rational.h"
+#include "std_types.h"
 
 static mp_integer power10(size_t i)
 {
@@ -32,18 +23,6 @@ static mp_integer power10(size_t i)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: to_rational
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool to_rational(const exprt &expr, rationalt &rational_value)
 {
@@ -98,18 +77,6 @@ bool to_rational(const exprt &expr, rationalt &rational_value)
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: from_rational
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 constant_exprt from_rational(const rationalt &a)
 {

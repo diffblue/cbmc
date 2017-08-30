@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Property Checker Interface
+
 #ifndef CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H
 #define CPROVER_GOTO_PROGRAMS_PROPERTY_CHECKER_H
 
@@ -26,7 +29,7 @@ public:
   explicit property_checkert(
     message_handlert &_message_handler);
 
-  typedef enum { PASS, FAIL, ERROR, UNKNOWN } resultt;
+  enum class resultt { PASS, FAIL, ERROR, UNKNOWN };
 
   static std::string as_string(resultt);
 

@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/unicode.h>
+/// \file
+/// mmcc Main Module
 
 #include "mmcc_parse_options.h"
 
-/*******************************************************************\
-
-Function: main / wmain
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/unicode.h>
 
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)

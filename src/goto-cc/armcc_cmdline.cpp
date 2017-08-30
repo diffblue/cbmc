@@ -1,28 +1,22 @@
 /*******************************************************************\
 
-Module: A special command line object to mimick ARM's armcc
+Module: A special command line object to mimic ARM's armcc
 
 Author: Daniel Kroening
 
 \*******************************************************************/
 
-#include <cstring>
-#include <iostream>
+/// \file
+/// A special command line object to mimic ARM's armcc
 
 #include "armcc_cmdline.h"
 
-/*******************************************************************\
+#include <cstring>
+#include <iostream>
 
-Function: armcc_cmdlinet::parse
-
-  Inputs: argument count, argument strings
-
- Outputs: none
-
- Purpose: parses the commandline options into a cmdlinet
-
-\*******************************************************************/
-
+/// parses the command line options into a cmdlinet
+/// \par parameters: argument count, argument strings
+/// \return none
 // see
 // http://infocenter.arm.com/help/topic/com.arm.doc.dui0472c/Cchbggjb.html
 
@@ -93,8 +87,8 @@ static const char *options_no_arg[]=
   "--no_implicit_include_searches",
   "--implicit_typename",
   "--no_implicit_typename",
-  "--nonstd_qualifider_deduction",
-  "--no_nonstd_qualifider_deduction",
+  "--nonstd_qualifier_deduction",
+  "--no_nonstd_qualifier_deduction",
   "--old_specializations",
   "--no_old_specializations",
   "--parse_templates",
@@ -198,7 +192,7 @@ static const char *options_no_arg[]=
   "--translate_gcc",
   "--translate_gld",
   "-W",
-  NULL
+  nullptr
 };
 
 static const char *options_with_prefix[]=
@@ -248,7 +242,7 @@ static const char *options_with_prefix[]=
   "--configure_cpp_headers=",
   "--configure_extra_includes=",
   "--configure_extra_libraries=",
-  NULL
+  nullptr
 };
 
 static const char *options_with_arg[]=
@@ -268,7 +262,7 @@ static const char *options_with_arg[]=
   "-o",
   "--cpu",
   "--apcs",
-  NULL
+  nullptr
 };
 
 bool armcc_cmdlinet::parse(int argc, const char **argv)
@@ -316,7 +310,7 @@ bool armcc_cmdlinet::parse(int argc, const char **argv)
     else
     { // unrecognized option
       std::cout << "Warning: uninterpreted armcc option '"
-                << argv[i] << "'" << std::endl;
+                << argv[i] << "'\n";
     }
   }
 

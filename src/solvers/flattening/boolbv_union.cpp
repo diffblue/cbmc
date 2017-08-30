@@ -6,23 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/endianness_map.h>
-
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_union(const union_exprt &expr)
 {

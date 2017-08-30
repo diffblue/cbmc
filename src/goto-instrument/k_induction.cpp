@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// k-induction
+
+#include "k_induction.h"
+
 #include <util/std_expr.h>
 
 #include <analyses/natural_loops.h>
@@ -15,7 +20,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "unwind.h"
 #include "loop_utils.h"
-#include "k_induction.h"
 
 class k_inductiont
 {
@@ -49,18 +53,6 @@ protected:
     const loopt &);
 };
 
-/*******************************************************************\
-
-Function: k_inductiont::process_loop
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void k_inductiont::process_loop(
   const goto_programt::targett loop_head,
   const loopt &loop)
@@ -79,7 +71,7 @@ void k_inductiont::process_loop(
     // now unwind k times
     goto_unwindt goto_unwind;
     goto_unwind.unwind(goto_function.body, loop_head, loop_exit, k,
-                       goto_unwindt::PARTIAL);
+                       goto_unwindt::unwind_strategyt::PARTIAL);
 
     // assume the loop condition has become false
     goto_programt::instructiont assume(ASSUME);
@@ -95,7 +87,7 @@ void k_inductiont::process_loop(
     modifiest modifies;
     get_modifies(local_may_alias, loop, modifies);
 
-    // build the havoc-ing code
+    // build the havocking code
     goto_programt havoc_code;
     build_havoc_code(loop_head, modifies, havoc_code);
 
@@ -103,8 +95,13 @@ void k_inductiont::process_loop(
     std::vector<goto_programt::targett> iteration_points;
 
     goto_unwindt goto_unwind;
-    goto_unwind.unwind(goto_function.body, loop_head, loop_exit, k+1,
-                       goto_unwindt::PARTIAL, iteration_points);
+    goto_unwind.unwind(
+      goto_function.body,
+      loop_head,
+      loop_exit,
+      k+1,
+      goto_unwindt::unwind_strategyt::PARTIAL,
+      iteration_points);
 
     // we can remove everything up to the first assertion
     for(goto_programt::targett t=loop_head; t!=loop_exit; t++)
@@ -141,18 +138,6 @@ void k_inductiont::process_loop(
   remove_skip(goto_function.body);
 }
 
-/*******************************************************************\
-
-Function: k_inductiont::k_induction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void k_inductiont::k_induction()
 {
   // iterate over the (natural) loops in the function
@@ -163,18 +148,6 @@ void k_inductiont::k_induction()
       l_it++)
     process_loop(l_it->first, l_it->second);
 }
-
-/*******************************************************************\
-
-Function: k_induction
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void k_induction(
   goto_functionst &goto_functions,

@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_THREEVAL_H
 #define CPROVER_UTIL_THREEVAL_H
 
@@ -41,7 +42,7 @@ public:
     return value;
   }
 
-  tvt()
+  tvt():value(tv_enumt::TV_UNKNOWN)
   {
   }
 
@@ -73,7 +74,7 @@ public:
     return unknown();
   }
 
-  tvt operator||(const tvt other)
+  tvt operator||(const tvt other) const
   {
     if(is_true() || other.is_true())
       return tvt(true);

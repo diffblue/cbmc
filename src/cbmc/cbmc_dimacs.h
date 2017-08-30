@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Writing DIMACS Files
+
 #ifndef CPROVER_CBMC_CBMC_DIMACS_H
 #define CPROVER_CBMC_CBMC_DIMACS_H
 

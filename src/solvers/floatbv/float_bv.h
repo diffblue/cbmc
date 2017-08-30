@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
 #define CPROVER_SOLVERS_FLOATBV_FLOAT_BV_H
 
@@ -93,7 +94,7 @@ public:
     const ieee_float_spect &dest_spec);
 
   // relations
-  typedef enum { LT, LE, EQ, GT, GE } relt;
+  enum class relt { LT, LE, EQ, GT, GE };
   exprt relation(
     const exprt &,
     relt rel,

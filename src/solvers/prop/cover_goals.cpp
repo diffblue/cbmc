@@ -6,39 +6,20 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Cover a set of goals incrementally
+
+#include "cover_goals.h"
+
 #include <util/threeval.h>
 
 #include "literal_expr.h"
-#include "cover_goals.h"
-
-/*******************************************************************\
-
-Function: cover_goalst::~cover_goalst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 cover_goalst::~cover_goalst()
 {
 }
 
-/*******************************************************************\
-
-Function: cover_goalst::mark
-
-  Inputs:
-
- Outputs:
-
- Purpose: Mark goals that are covered
-
-\*******************************************************************/
-
+/// Mark goals that are covered
 void cover_goalst::mark()
 {
   // notify observers
@@ -58,18 +39,7 @@ void cover_goalst::mark()
     }
 }
 
-/*******************************************************************\
-
-Function: cover_goalst::constaint
-
-  Inputs:
-
- Outputs:
-
- Purpose: Build clause
-
-\*******************************************************************/
-
+/// Build clause
 void cover_goalst::constraint()
 {
   exprt::operandst disjuncts;
@@ -88,18 +58,7 @@ void cover_goalst::constraint()
   prop_conv.set_to_true(disjunction(disjuncts));
 }
 
-/*******************************************************************\
-
-Function: cover_goalst::freeze_goal_variables
-
-  Inputs:
-
- Outputs:
-
- Purpose: Build clause
-
-\*******************************************************************/
-
+/// Build clause
 void cover_goalst::freeze_goal_variables()
 {
   for(std::list<goalt>::const_iterator
@@ -110,18 +69,7 @@ void cover_goalst::freeze_goal_variables()
       prop_conv.set_frozen(g_it->condition);
 }
 
-/*******************************************************************\
-
-Function: cover_goalst::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: Try to cover all goals
-
-\*******************************************************************/
-
+/// Try to cover all goals
 decision_proceduret::resultt cover_goalst::operator()()
 {
   _iterations=_number_covered=0;
@@ -142,10 +90,10 @@ decision_proceduret::resultt cover_goalst::operator()()
 
     switch(dec_result)
     {
-    case decision_proceduret::D_UNSATISFIABLE: // DONE
+    case decision_proceduret::resultt::D_UNSATISFIABLE: // DONE
       return dec_result;
 
-    case decision_proceduret::D_SATISFIABLE:
+    case decision_proceduret::resultt::D_SATISFIABLE:
       // mark the goals we got, and notify observers
       mark();
       break;
@@ -155,8 +103,8 @@ decision_proceduret::resultt cover_goalst::operator()()
       return dec_result;
     }
   }
-  while(dec_result==decision_proceduret::D_SATISFIABLE &&
+  while(dec_result==decision_proceduret::resultt::D_SATISFIABLE &&
         number_covered()<size());
 
-  return decision_proceduret::D_SATISFIABLE;
+  return decision_proceduret::resultt::D_SATISFIABLE;
 }

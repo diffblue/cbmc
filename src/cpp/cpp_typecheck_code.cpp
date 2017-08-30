@@ -6,26 +6,18 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <util/source_location.h>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
+
+#include <util/source_location.h>
+
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_util.h"
 #include "cpp_exception_id.h"
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_code
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_code(codet &code)
 {
@@ -45,21 +37,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
           statement==ID_msc_if_not_exists)
   {
   }
+  else if(statement==ID_decl_block)
+  {
+    // type checked already
+  }
   else
     c_typecheck_baset::typecheck_code(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_try_catch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_try_catch(codet &code)
 {
@@ -127,18 +111,6 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
   }
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_ifthenelse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
@@ -153,18 +125,6 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     c_typecheck_baset::typecheck_ifthenelse(code);
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_while
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_while(code_whilet &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
@@ -178,18 +138,6 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
   else
     c_typecheck_baset::typecheck_while(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_switch
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_switch(code_switcht &code)
 {
@@ -222,18 +170,6 @@ void cpp_typecheckt::typecheck_switch(code_switcht &code)
     c_typecheck_baset::typecheck_switch(code);
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_member_initializer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_member_initializer(codet &code)
 {
   const cpp_namet &member=
@@ -256,7 +192,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   // Plus, this should happen in class scope, not the scope of
   // the constructor because of the constructor arguments.
   exprt symbol_expr=
-    resolve(member, cpp_typecheck_resolvet::VAR, fargs);
+    resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
 
   if(symbol_expr.type().id()==ID_code)
   {
@@ -340,7 +276,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
         cpp_scopes.go_to(
           *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
-        symbol_expr=resolve(member, cpp_typecheck_resolvet::VAR, fargs);
+        symbol_expr=resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
       }
 
       if(symbol_expr.id() == ID_dereference &&
@@ -412,18 +348,6 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     }
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_decl
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_decl(codet &code)
 {
@@ -518,18 +442,6 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   code.swap(new_code);
 }
 
-/*******************************************************************\
-
-Function: cpp_typecheck_codet::typecheck_block
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void cpp_typecheckt::typecheck_block(codet &code)
 {
   cpp_save_scopet saved_scope(cpp_scopes);
@@ -537,18 +449,6 @@ void cpp_typecheckt::typecheck_block(codet &code)
 
   c_typecheck_baset::typecheck_block(code);
 }
-
-/*******************************************************************\
-
-Function: cpp_typecheckt::typecheck_assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_typecheckt::typecheck_assign(codet &code)
 {
@@ -560,7 +460,7 @@ void cpp_typecheckt::typecheck_assign(codet &code)
     throw 0;
   }
 
-  // turn into a sideeffect
+  // turn into a side effect
   side_effect_exprt expr(code.get(ID_statement));
   expr.operands() = code.operands();
   typecheck_expr(expr);

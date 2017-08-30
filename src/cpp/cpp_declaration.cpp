@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
-#include <ostream>
+/// \file
+/// C++ Language Type Checking
 
 #include "cpp_declaration.h"
 
-/*******************************************************************\
-
-Function: cpp_declarationt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <ostream>
 
 void cpp_declarationt::output(std::ostream &out) const
 {
@@ -37,18 +28,6 @@ void cpp_declarationt::output(std::ostream &out) const
     out << "\n";
   }
 }
-
-/*******************************************************************\
-
-Function: cpp_declarationt::name_anon_struct_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void cpp_declarationt::name_anon_struct_union(typet &dest)
 {

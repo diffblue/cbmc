@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Type Checking
+
 #include "ansi_c_typecheck.h"
-
-/*******************************************************************\
-
-Function: ansi_c_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_typecheckt::typecheck()
 {
@@ -32,18 +23,6 @@ void ansi_c_typecheckt::typecheck()
   }
 }
 
-/*******************************************************************\
-
-Function: ansi_c_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_typecheck(
   ansi_c_parse_treet &ansi_c_parse_tree,
   symbol_tablet &symbol_table,
@@ -55,23 +34,14 @@ bool ansi_c_typecheck(
   return ansi_c_typecheck.typecheck_main();
 }
 
-/*******************************************************************\
-
-Function: ansi_c_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool ansi_c_typecheck(
   exprt &expr,
   message_handlert &message_handler,
   const namespacet &ns)
 {
+  const unsigned errors_before=
+    message_handler.get_message_count(messaget::M_ERROR);
+
   symbol_tablet symbol_table;
   ansi_c_parse_treet ansi_c_parse_tree;
 
@@ -99,5 +69,5 @@ bool ansi_c_typecheck(
     ansi_c_typecheck.error() << e << messaget::eom;
   }
 
-  return ansi_c_typecheck.get_error_found();
+  return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
 }

@@ -6,6 +6,9 @@ Author: Alex Groce (agroce@gmail.com)
 
 \*******************************************************************/
 
+/// \file
+/// Slicer for matching with trace files
+
 #ifndef CPROVER_GOTO_SYMEX_SLICE_BY_TRACE_H
 #define CPROVER_GOTO_SYMEX_SLICE_BY_TRACE_H
 
@@ -14,7 +17,9 @@ Author: Alex Groce (agroce@gmail.com)
 class symex_slice_by_tracet
 {
 public:
-  explicit symex_slice_by_tracet(const namespacet &_ns):ns(_ns)
+  explicit symex_slice_by_tracet(const namespacet &_ns):
+    ns(_ns),
+    alphabet_parity(false)
   {
   }
 

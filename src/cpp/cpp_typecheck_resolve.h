@@ -6,12 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 #define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
 #include "cpp_typecheck_fargs.h"
 #include "cpp_name.h"
 #include "cpp_template_args.h"
+#include "cpp_scopes.h"
 
 class cpp_typecheck_resolvet
 {
@@ -19,7 +23,7 @@ public:
   cpp_typecheck_resolvet(
     class cpp_typecheckt &_cpp_typecheck);
 
-  typedef enum { VAR, TYPE, BOTH } wantt;
+  enum class wantt { VAR, TYPE, BOTH };
 
   exprt resolve(
     const cpp_namet &cpp_name,

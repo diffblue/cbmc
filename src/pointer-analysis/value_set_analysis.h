@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set Propagation
+
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_H
 
@@ -59,7 +62,7 @@ public:
       if(location==previous_location)
         continue;
 
-      if(location.is_nil() || location.get_file()==irep_idt())
+      if(location.is_nil() || location.get_file().empty())
         continue;
 
       // find value set
@@ -116,8 +119,8 @@ public:
 
     Inputs: The set of expressions to check.
 
-   Outputs: true, if it contains only one expression and 
-            that expression is a symbol, 
+   Outputs: true, if it contains only one expression and
+            that expression is a symbol,
             false, otherwise.
 
    Purpose: Get whether a set of expressions can have a strong update

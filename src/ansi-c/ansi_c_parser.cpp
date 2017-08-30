@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_parser.h"
+
 #include <iostream>
 
-#include "ansi_c_parser.h"
 #include "c_storage_spec.h"
 
 ansi_c_parsert ansi_c_parser;
-
-/*******************************************************************\
-
-Function: ansi_c_parsert::lookup
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 ansi_c_id_classt ansi_c_parsert::lookup(
   const irep_idt &base_name,
@@ -59,28 +48,16 @@ ansi_c_id_classt ansi_c_parsert::lookup(
   {
     ansi_c_identifiert &i=
       current_scope().name_map[scope_name];
-    i.id_class=ANSI_C_TAG;
+    i.id_class=ansi_c_id_classt::ANSI_C_TAG;
     i.prefixed_name=current_scope().prefix+id2string(scope_name);
     i.base_name=base_name;
     identifier=i.prefixed_name;
-    return ANSI_C_TAG;
+    return ansi_c_id_classt::ANSI_C_TAG;
   }
 
   identifier=base_name;
-  return ANSI_C_UNKNOWN;
+  return ansi_c_id_classt::ANSI_C_UNKNOWN;
 }
-
-/*******************************************************************\
-
-Function: ansi_c_parsert::add_tag_with_body
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_parsert::add_tag_with_body(irept &tag)
 {
@@ -94,23 +71,11 @@ void ansi_c_parsert::add_tag_with_body(irept &tag)
     // re-defined in a deeper scope
     ansi_c_identifiert &identifier=
       current_scope().name_map[scope_name];
-    identifier.id_class=ANSI_C_TAG;
+    identifier.id_class=ansi_c_id_classt::ANSI_C_TAG;
     identifier.prefixed_name=prefixed_name;
     tag.set(ID_identifier, prefixed_name);
   }
 }
-
-/*******************************************************************\
-
-Function: yyansi_cerror
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 extern char *yyansi_ctext;
 
@@ -119,18 +84,6 @@ int yyansi_cerror(const std::string &error)
   ansi_c_parser.parse_error(error, yyansi_ctext);
   return 0;
 }
-
-/*******************************************************************\
-
-Function: ansi_c_parsert::add_declarator
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_parsert::add_declarator(
   exprt &declaration,
@@ -180,8 +133,9 @@ void ansi_c_parsert::add_declarator(
     if(is_extern)
       force_root_scope=true;
 
-    ansi_c_id_classt id_class=
-      is_typedef?ANSI_C_TYPEDEF:ANSI_C_SYMBOL;
+    ansi_c_id_classt id_class=is_typedef?
+      ansi_c_id_classt::ANSI_C_TYPEDEF:
+      ansi_c_id_classt::ANSI_C_SYMBOL;
 
     scopet &scope=
       force_root_scope?root_scope():current_scope();
@@ -201,34 +155,22 @@ void ansi_c_parsert::add_declarator(
   ansi_c_declaration.declarators().push_back(new_declarator);
 }
 
-/*******************************************************************\
-
-Function: ansi_c_parsert::get_class
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 ansi_c_id_classt ansi_c_parsert::get_class(const typet &type)
 {
   if(type.id()==ID_typedef)
-    return ANSI_C_TYPEDEF;
+    return ansi_c_id_classt::ANSI_C_TYPEDEF;
   else if(type.id()==ID_struct ||
           type.id()==ID_union ||
           type.id()==ID_c_enum)
-    return ANSI_C_TAG;
+    return ansi_c_id_classt::ANSI_C_TAG;
   else if(type.id()==ID_merged_type)
   {
     forall_subtypes(it, type)
-      if(get_class(*it)==ANSI_C_TYPEDEF)
-        return ANSI_C_TYPEDEF;
+      if(get_class(*it)==ansi_c_id_classt::ANSI_C_TYPEDEF)
+        return ansi_c_id_classt::ANSI_C_TYPEDEF;
   }
   else if(type.has_subtype())
     return get_class(type.subtype());
 
-  return ANSI_C_SYMBOL;
+  return ansi_c_id_classt::ANSI_C_SYMBOL;
 }

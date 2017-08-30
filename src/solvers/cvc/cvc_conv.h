@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_CVC_CVC_CONV_H
 #define CPROVER_SOLVERS_CVC_CVC_CONV_H
 

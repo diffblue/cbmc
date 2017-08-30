@@ -6,16 +6,23 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// SMT Backend
+
+#include "smt2_conv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
+#include <util/base_type.h>
+#include <util/c_types.h>
 #include <util/expr_util.h>
+#include <util/fixedbv.h>
+#include <util/ieee_float.h>
+#include <util/invariant.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/fixedbv.h>
-#include <util/pointer_offset_size.h>
-#include <util/ieee_float.h>
-#include <util/base_type.h>
 #include <util/string2int.h>
 
 #include <ansi-c/string_constant.h>
@@ -27,11 +34,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/flattening/c_bit_field_replacement_type.h>
 #include <solvers/floatbv/float_bv.h>
 
-#include "smt2_conv.h"
-
 // Mark different kinds of error condition
 // General
-#define UNREACHABLE throw "Supposidly unreachable location reached"
 #define PARSERERROR(S) throw S
 
 // Error checking the expression type
@@ -42,19 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define UNEXPECTEDCASE(S) throw "Unexpected case: " S
 
 // General todos
-#define TODO(S) throw "TODO: " S
-
-/*******************************************************************\
-
-Function: smt2_convt::print_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#define SMT2_TODO(S) throw "TODO: " S
 
 void smt2_convt::print_assignment(std::ostream &out) const
 {
@@ -66,18 +58,6 @@ void smt2_convt::print_assignment(std::ostream &out) const
   // others
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::l_get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 tvt smt2_convt::l_get(literalt l) const
 {
   if(l.is_true())
@@ -88,32 +68,20 @@ tvt smt2_convt::l_get(literalt l) const
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::write_header
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::write_header()
 {
   out << "; SMT 2" << "\n";
 
   switch(solver)
   {
-  case GENERIC: break;
-  case BOOLECTOR: out << "; Generated for Boolector\n"; break;
-  case CVC3: out << "; Generated for CVC 3\n"; break;
-  case CVC4: out << "; Generated for CVC 4\n"; break;
-  case MATHSAT: out << "; Generated for MathSAT\n"; break;
-  case OPENSMT: out << "; Generated for OPENSMT\n"; break;
-  case YICES: out << "; Generated for Yices\n"; break;
-  case Z3: out << "; Generated for Z3\n"; break;
+  case solvert::GENERIC: break;
+  case solvert::BOOLECTOR: out << "; Generated for Boolector\n"; break;
+  case solvert::CVC3: out << "; Generated for CVC 3\n"; break;
+  case solvert::CVC4: out << "; Generated for CVC 4\n"; break;
+  case solvert::MATHSAT: out << "; Generated for MathSAT\n"; break;
+  case solvert::OPENSMT: out << "; Generated for OPENSMT\n"; break;
+  case solvert::YICES: out << "; Generated for Yices\n"; break;
+  case solvert::Z3: out << "; Generated for Z3\n"; break;
   }
 
   out << "(set-info :source \"" << notes << "\")" << "\n";
@@ -126,18 +94,6 @@ void smt2_convt::write_header()
   if(emit_set_logic && !logic.empty())
     out << "(set-logic " << logic << ")" << "\n";
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::write_footer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::write_footer(std::ostream &out)
 {
@@ -163,7 +119,7 @@ void smt2_convt::write_footer(std::ostream &out)
   out << "(check-sat)" << "\n";
   out << "\n";
 
-  if(solver!=BOOLECTOR)
+  if(solver!=solvert::BOOLECTOR)
   {
     for(const auto &id : smt2_identifiers)
       out << "(get-value (|" << id << "|))" << "\n";
@@ -175,18 +131,6 @@ void smt2_convt::write_footer(std::ostream &out)
 
   out << "; end of SMT2 file" << "\n";
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::define_object_size
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::define_object_size(
   const irep_idt &id,
@@ -225,36 +169,12 @@ void smt2_convt::define_object_size(
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::dec_solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 decision_proceduret::resultt smt2_convt::dec_solve()
 {
   write_footer(out);
   out.flush();
-  return decision_proceduret::D_ERROR;
+  return decision_proceduret::resultt::D_ERROR;
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt smt2_convt::get(const exprt &expr) const
 {
@@ -278,18 +198,6 @@ exprt smt2_convt::get(const exprt &expr) const
 
   return nil_exprt();
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::parse_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 constant_exprt smt2_convt::parse_literal(
   const irept &src,
@@ -411,18 +319,6 @@ constant_exprt smt2_convt::parse_literal(
     UNEXPECTEDCASE("smt2_convt::parse_literal can't do type "+type.id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::parse_array
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt smt2_convt::parse_array(
   const irept &src,
   const array_typet &type)
@@ -453,18 +349,6 @@ exprt smt2_convt::parse_array(
     return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::parse_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt smt2_convt::parse_union(
   const irept &src,
   const union_typet &type)
@@ -479,18 +363,6 @@ exprt smt2_convt::parse_union(
   exprt converted=typecast_exprt(value, first.type());
   return union_exprt(first.get_name(), converted, type);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::parse_struct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt smt2_convt::parse_struct(
   const irept &src,
@@ -553,18 +425,6 @@ exprt smt2_convt::parse_struct(
   return result;
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::parse_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
 {
   const typet &type=ns.follow(_type);
@@ -616,18 +476,6 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
   return nil_exprt();
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_address_of_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_address_of_rec(
   const exprt &expr,
   const pointer_typet &result_type)
@@ -665,12 +513,14 @@ void smt2_convt::convert_address_of_rec(
       exprt new_index_expr=expr;
       new_index_expr.op1()=from_integer(0, index.type());
 
-      exprt address_of_expr(ID_address_of, pointer_typet());
-      address_of_expr.type().subtype()=array.type().subtype();
-      address_of_expr.copy_to_operands(new_index_expr);
+      address_of_exprt address_of_expr(
+        new_index_expr,
+        pointer_type(array.type().subtype()));
 
-      exprt plus_expr(ID_plus, address_of_expr.type());
-      plus_expr.copy_to_operands(address_of_expr, index);
+      plus_exprt plus_expr(
+        address_of_expr,
+        index,
+        address_of_expr.type());
 
       convert_expr(plus_expr);
     }
@@ -694,6 +544,7 @@ void smt2_convt::convert_address_of_rec(
         member_expr.get_component_name();
 
       mp_integer offset=member_offset(struct_type, component_name, ns);
+      assert(offset>=0);
 
       unsignedbv_typet index_type;
       index_type.set_width(boolbv_width(result_type));
@@ -723,38 +574,14 @@ void smt2_convt::convert_address_of_rec(
     UNEXPECTEDCASE("don't know how to take address of: "+expr.id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_byte_extract
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_byte_extract(const byte_extract_exprt &expr)
 {
   // we just run the flattener
   exprt flattened_expr=flatten_byte_extract(expr, ns);
-  unflatten(BEGIN, expr.type());
+  unflatten(wheret::BEGIN, expr.type());
   convert_expr(flattened_expr);
-  unflatten(END, expr.type());
+  unflatten(wheret::END, expr.type());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_byte_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
 {
@@ -854,23 +681,11 @@ void smt2_convt::convert_byte_update(const byte_update_exprt &expr)
   exprt ext_value=typecast_exprt(expr.value(), one_mask.type());
   exprt or_expr=bitor_exprt(and_expr, shl_exprt(ext_value, distance));
 
-  unflatten(BEGIN, expr.type());
+  unflatten(wheret::BEGIN, expr.type());
   flatten2bv(or_expr);
-  unflatten(END, expr.type());
+  unflatten(wheret::END, expr.type());
   #endif
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt smt2_convt::convert(const exprt &expr)
 {
@@ -904,18 +719,6 @@ literalt smt2_convt::convert(const exprt &expr)
   return l;
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_literal(const literalt l)
 {
   if(l==const_literal(false))
@@ -935,18 +738,6 @@ void smt2_convt::convert_literal(const literalt l)
     smt2_identifiers.insert("B"+std::to_string(l.var_no()));
   }
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 {
@@ -978,18 +769,6 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::type2id
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string smt2_convt::type2id(const typet &type) const
 {
@@ -1025,35 +804,11 @@ std::string smt2_convt::type2id(const typet &type) const
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::floatbv_suffix
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string smt2_convt::floatbv_suffix(const exprt &expr) const
 {
   assert(!expr.operands().empty());
   return "_"+type2id(expr.op0().type())+"->"+type2id(expr.type());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_floatbv(const exprt &expr)
 {
@@ -1087,18 +842,6 @@ void smt2_convt::convert_floatbv(const exprt &expr)
 
   out << ')';
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_expr(const exprt &expr)
 {
@@ -1212,7 +955,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         out << "))"; // mk-, let
       }
       else
-        TODO("bitnot for vectors");
+        SMT2_TODO("bitnot for vectors");
     }
     else
     {
@@ -1277,7 +1020,7 @@ void smt2_convt::convert_expr(const exprt &expr)
         out << "))"; // mk-, let
       }
       else
-        TODO("unary minus for vector");
+        SMT2_TODO("unary minus for vector");
     }
     else
     {
@@ -1623,7 +1366,7 @@ void smt2_convt::convert_expr(const exprt &expr)
     assert(expr.operands().size()==1);
 
     out << "false"; // TODO
-    TODO("pointer_object_has_type not implemented");
+    SMT2_TODO("pointer_object_has_type not implemented");
   }
   else if(expr.id()==ID_string_constant)
   {
@@ -1692,7 +1435,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       convert_expr(tmp);
       out << ")) bin1)"; // bvlshr, extract, =
       #endif
-      TODO("smt2: extractbits with non-constant index");
+      SMT2_TODO("smt2: extractbits with non-constant index");
     }
   }
   else if(expr.id()==ID_replication)
@@ -1972,7 +1715,7 @@ void smt2_convt::convert_expr(const exprt &expr)
   else if(expr.id()==ID_forall ||
           expr.id()==ID_exists)
   {
-    if(solver==MATHSAT)
+    if(solver==solvert::MATHSAT)
       // NOLINTNEXTLINE(readability/throw)
       throw "MathSAT does not support quantifiers";
 
@@ -2049,18 +1792,6 @@ void smt2_convt::convert_expr(const exprt &expr)
     UNEXPECTEDCASE(
       "smt2_convt::convert_expr: `"+expr.id_string()+"' is unsupported");
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_typecast(const typecast_exprt &expr)
 {
@@ -2216,7 +1947,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           // This conversion is non-trivial as it requires creating a
           // new bit-vector variable and then asserting that it converts
           // to the required floating-point number.
-          TODO("bit-wise floatbv to bv");
+          SMT2_TODO("bit-wise floatbv to bv");
         }
         else
         {
@@ -2289,7 +2020,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         out << "(_ bv" << i << " " << to_width << ")";
       }
       else
-        TODO("can't convert non-constant integer to bitvector");
+        SMT2_TODO("can't convert non-constant integer to bitvector");
     }
     else if(src_type.id()==ID_struct) // flatten a struct to a bit-vector
     {
@@ -2479,7 +2210,7 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   }
   else if(dest_type.id()==ID_range)
   {
-    TODO("range typecast");
+    SMT2_TODO("range typecast");
   }
   else if(dest_type.id()==ID_floatbv)
   {
@@ -2545,18 +2276,6 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     UNEXPECTEDCASE(
       "TODO typecast8 "+src_type.id_string()+" -> "+dest_type.id_string());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
@@ -2704,18 +2423,6 @@ void smt2_convt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_struct
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type=to_struct_type(expr.type());
@@ -2778,18 +2485,7 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::flatten_array
-
-  Inputs:
-
- Outputs:
-
- Purpose: produce a flat bit-vector for a given array of fixed size
-
-\*******************************************************************/
-
+/// produce a flat bit-vector for a given array of fixed size
 void smt2_convt::flatten_array(const exprt &expr)
 {
   const array_typet &array_type=
@@ -2824,18 +2520,6 @@ void smt2_convt::flatten_array(const exprt &expr)
   out << ")"; // let
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_union
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_union(const union_exprt &expr)
 {
   const union_typet &union_type=to_union_type(expr.type());
@@ -2868,18 +2552,6 @@ void smt2_convt::convert_union(const union_exprt &expr)
     out << ")";
   }
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_constant
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_constant(const constant_exprt &expr)
 {
@@ -3017,18 +2689,6 @@ void smt2_convt::convert_constant(const constant_exprt &expr)
     UNEXPECTEDCASE("unknown constant: "+expr_type.id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_mod
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_mod(const mod_exprt &expr)
 {
   assert(expr.operands().size()==2);
@@ -3049,18 +2709,6 @@ void smt2_convt::convert_mod(const mod_exprt &expr)
   else
     UNEXPECTEDCASE("unsupported type for mod: "+expr.type().id_string());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_is_dynamic_object
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_is_dynamic_object(const exprt &expr)
 {
@@ -3100,18 +2748,6 @@ void smt2_convt::convert_is_dynamic_object(const exprt &expr)
     out << ")"; // let
   }
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_relation
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_relation(const exprt &expr)
 {
@@ -3198,21 +2834,9 @@ void smt2_convt::convert_relation(const exprt &expr)
       "unsupported type for "+expr.id_string()+": "+op_type.id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_plus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_plus(const plus_exprt &expr)
 {
-  if(expr.operands().size()==0)
+  if(expr.operands().empty())
   {
     INVALIDEXPR("No operands to plus");
   }
@@ -3253,6 +2877,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
       mp_integer element_size=
         pointer_offset_size(expr.type().subtype(), ns);
+      assert(element_size>0);
 
       out << "(bvadd ";
       convert_expr(p);
@@ -3326,19 +2951,10 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_rounding_mode_FPA
-
-  Inputs: The expression representing the rounding mode.
-
- Outputs: SMT-LIB output to out.
-
- Purpose: Converting a constant or symbolic rounding mode to SMT-LIB.
-          Only called when use_FPA_theory is enabled
-
-\*******************************************************************/
-
+/// Converting a constant or symbolic rounding mode to SMT-LIB. Only called when
+/// use_FPA_theory is enabled
+/// \par parameters: The expression representing the rounding mode.
+/// \return SMT-LIB output to out.
 void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
 {
   assert(use_FPA_theory);
@@ -3395,18 +3011,6 @@ void smt2_convt::convert_rounding_mode_FPA(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv_plus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
 {
   const typet &type=expr.type();
@@ -3430,11 +3034,11 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
     }
     else if(type.id()==ID_complex)
     {
-      TODO("+ for floatbv complex");
+      SMT2_TODO("+ for floatbv complex");
     }
     else if(type.id()==ID_vector)
     {
-      TODO("+ for floatbv vector");
+      SMT2_TODO("+ for floatbv vector");
     }
     else
       UNEXPECTEDCASE("unsupported type for +: "+type.id_string());
@@ -3442,18 +3046,6 @@ void smt2_convt::convert_floatbv_plus(const ieee_float_op_exprt &expr)
   else
     convert_floatbv(expr);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_minus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_minus(const minus_exprt &expr)
 {
@@ -3469,6 +3061,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       // Pointer difference.
       mp_integer element_size=
         pointer_offset_size(expr.op0().type().subtype(), ns);
+      assert(element_size>0);
 
       if(element_size>=2)
         out << "(bvsdiv ";
@@ -3503,7 +3096,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
   }
   else if(expr.type().id()==ID_pointer)
   {
-    TODO("pointer subtraction");
+    SMT2_TODO("pointer subtraction");
   }
   else if(expr.type().id()==ID_vector)
   {
@@ -3548,18 +3141,6 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
     UNEXPECTEDCASE("unsupported type for -: "+expr.type().id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv_minus
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_floatbv_minus(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
@@ -3578,18 +3159,6 @@ void smt2_convt::convert_floatbv_minus(const ieee_float_op_exprt &expr)
   else
     convert_floatbv(expr);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_div
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_div(const div_exprt &expr)
 {
@@ -3637,18 +3206,6 @@ void smt2_convt::convert_div(const div_exprt &expr)
     UNEXPECTEDCASE("unsupported type for /: "+expr.type().id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv_div
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
@@ -3667,18 +3224,6 @@ void smt2_convt::convert_floatbv_div(const ieee_float_op_exprt &expr)
   else
     convert_floatbv(expr);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_mult
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_mult(const mult_exprt &expr)
 {
@@ -3753,18 +3298,6 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
     UNEXPECTEDCASE("unsupported type for *: "+expr.type().id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_floatbv_mult
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
 {
   assert(expr.operands().size()==3);
@@ -3783,18 +3316,6 @@ void smt2_convt::convert_floatbv_mult(const ieee_float_op_exprt &expr)
   else
     convert_floatbv(expr);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_with
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_with(const with_exprt &expr)
 {
@@ -4009,7 +3530,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
     typecast_exprt index_tc(index, expr_type);
 
     // TODO: SMT2-ify
-    TODO("SMT2-ify");
+    SMT2_TODO("SMT2-ify");
+
+#if 0
     out << "(bvor ";
     out << "(band ";
 
@@ -4036,6 +3559,7 @@ void smt2_convt::convert_with(const with_exprt &expr)
     out << ")"; // bvshl
 
     out << ")"; // bvor
+#endif
   }
   else
     UNEXPECTEDCASE(
@@ -4043,36 +3567,12 @@ void smt2_convt::convert_with(const with_exprt &expr)
       expr.type().id_string());
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_update(const exprt &expr)
 {
   assert(expr.operands().size()==3);
 
-  TODO("smt2_convt::convert_update to be implemented");
+  SMT2_TODO("smt2_convt::convert_update to be implemented");
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_index
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_index(const index_exprt &expr)
 {
@@ -4111,7 +3611,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
       std::size_t array_width=boolbv_width(array_type);
       assert(array_width!=0);
 
-      unflatten(BEGIN, array_type.subtype());
+      unflatten(wheret::BEGIN, array_type.subtype());
 
       std::size_t sub_width=boolbv_width(array_type.subtype());
       std::size_t index_width=boolbv_width(expr.index().type());
@@ -4139,7 +3639,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
 
       out << ")))"; // mult, bvlshr, extract
 
-      unflatten(END, array_type.subtype());
+      unflatten(wheret::END, array_type.subtype());
     }
   }
   else if(array_op_type.id()==ID_vector)
@@ -4157,7 +3657,7 @@ void smt2_convt::convert_index(const index_exprt &expr)
       mp_integer index_int;
       if(to_integer(expr.index(), index_int))
       {
-        TODO("non-constant index on vectors");
+        SMT2_TODO("non-constant index on vectors");
       }
       else
       {
@@ -4168,25 +3668,13 @@ void smt2_convt::convert_index(const index_exprt &expr)
     }
     else
     {
-      TODO("index on vectors");
+      SMT2_TODO("index on vectors");
     }
   }
   else
     UNEXPECTEDCASE(
       "index with unsupported array type: "+array_op_type.id_string());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_member
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_member(const member_exprt &expr)
 {
@@ -4238,7 +3726,7 @@ void smt2_convt::convert_member(const member_exprt &expr)
     if(width==0)
       INVALIDEXPR("failed to get union member width");
 
-    unflatten(BEGIN, expr.type());
+    unflatten(wheret::BEGIN, expr.type());
 
     out << "((_ extract "
            << (width-1)
@@ -4246,24 +3734,12 @@ void smt2_convt::convert_member(const member_exprt &expr)
     convert_expr(struct_op);
     out << ")";
 
-    unflatten(END, expr.type());
+    unflatten(wheret::END, expr.type());
   }
   else
     UNEXPECTEDCASE(
       "convert_member on an unexpected type "+struct_op_type.id_string());
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::flatten2bv
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::flatten2bv(const exprt &expr)
 {
@@ -4361,18 +3837,6 @@ void smt2_convt::flatten2bv(const exprt &expr)
     convert_expr(expr);
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::unflatten
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::unflatten(
   wheret where,
   const typet &type,
@@ -4383,7 +3847,7 @@ void smt2_convt::unflatten(
 
   if(type.id()==ID_bool)
   {
-    if(where==BEGIN)
+    if(where==wheret::BEGIN)
       out << "(= "; // produces a bool
     else
       out << " #b1)";
@@ -4406,7 +3870,7 @@ void smt2_convt::unflatten(
       if(to_integer(vector_type.size(), size))
         INVALIDEXPR("failed to convert vector size to constant");
 
-      if(where==BEGIN)
+      if(where==wheret::BEGIN)
         out << "(let ((?ufop" << nesting << " ";
       else
       {
@@ -4419,10 +3883,10 @@ void smt2_convt::unflatten(
         for(mp_integer i=0; i!=size; ++i, offset+=subtype_width)
         {
           out << " ";
-          unflatten(BEGIN, vector_type.subtype(), nesting+1);
+          unflatten(wheret::BEGIN, vector_type.subtype(), nesting+1);
           out << "((_ extract " << offset+subtype_width-1 << " "
               << offset << ") ?ufop" << nesting << ")";
-          unflatten(END, vector_type.subtype(), nesting+1);
+          unflatten(wheret::END, vector_type.subtype(), nesting+1);
         }
 
         out << "))"; // mk-, let
@@ -4438,7 +3902,7 @@ void smt2_convt::unflatten(
     if(use_datatypes)
     {
       // extract members
-      if(where==BEGIN)
+      if(where==wheret::BEGIN)
         out << "(let ((?ufop" << nesting << " ";
       else
       {
@@ -4467,10 +3931,10 @@ void smt2_convt::unflatten(
           std::size_t member_width=boolbv_width(it->type());
 
           out << " ";
-          unflatten(BEGIN, it->type(), nesting+1);
+          unflatten(wheret::BEGIN, it->type(), nesting+1);
           out << "((_ extract " << offset+member_width-1 << " "
               << offset << ") ?ufop" << nesting << ")";
-          unflatten(END, it->type(), nesting+1);
+          unflatten(wheret::END, it->type(), nesting+1);
           offset+=member_width;
         }
 
@@ -4488,34 +3952,10 @@ void smt2_convt::unflatten(
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::convert_overflow
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::convert_overflow(const exprt &expr)
 {
   UNREACHABLE;
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::set_to(const exprt &expr, bool value)
 {
@@ -4604,18 +4044,6 @@ void smt2_convt::set_to(const exprt &expr, bool value)
 
   return;
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::find_symbols(const exprt &expr)
 {
@@ -4810,18 +4238,6 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::use_array_theory
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool smt2_convt::use_array_theory(const exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
@@ -4843,18 +4259,6 @@ bool smt2_convt::use_array_theory(const exprt &expr)
       return true;
   }
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::convert_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::convert_type(const typet &type)
 {
@@ -5007,35 +4411,11 @@ void smt2_convt::convert_type(const typet &type)
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::find_symbols
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void smt2_convt::find_symbols(const typet &type)
 {
   std::set<irep_idt> recstack;
   find_symbols_rec(type, recstack);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::find_symbols_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::find_symbols_rec(
   const typet &type,
@@ -5233,18 +4613,6 @@ void smt2_convt::find_symbols_rec(
   }
 }
 
-/*******************************************************************\
-
-Function: smt2_convt::letify
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 exprt smt2_convt::letify(exprt &expr)
 {
   seen_expressionst map;
@@ -5254,18 +4622,6 @@ exprt smt2_convt::letify(exprt &expr)
 
   return letify_rec(expr, let_order, map, 0);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::letify_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt smt2_convt::letify_rec(
   exprt &expr,
@@ -5290,18 +4646,6 @@ exprt smt2_convt::letify_rec(
 
   return let;
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::collect_bindings
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void smt2_convt::collect_bindings(
   exprt &expr,
@@ -5333,18 +4677,6 @@ void smt2_convt::collect_bindings(
 
   let_order.push_back(expr);
 }
-
-/*******************************************************************\
-
-Function: smt2_convt::substitute_let
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt smt2_convt::substitute_let(
   exprt &expr,

@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// mmcc Command Line Option Processing
+
+#include "mmcc_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 
@@ -15,42 +20,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mm_parser.h"
 #include "mm2cpp.h"
-#include "mmcc_parse_options.h"
-
-/*******************************************************************\
-
-Function: mmcc_parse_optionst::mmcc_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 mmcc_parse_optionst::mmcc_parse_optionst(int argc, const char **argv):
   parse_options_baset(MMCC_OPTIONS, argc, argv)
 {
 }
 
-/*******************************************************************\
-
-Function: mmcc_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int mmcc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -68,7 +49,7 @@ int mmcc_parse_optionst::doit()
 
       return convert(in, cmdline.args[0]);
     }
-    else if(cmdline.args.size()==0)
+    else if(cmdline.args.empty())
     {
       return convert(std::cin, "stdin");
     }
@@ -92,18 +73,6 @@ int mmcc_parse_optionst::doit()
   return 0;
 }
 
-/*******************************************************************\
-
-Function: mmcc_parse_optionst::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 int mmcc_parse_optionst::convert(
   std::istream &in,
   const std::string &file)
@@ -125,18 +94,7 @@ int mmcc_parse_optionst::convert(
   return 0;
 }
 
-/*******************************************************************\
-
-Function: mmcc_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void mmcc_parse_optionst::help()
 {
   std::cout <<

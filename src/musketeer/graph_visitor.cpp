@@ -6,23 +6,15 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
-#include "fence_inserter.h"
+/// \file
+/// graph visitor for computing edges involved for fencing
+
 #include "graph_visitor.h"
+
+#include "fence_inserter.h"
 
 /* implemented: BTWN1, BTWN4 */
 #define BTWN1
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::graph_explore(
   event_grapht &egraph,
@@ -44,7 +36,7 @@ void const_graph_visitort::graph_explore(
       edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
   }
-  else if(egraph.po_out(next).size()==0)
+  else if(egraph.po_out(next).empty())
   {
     /* this path is not connecting a to b => return */
   }
@@ -66,18 +58,6 @@ void const_graph_visitort::graph_explore(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::const_graph_explore(
   event_grapht &egraph,
   event_idt next,
@@ -97,7 +77,7 @@ void const_graph_visitort::const_graph_explore(
       fence_inserter.add_edge(edget(*it, *next_it));
     }
   }
-  else if(egraph.po_out(next).size()==0)
+  else if(egraph.po_out(next).empty())
   {
     /* this path is not connecting a to b => return */
   }
@@ -119,18 +99,6 @@ void const_graph_visitort::const_graph_explore(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::graph_explore_BC(
   event_grapht &egraph,
   event_idt next,
@@ -139,7 +107,7 @@ void const_graph_visitort::graph_explore_BC(
   bool porw)
 {
   /* TODO: restricts to C_1 U ... U C_n for perf improvement */
-  assert(old_path.size()>0);
+  assert(!old_path.empty());
 
   fence_inserter.instrumenter.message.debug() << "(BC) explore "
                                               << old_path.front()
@@ -162,7 +130,7 @@ void const_graph_visitort::graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos)
+  if(egraph.po_out(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -173,8 +141,8 @@ void const_graph_visitort::graph_explore_BC(
       const abstract_eventt &e1=egraph[*it];
       const abstract_eventt &e2=egraph[*next_it];
       if(!porw ||
-         (e1.operation==abstract_eventt::Read &&
-          e2.operation==abstract_eventt::Write))
+         (e1.operation==abstract_eventt::operationt::Read &&
+          e2.operation==abstract_eventt::operationt::Write))
         edges.insert(fence_inserter.add_edge(edget(*it, *next_it)));
     }
     assert(it!=old_path.end());
@@ -192,18 +160,6 @@ void const_graph_visitort::graph_explore_BC(
     }
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::const_graph_explore_BC(
   event_grapht &egraph,
@@ -229,7 +185,7 @@ void const_graph_visitort::const_graph_explore_BC(
       break;
     }
 
-  if(egraph.po_out(next).size()==0 || no_other_pos)
+  if(egraph.po_out(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -239,8 +195,8 @@ void const_graph_visitort::const_graph_explore_BC(
     {
       const abstract_eventt &e1=egraph[*it];
       const abstract_eventt &e2=egraph[*next_it];
-      if((e1.operation==abstract_eventt::Read
-        && e2.operation==abstract_eventt::Write))
+      if((e1.operation==abstract_eventt::operationt::Read &&
+          e2.operation==abstract_eventt::operationt::Write))
         fence_inserter.add_edge(edget(*it, *next_it));
     }
     // NEW
@@ -259,18 +215,6 @@ void const_graph_visitort::const_graph_explore_BC(
     }
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::graph_explore_AC(
   event_grapht &egraph,
@@ -301,7 +245,7 @@ void const_graph_visitort::graph_explore_AC(
       break;
     }
 
-  if(egraph.po_in(next).size()==0 || no_other_pos)
+  if(egraph.po_in(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -312,8 +256,8 @@ void const_graph_visitort::graph_explore_AC(
       const abstract_eventt &e1=egraph[*next_it];
       const abstract_eventt &e2=egraph[*it];
       if(!porw ||
-         (e1.operation==abstract_eventt::Read &&
-          e2.operation==abstract_eventt::Write))
+         (e1.operation==abstract_eventt::operationt::Read &&
+          e2.operation==abstract_eventt::operationt::Write))
         edges.insert(fence_inserter.add_edge(edget(*next_it, *it)));
     }
     assert(it!=old_path.end());
@@ -331,18 +275,6 @@ void const_graph_visitort::graph_explore_AC(
     }
   }
 }
-
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void const_graph_visitort::const_graph_explore_AC(
   event_grapht &egraph,
@@ -369,7 +301,7 @@ void const_graph_visitort::const_graph_explore_AC(
     }
 
   /* if beginning of the thread */
-  if(egraph.po_in(next).size()==0 || no_other_pos)
+  if(egraph.po_in(next).empty() || no_other_pos)
   {
     /* inserts all the pos collected from old_path in edges */
     std::list<event_idt>::const_iterator it=old_path.begin();
@@ -379,8 +311,8 @@ void const_graph_visitort::const_graph_explore_AC(
     {
       const abstract_eventt &e1=egraph[*next_it];
       const abstract_eventt &e2=egraph[*it];
-      if(e1.operation==abstract_eventt::Read &&
-         e2.operation==abstract_eventt::Write)
+      if(e1.operation==abstract_eventt::operationt::Read &&
+         e2.operation==abstract_eventt::operationt::Write)
         fence_inserter.add_edge(edget(*next_it, *it));
     }
     // NEW
@@ -400,18 +332,6 @@ void const_graph_visitort::const_graph_explore_AC(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void const_graph_visitort::PT(
   const edget &e,
   std::set<unsigned> &edges)
@@ -427,7 +347,7 @@ void const_graph_visitort::PT(
 #ifdef BTWN1
     event_grapht &egraph=fence_inserter.instrumenter.egraph;
 
-    /* all the pos inbetween */
+    /// all the pos in between
     for(wmm_grapht::edgest::const_iterator
       next_it=egraph.po_out(e.first).begin();
       next_it!=egraph.po_out(e.first).end();
@@ -454,18 +374,8 @@ void const_graph_visitort::PT(
     edges.insert(fence_inserter.map_from_e[e]);
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: e in comWR /\ C_j (invisible variables)
-
- Outputs: e's in po /\ C (problem variables)
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: e in comWR /\ C_j (invisible variables)
+/// \return e's in po /\ C (problem variables)
 void const_graph_visitort::CT(
   const edget &edge,
   std::set<unsigned> &edges)
@@ -478,9 +388,13 @@ void const_graph_visitort::CT(
   assert(test_first.operation!=test_second.operation);
 
   const event_idt first=
-    (test_first.operation==abstract_eventt::Write?edge.first:edge.second);
+    (test_first.operation==abstract_eventt::operationt::Write?
+     edge.first:
+     edge.second);
   const event_idt second=
-    (test_second.operation==abstract_eventt::Read?edge.second:edge.first);
+    (test_second.operation==abstract_eventt::operationt::Read?
+     edge.second:
+     edge.first);
 
   /* TODO: AC + restricts to C_1 U ... U C_n */
   visited_nodes.clear();
@@ -515,18 +429,8 @@ void const_graph_visitort::CT(
   }
 }
 
-/*******************************************************************\
-
-Function:
-
-  Inputs: e in comWR /\ C_j (invisible variables)
-
- Outputs: e's in poRW/\ C (problem variables)
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: e in comWR /\ C_j (invisible variables)
+/// \return e's in poRW/\ C (problem variables)
 void const_graph_visitort::CT_not_powr(
   const edget &edge,
   std::set<unsigned> &edges)
@@ -539,9 +443,13 @@ void const_graph_visitort::CT_not_powr(
   assert(test_first.operation!=test_second.operation);
 
   const event_idt first=
-    (test_first.operation==abstract_eventt::Write?edge.first:edge.second);
+    (test_first.operation==abstract_eventt::operationt::Write?
+     edge.first:
+     edge.second);
   const event_idt second=
-    (test_second.operation==abstract_eventt::Read?edge.second:edge.first);
+    (test_second.operation==abstract_eventt::operationt::Read?
+     edge.second:
+     edge.first);
 
   /* TODO: AC + restricts to C_1 U ... U C_n */
   visited_nodes.clear();

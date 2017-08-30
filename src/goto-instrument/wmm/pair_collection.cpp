@@ -9,26 +9,18 @@ Date: 2013
 
 \*******************************************************************/
 
+/// \file
+/// collection of pairs (for Pensieve's static delay-set analysis) in graph of
+///   abstract events
+
+#include "event_graph.h"
+
 #include <fstream>
 
 #include <util/message.h>
 
-#include "event_graph.h"
-
 #define OUTPUT(s, fence, file, line, id, type)  \
-  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<std::endl
-
-/*******************************************************************\
-
-Function: event_grapht::graph_explorert::collect_pairs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+  s<<fence<<"|"<<file<<"|"<<line<<"|"<<id<<"|"<<type<<'\n'
 
 void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
 {
@@ -59,7 +51,7 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
         /* directly outputs */
         OUTPUT(res, "fence", first_event.source_location.get_file(),
           first_event.source_location.get_line(), first_event.variable,
-            first_event.operation);
+            static_cast<int>(first_event.operation));
       }
       catch(std::string s)
       {
@@ -71,18 +63,6 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
 
   res.close();
 }
-
-/*******************************************************************\
-
-Function: event_grapht::graph_explorert::find_second_event
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool event_grapht::graph_pensieve_explorert::find_second_event(
   event_idt current)

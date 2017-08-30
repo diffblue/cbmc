@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_LANGUAGE_FILE_H
 #define CPROVER_UTIL_LANGUAGE_FILE_H
 
@@ -27,8 +28,11 @@ public:
   bool type_checked, in_progress;
   language_filet *file;
 
-  language_modulet()
-  { type_checked=in_progress=false; }
+  language_modulet():
+    type_checked(false),
+    in_progress(false),
+    file(nullptr)
+  {}
 };
 
 class language_filet
@@ -48,7 +52,7 @@ public:
 
   language_filet(const language_filet &rhs);
 
-  language_filet():language(NULL)
+  language_filet():language(nullptr)
   {
   }
 

@@ -8,6 +8,11 @@ Date: February 2004
 
 \*******************************************************************/
 
+/// \file
+/// Time Stopping
+
+#include "time_stopping.h"
+
 #include <sstream>
 
 #if defined(_WIN32) && !defined(__MINGW32__)
@@ -16,8 +21,6 @@ Date: February 2004
 #else
 #include <sys/time.h>
 #endif
-
-#include "time_stopping.h"
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 // NOLINTNEXTLINE(readability/identifiers)
@@ -41,18 +44,6 @@ void gettimeofday(struct timeval* p, struct timezone *tz)
 }
 #endif
 
-/*******************************************************************\
-
-Function: current_time
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 absolute_timet current_time()
 {
   // NOLINTNEXTLINE(readability/identifiers)
@@ -65,34 +56,10 @@ absolute_timet current_time()
   return absolute_timet(tv.tv_usec/1000+(unsigned long long)tv.tv_sec*1000);
 }
 
-/*******************************************************************\
-
-Function: operator <<
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::ostream &operator << (std::ostream &out, const time_periodt &period)
 {
   return out << static_cast<double>(period.get_t())/1000;
 }
-
-/*******************************************************************\
-
-Function: time_periodt::as_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string time_periodt::as_string() const
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Pointer Dereferencing
+
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H
 
@@ -48,7 +51,7 @@ public:
 
   virtual ~value_set_dereferencet() { }
 
-  typedef enum { READ, WRITE } modet;
+  enum class modet { READ, WRITE };
 
   /*!
    * The method 'dereference' dereferences the

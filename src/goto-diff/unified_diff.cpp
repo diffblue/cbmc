@@ -8,23 +8,14 @@ Date: April 2016
 
 \*******************************************************************/
 
-#include <algorithm>
-
-#include <goto-programs/goto_model.h>
+/// \file
+/// Unified diff (using LCSS) of goto functions
 
 #include "unified_diff.h"
 
-/*******************************************************************\
+#include <algorithm>
 
-Function: unified_difft::unified_difft
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <goto-programs/goto_model.h>
 
 unified_difft::unified_difft(const goto_modelt &model_old,
                              const goto_modelt &model_new):
@@ -34,18 +25,6 @@ unified_difft::unified_difft(const goto_modelt &model_old,
   ns_new(model_new.symbol_table)
 {
 }
-
-/*******************************************************************\
-
-Function: unified_difft::get_diff
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void unified_difft::get_diff(
   const irep_idt &function,
@@ -81,18 +60,6 @@ void unified_difft::get_diff(
     entry->second,
     dest);
 }
-
-/*******************************************************************\
-
-Function: unified_difft::get_diff
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void unified_difft::get_diff(
   const irep_idt &identifier,
@@ -132,18 +99,6 @@ void unified_difft::get_diff(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: unified_difft::output_diff
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void unified_difft::output_diff(
   const irep_idt &identifier,
@@ -205,18 +160,6 @@ void unified_difft::output_diff(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: unified_difft::lcss
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void unified_difft::lcss(
   const irep_idt &identifier,
@@ -306,8 +249,8 @@ void unified_difft::lcss(
   }
 
   #if 0
-  std::cerr << "old_count=" << old_count << std::endl;
-  std::cerr << "new_count=" << new_count << std::endl;
+  std::cerr << "old_count=" << old_count << '\n';
+  std::cerr << "new_count=" << new_count << '\n';
   for(i=0; i<=old_count; ++i)
   {
     for(j=0; j<=new_count; ++j)
@@ -317,7 +260,7 @@ void unified_difft::lcss(
         std::cerr << " ";
       std::cerr << lcss_matrix[i][j];
     }
-    std::cerr << std::endl;
+    std::cerr << '\n';
   }
   #endif
 
@@ -371,18 +314,6 @@ void unified_difft::lcss(
     differences.push_back(differencet::SAME);
 }
 
-/*******************************************************************\
-
-Function: unified_difft::unified_diff
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void unified_difft::unified_diff(
   const irep_idt &identifier,
   const goto_programt &old_goto_program,
@@ -406,18 +337,6 @@ void unified_difft::unified_diff(
   else
     lcss(identifier, old_goto_program, new_goto_program, differences);
 }
-
-/*******************************************************************\
-
-Function: unified_difft::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool unified_difft::operator()()
 {
@@ -461,18 +380,6 @@ bool unified_difft::operator()()
 
   return !differences_map.empty();
 }
-
-/*******************************************************************\
-
-Function: unified_difft::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void unified_difft::output(std::ostream &os) const
 {

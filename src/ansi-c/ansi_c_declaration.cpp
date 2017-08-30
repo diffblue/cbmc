@@ -6,25 +6,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// ANSI-C Language Type Checking
+
+#include "ansi_c_declaration.h"
+
 #include <ostream>
 #include <cassert>
 
 #include <util/config.h>
 #include <util/std_types.h>
-
-#include "ansi_c_declaration.h"
-
-/*******************************************************************\
-
-Function: ansi_c_declaratort::build
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_declaratort::build(irept &src)
 {
@@ -42,7 +33,7 @@ void ansi_c_declaratort::build(irept &src)
       t.make_nil();
       break;
     }
-    else if(t.id()==irep_idt() ||
+    else if(t.id().empty() ||
             t.is_nil())
     {
       assert(0);
@@ -65,18 +56,6 @@ void ansi_c_declaratort::build(irept &src)
   type()=static_cast<const typet &>(src);
   value().make_nil();
 }
-
-/*******************************************************************\
-
-Function: ansi_c_declarationt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void ansi_c_declarationt::output(std::ostream &out) const
 {
@@ -108,18 +87,6 @@ void ansi_c_declarationt::output(std::ostream &out) const
   for(const auto &declarator : declarators())
     out << "Declarator: " << declarator.pretty() << "\n";
 }
-
-/*******************************************************************\
-
-Function: ansi_c_declarationt::full_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 typet ansi_c_declarationt::full_type(
   const ansi_c_declaratort &declarator) const
@@ -153,18 +120,6 @@ typet ansi_c_declarationt::full_type(
   return result;
 }
 
-/*******************************************************************\
-
-Function: ansi_c_declarationt::to_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void ansi_c_declarationt::to_symbol(
   const ansi_c_declaratort &declarator,
   symbolt &symbol) const
@@ -173,6 +128,7 @@ void ansi_c_declarationt::to_symbol(
   symbol.value=declarator.value();
   symbol.type=full_type(declarator);
   symbol.name=declarator.get_name();
+  symbol.pretty_name=symbol.name;
   symbol.base_name=declarator.get_base_name();
   symbol.is_type=get_is_typedef();
   symbol.location=declarator.source_location();

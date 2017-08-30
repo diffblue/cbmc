@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "prop_conv.h"
+
 #include <cassert>
 #include <cstdlib>
 #include <map>
@@ -15,72 +17,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 
 #include "prop.h"
-#include "prop_conv.h"
 #include "literal_expr.h"
 
-/*******************************************************************\
-
-Function: prop_convt::is_in_conflict
-
-  Inputs:
-
- Outputs:
-
- Purpose: determine whether a variable is in the final conflict
-
-\*******************************************************************/
-
+/// determine whether a variable is in the final conflict
 bool prop_convt::is_in_conflict(literalt l) const
 {
   assert(false);
   return false;
 }
 
-/*******************************************************************\
-
-Function: prop_convt::set_assumptions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void prop_convt::set_assumptions(const bvt &)
 {
   assert(false);
 }
 
-/*******************************************************************\
-
-Function: prop_convt::set_frozen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void prop_convt::set_frozen(const literalt)
 {
   assert(false);
 }
-
-/*******************************************************************\
-
-Function: prop_convt::set_frozen
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_convt::set_frozen(const bvt &bv)
 {
@@ -88,18 +42,6 @@ void prop_convt::set_frozen(const bvt &bv)
     if(!bv[i].is_constant())
       set_frozen(bv[i]);
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
 {
@@ -121,18 +63,6 @@ bool prop_conv_solvert::literal(const exprt &expr, literalt &dest) const
   throw "found no literal for expression";
 }
 
-/*******************************************************************\
-
-Function: prop_conv_solvert::get_literal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
 {
   std::pair<symbolst::iterator, bool> result=
@@ -153,18 +83,7 @@ literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
   return literal;
 }
 
-/*******************************************************************\
-
-Function: prop_conv_solvert::get_bool
-
-  Inputs:
-
- Outputs:
-
- Purpose: get a boolean value from counter example if not valid
-
-\*******************************************************************/
-
+/// get a boolean value from counter example if not valid
 bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
 {
   // trivial cases
@@ -253,18 +172,6 @@ bool prop_conv_solvert::get_bool(const exprt &expr, tvt &value) const
   return false;
 }
 
-/*******************************************************************\
-
-Function: prop_conv_solvert::convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt prop_conv_solvert::convert(const exprt &expr)
 {
   if(!use_cache ||
@@ -293,23 +200,11 @@ literalt prop_conv_solvert::convert(const exprt &expr)
     prop.set_frozen(literal);
 
   #if 0
-  std::cout << literal << "=" << expr << std::endl;
+  std::cout << literal << "=" << expr << '\n';
   #endif
 
   return literal;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::convert_bool
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 literalt prop_conv_solvert::convert_bool(const exprt &expr)
 {
@@ -439,36 +334,12 @@ literalt prop_conv_solvert::convert_bool(const exprt &expr)
   return convert_rest(expr);
 }
 
-/*******************************************************************\
-
-Function: prop_conv_solvert::convert_rest
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt prop_conv_solvert::convert_rest(const exprt &expr)
 {
   // fall through
   ignoring(expr);
   return prop.new_variable();
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::set_equality_to_true
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 {
@@ -496,18 +367,6 @@ bool prop_conv_solvert::set_equality_to_true(const equal_exprt &expr)
 
   return true;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::set_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_solvert::set_to(const exprt &expr, bool value)
 {
@@ -556,7 +415,7 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
           // Special case for a CNF-clause,
           // i.e., a constraint that's a disjunction.
 
-          if(expr.operands().size()>0)
+          if(!expr.operands().empty())
           {
             bvt bv;
             bv.reserve(expr.operands().size());
@@ -608,90 +467,40 @@ void prop_conv_solvert::set_to(const exprt &expr, bool value)
   prop.l_set_to(convert(expr), value);
 }
 
-/*******************************************************************\
-
-Function: prop_conv_solvert::ignoring
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void prop_conv_solvert::ignoring(const exprt &expr)
 {
   // fall through
 
-  std::string msg="warning: ignoring "+expr.pretty();
-
-  print(2, msg);
+  warning() << "warning: ignoring " << expr.pretty() << eom;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::post_process
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_solvert::post_process()
 {
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::solve
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 decision_proceduret::resultt prop_conv_solvert::dec_solve()
 {
   // post-processing isn't incremental yet
   if(!post_processing_done)
   {
-    print(8, "Post-processing");
+    statistics() << "Post-processing" << eom;
     post_process();
     post_processing_done=true;
   }
 
-  print(7, "Solving with "+prop.solver_text());
+  statistics() << "Solving with " << prop.solver_text() << eom;
 
   propt::resultt result=prop.prop_solve();
 
   switch(result)
   {
-    case propt::P_SATISFIABLE: return D_SATISFIABLE;
-    case propt::P_UNSATISFIABLE: return D_UNSATISFIABLE;
-    default: return D_ERROR;
+    case propt::resultt::P_SATISFIABLE: return resultt::D_SATISFIABLE;
+    case propt::resultt::P_UNSATISFIABLE: return resultt::D_UNSATISFIABLE;
+    default: return resultt::D_ERROR;
   }
 
-  return D_ERROR;
+  return resultt::D_ERROR;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::get
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt prop_conv_solvert::get(const exprt &expr) const
 {
@@ -718,18 +527,6 @@ exprt prop_conv_solvert::get(const exprt &expr) const
 
   return tmp;
 }
-
-/*******************************************************************\
-
-Function: prop_conv_solvert::print_assignment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void prop_conv_solvert::print_assignment(std::ostream &out) const
 {

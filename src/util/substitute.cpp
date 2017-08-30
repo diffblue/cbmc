@@ -6,21 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <cassert>
-
 #include "substitute.h"
 
-/*******************************************************************\
-
-Function: substitute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <cassert>
 
 void substitute(
   std::string &dest,

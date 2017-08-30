@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symex Command Line Options Processing
+
+#include "clobber_parse_options.h"
+
 #include <iostream>
 #include <fstream>
 #include <cstdlib>
@@ -34,20 +39,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "clobber_parse_options.h"
 // #include "clobber_instrumenter.h"
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::clobber_parse_optionst
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   parse_options_baset(CLOBBER_OPTIONS, argc, argv),
@@ -55,18 +47,6 @@ clobber_parse_optionst::clobber_parse_optionst(int argc, const char **argv):
   ui_message_handler(cmdline, "CLOBBER " CBMC_VERSION)
 {
 }
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::eval_verbosity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void clobber_parse_optionst::eval_verbosity()
 {
@@ -84,18 +64,6 @@ void clobber_parse_optionst::eval_verbosity()
 
   ui_message_handler.set_verbosity(v);
 }
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::get_command_line_options
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void clobber_parse_optionst::get_command_line_options(optionst &options)
 {
@@ -131,23 +99,12 @@ void clobber_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("error-label", cmdline.get_value("error-label"));
 }
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int clobber_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -190,7 +147,7 @@ int clobber_parse_optionst::doit()
     if(!out)
       throw std::string("failed to create file simulator.c");
 
-    dump_c(goto_functions, true, ns, out);
+    dump_c(goto_functions, true, false, ns, out);
 
     status() << "instrumentation complete; compile and execute simulator.c"
              << eom;
@@ -224,18 +181,6 @@ int clobber_parse_optionst::doit()
   #endif
 }
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
 {
   if(cmdline.isset("property"))
@@ -244,23 +189,11 @@ bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
   return false;
 }
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::get_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool clobber_parse_optionst::get_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
 {
-  if(cmdline.args.size()==0)
+  if(cmdline.args.empty())
   {
     error() << "Please provide a program to verify" << eom;
     return true;
@@ -317,7 +250,7 @@ bool clobber_parse_optionst::get_goto_program(
 
       languaget *language=get_language_from_filename(filename);
 
-      if(language==NULL)
+      if(language==nullptr)
       {
         error() << "failed to figure out type of file `" <<  filename << "'"
                 << eom;
@@ -326,7 +259,7 @@ bool clobber_parse_optionst::get_goto_program(
 
       language->set_message_handler(get_message_handler());
 
-      status("Parsing", filename);
+      status() << "Parsing " << filename << eom;
 
       if(language->parse(infile, filename))
       {
@@ -378,18 +311,6 @@ bool clobber_parse_optionst::get_goto_program(
   return false;
 }
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::process_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool clobber_parse_optionst::process_goto_program(
   const optionst &options,
   goto_functionst &goto_functions)
@@ -434,18 +355,6 @@ bool clobber_parse_optionst::process_goto_program(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::report_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 #if 0
 void clobber_parse_optionst::report_properties(
@@ -506,33 +415,21 @@ void clobber_parse_optionst::report_properties(
 }
 #endif
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::report_success
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void clobber_parse_optionst::report_success()
 {
   result() << "VERIFICATION SUCCESSFUL" << eom;
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -540,18 +437,6 @@ void clobber_parse_optionst::report_success()
     assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::show_counterexample
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void clobber_parse_optionst::show_counterexample(
   const goto_tracet &error_trace)
@@ -560,16 +445,16 @@ void clobber_parse_optionst::show_counterexample(
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
-    std::cout << std::endl << "Counterexample:" << std::endl;
+  case ui_message_handlert::uit::PLAIN:
+    std::cout << "\nCounterexample:\n";
     show_goto_trace(std::cout, ns, error_trace);
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, error_trace, xml);
-      std::cout << xml << std::endl;
+      std::cout << xml << '\n';
     }
     break;
 
@@ -577,18 +462,6 @@ void clobber_parse_optionst::show_counterexample(
     assert(false);
   }
 }
-
-/*******************************************************************\
-
-Function: clobber_parse_optionst::report_failure
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void clobber_parse_optionst::report_failure()
 {
@@ -596,15 +469,15 @@ void clobber_parse_optionst::report_failure()
 
   switch(get_ui())
   {
-  case ui_message_handlert::PLAIN:
+  case ui_message_handlert::uit::PLAIN:
     break;
 
-  case ui_message_handlert::XML_UI:
+  case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
       std::cout << xml;
-      std::cout << std::endl;
+      std::cout << '\n';
     }
     break;
 
@@ -613,18 +486,7 @@ void clobber_parse_optionst::report_failure()
   }
 }
 
-/*******************************************************************\
-
-Function: clobber_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void clobber_parse_optionst::help()
 {
   std::cout <<

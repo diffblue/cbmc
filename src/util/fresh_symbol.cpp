@@ -6,27 +6,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Fresh auxiliary symbol creation
+
 #include "fresh_symbol.h"
 
-/*******************************************************************\
-
-Function: get_fresh_aux_symbol
-
-  Inputs: `type`: type of new symbol
-          `name_prefix`, `basename_prefix`:
-            new symbol will be named name_prefix::basename_prefix$num
-            unless name_prefix is empty, in which case the :: prefix
-            is omitted.
-          `source_location`: new symbol source loc
-          `symbol_mode`: new symbol mode
-          `symbol_table`: table to add the new symbol to
-
- Outputs:
-
- Purpose: Installs a fresh-named symbol with the requested name pattern
-
-\*******************************************************************/
-
+/// Installs a fresh-named symbol with the requested name pattern
+/// \par parameters: `type`: type of new symbol
+/// `name_prefix`, `basename_prefix`: new symbol will be named
+///   name_prefix::basename_prefix$num unless name_prefix is empty, in which
+///   case the :: prefix is omitted.
+/// `source_location`: new symbol source loc
+/// `symbol_mode`: new symbol mode
+/// `symbol_table`: table to add the new symbol to
 symbolt &get_fresh_aux_symbol(
   const typet &type,
   const std::string &name_prefix,
@@ -41,6 +33,7 @@ symbolt &get_fresh_aux_symbol(
 
   do
   {
+    // Distinguish local variables with the same name
     new_symbol.base_name=
       basename_prefix+
       "$"+

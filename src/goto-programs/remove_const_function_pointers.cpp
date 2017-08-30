@@ -6,91 +6,60 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Goto Programs
+
+#include "remove_const_function_pointers.h"
+
 #include <ansi-c/c_qualifiers.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
-
-#include "remove_const_function_pointers.h"
 
 #define LOG(message, irep) \
   debug() << "Case " << __LINE__ << " : " << message << "\n" \
           << irep.pretty() << eom;
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::remove_const_function_pointerst
-
-  Inputs:
-   message_handler - The message handler for messaget
-   base_expression - The function call through a function pointer
-   ns - The namespace to use to resolve types
-   symbol_table - The symbol table to look up symbols in
-
- Outputs:
-
- Purpose: To take a function call on a function pointer, and if possible
-          resolve it to a small collection of possible values.
-
-\*******************************************************************/
-
+/// To take a function call on a function pointer, and if possible resolve it to
+/// a small collection of possible values.
+/// \param message_handler: The message handler for messaget
+/// \param ns: The namespace to use to resolve types
+/// \param symbol_table: The symbol table to look up symbols in
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
-  const exprt &base_expression,
   const namespacet &ns,
   const symbol_tablet &symbol_table):
     messaget(message_handler),
-    original_expression(base_expression),
     ns(ns),
     symbol_table(symbol_table)
 {}
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::operator()
-
-  Inputs:
-   out_functions - The functions that (symbols of type ID_code) the base
-                   expression could take.
-
- Outputs: Returns true if it was able to resolve the call, false if not.
-          If it returns true, out_functions will be populated by all the
-          possible values the function pointer could be.
-
- Purpose: To take a function call on a function pointer, and if possible
-          resolve it to a small collection of possible values. It will
-          resolve function pointers that are const and:
-          - assigned directly to a function
-          - assigned to a value in an array of functions
-          - assigned to a const struct component
-          Or variations within.
-
-\*******************************************************************/
-
+/// To take a function call on a function pointer, and if possible resolve it to
+/// a small collection of possible values. It will resolve function pointers
+/// that are const and: - assigned directly to a function - assigned to a value
+/// in an array of functions - assigned to a const struct component Or
+/// variations within.
+/// \param base_expression: The function call through a function pointer
+/// \param out_functions: The functions that (symbols of type ID_code) the base
+/// expression could take.
+/// \return Returns true if it was able to resolve the call, false if not. If it
+///   returns true, out_functions will be populated by all the possible values
+///   the function pointer could be.
 bool remove_const_function_pointerst::operator()(
+  const exprt &base_expression,
   functionst &out_functions)
 {
   // Replace all const symbols with their values
-  exprt non_symbol_expression=replace_const_symbols(original_expression);
+  exprt non_symbol_expression=replace_const_symbols(base_expression);
   return try_resolve_function_call(non_symbol_expression, out_functions);
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::replace_const_symbols
-
-  Inputs:
-   expression - The expression to resolve symbols in
-
- Outputs: Returns a modified version of the expression, with all
-          const symbols resolved to their actual values.
-
- Purpose: To collapse the symbols down to their values where possible
-          This takes a very general approach, recreating the expr tree
-          exactly as it was and ignoring what type of expressions are found
-          and instead recurses over all the operands.
-
-\*******************************************************************/
-
+/// To collapse the symbols down to their values where possible This takes a
+/// very general approach, recreating the expr tree exactly as it was and
+/// ignoring what type of expressions are found and instead recurses over all
+/// the operands.
+/// \param expression: The expression to resolve symbols in
+/// \return Returns a modified version of the expression, with all const symbols
+///   resolved to their actual values.
 exprt remove_const_function_pointerst::replace_const_symbols(
   const exprt &expression) const
 {
@@ -129,19 +98,9 @@ exprt remove_const_function_pointerst::replace_const_symbols(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::resolve_symbol
-
-  Inputs:
-   symbol_expr - The symbol expression
-
- Outputs: The expression value of the symbol.
-
- Purpose: Look up a symbol in the symbol table and return its value
-
-\*******************************************************************/
-
+/// Look up a symbol in the symbol table and return its value
+/// \param symbol_expr: The symbol expression
+/// \return The expression value of the symbol.
 exprt remove_const_function_pointerst::resolve_symbol(
   const symbol_exprt &symbol_expr) const
 {
@@ -150,25 +109,14 @@ exprt remove_const_function_pointerst::resolve_symbol(
   return symbol.value;
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_function_call
-
-  Inputs:
-   expr - The expression to get the possible function calls
-   out_functions - The functions this expression could be resolved to
-
- Outputs: Returns true if it was able to resolve the expression to some
-          specific functions. If this is the case, out_functions will contain
-          the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. This is different to try_resolve_expression which isn't
-          explicitly looking for functions and is instead just trying
-          to squash particular exprt structures.
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be. This is
+/// different to try_resolve_expression which isn't explicitly looking for
+/// functions and is instead just trying to squash particular exprt structures.
+/// \param expr: The expression to get the possible function calls
+/// \param out_functions: The functions this expression could be resolved to
+/// \return Returns true if it was able to resolve the expression to some
+///   specific functions. If this is the case, out_functions will contain the
+///   possible functions.
 bool remove_const_function_pointerst::try_resolve_function_call(
   const exprt &expr, functionst &out_functions)
 {
@@ -216,6 +164,20 @@ bool remove_const_function_pointerst::try_resolve_function_call(
       resolved=false;
     }
   }
+  else if(simplified_expr.id()==ID_constant)
+  {
+    if(simplified_expr.is_zero())
+    {
+      // We have the null pointer - no need to throw everything away
+      // but we don't add any functions either
+      resolved=true;
+    }
+    else
+    {
+      LOG("Non-zero constant value found", simplified_expr);
+      resolved=false;
+    }
+  }
   else
   {
     LOG("Unrecognised expression", simplified_expr);
@@ -233,23 +195,12 @@ bool remove_const_function_pointerst::try_resolve_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_function_calls
-
-  Inputs:
-   exprs - The expressions to evaluate
-   out_functions - The functions these expressions resolve to
-
- Outputs: Returns true if able to resolve each of the expressions down
-          to one or more functions.
-
- Purpose: To resolve a collection of expressions to the specific function
-          calls they can be. Returns a collection if and only if all of
-          them can be resolved.
-
-\*******************************************************************/
-
+/// To resolve a collection of expressions to the specific function calls they
+/// can be. Returns a collection if and only if all of them can be resolved.
+/// \param exprs: The expressions to evaluate
+/// \param out_functions: The functions these expressions resolve to
+/// \return Returns true if able to resolve each of the expressions down to one
+///   or more functions.
 bool remove_const_function_pointerst::try_resolve_function_calls(
   const expressionst &exprs, functionst &out_functions)
 {
@@ -274,27 +225,17 @@ bool remove_const_function_pointerst::try_resolve_function_calls(
   return true;
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_index_of_function_call
-
-  Inputs:
-   index_expr - The index expression to resolve to possible function calls
-   out_functions - The functions this expression could be
-
- Outputs: Returns true if it was able to resolve the index expression to some
-          specific functions. If this is the case, out_functions will contain
-          the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. Specifically, this function deals with index expressions
-          where it squashes its array and squash its index
-          If we can get a precise number for the index, we
-          try_resolve_function_call on its value otherwise
-          try_resolve_function_call on each and return the union of them all
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be.
+/// Specifically, this function deals with index expressions where it squashes
+/// its array and squash its index If we can get a precise number for the index,
+/// we try_resolve_function_call on its value otherwise
+/// try_resolve_function_call on each and return the union of them all
+/// \param index_expr: The index expression to resolve to possible function
+///   calls
+/// \param out_functions: The functions this expression could be
+/// \return Returns true if it was able to resolve the index expression to some
+///   specific functions. If this is the case, out_functions will contain the
+///   possible functions.
 bool remove_const_function_pointerst::try_resolve_index_of_function_call(
   const index_exprt &index_expr, functionst &out_functions)
 {
@@ -318,24 +259,15 @@ bool remove_const_function_pointerst::try_resolve_index_of_function_call(
   return try_resolve_function_calls(potential_array_values, out_functions);
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_member_function_call
-
-  Inputs:
-   member_expr - The member expression to resolve to possible function calls
-   out_functions - The functions this expression could be
-
- Outputs: Returns true if it was able to resolve the member expression to some
-          specific functions. If this is the case, out_functions will contain
-          the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. Specifically, this function deals with member expressions
-          by using try_resolve_member and then recursing on its value.
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be.
+/// Specifically, this function deals with member expressions by using
+/// try_resolve_member and then recursing on its value.
+/// \param member_expr: The member expression to resolve to possible function
+///   calls
+/// \param out_functions: The functions this expression could be
+/// \return Returns true if it was able to resolve the member expression to some
+///   specific functions. If this is the case, out_functions will contain the
+///   possible functions.
 bool remove_const_function_pointerst::try_resolve_member_function_call(
   const member_exprt &member_expr, functionst &out_functions)
 {
@@ -359,24 +291,14 @@ bool remove_const_function_pointerst::try_resolve_member_function_call(
   return try_resolve_function_calls(potential_component_values, out_functions);
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_address_of_function_call
-
-  Inputs:
-   address_expr - The address_of expression to resolve to possible function
-                  calls
-   out_functions - The functions this expression could be
-
- Outputs: Returns true if it was able to resolve the address_of expression to
-          some specific functions. If this is the case, out_functions will
-          contain the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. Specifically, this function deals with address_of expressions.
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be.
+/// Specifically, this function deals with address_of expressions.
+/// \param address_expr: The address_of expression to resolve to possible
+///   function calls
+/// \param out_functions: The functions this expression could be
+/// \return Returns true if it was able to resolve the address_of expression to
+///   some specific functions. If this is the case, out_functions will contain
+///   the possible functions.
 bool remove_const_function_pointerst::try_resolve_address_of_function_call(
   const address_of_exprt &address_expr, functionst &out_functions)
 {
@@ -389,24 +311,15 @@ bool remove_const_function_pointerst::try_resolve_address_of_function_call(
   return resolved;
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_dereference_function_call
-
-  Inputs:
-   deref_expr - The dereference expression to resolve to possible function calls
-   out_functions - The functions this expression could be
-
- Outputs: Returns true if it was able to resolve the dereference expression to
-          some specific functions. If this is the case, out_functions will
-          contain the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. Specifically, this function deals with dereference expressions
-          by using try_resolve_dereferebce and then recursing on its value.
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be.
+/// Specifically, this function deals with dereference expressions by using
+/// try_resolve_dereferebce and then recursing on its value.
+/// \param deref_expr: The dereference expression to resolve to possible
+///   function calls
+/// \param out_functions: The functions this expression could be
+/// \return Returns true if it was able to resolve the dereference expression to
+///   some specific functions. If this is the case, out_functions will contain
+///   the possible functions.
 bool remove_const_function_pointerst::try_resolve_dereference_function_call(
   const dereference_exprt &deref_expr, functionst &out_functions)
 {
@@ -430,24 +343,15 @@ bool remove_const_function_pointerst::try_resolve_dereference_function_call(
   return try_resolve_function_calls(potential_deref_values, out_functions);
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_typecast_function_call
-
-  Inputs:
-   typecast_expr - The typecast expression to resolve to possible function calls
-   out_functions - The functions this expression could be
-
- Outputs: Returns true if it was able to resolve the typecast expression to
-          some specific functions. If this is the case, out_functions will
-          contain the possible functions.
-
- Purpose: To resolve an expression to the specific function calls it can
-          be. Specifically, this function deals with typecast expressions
-          by looking at the type cast values.
-
-\*******************************************************************/
-
+/// To resolve an expression to the specific function calls it can be.
+/// Specifically, this function deals with typecast expressions by looking at
+/// the type cast values.
+/// \param typecast_expr: The typecast expression to resolve to possible
+///   function calls
+/// \param out_functions: The functions this expression could be
+/// \return Returns true if it was able to resolve the typecast expression to
+///   some specific functions. If this is the case, out_functions will contain
+///   the possible functions.
 bool remove_const_function_pointerst::try_resolve_typecast_function_call(
   const typecast_exprt &typecast_expr, functionst &out_functions)
 {
@@ -471,33 +375,20 @@ bool remove_const_function_pointerst::try_resolve_typecast_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_expression
-
-  Inputs:
-   expr - The expression to try and squash
-   out_resolved_expression - The squashed version of this expression
-   out_is_const - Is the squashed expression constant
-
- Outputs: Returns true providing the squashing went OK (note it
-          may not have squashed anything). The out_resolved_expression will in
-          this case be all the possible squashed versions of the supplied
-          expression.
-          The out_is_const will return whether the squashed value is suitably
-          const (e.g. if we squashed a struct access, was the struct const).
-
- Purpose: To squash various expr types to simplify the expression.
-          ID_index -> dig to find ID_array and get the values out of it
-          ID_member -> dig to find ID_struct and extract the component value
-          ID_dereference -> dig to find ID_address_of and extract the value
-          ID_typecast -> return the value
-          ID_symbol -> return false, const symbols are squashed first and
-                       non const symbols cannot be squashed
-          Everything else -> unchanged
-
-\*******************************************************************/
-
+/// To squash various expr types to simplify the expression. ID_index -> dig to
+/// find ID_array and get the values out of it ID_member -> dig to find
+/// ID_struct and extract the component value ID_dereference -> dig to find
+/// ID_address_of and extract the value ID_typecast -> return the value
+/// ID_symbol -> return false, const symbols are squashed first and non const
+/// symbols cannot be squashed Everything else -> unchanged
+/// \param expr: The expression to try and squash
+/// \param out_resolved_expression: The squashed version of this expression
+/// \param out_is_const: Is the squashed expression constant
+/// \return Returns true providing the squashing went OK (note it may not have
+///   squashed anything). The out_resolved_expression will in this case be all
+///   the possible squashed versions of the supplied expression. The
+///   out_is_const will return whether the squashed value is suitably const
+///   (e.g. if we squashed a struct access, was the struct const).
 bool remove_const_function_pointerst::try_resolve_expression(
   const exprt &expr, expressionst &out_resolved_expression, bool &out_is_const)
 {
@@ -559,25 +450,14 @@ bool remove_const_function_pointerst::try_resolve_expression(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_index_value
-
-  Inputs:
-   expr - The expression of the index of the index expression (e.g.
-          index_exprt::index())
-   out_array_index - The constant value the index takes
-
- Outputs: Returns true if was able to find a constant value for the index
-          expression. If true, then out_array_index will be the index within
-          the array that the function pointer is pointing to.
-
- Purpose: Given an index into an array, resolve, if possible, the index
-          that is being accessed. This deals with symbols and typecasts to
-          constant values.
-
-\*******************************************************************/
-
+/// Given an index into an array, resolve, if possible, the index that is being
+/// accessed. This deals with symbols and typecasts to constant values.
+/// \param expr: The expression of the index of the index expression (e.g.
+///   index_exprt::index())
+/// \param out_array_index: The constant value the index takes
+/// \return Returns true if was able to find a constant value for the index
+///   expression. If true, then out_array_index will be the index within the
+///   array that the function pointer is pointing to.
 bool remove_const_function_pointerst::try_resolve_index_value(
   const exprt &expr, mp_integer &out_array_index)
 {
@@ -610,28 +490,16 @@ bool remove_const_function_pointerst::try_resolve_index_value(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_index_of
-
-  Inputs:
-   index_expr - The index expression to  to resolve
-   out_expressions - The expressions this expression could be
-   out_is_const - Is the squashed expression constant
-
- Outputs: Returns true if it was able to squash the index expression
-          If this is the case, out_expressions will contain
-          the possible values this index_of could return
-          The out_is_const will return whether either the array itself
-          is const, or the values of the array are const.
-
- Purpose: To squash an index access by first finding the array it is accessing
-          Then if the index can be resolved, return the squashed value. If
-          the index can't be determined then squash each value in the array
-          and return them all.
-
-\*******************************************************************/
-
+/// To squash an index access by first finding the array it is accessing Then if
+/// the index can be resolved, return the squashed value. If the index can't be
+/// determined then squash each value in the array and return them all.
+/// \param index_expr: The index expression to  to resolve
+/// \param out_expressions: The expressions this expression could be
+/// \param out_is_const: Is the squashed expression constant
+/// \return Returns true if it was able to squash the index expression If this
+///   is the case, out_expressions will contain the possible values this
+///   index_of could return The out_is_const will return whether either the
+///   array itself is const, or the values of the array are const.
 bool remove_const_function_pointerst::try_resolve_index_of(
   const index_exprt &index_expr,
   expressionst &out_expressions,
@@ -701,10 +569,7 @@ bool remove_const_function_pointerst::try_resolve_index_of(
 
             for(const exprt &resolved_array_entry : array_contents)
             {
-              if(!resolved_array_entry.is_zero())
-              {
-                out_expressions.push_back(resolved_array_entry);
-              }
+              out_expressions.push_back(resolved_array_entry);
             }
           }
         }
@@ -728,26 +593,14 @@ bool remove_const_function_pointerst::try_resolve_index_of(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_member
-
-  Inputs:
-   member_expr - The member expression to resolve.
-   out_expressions - The expressions this component could be
-   out_is_const - Is the squashed expression constant
-
- Outputs: Returns true if it was able to squash the member expression
-          If this is the case, out_expressions will contain
-          the possible values this member could return
-          The out_is_const will return whether the struct
-          is const.
-
- Purpose: To squash an member access by first finding the struct it is accessing
-          Then return the squashed value of the relevant component.
-
-\*******************************************************************/
-
+/// To squash an member access by first finding the struct it is accessing Then
+/// return the squashed value of the relevant component.
+/// \param member_expr: The member expression to resolve.
+/// \param out_expressions: The expressions this component could be
+/// \param out_is_const: Is the squashed expression constant
+/// \return Returns true if it was able to squash the member expression If this
+///   is the case, out_expressions will contain the possible values this member
+///   could return The out_is_const will return whether the struct is const.
 bool remove_const_function_pointerst::try_resolve_member(
   const member_exprt &member_expr,
   expressionst &out_expressions,
@@ -805,27 +658,16 @@ bool remove_const_function_pointerst::try_resolve_member(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_dereference
-
-  Inputs:
-   deref_expr - The dereference expression to resolve.
-   out_expressions - The expressions this dereference could be
-   out_is_const - Is the squashed expression constant
-
- Outputs: Returns true if it was able to squash the dereference expression
-          If this is the case, out_expressions will contain
-          the possible values this dereference could return
-          The out_is_const will return whether the object that gets
-          dereferenced is constant.
-
- Purpose: To squash a dereference access by first finding the address_of
-          the dereference is dereferencing.
-          Then return the squashed value of the relevant component.
-
-\*******************************************************************/
-
+/// To squash a dereference access by first finding the address_of the
+/// dereference is dereferencing. Then return the squashed value of the relevant
+/// component.
+/// \param deref_expr: The dereference expression to resolve.
+/// \param out_expressions: The expressions this dereference could be
+/// \param out_is_const: Is the squashed expression constant
+/// \return Returns true if it was able to squash the dereference expression If
+///   this is the case, out_expressions will contain the possible values this
+///   dereference could return The out_is_const will return whether the object
+///   that gets dereferenced is constant.
 bool remove_const_function_pointerst::try_resolve_dereference(
   const dereference_exprt &deref_expr,
   expressionst &out_expressions,
@@ -890,23 +732,13 @@ bool remove_const_function_pointerst::try_resolve_dereference(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::try_resolve_dereference
-
-  Inputs:
-   typecast_expr - The typecast expression to resolve.
-   out_expressions - The expressions this typecast could be
-   out_is_const - Is the squashed expression constant
-
- Outputs: Returns true if it was able to squash the typecast expression
-          If this is the case, out_expressions will contain
-          the possible values after removing the typecast.
-
- Purpose: To squash a typecast access.
-
-\*******************************************************************/
-
+/// To squash a typecast access.
+/// \param typecast_expr: The typecast expression to resolve.
+/// \param out_expressions: The expressions this typecast could be
+/// \param out_is_const: Is the squashed expression constant
+/// \return Returns true if it was able to squash the typecast expression If
+///   this is the case, out_expressions will contain the possible values after
+///   removing the typecast.
 bool remove_const_function_pointerst::try_resolve_typecast(
   const typecast_exprt &typecast_expr,
   expressionst &out_expressions,
@@ -934,39 +766,19 @@ bool remove_const_function_pointerst::try_resolve_typecast(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::is_expression_const
-
-  Inputs:
-   expression - The expression to check
-
- Outputs: Returns true if the type of the expression is constant.
-
- Purpose: To evaluate the const-ness of the expression type.
-
-\*******************************************************************/
-
+/// To evaluate the const-ness of the expression type.
+/// \param expression: The expression to check
+/// \return Returns true if the type of the expression is constant.
 bool remove_const_function_pointerst::is_const_expression(
   const exprt &expression) const
 {
   return is_const_type(expression.type());
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::is_type_const
-
-  Inputs:
-   type - The type to check
-
- Outputs: Returns true if the type has ID_C_constant or is an array
-          since arrays are implicitly const in C.
-
- Purpose: To evaluate the const-ness of the type.
-
-\*******************************************************************/
-
+/// To evaluate the const-ness of the type.
+/// \param type: The type to check
+/// \return Returns true if the type has ID_C_constant or is an array since
+///   arrays are implicitly const in C.
 bool remove_const_function_pointerst::is_const_type(const typet &type) const
 {
   c_qualifierst qualifers(type);
@@ -981,21 +793,11 @@ bool remove_const_function_pointerst::is_const_type(const typet &type) const
   }
 }
 
-/*******************************************************************\
-
-Function: remove_const_function_pointerst::get_component_value
-
-  Inputs:
-   struct_expr - The expression of the structure being accessed
-   member_expr - The expression saying which component is being accessed
-
- Outputs: Returns the value of a specific component for a given struct
-          expression.
-
- Purpose: To extract the value of the specific component within a struct
-
-\*******************************************************************/
-
+/// To extract the value of the specific component within a struct
+/// \param struct_expr: The expression of the structure being accessed
+/// \param member_expr: The expression saying which component is being accessed
+/// \return Returns the value of a specific component for a given struct
+///   expression.
 exprt remove_const_function_pointerst::get_component_value(
   const struct_exprt &struct_expr, const member_exprt &member_expr)
 {

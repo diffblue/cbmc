@@ -7,6 +7,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Generates string constraints for Java functions dealing with code points
+
 #include <solvers/refinement/string_constraint_generator.h>
 
 /*******************************************************************    \
@@ -70,21 +73,12 @@ string_exprt string_constraint_generatort::add_axioms_for_code_point(
   return res;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::is_high_surrogate
-
-  Inputs: a character expression
-
- Outputs: a Boolean expression
-
- Purpose: the output is true when the character is a high surrogate for
-          UTF-16 encoding, see https://en.wikipedia.org/wiki/UTF-16 for
-          more explenation about the encoding;
-          this is true when the character is in the range 0xD800..0xDBFF
-
-\*******************************************************************/
-
+/// the output is true when the character is a high surrogate for UTF-16
+/// encoding, see https://en.wikipedia.org/wiki/UTF-16 for more explenation
+/// about the encoding; this is true when the character is in the range
+/// 0xD800..0xDBFF
+/// \par parameters: a character expression
+/// \return a Boolean expression
 exprt string_constraint_generatort::is_high_surrogate(const exprt &chr) const
 {
   return and_exprt(
@@ -92,21 +86,12 @@ exprt string_constraint_generatort::is_high_surrogate(const exprt &chr) const
     binary_relation_exprt(chr, ID_le, constant_char(0xDBFF, chr.type())));
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::is_low_surrogate
-
-  Inputs: a character expression
-
- Outputs: a Boolean expression
-
- Purpose: the output is true when the character is a low surrogate for
-          UTF-16 encoding, see https://en.wikipedia.org/wiki/UTF-16 for
-          more explenation about the encoding;
-          this is true when the character is in the range 0xDC00..0xDFFF
-
-\*******************************************************************/
-
+/// the output is true when the character is a low surrogate for UTF-16
+/// encoding, see https://en.wikipedia.org/wiki/UTF-16 for more explenation
+/// about the encoding; this is true when the character is in the range
+/// 0xDC00..0xDFFF
+/// \par parameters: a character expression
+/// \return a Boolean expression
 exprt string_constraint_generatort::is_low_surrogate(const exprt &chr) const
 {
   return and_exprt(
@@ -114,24 +99,14 @@ exprt string_constraint_generatort::is_low_surrogate(const exprt &chr) const
     binary_relation_exprt(chr, ID_le, constant_char(0xDFFF, chr.type())));
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::pair_value
-
-  Inputs: two character expressions and a return type
-          char1 and char2 should be of type return_type
-
- Outputs: an integer expression of type return_type
-
- Purpose: the output corresponds to the unicode character given by the
-          pair of characters of inputs assuming it has been encoded in
-          UTF-16, see https://en.wikipedia.org/wiki/UTF-16 for
-          more explenation about the encoding;
-          the operation we perform is:
-          pair_value=0x10000+(((char1%0x0800)*0x0400)+char2%0x0400)
-
-\*******************************************************************/
-
+/// the output corresponds to the unicode character given by the pair of
+/// characters of inputs assuming it has been encoded in UTF-16, see
+/// https://en.wikipedia.org/wiki/UTF-16 for more explenation about the
+/// encoding; the operation we perform is:
+/// pair_value=0x10000+(((char1%0x0800)*0x0400)+char2%0x0400)
+/// \par parameters: two character expressions and a return type
+/// char1 and char2 should be of type return_type
+/// \return an integer expression of type return_type
 exprt pair_value(exprt char1, exprt char2, typet return_type)
 {
   exprt hex010000=from_integer(0x010000, return_type);
@@ -143,18 +118,10 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
   return pair_value;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_code_point_at
-
-  Inputs: function application with two arguments: a string and an index
-
- Outputs: a integer expression corresponding to a code point
-
- Purpose: add axioms corresponding to the String.codePointAt java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.codePointAt java function
+/// \par parameters: function application with two arguments: a string and an
+///   index
+/// \return a integer expression corresponding to a code point
 exprt string_constraint_generatort::add_axioms_for_code_point_at(
   const function_application_exprt &f)
 {
@@ -179,18 +146,10 @@ exprt string_constraint_generatort::add_axioms_for_code_point_at(
   return result;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_code_point_before
-
-  Inputs: function application with two arguments: a string and an index
-
- Outputs: a integer expression corresponding to a code point
-
- Purpose: add axioms corresponding to the String.codePointBefore java function
-
-\*******************************************************************/
-
+/// add axioms corresponding to the String.codePointBefore java function
+/// \par parameters: function application with two arguments: a string and an
+///   index
+/// \return a integer expression corresponding to a code point
 exprt string_constraint_generatort::add_axioms_for_code_point_before(
   const function_application_exprt &f)
 {
@@ -218,19 +177,11 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
   return result;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_code_point_count
-
-  Inputs: function application with three arguments: a string and two indexes
-
- Outputs: an integer expression
-
- Purpose: add axioms giving approximate bounds on the result of the
-          String.codePointCount java function
-
-\*******************************************************************/
-
+/// add axioms giving approximate bounds on the result of the
+/// String.codePointCount java function
+/// \par parameters: function application with three arguments: a string and two
+///   indexes
+/// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_code_point_count(
   const function_application_exprt &f)
 {
@@ -247,21 +198,12 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
   return result;
 }
 
-/*******************************************************************\
-
-Function: string_constraint_generatort::add_axioms_for_offset_by_code_point
-
-  Inputs: function application with three arguments: a string and two indexes
-
- Outputs: a new string expression
-
- Purpose: add axioms giving approximate bounds on the result of the
-          String.offsetByCodePointCount java function.
-          We approximate the result by saying the result is
-          between index + offset and index + 2 * offset
-
-\*******************************************************************/
-
+/// add axioms giving approximate bounds on the result of the
+/// String.offsetByCodePointCount java function. We approximate the result by
+/// saying the result is between index + offset and index + 2 * offset
+/// \par parameters: function application with three arguments: a string and two
+///   indexes
+/// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   const function_application_exprt &f)
 {

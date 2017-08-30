@@ -8,6 +8,11 @@ Date: February 2006
 
 \*******************************************************************/
 
+/// \file
+/// Race Detection for Threaded Goto Programs
+
+#include "rw_set.h"
+
 #include <util/std_expr.h>
 #include <util/std_code.h>
 #include <util/namespace.h>
@@ -16,54 +21,28 @@ Date: February 2006
 
 #include <pointer-analysis/goto_program_dereference.h>
 
-#include "rw_set.h"
-
-/*******************************************************************\
-
-Function: rw_set_baset::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void rw_set_baset::output(std::ostream &out) const
 {
-  out << "READ:" << std::endl;
+  out << "READ:\n";
   for(entriest::const_iterator it=r_entries.begin();
       it!=r_entries.end();
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << std::endl;
+        << from_expr(ns, "", it->second.guard) << '\n';
   }
 
-  out << std::endl;
+  out << '\n';
 
-  out << "WRITE:" << std::endl;
+  out << "WRITE:\n";
   for(entriest::const_iterator it=w_entries.begin();
       it!=w_entries.end();
       it++)
   {
     out << it->second.object << " if "
-        << from_expr(ns, "", it->second.guard) << std::endl;
+        << from_expr(ns, "", it->second.guard) << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: rw_set_loct::compute
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void _rw_set_loct::compute()
 {
@@ -97,35 +76,11 @@ void _rw_set_loct::compute()
   }
 }
 
-/*******************************************************************\
-
-Function: rw_set_loct::assign
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void _rw_set_loct::assign(const exprt &lhs, const exprt &rhs)
 {
   read(rhs);
   read_write_rec(lhs, false, true, "", guardt());
 }
-
-/*******************************************************************\
-
-Function: rw_set_loct::read_write_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void _rw_set_loct::read_write_rec(
   const exprt &expr,
@@ -190,7 +145,7 @@ void _rw_set_loct::read_write_rec(
       {
         /* as an under-approximation */
         // std::cout << "Sorry, LOCAL_MAY too imprecise. "
-        //           << Omitting some variables." << std::endl;
+        //           << Omitting some variables.\n";
         irep_idt object=ID_unknown;
 
         entryt &entry=r_entries[object];
@@ -239,18 +194,6 @@ void _rw_set_loct::read_write_rec(
       read_write_rec(*it, r, w, suffix, guard);
   }
 }
-
-/*******************************************************************\
-
-Function: rw_set_functiont::compute_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void rw_set_functiont::compute_rec(const exprt &function)
 {

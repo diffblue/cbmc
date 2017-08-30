@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// GOTO Programs
+
+#include "goto_check.h"
+
 #include <algorithm>
 
 #include <util/simplify_expr.h>
@@ -24,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 
 #include "local_bitvector_analysis.h"
-#include "goto_check.h"
 
 class goto_checkt
 {
@@ -33,7 +37,7 @@ public:
     const namespacet &_ns,
     const optionst &_options):
     ns(_ns),
-    local_bitvector_analysis(0)
+    local_bitvector_analysis(nullptr)
   {
     enable_bounds_check=_options.get_bool_option("bounds-check");
     enable_pointer_check=_options.get_bool_option("pointer-check");
@@ -63,6 +67,8 @@ public:
   typedef goto_functionst::goto_functiont goto_functiont;
 
   void goto_check(goto_functiont &goto_function, const irep_idt &mode);
+
+  void collect_allocations(const goto_functionst &goto_functions);
 
 protected:
   const namespacet &ns;
@@ -134,19 +140,43 @@ protected:
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
+
+  typedef std::pair<exprt, exprt> allocationt;
+  typedef std::list<allocationt> allocationst;
+  allocationst allocations;
 };
 
-/*******************************************************************\
+void goto_checkt::collect_allocations(
+  const goto_functionst &goto_functions)
+{
+  if(!enable_pointer_check)
+    return;
 
-Function: goto_checkt::invalidate
+  forall_goto_functions(itf, goto_functions)
+    forall_goto_program_instructions(it, itf->second.body)
+    {
+      const goto_programt::instructiont &instruction=*it;
+      if(!instruction.is_function_call())
+        continue;
 
-  Inputs:
+      const code_function_callt &call=
+        to_code_function_call(instruction.code);
+      if(call.function().id()!=ID_symbol ||
+         to_symbol_expr(call.function()).get_identifier()!=
+         CPROVER_PREFIX "allocated_memory")
+        continue;
 
- Outputs:
+      const code_function_callt::argumentst &args= call.arguments();
+      if(args.size()!=2 ||
+         args[0].type().id()!=ID_unsignedbv ||
+         args[1].type().id()!=ID_unsignedbv)
+        throw "expected two unsigned arguments to "
+              CPROVER_PREFIX "allocated_memory";
 
- Purpose:
-
-\*******************************************************************/
+      assert(args[0].type()==args[1].type());
+      allocations.push_back({args[0], args[1]});
+    }
+}
 
 void goto_checkt::invalidate(const exprt &lhs)
 {
@@ -182,18 +212,6 @@ void goto_checkt::invalidate(const exprt &lhs)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::div_by_zero_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::div_by_zero_check(
   const div_exprt &expr,
   const guardt &guard)
@@ -219,18 +237,6 @@ void goto_checkt::div_by_zero_check(
     expr,
     guard);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::undefined_shift_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::undefined_shift_check(
   const shift_exprt &expr,
@@ -283,18 +289,6 @@ void goto_checkt::undefined_shift_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::mod_by_zero_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::mod_by_zero_check(
   const mod_exprt &expr,
   const guardt &guard)
@@ -320,18 +314,6 @@ void goto_checkt::mod_by_zero_check(
     expr,
     guard);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::conversion_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::conversion_check(
   const exprt &expr,
@@ -512,18 +494,6 @@ void goto_checkt::conversion_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::integer_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::integer_overflow_check(
   const exprt &expr,
   const guardt &guard)
@@ -644,18 +614,6 @@ void goto_checkt::integer_overflow_check(
       guard);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::float_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::float_overflow_check(
   const exprt &expr,
@@ -779,18 +737,6 @@ void goto_checkt::float_overflow_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::nan_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::nan_check(
   const exprt &expr,
   const guardt &guard)
@@ -900,18 +846,6 @@ void goto_checkt::nan_check(
     guard);
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::pointer_rel_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::pointer_rel_check(
   const exprt &expr,
   const guardt &guard)
@@ -942,18 +876,6 @@ void goto_checkt::pointer_rel_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::pointer_overflow_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::pointer_overflow_check(
   const exprt &expr,
   const guardt &guard)
@@ -979,18 +901,6 @@ void goto_checkt::pointer_overflow_check(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::pointer_validity_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::pointer_validity_check(
   const dereference_exprt &expr,
@@ -1031,10 +941,49 @@ void goto_checkt::pointer_validity_check(
   }
   else
   {
+    exprt allocs=false_exprt();
+
+    if(!allocations.empty())
+    {
+      exprt::operandst disjuncts;
+
+      for(const auto &a : allocations)
+      {
+        typecast_exprt int_ptr(pointer, a.first.type());
+
+        exprt lb(int_ptr);
+        if(access_lb.is_not_nil())
+        {
+          if(!base_type_eq(lb.type(), access_lb.type(), ns))
+            lb=plus_exprt(lb, typecast_exprt(access_lb, lb.type()));
+          else
+            lb=plus_exprt(lb, access_lb);
+        }
+
+        binary_relation_exprt lb_check(a.first, ID_le, lb);
+
+        exprt ub(int_ptr);
+        if(access_ub.is_not_nil())
+        {
+          if(!base_type_eq(ub.type(), access_ub.type(), ns))
+            ub=plus_exprt(ub, typecast_exprt(access_ub, ub.type()));
+          else
+            ub=plus_exprt(ub, access_ub);
+        }
+
+        binary_relation_exprt ub_check(
+          ub, ID_le, plus_exprt(a.first, a.second));
+
+        disjuncts.push_back(and_exprt(lb_check, ub_check));
+      }
+
+      allocs=disjunction(disjuncts);
+    }
+
     if(flags.is_unknown() || flags.is_null())
     {
       add_guarded_claim(
-        not_exprt(null_pointer(pointer)),
+        or_exprt(allocs, not_exprt(null_pointer(pointer))),
         "dereference failure: pointer NULL",
         "pointer dereference",
         expr.find_source_location(),
@@ -1044,7 +993,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown())
       add_guarded_claim(
-        not_exprt(invalid_pointer(pointer)),
+        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer invalid",
         "pointer dereference",
         expr.find_source_location(),
@@ -1053,7 +1002,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_uninitialized())
       add_guarded_claim(
-        not_exprt(invalid_pointer(pointer)),
+        or_exprt(allocs, not_exprt(invalid_pointer(pointer))),
         "dereference failure: pointer uninitialized",
         "pointer dereference",
         expr.find_source_location(),
@@ -1062,7 +1011,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() || flags.is_dynamic_heap())
       add_guarded_claim(
-        not_exprt(deallocated(pointer, ns)),
+        or_exprt(allocs, not_exprt(deallocated(pointer, ns))),
         "dereference failure: deallocated dynamic object",
         "pointer dereference",
         expr.find_source_location(),
@@ -1071,7 +1020,7 @@ void goto_checkt::pointer_validity_check(
 
     if(flags.is_unknown() || flags.is_dynamic_local())
       add_guarded_claim(
-        not_exprt(dead_object(pointer, ns)),
+        or_exprt(allocs, not_exprt(dead_object(pointer, ns))),
         "dereference failure: dead object",
         "pointer dereference",
         expr.find_source_location(),
@@ -1089,7 +1038,11 @@ void goto_checkt::pointer_validity_check(
                    access_ub));
 
       add_guarded_claim(
-        implies_exprt(malloc_object(pointer, ns), not_exprt(dynamic_bounds)),
+        or_exprt(
+          allocs,
+          implies_exprt(
+            malloc_object(pointer, ns),
+            not_exprt(dynamic_bounds))),
         "dereference failure: pointer outside dynamic object bounds",
         "pointer dereference",
         expr.find_source_location(),
@@ -1110,7 +1063,7 @@ void goto_checkt::pointer_validity_check(
                    access_ub));
 
       add_guarded_claim(
-        or_exprt(dynamic_object(pointer), not_exprt(object_bounds)),
+        or_exprt(allocs, dynamic_object(pointer), not_exprt(object_bounds)),
         "dereference failure: pointer outside object bounds",
         "pointer dereference",
         expr.find_source_location(),
@@ -1120,34 +1073,10 @@ void goto_checkt::pointer_validity_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::array_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string goto_checkt::array_name(const exprt &expr)
 {
   return ::array_name(ns, expr);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::bounds_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::bounds_check(
   const index_exprt &expr,
@@ -1238,7 +1167,8 @@ void goto_checkt::bounds_check(
     plus_exprt effective_offset(ode.offset(), pointer_offset(pointer));
 
     assert(effective_offset.op0().type()==effective_offset.op1().type());
-    assert(effective_offset.type()==size.type());
+    if(effective_offset.type()!=size.type())
+      size.make_typecast(effective_offset.type());
 
     binary_relation_exprt inequality(effective_offset, ID_lt, size);
 
@@ -1303,18 +1233,6 @@ void goto_checkt::bounds_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::add_guarded_claim
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::add_guarded_claim(
   const exprt &_expr,
   const std::string &comment,
@@ -1361,18 +1279,6 @@ void goto_checkt::add_guarded_claim(
     t->source_location.set_property_class(property_class);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::check_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::check_rec(
   const exprt &expr,
@@ -1554,35 +1460,11 @@ void goto_checkt::check_rec(
       mode);
 }
 
-/*******************************************************************\
-
-Function: goto_checkt::check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_checkt::check(const exprt &expr, const irep_idt &mode)
 {
   guardt guard;
   check_rec(expr, guard, false, mode);
 }
-
-/*******************************************************************\
-
-Function: goto_checkt::goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_checkt::goto_check(
   goto_functiont &goto_function,
@@ -1679,7 +1561,7 @@ void goto_checkt::goto_check(
 
           add_guarded_claim(
             not_eq_null,
-            "this is null on method invokation",
+            "this is null on method invocation",
             "pointer dereference",
             i.source_location,
             pointer,
@@ -1808,21 +1690,21 @@ void goto_checkt::goto_check(
       {
         i_it->source_location.id(irep_idt());
 
-        if(it->source_location.get_file()!=irep_idt())
+        if(!it->source_location.get_file().empty())
           i_it->source_location.set_file(it->source_location.get_file());
 
-        if(it->source_location.get_line()!=irep_idt())
+        if(!it->source_location.get_line().empty())
           i_it->source_location.set_line(it->source_location.get_line());
 
-        if(it->source_location.get_function()!=irep_idt())
+        if(!it->source_location.get_function().empty())
           i_it->source_location.set_function(
             it->source_location.get_function());
 
-        if(it->source_location.get_column()!=irep_idt())
+        if(!it->source_location.get_column().empty())
           i_it->source_location.set_column(it->source_location.get_column());
       }
 
-      if(i_it->function==irep_idt())
+      if(i_it->function.empty())
         i_it->function=it->function;
     }
 
@@ -1837,18 +1719,6 @@ void goto_checkt::goto_check(
   }
 }
 
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_check(
   const namespacet &ns,
   const optionst &options,
@@ -1858,18 +1728,6 @@ void goto_check(
   goto_check.goto_check(goto_function, irep_idt());
 }
 
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_check(
   const namespacet &ns,
   const optionst &options,
@@ -1877,24 +1735,14 @@ void goto_check(
 {
   goto_checkt goto_check(ns, options);
 
+  goto_check.collect_allocations(goto_functions);
+
   Forall_goto_functions(it, goto_functions)
   {
     irep_idt mode=ns.lookup(it->first).mode;
     goto_check.goto_check(it->second, mode);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_check(
   const optionst &options,

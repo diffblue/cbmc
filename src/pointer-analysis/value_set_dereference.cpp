@@ -6,12 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution of ANSI-C
+
+#include "value_set_dereference.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
 
 #include <cassert>
 
+#include <util/invariant.h>
 #include <util/string2int.h>
 #include <util/expr_util.h>
 #include <util/base_type.h>
@@ -28,48 +34,23 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/byte_operators.h>
 #include <util/ssa_expr.h>
+#include <util/c_types.h>
 
-#include <ansi-c/c_types.h>
 #include <ansi-c/c_typecast.h>
 
 #include <pointer-analysis/value_set.h>
 
 #include <langapi/language_util.h>
 
-#include "value_set_dereference.h"
 #include "pointer_offset_sum.h"
 
 // global data, horrible
 unsigned int value_set_dereferencet::invalid_counter=0;
 
-/*******************************************************************\
-
-Function: value_set_dereferencet::has_dereference
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_dereferencet::has_dereference(const exprt &expr)
 {
   return has_subexpr(expr, ID_dereference);
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::get_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
@@ -79,19 +60,9 @@ const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
   return expr;
 }
 
-/*******************************************************************\
-
-Function: value_set_dereferencet::dereference
-
-  Inputs: expression dest, to be dereferenced under given guard,
-          and given mode
-
- Outputs: returns pointer after dereferencing
-
- Purpose:
-
-\*******************************************************************/
-
+/// \par parameters: expression dest, to be dereferenced under given guard,
+/// and given mode
+/// \return returns pointer after dereferencing
 exprt value_set_dereferencet::dereference(
   const exprt &pointer,
   const guardt &guard,
@@ -122,7 +93,7 @@ exprt value_set_dereferencet::dereference(
   const typet &type=pointer.type().subtype();
 
   #if 0
-  std::cout << "DEREF: " << from_expr(ns, "", pointer) << std::endl;
+  std::cout << "DEREF: " << from_expr(ns, "", pointer) << '\n';
   #endif
 
   // collect objects the pointer may point to
@@ -135,7 +106,7 @@ exprt value_set_dereferencet::dereference(
       it=points_to_set.begin();
       it!=points_to_set.end();
       it++)
-    std::cout << "P: " << from_expr(ns, "", *it) << std::endl;
+    std::cout << "P: " << from_expr(ns, "", *it) << '\n';
   #endif
 
   // get the values of these
@@ -151,7 +122,7 @@ exprt value_set_dereferencet::dereference(
 
     #if 0
     std::cout << "V: " << from_expr(ns, "", value.pointer_guard) << " --> ";
-    std::cout << from_expr(ns, "", value.value) << std::endl;
+    std::cout << from_expr(ns, "", value.value) << '\n';
     #endif
 
     values.push_back(value);
@@ -235,24 +206,11 @@ exprt value_set_dereferencet::dereference(
   }
 
   #if 0
-  std::cout << "R: " << from_expr(ns, "", value) << std::endl
-            << std::endl;
+  std::cout << "R: " << from_expr(ns, "", value) << "\n\n";
   #endif
 
   return value;
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::dereference_type_compare
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_dereferencet::dereference_type_compare(
   const typet &object_type,
@@ -282,22 +240,19 @@ bool value_set_dereferencet::dereference_type_compare(
      object_type.id()==ID_code)
     return true;
 
+  // bitvectors of same width are ok
+  if((dereference_type.id()==ID_signedbv ||
+      dereference_type.id()==ID_unsignedbv) &&
+     (object_type.id()==ID_signedbv ||
+      object_type.id()==ID_unsignedbv) &&
+     to_bitvector_type(dereference_type).get_width()==
+     to_bitvector_type(object_type).get_width())
+    return true;
+
   // really different
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::invalid_pointer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_dereferencet::invalid_pointer(
   const exprt &pointer,
@@ -315,18 +270,6 @@ void value_set_dereferencet::invalid_pointer(
     "invalid pointer",
     tmp_guard);
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::build_reference_to
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &what,
@@ -353,7 +296,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   const exprt &object=o.object();
 
   #if 0
-  std::cout << "O: " << from_expr(ns, "", root_object) << std::endl;
+  std::cout << "O: " << from_expr(ns, "", root_object) << '\n';
   #endif
 
   valuet result;
@@ -468,9 +411,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     const symbolt &memory_symbol=ns.lookup(CPROVER_PREFIX "memory");
     exprt symbol_expr=symbol_exprt(memory_symbol.name, memory_symbol.type);
 
-    exprt pointer_offset=unary_exprt(
-      ID_pointer_offset, pointer_expr, index_type());
-
     if(base_type_eq(
          ns.follow(memory_symbol.type).subtype(),
          dereference_type, ns))
@@ -478,14 +418,22 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       // Types match already, what a coincidence!
       // We can use an index expression.
 
-      exprt index_expr=index_exprt(symbol_expr, pointer_offset);
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
       index_expr.type()=ns.follow(memory_symbol.type).subtype();
       result.value=index_expr;
+    }
+    else if(dereference_type_compare(
+              ns.follow(memory_symbol.type).subtype(),
+              dereference_type))
+    {
+      exprt index_expr=index_exprt(symbol_expr, pointer_offset(pointer_expr));
+      index_expr.type()=ns.follow(memory_symbol.type).subtype();
+      result.value=typecast_exprt(index_expr, dereference_type);
     }
     else
     {
       // We need to use byte_extract.
-      // Won't do this without a committment to an endianness.
+      // Won't do this without a commitment to an endianness.
 
       if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
       {
@@ -493,7 +441,8 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       else
       {
         exprt byte_extract(byte_extract_id(), dereference_type);
-        byte_extract.copy_to_operands(symbol_expr, pointer_offset);
+        byte_extract.copy_to_operands(
+          symbol_expr, pointer_offset(pointer_expr));
         result.value=byte_extract;
       }
     }
@@ -554,18 +503,24 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       if(o.offset().is_constant())
         offset=o.offset();
       else
-        offset=unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+        offset=pointer_offset(pointer_expr);
 
       exprt adjusted_offset;
 
       // are we doing a byte?
       mp_integer element_size=
+        dereference_type.id()==ID_empty?
+        pointer_offset_size(char_type(), ns):
         pointer_offset_size(dereference_type, ns);
 
       if(element_size==1)
       {
         // no need to adjust offset
         adjusted_offset=offset;
+      }
+      else if(element_size<=0)
+      {
+        throw "unknown or invalid type size of:\n"+dereference_type.pretty();
       }
       else
       {
@@ -604,8 +559,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
       result.value=o.root_object();
 
       // this is relative to the root object
-      const exprt offset=
-        unary_exprt(ID_pointer_offset, pointer_expr, index_type());
+      const exprt offset=pointer_offset(pointer_expr);
 
       if(memory_model(result.value, dereference_type, tmp_guard, offset))
       {
@@ -634,18 +588,6 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
   return result;
 }
 
-/*******************************************************************\
-
-Function: value_set_dereferencet::valid_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void value_set_dereferencet::valid_check(
   const exprt &object,
   const guardt &guard,
@@ -660,7 +602,7 @@ void value_set_dereferencet::valid_check(
   {
     // always valid, but can't write
 
-    if(mode==WRITE)
+    if(mode==modet::WRITE)
     {
       dereference_callback.dereference_failure(
         "pointer dereference",
@@ -697,18 +639,6 @@ void value_set_dereferencet::valid_check(
     #endif
   }
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::bounds_check
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void value_set_dereferencet::bounds_check(
   const index_exprt &expr,
@@ -783,18 +713,6 @@ void value_set_dereferencet::bounds_check(
   }
 }
 
-/*******************************************************************\
-
-Function: value_set_dereferencet::memory_model
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 inline static unsigned bv_width(
   const typet &type,
   const namespacet &ns)
@@ -859,22 +777,10 @@ bool value_set_dereferencet::memory_model(
       return memory_model_conversion(value, to_type, guard, offset);
   }
 
-  // otherwise, we will stich it together from bytes
+  // otherwise, we will stitch it together from bytes
 
   return memory_model_bytes(value, to_type, guard, offset);
 }
-
-/*******************************************************************\
-
-Function: value_set_dereferencet::memory_model_conversion
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool value_set_dereferencet::memory_model_conversion(
   exprt &value,
@@ -903,18 +809,6 @@ bool value_set_dereferencet::memory_model_conversion(
   return true;
 }
 
-/*******************************************************************\
-
-Function: value_set_dereferencet::memory_model_bytes
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool value_set_dereferencet::memory_model_bytes(
   exprt &value,
   const typet &to_type,
@@ -927,7 +821,7 @@ bool value_set_dereferencet::memory_model_bytes(
   if(from_type.id()==ID_code || to_type.id()==ID_code)
     return false;
 
-  // We won't do this without a committment to an endianness.
+  // We won't do this without a commitment to an endianness.
   if(config.ansi_c.endianness==configt::ansi_ct::endiannesst::NO_ENDIANNESS)
     return false;
 
@@ -965,10 +859,24 @@ bool value_set_dereferencet::memory_model_bytes(
   {
     // upper bound
     {
-      mp_integer from_width=pointer_offset_size(from_type, ns);
-      mp_integer to_width=pointer_offset_size(to_type, ns);
+      exprt from_width=size_of_expr(from_type, ns);
+      INVARIANT(
+        from_width.is_not_nil(),
+        "unknown or invalid type size:\n"+from_type.pretty());
 
-      exprt bound=from_integer(from_width-to_width, offset.type());
+      exprt to_width=
+        to_type.id()==ID_empty?
+        from_integer(0, size_type()):size_of_expr(to_type, ns);
+      INVARIANT(
+        to_width.is_not_nil(),
+        "unknown or invalid type size:\n"+to_type.pretty());
+      INVARIANT(
+        from_width.type()==to_width.type(),
+        "type mismatch on result of size_of_expr");
+
+      minus_exprt bound(from_width, to_width);
+      if(bound.type()!=offset.type())
+        bound.make_typecast(offset.type());
 
       binary_relation_exprt
         offset_upper_bound(offset, ID_gt, bound);

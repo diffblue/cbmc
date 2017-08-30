@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_LINKING_STATIC_LIFETIME_INIT_H
 #define CPROVER_LINKING_STATIC_LIFETIME_INIT_H
 

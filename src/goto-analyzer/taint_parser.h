@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Taint Parser
+
 #ifndef CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
 #define CPROVER_GOTO_ANALYZER_TAINT_PARSER_H
 
@@ -43,12 +46,14 @@ public:
     irep_idt id;
     irep_idt function_identifier;
     irep_idt taint;
-    unsigned parameter_number; // the frist one is '1'
+    unsigned parameter_number; // the first one is '1'
     std::string message;
 
     void output(std::ostream &) const;
 
-    rulet():parameter_number(0)
+    rulet():
+      parameter_number(0)
+      // The other class members are initialized by taint_parser().
     {
     }
   };

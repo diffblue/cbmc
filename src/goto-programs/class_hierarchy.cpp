@@ -8,25 +8,20 @@ Date: April 2016
 
 \*******************************************************************/
 
+/// \file
+/// Class Hierarchy
+
+#include "class_hierarchy.h"
+
 #include <ostream>
 
 #include <util/std_types.h>
 #include <util/symbol_table.h>
 
-#include "class_hierarchy.h"
-
-/*******************************************************************\
-
-Function: class_hierarchyt::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
+/// Looks for all the struct types in the symbol table and construct a map from
+/// class names to a data structure that contains lists of parent and child
+/// classes for each struct type (ie class).
+/// \param symbol_table: The symbol table to analyze
 void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
 {
   forall_symbols(it, symbol_table.symbols)
@@ -52,18 +47,6 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
   }
 }
 
-/*******************************************************************\
-
-Function: class_hierarchyt::get_children_trans_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void class_hierarchyt::get_children_trans_rec(
   const irep_idt &c,
   idst &dest) const
@@ -80,18 +63,6 @@ void class_hierarchyt::get_children_trans_rec(
   for(const auto &child : entry.children)
     get_children_trans_rec(child, dest);
 }
-
-/*******************************************************************\
-
-Function: class_hierarchyt::get_parents_trans_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void class_hierarchyt::get_parents_trans_rec(
   const irep_idt &c,
@@ -110,18 +81,6 @@ void class_hierarchyt::get_parents_trans_rec(
     get_parents_trans_rec(child, dest);
 }
 
-/*******************************************************************\
-
-Function: class_hierarchyt::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void class_hierarchyt::output(std::ostream &out) const
 {
   for(const auto &c : class_map)
@@ -135,18 +94,6 @@ void class_hierarchyt::output(std::ostream &out) const
           << ch << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: output_dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::ostream &output_dot(std::ostream &ostr, const class_hierarchyt &hierarchy)
 {

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interval Domain
+
 #ifndef CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 #define CPROVER_ANALYSES_INTERVAL_DOMAIN_H
 
@@ -15,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ai.h"
 #include "interval_template.h"
 
-typedef interval_template<mp_integer> integer_intervalt;
-typedef interval_template<ieee_floatt> ieee_float_intervalt;
+typedef interval_templatet<mp_integer> integer_intervalt;
+typedef interval_templatet<ieee_floatt> ieee_float_intervalt;
 
 class interval_domaint:public ai_domain_baset
 {
@@ -40,10 +43,17 @@ public:
     const ai_baset &ai,
     const namespacet &ns) const final;
 
+protected:
+  bool join(const interval_domaint &b);
+
+public:
   bool merge(
     const interval_domaint &b,
     locationt from,
-    locationt to);
+    locationt to)
+  {
+    return join(b);
+  }
 
   // no states
   void make_bottom() final
@@ -85,7 +95,11 @@ public:
     return bottom;
   }
 
-private:
+  virtual bool ai_simplify(
+    exprt &condition,
+    const namespacet &ns) const override;
+
+protected:
   bool bottom;
 
   typedef std::map<irep_idt, integer_intervalt> int_mapt;

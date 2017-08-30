@@ -7,6 +7,9 @@ Author: Daniel Kroening, kroening@kroening.com,
 
 \*******************************************************************/
 
+/// \file
+/// Value Set Analysis (Flow Insensitive, Validity Regions)
+
 #ifndef CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FIVRNS_H
 #define CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FIVRNS_H
 
@@ -49,11 +52,11 @@ public:
   {
     forall_goto_program_instructions(it, goto_program)
     {
-      out << "**** " << it->source_location << std::endl;
+      out << "**** " << it->source_location << '\n';
       output(it, out);
-      out << std::endl;
+      out << '\n';
       goto_program.output_instruction(ns, "", out, it);
-      out << std::endl;
+      out << '\n';
     }
   }
 

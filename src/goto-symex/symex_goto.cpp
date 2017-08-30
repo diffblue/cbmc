@@ -6,26 +6,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "goto_symex.h"
+
 #include <cassert>
 #include <algorithm>
 
 #include <util/std_expr.h>
 
 #include <analyses/dirty.h>
-
-#include "goto_symex.h"
-
-/*******************************************************************\
-
-Function: goto_symext::symex_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_goto(statet &state)
 {
@@ -45,12 +36,8 @@ void goto_symext::symex_goto(statet &state)
     if(!state.guard.is_false())
       target.location(state.guard.as_expr(), state.source);
 
-    // reset unwinding counter
-    if(instruction.is_backwards_goto())
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count=0;
-
     // next instruction
-    state.source.pc++;
+    symex_transition(state);
     return; // nothing to do
   }
 
@@ -86,7 +73,7 @@ void goto_symext::symex_goto(statet &state)
       symex_assume(state, negated_cond);
 
       // next instruction
-      state.source.pc++;
+      symex_transition(state);
       return;
     }
 
@@ -100,17 +87,14 @@ void goto_symext::symex_goto(statet &state)
       // no!
       loop_bound_exceeded(state, new_guard);
 
-      // reset unwinding
-      unwind=0;
-
       // next instruction
-      state.source.pc++;
+      symex_transition(state);
       return;
     }
 
     if(new_guard.is_true())
     {
-      state.source.pc=goto_target;
+      symex_transition(state, goto_target, true);
       return; // nothing else to do
     }
   }
@@ -131,7 +115,7 @@ void goto_symext::symex_goto(statet &state)
 
     if(state_pc==goto_target)
     {
-      state.source.pc=goto_target;
+      symex_transition(state, goto_target);
       return; // nothing else to do
     }
   }
@@ -149,7 +133,7 @@ void goto_symext::symex_goto(statet &state)
   goto_state_list.push_back(statet::goto_statet(state));
   statet::goto_statet &new_state=goto_state_list.back();
 
-  state.source.pc=state_pc;
+  symex_transition(state, state_pc, !forward);
 
   // adjust guards
   if(new_guard.is_true())
@@ -184,7 +168,7 @@ void goto_symext::symex_goto(statet &state)
         new_lhs, new_lhs, guard_symbol_expr,
         new_rhs,
         original_source,
-        symex_targett::GUARD);
+        symex_targett::assignment_typet::GUARD);
 
       guard_expr=guard_symbol_expr;
       guard_expr.make_not();
@@ -206,18 +190,6 @@ void goto_symext::symex_goto(statet &state)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::symex_step_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::symex_step_goto(statet &state, bool taken)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;
@@ -234,18 +206,6 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
 
   target.assumption(state.guard.as_expr(), guard, state.source);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::merge_gotos
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::merge_gotos(statet &state)
 {
@@ -271,18 +231,6 @@ void goto_symext::merge_gotos(statet &state)
   frame.goto_state_map.erase(state_map_it);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::merge_goto
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::merge_goto(
   const statet::goto_statet &goto_state,
   statet &state)
@@ -303,18 +251,6 @@ void goto_symext::merge_goto(
   state.depth=std::min(state.depth, goto_state.depth);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::merge_value_sets
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::merge_value_sets(
   const statet::goto_statet &src,
   statet &dest)
@@ -328,18 +264,6 @@ void goto_symext::merge_value_sets(
   dest.value_set.make_union(src.value_set);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::phi_function
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::phi_function(
   const statet::goto_statet &goto_state,
   statet &dest_state)
@@ -349,6 +273,16 @@ void goto_symext::phi_function(
 
   goto_state.level2_get_variables(variables);
   dest_state.level2.get_variables(variables);
+
+  guardt diff_guard;
+
+  if(!variables.empty())
+  {
+    diff_guard=goto_state.guard;
+
+    // this gets the diff between the guards
+    diff_guard-=dest_state.guard;
+  }
 
   for(std::unordered_set<ssa_exprt, irep_hash>::const_iterator
       it=variables.begin();
@@ -417,12 +351,7 @@ void goto_symext::phi_function(
       rhs=dest_state_rhs;
     else
     {
-      guardt tmp_guard(goto_state.guard);
-
-      // this gets the diff between the guards
-      tmp_guard-=dest_state.guard;
-
-      rhs=if_exprt(tmp_guard.as_expr(), goto_state_rhs, dest_state_rhs);
+      rhs=if_exprt(diff_guard.as_expr(), goto_state_rhs, dest_state_rhs);
       do_simplify(rhs);
     }
 
@@ -437,21 +366,9 @@ void goto_symext::phi_function(
       new_lhs, new_lhs, new_lhs.get_original_expr(),
       rhs,
       dest_state.source,
-      symex_targett::PHI);
+      symex_targett::assignment_typet::PHI);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::loop_bound_exceeded
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::loop_bound_exceeded(
   statet &state,
@@ -491,18 +408,6 @@ void goto_symext::loop_bound_exceeded(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: goto_symext::get_unwind
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool goto_symext::get_unwind(
   const symex_targett::sourcet &source,

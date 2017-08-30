@@ -6,24 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Value Set Propagation
+
+#include "value_set_analysis.h"
+
 #include <util/prefix.h>
 #include <util/cprover_prefix.h>
 
 #include <langapi/language_util.h>
-
-#include "value_set_analysis.h"
-
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void convert(
   const goto_functionst &goto_functions,
@@ -42,18 +33,6 @@ void convert(
     value_set_analysis.convert(f_it->second.body, f_it->first, f);
   }
 }
-
-/*******************************************************************\
-
-Function: convert
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void convert(
   const goto_programt &goto_program,

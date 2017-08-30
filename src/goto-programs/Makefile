@@ -27,6 +27,7 @@ SRC = basic_blocks.cpp \
       json_goto_trace.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
+      mm_io.cpp \
       osx_fat_reader.cpp \
       parameter_assignments.cpp \
       pointer_arithmetic.cpp \

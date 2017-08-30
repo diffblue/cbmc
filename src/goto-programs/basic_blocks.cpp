@@ -6,20 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Group Basic Blocks in Goto Program
+
 #include "basic_blocks.h"
 
-/*******************************************************************\
-
-Function: basic_blocks
-
-  Inputs:
-
- Outputs:
-
- Purpose: convert basic blocks into single expressions of type "block"
-
-\*******************************************************************/
-
+/// convert basic blocks into single expressions of type "block"
 void basic_blocks(goto_programt &goto_program,
                   unsigned max_block_size)
 {
@@ -42,7 +34,7 @@ void basic_blocks(goto_programt &goto_program,
       it!=goto_program.instructions.end();
       ) // intentionally no it++
   {
-    // goto's and empty code are left unchanged
+    // gotos and empty code are left unchanged
     if(it->is_goto() || it->is_dead() ||
        it->is_assert() || it->is_assume() ||
        it->is_atomic_begin() || it->is_atomic_end() ||

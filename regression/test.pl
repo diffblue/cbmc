@@ -35,7 +35,6 @@ sub run($$$$$) {
   print LOG "  Core: $dumped_core\n";
 
   if($signal_num != 0) {
-    $failed = 1;
     print "Killed by signal $signal_num";
     if($dumped_core) {
       print " (code dumped)";
@@ -72,7 +71,9 @@ sub test($$$$$) {
 
   $options =~ s/$ign//g if(defined($ign));
 
-  my $output = $input;
+  my $descriptor = $test;
+  $descriptor =~ s/^.*\///;
+  my $output = $descriptor;
   $output =~ s/\.[^.]*$/.out/;
 
   if($output eq $input) {
@@ -83,6 +84,7 @@ sub test($$$$$) {
   print LOG "Test '$name'\n";
   print LOG "  Level: $level\n";
   print LOG "  Input: $input\n";
+  print LOG "  Descriptor: $descriptor\n";
   print LOG "  Output: $output\n";
   print LOG "  Options: $options\n";
   print LOG "  Results:\n";
@@ -182,7 +184,7 @@ sub dirs() {
   my @list;
 
   opendir CWD, ".";
-  @list = grep { !/^\./ && -d "$_" && !/CVS/ && -s "$_/test.desc" } readdir CWD;
+  @list = grep { !/^\./ && -d "$_" && !/CVS/ } readdir CWD;
   closedir CWD;
 
   @list = sort @list;

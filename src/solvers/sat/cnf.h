@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CNF Generation, via Tseitin
+
 #ifndef CPROVER_SOLVERS_SAT_CNF_H
 #define CPROVER_SOLVERS_SAT_CNF_H
 
@@ -63,7 +66,7 @@ protected:
 class cnf_solvert:public cnft
 {
 public:
-  cnf_solvert():status(INIT), clause_counter(0)
+  cnf_solvert():status(statust::INIT), clause_counter(0)
   {
   }
 
@@ -73,7 +76,7 @@ public:
   }
 
 protected:
-  typedef enum { INIT, SAT, UNSAT, ERROR } statust;
+  enum class statust { INIT, SAT, UNSAT, ERROR };
   statust status;
   size_t clause_counter;
 };

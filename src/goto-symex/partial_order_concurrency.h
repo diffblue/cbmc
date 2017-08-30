@@ -6,6 +6,9 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 \*******************************************************************/
 
+/// \file
+/// Add constraints to equation encoding partial orders on events
+
 #ifndef CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 #define CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 
@@ -24,13 +27,13 @@ public:
   typedef eventst::const_iterator event_it;
 
   // the name of a clock variable for a shared read/write
-  typedef enum
+  enum axiomt
   {
     AX_SC_PER_LOCATION=1,
     AX_NO_THINAIR=2,
     AX_OBSERVATION=4,
     AX_PROPAGATION=8
-  } axiomt;
+  };
 
   static irep_idt rw_clock_id(
     event_it e,
@@ -191,14 +194,14 @@ class partial_order_concurrencyt
 {
 public:
   // the is-acyclic checks
-  typedef enum
+  enum acyclict
   {
     AC_UNIPROC=0,
     AC_THINAIR=1,
     AC_GHB=2,
     AC_PPC_WS_FENCE=3,
     AC_N_AXIOMS=4
-  } acyclict;
+  };
 
   typedef abstract_eventt evtt;
   typedef std::map<evtt const*, std::map<evtt const*, exprt> > adj_matrixt;

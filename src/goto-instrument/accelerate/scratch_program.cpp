@@ -6,14 +6,17 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
+#include "scratch_program.h"
+
 #include <util/fixedbv.h>
 #include <util/decision_procedure.h>
 
 #include <goto-symex/slice.h>
 
 #include <goto-programs/remove_skip.h>
-
-#include "scratch_program.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -58,7 +61,7 @@ bool scratch_programt::check_sat(bool do_slice)
   std::cout << "Finished symex, invoking decision procedure.\n";
 #endif
 
-  return (checker->dec_solve()==decision_proceduret::D_SATISFIABLE);
+  return (checker->dec_solve()==decision_proceduret::resultt::D_SATISFIABLE);
 }
 
 exprt scratch_programt::eval(const exprt &e)

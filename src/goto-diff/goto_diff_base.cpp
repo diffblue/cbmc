@@ -6,30 +6,21 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
-#include <util/json_expr.h>
+/// \file
+/// GOTO-DIFF Base Class
 
 #include "goto_diff.h"
 
-/*******************************************************************\
-
-Function: goto_difft::output_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/json_expr.h>
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
 {
   switch(ui)
   {
-    case ui_message_handlert::PLAIN:
+    case ui_message_handlert::uit::PLAIN:
     {
       out << "total number of functions: " << total_functions_count << "\n";
-      out << "new functions: \n";
+      out << "new functions:\n";
       for(irep_id_sett::const_iterator it=new_functions.begin();
           it!=new_functions.end(); ++it)
       {
@@ -40,7 +31,7 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "modified functions: \n";
+      out << "modified functions:\n";
       for(irep_id_sett::const_iterator it=modified_functions.begin();
           it!=modified_functions.end(); ++it)
       {
@@ -51,19 +42,19 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
           << ": " << *it << "\n";
       }
 
-      out << "deleted functions: \n";
+      out << "deleted functions:\n";
       for(irep_id_sett::const_iterator it=deleted_functions.begin();
           it!=deleted_functions.end(); ++it)
       {
         const goto_programt &program=
-          goto_model2.goto_functions.function_map.at(*it).body;
+          goto_model1.goto_functions.function_map.at(*it).body;
         out << "  "
           << program.instructions.begin()->source_location.get_file()
           << ": " << *it << "\n";
       }
       break;
     }
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
     {
       json_objectt json_result;
       json_result["totalNumberOfFunctions"]=
@@ -77,25 +68,13 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
       out << ",\n" << json_result;
       break;
     }
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
     {
       out << "not supported yet";
     }
   }
   return out;
 }
-
-/*******************************************************************\
-
-Function: goto_difft::convert_function_group
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_difft::convert_function_group(
   json_arrayt &result,
@@ -107,18 +86,6 @@ void goto_difft::convert_function_group(
     convert_function(result.push_back(jsont()).make_object(), *it);
   }
 }
-
-/*******************************************************************\
-
-Function: goto_difft::convert_functions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_difft::convert_function(
   json_objectt &result,

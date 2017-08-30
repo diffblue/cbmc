@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_LANGAPI_LANGUAGE_UI_H
 #define CPROVER_LANGAPI_LANGUAGE_UI_H
 
@@ -48,10 +49,9 @@ public:
     return ui_message_handler.get_ui();
   }
 
-  ui_message_handlert &ui_message_handler;
-
 protected:
   const cmdlinet &_cmdline;
+  ui_message_handlert &ui_message_handler;
   bool generate_start_function;
 };
 

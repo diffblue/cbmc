@@ -6,22 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <util/std_types.h>
-#include <util/std_code.h>
+/// \file
+/// Destructor Calls
 
 #include "destructor.h"
 
-/*******************************************************************\
-
-Function: get_destructor
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/std_types.h>
+#include <util/std_code.h>
 
 code_function_callt get_destructor(
   const namespacet &ns,

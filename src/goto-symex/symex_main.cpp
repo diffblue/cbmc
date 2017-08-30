@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbolic Execution
+
+#include "goto_symex.h"
+
 #include <cassert>
 
 #include <util/std_expr.h>
@@ -15,37 +20,35 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
-#include "goto_symex.h"
+void goto_symext::symex_transition(
+  statet &state,
+  goto_programt::const_targett to,
+  bool is_backwards_goto)
+{
+  if(!state.call_stack().empty())
+  {
+    // initialize the loop counter of any loop we are newly entering
+    // upon this transition; we are entering a loop if
+    // 1. the transition from state.source.pc to "to" is not a backwards goto
+    // or
+    // 2. we are arriving from an outer loop
+    statet::framet &frame=state.top();
+    const goto_programt::instructiont &instruction=*to;
+    for(const auto &i_e : instruction.incoming_edges)
+      if(i_e->is_goto() && i_e->is_backwards_goto() &&
+         (!is_backwards_goto ||
+          state.source.pc->location_number>i_e->location_number))
+        frame.loop_iterations[goto_programt::loop_id(i_e)].count=0;
+  }
 
-/*******************************************************************\
-
-Function: goto_symext::new_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+  state.source.pc=to;
+}
 
 void goto_symext::new_name(symbolt &symbol)
 {
   get_new_name(symbol, ns);
   new_symbol_table.add(symbol);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::vcc
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::vcc(
   const exprt &vcc_expr,
@@ -73,18 +76,6 @@ void goto_symext::vcc(
   remaining_vccs++;
   target.assertion(state.guard.as_expr(), expr, msg, state.source);
 }
-
-/*******************************************************************\
-
-Function: goto_symext::symex_assume
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_symext::symex_assume(statet &state, const exprt &cond)
 {
@@ -115,18 +106,6 @@ void goto_symext::symex_assume(statet &state, const exprt &cond)
     symex_atomic_end(state);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::rewrite_quantifiers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
 {
   if(expr.id()==ID_forall)
@@ -143,18 +122,7 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
   }
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex from given state
-
-\*******************************************************************/
-
+/// symex from given state
 void goto_symext::operator()(
   statet &state,
   const goto_functionst &goto_functions,
@@ -170,6 +138,8 @@ void goto_symext::operator()(
   state.symex_target=&target;
   state.dirty=new dirtyt(goto_functions);
 
+  symex_transition(state, state.source.pc);
+
   assert(state.top().end_of_function->is_end_function());
 
   while(!state.call_stack().empty())
@@ -181,27 +151,17 @@ void goto_symext::operator()(
        state.source.thread_nr+1<state.threads.size())
     {
       unsigned t=state.source.thread_nr+1;
-      // std::cout << "********* Now executing thread " << t << std::endl;
+      // std::cout << "********* Now executing thread " << t << '\n';
       state.switch_to_thread(t);
+      symex_transition(state, state.source.pc);
     }
   }
 
   delete state.dirty;
-  state.dirty=0;
+  state.dirty=nullptr;
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex starting from given program
-
-\*******************************************************************/
-
+/// symex starting from given program
 void goto_symext::operator()(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
@@ -210,18 +170,7 @@ void goto_symext::operator()(
   operator() (state, goto_functions, goto_program);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::operator()
-
-  Inputs:
-
- Outputs:
-
- Purpose: symex from entry point
-
-\*******************************************************************/
-
+/// symex from entry point
 void goto_symext::operator()(const goto_functionst &goto_functions)
 {
   goto_functionst::function_mapt::const_iterator it=
@@ -235,18 +184,7 @@ void goto_symext::operator()(const goto_functionst &goto_functions)
   operator()(goto_functions, body);
 }
 
-/*******************************************************************\
-
-Function: goto_symext::symex_step
-
-  Inputs:
-
- Outputs:
-
- Purpose: do just one step
-
-\*******************************************************************/
-
+/// do just one step
 void goto_symext::symex_step(
   const goto_functionst &goto_functions,
   statet &state)
@@ -279,20 +217,20 @@ void goto_symext::symex_step(
   case SKIP:
     if(!state.guard.is_false())
       target.location(state.guard.as_expr(), state.source);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case END_FUNCTION:
     // do even if state.guard.is_false() to clear out frame created
     // in symex_start_thread
     symex_end_of_function(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case LOCATION:
     if(!state.guard.is_false())
       target.location(state.guard.as_expr(), state.source);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case GOTO:
@@ -308,7 +246,7 @@ void goto_symext::symex_step(
       symex_assume(state, tmp);
     }
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case ASSERT:
@@ -322,21 +260,21 @@ void goto_symext::symex_step(
       vcc(tmp, msg, state);
     }
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case RETURN:
     if(!state.guard.is_false())
       return_assignment(state);
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case ASSIGN:
     if(!state.guard.is_false())
       symex_assign_rec(state, to_code_assign(instruction.code));
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case FUNCTION_CALL:
@@ -356,58 +294,58 @@ void goto_symext::symex_step(
       symex_function_call(goto_functions, state, deref_code);
     }
     else
-      state.source.pc++;
+      symex_transition(state);
     break;
 
   case OTHER:
     if(!state.guard.is_false())
       symex_other(goto_functions, state);
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case DECL:
     if(!state.guard.is_false())
       symex_decl(state);
 
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case DEAD:
     symex_dead(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case START_THREAD:
     symex_start_thread(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case END_THREAD:
     // behaves like assume(0);
     if(!state.guard.is_false())
       state.guard.add(false_exprt());
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case ATOMIC_BEGIN:
     symex_atomic_begin(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case ATOMIC_END:
     symex_atomic_end(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case CATCH:
     symex_catch(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case THROW:
     symex_throw(state);
-    state.source.pc++;
+    symex_transition(state);
     break;
 
   case NO_INSTRUCTION_TYPE:

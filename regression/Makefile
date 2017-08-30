@@ -1,4 +1,3 @@
-
 DIRS = ansi-c \
        cbmc \
        cpp \
@@ -6,9 +5,18 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-instrument \
        goto-instrument-typedef \
+       goto-diff \
+       invariants \
        test-script \
        # Empty last line
 
 
 test:
 	$(foreach var,$(DIRS), $(MAKE) -C $(var) test || exit 1;)
+
+clean:
+	@for dir in *; do \
+		if [ -d "$$dir" ]; then \
+			$(MAKE) -C "$$dir" clean; \
+		fi; \
+	done;

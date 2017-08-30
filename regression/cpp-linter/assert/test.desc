@@ -1,0 +1,6 @@
+CORE
+main.cpp
+
+^main\.cpp:8:  assert is deprecated, use INVARIANT instead  \[build/deprecated\] \[4\]
+^Total errors found: 1$
+^SIGNAL=0$

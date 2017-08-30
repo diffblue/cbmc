@@ -6,9 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <ostream>
-
 #include "threeval.h"
+
+#include <ostream>
 
 const char *tvt::to_string() const
 {

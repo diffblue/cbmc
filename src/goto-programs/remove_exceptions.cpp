@@ -8,6 +8,11 @@ Date:   December 2016
 
 \*******************************************************************/
 
+/// \file
+/// Remove exception handling
+
+#include "remove_exceptions.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -15,10 +20,9 @@ Date:   December 2016
 #include <stack>
 #include <algorithm>
 
+#include <util/c_types.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
-
-#include "remove_exceptions.h"
 
 class remove_exceptionst
 {
@@ -61,19 +65,8 @@ protected:
     const goto_functionst::function_mapt::iterator &);
 };
 
-/*******************************************************************\
-
-Function: remove_exceptionst::add_exceptional_returns
-
-Inputs:
-
-Outputs:
-
-Purpose: adds exceptional return variables for every function that
-         may escape exceptions
-
-\*******************************************************************/
-
+/// adds exceptional return variables for every function that may escape
+/// exceptions
 void remove_exceptionst::add_exceptional_returns(
   const goto_functionst::function_mapt::iterator &func_it)
 {
@@ -116,12 +109,12 @@ void remove_exceptionst::add_exceptional_returns(
     new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
     new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
     new_symbol.mode=function_symbol.mode;
-    new_symbol.type=typet(ID_pointer, empty_typet());
+    new_symbol.type=pointer_type(empty_typet());
     symbol_table.add(new_symbol);
 
     // initialize the exceptional return with NULL
     symbol_exprt lhs_expr_null=new_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
     goto_programt::targett t_null=
       goto_program.insert_before(goto_program.instructions.begin());
     t_null->make_assignment();
@@ -134,19 +127,8 @@ void remove_exceptionst::add_exceptional_returns(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_exceptionst::instrument_exception_handler
-
-Inputs:
-
-Outputs:
-
-Purpose: at the beginning of each handler in function f 
-         adds exc=f#exception_value; f#exception_value=NULL;
-
-\*******************************************************************/
-
+/// at the beginning of each handler in function f  adds exc=f#exception_value;
+/// f#exception_value=NULL;
 void remove_exceptionst::instrument_exception_handler(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it)
@@ -165,7 +147,7 @@ void remove_exceptionst::instrument_exception_handler(
       symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
     // next we reset the exceptional return to NULL
     symbol_exprt lhs_expr_null=function_symbol.symbol_expr();
-    null_pointer_exprt rhs_expr_null((pointer_typet(empty_typet())));
+    null_pointer_exprt rhs_expr_null(pointer_type(empty_typet()));
 
     // add the assignment
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
@@ -190,19 +172,8 @@ void remove_exceptionst::instrument_exception_handler(
   instr_it->make_skip();
 }
 
-/*******************************************************************\
-
-Function: remove_exceptionst::instrument_throw
-
-Inputs:
-
-Outputs:
-
-Purpose: instruments each throw with conditional GOTOS to the 
-         corresponding exception handlers
-
-\*******************************************************************/
-
+/// instruments each throw with conditional GOTOS to the  corresponding
+/// exception handlers
 void remove_exceptionst::instrument_throw(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
@@ -281,19 +252,8 @@ void remove_exceptionst::instrument_throw(
   instr_it->code=assignment;
 }
 
-/*******************************************************************\
-
-Function: remove_exceptionst::instrument_function_call
-
-Inputs:
-
-Outputs:
-
-Purpose: instruments each function call that may escape exceptions
-         with conditional GOTOS to the corresponding exception handlers
-
-\*******************************************************************/
-
+/// instruments each function call that may escape exceptions with conditional
+/// GOTOS to the corresponding exception handlers
 void remove_exceptionst::instrument_function_call(
   const goto_functionst::function_mapt::iterator &func_it,
   const goto_programt::instructionst::iterator &instr_it,
@@ -367,7 +327,7 @@ void remove_exceptionst::instrument_function_call(
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(
       callee_exc,
-      null_pointer_exprt(pointer_typet(empty_typet())));
+      null_pointer_exprt(pointer_type(empty_typet())));
     goto_programt::targett t_null=goto_program.insert_after(instr_it);
     t_null->make_goto(next_it);
     t_null->source_location=instr_it->source_location;
@@ -388,20 +348,9 @@ void remove_exceptionst::instrument_function_call(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_exceptionst::instrument_exceptions
-
-Inputs:
-
-Outputs:
-
-Purpose: instruments throws, function calls that may escape exceptions
-         and exception handlers. Additionally, it re-computes
-         the live-range of local variables in order to add DEAD instructions.
-
-\*******************************************************************/
-
+/// instruments throws, function calls that may escape exceptions and exception
+/// handlers. Additionally, it re-computes the live-range of local variables in
+/// order to add DEAD instructions.
 void remove_exceptionst::instrument_exceptions(
   const goto_functionst::function_mapt::iterator &func_it)
 {
@@ -438,7 +387,7 @@ void remove_exceptionst::instrument_exceptions(
         else
         {
 #ifdef DEBUG
-          std::cout << "Remove exceptions: empty stack" << std::endl;
+          std::cout << "Remove exceptions: empty stack\n";
 #endif
         }
       }
@@ -484,18 +433,6 @@ void remove_exceptionst::instrument_exceptions(
   }
 }
 
-/*******************************************************************\
-
-Function: remove_exceptionst::operator()
-
-Inputs:
-
-Outputs:
-
-Purpose:
-
-\*******************************************************************/
-
 void remove_exceptionst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
@@ -504,18 +441,7 @@ void remove_exceptionst::operator()(goto_functionst &goto_functions)
     instrument_exceptions(it);
 }
 
-/*******************************************************************\
-
-Function: remove_exceptions
-
-Inputs:
-
-Outputs:
-
-Purpose: removes throws/CATCH-POP/CATCH-PUSH
-
-\*******************************************************************/
-
+/// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
@@ -524,18 +450,7 @@ void remove_exceptions(
   remove_exceptions(goto_functions);
 }
 
-/*******************************************************************\
-
-Function: remove_exceptions
-
-Inputs:
-
-Outputs:
-
-Purpose: removes throws/CATCH-POP/CATCH-PUSH
-
-\*******************************************************************/
-
+/// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(goto_modelt &goto_model)
 {
   remove_exceptionst remove_exceptions(goto_model.symbol_table);

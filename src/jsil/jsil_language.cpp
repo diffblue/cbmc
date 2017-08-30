@@ -6,6 +6,11 @@ Author: Michael Tautschnig, tautschn@amazon.com
 
 \*******************************************************************/
 
+/// \file
+/// Jsil Language
+
+#include "jsil_language.h"
+
 #include <util/symbol_table.h>
 #include <util/get_base_name.h>
 
@@ -17,54 +22,17 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #include "jsil_parser.h"
 #include "jsil_typecheck.h"
 
-#include "jsil_language.h"
-
-/*******************************************************************\
-
-Function: jsil_languaget::extensions
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::set<std::string> jsil_languaget::extensions() const
 {
   return { "jsil" };
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::modules_provided
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void jsil_languaget::modules_provided(std::set<std::string> &modules)
 {
   modules.insert(get_base_name(parse_path, true));
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::interfaces
-
-  Inputs:
-
- Outputs:
-
- Purpose: Adding symbols for all procedure declarations
-
-\*******************************************************************/
-
+/// Adding symbols for all procedure declarations
 bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
 {
   if(jsil_convert(parse_tree, symbol_table, get_message_handler()))
@@ -74,18 +42,6 @@ bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
   return false;
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::preprocess
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool jsil_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
@@ -94,18 +50,6 @@ bool jsil_languaget::preprocess(
   // there is no preprocessing!
   return true;
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_languaget::parse(
   std::istream &instream,
@@ -132,18 +76,7 @@ bool jsil_languaget::parse(
   return result;
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose: Converting from parse tree and type checking.
-
-\*******************************************************************/
-
+/// Converting from parse tree and type checking.
 bool jsil_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
@@ -153,18 +86,6 @@ bool jsil_languaget::typecheck(
 
   return false;
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::final
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_languaget::final(
   symbol_tablet &symbol_table,
@@ -181,51 +102,15 @@ bool jsil_languaget::final(
   return false;
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::show_parse
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void jsil_languaget::show_parse(std::ostream &out)
 {
   parse_tree.output(out);
 }
 
-/*******************************************************************\
-
-Function: new_jsil_language
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 languaget *new_jsil_language()
 {
   return new jsil_languaget;
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::from_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_languaget::from_expr(
   const exprt &expr,
@@ -236,18 +121,6 @@ bool jsil_languaget::from_expr(
   return false;
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::from_type
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool jsil_languaget::from_type(
   const typet &type,
   std::string &code,
@@ -257,35 +130,11 @@ bool jsil_languaget::from_type(
   return false;
 }
 
-/*******************************************************************\
-
-Function: jsil_languaget::get_pretty_printer
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::unique_ptr<pretty_printert>
 jsil_languaget::get_pretty_printer(const namespacet &ns)
 {
   return std::unique_ptr<pretty_printert>(new expr2jsilt(ns));
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::to_expr
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool jsil_languaget::to_expr(
   const std::string &code,
@@ -330,18 +179,6 @@ bool jsil_languaget::to_expr(
 
   return result;
 }
-
-/*******************************************************************\
-
-Function: jsil_languaget::~jsil_languaget
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 jsil_languaget::~jsil_languaget()
 {

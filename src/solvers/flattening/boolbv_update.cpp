@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
@@ -13,21 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/pointer_offset_size.h>
 
-#include <ansi-c/c_types.h>
-
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_update
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/c_types.h>
 
 bvt boolbvt::convert_update(const exprt &expr)
 {
@@ -52,18 +40,6 @@ bvt boolbvt::convert_update(const exprt &expr)
 
   return bv;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::convert_update_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbvt::convert_update_rec(
   const exprt::operandst &designators,

@@ -6,16 +6,25 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
-#include <utility>
-#include <iostream>
+/// \file
+/// Loop Acceleration
 
 #include "trace_automaton.h"
+
+#include <utility>
+#include <iostream>
+#include <limits>
+
+#include <util/invariant.h>
+
 #include "path.h"
+
+const statet automatont::no_state=std::numeric_limits<statet>::max();
 
 void trace_automatont::build()
 {
 #ifdef DEBUG
-  std::cout << "NTA:" << std::endl;
+  std::cout << "NTA:\n";
   nta.output(std::cout);
 #endif
 
@@ -23,7 +32,7 @@ void trace_automatont::build()
   // minimise();
 
 #ifdef DEBUG
-  std::cout << "DTA:" << std::endl;
+  std::cout << "DTA:\n";
   dta.output(std::cout);
 #endif
 }
@@ -90,9 +99,9 @@ void trace_automatont::add_path(patht &path)
   }
 
 #ifdef DEBUG
-  std::cout << std::endl;
+  std::cout << '\n';
 
-  std::cout << "Final state: " << state << std::endl;
+  std::cout << "Final state: " << state << '\n';
 #endif
 
   nta.set_accepting(state);
@@ -130,7 +139,9 @@ void trace_automatont::determinise()
   {
     state_sett t;
     pop_unmarked_dstate(t);
-    assert(find_dstate(t)!=no_state);
+    INVARIANT(
+      find_dstate(t)!=automatont::no_state,
+      "Removed state has actually been removed");
 
 
     // For each symbol a such that there is a transition
@@ -163,7 +174,7 @@ void trace_automatont::determinise()
 #ifdef DEBUG
   std::cout << "Produced DTA with " << dta.num_states << " states and "
             << dta.accept_states.size() << " accept states and "
-            << dta.count_transitions() << " transitions" << std::endl;
+            << dta.count_transitions() << " transitions\n";
 #endif
 }
 
@@ -221,7 +232,7 @@ statet trace_automatont::add_dstate(state_sett &s)
 {
   statet state_num=find_dstate(s);
 
-  if(state_num!=no_state)
+  if(state_num!=automatont::no_state)
   {
     // We've added this state before.  Don't need to do it again.
     return state_num;
@@ -230,8 +241,9 @@ statet trace_automatont::add_dstate(state_sett &s)
   state_num=dta.add_state();
   dstates[s]=state_num;
   unmarked_dstates.push_back(s);
-
-  assert(dstates.find(s)!=dstates.end());
+  INVARIANT(
+    dstates.find(s)!=dstates.end(),
+    "Added state has actually been added");
 
   for(state_sett::iterator it=s.begin();
       it!=s.end();
@@ -242,7 +254,7 @@ statet trace_automatont::add_dstate(state_sett &s)
 #ifdef DEBUG
       std::cout << "NTA state " << *it
                 << " is accepting, so accepting DTA state "
-                << state_num << std::endl;
+                << state_num << '\n';
 #endif
 
       dta.set_accepting(state_num);
@@ -259,7 +271,7 @@ statet trace_automatont::find_dstate(state_sett &s)
 
   if(it==dstates.end())
   {
-    return no_state;
+    return automatont::no_state;
   }
   else
   {
@@ -283,7 +295,7 @@ statet automatont::add_state()
  */
 void automatont::add_trans(statet s, goto_programt::targett a, statet t)
 {
-  assert(s < transitions.size());
+  PRECONDITION(s<transitions.size());
   transitionst &trans=transitions[s];
 
   trans.insert(std::make_pair(a, t));
@@ -298,17 +310,17 @@ void trace_automatont::add_dtrans(
   state_sett &t)
 {
   statet sidx=find_dstate(s);
-  statet tidx=find_dstate(t);
+  CHECK_RETURN(sidx!=automatont::no_state);
 
-  assert(sidx!=no_state);
-  assert(tidx!=no_state);
+  statet tidx=find_dstate(t);
+  CHECK_RETURN(tidx!=automatont::no_state);
 
   dta.add_trans(sidx, a, tidx);
 }
 
 void automatont::move(statet s, goto_programt::targett a, state_sett &t)
 {
-  assert(s < transitions.size());
+  PRECONDITION(s<transitions.size());
 
   transitionst &trans=transitions[s];
 
@@ -335,7 +347,7 @@ void trace_automatont::get_transitions(sym_mapt &transitions)
 {
   automatont::transition_tablet &dtrans=dta.transitions;
 
-  for(std::size_t i=0; i < dtrans.size(); ++i)
+  for(std::size_t i=0; i<dtrans.size(); ++i)
   {
     automatont::transitionst &dta_transitions=dtrans[i];
 
@@ -358,12 +370,12 @@ void automatont::reverse(goto_programt::targett epsilon)
 
   old_table.swap(transitions);
 
-  for(std::size_t i=0; i < old_table.size(); i++)
+  for(std::size_t i=0; i<old_table.size(); i++)
   {
     transitions.push_back(transitionst());
   }
 
-  if(accept_states.size()==0)
+  if(accept_states.empty())
   {
     num_states=0;
     return;
@@ -385,14 +397,14 @@ void automatont::reverse(goto_programt::targett epsilon)
   std::cout << "Reversing automaton, old init=" << init_state
             << ", new init=" << new_init << ", old accept="
             << *(accept_states.begin()) << '/' << accept_states.size()
-            << " new accept=" << init_state << std::endl;
+            << " new accept=" << init_state << '\n';
 
   accept_states.clear();
   set_accepting(init_state);
 
   init_state=new_init;
 
-  for(std::size_t i=0; i < old_table.size(); i++)
+  for(std::size_t i=0; i<old_table.size(); i++)
   {
     transitionst &trans=old_table[i];
 
@@ -440,7 +452,7 @@ void automatont::trim()
   }
   while(!new_states.empty());
 
-  for(std::size_t i=0; i < num_states; i++)
+  for(std::size_t i=0; i<num_states; i++)
   {
     if(reachable.find(i)==reachable.end())
     {
@@ -463,23 +475,23 @@ void trace_automatont::minimise()
 
 void automatont::output(std::ostream &str)
 {
-  str << "Init: " << init_state << std::endl;
+  str << "Init: " << init_state << '\n';
 
   str << "Accept states: ";
 
   for(const auto &state : accept_states)
     str << state << ' ';
 
-  str << std::endl;
+  str << '\n';
 
-  for(unsigned int i=0; i < transitions.size(); ++i)
+  for(unsigned int i=0; i<transitions.size(); ++i)
   {
     for(const auto &trans : transitions[i])
     {
       goto_programt::targett l=trans.first;
       statet j=trans.second;
 
-      str << i << " -- " << l->location_number << " --> " << j << std::endl;
+      str << i << " -- " << l->location_number << " --> " << j << '\n';
     }
   }
 }

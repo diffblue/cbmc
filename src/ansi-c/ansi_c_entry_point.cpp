@@ -6,6 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ansi_c_entry_point.h"
+
 #include <cassert>
 #include <cstdlib>
 
@@ -17,26 +19,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
-#include <ansi-c/c_types.h>
+#include <util/c_types.h>
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/goto_functions.h>
 #include <linking/static_lifetime_init.h>
 
-#include "ansi_c_entry_point.h"
 #include "c_nondet_symbol_factory.h"
-
-/*******************************************************************\
-
-Function: build_function_environment
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
@@ -67,18 +56,6 @@ exprt::operandst build_function_environment(
 
   return main_arguments;
 }
-
-/*******************************************************************\
-
-Function: record_function_outputs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void record_function_outputs(
   const symbolt &function,
@@ -140,18 +117,6 @@ void record_function_outputs(
   }
   #endif
 }
-
-/*******************************************************************\
-
-Function: ansi_c_entry_point
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
@@ -362,16 +327,13 @@ bool ansi_c_entry_point(
         zero_string.type().set(ID_size, "infinity");
         exprt index(ID_index, char_type());
         index.copy_to_operands(zero_string, from_integer(0, uint_type()));
-        exprt address_of("address_of", pointer_typet());
-        address_of.type().subtype()=char_type();
-        address_of.copy_to_operands(index);
+        exprt address_of=address_of_exprt(index, pointer_type(char_type()));
 
         if(argv_symbol.type.subtype()!=address_of.type())
           address_of.make_typecast(argv_symbol.type.subtype());
 
         // assign argv[*] to the address of a string-object
-        exprt array_of("array_of", argv_symbol.type);
-        array_of.copy_to_operands(address_of);
+        array_of_exprt array_of(address_of, argv_symbol.type);
 
         init_code.copy_to_operands(
           code_assignt(argv_symbol.symbol_expr(), array_of));
@@ -435,17 +397,18 @@ bool ansi_c_entry_point(
 
         {
           const exprt &arg1=parameters[1];
+          const pointer_typet &pointer_type=
+            to_pointer_type(arg1.type());
 
-          exprt index_expr(ID_index, arg1.type().subtype());
-          index_expr.copy_to_operands(
+          index_exprt index_expr(
             argv_symbol.symbol_expr(),
-            from_integer(0, index_type()));
+            from_integer(0, index_type()),
+            pointer_type.subtype());
 
           // disable bounds check on that one
           index_expr.set("bounds_check", false);
 
-          op1=exprt(ID_address_of, arg1.type());
-          op1.move_to_operands(index_expr);
+          op1=address_of_exprt(index_expr, pointer_type);
         }
 
         // do we need envp?
@@ -455,13 +418,15 @@ bool ansi_c_entry_point(
           exprt &op2=operands[2];
 
           const exprt &arg2=parameters[2];
+          const pointer_typet &pointer_type=
+            to_pointer_type(arg2.type());
 
-          exprt index_expr(ID_index, arg2.type().subtype());
-          index_expr.copy_to_operands(
-            envp_symbol.symbol_expr(), from_integer(0, index_type()));
+          index_exprt index_expr(
+            envp_symbol.symbol_expr(),
+            from_integer(0, index_type()),
+            pointer_type.subtype());
 
-          op2=exprt(ID_address_of, arg2.type());
-          op2.move_to_operands(index_expr);
+          op2=address_of_exprt(index_expr, pointer_type);
         }
       }
     }

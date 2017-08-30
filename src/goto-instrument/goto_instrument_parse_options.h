@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Command Line Parsing
+
 #ifndef CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 #define CPROVER_GOTO_INSTRUMENT_GOTO_INSTRUMENT_PARSE_OPTIONS_H
 
@@ -23,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
-  "(dump-c)(dump-cpp)(use-system-headers)(dot)(xml)" \
+  "(dump-c)(dump-cpp)(no-system-headers)(use-all-headers)(dot)(xml)" \
   OPT_GOTO_CHECK \
   /* no-X-check are deprecated and ignored */ \
   "(no-bounds-check)(no-pointer-check)(no-div-by-zero-check)" \
@@ -57,6 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
+  "(print-internal-representation)" \
   "(remove-function-pointers)" \
   "(show-claims)(show-properties)(property):" \
   "(show-symbol-table)(show-points-to)(show-rw-set)" \
@@ -72,7 +76,8 @@ Author: Daniel Kroening, kroening@kroening.com
   "(z3)(add-library)(show-dependence-graph)" \
   "(horn)(skip-loops):(apply-code-contracts)(model-argc-argv):" \
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
-  "(undefined-function-is-assume-false)"
+  "(undefined-function-is-assume-false)" \
+  "(remove-function-body):"
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,

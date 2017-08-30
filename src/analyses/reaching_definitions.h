@@ -9,9 +9,14 @@ Date: February 2013
 
 \*******************************************************************/
 
+/// \file
+/// Range-based reaching definitions analysis (following Field- Sensitive
+///   Program Dependence Analysis, Litvak et al., FSE 2010)
+
 #ifndef CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 #define CPROVER_ANALYSES_REACHING_DEFINITIONS_H
 
+#include <util/base_exceptions.h>
 #include <util/threeval.h>
 
 #include "ai.h"
@@ -98,7 +103,7 @@ public:
   rd_range_domaint():
     ai_domain_baset(),
     has_values(false),
-    bv_container(0)
+    bv_container(nullptr)
   {
   }
 
@@ -143,7 +148,7 @@ public:
     make_top();
   }
 
-  // returns true iff there is s.th. new
+  // returns true iff there is something new
   bool merge(
     const rd_range_domaint &other,
     locationt from,
@@ -239,9 +244,9 @@ public:
   explicit reaching_definitions_analysist(const namespacet &_ns):
     concurrency_aware_ait<rd_range_domaint>(),
     ns(_ns),
-    value_sets(0),
-    is_threaded(0),
-    is_dirty(0)
+    value_sets(nullptr),
+    is_threaded(nullptr),
+    is_dirty(nullptr)
   {
   }
 
@@ -255,7 +260,10 @@ public:
     statet &s=concurrency_aware_ait<rd_range_domaint>::get_state(l);
 
     rd_range_domaint *rd_state=dynamic_cast<rd_range_domaint*>(&s);
-    assert(rd_state!=0);
+    INVARIANT_STRUCTURED(
+      rd_state!=nullptr,
+      bad_cast_exceptiont,
+      "rd_state has type rd_range_domaint");
 
     rd_state->set_bitvector_container(*this);
 

@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// A Template Class for Graphs
+
 #ifndef CPROVER_UTIL_GRAPH_H
 #define CPROVER_UTIL_GRAPH_H
 
@@ -16,11 +19,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ostream>
 #include <cassert>
 #include <algorithm>
+#include <queue>
+
+#include "invariant.h"
 
 class empty_edget
 {
 };
 
+/// This class represents a node in a directed graph.
+/// See \ref grapht for more information.
 template<class E=empty_edget>
 class graph_nodet
 {
@@ -53,7 +61,7 @@ public:
   }
 };
 
-// a node type with an exta bit
+/// A node type with an extra bit
 template<class E>
 class visited_nodet:public graph_nodet<E>
 {
@@ -68,8 +76,7 @@ public:
   }
 };
 
-// compute intersection of two edge sets,
-// in linear time
+/// Compute intersection of two edge sets, in linear time
 template<class E>
 void intersection(
   const typename graph_nodet<E>::edgest &a,
@@ -95,7 +102,32 @@ void intersection(
   }
 }
 
-// a generic graph class with a parametric node type
+/// A generic directed graph with a parametric node type.
+///
+/// The nodes of the graph are stored in the only field of the class, a
+/// std::vector named `nodes`. Nodes are instances of class graph_nodet<E> or a
+/// subclass of it. Graph edges contain a payload object of parametric type E
+/// (which has to be default-constructible).  By default E is instantiated with
+/// an empty class (empty_edget).
+///
+/// Each node is identified by its offset inside the `nodes` vector. The
+/// incoming and outgoing edges of a node are stored as std::maps in the fields
+/// `in` and `out` of the graph_nodet<E>. These maps associate a node identifier
+/// (the offset) to the edge payload (of type E).
+///
+/// In fact, observe that two instances of E are stored per edge of the graph.
+/// For instance, assume that we want to create a graph with two nodes, A and B,
+/// and one edge from A to B, labelled by object e. We achieve this by inserting
+/// the pair (offsetof(B),e) in the map `A.out` and the pair (offsetof(A),e) in
+/// the map `B.in`.
+///
+/// Nodes are inserted in the graph using grapht::add_node(), which returns the
+/// identifier (offset) of the inserted node. Edges between nodes are created
+/// by grapht::add_edge(a,b), where `a` and `b` are the identifiers of nodes.
+/// Method `add_edges` adds a default-constructed payload object of type E.
+/// Adding a payload objet `e` to an edge seems to be only possibly by manually
+/// inserting `e` in the std::maps `in` and `out` of the two nodes associated to
+/// the edge.
 template<class N=graph_nodet<empty_edget> >
 class grapht
 {
@@ -145,6 +177,11 @@ public:
   std::size_t size() const
   {
     return nodes.size();
+  }
+
+  bool empty() const
+  {
+    return nodes.empty();
   }
 
   const edgest &in(node_indext n) const
@@ -218,6 +255,13 @@ public:
   // return value: number of SCCs
   std::size_t SCCs(std::vector<node_indext> &subgraph_nr);
 
+  bool is_dag() const
+  {
+    return empty() || !topsort().empty();
+  }
+
+  std::list<node_indext> topsort() const;
+
   void output_dot(std::ostream &out) const;
   void output_dot_node(std::ostream &out, node_indext n) const;
 
@@ -255,18 +299,6 @@ protected:
     bool non_trivial) const;
 };
 
-/*******************************************************************\
-
-Function: grapht::add_undirected_edge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
 {
@@ -280,18 +312,6 @@ void grapht<N>::add_undirected_edge(node_indext a, node_indext b)
   nb.add_in(a);
 }
 
-/*******************************************************************\
-
-Function: grapht::remove_undirected_edge
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::remove_undirected_edge(node_indext a, node_indext b)
 {
@@ -302,18 +322,6 @@ void grapht<N>::remove_undirected_edge(node_indext a, node_indext b)
   na.in.erase(b);
   nb.in.erase(a);
 }
-
-/*******************************************************************\
-
-Function: grapht::remove_in_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::remove_in_edges(node_indext n)
@@ -330,18 +338,6 @@ void grapht<N>::remove_in_edges(node_indext n)
   node.in.clear();
 }
 
-/*******************************************************************\
-
-Function: grapht::remove_out_edges
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::remove_out_edges(node_indext n)
 {
@@ -356,18 +352,6 @@ void grapht<N>::remove_out_edges(node_indext n)
 
   node.out.clear();
 }
-
-/*******************************************************************\
-
-Function: grapht::shortest_path
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::shortest_path(
@@ -460,18 +444,6 @@ void grapht<N>::shortest_path(
   }
 }
 
-/*******************************************************************\
-
-Function: grapht::visit_reachable
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::visit_reachable(node_indext src)
 {
@@ -496,18 +468,6 @@ void grapht<N>::visit_reachable(node_indext src)
         s.push(it->first);
   }
 }
-
-/*******************************************************************\
-
-Function: grapht::connected_subgraphs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 std::size_t grapht<N>::connected_subgraphs(
@@ -554,18 +514,6 @@ std::size_t grapht<N>::connected_subgraphs(
   return nr;
 }
 
-/*******************************************************************\
-
-Function: grapht::tarjan
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 void grapht<N>::tarjan(tarjant &t, node_indext v)
 {
@@ -610,18 +558,6 @@ void grapht<N>::tarjan(tarjant &t, node_indext v)
   }
 }
 
-/*******************************************************************\
-
-Function: grapht::SCCs
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 template<class N>
 std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 {
@@ -633,18 +569,6 @@ std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
 
   return t.scc_count;
 }
-
-/*******************************************************************\
-
-Function: grapht::make_chordal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::make_chordal()
@@ -682,17 +606,51 @@ void grapht<N>::make_chordal()
   }
 }
 
-/*******************************************************************\
+/// Find a topological order of the nodes if graph is DAG, return empty list for
+/// non-DAG or empty graph. Uses Kahn's algorithm running in O(#edges+#nodes).
+template<class N>
+std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
+{
+  // list of topologically sorted nodes
+  std::list<node_indext> nodelist;
+  // queue of working set nodes with in-degree zero
+  std::queue<node_indext> indeg0_nodes;
+  // in-degree for each node
+  std::vector<size_t> in_deg(nodes.size(), 0);
 
-Function: grapht::output_dot
+  // abstract graph as in-degree of each node
+  for(node_indext idx=0; idx<nodes.size(); idx++)
+  {
+    in_deg[idx]=in(idx).size();
+    if(in_deg[idx]==0)
+      indeg0_nodes.push(idx);
+  }
 
-  Inputs:
+  while(!indeg0_nodes.empty())
+  {
+    node_indext source=indeg0_nodes.front();
+    indeg0_nodes.pop();
+    nodelist.push_back(source);
 
- Outputs:
+    for(const auto &edge : out(source))
+    {
+      const node_indext target=edge.first;
+      INVARIANT(in_deg[target]!=0, "in-degree of node cannot be zero here");
 
- Purpose:
+      // remove edge from graph, by decrementing the in-degree of target
+      // outgoing edges from source will not be traversed again
+      in_deg[target]--;
+      if(in_deg[target]==0)
+        indeg0_nodes.push(target);
+    }
+  }
 
-\*******************************************************************/
+  // if all nodes are sorted, the graph is acyclic
+  // return empty list in case of cyclic graph
+  if(nodelist.size()!=nodes.size())
+    nodelist.clear();
+  return nodelist;
+}
 
 template<class N>
 void grapht<N>::output_dot(std::ostream &out) const
@@ -700,18 +658,6 @@ void grapht<N>::output_dot(std::ostream &out) const
   for(node_indext n=0; n<nodes.size(); n++)
     output_dot_node(out, n);
 }
-
-/*******************************************************************\
-
-Function: grapht::output_dot_node
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 template<class N>
 void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const

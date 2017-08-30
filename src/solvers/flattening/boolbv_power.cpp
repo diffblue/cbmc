@@ -6,19 +6,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #include "boolbv.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_power
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_power(const binary_exprt &expr)
 {
@@ -40,7 +29,7 @@ bvt boolbvt::convert_power(const binary_exprt &expr)
       bv_utils.equal(op0, bv_utils.build_constant(2, op0.size()));
 
     bvt one=bv_utils.build_constant(1, width);
-    bvt shift=bv_utils.shift(one, bv_utilst::LEFT, op1);
+    bvt shift=bv_utils.shift(one, bv_utilst::shiftt::LEFT, op1);
 
     bvt nondet=prop.new_variables(width);
 

@@ -6,13 +6,16 @@ Author: Matt Lewis
 
 \*******************************************************************/
 
+/// \file
+/// Loop Acceleration
+
+#include "util.h"
+
 #include <iostream>
 #include <algorithm>
 
 #include <util/std_types.h>
 #include <util/config.h>
-
-#include "util.h"
 
 signedbv_typet signed_poly_type()
 {
@@ -45,9 +48,7 @@ bool is_signed(const typet &t)
 }
 
 
-/**
- * Conveniece function -- is the type unsigned?
- */
+/// Convenience function -- is the type unsigned?
 bool is_unsigned(const typet &t)
 {
   return t.id()==ID_bv ||
@@ -115,6 +116,6 @@ typet join_types(const typet &t1, const typet &t2)
 
   std::cerr << "Tried to join types: "
             << t1.pretty() << " and " << t2.pretty()
-            << std::endl;
+            << '\n';
   assert(!"Couldn't join types");
 }

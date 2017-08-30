@@ -6,24 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <algorithm>
-
 #include "simplify_utils.h"
 
-/*******************************************************************\
+#include <algorithm>
 
-Function: simplify_exprt::sort_operands
-
-  Inputs: operand list
-
- Outputs: modifies operand list
-          returns true iff nothing was changed
-
- Purpose: sort operands of an expression according to ordering
-          defined by operator<
-
-\*******************************************************************/
-
+/// sort operands of an expression according to ordering defined by operator<
+/// \par parameters: operand list
+/// \return modifies operand list returns true iff nothing was changed
 bool sort_operands(exprt::operandst &operands)
 {
   bool do_sort=false;
@@ -48,19 +37,7 @@ bool sort_operands(exprt::operandst &operands)
   return false;
 }
 
-/*******************************************************************\
-
-Function: sort_and_join
-
-  Inputs:
-
- Outputs:
-
- Purpose: produce canonical ordering for associative and commutative
-          binary operators
-
-\*******************************************************************/
-
+/// produce canonical ordering for associative and commutative binary operators
 // The entries
 //  { ID_plus,   ID_floatbv  },
 //  { ID_mult,   ID_floatbv  },
@@ -121,7 +98,7 @@ static bool sort_and_join(
   const struct saj_tablet &saj_entry,
   const irep_idt &type_id)
 {
-  for(unsigned i=0; saj_entry.type_ids[i]!=irep_idt(); i++)
+  for(unsigned i=0; !saj_entry.type_ids[i].empty(); i++)
     if(type_id==saj_entry.type_ids[i])
       return true;
 
@@ -134,25 +111,13 @@ static const struct saj_tablet &sort_and_join(
 {
   unsigned i=0;
 
-  for( ; saj_table[i].id!=irep_idt(); i++)
+  for( ; !saj_table[i].id.empty(); i++)
     if(id==saj_table[i].id &&
        sort_and_join(saj_table[i], type_id))
       return saj_table[i];
 
   return saj_table[i];
 }
-
-/*******************************************************************\
-
-Function: sort_and_join
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool sort_and_join(exprt &expr)
 {
@@ -163,7 +128,7 @@ bool sort_and_join(exprt &expr)
 
   const struct saj_tablet &saj_entry=
     sort_and_join(expr.id(), expr.type().id());
-  if(saj_entry.id==irep_idt())
+  if(saj_entry.id.empty())
     return true;
 
   // check operand types

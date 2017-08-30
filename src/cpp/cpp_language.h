@@ -6,18 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Module
+
 #ifndef CPROVER_CPP_CPP_LANGUAGE_H
 #define CPROVER_CPP_CPP_LANGUAGE_H
-
-/*! \defgroup gr_cpp C++ front-end */
 
 #include <util/language.h>
 
 #include "cpp_parse_tree.h"
 
-/*! \brief TO_BE_DOCUMENTED
-    \ingroup gr_cpp
-*/
 class cpp_languaget:public languaget
 {
 public:

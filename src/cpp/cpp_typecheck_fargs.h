@@ -6,12 +6,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #ifndef CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 #define CPROVER_CPP_CPP_TYPECHECK_FARGS_H
 
 #include <util/std_code.h>
 
 class cpp_typecheckt;
+class code_typet;
 
 class cpp_typecheck_fargst // for function overloading
 {

@@ -1,0 +1,8 @@
+CORE
+interproc1.class
+--taint taint.json
+^EXIT=0$
+^SIGNAL=0$
+^file interproc1.java line 13( function .*)?: There is a T1 flow \(taint rule my_h1\)$
+--
+^warning: ignoring

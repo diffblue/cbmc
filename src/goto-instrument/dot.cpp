@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as DOT Graph
+
+#include "dot.h"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -16,8 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
                           "compound=true;"\
                           "size=\"30,40\";"\
                           "ratio=compress;"
-
-#include "dot.h"
 
 class dott
 {
@@ -62,19 +65,10 @@ protected:
                  std::set<goto_programt::const_targett> &);
 };
 
-/*******************************************************************\
-
-Function: dott::write_dot_subgraph
-
-  Inputs: output stream, name and goto program
-
- Outputs: true on error, false otherwise
-
- Purpose: writes the dot graph that corresponds to the goto program
-          to the output stream.
-
-\*******************************************************************/
-
+/// writes the dot graph that corresponds to the goto program to the output
+/// stream.
+/// \par parameters: output stream, name and goto program
+/// \return true on error, false otherwise
 void dott::write_dot_subgraph(
   std::ostream &out,
   const std::string &name,
@@ -84,8 +78,8 @@ void dott::write_dot_subgraph(
   clusters.back().set("name", name);
   clusters.back().set("nr", subgraphscount);
 
-  out << "subgraph \"cluster_" << name << "\" {" << std::endl;
-  out << "label=\"" << name << "\";" << std::endl;
+  out << "subgraph \"cluster_" << name << "\" {\n";
+  out << "label=\"" << name << "\";\n";
 
   const goto_programt::instructionst &instructions =
     goto_program.instructions;
@@ -93,7 +87,7 @@ void dott::write_dot_subgraph(
   if(instructions.empty())
   {
     out << "Node_" << subgraphscount << "_0 " <<
-      "[shape=Mrecord,fontsize=22,label=\"?\"];" << std::endl;
+      "[shape=Mrecord,fontsize=22,label=\"?\"];\n";
   }
   else
   {
@@ -191,7 +185,7 @@ void dott::write_dot_subgraph(
         out <<"Mrecord";
       out << ",fontsize=22,label=\"";
       out << tmp.str();
-      out << "\"];" << std::endl;
+      out << "\"];\n";
 
       std::set<goto_programt::const_targett> tres;
       std::set<goto_programt::const_targett> fres;
@@ -222,21 +216,9 @@ void dott::write_dot_subgraph(
     }
   }
 
-  out << "}" << std::endl;
+  out << "}\n";
   subgraphscount++;
 }
-
-/*******************************************************************\
-
-Function: dott::do_dot_function_calls
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dott::do_dot_function_calls(
   std::ostream &out)
@@ -253,46 +235,33 @@ void dott::do_dot_function_calls(
       out << expr.op0().id() <<
         " -> " "Node_" << cit->get("nr") << "_0" <<
         " [lhead=\"cluster_" << expr.op1().get(ID_identifier) << "\"," <<
-        "color=blue];" << std::endl;
+        "color=blue];\n";
     }
     else
     {
       out << "subgraph \"cluster_" << expr.op1().get(ID_identifier) <<
-        "\" {" << std::endl;
-      out << "rank=sink;"<<std::endl;
-      out << "label=\"" << expr.op1().get(ID_identifier) << "\";" << std::endl;
+        "\" {\n";
+      out << "rank=sink;\n";
+      out << "label=\"" << expr.op1().get(ID_identifier) << "\";\n";
       out << "Node_" << subgraphscount << "_0 " <<
-        "[shape=Mrecord,fontsize=22,label=\"?\"];"
-          << std::endl;
-      out << "}" << std::endl;
+        "[shape=Mrecord,fontsize=22,label=\"?\"];\n";
+      out << "}\n";
       clusters.push_back(exprt("cluster"));
       clusters.back().set("name", expr.op1().get(ID_identifier));
       clusters.back().set("nr", subgraphscount);
       out << expr.op0().id() <<
         " -> " "Node_" << subgraphscount << "_0" <<
         " [lhead=\"cluster_" << expr.op1().get("identifier") << "\"," <<
-        "color=blue];" << std::endl;
+        "color=blue];\n";
       subgraphscount++;
     }
   }
 }
 
-/*******************************************************************\
-
-Function: dott::output
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void dott::output(std::ostream &out)
 {
-  out << "digraph G {" << std::endl;
-  out << DOTGRAPHSETTINGS << std::endl;
+  out << "digraph G {\n";
+  out << DOTGRAPHSETTINGS << '\n';
 
   std::list<exprt> clusters;
 
@@ -302,22 +271,12 @@ void dott::output(std::ostream &out)
 
   do_dot_function_calls(out);
 
-  out << "}" << std::endl;
+  out << "}\n";
 }
 
-/*******************************************************************\
-
-Function: dott::escape
-
-  Inputs: a string
-
- Outputs: the escaped string
-
- Purpose: escapes a string. beware, this might not work for all
-          kinds of strings.
-
-\*******************************************************************/
-
+/// escapes a string. beware, this might not work for all kinds of strings.
+/// \par parameters: a string
+/// \return the escaped string
 std::string &dott::escape(std::string &str)
 {
   for(std::string::size_type i=0; i<str.size(); i++)
@@ -343,19 +302,10 @@ std::string &dott::escape(std::string &str)
   return str;
 }
 
-/*******************************************************************\
-
-Function: dott::find_next
-
-  Inputs: instructions, instruction iterator, true results and
-          false results
-
- Outputs: none
-
- Purpose: finds an instructions successors (for goto graphs)
-
-\*******************************************************************/
-
+/// finds an instructions successors (for goto graphs)
+/// \par parameters: instructions, instruction iterator, true results and
+/// false results
+/// \return none
 void dott::find_next(
   const goto_programt::instructionst &instructions,
   const goto_programt::const_targett &it,
@@ -376,19 +326,10 @@ void dott::find_next(
     fres.insert(next);
 }
 
-/*******************************************************************\
-
-Function: dott::write_edge
-
-  Inputs: output stream, from, to and a label
-
- Outputs: none
-
- Purpose: writes an edge from the from node to the to node and with
-          the given label to the output stream (dot format)
-
-\*******************************************************************/
-
+/// writes an edge from the from node to the to node and with the given label to
+/// the output stream (dot format)
+/// \par parameters: output stream, from, to and a label
+/// \return none
 void dott::write_edge(
   std::ostream &out,
   const goto_programt::instructiont &from,
@@ -406,20 +347,8 @@ void dott::write_edge(
         out << ",color=red";
       out << "]";
     }
-  out << ";" << std::endl;
+  out << ";\n";
 }
-
-/*******************************************************************\
-
-Function: dot
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void dot(
   const goto_functionst &src,

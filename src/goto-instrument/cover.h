@@ -8,11 +8,16 @@ Date: May 2016
 
 \*******************************************************************/
 
+/// \file
+/// Coverage Instrumentation
+
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
 #include <util/cmdline.h>
+
+class message_handlert;
 
 enum class coverage_criteriont
 {

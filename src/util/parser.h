@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Parser utilities
+
 #ifndef CPROVER_UTIL_PARSER_H
 #define CPROVER_UTIL_PARSER_H
 
@@ -36,7 +39,7 @@ public:
     last_line.clear();
   }
 
-  parsert():in(NULL) { clear(); }
+  parsert():in(nullptr) { clear(); }
   virtual ~parsert() { }
 
   // The following are for the benefit of the scanner

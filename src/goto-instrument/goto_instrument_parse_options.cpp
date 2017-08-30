@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Main Module
+
+#include "goto_instrument_parse_options.h"
+
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -57,7 +62,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cbmc/version.h>
 
-#include "goto_instrument_parse_options.h"
 #include "document_properties.h"
 #include "uninitialized.h"
 #include "full_slicer.h"
@@ -90,18 +94,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "unwind.h"
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
-
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::eval_verbosity
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include "remove_function.h"
 
 void goto_instrument_parse_optionst::eval_verbosity()
 {
@@ -117,23 +110,12 @@ void goto_instrument_parse_optionst::eval_verbosity()
   ui_message_handler.set_verbosity(v);
 }
 
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::doit
-
-  Inputs:
-
- Outputs:
-
- Purpose: invoke main modules
-
-\*******************************************************************/
-
+/// invoke main modules
 int goto_instrument_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
-    std::cout << CBMC_VERSION << std::endl;
+    std::cout << CBMC_VERSION << '\n';
     return 0;
   }
 
@@ -200,19 +182,20 @@ int goto_instrument_parse_optionst::doit()
           throw "more than one of --unwinding-assertions,--partial-loops,"
                 "--continue-as-loops selected";
 
-        goto_unwindt::unwind_strategyt unwind_strategy=goto_unwindt::ASSUME;
+        goto_unwindt::unwind_strategyt unwind_strategy=
+          goto_unwindt::unwind_strategyt::ASSUME;
 
         if(unwinding_assertions)
         {
-          unwind_strategy=goto_unwindt::ASSERT;
+          unwind_strategy=goto_unwindt::unwind_strategyt::ASSERT;
         }
         else if(partial_loops)
         {
-          unwind_strategy=goto_unwindt::PARTIAL;
+          unwind_strategy=goto_unwindt::unwind_strategyt::PARTIAL;
         }
         else if(continue_as_loops)
         {
-          unwind_strategy=goto_unwindt::CONTINUE;
+          unwind_strategy=goto_unwindt::unwind_strategyt::CONTINUE;
         }
 
         goto_unwindt goto_unwind;
@@ -243,7 +226,7 @@ int goto_instrument_parse_optionst::doit()
           }
           else
           {
-            std::cout << result << std::endl;
+            std::cout << result << '\n';
           }
         }
       }
@@ -257,10 +240,9 @@ int goto_instrument_parse_optionst::doit()
 
       forall_goto_functions(f_it, goto_functions)
       {
-        std::cout << "////" << std::endl;
-        std::cout << "//// Function: " << f_it->first << std::endl;
-        std::cout << "////" << std::endl;
-        std::cout << std::endl;
+        std::cout << "////\n";
+        std::cout << "//// Function: " << f_it->first << '\n';
+        std::cout << "////\n\n";
 
         const goto_programt &goto_program=f_it->second.body;
 
@@ -268,8 +250,7 @@ int goto_instrument_parse_optionst::doit()
         {
           goto_program.output_instruction(ns, "", std::cout, i_it);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
-                    << std::endl;
-          std::cout << std::endl;
+                    << "\n\n";
         }
       }
     }
@@ -323,11 +304,11 @@ int goto_instrument_parse_optionst::doit()
       forall_goto_functions(it, goto_functions)
       {
         local_bitvector_analysist local_bitvector_analysis(it->second);
-        std::cout << ">>>>" << std::endl;
-        std::cout << ">>>> " << it->first << std::endl;
-        std::cout << ">>>>" << std::endl;
+        std::cout << ">>>>\n";
+        std::cout << ">>>> " << it->first << '\n';
+        std::cout << ">>>>\n";
         local_bitvector_analysis.output(std::cout, it->second, ns);
-        std::cout << std::endl;
+        std::cout << '\n';
       }
 
       return 0;
@@ -507,17 +488,7 @@ int goto_instrument_parse_optionst::doit()
       reaching_definitions_analysist rd_analysis(ns);
       rd_analysis(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          rd_analysis.output(ns, f_it->second.body, std::cout);
-        }
-      }
+      rd_analysis.output(ns, goto_functions, std::cout);
 
       return 0;
     }
@@ -530,18 +501,7 @@ int goto_instrument_parse_optionst::doit()
       dependence_grapht dependence_graph(ns);
       dependence_graph(goto_functions, ns);
 
-      forall_goto_functions(f_it, goto_functions)
-      {
-        if(f_it->second.body_available())
-        {
-          std::cout << "////" << std::endl;
-          std::cout << "//// Function: " << f_it->first << std::endl;
-          std::cout << "////" << std::endl;
-          std::cout << std::endl;
-          dependence_graph.output(ns, f_it->second.body, std::cout);
-        }
-      }
-
+      dependence_graph.output(ns, goto_functions, std::cout);
       dependence_graph.output_dot(std::cout);
 
       return 0;
@@ -619,6 +579,19 @@ int goto_instrument_parse_optionst::doit()
       return 0;
     }
 
+    if(cmdline.isset("print-internal-representation"))
+    {
+      for(auto const &pair : goto_functions.function_map)
+        for(auto const &ins : pair.second.body.instructions)
+        {
+          if(ins.code.is_not_nil())
+            status() << ins.code.pretty() << eom;
+          if(ins.guard.is_not_nil())
+            status() << "[guard] " << ins.guard.pretty() << eom;
+        }
+      return 0;
+    }
+
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(symbol_table);
@@ -649,7 +622,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
     {
       const bool is_cpp=cmdline.isset("dump-cpp");
-      const bool h=cmdline.isset("use-system-headers");
+      const bool h_libc=!cmdline.isset("no-system-headers");
+      const bool h_all=cmdline.isset("use-all-headers");
       namespacet ns(symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -668,10 +642,11 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
       }
       else
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h, ns, std::cout);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_functions, h_libc, h_all, ns, std::cout);
 
       return 0;
     }
@@ -811,19 +786,8 @@ int goto_instrument_parse_optionst::doit()
     error() << "Out of memory" << eom;
     return 11;
   }
+// NOLINTNEXTLINE(readability/fn_size)
 }
-
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   bool force)
@@ -847,21 +811,9 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   remove_instanceof(symbol_table, goto_functions);
 }
 
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::do_remove_const_function_pointers_only
-
-  Inputs:
-
- Outputs:
-
- Purpose: Remove function pointers that can be resolved by analysing
-          const variables (i.e. can be resolved using
-          remove_const_function_pointers). Function pointers that cannot
-          be resolved will be left as function pointers.
-
-\*******************************************************************/
-
+/// Remove function pointers that can be resolved by analysing const variables
+/// (i.e. can be resolved using remove_const_function_pointers). Function
+/// pointers that cannot be resolved will be left as function pointers.
 void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
 {
   // Don't bother if we've already done a full function pointer
@@ -880,18 +832,6 @@ void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
     true); // abort if we can't resolve via const pointers
 }
 
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::do_partial_inlining
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_instrument_parse_optionst::do_partial_inlining()
 {
   if(partial_inlining_done)
@@ -907,18 +847,6 @@ void goto_instrument_parse_optionst::do_partial_inlining()
   }
 }
 
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::do_remove_returns
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void goto_instrument_parse_optionst::do_remove_returns()
 {
   if(remove_returns_done)
@@ -929,18 +857,6 @@ void goto_instrument_parse_optionst::do_remove_returns()
   status() << "Removing returns" << eom;
   remove_returns(symbol_table, goto_functions);
 }
-
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::get_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_instrument_parse_optionst::get_goto_program()
 {
@@ -953,18 +869,6 @@ void goto_instrument_parse_optionst::get_goto_program()
   config.set(cmdline);
   config.set_from_symbol_table(symbol_table);
 }
-
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::instrument_goto_program
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void goto_instrument_parse_optionst::instrument_goto_program()
 {
@@ -1035,6 +939,15 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         max_argc,
         get_message_handler()))
       throw 0;
+  }
+
+  if(cmdline.isset("remove-function-body"))
+  {
+    remove_functions(
+      symbol_table,
+      goto_functions,
+      cmdline.get_values("remove-function-body"),
+      get_message_handler());
   }
 
   // we add the library in some cases, as some analyses benefit
@@ -1166,7 +1079,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       }
       else
       {
-        std::cout << result << std::endl;
+        std::cout << result << '\n';
       }
     }
 
@@ -1216,7 +1129,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // add generic checks, if needed
   goto_check(ns, options, goto_functions);
 
-  // check for uninitalized local varibles
+  // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))
   {
     status() << "Adding checks for uninitialized local variables" << eom;
@@ -1427,7 +1340,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("havoc-loops"))
   {
-    status() << "Havocing loops" << eom;
+    status() << "Havocking loops" << eom;
     havoc_loops(goto_functions);
   }
 
@@ -1521,25 +1434,11 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       full_slicer(goto_functions, ns);
   }
 
-  // label the assertions
-  label_properties(goto_functions);
-
   // recalculate numbers, etc.
   goto_functions.update();
 }
 
-/*******************************************************************\
-
-Function: goto_instrument_parse_optionst::help
-
-  Inputs:
-
- Outputs:
-
- Purpose: display command line help
-
-\*******************************************************************/
-
+/// display command line help
 void goto_instrument_parse_optionst::help()
 {
   std::cout <<
@@ -1569,6 +1468,8 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --print-internal-representation\n" // NOLINTNEXTLINE(*)
+    "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
     " --show-struct-alignment      show struct members that might be concurrently accessed\n" // NOLINT(*)
     " --show-natural-loops         show natural loop heads\n"
@@ -1596,7 +1497,8 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
-    " --undefined-function-is-assume-false\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
     "\n"
     "Loop transformations:\n"
@@ -1637,9 +1539,12 @@ void goto_instrument_parse_optionst::help()
     HELP_REMOVE_CONST_FUNCTION_POINTERS
     " --add-library                add models of C library functions\n"
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
     "\n"
     "Other options:\n"
-    " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)
+    " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
+    " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"

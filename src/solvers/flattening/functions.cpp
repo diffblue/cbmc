@@ -6,24 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "functions.h"
+
 #include <cassert>
 
 #include <util/std_types.h>
 #include <util/std_expr.h>
-
-#include "functions.h"
-
-/*******************************************************************\
-
-Function: functionst::record
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void functionst::record(
   const function_application_exprt &function_application)
@@ -31,18 +19,6 @@ void functionst::record(
   function_map[function_application.function()].applications.
     insert(function_application);
 }
-
-/*******************************************************************\
-
-Function: functionst::add_function_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void functionst::add_function_constraints()
 {
@@ -52,18 +28,6 @@ void functionst::add_function_constraints()
       it++)
     add_function_constraints(it->second);
 }
-
-/*******************************************************************\
-
-Function: functionst::add_function_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 exprt functionst::arguments_equal(const exprt::operandst &o1,
                                   const exprt::operandst &o2)
@@ -90,18 +54,6 @@ exprt functionst::arguments_equal(const exprt::operandst &o1,
 
   return and_expr;
 }
-
-/*******************************************************************\
-
-Function: functionst::add_function_constraints
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void functionst::add_function_constraints(const function_infot &info)
 {

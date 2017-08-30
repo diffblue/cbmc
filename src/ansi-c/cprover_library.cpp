@@ -6,11 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "cprover_library.h"
+
 #include <sstream>
 
 #include <util/config.h>
 
-#include "cprover_library.h"
 #include "ansi_c_language.h"
 
 struct cprover_library_entryt
@@ -20,18 +21,6 @@ struct cprover_library_entryt
 } cprover_library[]=
 #include "cprover_library.inc"
 ; // NOLINT(whitespace/semicolon)
-
-/*******************************************************************\
-
-Function: get_cprover_library_text
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string get_cprover_library_text(
   const std::set<irep_idt> &functions,
@@ -49,7 +38,7 @@ std::string get_cprover_library_text(
   std::size_t count=0;
 
   for(cprover_library_entryt *e=cprover_library;
-      e->function!=NULL;
+      e->function!=nullptr;
       e++)
   {
     irep_idt id=e->function;
@@ -74,18 +63,6 @@ std::string get_cprover_library_text(
     return library_text.str();
 }
 
-/*******************************************************************\
-
-Function: add_cprover_library
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void add_cprover_library(
   const std::set<irep_idt> &functions,
   symbol_tablet &symbol_table,
@@ -100,18 +77,6 @@ void add_cprover_library(
 
   add_library(library_text, symbol_table, message_handler);
 }
-
-/*******************************************************************\
-
-Function: add_library
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void add_library(
   const std::string &src,

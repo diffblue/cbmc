@@ -8,6 +8,9 @@ Date: December 2012
 
 \*******************************************************************/
 
+/// \file
+/// Count effective lines of code
+
 #ifndef CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H
 #define CPROVER_GOTO_INSTRUMENT_COUNT_ELOC_H
 

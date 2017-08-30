@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 #define CPROVER_SOLVERS_FLATTENING_BOOLBV_MAP_H
 
@@ -42,7 +43,7 @@ public:
   class map_entryt
   {
   public:
-    map_entryt():width(0), bvtype(IS_UNKNOWN)
+    map_entryt():width(0), bvtype(bvtypet::IS_UNKNOWN)
     {
     }
 

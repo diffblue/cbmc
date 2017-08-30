@@ -6,58 +6,26 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// JAVA Bytecode Conversion / Type Checking
+
+#include "java_bytecode_typecheck.h"
+
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
 
 #include "expr2java.h"
-#include "java_bytecode_typecheck.h"
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::string java_bytecode_typecheckt::to_string(const exprt &expr)
 {
   return expr2java(expr, ns);
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::to_string
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 std::string java_bytecode_typecheckt::to_string(const typet &type)
 {
   return type2java(type, ns);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck_non_type_symbol
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
 {
@@ -65,18 +33,6 @@ void java_bytecode_typecheckt::typecheck_non_type_symbol(symbolt &symbol)
   typecheck_type(symbol.type);
   typecheck_expr(symbol.value);
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheckt::typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void java_bytecode_typecheckt::typecheck()
 {
@@ -112,18 +68,6 @@ void java_bytecode_typecheckt::typecheck()
   }
 }
 
-/*******************************************************************\
-
-Function: java_bytecode_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bool java_bytecode_typecheck(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
@@ -133,18 +77,6 @@ bool java_bytecode_typecheck(
     symbol_table, message_handler, string_refinement_enabled);
   return java_bytecode_typecheck.typecheck_main();
 }
-
-/*******************************************************************\
-
-Function: java_bytecode_typecheck
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool java_bytecode_typecheck(
   exprt &expr,

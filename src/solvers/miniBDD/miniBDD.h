@@ -7,6 +7,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// A minimalistic BDD library, following Bryant's original paper and Andersen's
+///   lecture notes
+
 #ifndef CPROVER_SOLVERS_MINIBDD_MINIBDD_H
 #define CPROVER_SOLVERS_MINIBDD_MINIBDD_H
 
@@ -51,7 +55,7 @@ public:
   unsigned node_number() const;
   void clear();
 
-  bool is_initialized() const { return node!=0; }
+  bool is_initialized() const { return node!=nullptr; }
 
   // internal
   explicit mini_bddt(class mini_bdd_nodet *_node);
@@ -120,7 +124,7 @@ protected:
     reverse_keyt(
       unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
 
-    bool operator<(const reverse_keyt &other) const;
+    bool operator<(const reverse_keyt &) const;
   };
 
   typedef std::map<reverse_keyt, mini_bdd_nodet *> reverse_mapt;

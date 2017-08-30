@@ -6,24 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "ssa_expr.h"
+
 #include <sstream>
 #include <cassert>
 
 #include <util/arith_tools.h>
-
-#include "ssa_expr.h"
-
-/*******************************************************************\
-
-Function: build_identifier_rec
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void build_ssa_identifier_rec(
   const exprt &expr,
@@ -61,34 +49,27 @@ static void build_ssa_identifier_rec(
 
     if(!l0.empty())
     {
+      // Distinguish different threads of execution
       os << '!' << l0;
       l1_object_os << '!' << l0;
     }
 
     if(!l1.empty())
     {
+      // Distinguish different calls to the same function (~stack frame)
       os << '@' << l1;
       l1_object_os << '@' << l1;
     }
 
     if(!l2.empty())
+    {
+      // Distinguish SSA steps for the same variable
       os << '#' << l2;
+    }
   }
   else
     assert(false);
 }
-
-/*******************************************************************\
-
-Function: ssa_exprt::build_identifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(
   const exprt &expr,

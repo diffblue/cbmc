@@ -8,21 +8,16 @@ Date: June 2006
 
 \*******************************************************************/
 
-#include "xml_irep.h"
+/// \file
+/// Compile and link source and object files.
+
 #include "xml_symbol.h"
 
-/*******************************************************************\
+#include "xml_irep.h"
 
-Function: convert
-
-  Inputs: a symbol and an xml node
-
- Outputs: none
-
- Purpose: converts a symbol to an xml symbol node
-
-\*******************************************************************/
-
+/// converts a symbol to an xml symbol node
+/// \par parameters: a symbol and an xml node
+/// \return none
 void convert(const symbolt &sym, xmlt &root)
 {
   xmlt &xmlsym = root.new_element("symbol");
@@ -60,7 +55,7 @@ void convert(const symbolt &sym, xmlt &root)
   flags.new_element("base_name").data=id2string(sym.base_name);
   flags.new_element("module").data=id2string(sym.module);
 
-  if(sym.pretty_name.size()>0)
+  if(!sym.pretty_name.empty())
     flags.new_element("pretty_name").data=id2string(sym.pretty_name);
 
   xmlt &xmlloc = xmlsym.new_element("location");
@@ -68,18 +63,9 @@ void convert(const symbolt &sym, xmlt &root)
   xmlloc.name = "location"; // convert overwrote this
 }
 
-/*******************************************************************\
-
-Function: convert
-
-  Inputs: an xml node and a symbol
-
- Outputs: none
-
- Purpose: converts an xml symbol node to a symbol
-
-\*******************************************************************/
-
+/// converts an xml symbol node to a symbol
+/// \par parameters: an xml node and a symbol
+/// \return none
 void convert(const xmlt &xmlsym, symbolt &symbol)
 {
   symbol.name=xmlsym.get_attribute("name");

@@ -8,6 +8,7 @@ Date: April 2010
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANALYSES_GOTO_RW_H
 #define CPROVER_ANALYSES_GOTO_RW_H
 
@@ -107,11 +108,11 @@ public:
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<range_domaint*>(it->second)!=0);
+    PRECONDITION(dynamic_cast<range_domaint*>(it->second)!=nullptr);
     return *static_cast<range_domaint*>(it->second);
   }
 
-  typedef enum { LHS_W, READ } get_modet;
+  enum class get_modet { LHS_W, READ };
 
   virtual void get_objects_rec(
     goto_programt::const_targett _target,
@@ -276,7 +277,7 @@ public:
 
   const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    assert(dynamic_cast<guarded_range_domaint*>(it->second)!=0);
+    PRECONDITION(dynamic_cast<guarded_range_domaint*>(it->second)!=nullptr);
     return *static_cast<guarded_range_domaint*>(it->second);
   }
 

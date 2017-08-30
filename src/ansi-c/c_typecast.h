@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_ANSI_C_C_TYPECAST_H
 #define CPROVER_ANSI_C_C_TYPECAST_H
 
@@ -14,7 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 // try a type cast from expr.type() to type
 //
-// false: typecast successfull, expr modified
+// false: typecast successful, expr modified
 // true:  typecast failed
 
 bool check_c_implicit_typecast(

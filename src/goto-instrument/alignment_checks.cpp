@@ -6,23 +6,14 @@ Author:
 
 \*******************************************************************/
 
-#include <util/pointer_offset_size.h>
-#include <util/config.h>
-#include <util/symbol_table.h>
+/// \file
+/// Alignment Checks
 
 #include "alignment_checks.h"
 
-/*******************************************************************\
-
-Function: print_struct_alignment_problems
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <util/pointer_offset_size.h>
+#include <util/config.h>
+#include <util/symbol_table.h>
 
 void print_struct_alignment_problems(
   const symbol_tablet &symbol_table,
@@ -60,6 +51,9 @@ void print_struct_alignment_problems(
           const namespacet ns(symbol_table);
           mp_integer size=pointer_offset_size(it_type, ns);
 
+          if(size<0)
+            throw "type of unknown size:\n"+it_type.pretty();
+
           cumulated_length+=size;
           // [it_mem;it_next] cannot be covered by an instruction
           if(cumulated_length>config.ansi_c.memory_operand_size)
@@ -78,35 +72,36 @@ void print_struct_alignment_problems(
               first_time_seen_in_struct=false;
               first_time_seen_from=false;
 
-              out << std::endl
-                  << "WARNING: "
+              out << "\nWARNING: "
                   << "declaration of structure "
                   << str.find_type(ID_tag).pretty()
-                  << " at " << it->second.location << std::endl;
+                  << " at " << it->second.location << '\n';
             }
 
             out << "members " << it_mem->get_pretty_name() << " and "
-                << it_next->get_pretty_name() << " might interfere"
-                << std::endl;
+                << it_next->get_pretty_name() << " might interfere\n";
           }
         }
       }
     }
     else if(it->second.type.id()==ID_array)
     {
-      // is this structure likely to introduce dataraces?
+      // is this structure likely to introduce data races?
       #if 0
       const namespacet ns(symbol_table);
       const array_typet array=to_array_type(it->second.type);
       const mp_integer size=
         pointer_offset_size(array.subtype(), ns);
 
+      if(size<0)
+        throw "type of unknown size:\n"+it_type.pretty();
+
       if(2*integer2long(size)<=config.ansi_c.memory_operand_size)
       {
-        out << std::endl << "WARNING: "
+        out << "\nWARNING: "
             << "declaration of an array at "
-            << it->second.location << std::endl
-            << "might be concurrently accessed" << std::endl;
+            << it->second.location <<
+            << "\nmight be concurrently accessed\n";
       }
       #endif
     }

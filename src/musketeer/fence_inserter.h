@@ -6,6 +6,9 @@ Author: Vincent Nimal
 
 \*******************************************************************/
 
+/// \file
+/// ILP construction for all cycles and resolution
+
 #ifndef CPROVER_MUSKETEER_FENCE_INSERTER_H
 #define CPROVER_MUSKETEER_FENCE_INSERTER_H
 
@@ -61,7 +64,7 @@ public:
 
   instrumentert &instrumenter;
 
-  /* normal variables used almost everytime */
+  /// normal variables used almost every time
   std::map<unsigned, edget> &map_to_e;
   std::map<edget, unsigned> &map_from_e;
   unsigned add_edge(const edget &e) { return var.add_edge(e); }
@@ -70,11 +73,11 @@ public:
     return invisible_var.add_edge(e);
   }
 
-  /* number of contraints */
+  /// number of constraints
   std::size_t constraints_number;
   const memory_modelt model;
 
-  /* to retrieve the concrete graph edges involved in the (abstract) cycles */
+  /// to retrieve the concrete graph edges involved in the (abstract) cycles
   const_graph_visitort const_graph_visitor;
 
 protected:
@@ -100,7 +103,7 @@ protected:
   void preprocess();
   void solve();
 
-  typedef enum {Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4} fence_typet;
+  enum fence_typet { Fence=0, Dp=1, Lwfence=2, Branching=3, Ctlfence=4 };
   virtual unsigned fence_cost(fence_typet e) const;
 
   std::string to_string(fence_typet f) const;

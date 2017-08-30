@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 #define CPROVER_SOLVERS_SMT2_SMT2_CONV_H
 
@@ -27,7 +28,7 @@ class member_exprt;
 class smt2_convt:public prop_convt
 {
 public:
-  typedef enum
+  enum class solvert
   {
     GENERIC,
     BOOLECTOR,
@@ -37,7 +38,7 @@ public:
     OPENSMT,
     YICES,
     Z3
-  } solvert;
+  };
 
   smt2_convt(
     const namespacet &_ns,
@@ -66,28 +67,28 @@ public:
 
     switch(solver)
     {
-    case GENERIC:
+    case solvert::GENERIC:
       break;
 
-    case BOOLECTOR:
+    case solvert::BOOLECTOR:
       break;
 
-    case CVC3:
+    case solvert::CVC3:
       break;
 
-    case CVC4:
+    case solvert::CVC4:
       break;
 
-    case MATHSAT:
+    case solvert::MATHSAT:
       break;
 
-    case OPENSMT:
+    case solvert::OPENSMT:
       break;
 
-    case YICES:
+    case solvert::YICES:
       break;
 
-    case Z3:
+    case solvert::Z3:
       use_array_of_bool=true;
       emit_set_logic=false;
       use_datatypes=true;
@@ -249,7 +250,7 @@ protected:
   // e.g., booleans, vectors, structs, arrays but also
   // floats when using the FPA theory.
   // unflatten() does the opposite.
-  typedef enum { BEGIN, END } wheret;
+  enum class wheret { BEGIN, END };
   void flatten2bv(const exprt &);
   void unflatten(wheret, const typet &, unsigned nesting=0);
 

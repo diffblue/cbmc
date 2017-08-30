@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Bounded Model Checking for ANSI-C + HDL
+
 #ifndef CPROVER_CBMC_CBMC_SOLVERS_H
 #define CPROVER_CBMC_CBMC_SOLVERS_H
 
@@ -27,12 +30,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bv_cbmc.h"
 
-/*******************************************************************\
-
-Solver factory
-
-\*******************************************************************/
-
 class cbmc_solverst:public messaget
 {
 public:
@@ -43,7 +40,8 @@ public:
     messaget(_message_handler),
     options(_options),
     symbol_table(_symbol_table),
-    ns(_symbol_table)
+    ns(_symbol_table),
+    ui(ui_message_handlert::uit::PLAIN)
   {
   }
 

@@ -6,19 +6,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dense Data Structure for Path Replay
+
 #include "path_replay.h"
-
-/*******************************************************************\
-
-Function: path_replayt::get_branches
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void get_branches(path_symex_step_reft history)
 {

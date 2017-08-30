@@ -6,21 +6,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <linking/zero_initializer.h>
+/// \file
+/// Symbolic Execution
 
 #include "goto_symex.h"
 
-/*******************************************************************\
-
-Function: goto_symext::symex_start_thread
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <linking/zero_initializer.h>
 
 void goto_symext::symex_start_thread(statet &state)
 {
@@ -76,7 +67,7 @@ void goto_symext::symex_start_thread(statet &state)
     // get L0 name for current thread
     lhs.set_level_0(t);
 
-    // setup L1 name
+    // set up L1 name
     if(!state.level1.current_names.insert(
         std::make_pair(lhs.get_l1_object_identifier(),
                        std::make_pair(lhs, 0))).second)
@@ -94,7 +85,12 @@ void goto_symext::symex_start_thread(statet &state)
     const bool record_events=state.record_events;
     state.record_events=false;
     symex_assign_symbol(
-      state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+      state,
+      lhs,
+      nil_exprt(),
+      rhs,
+      guard,
+      symex_targett::assignment_typet::HIDDEN);
     state.record_events=record_events;
   }
 
@@ -122,6 +118,11 @@ void goto_symext::symex_start_thread(statet &state)
 
     guardt guard;
     symex_assign_symbol(
-      state, lhs, nil_exprt(), rhs, guard, symex_targett::HIDDEN);
+      state,
+      lhs,
+      nil_exprt(),
+      rhs,
+      guard,
+      symex_targett::assignment_typet::HIDDEN);
   }
 }

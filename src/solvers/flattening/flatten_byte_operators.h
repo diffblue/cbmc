@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_SOLVERS_FLATTENING_FLATTEN_BYTE_OPERATORS_H
 #define CPROVER_SOLVERS_FLATTENING_FLATTEN_BYTE_OPERATORS_H
 

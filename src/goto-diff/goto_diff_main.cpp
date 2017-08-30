@@ -6,25 +6,16 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// GOTO-DIFF Main Module
+
+#include "goto_diff_parse_options.h"
+
 #include <util/unicode.h>
 
 #ifdef IREP_HASH_STATS
 #include <iostream>
 #endif
-
-#include "goto_diff_parse_options.h"
-
-/*******************************************************************\
-
-Function: main / wmain
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 #ifdef IREP_HASH_STATS
 extern unsigned long long irep_hash_cnt;
@@ -45,9 +36,9 @@ int main(int argc, const char **argv)
   int res=parse_options.main();
 
   #ifdef IREP_HASH_STATS
-  std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << std::endl;
-  std::cout << "IREP_CMP_CNT=" << irep_cmp_cnt << std::endl;
-  std::cout << "IREP_CMP_NE_CNT=" << irep_cmp_ne_cnt << std::endl;
+  std::cout << "IREP_HASH_CNT=" << irep_hash_cnt << '\n';
+  std::cout << "IREP_CMP_CNT=" << irep_cmp_cnt << '\n';
+  std::cout << "IREP_CMP_NE_CNT=" << irep_cmp_ne_cnt << '\n';
   #endif
 
   return res;

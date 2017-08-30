@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// CBMC Command Line Option Processing
+
 #ifndef CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 #define CPROVER_CBMC_CBMC_PARSE_OPTIONS_H
 
@@ -82,11 +85,14 @@ protected:
   virtual void register_languages();
 
   virtual void get_command_line_options(optionst &options);
-  virtual int do_bmc(bmct &bmc, const goto_functionst &goto_functions);
+
+  virtual int do_bmc(
+    bmct &bmc,
+    const goto_functionst &goto_functions);
 
   virtual int get_goto_program(
     const optionst &options,
-    bmct &bmc,
+    expr_listt &bmc_constraints,
     goto_functionst &goto_functions);
 
   virtual bool process_goto_program(
@@ -97,8 +103,8 @@ protected:
 
   void eval_verbosity();
 
-  // get any additional stuff before finalizing
-  virtual int get_modules(bmct &bmc)
+  // get any additional stuff before finalizing the goto program
+  virtual int get_modules(expr_listt &bmc_constraints)
   {
     return -1; // continue
   }

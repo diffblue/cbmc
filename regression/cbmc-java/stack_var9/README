@@ -1,0 +1,9 @@
+This regression test is created from the .j file with the jasmin assembler.
+https://github.com/Sable/jasmin
+
+On Ubuntu, it is available as jasmin-sable. To convert a .j file, it is
+sufficient to do
+
+> jasmin $FILE.j
+
+and it will create the corresponding $FILE.class file.

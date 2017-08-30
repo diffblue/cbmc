@@ -6,6 +6,9 @@ Author: Nathan Phillips, nathan.phillips@diffblue.com
 
 \*******************************************************************/
 
+/// \file
+/// Symbol utilities
+
 #ifndef CPROVER_UTIL_SYMBOL_UTILS_H
 #define CPROVER_UTIL_SYMBOL_UTILS_H
 

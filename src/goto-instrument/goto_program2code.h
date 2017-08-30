@@ -6,10 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Dump Goto-Program as C/C++ Source
+
 #ifndef CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
 #define CPROVER_GOTO_INSTRUMENT_GOTO_PROGRAM2CODE_H
 
 #include <list>
+#include <unordered_set>
 
 #include <analyses/natural_loops.h>
 
@@ -49,6 +53,7 @@ public:
       code_blockt &_dest,
       id_listt &_local_static,
       id_listt &_type_names,
+      const id_sett &_typedef_names,
       std::set<std::string> &_system_headers):
     func_name(identifier),
     goto_program(_goto_program),
@@ -57,6 +62,7 @@ public:
     toplevel_block(_dest),
     local_static(_local_static),
     type_names(_type_names),
+    typedef_names(_typedef_names),
     system_headers(_system_headers)
   {
     assert(local_static.empty());
@@ -78,6 +84,7 @@ protected:
   code_blockt &toplevel_block;
   id_listt &local_static;
   id_listt &type_names;
+  const id_sett &typedef_names;
   std::set<std::string> &system_headers;
   std::unordered_set<exprt, irep_hash> va_list_expr;
 
@@ -193,6 +200,7 @@ protected:
 
   goto_programt::const_targett convert_goto_break_continue(
       goto_programt::const_targett target,
+      goto_programt::const_targett upper_bound,
       codet &dest);
 
   goto_programt::const_targett convert_goto_goto(

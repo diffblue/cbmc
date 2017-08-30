@@ -6,6 +6,9 @@ Author: Peter Schrammel
 
 \*******************************************************************/
 
+/// \file
+/// GOTO-DIFF Languages
+
 #ifndef CPROVER_GOTO_DIFF_GOTO_DIFF_LANGUAGES_H
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_LANGUAGES_H
 

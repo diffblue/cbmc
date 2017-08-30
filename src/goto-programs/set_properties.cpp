@@ -6,23 +6,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include <algorithm>
-#include <unordered_set>
-
+/// \file
+/// Set Properties
 
 #include "set_properties.h"
 
-/*******************************************************************\
-
-Function: set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <algorithm>
+#include <unordered_set>
 
 void set_properties(
   goto_programt &goto_program,
@@ -48,34 +38,10 @@ void set_properties(
   }
 }
 
-/*******************************************************************\
-
-Function: label_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void label_properties(goto_modelt &goto_model)
 {
   label_properties(goto_model.goto_functions);
 }
-
-/*******************************************************************\
-
-Function: label_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void label_properties(
   goto_programt &goto_program,
@@ -119,35 +85,11 @@ void label_properties(
   }
 }
 
-/*******************************************************************\
-
-Function: label_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void label_properties(goto_programt &goto_program)
 {
   std::map<irep_idt, unsigned> property_counters;
   label_properties(goto_program, property_counters);
 }
-
-/*******************************************************************\
-
-Function: set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void set_properties(
   goto_modelt &goto_model,
@@ -155,18 +97,6 @@ void set_properties(
 {
   set_properties(goto_model.goto_functions, properties);
 }
-
-/*******************************************************************\
-
-Function: set_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void set_properties(
   goto_functionst &goto_functions,
@@ -184,18 +114,6 @@ void set_properties(
     throw "property "+id2string(*property_set.begin())+" not found";
 }
 
-/*******************************************************************\
-
-Function: label_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void label_properties(goto_functionst &goto_functions)
 {
   std::map<irep_idt, unsigned> property_counters;
@@ -208,34 +126,10 @@ void label_properties(goto_functionst &goto_functions)
       label_properties(it->second.body, property_counters);
 }
 
-/*******************************************************************\
-
-Function: make_assertions_false
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void make_assertions_false(goto_modelt &goto_model)
 {
   make_assertions_false(goto_model.goto_functions);
 }
-
-/*******************************************************************\
-
-Function: make_assertions_false
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void make_assertions_false(
   goto_functionst &goto_functions)

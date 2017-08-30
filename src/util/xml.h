@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+
 #ifndef CPROVER_UTIL_XML_H
 #define CPROVER_UTIL_XML_H
 
@@ -14,11 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <string>
 #include <iosfwd>
 
-/*! \defgroup gr_xml XML file processing */
-
-/*! \brief TO_BE_DOCUMENTED
-    \ingroup xml
-*/
 class xmlt
 {
 public:

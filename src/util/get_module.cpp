@@ -6,10 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Find module symbol using name
+
+#include "get_module.h"
+
 #include <list>
 #include <set>
 
-#include "get_module.h"
 #include "message.h"
 #include "symbol_table.h"
 
@@ -22,18 +26,6 @@ typedef std::list<const symbolt *> symbolptr_listt;
 #define Forall_symbolptr_list(it, list) \
   for(symbolptr_listt::iterator it=(list).begin(); \
       it!=(list).end(); ++it)
-
-/*******************************************************************\
-
-Function: get_module_by_name
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const symbolt &get_module_by_name(
   const symbol_tablet &symbol_table,
@@ -79,18 +71,6 @@ const symbolt &get_module_by_name(
 
   return *symbolptr_list.front();
 }
-
-/*******************************************************************\
-
-Function: get_module
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 const symbolt &get_module(
   const symbol_tablet &symbol_table,

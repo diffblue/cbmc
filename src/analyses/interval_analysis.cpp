@@ -6,22 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Interval Analysis
+
+#include "interval_analysis.h"
+
 #include <util/find_symbols.h>
 
 #include "interval_domain.h"
-#include "interval_analysis.h"
-
-/*******************************************************************\
-
-Function: instrument_intervals
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void instrument_intervals(
   const ait<interval_domaint> &interval_analysis,
@@ -83,18 +75,6 @@ void instrument_intervals(
     }
   }
 }
-
-/*******************************************************************\
-
-Function: interval_analysis
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void interval_analysis(
   const namespacet &ns,

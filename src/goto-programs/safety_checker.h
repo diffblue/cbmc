@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Safety Checker Interface
+
 #ifndef CPROVER_GOTO_PROGRAMS_SAFETY_CHECKER_H
 #define CPROVER_GOTO_PROGRAMS_SAFETY_CHECKER_H
 
@@ -26,7 +29,7 @@ public:
     const namespacet &_ns,
     message_handlert &_message_handler);
 
-  typedef enum { SAFE, UNSAFE, ERROR } resultt;
+  enum class resultt { SAFE, UNSAFE, ERROR };
 
   // check whether all assertions in goto_functions are safe
   // if UNSAFE, then a trace is returned

@@ -6,6 +6,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+/// \file
+/// Show Claims
+
+#include "show_properties.h"
+
 #include <iostream>
 
 #include <util/xml.h>
@@ -15,21 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-#include "show_properties.h"
 #include "goto_functions.h"
 #include "goto_model.h"
-
-/*******************************************************************\
-
-Function: cbmc_parseoptionst::show_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_properties(
   const namespacet &ns,
@@ -53,7 +45,7 @@ void show_properties(
 
     switch(ui)
     {
-    case ui_message_handlert::XML_UI:
+    case ui_message_handlert::uit::XML_UI:
       {
         // use me instead
         xmlt xml_property("property");
@@ -67,23 +59,23 @@ void show_properties(
         xml_property.new_element("expression").data=
           from_expr(ns, identifier, ins.guard);
 
-        std::cout << xml_property << std::endl;
+        std::cout << xml_property << '\n';
       }
       break;
 
-    case ui_message_handlert::JSON_UI:
+    case ui_message_handlert::uit::JSON_UI:
       assert(false);
       break;
 
-    case ui_message_handlert::PLAIN:
-      std::cout << "Property " << property_id << ":" << std::endl;
+    case ui_message_handlert::uit::PLAIN:
+      std::cout << "Property " << property_id << ":\n";
 
-      std::cout << "  " << ins.source_location << std::endl
-                << "  " << description << std::endl
+      std::cout << "  " << ins.source_location << '\n'
+                << "  " << description << '\n'
                 << "  " << from_expr(ns, identifier, ins.guard)
-                        << std::endl;
+                        << '\n';
 
-      std::cout << std::endl;
+      std::cout << '\n';
       break;
 
     default:
@@ -92,18 +84,6 @@ void show_properties(
   }
 }
 
-
-/*******************************************************************\
-
-Function: cbmc_parseoptionst::show_properties_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_properties_json(
   json_arrayt &json_properties,
@@ -137,18 +117,6 @@ void show_properties_json(
   }
 }
 
-/*******************************************************************\
-
-Function: show_properties_json
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_properties_json(
   const namespacet &ns,
   const goto_functionst &goto_functions)
@@ -168,24 +136,12 @@ void show_properties_json(
   std::cout << ",\n" << json_result;
 }
 
-/*******************************************************************\
-
-Function: show_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_properties(
   const namespacet &ns,
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions)
 {
-  if(ui == ui_message_handlert::JSON_UI)
+  if(ui == ui_message_handlert::uit::JSON_UI)
     show_properties_json(ns, goto_functions);
   else
     for(const auto &fct : goto_functions.function_map)
@@ -193,24 +149,12 @@ void show_properties(
         show_properties(ns, fct.first, ui, fct.second.body);
 }
 
-/*******************************************************************\
-
-Function: show_properties
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_properties(
   const goto_modelt &goto_model,
   ui_message_handlert::uit ui)
 {
   const namespacet ns(goto_model.symbol_table);
-  if(ui == ui_message_handlert::JSON_UI)
+  if(ui == ui_message_handlert::uit::JSON_UI)
     show_properties_json(ns, goto_model.goto_functions);
   else
     show_properties(ns, ui, goto_model.goto_functions);

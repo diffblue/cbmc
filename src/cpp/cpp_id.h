@@ -6,6 +6,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 \*******************************************************************/
 
+/// \file
+/// C++ Language Type Checking
+
 #ifndef CPROVER_CPP_CPP_ID_H
 #define CPROVER_CPP_CPP_ID_H
 
@@ -17,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <iosfwd>
 
 #include <util/expr.h>
+#include <util/invariant.h>
 #include <util/std_types.h>
 
 class cpp_scopet;
@@ -26,12 +30,20 @@ class cpp_idt
 public:
   cpp_idt();
 
-  typedef enum
+  enum class id_classt
   {
-    UNKNOWN, SYMBOL, TYPEDEF, CLASS, ENUM, TEMPLATE,
-    TEMPLATE_PARAMETER, NAMESPACE, BLOCK_SCOPE,
-    TEMPLATE_SCOPE, ROOT_SCOPE
-  } id_classt;
+    UNKNOWN,
+    SYMBOL,
+    TYPEDEF,
+    CLASS,
+    ENUM,
+    TEMPLATE,
+    TEMPLATE_PARAMETER,
+    NAMESPACE,
+    BLOCK_SCOPE,
+    TEMPLATE_SCOPE,
+    ROOT_SCOPE,
+  };
 
   bool is_member, is_method, is_static_member,
        is_scope, is_constructor;
@@ -40,22 +52,22 @@ public:
 
   bool is_class() const
   {
-    return id_class==CLASS;
+    return id_class==id_classt::CLASS;
   }
 
   bool is_enum() const
   {
-    return id_class==ENUM;
+    return id_class==id_classt::ENUM;
   }
 
   bool is_namespace() const
   {
-    return id_class==NAMESPACE;
+    return id_class==id_classt::NAMESPACE;
   }
 
   bool is_typedef() const
   {
-    return id_class==TYPEDEF;
+    return id_class==id_classt::TYPEDEF;
   }
 
   irep_idt identifier, base_name;
@@ -70,7 +82,7 @@ public:
 
   cpp_idt &get_parent() const
   {
-    assert(parent!=NULL);
+    PRECONDITION(parent!=nullptr);
     return *parent;
   }
 

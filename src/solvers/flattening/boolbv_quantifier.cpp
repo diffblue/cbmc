@@ -6,27 +6,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <cassert>
 
 #include <util/arith_tools.h>
 #include <util/replace_expr.h>
 #include <util/simplify_expr.h>
 
-#include "boolbv.h"
-
-/*******************************************************************\
-
-Function: expr_eq
-
-  Inputs:
-
- Outputs:
-
- Purpose: A method to detect equivalence between experts that can
-          contain typecast
-
-\*******************************************************************/
-
+/// A method to detect equivalence between experts that can contain typecast
 bool expr_eq(const exprt &expr1, const exprt &expr2)
 {
   exprt e1=expr1, e2=expr2;
@@ -37,20 +25,9 @@ bool expr_eq(const exprt &expr1, const exprt &expr2)
   return e1==e2;
 }
 
-/*******************************************************************\
-
-Function: get_quantifier_var_min
-
-  Inputs:
-
- Outputs:
-
- Purpose: To obtain the min value for the quantifier variable
-          of the specified forall/exists operator. The min variable
-          is in the form of "!(var_expr > constant)".
-
-\*******************************************************************/
-
+/// To obtain the min value for the quantifier variable of the specified
+/// forall/exists operator. The min variable is in the form of "!(var_expr >
+/// constant)".
 exprt get_quantifier_var_min(
   const exprt &var_expr,
   const exprt &quantifier_expr)
@@ -97,19 +74,8 @@ exprt get_quantifier_var_min(
   return res;
 }
 
-/*******************************************************************\
-
-Function: get_quantifier_var_max
-
-  Inputs:
-
- Outputs:
-
- Purpose: To obtain the max value for the quantifier variable
-          of the specified forall/exists operator.
-
-\*******************************************************************/
-
+/// To obtain the max value for the quantifier variable of the specified
+/// forall/exists operator.
 exprt get_quantifier_var_max(
   const exprt &var_expr,
   const exprt &quantifier_expr)
@@ -170,18 +136,6 @@ exprt get_quantifier_var_max(
   }
   return res;
 }
-
-/*******************************************************************\
-
-Function: instantiate_quantifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bool instantiate_quantifier(exprt &expr,
                             const namespacet &ns)
@@ -247,18 +201,6 @@ bool instantiate_quantifier(exprt &expr,
   return res;
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_quantifier
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 literalt boolbvt::convert_quantifier(const exprt &src)
 {
   exprt expr(src);
@@ -274,18 +216,6 @@ literalt boolbvt::convert_quantifier(const exprt &src)
 
   return l;
 }
-
-/*******************************************************************\
-
-Function: boolbvt::post_process_quantifiers
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void boolbvt::post_process_quantifiers()
 {

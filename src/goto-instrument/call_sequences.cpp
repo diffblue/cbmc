@@ -8,6 +8,11 @@ Date: April 2013
 
 \*******************************************************************/
 
+/// \file
+/// Printing function call sequences for Ofer
+
+#include "call_sequences.h"
+
 #include <stack>
 #include <iostream>
 #include <unordered_set>
@@ -15,26 +20,12 @@ Date: April 2013
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
-#include "call_sequences.h"
-
-/*******************************************************************\
-
-Function: show_call_sequences
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_call_sequences(
   const irep_idt &function,
   const goto_programt &goto_program,
   const goto_programt::const_targett start)
 {
-  std::cout << "# From " << function << std::endl;
+  std::cout << "# From " << function << '\n';
 
   std::stack<goto_programt::const_targett> stack;
   std::set<goto_programt::const_targett> seen;
@@ -57,7 +48,7 @@ void show_call_sequences(
       {
         // print pair function, function2
         std::cout << function << " -> "
-                  << to_symbol_expr(function2).get_identifier() << std::endl;
+                  << to_symbol_expr(function2).get_identifier() << '\n';
       }
       continue; // abort search
     }
@@ -70,25 +61,13 @@ void show_call_sequences(
   }
 }
 
-/*******************************************************************\
-
-Function: show_call_sequences
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void show_call_sequences(
   const irep_idt &function,
   const goto_programt &goto_program)
 {
   // this is quadratic
 
-  std::cout << "# " << function << std::endl;
+  std::cout << "# " << function << '\n';
 
   show_call_sequences(
     function,
@@ -115,20 +94,8 @@ void show_call_sequences(
       next);
   }
 
-  std::cout << std::endl;
+  std::cout << '\n';
 }
-
-/*******************************************************************\
-
-Function: show_call_sequences
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void show_call_sequences(const goto_functionst &goto_functions)
 {
@@ -137,18 +104,6 @@ void show_call_sequences(const goto_functionst &goto_functions)
   forall_goto_functions(f_it, goto_functions)
     show_call_sequences(f_it->first, f_it->second.body);
 }
-
-/*******************************************************************\
-
-Function: check_call_sequence
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 class check_call_sequencet
 {
@@ -326,18 +281,6 @@ void check_call_sequencet::operator()()
   std::cout << "sequence not feasible\n";
 }
 
-/*******************************************************************\
-
-Function: check_call_sequence
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 void check_call_sequence(const goto_functionst &goto_functions)
 {
   // read the sequence from stdin
@@ -356,18 +299,6 @@ void check_call_sequence(const goto_functionst &goto_functions)
 
   check_call_sequencet(goto_functions, sequence)();
 }
-
-/*******************************************************************\
-
-Function: list_calls_and_arguments
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 static void list_calls_and_arguments(
   const namespacet &ns,
@@ -414,18 +345,6 @@ static void list_calls_and_arguments(
     std::cout << '\n';
   }
 }
-
-/*******************************************************************\
-
-Function: show_call_sequences
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 void list_calls_and_arguments(
   const namespacet &ns,

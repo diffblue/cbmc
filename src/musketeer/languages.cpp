@@ -6,23 +6,14 @@ Author:
 
 \*******************************************************************/
 
-#include <langapi/mode.h>
-
-#include <ansi-c/ansi_c_language.h>
+/// \file
+/// Language Registration
 
 #include "musketeer_parse_options.h"
 
-/*******************************************************************\
+#include <langapi/mode.h>
 
-Function: goto_instrument_parse_optionst::register_languages
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
+#include <ansi-c/ansi_c_language.h>
 
 void goto_fence_inserter_parse_optionst::register_languages()
 {

@@ -6,26 +6,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include "boolbv.h"
+
 #include <algorithm>
 #include <iostream>
 
 #include <util/std_types.h>
 
-#include "boolbv.h"
-
 #include "../floatbv/float_utils.h"
-
-/*******************************************************************\
-
-Function: boolbvt::convert_floatbv_typecast
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
 
 bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
 {
@@ -84,18 +72,6 @@ bvt boolbvt::convert_floatbv_typecast(const floatbv_typecast_exprt &expr)
     return conversion_failed(expr);
 }
 
-/*******************************************************************\
-
-Function: boolbvt::convert_floatbv_op
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 bvt boolbvt::convert_floatbv_op(const exprt &expr)
 {
   const exprt::operandst &operands=expr.operands();
@@ -115,7 +91,7 @@ bvt boolbvt::convert_floatbv_op(const exprt &expr)
 
   if(op0.type()!=type || op1.type()!=type)
   {
-    std::cerr << expr.pretty() << std::endl;
+    std::cerr << expr.pretty() << '\n';
     throw "float op with mixed types";
   }
 
