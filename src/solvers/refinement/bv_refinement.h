@@ -54,8 +54,6 @@ protected:
   bvt convert_mod(const mod_exprt &expr) override;
   bvt convert_floatbv_op(const exprt &expr) override;
 
-  // Collect stats
-  void set_to(const exprt &expr, bool value) override;
   void set_assumptions(const bvt &_assumptions) override;
 
 private:

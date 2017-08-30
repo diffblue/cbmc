@@ -133,24 +133,6 @@ void bv_refinementt::check_UNSAT()
     check_UNSAT(approximation);
 }
 
-void bv_refinementt::set_to(const exprt &expr, bool value)
-{
-  #if 0
-  unsigned prev=prop.no_variables();
-  SUB::set_to(expr, value);
-  unsigned n=prop.no_variables()-prev;
-  std::cout << n << " EEE " << expr.id() << "@" << expr.type().id();
-  forall_operands(it, expr)
-    std::cout << " " << it->id() << "@" << it->type().id();
-  if(expr.id()=="=" && expr.operands().size()==2)
-    forall_operands(it, expr.op1())
-      std::cout << " " << it->id() << "@" << it->type().id();
-  std::cout << '\n';
-  #else
-  SUB::set_to(expr, value);
-  #endif
-}
-
 void bv_refinementt::set_assumptions(const bvt &_assumptions)
 {
   parent_assumptions=_assumptions;
