@@ -19,6 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
+#include <limits>
 #include <ansi-c/string_constant.h>
 #include <java_bytecode/java_types.h>
 #include <solvers/refinement/string_refinement_invariant.h>

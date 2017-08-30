@@ -24,13 +24,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <util/refined_string_type.h>
+#include <util/constexpr.def>
 #include <solvers/refinement/string_constraint.h>
-
-#if defined(__GNUC__) || defined(__clang__)
-#define CBMC_CONSTEXPR constexpr
-#else
-#define CBMC_CONSTEXPR
-#endif
 
 class string_constraint_generatort final
 {

@@ -20,6 +20,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
+#include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <solvers/refinement/string_constraint.h>
