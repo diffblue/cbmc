@@ -115,28 +115,6 @@ public:
     }
   }
 
-  // map program locations to block numbers
-  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
-  block_mapt block_map;
-
-  struct block_infot
-  {
-    /// the program location to instrument for this block
-    goto_programt::const_targett representative_inst;
-
-    /// the source location representative for this block
-    // (we need a separate copy of source locations because we attach
-    //  the line number ranges to them)
-    source_locationt source_location;
-
-    // map block numbers to source code locations
-    /// the set of lines belonging to this block
-    std::unordered_set<unsigned> lines;
-  };
-
-  typedef std::vector<block_infot> block_infost;
-  block_infost block_infos;
-
   /// \param t a goto instruction
   /// \return the block number of the block
   ///         the given goto instruction is part of
@@ -176,6 +154,29 @@ public:
           << " -> " << b_it->second
           << '\n';
   }
+
+protected:
+  // map program locations to block numbers
+  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
+  block_mapt block_map;
+
+  struct block_infot
+  {
+    /// the program location to instrument for this block
+    goto_programt::const_targett representative_inst;
+
+    /// the source location representative for this block
+    // (we need a separate copy of source locations because we attach
+    //  the line number ranges to them)
+    source_locationt source_location;
+
+    // map block numbers to source code locations
+    /// the set of lines belonging to this block
+    std::unordered_set<unsigned> lines;
+  };
+
+  typedef std::vector<block_infot> block_infost;
+  block_infost block_infos;
 };
 
 bool coverage_goalst::get_coverage_goals(
