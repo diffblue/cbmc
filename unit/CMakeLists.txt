@@ -31,7 +31,12 @@ target_include_directories(unit
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(unit ansi-c solvers java_bytecode)
-add_test(NAME unit COMMAND unit WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+add_test(
+    NAME unit
+    COMMAND $<TARGET_FILE:unit>
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+set_tests_properties(unit PROPERTIES LABELS CORE)
 
 add_executable(miniBDD miniBDD.cpp)
 target_include_directories(miniBDD
@@ -41,7 +46,8 @@ target_include_directories(miniBDD
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(miniBDD solvers ansi-c)
-add_test(miniBDD miniBDD)
+add_test(NAME miniBDD COMMAND $<TARGET_FILE:miniBDD>)
+set_tests_properties(miniBDD PROPERTIES LABELS CORE)
 
 add_executable(string_utils string_utils.cpp)
 target_include_directories(string_utils
@@ -51,7 +57,8 @@ target_include_directories(string_utils
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(string_utils solvers ansi-c)
-add_test(string_utils string_utils)
+add_test(NAME string_utils COMMAND $<TARGET_FILE:string_utils>)
+set_tests_properties(string_utils PROPERTIES LABELS CORE)
 
 add_executable(sharing_node sharing_node.cpp)
 target_include_directories(sharing_node
@@ -60,6 +67,6 @@ target_include_directories(sharing_node
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
-add_test(sharing_node sharing_node)
-
-install(TARGETS unit miniBDD string_utils sharing_node DESTINATION bin)
+target_link_libraries(sharing_node util)
+add_test(NAME sharing_node COMMAND $<TARGET_FILE:sharing_node>)
+set_tests_properties(sharing_node PROPERTIES LABELS CORE)

@@ -20,6 +20,31 @@ function(make_inc name)
     )
 endfunction(make_inc)
 
+################################################################################
+
+if(MINGW)
+    set(platform_unavail
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/java.io.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/err.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/threads.c
+    )
+else()
+    set(platform_unavail
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/java.io.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/library/threads.c
+    )
+endif()
+
+file(GLOB library_check_sources "library/*.c")
+list(REMOVE_ITEM library_check_sources ${platform_unavail})
+
+add_custom_target(library_check
+    ${CMAKE_CURRENT_SOURCE_DIR}/check_library.sh ${library_check_sources}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+################################################################################
+
 make_inc(arm_builtin_headers)
 make_inc(clang_builtin_headers)
 make_inc(cw_builtin_headers)

@@ -1,13 +1,22 @@
 default: tests.log
 
+include ../../src/config.inc
+include ../../src/common
+
+ifeq ($(BUILD_ENV_),MSVC)
+	exe=../../../src/goto-cc/goto-cl
+else
+	exe=../../../src/goto-cc/goto-cc
+endif
+
 test:
-	@if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
+	@if ! ../test.pl -c $(exe) ; then \
 		../failed-tests-printer.pl ; \
 		exit 1 ; \
 	fi
 
 tests.log: ../test.pl
-	@if ! ../test.pl -c ../../../src/goto-cc/goto-cc ; then \
+	@if ! ../test.pl -c $(exe) ; then \
 		../failed-tests-printer.pl ; \
 		exit 1 ; \
 	fi

@@ -35,3 +35,7 @@ add_if_library(goto-cc-lib jsil)
 # Executable
 add_executable(goto-cc goto_cc_main.cpp)
 target_link_libraries(goto-cc goto-cc-lib)
+
+if(WIN32)
+  set_target_properties(goto-cc PROPERTIES OUTPUT_NAME goto-cl)
+endif()
