@@ -49,17 +49,17 @@ public:
 
   explicit string_constraint_generatort(const infot& info);
 
-  // Axioms are of three kinds: universally quantified string constraint,
-  // not contains string constraints and simple formulas.
+  /// Axioms are of three kinds: universally quantified string constraint,
+  /// not contains string constraints and simple formulas.
   const std::vector<exprt> &get_axioms() const;
 
-  // Boolean symbols for the results of some string functions
+  /// Boolean symbols for the results of some string functions
   const std::vector<symbol_exprt> &get_boolean_symbols() const;
 
   /// Symbols used in existential quantifications
   const std::vector<symbol_exprt> &get_index_symbols() const;
 
-  // Set of strings that have been created by the generator
+  /// Set of strings that have been created by the generator
   const std::set<string_exprt> &get_created_strings() const;
 
   exprt get_witness_of(
@@ -73,8 +73,7 @@ public:
     const irep_idt &prefix, const typet &type=bool_typet());
   symbol_exprt fresh_univ_index(const irep_idt &prefix, const typet &type);
 
-  // Maps unresolved symbols to the string_exprt that was created for them
-
+  /// Maps unresolved symbols to the string_exprt that was created for them
   string_exprt add_axioms_for_refined_string(const exprt &expr);
 
   exprt add_axioms_for_function_application(

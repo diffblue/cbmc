@@ -42,7 +42,7 @@ public:
     size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Make non-deterministic character arrays have at least one character
     bool string_non_empty=false;
-    // Concretize strings after solver is finished
+    /// Concretize strings after solver is finished
     bool trace=false;
     /// Make non-deterministic characters printable
     bool string_printable=false;
