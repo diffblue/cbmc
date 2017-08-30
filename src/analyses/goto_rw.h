@@ -45,6 +45,14 @@ void goto_rw(const goto_functionst &goto_functions,
 class range_domain_baset
 {
 public:
+  range_domain_baset()=default;
+
+  range_domain_baset(const range_domain_baset &rhs)=delete;
+  range_domain_baset &operator=(const range_domain_baset &rhs)=delete;
+
+  range_domain_baset(range_domain_baset &&rhs)=delete;
+  range_domain_baset &operator=(range_domain_baset &&rhs)=delete;
+
   virtual ~range_domain_baset();
 
   virtual void output(const namespacet &ns, std::ostream &out) const=0;
@@ -62,12 +70,29 @@ inline range_spect to_range_spect(const mp_integer &size)
 }
 
 // each element x represents a range of bits [x.first, x.second.first)
-class range_domaint:
-  public range_domain_baset,
-  public std::list<std::pair<range_spect, range_spect> >
+class range_domaint:public range_domain_baset
 {
+  typedef std::list<std::pair<range_spect, range_spect>> sub_typet;
+  sub_typet data;
+
 public:
-  virtual void output(const namespacet &ns, std::ostream &out) const;
+  void output(const namespacet &ns, std::ostream &out) const override;
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::const_iterator const_iterator;
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.begin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.end(); }
+
+  template <typename T>
+  void push_back(T &&v) { data.push_back(std::forward<T>(v)); }
 };
 
 class array_exprt;
@@ -258,12 +283,29 @@ protected:
     const range_spect &size);
 };
 
-class guarded_range_domaint:
-  public range_domain_baset,
-  public std::multimap<range_spect, std::pair<range_spect, exprt> >
+class guarded_range_domaint:public range_domain_baset
 {
+  typedef std::multimap<range_spect, std::pair<range_spect, exprt>> sub_typet;
+  sub_typet data;
+
 public:
-  virtual void output(const namespacet &ns, std::ostream &out) const;
+  virtual void output(const namespacet &ns, std::ostream &out) const override;
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::const_iterator const_iterator;
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.begin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.end(); }
+
+  template<typename T>
+  iterator insert(T &&v) { return data.insert(std::forward<T>(v)); }
 };
 
 class rw_guarded_range_set_value_sett:public rw_range_set_value_sett

@@ -186,27 +186,20 @@ protected:
   // This is a vector, so it's fast.
   typedef expanding_vectort<flagst> points_tot;
 
-  // the information tracked per program location
-  class loc_infot
-  {
-  public:
-    points_tot points_to;
+  static bool merge(points_tot &a, points_tot &b);
 
-    bool merge(const loc_infot &src);
-  };
-
-  typedef std::vector<loc_infot> loc_infost;
+  typedef std::vector<points_tot> loc_infost;
   loc_infost loc_infos;
 
   void assign_lhs(
     const exprt &lhs,
     const exprt &rhs,
-    const loc_infot &loc_info_src,
-    loc_infot &loc_info_dest);
+    points_tot &loc_info_src,
+    points_tot &loc_info_dest);
 
   flagst get_rec(
     const exprt &rhs,
-    const loc_infot &loc_info_src);
+    points_tot &loc_info_src);
 
   bool is_tracked(const irep_idt &identifier);
 };

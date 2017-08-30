@@ -33,7 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "add_failed_symbols.h"
 
-const value_sett::object_map_dt value_sett::object_map_dt::blank;
+const value_sett::object_map_dt value_sett::object_map_dt::blank{};
 object_numberingt value_sett::object_numbering;
 
 bool value_sett::field_sensitive(
@@ -74,7 +74,7 @@ bool value_sett::insert(
   unsigned n,
   const objectt &object) const
 {
-  object_map_dt::const_iterator entry=dest.read().find(n);
+  auto entry=dest.read().find(n);
 
   if(entry==dest.read().end())
   {
@@ -184,9 +184,9 @@ void value_sett::output(
   }
 }
 
-exprt value_sett::to_expr(object_map_dt::const_iterator it) const
+exprt value_sett::to_expr(const object_map_dt::value_type &it) const
 {
-  const exprt &object=object_numbering[it->first];
+  const exprt &object=object_numbering[it.first];
 
   if(object.id()==ID_invalid ||
      object.id()==ID_unknown)
@@ -196,8 +196,8 @@ exprt value_sett::to_expr(object_map_dt::const_iterator it) const
 
   od.object()=object;
 
-  if(it->second.offset_is_set)
-    od.offset()=from_integer(it->second.offset, index_type());
+  if(it.second.offset_is_set)
+    od.offset()=from_integer(it.second.offset, index_type());
 
   od.type()=od.object().type();
 
@@ -251,7 +251,7 @@ bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const
       it!=src.read().end();
       it++)
   {
-    if(insert(dest, it))
+    if(insert(dest, *it))
       result=true;
   }
 
@@ -323,7 +323,7 @@ void value_sett::get_value_set(
       it=object_map.read().begin();
       it!=object_map.read().end();
       it++)
-    dest.push_back(to_expr(it));
+    dest.push_back(to_expr(*it));
 
   #if 0
   for(value_setst::valuest::const_iterator it=dest.begin();
@@ -918,7 +918,7 @@ void value_sett::get_reference_set(
       it=object_map.read().begin();
       it!=object_map.read().end();
       it++)
-    dest.push_back(to_expr(it));
+    dest.push_back(to_expr(*it));
 }
 
 void value_sett::get_reference_set_rec(
@@ -1267,7 +1267,7 @@ void value_sett::do_free(
           to_dynamic_object_expr(object);
 
         if(to_mark.count(dynamic_object.get_instance())==0)
-          set(new_object_map, o_it);
+          set(new_object_map, *o_it);
         else
         {
           // adjust
@@ -1279,7 +1279,7 @@ void value_sett::do_free(
         }
       }
       else
-        set(new_object_map, o_it);
+        set(new_object_map, *o_it);
     }
 
     if(changed)

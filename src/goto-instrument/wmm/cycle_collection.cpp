@@ -25,7 +25,7 @@ void event_grapht::graph_explorert::filter_thin_air(
   {
     std::set<critical_cyclet>::const_iterator next=it;
     ++next;
-    critical_cyclet::const_iterator e_it=it->begin();
+    auto e_it=it->begin();
     /* is there an event in the cycle not in thin-air events? */
     for(; e_it!=it->end(); ++e_it)
       if(thin_air_events.find(*e_it)==thin_air_events.end())
