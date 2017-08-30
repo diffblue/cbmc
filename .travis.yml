@@ -34,6 +34,7 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
+            - parallel
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
@@ -62,7 +63,7 @@ jobs:
       before_install:
           #we create symlink to non-ccache gcc, to be used in tests
         - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env: COMPILER="ccache g++"
 
@@ -73,7 +74,7 @@ jobs:
       compiler: clang
       cache: ccache
       before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache parallel
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env:
         - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
@@ -93,6 +94,7 @@ jobs:
             - libwww-perl
             - g++-5
             - libubsan0
+            - parallel
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
@@ -117,6 +119,7 @@ jobs:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
+            - parallel
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
         - export CCACHE_CPP2=yes
@@ -141,6 +144,7 @@ jobs:
             - clang-3.7
             - libstdc++-5-dev
             - libubsan0
+            - parallel
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
         - export CCACHE_CPP2=yes
@@ -165,7 +169,7 @@ install:
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\"" &&
+    COMMAND="env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test-parallel CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\"" &&
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C unit CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}

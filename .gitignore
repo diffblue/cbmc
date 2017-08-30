@@ -48,6 +48,9 @@ regression/**/*.smt2
 # regression/coverage file
 /regression/coverage_**
 
+# stats from parallel run of regression tests
+/regression/regression.stats
+
 # files stored by editors
 *~
 
