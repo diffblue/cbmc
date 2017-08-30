@@ -199,6 +199,11 @@ public:
       targets.push_back(t);
     }
 
+    bool has_target() const
+    {
+      return !targets.empty();
+    }
+
     /// Goto target labels
     typedef std::list<irep_idt> labelst;
     labelst labels;

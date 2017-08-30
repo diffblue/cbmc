@@ -93,23 +93,21 @@ void natural_loops_templatet<P, T>::compute(P &program)
   {
     if(m_it->is_backwards_goto())
     {
-      for(const auto &target : m_it->targets)
-      {
-        if(target->location_number<=m_it->location_number)
-        {
-          const nodet &node=
-            cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
+      const auto &target=m_it->get_target();
 
-#ifdef DEBUG
-          std::cout << "Computing loop for "
-                    << m_it->location_number << " -> "
-                    << target->location_number << "\n";
-#endif
-          if(node.dominators.find(target)!=node.dominators.end())
-          {
-            compute_natural_loop(m_it, target);
-          }
-        }
+      if(target->location_number<=m_it->location_number)
+      {
+        const nodet &node=
+          cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
+
+        #ifdef DEBUG
+        std::cout << "Computing loop for "
+                  << m_it->location_number << " -> "
+                  << target->location_number << "\n";
+        #endif
+
+        if(node.dominators.find(target)!=node.dominators.end())
+          compute_natural_loop(m_it, target);
       }
     }
   }
