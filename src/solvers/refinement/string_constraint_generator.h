@@ -338,8 +338,8 @@ private:
 
   // MEMBERS
 public:
-  // Used to store information about witnesses for not_contains constraints
   const size_t max_string_length;
+  // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
   // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
