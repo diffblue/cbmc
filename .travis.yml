@@ -151,6 +151,35 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      env:
+        - BUILD_SYSTEM=cmake
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      install:
+        - mkdir build
+        - cmake -Bbuild -H. '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
+        - cmake --build build -- -j4
+      script: (cd build; ctest -V -L CORE)
+      before_cache:
+
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      env:
+        - BUILD_SYSTEM=cmake
+      install:
+        - mkdir build
+        - cmake -Bbuild -H. '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=i386;x86_64'
+        - cmake --build build -- -j4
+      script: (cd build; ctest -V -L CORE)
+      before_cache:
+
+
   allow_failures:
     - <<: *linter-stage
 
