@@ -199,7 +199,7 @@ constant_exprt from_integer(
   }
 
   {
-    assert(false);
+    PRECONDITION(false);
     constant_exprt r;
     r.make_nil();
     return r;

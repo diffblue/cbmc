@@ -460,7 +460,7 @@ void ansi_c_convert_typet::write(typet &type)
         else
           type=unsigned_long_long_int_type();
       else
-        assert(false);
+        UNREACHABLE;
     }
     else if(gcc_int128_cnt)
     {

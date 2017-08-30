@@ -172,7 +172,7 @@ void configt::ansi_ct::set_arch_spec_i386()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -209,7 +209,7 @@ void configt::ansi_ct::set_arch_spec_x86_64()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -270,7 +270,7 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -313,7 +313,7 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -342,7 +342,7 @@ void configt::ansi_ct::set_arch_spec_alpha()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -382,7 +382,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -392,7 +392,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -411,7 +411,7 @@ void configt::ansi_ct::set_arch_spec_s390()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -421,7 +421,7 @@ void configt::ansi_ct::set_arch_spec_s390()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -439,7 +439,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -449,7 +449,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -479,7 +479,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -489,7 +489,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -520,7 +520,7 @@ void configt::ansi_ct::set_arch_spec_ia64()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -545,7 +545,7 @@ void configt::ansi_ct::set_arch_spec_x32()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -555,7 +555,7 @@ void configt::ansi_ct::set_arch_spec_x32()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -599,7 +599,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -609,7 +609,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -629,7 +629,7 @@ void configt::ansi_ct::set_arch_spec_sh4()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -639,7 +639,7 @@ void configt::ansi_ct::set_arch_spec_sh4()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 

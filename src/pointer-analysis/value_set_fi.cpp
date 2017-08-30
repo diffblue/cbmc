@@ -245,7 +245,7 @@ exprt value_set_fit::to_expr(const object_map_dt::value_type &it) const
 
 bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
 {
-  assert(0);
+  UNREACHABLE;
   bool result=false;
 
   for(valuest::const_iterator
@@ -1429,7 +1429,7 @@ void value_set_fit::apply_code(
   else if(statement==ID_function_call)
   {
     // shouldn't be here
-    assert(false);
+    UNREACHABLE;
   }
   else if(statement==ID_assign ||
           statement==ID_init)

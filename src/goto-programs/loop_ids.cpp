@@ -67,7 +67,7 @@ void show_loop_ids(
       break;
     }
     case ui_message_handlert::uit::JSON_UI:
-      assert(false); // use function below
+      UNREACHABLE; // use function below
   }
 }
 

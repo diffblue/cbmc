@@ -64,7 +64,7 @@ void show_properties(
       break;
 
     case ui_message_handlert::uit::JSON_UI:
-      assert(false);
+      UNREACHABLE;
       break;
 
     case ui_message_handlert::uit::PLAIN:
@@ -79,7 +79,7 @@ void show_properties(
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
   }
 }

@@ -1021,7 +1021,7 @@ void cpp_typecheckt::typecheck_expr_delete(exprt &expr)
   {
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   typet pointer_type=follow(expr.op0().type());
 
@@ -1065,7 +1065,7 @@ void cpp_typecheckt::typecheck_expr_typecast(exprt &expr)
   // should not be called
   #if 0
   std::cout << "E: " << expr.pretty() << '\n';
-  assert(0);
+  UNREACHABLE;
   #endif
 }
 
@@ -1392,7 +1392,7 @@ void cpp_typecheckt::typecheck_cast_expr(exprt &expr)
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   expr.swap(new_expr);
 }

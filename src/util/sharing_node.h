@@ -17,6 +17,8 @@ Author: Daniel Poetzl
 #include <memory>
 #include <cassert>
 
+#include "invariant.h"
+
 #define _sn_assert(b) assert(b)
 //#define _sn_assert(b)
 
@@ -235,7 +237,7 @@ public:
       }
     }
 
-    assert(false);
+    UNREACHABLE;
   }
 
   // misc

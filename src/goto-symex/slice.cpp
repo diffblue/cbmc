@@ -105,7 +105,7 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -196,7 +196,7 @@ void symex_slicet::collect_open_variables(
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
   }
 

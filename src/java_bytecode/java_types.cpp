@@ -92,7 +92,7 @@ reference_typet java_array_type(const char subtype)
   case 'j': subtype_str="long"; break;
   case 'l': subtype_str="long"; break;
   case 'a': subtype_str="reference"; break;
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   irep_idt class_name="array["+subtype_str+"]";
@@ -131,7 +131,7 @@ typet java_type_from_char(char t)
   case 'd': return java_double_type();
   case 'z': return java_boolean_type();
   case 'a': return java_reference_type(void_typet());
-  default: assert(false); return nil_typet();
+  default: UNREACHABLE; return nil_typet();
   }
 }
 
