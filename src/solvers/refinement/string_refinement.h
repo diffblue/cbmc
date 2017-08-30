@@ -48,11 +48,11 @@ public:
     unsigned max_node_refinement=5;
     bool refine_arrays=false;
     bool refine_arithmetic=false;
+    bool use_counter_example=false;
   };
 
   explicit string_refinementt(const infot &);
 
-  const bool use_counter_example=false;
 
   virtual std::string decision_procedure_text() const override
   {
@@ -65,6 +65,7 @@ protected:
   decision_proceduret::resultt dec_solve() override;
 
 private:
+  const bool use_counter_example;
   const bool do_concretizing;
   // Base class
   typedef bv_refinementt supert;
