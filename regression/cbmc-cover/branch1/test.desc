@@ -3,12 +3,12 @@ main.c
 --cover branch
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 3 function main function main entry point: SATISFIED$
-^\[main.coverage.2\] file main.c line 8 function main function main block 1 branch false: SATISFIED$
-^\[main.coverage.3\] file main.c line 8 function main function main block 1 branch true: SATISFIED$
-^\[main.coverage.4\] file main.c line 10 function main function main block 2 branch false: FAILED$
-^\[main.coverage.5\] file main.c line 10 function main function main block 2 branch true: SATISFIED$
-^\[main.coverage.6\] file main.c line 16 function main function main block 4 branch false: SATISFIED$
-^\[main.coverage.7\] file main.c line 16 function main function main block 4 branch true: SATISFIED$
+^\[main.coverage.1\] file main.c line 3 function main entry point: SATISFIED$
+^\[main.coverage.2\] file main.c line 8 function main block 1 branch false: SATISFIED$
+^\[main.coverage.3\] file main.c line 8 function main block 1 branch true: SATISFIED$
+^\[main.coverage.4\] file main.c line 10 function main block 2 branch false: FAILED$
+^\[main.coverage.5\] file main.c line 10 function main block 2 branch true: SATISFIED$
+^\[main.coverage.6\] file main.c line 16 function main block 4 branch false: SATISFIED$
+^\[main.coverage.7\] file main.c line 16 function main block 4 branch true: SATISFIED$
 --
 ^warning: ignoring

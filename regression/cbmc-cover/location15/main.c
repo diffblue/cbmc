@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <math.h>
 
 int foo (int iX, int iY)
