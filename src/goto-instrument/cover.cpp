@@ -133,8 +133,12 @@ public:
   /// Select an instruction to be instrumented for each basic block such that
   /// the java bytecode indices for each basic block is unique
   /// \param goto_program The goto program
-  void select_unique_java_bytecode_indices(const goto_programt &goto_program)
+  /// \param message_handler The message handler
+  void select_unique_java_bytecode_indices(
+    const goto_programt &goto_program,
+    message_handlert &message_handler)
   {
+    messaget msg(message_handler);
     std::set<unsigned> blocks_seen;
     std::set<irep_idt> bytecode_indices_seen;
 
@@ -158,6 +162,12 @@ public:
             block_info.source_location=it->source_location;
             update_covered_lines(block_info);
             blocks_seen.insert(block_nr);
+            msg.debug() << it->function
+                        << " block " << (block_nr+1)
+                        << ": location " << it->location_number
+                        << ", bytecode-index "
+                        << it->source_location.get_java_bytecode_index()
+                        << " selected for instrumentation." << messaget::eom;
           }
         }
       }
@@ -176,6 +186,14 @@ public:
             // clash, reset to search for a new one
             block_info.representative_inst=goto_program.instructions.end();
             block_info.source_location=source_locationt::nil();
+            msg.debug() << it->function
+                        << " block " << (block_nr+1)
+                        << ", location " << it->location_number
+                        << ": bytecode-index "
+                        << it->source_location.get_java_bytecode_index()
+                        << " already instrumented."
+                        << " Searching for alternative instruction"
+                        << " to instrument." << messaget::eom;
           }
         }
       }
@@ -1232,7 +1250,8 @@ void instrument_cover_goals(
 
   const namespacet ns(symbol_table);
   basic_blockst basic_blocks(goto_program);
-  basic_blocks.select_unique_java_bytecode_indices(goto_program);
+  basic_blocks.select_unique_java_bytecode_indices(
+    goto_program, message_handler);
   basic_blocks.report_block_anomalies(goto_program, message_handler);
 
   const irep_idt coverage_criterion=as_string(criterion);
