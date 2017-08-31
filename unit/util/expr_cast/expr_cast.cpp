@@ -56,9 +56,11 @@ SCENARIO("expr_dynamic_cast",
 
     THEN("Casting from exprt reference to transt reference should throw")
     {
-      REQUIRE_THROWS_AS(
-        expr_dynamic_cast<const transt &>(expr_ref),
-        std::bad_cast);
+      // This no longer throws exceptions when our custom asserts are set to
+      //  abort the program
+      // REQUIRE_THROWS_AS(
+      //   expr_dynamic_cast<const transt &>(expr_ref),
+      //   std::bad_cast);
     }
   }
   GIVEN("A exprt reference to a symbolt")
@@ -73,7 +75,11 @@ SCENARIO("expr_dynamic_cast",
 
     THEN("Casting from exprt reference to transt reference should throw")
     {
-      REQUIRE_THROWS_AS(expr_dynamic_cast<transt &>(expr_ref), std::bad_cast);
+      // This no longer throws exceptions when our custom asserts are set to
+      //  abort the program
+      // REQUIRE_THROWS_AS(
+      //   expr_dynamic_cast<transt &>(expr_ref),
+      //   std::bad_cast);
     }
 
     THEN(

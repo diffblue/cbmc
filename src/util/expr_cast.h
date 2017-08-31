@@ -88,6 +88,8 @@ T expr_dynamic_cast(TExpr *base)
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a T
+/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
+///   abort rather than throw if \a base is not an instance of \a T
 template<typename T>
 T expr_dynamic_cast(const exprt &base)
 {
@@ -102,6 +104,8 @@ T expr_dynamic_cast(const exprt &base)
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a T
+/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
+///   abort rather than throw if \a base is not an instance of \a T
 template<typename T>
 T expr_dynamic_cast(exprt &base)
 {
@@ -118,6 +122,8 @@ T expr_dynamic_cast(exprt &base)
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a TUnderlying
+/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
+///   abort rather than throw if \a base is not an instance of \a TUnderlying
 template<typename T, typename TUnderlying, typename TExpr>
 T expr_dynamic_cast(TExpr &base)
 {
@@ -130,6 +136,7 @@ T expr_dynamic_cast(TExpr &base)
   static_assert(
     std::is_base_of<exprt, TUnderlying>::value,
     "The template argument T must be derived from exprt.");
+  PRECONDITION(can_cast_expr<TUnderlying>(base));
   if(!can_cast_expr<TUnderlying>(base))
     throw std::bad_cast();
   T value=static_cast<T>(base);
