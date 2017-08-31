@@ -137,7 +137,9 @@ public:
 
   message_handlert &get_message_handler()
   {
-    INVARIANT(message_handler!=nullptr, "message handler is set");
+    INVARIANT(
+      message_handler!=nullptr,
+      "message handler should be set before calling get_message_handler");
     return *message_handler;
   }
 
