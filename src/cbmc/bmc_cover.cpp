@@ -161,7 +161,8 @@ void bmc_covert::satisfying_assignment()
 
       if(solver.l_get(cond).is_true())
       {
-        status() << "Covered " << g.description << messaget::eom;
+        status() << "Covered function " << g.source_location.get_function()
+                 << " " << g.description << messaget::eom;
         g.satisfied=true;
         test.covered_goals.push_back(goal_pair.first);
         break;

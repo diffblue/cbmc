@@ -1327,8 +1327,7 @@ void instrument_cover_goals(
              !source_location.is_built_in() &&
              cover_curr_function)
           {
-            std::string comment=
-              "function "+id2string(i_it->function)+" block "+b;
+            std::string comment="block "+b;
             const irep_idt function=i_it->function;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
@@ -1354,8 +1353,7 @@ void instrument_cover_goals(
       {
         // we want branch coverage to imply 'entry point of function'
         // coverage
-        std::string comment=
-          "function "+id2string(i_it->function)+" entry point";
+        std::string comment="entry point";
 
         source_locationt source_location=i_it->source_location;
 
@@ -1374,10 +1372,8 @@ void instrument_cover_goals(
       {
         std::string b=
           std::to_string(basic_blocks.block_of(i_it)+1); // start with 1
-        std::string true_comment=
-          "function "+id2string(i_it->function)+" block "+b+" branch true";
-        std::string false_comment=
-          "function "+id2string(i_it->function)+" block "+b+" branch false";
+        std::string true_comment="block "+b+" branch true";
+        std::string false_comment="block "+b+" branch false";
 
         exprt guard=i_it->guard;
         const irep_idt function=i_it->function;
