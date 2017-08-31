@@ -119,7 +119,12 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
 decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 {
   satcheck_no_simplifiert sat_check;
-  bv_refinementt solver(ns, sat_check);
+  bv_refinementt::infot info;
+  info.ns=&ns;
+  info.prop=&sat_check;
+  const auto ui=language_uit::uit::PLAIN;
+  info.ui=ui;
+  bv_refinementt solver(info);
   solver << expr;
   return solver();
 }
@@ -148,11 +153,13 @@ SCENARIO("instantiate_not_contains",
     // Generating the corresponding axioms and simplifying, recording info
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort::infot info;
+    info.ns=&empty_ns;
+    string_constraint_generatort generator(info);
     exprt res=generator.add_axioms_for_function_application(func);
     std::string axioms;
     std::vector<string_not_contains_constraintt> nc_axioms;
-    for(auto &axiom : generator.axioms)
+    for(exprt axiom : generator.get_axioms())
     {
       simplify(axiom, ns);
       if(axiom.id()==ID_string_constraint)
@@ -234,7 +241,9 @@ SCENARIO("instantiate_not_contains",
     // Create witness for axiom
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort::infot info;
+    info.ns=&empty_ns;
+    string_constraint_generatort generator(info);
     generator.witness[vacuous]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -291,7 +300,9 @@ SCENARIO("instantiate_not_contains",
     // Create witness for axiom
     symbol_tablet symtab;
     namespacet ns(symtab);
-    string_constraint_generatort generator(ns);
+    string_constraint_generatort::infot info;
+    info.ns=&ns;
+    string_constraint_generatort generator(info);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -349,7 +360,9 @@ SCENARIO("instantiate_not_contains",
     // Create witness for axiom
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort::infot info;
+    info.ns=&empty_ns;
+    string_constraint_generatort generator(info);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -408,7 +421,10 @@ SCENARIO("instantiate_not_contains",
     // Create witness for axiom
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
-    string_constraint_generatort generator(empty_ns);
+
+    string_constraint_generatort::infot info;
+    info.ns=&empty_ns;
+    string_constraint_generatort generator(info);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -466,7 +482,9 @@ SCENARIO("instantiate_not_contains",
     // Create witness for axiom
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
-    string_constraint_generatort generator(empty_ns);
+    string_constraint_generatort::infot info;
+    info.ns=&empty_ns;
+    string_constraint_generatort generator(info);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 

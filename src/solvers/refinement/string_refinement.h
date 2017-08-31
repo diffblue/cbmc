@@ -20,6 +20,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_REFINEMENT_H
 
+#include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
 #include <solvers/refinement/string_constraint.h>
@@ -28,52 +29,59 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define MAX_NB_REFINEMENT 100
 
-class string_refinementt: public bv_refinementt
+class string_refinementt final: public bv_refinementt
 {
 public:
-  string_refinementt(
-    const namespacet &_ns,
-    propt &_prop,
-    unsigned refinement_bound);
+  /// string_refinementt constructor arguments
+  struct infot
+  {
+    const namespacet *ns=nullptr;
+    propt *prop=nullptr;
+    language_uit::uit ui=language_uit::uit::PLAIN;
+    unsigned refinement_bound=0;
+    size_t string_max_length=std::numeric_limits<size_t>::max();
+    /// Make non-deterministic character arrays have at least one character
+    bool string_non_empty=false;
+    /// Concretize strings after solver is finished
+    bool trace=false;
+    /// Make non-deterministic characters printable
+    bool string_printable=false;
+    unsigned max_node_refinement=5;
+    bool refine_arrays=false;
+    bool refine_arithmetic=false;
+    bool use_counter_example=false;
+  };
 
-  void set_mode();
+  explicit string_refinementt(const infot &);
 
-  // Should we use counter examples at each iteration?
-  bool use_counter_example;
-
-  // Should we concretize strings when the solver finished
-  bool do_concretizing;
-
-  void set_max_string_length(size_t i);
-  void enforce_non_empty_string();
-  void enforce_printable_characters();
 
   virtual std::string decision_procedure_text() const override
   {
     return "string refinement loop with "+prop.solver_text();
   }
 
-  static exprt is_positive(const exprt &x);
-
   exprt get(const exprt &expr) const override;
 
 protected:
+  decision_proceduret::resultt dec_solve() override;
+
+private:
+  const bool use_counter_example;
+  const bool do_concretizing;
+  // Base class
+  typedef bv_refinementt supert;
+
   typedef std::set<exprt> expr_sett;
   typedef std::list<exprt> exprt_listt;
 
-  decision_proceduret::resultt dec_solve() override;
-
+  string_refinementt(const infot &, bool);
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
-
-private:
-  // Base class
-  typedef bv_refinementt supert;
 
   unsigned initial_loop_bound;
 
   string_constraint_generatort generator;
 
-  bool non_empty_string;
+  const bool non_empty_string;
   expr_sett nondet_arrays;
 
   // Simple constraints that have been given to the solver

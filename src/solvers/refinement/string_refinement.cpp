@@ -34,41 +34,46 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 
-string_refinementt::string_refinementt(
-  const namespacet &_ns,
-  propt &_prop,
-  unsigned refinement_bound):
-  supert(_ns, _prop),
+static bool validate(const string_refinementt::infot &info)
+{
+  PRECONDITION(info.ns);
+  PRECONDITION(info.prop);
+  return true;
+}
+
+static bv_refinementt::infot bv_refinement_info(
+  const string_refinementt::infot &in)
+{
+  bv_refinementt::infot out;
+  out.ns=in.ns;
+  out.prop=in.prop;
+  out.ui=in.ui;
+  out.max_node_refinement=in.max_node_refinement;
+  out.refine_arrays=in.refine_arrays;
+  out.refine_arithmetic=in.refine_arithmetic;
+  return out;
+}
+
+static string_constraint_generatort::infot
+generator_info(const string_refinementt::infot &in)
+{
+  string_constraint_generatort::infot out;
+  out.ns=in.ns;
+  out.string_max_length=in.string_max_length;
+  out.string_printable=in.string_printable;
+  return out;
+}
+
+string_refinementt::string_refinementt(const infot &info, bool):
+  supert(bv_refinement_info(info)),
   use_counter_example(false),
-  do_concretizing(false),
-  initial_loop_bound(refinement_bound),
-  generator(_ns),
-  non_empty_string(false)
-{ }
+  do_concretizing(info.trace),
+  initial_loop_bound(info.refinement_bound),
+  generator(generator_info(info)),
+  non_empty_string(info.string_non_empty) { }
 
-/// Add constraints on the size of strings used in the program.
-/// \param i: maximum length which is allowed for strings.
-/// by default the strings length has no other limit
-/// than the maximal integer according to the type of their
-/// length, for instance 2^31-1 for Java.
-void string_refinementt::set_max_string_length(size_t i)
-{
-  generator.max_string_length=i;
-}
-
-/// Add constraints on the size of nondet character arrays to ensure they have
-/// length at least 1
-void string_refinementt::enforce_non_empty_string()
-{
-  non_empty_string=true;
-}
-
-/// Add constraints on characters used in the program to ensure they are
-/// printable
-void string_refinementt::enforce_printable_characters()
-{
-  generator.force_printable_characters=true;
-}
+string_refinementt::string_refinementt(const infot &info):
+  string_refinementt(info, validate(info)) { }
 
 /// display the current index set, for debugging
 void string_refinementt::display_index_set()
@@ -373,7 +378,7 @@ void string_refinementt::concretize_results()
 {
   for(const auto &it : symbol_resolve)
     concretize_string(it.second);
-  for(const auto &it : generator.created_strings)
+  for(const auto &it : generator.get_created_strings())
     concretize_string(it);
   add_instantiations();
 }
@@ -393,7 +398,7 @@ void string_refinementt::concretize_lengths()
       found_length[content]=length;
      }
   }
-  for(const auto &it : generator.created_strings)
+  for(const auto &it : generator.get_created_strings())
   {
     if(is_refined_string_type(it.type()))
     {
@@ -496,7 +501,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(pair.first, pair.second);
   }
 
-  for(exprt &axiom : generator.axioms)
+  for(exprt axiom : generator.get_axioms())
   {
     replace_expr(symbol_resolve, axiom);
     if(axiom.id()==ID_string_constraint)
@@ -818,13 +823,13 @@ void string_refinementt::debug_model()
     }
   }
 
-  for(auto it : generator.boolean_symbols)
+  for(const auto it : generator.get_boolean_symbols())
   {
       debug() << " - " << it.get_identifier() << ": "
               << from_expr(ns, "", supert::get(it)) << eom;
   }
 
-  for(auto it : generator.index_symbols)
+  for(const auto it : generator.get_index_symbols())
   {
      debug() << " - " << it.get_identifier() << ": "
              << from_expr(ns, "", supert::get(it)) << eom;
@@ -1752,8 +1757,14 @@ bool string_refinementt::is_axiom_sat(
   const exprt &axiom, const symbol_exprt& var, exprt &witness)
 {
   satcheck_no_simplifiert sat_check;
-  supert solver(ns, sat_check);
-  solver.set_ui(ui);
+  supert::infot info;
+  info.ns=&ns;
+  info.prop=&sat_check;
+  info.refine_arithmetic=true;
+  info.refine_arrays=true;
+  info.max_node_refinement=5;
+  info.ui=ui;
+  supert solver(info);
   solver << axiom;
 
   switch(solver())

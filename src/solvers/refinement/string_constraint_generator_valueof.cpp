@@ -94,24 +94,24 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 
   std::string str_true="true";
   implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
   {
     exprt chr=from_integer(str_true[i], char_type);
     implies_exprt a2(eq, equal_exprt(res[i], chr));
-    axioms.push_back(a2);
+    m_axioms.push_back(a2);
   }
 
   std::string str_false="false";
   implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
   {
     exprt chr=from_integer(str_false[i], char_type);
     implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
-    axioms.push_back(a4);
+    m_axioms.push_back(a4);
   }
 
   return res;
@@ -189,7 +189,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_with_radix(
 /// \param chr: a character expression in the following set:
 ///   0123456789abcdef
 /// \return an integer expression
-exprt string_constraint_generatort::int_of_hex_char(const exprt &chr) const
+exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 {
   exprt zero_char=constant_char('0', chr.type());
   exprt nine_char=constant_char('9', chr.type());
@@ -221,7 +221,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
   exprt f_char=constant_char('f', char_type);
 
   size_t max_size=8;
-  axioms.push_back(
+  m_axioms.push_back(
     and_exprt(res.axiom_for_length_gt(0),
               res.axiom_for_length_le(max_size)));
 
@@ -247,12 +247,12 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
     }
 
     equal_exprt premise(res.axiom_for_has_length(size));
-    axioms.push_back(
+    m_axioms.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
     // disallow 0s at the beginning
     if(size>1)
-      axioms.push_back(
+      m_axioms.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
   return res;
@@ -288,7 +288,7 @@ string_exprt string_constraint_generatort::add_axioms_from_char(
 {
   string_exprt res=fresh_string(ref_type);
   and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
-  axioms.push_back(lemma);
+  m_axioms.push_back(lemma);
   return res;
 }
 
@@ -323,30 +323,30 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 
   // |str| > 0
   const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
-  axioms.push_back(non_empty);
+  m_axioms.push_back(non_empty);
 
   if(strict_formatting)
   {
     // str[0] = '-' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(starts_with_minus, starts_with_digit);
-    axioms.push_back(correct_first);
+    m_axioms.push_back(correct_first);
   }
   else
   {
     // str[0] = '-' || str[0] = '+' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(
       starts_with_minus, starts_with_digit, starts_with_plus);
-    axioms.push_back(correct_first);
+    m_axioms.push_back(correct_first);
   }
 
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
     str.axiom_for_length_ge(from_integer(2, index_type)));
-  axioms.push_back(contains_digit);
+  m_axioms.push_back(contains_digit);
 
   // |str| <= max_size
-  axioms.push_back(str.axiom_for_length_le(max_size));
+  m_axioms.push_back(str.axiom_for_length_le(max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -358,7 +358,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
       str.axiom_for_length_ge(from_integer(index+1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
-    axioms.push_back(character_at_index_is_digit);
+    m_axioms.push_back(character_at_index_is_digit);
   }
 
   if(strict_formatting)
@@ -369,12 +369,12 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
     const implies_exprt no_leading_zero(
       equal_exprt(chr, zero_char),
       str.axiom_for_has_length(from_integer(1, index_type)));
-    axioms.push_back(no_leading_zero);
+    m_axioms.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
       starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
-    axioms.push_back(no_leading_zero_after_minus);
+    m_axioms.push_back(no_leading_zero_after_minus);
   }
 }
 
@@ -412,7 +412,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   /// Deal with size==1 case separately. There are axioms from
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
-  axioms.push_back(
+  m_axioms.push_back(
     implies_exprt(str.axiom_for_has_length(1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
@@ -456,18 +456,18 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     if(!digit_constraints.empty())
     {
       const implies_exprt a5(premise, conjunction(digit_constraints));
-      axioms.push_back(a5);
+      m_axioms.push_back(a5);
     }
 
     const implies_exprt a6(
       and_exprt(premise, not_exprt(starts_with_minus)),
       equal_exprt(input_int, sum));
-    axioms.push_back(a6);
+    m_axioms.push_back(a6);
 
     const implies_exprt a7(
       and_exprt(premise, starts_with_minus),
       equal_exprt(input_int, unary_minus_exprt(sum)));
-    axioms.push_back(a7);
+    m_axioms.push_back(a7);
   }
 }
 
@@ -530,7 +530,7 @@ unsigned long string_constraint_generatort::to_integer_or_default(
   const exprt &expr, unsigned long def)
 {
   mp_integer mp_radix;
-  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
+  bool to_integer_failed=to_integer(simplify_expr(expr, m_ns), mp_radix);
   return to_integer_failed?def:integer2ulong(mp_radix);
 }
 

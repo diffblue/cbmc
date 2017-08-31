@@ -48,27 +48,27 @@ string_exprt string_constraint_generatort::add_axioms_for_code_point(
 
   binary_relation_exprt small(code_point, ID_lt, hex010000);
   implies_exprt a1(small, res.axiom_for_has_length(1));
-  axioms.push_back(a1);
+  m_axioms.push_back(a1);
 
   implies_exprt a2(not_exprt(small), res.axiom_for_has_length(2));
-  axioms.push_back(a2);
+  m_axioms.push_back(a2);
 
   typecast_exprt code_point_as_char(code_point, ref_type.get_char_type());
   implies_exprt a3(small, equal_exprt(res[0], code_point_as_char));
-  axioms.push_back(a3);
+  m_axioms.push_back(a3);
 
   plus_exprt first_char(
     hexD800, div_exprt(minus_exprt(code_point, hex010000), hex0400));
   implies_exprt a4(
     not_exprt(small),
     equal_exprt(res[0], typecast_exprt(first_char, ref_type.get_char_type())));
-  axioms.push_back(a4);
+  m_axioms.push_back(a4);
 
   plus_exprt second_char(hexDC00, mod_exprt(code_point, hex0400));
   implies_exprt a5(
     not_exprt(small),
     equal_exprt(res[1], typecast_exprt(second_char, ref_type.get_char_type())));
-  axioms.push_back(a5);
+  m_axioms.push_back(a5);
 
   return res;
 }
@@ -79,7 +79,7 @@ string_exprt string_constraint_generatort::add_axioms_for_code_point(
 /// 0xD800..0xDBFF
 /// \par parameters: a character expression
 /// \return a Boolean expression
-exprt string_constraint_generatort::is_high_surrogate(const exprt &chr) const
+exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 {
   return and_exprt(
     binary_relation_exprt(chr, ID_ge, constant_char(0xD800, chr.type())),
@@ -92,7 +92,7 @@ exprt string_constraint_generatort::is_high_surrogate(const exprt &chr) const
 /// 0xDC00..0xDFFF
 /// \par parameters: a character expression
 /// \return a Boolean expression
-exprt string_constraint_generatort::is_low_surrogate(const exprt &chr) const
+exprt string_constraint_generatort::is_low_surrogate(const exprt &chr)
 {
   return and_exprt(
     binary_relation_exprt(chr, ID_ge, constant_char(0xDC00, chr.type())),
@@ -141,8 +141,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_at(
     str[plus_exprt_with_overflow_check(pos, index1)]);
   exprt return_pair=and_exprt(is_high_surrogate(str[pos]), is_low);
 
-  axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
-  axioms.push_back(
+  m_axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
+  m_axioms.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char1_as_int)));
   return result;
 }
@@ -172,8 +172,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
   exprt return_pair=and_exprt(
     is_high_surrogate(char1), is_low_surrogate(char2));
 
-  axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
-  axioms.push_back(
+  m_axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
+  m_axioms.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char2_as_int)));
   return result;
 }
@@ -193,8 +193,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
   symbol_exprt result=fresh_symbol("code_point_count", return_type);
   minus_exprt length(end, begin);
   div_exprt minimum(length, from_integer(2, length.type()));
-  axioms.push_back(binary_relation_exprt(result, ID_le, length));
-  axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
+  m_axioms.push_back(binary_relation_exprt(result, ID_le, length));
+  m_axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
 
   return result;
 }
@@ -217,8 +217,8 @@ exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   exprt minimum=plus_exprt_with_overflow_check(index, offset);
   exprt maximum=plus_exprt_with_overflow_check(
     index, plus_exprt_with_overflow_check(offset, offset));
-  axioms.push_back(binary_relation_exprt(result, ID_le, maximum));
-  axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
+  m_axioms.push_back(binary_relation_exprt(result, ID_le, maximum));
+  m_axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
 
   return result;
 }

@@ -109,7 +109,8 @@ SCENARIO("calculate_max_string_length",
   "[core][solvers][refinement][string_constraint_generator_valueof]")
 {
   const unsigned long radixes[]={2, 8, 10, 16};
-  const typet int_types[]={
+  const typet int_types[]=
+  {
     signedbv_typet(32),
     unsignedbv_typet(32),
     signedbv_typet(64),
