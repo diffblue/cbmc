@@ -152,17 +152,15 @@ std::string utf32_to_utf8(const std::basic_string<unsigned int> &s)
   return result;
 }
 
-const char **narrow_argv(int argc, const wchar_t **argv_wide)
+std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide)
 {
   if(argv_wide==nullptr)
-    return nullptr;
+    return std::vector<std::string>();
 
-  // the following never gets deleted
-  const char **argv_narrow=new const char *[argc+1];
-  argv_narrow[argc]=nullptr;
+  std::vector<std::string> argv_narrow(argc);
 
-  for(int i=0; i<argc; i++)
-    argv_narrow[i]=strdup(narrow(argv_wide[i]).c_str());
+  for(int i=0; i!=argc; ++i)
+    argv_narrow[i]=narrow(argv_wide[i]);
 
   return argv_narrow;
 }
@@ -272,7 +270,7 @@ std::wstring utf8_to_utf16(const std::string& in, bool swap_bytes)
 
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-16BE format
-std::wstring utf8_to_utf16_big_endian(const std::string& in)
+std::wstring utf8_to_utf16_big_endian(const std::string &in)
 {
   bool swap_bytes=is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
@@ -280,7 +278,7 @@ std::wstring utf8_to_utf16_big_endian(const std::string& in)
 
 /// \par parameters: String in UTF-8 format
 /// \return String in UTF-16LE format
-std::wstring utf8_to_utf16_little_endian(const std::string& in)
+std::wstring utf8_to_utf16_little_endian(const std::string &in)
 {
   bool swap_bytes=!is_little_endian_arch();
   return utf8_to_utf16(in, swap_bytes);
@@ -288,21 +286,36 @@ std::wstring utf8_to_utf16_little_endian(const std::string& in)
 
 /// \par parameters: String in UTF-16LE format
 /// \return String in US-ASCII format, with \uxxxx escapes for other characters
-std::string utf16_little_endian_to_ascii(const std::wstring& in)
+std::string utf16_little_endian_to_java(const std::wstring &in)
 {
   std::ostringstream result;
-  std::locale loc;
-  for(const auto c : in)
+  const std::locale loc;
+  for(const auto ch : in)
   {
-    if(c<=255 && isprint(c, loc))
-      result << (unsigned char)c;
+    if(ch=='\n')
+      result << "\\n";
+    else if(ch=='\r')
+      result << "\\r";
+    else if(ch=='\f')
+      result << "\\f";
+    else if(ch=='\b')
+      result << "\\b";
+    else if(ch=='\t')
+      result << "\\t";
+    else if(ch<=255 && isprint(ch, loc))
+    {
+      const auto uch=static_cast<unsigned char>(ch);
+      if(uch=='"' || uch=='\\')
+        result << '\\';
+      result << uch;
+    }
     else
     {
       result << "\\u"
              << std::hex
              << std::setw(4)
              << std::setfill('0')
-             << (unsigned int)c;
+             << static_cast<unsigned int>(ch);
     }
   }
   return result.str();

@@ -41,16 +41,16 @@ void local_bitvector_analysist::flagst::print(std::ostream &out) const
     out << "+integer_address";
 }
 
-bool local_bitvector_analysist::loc_infot::merge(const loc_infot &src)
+bool local_bitvector_analysist::merge(points_tot &a, points_tot &b)
 {
   bool result=false;
 
   std::size_t max_index=
-    std::max(src.points_to.size(), points_to.size());
+    std::max(a.size(), b.size());
 
   for(std::size_t i=0; i<max_index; i++)
   {
-    if(points_to[i].merge(src.points_to[i]))
+    if(a[i].merge(b[i]))
       result=true;
   }
 
@@ -72,8 +72,8 @@ bool local_bitvector_analysist::is_tracked(const irep_idt &identifier)
 void local_bitvector_analysist::assign_lhs(
   const exprt &lhs,
   const exprt &rhs,
-  const loc_infot &loc_info_src,
-  loc_infot &loc_info_dest)
+  points_tot &loc_info_src,
+  points_tot &loc_info_dest)
 {
   if(lhs.id()==ID_symbol)
   {
@@ -83,7 +83,7 @@ void local_bitvector_analysist::assign_lhs(
     {
       unsigned dest_pointer=pointers.number(identifier);
       flagst rhs_flags=get_rec(rhs, loc_info_src);
-      loc_info_dest.points_to[dest_pointer]=rhs_flags;
+      loc_info_dest[dest_pointer]=rhs_flags;
     }
   }
   else if(lhs.id()==ID_dereference)
@@ -117,14 +117,12 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get(
 
   assert(loc_it!=cfg.loc_map.end());
 
-  const loc_infot &loc_info_src=loc_infos[loc_it->second];
-
-  return get_rec(rhs, loc_info_src);
+  return get_rec(rhs, loc_infos[loc_it->second]);
 }
 
 local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
   const exprt &rhs,
-  const loc_infot &loc_info_src)
+  points_tot &loc_info_src)
 {
   if(rhs.id()==ID_constant)
   {
@@ -139,7 +137,7 @@ local_bitvector_analysist::flagst local_bitvector_analysist::get_rec(
     if(is_tracked(identifier))
     {
       unsigned src_pointer=pointers.number(identifier);
-      return loc_info_src.points_to[src_pointer];
+      return loc_info_src[src_pointer];
     }
     else
       return flagst::mk_unknown();
@@ -258,7 +256,7 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
   // in the entry location.
   for(const auto &local : locals.locals_map)
     if(is_tracked(local.first))
-      loc_infos[0].points_to[pointers.number(local.first)]=flagst::mk_unknown();
+      loc_infos[0][pointers.number(local.first)]=flagst::mk_unknown();
 
   while(!work_queue.empty())
   {
@@ -267,8 +265,8 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
     const goto_programt::instructiont &instruction=*node.t;
     work_queue.pop();
 
-    const loc_infot &loc_info_src=loc_infos[loc_nr];
-    loc_infot loc_info_dest=loc_infos[loc_nr];
+    auto &loc_info_src=loc_infos[loc_nr];
+    auto loc_info_dest=loc_infos[loc_nr];
 
     switch(instruction.type)
     {
@@ -320,7 +318,7 @@ void local_bitvector_analysist::build(const goto_functiont &goto_function)
     for(const auto &succ : node.successors)
     {
       assert(succ<loc_infos.size());
-      if(loc_infos[succ].merge(loc_info_dest))
+      if(merge(loc_infos[succ], (loc_info_dest)))
         work_queue.push(succ);
     }
   }
@@ -337,14 +335,14 @@ void local_bitvector_analysist::output(
   {
     out << "**** " << i_it->source_location << "\n";
 
-    const loc_infot &loc_info=loc_infos[l];
+    const auto &loc_info=loc_infos[l];
 
     for(points_tot::const_iterator
-        p_it=loc_info.points_to.begin();
-        p_it!=loc_info.points_to.end();
+        p_it=loc_info.begin();
+        p_it!=loc_info.end();
         p_it++)
     {
-      out << "  " << pointers[p_it-loc_info.points_to.begin()]
+      out << "  " << pointers[p_it-loc_info.begin()]
           << ": "
           << *p_it
           << "\n";

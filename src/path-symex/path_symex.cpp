@@ -524,7 +524,7 @@ void path_symext::assign_rec(
     else if(ssa_lhs.id()==ID_byte_extract_big_endian)
       new_id=ID_byte_update_big_endian;
     else
-      assert(false);
+      UNREACHABLE;
 
     byte_update_exprt new_rhs(new_id);
 

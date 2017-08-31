@@ -22,26 +22,15 @@ Author: Vincent Nimal
 class ilpt
 {
 protected:
-  template <class T>
-  class my_vectort: public std::vector<T>
-  {
-  public:
-    T *to_array()
-    {
-      /* NOTE: not valid if T==bool */
-      return &(*this)[0];
-    }
-  };
-
   glp_iocp parm;
   unsigned matrix_size;
 
 public:
   glp_prob *lp;
 
-  my_vectort<int> imat;
-  my_vectort<int> jmat;
-  my_vectort<double> vmat;
+  std::vector<int> imat;
+  std::vector<int> jmat;
+  std::vector<double> vmat;
 
   ilpt()
   {
@@ -69,8 +58,8 @@ public:
 
   void solve()
   {
-    glp_load_matrix(lp, matrix_size, imat.to_array(),
-      jmat.to_array(), vmat.to_array());
+    glp_load_matrix(lp, matrix_size, imat.data(),
+      jmat.data(), vmat.data());
     glp_intopt(lp, &parm);
   }
 };

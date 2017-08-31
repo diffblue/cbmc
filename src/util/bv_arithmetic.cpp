@@ -42,7 +42,7 @@ void bv_spect::from_type(const typet &type)
   else if(type.id()==ID_signedbv)
     is_signed=true;
   else
-    assert(0);
+    UNREACHABLE;
 
   width=unsafe_string2unsigned(type.get_string(ID_width));
 }

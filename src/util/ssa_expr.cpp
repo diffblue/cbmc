@@ -37,7 +37,7 @@ static void build_ssa_identifier_rec(
 
     mp_integer idx;
     if(to_integer(to_constant_expr(index.index()), idx))
-      assert(false);
+      UNREACHABLE;
 
     os << '[' << idx << ']';
   }
@@ -68,7 +68,20 @@ static void build_ssa_identifier_rec(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
+}
+
+/* Used to determine whether or not an identifier can be built
+   * before trying and getting an exception */
+bool ssa_exprt::can_build_identifier(const exprt &expr)
+{
+  if(expr.id()==ID_symbol)
+    return true;
+  else if(expr.id()==ID_member ||
+          expr.id()==ID_index)
+    return can_build_identifier(expr.op0());
+  else
+    return false;
 }
 
 std::pair<irep_idt, irep_idt> ssa_exprt::build_identifier(

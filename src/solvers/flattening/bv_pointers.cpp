@@ -95,7 +95,7 @@ bv_pointerst::bv_pointerst(
   boolbvt(_ns, _prop),
   pointer_logic(_ns)
 {
-  object_bits=BV_ADDR_BITS;
+  object_bits=config.bv_encoding.object_bits;
   offset_bits=config.ansi_c.pointer_width-object_bits;
   bits=config.ansi_c.pointer_width;
 }
@@ -600,7 +600,7 @@ exprt bv_pointerst::bv_get_rec(
   result.set_value(value);
 
   pointer_logict::pointert pointer;
-  pointer.object=integer2unsigned(binary2integer(value_addr, false));
+  pointer.object=integer2size_t(binary2integer(value_addr, false));
   pointer.offset=binary2integer(value_offset, true);
 
   // we add the elaborated expression as operand
@@ -681,8 +681,12 @@ void bv_pointerst::add_addr(const exprt &expr, bvt &bv)
 {
   std::size_t a=pointer_logic.add_object(expr);
 
-  if(a==(std::size_t(1)<<object_bits))
-    throw "too many variables";
+  const std::size_t max_objects=std::size_t(1)<<object_bits;
+  if(a==max_objects)
+    throw
+      "too many addressed objects: maximum number of objects is set to 2^n="+
+      std::to_string(max_objects)+" (with n="+std::to_string(object_bits)+"); "+
+      "use the `--object-bits n` option to increase the maximum number";
 
   encode(a, bv);
 }

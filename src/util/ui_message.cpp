@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml.h"
 #include "json.h"
 #include "xml_expr.h"
+#include "json_expr.h"
 #include "cout_message.h"
 #include "cmdline.h"
 
@@ -89,7 +90,8 @@ const char *ui_message_handlert::level_string(unsigned level)
 
 void ui_message_handlert::print(
   unsigned level,
-  const std::string &message)
+  const std::string &message,
+  bool preformatted)
 {
   if(verbosity>=level)
   {
@@ -98,7 +100,7 @@ void ui_message_handlert::print(
     case uit::PLAIN:
     {
       console_message_handlert console_message_handler;
-      console_message_handler.print(level, message);
+      console_message_handler.print(level, message, preformatted);
     }
     break;
 
@@ -107,7 +109,7 @@ void ui_message_handlert::print(
     {
       source_locationt location;
       location.make_nil();
-      print(level, message, -1, location);
+      print(level, message, -1, location, preformatted);
     }
     break;
     }
@@ -118,9 +120,10 @@ void ui_message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const source_locationt &location)
+  const source_locationt &location,
+  bool preformatted)
 {
-  message_handlert::print(level, message);
+  message_handlert::print(level, message, preformatted);
 
   if(verbosity>=level)
   {
@@ -128,7 +131,7 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
       message_handlert::print(
-        level, message, sequence_number, location);
+        level, message, sequence_number, location, preformatted);
       break;
 
     case uit::XML_UI:
@@ -144,7 +147,7 @@ void ui_message_handlert::print(
       std::string sequence_number_str=
         sequence_number>=0?std::to_string(sequence_number):"";
 
-      ui_msg(type, tmp_message, sequence_number_str, location);
+      ui_msg(type, tmp_message, sequence_number_str, location, preformatted);
     }
     break;
     }
@@ -155,7 +158,8 @@ void ui_message_handlert::ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location)
+  const source_locationt &location,
+  bool preformatted)
 {
   switch(get_ui())
   {
@@ -163,11 +167,11 @@ void ui_message_handlert::ui_msg(
     break;
 
   case uit::XML_UI:
-    xml_ui_msg(type, msg1, msg2, location);
+    xml_ui_msg(type, msg1, msg2, location, preformatted);
     break;
 
   case uit::JSON_UI:
-    json_ui_msg(type, msg1, msg2, location);
+    json_ui_msg(type, msg1, msg2, location, preformatted);
     break;
   }
 }
@@ -176,8 +180,16 @@ void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location)
+  const source_locationt &location,
+  bool preformatted)
 {
+  if(preformatted)
+  {
+    // Expect the message is already an XML fragment.
+    std::cout << msg1 << '\n';
+    return;
+  }
+
   xmlt result;
   result.name="message";
 
@@ -196,15 +208,21 @@ void ui_message_handlert::json_ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location)
+  const source_locationt &location,
+  bool preformatted)
 {
+  if(preformatted)
+  {
+    // Expect the message is already a JSON fragment.
+    std::cout << ",\n" << msg1;
+    return;
+  }
+
   json_objectt result;
 
-  #if 0
   if(location.is_not_nil() &&
      !location.get_file().empty())
-    result.new_element(xml(location));
-  #endif
+    result["sourceLocation"] = json(location);
 
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);

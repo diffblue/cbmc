@@ -1,81 +1,48 @@
 /*******************************************************************\
 
-Module: JAR File Reading
+Module: Jar file reader
 
-Author: Daniel Kroening, kroening@kroening.com
+Author: Diffblue Ltd
 
 \*******************************************************************/
-
-/// \file
-/// JAR File Reading
 
 #ifndef CPROVER_JAVA_BYTECODE_JAR_FILE_H
 #define CPROVER_JAVA_BYTECODE_JAR_FILE_H
 
-#define _LARGEFILE64_SOURCE 1
-#include "miniz/miniz.h"
-
+#include <unordered_map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <map>
-#include <regex>
-#include <util/message.h>
+#include "mz_zip_archive.h"
 
-#include "java_class_loader_limit.h"
+class java_class_loader_limitt;
 
-class jar_filet:public messaget
+/// Class representing a .jar archive
+class jar_filet final
 {
 public:
-  jar_filet():
-    mz_ok(false)
-    // `zip` will be initialized by open()
-  {
-  }
-
-  ~jar_filet();
-
-  void open(java_class_loader_limitt &, const std::string &);
-
-  // Test for error; 'true' means we are good.
-  explicit operator bool() const { return mz_ok; }
-
-  // map internal index to real index in jar central directory
-  typedef std::map<irep_idt, size_t> filtered_jart;
-  filtered_jart filtered_jar;
-
-  std::string get_entry(const irep_idt &);
-
-  typedef std::map<std::string, std::string> manifestt;
-  manifestt get_manifest();
-
-protected:
-  mz_zip_archive zip;
-  bool mz_ok;
-};
-
-class jar_poolt:public messaget
-{
-public:
-  jar_filet &operator()(
-    java_class_loader_limitt &class_loader_limit,
-    const std::string &file_name)
-  {
-    file_mapt::iterator it=file_map.find(file_name);
-    if(it==file_map.end())
-    {
-      jar_filet &jar_file=file_map[file_name];
-      jar_file.set_message_handler(get_message_handler());
-      jar_file.open(class_loader_limit, file_name);
-      return jar_file;
-    }
-    else
-      return file_map[file_name];
-  }
-
-protected:
-  typedef std::map<std::string, jar_filet> file_mapt;
-  file_mapt file_map;
-  std::string java_cp_include_files;
+  /// Open java file for reading
+  /// \param limit Object limiting number of loaded .class files
+  /// \param filename Name of the file
+  /// \throw Throws std::runtime_error if file cannot be opened
+  jar_filet(java_class_loader_limitt &limit, const std::string &filename);
+  jar_filet(const jar_filet &)=delete;
+  jar_filet &operator=(const jar_filet &)=delete;
+  jar_filet(jar_filet &&);
+  jar_filet &operator=(jar_filet &&);
+  ~jar_filet()=default;
+  /// Get contents of a file in the jar archive.
+  /// Terminates the program if file doesn't exist
+  /// \param filename Name of the file in the archive
+  std::string get_entry(const std::string &filename);
+  /// Get contents of the Manifest file in the jar archive
+  std::unordered_map<std::string, std::string> get_manifest();
+  /// Get list of filenames in the archive
+  std::vector<std::string> filenames() const;
+private:
+  mz_zip_archivet m_zip_archive;
+  /// Map of filename to the file index in the zip archive
+  std::unordered_map<std::string, size_t> m_name_to_index;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAR_FILE_H

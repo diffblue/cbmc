@@ -14,6 +14,13 @@ Author: CM Wintersteiger
 #include <util/message.h>
 
 void remove_unused_functions(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  remove_unused_functions(goto_model.goto_functions, message_handler);
+}
+
+void remove_unused_functions(
   goto_functionst &functions,
   message_handlert &message_handler)
 {

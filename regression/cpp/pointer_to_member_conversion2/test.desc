@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+
+^EXIT=(64|1)$
+^SIGNAL=0$
+invalid implicit conversion
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+should exercise cpp_typecheckt::standard_conversion_pointer_to_member, cpp/cpp_typecheck_conversion.cpp:610 once other bugs are fixed

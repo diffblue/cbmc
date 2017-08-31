@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "simplify_expr.h"
 #include "std_expr.h"
 #include "cprover_prefix.h"
+#include "string2int.h"
 
 configt config;
 
@@ -171,7 +172,7 @@ void configt::ansi_ct::set_arch_spec_i386()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -208,7 +209,7 @@ void configt::ansi_ct::set_arch_spec_x86_64()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -269,7 +270,7 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -312,7 +313,7 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -341,7 +342,7 @@ void configt::ansi_ct::set_arch_spec_alpha()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -381,7 +382,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -391,7 +392,7 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -410,7 +411,7 @@ void configt::ansi_ct::set_arch_spec_s390()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -420,7 +421,7 @@ void configt::ansi_ct::set_arch_spec_s390()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -438,7 +439,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -448,7 +449,7 @@ void configt::ansi_ct::set_arch_spec_s390x()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -478,7 +479,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -488,7 +489,7 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -519,7 +520,7 @@ void configt::ansi_ct::set_arch_spec_ia64()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -544,7 +545,7 @@ void configt::ansi_ct::set_arch_spec_x32()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -554,7 +555,7 @@ void configt::ansi_ct::set_arch_spec_x32()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -598,7 +599,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -608,7 +609,7 @@ void configt::ansi_ct::set_arch_spec_hppa()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -628,7 +629,7 @@ void configt::ansi_ct::set_arch_spec_sh4()
     break;
 
   case flavourt::VISUAL_STUDIO:
-    assert(false); // not supported by Visual Studio
+    UNREACHABLE; // not supported by Visual Studio
     break;
 
   case flavourt::APPLE:
@@ -638,7 +639,7 @@ void configt::ansi_ct::set_arch_spec_sh4()
     break;
 
   case flavourt::NONE:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -729,6 +730,10 @@ bool configt::set(const cmdlinet &cmdline)
   // defaults -- we match the architecture we have ourselves
 
   cpp.cpp_standard=cppt::default_cpp_standard();
+
+  bv_encoding.object_bits=bv_encoding.default_object_bits;
+  // This will allow us to override by language defaults later.
+  bv_encoding.is_object_bits_default=true;
 
   ansi_c.single_precision_constant=false;
   ansi_c.for_has_scope=true; // C99 or later
@@ -1010,6 +1015,20 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("round-to-zero"))
     ansi_c.rounding_mode=ieee_floatt::ROUND_TO_ZERO;
 
+  if(cmdline.isset("object-bits"))
+  {
+    bv_encoding.object_bits=
+      unsafe_string2unsigned(cmdline.get_value("object-bits"));
+    bv_encoding.is_object_bits_default=false;
+
+    if(!(0<bv_encoding.object_bits &&
+         bv_encoding.object_bits<ansi_c.pointer_width))
+    {
+      throw "object-bits must be positive and less than the pointer width ("+
+        std::to_string(ansi_c.pointer_width)+") ";
+    }
+  }
+
   return false;
 }
 
@@ -1143,6 +1162,46 @@ void configt::set_from_symbol_table(
 
   // mode, preprocessor (and all preprocessor command line options),
   // lib, string_abstraction not stored in namespace
+
+  set_object_bits_from_symbol_table(symbol_table);
+}
+
+/// Sets the number of bits used for object addresses
+/// \param symbol_table The symbol table
+void configt::set_object_bits_from_symbol_table(
+  const symbol_tablet &symbol_table)
+{
+  // has been overridden by command line option,
+  //   thus do not apply language defaults
+  if(!bv_encoding.is_object_bits_default)
+    return;
+
+  // set object_bits according to entry point language
+  if(symbol_table.has_symbol(CPROVER_PREFIX "_start"))
+  {
+    const symbolt &entry_point_symbol=
+      symbol_table.lookup(CPROVER_PREFIX "_start");
+
+    if(entry_point_symbol.mode==ID_java)
+      bv_encoding.object_bits=java.default_object_bits;
+    else if(entry_point_symbol.mode==ID_C)
+      bv_encoding.object_bits=ansi_c.default_object_bits;
+    else if(entry_point_symbol.mode==ID_cpp)
+      bv_encoding.object_bits=cpp.default_object_bits;
+    DATA_INVARIANT(
+      0<bv_encoding.object_bits && bv_encoding.object_bits<ansi_c.pointer_width,
+      "object_bits should fit into pointer width");
+  }
+}
+
+std::string configt::object_bits_info()
+{
+  return "Running with "+std::to_string(bv_encoding.object_bits)+
+    " object bits, "+
+    std::to_string(ansi_c.pointer_width-bv_encoding.object_bits)+
+    " offset bits ("+
+    (bv_encoding.is_object_bits_default ? "default" : "user-specified")+
+    ")";
 }
 
 irep_idt configt::this_architecture()

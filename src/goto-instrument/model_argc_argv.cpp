@@ -136,7 +136,7 @@ bool model_argc_argv(
     else if(has_prefix(id2string(it->first),
                        CPROVER_PREFIX "initialize::") &&
             symbol_table.add(it->second))
-      assert(false);
+      UNREACHABLE;
   }
 
   assert(value.is_not_nil());

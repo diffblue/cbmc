@@ -356,6 +356,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove Java throw and catch
+    // This introduces instanceof, so order is important:
     remove_exceptions(goto_model);
     // remove rtti
     remove_instanceof(goto_model);
@@ -492,6 +493,7 @@ void goto_analyzer_parse_optionst::help()
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"

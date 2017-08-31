@@ -136,10 +136,10 @@ void inline instrumentert::instrument_one_event_per_cycle_inserter(
       continue;
 
     /* instruments the first pair */
-    for(std::set<event_grapht::critical_cyclet::delayt>::iterator
-      p_it=it->unsafe_pairs.begin();
-      p_it!=it->unsafe_pairs.end(); ++p_it)
+    if(!it->unsafe_pairs.empty())
     {
+      std::set<event_grapht::critical_cyclet::delayt>::iterator
+        p_it=it->unsafe_pairs.begin();
       delayed.insert(*p_it);
       const abstract_eventt &first_ev=egraph[p_it->first];
       var_to_instr.insert(first_ev.variable);
@@ -154,7 +154,6 @@ void inline instrumentert::instrument_one_event_per_cycle_inserter(
           std::pair<irep_idt, source_locationt>(
             second_ev.variable, second_ev.source_location));
       }
-      break;
     }
   }
 }
@@ -273,9 +272,9 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   const std::size_t mat_size=set_of_cycles.size()*edges.size();
   message.debug() << "size of the system: " << mat_size
     << messaget::eom;
-  int *imat=new int[mat_size+1];
-  int *jmat=new int[mat_size+1];
-  double *vmat=new double[mat_size+1];
+  std::vector<int> imat(mat_size+1);
+  std::vector<int> jmat(mat_size+1);
+  std::vector<double> vmat(mat_size+1);
 
   /* fills the constraints coeff */
   /* tables read from 1 in glpk -- first row/column ignored */
@@ -344,9 +343,6 @@ void inline instrumentert::instrument_minimum_interference_inserter(
   }
 
   glp_delete_prob(lp);
-  delete[] imat;
-  delete[] jmat;
-  delete[] vmat;
 #else
   throw "sorry, minimum interference option requires glpk; "
         "please recompile goto-instrument with glpk";

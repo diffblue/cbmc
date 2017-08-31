@@ -10,16 +10,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Expression Representation
 
 #include "expr.h"
-
 #include <cassert>
-
 #include <stack>
-
 #include "string2int.h"
 #include "mp_arith.h"
 #include "fixedbv.h"
 #include "ieee_float.h"
 #include "invariant.h"
+#include "expr_iterator.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "arith_tools.h"
@@ -515,3 +513,25 @@ void exprt::visit(const_expr_visitort &visitor) const
       stack.push(&(*it));
   }
 }
+
+depth_iteratort exprt::depth_begin()
+{ return depth_iteratort(*this); }
+depth_iteratort exprt::depth_end()
+{ return depth_iteratort(); }
+const_depth_iteratort exprt::depth_begin() const
+{ return const_depth_iteratort(*this); }
+const_depth_iteratort exprt::depth_end() const
+{ return const_depth_iteratort(); }
+const_depth_iteratort exprt::depth_cbegin() const
+{ return const_depth_iteratort(*this); }
+const_depth_iteratort exprt::depth_cend() const
+{ return const_depth_iteratort(); }
+
+const_unique_depth_iteratort exprt::unique_depth_begin() const
+{ return const_unique_depth_iteratort(*this); }
+const_unique_depth_iteratort exprt::unique_depth_end() const
+{ return const_unique_depth_iteratort(); }
+const_unique_depth_iteratort exprt::unique_depth_cbegin() const
+{ return const_unique_depth_iteratort(*this); }
+const_unique_depth_iteratort exprt::unique_depth_cend() const
+{ return const_unique_depth_iteratort(); }

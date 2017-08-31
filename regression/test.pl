@@ -3,6 +3,7 @@
 use subs;
 use strict;
 use warnings;
+use File::Basename;
 
 use Cwd;
 
@@ -71,8 +72,7 @@ sub test($$$$$) {
 
   $options =~ s/$ign//g if(defined($ign));
 
-  my $descriptor = $test;
-  $descriptor =~ s/^.*\///;
+  my $descriptor = basename($test);
   my $output = $descriptor;
   $output =~ s/\.[^.]*$/.out/;
 

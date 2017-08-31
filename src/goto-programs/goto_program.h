@@ -76,10 +76,17 @@ public:
       it!=(program).instructions.end(); it++)
 
 inline bool operator<(
-  const goto_programt::const_targett i1,
-  const goto_programt::const_targett i2)
+  const goto_programt::const_targett &i1,
+  const goto_programt::const_targett &i2)
 {
   return order_const_target<codet, exprt>(i1, i2);
+}
+
+inline bool operator<(
+  const goto_programt::targett &i1,
+  const goto_programt::targett &i2)
+{
+  return &(*i1)<&(*i2);
 }
 
 // NOLINTNEXTLINE(readability/identifiers)

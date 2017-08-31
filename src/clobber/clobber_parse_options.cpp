@@ -209,8 +209,6 @@ bool clobber_parse_optionst::get_goto_program(
            symbol_table, goto_functions, get_message_handler()))
         return true;
 
-      config.set_from_symbol_table(symbol_table);
-
       if(cmdline.isset("show-symbol-table"))
       {
         show_symbol_table();
@@ -248,7 +246,8 @@ bool clobber_parse_optionst::get_goto_program(
         return true;
       }
 
-      languaget *language=get_language_from_filename(filename);
+      std::unique_ptr<languaget> language=get_language_from_filename(filename);
+      language->get_language_options(cmdline);
 
       if(language==nullptr)
       {
@@ -434,7 +433,7 @@ void clobber_parse_optionst::report_success()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -459,7 +458,7 @@ void clobber_parse_optionst::show_counterexample(
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -482,7 +481,7 @@ void clobber_parse_optionst::report_failure()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -536,6 +535,8 @@ void clobber_parse_optionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
+    "\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

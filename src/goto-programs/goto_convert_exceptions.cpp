@@ -93,61 +93,6 @@ void goto_convertt::convert_msc_leave(
   t->source_location=code.source_location();
 }
 
-void goto_convertt::convert_java_try_catch(
-  const codet &code,
-  goto_programt &dest)
-{
-  assert(!code.operands().empty());
-
-  // add the CATCH instruction to 'dest'
-  goto_programt::targett catch_instruction=dest.add_instruction();
-  catch_instruction->make_catch();
-  catch_instruction->code.set_statement(ID_catch);
-  catch_instruction->source_location=code.source_location();
-  catch_instruction->function=code.source_location().get_function();
-
-  // the CATCH instruction is annotated with a list of exception IDs
-  const irept exceptions=code.op0().find(ID_exception_list);
-  if(exceptions.is_not_nil())
-  {
-    irept::subt exceptions_sub=exceptions.get_sub();
-    irept::subt &exception_list=
-      catch_instruction->code.add(ID_exception_list).get_sub();
-    exception_list.resize(exceptions_sub.size());
-    for(size_t i=0; i<exceptions_sub.size(); ++i)
-      exception_list[i].id(exceptions_sub[i].id());
-  }
-
-  // the CATCH instruction is also annotated with a list of handle labels
-  const irept handlers=code.op0().find(ID_label);
-  if(handlers.is_not_nil())
-  {
-    irept::subt handlers_sub=handlers.get_sub();
-    irept::subt &handlers_list=
-      catch_instruction->code.add(ID_label).get_sub();
-    handlers_list.resize(handlers_sub.size());
-    for(size_t i=0; i<handlers_sub.size(); ++i)
-      handlers_list[i].id(handlers_sub[i].id());
-  }
-
-  // the CATCH instruction may also signal a handler
-  if(code.op0().has_operands())
-  {
-    catch_instruction->code.get_sub().resize(1);
-    catch_instruction->code.get_sub()[0]=code.op0().op0();
-  }
-
-  // add a SKIP target for the end of everything
-  goto_programt end;
-  goto_programt::targett end_target=end.add_instruction();
-  end_target->make_skip();
-  end_target->source_location=code.source_location();
-  end_target->function=code.source_location().get_function();
-
-  // add the end-target
-  dest.destructive_append(end);
-}
-
 void goto_convertt::convert_try_catch(
   const codet &code,
   goto_programt &dest)
@@ -157,13 +102,14 @@ void goto_convertt::convert_try_catch(
   // add the CATCH-push instruction to 'dest'
   goto_programt::targett catch_push_instruction=dest.add_instruction();
   catch_push_instruction->make_catch();
-  catch_push_instruction->code.set_statement(ID_catch);
   catch_push_instruction->source_location=code.source_location();
+
+  code_push_catcht push_catch_code;
 
   // the CATCH-push instruction is annotated with a list of IDs,
   // one per target
-  irept::subt &exception_list=
-    catch_push_instruction->code.add(ID_exception_list).get_sub();
+  code_push_catcht::exception_listt &exception_list=
+    push_catch_code.exception_list();
 
   // add a SKIP target for the end of everything
   goto_programt end;
@@ -176,7 +122,7 @@ void goto_convertt::convert_try_catch(
   // add the CATCH-pop to the end of the 'try' block
   goto_programt::targett catch_pop_instruction=dest.add_instruction();
   catch_pop_instruction->make_catch();
-  catch_pop_instruction->code.set_statement(ID_catch);
+  catch_pop_instruction->code=code_pop_catcht();
 
   // add a goto to the end of the 'try' block
   dest.add_instruction()->make_goto(end_target);
@@ -186,7 +132,8 @@ void goto_convertt::convert_try_catch(
     const codet &block=to_code(code.operands()[i]);
 
     // grab the ID and add to CATCH instruction
-    exception_list.push_back(irept(block.get(ID_exception_id)));
+    exception_list.push_back(
+      code_push_catcht::exception_list_entryt(block.get(ID_exception_id)));
 
     goto_programt tmp;
     convert(block, tmp);
@@ -196,6 +143,8 @@ void goto_convertt::convert_try_catch(
     // add a goto to the end of the 'catch' block
     dest.add_instruction()->make_goto(end_target);
   }
+
+  catch_push_instruction->code=push_catch_code;
 
   // add the end-target
   dest.destructive_append(end);

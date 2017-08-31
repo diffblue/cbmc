@@ -64,10 +64,29 @@ class cfg_baset:public grapht< cfg_base_nodet<T, I> >
 public:
   typedef std::size_t entryt;
 
-  struct entry_mapt:
-    public std::map<goto_programt::const_targett, entryt>
+  class entry_mapt final
   {
+    typedef std::map<goto_programt::const_targett, entryt> data_typet;
+    data_typet data;
+
+  public:
     grapht< cfg_base_nodet<T, I> > &container;
+
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::iterator iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::const_iterator const_iterator;
+
+    template <typename U>
+    const_iterator find(U &&u) const { return data.find(std::forward<U>(u)); }
+
+    iterator begin() { return data.begin(); }
+    const_iterator begin() const { return data.begin(); }
+    const_iterator cbegin() const { return data.cbegin(); }
+
+    iterator end() { return data.end(); }
+    const_iterator end() const { return data.end(); }
+    const_iterator cend() const { return data.cend(); }
 
     explicit entry_mapt(grapht< cfg_base_nodet<T, I> > &_container):
       container(_container)
@@ -76,7 +95,7 @@ public:
 
     entryt &operator[](const goto_programt::const_targett &t)
     {
-      std::pair<iterator, bool> e=insert(std::make_pair(t, 0));
+      auto e=data.insert(std::make_pair(t, 0));
 
       if(e.second)
         e.first->second=container.add_node();
@@ -203,9 +222,7 @@ void cfg_baset<T, P, I>::compute_edges_goto(
      !instruction.guard.is_true())
     this->add_edge(entry, entry_map[next_PC]);
 
-  for(const auto &t : instruction.targets)
-    if(t!=goto_program.instructions.end())
-      this->add_edge(entry, entry_map[t]);
+  this->add_edge(entry, entry_map[instruction.get_target()]);
 }
 
 template<class T, typename P, typename I>
@@ -260,9 +277,7 @@ void concurrent_cfg_baset<T, P, I>::compute_edges_start_thread(
     next_PC,
     entry);
 
-  for(const auto &t : instruction.targets)
-    if(t!=goto_program.instructions.end())
-      this->add_edge(entry, this->entry_map[t]);
+  this->add_edge(entry, this->entry_map[instruction.get_target()]);
 }
 
 template<class T, typename P, typename I>
@@ -403,7 +418,7 @@ void cfg_baset<T, P, I>::compute_edges(
     break;
 
   case NO_INSTRUCTION_TYPE:
-    assert(false);
+    UNREACHABLE;
     break;
   }
 }

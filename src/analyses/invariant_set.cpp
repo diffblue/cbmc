@@ -474,7 +474,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
       }
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
   else if(expr.id()==ID_equal)
   {
@@ -673,7 +673,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     else if(expr.id()==ID_notequal)
       return is_ne(p);
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   return tvt::unknown();

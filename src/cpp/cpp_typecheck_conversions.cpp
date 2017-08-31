@@ -1750,7 +1750,7 @@ bool cpp_typecheckt::dynamic_typecast(
     {
       if(!e.get_bool(ID_C_lvalue))
         return false;
-      assert(0); // currently not supported
+      UNREACHABLE; // currently not supported
     }
     else if(follow(type.subtype()).id()==ID_struct)
     {

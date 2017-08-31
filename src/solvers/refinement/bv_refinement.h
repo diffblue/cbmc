@@ -21,34 +21,44 @@ Author: Daniel Kroening, kroening@kroening.com
 class bv_refinementt:public bv_pointerst
 {
 public:
-  bv_refinementt(const namespacet &_ns, propt &_prop);
-  ~bv_refinementt();
+  struct infot
+  {
+    const namespacet *ns=nullptr;
+    propt *prop=nullptr;
+    language_uit::uit ui=language_uit::uit::PLAIN;
+    /// Max number of times we refine a formula node
+    unsigned max_node_refinement=5;
+    /// Enable array refinement
+    bool refine_arrays=true;
+    /// Enable arithmetic refinement
+    bool refine_arithmetic=true;
+  };
 
-  virtual decision_proceduret::resultt dec_solve();
+  explicit bv_refinementt(const infot &info);
 
-  virtual std::string decision_procedure_text() const
+  decision_proceduret::resultt dec_solve() override;
+
+  std::string decision_procedure_text() const override
   {
     return "refinement loop with "+prop.solver_text();
   }
 
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef bv_pointerst SUB;
-
-  // maximal number of times we refine a formula node
-  unsigned max_node_refinement;
-  // enable/disable refinements
-  bool do_array_refinement;
-  bool do_arithmetic_refinement;
-
-  using bv_pointerst::is_in_conflict;
-
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
-
 protected:
-  resultt prop_solve();
 
+  // Refine array
+  void post_process_arrays() override;
+
+  // Refine arithmetic
+  bvt convert_mult(const exprt &expr) override;
+  bvt convert_div(const div_exprt &expr) override;
+  bvt convert_mod(const mod_exprt &expr) override;
+  bvt convert_floatbv_op(const exprt &expr) override;
+
+  void set_assumptions(const bvt &_assumptions) override;
+
+private:
   // the list of operator approximations
-  struct approximationt
+  struct approximationt final
   {
   public:
     explicit approximationt(std::size_t _id_nr):
@@ -79,39 +89,30 @@ protected:
     std::size_t id_nr;
   };
 
-  typedef std::list<approximationt> approximationst;
-  approximationst approximations;
-
+  resultt prop_solve();
   approximationt &add_approximation(const exprt &expr, bvt &bv);
+  bool conflicts_with(approximationt &approximation);
   void check_SAT(approximationt &approximation);
   void check_UNSAT(approximationt &approximation);
   void initialize(approximationt &approximation);
   void get_values(approximationt &approximation);
-  bool is_in_conflict(approximationt &approximation);
-
-  virtual void check_SAT();
-  virtual void check_UNSAT();
-  bool progress;
-
-  // we refine the theory of arrays
-  virtual void post_process_arrays();
+  void check_SAT();
+  void check_UNSAT();
   void arrays_overapproximated();
   void freeze_lazy_constraints();
 
-  // we refine expensive arithmetic
-  virtual bvt convert_mult(const exprt &expr);
-  virtual bvt convert_div(const div_exprt &expr);
-  virtual bvt convert_mod(const mod_exprt &expr);
-  virtual bvt convert_floatbv_op(const exprt &expr);
+  // MEMBERS
 
-  // for collecting statistics
-  virtual void set_to(const exprt &expr, bool value);
-
-  // overloading
-  virtual void set_assumptions(const bvt &_assumptions);
-
+  // Maximum number of times we refine a formula node
+  const unsigned max_node_refinement;
+  // Refinement toggles
+  const bool do_array_refinement;
+  const bool do_arithmetic_refinement;
+  bool progress;
+  std::vector<approximationt> approximations;
   bvt parent_assumptions;
 
+protected:
   // use gui format
   language_uit::uit ui;
 };

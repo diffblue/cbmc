@@ -1377,7 +1377,8 @@ def CleanseRawStrings(raw_lines):
 def FindNextMultiLineCommentStart(lines, lineix):
   """Find the beginning marker for a multiline comment."""
   while lineix < len(lines):
-    if lines[lineix].strip().startswith('/*'):
+    if (lines[lineix].strip().startswith('/*') or
+       lines[lineix].strip().startswith('#if 0')):
       # Only return this marker if the comment goes beyond this line
       if lines[lineix].strip().find('*/', 2) < 0:
         return lineix
@@ -1388,7 +1389,8 @@ def FindNextMultiLineCommentStart(lines, lineix):
 def FindNextMultiLineCommentEnd(lines, lineix):
   """We are inside a comment, find the end marker."""
   while lineix < len(lines):
-    if lines[lineix].strip().endswith('*/'):
+    if (lines[lineix].strip().endswith('*/') or
+       lines[lineix].strip().endswith('#endif')):
       return lineix
     lineix += 1
   return len(lines)
@@ -1923,11 +1925,11 @@ def CheckForCopyright(filename, lines, error):
   # We'll say it should occur by line 10. Don't forget there's a
   # dummy line at the front.
   for line in xrange(1, min(len(lines), 11)):
-    if re.search(r'Author', lines[line], re.I): break
+    if re.search(r'Author|Copyright', lines[line], re.I): break
   else:                       # means no copyright line was found
     error(filename, 0, 'legal/copyright', 5,
           'No copyright message found.  '
-          'You should have a line: "Author: <name>"')
+          'You should have a line: "Author: <name>" or "Copyright <year> ..."')
 
 
 def GetIndentLevel(line):
@@ -6512,6 +6514,9 @@ def ProcessFile(filename, vlevel, extra_check_functions=[]):
     return
 
   if Search(r'_builtin_headers(_[a-z0-9_-]+)?\.h$', filename):
+    return
+
+  if Search(r'regression/.*\.cpp', filename):
     return
 
   if not ProcessConfigOverrides(filename):

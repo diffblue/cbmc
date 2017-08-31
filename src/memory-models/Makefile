@@ -9,6 +9,7 @@ SRC = mm2cpp.cpp \
 OBJ += ../big-int/big-int$(LIBEXT) \
       ../ansi-c/ansi-c$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
+      ../langapi/langapi$(LIBEXT) \
       ../util/util$(LIBEXT)
 
 INCLUDES= -I ..

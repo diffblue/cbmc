@@ -1,6 +1,6 @@
 FUTURE
 TokenTest02.class
---string-refine --unwind 15
+--refine-strings --unwind 15
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

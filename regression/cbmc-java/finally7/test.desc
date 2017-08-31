@@ -1,0 +1,10 @@
+CORE
+test.class
+
+^EXIT=10$
+^SIGNAL=0$
+assertion at file test\.java line 7 function java::test\.main:\(\)V bytecode-index 12: SUCCESS
+assertion at file test\.java line 10 function java::test\.main:\(\)V bytecode-index 25: FAILURE
+^VERIFICATION FAILED$
+--
+^warning: ignoring

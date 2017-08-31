@@ -41,6 +41,10 @@ Author: Daniel Kroening, kroening@kroening.com
   for(expr_listt::iterator it=(expr).begin(); \
       it!=(expr).end(); ++it)
 
+class depth_iteratort;
+class const_depth_iteratort;
+class const_unique_depth_iteratort;
+
 /*! \brief Base class for all expressions
 */
 class exprt:public irept
@@ -161,6 +165,17 @@ public:
 
   void visit(class expr_visitort &visitor);
   void visit(class const_expr_visitort &visitor) const;
+
+  depth_iteratort depth_begin();
+  depth_iteratort depth_end();
+  const_depth_iteratort depth_begin() const;
+  const_depth_iteratort depth_end() const;
+  const_depth_iteratort depth_cbegin() const;
+  const_depth_iteratort depth_cend() const;
+  const_unique_depth_iteratort unique_depth_begin() const;
+  const_unique_depth_iteratort unique_depth_end() const;
+  const_unique_depth_iteratort unique_depth_cbegin() const;
+  const_unique_depth_iteratort unique_depth_cend() const;
 };
 
 typedef std::list<exprt> expr_listt;

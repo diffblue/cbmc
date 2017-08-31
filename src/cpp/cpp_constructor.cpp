@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_util.h"
 
+/// \param source_location: source location for generated code
 /// \param object: non-typechecked object
 /// \param operands: non-typechecked operands
 /// \return typechecked code
@@ -182,7 +183,7 @@ codet cpp_typecheckt::cpp_constructor(
   }
   else if(tmp_type.id()==ID_union)
   {
-    assert(0); // Todo: union
+    UNREACHABLE; // Todo: union
   }
   else if(tmp_type.id()==ID_struct)
   {
@@ -300,7 +301,7 @@ codet cpp_typecheckt::cpp_constructor(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   codet nil;
   nil.make_nil();

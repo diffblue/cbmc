@@ -84,6 +84,14 @@ glucose-download:
 	@(cd ../glucose-syrup; patch -p1 < ../scripts/glucose-syrup-patch)
 	@rm glucose-syrup.tgz
 
+cprover-jar-build:
+	@echo "Building org.cprover.jar"
+	@(cd java_bytecode/library/; \
+	mkdir -p target; \
+	javac -d target/ `find src/ -name "*.java"`; \
+	cd target; jar cf org.cprover.jar `find . -name "*.class"`; \
+	mv org.cprover.jar ../../../)
+
 boost-download:
 	@echo "Downloading boost headers"
 	@lwp-download "http://storage.googleapis.com/diffblue-mirror/boost/boost_1.63_headers.tar.bz2?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1542631994&Signature=X2GwPSm1dR8IPGP0D5JoyDmOnL%2Br4F7AI7NUA7SbmOAowMC0JS7Q5A6%2BkQziUzQa88zpddr5gSRbDOLqdoGzwLrYgPNtURS5dJ7l1q6xfJWSS%2FYf8be%2FSbdfLVN8qcXKCsfDe05Hqf%2Bz2cksqjQ1H6L0syj43rftbW4%2F7tp355%2BkinCeE466ulJeyru3CK%2F3RGX2Ul6ZQV6lNxkit1m6QM5BRtLbUQ1GOW0GCK9fWH2fry2n7kRVBCM3oz8fX62kLdKYlaXCf%2BvvXs9hOOmcQurL%2Fa4DCJYoClX%2BpznqXVmjUY%2FI3pD4HlRKbCeiPnoC6de2i1uxFNSVTBpG3w%2BtfA%3D%3D"
@@ -93,4 +101,4 @@ boost-download:
 	@mv boost ../boost-include/boost
 	@rm boost_1.63_headers.tar.bz2
 
-.PHONY: minisat2-download glucose-download
+.PHONY: minisat2-download glucose-download cprover-jar-build

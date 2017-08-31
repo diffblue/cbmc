@@ -15,13 +15,25 @@ Date: February 2013
 
 #include "reaching_definitions.h"
 
+#include <memory>
+
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
+#include <util/make_unique.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
 
 #include "is_threaded.h"
 #include "dirty.h"
+
+reaching_definitions_analysist::reaching_definitions_analysist(
+  const namespacet &_ns):
+    concurrency_aware_ait<rd_range_domaint>(),
+    ns(_ns)
+{
+}
+
+reaching_definitions_analysist::~reaching_definitions_analysist()=default;
 
 void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 {
@@ -717,26 +729,16 @@ const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
     return entry->second;
 }
 
-reaching_definitions_analysist::~reaching_definitions_analysist()
-{
-  if(is_dirty)
-    delete is_dirty;
-  if(is_threaded)
-    delete is_threaded;
-  if(value_sets)
-    delete value_sets;
-}
-
 void reaching_definitions_analysist::initialize(
   const goto_functionst &goto_functions)
 {
-  value_set_analysis_fit *value_sets_=new value_set_analysis_fit(ns);
+  auto value_sets_=util_make_unique<value_set_analysis_fit>(ns);
   (*value_sets_)(goto_functions);
-  value_sets=value_sets_;
+  value_sets=std::move(value_sets_);
 
-  is_threaded=new is_threadedt(goto_functions);
+  is_threaded=util_make_unique<is_threadedt>(goto_functions);
 
-  is_dirty=new dirtyt(goto_functions);
+  is_dirty=util_make_unique<dirtyt>(goto_functions);
 
   concurrency_aware_ait<rd_range_domaint>::initialize(goto_functions);
 }

@@ -59,25 +59,58 @@ public:
     { return offset_is_set && offset.is_zero(); }
   };
 
-  class object_map_dt:public std::map<unsigned, objectt>
+  class object_map_dt
   {
+    typedef std::map<unsigned, objectt> data_typet;
+    data_typet data;
+
   public:
-    object_map_dt() {}
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::iterator iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::const_iterator const_iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::value_type value_type;
+
+    iterator begin() { return data.begin(); }
+    const_iterator begin() const { return data.begin(); }
+    const_iterator cbegin() const { return data.cbegin(); }
+
+    iterator end() { return data.end(); }
+    const_iterator end() const { return data.end(); }
+    const_iterator cend() const { return data.cend(); }
+
+    size_t size() const { return data.size(); }
+    bool empty() const { return data.empty(); }
+
+    objectt &operator[](unsigned i) { return data[i]; }
+
+    template <typename It>
+    void insert(It b, It e) { data.insert(b, e); }
+
+    template <typename T>
+    const_iterator find(T &&t) const { return data.find(std::forward<T>(t)); }
+
     static const object_map_dt blank;
+
+    object_map_dt()=default;
+
+  protected:
+    ~object_map_dt()=default;
   };
 
-  exprt to_expr(object_map_dt::const_iterator it) const;
+  exprt to_expr(const object_map_dt::value_type &it) const;
 
   typedef reference_counting<object_map_dt> object_mapt;
 
-  void set(object_mapt &dest, object_map_dt::const_iterator it) const
+  void set(object_mapt &dest, const object_map_dt::value_type &it) const
   {
-    dest.write()[it->first]=it->second;
+    dest.write()[it.first]=it.second;
   }
 
-  bool insert(object_mapt &dest, object_map_dt::const_iterator it) const
+  bool insert(object_mapt &dest, const object_map_dt::value_type &it) const
   {
-    return insert(dest, it->first, it->second);
+    return insert(dest, it.first, it.second);
   }
 
   bool insert(object_mapt &dest, const exprt &src) const
