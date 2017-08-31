@@ -1338,6 +1338,7 @@ void instrument_cover_goals(
               ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
             i_it->source_location.set_function(function);
+            i_it->function=function;
             i_it++;
           }
         }
@@ -1365,6 +1366,7 @@ void instrument_cover_goals(
         t->source_location.set(ID_coverage_criterion, coverage_criterion);
         t->source_location.set_property_class(property_class);
         t->source_location.set_function(i_it->function);
+        t->function=i_it->function;
       }
 
       if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
@@ -1378,8 +1380,9 @@ void instrument_cover_goals(
           "function "+id2string(i_it->function)+" block "+b+" branch false";
 
         exprt guard=i_it->guard;
+        const irep_idt function=i_it->function;
         source_locationt source_location=i_it->source_location;
-        source_location.set_function(i_it->function);
+        source_location.set_function(function);
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(not_exprt(guard));
@@ -1387,6 +1390,7 @@ void instrument_cover_goals(
         i_it->source_location.set_comment(true_comment);
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
+        i_it->function=function;
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(guard);
@@ -1394,6 +1398,7 @@ void instrument_cover_goals(
         i_it->source_location.set_comment(false_comment);
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
+        i_it->function=function;
 
         i_it++;
         i_it++;
@@ -1424,6 +1429,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
 
           const std::string comment_f="condition `"+c_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1433,6 +1439,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<conditions.size()*2; i++)
@@ -1464,6 +1471,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
 
           const std::string comment_f="decision `"+d_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1473,6 +1481,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<decisions.size()*2; i++)
@@ -1525,6 +1534,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1535,6 +1545,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         std::set<exprt> controlling;
@@ -1561,6 +1572,7 @@ void instrument_cover_goals(
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
           i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
@@ -1768,7 +1780,8 @@ bool instrument_cover_goals(
     if_it->make_assertion(false_exprt());
     if_it->source_location.set_comment(comment);
     if_it->source_location.set_property_class("reachability_constraint");
-    if_it->source_location.set_function(if_it->function);
+    if_it->source_location.set_function(goto_functions.entry_point());
+    if_it->function=goto_functions.entry_point();
   }
 
   goto_functions.update();
