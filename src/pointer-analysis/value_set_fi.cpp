@@ -1289,11 +1289,9 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_array ||
-           type.id()==ID_incomplete_array ||
-           type.id()=="#REF#");
-
-    assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
+    if(type.id()==ID_array ||
+       type.id()==ID_incomplete_array)
+      assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
   }
   else if(lhs.id()==ID_member)
   {
@@ -1359,6 +1357,9 @@ void value_set_fit::do_function_call(
 {
   const symbolt &symbol=ns.lookup(function);
 
+  if(symbol.type.id()!=ID_code)
+    return;
+
   const code_typet &type=to_code_type(symbol.type);
   const code_typet::parameterst &parameter_types=type.parameters();
 
@@ -1408,7 +1409,9 @@ void value_set_fit::do_end_function(
   if(lhs.is_nil())
     return;
 
-  std::string rvs = "value_set::return_value" + std::to_string(from_function);
+  std::string rvs=
+    "value_set::return_value"+std::to_string(from_function);
+
   symbol_exprt rhs(rvs, lhs.type());
 
   assign(lhs, rhs, ns);
