@@ -1,0 +1,10 @@
+KNOWNBUG
+main.c
+--show-goto-functions --wrap-entry-point-in-while --function skipWhitespace
+^EXIT=0$
+^SIGNAL=0$
+^     1: skipWhitespace\(\);$
+^        GOTO 1$
+--
+--
+This is tracked by the JIRA issue TYT-4: https://diffblue.atlassian.net/projects/TYT/issues/TYT-4

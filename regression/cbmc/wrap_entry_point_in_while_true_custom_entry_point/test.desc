@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions --wrap-entry-point-in-while --function skipWhitespace
+^EXIT=0$
+^SIGNAL=0$
+^     1: skipWhitespace\(\);$
+^        GOTO 1$
+--

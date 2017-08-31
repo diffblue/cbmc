@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions --wrap-entry-point-in-while
+^EXIT=0$
+^SIGNAL=0$
+^     1: main\(argc', argv'\);$
+^        GOTO 1$
+--

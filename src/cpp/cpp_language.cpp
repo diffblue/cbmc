@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/config.h>
 #include <util/replace_symbol.h>
 #include <util/get_base_name.h>
-
+#include <util/cmdline.h>
 #include <linking/linking.h>
 
 #include <ansi-c/ansi_c_entry_point.h>
@@ -28,6 +28,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_parser.h"
 #include "cpp_typecheck.h"
 #include "cpp_type2name.h"
+
+void cpp_languaget::get_language_options(const cmdlinet &cmd)
+{
+  wrap_entry_point=cmd.isset("wrap-entry-point-in-while");
+}
 
 std::set<std::string> cpp_languaget::extensions() const
 {
@@ -135,8 +140,11 @@ bool cpp_languaget::typecheck(
 
 bool cpp_languaget::final(symbol_tablet &symbol_table)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+  if(ansi_c_entry_point(symbol_table, "main", get_message_handler(),
+     wrap_entry_point_in_while()))
+  {
     return true;
+  }
 
   return false;
 }

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/parse_options.h>
 
 #include <langapi/language_ui.h>
+#include <langapi/wrap_entry_point.h>
 
 #include <analyses/goto_check.h>
 
@@ -63,6 +64,7 @@ class optionst;
   "(java-cp-include-files):" \
   "(localize-faults)(localize-faults-method):" \
   "(lazy-methods)" \
+  WRAP_ENTRY_POINT_IN_WHILE_TRUE \
   "(test-invariant-failure)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 

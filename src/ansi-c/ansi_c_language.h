@@ -22,6 +22,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class ansi_c_languaget:public languaget
 {
 public:
+  virtual void get_language_options(
+    const cmdlinet &) override;
+
   bool preprocess(
     std::istream &instream,
     const std::string &path,
@@ -76,6 +79,12 @@ public:
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
+
+  bool wrap_entry_point_in_while() const
+  { return wrap_entry_point; }
+
+private:
+  bool wrap_entry_point;
 };
 
 languaget *new_ansi_c_language();
