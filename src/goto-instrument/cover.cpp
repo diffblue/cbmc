@@ -96,23 +96,8 @@ public:
 #endif
     }
 
-    // create list of covered lines as CSV string and set as property of source
-    // location of basic block, compress to ranges if applicable
-    format_number_ranget format_lines;
     for(auto &block_info : block_infos)
-    {
-      if(block_info.source_location.is_nil())
-        continue;
-
-      const auto &cover_set=block_info.lines;
-      INVARIANT(!cover_set.empty(),
-        "covered lines set must not be empty");
-      std::vector<unsigned>
-        line_list{cover_set.begin(), cover_set.end()};
-
-      std::string covered_lines=format_lines(line_list);
-      block_info.source_location.set_basic_block_covered_lines(covered_lines);
-    }
+      update_covered_lines(block_info);
   }
 
   /// \param t a goto instruction
@@ -177,6 +162,24 @@ protected:
 
   typedef std::vector<block_infot> block_infost;
   block_infost block_infos;
+
+  /// create list of covered lines as CSV string and set as property of source
+  /// location of basic block, compress to ranges if applicable
+  void update_covered_lines(block_infot &block_info)
+  {
+    if(block_info.source_location.is_nil())
+      return;
+
+    const auto &cover_set=block_info.lines;
+    INVARIANT(!cover_set.empty(),
+              "covered lines set must not be empty");
+    std::vector<unsigned>
+      line_list{cover_set.begin(), cover_set.end()};
+
+    format_number_ranget format_lines;
+    std::string covered_lines=format_lines(line_list);
+    block_info.source_location.set_basic_block_covered_lines(covered_lines);
+  }
 };
 
 bool coverage_goalst::get_coverage_goals(
