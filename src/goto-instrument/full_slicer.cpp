@@ -42,7 +42,8 @@ void full_slicert::add_function_calls(
 {
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(node.PC->function);
-  assert(f_it!=goto_functions.function_map.end());
+  if(f_it==goto_functions.function_map.end())
+    return;
 
   assert(!f_it->second.body.instructions.empty());
   goto_programt::const_targett begin_function=
