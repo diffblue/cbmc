@@ -9,6 +9,7 @@
 /// \brief Templated functions to cast to specific exprt-derived classes
 
 #include <typeinfo>
+#include <type_traits>
 #include "invariant.h"
 #include "expr.h"
 
@@ -56,12 +57,16 @@ T expr_dynamic_cast(exprt *base)
 /// \brief Cast a pointer to a generic exprt to a specific derived class
 /// \tparam T The pointer or const pointer type to \a TUnderlying to cast to
 /// \tparam TUnderlying An exprt-derived class type
+/// \tparam TExpr The original type to cast from, either exprt or const exprt
 /// \param base Pointer to a generic \ref exprt
 /// \return Pointer to object of type \a TUnderlying
 ///   or null if \a base is not an instance of \a TUnderlying
 template<typename T, typename TUnderlying, typename TExpr>
 T expr_dynamic_cast(TExpr *base)
 {
+  static_assert(
+    std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
+    "Tried to expr_dynamic_cast from something that wasn't an exprt");
   static_assert(
     std::is_pointer<T>::value,
     "Tried to convert exprt * to non-pointer type");
@@ -109,12 +114,16 @@ T expr_dynamic_cast(exprt &base)
 /// \brief Cast a reference to a generic exprt to a specific derived class
 /// \tparam T The reference or const reference type to \a TUnderlying to cast to
 /// \tparam TUnderlying An exprt-derived class type
+/// \tparam TExpr The original type to cast from, either exprt or const exprt
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a T
 /// \throw std::bad_cast If \a base is not an instance of \a TUnderlying
 template<typename T, typename TUnderlying, typename TExpr>
 T expr_dynamic_cast(TExpr &base)
 {
+  static_assert(
+    std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
+    "Tried to expr_dynamic_cast from something that wasn't an exprt");
   static_assert(
     std::is_reference<T>::value,
     "Tried to convert exprt & to non-reference type");
@@ -133,10 +142,10 @@ inline void validate_operands(
   const exprt &value,
   exprt::operandst::size_type number,
   const char *message,
-  bool allowMore=false)
+  bool allow_more=false)
 {
   DATA_INVARIANT(
-    allowMore
+    allow_more
       ? value.operands().size()==number
       : value.operands().size()>=number,
     message);
