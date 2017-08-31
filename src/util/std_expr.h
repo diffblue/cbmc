@@ -79,7 +79,7 @@ inline transt &to_trans_expr(exprt &expr)
   return static_cast<transt &>(expr);
 }
 
-template<> inline bool check_expr_type<transt>(const exprt &base)
+template<> inline bool can_cast_expr<transt>(const exprt &base)
 {
   return base.id()==ID_trans;
 }
@@ -228,7 +228,7 @@ inline symbol_exprt &to_symbol_expr(exprt &expr)
   return static_cast<symbol_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<symbol_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<symbol_exprt>(const exprt &base)
 {
   return base.id()==ID_symbol;
 }
@@ -317,7 +317,7 @@ inline unary_exprt &to_unary_expr(exprt &expr)
   return static_cast<unary_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<unary_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<unary_exprt>(const exprt &base)
 {
   return base.operands().size()==1;
 }
@@ -369,7 +369,7 @@ inline abs_exprt &to_abs_expr(exprt &expr)
   return static_cast<abs_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<abs_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<abs_exprt>(const exprt &base)
 {
   return base.id()==ID_abs;
 }
@@ -432,7 +432,7 @@ inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
   return static_cast<unary_minus_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<unary_minus_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<unary_minus_exprt>(const exprt &base)
 {
   return base.id()==ID_unary_minus;
 }
@@ -588,7 +588,7 @@ inline binary_exprt &to_binary_expr(exprt &expr)
   return static_cast<binary_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<binary_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
 {
   return base.operands().size()==2;
 }
@@ -689,9 +689,9 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   return static_cast<binary_relation_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<binary_relation_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
 {
-  return check_expr_type<binary_exprt>(base);
+  return can_cast_expr<binary_exprt>(base);
 }
 
 
@@ -814,7 +814,7 @@ inline plus_exprt &to_plus_expr(exprt &expr)
   return static_cast<plus_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<plus_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<plus_exprt>(const exprt &base)
 {
   return base.id()==ID_plus;
 }
@@ -872,7 +872,7 @@ inline minus_exprt &to_minus_expr(exprt &expr)
   return static_cast<minus_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<minus_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<minus_exprt>(const exprt &base)
 {
   return base.id()==ID_minus;
 }
@@ -930,7 +930,7 @@ inline mult_exprt &to_mult_expr(exprt &expr)
   return static_cast<mult_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<mult_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<mult_exprt>(const exprt &base)
 {
   return base.id()==ID_mult;
 }
@@ -988,7 +988,7 @@ inline div_exprt &to_div_expr(exprt &expr)
   return static_cast<div_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<div_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<div_exprt>(const exprt &base)
 {
   return base.id()==ID_div;
 }
@@ -1042,7 +1042,7 @@ inline mod_exprt &to_mod_expr(exprt &expr)
   return static_cast<mod_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<mod_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<mod_exprt>(const exprt &base)
 {
   return base.id()==ID_mod;
 }
@@ -1096,7 +1096,7 @@ inline rem_exprt &to_rem_expr(exprt &expr)
   return static_cast<rem_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<rem_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<rem_exprt>(const exprt &base)
 {
   return base.id()==ID_rem;
 }
@@ -1150,7 +1150,7 @@ inline power_exprt &to_power_expr(exprt &expr)
   return static_cast<power_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<power_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<power_exprt>(const exprt &base)
 {
   return base.id()==ID_power;
 }
@@ -1208,7 +1208,7 @@ inline factorial_power_exprt &to_factorial_expr(exprt &expr)
   return static_cast<factorial_power_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<factorial_power_exprt>(
+template<> inline bool can_cast_expr<factorial_power_exprt>(
   const exprt &base)
 {
   return base.id()==ID_factorial_power;
@@ -1261,7 +1261,7 @@ inline equal_exprt &to_equal_expr(exprt &expr)
   return static_cast<equal_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<equal_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<equal_exprt>(const exprt &base)
 {
   return base.id()==ID_equal;
 }
@@ -1317,7 +1317,7 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
   return static_cast<notequal_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<notequal_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<notequal_exprt>(const exprt &base)
 {
   return base.id()==ID_notequal;
 }
@@ -1409,7 +1409,7 @@ inline index_exprt &to_index_expr(exprt &expr)
   return static_cast<index_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<index_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<index_exprt>(const exprt &base)
 {
   return base.id()==ID_index;
 }
@@ -1476,7 +1476,7 @@ inline array_of_exprt &to_array_of_expr(exprt &expr)
   return static_cast<array_of_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<array_of_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<array_of_exprt>(const exprt &base)
 {
   return base.id()==ID_array_of;
 }
@@ -1526,7 +1526,7 @@ inline array_exprt &to_array_expr(exprt &expr)
   return static_cast<array_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<array_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
 {
   return base.id()==ID_array;
 }
@@ -1572,7 +1572,7 @@ inline vector_exprt &to_vector_expr(exprt &expr)
   return static_cast<vector_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<vector_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<vector_exprt>(const exprt &base)
 {
   return base.id()==ID_vector;
 }
@@ -1653,7 +1653,7 @@ inline union_exprt &to_union_expr(exprt &expr)
   return static_cast<union_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<union_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<union_exprt>(const exprt &base)
 {
   return base.id()==ID_union;
 }
@@ -1703,7 +1703,7 @@ inline struct_exprt &to_struct_expr(exprt &expr)
   return static_cast<struct_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<struct_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<struct_exprt>(const exprt &base)
 {
   return base.id()==ID_struct;
 }
@@ -1781,7 +1781,7 @@ inline complex_exprt &to_complex_expr(exprt &expr)
   return static_cast<complex_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<complex_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<complex_exprt>(const exprt &base)
 {
   return base.id()==ID_complex;
 }
@@ -1874,7 +1874,7 @@ inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
 }
 
 template<>
-inline bool check_expr_type<object_descriptor_exprt>(const exprt &base)
+inline bool can_cast_expr<object_descriptor_exprt>(const exprt &base)
 {
   return base.id()==ID_object_descriptor;
 }
@@ -1951,7 +1951,7 @@ inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
   return static_cast<dynamic_object_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<dynamic_object_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<dynamic_object_exprt>(const exprt &base)
 {
   return base.id()==ID_dynamic_object;
 }
@@ -2019,7 +2019,7 @@ inline typecast_exprt &to_typecast_expr(exprt &expr)
   return static_cast<typecast_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<typecast_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<typecast_exprt>(const exprt &base)
 {
   return base.id()==ID_typecast;
 }
@@ -2098,7 +2098,7 @@ inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
 }
 
 template<>
-inline bool check_expr_type<floatbv_typecast_exprt>(const exprt &base)
+inline bool can_cast_expr<floatbv_typecast_exprt>(const exprt &base)
 {
   return base.id()==ID_floatbv_typecast;
 }
@@ -2182,7 +2182,7 @@ inline and_exprt &to_and_expr(exprt &expr)
   return static_cast<and_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<and_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<and_exprt>(const exprt &base)
 {
   return base.id()==ID_and;
 }
@@ -2234,7 +2234,7 @@ inline implies_exprt &to_implies_expr(exprt &expr)
   return static_cast<implies_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<implies_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<implies_exprt>(const exprt &base)
 {
   return base.id()==ID_implies;
 }
@@ -2318,7 +2318,7 @@ inline or_exprt &to_or_expr(exprt &expr)
   return static_cast<or_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<or_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<or_exprt>(const exprt &base)
 {
   return base.id()==ID_or;
 }
@@ -2372,7 +2372,7 @@ inline bitnot_exprt &to_bitnot_expr(exprt &expr)
   return static_cast<bitnot_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<bitnot_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
 {
   return base.id()==ID_bitnot;
 }
@@ -2429,7 +2429,7 @@ inline bitor_exprt &to_bitor_expr(exprt &expr)
   return static_cast<bitor_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<bitor_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<bitor_exprt>(const exprt &base)
 {
   return base.id()==ID_bitor;
 }
@@ -2489,7 +2489,7 @@ inline bitxor_exprt &to_bitxor_expr(exprt &expr)
   return static_cast<bitxor_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<bitxor_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<bitxor_exprt>(const exprt &base)
 {
   return base.id()==ID_bitxor;
 }
@@ -2550,7 +2550,7 @@ inline bitand_exprt &to_bitand_expr(exprt &expr)
   return static_cast<bitand_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<bitand_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<bitand_exprt>(const exprt &base)
 {
   return base.id()==ID_bitand;
 }
@@ -2780,7 +2780,7 @@ inline replication_exprt &to_replication_expr(exprt &expr)
   return static_cast<replication_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<replication_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<replication_exprt>(const exprt &base)
 {
   return base.id()==ID_replication;
 }
@@ -2861,7 +2861,7 @@ inline extractbit_exprt &to_extractbit_expr(exprt &expr)
   return static_cast<extractbit_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<extractbit_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<extractbit_exprt>(const exprt &base)
 {
   return base.id()==ID_extractbit;
 }
@@ -2959,7 +2959,7 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
   return static_cast<extractbits_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<extractbits_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<extractbits_exprt>(const exprt &base)
 {
   return base.id()==ID_extractbits;
 }
@@ -3019,7 +3019,7 @@ inline address_of_exprt &to_address_of_expr(exprt &expr)
   return static_cast<address_of_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<address_of_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<address_of_exprt>(const exprt &base)
 {
   return base.id()==ID_address_of;
 }
@@ -3082,7 +3082,7 @@ inline not_exprt &to_not_expr(exprt &expr)
   return static_cast<not_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<not_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<not_exprt>(const exprt &base)
 {
   return base.id()==ID_not;
 }
@@ -3162,7 +3162,7 @@ inline dereference_exprt &to_dereference_expr(exprt &expr)
   return static_cast<dereference_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<dereference_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<dereference_exprt>(const exprt &base)
 {
   return base.id()==ID_dereference;
 }
@@ -3260,7 +3260,7 @@ inline if_exprt &to_if_expr(exprt &expr)
   return static_cast<if_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<if_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<if_exprt>(const exprt &base)
 {
   return base.id()==ID_if;
 }
@@ -3353,7 +3353,7 @@ inline with_exprt &to_with_expr(exprt &expr)
   return static_cast<with_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<with_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<with_exprt>(const exprt &base)
 {
   return base.id()==ID_with;
 }
@@ -3417,7 +3417,7 @@ inline index_designatort &to_index_designator(exprt &expr)
   return static_cast<index_designatort &>(expr);
 }
 
-template<> inline bool check_expr_type<index_designatort>(const exprt &base)
+template<> inline bool can_cast_expr<index_designatort>(const exprt &base)
 {
   return base.id()==ID_index_designator;
 }
@@ -3473,7 +3473,7 @@ inline member_designatort &to_member_designator(exprt &expr)
   return static_cast<member_designatort &>(expr);
 }
 
-template<> inline bool check_expr_type<member_designatort>(const exprt &base)
+template<> inline bool can_cast_expr<member_designatort>(const exprt &base)
 {
   return base.id()==ID_member_designator;
 }
@@ -3575,7 +3575,7 @@ inline update_exprt &to_update_expr(exprt &expr)
   return static_cast<update_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<update_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<update_exprt>(const exprt &base)
 {
   return base.id()==ID_update;
 }
@@ -3670,7 +3670,7 @@ inline array_update_exprt &to_array_update_expr(exprt &expr)
   return static_cast<array_update_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<array_update_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<array_update_exprt>(const exprt &base)
 {
   return base.id()==ID_array_update;
 }
@@ -3804,7 +3804,7 @@ inline member_exprt &to_member_expr(exprt &expr)
   return static_cast<member_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<member_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<member_exprt>(const exprt &base)
 {
   return base.id()==ID_member;
 }
@@ -3856,7 +3856,7 @@ inline isnan_exprt &to_isnan_expr(exprt &expr)
   return static_cast<isnan_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<isnan_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<isnan_exprt>(const exprt &base)
 {
   return base.id()==ID_isnan;
 }
@@ -3912,7 +3912,7 @@ inline isinf_exprt &to_isinf_expr(exprt &expr)
   return static_cast<isinf_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<isinf_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<isinf_exprt>(const exprt &base)
 {
   return base.id()==ID_isinf;
 }
@@ -3964,7 +3964,7 @@ inline isfinite_exprt &to_isfinite_expr(exprt &expr)
   return static_cast<isfinite_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<isfinite_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<isfinite_exprt>(const exprt &base)
 {
   return base.id()==ID_isfinite;
 }
@@ -4016,7 +4016,7 @@ inline isnormal_exprt &to_isnormal_expr(exprt &expr)
   return static_cast<isnormal_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<isnormal_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<isnormal_exprt>(const exprt &base)
 {
   return base.id()==ID_isnormal;
 }
@@ -4073,7 +4073,7 @@ inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
 }
 
 template<>
-inline bool check_expr_type<ieee_float_equal_exprt>(const exprt &base)
+inline bool can_cast_expr<ieee_float_equal_exprt>(const exprt &base)
 {
   return base.id()==ID_ieee_float_equal;
 }
@@ -4132,7 +4132,7 @@ inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
 }
 
 template<>
-inline bool check_expr_type<ieee_float_notequal_exprt>(const exprt &base)
+inline bool can_cast_expr<ieee_float_notequal_exprt>(const exprt &base)
 {
   return base.id()==ID_ieee_float_notequal;
 }
@@ -4308,7 +4308,7 @@ inline constant_exprt &to_constant_expr(exprt &expr)
   return static_cast<constant_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<constant_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<constant_exprt>(const exprt &base)
 {
   return base.id()==ID_constant;
 }
@@ -4436,7 +4436,7 @@ inline function_application_exprt &to_function_application_expr(exprt &expr)
 }
 
 template<>
-inline bool check_expr_type<function_application_exprt>(const exprt &base)
+inline bool can_cast_expr<function_application_exprt>(const exprt &base)
 {
   return base.id()==ID_function_application;
 }
@@ -4504,7 +4504,7 @@ inline concatenation_exprt &to_concatenation_expr(exprt &expr)
   return static_cast<concatenation_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<concatenation_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<concatenation_exprt>(const exprt &base)
 {
   return base.id()==ID_concatenation;
 }
@@ -4600,7 +4600,7 @@ inline let_exprt &to_let_expr(exprt &expr)
   return static_cast<let_exprt &>(expr);
 }
 
-template<> inline bool check_expr_type<let_exprt>(const exprt &base)
+template<> inline bool can_cast_expr<let_exprt>(const exprt &base)
 {
   return base.id()==ID_let;
 }

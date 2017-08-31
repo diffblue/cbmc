@@ -21,7 +21,7 @@
 /// \tparam T The exprt-derived class to check for
 /// \param base Reference to a generic \ref exprt
 /// \return true if \a base is of type \a T
-template<typename T> bool check_expr_type(const exprt &base);
+template<typename T> bool can_cast_expr(const exprt &base);
 
 
 /// \brief Cast a constant pointer to a generic exprt to a specific derived
@@ -70,7 +70,7 @@ T expr_dynamic_cast(TExpr *base)
     "The template argument T must be derived from exprt.");
   if(base == nullptr)
     return nullptr;
-  if(!check_expr_type<TUnderlying>(*base))
+  if(!can_cast_expr<TUnderlying>(*base))
     return nullptr;
   T value=static_cast<T>(base);
   validate_expr(*value);
@@ -121,7 +121,7 @@ T expr_dynamic_cast(TExpr &base)
   static_assert(
     std::is_base_of<exprt, TUnderlying>::value,
     "The template argument T must be derived from exprt.");
-  if(!check_expr_type<TUnderlying>(base))
+  if(!can_cast_expr<TUnderlying>(base))
     throw std::bad_cast();
   T value=static_cast<T>(base);
   validate_expr(value);
