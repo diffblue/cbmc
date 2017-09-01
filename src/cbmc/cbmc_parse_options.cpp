@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/convert_nondet.h>
 #include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
@@ -779,6 +780,9 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_instanceof(goto_model);
 
     mm_io(goto_model);
+
+    // instrument library preconditions
+    instrument_preconditions(goto_model);
 
     // do partial inlining
     status() << "Partial Inlining" << eom;

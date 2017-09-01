@@ -23,6 +23,7 @@ SRC = basic_blocks.cpp \
       goto_program_template.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
+      instrument_preconditions.cpp \
       interpreter.cpp \
       interpreter_evaluate.cpp \
       json_goto_trace.cpp \
