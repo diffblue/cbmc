@@ -47,11 +47,6 @@ Author: Daniel Kroening, kroening@kroening.com
 // global data, horrible
 unsigned int value_set_dereferencet::invalid_counter=0;
 
-bool value_set_dereferencet::has_dereference(const exprt &expr)
-{
-  return has_subexpr(expr, ID_dereference);
-}
-
 const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
 {
   if(expr.id()==ID_member || expr.id()==ID_index)

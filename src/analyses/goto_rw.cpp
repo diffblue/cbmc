@@ -14,6 +14,7 @@ Date: April 2010
 #include <limits>
 #include <memory>
 
+#include <util/expr_util.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
@@ -617,8 +618,7 @@ void rw_range_set_value_sett::get_objects_dereference(
 
   // value_set_dereferencet::build_reference_to will turn *p into
   // DYNAMIC_OBJECT(p) ? *p : invalid_objectN
-  if(object.is_not_nil() &&
-     !value_set_dereferencet::has_dereference(object))
+  if(object.is_not_nil() && !has_subexpr(object, ID_dereference))
     get_objects_rec(mode, object, range_start, new_size);
 }
 

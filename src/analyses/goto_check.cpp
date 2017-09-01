@@ -117,11 +117,6 @@ protected:
 
   void invalidate(const exprt &lhs);
 
-  inline static bool has_dereference(const exprt &src)
-  {
-    return has_subexpr(src, ID_dereference);
-  }
-
   bool enable_bounds_check;
   bool enable_pointer_check;
   bool enable_memory_leak_check;
@@ -200,8 +195,7 @@ void goto_checkt::invalidate(const exprt &lhs)
       assertionst::iterator next=it;
       next++;
 
-      if(has_symbol(*it, find_symbols_set) ||
-         has_dereference(*it))
+      if(has_symbol(*it, find_symbols_set) || has_subexpr(*it, ID_dereference))
         assertions.erase(it);
 
       it=next;
