@@ -6,7 +6,7 @@ SRC = src/expr/require_expr.cpp \
       unit_tests.cpp \
       catch_example.cpp \
       util/expr_iterator.cpp \
-      optional.cpp \
+      util/optional.cpp \
       analyses/call_graph.cpp \
       java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
       # Empty last line
