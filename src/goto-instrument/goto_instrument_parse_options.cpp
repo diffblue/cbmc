@@ -624,6 +624,7 @@ int goto_instrument_parse_optionst::doit()
       const bool is_cpp=cmdline.isset("dump-cpp");
       const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
+      const bool harness=cmdline.isset("harness");
       namespacet ns(symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -642,11 +643,22 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          out);
       }
       else
         (is_cpp ? dump_cpp : dump_c)(
-          goto_functions, h_libc, h_all, ns, std::cout);
+          goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          std::cout);
 
       return 0;
     }
@@ -1545,6 +1557,7 @@ void goto_instrument_parse_optionst::help()
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
     " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
+    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
