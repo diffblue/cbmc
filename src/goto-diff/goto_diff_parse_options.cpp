@@ -319,14 +319,10 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_difft> goto_diff=
-    util_make_unique<syntactic_difft>(
-      goto_model1, goto_model2, get_message_handler());
-  goto_diff->set_ui(get_ui());
-
-  (*goto_diff)();
-
-  goto_diff->output_functions(std::cout);
+  syntactic_difft sd(goto_model1, goto_model2, get_message_handler());
+  sd.set_ui(get_ui());
+  sd();
+  sd.output_functions(std::cout);
 
   return 0;
 }
