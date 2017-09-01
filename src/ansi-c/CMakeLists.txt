@@ -39,7 +39,7 @@ file(GLOB library_check_sources "library/*.c")
 list(REMOVE_ITEM library_check_sources ${platform_unavail})
 
 add_custom_target(library_check
-    ${CMAKE_CURRENT_SOURCE_DIR}/check_library.sh ${library_check_sources}
+    ${CMAKE_CURRENT_SOURCE_DIR}/library_check.sh ${library_check_sources}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -93,3 +93,5 @@ add_library(ansi-c
 generic_includes(ansi-c)
 
 target_link_libraries(ansi-c util linking goto-programs assembler)
+
+add_dependencies(ansi-c library_check)
