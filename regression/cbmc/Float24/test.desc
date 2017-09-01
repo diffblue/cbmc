@@ -1,0 +1,10 @@
+CORE
+main.c
+--win32 --xml-ui
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+<full_lhs_value>5\.1</full_lhs_value>
+--
+^warning: ignoring
+<full_lhs_value>5\.1l</full_lhs_value>
