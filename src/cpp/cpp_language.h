@@ -24,9 +24,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_languaget:public languaget
 {
 public:
-  virtual void get_language_options(
-    const cmdlinet &cmd) override;
-
   bool preprocess(
     std::istream &instream,
     const std::string &path,
@@ -88,9 +85,6 @@ public:
 
   void modules_provided(std::set<std::string> &modules) override;
 
-  bool wrap_entry_point_in_while() const
-  { return wrap_entry_point; }
-
 protected:
   cpp_parse_treet cpp_parse_tree;
   std::string parse_path;
@@ -101,9 +95,6 @@ protected:
   {
     return "main";
   }
-
-private:
-  bool wrap_entry_point;
 };
 
 languaget *new_cpp_language();

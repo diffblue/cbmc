@@ -44,6 +44,7 @@ public:
     bool use_fixed_for_float;
     bool for_has_scope;
     bool single_precision_constant;
+    bool wrap_entry_point_in_while;
     enum class c_standardt { C89, C99, C11 } c_standard;
     static c_standardt default_c_standard();
 

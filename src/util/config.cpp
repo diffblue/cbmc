@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "cprover_prefix.h"
 
+#include "langapi/wrap_entry_point.h"
+
 configt config;
 
 void configt::ansi_ct::set_16()
@@ -756,6 +758,9 @@ bool configt::set(const cmdlinet &cmdline)
 
   if(cmdline.isset('I'))
     ansi_c.include_paths=cmdline.get_values('I');
+
+  ansi_c.wrap_entry_point_in_while=
+    cmdline.isset(WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING);
 
   if(cmdline.isset("classpath"))
   {

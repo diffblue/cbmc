@@ -27,11 +27,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_internal_additions.h"
 #include "type2name.h"
 
-void ansi_c_languaget::get_language_options(const cmdlinet &cmd)
-{
-  wrap_entry_point=cmd.isset("wrap-entry-point-in-while");
-}
-
 std::set<std::string> ansi_c_languaget::extensions() const
 {
   return { "c", "i" };
@@ -133,7 +128,7 @@ bool ansi_c_languaget::typecheck(
 bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
   if(ansi_c_entry_point(symbol_table, "main", get_message_handler(),
-     wrap_entry_point_in_while()))
+     config.ansi_c.wrap_entry_point_in_while))
   {
     return true;
   }

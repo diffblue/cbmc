@@ -29,11 +29,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_type2name.h"
 
-void cpp_languaget::get_language_options(const cmdlinet &cmd)
-{
-  wrap_entry_point=cmd.isset("wrap-entry-point-in-while");
-}
-
 std::set<std::string> cpp_languaget::extensions() const
 {
   std::set<std::string> s;
@@ -141,7 +136,7 @@ bool cpp_languaget::typecheck(
 bool cpp_languaget::final(symbol_tablet &symbol_table)
 {
   if(ansi_c_entry_point(symbol_table, "main", get_message_handler(),
-     wrap_entry_point_in_while()))
+     config.ansi_c.wrap_entry_point_in_while))
   {
     return true;
   }

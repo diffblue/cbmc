@@ -14,6 +14,10 @@ Date: August 2017
 #include <util/std_code.h>
 
 /// Command line option (to be shared by the different tools)
+/// (This contains the actual string, needed in config.cpp)
+#define WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING "wrap-entry-point-in-while"
+
+/// Command line option (to be shared by the different tools)
 #define WRAP_ENTRY_POINT_IN_WHILE_TRUE "(wrap-entry-point-in-while)"
 
 /// Command line help text

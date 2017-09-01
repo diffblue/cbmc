@@ -447,7 +447,7 @@ bool ansi_c_entry_point(
         message_handler);
   }
 
-  if(wrap_entry_point)
+  if(config.ansi_c.wrap_entry_point_in_while)
   {
     code_whilet wrapped_main=wrap_entry_point_in_while(call_main);
     init_code.move_to_operands(wrapped_main);
