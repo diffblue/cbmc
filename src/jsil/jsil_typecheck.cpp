@@ -748,7 +748,7 @@ void jsil_typecheckt::typecheck_function_call(
 
     if(symbol_table.has_symbol(id))
     {
-      symbolt &s=symbol_table.lookup(id);
+      symbolt &s=symbol_table.at(id);
 
       if(s.type.id()==ID_code)
       {

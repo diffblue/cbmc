@@ -291,7 +291,7 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
       // member doesn't exist. In this case struct_type should be an opaque
       // stub, and we'll add the member to it.
       symbolt &symbol_table_type=
-        symbol_table.lookup("java::"+id2string(struct_type.get_tag()));
+        symbol_table.at("java::"+id2string(struct_type.get_tag()));
       auto &add_to_components=
         to_struct_type(symbol_table_type.type).components();
       add_to_components

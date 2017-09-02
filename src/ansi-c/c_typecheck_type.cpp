@@ -207,11 +207,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
         const irep_idt &tag_name=
           to_c_enum_tag_type(type.subtype()).get_identifier();
 
-        symbol_tablet::symbolst::iterator entry=
-          symbol_table.symbols.find(tag_name);
-        assert(entry!=symbol_table.symbols.end());
-
-        entry->second.type.subtype()=result;
+        symbolt &s=symbol_table.at(tag_name);
+        s.type.subtype()=result;
       }
 
       type=result;

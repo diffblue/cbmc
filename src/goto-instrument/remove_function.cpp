@@ -52,7 +52,7 @@ void remove_function(
     message.status() << "Removing body of " << identifier
                      << messaget::eom;
     entry->second.clear();
-    symbol_table.lookup(identifier).value.make_nil();
+    symbol_table.at(identifier).value.make_nil();
   }
 }
 

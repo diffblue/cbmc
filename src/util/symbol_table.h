@@ -89,7 +89,7 @@ public:
     return symbols.find(name)!=symbols.end();
   }
 
-  symbolt &lookup(const irep_idt &identifier);
+  symbolt &at(const irep_idt &identifier);
   const symbolt &lookup(const irep_idt &identifier) const;
 };
 

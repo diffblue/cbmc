@@ -94,7 +94,7 @@ void java_static_lifetime_init(
   unsigned max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector)
 {
-  symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
+  symbolt &initialize_symbol=symbol_table.at(INITIALIZE);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
 
   // We need to zero out all static variables, or nondet-initialize if they're

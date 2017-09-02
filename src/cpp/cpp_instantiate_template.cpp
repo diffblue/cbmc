@@ -451,12 +451,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(is_template_method)
   {
-    symbol_tablet::symbolst::iterator it =
-      symbol_table.symbols.find(class_name);
-
-    assert(it!=symbol_table.symbols.end());
-
-    symbolt &symb = it->second;
+    symbolt &symb=symbol_table.at(class_name);
 
     assert(new_decl.declarators().size() == 1);
 

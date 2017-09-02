@@ -104,12 +104,9 @@ bool static_lifetime_init(
     {
       // C standard 6.9.2, paragraph 5
       // adjust the type to an array of size 1
-      symbol_tablet::symbolst::iterator it=
-        symbol_table.symbols.find(identifier);
-      assert(it!=symbol_table.symbols.end());
-
-      it->second.type=type;
-      it->second.type.set(ID_size, from_integer(1, size_type()));
+      symbolt &s=symbol_table.at(identifier);
+      s.type=type;
+      s.type.set(ID_size, from_integer(1, size_type()));
     }
 
     if(type.id()==ID_incomplete_struct ||

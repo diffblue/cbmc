@@ -617,5 +617,5 @@ void java_bytecode_instrument(
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
-    instrument(symbol_table.lookup(symbol).value);
+    instrument(symbol_table.at(symbol).value);
 }
