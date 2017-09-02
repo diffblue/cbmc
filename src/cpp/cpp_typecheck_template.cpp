@@ -576,12 +576,8 @@ void cpp_typecheckt::convert_class_template_specialization(
     throw 0;
   }
 
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find((*id_set.begin())->identifier);
 
-  assert(s_it!=symbol_table.symbols.end());
-
-  symbolt &template_symbol=s_it->second;
+  const symbolt &template_symbol=lookup((*id_set.begin())->identifier);
 
   if(!template_symbol.type.get_bool(ID_is_template))
   {

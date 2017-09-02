@@ -41,14 +41,13 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
   if(expr.id()==ID_symbol)
   {
     const irep_idt &id=to_symbol_expr(expr).get_identifier();
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(id);
 
-    if(!symbol_table.has_symbol(id))
-    {
-      error() << "unexpected symbol: " << id << eom;
-      throw 0;
-    }
+    if(s_it==symbol_table.symbols.end())
+      throw "unexpected symbol: "+id2string(id);
 
-    symbolt &s=symbol_table.lookup(id);
+    symbolt &s=s_it->second;
     if(s.type.id().empty() || s.type.is_nil())
       s.type=type;
     else

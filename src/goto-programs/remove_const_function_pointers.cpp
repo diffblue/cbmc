@@ -23,14 +23,11 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 /// a small collection of possible values.
 /// \param message_handler: The message handler for messaget
 /// \param ns: The namespace to use to resolve types
-/// \param symbol_table: The symbol table to look up symbols in
 remove_const_function_pointerst::remove_const_function_pointerst(
   message_handlert &message_handler,
-  const namespacet &ns,
-  const symbol_tablet &symbol_table):
+  const namespacet &ns):
     messaget(message_handler),
-    ns(ns),
-    symbol_table(symbol_table)
+    ns(ns)
 {}
 
 /// To take a function call on a function pointer, and if possible resolve it to
@@ -67,8 +64,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
   {
     if(is_const_expression(expression))
     {
-      const symbolt &symbol=
-        symbol_table.lookup(expression.get(ID_identifier));
+      const symbolt &symbol=ns.lookup(expression.get(ID_identifier));
       if(symbol.type.id()!=ID_code)
       {
         const exprt &symbol_value=symbol.value;
@@ -104,8 +100,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
 exprt remove_const_function_pointerst::resolve_symbol(
   const symbol_exprt &symbol_expr) const
 {
-  const symbolt &symbol=
-    symbol_table.lookup(symbol_expr.get_identifier());
+  const symbolt &symbol=ns.lookup(symbol_expr.get_identifier());
   return symbol.value;
 }
 

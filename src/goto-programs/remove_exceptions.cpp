@@ -134,9 +134,6 @@ void remove_exceptionst::add_exceptional_returns(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  INVARIANT(
-    symbol_table.has_symbol(function_id),
-    "functions should be recorded in the symbol table");
   const symbolt &function_symbol=symbol_table.lookup(function_id);
 
   // for now only add exceptional returns for Java

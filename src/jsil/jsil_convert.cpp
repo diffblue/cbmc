@@ -48,13 +48,12 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;
 
-    if(symbol_table.has_symbol(new_symbol.name))
+    symbol_tablet::symbolst::iterator s_it=
+      symbol_table.symbols.find(new_symbol.name);
+    if(s_it!=symbol_table.symbols.end())
     {
-      symbolt &s=symbol_table.lookup(new_symbol.name);
-      if(s.value.id()=="no-body-just-yet")
-      {
-        symbol_table.remove(s.name);
-      }
+      if(s_it->second.value.id()=="no-body-just-yet")
+        symbol_table.symbols.erase(s_it);
     }
     if(symbol_table.add(new_symbol))
     {

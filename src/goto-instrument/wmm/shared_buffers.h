@@ -158,9 +158,11 @@ public:
 
   irep_idt choice(const irep_idt &function, const std::string &suffix)
   {
-    const std::string function_base_name = (symbol_table.has_symbol(function)?
-      id2string(symbol_table.lookup(function).base_name):
-      "main");
+    symbol_tablet::symbolst::const_iterator s_it=
+      symbol_table.symbols.find(function);
+    const std::string function_base_name=s_it!=symbol_table.symbols.end()?
+      id2string(s_it->second.base_name):
+      "main";
     return add(function_base_name+"_weak_choice",
       function_base_name+"_weak_choice", suffix, bool_typet());
   }
