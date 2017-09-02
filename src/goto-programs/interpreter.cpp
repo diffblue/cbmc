@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "interpreter.h"
 
 #include <cctype>
+#include <cstdint>
 #include <cstdio>
 #include <iostream>
 #include <fstream>
@@ -965,7 +966,7 @@ bool interpretert::unbounded_size(const typet &type)
 /// get allocated 2^32 address space each (of a 2^64 sized space).
 /// \param type: a structured type
 /// \return Size of the given type
-size_t interpretert::get_size(const typet &type)
+uint64_t interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
     return 2ULL << 32ULL;
@@ -992,7 +993,7 @@ size_t interpretert::get_size(const typet &type)
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    size_t max_size=0;
+    uint64_t max_size=0;
 
     for(const auto &comp : components)
     {

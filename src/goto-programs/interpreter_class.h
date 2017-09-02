@@ -193,7 +193,7 @@ protected:
   mp_integer build_memory_map(const irep_idt &id, const typet &type);
   typet concretize_type(const typet &type);
   bool unbounded_size(const typet &);
-  size_t get_size(const typet &type);
+  uint64_t get_size(const typet &type);
 
   irep_idt get_component_id(const irep_idt &object, unsigned offset);
   typet get_type(const irep_idt &id) const;
