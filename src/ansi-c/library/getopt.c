@@ -8,8 +8,11 @@ extern int optind;
 #define __CPROVER_STRING_H_INCLUDED
 #endif
 
-inline int getopt(int argc, char * const argv[],
-                  const char *optstring)
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+size_t __VERIFIER_nondet_size_t();
+
+inline int getopt(
+  int argc, char * const argv[], const char *optstring)
 {
   __CPROVER_HIDE:;
   int result=-1;
@@ -20,7 +23,7 @@ inline int getopt(int argc, char * const argv[],
   if(optind>=argc || argv[optind][0]!='-')
     return -1;
 
-  size_t result_index;
+  size_t result_index=__VERIFIER_nondet_size_t();
   __CPROVER_assume(
     result_index<strlen(optstring) && optstring[result_index]!=':');
   #ifdef __CPROVER_STRING_ABSTRACTION
@@ -28,17 +31,18 @@ inline int getopt(int argc, char * const argv[],
     "getopt zero-termination of 3rd argument");
   #endif
 
-  _Bool found;
+  __CPROVER_bool found=__VERIFIER_nondet___CPROVER_bool();
   if(found)
   {
     result=optstring[result_index];
+    __CPROVER_bool skipped=__VERIFIER_nondet___CPROVER_bool();
     if(skipped)
       ++optind;
   }
 
   if(result!=-1 && optind<argc && optstring[result_index+1]==':')
   {
-    _Bool has_no_arg;
+    __CPROVER_bool has_no_arg=__VERIFIER_nondet___CPROVER_bool();
     if(has_no_arg)
     {
       optarg=argv[optind];
@@ -53,10 +57,17 @@ inline int getopt(int argc, char * const argv[],
 
 /* FUNCTION: getopt_long */
 
-int getopt(int argc, char * const argv[], const char *optstring);
+#ifndef __CPROVER_GETOPT_H_INCLUDED
+#include <getopt.h>
+#define __CPROVER_GETOPT_H_INCLUDED
+#endif
 
-inline int getopt_long(int argc, char * const argv[], const char *optstring,
-                const struct option *longopts, int *longindex)
+inline int getopt_long(
+  int argc,
+  char * const argv[],
+  const char *optstring,
+  const struct option *longopts,
+  int *longindex)
 {
   // trigger valid-pointer checks (if enabled), even though we don't
   // use the parameter in this model

@@ -7,9 +7,11 @@
 
 #undef time
 
+time_t __VERIFIER_nondet_time_t();
+
 time_t time(time_t *tloc)
 {
-  time_t res;
+  time_t res=__VERIFIER_nondet_time_t();
   if(!tloc) *tloc=res;
   return res;
 }
@@ -105,10 +107,12 @@ struct tm *localtime_r(const time_t *clock, struct tm *result)
 
 #undef mktime
 
+time_t __VERIFIER_nondet_time_t();
+
 time_t mktime(struct tm *timeptr)
 {
   (void)*timeptr;
-  time_t result;
+  time_t result=__VERIFIER_nondet_time_t();
   return result;
 }
 
@@ -121,10 +125,12 @@ time_t mktime(struct tm *timeptr)
 
 #undef timegm
 
+time_t __VERIFIER_nondet_time_t();
+
 time_t timegm(struct tm *timeptr)
 {
   (void)*timeptr;
-  time_t result;
+  time_t result=__VERIFIER_nondet_time_t();
   return result;
 }
 
