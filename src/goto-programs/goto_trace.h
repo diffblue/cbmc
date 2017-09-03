@@ -83,6 +83,9 @@ public:
   // we may choose to hide a step
   bool hidden;
 
+  // this is related to an internal expression
+  bool internal;
+
   // we categorize
   enum class assignment_typet { STATE, ACTUAL_PARAMETER };
   assignment_typet assignment_type;
@@ -127,6 +130,7 @@ public:
     step_nr(0),
     type(typet::NONE),
     hidden(false),
+    internal(false),
     assignment_type(assignment_typet::STATE),
     thread_nr(0),
     cond_value(false),
@@ -172,6 +176,13 @@ public:
   void add_step(const goto_trace_stept &step)
   {
     steps.push_back(step);
+  }
+
+  // retrieves the final step in the trace for manipulation
+  // (used to fill a trace from code, hence non-const)
+  inline goto_trace_stept &get_last_step()
+  {
+    return steps.back();
   }
 
   // delete all steps after (not including) s

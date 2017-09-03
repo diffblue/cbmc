@@ -1,0 +1,8 @@
+CORE
+Assume1.class
+--function Assume1.foo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring

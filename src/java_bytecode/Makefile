@@ -1,10 +1,12 @@
 SRC = bytecode_info.cpp \
       character_refine_preprocess.cpp \
       ci_lazy_methods.cpp \
+      ci_lazy_methods_needed.cpp \
       expr2java.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
+      java_bytecode_instrument.cpp \
       java_bytecode_internal_additions.cpp \
       java_bytecode_language.cpp \
       java_bytecode_parse_tree.cpp \
@@ -20,8 +22,10 @@ SRC = bytecode_info.cpp \
       java_object_factory.cpp \
       java_pointer_casts.cpp \
       java_root_class.cpp \
+      java_string_library_preprocess.cpp \
       java_types.cpp \
       java_utils.cpp \
+      select_pointer_type.cpp \
       # Empty last line
 
 INCLUDES= -I ..

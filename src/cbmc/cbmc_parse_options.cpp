@@ -47,6 +47,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/replace_java_nondet.h>
+#include <goto-programs/convert_nondet.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -58,6 +60,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
+
+#include "java_bytecode/java_bytecode_language.h"
 
 #include "cbmc_solvers.h"
 #include "bmc.h"
@@ -268,6 +272,11 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
+  if(cmdline.isset("refine-strings"))
+  {
+    options.set_option("refine-strings", true);
+  }
+
   if(cmdline.isset("max-node-refinement"))
     options.set_option(
       "max-node-refinement",
@@ -414,7 +423,23 @@ int cbmc_parse_optionst::doit()
   //
 
   optionst options;
-  get_command_line_options(options);
+  try
+  {
+    get_command_line_options(options);
+  }
+
+  catch(const char *error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
+  catch(const std::string error_msg)
+  {
+    error() << error_msg << eom;
+    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+  }
+
   eval_verbosity();
 
   //
@@ -472,7 +497,11 @@ int cbmc_parse_optionst::doit()
   // unwinds <clinit> loops to number of enum elements
   // side effect: add this as explicit unwind to unwind set
   if(options.get_bool_option("java-unwind-enum-static"))
-    remove_static_init_loops(symbol_table, goto_functions, options);
+    remove_static_init_loops(
+      symbol_table,
+      goto_functions,
+      options,
+      ui_message_handler);
 
   // get solver
   cbmc_solverst cbmc_solvers(options, symbol_table, ui_message_handler);
@@ -568,6 +597,7 @@ int cbmc_parse_optionst::get_goto_program(
       }
 
       languaget *language=get_language_from_filename(filename);
+      language->get_language_options(cmdline);
 
       if(language==nullptr)
       {
@@ -638,9 +668,6 @@ int cbmc_parse_optionst::get_goto_program(
       }
     }
 
-    if(!binaries.empty())
-      config.set_from_symbol_table(symbol_table);
-
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table();
@@ -668,6 +695,8 @@ int cbmc_parse_optionst::get_goto_program(
       show_goto_functions(ns, get_ui(), goto_functions);
       return 0;
     }
+
+    status() << config.object_bits_info() << eom;
   }
 
   catch(const char *e)
@@ -717,6 +746,7 @@ void cbmc_parse_optionst::preprocessing()
     }
 
     languaget *ptr=get_language_from_filename(filename);
+    ptr->get_language_options(cmdline);
 
     if(ptr==nullptr)
     {
@@ -780,7 +810,7 @@ bool cbmc_parse_optionst::process_goto_program(
       cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(symbol_table, goto_functions);
-    // remove catch and throw
+    // remove catch and throw (introduces instanceof)
     remove_exceptions(symbol_table, goto_functions);
     // Similar removal of RTTI inspection:
     remove_instanceof(symbol_table, goto_functions);
@@ -796,6 +826,25 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_vector(symbol_table, goto_functions);
     remove_complex(symbol_table, goto_functions);
     rewrite_union(goto_functions, ns);
+
+    // Similar removal of java nondet statements:
+    // TODO Should really get this from java_bytecode_language somehow, but we
+    // don't have an instance of that here.
+    const size_t max_nondet_array_length=
+      cmdline.isset("java-max-input-array-length")
+        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    const size_t max_nondet_tree_depth=
+      cmdline.isset("java-max-input-tree-depth")
+        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+        : MAX_NONDET_TREE_DEPTH;
+    replace_java_nondet(goto_functions);
+    convert_nondet(
+      goto_functions,
+      symbol_table,
+      ui_message_handler,
+      max_nondet_array_length,
+      max_nondet_tree_depth);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -839,6 +888,10 @@ bool cbmc_parse_optionst::process_goto_program(
       remove_unused_functions(goto_functions, ui_message_handler);
     }
 
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_functions);
+
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
@@ -867,7 +920,7 @@ bool cbmc_parse_optionst::process_goto_program(
         full_slicer(goto_functions, ns);
     }
 
-    // remove skips
+    // remove any skips introduced since coverage instrumentation
     remove_skip(goto_functions);
     goto_functions.update();
   }
@@ -1015,14 +1068,14 @@ void cbmc_parse_optionst::help()
     "Java Bytecode frontend options:\n"
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-max-vla-length        limit the length of user-code-created arrays\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --java-cp-include-files      regexp or JSON list of files to load (with '@' prefix)\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    // This one is handled by cbmc_parse_options not by the Java frontend,
+    // hence its presence here:
     " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
     " --program-only               only show program expression\n"
@@ -1039,6 +1092,7 @@ void cbmc_parse_optionst::help()
     " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
     "\n"
     "Backend options:\n"
+    " --object-bits n              number of bits used for object addresses\n"
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
@@ -1050,6 +1104,10 @@ void cbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
+    " --refine-strings             use string refinement (experimental)\n"
+    " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
+    " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
+    " --string-max-length          add constraint on the length of strings (experimental)\n" // NOLINT(*)
     " --outfile filename           output formula to given file\n"
     " --arrays-uf-never            never turn arrays into uninterpreted functions\n" // NOLINT(*)
     " --arrays-uf-always           always turn arrays into uninterpreted functions\n" // NOLINT(*)

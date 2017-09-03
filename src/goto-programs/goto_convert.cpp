@@ -58,31 +58,24 @@ static void finish_catch_push_targets(goto_programt &dest)
   // in the second pass set the targets
   Forall_goto_program_instructions(it, dest)
   {
-    if(it->is_catch())
+    if(it->is_catch() && it->code.get_statement()==ID_push_catch)
     {
-      bool handler_added=true;
-      irept exceptions=it->code.find(ID_exception_list);
+      // Populate `targets` with a GOTO instruction target per
+      // exception handler if it isn't already populated.
+      // (Java handlers, for example, need this finish step; C++
+      //  handlers will already be populated by now)
 
-      if(exceptions.is_nil() &&
-         it->code.has_operands())
-        exceptions=it->code.op0().find(ID_exception_list);
-
-      const irept::subt &exception_list=exceptions.get_sub();
-
-      if(!exception_list.empty())
+      if(it->targets.empty())
       {
-        // in this case we have a CATCH_PUSH
-        irept handlers=it->code.find(ID_label);
-        if(handlers.is_nil() &&
-           it->code.has_operands())
-          handlers=it->code.op0().find(ID_label);
-        const irept::subt &handler_list=handlers.get_sub();
+        bool handler_added=true;
+        const code_push_catcht::exception_listt &handler_list=
+          to_code_push_catch(it->code).exception_list();
 
-        // some handlers may not have been converted (if there was no
-        // exception to be caught); in such a situation we abort
         for(const auto &handler : handler_list)
         {
-          if(label_targets.find(handler.id())==label_targets.end())
+          // some handlers may not have been converted (if there was no
+          // exception to be caught); in such a situation we abort
+          if(label_targets.find(handler.get_label())==label_targets.end())
           {
             handler_added=false;
             break;
@@ -93,14 +86,7 @@ static void finish_catch_push_targets(goto_programt &dest)
           continue;
 
         for(const auto &handler : handler_list)
-        {
-          std::map<irep_idt,
-                   goto_programt::targett>::const_iterator handler_it=
-            label_targets.find(handler.id());
-          assert(handler_it!=label_targets.end());
-          // set the target
-          it->targets.push_back(handler_it->second);
-        }
+          it->targets.push_back(label_targets.at(handler.get_label()));
       }
     }
   }
@@ -558,6 +544,10 @@ void goto_convertt::convert(
     forall_operands(it, code)
       convert(to_code(*it), dest);
   }
+  else if(statement==ID_push_catch ||
+          statement==ID_pop_catch ||
+          statement==ID_exception_landingpad)
+    copy(code, CATCH, dest);
   else
     copy(code, OTHER, dest);
 
@@ -1264,6 +1254,19 @@ void goto_convertt::convert_switch(
 
   goto_programt tmp_cases;
 
+  // The case number represents which case this corresponds to in the sequence
+  // of case statements.
+  //
+  // switch (x)
+  // {
+  // case 2:  // case_number 1
+  //   ...;
+  // case 3:  // case_number 2
+  //   ...;
+  // case 10: // case_number 3
+  //   ...;
+  // }
+  size_t case_number=1;
   for(auto &case_pair : targets.cases)
   {
     const caset &case_ops=case_pair.second;
@@ -1272,10 +1275,15 @@ void goto_convertt::convert_switch(
 
     exprt guard_expr=case_guard(argument, case_ops);
 
+    source_locationt source_location=case_ops.front().find_source_location();
+    source_location.set_case_number(std::to_string(case_number));
+    case_number++;
+    guard_expr.add_source_location()=source_location;
+
     goto_programt::targett x=tmp_cases.add_instruction();
     x->make_goto(case_pair.first);
     x->guard.swap(guard_expr);
-    x->source_location=case_ops.front().find_source_location();
+    x->source_location=source_location;
   }
 
   {

@@ -64,6 +64,11 @@ void class_hierarchyt::get_children_trans_rec(
     get_children_trans_rec(child, dest);
 }
 
+/// Get all the classes that inherit (directly or indirectly) from class c. The
+/// first element(s) will be the immediate parents of c, though after this
+/// the order is all the parents of the first immediate parent
+/// \param c: The class to consider
+/// \param [out] dest: A list of class ids that c eventually inherits from.
 void class_hierarchyt::get_parents_trans_rec(
   const irep_idt &c,
   idst &dest) const

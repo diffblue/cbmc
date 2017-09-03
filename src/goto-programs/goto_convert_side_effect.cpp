@@ -636,17 +636,6 @@ void goto_convertt::remove_statement_expression(
   static_cast<exprt &>(expr)=tmp_symbol_expr;
 }
 
-void goto_convertt::remove_push_catch(
-  side_effect_exprt &expr,
-  goto_programt &dest)
-{
-  // we only get here for ID_push_catch, which is only used for Java
-  convert_java_try_catch(code_expressiont(expr), dest);
-
-  // the result can't be used, these are void
-  expr.make_nil();
-}
-
 void goto_convertt::remove_side_effect(
   side_effect_exprt &expr,
   goto_programt &dest,
@@ -707,8 +696,6 @@ void goto_convertt::remove_side_effect(
     // the result can't be used, these are void
     expr.make_nil();
   }
-  else if(statement==ID_push_catch)
-    remove_push_catch(expr, dest);
   else
   {
     error().source_location=expr.find_source_location();

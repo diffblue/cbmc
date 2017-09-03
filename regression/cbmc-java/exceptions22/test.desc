@@ -1,0 +1,11 @@
+CORE
+test.class
+
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+^warning: ignoring
+--
+This test checks that a thrown exception is caught, and is not erroneously rethrown
+on function exit such that another surrounding try block can catch it again.

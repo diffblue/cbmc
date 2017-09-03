@@ -1,0 +1,8 @@
+KNOWNBUG
+test.class
+--refine-strings --string-max-length 20
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 8.* SUCCESS$
+^\[.*assertion.2\].* line 13.* FAILURE$
+--

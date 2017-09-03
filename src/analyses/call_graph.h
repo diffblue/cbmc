@@ -31,6 +31,7 @@ public:
   grapht graph;
 
   void add(const irep_idt &caller, const irep_idt &callee);
+  call_grapht get_inverted() const;
 
 protected:
   void add(const irep_idt &function,

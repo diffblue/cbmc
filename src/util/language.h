@@ -15,6 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <set>
 #include <iosfwd>
 #include <string>
+#include <util/symbol.h>
+#include <util/std_types.h>
+#include <goto-programs/system_library_symbols.h>
 
 #include "message.h"
 
@@ -113,9 +116,35 @@ public:
 
   virtual languaget *new_language()=0;
 
+  void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
+
   // constructor / destructor
 
   languaget() { }
   virtual ~languaget() { }
+
+protected:
+  void generate_opaque_method_stubs(symbol_tablet &symbol_table);
+  virtual irep_idt generate_opaque_stub_body(
+    symbolt &symbol,
+    symbol_tablet &symbol_table);
+
+  virtual parameter_symbolt build_stub_parameter_symbol(
+    const symbolt &function_symbol,
+    size_t parameter_index,
+    const code_typet::parametert &parameter);
+
+  static irep_idt get_stub_return_symbol_name(const irep_idt &function_id);
+
+  bool generate_opaque_stubs;
+  bool language_options_initialized=false;
+
+private:
+  bool is_symbol_opaque_function(const symbolt &symbol);
+  void generate_opaque_parameter_symbols(
+    symbolt &function_symbol,
+    symbol_tablet &symbol_table);
+
+  system_library_symbolst system_symbols;
 };
 #endif // CPROVER_UTIL_LANGUAGE_H

@@ -4,7 +4,8 @@ SRC = driver.cpp
 
 INCLUDES = -I ../../src
 
-OBJ += ../../src/util/util$(LIBEXT)
+OBJ += ../../src/big-int/big-int$(LIBEXT) \
+      ../../src/util/util$(LIBEXT)
 
 include ../../src/config.inc
 include ../../src/common

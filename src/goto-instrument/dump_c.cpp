@@ -148,7 +148,8 @@ void dump_ct::operator()(std::ostream &os)
 
     // we don't want to dump in full all definitions; in particular
     // do not dump anonymous types that are defined in system headers
-    if((!tag_added || symbol.is_type) && ignore(symbol))
+    if((!tag_added || symbol.is_type) &&
+       system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       continue;
 
     bool inserted=symbols_sorted.insert(name_str).second;
@@ -175,7 +176,7 @@ void dump_ct::operator()(std::ostream &os)
         type_id==ID_incomplete_union ||
         type_id==ID_c_enum))
     {
-      if(!ignore(symbol))
+      if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       {
         global_decl_stream << "// " << symbol.name << '\n';
         global_decl_stream << "// " << symbol.location << '\n';
@@ -317,7 +318,7 @@ void dump_ct::convert_compound(
       ns.lookup(to_symbol_type(type).get_identifier());
     DATA_INVARIANT(symbol.is_type, "symbol expected to be type symbol");
 
-    if(!ignore(symbol))
+    if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       convert_compound(symbol.type, unresolved, recursive, os);
   }
   else if(type.id()==ID_c_enum_tag)
@@ -326,7 +327,7 @@ void dump_ct::convert_compound(
       ns.lookup(to_c_enum_tag_type(type).get_identifier());
     DATA_INVARIANT(symbol.is_type, "symbol expected to be type symbol");
 
-    if(!ignore(symbol))
+    if(!system_symbols.is_symbol_internal_symbol(symbol, system_headers))
       convert_compound(symbol.type, unresolved, recursive, os);
   }
   else if(type.id()==ID_array || type.id()==ID_pointer)
@@ -581,284 +582,6 @@ void dump_ct::convert_compound_enum(
   os << ";\n\n";
 }
 
-#define ADD_TO_SYSTEM_LIBRARY(v, header) \
-  for(size_t i=0; i<sizeof(v)/sizeof(char*); ++i) \
-    system_library_map.insert( \
-      std::make_pair(v[i], header))
-
-void dump_ct::init_system_library_map()
-{
-  // ctype.h
-  const char* ctype_syms[]=
-  {
-    "isalnum", "isalpha", "isblank", "iscntrl", "isdigit", "isgraph",
-    "islower", "isprint", "ispunct", "isspace", "isupper", "isxdigit",
-    "tolower", "toupper"
-  };
-  ADD_TO_SYSTEM_LIBRARY(ctype_syms, "ctype.h");
-
-  // fcntl.h
-  const char* fcntl_syms[]=
-  {
-    "creat", "fcntl", "open"
-  };
-  ADD_TO_SYSTEM_LIBRARY(fcntl_syms, "fcntl.h");
-
-  // locale.h
-  const char* locale_syms[]=
-  {
-    "setlocale"
-  };
-  ADD_TO_SYSTEM_LIBRARY(locale_syms, "locale.h");
-
-  // math.h
-  const char* math_syms[]=
-  {
-    "acos", "acosh", "asin", "asinh", "atan", "atan2", "atanh",
-    "cbrt", "ceil", "copysign", "cos", "cosh", "erf", "erfc", "exp",
-    "exp2", "expm1", "fabs", "fdim", "floor", "fma", "fmax", "fmin",
-    "fmod", "fpclassify", "frexp", "hypot", "ilogb", "isfinite",
-    "isinf", "isnan", "isnormal", "j0", "j1", "jn", "ldexp", "lgamma",
-    "llrint", "llround", "log", "log10", "log1p", "log2", "logb",
-    "lrint", "lround", "modf", "nan", "nearbyint", "nextafter", "pow",
-    "remainder", "remquo", "rint", "round", "scalbln", "scalbn",
-    "signbit", "sin", "sinh", "sqrt", "tan", "tanh", "tgamma",
-    "trunc", "y0", "y1", "yn"
-  };
-  ADD_TO_SYSTEM_LIBRARY(math_syms, "math.h");
-
-  // pthread.h
-  const char* pthread_syms[]=
-  {
-    "pthread_cleanup_pop", "pthread_cleanup_push",
-    "pthread_cond_broadcast", "pthread_cond_destroy",
-    "pthread_cond_init", "pthread_cond_signal",
-    "pthread_cond_timedwait", "pthread_cond_wait", "pthread_create",
-    "pthread_detach", "pthread_equal", "pthread_exit",
-    "pthread_getspecific", "pthread_join", "pthread_key_delete",
-    "pthread_mutex_destroy", "pthread_mutex_init",
-    "pthread_mutex_lock", "pthread_mutex_trylock",
-    "pthread_mutex_unlock", "pthread_once", "pthread_rwlock_destroy",
-    "pthread_rwlock_init", "pthread_rwlock_rdlock",
-    "pthread_rwlock_unlock", "pthread_rwlock_wrlock",
-    "pthread_rwlockattr_destroy", "pthread_rwlockattr_getpshared",
-    "pthread_rwlockattr_init", "pthread_rwlockattr_setpshared",
-    "pthread_self", "pthread_setspecific",
-    /* non-public struct types */
-    "tag-__pthread_internal_list", "tag-__pthread_mutex_s",
-    "pthread_mutex_t"
-  };
-  ADD_TO_SYSTEM_LIBRARY(pthread_syms, "pthread.h");
-
-  // setjmp.h
-  const char* setjmp_syms[]=
-  {
-    "_longjmp", "_setjmp", "longjmp", "longjmperror", "setjmp",
-    "siglongjmp", "sigsetjmp"
-  };
-  ADD_TO_SYSTEM_LIBRARY(setjmp_syms, "setjmp.h");
-
-  // stdio.h
-  const char* stdio_syms[]=
-  {
-    "asprintf", "clearerr", "fclose", "fdopen", "feof", "ferror",
-    "fflush", "fgetc", "fgetln", "fgetpos", "fgets", "fgetwc",
-    "fgetws", "fileno", "fopen", "fprintf", "fpurge", "fputc",
-    "fputs", "fputwc", "fputws", "fread", "freopen", "fropen",
-    "fscanf", "fseek", "fsetpos", "ftell", "funopen", "fwide",
-    "fwopen", "fwprintf", "fwrite", "getc", "getchar", "getdelim",
-    "getline", "gets", "getw", "getwc", "getwchar", "mkdtemp",
-    "mkstemp", "mktemp", "perror", "printf", "putc", "putchar",
-    "puts", "putw", "putwc", "putwchar", "remove", "rewind", "scanf",
-    "setbuf", "setbuffer", "setlinebuf", "setvbuf", "snprintf",
-    "sprintf", "sscanf", "swprintf", "sys_errlist",
-    "sys_nerr", "tempnam", "tmpfile", "tmpnam", "ungetc", "ungetwc",
-    "vasprintf", "vfprintf", "vfscanf", "vfwprintf", "vprintf",
-    "vscanf", "vsnprintf", "vsprintf", "vsscanf", "vswprintf",
-    "vwprintf", "wprintf",
-    /* non-public struct types */
-    "tag-__sFILE", "tag-__sbuf", // OS X
-    "tag-_IO_FILE", "tag-_IO_marker", // Linux
-  };
-  ADD_TO_SYSTEM_LIBRARY(stdio_syms, "stdio.h");
-
-  // stdlib.h
-  const char* stdlib_syms[]=
-  {
-    "abort", "abs", "atexit", "atof", "atoi", "atol", "atoll",
-    "bsearch", "calloc", "div", "exit", "free", "getenv", "labs",
-    "ldiv", "llabs", "lldiv", "malloc", "mblen", "mbstowcs", "mbtowc",
-    "qsort", "rand", "realloc", "srand", "strtod", "strtof", "strtol",
-    "strtold", "strtoll", "strtoul", "strtoull", "system", "wcstombs",
-    "wctomb"
-  };
-  ADD_TO_SYSTEM_LIBRARY(stdlib_syms, "stdlib.h");
-
-  // string.h
-  const char* string_syms[]=
-  {
-    "strcat", "strncat", "strchr", "strrchr", "strcmp", "strncmp",
-    "strcpy", "strncpy", "strerror", "strlen", "strpbrk", "strspn",
-    "strcspn", "strstr", "strtok"
-  };
-  ADD_TO_SYSTEM_LIBRARY(string_syms, "string.h");
-
-  // time.h
-  const char* time_syms[]=
-  {
-    "asctime", "asctime_r", "ctime", "ctime_r", "difftime", "gmtime",
-    "gmtime_r", "localtime", "localtime_r", "mktime", "strftime",
-    /* non-public struct types */
-    "tag-timespec", "tag-timeval", "tag-tm"
-  };
-  ADD_TO_SYSTEM_LIBRARY(time_syms, "time.h");
-
-  // unistd.h
-  const char* unistd_syms[]=
-  {
-    "_exit", "access", "alarm", "chdir", "chown", "close", "dup",
-    "dup2", "execl", "execle", "execlp", "execv", "execve", "execvp",
-    "fork", "fpathconf", "getcwd", "getegid", "geteuid", "getgid",
-    "getgroups", "getlogin", "getpgrp", "getpid", "getppid", "getuid",
-    "isatty", "link", "lseek", "pathconf", "pause", "pipe", "read",
-    "rmdir", "setgid", "setpgid", "setsid", "setuid", "sleep",
-    "sysconf", "tcgetpgrp", "tcsetpgrp", "ttyname", "ttyname_r",
-    "unlink", "write"
-  };
-  ADD_TO_SYSTEM_LIBRARY(unistd_syms, "unistd.h");
-
-  // sys/select.h
-  const char* sys_select_syms[]=
-  {
-    "select",
-    /* non-public struct types */
-    "fd_set"
-  };
-  ADD_TO_SYSTEM_LIBRARY(sys_select_syms, "sys/select.h");
-
-  // sys/socket.h
-  const char* sys_socket_syms[]=
-  {
-    "accept", "bind", "connect",
-    /* non-public struct types */
-    "tag-sockaddr"
-  };
-  ADD_TO_SYSTEM_LIBRARY(sys_socket_syms, "sys/socket.h");
-
-  // sys/stat.h
-  const char* sys_stat_syms[]=
-  {
-    "fstat", "lstat", "stat",
-    /* non-public struct types */
-    "tag-stat"
-  };
-  ADD_TO_SYSTEM_LIBRARY(sys_stat_syms, "sys/stat.h");
-
-  /*
-  // sys/types.h
-  const char* sys_types_syms[]=
-  {
-  };
-  ADD_TO_SYSTEM_LIBRARY(sys_types_syms, "sys/types.h");
-  */
-
-  // sys/wait.h
-  const char* sys_wait_syms[]=
-  {
-    "wait", "waitpid"
-  };
-  ADD_TO_SYSTEM_LIBRARY(sys_wait_syms, "sys/wait.h");
-}
-
-/*******************************************************************\
-
-Function: dump_ct::ignore
-
-Inputs: type  input to check whether it should not be dumped
-
-Outputs: true, iff the type should not be printed
-
-Purpose: Ignore selected types as they are covered via system headers
-
-\*******************************************************************/
-
-bool dump_ct::ignore(const typet &type)
-{
-  symbolt symbol;
-  symbol.type=type;
-
-  return ignore(symbol);
-}
-
-/*******************************************************************\
-
-Function: dump_ct::ignore
-
-Inputs: type  input to check whether it should not be dumped
-
-Outputs: true, iff the symbol should not be printed
-
-Purpose: Ignore selected symbols as they are covered via system headers
-
-\*******************************************************************/
-
-bool dump_ct::ignore(const symbolt &symbol)
-{
-  const std::string &name_str=id2string(symbol.name);
-
-  if(has_prefix(name_str, CPROVER_PREFIX) ||
-     name_str=="__func__" ||
-     name_str=="__FUNCTION__" ||
-     name_str=="__PRETTY_FUNCTION__" ||
-     name_str=="argc'" ||
-     name_str=="argv'" ||
-     name_str=="envp'" ||
-     name_str=="envp_size'")
-    return true;
-
-  if(has_suffix(name_str, "$object"))
-    return true;
-
-  const std::string &file_str=id2string(symbol.location.get_file());
-
-  // don't dump internal GCC builtins
-  if(has_prefix(file_str, "gcc_builtin_headers_") &&
-     has_prefix(name_str, "__builtin_"))
-    return true;
-
-  if(name_str=="__builtin_va_start" ||
-     name_str=="__builtin_va_end" ||
-     symbol.name==ID_gcc_builtin_va_arg)
-  {
-    system_headers.insert("stdarg.h");
-    return true;
-  }
-
-  system_library_mapt::const_iterator it=
-    system_library_map.find(symbol.name);
-
-  if(it!=system_library_map.end())
-  {
-    system_headers.insert(it->second);
-    return true;
-  }
-
-  if(use_all_headers &&
-     has_prefix(file_str, "/usr/include/"))
-  {
-    if(file_str.find("/bits/")==std::string::npos)
-    {
-      // Do not include transitive includes of system headers!
-      std::string::size_type prefix_len=std::string("/usr/include/").size();
-      system_headers.insert(file_str.substr(prefix_len));
-    }
-
-    return true;
-  }
-
-  return false;
-}
-
 void dump_ct::cleanup_decl(
   code_declt &decl,
   std::list<irep_idt> &local_static,
@@ -948,7 +671,7 @@ void dump_ct::collect_typedefs_rec(
   bool early,
   std::unordered_set<irep_idt, irep_id_hash> &dependencies)
 {
-  if(ignore(type))
+  if(system_symbols.is_type_internal(type, system_headers))
     return;
 
   std::unordered_set<irep_idt, irep_id_hash> local_deps;
@@ -1052,7 +775,7 @@ void dump_ct::gather_global_typedefs()
       const irep_idt &typedef_str=symbol.type.get(ID_C_typedef);
       PRECONDITION(!typedef_str.empty());
       typedef_types[symbol.type]=typedef_str;
-      if(ignore(symbol))
+      if(system_symbols.is_symbol_internal_symbol(symbol, system_headers))
         typedef_map.insert({typedef_str, typedef_infot(typedef_str)});
       else
         collect_typedefs(symbol.type, false);

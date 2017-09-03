@@ -1,5 +1,5 @@
 CORE
 test.c
---no-simplify --unwind 300
-too many variables
+--no-simplify --unwind 300 --object-bits 8
+too many addressed objects
 --

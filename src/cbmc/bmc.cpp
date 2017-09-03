@@ -55,15 +55,16 @@ void bmct::error_trace()
   switch(ui)
   {
   case ui_message_handlert::uit::PLAIN:
-    std::cout << "\n" << "Counterexample:" << "\n";
-    show_goto_trace(std::cout, ns, goto_trace);
+    status() << "Counterexample:" << eom;
+    show_goto_trace(status(), ns, goto_trace);
+    status() << eom;
     break;
 
   case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      std::cout << xml << "\n";
+      status() << preformatted_output << xml << eom;
     }
     break;
 
@@ -80,7 +81,7 @@ void bmct::error_trace()
       result["status"]=json_stringt("failed");
       jsont &json_trace=result["trace"];
       convert(ns, goto_trace, json_trace);
-      std::cout << ",\n" << json_result;
+      status() << preformatted_output << json_result << eom;
     }
     break;
   }

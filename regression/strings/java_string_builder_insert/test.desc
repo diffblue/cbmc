@@ -1,8 +1,0 @@
-FUTURE
-test_insert.class
---string-refine
-^EXIT=10$
-^SIGNAL=0$
-^\[assertion.1\] assertion at file test_insert.java line 17: SUCCESS$
-^\[assertion.2\] assertion at file test_insert.java line 18: FAILURE$
---

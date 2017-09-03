@@ -1,7 +1,7 @@
 FUTURE
-test.c
---string-refine
-^EXIT=10$
+test_init.class
+--refine-strings
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^VERIFICATION SUCCESSFUL$
 --

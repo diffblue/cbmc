@@ -1,0 +1,164 @@
+CBMC version 5.7 64-bit x86_64 linux
+Parsing test_parseint_with_radix.class
+Java main class: test_parseint_with_radix
+Converting
+Generating GOTO Program
+Adding CPROVER library (x86_64)
+Removal of function pointers and virtual functions
+Partial Inlining
+Generic Property Instrumentation
+Starting Bounded Model Checking
+Unwinding loop __CPROVER__start.0 iteration 1  thread 0
+Unwinding loop __CPROVER__start.0 iteration 2  thread 0
+Unwinding loop __CPROVER__start.0 iteration 3  thread 0
+Unwinding loop __CPROVER__start.0 iteration 4  thread 0
+Unwinding loop __CPROVER__start.0 iteration 5  thread 0
+Unwinding recursion java::test_parseint_with_radix::clinit_wrapper iteration 1
+Unwinding recursion java::test_parseint_with_radix::clinit_wrapper iteration 1
+size of program expression: 530 steps
+simple slicing removed 50 assignments
+Generated 68 VCC(s), 9 remaining after simplification
+Passing problem to string refinement loop with MiniSAT 2.2.1 without simplifier
+converting SSA
+Running string refinement loop with MiniSAT 2.2.1 without simplifier
+BV-Refinement: post-processing
+BV-Refinement: iteration 1
+54337 variables, 39117 clauses
+SAT checker inconsistent: instance is UNSATISFIABLE
+BV-Refinement: got UNSAT, and the proof passes => UNSAT
+Total iterations: 1
+BV-Refinement: post-processing
+BV-Refinement: iteration 1
+54337 variables, 39117 clauses
+SAT checker inconsistent: instance is UNSATISFIABLE
+BV-Refinement: got UNSAT, and the proof passes => UNSAT
+Total iterations: 1
+Runtime decision procedure: 0.386s
+
+** Results:
+[pointer_dereference.1] reference is null in *stub_ignored_arg1: SUCCESS
+[pointer_dereference.2] reference is null in *stub_ignored_arg1->data: SUCCESS
+[pointer_dereference.3] reference is null in *cprover_string_array$7: SUCCESS
+[pointer_dereference.4] reference is null in *this: SUCCESS
+[pointer_dereference.5] reference is null in *stub_ignored_arg0: SUCCESS
+[pointer_dereference.6] reference is null in *stub_ignored_arg0->data: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.1] reference is null in *args: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.2] reference is null in *new_tmp0: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.3] reference is null in *new_tmp2: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.1] assertion at file test_parseint_with_radix.java line 9 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 20: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.1] Throw null: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.4] reference is null in *new_tmp3: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.2] assertion at file test_parseint_with_radix.java line 10 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 29: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.2] Throw null: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.5] reference is null in *args: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.6] reference is null in *new_tmp4: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.7] reference is null in *new_tmp6: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.3] assertion at file test_parseint_with_radix.java line 16 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 52: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.3] Throw null: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.8] reference is null in *new_tmp7: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.assertion.4] assertion at file test_parseint_with_radix.java line 17 function java::test_parseint_with_radix.main:([Ljava/lang/String;)V bytecode_index 61: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.null-pointer-exception.4] Throw null: SUCCESS
+[pointer_dereference.7] reference is null in *this: SUCCESS
+[array-create-negative-size.1] Array size should be >= 0: SUCCESS
+[pointer_dereference.8] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.9] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.10] reference is null in *this: SUCCESS
+[pointer_dereference.11] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.12] reference is null in *this: SUCCESS
+[pointer_dereference.13] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.14] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.15] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.16] reference is null in *this: SUCCESS
+[array-create-negative-size.2] Array size should be >= 0: SUCCESS
+[pointer_dereference.17] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.18] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.19] reference is null in *this: SUCCESS
+[pointer_dereference.20] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.21] reference is null in *this: SUCCESS
+[pointer_dereference.22] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.23] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.24] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.25] reference is null in *this: SUCCESS
+[array-create-negative-size.3] Array size should be >= 0: SUCCESS
+[pointer_dereference.26] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.27] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.28] reference is null in *this: SUCCESS
+[pointer_dereference.29] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.30] reference is null in *this: SUCCESS
+[pointer_dereference.31] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.32] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.33] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.34] reference is null in *this: SUCCESS
+[array-create-negative-size.4] Array size should be >= 0: SUCCESS
+[pointer_dereference.35] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.36] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.37] reference is null in *this: SUCCESS
+[pointer_dereference.38] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.39] reference is null in *this: SUCCESS
+[pointer_dereference.40] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.41] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.42] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.43] reference is null in *this: SUCCESS
+[array-create-negative-size.5] Array size should be >= 0: SUCCESS
+[pointer_dereference.44] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.45] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.46] reference is null in *this: SUCCESS
+[pointer_dereference.47] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.48] reference is null in *this: SUCCESS
+[pointer_dereference.49] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.50] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.51] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.52] reference is null in *this: SUCCESS
+[array-create-negative-size.6] Array size should be >= 0: SUCCESS
+[pointer_dereference.53] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.54] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.55] reference is null in *this: SUCCESS
+[pointer_dereference.56] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.57] reference is null in *this: SUCCESS
+[pointer_dereference.58] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.59] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.60] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.61] reference is null in *this: SUCCESS
+[array-create-negative-size.7] Array size should be >= 0: SUCCESS
+[pointer_dereference.62] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.63] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.64] reference is null in *this: SUCCESS
+[pointer_dereference.65] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.66] reference is null in *this: SUCCESS
+[pointer_dereference.67] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.68] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.69] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.70] reference is null in *this: SUCCESS
+[array-create-negative-size.8] Array size should be >= 0: SUCCESS
+[pointer_dereference.71] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.72] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.73] reference is null in *this: SUCCESS
+[pointer_dereference.74] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.75] reference is null in *this: SUCCESS
+[pointer_dereference.76] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.77] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.78] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.79] reference is null in *this: SUCCESS
+[array-create-negative-size.9] Array size should be >= 0: SUCCESS
+[pointer_dereference.80] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.81] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.82] reference is null in *this: SUCCESS
+[pointer_dereference.83] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.84] reference is null in *this: SUCCESS
+[pointer_dereference.85] reference is null in *cloned_array: SUCCESS
+[pointer_dereference.86] reference is null in cloned_array->data[index]: SUCCESS
+[pointer_dereference.87] reference is null in this->data[index]: SUCCESS
+[pointer_dereference.88] reference is null in *args: SUCCESS
+[pointer_dereference.89] reference is null in *args: SUCCESS
+[pointer_dereference.90] reference is null in *args: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.9] reference is null in *args: SUCCESS
+[pointer_dereference.91] reference is null in *args: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.10] reference is null in array_data_init$10[array_init_iter$11]: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.11] reference is null in *malloc_site$12: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.12] reference is null in *malloc_site$12: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.13] reference is null in *malloc_site$12: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.14] reference is null in *malloc_site$12: SUCCESS
+[java::test_parseint_with_radix.main:([Ljava/lang/String;)V.pointer_dereference.15] reference is null in *malloc_site$13: SUCCESS
+
+** 0 of 123 failed (1 iteration)
+VERIFICATION SUCCESSFUL

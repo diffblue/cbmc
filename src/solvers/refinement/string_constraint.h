@@ -22,7 +22,33 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <langapi/language_ui.h>
 #include <solvers/refinement/bv_refinement.h>
-#include <solvers/refinement/refined_string_type.h>
+#include <solvers/refinement/string_refinement_invariant.h>
+#include <util/refined_string_type.h>
+#include <util/string_expr.h>
+#include <langapi/language_util.h>
+
+/*! \brief Universally quantified string constraint
+
+    This represents a universally quantified string constraint as laid out in
+    DOI: 10.1007/978-3-319-03077-7. The paper seems to specify a universal
+    constraint as follows.
+
+    A universal constraint is of the form \f$\forall n. L(n) \rightarrow
+    P(n, s_0,\ldots, s_k)\f$ where
+
+    1. \f$L(n)\f$ does not contain string indices [possibly not required, but
+       implied by examples]
+    2. \f$\forall n. L(n) \rightarrow P'\left(s_0[f_0(n)],\ldots, s_k[f_k(n)]
+       \right)\f$, i.e. when focusing on one specific string, all indices are
+       the same [stated in a roundabout manner]
+    3. Each \f$f\f$ is linear and therefore has an inverse [explicitly stated]
+    4. \f$L(n)\f$ and \f$P(n, s_0,\ldots, s_k)\f$ may contain other (free)
+       variables, but in \f$P\f$, \f$n\f$ can only occur as an argument to an
+       \f$f\f$ [explicitly stated, implied]
+
+    We extend this slightly by restricting n to be in a specific range, but this
+    is another implication which can be pushed in to \f$L(n)\f$.
+*/
 
 class string_constraintt: public exprt
 {
@@ -54,7 +80,6 @@ public:
   {
     return operands()[4];
   }
-
 
  private:
   string_constraintt();
@@ -104,14 +129,31 @@ public:
 
 extern inline const string_constraintt &to_string_constraint(const exprt &expr)
 {
-  assert(expr.id()==ID_string_constraint && expr.operands().size()==5);
+  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
   return static_cast<const string_constraintt &>(expr);
 }
 
 extern inline string_constraintt &to_string_constraint(exprt &expr)
 {
-  assert(expr.id()==ID_string_constraint && expr.operands().size()==5);
+  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
   return static_cast<string_constraintt &>(expr);
+}
+
+/// Used for debug printing.
+/// \param [in] ns: namespace for `from_expr`
+/// \param [in] identifier: identifier for `from_expr`
+/// \param [in] expr: constraint to render
+/// \return rendered string
+inline static std::string from_expr(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const string_constraintt &expr)
+{
+  return "forall "+from_expr(ns, identifier, expr.univ_var())+" in ["+
+    from_expr(ns, identifier, expr.lower_bound())+", "+
+    from_expr(ns, identifier, expr.upper_bound())+"). "+
+    from_expr(ns, identifier, expr.premise())+" => "+
+    from_expr(ns, identifier, expr.body());
 }
 
 class string_not_contains_constraintt: public exprt
@@ -171,19 +213,45 @@ public:
   }
 };
 
+/// Used for debug printing.
+/// \param [in] ns: namespace for `from_expr`
+/// \param [in] identifier: identifier for `from_expr`
+/// \param [in] expr: constraint to render
+/// \return rendered string
+inline static std::string from_expr(
+  const namespacet &ns,
+  const irep_idt &identifier,
+  const string_not_contains_constraintt &expr)
+{
+  return "forall x in ["+
+    from_expr(ns, identifier, expr.univ_lower_bound())+", "+
+    from_expr(ns, identifier, expr.univ_upper_bound())+"). "+
+    from_expr(ns, identifier, expr.premise())+" => ("+
+    "exists y in ["+from_expr(ns, identifier, expr.exists_lower_bound())+", "+
+    from_expr(ns, identifier, expr.exists_upper_bound())+"). "+
+    from_expr(ns, identifier, expr.s0())+"[x+y] != "+
+    from_expr(ns, identifier, expr.s1())+"[y])";
+}
+
 inline const string_not_contains_constraintt
 &to_string_not_contains_constraint(const exprt &expr)
 {
-  assert(expr.id()==ID_string_not_contains_constraint);
-  assert(expr.operands().size()==7);
+  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
+  DATA_INVARIANT(
+    expr.operands().size()==7,
+    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
+      "operands"));
   return static_cast<const string_not_contains_constraintt &>(expr);
 }
 
 inline string_not_contains_constraintt
 &to_string_not_contains_constraint(exprt &expr)
 {
-  assert(expr.id()==ID_string_not_contains_constraint);
-  assert(expr.operands().size()==7);
+  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
+  DATA_INVARIANT(
+    expr.operands().size()==7,
+    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
+      "operands"));
   return static_cast<string_not_contains_constraintt &>(expr);
 }
 

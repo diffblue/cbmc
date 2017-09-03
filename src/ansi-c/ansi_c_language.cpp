@@ -126,6 +126,8 @@ bool ansi_c_languaget::typecheck(
 
 bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
+  generate_opaque_method_stubs(symbol_table);
+
   if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
     return true;
 

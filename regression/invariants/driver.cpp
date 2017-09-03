@@ -12,6 +12,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <string>
 #include <sstream>
 #include <util/invariant.h>
+#include <util/invariant_utils.h>
+#include <util/std_types.h>
 
 /// An example of structured invariants-- this contains fields to
 /// describe the error to a catcher, and also produces a human-readable
@@ -83,6 +85,8 @@ int main(int argc, char** argv)
     DATA_INVARIANT_STRUCTURED(false, structured_error_testt, 1, "Structured error"); // NOLINT
   else if(arg=="data-invariant-string")
     DATA_INVARIANT(false, "Test invariant failure");
+  else if(arg=="irep")
+    INVARIANT_WITH_IREP(false, "error with irep", pointer_typet(void_typet()));
   else
     return 1;
 }
