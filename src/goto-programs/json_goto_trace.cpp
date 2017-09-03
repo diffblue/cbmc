@@ -13,12 +13,95 @@ Author: Daniel Kroening
 
 #include "json_goto_trace.h"
 
-#include <cassert>
-
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/invariant.h>
 #include <util/json_expr.h>
+#include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
+#include <solvers/flattening/pointer_logic.h>
 
+/// Replaces in src, expressions of the form pointer_offset(constant) by that
+/// constant.
+/// \param src: an expression
+void remove_pointer_offsets(exprt &src)
+{
+  if(src.id()==ID_pointer_offset &&
+     src.op0().id()==ID_constant &&
+     src.op0().type().id()==ID_pointer)
+  {
+    std::string binary_str=id2string(to_constant_expr(src.op0()).get_value());
+    // The constant address consists of OBJECT-ID || OFFSET.
+    // Shift out the object-identifier bits, leaving only the offset:
+    mp_integer offset=binary2integer(binary_str.substr(BV_ADDR_BITS), false);
+    src=from_integer(offset, src.type());
+  }
+  else
+    for(auto &op : src.operands())
+      remove_pointer_offsets(op);
+}
+
+/// Replaces in src, expressions of the form pointer_offset(array_symbol) by a
+/// constant value of 0. This is meant to simplify array expressions.
+/// \param src: an expression
+/// \param array_symbol: a symbol expression representing an array
+void remove_pointer_offsets(exprt &src, const symbol_exprt &array_symbol)
+{
+  if(src.id()==ID_pointer_offset &&
+     src.op0().id()==ID_constant &&
+     src.op0().op0().id()==ID_address_of &&
+     src.op0().op0().op0().id()==ID_index)
+  {
+    const index_exprt &idx=to_index_expr(src.op0().op0().op0());
+    const irep_idt &array_id=to_symbol_expr(idx.array()).get_identifier();
+    if(idx.array().id()==ID_symbol &&
+       array_id==array_symbol.get_identifier() &&
+       to_constant_expr(idx.index()).value_is_zero_string())
+      src=from_integer(0, src.type());
+  }
+  else
+    for(auto &op : src.operands())
+      remove_pointer_offsets(op, array_symbol);
+}
+
+/// Simplify an expression before putting it in the json format
+/// \param src: an expression potentialy containing array accesses (index_expr)
+/// \return an expression similar in meaning to src but where array accesses
+///   have been simplified
+exprt simplify_array_access(const exprt &src, const namespacet &ns)
+{
+  if(src.id()==ID_index && to_index_expr(src).array().id()==ID_symbol)
+  {
+    // Case where the array is a symbol.
+    const symbol_exprt &array_symbol=to_symbol_expr(to_index_expr(src).array());
+    exprt simplified_index=to_index_expr(src).index();
+    // We remove potential appearances of `pointer_offset(array_symbol)`
+    remove_pointer_offsets(simplified_index, array_symbol);
+    simplified_index=simplify_expr(simplified_index, ns);
+    return index_exprt(array_symbol, simplified_index);
+  }
+  else if(src.id()==ID_index && to_index_expr(src).array().id()==ID_array)
+  {
+    // Case where the array is given by an array of expressions
+    exprt index=to_index_expr(src).index();
+    remove_pointer_offsets(index);
+
+    // We look for an actual integer value for the index
+    index=simplify_expr(index, ns);
+    unsigned i;
+    if(index.id()==ID_constant &&
+       !to_unsigned_integer(to_constant_expr(index), i))
+      return to_index_expr(src).array().operands()[i];
+  }
+  return src;
+}
+
+/// Produce a json representation of a trace.
+/// \param ns: a namespace
+/// \param goto_trace: a trace in a goto program
+/// \param dest: referecence to a json object in which the goto trace will be
+///   added
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -82,16 +165,11 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        if(step.full_lhs.is_not_nil())
-          full_lhs_string=from_expr(ns, identifier, step.full_lhs);
-
-#if 0
-        if(it.full_lhs_value.is_not_nil())
-          full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
-#endif
-
-        if(step.full_lhs_value.is_not_nil())
-          full_lhs_value = json(step.full_lhs_value, ns);
+        DATA_INVARIANT(
+          step.full_lhs.is_not_nil(),
+          "full_lhs in assignment must not be nil");
+        exprt simplified=simplify_array_access(step.full_lhs, ns);
+        full_lhs_string=from_expr(ns, identifier, simplified);
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -104,6 +182,16 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
+          exprt simplified=simplify_array_access(step.full_lhs_value, ns);
+
+          full_lhs_value=json(simplified, ns, symbol->mode);
+        }
+        else
+        {
+          DATA_INVARIANT(
+            step.full_lhs_value.is_not_nil(),
+            "full_lhs_value in assignment must not be nil");
+          full_lhs_value=json(step.full_lhs_value, ns);
         }
 
         json_assignment["value"]=full_lhs_value;
@@ -129,6 +217,15 @@ void convert(
         json_output["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
+        json_output["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -136,7 +233,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
@@ -153,6 +250,15 @@ void convert(
         json_input["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_input["inputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
+        json_input["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_input["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -160,7 +266,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())

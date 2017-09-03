@@ -1,0 +1,10 @@
+CORE
+test.class
+--refine-strings --function test.check --json-ui --trace --string-max-length 100 --cover location
+^EXIT=0$
+^SIGNAL=0$
+\"data\".*\"tmp_object_factory\$6.*\"
+--
+This checks that tmp_object_factory$6 gets affected to the data field
+of some strings, which was not the case in previous versions of cbmc,
+as it was just ignored by the json output.
