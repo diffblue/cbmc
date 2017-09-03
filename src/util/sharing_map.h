@@ -386,7 +386,7 @@ SHARING_MAPT(void)::get_delta_view(
     }
     else
     {
-      assert(false);
+      UNREACHABLE;
     }
   }
   while(!stack.empty());

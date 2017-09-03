@@ -79,7 +79,7 @@ void constant_propagator_domaint::assign_rec(
         cond = simplify_expr(cond,ns);
       }
       else
-        assert(0);
+        UNREACHABLE;
 
       assign(values, to_symbol_expr(lhs), cond, ns);
 	}

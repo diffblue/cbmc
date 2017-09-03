@@ -1499,7 +1499,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
         statement=="ifge"?ID_ge:
         statement=="ifgt"?ID_gt:
         statement=="ifle"?ID_le:
-        (assert(false), "");
+        irep_idt();
+
+      INVARIANT(!id.empty(), "unexpected bytecode-if");
 
       assert(op.size()==1 && results.empty());
       mp_integer number;

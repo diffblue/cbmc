@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mp_arith.h>
 #include <util/namespace.h>
 #include <util/reference_counting.h>
+#include <util/invariant.h>
 
 #include "object_numbering.h"
 
@@ -100,11 +101,11 @@ public:
     // operator[] is the only way to insert something!
     std::pair<iterator, bool> insert(const std::pair<unsigned, objectt>&)
     {
-      assert(false);
+      UNREACHABLE;
     }
     iterator insert(iterator, const std::pair<unsigned, objectt>&)
     {
-      assert(false);
+      UNREACHABLE;
     }
 
     class validity_ranget

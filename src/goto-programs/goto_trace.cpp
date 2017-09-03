@@ -53,7 +53,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
@@ -383,16 +383,16 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::CONSTRAINT:
-      assert(false);
+      UNREACHABLE;
       break;
 
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-      assert(false);
+      UNREACHABLE;
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
   }
 }

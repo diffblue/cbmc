@@ -380,7 +380,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     type.set(ID_f, integer2string(f_int));
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
@@ -759,7 +759,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       else if(compound_symbol.type.id()==ID_union)
         compound_symbol.type.id(ID_incomplete_union);
       else
-        assert(false);
+        UNREACHABLE;
 
       symbolt *new_symbol;
       move_symbol(compound_symbol, new_symbol);

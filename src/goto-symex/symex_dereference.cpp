@@ -297,7 +297,7 @@ void goto_symext::dereference_rec(
           to_index_expr(expr).array().type().id()==ID_pointer)
   {
     // old stuff, will go away
-    assert(false);
+    UNREACHABLE;
   }
   else if(expr.id()==ID_address_of)
   {

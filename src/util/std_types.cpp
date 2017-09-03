@@ -44,7 +44,7 @@ std::size_t struct_union_typet::component_number(
     number++;
   }
 
-  assert(false);
+  UNREACHABLE;
   return 0;
 }
 

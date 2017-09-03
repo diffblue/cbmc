@@ -310,7 +310,7 @@ bool simplify_exprt::simplify_floatbv_op(exprt &expr)
       else if(expr.id()==ID_floatbv_div)
         result/=v1;
       else
-        assert(false);
+        UNREACHABLE;
 
       expr=result.to_expr();
       return false;
@@ -363,7 +363,7 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
     else if(expr.id()==ID_ieee_float_equal)
       expr.make_bool(f0.ieee_equal(f1));
     else
-      assert(false);
+      UNREACHABLE;
 
     return false;
   }
@@ -380,7 +380,7 @@ bool simplify_exprt::simplify_ieee_float_relation(exprt &expr)
     else if(expr.id()==ID_ieee_float_equal)
       isnan.make_not();
     else
-      assert(false);
+      UNREACHABLE;
 
     expr.swap(isnan);
     return false;

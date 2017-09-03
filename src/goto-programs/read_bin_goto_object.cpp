@@ -114,7 +114,7 @@ bool read_bin_goto_object_v3(
          rev_target_map.insert(
            rev_target_map.end(),
            std::make_pair(instruction.target_number, itarget))->second!=itarget)
-        assert(false);
+        UNREACHABLE;
 
       std::size_t t_count = irepconverter.read_gb_word(in); // # of targets
       for(std::size_t i=0; i<t_count; i++)

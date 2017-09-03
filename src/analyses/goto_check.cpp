@@ -833,7 +833,7 @@ void goto_checkt::nan_check(
           equal_exprt(expr.op1(), minus_inf)));
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   isnan.make_not();
 

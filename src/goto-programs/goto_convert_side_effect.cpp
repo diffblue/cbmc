@@ -123,7 +123,7 @@ void goto_convertt::remove_assignment(
     convert(assignment, dest);
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   // revert assignment in the expression to its LHS
   if(result_is_used)
