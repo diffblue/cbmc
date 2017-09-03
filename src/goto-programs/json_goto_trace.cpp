@@ -59,6 +59,7 @@ void convert(
 
         json_failure["stepType"]=json_stringt("failure");
         json_failure["hidden"]=jsont::json_boolean(step.hidden);
+        json_failure["internal"]=jsont::json_boolean(step.internal);
         json_failure["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_failure["reason"]=json_stringt(id2string(step.comment));
         json_failure["property"]=json_stringt(id2string(property_id));
@@ -109,6 +110,7 @@ void convert(
         json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
         json_assignment["hidden"]=jsont::json_boolean(step.hidden);
+        json_assignment["internal"]=jsont::json_boolean(step.internal);
         json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));
 
         json_assignment["assignmentType"]=
@@ -126,6 +128,7 @@ void convert(
 
         json_output["stepType"]=json_stringt("output");
         json_output["hidden"]=jsont::json_boolean(step.hidden);
+        json_output["internal"]=jsont::json_boolean(step.internal);
         json_output["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
@@ -150,6 +153,7 @@ void convert(
 
         json_input["stepType"]=json_stringt("input");
         json_input["hidden"]=jsont::json_boolean(step.hidden);
+        json_input["internal"]=jsont::json_boolean(step.internal);
         json_input["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_input["inputID"]=json_stringt(id2string(step.io_id));
 
@@ -178,6 +182,7 @@ void convert(
 
         json_call_return["stepType"]=json_stringt(tag);
         json_call_return["hidden"]=jsont::json_boolean(step.hidden);
+        json_call_return["internal"]=jsont::json_boolean(step.internal);
         json_call_return["thread"]=json_numbert(std::to_string(step.thread_nr));
 
         const symbolt &symbol=ns.lookup(step.identifier);
@@ -201,6 +206,7 @@ void convert(
           json_objectt &json_location_only=dest_array.push_back().make_object();
           json_location_only["stepType"]=json_stringt("location-only");
           json_location_only["hidden"]=jsont::json_boolean(step.hidden);
+          json_location_only["internal"]=jsont::json_boolean(step.internal);
           json_location_only["thread"]=
             json_numbert(std::to_string(step.thread_nr));
           json_location_only["sourceLocation"]=json_location;
