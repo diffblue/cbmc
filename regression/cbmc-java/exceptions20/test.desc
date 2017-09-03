@@ -1,0 +1,11 @@
+CORE
+test.class
+--json-ui --trace
+^EXIT=10$
+^SIGNAL=0$
+.*VERIFICATION FAILED.*
+--
+^warning: ignoring
+--
+this fails with assertion error if nil values are not allowed in assignments in
+the JSON trace

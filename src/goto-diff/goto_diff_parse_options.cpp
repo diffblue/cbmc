@@ -347,7 +347,6 @@ int goto_diff_parse_optionst::get_goto_program(
       return 6;
 
     config.set(cmdline);
-    config.set_from_symbol_table(goto_model.symbol_table);
 
     // This one is done.
     cmdline.args.erase(cmdline.args.begin());

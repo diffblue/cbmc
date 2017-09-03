@@ -1,0 +1,11 @@
+CORE
+main.c
+--32 --little-endian --object-bits 25 --pointer-check
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^.* dereference failure: pointer outside object bounds in .*: FAILURE$
+--
+^warning: ignoring
+--
+requires at least 8 offset bits
