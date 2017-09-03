@@ -62,6 +62,33 @@ STATIC_ASSERT(sizeof(union some_union4)==3);
 
 #endif
 
+#ifdef _MSC_VER
+
+union some_union5
+{
+  int i;
+};
+
+STATIC_ASSERT(__alignof(union some_union5)==1);
+
+#else
+
+union some_union5
+{
+  int i;
+};
+
+union some_union6
+{
+  int i;
+} __attribute__((__packed__));
+
+// Packing may affect alignment
+STATIC_ASSERT(_Alignof(union some_union5)==4);
+STATIC_ASSERT(_Alignof(union some_union6)==1);
+
+#endif
+
 int main()
 {
 }
