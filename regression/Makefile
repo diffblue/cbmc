@@ -1,9 +1,9 @@
 DIRS = ansi-c \
        cbmc \
-       cpp \
+       cbmc-cover \
        cbmc-java \
        cbmc-java-inheritance \
-       cbmc-cover \
+       cpp \
        goto-analyzer \
        goto-diff \
        goto-gcc \
