@@ -336,11 +336,12 @@ int as_modet::as_hybrid_binary()
     result=run(objcopy_argv[0], objcopy_argv, "", "");
   }
 
-  result=remove(saved.c_str());
-  if(result!=0)
+  int remove_result=remove(saved.c_str());
+  if(remove_result!=0)
   {
     error() << "Remove failed: " << std::strerror(errno) << eom;
-    return result;
+    if(result==0)
+      result=remove_result;
   }
 
   #elif defined(__APPLE__)
@@ -362,11 +363,12 @@ int as_modet::as_hybrid_binary()
     result=run(lipo_argv[0], lipo_argv, "", "");
   }
 
-  result=remove(saved.c_str());
-  if(result!=0)
+  int remove_result=remove(saved.c_str());
+  if(remove_result!=0)
   {
     error() << "Remove failed: " << std::strerror(errno) << eom;
-    return result;
+    if(result==0)
+      result=remove_result;
   }
 
   #else
