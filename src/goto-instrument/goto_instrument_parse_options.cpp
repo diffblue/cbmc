@@ -1426,6 +1426,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
   {
+    do_indirect_call_and_rtti_removal();
+
     status() << "Performing a reachability slice" << eom;
     if(cmdline.isset("property"))
       reachability_slicer(goto_functions, cmdline.get_values("property"));
@@ -1436,8 +1438,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    remove_returns(symbol_table, goto_functions);
     do_indirect_call_and_rtti_removal();
+    do_remove_returns();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
