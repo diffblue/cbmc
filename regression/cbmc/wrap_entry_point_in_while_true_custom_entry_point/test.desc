@@ -1,8 +1,10 @@
 CORE
 main.c
---show-goto-functions --wrap-entry-point-in-while --function skipWhitespace
-^EXIT=0$
+--wrap-entry-point-in-while --unwind 100 --function skipWhitespace
+^EXIT=10$
 ^SIGNAL=0$
-^     1: skipWhitespace\(\);$
-^        GOTO 1$
+^\[skipWhitespace.assertion.1\] assertion g == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+^VERIFICATION SUCCESSFUL$
 --

@@ -1,4 +1,7 @@
-int skipWhitespace()
+int g = 0;
+
+int skipWhitespace(void)
 {
-    return 120;
+    assert(g == 0);
+    g = (g == 0) ? 1 : 0;
 }
