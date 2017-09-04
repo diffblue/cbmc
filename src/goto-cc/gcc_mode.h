@@ -16,6 +16,7 @@ Date: June 2006
 
 #include <util/cout_message.h>
 
+#include "compile.h"
 #include "goto_cc_mode.h"
 
 class compilet;
@@ -39,6 +40,9 @@ protected:
   const bool act_as_ld;
   std::string native_tool_name;
 
+  const std::string goto_binary_tmp_suffix;
+
+  /// \brief Associate CBMC architectures with processor names
   const std::map<std::string, std::set<std::string>> arch_map;
 
   int preprocess(
@@ -50,7 +54,7 @@ protected:
   /// \brief call gcc with original command line
   int run_gcc(const compilet &compiler);
 
-  int gcc_hybrid_binary(const compilet &compiler);
+  int gcc_hybrid_binary(compilet &compiler);
 
   int asm_output(
     bool act_as_bcc,
