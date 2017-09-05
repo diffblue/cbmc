@@ -564,7 +564,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-natural-loops"))
     {
-      show_natural_loops(goto_model);
+      show_natural_loops(goto_model, std::cout);
       return 0;
     }
 
