@@ -141,12 +141,12 @@ protected:
     return next_alloc_address-address;
   }
 
-  uint64_t base_address_to_actual_size(const mp_integer &address) const
+  mp_integer base_address_to_actual_size(const mp_integer &address) const
   {
     auto memory_iter=memory.find(address);
     if(memory_iter==memory.end())
       return 0;
-    std::size_t ret=0;
+    mp_integer ret=0;
     mp_integer alloc_size=base_address_to_alloc_size(address);
     while(memory_iter!=memory.end() && memory_iter->first<(address+alloc_size))
     {
@@ -193,15 +193,16 @@ protected:
   mp_integer build_memory_map(const irep_idt &id, const typet &type);
   typet concretize_type(const typet &type);
   bool unbounded_size(const typet &);
-  uint64_t get_size(const typet &type);
+  mp_integer get_size(const typet &type);
 
   irep_idt get_component_id(const irep_idt &object, mp_integer offset);
   typet get_type(const irep_idt &id) const;
   exprt get_value(
     const typet &type,
-    uint64_t offset=0,
+    mp_integer offset=0,
     bool use_non_det=false);
-  exprt get_value(const typet &type, mp_vectort &rhs, uint64_t offset=0);
+  exprt get_value(
+    const typet &type, mp_vectort &rhs, mp_integer offset=0);
   exprt get_value(const irep_idt &id);
 
   void step();
@@ -217,7 +218,7 @@ protected:
 
   void allocate(
     const mp_integer &address,
-    size_t size);
+    mp_integer size);
 
   void assign(
     const mp_integer &address,

@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <fstream>
 #include <algorithm>
 #include <string.h>
+#include <type_traits>
 
 #include <util/invariant.h>
 #include <util/std_types.h>
@@ -393,7 +394,7 @@ void interpretert::execute_other()
     mp_vectort tmp, rhs;
     evaluate(pc->code.op1(), tmp);
     mp_integer address=evaluate_address(pc->code.op0());
-    auto size=get_size(pc->code.op0().type());
+    const auto size=get_size(pc->code.op0().type());
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -434,7 +435,7 @@ irep_idt interpretert::get_component_id(
   {
     if(offset<=0)
       return it->id();
-    auto size=get_size(it->type());
+    const auto size=get_size(it->type());
     offset-=size;
   }
   return object;
@@ -453,7 +454,7 @@ typet interpretert::get_type(const irep_idt &id) const
 /// type
 exprt interpretert::get_value(
   const typet &type,
-  uint64_t offset,
+  mp_integer offset,
   bool use_non_det)
 {
   const typet real_type=ns.follow(type);
@@ -468,7 +469,7 @@ exprt interpretert::get_value(
     for(struct_typet::componentst::const_iterator it=components.begin();
         it!=components.end(); it++)
     {
-      auto size=get_size(it->type());
+      const auto size=get_size(it->type());
       const exprt operand=get_value(it->type(), offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -480,8 +481,8 @@ exprt interpretert::get_value(
     // Get size of array
     exprt result=array_exprt(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    auto subtype_size=get_size(type.subtype());
-    std::size_t count;
+    const auto subtype_size=get_size(type.subtype());
+    mp_integer count=0;
     if(size_expr.id()!=ID_constant)
     {
       count=base_address_to_actual_size(offset)/subtype_size;
@@ -490,12 +491,12 @@ exprt interpretert::get_value(
     {
       mp_integer mp_count;
       to_integer(size_expr, mp_count);
-      count=integer2size_t(mp_count);
+      count=mp_count;
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(count);
-    for(unsigned i=0; i<count; i++)
+    result.reserve_operands(integer2size_t(count));
+    for(decltype(count) i=0; i<count; ++i)
     {
       const exprt operand=get_value(
         type.subtype(),
@@ -518,7 +519,7 @@ exprt interpretert::get_value(
 exprt interpretert::get_value(
   const typet &type,
   mp_vectort &rhs,
-  uint64_t offset)
+  mp_integer offset)
 {
   const typet real_type=ns.follow(type);
   PRECONDITION(!rhs.empty());
@@ -533,7 +534,7 @@ exprt interpretert::get_value(
     result.reserve_operands(components.size());
     for(const struct_union_typet::componentt &expr : components)
     {
-      auto size=get_size(expr.type());
+      const auto size=get_size(expr.type());
       const exprt operand=get_value(expr.type(), rhs, offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -546,8 +547,8 @@ exprt interpretert::get_value(
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
-    auto subtype_size=get_size(type.subtype());
-    unsigned count;
+    const auto subtype_size=get_size(type.subtype());
+    mp_integer count;
     if(unbounded_size(type))
     {
       count=base_address_to_actual_size(offset)/subtype_size;
@@ -556,12 +557,12 @@ exprt interpretert::get_value(
     {
       mp_integer mp_count;
       to_integer(size_expr, mp_count);
-      count=integer2unsigned(mp_count);
+      count=mp_count;
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(count);
-    for(unsigned i=0; i<count; i++)
+    result.reserve_operands(integer2size_t(count));
+    for(std::remove_const<decltype(count)>::type i=0; i<count; ++i)
     {
       const exprt operand=get_value(type.subtype(), rhs,
           offset+i*subtype_size);
@@ -572,41 +573,41 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_floatbv)
   {
     ieee_floatt f(to_floatbv_type(type));
-    f.unpack(rhs[offset]);
+    f.unpack(rhs[integer2size_t(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_fixedbv)
   {
     fixedbvt f;
-    f.from_integer(rhs[offset]);
+    f.from_integer(rhs[integer2size_t(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_bool)
   {
-    if(rhs[offset]!=0)
+    if(rhs[integer2size_t(offset)]!=0)
       return true_exprt();
     else
       false_exprt();
   }
   else if(real_type.id()==ID_c_bool)
   {
-    return from_integer(rhs[offset]!=0?1:0, type);
+    return from_integer(rhs[integer2size_t(offset)]!=0?1:0, type);
   }
   else if((real_type.id()==ID_pointer) || (real_type.id()==ID_address_of))
   {
-    if(rhs[offset]==0)
+    if(rhs[integer2size_t(offset)]==0)
     {
       // NULL pointer
       constant_exprt result(type);
       result.set_value(ID_NULL);
       return result;
     }
-    if(rhs[offset]<memory.size())
+    if(rhs[integer2size_t(offset)]<memory.size())
     {
       // We want the symbol pointed to
-      std::size_t address=integer2size_t(rhs[offset]);
+      const auto address=rhs[integer2size_t(offset)];
       irep_idt identifier=address_to_identifier(address);
-      auto offset=address_to_offset(address);
+      const auto offset=address_to_offset(address);
       const typet type=get_type(identifier);
       exprt symbol_expr(ID_symbol, type);
       symbol_expr.set(ID_identifier, identifier);
@@ -625,7 +626,7 @@ exprt interpretert::get_value(
       return index_expr;
     }
 
-    error() << "interpreter: invalid pointer " << rhs[offset]
+    error() << "interpreter: invalid pointer " << rhs[integer2size_t(offset)]
             << " > object count " << memory.size() << eom;
     throw "interpreter: reading from invalid pointer";
   }
@@ -633,11 +634,11 @@ exprt interpretert::get_value(
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      irep_idt::make_from_table_index(rhs[offset].to_long()),
+      irep_idt::make_from_table_index(rhs[integer2size_t(offset)].to_long()),
       type);
   }
   // Retrieve value of basic data type
-  return from_integer(rhs[offset], type);
+  return from_integer(rhs[integer2size_t(offset)], type);
 }
 
 /// executes the assign statement at the current pc value
@@ -652,7 +653,7 @@ void interpretert::execute_assign()
   if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());
-    auto size=get_size(code_assign.lhs().type());
+    const auto size=get_size(code_assign.lhs().type());
 
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs ("
@@ -680,9 +681,9 @@ void interpretert::execute_assign()
     side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
     if(side_effect.get_statement()==ID_nondet)
     {
-      unsigned address=integer2unsigned(evaluate_address(code_assign.lhs()));
-      auto size=get_size(code_assign.lhs().type());
-      for(size_t i=0; i<size; i++)
+      const auto address=evaluate_address(code_assign.lhs());
+      const auto size=get_size(code_assign.lhs().type());
+      for(std::remove_const<decltype(size)>::type i=0; i<size; ++i)
       {
         memory[address+i].initialized=
           memory_cellt::initializedt::READ_BEFORE_WRITTEN;
@@ -700,7 +701,7 @@ void interpretert::assign(
   {
     if((address+i)<memory.size())
     {
-      std::size_t address_val=integer2size_t(address+i);
+      const auto address_val=address+i;
       memory_cellt &cell=memory[address_val];
       if(show)
       {
@@ -750,7 +751,7 @@ void interpretert::execute_function_call()
   // Retrieve the empty last trace step struct we pushed for this step
   // of the interpreter run to fill it with the corresponding data
   goto_trace_stept &trace_step=steps.get_last_step();
-  std::size_t address=integer2size_t(a);
+  const auto address=a;
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
@@ -799,7 +800,7 @@ void interpretert::execute_function_call()
     for(const auto &id : locals)
     {
       const symbolt &symbol=ns.lookup(id);
-      frame.local_map[id]=integer2unsigned(build_memory_map(id, symbol.type));
+      frame.local_map[id]=build_memory_map(id, symbol.type);
     }
 
     // assign the arguments
@@ -863,7 +864,7 @@ void interpretert::build_memory_map()
 
 void interpretert::build_memory_map(const symbolt &symbol)
 {
-  uint64_t size=0;
+  mp_integer size=0;
 
   if(symbol.type.id()==ID_code)
   {
@@ -876,7 +877,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
 
   if(size!=0)
   {
-    auto address=memory.size();
+    const auto address=memory.size();
     memory.resize(address+size);
     memory_map[symbol.name]=address;
     inverse_memory_map[address]=symbol.name;
@@ -917,7 +918,7 @@ mp_integer interpretert::build_memory_map(
 {
   typet alloc_type=concretize_type(type);
   auto size=get_size(alloc_type);
-  auto it=dynamic_types.find(id);
+  const auto it=dynamic_types.find(id);
 
   if(it!=dynamic_types.end())
   {
@@ -966,7 +967,7 @@ bool interpretert::unbounded_size(const typet &type)
 /// get allocated 2^32 address space each (of a 2^64 sized space).
 /// \param type: a structured type
 /// \return Size of the given type
-uint64_t interpretert::get_size(const typet &type)
+mp_integer interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
     return 2ULL << 32ULL;
@@ -976,7 +977,7 @@ uint64_t interpretert::get_size(const typet &type)
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    uint64_t sum=0;
+    mp_integer sum=0;
 
     for(const auto &comp : components)
     {
@@ -993,7 +994,7 @@ uint64_t interpretert::get_size(const typet &type)
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    uint64_t max_size=0;
+    mp_integer max_size=0;
 
     for(const auto &comp : components)
     {
@@ -1009,7 +1010,7 @@ uint64_t interpretert::get_size(const typet &type)
   {
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
-    size_t subtype_size=get_size(type.subtype());
+    const auto subtype_size=get_size(type.subtype());
 
     mp_vectort i;
     evaluate(size_expr, i);
@@ -1021,7 +1022,7 @@ uint64_t interpretert::get_size(const typet &type)
       mp_integer size_mp;
       bool ret=to_integer(size_const, size_mp);
       CHECK_RETURN(!ret);
-      return subtype_size*integer2unsigned(size_mp);
+      return subtype_size*size_mp;
     }
     return subtype_size;
   }
@@ -1037,7 +1038,7 @@ exprt interpretert::get_value(const irep_idt &id)
   // The dynamic type and the static symbol type may differ for VLAs,
   // where the symbol carries a size expression and the dynamic type
   // registry contains its actual length.
-  auto findit=dynamic_types.find(id);
+  const auto findit=dynamic_types.find(id);
   typet get_type;
   if(findit!=dynamic_types.end())
     get_type=findit->second;
@@ -1047,7 +1048,7 @@ exprt interpretert::get_value(const irep_idt &id)
   symbol_exprt symbol_expr(id, get_type);
   mp_integer whole_lhs_object_address=evaluate_address(symbol_expr);
 
-  return get_value(get_type, integer2size_t(whole_lhs_object_address));
+  return get_value(get_type, whole_lhs_object_address);
 }
 
 void interpreter(

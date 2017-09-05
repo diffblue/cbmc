@@ -51,12 +51,12 @@ void interpretert::read_unbounded(
   mp_vectort &dest) const
 {
   // copy memory region
-  std::size_t address_val=integer2size_t(address);
+  const auto address_val=address;
   const auto offset=address_to_offset(address_val);
-  const std::size_t alloc_size=
+  const auto alloc_size=
     base_address_to_actual_size(address_val-offset);
   const auto to_read=alloc_size-offset;
-  for(size_t i=0; i<to_read; i++)
+  for(std::remove_const<decltype(to_read)>::type i=0; i<to_read; ++i)
   {
     mp_integer value;
 
@@ -77,10 +77,10 @@ void interpretert::read_unbounded(
 /// reserves memory block of size at address
 void interpretert::allocate(
   const mp_integer &address,
-  size_t size)
+  mp_integer size)
 {
   // clear memory region
-  for(size_t i=0; i<size; i++)
+  for(decltype(size) i=0; i<size; ++i)
   {
     if((address+i)<memory.size())
     {
@@ -307,7 +307,7 @@ void interpretert::evaluate(
   {
     if(expr.type().id()==ID_struct)
     {
-      dest.reserve(get_size(expr.type()));
+      dest.reserve(integer2size_t(get_size(expr.type())));
       bool error=false;
 
       forall_operands(it, expr)
@@ -315,7 +315,7 @@ void interpretert::evaluate(
         if(it->type().id()==ID_code)
           continue;
 
-        size_t sub_size=get_size(it->type());
+        const auto sub_size=get_size(it->type());
         if(sub_size==0)
           continue;
 
@@ -324,8 +324,8 @@ void interpretert::evaluate(
 
         if(tmp.size()==sub_size)
         {
-          for(size_t i=0; i<sub_size; i++)
-            dest.push_back(tmp[i]);
+          for(std::remove_const<decltype(sub_size)>::type i=0; i<sub_size; ++i)
+            dest.push_back(tmp[integer2size_t(i)]);
         }
         else
           error=true;
@@ -380,7 +380,7 @@ void interpretert::evaluate(
     {
       irep_idt value=to_constant_expr(expr).get_value();
       const char *str=value.c_str();
-      size_t length=strlen(str)+1;
+      const auto length=strlen(str)+1;
       if(show)
         warning() << "string decoding not fully implemented "
                   << length << eom;
@@ -401,7 +401,7 @@ void interpretert::evaluate(
   else if(expr.id()==ID_struct)
   {
     if(!unbounded_size(expr.type()))
-      dest.reserve(get_size(expr.type()));
+      dest.reserve(integer2size_t(get_size(expr.type())));
     bool error=false;
 
     forall_operands(it, expr)
@@ -409,7 +409,7 @@ void interpretert::evaluate(
       if(it->type().id()==ID_code)
         continue;
 
-      size_t sub_size=get_size(it->type());
+      const auto sub_size=get_size(it->type());
       if(sub_size==0)
         continue;
 
@@ -852,7 +852,7 @@ void interpretert::evaluate(
       mp_integer address=result[0];
       if(address>0 && address<memory.size())
       {
-        std::size_t address_val=integer2size_t(address);
+        const auto address_val=address;
         auto obj_type=get_type(address_to_identifier(address_val));
 
         mp_integer offset=address_to_offset(address_val);
@@ -954,7 +954,7 @@ void interpretert::evaluate(
     {
       if(!unbounded_size(expr.type()))
       {
-        dest.resize(get_size(expr.type()));
+        dest.resize(integer2size_t(get_size(expr.type())));
         read(address, dest);
       }
       else
@@ -1020,8 +1020,8 @@ void interpretert::evaluate(
       evaluate(ty.size(), size);
     if(size.size()==1)
     {
-      std::size_t size_int=integer2size_t(size[0]);
-      for(std::size_t i=0; i<size_int; ++i)
+      const auto size_int=size[0];
+      for(std::remove_const<decltype(size_int)>::type i=0; i<size_int; ++i)
         evaluate(expr.op0(), dest);
       return;
     }
@@ -1040,13 +1040,13 @@ void interpretert::evaluate(
       // Ignore indices < 0, which the string solver sometimes produces
       if(where[0]<0)
         return;
-      std::size_t where_idx=integer2size_t(where[0]);
-      std::size_t subtype_size=get_size(subtype);
-      std::size_t need_size=(where_idx+1)*subtype_size;
+      const auto where_idx=where[0];
+      const auto subtype_size=get_size(subtype);
+      const auto need_size=(where_idx+1)*subtype_size;
       if(dest.size()<need_size)
-        dest.resize(need_size, 0);
+        dest.resize(integer2size_t(need_size), 0);
       for(std::size_t i=0; i<new_value.size(); ++i)
-        dest[(where_idx*subtype_size)+i]=new_value[i];
+        dest[integer2size_t((where_idx*subtype_size)+i)]=new_value[i];
       return;
     }
   }
@@ -1135,7 +1135,7 @@ mp_integer interpretert::evaluate_address(
     const irep_idt &component_name=
       to_member_expr(expr).get_component_name();
 
-    unsigned offset=0;
+    mp_integer offset=0;
 
     for(const auto &comp : struct_type.components())
     {
