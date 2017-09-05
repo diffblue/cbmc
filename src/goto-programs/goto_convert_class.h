@@ -530,11 +530,6 @@ protected:
     const exprt &rhs,
     const exprt::operandst &arguments,
     goto_programt &dest);
-  void do_array_set(
-    const exprt &lhs,
-    const exprt &rhs,
-    const exprt::operandst &arguments,
-    goto_programt &dest);
   void do_array_equal(
     const exprt &lhs,
     const exprt &rhs,
@@ -543,7 +538,7 @@ protected:
   void do_array_op(
     const irep_idt &id,
     const exprt &lhs,
-    const exprt &rhs,
+    const exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_printf(
