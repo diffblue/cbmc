@@ -272,26 +272,25 @@ bool bmc_covert::operator()()
   {
     case ui_message_handlert::uit::PLAIN:
     {
-      status() << "\n** coverage results:" << eom;
+      result() << "\n** coverage results:" << eom;
 
       for(const auto &g : goal_map)
       {
         const goalt &goal=g.second;
 
-        status() << "[" << g.first << "]";
+        result() << "[" << g.first << "]";
 
         if(goal.source_location.is_not_nil())
-          status() << ' ' << goal.source_location;
+          result() << ' ' << goal.source_location;
 
         if(!goal.description.empty())
-          status() << ' ' << goal.description;
+          result() << ' ' << goal.description;
 
-        status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
-                 << eom;
+        result() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
+                 << '\n';
       }
 
-      status() << '\n';
-
+      result() << eom;
       break;
     }
 

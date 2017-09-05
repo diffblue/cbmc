@@ -55,9 +55,9 @@ void bmct::error_trace()
   switch(ui)
   {
   case ui_message_handlert::uit::PLAIN:
-    status() << "Counterexample:" << eom;
-    show_goto_trace(status(), ns, goto_trace);
-    status() << eom;
+    result() << "Counterexample:" << eom;
+    show_goto_trace(result(), ns, goto_trace);
+    result() << eom;
     break;
 
   case ui_message_handlert::uit::XML_UI:
