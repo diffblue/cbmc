@@ -1,7 +1,8 @@
 CORE
 test_append_char.class
 --refine-strings --string-max-length 1000
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+assertion.* file test_append_char.java line 23 .* SUCCESS
+assertion.* file test_append_char.java line 25 .* FAILURE
 --

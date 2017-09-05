@@ -3,11 +3,12 @@ test_char_array.class
 --refine-strings --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
-.*assertion.* test_char_array.java line 9 .* SUCCESS$
-.*assertion.* test_char_array.java line 10 .* SUCCESS$
-.*assertion.* test_char_array.java line 11 .* SUCCESS$
-.*assertion.* test_char_array.java line 13 .* FAILURE$
-.*assertion.* test_char_array.java line 15 .* FAILURE$
-.*assertion.* test_char_array.java line 17 .* FAILURE$
+.*assertion.* test_char_array.java line 7 .* SUCCESS$
+.*assertion.* test_char_array.java line 21 .* SUCCESS$
+.*assertion.* test_char_array.java line 22 .* SUCCESS$
+.*assertion.* test_char_array.java line 23 .* SUCCESS$
+.*assertion.* test_char_array.java line 25 .* FAILURE$
+.*assertion.* test_char_array.java line 27 .* FAILURE$
+.*assertion.* test_char_array.java line 29 .* FAILURE$
 ^VERIFICATION FAILED$
 --
