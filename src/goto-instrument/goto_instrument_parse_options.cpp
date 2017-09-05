@@ -1489,6 +1489,8 @@ void goto_instrument_parse_optionst::help()
     " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --print-path-lengths         print statistics about control-flow graph paths\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
