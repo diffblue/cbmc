@@ -13,6 +13,7 @@ Author: Romain Brenguier
 #define CPROVER_UTIL_SPARSE_VECTOR_H
 
 #include "invariant.h"
+#include "mp_arith.h"
 
 #include <cstdint>
 #include <map>
@@ -20,35 +21,36 @@ Author: Romain Brenguier
 template<class T> class sparse_vectort
 {
 protected:
-  typedef std::map<uint64_t, T> underlyingt;
+  typedef std::map<mp_integer, T> underlyingt;
+  typedef typename underlyingt::key_type key_type;
   underlyingt underlying;
-  uint64_t _size;
+  mp_integer _size;
 
 public:
   sparse_vectort() :
     _size(0) {}
 
-  const T &operator[](uint64_t idx) const
+  const T &operator[](const key_type &idx) const
   {
     INVARIANT(idx<_size, "index out of range");
     return underlying[idx];
   }
 
-  T &operator[](uint64_t idx)
+  T &operator[](const key_type &idx)
   {
     INVARIANT(idx<_size, "index out of range");
     return underlying[idx];
   }
 
-  uint64_t size() const
+  mp_integer size() const
   {
     return _size;
   }
 
-  void resize(uint64_t new_size)
+  void resize(mp_integer new_size)
   {
     INVARIANT(new_size>=_size, "sparse vector can't be shrunk (yet)");
-    _size=new_size;
+    _size=std::move(new_size);
   }
 
   typedef typename underlyingt::iterator iteratort;
@@ -60,7 +62,7 @@ public:
   iteratort end() { return underlying.end(); }
   const_iteratort end() const { return underlying.end(); }
 
-  const_iteratort find(uint64_t idx) { return underlying.find(idx); }
+  const_iteratort find(const mp_integer &idx) { return underlying.find(idx); }
 };
 
 #endif // CPROVER_UTIL_SPARSE_VECTOR_H

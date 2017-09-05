@@ -393,7 +393,7 @@ void interpretert::execute_other()
     mp_vectort tmp, rhs;
     evaluate(pc->code.op1(), tmp);
     mp_integer address=evaluate_address(pc->code.op0());
-    size_t size=get_size(pc->code.op0().type());
+    auto size=get_size(pc->code.op0().type());
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -420,7 +420,7 @@ void interpretert::execute_decl()
 /// \par parameters: an object and a memory offset
 irep_idt interpretert::get_component_id(
   const irep_idt &object,
-  unsigned offset)
+  mp_integer offset)
 {
   const symbolt &symbol=ns.lookup(object);
   const typet real_type=ns.follow(symbol.type);
@@ -434,7 +434,7 @@ irep_idt interpretert::get_component_id(
   {
     if(offset<=0)
       return it->id();
-    size_t size=get_size(it->type());
+    auto size=get_size(it->type());
     offset-=size;
   }
   return object;
@@ -453,7 +453,7 @@ typet interpretert::get_type(const irep_idt &id) const
 /// type
 exprt interpretert::get_value(
   const typet &type,
-  std::size_t offset,
+  uint64_t offset,
   bool use_non_det)
 {
   const typet real_type=ns.follow(type);
@@ -468,7 +468,7 @@ exprt interpretert::get_value(
     for(struct_typet::componentst::const_iterator it=components.begin();
         it!=components.end(); it++)
     {
-      size_t size=get_size(it->type());
+      auto size=get_size(it->type());
       const exprt operand=get_value(it->type(), offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -480,7 +480,7 @@ exprt interpretert::get_value(
     // Get size of array
     exprt result=array_exprt(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    size_t subtype_size=get_size(type.subtype());
+    auto subtype_size=get_size(type.subtype());
     std::size_t count;
     if(size_expr.id()!=ID_constant)
     {
@@ -518,7 +518,7 @@ exprt interpretert::get_value(
 exprt interpretert::get_value(
   const typet &type,
   mp_vectort &rhs,
-  std::size_t offset)
+  uint64_t offset)
 {
   const typet real_type=ns.follow(type);
   PRECONDITION(!rhs.empty());
@@ -533,7 +533,7 @@ exprt interpretert::get_value(
     result.reserve_operands(components.size());
     for(const struct_union_typet::componentt &expr : components)
     {
-      size_t size=get_size(expr.type());
+      auto size=get_size(expr.type());
       const exprt operand=get_value(expr.type(), rhs, offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -546,7 +546,7 @@ exprt interpretert::get_value(
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
-    size_t subtype_size=get_size(type.subtype());
+    auto subtype_size=get_size(type.subtype());
     unsigned count;
     if(unbounded_size(type))
     {
@@ -606,7 +606,7 @@ exprt interpretert::get_value(
       // We want the symbol pointed to
       std::size_t address=integer2size_t(rhs[offset]);
       irep_idt identifier=address_to_identifier(address);
-      size_t offset=address_to_offset(address);
+      auto offset=address_to_offset(address);
       const typet type=get_type(identifier);
       exprt symbol_expr(ID_symbol, type);
       symbol_expr.set(ID_identifier, identifier);
@@ -652,7 +652,7 @@ void interpretert::execute_assign()
   if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());
-    size_t size=get_size(code_assign.lhs().type());
+    auto size=get_size(code_assign.lhs().type());
 
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs ("
@@ -681,7 +681,7 @@ void interpretert::execute_assign()
     if(side_effect.get_statement()==ID_nondet)
     {
       unsigned address=integer2unsigned(evaluate_address(code_assign.lhs()));
-      size_t size=get_size(code_assign.lhs().type());
+      auto size=get_size(code_assign.lhs().type());
       for(size_t i=0; i<size; i++)
       {
         memory[address+i].initialized=
@@ -863,7 +863,7 @@ void interpretert::build_memory_map()
 
 void interpretert::build_memory_map(const symbolt &symbol)
 {
-  size_t size=0;
+  uint64_t size=0;
 
   if(symbol.type.id()==ID_code)
   {
@@ -876,7 +876,7 @@ void interpretert::build_memory_map(const symbolt &symbol)
 
   if(size!=0)
   {
-    std::size_t address=memory.size();
+    auto address=memory.size();
     memory.resize(address+size);
     memory_map[symbol.name]=address;
     inverse_memory_map[address]=symbol.name;
@@ -916,13 +916,13 @@ mp_integer interpretert::build_memory_map(
   const typet &type)
 {
   typet alloc_type=concretize_type(type);
-  size_t size=get_size(alloc_type);
+  auto size=get_size(alloc_type);
   auto it=dynamic_types.find(id);
 
   if(it!=dynamic_types.end())
   {
-    std::size_t address=memory_map[id];
-    std::size_t current_size=base_address_to_alloc_size(address);
+    const auto address=memory_map[id];
+    const auto current_size=base_address_to_alloc_size(address);
     // current size <= size already recorded
     if(size<=current_size)
       return memory_map[id];
@@ -934,7 +934,7 @@ mp_integer interpretert::build_memory_map(
   if(size==0)
     size=1; // This is a hack to create existence
 
-  std::size_t address=memory.size();
+  const auto address=memory.size();
   memory.resize(address+size);
   memory_map[id]=address;
   inverse_memory_map[address]=id;
@@ -976,7 +976,7 @@ uint64_t interpretert::get_size(const typet &type)
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    unsigned sum=0;
+    uint64_t sum=0;
 
     for(const auto &comp : components)
     {
@@ -1068,7 +1068,7 @@ void interpretert::print_memory(bool input_flags)
 {
   for(const auto &cell_address : memory)
   {
-    std::size_t i=cell_address.first;
+    const auto i=cell_address.first;
     const memory_cellt &cell=cell_address.second;
     const auto identifier=address_to_identifier(i);
     const auto offset=address_to_offset(i);

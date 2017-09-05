@@ -52,10 +52,10 @@ void interpretert::read_unbounded(
 {
   // copy memory region
   std::size_t address_val=integer2size_t(address);
-  const std::size_t offset=address_to_offset(address_val);
+  const auto offset=address_to_offset(address_val);
   const std::size_t alloc_size=
     base_address_to_actual_size(address_val-offset);
-  const std::size_t to_read=alloc_size-offset;
+  const auto to_read=alloc_size-offset;
   for(size_t i=0; i<to_read; i++)
   {
     mp_integer value;
