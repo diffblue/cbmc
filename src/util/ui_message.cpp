@@ -90,8 +90,7 @@ const char *ui_message_handlert::level_string(unsigned level)
 
 void ui_message_handlert::print(
   unsigned level,
-  const std::string &message,
-  bool preformatted)
+  const std::string &message)
 {
   if(verbosity>=level)
   {
@@ -100,7 +99,7 @@ void ui_message_handlert::print(
     case uit::PLAIN:
     {
       console_message_handlert console_message_handler;
-      console_message_handler.print(level, message, preformatted);
+      console_message_handler.print(level, message);
     }
     break;
 
@@ -109,7 +108,7 @@ void ui_message_handlert::print(
     {
       source_locationt location;
       location.make_nil();
-      print(level, message, -1, location, preformatted);
+      print(level, message, -1, location);
     }
     break;
     }
@@ -120,10 +119,9 @@ void ui_message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const source_locationt &location,
-  bool preformatted)
+  const source_locationt &location)
 {
-  message_handlert::print(level, message, preformatted);
+  message_handlert::print(level, message);
 
   if(verbosity>=level)
   {
@@ -131,7 +129,7 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
       message_handlert::print(
-        level, message, sequence_number, location, preformatted);
+        level, message, sequence_number, location);
       break;
 
     case uit::XML_UI:
@@ -147,7 +145,7 @@ void ui_message_handlert::print(
       std::string sequence_number_str=
         sequence_number>=0?std::to_string(sequence_number):"";
 
-      ui_msg(type, tmp_message, sequence_number_str, location, preformatted);
+      ui_msg(type, tmp_message, sequence_number_str, location);
     }
     break;
     }
@@ -158,8 +156,7 @@ void ui_message_handlert::ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location,
-  bool preformatted)
+  const source_locationt &location)
 {
   switch(get_ui())
   {
@@ -167,11 +164,11 @@ void ui_message_handlert::ui_msg(
     break;
 
   case uit::XML_UI:
-    xml_ui_msg(type, msg1, msg2, location, preformatted);
+    xml_ui_msg(type, msg1, msg2, location);
     break;
 
   case uit::JSON_UI:
-    json_ui_msg(type, msg1, msg2, location, preformatted);
+    json_ui_msg(type, msg1, msg2, location);
     break;
   }
 }
@@ -180,16 +177,8 @@ void ui_message_handlert::xml_ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location,
-  bool preformatted)
+  const source_locationt &location)
 {
-  if(preformatted)
-  {
-    // Expect the message is already an XML fragment.
-    std::cout << msg1 << '\n';
-    return;
-  }
-
   xmlt result;
   result.name="message";
 
@@ -208,16 +197,8 @@ void ui_message_handlert::json_ui_msg(
   const std::string &type,
   const std::string &msg1,
   const std::string &msg2,
-  const source_locationt &location,
-  bool preformatted)
+  const source_locationt &location)
 {
-  if(preformatted)
-  {
-    // Expect the message is already a JSON fragment.
-    std::cout << ",\n" << msg1;
-    return;
-  }
-
   json_objectt result;
 
   if(location.is_not_nil() &&

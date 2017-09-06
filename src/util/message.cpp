@@ -13,8 +13,7 @@ void message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const source_locationt &location,
-  bool preformatted)
+  const source_locationt &location)
 {
   std::string dest;
 
@@ -52,13 +51,12 @@ void message_handlert::print(
     dest+=": ";
   dest+=message;
 
-  print(level, dest, preformatted);
+  print(level, dest);
 }
 
 void message_handlert::print(
   unsigned level,
-  const std::string &message,
-  bool preformatted)
+  const std::string &message)
 {
   if(level>=message_count.size())
     message_count.resize(level+1, 0);
