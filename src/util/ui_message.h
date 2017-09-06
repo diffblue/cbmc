@@ -36,22 +36,28 @@ public:
     _ui=__ui;
   }
 
-  virtual void flush(unsigned level);
+  virtual void flush(unsigned level) override;
 
 protected:
   uit _ui;
 
-  // overloading
   virtual void print(
     unsigned level,
-    const std::string &message);
+    const std::string &message) override;
 
-  // overloading
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location);
+    const source_locationt &location) override;
+
+  virtual void print(
+    unsigned level,
+    const xmlt &data) override;
+
+  virtual void print(
+    unsigned level,
+    const jsont &data) override;
 
   virtual void xml_ui_msg(
     const std::string &type,

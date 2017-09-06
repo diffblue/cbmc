@@ -301,7 +301,7 @@ safety_checkert::resultt fault_localizationt::stop_on_fail()
       xmlt dest("fault-localization");
       xmlt xml_diagnosis=report_xml(ID_nil);
       dest.new_element().swap(xml_diagnosis);
-      status() << preformatted_output << dest << eom;
+      status() << dest;
       break;
     }
     case ui_message_handlert::uit::JSON_UI:
@@ -379,7 +379,7 @@ void fault_localizationt::report(
         xmlt xml_diagnosis=report_xml(goal_pair.first);
         dest.new_element().swap(xml_diagnosis);
       }
-      status() << preformatted_output << dest << eom;
+      status() << dest;
     }
     break;
   case ui_message_handlert::uit::JSON_UI:

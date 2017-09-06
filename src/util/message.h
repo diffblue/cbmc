@@ -15,7 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include "invariant.h"
+#include "json.h"
 #include "source_location.h"
+#include "xml.h"
 
 class message_handlert
 {
@@ -24,7 +26,17 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message) = 0;
+  virtual void print(unsigned level, const std::string &message)=0;
+
+  virtual void print(unsigned level, const xmlt &xml)
+  {
+    // no-op by default
+  }
+
+  virtual void print(unsigned level, const jsont &json)
+  {
+    // no-op by default
+  }
 
   virtual void print(
     unsigned level,
@@ -175,6 +187,26 @@ public:
     unsigned message_level;
     messaget &message;
     source_locationt source_location;
+
+    mstreamt &operator << (const xmlt &data)
+    {
+      *this << eom; // force end of previous message
+      if(message.message_handler)
+      {
+        message.message_handler->print(message_level, data);
+      }
+      return *this;
+    }
+
+    mstreamt &operator << (const json_objectt &data)
+    {
+      *this << eom; // force end of previous message
+      if(message.message_handler)
+      {
+        message.message_handler->print(message_level, data);
+      }
+      return *this;
+    }
 
     template <class T>
     mstreamt &operator << (const T &x)

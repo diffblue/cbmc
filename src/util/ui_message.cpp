@@ -117,6 +117,50 @@ void ui_message_handlert::print(
 
 void ui_message_handlert::print(
   unsigned level,
+  const xmlt &data)
+{
+  if(verbosity>=level)
+  {
+    switch(get_ui())
+    {
+    case uit::PLAIN:
+      INVARIANT(false, "Cannot print xml data on PLAIN UI");
+      break;
+    case uit::XML_UI:
+      std::cout << data << '\n';
+      flush(level);
+      break;
+    case uit::JSON_UI:
+      INVARIANT(false, "Cannot print xml data on JSON UI");
+      break;
+    }
+  }
+}
+
+void ui_message_handlert::print(
+  unsigned level,
+  const jsont &data)
+{
+  if(verbosity>=level)
+  {
+    switch(get_ui())
+    {
+    case uit::PLAIN:
+      INVARIANT(false, "Cannot print json data on PLAIN UI");
+      break;
+    case uit::XML_UI:
+      INVARIANT(false, "Cannot print json data on XML UI");
+      break;
+    case uit::JSON_UI:
+      std::cout << ',' << '\n' << data;
+      flush(level);
+      break;
+    }
+  }
+}
+
+void ui_message_handlert::print(
+  unsigned level,
   const std::string &message,
   int sequence_number,
   const source_locationt &location)

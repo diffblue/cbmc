@@ -64,24 +64,24 @@ void bmct::error_trace()
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      status() << xml << eom;
+      status() << xml;
     }
     break;
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_arrayt &result_array=json_result["results"].make_array();
-      json_objectt &result=result_array.push_back().make_object();
+      json_objectt json;
+      json_arrayt &result_array=json["results"].make_array();
+      json_objectt &json_result=result_array.push_back().make_object();
       const goto_trace_stept &step=goto_trace.steps.back();
-      result["property"]=
+      json_result["property"]=
         json_stringt(id2string(step.pc->source_location.get_property_id()));
-      result["description"]=
+      json_result["description"]=
         json_stringt(id2string(step.pc->source_location.get_comment()));
-      result["status"]=json_stringt("failed");
-      jsont &json_trace=result["trace"];
+      json_result["status"]=json_stringt("failed");
+      jsont &json_trace=json_result["trace"];
       convert(ns, goto_trace, json_trace);
-      status() << ",\n" << json_result << eom;
+      status() << json_result;
     }
     break;
   }
@@ -173,8 +173,7 @@ void bmct::report_success()
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
-      std::cout << xml;
-      std::cout << "\n";
+      result() << xml;
     }
     break;
 
@@ -182,7 +181,7 @@ void bmct::report_success()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
-      std::cout << ",\n" << json_result;
+      result() << json_result;
     }
     break;
   }
@@ -201,8 +200,7 @@ void bmct::report_failure()
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
-      std::cout << xml;
-      std::cout << "\n";
+      result() << xml;
     }
     break;
 
@@ -210,7 +208,7 @@ void bmct::report_failure()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");
-      std::cout << ",\n" << json_result;
+      result() << json_result;
     }
     break;
   }
