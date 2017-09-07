@@ -935,12 +935,7 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
   {
     linker_script_merget ls_merge(
         compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
-    const int fail=ls_merge.add_linker_script_definitions();
-    if(fail!=0)
-    {
-      error() << "Unable to merge linker script symbols" << eom;
-      return fail;
-    }
+    result=ls_merge.add_linker_script_definitions();
   }
 
   // merge output from gcc with goto-binaries

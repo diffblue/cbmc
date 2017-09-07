@@ -105,10 +105,10 @@ protected:
 
   /// \brief Write linker script definitions to `linker_data`.
   int get_linker_script_data(
-      jsont &linker_data,
       std::list<irep_idt> &linker_defined_symbols,
       const symbol_tablet &symbol_table,
-      const std::string &out_file);
+      const std::string &out_file,
+      const std::string &def_out_file);
 
   /// \brief Write a list of definitions derived from `data` into gp's
   ///        `instructions` member.
