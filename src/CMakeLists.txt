@@ -23,8 +23,8 @@ include(CPack)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
     add_custom_target(doc
-        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.cfg
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        "${DOXYGEN_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/doxygen.cfg"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
     )
 endif(DOXYGEN_FOUND)
 
@@ -32,26 +32,26 @@ endif(DOXYGEN_FOUND)
 macro(generic_bison name)
     bison_target(
         parser
-        ${CMAKE_CURRENT_SOURCE_DIR}/parser.y
-        ${CMAKE_CURRENT_BINARY_DIR}/${name}_y.tab.cpp
-        COMPILE_FLAGS -pyy${name}
+        "${CMAKE_CURRENT_SOURCE_DIR}/parser.y"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}_y.tab.cpp"
+        COMPILE_FLAGS "-pyy${name}"
     )
-    set(renamed_parser_header ${CMAKE_CURRENT_BINARY_DIR}/${name}_y.tab.h)
-    add_custom_command(OUTPUT ${renamed_parser_header}
-        COMMAND ${CMAKE_COMMAND} -E copy ${BISON_parser_OUTPUT_HEADER} ${renamed_parser_header}
-        MAIN_DEPENDENCY ${BISON_parser_OUTPUT_HEADER}
+    set(renamed_parser_header "${CMAKE_CURRENT_BINARY_DIR}/${name}_y.tab.h")
+    add_custom_command(OUTPUT "${renamed_parser_header}"
+        COMMAND "${CMAKE_COMMAND}" -E copy "${BISON_parser_OUTPUT_HEADER}" "${renamed_parser_header}"
+        MAIN_DEPENDENCY "${BISON_parser_OUTPUT_HEADER}"
     )
-    list(REMOVE_ITEM BISON_parser_OUTPUTS ${BISON_parser_OUTPUT_HEADER})
-    list(APPEND BISON_parser_OUTPUTS ${renamed_parser_header})
+    list(REMOVE_ITEM BISON_parser_OUTPUTS "${BISON_parser_OUTPUT_HEADER}")
+    list(APPEND BISON_parser_OUTPUTS "${renamed_parser_header}")
 endmacro(generic_bison)
 
 #   Add a flex target named 'scanner'
 macro(generic_flex name)
     flex_target(
         scanner
-        ${CMAKE_CURRENT_SOURCE_DIR}/scanner.l
-        ${CMAKE_CURRENT_BINARY_DIR}/${name}_lex.yy.cpp
-        COMPILE_FLAGS -Pyy${name}
+        "${CMAKE_CURRENT_SOURCE_DIR}/scanner.l"
+        "${CMAKE_CURRENT_BINARY_DIR}/${name}_lex.yy.cpp"
+        COMPILE_FLAGS "-Pyy${name}"
     )
 endmacro(generic_flex)
 
