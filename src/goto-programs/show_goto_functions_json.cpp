@@ -67,6 +67,10 @@ json_objectt show_goto_functions_jsont::convert(
         {
           instruction_entry["sourceLocation"]=
             json(instruction.code.source_location());
+
+          if(instruction.code.source_location().get_goto_location()!="")
+            instruction_entry["originalGOTOLocation"]=
+              json_stringt(id2string(instruction.code.source_location().get_goto_location()));
         }
 
         std::ostringstream instruction_builder;

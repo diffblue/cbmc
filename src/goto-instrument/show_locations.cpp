@@ -45,6 +45,8 @@ void show_locations(
         l.new_element("file").data=id2string(source_location.get_file());
         l.new_element("function").data=
           id2string(source_location.get_function());
+        l.new_element("original_goto_location").data=
+          id2string(source_location.get_goto_location());
 
         std::cout << xml << '\n';
       }
@@ -53,7 +55,9 @@ void show_locations(
     case ui_message_handlert::uit::PLAIN:
       std::cout << function_id << " "
                 << it->location_number << " "
-                << it->source_location << '\n';
+                << it->source_location << " "
+                << "(Original GOTO Location:" << " "
+                << it->source_location.get_goto_location() << ") \n";
       break;
 
     default:
