@@ -48,7 +48,7 @@ bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
 ///   function symbol will be added to this table
 /// \return Returns false if the _start method was generated correctly
 bool jsil_languaget::generate_start_function(
-  const symbolt &entry_function_symbol,
+  const irep_idt &entry_function_symbol_id,
   symbol_tablet &symbol_table)
 {
   // TODO(tkiley): This should be implemented if this language

@@ -31,6 +31,10 @@ public:
   bool operator()(const irep_idt &entry_function);
 
 private:
+  irep_idt get_entry_point_mode() const;
+
+  void remove_existing_entry_point();
+
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 };

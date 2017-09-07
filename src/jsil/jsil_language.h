@@ -67,7 +67,7 @@ public:
   virtual bool interfaces(symbol_tablet &symbol_table) override;
 
   virtual bool generate_start_function(
-    const class symbolt &entry_function_symbol,
+    const irep_idt &entry_function_symbol_id,
     class symbol_tablet &symbol_table) override;
 
 protected:
