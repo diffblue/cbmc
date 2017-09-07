@@ -96,6 +96,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
+#include "splice_call.h"
 
 void goto_instrument_parse_optionst::eval_verbosity()
 {
@@ -1408,6 +1409,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       full_slicer(goto_model);
   }
 
+  // splice option
+  if(cmdline.isset("splice-call"))
+  {
+    status() << "Performing call splicing" << eom;
+    std::string callercallee=cmdline.get_value("splice-call");
+    if(splice_call(
+        goto_model.goto_functions,
+        callercallee,
+        goto_model.symbol_table,
+        get_message_handler()))
+      throw 0;
+  }
+
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 }
@@ -1474,6 +1488,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)
     " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
