@@ -473,7 +473,7 @@ void trace_automatont::minimise()
   determinise();
 }
 
-void automatont::output(std::ostream &str)
+void automatont::output(std::ostream &str) const
 {
   str << "Init: " << init_state << '\n';
 

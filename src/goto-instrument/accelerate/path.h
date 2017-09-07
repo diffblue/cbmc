@@ -36,7 +36,7 @@ public:
   {
   }
 
-  void output(const goto_programt &program, std::ostream &str);
+  void output(const goto_programt &program, std::ostream &str) const;
 
   goto_programt::targett loc;
   const exprt guard;

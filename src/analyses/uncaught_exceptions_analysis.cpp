@@ -186,19 +186,22 @@ void uncaught_exceptions_analysist::collect_uncaught_exceptions(
 /// Prints the exceptions map that maps each method to the  set of exceptions
 /// that may escape it
 void uncaught_exceptions_analysist::output(
-  const goto_functionst &goto_functions)
+  const goto_functionst &goto_functions) const
 {
 #ifdef DEBUG
   forall_goto_functions(it, goto_functions)
   {
-    if(exceptions_map[it->first].size()>0)
+    const auto fn=it->first;
+    const exceptions_mapt::const_iterator found=exceptions_map.find(fn);
+    INVARIANT(
+      found!=exceptions_map.end(),
+      "each function expected to be recorded in `exceptions_map`");
+    const auto &fs=found->second;
+    if(!fs.empty())
     {
       std::cout << "Uncaught exceptions in function " <<
-        it->first << ": " << std::endl;
-      INVARIANT(
-        exceptions_map.find(it->first)!=exceptions_map.end(),
-        "each function expected to be recorded in `exceptions_map`");
-      for(auto exc_id : exceptions_map[it->first])
+        fn << ": " << std::endl;
+      for(const auto exc_id : fs)
         std::cout << id2string(exc_id) << " ";
       std::cout << std::endl;
     }
