@@ -1523,9 +1523,8 @@ void value_sett::apply_code(
 
       if(failed.is_not_nil())
       {
-        address_of_exprt address_of_expr;
-        address_of_expr.object()=failed;
-        address_of_expr.type()=lhs.type();
+        address_of_exprt address_of_expr(
+          failed, to_pointer_type(lhs.type()));
         assign(lhs, address_of_expr, ns, false, false);
       }
       else
