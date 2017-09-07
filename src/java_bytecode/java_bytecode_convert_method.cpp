@@ -1779,7 +1779,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_branch.cond()=condition;
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.then_case().add_source_location()=
+        address_map.at(integer2unsigned(number)).source->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
       c=code_branch;
@@ -1808,7 +1809,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       code_branch.cond().add_source_location()=i_it->source_location;
       code_branch.cond().add_source_location().set_function(method_id);
       code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.then_case().add_source_location()=
+        address_map.at(integer2unsigned(number)).source->source_location;
       code_branch.then_case().add_source_location().set_function(method_id);
       code_branch.add_source_location()=i_it->source_location;
       code_branch.add_source_location().set_function(method_id);
@@ -1826,7 +1828,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_notequal, rhs);
       code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.then_case().add_source_location()=
+        address_map.at(integer2unsigned(number)).source->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
       c=code_branch;
@@ -1842,7 +1845,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       const exprt rhs(null_pointer_exprt(to_pointer_type(lhs.type())));
       code_branch.cond()=binary_relation_exprt(lhs, ID_equal, rhs);
       code_branch.then_case()=code_gotot(label(integer2string(number)));
-      code_branch.then_case().add_source_location()=i_it->source_location;
+      code_branch.then_case().add_source_location()=
+        address_map.at(integer2unsigned(number)).source->source_location;
       code_branch.add_source_location()=i_it->source_location;
 
       c=code_branch;
@@ -2348,7 +2352,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
           bool ret=to_integer(to_constant_expr(*a_it), number);
           DATA_INVARIANT(!ret, "case label expected to be integer");
           code_case.code()=code_gotot(label(integer2string(number)));
-          code_case.code().add_source_location()=i_it->source_location;
+          code_case.code().add_source_location()=
+            address_map.at(integer2unsigned(number)).source->source_location;
 
           if(a_it==i_it->args.begin())
             code_case.set_default();

@@ -1,0 +1,9 @@
+CORE
+main.c
+--version
+^EXIT=0$
+^SIGNAL=0$
+--
+^RUN: .* --version
+^warning: ignoring
+^CONVERSION ERROR$

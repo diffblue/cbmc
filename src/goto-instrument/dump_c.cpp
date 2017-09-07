@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/base_type.h>
 #include <util/cprover_prefix.h>
+#include <util/replace_symbol.h>
 
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
@@ -149,7 +150,8 @@ void dump_ct::operator()(std::ostream &os)
     // we don't want to dump in full all definitions; in particular
     // do not dump anonymous types that are defined in system headers
     if((!tag_added || symbol.is_type) &&
-       system_symbols.is_symbol_internal_symbol(symbol, system_headers))
+       system_symbols.is_symbol_internal_symbol(symbol, system_headers) &&
+       symbol.name!=goto_functions.entry_point())
       continue;
 
     bool inserted=symbols_sorted.insert(name_str).second;
@@ -198,7 +200,8 @@ void dump_ct::operator()(std::ostream &os)
       goto_functionst::function_mapt::const_iterator func_entry=
         goto_functions.function_map.find(symbol.name);
 
-      if(func_entry!=goto_functions.function_map.end() &&
+      if(!harness &&
+         func_entry!=goto_functions.function_map.end() &&
          func_entry->second.body_available() &&
          (symbol.name==ID_main ||
           (!config.main.empty() && symbol.name==config.main)))
@@ -901,6 +904,63 @@ void dump_ct::convert_global_variable(
   }
 }
 
+/// Replace CPROVER internal symbols in b by printable values and generate
+/// necessary declarations.
+/// \param b: Code block to be cleaned
+void dump_ct::cleanup_harness(code_blockt &b)
+{
+  replace_symbolt replace;
+  code_blockt decls;
+
+  const symbolt *argc_sym=nullptr;
+  if(!ns.lookup("argc'", argc_sym))
+  {
+    symbol_exprt argc("argc", argc_sym->type);
+    replace.insert(argc_sym->name, argc);
+    code_declt d(argc);
+    decls.add(d);
+  }
+  const symbolt *argv_sym=nullptr;
+  if(!ns.lookup("argv'", argv_sym))
+  {
+    symbol_exprt argv("argv", argv_sym->type);
+    replace.insert(argv_sym->name, argv);
+    code_declt d(argv);
+    decls.add(d);
+  }
+  const symbolt *return_sym=nullptr;
+  if(!ns.lookup("return'", return_sym))
+  {
+    symbol_exprt return_value("return_value", return_sym->type);
+    replace.insert(return_sym->name, return_value);
+    code_declt d(return_value);
+    decls.add(d);
+  }
+
+  Forall_operands(it, b)
+  {
+    codet &code=to_code(*it);
+
+    if(code.get_statement()==ID_function_call)
+    {
+      exprt &func=to_code_function_call(code).function();
+      if(func.id()==ID_symbol)
+      {
+        symbol_exprt &s=to_symbol_expr(func);
+        if(s.get_identifier()==ID_main)
+          s.set_identifier(CPROVER_PREFIX+id2string(ID_main));
+        else if(s.get_identifier()==CPROVER_PREFIX "initialize")
+          continue;
+      }
+    }
+
+    decls.add(code);
+  }
+
+  b.swap(decls);
+  replace(b);
+}
+
 void dump_ct::convert_function_declaration(
     const symbolt &symbol,
     const bool skip_main,
@@ -956,9 +1016,20 @@ void dump_ct::convert_function_declaration(
     converted_enum.swap(converted_e_bak);
     converted_compound.swap(converted_c_bak);
 
+    if(harness && symbol.name==goto_functions.entry_point())
+      cleanup_harness(b);
+
     os_body << "// " << symbol.name << '\n';
     os_body << "// " << symbol.location << '\n';
-    os_body << make_decl(symbol.name, symbol.type) << '\n';
+    if(symbol.name==goto_functions.entry_point())
+      os_body << make_decl(ID_main, symbol.type) << '\n';
+    else if(!harness || symbol.name!=ID_main)
+      os_body << make_decl(symbol.name, symbol.type) << '\n';
+    else if(harness && symbol.name==ID_main)
+    {
+      os_body << make_decl(CPROVER_PREFIX+id2string(symbol.name), symbol.type)
+              << '\n';
+    }
     os_body << expr_to_string(b);
     os_body << "\n\n";
 
@@ -971,6 +1042,13 @@ void dump_ct::convert_function_declaration(
     os_decl << "// " << symbol.name << '\n';
     os_decl << "// " << symbol.location << '\n';
     os_decl << make_decl(symbol.name, symbol.type) << ";\n";
+  }
+  else if(harness && symbol.name==ID_main)
+  {
+    os_decl << "// " << symbol.name << '\n';
+    os_decl << "// " << symbol.location << '\n';
+    os_decl << make_decl(CPROVER_PREFIX+id2string(symbol.name), symbol.type)
+            << ";\n";
   }
 
   // make sure typedef names used in the function declaration are
@@ -1323,11 +1401,17 @@ void dump_c(
   const goto_functionst &src,
   const bool use_system_headers,
   const bool use_all_headers,
+  const bool include_harness,
   const namespacet &ns,
   std::ostream &out)
 {
   dump_ct goto2c(
-    src, use_system_headers, use_all_headers, ns, new_ansi_c_language);
+    src,
+    use_system_headers,
+    use_all_headers,
+    include_harness,
+    ns,
+    new_ansi_c_language);
   out << goto2c;
 }
 
@@ -1335,10 +1419,16 @@ void dump_cpp(
   const goto_functionst &src,
   const bool use_system_headers,
   const bool use_all_headers,
+  const bool include_harness,
   const namespacet &ns,
   std::ostream &out)
 {
   dump_ct goto2cpp(
-    src, use_system_headers, use_all_headers, ns, new_cpp_language);
+    src,
+    use_system_headers,
+    use_all_headers,
+    include_harness,
+    ns,
+    new_cpp_language);
   out << goto2cpp;
 }

@@ -379,7 +379,7 @@ bool compilet::link()
       output_file_executable, symbol_table, compiled_functions))
     return true;
 
-  return false;
+  return add_written_cprover_symbols(symbol_table);
 }
 
 /// parses source files and writes object files, or keeps the symbols in the
@@ -428,6 +428,9 @@ bool compilet::compile()
         cfn=output_file_object;
 
       if(write_object_file(cfn, symbol_table, compiled_functions))
+        return true;
+
+      if(add_written_cprover_symbols(symbol_table))
         return true;
 
       symbol_table.clear(); // clean symbol table for next source file.
@@ -616,6 +619,7 @@ bool compilet::write_bin_object_file(
                << "; " << cnt << " have a body." << eom;
 
   outfile.close();
+  wrote_object=true;
 
   return false;
 }
@@ -650,6 +654,7 @@ compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
+  wrote_object=false;
   working_directory=get_current_working_directory();
 }
 
@@ -723,4 +728,29 @@ void compilet::convert_symbols(goto_functionst &dest)
       }
     }
   }
+}
+
+bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
+{
+  for(const auto &pair : symbol_table.symbols)
+  {
+    const irep_idt &name=pair.second.name;
+    const typet &new_type=pair.second.type;
+    if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
+      continue;
+
+    bool inserted;
+    std::map<irep_idt, symbolt>::iterator old;
+    std::tie(old, inserted)=written_macros.insert({name, pair.second});
+
+    if(!inserted && old->second.type!=new_type)
+    {
+      error() << "Incompatible CPROVER macro symbol types:" << eom
+              << old->second.type.pretty() << "(at " << old->second.location
+              << ")" << eom << "and" << eom << new_type.pretty()
+              << "(at " << pair.second.location << ")" << eom;
+      return true;
+    }
+  }
+  return false;
 }

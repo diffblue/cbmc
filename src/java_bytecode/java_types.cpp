@@ -67,7 +67,7 @@ typet java_boolean_type()
 
 reference_typet java_reference_type(const typet &subtype)
 {
-  return to_reference_type(reference_type(subtype));
+  return reference_type(subtype);
 }
 
 reference_typet java_lang_object_type()
@@ -246,11 +246,10 @@ typet java_type_from_string(const std::string &src)
           class_name[i]='.';
 
       std::string identifier="java::"+class_name;
+      symbol_typet symbol_type(identifier);
+      symbol_type.set(ID_C_base_name, class_name);
 
-      reference_typet result;
-      result.subtype()=symbol_typet(identifier);
-      result.subtype().set(ID_C_base_name, class_name);
-      return result;
+      return java_reference_type(symbol_type);
     }
 
   default:

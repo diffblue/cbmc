@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int myfunc(int x, int y)
 {
   int z = x + y;

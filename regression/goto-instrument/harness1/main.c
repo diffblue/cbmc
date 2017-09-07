@@ -1,0 +1,8 @@
+#include <assert.h>
+
+int main(int argc, char* argv[])
+{
+  assert(argc<2 || argv[1]!=0);
+
+  return 0;
+}

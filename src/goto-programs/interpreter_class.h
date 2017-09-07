@@ -161,12 +161,18 @@ protected:
   public:
     memory_cellt() :
     value(0),
-    initialized(0)
+    initialized(initializedt::UNKNOWN)
     {}
     mp_integer value;
     // Initialized is annotated even during reads
+    enum class initializedt
+    {
+      UNKNOWN,
+      WRITTEN_BEFORE_READ,
+      READ_BEFORE_WRITTEN
+    };
     // Set to 1 when written-before-read, -1 when read-before-written
-    mutable char initialized;
+    mutable initializedt initialized;
   };
 
   typedef sparse_vectort<memory_cellt> memoryt;
@@ -210,19 +216,19 @@ protected:
   void clear_input_flags();
 
   void allocate(
-    mp_integer address,
+    const mp_integer &address,
     size_t size);
 
   void assign(
-    mp_integer address,
+    const mp_integer &address,
     const mp_vectort &rhs);
 
   void read(
-    mp_integer address,
+    const mp_integer &address,
     mp_vectort &dest) const;
 
   void read_unbounded(
-    mp_integer address,
+    const mp_integer &address,
     mp_vectort &dest) const;
 
   virtual void command();
@@ -273,12 +279,12 @@ protected:
 
   bool byte_offset_to_memory_offset(
     const typet &source_type,
-    mp_integer byte_offset,
+    const mp_integer &byte_offset,
     mp_integer &result);
 
   bool memory_offset_to_byte_offset(
     const typet &source_type,
-    mp_integer cell_offset,
+    const mp_integer &cell_offset,
     mp_integer &result);
 
   void evaluate(

@@ -296,12 +296,12 @@ signedbv_typet pointer_diff_type()
 
 pointer_typet pointer_type(const typet &subtype)
 {
-  return pointer_typet(subtype);
+  return pointer_typet(subtype, config.ansi_c.pointer_width);
 }
 
 reference_typet reference_type(const typet &subtype)
 {
-  return reference_typet(subtype);
+  return reference_typet(subtype, config.ansi_c.pointer_width);
 }
 
 typet void_type()

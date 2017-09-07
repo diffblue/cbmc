@@ -1853,7 +1853,8 @@ std::string expr2ct::convert_constant(
       // ANSI-C: double is default; float/long-double require annotation
       if(src.type()==float_type())
         dest+='f';
-      else if(src.type()==long_double_type())
+      else if(src.type()==long_double_type() &&
+              double_type()!=long_double_type())
         dest+='l';
     }
     else if(dest.size()==4 &&

@@ -13,6 +13,7 @@ SRC = armcc_cmdline.cpp \
       goto_cc_main.cpp \
       goto_cc_mode.cpp \
       ld_cmdline.cpp \
+      linker_script_merge.cpp \
       ms_cl_cmdline.cpp \
       ms_cl_mode.cpp \
       # Empty last line

@@ -2635,11 +2635,6 @@ public:
   {
   }
 
-  address_of_exprt():
-    unary_exprt(ID_address_of, pointer_typet())
-  {
-  }
-
   exprt &object()
   {
     return op0();

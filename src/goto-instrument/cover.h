@@ -30,7 +30,7 @@ public:
     const irep_idt &mode);
   void add_goal(source_locationt goal);
   bool is_existing_goal(source_locationt source_loc);
-  void check_uncovered_goals(messaget &msg);
+  void check_existing_goals(messaget &msg);
 
 private:
   std::map<source_locationt, bool> existing_goals;
@@ -49,26 +49,31 @@ void instrument_cover_goals(
   const symbol_tablet &,
   goto_functionst &,
   coverage_criteriont,
+  message_handlert &message_handler,
   bool function_only=false);
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_programt &,
   coverage_criteriont,
+  message_handlert &message_handler,
   bool function_only=false);
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_functionst &,
   coverage_criteriont,
+  message_handlert &message_handler,
   coverage_goalst &,
   bool function_only=false,
-  bool ignore_trivial=false);
+  bool ignore_trivial=false,
+  const std::string &cover_inclue_pattern="");
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_programt &,
   coverage_criteriont,
+  message_handlert &message_handler,
   coverage_goalst &goals,
   bool function_only=false,
   bool ignore_trivial=false);

@@ -51,10 +51,12 @@ inline void siglongjmp(sigjmp_buf env, int val)
 #define __CPROVER_SETJMP_H_INCLUDED
 #endif
 
+int __VERIFIER_nondet_int();
+
 inline int setjmp(jmp_buf env)
 {
   // store PC
-  int retval;
+  int retval=__VERIFIER_nondet_int();
   (void)env;
   return retval;
 }

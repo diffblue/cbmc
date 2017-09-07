@@ -160,6 +160,8 @@ install:
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src boost-download" &&
     eval ${PRE_COMMAND} ${COMMAND}
+  - COMMAND="make -C src/ansi-c library_check" &&
+    eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"-Wall -Werror -pedantic -O2 -g -DUSE_BOOST $EXTRA_CXXFLAGS\" -j2" &&
     eval ${PRE_COMMAND} ${COMMAND}
   - COMMAND="make -C src CXX=\"$COMPILER\" CXXFLAGS=\"$FLAGS $EXTRA_CXXFLAGS\" -j2 clobber.dir memory-models.dir musketeer.dir" &&
