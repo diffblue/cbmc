@@ -130,11 +130,21 @@ public:
 
 template <typename T>
 // NOLINTNEXTLINE(readability/identifiers)
-class union_find:public numbering<T>
+class union_find final
 {
+  typedef numbering<T> numbering_typet;
+  numbering_typet numbers;
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename numbering_typet::number_type number_type;
+
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering<T>::size_type size_type;
+  typedef typename numbering_typet::size_type size_type;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename numbering_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef typename numbering_typet::const_iterator const_iterator;
 
   // true == already in same set
   bool make_union(const T &a, const T &b)
@@ -149,7 +159,7 @@ public:
   bool make_union(typename numbering<T>::const_iterator it_a,
                   typename numbering<T>::const_iterator it_b)
   {
-    size_type na=it_a-numbering<T>::begin(), nb=it_b-numbering<T>::begin();
+    size_type na=it_a-numbers.begin(), nb=it_b-numbers.begin();
     bool is_union=find_number(na)==find_number(nb);
     uuf.make_union(na, nb);
     return is_union;
@@ -158,10 +168,9 @@ public:
   // are 'a' and 'b' in the same set?
   bool same_set(const T &a, const T &b) const
   {
-    typedef typename subt::number_type subt_number_typet;
-    subt_number_typet na=subt_number_typet(), nb=subt_number_typet();
-    bool have_na=!subt::get_number(a, na),
-         have_nb=!subt::get_number(b, nb);
+    number_type na, nb;
+    bool have_na=!numbers.get_number(a, na),
+         have_nb=!numbers.get_number(b, nb);
 
     if(have_na && have_nb)
       return uuf.same_set(na, nb);
@@ -175,22 +184,22 @@ public:
   bool same_set(typename numbering<T>::const_iterator it_a,
                 typename numbering<T>::const_iterator it_b) const
   {
-    return uuf.same_set(it_a-numbering<T>::begin(), it_b-numbering<T>::begin());
+    return uuf.same_set(it_a-numbers.begin(), it_b-numbers.begin());
   }
 
   const T &find(typename numbering<T>::const_iterator it) const
   {
-    return numbering<T>::operator[](find_number(it-numbering<T>::begin()));
+    return numbers[find_number(it-numbers.begin())];
   }
 
   const T &find(const T &a)
   {
-    return numbering<T>::operator[](find_number(number(a)));
+    return numbers[find_number(number(a))];
   }
 
   size_type find_number(typename numbering<T>::const_iterator it) const
   {
-    return find_number(it-numbering<T>::begin());
+    return find_number(it-numbers.begin());
   }
 
   size_type find_number(size_type a) const
@@ -210,9 +219,8 @@ public:
 
   bool is_root(const T &a) const
   {
-    typename subt::number_type na;
-
-    if(subt::get_number(a, na))
+    number_type na;
+    if(numbers.get_number(a, na))
       return true; // not found, it's a root
     else
       return uuf.is_root(na);
@@ -220,36 +228,54 @@ public:
 
   bool is_root(typename numbering<T>::const_iterator it) const
   {
-    return uuf.is_root(it-numbering<T>::begin());
+    return uuf.is_root(it-numbers.begin());
   }
 
   size_type number(const T &a)
   {
-    size_type n=subt::number(a);
+    size_type n=numbers.number(a);
 
     if(n>=uuf.size())
-      uuf.resize(this->size());
+      uuf.resize(numbers.size());
 
-    assert(uuf.size()==this->size());
+    INVARIANT(uuf.size()==numbers.size(), "container sizes must match");
 
     return n;
   }
 
   void clear()
   {
-    subt::clear();
+    numbers.clear();
     uuf.clear();
   }
 
   void isolate(typename numbering<T>::const_iterator it)
   {
-    uuf.isolate(it-numbering<T>::begin());
+    uuf.isolate(it-numbers.begin());
   }
 
   void isolate(const T &a)
   {
     uuf.isolate(number(a));
   }
+
+  bool get_number(const T &a, number_type &n) const
+  {
+    return numbers.get_number(a, n);
+  }
+
+  size_t size() const { return numbers.size(); }
+
+  T &operator[](size_type t) { return numbers[t]; }
+  const T &operator[](size_type t) const { return numbers[t]; }
+
+  iterator begin() { return numbers.begin(); }
+  const_iterator begin() const { return numbers.begin(); }
+  const_iterator cbegin() const { return numbers.cbegin(); }
+
+  iterator end() { return numbers.end(); }
+  const_iterator end() const { return numbers.end(); }
+  const_iterator cend() const { return numbers.cend(); }
 
 protected:
   unsigned_union_find uuf;

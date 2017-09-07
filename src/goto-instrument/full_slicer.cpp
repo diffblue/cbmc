@@ -382,6 +382,13 @@ void full_slicer(
   full_slicert()(goto_functions, ns, a);
 }
 
+void full_slicer(goto_modelt &goto_model)
+{
+  assert_criteriont a;
+  const namespacet ns(goto_model.symbol_table);
+  full_slicert()(goto_model.goto_functions, ns, a);
+}
+
 void property_slicer(
   goto_functionst &goto_functions,
   const namespacet &ns,
@@ -389,6 +396,14 @@ void property_slicer(
 {
   properties_criteriont p(properties);
   full_slicert()(goto_functions, ns, p);
+}
+
+void property_slicer(
+  goto_modelt &goto_model,
+  const std::list<std::string> &properties)
+{
+  const namespacet ns(goto_model.symbol_table);
+  property_slicer(goto_model.goto_functions, ns, properties);
 }
 
 slicing_criteriont::~slicing_criteriont()

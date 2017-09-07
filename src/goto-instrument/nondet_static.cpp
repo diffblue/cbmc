@@ -19,6 +19,7 @@ Date: November 2011
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/goto_functions.h>
 
 void nondet_static(
@@ -70,7 +71,6 @@ void nondet_static(
   }
 }
 
-
 void nondet_static(
   const namespacet &ns,
   goto_functionst &goto_functions)
@@ -79,4 +79,10 @@ void nondet_static(
 
   // update counters etc.
   goto_functions.update();
+}
+
+void nondet_static(goto_modelt &goto_model)
+{
+  const namespacet ns(goto_model.symbol_table);
+  nondet_static(ns, goto_model.goto_functions);
 }

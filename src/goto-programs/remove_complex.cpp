@@ -24,7 +24,7 @@ static exprt complex_member(const exprt &expr, irep_idt id)
     else if(id==ID_imag)
       return expr.op1();
     else
-      assert(false);
+      UNREACHABLE;
   }
   else
   {

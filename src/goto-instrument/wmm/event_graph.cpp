@@ -1427,7 +1427,7 @@ std::string event_grapht::critical_cyclet::print_name(
 
   if(first_done)
   {
-    critical_cyclet::size_type n_events=extra_fence_count;
+    auto n_events=extra_fence_count;
     for(std::string::const_iterator it=name.begin();
         it!=name.end();
         ++it)

@@ -129,6 +129,8 @@ bool ansi_c_languaget::final(
   symbol_tablet &symbol_table,
   bool generate_start_function)
 {
+  generate_opaque_method_stubs(symbol_table);
+
   if(generate_start_function)
   {
     if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
@@ -143,9 +145,9 @@ void ansi_c_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-languaget *new_ansi_c_language()
+std::unique_ptr<languaget> new_ansi_c_language()
 {
-  return new ansi_c_languaget;
+  return util_make_unique<ansi_c_languaget>();
 }
 
 bool ansi_c_languaget::from_expr(

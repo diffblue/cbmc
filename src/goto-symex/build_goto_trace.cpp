@@ -109,6 +109,67 @@ exprt adjust_lhs_object(
   return nil_exprt();
 }
 
+/// set internal field for variable assignment related to dynamic_object[0-9]
+/// and dynamic_[0-9]_array.
+void set_internal_dynamic_object(
+  const exprt &expr,
+  goto_trace_stept &goto_trace_step,
+  const namespacet &ns)
+{
+  if(expr.id()==ID_symbol)
+  {
+    const irep_idt &id=to_ssa_expr(expr).get_original_name();
+    const symbolt *symbol;
+    if(!ns.lookup(id, symbol))
+    {
+      bool result=symbol->type.get_bool("#dynamic");
+      if(result)
+        goto_trace_step.internal=true;
+    }
+  }
+  else
+  {
+    forall_operands(it, expr)
+      set_internal_dynamic_object(*it, goto_trace_step, ns);
+  }
+}
+
+/// set internal for variables assignments related to dynamic_object and CPROVER
+/// internal functions (e.g., __CPROVER_initialize)
+void update_internal_field(
+  const symex_target_equationt::SSA_stept &SSA_step,
+  goto_trace_stept &goto_trace_step,
+  const namespacet &ns)
+{
+  // set internal for dynamic_object in both lhs and rhs expressions
+  set_internal_dynamic_object(SSA_step.ssa_lhs, goto_trace_step, ns);
+  set_internal_dynamic_object(SSA_step.ssa_rhs, goto_trace_step, ns);
+
+  // set internal field to CPROVER functions (e.g., __CPROVER_initialize)
+  if(SSA_step.is_function_call())
+  {
+    if(SSA_step.source.pc->source_location.as_string().empty())
+      goto_trace_step.internal=true;
+  }
+
+  // set internal field to input and output steps
+  if(goto_trace_step.type==goto_trace_stept::typet::OUTPUT ||
+      goto_trace_step.type==goto_trace_stept::typet::INPUT)
+  {
+    goto_trace_step.internal=true;
+  }
+
+  // set internal field to _start function-return step
+  if(SSA_step.source.pc->function==goto_functionst::entry_point())
+  {
+    // "__CPROVER_*" function calls in __CPROVER_start are already marked as
+    // internal. Don't mark any other function calls (i.e. "main"), function
+    // arguments or any other parts of a code_function_callt as internal.
+    if(SSA_step.source.pc->code.get_statement()!=ID_function_call)
+      goto_trace_step.internal=true;
+  }
+}
+
 void build_goto_trace(
   const symex_target_equationt &target,
   symex_target_equationt::SSA_stepst::const_iterator end_step,
@@ -215,6 +276,9 @@ void build_goto_trace(
     goto_trace_step.io_id=SSA_step.io_id;
     goto_trace_step.formatted=SSA_step.formatted;
     goto_trace_step.identifier=SSA_step.identifier;
+
+    // update internal field for specific variables in the counterexample
+    update_internal_field(SSA_step, goto_trace_step, ns);
 
     goto_trace_step.assignment_type=
       (it->is_assignment()&&

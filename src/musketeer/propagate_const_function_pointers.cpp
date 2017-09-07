@@ -114,12 +114,25 @@ protected:
     unsigned stack_scope);
 
   /* to keep track of the constant function pointers passed as arguments */
-  class arg_stackt: public std::set<irep_idt>
+  class arg_stackt final
   {
-  protected:
+    typedef std::set<irep_idt> data_typet;
+    data_typet data;
     const_function_pointer_propagationt &cfpp;
 
   public:
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::iterator iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::const_iterator const_iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::value_type value_type;
+
+    std::pair<iterator, bool> insert(const value_type &t)
+    {
+      return data.insert(t);
+    }
+
     explicit arg_stackt(const_function_pointer_propagationt &_cfpp):
       cfpp(_cfpp)
     {}
@@ -415,7 +428,7 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
 void const_function_pointer_propagationt::arg_stackt::remove_args()
 {
   /* remove the parameter names */
-  for(const_iterator arg_it=begin(); arg_it!=end(); ++arg_it)
+  for(const_iterator arg_it=data.begin(); arg_it!=data.end(); ++arg_it)
   {
     cfpp.remove(*arg_it);
     cfpp.message.debug() << "SET: remove " << *arg_it << messaget::eom;

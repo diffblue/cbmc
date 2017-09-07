@@ -511,7 +511,7 @@ void symex_target_equationt::convert_assertions(
         prop_conv.set_to_true(step.cond_expr);
     }
 
-    assert(false); // unreachable
+    UNREACHABLE; // unreachable
   }
 
   // We do (NOT a1) OR (NOT a2) ...
@@ -695,7 +695,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::typet::GOTO:
     out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
 
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())

@@ -1,6 +1,6 @@
 FUTURE
 StringBuilderChars05.class
---string-refine --unwind 100
+--refine-strings --unwind 100
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

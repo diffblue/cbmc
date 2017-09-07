@@ -31,6 +31,9 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   queue.push("java.lang.String");
   // add java.lang.Class
   queue.push("java.lang.Class");
+  // Require java.lang.Throwable as the catch-type used for
+  // universal exception handlers:
+  queue.push("java.lang.Throwable");
   queue.push(class_name);
 
   java_class_loader_limitt class_loader_limit(
@@ -65,7 +68,6 @@ void java_class_loadert::set_java_cp_include_files(
   std::string &_java_cp_include_files)
 {
   java_cp_include_files=_java_cp_include_files;
-  jar_pool.set_message_handler(get_message_handler());
 }
 
 java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
@@ -185,25 +187,27 @@ void java_class_loadert::read_jar_file(
   if(jar_map.find(file)!=jar_map.end())
     return;
 
-  jar_filet &jar_file=jar_pool(class_loader_limit, id2string(file));
-
-  if(!jar_file)
+  std::vector<std::string> filenames;
+  try
+  {
+    filenames=this->jar_pool(class_loader_limit, id2string(file)).filenames();
+  }
+  catch(const std::runtime_error &)
   {
     error() << "failed to open JAR file `" << file << "'" << eom;
     return;
   }
-
   debug() << "adding JAR file `" << file << "'" << eom;
 
+  // create a new entry in the map and initialize using the list of file names
+  // that were retained in the jar_filet by the class_loader_limit filter
   auto &jm=jar_map[file];
-
-  for(auto &jar_entry : jar_file.filtered_jar)
+  for(auto &file_name : filenames)
   {
-    std::string file_name=id2string(jar_entry.first);
-
     // does it end on .class?
     if(has_suffix(file_name, ".class"))
     {
+      status() << "read class file " << file_name << " from " << file << eom;
       irep_idt class_name=file_to_class_name(file_name);
 
       // record
@@ -258,4 +262,19 @@ std::string java_class_loadert::class_name_to_file(const irep_idt &class_name)
   result+=".class";
 
   return result;
+}
+
+jar_filet &java_class_loadert::jar_pool(
+  java_class_loader_limitt &class_loader_limit,
+  const std::string &file_name)
+{
+  const auto it=m_archives.find(file_name);
+  if(it==m_archives.end())
+  {
+    // VS: Can't construct in place
+    auto file=jar_filet(class_loader_limit, file_name);
+    return m_archives.emplace(file_name, std::move(file)).first->second;
+  }
+  else
+    return it->second;
 }

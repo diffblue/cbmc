@@ -35,6 +35,7 @@ public:
   void swap(call_grapht &other);
 
   void add(const irep_idt &caller, const irep_idt &callee);
+  call_grapht get_inverted() const;
 
   /**
    * The type provides a mapping from edges of the call-graph to particular

@@ -1,0 +1,8 @@
+FUTURE
+test_init.class
+--refine-strings
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+cbmc/test-gen#259

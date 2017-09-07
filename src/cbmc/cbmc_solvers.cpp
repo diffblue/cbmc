@@ -11,14 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_solvers.h"
 
-#include <memory>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <memory>
 
 #include <util/unicode.h>
+#include <util/make_unique.h>
 
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/bv_refinement.h>
+#include <solvers/refinement/string_refinement.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <solvers/cvc/cvc_dec.h>
@@ -86,81 +88,111 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
   return s;
 }
 
-/// Get the default decision procedure
-cbmc_solverst::solvert* cbmc_solverst::get_default()
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_default()
 {
-  solvert *solver=new solvert;
+  auto solver=util_make_unique<solvert>();
 
   if(options.get_bool_option("beautify") ||
      !options.get_bool_option("sat-preprocessor")) // no simplifier
   {
     // simplifier won't work with beautification
-    solver->set_prop(new satcheck_no_simplifiert());
+    solver->set_prop(util_make_unique<satcheck_no_simplifiert>());
   }
   else // with simplifier
   {
-    solver->set_prop(new satcheckt());
+    solver->set_prop(util_make_unique<satcheckt>());
   }
 
   solver->prop().set_message_handler(get_message_handler());
 
-  bv_cbmct *bv_cbmc=new bv_cbmct(ns, solver->prop());
+  auto bv_cbmc=util_make_unique<bv_cbmct>(ns, solver->prop());
 
   if(options.get_option("arrays-uf")=="never")
     bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf")=="always")
     bv_cbmc->unbounded_array=bv_cbmct::unbounded_arrayt::U_ALL;
 
-  solver->set_prop_conv(bv_cbmc);
+  solver->set_prop_conv(std::move(bv_cbmc));
 
   return solver;
 }
 
-cbmc_solverst::solvert* cbmc_solverst::get_dimacs()
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_dimacs()
 {
   no_beautification();
   no_incremental_check();
 
-  dimacs_cnft *prop=new dimacs_cnft();
+  auto prop=util_make_unique<dimacs_cnft>();
   prop->set_message_handler(get_message_handler());
 
   std::string filename=options.get_option("outfile");
 
-  return new solvert(new cbmc_dimacst(ns, *prop, filename), prop);
+  auto cbmc_dimacs=util_make_unique<cbmc_dimacst>(ns, *prop, filename);
+  return util_make_unique<solvert>(std::move(cbmc_dimacs), std::move(prop));
 }
 
-cbmc_solverst::solvert* cbmc_solverst::get_bv_refinement()
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
 {
-  propt *prop;
-
-  // We offer the option to disable the SAT preprocessor
-  if(options.get_bool_option("sat-preprocessor"))
+  std::unique_ptr<propt> prop=[this]() -> std::unique_ptr<propt>
   {
-    no_beautification();
-    prop=new satcheckt();
-  }
-  else
-    prop=new satcheck_no_simplifiert();
+    // We offer the option to disable the SAT preprocessor
+    if(options.get_bool_option("sat-preprocessor"))
+    {
+      no_beautification();
+      return util_make_unique<satcheckt>();
+    }
+    return util_make_unique<satcheck_no_simplifiert>();
+  }();
 
   prop->set_message_handler(get_message_handler());
 
-  bv_refinementt *bv_refinement=new bv_refinementt(ns, *prop);
-  bv_refinement->set_ui(ui);
+  bv_refinementt::infot info;
+  info.ns=&ns;
+  info.prop=prop.get();
+  info.ui=ui;
 
   // we allow setting some parameters
-  if(options.get_option("max-node-refinement")!="")
-    bv_refinement->max_node_refinement =
+  if(options.get_bool_option("max-node-refinement"))
+    info.max_node_refinement=
       options.get_unsigned_int_option("max-node-refinement");
 
-  bv_refinement->do_array_refinement =
-    options.get_bool_option("refine-arrays");
-  bv_refinement->do_arithmetic_refinement =
-    options.get_bool_option("refine-arithmetic");
+  info.refine_arrays=options.get_bool_option("refine-arrays");
+  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
 
-  return new solvert(bv_refinement, prop);
+  return util_make_unique<solvert>(
+    util_make_unique<bv_refinementt>(info),
+    std::move(prop));
 }
 
-cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
+/// the string refinement adds to the bit vector refinement specifications for
+/// functions from the Java string library
+/// \return a solver for cbmc
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
+{
+  string_refinementt::infot info;
+  info.ns=&ns;
+  auto prop=util_make_unique<satcheck_no_simplifiert>();
+  prop->set_message_handler(get_message_handler());
+  info.prop=prop.get();
+  info.refinement_bound=MAX_NB_REFINEMENT;
+  info.ui=ui;
+  if(options.get_bool_option("string-max-length"))
+    info.string_max_length=options.get_signed_int_option("string-max-length");
+  info.string_non_empty=options.get_bool_option("string-non-empty");
+  info.trace=options.get_bool_option("trace");
+  info.string_printable=options.get_bool_option("string-printable");
+  if(options.get_bool_option("max-node-refinement"))
+    info.max_node_refinement=
+      options.get_unsigned_int_option("max-node-refinement");
+  info.refine_arrays=options.get_bool_option("refine-arrays");
+  info.refine_arithmetic=options.get_bool_option("refine-arithmetic");
+
+  return util_make_unique<solvert>(
+    util_make_unique<string_refinementt>(info), std::move(prop));
+}
+
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt1(
+  smt1_dect::solvert solver)
 {
   no_beautification();
   no_incremental_check();
@@ -175,20 +207,20 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
       throw 0;
     }
 
-    smt1_dect *smt1_dec=
-      new smt1_dect(
+    auto smt1_dec=
+      util_make_unique<smt1_dect>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
         "QF_AUFBV",
         solver);
 
-    return new solvert(smt1_dec);
+    return util_make_unique<solvert>(std::move(smt1_dec));
   }
   else if(filename=="-")
   {
-    smt1_convt *smt1_conv=
-      new smt1_convt(
+    auto smt1_conv=
+      util_make_unique<smt1_convt>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
@@ -198,14 +230,14 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
 
     smt1_conv->set_message_handler(get_message_handler());
 
-    return new solvert(smt1_conv);
+    return util_make_unique<solvert>(std::move(smt1_conv));
   }
   else
   {
     #ifdef _MSC_VER
-    std::ofstream *out=new std::ofstream(widen(filename));
+    auto out=util_make_unique<std::ofstream>(widen(filename));
     #else
-    std::ofstream *out=new std::ofstream(filename);
+    auto out=util_make_unique<std::ofstream>(filename);
     #endif
 
     if(!out)
@@ -214,8 +246,8 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
       throw 0;
     }
 
-    smt1_convt *smt1_conv=
-      new smt1_convt(
+    auto smt1_conv=
+      util_make_unique<smt1_convt>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
@@ -225,11 +257,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt1(smt1_dect::solvert solver)
 
     smt1_conv->set_message_handler(get_message_handler());
 
-    return new solvert(smt1_conv, out);
+    return util_make_unique<solvert>(std::move(smt1_conv), std::move(out));
   }
 }
 
-cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
+std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_smt2(
+  smt2_dect::solvert solver)
 {
   no_beautification();
 
@@ -243,8 +276,8 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
       throw 0;
     }
 
-    smt2_dect *smt2_dec=
-      new smt2_dect(
+    auto smt2_dec=
+      util_make_unique<smt2_dect>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
@@ -254,12 +287,12 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory=true;
 
-    return new solvert(smt2_dec);
+    return util_make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename=="-")
   {
-    smt2_convt *smt2_conv=
-      new smt2_convt(
+    auto smt2_conv=
+      util_make_unique<smt2_convt>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
@@ -272,14 +305,14 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 
     smt2_conv->set_message_handler(get_message_handler());
 
-    return new solvert(smt2_conv);
+    return util_make_unique<solvert>(std::move(smt2_conv));
   }
   else
   {
     #ifdef _MSC_VER
-    std::ofstream *out=new std::ofstream(widen(filename));
+    auto out=util_make_unique<std::ofstream>(widen(filename));
     #else
-    std::ofstream *out=new std::ofstream(filename);
+    auto out=util_make_unique<std::ofstream>(filename);
     #endif
 
     if(!*out)
@@ -288,8 +321,8 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
       throw 0;
     }
 
-    smt2_convt *smt2_conv=
-      new smt2_convt(
+    auto smt2_conv=
+      util_make_unique<smt2_convt>(
         ns,
         "cbmc",
         "Generated by CBMC " CBMC_VERSION,
@@ -302,7 +335,7 @@ cbmc_solverst::solvert* cbmc_solverst::get_smt2(smt2_dect::solvert solver)
 
     smt2_conv->set_message_handler(get_message_handler());
 
-    return new solvert(smt2_conv, out);
+    return util_make_unique<solvert>(std::move(smt2_conv), std::move(out));
   }
 }
 

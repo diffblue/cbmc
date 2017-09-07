@@ -1,6 +1,6 @@
 FUTURE
 StringMiscellaneous01.class
---string-refine --unwind 30
+--refine-strings --unwind 30
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

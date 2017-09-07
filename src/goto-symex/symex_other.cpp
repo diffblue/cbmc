@@ -66,7 +66,7 @@ void goto_symext::symex_other(
   }
   else if(statement==ID_decl)
   {
-    assert(false); // see symex_decl.cpp
+    UNREACHABLE; // see symex_decl.cpp
   }
   else if(statement==ID_nondet)
   {

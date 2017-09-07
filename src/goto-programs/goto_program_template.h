@@ -45,7 +45,7 @@ enum goto_program_instruction_typet
   DEAD=15,          // marks the end-of-live of a local variable
   FUNCTION_CALL=16, // call a function
   THROW=17,         // throw an exception
-  CATCH=18          // catch an exception
+  CATCH=18          // push, pop or enter an exception handler
 };
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
@@ -197,6 +197,11 @@ public:
     {
       targets.clear();
       targets.push_back(t);
+    }
+
+    bool has_target() const
+    {
+      return !targets.empty();
     }
 
     /// Goto target labels

@@ -28,6 +28,10 @@ xmlt xml(const source_locationt &location)
 
   result.name="location";
 
+  if(!location.get_working_directory().empty())
+    result.set_attribute(
+      "working-directory", id2string(location.get_working_directory()));
+
   if(!location.get_file().empty())
     result.set_attribute("file", id2string(location.get_file()));
 

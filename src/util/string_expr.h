@@ -53,59 +53,59 @@ public:
   }
 
   // Comparison on the length of the strings
-  binary_relation_exprt axiom_for_is_longer_than(
+  binary_relation_exprt axiom_for_length_ge(
     const string_exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_ge, rhs.length());
   }
 
-  binary_relation_exprt axiom_for_is_longer_than(
+  binary_relation_exprt axiom_for_length_ge(
     const exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_ge, rhs);
   }
 
-  binary_relation_exprt axiom_for_is_strictly_longer_than(
+  binary_relation_exprt axiom_for_length_gt(
     const exprt &rhs) const
   {
     return binary_relation_exprt(rhs, ID_lt, length());
   }
 
-  binary_relation_exprt axiom_for_is_strictly_longer_than(
+  binary_relation_exprt axiom_for_length_gt(
     const string_exprt &rhs) const
   {
     return binary_relation_exprt(rhs.length(), ID_lt, length());
   }
 
-  binary_relation_exprt axiom_for_is_strictly_longer_than(int i) const
+  binary_relation_exprt axiom_for_length_gt(mp_integer i) const
   {
-    return axiom_for_is_strictly_longer_than(from_integer(i, length().type()));
+    return axiom_for_length_gt(from_integer(i, length().type()));
   }
 
-  binary_relation_exprt axiom_for_is_shorter_than(
+  binary_relation_exprt axiom_for_length_le(
     const string_exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_le, rhs.length());
   }
 
-  binary_relation_exprt axiom_for_is_shorter_than(
+  binary_relation_exprt axiom_for_length_le(
     const exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_le, rhs);
   }
 
-  binary_relation_exprt axiom_for_is_shorter_than(int i) const
+  binary_relation_exprt axiom_for_length_le(mp_integer i) const
   {
-    return axiom_for_is_shorter_than(from_integer(i, length().type()));
+    return axiom_for_length_le(from_integer(i, length().type()));
   }
 
-  binary_relation_exprt axiom_for_is_strictly_shorter_than(
+  binary_relation_exprt axiom_for_length_lt(
     const string_exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_lt, rhs.length());
   }
 
-  binary_relation_exprt axiom_for_is_strictly_shorter_than(
+  binary_relation_exprt axiom_for_length_lt(
     const exprt &rhs) const
   {
     return binary_relation_exprt(length(), ID_lt, rhs);
@@ -122,7 +122,7 @@ public:
     return equal_exprt(length(), rhs);
   }
 
-  equal_exprt axiom_for_has_length(int i) const
+  equal_exprt axiom_for_has_length(mp_integer i) const
   {
     return axiom_for_has_length(from_integer(i, length().type()));
   }
@@ -132,15 +132,15 @@ public:
 
 inline string_exprt &to_string_expr(exprt &expr)
 {
-  assert(expr.id()==ID_struct);
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.id()==ID_struct);
+  PRECONDITION(expr.operands().size()==2);
   return static_cast<string_exprt &>(expr);
 }
 
 inline const string_exprt &to_string_expr(const exprt &expr)
 {
-  assert(expr.id()==ID_struct);
-  assert(expr.operands().size()==2);
+  PRECONDITION(expr.id()==ID_struct);
+  PRECONDITION(expr.operands().size()==2);
   return static_cast<const string_exprt &>(expr);
 }
 

@@ -12,8 +12,10 @@ Author: Matt Lewis
 #ifndef CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 #define CPROVER_GOTO_INSTRUMENT_ACCELERATE_SCRATCH_PROGRAM_H
 
+#include <memory>
 #include <string>
 
+#include <util/make_unique.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
@@ -38,16 +40,11 @@ public:
     ns(symbol_table),
     equation(ns),
     symex(ns, symbol_table, equation),
-    satcheck(new satcheckt),
+    satcheck(util_make_unique<satcheckt>()),
     satchecker(ns, *satcheck),
     z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
     checker(&z3) // checker(&satchecker)
   {
-  }
-
-  ~scratch_programt()
-  {
-    delete satcheck;
   }
 
   void append(goto_programt::instructionst &instructions);
@@ -79,7 +76,7 @@ protected:
   symex_target_equationt equation;
   goto_symext symex;
 
-  propt *satcheck;
+  std::unique_ptr<propt> satcheck;
   bv_pointerst satchecker;
   smt2_dect z3;
   prop_convt *checker;

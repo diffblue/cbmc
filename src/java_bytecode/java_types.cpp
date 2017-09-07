@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <cctype>
 
+#include <util/prefix.h>
 #include <util/std_types.h>
 #include <util/c_types.h>
 #include <util/std_expr.h>
@@ -91,7 +92,7 @@ reference_typet java_array_type(const char subtype)
   case 'j': subtype_str="long"; break;
   case 'l': subtype_str="long"; break;
   case 'a': subtype_str="reference"; break;
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   irep_idt class_name="array["+subtype_str+"]";
@@ -101,6 +102,14 @@ reference_typet java_array_type(const char subtype)
   symbol_type.set(ID_C_element_type, java_type_from_char(subtype));
 
   return java_reference_type(symbol_type);
+}
+
+/// See above
+/// \par parameters: Struct tag 'tag'
+/// \return True if the given struct is a Java array
+bool is_java_array_tag(const irep_idt& tag)
+{
+  return has_prefix(id2string(tag), "java::array[");
 }
 
 bool is_reference_type(const char t)
@@ -122,7 +131,7 @@ typet java_type_from_char(char t)
   case 'd': return java_double_type();
   case 'z': return java_boolean_type();
   case 'a': return java_reference_type(void_typet());
-  default: assert(false); return nil_typet();
+  default: UNREACHABLE; return nil_typet();
   }
 }
 
@@ -304,4 +313,48 @@ symbol_typet java_classname(const std::string &id)
   symbol_type.set(ID_C_base_name, class_name);
 
   return symbol_type;
+}
+
+/// Programmatic documentation of the structure of a Java array (of either
+/// primitives or references) type.
+/// A Java array is represented in GOTO in the following way:
+/// A struct component with a tag like java::array[type] where type is either
+/// a primitive like int, or reference.
+/// The struct has precisely three components:
+/// 1. \@java.lang.Object: of type struct {java.lang.Object} containing the base
+///   class data
+/// 2. length: of type Java integer - the length of the array
+/// 3. data: of type pointer to either pointer to a primitive type, or pointer
+///   to pointer to empty (i.e. a void**) pointing to the contents of the array
+/// \param type: A type that might represent a Java array
+/// \return True if it is a Java array type, false otherwise
+bool is_valid_java_array(const struct_typet &type)
+{
+  bool correct_num_components=type.components().size()==3;
+  if(!correct_num_components)
+    return false;
+
+  // First component, the base class (Object) data
+  const struct_union_typet::componentt base_class_component=
+    type.components()[0];
+
+  bool base_component_valid=true;
+  base_component_valid&=base_class_component.get_name()=="@java.lang.Object";
+
+  bool length_component_valid=true;
+  const struct_union_typet::componentt length_component=
+    type.components()[1];
+  length_component_valid&=length_component.get_name()=="length";
+  length_component_valid&=length_component.type()==java_int_type();
+
+  bool data_component_valid=true;
+  const struct_union_typet::componentt data_component=
+    type.components()[2];
+  data_component_valid&=data_component.get_name()=="data";
+  data_component_valid&=data_component.type().id()==ID_pointer;
+
+  return correct_num_components &&
+    base_component_valid &&
+    length_component_valid &&
+    data_component_valid;
 }

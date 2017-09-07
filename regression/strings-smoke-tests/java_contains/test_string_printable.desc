@@ -1,0 +1,12 @@
+KNOWNBUG
+test_contains.class
+--refine-strings --string-max-length 100 --string-printable
+^EXIT=0$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 8.* SUCCESS$
+^\[.*assertion.2\].* line 9.* SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This should create a huge formula and run out of memory.
+Issue: https://github.com/diffblue/test-gen/issues/745

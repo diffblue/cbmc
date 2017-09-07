@@ -1,0 +1,7 @@
+KNOWNBUG
+test_equal_2.class
+--refine-strings --string-max-length 100 --string-max-length 100
+^EXIT=0$
+^SIGNAL=0$
+--
+https://github.com/diffblue/test-gen/issues/856

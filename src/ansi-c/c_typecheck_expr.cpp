@@ -77,7 +77,7 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
       else if(expr.id()==ID_minus)
         expr.id(ID_floatbv_minus);
       else
-        assert(false);
+        UNREACHABLE;
 
       expr.op2()=from_integer(0, unsigned_int_type());
     }
@@ -875,7 +875,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   else if(last_statement==ID_function_call)
   {
     // this is suspected to be dead
-    assert(false);
+    UNREACHABLE;
 
     // make the last statement an expression
 
@@ -2852,7 +2852,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
         else if(expr.id()==ID_bitxor)
           expr.id(ID_xor);
         else
-          assert(false);
+          UNREACHABLE;
         expr.type()=type0;
         return;
       }
@@ -3010,7 +3010,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     else
     {
       p_op=int_op=nullptr;
-      assert(false);
+      UNREACHABLE;
     }
 
     const typet &int_op_type=follow(int_op->type());

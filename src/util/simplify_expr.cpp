@@ -1539,7 +1539,7 @@ exprt simplify_exprt::bits2expr(
 
     mp_integer size;
     if(to_integer(array_type.size(), size))
-      assert(false);
+      UNREACHABLE;
     std::size_t n_el=integer2size_t(size);
 
     std::size_t el_size=

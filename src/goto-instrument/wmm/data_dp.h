@@ -48,11 +48,13 @@ struct datat
   }
 };
 
-class data_dpt:public std::set<datat>
+class data_dpt final
 {
-public:
+  typedef std::set<datat> data_typet;
+  data_typet data;
   unsigned class_nb;
 
+public:
   /* add this dependency in the structure */
   void dp_analysis(const abstract_eventt &read, const abstract_eventt &write);
   void dp_analysis(

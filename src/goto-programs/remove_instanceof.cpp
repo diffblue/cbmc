@@ -124,6 +124,7 @@ void remove_instanceoft::lower_instanceof(
     newinst->make_assignment();
     newinst->code=code_assignt(newsym.symbol_expr(), object_clsid);
     newinst->source_location=this_inst->source_location;
+    newinst->function=this_inst->function;
 
     // Insert the check instruction after the existing one.
     // This will briefly be ill-formed (use before def of

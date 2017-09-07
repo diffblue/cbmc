@@ -12,6 +12,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "java_bytecode_convert_method_class.h"
 
 #include "java_types.h"
+#include "java_utils.h"
 
 #include <util/arith_tools.h>
 #include <util/invariant.h>
@@ -58,8 +59,9 @@ struct procedure_local_cfg_baset<
     for(const auto &table_entry : method.exception_table)
     {
       auto findit=amap.find(table_entry.start_pc);
-      assert(findit!=amap.end() &&
-             "Exception table entry doesn't point to an instruction?");
+      INVARIANT(
+        findit!=amap.end(),
+        "Exception table entry doesn't point to an instruction?");
       for(; findit->first<table_entry.end_pc; ++findit)
       {
         // For now just assume any non-branch
@@ -145,7 +147,7 @@ struct is_predecessor_oft
   }
 };
 
-// Helper routines for the find-initialisers code below:
+// Helper routines for the find-initializers code below:
 
 /// See above
 /// `start`: Variable to find the predecessors of `predecessor_map`: Map from
@@ -190,9 +192,13 @@ static bool is_store_to_slot(
   else
   {
     // Store shorthands, like "store_0", "store_1"
-    assert(prevstatement[6]=='_' && prevstatement.size()==8);
+    INVARIANT(
+      prevstatement[6]=='_' && prevstatement.size()==8,
+      "expected store instruction looks like store_0, store_1...");
     std::string storeslot(1, prevstatement[7]);
-    assert(isdigit(storeslot[0]));
+    INVARIANT(
+      isdigit(storeslot[0]),
+      "store_? instructions should end in a digit");
     storeslotidx=safe_string2unsigned(storeslot);
   }
   return storeslotidx==slotidx;
@@ -207,7 +213,7 @@ static void maybe_add_hole(
   unsigned from,
   unsigned to)
 {
-  assert(to>=from);
+  PRECONDITION(to>=from);
   if(to!=from)
     var.holes.push_back({from, to-from});
 }
@@ -234,26 +240,35 @@ static void populate_variable_address_map(
         idx!=idxlim;
         ++idx)
     {
-      assert((!live_variable_at_address[idx]) && "Local variable table clash?");
+      INVARIANT(!live_variable_at_address[idx], "Local variable table clash?");
       live_variable_at_address[idx]=&*it;
     }
   }
 }
 
-/// Usually a live variable range begins with a store instruction initialising
+/// Populates the `predecessor_map` with a graph from local variable table
+/// entries to their predecessors (table entries which may flow together and
+/// thus may be considered the same live range).
+///
+/// Usually a live variable range begins with a store instruction initializing
 /// the relevant local variable slot, but instead of or in addition to this,
 /// control flow edges may exist from bytecode addresses that fall under a table
-/// entry which differs, but which has the same variable name and type
-/// descriptor. This indicates a split live range, and will be recorded in the
-/// predecessor map.
-/// \par parameters: `firstvar`-`varlimit`: range of local variable table
-///   entries to consider
-/// `live_variable_at_address`: map from bytecode address to table entry (drawn
-///   from firstvar-varlimit) live at that address
-/// `amap`: map from bytecode address to instructions
-/// \return Populates `predecessor_map` with a graph from local variable table
-///   entries to their predecessors (table entries which may flow together and
-///   thus may be considered the same live range).
+/// entry which differs (or which fall under no table entry at all), but which
+/// has the same variable name and type descriptor. This indicates a split live
+/// range, and will be recorded in the predecessor map.
+///
+/// \param firstvar:
+///   range of local variable table entries to consider
+/// \param varlimit:
+///   range of local variable table entries to consider
+/// \param live_variable_at_address:
+///   map from bytecode address to table entry (drawn from firstvar-varlimit)
+//    live at that address
+/// \param amap:
+///   map from bytecode address to instructions, this is the CFG of the java
+///   method
+/// \param [out] predecessor_map:
+///   the output of the function, populated as described above
 static void populate_predecessor_map(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
@@ -265,45 +280,78 @@ static void populate_predecessor_map(
   messaget msg(msg_handler);
   for(auto it=firstvar, itend=varlimit; it!=itend; ++it)
   {
-    // Parameters are irrelevant to us and shouldn't be changed:
-    if(it->var.start_pc==0)
+    // All entries of the "local_variable_table_with_holest" processed in this
+    // function concern the same Java Local Variable Table slot/register. This
+    // is because "find_initializers()" has already sorted them.
+    INVARIANT(
+      it->var.index==firstvar->var.index,
+      "all entries are for the same local variable slot");
+
+    // Parameters are irrelevant to us and shouldn't be changed. This is because
+    // they cannot have live predecessor ranges: they are initialized by the JVM
+    // and no other live variable range can flow into them.
+    if(it->is_parameter)
       continue;
+
+#ifdef DEBUG
+    msg.debug() << "jcm: ppm: processing var idx " << it->var.index
+                << " name '" << it->var.name << "' start-pc "
+                << it->var.start_pc << " len " << it->var.length
+                << "; holes " << it->holes.size() << messaget::eom;
+#endif
 
     // Find the last instruction within the live range:
     unsigned end_pc=it->var.start_pc+it->var.length;
     auto amapit=amap.find(end_pc);
-    assert(amapit!=amap.begin());
+    INVARIANT(
+      amapit!=amap.begin(),
+      "current bytecode shall not be the first");
     auto old_amapit=amapit;
     --amapit;
     if(old_amapit==amap.end())
     {
-      assert(
-        end_pc>amapit->first &&
+      INVARIANT(
+        end_pc>amapit->first,
         "Instruction live range doesn't align to instruction boundary?");
     }
 
-    // Find vartable entries that flow into this one:
+    // Find vartable entries that flow into this one. For unknown reasons this
+    // loop iterates backwards, walking back from the last bytecode in the live
+    // range of variable it to the first one. For each value of the iterator
+    // "amapit" we search for instructions that jump into amapit's address
+    // (predecessors)
     unsigned new_start_pc=it->var.start_pc;
     for(; amapit->first>=it->var.start_pc; --amapit)
     {
       for(auto pred : amapit->second.predecessors)
       {
+        // pred is the address (byecode offset) of a instruction that jumps into
+        // amapit. Compute now a pointer to the variable-with-holes whose index
+        // equals that of amapit and which was alive on instruction pred, or a
+        // null pointer if no such variable exists (e.g., because no live range
+        // covers that instruction)
         auto pred_var=
           (pred<live_variable_at_address.size() ?
            live_variable_at_address[pred] :
            nullptr);
+
+        // Three cases are now possible:
+        // 1. The predecessor instruction is in the same live range: nothing to
+        // do.
         if(pred_var==&*it)
         {
-          // Flow from within same live range?
           continue;
         }
+        // 2. The predecessor instruction is in no live range among those for
+        // variable slot it->var.index
         else if(!pred_var)
         {
-          // Flow from out of range?
-          // Check if this is an initialiser, and if so expand the live range
+          // Check if this is an initializer, and if so expand the live range
           // to include it, but don't check its predecessors:
           auto inst_before_this=amapit;
-          assert(inst_before_this!=amap.begin());
+          INVARIANT(
+            inst_before_this!=amap.begin(),
+            "we shall not be on the first bytecode of the method");
           --inst_before_this;
           if(amapit->first!=it->var.start_pc || inst_before_this->first!=pred)
           {
@@ -320,10 +368,17 @@ static void populate_predecessor_map(
                *(inst_before_this->second.source),
                it->var.index))
           {
-            throw "local variable table: didn't find initialising store";
+            msg.warning() << "Local variable table: didn't find initializing "
+                          << "store for predecessor of bytecode at address "
+                          << amapit->first << " ("
+                          << amapit->second.predecessors.size()
+                          << " predecessors)" << msg.eom;
+            throw "local variable table: unexpected live ranges";
           }
           new_start_pc=pred;
         }
+        // 3. Predecessor instruction is a different range associated to the
+        // same variable slot
         else
         {
           if(pred_var->var.name!=it->var.name ||
@@ -345,7 +400,7 @@ static void populate_predecessor_map(
       }
     }
 
-    // If a simple pre-block initialiser was found,
+    // If a simple pre-block initializer was found,
     // add it to the live range now:
     it->var.length+=(it->var.start_pc-new_start_pc);
     it->var.start_pc=new_start_pc;
@@ -356,7 +411,7 @@ static void populate_predecessor_map(
 /// variable live ranges.
 /// \par parameters: `merge_vars`: Set of variables we want the common dominator
 ///   for.
-/// `dominator_analysis`: Already-initialised dominator tree
+/// `dominator_analysis`: Already-initialized dominator tree
 /// \return Returns the bytecode address of the closest common dominator of all
 ///   given variable table entries. In the worst case the function entry point
 ///   should always satisfy this criterion.
@@ -364,7 +419,7 @@ static unsigned get_common_dominator(
   const std::set<local_variable_with_holest*> &merge_vars,
   const java_cfg_dominatorst &dominator_analysis)
 {
-  assert(!merge_vars.empty());
+  PRECONDITION(!merge_vars.empty());
 
   unsigned first_pc=UINT_MAX;
   for(auto v : merge_vars)
@@ -492,15 +547,15 @@ static void merge_variable_table_entries(
 /// Given a sequence of users of the same local variable slot, this figures out
 /// which ones are related by control flow, and combines them into a single
 /// entry with holes, such that after combination we can create a single
-/// declaration per variable table entry, placed at the live range's start
+/// GOTO variable per variable table entry, placed at the live range's start
 /// address, which may be moved back so that the declaration dominates all uses.
 /// \par parameters: `firstvar`-`varlimit`: sequence of variable table entries,
 ///   all of which should concern the same slot index.
 /// `amap`: Map from bytecode address to instruction
 /// \return Side-effect: merges variable table entries which flow into one
 ///   another (e.g. there are branches from one live range to another without
-///   re-initialising the local slot).
-void java_bytecode_convert_methodt::find_initialisers_for_slot(
+///   re-initializing the local slot).
+void java_bytecode_convert_methodt::find_initializers_for_slot(
   local_variable_table_with_holest::iterator firstvar,
   local_variable_table_with_holest::iterator varlimit,
   const address_mapt &amap,
@@ -513,7 +568,7 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
   populate_variable_address_map(firstvar, varlimit, live_variable_at_address);
 
   // Now find variables that flow together by
-  // walking backwards to find initialisers
+  // walking backwards to find initializers
   // or branches from other live ranges:
   predecessor_mapt predecessor_map;
   populate_predecessor_map(
@@ -556,7 +611,7 @@ void java_bytecode_convert_methodt::find_initialisers_for_slot(
       continue;
 
     const auto &merge_vars=findit->second;
-    assert(merge_vars.size()>=2);
+    INVARIANT(merge_vars.size()>=2, "merging requires at least 2 variables");
 
     merge_variable_table_entries(
       *merge_into,
@@ -591,13 +646,13 @@ static void walk_to_next_index(
   it1=old_it2;
 }
 
-/// See `find_initialisers_for_slot` above for more detail.
+/// See `find_initializers_for_slot` above for more detail.
 /// \par parameters: `vars`: Local variable table
 /// `amap`: Map from bytecode index to instruction
 /// `dominator_analysis`: Already computed dominator tree for the Java function
 ///   described by `amap`
 /// \return Combines entries in `vars` which flow together
-void java_bytecode_convert_methodt::find_initialisers(
+void java_bytecode_convert_methodt::find_initializers(
   local_variable_table_with_holest &vars,
   const address_mapt &amap,
   const java_cfg_dominatorst &dominator_analysis)
@@ -612,7 +667,7 @@ void java_bytecode_convert_methodt::find_initialisers(
   auto itend=vars.end();
   walk_to_next_index(it1, it2, itend);
   for(; it1!=itend; walk_to_next_index(it1, it2, itend))
-    find_initialisers_for_slot(it1, it2, amap, dominator_analysis);
+    find_initializers_for_slot(it1, it2, amap, dominator_analysis);
 }
 
 /// See above
@@ -640,7 +695,7 @@ static void cleanup_var_table(
   vars_with_holes.resize(vars_with_holes.size()-toremove);
 }
 
-/// See `find_initialisers_for_slot` above for more detail.
+/// See `find_initializers_for_slot` above for more detail.
 /// \par parameters: `m`: Java method
 /// `amap`: Map from bytecode indices to instructions in `m`
 /// \return Populates `this->vars_with_holes` equal to
@@ -655,14 +710,40 @@ void java_bytecode_convert_methodt::setup_local_variables(
   method_with_amapt dominator_args(m, amap);
   dominator_analysis(dominator_args);
 
+#ifdef DEBUG
+  debug() << "jcm: setup-local-vars: m.is_static "
+          << m.is_static << " m.signature " << m.signature << eom;
+  debug() << "jcm: setup-local-vars: lv arg slots "
+          << slots_for_parameters << eom;
+  debug() << "jcm: setup-local-vars: lvt size "
+          << m.local_variable_table.size() << eom;
+#endif
+
   // Find out which local variable table entries should be merged:
-  // Wrap each entry so we have somewhere to record live ranges with holes:
+  // Wrap each entry so we have a data structure to work during function calls,
+  // where we record live ranges with holes:
   std::vector<local_variable_with_holest> vars_with_holes;
   for(const auto &v : m.local_variable_table)
-    vars_with_holes.push_back({v, {}});
+    vars_with_holes.push_back({v, is_parameter(v), {}});
 
-  // Merge variable records:
-  find_initialisers(vars_with_holes, amap, dominator_analysis);
+  // Merge variable records. See documentation of in
+  // `find_initializers_for_slot` for more details. If the strategy employed
+  // there fails with an exception, we just ignore the LVT for this method, no
+  // variable is generated in `this->variables[]` (because we return here and
+  // dont let the for loop below to execute), and as a result the method
+  // this->variable() will be forced to create new `anonlocal::` variables, as
+  // the only source of variable names for that method is `this->variables[]`.
+  try
+  {
+    find_initializers(vars_with_holes, amap, dominator_analysis);
+  }
+  catch(const char *message)
+  {
+    warning() << "Bytecode -> codet translation error: " << message << eom
+              << "This is probably due to an unexpected LVT, "
+              << "falling back to translation without LVT" << eom;
+    return;
+  }
 
   // Clean up removed records from the variable table:
   cleanup_var_table(vars_with_holes);
@@ -677,9 +758,14 @@ void java_bytecode_convert_methodt::setup_local_variables(
   // length values in the local variable table
   for(const auto &v : vars_with_holes)
   {
-    if(v.var.start_pc==0) // Parameter?
+    if(v.is_parameter)
       continue;
 
+#ifdef DEBUG
+    debug() << "jcm: setup-local-vars: merged variable: idx " << v.var.index
+            << " name " << v.var.name << " v.var.signature '"
+            << v.var.signature << "' holes " << v.holes.size() << eom;
+#endif
     typet t=java_type_from_string(v.var.signature);
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.var.start_pc << "::" << v.var.name;
@@ -687,6 +773,9 @@ void java_bytecode_convert_methodt::setup_local_variables(
     symbol_exprt result(identifier, t);
     result.set(ID_C_base_name, v.var.name);
 
+    // Create a new local variable in the variables[] array, the result of
+    // merging multiple local variables with equal name (parameters excluded)
+    // into a single local variable with holes
     variables[v.var.index].push_back(variablet());
     auto &newv=variables[v.var.index].back();
     newv.symbol_expr=result;
@@ -694,6 +783,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
     newv.length=v.var.length;
     newv.holes=std::move(v.holes);
 
+    // Register the local variable in the symbol table
     symbolt new_symbol;
     new_symbol.name=identifier;
     new_symbol.type=t;

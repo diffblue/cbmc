@@ -88,7 +88,7 @@ void goto_program2codet::build_loop_map()
       }
 
     if(!loop_map.insert(std::make_pair(loop_start, loop_end)).second)
-      assert(false);
+      UNREACHABLE;
   }
 }
 
@@ -249,11 +249,11 @@ goto_programt::const_targett goto_program2codet::convert_instruction(
       return convert_catch(target, upper_bound, dest);
 
     case NO_INSTRUCTION_TYPE:
-      assert(false);
+      UNREACHABLE;
   }
 
   // not reached
-  assert(false);
+  UNREACHABLE;
   return target;
 }
 
@@ -817,7 +817,7 @@ bool goto_program2codet::set_block_end_points(
         break;
 
       if(!processed_locations.insert(case_end->location_number).second)
-        assert(false);
+        UNREACHABLE;
 
       it->case_last=case_end;
     }
@@ -1022,7 +1022,7 @@ goto_programt::const_targett goto_program2codet::convert_goto_switch(
       // this improves convergence
       if(it->case_start!=(--cases.end())->case_start)
       {
-        assert(false);
+        UNREACHABLE;
         goto_programt::instructiont i=*(it->case_selector);
         i.guard=true_exprt();
         goto_programt tmp;
@@ -1416,7 +1416,7 @@ goto_programt::const_targett goto_program2codet::convert_throw(
     codet &dest)
 {
   // this isn't really clear as throw is not supported in expr2cpp either
-  assert(false);
+  UNREACHABLE;
   return target;
 }
 
@@ -1426,7 +1426,7 @@ goto_programt::const_targett goto_program2codet::convert_catch(
     codet &dest)
 {
   // this isn't really clear as catch is not supported in expr2cpp either
-  assert(false);
+  UNREACHABLE;
   return target;
 }
 

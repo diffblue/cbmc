@@ -82,6 +82,16 @@ void string_abstraction(
   string_abstraction(dest);
 }
 
+void string_abstraction(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  string_abstraction(
+    goto_model.symbol_table,
+    message_handler,
+    goto_model.goto_functions);
+}
+
 string_abstractiont::string_abstractiont(
   symbol_tablet &_symbol_table,
   message_handlert &_message_handler):
@@ -471,7 +481,7 @@ goto_programt::targett string_abstractiont::abstract(
 
   case RETURN:
     // use remove_returns
-    assert(false);
+    UNREACHABLE;
     break;
 
   case END_FUNCTION:
@@ -488,7 +498,7 @@ goto_programt::targett string_abstractiont::abstract(
   case LOCATION:
     break;
   case NO_INSTRUCTION_TYPE:
-    assert(false);
+    UNREACHABLE;
     break;
   }
 
@@ -637,7 +647,7 @@ exprt string_abstractiont::build(
 
   exprt str_struct;
   if(build_wrap(pointer, str_struct, write))
-    assert(false);
+    UNREACHABLE;
 
   exprt result=member(str_struct, what);
 

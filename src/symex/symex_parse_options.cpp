@@ -37,6 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_exceptions.h>
@@ -314,6 +315,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // Java throw and catch -> explicit exceptional return variables:
+    // This introduces instanceof, so order is important:
     remove_exceptions(goto_model);
     // Java instanceof -> clsid comparison:
     remove_instanceof(goto_model);
@@ -332,6 +334,10 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
       status() << "Removing unused functions" << eom;
       remove_unused_functions(goto_model.goto_functions, ui_message_handler);
     }
+
+    // remove skips such that trivial GOTOs are deleted and not considered
+    // for coverage annotation:
+    remove_skip(goto_model.goto_functions);
 
     if(cmdline.isset("cover"))
     {
@@ -493,7 +499,7 @@ void symex_parse_optionst::report_success()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -518,7 +524,7 @@ void symex_parse_optionst::show_counterexample(
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -541,7 +547,7 @@ void symex_parse_optionst::report_failure()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -606,6 +612,9 @@ void symex_parse_optionst::help()
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
     " --function name              set main function name\n"
+    "\n"
+    "Java Bytecode frontend options:\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

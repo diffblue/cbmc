@@ -1,0 +1,9 @@
+CORE
+test.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+assertion at file test.java line 8 .* SUCCESS$
+assertion at file test.java line 10 .* FAILURE$
+--
+^warning: ignoring

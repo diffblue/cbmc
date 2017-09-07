@@ -1,0 +1,9 @@
+CORE
+Test6.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 9.* SUCCESS$
+^\[.*assertion.2\].* line 12.* FAILURE$
+--
+--

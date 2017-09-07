@@ -3,8 +3,6 @@ stack_test.class
 
 ^EXIT=0$
 ^SIGNAL=0$
-^.*assertion at file stack_test.java line 5 function.*: SUCCESS
-$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

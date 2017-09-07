@@ -293,7 +293,7 @@ bool path_searcht::drop_state(const statet &state)
     return true;
 
   // unwinding limit -- loops
-  if(unwind_limit!=std::numeric_limits<unsigned>::max() && 
+  if(unwind_limit!=std::numeric_limits<unsigned>::max() &&
      pc->is_backwards_goto())
   {
     bool stop=false;

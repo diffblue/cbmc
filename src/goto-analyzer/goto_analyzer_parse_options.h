@@ -22,6 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+
 class bmct;
 class goto_functionst;
 class optionst;
@@ -45,7 +47,8 @@ class optionst;
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
-  "(non-null)(show-non-null)"
+  "(non-null)(show-non-null)" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
