@@ -56,59 +56,54 @@ void remove_returnst::replace_returns(
 
   const irep_idt function_id=f_it->first;
 
-  // returns something but void?
-  bool has_return_value=return_type!=empty_typet();
+  // Nothing to do if this function returns void
+  if(return_type==empty_typet())
+    return;
 
-  if(has_return_value)
-  {
-    // look up the function symbol
-    symbol_tablet::symbolst::iterator s_it=
-      symbol_table.symbols.find(function_id);
+  // look up the function symbol
+  symbol_tablet::symbolst::iterator s_it=
+    symbol_table.symbols.find(function_id);
 
-    assert(s_it!=symbol_table.symbols.end());
-    symbolt &function_symbol=s_it->second;
+  assert(s_it!=symbol_table.symbols.end());
+  symbolt &function_symbol=s_it->second;
 
-    // make the return type 'void'
-    f_it->second.type.return_type()=empty_typet();
-    function_symbol.type=f_it->second.type;
+  // make the return type 'void'
+  f_it->second.type.return_type()=empty_typet();
+  function_symbol.type=f_it->second.type;
 
-    // add return_value symbol to symbol_table
-    auxiliary_symbolt new_symbol;
-    new_symbol.is_static_lifetime=true;
-    new_symbol.module=function_symbol.module;
-    new_symbol.base_name=
-      id2string(function_symbol.base_name)+RETURN_VALUE_SUFFIX;
-    new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
-    new_symbol.mode=function_symbol.mode;
-    new_symbol.type=return_type;
+  // add return_value symbol to symbol_table
+  auxiliary_symbolt new_symbol;
+  new_symbol.is_static_lifetime=true;
+  new_symbol.module=function_symbol.module;
+  new_symbol.base_name=
+    id2string(function_symbol.base_name)+RETURN_VALUE_SUFFIX;
+  new_symbol.name=id2string(function_symbol.name)+RETURN_VALUE_SUFFIX;
+  new_symbol.mode=function_symbol.mode;
+  new_symbol.type=return_type;
 
-    symbol_table.add(new_symbol);
-  }
+  symbol_table.add(new_symbol);
 
   goto_programt &goto_program=f_it->second.body;
 
   if(goto_program.empty())
     return;
 
-  if(has_return_value)
+  Forall_goto_program_instructions(i_it, goto_program)
   {
-    Forall_goto_program_instructions(i_it, goto_program)
+    if(i_it->is_return())
     {
-      if(i_it->is_return())
-      {
-        assert(i_it->code.operands().size()==1);
+      assert(i_it->code.operands().size()==1);
 
-        // replace "return x;" by "fkt#return_value=x;"
-        symbol_exprt lhs_expr;
-        lhs_expr.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
-        lhs_expr.type()=return_type;
+      // replace "return x;" by "fkt#return_value=x;"
+      symbol_exprt lhs_expr;
+      lhs_expr.set_identifier(id2string(function_id)+RETURN_VALUE_SUFFIX);
+      lhs_expr.type()=return_type;
 
-        code_assignt assignment(lhs_expr, i_it->code.op0());
+      code_assignt assignment(lhs_expr, i_it->code.op0());
 
-        // now turn the `return' into `assignment'
-        i_it->type=ASSIGN;
-        i_it->code=assignment;
-      }
+      // now turn the `return' into `assignment'
+      i_it->type=ASSIGN;
+      i_it->code=assignment;
     }
   }
 }
