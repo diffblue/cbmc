@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/message.h>
 #include <util/tempfile.h>
 #include <util/unicode.h>
@@ -430,7 +431,7 @@ bool c_preprocess_visual_studio(
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
 
-    if(config.ansi_c.pointer_width==64)
+    if(pointer_diff_type()==signed_long_long_int_type())
     {
       command_file << "\"/D__PTRDIFF_TYPE__=long long int\""  << "\n";
       // yes, both _WIN32 and _WIN64 get defined
@@ -438,6 +439,9 @@ bool c_preprocess_visual_studio(
     }
     else
     {
+      DATA_INVARIANT(
+        pointer_diff_type()==signed_int_type(),
+        "Pointer difference expected to be int typed");
       command_file << "/D__PTRDIFF_TYPE__=int" << "\n";
       command_file << "/U_WIN64" << "\n";
     }

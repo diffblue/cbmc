@@ -204,7 +204,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().id()==ID_typecast &&
      expr.op0().operands().size()==1 &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv) &&
-     to_bitvector_type(op_type).get_width()>=config.ansi_c.pointer_width)
+     to_bitvector_type(op_type).get_width()>=
+     to_bitvector_type(expr_type).get_width())
   {
     exprt tmp=expr.op0().op0();
     expr.op0().swap(tmp);

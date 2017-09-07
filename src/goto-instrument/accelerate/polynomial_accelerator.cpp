@@ -37,7 +37,6 @@ Author: Matt Lewis
 #include <util/simplify_expr.h>
 #include <util/replace_expr.h>
 #include <util/arith_tools.h>
-#include <util/config.h>
 
 #include "accelerator.h"
 #include "util.h"
@@ -345,9 +344,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
     return false;
   }
 
-  unsigned width=to_bitvector_type(var.type()).get_width();
-  if(var.type().id()==ID_pointer)
-    width=config.ansi_c.pointer_width;
+  std::size_t width=to_bitvector_type(var.type()).get_width();
   assert(width>0);
 
   for(std::vector<expr_listt>::iterator it=parameters.begin();

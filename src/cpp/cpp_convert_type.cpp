@@ -162,9 +162,12 @@ void cpp_convert_typet::read_rec(const typet &type)
   else if(type.id()==ID_frontend_pointer)
   {
     // add width and turn into ID_pointer
-    typet tmp=type;
-    tmp.id(ID_pointer);
-    tmp.set(ID_width, config.ansi_c.pointer_width);
+    pointer_typet tmp(type.subtype(), config.ansi_c.pointer_width);
+    tmp.add_source_location()=type.source_location();
+    if(type.get_bool(ID_C_reference))
+      tmp.set(ID_C_reference, true);
+    if(type.get_bool(ID_C_rvalue_reference))
+      tmp.set(ID_C_rvalue_reference, true);
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)

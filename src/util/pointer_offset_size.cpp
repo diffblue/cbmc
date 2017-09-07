@@ -11,15 +11,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "pointer_offset_size.h"
 
-#include <cassert>
-
 #include "c_types.h"
 #include "expr.h"
+#include "invariant.h"
 #include "arith_tools.h"
 #include "std_types.h"
 #include "std_expr.h"
 #include "expr_util.h"
-#include "config.h"
 #include "simplify_expr.h"
 #include "namespace.h"
 #include "symbol.h"
@@ -103,6 +101,7 @@ mp_integer member_offset_bits(
   return offset;
 }
 
+/// Compute the size of a type in bytes, rounding up to full bytes
 mp_integer pointer_offset_size(
   const typet &type,
   const namespacet &ns)
@@ -110,7 +109,7 @@ mp_integer pointer_offset_size(
   mp_integer bits=pointer_offset_bits(type, ns);
   if(bits==-1)
     return -1;
-  return bits/8+(((bits%8)==0)?0:1);
+  return (bits+7)/8;
 }
 
 mp_integer pointer_offset_bits(
@@ -234,7 +233,7 @@ mp_integer pointer_offset_bits(
     if(type.get_bool(ID_C_ptr32))
       return 32;
 
-    return config.ansi_c.pointer_width;
+    return to_bitvector_type(type).get_width();
   }
   else if(type.id()==ID_symbol)
   {
@@ -495,7 +494,7 @@ exprt size_of_expr(
     if(type.get_bool(ID_C_ptr32))
       return from_integer(4, size_type());
 
-    std::size_t width=config.ansi_c.pointer_width;
+    std::size_t width=to_bitvector_type(type).get_width();
     std::size_t bytes=width/8;
     if(bytes*8!=width)
       bytes++;
@@ -531,12 +530,13 @@ mp_integer compute_pointer_offset(
   }
   else if(expr.id()==ID_index)
   {
-    assert(expr.operands().size()==2);
+    const index_exprt &index_expr=to_index_expr(expr);
+    const typet &array_type=ns.follow(index_expr.array().type());
+    DATA_INVARIANT(
+      array_type.id()==ID_array,
+      "index into array expected, found "+array_type.id_string());
 
-    const typet &array_type=ns.follow(expr.op0().type());
-    assert(array_type.id()==ID_array);
-
-    mp_integer o=compute_pointer_offset(expr.op0(), ns);
+    mp_integer o=compute_pointer_offset(index_expr.array(), ns);
 
     if(o!=-1)
     {
@@ -545,7 +545,7 @@ mp_integer compute_pointer_offset(
 
       mp_integer i;
 
-      if(sub_size>0 && !to_integer(expr.op1(), i))
+      if(sub_size>0 && !to_integer(index_expr.index(), i))
         return o+i*sub_size;
     }
 
@@ -553,13 +553,11 @@ mp_integer compute_pointer_offset(
   }
   else if(expr.id()==ID_member)
   {
-    assert(expr.operands().size()==1);
-    const typet &type=ns.follow(expr.op0().type());
+    const member_exprt &member_expr=to_member_expr(expr);
+    const exprt &op=member_expr.struct_op();
+    const struct_union_typet &type=to_struct_union_type(ns.follow(op.type()));
 
-    assert(type.id()==ID_struct ||
-           type.id()==ID_union);
-
-    mp_integer o=compute_pointer_offset(expr.op0(), ns);
+    mp_integer o=compute_pointer_offset(op, ns);
 
     if(o!=-1)
     {
@@ -567,7 +565,7 @@ mp_integer compute_pointer_offset(
         return o;
 
       return o+member_offset(
-        to_struct_type(type), expr.get(ID_component_name), ns);
+        to_struct_type(type), member_expr.get_component_name(), ns);
     }
   }
   else if(expr.id()==ID_string_constant)
@@ -594,8 +592,10 @@ exprt build_sizeof_expr(
      (type_size==0 && val>0))
     return nil_exprt();
 
-  assert(address_bits(val+1)<=config.ansi_c.pointer_width);
   const typet t(size_type());
+  DATA_INVARIANT(
+    address_bits(val+1)<=pointer_offset_bits(t, ns),
+    "sizeof value does not fit size_type");
 
   mp_integer remainder=0;
   if(type_size!=0)

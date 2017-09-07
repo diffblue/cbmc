@@ -73,20 +73,15 @@ mp_integer alignment(const typet &type, const namespacet &ns)
           type.id()==ID_signedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
-          type.id()==ID_c_bool)
+          type.id()==ID_c_bool ||
+          type.id()==ID_pointer)
   {
-    std::size_t width=to_bitvector_type(type).get_width();
-    result=width%8?width/8+1:width/8;
+    result=pointer_offset_size(type, ns);
   }
   else if(type.id()==ID_c_enum)
     result=alignment(type.subtype(), ns);
   else if(type.id()==ID_c_enum_tag)
     result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
-  else if(type.id()==ID_pointer)
-  {
-    std::size_t width=config.ansi_c.pointer_width;
-    result=width%8?width/8+1:width/8;
-  }
   else if(type.id()==ID_symbol)
     result=alignment(ns.follow(type), ns);
   else if(type.id()==ID_c_bit_field)
