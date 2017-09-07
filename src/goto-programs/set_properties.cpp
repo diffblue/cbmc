@@ -122,8 +122,7 @@ void label_properties(goto_functionst &goto_functions)
       it=goto_functions.function_map.begin();
       it!=goto_functions.function_map.end();
       it++)
-    if(!it->second.is_inlined())
-      label_properties(it->second.body, property_counters);
+    label_properties(it->second.body, property_counters);
 }
 
 void make_assertions_false(goto_modelt &goto_model)
