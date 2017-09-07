@@ -744,33 +744,12 @@ bool goto_inlinet::check_inline_map(
 
   const call_listt &call_list=im_it->second;
 
-  if(call_list.empty())
-    return true;
-
-  #if 0
-  int ln=-1;
-  #endif
-
   for(const auto &call : call_list)
   {
     const goto_programt::const_targett target=call.first;
 
-    #if 0
-    // might not hold if call was previously inlined
-    if(target->function!=identifier)
+    if(!is_call(target))
       return false;
-
-    // location numbers increasing
-    if(static_cast<int>(target->location_number)<=ln)
-      return false;
-    #endif
-
-    if(!target->is_function_call())
-      return false;
-
-    #if 0
-    ln=target->location_number;
-    #endif
   }
 
   return true;
