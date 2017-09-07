@@ -1482,6 +1482,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
@@ -1489,6 +1490,8 @@ void goto_instrument_parse_optionst::help()
     " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --print-path-lengths         print statistics about control-flow graph paths\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"

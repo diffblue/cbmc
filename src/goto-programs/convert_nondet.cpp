@@ -67,7 +67,8 @@ static goto_programt::targett insert_nondet_init_code(
   }
 
   // Although, if the type is a ptr-to-void then we also want to bail
-  if(lhs.type().subtype().id()==ID_empty)
+  if(lhs.type().subtype().id()==ID_empty ||
+     lhs.type().subtype().id()==ID_code)
   {
     return next_instr;
   }

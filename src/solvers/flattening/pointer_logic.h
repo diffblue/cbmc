@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
-class namespacet;
-
 class pointer_logict
 {
 public:
