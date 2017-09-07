@@ -60,11 +60,11 @@ void cpp_languaget::modules_provided(std::set<std::string> &modules)
 ///   function symbol will be added to this table
 /// \return Returns false if the _start method was generated correctly
 bool cpp_languaget::generate_start_function(
-  const symbolt &entry_function_symbol,
+  const irep_idt &entry_function_symbol_id,
   symbol_tablet &symbol_table)
 {
   return generate_ansi_c_start_function(
-    entry_function_symbol,
+    symbol_table.lookup(entry_function_symbol_id),
     symbol_table,
     *message_handler);
 }

@@ -120,7 +120,7 @@ public:
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
 
   virtual bool generate_start_function(
-    const class symbolt &entry_function_symbol,
+    const irep_idt &entry_function_symbol_id,
     class symbol_tablet &symbol_table)=0;
 
   // constructor / destructor

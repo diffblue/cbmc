@@ -113,11 +113,15 @@ void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
 ///   function symbol will be added to this table
 /// \return Returns false if the _start method was generated correctly
 bool java_bytecode_languaget::generate_start_function(
-  const symbolt &entry_function_symbol,
+  const irep_idt &entry_function_symbol_id,
   symbol_tablet &symbol_table)
 {
+  const auto res=
+    get_main_symbol(
+      symbol_table, entry_function_symbol_id, get_message_handler());
+
   return generate_java_start_function(
-    entry_function_symbol,
+    res.main_function,
     symbol_table,
     get_message_handler(),
     assume_inputs_non_null,

@@ -12,6 +12,7 @@
 #include <util/language.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
+#include <util/prefix.h>
 #include <langapi/mode.h>
 #include <memory>
 
@@ -43,30 +44,18 @@ rebuild_goto_start_functiont::rebuild_goto_start_functiont(
 bool rebuild_goto_start_functiont::operator()(
   const irep_idt &entry_function)
 {
-  const auto &desired_entry_function=
-    symbol_table.symbols.find(entry_function);
+  const irep_idt &mode=get_entry_point_mode();
 
-  // Check the specified entry function is a function in the symbol table
-  if(desired_entry_function==symbol_table.symbols.end())
-  {
-    error() << "main symbol `" << entry_function
-            << "' not found" << eom;
-    return true;
-  }
+  // Get the relevant languaget to generate the new entry point with
+  std::unique_ptr<languaget> language=get_language_from_mode(mode);
+  INVARIANT(language, "No language found for mode: "+id2string(mode));
+  language->set_message_handler(get_message_handler());
 
-  // Remove the existing _start function so we can create a new one
-  symbol_table.remove(goto_functionst::entry_point());
-
-  auto language=
-    std::unique_ptr<languaget>(
-      get_language_from_mode(
-        desired_entry_function->second.mode));
-  assert(language);
+  // To create a new entry point we must first remove the old one
+  remove_existing_entry_point();
 
   bool return_code=
-    language->generate_start_function(
-      desired_entry_function->second,
-      symbol_table);
+    language->generate_start_function(entry_function, symbol_table);
 
   // Remove the function from the goto_functions so it is copied back in
   // from the symbol table during goto_convert
@@ -81,4 +70,40 @@ bool rebuild_goto_start_functiont::operator()(
   }
 
   return return_code;
+}
+
+/// Find out the mode of the current entry point to determine the mode of the
+/// replacement entry point
+/// \return A mode string saying which language to use
+irep_idt rebuild_goto_start_functiont::get_entry_point_mode() const
+{
+  const symbolt &current_entry_point=
+    symbol_table.lookup(goto_functionst::entry_point());
+  return current_entry_point.mode;
+}
+
+/// Eliminate the existing entry point function symbol and any symbols created
+/// in that scope from the symbol table.
+void rebuild_goto_start_functiont::remove_existing_entry_point()
+{
+  // Remove the function itself
+  symbol_table.remove(goto_functionst::entry_point());
+
+  // And any symbols created in the scope of the entry point
+  std::vector<irep_idt> entry_point_symbols;
+  for(const auto &symbol_entry : symbol_table.symbols)
+  {
+    const bool is_entry_point_symbol=
+      has_prefix(
+        id2string(symbol_entry.first),
+        id2string(goto_functionst::entry_point()));
+
+    if(is_entry_point_symbol)
+      entry_point_symbols.push_back(symbol_entry.first);
+  }
+
+  for(const irep_idt &entry_point_symbol : entry_point_symbols)
+  {
+    symbol_table.remove(entry_point_symbol);
+  }
 }
