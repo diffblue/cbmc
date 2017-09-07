@@ -14,9 +14,10 @@ mkdir /tmp/goto-cc-dist
 cp goto-cc /tmp/goto-cc-dist/
 cp ../goto-instrument/goto-instrument /tmp/goto-cc-dist/
 cp ../../LICENSE /tmp/goto-cc-dist/
+cp ../../scripts/ls_parse.py /tmp/goto-cc-dist/
 cd /tmp/goto-cc-dist
 tar cfz goto-cc-${VERSION_FILE}-linux.tgz goto-cc \
-  goto-instrument LICENSE
+  goto-instrument LICENSE ls_parse.py
 
 echo Copying.
 scp goto-cc-${VERSION_FILE}-linux.tgz kroening@dkr0.inf.ethz.ch:/home/www/cprover.org/goto-cc/download/
