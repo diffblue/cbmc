@@ -813,7 +813,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
 
-  if(compiler.wrote_object_files())
+  if(!act_as_ld && compiler.wrote_object_files())
   {
     // Undefine all __CPROVER macros for the system compiler
     std::map<irep_idt, std::size_t> arities;
