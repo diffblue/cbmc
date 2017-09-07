@@ -49,6 +49,7 @@ SRC = arith_tools.cpp \
       parse_options.cpp \
       parser.cpp \
       pipe_stream.cpp \
+      platform_types.cpp \
       pointer_offset_size.cpp \
       pointer_predicates.cpp \
       rational.cpp \
