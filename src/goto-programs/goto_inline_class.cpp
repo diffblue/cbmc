@@ -17,12 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <cassert>
 
-#include <util/prefix.h>
-#include <util/cprover_prefix.h>
 #include <util/base_type.h>
+#include <util/cprover_prefix.h>
+#include <util/expr_util.h>
+#include <util/invariant.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
-#include <util/expr_util.h>
 
 #include "remove_skip.h"
 #include "goto_inline.h"
@@ -34,8 +35,8 @@ void goto_inlinet::parameter_assignments(
   const exprt::operandst &arguments, // arguments of call
   goto_programt &dest)
 {
-  assert(is_call(target));
-  assert(dest.empty());
+  PRECONDITION(target->is_function_call());
+  PRECONDITION(dest.empty());
 
   const source_locationt &source_location=target->source_location;
 
@@ -46,13 +47,8 @@ void goto_inlinet::parameter_assignments(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it2=parameter_types.begin();
-      it2!=parameter_types.end();
-      it2++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it2;
-
     // this is the type the n-th argument should be
     const typet &par_type=ns.follow(parameter.type());
 
@@ -165,8 +161,8 @@ void goto_inlinet::parameter_destruction(
   const code_typet &code_type, // type of called function
   goto_programt &dest)
 {
-  assert(is_call(target));
-  assert(dest.empty());
+  PRECONDITION(target->is_function_call());
+  PRECONDITION(dest.empty());
 
   const source_locationt &source_location=target->source_location;
 
@@ -174,13 +170,8 @@ void goto_inlinet::parameter_destruction(
     code_type.parameters();
 
   // iterates over the types of the parameters
-  for(code_typet::parameterst::const_iterator
-      it=parameter_types.begin();
-      it!=parameter_types.end();
-      it++)
+  for(const auto &parameter : parameter_types)
   {
-    const code_typet::parametert &parameter=*it;
-
     const irep_idt &identifier=parameter.get_identifier();
 
     if(identifier.empty())
@@ -205,8 +196,7 @@ void goto_inlinet::parameter_destruction(
 
 void goto_inlinet::replace_return(
   goto_programt &dest, // inlining this
-  const exprt &lhs, // lhs in caller
-  const exprt &constrain)
+  const exprt &lhs) // lhs in caller
 {
   for(goto_programt::instructionst::iterator
       it=dest.instructions.begin();
@@ -215,59 +205,6 @@ void goto_inlinet::replace_return(
   {
     if(it->is_return())
     {
-      #if 0
-      if(lhs.is_not_nil())
-      {
-        if(it->code.operands().size()!=1)
-        {
-          error().source_location=it->code.find_source_location();
-          str << "return expects one operand!";
-          warning_msg();
-          continue;
-        }
-
-        goto_programt tmp;
-        goto_programt::targett assignment=tmp.add_instruction(ASSIGN);
-
-        code_assignt code_assign(lhs, it->code.op0());
-
-        // this may happen if the declared return type at the call site
-        // differs from the defined return type
-        if(code_assign.lhs().type()!=
-           code_assign.rhs().type())
-          code_assign.rhs().make_typecast(code_assign.lhs().type());
-
-        assignment->code=code_assign;
-        assignment->source_location=it->source_location;
-        assignment->function=it->function;
-
-        if(constrain.is_not_nil() && !constrain.is_true())
-        {
-          codet constrain(ID_bp_constrain);
-          constrain.reserve_operands(2);
-          constrain.move_to_operands(assignment->code);
-          constrain.copy_to_operands(constrain);
-        }
-
-        dest.insert_before_swap(it, *assignment);
-        it++;
-      }
-      else if(!it->code.operands().empty())
-      {
-        goto_programt tmp;
-        goto_programt::targett expression=tmp.add_instruction(OTHER);
-
-        expression->code=codet(ID_expression);
-        expression->code.move_to_operands(it->code.op0());
-        expression->source_location=it->source_location;
-        expression->function=it->function;
-
-        dest.insert_before_swap(it, *expression);
-        it++;
-      }
-
-      it->make_goto(--dest.instructions.end());
-      #else
       if(lhs.is_not_nil())
       {
         if(it->code.operands().size()!=1)
@@ -286,20 +223,8 @@ void goto_inlinet::replace_return(
            code_assign.rhs().type())
           code_assign.rhs().make_typecast(code_assign.lhs().type());
 
-        if(constrain.is_not_nil() && !constrain.is_true())
-        {
-          codet constrain(ID_bp_constrain);
-          constrain.reserve_operands(2);
-          constrain.move_to_operands(code_assign);
-          constrain.copy_to_operands(constrain);
-          it->code=constrain;
-          it->type=OTHER;
-        }
-        else
-        {
-          it->code=code_assign;
-          it->type=ASSIGN;
-        }
+        it->code=code_assign;
+        it->type=ASSIGN;
 
         it++;
       }
@@ -311,7 +236,6 @@ void goto_inlinet::replace_return(
         it->type=OTHER;
         it++;
       }
-      #endif
     }
   }
 }
@@ -356,12 +280,11 @@ void goto_inlinet::insert_function_body(
   goto_programt::targett target,
   const exprt &lhs,
   const symbol_exprt &function,
-  const exprt::operandst &arguments,
-  const exprt &constrain)
+  const exprt::operandst &arguments)
 {
-  assert(is_call(target));
-  assert(!dest.empty());
-  assert(goto_function.body_available());
+  PRECONDITION(target->is_function_call());
+  PRECONDITION(!dest.empty());
+  PRECONDITION(goto_function.body_available());
 
   const irep_idt identifier=function.get_identifier();
 
@@ -370,14 +293,16 @@ void goto_inlinet::insert_function_body(
   inline_log.copy_from(goto_function.body, body);
 
   goto_programt::instructiont &end=body.instructions.back();
-  assert(end.is_end_function());
+  DATA_INVARIANT(
+    end.is_end_function(),
+    "final instruction of a function must be an END_FUNCTION");
   end.type=LOCATION;
 
   if(adjust_function)
-    Forall_goto_program_instructions(i_it, body)
-      i_it->function=target->function;
+    for(auto &instruction : body.instructions)
+      instruction.function=target->function;
 
-  replace_return(body, lhs, constrain);
+  replace_return(body, lhs);
 
   goto_programt tmp1;
   parameter_assignments(
@@ -399,7 +324,9 @@ void goto_inlinet::insert_function_body(
   t_it=goto_function.body.instructions.begin();
   unsigned begin_location_number=t_it->location_number;
   t_it=--goto_function.body.instructions.end();
-  assert(t_it->is_end_function());
+  DATA_INVARIANT(
+    t_it->is_end_function(),
+    "final instruction of a function must be an END_FUNCTION");
   unsigned end_location_number=t_it->location_number;
 
   unsigned call_location_number=target->location_number;
@@ -458,8 +385,8 @@ void goto_inlinet::insert_function_nobody(
   const symbol_exprt &function,
   const exprt::operandst &arguments)
 {
-  assert(is_call(target));
-  assert(!dest.empty());
+  PRECONDITION(target->is_function_call());
+  PRECONDITION(!dest.empty());
 
   const irep_idt identifier=function.get_identifier();
 
@@ -511,9 +438,9 @@ void goto_inlinet::expand_function_call(
   const bool force_full,
   goto_programt::targett target)
 {
-  assert(is_call(target));
-  assert(!dest.empty());
-  assert(!transitive || inline_map.empty());
+  PRECONDITION(target->is_function_call());
+  PRECONDITION(!dest.empty());
+  PRECONDITION(!transitive || inline_map.empty());
 
 #ifdef DEBUG
   std::cout << "Expanding call:\n";
@@ -523,9 +450,8 @@ void goto_inlinet::expand_function_call(
   exprt lhs;
   exprt function_expr;
   exprt::operandst arguments;
-  exprt constrain;
 
-  get_call(target, lhs, function_expr, arguments, constrain);
+  get_call(target, lhs, function_expr, arguments);
 
   if(function_expr.id()!=ID_symbol)
     return;
@@ -586,8 +512,7 @@ void goto_inlinet::expand_function_call(
         target,
         lhs,
         function,
-        arguments,
-        constrain);
+        arguments);
 
       progress() << "Inserting " << identifier << " into caller" << eom;
       progress() << "Number of instructions: "
@@ -619,8 +544,7 @@ void goto_inlinet::expand_function_call(
         target,
         lhs,
         function,
-        arguments,
-        constrain);
+        arguments);
     }
   }
   else // no body available
@@ -633,57 +557,27 @@ void goto_inlinet::get_call(
   goto_programt::const_targett it,
   exprt &lhs,
   exprt &function,
-  exprt::operandst &arguments,
-  exprt &constrain)
+  exprt::operandst &arguments)
 {
-  assert(is_call(it));
+  PRECONDITION(it->is_function_call());
 
-  if(it->is_function_call())
-  {
-    const code_function_callt &call=to_code_function_call(it->code);
+  const code_function_callt &call=to_code_function_call(it->code);
 
-    lhs=call.lhs();
-    function=call.function();
-    arguments=call.arguments();
-    constrain=static_cast<const exprt &>(get_nil_irep());
-  }
-  else
-  {
-    assert(is_bp_call(it));
-
-    lhs=it->code.op0().op0();
-    function=to_symbol_expr(it->code.op0().op1().op0());
-    arguments=it->code.op0().op1().op1().operands();
-    constrain=it->code.op1();
-  }
-}
-
-bool goto_inlinet::is_call(goto_programt::const_targett it)
-{
-  return it->is_function_call() || is_bp_call(it);
-}
-
-bool goto_inlinet::is_bp_call(goto_programt::const_targett it)
-{
-  if(!it->is_other())
-    return false;
-
-  return it->code.get(ID_statement)==ID_bp_constrain &&
-    it->code.operands().size()==2 &&
-    it->code.op0().operands().size()==2 &&
-    it->code.op0().op1().get(ID_statement)==ID_function_call;
+  lhs=call.lhs();
+  function=call.function();
+  arguments=call.arguments();
 }
 
 void goto_inlinet::goto_inline(
   const inline_mapt &inline_map,
   const bool force_full)
 {
-  assert(check_inline_map(inline_map));
+  PRECONDITION(check_inline_map(inline_map));
 
   Forall_goto_functions(f_it, goto_functions)
   {
     const irep_idt identifier=f_it->first;
-    assert(!identifier.empty());
+    DATA_INVARIANT(!identifier.empty(), "function name must not be empty");
     goto_functiont &goto_function=f_it->second;
 
     if(!goto_function.body_available())
@@ -714,14 +608,14 @@ void goto_inlinet::goto_inline_nontransitive(
   const inline_mapt &inline_map,
   const bool force_full)
 {
-  assert(goto_function.body_available());
+  PRECONDITION(goto_function.body_available());
 
   finished_sett::const_iterator f_it=finished_set.find(identifier);
 
   if(f_it!=finished_set.end())
     return;
 
-  assert(check_inline_map(identifier, inline_map));
+  PRECONDITION(check_inline_map(identifier, inline_map));
 
   goto_programt &goto_program=goto_function.body;
 
@@ -737,10 +631,8 @@ void goto_inlinet::goto_inline_nontransitive(
 
   recursion_set.insert(identifier);
 
-  for(call_listt::const_iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
-    const callt &call=*c_it;
     const bool transitive=call.second;
 
     const inline_mapt &new_inline_map=
@@ -767,19 +659,23 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
   const goto_functiont &goto_function,
   const bool force_full)
 {
-  assert(goto_function.body_available());
+  PRECONDITION(goto_function.body_available());
 
   cachet::const_iterator c_it=cache.find(identifier);
 
   if(c_it!=cache.end())
   {
     const goto_functiont &cached=c_it->second;
-    assert(cached.body_available());
+    DATA_INVARIANT(
+      cached.body_available(),
+      "body of cached functions must be available");
     return cached;
   }
 
   goto_functiont &cached=cache[identifier];
-  assert(cached.body.empty());
+  INVARIANT(
+    cached.body.empty(),
+    "body of new function in cache must be empty");
 
   progress() << "Creating copy of " << identifier << eom;
   progress() << "Number of instructions: "
@@ -792,10 +688,9 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   goto_programt::targetst call_list;
 
-  for(goto_programt::targett i_it=goto_program.instructions.begin();
-      i_it!=goto_program.instructions.end(); i_it++)
+  Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(is_call(i_it))
+    if(i_it->is_function_call())
       call_list.push_back(i_it);
   }
 
@@ -804,15 +699,14 @@ const goto_inlinet::goto_functiont &goto_inlinet::goto_inline_transitive(
 
   recursion_set.insert(identifier);
 
-  for(goto_programt::targetst::iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
     expand_function_call(
       goto_program,
       inline_mapt(),
       true,
       force_full,
-      *c_it);
+      call);
   }
 
   recursion_set.erase(identifier);
@@ -841,7 +735,7 @@ bool goto_inlinet::check_inline_map(
   goto_functionst::function_mapt::const_iterator f_it=
     goto_functions.function_map.find(identifier);
 
-  assert(f_it!=goto_functions.function_map.end());
+  PRECONDITION(f_it!=goto_functions.function_map.end());
 
   inline_mapt::const_iterator im_it=inline_map.find(identifier);
 
@@ -855,23 +749,21 @@ bool goto_inlinet::check_inline_map(
 
   int ln=-1;
 
-  for(call_listt::const_iterator c_it=call_list.begin();
-      c_it!=call_list.end(); c_it++)
+  for(const auto &call : call_list)
   {
-    const callt &call=*c_it;
     const goto_programt::const_targett target=call.first;
 
-#if 0
+    #if 0
     // might not hold if call was previously inlined
     if(target->function!=identifier)
       return false;
-#endif
+    #endif
 
     // location numbers increasing
     if(static_cast<int>(target->location_number)<=ln)
       return false;
 
-    if(!is_call(target))
+    if(!target->is_function_call())
       return false;
 
     ln=target->location_number;
@@ -895,13 +787,12 @@ void goto_inlinet::output_inline_map(
   std::ostream &out,
   const inline_mapt &inline_map)
 {
-  assert(check_inline_map(inline_map));
+  PRECONDITION(check_inline_map(inline_map));
 
-  for(inline_mapt::const_iterator it=inline_map.begin();
-      it!=inline_map.end(); it++)
+  for(const auto &it : inline_map)
   {
-    const irep_idt id=it->first;
-    const call_listt &call_list=it->second;
+    const irep_idt &id=it.first;
+    const call_listt &call_list=it.second;
 
     out << "Function: " << id << "\n";
 
@@ -914,14 +805,12 @@ void goto_inlinet::output_inline_map(
        !call_list.empty())
     {
       const goto_functiont &goto_function=f_it->second;
-      assert(goto_function.body_available());
+      PRECONDITION(goto_function.body_available());
 
       const goto_programt &goto_program=goto_function.body;
 
-      for(call_listt::const_iterator c_it=call_list.begin();
-          c_it!=call_list.end(); c_it++)
+      for(const auto &call : call_list)
       {
-        const callt &call=*c_it;
         const goto_programt::const_targett target=call.first;
         bool transitive=call.second;
 
@@ -959,10 +848,9 @@ void goto_inlinet::goto_inline_logt::cleanup(
 void goto_inlinet::goto_inline_logt::cleanup(
   const goto_functionst::function_mapt &function_map)
 {
-  for(goto_functionst::function_mapt::const_iterator it=
-        function_map.begin(); it!=function_map.end(); it++)
+  for(const auto &it : function_map)
   {
-    const goto_functiont &goto_function=it->second;
+    const goto_functiont &goto_function=it.second;
 
     if(!goto_function.body_available())
       continue;
@@ -978,12 +866,12 @@ void goto_inlinet::goto_inline_logt::add_segment(
   const unsigned call_location_number,
   const irep_idt function)
 {
-  assert(!goto_program.empty());
-  assert(!function.empty());
-  assert(end_location_number>=begin_location_number);
+  PRECONDITION(!goto_program.empty());
+  PRECONDITION(!function.empty());
+  PRECONDITION(end_location_number>=begin_location_number);
 
   goto_programt::const_targett start=goto_program.instructions.begin();
-  assert(log_map.find(start)==log_map.end());
+  PRECONDITION(log_map.find(start)==log_map.end());
 
   goto_programt::const_targett end=goto_program.instructions.end();
   end--;
@@ -1002,7 +890,7 @@ void goto_inlinet::goto_inline_logt::copy_from(
   const goto_programt &from,
   const goto_programt &to)
 {
-  assert(from.instructions.size()==to.instructions.size());
+  PRECONDITION(from.instructions.size()==to.instructions.size());
 
   goto_programt::const_targett it1=from.instructions.begin();
   goto_programt::const_targett it2=to.instructions.begin();
@@ -1043,13 +931,12 @@ jsont goto_inlinet::goto_inline_logt::output_inline_log_json() const
   json_objectt json_result;
   json_arrayt &json_inlined=json_result["inlined"].make_array();
 
-  for(log_mapt::const_iterator it=log_map.begin();
-      it!=log_map.end(); it++)
+  for(const auto &it : log_map)
   {
     json_objectt &object=json_inlined.push_back().make_object();
 
-    goto_programt::const_targett start=it->first;
-    const goto_inline_log_infot &info=it->second;
+    goto_programt::const_targett start=it.first;
+    const goto_inline_log_infot &info=it.second;
     goto_programt::const_targett end=info.end;
 
     assert(start->location_number<=end->location_number);

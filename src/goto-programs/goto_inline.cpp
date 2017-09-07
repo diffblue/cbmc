@@ -49,40 +49,42 @@ void goto_inline(
 
   typedef goto_functionst::goto_functiont goto_functiont;
 
-    // find entry point
-    goto_functionst::function_mapt::iterator it=
-      goto_functions.function_map.find(goto_functionst::entry_point());
+  // find entry point
+  goto_functionst::function_mapt::iterator it=
+    goto_functions.function_map.find(goto_functionst::entry_point());
 
-    if(it==goto_functions.function_map.end())
-      return;
+  if(it==goto_functions.function_map.end())
+    return;
 
-    goto_functiont &goto_function=it->second;
-    assert(goto_function.body_available());
+  goto_functiont &goto_function=it->second;
+  DATA_INVARIANT(
+    goto_function.body_available(),
+    "body of entry point function must be available");
 
-    // gather all calls
-    // we use non-transitive inlining to avoid the goto program
-    // copying that goto_inlinet would do otherwise
-    goto_inlinet::inline_mapt inline_map;
+  // gather all calls
+  // we use non-transitive inlining to avoid the goto program
+  // copying that goto_inlinet would do otherwise
+  goto_inlinet::inline_mapt inline_map;
 
-    Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    goto_functiont &goto_function=f_it->second;
+
+    if(!goto_function.body_available())
+      continue;
+
+    goto_inlinet::call_listt &call_list=inline_map[f_it->first];
+
+    goto_programt &goto_program=goto_function.body;
+
+    Forall_goto_program_instructions(i_it, goto_program)
     {
-      goto_functiont &goto_function=f_it->second;
-
-      if(!goto_function.body_available())
+      if(!i_it->is_function_call())
         continue;
 
-      goto_inlinet::call_listt &call_list=inline_map[f_it->first];
-
-      goto_programt &goto_program=goto_function.body;
-
-      Forall_goto_program_instructions(i_it, goto_program)
-      {
-        if(!goto_inlinet::is_call(i_it))
-          continue;
-
-        call_list.push_back(goto_inlinet::callt(i_it, false));
-      }
+      call_list.push_back(goto_inlinet::callt(i_it, false));
     }
+  }
 
   goto_inline.goto_inline(
     goto_functionst::entry_point(), goto_function, inline_map, true);
@@ -164,14 +166,13 @@ void goto_partial_inline(
 
     Forall_goto_program_instructions(i_it, goto_program)
     {
-      if(!goto_inlinet::is_call(i_it))
+      if(!i_it->is_function_call())
         continue;
 
       exprt lhs;
       exprt function_expr;
       exprt::operandst arguments;
-      exprt constrain;
-      goto_inlinet::get_call(i_it, lhs, function_expr, arguments, constrain);
+      goto_inlinet::get_call(i_it, lhs, function_expr, arguments);
 
       if(function_expr.id()!=ID_symbol)
         // Can't handle pointers to functions
@@ -199,7 +200,7 @@ void goto_partial_inline(
       if(goto_function.is_inlined() ||
          goto_program.instructions.size()<=smallfunc_limit)
       {
-        assert(goto_inlinet::is_call(i_it));
+        INVARIANT(i_it->is_function_call(), "is a call");
         call_list.push_back(goto_inlinet::callt(i_it, false));
       }
     }
@@ -273,7 +274,7 @@ void goto_function_inline(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(!goto_inlinet::is_call(i_it))
+    if(!i_it->is_function_call())
       continue;
 
     call_list.push_back(goto_inlinet::callt(i_it, true));
@@ -318,7 +319,7 @@ jsont goto_function_inline_and_log(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    if(!goto_inlinet::is_call(i_it))
+    if(!i_it->is_function_call())
       continue;
 
     call_list.push_back(goto_inlinet::callt(i_it, true));
