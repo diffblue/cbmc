@@ -1308,8 +1308,7 @@ void cvc_convt::convert_type(const typet &type)
 
     out << " #]";
   }
-  else if(type.id()==ID_pointer ||
-          type.id()==ID_reference)
+  else if(type.id()==ID_pointer)
   {
     out << cvc_pointer_type();
   }

@@ -179,7 +179,7 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
             expr.id()=="builtin_object" ||
             expr.id()=="user_object" ||
             expr.id()=="object" ||
-            expr.id()==ID_reference ||
+            expr.id()==ID_pointer ||
             expr.id()==ID_member ||
             expr.id()=="variable")
       expr.type()=jsil_kind();

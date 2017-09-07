@@ -26,7 +26,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
   if(expr.id()==ID_invalid_pointer)
   {
     if(operands.size()==1 &&
-       is_ptr(operands[0].type()))
+       operands[0].type().id()==ID_pointer)
     {
       const bvt &bv=convert_bv(operands[0]);
 
@@ -58,7 +58,7 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
   else if(expr.id()==ID_dynamic_object)
   {
     if(operands.size()==1 &&
-       is_ptr(operands[0].type()))
+       operands[0].type().id()==ID_pointer)
     {
       // we postpone
       literalt l=prop.new_variable();
@@ -75,8 +75,8 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
           expr.id()==ID_gt || expr.id()==ID_ge)
   {
     if(operands.size()==2 &&
-       is_ptr(operands[0].type()) &&
-       is_ptr(operands[1].type()))
+       operands[0].type().id()==ID_pointer &&
+       operands[1].type().id()==ID_pointer)
     {
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
@@ -216,7 +216,7 @@ bool bv_pointerst::convert_address_of_rec(
 
 bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 {
-  if(!is_ptr(expr.type()))
+  if(expr.type().id()!=ID_pointer)
     throw "convert_pointer_type got non-pointer type";
 
   // make sure the config hasn't been changed
@@ -444,7 +444,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
 bvt bv_pointerst::convert_bitvector(const exprt &expr)
 {
-  if(is_ptr(expr.type()))
+  if(expr.type().id()==ID_pointer)
     return convert_pointer_type(expr);
 
   if(expr.id()==ID_minus &&
@@ -483,7 +483,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_pointer_offset &&
           expr.operands().size()==1 &&
-          is_ptr(expr.op0().type()))
+          expr.op0().type().id()==ID_pointer)
   {
     bvt op0=convert_bv(expr.op0());
 
@@ -500,7 +500,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_object_size &&
           expr.operands().size()==1 &&
-          is_ptr(expr.op0().type()))
+          expr.op0().type().id()==ID_pointer)
   {
     // we postpone until we know the objects
     std::size_t width=boolbv_width(expr.type());
@@ -521,7 +521,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_pointer_object &&
           expr.operands().size()==1 &&
-          is_ptr(expr.op0().type()))
+          expr.op0().type().id()==ID_pointer)
   {
     bvt op0=convert_bv(expr.op0());
 
@@ -562,7 +562,7 @@ exprt bv_pointerst::bv_get_rec(
   std::size_t offset,
   const typet &type) const
 {
-  if(!is_ptr(type))
+  if(type.id()!=ID_pointer)
     return SUB::bv_get_rec(bv, unknown, offset, type);
 
   std::string value_addr, value_offset, value;
@@ -605,7 +605,7 @@ exprt bv_pointerst::bv_get_rec(
 
   // we add the elaborated expression as operand
   result.copy_to_operands(
-    pointer_logic.pointer_expr(pointer, type));
+    pointer_logic.pointer_expr(pointer, to_pointer_type(type)));
 
   return result;
 }
