@@ -743,10 +743,7 @@ void c_typecheck_baset::typecheck_declaration(
       // add code contract (if any); we typecheck this after the
       // function body done above, so as to have parameter symbols
       // available
-      symbol_tablet::symbolst::iterator s_it=
-        symbol_table.symbols.find(identifier);
-      assert(s_it!=symbol_table.symbols.end());
-      symbolt &new_symbol=s_it->second;
+      symbolt &new_symbol=symbol_table.at(identifier);
 
       typecheck_spec_expr(contract, ID_C_spec_requires);
 

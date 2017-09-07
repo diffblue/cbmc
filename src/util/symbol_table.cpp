@@ -131,7 +131,7 @@ const symbolt &symbol_tablet::lookup(const irep_idt &identifier) const
 /// found.
 /// \param identifier: The name of the symbol to look for
 /// \return The symbol in the symbol table with the correct name
-symbolt &symbol_tablet::lookup(const irep_idt &identifier)
+symbolt &symbol_tablet::at(const irep_idt &identifier)
 {
   symbolst::iterator it=symbols.find(identifier);
 

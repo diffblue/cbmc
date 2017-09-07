@@ -27,8 +27,7 @@ public:
   typedef std::list<exprt> expressionst;
   remove_const_function_pointerst(
     message_handlert &message_handler,
-    const namespacet &ns,
-    const symbol_tablet &symbol_table);
+    const namespacet &ns);
 
   bool operator()(const exprt &base_expression, functionst &out_functions);
 
@@ -93,7 +92,6 @@ private:
     const struct_exprt &struct_expr, const member_exprt &member_expr);
 
   const namespacet &ns;
-  const symbol_tablet &symbol_table;
 };
 
 #define OPT_REMOVE_CONST_FUNCTION_POINTERS \

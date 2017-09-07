@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/find_symbols.h>
@@ -133,11 +134,8 @@ void goto_program2codet::scan_for_varargs()
   {
     system_headers.insert("stdarg.h");
 
-    symbol_tablet::symbolst::iterator it=
-      symbol_table.symbols.find(func_name);
-    assert(it!=symbol_table.symbols.end());
-
-    code_typet &code_type=to_code_type(it->second.type);
+    symbolt &func_symb=symbol_table.at(func_name);
+    code_typet &code_type=to_code_type(func_symb.type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator
@@ -1671,12 +1669,9 @@ void goto_program2codet::remove_const(typet &type)
     if(!const_removed.insert(identifier).second)
       return;
 
-    symbol_tablet::symbolst::iterator it=
-      symbol_table.symbols.find(identifier);
-    assert(it!=symbol_table.symbols.end());
-    assert(it->second.is_type);
-
-    remove_const(it->second.type);
+    symbolt &symbol=symbol_table.at(identifier);
+    DATA_INVARIANT(symbol.is_type, "symbol expected to be type symbol");
+    remove_const(symbol.type);
   }
   else if(type.id()==ID_array)
     remove_const(type.subtype());

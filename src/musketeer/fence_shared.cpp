@@ -190,10 +190,7 @@ bool fence_volatilet::is_volatile(const typet &src) const
 //  << src.subtypes().empty() /*src.has_subtypes()*/ <<  '\n';
   if(src.id()==ID_symbol)
   {
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(to_symbol_type(src).get_identifier());
-    assert(s_it!=symbol_table.symbols.end());
-    return is_volatile(s_it->second.type);
+    return is_volatile(ns.follow(src));
   }
   else if(src.has_subtype())
   {

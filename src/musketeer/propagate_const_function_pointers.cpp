@@ -386,9 +386,6 @@ void const_function_pointer_propagationt::arg_stackt::add_args(
       assert(arg_expr.id()==ID_symbol);
       const symbol_exprt &arg_symbol_expr=to_symbol_expr(arg_expr);
 
-      // const symbolt &arg_symbol=
-        // cfpp.symbol_table.lookup(arg_symbol_expr.get_identifier());
-
       // debug
       for(std::unordered_map<irep_idt, unsigned, irep_id_hash>::const_iterator
         it=cfpp.fun_id_to_invok.begin();

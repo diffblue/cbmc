@@ -174,9 +174,7 @@ void string_abstractiont::add_str_arguments(
     const irep_idt &name,
     goto_functionst::goto_functiont &fct)
 {
-  symbol_tablet::symbolst::iterator sym_entry=symbol_table.symbols.find(name);
-  assert(sym_entry!=symbol_table.symbols.end());
-  symbolt &fct_symbol=sym_entry->second;
+  symbolt &fct_symbol=symbol_table.at(name);
 
   code_typet::parameterst &parameters=
     to_code_type(fct.type).parameters();

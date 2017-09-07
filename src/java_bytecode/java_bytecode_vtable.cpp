@@ -73,7 +73,7 @@ public:
   symbolt &get_vt_type_symbol(const class_typet &class_type)
   {
     const std::string &class_name(id2string(class_type.get(ID_name)));
-    return symbol_table.lookup(vtnamest::get_type(class_name));
+    return symbol_table.at(vtnamest::get_type(class_name));
   }
 
   void create_vtable_symbol(symbolt &result, const class_typet &class_type)

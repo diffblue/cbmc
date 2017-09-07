@@ -742,41 +742,13 @@ void polynomial_acceleratort::stash_polynomials(
 {
   expr_sett modified;
   utils.find_modified(body, modified);
-  stash_variables(program, modified, substitution);
+  utils.stash_variables(program, modified, substitution);
 
   for(std::map<exprt, polynomialt>::iterator it=polynomials.begin();
       it!=polynomials.end();
       ++it)
   {
     it->second.substitute(substitution);
-  }
-}
-
-void polynomial_acceleratort::stash_variables(
-  scratch_programt &program,
-  expr_sett modified,
-  substitutiont &substitution)
-{
-  find_symbols_sett vars;
-
-  for(expr_sett::iterator it=modified.begin();
-      it!=modified.end();
-      ++it)
-  {
-    find_symbols(*it, vars);
-  }
-
-  irep_idt loop_counter_name=to_symbol_expr(loop_counter).get_identifier();
-  vars.erase(loop_counter_name);
-
-  for(find_symbols_sett::iterator it=vars.begin();
-      it!=vars.end();
-      ++it)
-  {
-    symbolt orig=symbol_table.lookup(*it);
-    symbolt stashed_sym=utils.fresh_symbol("polynomial::stash", orig.type);
-    substitution[orig.symbol_expr()]=stashed_sym.symbol_expr();
-    program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());
   }
 }
 
