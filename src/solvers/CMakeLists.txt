@@ -41,6 +41,9 @@ set(booleforce_source
 set(minibdd_source
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD/example.cpp
 )
+set(limmat_source
+    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_limmat.cpp
+)
 
 file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
@@ -57,26 +60,19 @@ list(REMOVE_ITEM sources
     ${lingeling_source}
     ${booleforce_source}
     ${minibdd_source}
-
-    # Some files just don't build
-    ${CMAKE_CURRENT_SOURCE_DIR}/cvc/cvc_prop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/dplib/dplib_prop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/dplib/dplib_conv.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/dplib/dplib_dec.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/floatbv/float_approximation.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_limmat.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/smt1/smt1_prop.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/smt2/smt2_prop.cpp
+    ${limmat_source}
 )
 
 add_library(solvers ${sources} ${headers})
 
-if("${sat_impl}" STREQUAL "minisat2" AND TARGET minisat2-extern)
+if("${sat_impl}" STREQUAL "minisat2")
+    message(STATUS "Building solvers with minisat2")
     target_sources(solvers PRIVATE ${minisat2_source})
     add_dependencies(solvers minisat2-extern)
     target_compile_definitions(solvers PUBLIC SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS)
     target_link_libraries(solvers minisat2-condensed)
-elseif("${sat_impl}" STREQUAL "glucose" AND TARGET glucose-extern)
+elseif("${sat_impl}" STREQUAL "glucose")
+    message(STATUS "Building solvers with glucose")
     target_sources(solvers PRIVATE ${glucose_source})
     add_dependencies(solvers glucose-extern)
     target_compile_definitions(solvers PUBLIC SATCHECK_GLUCOSE HAVE_GLUCOSE __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS)

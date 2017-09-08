@@ -3,15 +3,6 @@ file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
 list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/goto_cc_main.cpp
-
-    # These files don't build
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/read_goto_object.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_goto_function.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_goto_function_hashing.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_goto_program.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_goto_program_hashing.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_irep_hashing.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_symbol_hashing.cpp
 )
 add_library(goto-cc-lib ${sources} ${headers})
 

@@ -3,9 +3,6 @@ file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
 list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/goto_analyzer_main.cpp
-
-    # This doesn't build
-    ${CMAKE_CURRENT_SOURCE_DIR}/xml_binaries/xml_goto_function.cpp
 )
 add_library(goto-analyzer-lib ${sources} ${headers})
 
