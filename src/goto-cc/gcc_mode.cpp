@@ -933,6 +933,34 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
   }
   objcopy_cmd+="objcopy";
 
+  #ifdef __linux__
+  if(act_as_ld && cmdline.get_value('m')=="i386pep")
+  {
+    for(const auto &object_file : compiler.object_files)
+    {
+      debug() << "stripping goto-cc sections before building EFI binary" << eom;
+      // create a backup copy
+      std::string bin_name=object_file+goto_binary_tmp_suffix;
+
+      std::ifstream in(object_file, std::ios::binary);
+      std::ofstream out(bin_name, std::ios::binary);
+      out << in.rdbuf();
+
+      // remove any existing goto-cc section
+      std::vector<std::string> objcopy_argv;
+
+      objcopy_argv.push_back(objcopy_cmd);
+      objcopy_argv.push_back("--remove-section=goto-cc");
+      objcopy_argv.push_back(object_file);
+
+      int result=run(objcopy_argv[0], objcopy_argv, "", "");
+      if(result!=0)
+        debug() << "EFI binary preparation: removing goto-cc section failed"
+                << eom;
+    }
+  }
+  #endif
+
   int result=run_gcc(compiler);
 
   if(result==0)
@@ -941,6 +969,21 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
         compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
     result=ls_merge.add_linker_script_definitions();
   }
+
+  #ifdef __linux__
+  if(act_as_ld && cmdline.get_value('m')=="i386pep")
+  {
+    debug() << "arch set with " << compiler.object_files.size() << eom;
+    for(const auto &object_file : compiler.object_files)
+    {
+      debug() << "EFI binary preparation: restoring object files" << eom;
+      std::string bin_name=object_file+goto_binary_tmp_suffix;
+      int mv_result=rename(bin_name.c_str(), object_file.c_str());
+      if(mv_result!=0)
+        debug() << "Rename failed: " << std::strerror(errno) << eom;
+    }
+  }
+  #endif
 
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
@@ -962,7 +1005,9 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       objcopy_argv.push_back("--remove-section=goto-cc");
       objcopy_argv.push_back(*it);
 
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
+      int rs_result=run(objcopy_argv[0], objcopy_argv, "", "");
+      if(rs_result!=0 && (!act_as_ld || cmdline.get_value('m')!="i386pep"))
+        result=rs_result;
     }
 
     if(result==0)
@@ -975,7 +1020,15 @@ int gcc_modet::gcc_hybrid_binary(compilet &compiler)
       objcopy_argv.push_back("goto-cc="+saved);
       objcopy_argv.push_back(*it);
 
-      result=run(objcopy_argv[0], objcopy_argv, "", "");
+      int as_result=run(objcopy_argv[0], objcopy_argv, "", "");
+      if(as_result!=0)
+      {
+        if(act_as_ld && cmdline.get_value('m')=="i386pep")
+          warning() << "cannot merge EFI binaries: goto-cc section lost"
+                    << eom;
+        else
+          result=as_result;
+      }
     }
 
     int remove_result=remove(saved.c_str());
