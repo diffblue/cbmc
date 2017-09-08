@@ -37,7 +37,7 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
 }
 
 /// Generate a _start function for a specific function
-/// \param entry_function_symbol: The symbol for the function that should be
+/// \param entry_function_symbol_id: The symbol for the function that should be
 ///   used as the entry point
 /// \param symbol_table: The symbol table for the program. The new _start
 ///   function symbol will be added to this table

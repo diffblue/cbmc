@@ -195,10 +195,11 @@ bool ansi_c_entry_point(
 
 
 /// Generate a _start function for a specific function
-/// \param entry_function_symbol: The symbol for the function that should be
+/// \param symbol: The symbol for the function that should be
 ///   used as the entry point
 /// \param symbol_table: The symbol table for the program. The new _start
 ///   function symbol will be added to this table
+/// \param message_handler: The message handler
 /// \return Returns false if the _start method was generated correctly
 bool generate_ansi_c_start_function(
   const symbolt &symbol,
