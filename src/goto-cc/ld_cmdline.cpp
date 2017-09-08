@@ -99,6 +99,7 @@ const char *ld_options_with_argument[]=
   "--ios_version_min", // Apple only
   "--macosx_version_min", // Apple only
   "--install_name", // Apple only
+  "--build-id",
   nullptr
 };
 
