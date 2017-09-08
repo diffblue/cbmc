@@ -677,6 +677,17 @@ void linkingt::duplicate_code_symbol(
           if(!found)
             break;
         }
+        // different non-pointer arguments with implementation - the
+        // implementation is always right, even though such code may
+        // be severely broken
+        else if(pointer_offset_bits(t1, ns)==pointer_offset_bits(t2, ns) &&
+                old_symbol.value.is_nil()!=new_symbol.value.is_nil())
+        {
+          if(warn_msg.empty())
+            warn_msg="non-pointer parameter types differ between "
+                     "declaration and definition";
+          replace=new_symbol.value.is_not_nil();
+        }
         else
           break;
 
