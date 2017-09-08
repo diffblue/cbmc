@@ -163,7 +163,7 @@ jobs:
           packages:
             - g++-5
       install:
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5' '-Dsat_impl=glucose'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
 
