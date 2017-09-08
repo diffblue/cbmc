@@ -1,5 +1,3 @@
-#   TODO Specify which solver to use (minisat2 etc.)
-
 #   We may use one of several different solver libraries.
 #   The following files wrap the chosen solver library.
 #   We remove them all from the solver-library sources list, and then add the
@@ -73,11 +71,16 @@ list(REMOVE_ITEM sources
 
 add_library(solvers ${sources} ${headers})
 
-if(TARGET minisat2-extern)
+if("${sat_impl}" STREQUAL "minisat2" AND TARGET minisat2-extern)
     target_sources(solvers PRIVATE ${minisat2_source})
     add_dependencies(solvers minisat2-extern)
-    target_compile_definitions(solvers PUBLIC HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS)
+    target_compile_definitions(solvers PUBLIC SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS)
     target_link_libraries(solvers minisat2-condensed)
+elseif("${sat_impl}" STREQUAL "glucose" AND TARGET glucose-extern)
+    target_sources(solvers PRIVATE ${glucose_source})
+    add_dependencies(solvers glucose-extern)
+    target_compile_definitions(solvers PUBLIC SATCHECK_GLUCOSE HAVE_GLUCOSE __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS)
+    target_link_libraries(solvers glucose-condensed)
 endif()
 
 target_link_libraries(solvers util)
