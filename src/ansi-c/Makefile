@@ -14,7 +14,6 @@ SRC = anonymous_member.cpp \
       c_nondet_symbol_factory.cpp \
       c_preprocess.cpp \
       c_qualifiers.cpp \
-      c_sizeof.cpp \
       c_storage_spec.cpp \
       c_typecast.cpp \
       c_typecheck_argc_argv.cpp \

@@ -13,6 +13,7 @@ Date: November 2011
 
 #include "stack_depth.h"
 
+#include <util/c_types.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
