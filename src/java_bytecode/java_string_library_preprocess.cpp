@@ -1304,8 +1304,7 @@ exprt java_string_library_preprocesst::get_object_at_index(
 {
   dereference_exprt deref_objs(argv, argv.type().subtype());
   pointer_typet empty_pointer=pointer_type(empty_typet());
-  pointer_typet pointer_of_pointer;
-  pointer_of_pointer.copy_to_subtypes(empty_pointer);
+  pointer_typet pointer_of_pointer=pointer_type(empty_pointer);
   member_exprt data_member(deref_objs, "data", pointer_of_pointer);
   plus_exprt data_pointer_plus_index(
     data_member, from_integer(index, java_int_type()), data_member.type());

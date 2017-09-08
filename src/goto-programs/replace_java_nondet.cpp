@@ -251,4 +251,3 @@ void replace_java_nondet(goto_modelt &goto_model)
 {
   replace_java_nondet(goto_model.goto_functions);
 }
-

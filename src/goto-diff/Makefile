@@ -9,6 +9,7 @@ SRC = change_impact.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -33,11 +34,6 @@ CLEANFILES = goto-diff$(EXEEXT)
 
 all: goto-diff$(EXEEXT)
 
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
-
 ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)
   CP_CXXFLAGS += -DHAVE_SPECC
@@ -55,5 +51,5 @@ goto-diff$(EXEEXT): $(OBJ)
 
 .PHONY: goto-diff-mac-signed
 
-cbmc-mac-signed: goto-diff$(EXEEXT)
+goto-diff-mac-signed: goto-diff$(EXEEXT)
 	strip goto-diff$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) goto-diff$(EXEEXT)

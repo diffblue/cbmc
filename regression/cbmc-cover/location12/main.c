@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int foo (int iX, int iY)
 {
   return iX + iY;

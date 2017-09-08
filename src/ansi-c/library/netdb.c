@@ -2,6 +2,8 @@
 
 #include <netdb.h>
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 struct hostent *gethostbyname(const char *name)
 {
   __CPROVER_HIDE:;
@@ -10,7 +12,7 @@ struct hostent *gethostbyname(const char *name)
   __CPROVER_assert(__CPROVER_is_zero_string(name), "gethostbyname zero-termination of name argument");
   #endif
 
-  __CPROVER_bool error;
+  __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error) return 0;
 
   // quite restrictive, as will alias between calls
@@ -22,6 +24,8 @@ struct hostent *gethostbyname(const char *name)
 
 /* FUNCTION: gethostbyaddr */
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 {
   __CPROVER_HIDE:;
@@ -29,7 +33,7 @@ struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
   (void)len;
   (void)type;
 
-  __CPROVER_bool error;
+  __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error) return 0;
 
   // quite restrictive, as will alias between calls
@@ -41,11 +45,13 @@ struct hostent *gethostbyaddr(const void *addr, socklen_t len, int type)
 
 /* FUNCTION: gethostent */
 
+__CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
+
 struct hostent *gethostent(void)
 {
   __CPROVER_HIDE:;
 
-  __CPROVER_bool error;
+  __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
   if(error) return 0;
 
   // quite restrictive, as will alias between calls

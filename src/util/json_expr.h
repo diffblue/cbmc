@@ -23,12 +23,12 @@ class namespacet;
 json_objectt json(
   const exprt &,
   const namespacet &,
-  const irep_idt &mode=ID_unknown);
+  const irep_idt &mode);
 
 json_objectt json(
   const typet &,
   const namespacet &,
-  const irep_idt &mode=ID_unknown);
+  const irep_idt &mode);
 
 json_objectt json(const source_locationt &);
 

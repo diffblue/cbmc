@@ -303,36 +303,40 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
-  mp_integer max_alignment=alignment(type, ns)*8;
-  mp_integer size_bits=pointer_offset_bits(type, ns);
+  mp_integer max_alignment_bits=alignment(type, ns)*8;
+  mp_integer size_bits=0;
 
-  if(size_bits<0)
-    throw "type of unknown size:\n"+type.pretty();
-
-  union_typet::componentst &components=type.components();
+  // check per component, and ignore those without fixed size
+  for(const auto &c : type.components())
+  {
+    mp_integer s=pointer_offset_bits(c.type(), ns);
+    if(s>0)
+      size_bits=std::max(size_bits, s);
+  }
 
   // Is the union packed?
   if(type.get_bool(ID_C_packed))
   {
-    // The size needs to be a multiple of 8 only.
-    max_alignment=8;
+    // The size needs to be a multiple of 8 bits only.
+    max_alignment_bits=8;
   }
 
   // The size must be a multiple of the alignment, or
   // we add a padding member to the union.
 
-  if(size_bits%max_alignment!=0)
+  if(size_bits%max_alignment_bits!=0)
   {
-    mp_integer padding=max_alignment-(size_bits%max_alignment);
+    mp_integer padding_bits=
+      max_alignment_bits-(size_bits%max_alignment_bits);
 
     unsignedbv_typet padding_type;
-    padding_type.set_width(integer2unsigned(size_bits+padding));
+    padding_type.set_width(integer2size_t(size_bits+padding_bits));
 
     struct_typet::componentt component;
     component.type()=padding_type;
     component.set_name("$pad");
     component.set_is_padding(true);
 
-    components.push_back(component);
+    type.components().push_back(component);
   }
 }

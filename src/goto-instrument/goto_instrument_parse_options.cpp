@@ -624,6 +624,7 @@ int goto_instrument_parse_optionst::doit()
       const bool is_cpp=cmdline.isset("dump-cpp");
       const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
+      const bool harness=cmdline.isset("harness");
       namespacet ns(symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -642,11 +643,22 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          out);
       }
       else
         (is_cpp ? dump_cpp : dump_c)(
-          goto_functions, h_libc, h_all, ns, std::cout);
+          goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          std::cout);
 
       return 0;
     }
@@ -1414,6 +1426,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
   {
+    do_indirect_call_and_rtti_removal();
+
     status() << "Performing a reachability slice" << eom;
     if(cmdline.isset("property"))
       reachability_slicer(goto_functions, cmdline.get_values("property"));
@@ -1424,8 +1438,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    remove_returns(symbol_table, goto_functions);
     do_indirect_call_and_rtti_removal();
+    do_remove_returns();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
@@ -1468,6 +1482,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
@@ -1475,6 +1490,8 @@ void goto_instrument_parse_optionst::help()
     " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --print-path-lengths         print statistics about control-flow graph paths\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1545,6 +1562,7 @@ void goto_instrument_parse_optionst::help()
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
     " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
+    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"

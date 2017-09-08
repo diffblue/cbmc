@@ -161,7 +161,8 @@ void bmc_covert::satisfying_assignment()
 
       if(solver.l_get(cond).is_true())
       {
-        status() << "Covered " << g.description << messaget::eom;
+        status() << "Covered function " << g.source_location.get_function()
+                 << " " << g.description << messaget::eom;
         g.satisfied=true;
         test.covered_goals.push_back(goal_pair.first);
         break;
@@ -393,7 +394,8 @@ bool bmc_covert::operator()()
               json_objectt json_input;
               json_input["id"]=json_stringt(id2string(step.io_id));
               if(step.io_args.size()==1)
-                json_input["value"]=json(step.io_args.front(), bmc.ns);
+                json_input["value"]=
+                  json(step.io_args.front(), bmc.ns, ID_unknown);
               json_test.push_back(json_input);
             }
           }

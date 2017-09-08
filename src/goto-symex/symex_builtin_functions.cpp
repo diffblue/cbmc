@@ -165,20 +165,20 @@ void goto_symext::symex_malloc(
 
   new_symbol_table.add(value_symbol);
 
-  address_of_exprt rhs;
+  exprt rhs;
 
   if(object_type.id()==ID_array)
   {
-    rhs.type()=pointer_type(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
-    rhs.op0()=index_expr;
+    rhs=address_of_exprt(
+      index_expr, pointer_type(value_symbol.type.subtype()));
   }
   else
   {
-    rhs.op0()=value_symbol.symbol_expr();
-    rhs.type()=pointer_type(value_symbol.type);
+    rhs=address_of_exprt(
+      value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
 
   if(rhs.type()!=lhs.type())

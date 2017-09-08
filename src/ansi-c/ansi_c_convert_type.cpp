@@ -216,6 +216,13 @@ void ansi_c_convert_typet::read_rec(const typet &type)
   {
     c_storage_spec.alias=type.subtype().get(ID_value);
   }
+  else if(type.id()==ID_pointer)
+  {
+    // pointers have a width, much like integers
+    pointer_typet tmp=to_pointer_type(type);
+    tmp.set_width(config.ansi_c.pointer_width);
+    other.push_back(tmp);
+  }
   else
     other.push_back(type);
 }

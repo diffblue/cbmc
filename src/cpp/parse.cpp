@@ -3015,7 +3015,7 @@ bool Parser::optPtrOperator(typet &ptrs)
 
     if(t=='*')
     {
-      pointer_typet op;
+      typet op(ID_pointer);
       cpp_tokent tk;
       lex.get_token(tk);
       set_location(op, tk);

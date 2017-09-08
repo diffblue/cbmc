@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/string_utils.h>
 
+#include <set>
+
 bool java_is_array_type(const typet &type)
 {
   if(type.id()!=ID_struct)

@@ -239,6 +239,7 @@ public:
     void make_dead() { clear(DEAD); }
     void make_atomic_begin() { clear(ATOMIC_BEGIN); }
     void make_atomic_end() { clear(ATOMIC_END); }
+    void make_end_function() { clear(END_FUNCTION); }
 
     void make_goto(targett _target)
     {
@@ -250,6 +251,18 @@ public:
     {
       make_goto(_target);
       guard=g;
+    }
+
+    void make_assignment(const codeT &_code)
+    {
+      clear(ASSIGN);
+      code=_code;
+    }
+
+    void make_decl(const codeT &_code)
+    {
+      clear(DECL);
+      code=_code;
     }
 
     void make_function_call(const codeT &_code)

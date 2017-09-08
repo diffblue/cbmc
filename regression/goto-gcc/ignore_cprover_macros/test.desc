@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+--
+goto-gcc must define out all CPROVER macros that are used in the
+codebase. This test succeeds iff GCC doesn't see the CPROVER macros in
+the test file.

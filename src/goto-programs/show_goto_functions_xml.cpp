@@ -49,8 +49,11 @@ xmlt show_goto_functions_xmlt::convert(
     xml_function.set_attribute("name", id2string(function_name));
     xml_function.set_attribute_bool(
       "is_body_available", function.body_available());
-    bool is_internal=(has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-                      function_name==goto_functions.entry_point());
+    bool is_internal=
+      has_prefix(id2string(function_name), CPROVER_PREFIX) ||
+      has_prefix(id2string(function_name), "java::array[") ||
+      has_prefix(id2string(function_name), "java::org.cprover") ||
+      has_prefix(id2string(function_name), "java::java");
     xml_function.set_attribute_bool("is_internal", is_internal);
 
     if(function.body_available())

@@ -76,7 +76,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_array)
     typecheck_array_type(to_array_type(type));
   else if(type.id()==ID_pointer)
+  {
     typecheck_type(type.subtype());
+    INVARIANT(!type.get(ID_width).empty(), "pointers must have width");
+  }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
     typecheck_compound_type(to_struct_union_type(type));
