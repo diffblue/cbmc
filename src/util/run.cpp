@@ -133,7 +133,7 @@ int run(
 
       /* usually no return */
       perror(std::string("execvp "+what+" failed").c_str());
-      return 1;
+      exit(1);
     }
     else /* fork() returns new pid to the parent process */
     {
