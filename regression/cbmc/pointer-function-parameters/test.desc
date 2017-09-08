@@ -4,8 +4,8 @@ main.c
 ^\*\* 5 of 5 covered \(100\.0%\)$
 ^\*\* Used 3 iterations$
 ^Test suite:$
-^a=\(\(signed int \*\)NULL\), tmp\$1=[^,]*$
-^a=&tmp\$1!0, tmp\$1=4$
-^a=&tmp\$1!0, tmp\$1=([012356789][0-9]*|4[0-9]+)$
+^a=\(\(signed int \*\)NULL\), tmp\$\d+=[^,]*$
+^a=&tmp\$\d+!0, tmp\$\d+=4$
+^a=&tmp\$\d+!0, tmp\$\d+=([012356789][0-9]*|4[0-9]+)$
 --
 ^warning: ignoring
