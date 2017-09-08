@@ -163,7 +163,7 @@ jobs:
           packages:
             - g++-5
       install:
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_FLAGS_RELEASE=-O3' '-DCMAKE_CXX_FLAGS=-Wall -Wpedantic -Werror' '-DCMAKE_CXX_COMPILER=g++-5' '-Dsat_impl=glucose'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5' '-Dsat_impl=glucose'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
 
@@ -174,7 +174,7 @@ jobs:
         - BUILD_SYSTEM=cmake
         - CCACHE_CPP2=yes
       install:
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_FLAGS_RELEASE=-O3' '-DCMAKE_CXX_FLAGS=-Wall -Wpedantic -Werror' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
 
