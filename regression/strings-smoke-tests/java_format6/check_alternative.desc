@@ -1,0 +1,8 @@
+FUTURE
+test.class
+--refine-strings --string-max-length 20 --function test.check_alternative
+^EXIT=0$
+^SIGNAL=0$
+ASSERTION SUCCESSFUL
+--
+^ignoring
