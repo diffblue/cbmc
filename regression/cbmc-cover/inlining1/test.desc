@@ -3,7 +3,7 @@ main.c
 --cover branch
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.coverage.1\] file main.c line 13 function main entry point: SATISFIED$
+^\[main.coverage.1\] file main.c line 15 function main entry point: SATISFIED$
 ^\[my_func.coverage.1\] file main.c line 5 function my_func entry point: SATISFIED$
 ^\[my_func.coverage.2\] file main.c line 5 function my_func block 1 branch false: SATISFIED$
 ^\[my_func.coverage.3\] file main.c line 5 function my_func block 1 branch true: SATISFIED$
