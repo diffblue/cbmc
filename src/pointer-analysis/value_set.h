@@ -83,7 +83,12 @@ public:
     size_t size() const { return data.size(); }
     bool empty() const { return data.empty(); }
 
+    void erase(unsigned i) { data.erase(i); }
+    void erase(iterator it) { data.erase(it); }
+
     objectt &operator[](unsigned i) { return data[i]; }
+    objectt &at(unsigned i) { return data.at(i); }
+    const objectt &at(unsigned i) const { return data.at(i); }
 
     template <typename It>
     void insert(It b, It e) { data.insert(b, e); }
