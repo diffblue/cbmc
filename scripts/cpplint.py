@@ -224,8 +224,9 @@ _ERROR_CATEGORIES = [
     'readability/inheritance',
     'readability/multiline_comment',
     'readability/multiline_string',
-    'readability/namespace',
+    'readability/identifier_spacing',
     'readability/identifiers',
+    'readability/namespace',
     'readability/nolint',
     'readability/nul',
     'readability/strings',
@@ -281,7 +282,12 @@ _LEGACY_ERROR_CATEGORIES = [
 # flag. By default all errors are on, so only add here categories that should be
 # off by default (i.e., categories that must be enabled by the --filter= flags).
 # All entries here should start with a '-' or '+', as in the --filter= flag.
-_DEFAULT_FILTERS = ['-build/include_alpha']
+_DEFAULT_FILTERS = [
+    '-build/include_alpha',
+    '-whitespace/',
+    '-readability/braces',
+    '-readability/identifier_spacing',
+    ]
 
 # The default list of categories suppressed for C (not C++) files.
 _DEFAULT_C_SUPPRESSED_CATEGORIES = [
@@ -3624,7 +3630,7 @@ def CheckOperatorSpacing(filename, clean_lines, linenum, error):
 
 # check any inherited classes don't have a space between the type and the :
   if Search(r'(struct|class)\s[\w_]*\s+:', line):
-    error(filename, linenum, 'readability/identifiers', 4, 'There shouldn\'t be a space between class identifier and :')
+    error(filename, linenum, 'readability/identifier_spacing', 4, 'There shouldn\'t be a space between class identifier and :')
 
   #check type definitions end with t
   # Look for class declarations and check the final character is a t
