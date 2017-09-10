@@ -152,6 +152,9 @@ public:
   T &operator[](size_type t) { return data[t]; }
   const T &operator[](size_type t) const { return data[t]; }
 
+  T &at(size_type t) { return data.at(t); }
+  const T &at(size_type t) const { return data.at(t); }
+
   size_type size() const { return data.size(); }
 
   iterator begin() { return data.begin(); }
