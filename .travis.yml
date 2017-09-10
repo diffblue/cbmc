@@ -3,6 +3,32 @@ language: cpp
 jobs:
   include:
 
+    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      env: NAME="clang-format"
+      addons:
+        apt:
+          packages:
+            - clang-format-3.8
+      install:
+      script: |
+        # Apparently update-alternatives doesn't work in Travis containers
+        mkdir -p priority-symlinks
+        ln -s /usr/bin/clang-format-3.8 priority-symlinks/clang-format
+        export PATH=${PWD}/priority-symlinks:${PATH}
+
+        # Now we can do the formatting pass
+        clang-format --version
+        git-clang-format-3.8 "${TRAVIS_BRANCH}"
+        git diff --color > formatted.diff
+        if [[ -s formatted.diff ]] ; then
+          echo 'Formatting error! Apply the following diff and resubmit:'
+          cat formatted.diff
+          exit 1
+        fi
+        echo 'No formatting errors found'
+        exit 0
+      before_cache:
+
     - &linter-stage
       stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       env: NAME="CPP-LINT"
