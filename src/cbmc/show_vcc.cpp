@@ -47,7 +47,7 @@ void bmct::show_vcc_plain(std::ostream &out)
     symex_target_equationt::SSA_stepst::const_iterator
       last_it=has_threads?equation.SSA_steps.end():s_it;
 
-    for(unsigned count=1; p_it!=last_it; p_it++)
+    for(std::size_t count=1; p_it!=last_it; p_it++)
       if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
       {
         if(!p_it->ignore)

@@ -45,7 +45,7 @@ void label_properties(goto_modelt &goto_model)
 
 void label_properties(
   goto_programt &goto_program,
-  std::map<irep_idt, unsigned> &property_counters)
+  std::map<irep_idt, std::size_t> &property_counters)
 {
   for(goto_programt::instructionst::iterator
       it=goto_program.instructions.begin();
@@ -75,7 +75,7 @@ void label_properties(
     if(prefix!="")
       prefix+=".";
 
-    unsigned &count=property_counters[prefix];
+    std::size_t &count=property_counters[prefix];
 
     count++;
 
@@ -87,7 +87,7 @@ void label_properties(
 
 void label_properties(goto_programt &goto_program)
 {
-  std::map<irep_idt, unsigned> property_counters;
+  std::map<irep_idt, std::size_t> property_counters;
   label_properties(goto_program, property_counters);
 }
 
@@ -116,7 +116,7 @@ void set_properties(
 
 void label_properties(goto_functionst &goto_functions)
 {
-  std::map<irep_idt, unsigned> property_counters;
+  std::map<irep_idt, std::size_t> property_counters;
 
   for(goto_functionst::function_mapt::iterator
       it=goto_functions.function_map.begin();

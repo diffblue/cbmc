@@ -675,7 +675,7 @@ std::string irept::pretty(unsigned indent, unsigned max_indent) const
     result+=it->second.pretty(indent+2, max_indent);
   }
 
-  unsigned count=0;
+  std::size_t count=0;
 
   forall_irep(it, get_sub())
   {

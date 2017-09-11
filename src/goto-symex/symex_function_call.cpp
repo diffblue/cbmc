@@ -138,7 +138,7 @@ void goto_symext::parameter_assignments(
   if(function_type.has_ellipsis())
   {
     // These are va_arg arguments; their types may differ from call to call
-    unsigned va_count=0;
+    std::size_t va_count=0;
     const symbolt *va_sym=nullptr;
     while(!ns.lookup(
         id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
