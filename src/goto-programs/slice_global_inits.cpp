@@ -25,14 +25,13 @@ Date:   December 2016
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
 
-void slice_global_inits(
-  const namespacet &ns,
-  goto_functionst &goto_functions)
+void slice_global_inits(goto_modelt &goto_model)
 {
   // gather all functions reachable from the entry point
 
-  call_grapht call_graph(goto_functions);
+  call_grapht call_graph(goto_model);
   const call_grapht::grapht &graph=call_graph.graph;
+  goto_functionst &goto_functions=goto_model.goto_functions;
 
   std::list<irep_idt> worklist;
   std::unordered_set<irep_idt, irep_id_hash> functions_reached;

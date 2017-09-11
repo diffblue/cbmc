@@ -79,11 +79,10 @@ code_function_callt function_to_call(
 }
 
 void function_enter(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const irep_idt &id)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     // don't instrument our internal functions
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
@@ -100,17 +99,16 @@ void function_enter(
     goto_programt::targett t=
       body.insert_before(body.instructions.begin());
     t->make_function_call(
-      function_to_call(symbol_table, id, f_it->first));
+      function_to_call(goto_model.symbol_table, id, f_it->first));
     t->function=f_it->first;
   }
 }
 
 void function_exit(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const irep_idt &id)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     // don't instrument our internal functions
     if(has_prefix(id2string(f_it->first), CPROVER_PREFIX))
@@ -136,7 +134,7 @@ void function_exit(
         goto_programt::instructiont call;
         call.function=f_it->first;
         call.make_function_call(
-          function_to_call(symbol_table, id, f_it->first));
+          function_to_call(goto_model.symbol_table, id, f_it->first));
         body.insert_before_swap(i_it, call);
 
         // move on
@@ -164,7 +162,7 @@ void function_exit(
     {
       goto_programt::instructiont call;
       call.make_function_call(
-        function_to_call(symbol_table, id, f_it->first));
+        function_to_call(goto_model.symbol_table, id, f_it->first));
       call.function=f_it->first;
       body.insert_before_swap(last, call);
     }

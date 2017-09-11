@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Unwind loops in static initializers
 
 #include "remove_static_init_loops.h"
+#include "goto_model.h"
 
 #include <algorithm>
 
@@ -104,11 +105,10 @@ void remove_static_init_loopst::unwind_enum_static(
 /// \par parameters: symbol table, goto_functions and options
 /// \return side effect is adding <clinit> loops to unwindset
 void remove_static_init_loops(
-  const symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   optionst &options,
   message_handlert &msg)
 {
-  remove_static_init_loopst remove_loops(symbol_table);
-  remove_loops.unwind_enum_static(goto_functions, options, msg);
+  remove_static_init_loopst remove_loops(goto_model.symbol_table);
+  remove_loops.unwind_enum_static(goto_model.goto_functions, options, msg);
 }

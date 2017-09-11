@@ -20,6 +20,8 @@ Date: April 2013
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
+#include <goto-programs/goto_model.h>
+
 void show_call_sequences(
   const irep_idt &function,
   const goto_programt &goto_program,
@@ -97,11 +99,11 @@ void show_call_sequences(
   std::cout << '\n';
 }
 
-void show_call_sequences(const goto_functionst &goto_functions)
+void show_call_sequences(const goto_modelt &goto_model)
 {
   // do per function
 
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
     show_call_sequences(f_it->first, f_it->second.body);
 }
 
@@ -109,9 +111,9 @@ class check_call_sequencet
 {
 public:
   explicit check_call_sequencet(
-    const goto_functionst &_goto_functions,
+    const goto_modelt &_goto_model,
     const std::vector<irep_idt> &_sequence):
-    goto_functions(_goto_functions),
+    goto_functions(_goto_model.goto_functions),
     sequence(_sequence)
   {
   }
@@ -281,7 +283,7 @@ void check_call_sequencet::operator()()
   std::cout << "sequence not feasible\n";
 }
 
-void check_call_sequence(const goto_functionst &goto_functions)
+void check_call_sequence(const goto_modelt &goto_model)
 {
   // read the sequence from stdin
 
@@ -297,7 +299,7 @@ void check_call_sequence(const goto_functionst &goto_functions)
       sequence.push_back(line);
   }
 
-  check_call_sequencet(goto_functions, sequence)();
+  check_call_sequencet(goto_model, sequence)();
 }
 
 static void list_calls_and_arguments(
@@ -346,12 +348,12 @@ static void list_calls_and_arguments(
   }
 }
 
-void list_calls_and_arguments(
-  const namespacet &ns,
-  const goto_functionst &goto_functions)
+void list_calls_and_arguments(const goto_modelt &goto_model)
 {
   // do per function
 
-  forall_goto_functions(f_it, goto_functions)
+  const namespacet ns(goto_model.symbol_table);
+
+  forall_goto_functions(f_it, goto_model.goto_functions)
     list_calls_and_arguments(ns, f_it->first, f_it->second.body);
 }

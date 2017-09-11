@@ -15,8 +15,6 @@ Author: Peter Schrammel
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <langapi/language_ui.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 

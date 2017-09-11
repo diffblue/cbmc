@@ -24,6 +24,7 @@ Date: July 2005
 #include <iosfwd>
 #include <vector>
 
+#include <util/namespace.h>
 #include <util/ssa_expr.h>
 
 #include <goto-programs/goto_program.h>
@@ -195,12 +196,12 @@ public:
 
 void show_goto_trace(
   std::ostream &out,
-  const namespacet &ns,
-  const goto_tracet &goto_trace);
+  const namespacet &,
+  const goto_tracet &);
 
 void trace_value(
   std::ostream &out,
-  const namespacet &ns,
+  const namespacet &,
   const ssa_exprt &lhs_object,
   const exprt &full_lhs,
   const exprt &value);

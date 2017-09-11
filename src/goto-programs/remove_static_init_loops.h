@@ -9,18 +9,19 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Unwind loops in static initializers
 
+#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_STATIC_INIT_LOOPS_H
+#define CPROVER_GOTO_PROGRAMS_REMOVE_STATIC_INIT_LOOPS_H
+
 #include <goto-programs/goto_functions.h>
 
 #include <util/message.h>
 #include <util/options.h>
 #include <util/symbol_table.h>
 
-#ifndef CPROVER_GOTO_PROGRAMS_REMOVE_STATIC_INIT_LOOPS_H
-#define CPROVER_GOTO_PROGRAMS_REMOVE_STATIC_INIT_LOOPS_H
+class goto_modelt;
 
 void remove_static_init_loops(
-  const symbol_tablet &,
-  const goto_functionst &,
+  const goto_modelt &,
   optionst &,
   message_handlert &);
 

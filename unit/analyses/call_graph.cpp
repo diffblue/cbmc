@@ -1,3 +1,10 @@
+/*******************************************************************\
+
+Module: Unit test for call graph generation
+
+Author:
+
+\*******************************************************************/
 
 #include <iostream>
 
@@ -56,7 +63,7 @@ SCENARIO("call_graph",
     // void C() { }
     // void D() { }
 
-    symbol_tablet symbol_table;
+    goto_modelt goto_model;
     code_typet void_function_type;
 
     {
@@ -68,7 +75,8 @@ SCENARIO("call_graph",
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
 
-      symbol_table.add(create_void_function_symbol("A", calls));
+      goto_model.symbol_table.add(
+        create_void_function_symbol("A", calls));
     }
 
     {
@@ -80,17 +88,19 @@ SCENARIO("call_graph",
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
 
-      symbol_table.add(create_void_function_symbol("B", calls));
+      goto_model.symbol_table.add(
+        create_void_function_symbol("B", calls));
     }
 
-    symbol_table.add(create_void_function_symbol("C", code_skipt()));
-    symbol_table.add(create_void_function_symbol("D", code_skipt()));
+    goto_model.symbol_table.add(
+      create_void_function_symbol("C", code_skipt()));
+    goto_model.symbol_table.add(
+      create_void_function_symbol("D", code_skipt()));
 
-    goto_functionst goto_functions;
     stream_message_handlert msg(std::cout);
-    goto_convert(symbol_table, goto_functions, msg);
+    goto_convert(goto_model, msg);
 
-    call_grapht call_graph_from_goto_functions(goto_functions);
+    call_grapht call_graph_from_goto_functions(goto_model);
 
     WHEN("A call graph is constructed from the GOTO functions")
     {

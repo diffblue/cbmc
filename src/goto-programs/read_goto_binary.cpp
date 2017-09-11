@@ -30,8 +30,6 @@ Author:
 #include <util/base_type.h>
 #include <util/config.h>
 
-#include <langapi/language_ui.h>
-
 #include "goto_model.h"
 #include "link_goto_model.h"
 #include "read_bin_goto_object.h"

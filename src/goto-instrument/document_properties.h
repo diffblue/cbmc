@@ -14,14 +14,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iosfwd>
 
-#include <goto-programs/goto_functions.h>
+class goto_modelt;
 
 void document_properties_latex(
-  const goto_functionst &goto_functions,
+  const goto_modelt &,
   std::ostream &out);
 
 void document_properties_html(
-  const goto_functionst &goto_functions,
+  const goto_modelt &,
   std::ostream &out);
 
 #endif // CPROVER_GOTO_INSTRUMENT_DOCUMENT_PROPERTIES_H

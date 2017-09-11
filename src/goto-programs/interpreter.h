@@ -14,11 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/message.h>
 
-#include "goto_functions.h"
+#include "goto_model.h"
 
 void interpreter(
-  const symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
-  message_handlert &message_handler);
+  const goto_modelt &,
+  message_handlert &);
 
 #endif // CPROVER_GOTO_PROGRAMS_INTERPRETER_H

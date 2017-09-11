@@ -15,13 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <map>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class call_grapht
 {
 public:
   call_grapht();
-  explicit call_grapht(const goto_functionst &);
+  explicit call_grapht(const goto_modelt &);
 
   void output_dot(std::ostream &out) const;
   void output(std::ostream &out) const;

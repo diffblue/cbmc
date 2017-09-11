@@ -137,6 +137,10 @@ bool initialize_goto_model(
       goto_model.symbol_table,
       goto_model.goto_functions,
       message_handler);
+
+    // stupid hack
+    config.set_object_bits_from_symbol_table(
+      goto_model.symbol_table);
   }
   catch(const char *e)
   {

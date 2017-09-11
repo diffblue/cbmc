@@ -431,14 +431,14 @@ bool goto_diff_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return true;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      show_goto_functions(ns, get_ui(), goto_functions);
+      show_goto_functions(goto_model, get_ui());
       return true;
     }
   }

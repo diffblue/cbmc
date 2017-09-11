@@ -18,9 +18,9 @@ call_grapht::call_grapht()
 {
 }
 
-call_grapht::call_grapht(const goto_functionst &goto_functions)
+call_grapht::call_grapht(const goto_modelt &goto_model)
 {
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     const goto_programt &body=f_it->second.body;
     add(f_it->first, body);

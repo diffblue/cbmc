@@ -184,10 +184,10 @@ void havoc_loopst::havoc_loops()
     havoc_loop(loop.first, loop.second);
 }
 
-void havoc_loops(goto_functionst &goto_functions)
+void havoc_loops(goto_modelt &goto_model)
 {
-  function_modifiest function_modifies(goto_functions);
+  function_modifiest function_modifies(goto_model.goto_functions);
 
-  Forall_goto_functions(it, goto_functions)
+  Forall_goto_functions(it, goto_model.goto_functions)
     havoc_loopst(function_modifies, it->second);
 }

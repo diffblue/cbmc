@@ -16,7 +16,7 @@ Date: October 2012
 
 #include <set>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class is_threadedt
 {
@@ -25,6 +25,12 @@ public:
     const goto_functionst &goto_functions)
   {
     compute(goto_functions);
+  }
+
+  explicit is_threadedt(
+    const goto_modelt &goto_model)
+  {
+    compute(goto_model.goto_functions);
   }
 
   bool operator()(const goto_programt::const_targett t) const

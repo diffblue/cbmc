@@ -222,10 +222,9 @@ void concurrency_instrumentationt::instrument(
 
 void concurrency(
   value_setst &value_sets,
-  class symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   concurrency_instrumentationt concurrency_instrumentation(
-    value_sets, symbol_table);
-  concurrency_instrumentation(goto_functions);
+    value_sets, goto_model.symbol_table);
+  concurrency_instrumentation(goto_model.goto_functions);
 }

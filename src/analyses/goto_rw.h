@@ -19,7 +19,7 @@ Date: April 2010
 
 #include <util/guard.h>
 
-#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
 
 #define forall_rw_range_set_r_objects(it, rw_set) \
   for(rw_range_sett::objectst::const_iterator it=(rw_set).get_r_set().begin(); \
@@ -30,15 +30,15 @@ Date: April 2010
       it!=(rw_set).get_w_set().end(); ++it)
 
 class rw_range_sett;
-class goto_functionst;
+class goto_modelt;
 
 void goto_rw(goto_programt::const_targett target,
              rw_range_sett &rw_set);
 
-void goto_rw(const goto_programt &goto_program,
+void goto_rw(const goto_programt &,
              rw_range_sett &rw_set);
 
-void goto_rw(const goto_functionst &goto_functions,
+void goto_rw(const goto_functionst &,
              const irep_idt &function,
              rw_range_sett &rw_set);
 

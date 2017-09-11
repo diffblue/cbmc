@@ -584,9 +584,7 @@ void remove_exceptions(
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(goto_modelt &goto_model)
 {
-  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
-  remove_exceptionst remove_exceptions(
+  remove_exceptions(
     goto_model.symbol_table,
-    exceptions_map);
-  remove_exceptions(goto_model.goto_functions);
+    goto_model.goto_functions);
 }

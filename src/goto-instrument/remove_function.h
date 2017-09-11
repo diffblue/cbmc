@@ -19,20 +19,17 @@ Date: April 2017
 
 #include <util/irep.h>
 
-class goto_functionst;
+class goto_modelt;
 class message_handlert;
-class symbol_tablet;
 
 void remove_function(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &,
   const irep_idt &identifier,
-  message_handlert &message_handler);
+  message_handlert &);
 
 void remove_functions(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &,
   const std::list<std::string> &names,
-  message_handlert &message_handler);
+  message_handlert &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_REMOVE_FUNCTION_H

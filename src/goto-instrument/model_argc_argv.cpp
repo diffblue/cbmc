@@ -27,7 +27,7 @@ Date: April 2016
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/goto_convert.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/remove_skip.h>
 
 /// Set up argv with up to max_argc pointers into an array of 4096 bytes.
@@ -37,18 +37,19 @@ Date: April 2016
 /// \param message_handler: message logging
 /// \return True, if and only if modelling succeeded
 bool model_argc_argv(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   unsigned max_argc,
   message_handlert &message_handler)
 {
   messaget message(message_handler);
-  const namespacet ns(symbol_table);
+  const namespacet ns(goto_model.symbol_table);
 
-  if(!symbol_table.has_symbol(goto_functions.entry_point()))
+  if(!goto_model.symbol_table.has_symbol(
+       goto_model.goto_functions.entry_point()))
   {
     message.error() << "Linking not done, missing "
-                    << goto_functions.entry_point() << messaget::eom;
+                    << goto_model.goto_functions.entry_point()
+                    << messaget::eom;
     return true;
   }
 
@@ -79,7 +80,7 @@ bool model_argc_argv(
   std::ostringstream oss;
   oss << "int ARGC;\n"
       << "char *ARGV[1];\n"
-      << "void " << goto_functions.entry_point() << "()\n"
+      << "void " << goto_model.goto_functions.entry_point() << "()\n"
       << "{\n"
       << "  unsigned next=0u;\n"
       << "  " CPROVER_PREFIX "assume(ARGC>=1);\n"
@@ -118,8 +119,8 @@ bool model_argc_argv(
     // add __CPROVER_assume if necessary (it might exist already)
     if(it->first==CPROVER_PREFIX "assume" ||
        it->first==CPROVER_PREFIX "input")
-      symbol_table.add(it->second);
-    else if(it->first==goto_functions.entry_point())
+      goto_model.symbol_table.add(it->second);
+    else if(it->first==goto_model.goto_functions.entry_point())
     {
       value=it->second.value;
 
@@ -128,28 +129,32 @@ bool model_argc_argv(
       replace.insert("ARGV", ns.lookup("argv'").symbol_expr());
       replace(value);
     }
-    else if(has_prefix(id2string(it->first),
-                       id2string(goto_functions.entry_point())+"::") &&
-            symbol_table.add(it->second))
+    else if(has_prefix(
+        id2string(it->first),
+        id2string(goto_model.goto_functions.entry_point())+"::") &&
+      goto_model.symbol_table.add(it->second))
       UNREACHABLE;
   }
   POSTCONDITION(value.is_not_nil());
 
   goto_convert(
     to_code(value),
-    symbol_table,
+    goto_model.symbol_table,
     init_instructions,
     message_handler);
+
   Forall_goto_program_instructions(it, init_instructions)
   {
     it->source_location.set_file("<built-in-library>");
-    it->function=goto_functions.entry_point();
+    it->function=goto_model.goto_functions.entry_point();
   }
 
   goto_functionst::function_mapt::iterator start_entry=
-    goto_functions.function_map.find(goto_functions.entry_point());
+    goto_model.goto_functions.function_map.find(
+      goto_model.goto_functions.entry_point());
+
   DATA_INVARIANT(
-    start_entry!=goto_functions.function_map.end() &&
+    start_entry!=goto_model.goto_functions.function_map.end() &&
     start_entry->second.body_available(),
     "entry point expected to have a body");
 
@@ -175,7 +180,7 @@ bool model_argc_argv(
   // update counters etc.
   remove_skip(start);
   start.compute_loop_numbers();
-  goto_functions.update();
+  goto_model.goto_functions.update();
 
   return false;
 }

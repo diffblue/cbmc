@@ -12,8 +12,7 @@ Author: Vincent Nimal
 #ifndef CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
 #define CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H
 
-class symbol_tablet;
-class goto_functionst;
+class goto_modelt;
 class message_handlert;
 
 /* Note that it only propagates from MAIN, following the CFG, without
@@ -24,8 +23,7 @@ class message_handlert;
    functions-based exploration in remove_function_pointers. */
 
 void propagate_const_function_pointers(
-  symbol_tablet &symbol_tables,
-  goto_functionst &goto_functions,
-  message_handlert &message_handler);
+  goto_modelt &,
+  message_handlert &);
 
 #endif // CPROVER_MUSKETEER_PROPAGATE_CONST_FUNCTION_POINTERS_H

@@ -80,18 +80,18 @@ void reachability_slicert::slice(goto_functionst &goto_functions)
   goto_functions.update();
 }
 
-void reachability_slicer(goto_functionst &goto_functions)
+void reachability_slicer(goto_modelt &goto_model)
 {
   reachability_slicert s;
   assert_criteriont a;
-  s(goto_functions, a);
+  s(goto_model.goto_functions, a);
 }
 
 void reachability_slicer(
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const std::list<std::string> &properties)
 {
   reachability_slicert s;
   properties_criteriont p(properties);
-  s(goto_functions, p);
+  s(goto_model.goto_functions, p);
 }
