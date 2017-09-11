@@ -534,11 +534,8 @@ inline int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
 
-  if(thread)
-  {
-    // pthread_t is a pointer type on some systems
-    *thread=(pthread_t)this_thread_id;
-  }
+  // pthread_t is a pointer type on some systems
+  *thread=(pthread_t)this_thread_id;
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");
