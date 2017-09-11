@@ -11,5 +11,5 @@ int main()
   if(i==2)
     if(j==i+1)
       if(k==i*j)
-        assert(0);
+        __CPROVER_assert(0, "");
 }
