@@ -78,7 +78,7 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
   // now instrument
   for(const auto &fkt : thread_fkts)
   {
-    thread_exit_instrumentation(goto_functions.function_map[fkt].body);
+    thread_exit_instrumentation(goto_functions.function_map.at(fkt).body);
   }
 }
 

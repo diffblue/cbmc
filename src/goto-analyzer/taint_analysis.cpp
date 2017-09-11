@@ -272,8 +272,7 @@ bool taint_analysist::operator()(
       end.add_instruction(END_FUNCTION);
 
       forall_goto_functions(f_it, goto_functions)
-        if(f_it->second.body_available() &&
-           f_it->first!=goto_functionst::entry_point())
+        if(f_it->second.body_available())
         {
           goto_programt::targett t=calls.add_instruction();
           code_function_callt call;
@@ -284,14 +283,12 @@ bool taint_analysist::operator()(
           g->make_goto(t, side_effect_expr_nondett(bool_typet()));
         }
 
-      goto_functionst::goto_functiont &entry=
-        goto_functions.function_map[goto_functionst::entry_point()];
-
+      goto_functionst::goto_functiont entry;
       goto_programt &body=entry.body;
-
       body.destructive_append(gotos);
       body.destructive_append(calls);
       body.destructive_append(end);
+      goto_functions.function_map.emplace(goto_functionst::entry_point(), std::move(entry));
 
       goto_functions.update();
     }
