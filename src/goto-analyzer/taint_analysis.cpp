@@ -400,6 +400,7 @@ bool taint_analysist::operator()(
   }
   catch(...)
   {
+    error() << "Caught unexpected error in taint_analysist::operator()" << eom;
     return true;
   }
 }
