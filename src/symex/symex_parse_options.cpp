@@ -26,23 +26,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
 
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/show_properties.h>
-#include <goto-programs/set_properties.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/loop_ids.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/loop_ids.h>
+#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_exceptions.h>
-#include <goto-programs/remove_instanceof.h>
-#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/set_properties.h>
+#include <goto-programs/show_properties.h>
+#include <goto-programs/xml_goto_trace.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -304,6 +305,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     goto_check(options, goto_model);
 
     // remove stuff
+    remove_returns(goto_model);
     remove_complex(goto_model);
     remove_vector(goto_model);
     // remove function pointers
