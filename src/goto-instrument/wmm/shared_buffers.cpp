@@ -1058,7 +1058,7 @@ void shared_bufferst::cfg_visitort::weak_memory(
     return;
 
   namespacet ns(symbol_table);
-  goto_programt &goto_program=goto_functions.function_map[function].body;
+  goto_programt &goto_program=goto_functions.function_map.at(function).body;
 
 #ifdef LOCAL_MAY
   local_may_aliast local_may(goto_functions.function_map[function]);

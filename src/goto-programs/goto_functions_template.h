@@ -185,42 +185,29 @@ template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_location_numbers()
 {
   unsigned nr=0;
-
-  for(typename function_mapt::iterator
-      it=function_map.begin();
-      it!=function_map.end();
-      it++)
-    it->second.body.compute_location_numbers(nr);
+  for(auto &named_function : function_map)
+    named_function.second.body.compute_location_numbers(nr);
 }
 
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_incoming_edges()
 {
-  for(typename function_mapt::iterator
-      it=function_map.begin();
-      it!=function_map.end();
-      it++)
-    it->second.body.compute_incoming_edges();
+  for(auto &named_function : function_map)
+    named_function.second.body.compute_incoming_edges();
 }
 
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_target_numbers()
 {
-  for(typename function_mapt::iterator
-      it=function_map.begin();
-      it!=function_map.end();
-      it++)
-    it->second.body.compute_target_numbers();
+  for(auto &named_function : function_map)
+    named_function.second.body.compute_target_numbers();
 }
 
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_loop_numbers()
 {
-  for(typename function_mapt::iterator
-      it=function_map.begin();
-      it!=function_map.end();
-      it++)
-    it->second.body.compute_loop_numbers();
+  for(auto &named_function : function_map)
+    named_function.second.body.compute_loop_numbers();
 }
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_FUNCTIONS_TEMPLATE_H

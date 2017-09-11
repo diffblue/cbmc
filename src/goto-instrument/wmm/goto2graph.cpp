@@ -175,12 +175,12 @@ void instrumentert::cfg_visitort::visit_cfg_function(
 
 #ifdef LOCAL_MAY
   local_may_aliast local_may(
-    instrumenter.goto_functions.function_map[function]);
+    instrumenter.goto_functions.function_map.at(function));
 #endif
 
   /* goes through the function */
   Forall_goto_program_instructions(i_it,
-    instrumenter.goto_functions.function_map[function].body)
+    instrumenter.goto_functions.function_map.at(function).body)
   {
     goto_programt::instructiont &instruction=*i_it;
 
@@ -274,7 +274,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   egraph.map_data_dp.insert(new_dp);
   data_dp.print(instrumenter.message);
 
-  if(instrumenter.goto_functions.function_map[function]
+  if(instrumenter.goto_functions.function_map.at(function)
      .body.instructions.empty())
   {
     /* empty set of ending edges */
@@ -282,7 +282,7 @@ void instrumentert::cfg_visitort::visit_cfg_function(
   else
   {
     goto_programt::instructionst::iterator it=instrumenter
-      .goto_functions.function_map[function].body.instructions.end();
+      .goto_functions.function_map.at(function).body.instructions.end();
     --it;
     ending_vertex=in_pos[it];
   }
@@ -319,7 +319,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_reference_function(
 
   /* gets the body of the function */
   goto_programt::instructionst &body=instrumenter.goto_functions
-    .function_map[id_function].body.instructions;
+    .function_map.at(id_function).body.instructions;
 
   if(body.empty())
     return;
@@ -502,7 +502,7 @@ void inline instrumentert::cfg_visitort::visit_cfg_duplicate(
 {
   instrumenter.message.status() << "Duplication..." << messaget::eom;
   const goto_functionst::goto_functiont &fun=
-    instrumenter.goto_functions.function_map[i_it->function];
+    instrumenter.goto_functions.function_map.at(i_it->function);
 
   bool found_pos=false;
   goto_programt::const_targett new_targ=targ;
@@ -1300,15 +1300,12 @@ bool instrumentert::is_cfg_spurious(const event_grapht::critical_cyclet &cyc)
     }
 
   /* now test whether this part of the code can exist */
-  goto_functionst::function_mapt map;
+  goto_functionst this_interleaving;
   goto_function_templatet<goto_programt> one_interleaving;
   one_interleaving.body.copy_from(interleaving);
-  map.insert(std::make_pair(
+  this_interleaving.function_map.insert(std::make_pair(
     goto_functionst::entry_point(),
     std::move(one_interleaving)));
-
-  goto_functionst this_interleaving;
-  this_interleaving.function_map=std::move(map);
   optionst no_option;
   null_message_handlert no_message;
 
