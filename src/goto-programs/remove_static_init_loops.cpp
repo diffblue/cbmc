@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 
-#include <util/message.h>
 #include <util/suffix.h>
 #include <util/string2int.h>
 
@@ -27,7 +26,8 @@ public:
 
   void unwind_enum_static(
     const goto_functionst &goto_functions,
-    optionst &options);
+    optionst &options,
+    message_handlert &);
 protected:
   const symbol_tablet &symbol_table;
 };
@@ -38,9 +38,12 @@ protected:
 /// \return side effect is adding <clinit> loops to unwindset
 void remove_static_init_loopst::unwind_enum_static(
   const goto_functionst &goto_functions,
-  optionst &options)
+  optionst &options,
+  message_handlert &msg)
 {
   size_t unwind_max=0;
+  messaget message;
+  message.set_message_handler(msg);
   forall_goto_functions(f, goto_functions)
   {
     auto &p=f->second.body;
@@ -53,6 +56,13 @@ void remove_static_init_loopst::unwind_enum_static(
         const std::string java_clinit="<clinit>:()V";
         const std::string &fname=id2string(ins.function);
         size_t class_prefix_length=fname.find_last_of('.');
+        // is the function symbol in the symbol table?
+        if(!symbol_table.has_symbol(ins.function))
+        {
+          message.warning() << "function `" << id2string(ins.function)
+                            << "` is not in symbol table" << messaget::eom;
+          continue;
+        }
         // is Java function and static init?
         const symbolt &function_name=symbol_table.lookup(ins.function);
         if(!(function_name.mode==ID_java && has_suffix(fname, java_clinit)))
@@ -96,8 +106,9 @@ void remove_static_init_loopst::unwind_enum_static(
 void remove_static_init_loops(
   const symbol_tablet &symbol_table,
   const goto_functionst &goto_functions,
-  optionst &options)
+  optionst &options,
+  message_handlert &msg)
 {
   remove_static_init_loopst remove_loops(symbol_table);
-  remove_loops.unwind_enum_static(goto_functions, options);
+  remove_loops.unwind_enum_static(goto_functions, options, msg);
 }

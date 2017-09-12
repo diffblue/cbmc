@@ -250,7 +250,7 @@ void cpp_typecheckt::do_not_typechecked()
           cont=true;
         }
         else
-          assert(0); // Don't know what to do!
+          UNREACHABLE; // Don't know what to do!
       }
     }
   }

@@ -37,11 +37,20 @@ void parse_options_baset::usage_error()
   help();
 }
 
+/// Print an error message mentioning the option that was not recognized when
+/// parsing the command line.
+void parse_options_baset::unknown_option_msg()
+{
+  if(!cmdline.unknown_arg.empty())
+    std::cerr << "Unknown option: " << cmdline.unknown_arg << "\n";
+}
+
 int parse_options_baset::main()
 {
   if(parse_result)
   {
     usage_error();
+    unknown_option_msg();
     return EX_USAGE;
   }
 

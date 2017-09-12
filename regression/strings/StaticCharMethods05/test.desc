@@ -1,8 +1,11 @@
-FUTURE
+CORE
 StaticCharMethods05.class
---string-refine
+--refine-strings
 ^EXIT=10$
 ^SIGNAL=0$
+null-pointer-exception\.14\] Throw null: FAILURE
+^\[.*assertion\.1\] .* line 12 .* FAILURE$
+^\[.*assertion\.2\] .* line 22 .* FAILURE$
 ^VERIFICATION FAILED$
 --
 ^warning: ignoring

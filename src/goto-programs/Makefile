@@ -3,6 +3,7 @@ SRC = basic_blocks.cpp \
       class_hierarchy.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
+      convert_nondet.cpp \
       destructor.cpp \
       elf_reader.cpp \
       format_strings.cpp \
@@ -25,6 +26,7 @@ SRC = basic_blocks.cpp \
       interpreter.cpp \
       interpreter_evaluate.cpp \
       json_goto_trace.cpp \
+      link_goto_model.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
       mm_io.cpp \
@@ -47,6 +49,8 @@ SRC = basic_blocks.cpp \
       remove_unused_functions.cpp \
       remove_vector.cpp \
       remove_virtual_functions.cpp \
+      replace_java_nondet.cpp \
+      resolve_concrete_function_call.cpp \
       safety_checker.cpp \
       set_properties.cpp \
       show_goto_functions.cpp \
@@ -57,6 +61,7 @@ SRC = basic_blocks.cpp \
       slice_global_inits.cpp \
       string_abstraction.cpp \
       string_instrumentation.cpp \
+      system_library_symbols.cpp \
       vcd_goto_trace.cpp \
       wp.cpp \
       write_goto_binary.cpp \

@@ -91,7 +91,7 @@ symbolt &cpp_declarator_convertert::convert(
     // adjust template type
     if(final_type.id()==ID_template)
     {
-      assert(0);
+      UNREACHABLE;
       typet tmp;
       tmp.swap(final_type.subtype());
       final_type.swap(tmp);

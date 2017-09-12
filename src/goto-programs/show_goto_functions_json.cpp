@@ -48,8 +48,11 @@ json_objectt show_goto_functions_jsont::convert(
     json_function["name"]=json_stringt(id2string(function_name));
     json_function["isBodyAvailable"]=
       jsont::json_boolean(function.body_available());
-    bool is_internal=(has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-                      function_name==goto_functions.entry_point());
+    bool is_internal=
+      has_prefix(id2string(function_name), CPROVER_PREFIX) ||
+      has_prefix(id2string(function_name), "java::array[") ||
+      has_prefix(id2string(function_name), "java::org.cprover") ||
+      has_prefix(id2string(function_name), "java::java");
     json_function["isInternal"]=jsont::json_boolean(is_internal);
 
     if(function.body_available())

@@ -14,5 +14,6 @@ int main()
   }
 
   // should not produce a goal
+  // assert() is platform-dependent and changes set of coverage goals
   __CPROVER_assert(input1, "");
 }

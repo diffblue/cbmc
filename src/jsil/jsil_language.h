@@ -12,7 +12,10 @@ Author: Michael Tautschnig, tautschn@amazon.com
 #ifndef CPROVER_JSIL_JSIL_LANGUAGE_H
 #define CPROVER_JSIL_JSIL_LANGUAGE_H
 
+#include <memory>
+
 #include <util/language.h>
+#include <util/make_unique.h>
 
 #include "jsil_parse_tree.h"
 
@@ -32,9 +35,7 @@ public:
     symbol_tablet &context,
     const std::string &module);
 
-  virtual bool final(
-    symbol_tablet &context,
-    bool generate_start_function);
+  virtual bool final(symbol_tablet &context, bool generate_start_function);
 
   virtual void show_parse(std::ostream &out);
 
@@ -60,8 +61,8 @@ public:
     exprt &expr,
     const namespacet &ns);
 
-  virtual languaget *new_language()
-  { return new jsil_languaget; }
+  virtual std::unique_ptr<languaget> new_language()
+  { return util_make_unique<jsil_languaget>(); }
 
   virtual std::string id() const { return "jsil"; }
   virtual std::string description() const
@@ -76,6 +77,6 @@ protected:
   std::string parse_path;
 };
 
-languaget *new_jsil_language();
+std::unique_ptr<languaget> new_jsil_language();
 
 #endif // CPROVER_JSIL_JSIL_LANGUAGE_H

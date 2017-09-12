@@ -14,7 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_functions.h"
 
-void remove_skip(goto_programt &goto_program);
-void remove_skip(goto_functionst &goto_functions);
+class goto_modelt;
+
+void remove_skip(goto_programt &);
+void remove_skip(goto_functionst &);
+void remove_skip(goto_modelt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_SKIP_H

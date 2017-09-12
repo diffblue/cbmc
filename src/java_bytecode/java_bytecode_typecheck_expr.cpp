@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_pointer_casts.h"
 #include "java_types.h"
+#include "java_utils.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -106,8 +107,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   const irep_idt value=expr.get(ID_value);
   const symbol_typet string_type("java::java.lang.String");
 
-  std::string escaped_symbol_name=
-    "java::java.lang.String.Literal.";
+  std::string escaped_symbol_name=JAVA_STRING_LITERAL_PREFIX ".";
   escaped_symbol_name+=escape_non_alnum(id2string(value));
 
   auto findit=symbol_table.symbols.find(escaped_symbol_name);

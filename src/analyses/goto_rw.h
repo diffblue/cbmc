@@ -15,6 +15,7 @@ Date: April 2010
 #include <map>
 #include <ostream>
 #include <limits>
+#include <memory> // unique_ptr
 
 #include <util/guard.h>
 
@@ -44,6 +45,14 @@ void goto_rw(const goto_functionst &goto_functions,
 class range_domain_baset
 {
 public:
+  range_domain_baset()=default;
+
+  range_domain_baset(const range_domain_baset &rhs)=delete;
+  range_domain_baset &operator=(const range_domain_baset &rhs)=delete;
+
+  range_domain_baset(range_domain_baset &&rhs)=delete;
+  range_domain_baset &operator=(range_domain_baset &&rhs)=delete;
+
   virtual ~range_domain_baset();
 
   virtual void output(const namespacet &ns, std::ostream &out) const=0;
@@ -61,12 +70,29 @@ inline range_spect to_range_spect(const mp_integer &size)
 }
 
 // each element x represents a range of bits [x.first, x.second.first)
-class range_domaint:
-  public range_domain_baset,
-  public std::list<std::pair<range_spect, range_spect> >
+class range_domaint:public range_domain_baset
 {
+  typedef std::list<std::pair<range_spect, range_spect>> sub_typet;
+  sub_typet data;
+
 public:
-  virtual void output(const namespacet &ns, std::ostream &out) const;
+  void output(const namespacet &ns, std::ostream &out) const override;
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::const_iterator const_iterator;
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.begin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.end(); }
+
+  void push_back(const sub_typet::value_type &v) { data.push_back(v); }
+  void push_back(sub_typet::value_type &&v) { data.push_back(std::move(v)); }
 };
 
 class array_exprt;
@@ -83,10 +109,10 @@ class rw_range_sett
 {
 public:
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, range_domain_baset*> objectst;
+  typedef std::map<irep_idt, std::unique_ptr<range_domain_baset>> objectst;
   #else
-  typedef std::unordered_map<irep_idt, range_domain_baset*, string_hash>
-    objectst;
+  typedef std::unordered_map<
+    irep_idt, std::unique_ptr<range_domain_baset>, string_hash> objectst;
   #endif
 
   virtual ~rw_range_sett();
@@ -108,8 +134,8 @@ public:
 
   const range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    PRECONDITION(dynamic_cast<range_domaint*>(it->second)!=nullptr);
-    return *static_cast<range_domaint*>(it->second);
+    PRECONDITION(dynamic_cast<range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const range_domaint &>(*it->second);
   }
 
   enum class get_modet { LHS_W, READ };
@@ -257,12 +283,36 @@ protected:
     const range_spect &size);
 };
 
-class guarded_range_domaint:
-  public range_domain_baset,
-  public std::multimap<range_spect, std::pair<range_spect, exprt> >
+class guarded_range_domaint:public range_domain_baset
 {
+  typedef std::multimap<range_spect, std::pair<range_spect, exprt>> sub_typet;
+  sub_typet data;
+
 public:
-  virtual void output(const namespacet &ns, std::ostream &out) const;
+  virtual void output(const namespacet &ns, std::ostream &out) const override;
+
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::iterator iterator;
+  // NOLINTNEXTLINE(readability/identifiers)
+  typedef sub_typet::const_iterator const_iterator;
+
+  iterator begin() { return data.begin(); }
+  const_iterator begin() const { return data.begin(); }
+  const_iterator cbegin() const { return data.begin(); }
+
+  iterator end() { return data.end(); }
+  const_iterator end() const { return data.end(); }
+  const_iterator cend() const { return data.end(); }
+
+  iterator insert(const sub_typet::value_type &v)
+  {
+    return data.insert(v);
+  }
+
+  iterator insert(sub_typet::value_type &&v)
+  {
+    return data.insert(std::move(v));
+  }
 };
 
 class rw_guarded_range_set_value_sett:public rw_range_set_value_sett
@@ -277,8 +327,9 @@ public:
 
   const guarded_range_domaint &get_ranges(objectst::const_iterator it) const
   {
-    PRECONDITION(dynamic_cast<guarded_range_domaint*>(it->second)!=nullptr);
-    return *static_cast<guarded_range_domaint*>(it->second);
+    PRECONDITION(
+      dynamic_cast<guarded_range_domaint*>(it->second.get())!=nullptr);
+    return static_cast<const guarded_range_domaint &>(*it->second);
   }
 
   virtual void get_objects_rec(

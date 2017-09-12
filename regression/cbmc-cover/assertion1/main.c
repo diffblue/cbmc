@@ -5,6 +5,7 @@ int main()
   __CPROVER_input("input1", input1);
   __CPROVER_input("input2", input2);
 
+  // assert() is platform-dependent and changes set of coverage goals
   __CPROVER_assert(!input1, "");
 
   if(input1)

@@ -13,11 +13,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cassert>
 
-#include <util/config.h>
 #include <util/arith_tools.h>
-#include <util/std_types.h>
-
 #include <util/c_types.h>
+#include <util/config.h>
+#include <util/invariant.h>
+#include <util/std_types.h>
 
 #include "cpp_declaration.h"
 #include "cpp_name.h"
@@ -285,7 +285,7 @@ void cpp_convert_typet::read_function_type(const typet &type)
       throw "ellipsis only allowed as last parameter";
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   // if we just have one parameter of type void, remove it

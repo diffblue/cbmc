@@ -11,12 +11,21 @@ Date: May 2016
 /// \file
 /// Coverage Instrumentation
 
+
 #include "cover.h"
 
 #include <algorithm>
 #include <iterator>
+#include <unordered_set>
+#include <regex>
 
+#include <util/format_number_range.h>
 #include <util/prefix.h>
+#include <util/string2int.h>
+#include <util/cprover_prefix.h>
+#include <util/config.h>
+
+#include <json/json_parser.h>
 #include <util/message.h>
 
 class basic_blockst
@@ -25,35 +34,207 @@ public:
   explicit basic_blockst(const goto_programt &_goto_program)
   {
     bool next_is_target=true;
-    unsigned block_count=0;
+    unsigned current_block=0;
 
     forall_goto_program_instructions(it, _goto_program)
     {
+      // Is it a potential beginning of a block?
       if(next_is_target || it->is_target())
-        block_count++;
+      {
+        // We keep the block number if this potential block
+        // is a continuation of a previous block through
+        // unconditional forward gotos; otherwise we increase the
+        // block number.
+        bool increase_block_nr=true;
+        if(it->incoming_edges.size()==1)
+        {
+          goto_programt::targett in_t=*it->incoming_edges.begin();
+          if(in_t->is_goto() &&
+             !in_t->is_backwards_goto() &&
+             in_t->guard.is_true())
+          {
+            current_block=block_map[in_t];
+            increase_block_nr=false;
+          }
+        }
+        if(increase_block_nr)
+        {
+          block_infos.push_back(block_infot());
+          block_infos.back().representative_inst=it;
+          block_infos.back().source_location=source_locationt::nil();
+          current_block=block_infos.size()-1;
+        }
+      }
 
-      block_map[it]=block_count;
+      INVARIANT(
+        current_block<block_infos.size(),
+        "current block number out of range");
+      block_infot &block_info=block_infos.at(current_block);
 
+      block_map[it]=current_block;
+
+      // update lines belonging to block
+      const irep_idt &line=it->source_location.get_line();
+      if(!line.empty())
+        block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
+
+      // set representative program location to instrument
       if(!it->source_location.is_nil() &&
-         source_location_map.find(block_count)==source_location_map.end())
-        source_location_map[block_count]=it->source_location;
+         !it->source_location.get_file().empty() &&
+         !it->source_location.get_line().empty() &&
+         block_info.source_location.is_nil())
+      {
+        block_info.representative_inst=it; // update
+        block_info.source_location=it->source_location;
+      }
 
       next_is_target=
+#if 0
+        // Disabled for being too messy
         it->is_goto() || it->is_function_call() || it->is_assume();
+#else
+        it->is_goto() || it->is_function_call();
+#endif
+    }
+
+    for(auto &block_info : block_infos)
+      update_covered_lines(block_info);
+  }
+
+  /// \param t a goto instruction
+  /// \return the block number of the block
+  ///         the given goto instruction is part of
+  unsigned block_of(goto_programt::const_targett t)
+  {
+    block_mapt::const_iterator it=block_map.find(t);
+    INVARIANT(it!=block_map.end(), "instruction must be part of a block");
+    return it->second;
+  }
+
+  /// \param block_nr a block number
+  /// \return  the instruction selected for
+  ///   instrumentation representative of the given block
+  goto_programt::const_targett instruction_of(unsigned block_nr)
+  {
+    INVARIANT(block_nr<block_infos.size(), "block number out of range");
+    return block_infos.at(block_nr).representative_inst;
+  }
+
+  /// \param block_nr a block number
+  /// \return  the source location selected for
+  ///   instrumentation representative of the given block
+  const source_locationt &source_location_of(
+    unsigned block_nr)
+  {
+    INVARIANT(block_nr<block_infos.size(), "block number out of range");
+    return block_infos.at(block_nr).source_location;
+  }
+
+  /// Select an instruction to be instrumented for each basic block such that
+  /// the java bytecode indices for each basic block is unique
+  /// \param goto_program The goto program
+  /// \param message_handler The message handler
+  void select_unique_java_bytecode_indices(
+    const goto_programt &goto_program,
+    message_handlert &message_handler)
+  {
+    messaget msg(message_handler);
+    std::set<unsigned> blocks_seen;
+    std::set<irep_idt> bytecode_indices_seen;
+
+    forall_goto_program_instructions(it, goto_program)
+    {
+      unsigned block_nr=block_of(it);
+      if(blocks_seen.find(block_nr)!=blocks_seen.end())
+        continue;
+
+      INVARIANT(block_nr<block_infos.size(), "block number out of range");
+      block_infot &block_info=block_infos.at(block_nr);
+      if(block_info.representative_inst==goto_program.instructions.end())
+      {
+        if(!it->source_location.get_java_bytecode_index().empty())
+        {
+          // search for a representative
+          if(bytecode_indices_seen.insert(
+               it->source_location.get_java_bytecode_index()).second)
+          {
+            block_info.representative_inst=it;
+            block_info.source_location=it->source_location;
+            update_covered_lines(block_info);
+            blocks_seen.insert(block_nr);
+            msg.debug() << it->function
+                        << " block " << (block_nr+1)
+                        << ": location " << it->location_number
+                        << ", bytecode-index "
+                        << it->source_location.get_java_bytecode_index()
+                        << " selected for instrumentation." << messaget::eom;
+          }
+        }
+      }
+      else if(it==block_info.representative_inst)
+      {
+        // check the existing representative
+        if(!it->source_location.get_java_bytecode_index().empty())
+        {
+          if(bytecode_indices_seen.insert(
+               it->source_location.get_java_bytecode_index()).second)
+          {
+            blocks_seen.insert(block_nr);
+          }
+          else
+          {
+            // clash, reset to search for a new one
+            block_info.representative_inst=goto_program.instructions.end();
+            block_info.source_location=source_locationt::nil();
+            msg.debug() << it->function
+                        << " block " << (block_nr+1)
+                        << ", location " << it->location_number
+                        << ": bytecode-index "
+                        << it->source_location.get_java_bytecode_index()
+                        << " already instrumented."
+                        << " Searching for alternative instruction"
+                        << " to instrument." << messaget::eom;
+          }
+        }
+      }
     }
   }
 
-  // map program locations to block numbers
-  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
-  block_mapt block_map;
-
-  // map block numbers to source code locations
-  typedef std::map<unsigned, source_locationt> source_location_mapt;
-  source_location_mapt source_location_map;
-
-  inline unsigned operator[](goto_programt::const_targett t)
+  /// Output warnings about ignored blocks
+  /// \param goto_program The goto program
+  /// \param message_handler The message handler
+  void report_block_anomalies(
+    const goto_programt &goto_program,
+    message_handlert &message_handler)
   {
-    return block_map[t];
+    messaget msg(message_handler);
+    std::set<unsigned> blocks_seen;
+    forall_goto_program_instructions(it, goto_program)
+    {
+      unsigned block_nr=block_of(it);
+      const block_infot &block_info=block_infos.at(block_nr);
+
+      if(blocks_seen.insert(block_nr).second &&
+         block_info.representative_inst==goto_program.instructions.end())
+      {
+        msg.warning() << "Ignoring block " << (block_nr+1) << " location "
+                      << it->location_number << " "
+                      << it->source_location
+                      << " (bytecode-index already instrumented)"
+                      << messaget::eom;
+      }
+      else if(block_info.representative_inst==it &&
+              block_info.source_location.is_nil())
+      {
+        msg.warning() << "Ignoring block " << (block_nr+1) << " location "
+                      << it->location_number << " "
+                      << it->function
+                      << " (missing source location)"
+                      << messaget::eom;
+      }
+      // The location numbers printed here are those
+      // before the coverage instrumentation.
+    }
   }
 
   void output(std::ostream &out)
@@ -66,7 +247,181 @@ public:
           << " -> " << b_it->second
           << '\n';
   }
+
+protected:
+  // map program locations to block numbers
+  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
+  block_mapt block_map;
+
+  struct block_infot
+  {
+    /// the program location to instrument for this block
+    goto_programt::const_targett representative_inst;
+
+    /// the source location representative for this block
+    // (we need a separate copy of source locations because we attach
+    //  the line number ranges to them)
+    source_locationt source_location;
+
+    // map block numbers to source code locations
+    /// the set of lines belonging to this block
+    std::unordered_set<unsigned> lines;
+  };
+
+  typedef std::vector<block_infot> block_infost;
+  block_infost block_infos;
+
+  /// create list of covered lines as CSV string and set as property of source
+  /// location of basic block, compress to ranges if applicable
+  void update_covered_lines(block_infot &block_info)
+  {
+    if(block_info.source_location.is_nil())
+      return;
+
+    const auto &cover_set=block_info.lines;
+    INVARIANT(!cover_set.empty(),
+              "covered lines set must not be empty");
+    std::vector<unsigned>
+      line_list{cover_set.begin(), cover_set.end()};
+
+    format_number_ranget format_lines;
+    std::string covered_lines=format_lines(line_list);
+    block_info.source_location.set_basic_block_covered_lines(covered_lines);
+  }
 };
+
+bool coverage_goalst::get_coverage_goals(
+  const std::string &coverage_file,
+  message_handlert &message_handler,
+  coverage_goalst &goals,
+  const irep_idt &mode)
+{
+  messaget message(message_handler);
+  jsont json;
+  source_locationt source_location;
+
+  message.status() << "Load existing coverage goals\n";
+
+  // check coverage file
+  if(parse_json(coverage_file, message_handler, json))
+  {
+    message.error() << coverage_file << " file is not a valid json file"
+                    << messaget::eom;
+    return true;
+  }
+
+  // make sure that we have an array of elements
+  if(!json.is_array())
+  {
+    message.error() << "expecting an array in the " <<  coverage_file
+                    << " file, but got "
+                    << json << messaget::eom;
+    return true;
+  }
+
+  // traverse the given JSON file
+  for(const auto &each_goal : json.array)
+  {
+    // ensure minimal requirements for a goal entry
+    PRECONDITION(
+      (!each_goal["goal"].is_null()) ||
+      (!each_goal["sourceLocation"]["bytecodeIndex"].is_null()) ||
+      (!each_goal["sourceLocation"]["file"].is_null() &&
+       !each_goal["sourceLocation"]["function"].is_null() &&
+       !each_goal["sourceLocation"]["line"].is_null()));
+
+    // check whether bytecodeIndex is provided for Java programs
+    if(mode==ID_java &&
+       each_goal["sourceLocation"]["bytecodeIndex"].is_null())
+    {
+      messaget message(message_handler);
+      message.error() << coverage_file
+                      << " file does not contain bytecodeIndex"
+                      << messaget::eom;
+      return true;
+    }
+
+    if(!each_goal["sourceLocation"]["bytecodeIndex"].is_null())
+    {
+      // get and set the bytecodeIndex
+      irep_idt bytecode_index=
+        each_goal["sourceLocation"]["bytecodeIndex"].value;
+      source_location.set_java_bytecode_index(bytecode_index);
+    }
+
+    if(!each_goal["sourceLocation"]["file"].is_null())
+    {
+      // get and set the file
+      irep_idt file=each_goal["sourceLocation"]["file"].value;
+      source_location.set_file(file);
+    }
+
+    if(!each_goal["sourceLocation"]["function"].is_null())
+    {
+      // get and set the function
+      irep_idt function=each_goal["sourceLocation"]["function"].value;
+      source_location.set_function(function);
+    }
+
+    if(!each_goal["sourceLocation"]["line"].is_null())
+    {
+      // get and set the line
+      irep_idt line=each_goal["sourceLocation"]["line"].value;
+      source_location.set_line(line);
+    }
+
+    // store the existing goal
+    goals.add_goal(source_location);
+    message.status() << "  " << source_location << "\n";
+  }
+  message.status() << messaget::eom;
+
+  return false;
+}
+
+/// store existing goal
+/// \param goal: source location of the existing goal
+void coverage_goalst::add_goal(source_locationt goal)
+{
+  existing_goals[goal]=false;
+}
+
+/// check whether we have an existing goal that does not match
+/// an instrumented goal
+/// \param msg: Message stream
+void coverage_goalst::check_existing_goals(messaget &msg)
+{
+  for(const auto &existing_loc : existing_goals)
+  {
+    if(!existing_loc.second)
+    {
+      msg.warning()
+        << "Warning: unmatched existing goal "
+        << existing_loc.first << messaget::eom;
+    }
+  }
+}
+
+/// compare the value of the current goal to the existing ones
+/// \param source_loc: source location of the current goal
+/// \return true : if the current goal exists false : otherwise
+bool coverage_goalst::is_existing_goal(source_locationt source_loc)
+{
+  for(const auto &existing_loc : existing_goals)
+  {
+    if((source_loc.get_file()==existing_loc.first.get_file()) &&
+       (source_loc.get_function()==existing_loc.first.get_function()) &&
+       (source_loc.get_line()==existing_loc.first.get_line()) &&
+       (source_loc.get_java_bytecode_index().empty() ||
+         (source_loc.get_java_bytecode_index()==
+           existing_loc.first.get_java_bytecode_index())))
+    {
+      existing_goals[existing_loc.first]=true;
+      return true;
+    }
+  }
+  return false;
+}
 
 const char *as_string(coverage_criteriont c)
 {
@@ -299,7 +654,7 @@ std::set<exprt> collect_mcdc_controlling_nested(
   const std::set<exprt> &decisions)
 {
   // To obtain the 1st-level controlling conditions
-  std::set<exprt> controlling = collect_mcdc_controlling(decisions);
+  std::set<exprt> controlling=collect_mcdc_controlling(decisions);
 
   std::set<exprt> result;
   // For each controlling condition, to check if it contains
@@ -490,7 +845,7 @@ void remove_repetition(std::set<exprt> &exprs)
      **/
     for(auto &y : new_exprs)
     {
-      bool iden = true;
+      bool iden=true;
       for(auto &c : conditions)
       {
         std::set<signed> signs1=sign_of_expr(c, x);
@@ -532,7 +887,7 @@ void remove_repetition(std::set<exprt> &exprs)
   }
 
   // update the original ''exprs''
-  exprs = new_exprs;
+  exprs=new_exprs;
 }
 
 /// To evaluate the value of expr ''src'', according to the atomic expr values
@@ -667,7 +1022,8 @@ bool is_mcdc_pair(
 
   if(diff_count==1)
     return true;
-  else return false;
+  else
+    return false;
 }
 
 /// To check if we can find the mcdc pair of the input ''expr_set'' regarding
@@ -769,7 +1125,8 @@ void minimize_mcdc_controlling(
     {
       controlling=new_controlling;
     }
-    else break;
+    else
+      break;
   }
 }
 
@@ -832,37 +1189,100 @@ std::set<exprt> collect_decisions(const goto_programt::const_targett t)
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  message_handlert &message_handler,
+  bool function_only)
 {
-  const namespacet ns(symbol_table);
-  basic_blockst basic_blocks(goto_program);
-  std::set<unsigned> blocks_done;
+  coverage_goalst goals; // empty already covered goals
+  instrument_cover_goals(
+    symbol_table,
+    goto_program,
+    criterion,
+    message_handler,
+    goals,
+    function_only,
+    false);
+}
+
+/// Call a goto_program trivial unless it has: * Any declarations * At least 2
+/// branches * At least 5 assignments
+/// \par parameters: Program `goto_program`
+/// \return Returns true if trivial
+bool program_is_trivial(const goto_programt &goto_program)
+{
+  unsigned long count_assignments=0, count_goto=0;
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    if(i_it->is_goto())
+    {
+      if((++count_goto)>=2)
+        return false;
+    }
+    else if(i_it->is_assign())
+    {
+      if((++count_assignments)>=5)
+        return false;
+    }
+    else if(i_it->is_decl())
+      return false;
+  }
+
+  return true;
+}
+
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
+  goto_programt &goto_program,
+  coverage_criteriont criterion,
+  message_handlert &message_handler,
+  coverage_goalst &goals,
+  bool function_only,
+  bool ignore_trivial)
+{
+  // exclude trivial coverage goals of a goto program
+  if(ignore_trivial && program_is_trivial(goto_program))
+    return;
 
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
      goto_program.instructions.front().source_location.is_built_in())
     return;
 
+  const namespacet ns(symbol_table);
+  basic_blockst basic_blocks(goto_program);
+  basic_blocks.select_unique_java_bytecode_indices(
+    goto_program, message_handler);
+  basic_blocks.report_block_anomalies(goto_program, message_handler);
+
   const irep_idt coverage_criterion=as_string(criterion);
   const irep_idt property_class="coverage";
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
+    std::string curr_function=id2string(i_it->function);
+
+    // if the --cover-function-only flag is set, then we only add coverage
+    // instrumentation for the entry function
+    bool cover_curr_function=
+      !function_only ||
+      curr_function.find(config.main)!=std::string::npos;
+
     switch(criterion)
     {
     case coverage_criteriont::ASSERTION:
       // turn into 'assert(false)' to avoid simplification
-      if(i_it->is_assert())
+      if(i_it->is_assert() && cover_curr_function)
       {
         i_it->guard=false_exprt();
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
+        i_it->source_location.set_function(i_it->function);
       }
       break;
 
     case coverage_criteriont::COVER:
       // turn __CPROVER_cover(x) into 'assert(!x)'
-      if(i_it->is_function_call())
+      if(i_it->is_function_call() && cover_curr_function)
       {
         const code_function_callt &code_function_call=
           to_code_function_call(i_it->code);
@@ -879,6 +1299,7 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(i_it->function);
         }
       }
       else if(i_it->is_assert())
@@ -890,18 +1311,24 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       {
-        unsigned block_nr=basic_blocks[i_it];
-        if(blocks_done.insert(block_nr).second)
+        unsigned block_nr=basic_blocks.block_of(i_it);
+        goto_programt::const_targett in_t=basic_blocks.instruction_of(block_nr);
+        // we only instrument the selected instruction
+        if(in_t==i_it)
         {
-          std::string b=std::to_string(block_nr);
+          std::string b=std::to_string(block_nr+1); // start with 1
           std::string id=id2string(i_it->function)+"#"+b;
           source_locationt source_location=
-            basic_blocks.source_location_map[block_nr];
+            basic_blocks.source_location_of(block_nr);
 
-          if(!source_location.get_file().empty() &&
-             !source_location.is_built_in())
+          // check whether the current goal already exists
+          if(!goals.is_existing_goal(source_location) &&
+             !source_location.get_file().empty() &&
+             !source_location.is_built_in() &&
+             cover_curr_function)
           {
             std::string comment="block "+b;
+            const irep_idt function=i_it->function;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
             i_it->source_location=source_location;
@@ -909,7 +1336,8 @@ void instrument_cover_goals(
             i_it->source_location.set(
               ID_coverage_criterion, coverage_criterion);
             i_it->source_location.set_property_class(property_class);
-
+            i_it->source_location.set_function(function);
+            i_it->function=function;
             i_it++;
           }
         }
@@ -920,12 +1348,12 @@ void instrument_cover_goals(
       if(i_it->is_assert())
         i_it->make_skip();
 
-      if(i_it==goto_program.instructions.begin())
+      if(i_it==goto_program.instructions.begin() &&
+         cover_curr_function)
       {
         // we want branch coverage to imply 'entry point of function'
         // coverage
-        std::string comment=
-          "function "+id2string(i_it->function)+" entry point";
+        std::string comment="entry point";
 
         source_locationt source_location=i_it->source_location;
 
@@ -935,19 +1363,22 @@ void instrument_cover_goals(
         t->source_location.set_comment(comment);
         t->source_location.set(ID_coverage_criterion, coverage_criterion);
         t->source_location.set_property_class(property_class);
+        t->source_location.set_function(i_it->function);
+        t->function=i_it->function;
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true() &&
+      if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
          !i_it->source_location.is_built_in())
       {
-        std::string b=std::to_string(basic_blocks[i_it]);
-        std::string true_comment=
-          "function "+id2string(i_it->function)+" block "+b+" branch true";
-        std::string false_comment=
-          "function "+id2string(i_it->function)+" block "+b+" branch false";
+        std::string b=
+          std::to_string(basic_blocks.block_of(i_it)+1); // start with 1
+        std::string true_comment="block "+b+" branch true";
+        std::string false_comment="block "+b+" branch false";
 
         exprt guard=i_it->guard;
+        const irep_idt function=i_it->function;
         source_locationt source_location=i_it->source_location;
+        source_location.set_function(function);
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(not_exprt(guard));
@@ -955,6 +1386,7 @@ void instrument_cover_goals(
         i_it->source_location.set_comment(true_comment);
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
+        i_it->function=function;
 
         goto_program.insert_before_swap(i_it);
         i_it->make_assertion(guard);
@@ -962,6 +1394,7 @@ void instrument_cover_goals(
         i_it->source_location.set_comment(false_comment);
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
         i_it->source_location.set_property_class(property_class);
+        i_it->function=function;
 
         i_it++;
         i_it++;
@@ -973,7 +1406,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
-      if(!i_it->source_location.is_built_in())
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -984,12 +1417,15 @@ void instrument_cover_goals(
           const std::string c_string=from_expr(ns, "", c);
 
           const std::string comment_t="condition `"+c_string+"' true";
+          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(c);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
 
           const std::string comment_f="condition `"+c_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -998,6 +1434,8 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<conditions.size()*2; i++)
@@ -1010,7 +1448,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
-      if(!i_it->source_location.is_built_in())
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1021,12 +1459,15 @@ void instrument_cover_goals(
           const std::string d_string=from_expr(ns, "", d);
 
           const std::string comment_t="decision `"+d_string+"' true";
+          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(d);
           i_it->source_location=source_location;
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
 
           const std::string comment_f="decision `"+d_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1035,6 +1476,8 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<decisions.size()*2; i++)
@@ -1051,15 +1494,18 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
-      if(!i_it->source_location.is_built_in())
+      if(cover_curr_function && !i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
 
         std::set<exprt> both;
-        std::set_union(conditions.begin(), conditions.end(),
-                       decisions.begin(), decisions.end(),
-                       inserter(both, both.end()));
+        std::set_union(
+          conditions.begin(),
+          conditions.end(),
+          decisions.begin(),
+          decisions.end(),
+          inserter(both, both.end()));
 
         const source_locationt source_location=i_it->source_location;
 
@@ -1075,6 +1521,7 @@ void instrument_cover_goals(
           std::string p_string=from_expr(ns, "", p);
 
           std::string comment_t=description+" `"+p_string+"' true";
+          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           // i_it->make_assertion(p);
           i_it->make_assertion(not_exprt(p));
@@ -1082,6 +1529,8 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_t);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
 
           std::string comment_f=description+" `"+p_string+"' false";
           goto_program.insert_before_swap(i_it);
@@ -1091,6 +1540,8 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(comment_f);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         std::set<exprt> controlling;
@@ -1108,6 +1559,7 @@ void instrument_cover_goals(
           std::string description=
             "MC/DC independence condition `"+p_string+"'";
 
+          const irep_idt function=i_it->function;
           goto_program.insert_before_swap(i_it);
           i_it->make_assertion(not_exprt(p));
           // i_it->make_assertion(p);
@@ -1115,6 +1567,8 @@ void instrument_cover_goals(
           i_it->source_location.set_comment(description);
           i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
           i_it->source_location.set_property_class(property_class);
+          i_it->source_location.set_function(function);
+          i_it->function=function;
         }
 
         for(std::size_t i=0; i<both.size()*2+controlling.size(); i++)
@@ -1137,26 +1591,67 @@ void instrument_cover_goals(
 void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  coverage_criteriont criterion)
+  coverage_criteriont criterion,
+  message_handlert &message_handler,
+  coverage_goalst &goals,
+  bool function_only,
+  bool ignore_trivial,
+  const std::string &cover_include_pattern)
 {
+  std::smatch string_matcher;
+  std::regex regex_matcher(cover_include_pattern);
+  bool do_include_pattern_match=!cover_include_pattern.empty();
+
   Forall_goto_functions(f_it, goto_functions)
   {
     if(f_it->first==goto_functions.entry_point() ||
-       f_it->first=="__CPROVER_initialize" ||
-       f_it->second.is_hidden())
+       f_it->first==(CPROVER_PREFIX "initialize") ||
+       f_it->second.is_hidden() ||
+       (do_include_pattern_match &&
+        !std::regex_match(
+          id2string(f_it->first), string_matcher, regex_matcher)) ||
+       // ignore Java array built-ins
+       has_prefix(id2string(f_it->first), "java::array"))
       continue;
 
-    instrument_cover_goals(symbol_table, f_it->second.body, criterion);
+    instrument_cover_goals(
+      symbol_table,
+      f_it->second.body,
+      criterion,
+      message_handler,
+      goals,
+      function_only,
+      ignore_trivial);
   }
+}
+
+void instrument_cover_goals(
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  coverage_criteriont criterion,
+  message_handlert &message_handler,
+  bool function_only)
+{
+  // empty set of existing goals
+  coverage_goalst goals;
+  instrument_cover_goals(
+    symbol_table,
+    goto_functions,
+    criterion,
+    message_handler,
+    goals,
+    function_only,
+    false,
+    "");
 }
 
 bool instrument_cover_goals(
   const cmdlinet &cmdline,
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
-  message_handlert &msgh)
+  message_handlert &message_handler)
 {
-  messaget msg(msgh);
+  messaget msg(message_handler);
   std::list<std::string> criteria_strings=cmdline.get_values("cover");
   std::set<coverage_criteriont> criteria;
   bool keep_assertions=false;
@@ -1219,11 +1714,84 @@ bool instrument_cover_goals(
     }
   }
 
+  // check existing test goals
+  coverage_goalst existing_goals;
+  if(cmdline.isset("existing-coverage"))
+  {
+    // get the mode to ensure invariants
+    // (e.g., bytecodeIndex for Java programs)
+    namespacet ns(symbol_table);
+    const irep_idt &mode=ns.lookup(goto_functions.entry_point()).mode;
+
+    // get file with covered test goals
+    const std::string coverage=cmdline.get_value("existing-coverage");
+    // get a coverage_goalst object
+    if(coverage_goalst::get_coverage_goals(
+       coverage, message_handler, existing_goals, mode))
+    {
+      msg.error() << "Loading existing coverage goals failed" << messaget::eom;
+      return true;
+    }
+  }
+
   msg.status() << "Instrumenting coverage goals" << messaget::eom;
 
   for(const auto &criterion : criteria)
-    instrument_cover_goals(symbol_table, goto_functions, criterion);
+  {
+    instrument_cover_goals(
+      symbol_table,
+      goto_functions,
+      criterion,
+      message_handler,
+      existing_goals,
+      cmdline.isset("cover-function-only"),
+      cmdline.isset("no-trivial-tests"),
+      cmdline.get_value("cover-include-pattern"));
+  }
+
+  // check whether all existing goals match with instrumented goals
+  existing_goals.check_existing_goals(msg);
+
+  if(cmdline.isset("cover-traces-must-terminate"))
+  {
+    // instrument an additional goal in CPROVER_START. This will rephrase
+    // the reachability problem  by asking BMC to provide a solution that
+    // satisfies a goal while getting to the end of the program-under-test.
+    const auto sf_it=
+      goto_functions.function_map.find(goto_functions.entry_point());
+    if(sf_it==goto_functions.function_map.end())
+    {
+      msg.error() << "cover-traces-must-terminate: invalid entry point ["
+        << goto_functions.entry_point() << "]"
+        << messaget::eom;
+      return true;
+    }
+    auto if_it=sf_it->second.body.instructions.end();
+    while(!if_it->is_function_call())
+      if_it--;
+    if_it++;
+    const std::string &comment=
+      "additional goal to ensure complete trace coverage.";
+    sf_it->second.body.insert_before_swap(if_it);
+    if_it->make_assertion(false_exprt());
+    if_it->source_location.set_comment(comment);
+    if_it->source_location.set_property_class("reachability_constraint");
+    if_it->source_location.set_function(goto_functions.entry_point());
+    if_it->function=goto_functions.entry_point();
+  }
 
   goto_functions.update();
   return false;
+}
+
+bool instrument_cover_goals(
+  const cmdlinet &cmdline,
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  return instrument_cover_goals(
+    cmdline,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    message_handler);
 }

@@ -20,6 +20,7 @@ Date: 2012
 #include <iosfwd>
 
 #include <util/graph.h>
+#include <util/invariant.h>
 
 #include "abstract_event.h"
 #include "data_dp.h"
@@ -35,9 +36,11 @@ class event_grapht
 {
 public:
   /* critical cycle */
-  class critical_cyclet:public std::list<event_idt>
+  class critical_cyclet final
   {
-  protected:
+    typedef std::list<event_idt> data_typet;
+    data_typet data;
+
     event_grapht &egraph;
 
     bool is_not_uniproc() const;
@@ -50,15 +53,47 @@ public:
     std::string print_name(const critical_cyclet &redyced,
       memory_modelt model) const;
 
-    bool check_AC(const_iterator s_it, const abstract_eventt &first,
+    bool check_AC(
+      data_typet::const_iterator s_it,
+      const abstract_eventt &first,
       const abstract_eventt &second) const;
-    bool check_BC(const_iterator it, const abstract_eventt &first,
+    bool check_BC(
+      data_typet::const_iterator it,
+      const abstract_eventt &first,
       const abstract_eventt &second) const;
 
   public:
     unsigned id;
-
     bool has_user_defined_fence;
+
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::iterator iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::const_iterator const_iterator;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::value_type value_type;
+
+    iterator begin() { return data.begin(); }
+    const_iterator begin() const { return data.begin(); }
+    const_iterator cbegin() const { return data.cbegin(); }
+
+    iterator end() { return data.end(); }
+    const_iterator end() const { return data.end(); }
+    const_iterator cend() const { return data.cend(); }
+
+    template <typename T>
+    void push_front(T &&t) { data.push_front(std::forward<T>(t)); }
+
+    template <typename T>
+    void push_back(T &&t) { data.push_back(std::forward<T>(t)); }
+
+    value_type &front() { return data.front(); }
+    const value_type &front() const { return data.front(); }
+
+    value_type &back() { return data.back(); }
+    const value_type &back() const { return data.back(); }
+
+    size_t size() const { return data.size(); }
 
     critical_cyclet(event_grapht &_egraph, unsigned _id)
       :egraph(_egraph), id(_id), has_user_defined_fence(false)
@@ -67,23 +102,25 @@ public:
 
     void operator()(const critical_cyclet &cyc)
     {
-      clear();
-      for(const_iterator it=cyc.begin(); it!=cyc.end(); it++)
-        push_back(*it);
+      data.clear();
+      for(auto it=cyc.data.cbegin();
+          it!=cyc.data.cend();
+          ++it)
+        data.push_back(*it);
       has_user_defined_fence=cyc.has_user_defined_fence;
     }
 
     bool is_cycle()
     {
       /* size check */
-      if(size()<4)
+      if(data.size()<4)
         return false;
 
       /* po order check */
-      const_iterator it=begin();
-      const_iterator n_it=it;
+      auto it=data.cbegin();
+      auto n_it=it;
       ++n_it;
-      for(; it!=end() && n_it!=end(); ++it, ++n_it)
+      for(; it!=data.cend() && n_it!=data.cend(); ++it, ++n_it)
       {
         if(egraph[*it].thread==egraph[*n_it].thread
           && !egraph.are_po_ordered(*it, *n_it))
@@ -177,7 +214,7 @@ public:
       {
         critical_cyclet reduced(egraph, id);
         this->hide_internals(reduced);
-        assert(!reduced.empty());
+        INVARIANT(!reduced.data.empty(), "reduced must not be empty");
         return print_name(reduced, model);
       }
       else
@@ -196,7 +233,7 @@ public:
 
     bool operator<(const critical_cyclet &other) const
     {
-      return ( ((std::list<event_idt>) *this) < (std::list<event_idt>)other);
+      return data<other.data;
     }
   };
 

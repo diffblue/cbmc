@@ -14,10 +14,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 #include <string>
+#include <memory> // unique_ptr
 
 #include <util/language.h>
 
 #include <langapi/mode.h>
+#include <goto-programs/system_library_symbols.h>
 
 class dump_ct
 {
@@ -26,22 +28,21 @@ public:
     const goto_functionst &_goto_functions,
     const bool use_system_headers,
     const bool use_all_headers,
+    const bool include_harness,
     const namespacet &_ns,
     language_factoryt factory):
     goto_functions(_goto_functions),
     copied_symbol_table(_ns.get_symbol_table()),
     ns(copied_symbol_table),
     language(factory()),
-    use_all_headers(use_all_headers)
+    harness(include_harness)
   {
     if(use_system_headers)
-      init_system_library_map();
+      system_symbols=system_library_symbolst();
+    system_symbols.set_use_all_headers(use_all_headers);
   }
 
-  virtual ~dump_ct()
-  {
-    delete language;
-  }
+  virtual ~dump_ct()=default;
 
   void operator()(std::ostream &out);
 
@@ -49,17 +50,15 @@ protected:
   const goto_functionst &goto_functions;
   symbol_tablet copied_symbol_table;
   const namespacet ns;
-  languaget *language;
-  const bool use_all_headers;
+  std::unique_ptr<languaget> language;
+  const bool harness;
 
   typedef std::unordered_set<irep_idt, irep_id_hash> convertedt;
   convertedt converted_compound, converted_global, converted_enum;
 
   std::set<std::string> system_headers;
 
-  typedef std::unordered_map<irep_idt, std::string, irep_id_hash>
-    system_library_mapt;
-  system_library_mapt system_library_map;
+  system_library_symbolst system_symbols;
 
   typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash>
     declared_enum_constants_mapt;
@@ -84,13 +83,8 @@ protected:
   typedef std::unordered_map<typet, irep_idt, irep_hash> typedef_typest;
   typedef_typest typedef_types;
 
-  void init_system_library_map();
-
   std::string type_to_string(const typet &type);
   std::string expr_to_string(const exprt &expr);
-
-  bool ignore(const symbolt &symbol);
-  bool ignore(const typet &type);
 
   static std::string indent(const unsigned n)
   {
@@ -167,6 +161,7 @@ protected:
     code_declt &decl,
     std::list<irep_idt> &local_static,
     std::list<irep_idt> &local_type_decls);
+  void cleanup_harness(code_blockt &b);
 };
 
 #endif // CPROVER_GOTO_INSTRUMENT_DUMP_C_CLASS_H

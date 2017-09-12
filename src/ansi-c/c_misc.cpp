@@ -11,81 +11,72 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_misc.h"
 
-#include <cstdio>
+#include <sstream>
 
-#ifdef _WIN32
-#ifndef __MINGW32__
-#define snprintf sprintf_s
-#endif
-#endif
-
-static void MetaChar(std::string &out, char c, bool inString)
+static void MetaChar(std::ostringstream &out, char c, bool inString)
 {
   switch(c)
   {
   case '\'':
     if(inString)
-      out+="'";
+      out << "'";
     else
-      out+="\\'";
+      out << "\\'";
     break;
 
   case '"':
     if(inString)
-      out+="\\\"";
+      out << "\\\"";
     else
-      out+="\"";
+      out << "\"";
     break;
 
   case '\0':
-    out+="\\0";
+    out << "\\0";
     break;
 
   case '\\':
-    out+="\\\\";
+    out << "\\\\";
     break;
 
   case '\n':
-    out+="\\n";
+    out << "\\n";
     break;
 
   case '\t':
-    out+="\\t";
+    out << "\\t";
     break;
 
   case '\r':
-    out+="\\r";
+    out << "\\r";
     break;
 
   case '\f':
-    out+="\\f";
+    out << "\\f";
     break;
 
   case '\b':
-    out+="\\b";
+    out << "\\b";
     break;
 
   case '\v':
-    out+="\\v";
+    out << "\\v";
     break;
 
   case '\a':
-    out+="\\a";
+    out << "\\a";
     break;
 
   default:
     // Show low and certain high ascii as octal
-    if(((unsigned char)c < ' ') || (c == 127))
+    if((static_cast<unsigned char>(c)<' ') || (c==127))
     {
-      char octbuf[8];
-      snprintf(octbuf, sizeof(octbuf), "%03o", (unsigned char) c);
-      out+="\\";
-      out+=octbuf;
+      out << "\\" << std::oct << static_cast<unsigned char>(c);
     }
     else
     {
       // leave everything else to permit UTF-8 and 8-bit codepages
-      out+=c;
+      out << c;
     }
 
     break;
@@ -103,10 +94,10 @@ static std::string MetaChar(char c)
 
 std::string MetaString(const std::string &in)
 {
-  std::string result;
+  std::ostringstream result;
 
   for(const auto &ch : in)
     MetaChar(result, ch, true);
 
-  return result;
+  return result.str();
 }

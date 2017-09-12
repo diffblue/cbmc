@@ -245,20 +245,20 @@ void path_symext::symex_malloc(
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
 
-  address_of_exprt rhs;
+  exprt rhs;
 
   if(object_type.id()==ID_array)
   {
-    rhs.type()=pointer_type(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
-    rhs.op0()=index_expr;
+    rhs=address_of_exprt(
+      index_expr, pointer_type(value_symbol.type.subtype()));
   }
   else
   {
-    rhs.op0()=value_symbol.symbol_expr();
-    rhs.type()=pointer_type(value_symbol.type);
+    rhs=address_of_exprt(
+      value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
 
   if(rhs.type()!=lhs.type())
@@ -524,7 +524,7 @@ void path_symext::assign_rec(
     else if(ssa_lhs.id()==ID_byte_extract_big_endian)
       new_id=ID_byte_update_big_endian;
     else
-      assert(false);
+      UNREACHABLE;
 
     byte_update_exprt new_rhs(new_id);
 

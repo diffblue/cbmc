@@ -6,6 +6,7 @@ SRC = path_search.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
        ../cpp/cpp$(LIBEXT) \
+       ../java_bytecode/java_bytecode$(LIBEXT) \
        ../linking/linking$(LIBEXT) \
        ../big-int/big-int$(LIBEXT) \
        ../goto-programs/goto-programs$(LIBEXT) \
@@ -33,16 +34,6 @@ include ../common
 CLEANFILES = symex$(EXEEXT)
 
 all: symex$(EXEEXT)
-
-ifneq ($(wildcard ../bv_refinement/Makefile),)
-  OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
-endif
-
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
 
 ifneq ($(wildcard ../specc/Makefile),)
   OBJ += ../specc/specc$(LIBEXT)

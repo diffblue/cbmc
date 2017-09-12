@@ -140,7 +140,7 @@ static bool build_graph_rec(
   }
   else
   {
-    assert(false);
+    UNREACHABLE;
     return true;
   }
 

@@ -17,6 +17,7 @@ SRC = arith_tools.cpp \
       find_symbols.cpp \
       fixedbv.cpp \
       format_constant.cpp \
+      format_number_range.cpp \
       fresh_symbol.cpp \
       get_base_name.cpp \
       get_module.cpp \
@@ -30,6 +31,7 @@ SRC = arith_tools.cpp \
       irep_hash_container.cpp \
       irep_ids.cpp \
       irep_serialization.cpp \
+      invariant_utils.cpp \
       json.cpp \
       json_expr.cpp \
       json_irep.cpp \
@@ -42,6 +44,7 @@ SRC = arith_tools.cpp \
       message.cpp \
       mp_arith.cpp \
       namespace.cpp \
+      nondet_ifthenelse.cpp \
       options.cpp \
       parameter_indices.cpp \
       parse_options.cpp \
@@ -52,6 +55,7 @@ SRC = arith_tools.cpp \
       rational.cpp \
       rational_tools.cpp \
       ref_expr_set.cpp \
+      refined_string_type.cpp \
       rename.cpp \
       rename_symbol.cpp \
       replace_expr.cpp \

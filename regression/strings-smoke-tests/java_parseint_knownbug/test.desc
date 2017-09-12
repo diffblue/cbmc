@@ -1,0 +1,10 @@
+KNOWNBUG
+Test.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+^\[.*assertion.1\].* line 10.* SUCCESS$
+^\[.*assertion.2\].* line 13.* FAILURE$
+--
+--
+Issue #664 is about turning these tests on

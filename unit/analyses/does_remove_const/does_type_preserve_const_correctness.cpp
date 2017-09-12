@@ -11,8 +11,10 @@
 
 #include <catch.hpp>
 
-#include <util/symbol_table.h>
+#include <util/c_types.h>
 #include <util/namespace.h>
+#include <util/symbol_table.h>
+
 #include <ansi-c/c_qualifiers.h>
 #include <goto-programs/goto_program.h>
 #include <analyses/does_remove_const/does_remove_const_util.h>
@@ -42,23 +44,23 @@ SCENARIO("does_type_preserve_const_correctness",
     // pointer (can be reassigned)
     //   to int (value can be changed)
     // int *
-    typet pointer_to_int_type=pointer_typet(non_const_primitive_type);
+    typet pointer_to_int_type=pointer_type(non_const_primitive_type);
 
     // const pointer (can't be reassigned)
     //   to int (value can be changed)
     // int * const
-    typet const_pointer_to_int_type=pointer_typet(non_const_primitive_type);
+    typet const_pointer_to_int_type=pointer_type(non_const_primitive_type);
     const_qualifier.write(const_pointer_to_int_type);
 
     // pointer (can be reassigned)
     //   to const int (value can't be changed)
     // const int *
-    typet pointer_to_const_int_type=pointer_typet(const_primitive_type);
+    typet pointer_to_const_int_type=pointer_type(const_primitive_type);
 
     // constant pointer (can't be reassigned)
     //   to const int (value can't be changed)
     // const int * const
-    typet const_pointer_to_const_int_type=pointer_typet(const_primitive_type);
+    typet const_pointer_to_const_int_type=pointer_type(const_primitive_type);
     const_qualifier.write(const_pointer_to_const_int_type);
 
     WHEN("Comparing int to int")

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/config.h>
 #include <util/std_types.h>
+#include <util/invariant.h>
 
 void ansi_c_declaratort::build(irept &src)
 {
@@ -36,7 +37,7 @@ void ansi_c_declaratort::build(irept &src)
     else if(t.id().empty() ||
             t.is_nil())
     {
-      assert(0);
+      UNREACHABLE;
     }
     else if(t.id()==ID_abstract)
     {
@@ -108,7 +109,7 @@ typet ansi_c_declarationt::full_type(
       p=&(p->subtypes().back());
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   *p=type();

@@ -31,9 +31,10 @@ cerr_message_handlert::cerr_message_handlert():
 
 void console_message_handlert::print(
   unsigned level,
-  const std::string &message)
+  const std::string &message,
+  bool preformatted)
 {
-  message_handlert::print(level, message);
+  message_handlert::print(level, message, preformatted);
 
   if(verbosity<level)
     return;
@@ -101,7 +102,8 @@ void gcc_message_handlert::print(
   unsigned level,
   const std::string &message,
   int sequence_number,
-  const source_locationt &location)
+  const source_locationt &location,
+  bool preformatted)
 {
   const irep_idt file=location.get_file();
   const irep_idt line=location.get_line();
@@ -139,14 +141,15 @@ void gcc_message_handlert::print(
 
   dest+=message;
 
-  print(level, dest);
+  print(level, dest, preformatted);
 }
 
 void gcc_message_handlert::print(
   unsigned level,
-  const std::string &message)
+  const std::string &message,
+  bool preformatted)
 {
-  message_handlert::print(level, message);
+  message_handlert::print(level, message, preformatted);
 
   // gcc appears to send everything to cerr
   if(verbosity>=level)

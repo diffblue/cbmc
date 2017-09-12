@@ -13,8 +13,11 @@ Date: January 2012
 
 #include "file_util.h"
 
+#include "invariant.h"
+
 #include <cerrno>
 #include <cassert>
+#include <cstring>
 
 #include <fstream>
 #include <cstring>
@@ -46,29 +49,26 @@ Date: January 2012
 #define chdir _chdir
 #define popen _popen
 #define pclose _pclose
-#else
-#include <cstring>
 #endif
 
 /// \return current working directory
 std::string get_current_working_directory()
 {
-  unsigned bsize=50;
-
-  char *buf=reinterpret_cast<char*>(malloc(sizeof(char)*bsize));
-  if(!buf)
-    abort();
-
+  #ifndef _WIN32
   errno=0;
+  char *wd=realpath(".", nullptr);
+  INVARIANT(
+    wd!=nullptr && errno==0,
+    std::string("realpath failed: ")+strerror(errno));
 
-  while(buf && getcwd(buf, bsize-1)==nullptr && errno==ERANGE)
-  {
-    bsize*=2;
-    buf=reinterpret_cast<char*>(realloc(buf, sizeof(char)*bsize));
-  }
-
-  std::string working_directory=buf;
-  free(buf);
+  std::string working_directory=wd;
+  free(wd);
+  #else
+  char buffer[4096];
+  DWORD retval=GetCurrentDirectory(4096, buffer);
+  CHECK_RETURN(retval>0);
+  std::string working_directory(buffer);
+  #endif
 
   return working_directory;
 }

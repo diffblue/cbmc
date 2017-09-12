@@ -79,6 +79,16 @@ void call_grapht::add(
     std::back_inserter(map_from_edges_to_call_locations[{caller, callee}]));
 }
 
+/// Returns an inverted copy of this call graph
+/// \return Inverted (callee -> caller) call graph
+call_grapht call_grapht::get_inverted() const
+{
+  call_grapht result;
+  for(const auto &caller_callee : graph)
+    result.add(caller_callee.second, caller_callee.first);
+  return result;
+}
+
 void call_grapht::output_dot(std::ostream &out) const
 {
   out << "digraph call_graph {\n"

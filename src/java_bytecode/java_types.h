@@ -13,6 +13,32 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 #include <util/std_types.h>
 
+class java_class_typet:public class_typet
+{
+ public:
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
+  }
+};
+
+inline const java_class_typet &to_java_class_type(const typet &type)
+{
+  assert(type.id()==ID_struct);
+  return static_cast<const java_class_typet &>(type);
+}
+
+inline java_class_typet &to_java_class_type(typet &type)
+{
+  assert(type.id()==ID_struct);
+  return static_cast<java_class_typet &>(type);
+}
+
 typet java_int_type();
 typet java_long_type();
 typet java_short_type();
@@ -45,5 +71,9 @@ char java_char_from_type(const typet &type);
 
 typet java_bytecode_promotion(const typet &);
 exprt java_bytecode_promotion(const exprt &);
+
+bool is_java_array_tag(const irep_idt& tag);
+
+bool is_valid_java_array(const struct_typet &type);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

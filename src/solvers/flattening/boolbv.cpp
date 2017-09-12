@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 #include <util/mp_arith.h>
 #include <util/arith_tools.h>
+#include <util/magic.h>
 #include <util/replace_expr.h>
 #include <util/std_types.h>
 #include <util/prefix.h>
@@ -688,7 +689,7 @@ bool boolbvt::is_unbounded_array(const typet &type) const
     return true;
 
   if(unbounded_array==unbounded_arrayt::U_AUTO)
-    if(s>1000) // magic number!
+    if(s>MAX_FLATTENED_ARRAY_SIZE)
       return true;
 
   return false;

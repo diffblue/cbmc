@@ -1026,7 +1026,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     break;
 
    default:
-    assert(0);
+    UNREACHABLE;
     break;
   }
 
@@ -1941,7 +1941,7 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
     case TOK_VIRTUAL:  member_spec.set_virtual(true); break;
     case TOK_FRIEND:   member_spec.set_friend(true); break;
     case TOK_EXPLICIT: member_spec.set_explicit(true); break;
-    default: assert(false);
+    default: UNREACHABLE;
     }
 
     t=lex.LookAhead(0);
@@ -1978,7 +1978,7 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
     case TOK_MUTABLE: storage_spec.set_mutable(); break;
     case TOK_GCC_ASM: storage_spec.set_asm(); break;
     case TOK_THREAD_LOCAL: storage_spec.set_thread_local(); break;
-    default: assert(false);
+    default: UNREACHABLE;
     }
 
     set_location(storage_spec, tk);
@@ -2048,7 +2048,7 @@ bool Parser::optCvQualify(typet &cv)
         break;
 
       default:
-        assert(false);
+        UNREACHABLE;
         break;
       }
     }
@@ -3015,7 +3015,7 @@ bool Parser::optPtrOperator(typet &ptrs)
 
     if(t=='*')
     {
-      pointer_typet op;
+      typet op(ID_pointer);
       cpp_tokent tk;
       lex.get_token(tk);
       set_location(op, tk);
@@ -4205,7 +4205,7 @@ bool Parser::rClassSpec(typet &spec)
   else if(t==TOK_UNION)
     spec=typet(ID_union);
   else
-    assert(false);
+    UNREACHABLE;
 
   set_location(spec, tk);
 
@@ -4314,7 +4314,7 @@ bool Parser::rBaseSpecifiers(irept &bases)
         break;
 
        default:
-        assert(0);
+        UNREACHABLE;
       }
 
       t=lex.LookAhead(0);
@@ -4438,7 +4438,7 @@ bool Parser::rClassMember(cpp_itemt &member)
       break;
 
     default:
-      assert(0);
+      UNREACHABLE;
     }
 
     set_location(member, tk1);
@@ -5487,7 +5487,7 @@ bool Parser::rUnaryExpr(exprt &exp)
       break;
 
     default:
-      assert(0);
+      UNREACHABLE;
     }
 
     exp.move_to_operands(right);
@@ -6393,7 +6393,7 @@ bool Parser::rTypePredicate(exprt &expr)
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 
   return true;

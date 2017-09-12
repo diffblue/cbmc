@@ -45,7 +45,7 @@ enum goto_program_instruction_typet
   DEAD=15,          // marks the end-of-live of a local variable
   FUNCTION_CALL=16, // call a function
   THROW=17,         // throw an exception
-  CATCH=18          // catch an exception
+  CATCH=18          // push, pop or enter an exception handler
 };
 
 std::ostream &operator<<(std::ostream &, goto_program_instruction_typet);
@@ -199,6 +199,11 @@ public:
       targets.push_back(t);
     }
 
+    bool has_target() const
+    {
+      return !targets.empty();
+    }
+
     /// Goto target labels
     typedef std::list<irep_idt> labelst;
     labelst labels;
@@ -234,6 +239,7 @@ public:
     void make_dead() { clear(DEAD); }
     void make_atomic_begin() { clear(ATOMIC_BEGIN); }
     void make_atomic_end() { clear(ATOMIC_END); }
+    void make_end_function() { clear(END_FUNCTION); }
 
     void make_goto(targett _target)
     {
@@ -245,6 +251,18 @@ public:
     {
       make_goto(_target);
       guard=g;
+    }
+
+    void make_assignment(const codeT &_code)
+    {
+      clear(ASSIGN);
+      code=_code;
+    }
+
+    void make_decl(const codeT &_code)
+    {
+      clear(DECL);
+      code=_code;
     }
 
     void make_function_call(const codeT &_code)

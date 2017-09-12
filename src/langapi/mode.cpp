@@ -37,7 +37,7 @@ void register_language(language_factoryt factory)
   languages.back().mode=l->id();
 }
 
-languaget *get_language_from_mode(const irep_idt &mode)
+std::unique_ptr<languaget> get_language_from_mode(const irep_idt &mode)
 {
   for(languagest::const_iterator it=languages.begin();
       it!=languages.end();
@@ -48,7 +48,8 @@ languaget *get_language_from_mode(const irep_idt &mode)
   return nullptr;
 }
 
-languaget *get_language_from_filename(const std::string &filename)
+std::unique_ptr<languaget> get_language_from_filename(
+  const std::string &filename)
 {
   std::size_t ext_pos=filename.rfind('.');
 
@@ -82,7 +83,7 @@ languaget *get_language_from_filename(const std::string &filename)
   return nullptr;
 }
 
-languaget *get_default_language()
+std::unique_ptr<languaget> get_default_language()
 {
   assert(!languages.empty());
   return languages.front().factory();

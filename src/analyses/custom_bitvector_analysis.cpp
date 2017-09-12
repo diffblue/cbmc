@@ -296,7 +296,7 @@ void custom_bitvector_domaint::transform(
             else if(identifier=="__CPROVER_clear_may")
               mode=modet::CLEAR_MAY;
             else
-              assert(false);
+              UNREACHABLE;
 
             exprt lhs=code_function_call.arguments()[0];
 
@@ -411,7 +411,7 @@ void custom_bitvector_domaint::transform(
         else if(statement=="clear_may")
           mode=modet::CLEAR_MAY;
         else
-          assert(false);
+          UNREACHABLE;
 
         exprt lhs=instruction.code.op0();
 

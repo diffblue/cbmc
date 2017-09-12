@@ -70,10 +70,13 @@ void cmdlinet::set(const std::string &option, const std::string &value)
   options[i].values.push_back(value);
 }
 
+static std::list<std::string> immutable_empty_list;
+
 const std::list<std::string> &cmdlinet::get_values(char option) const
 {
   int i=getoptnr(option);
-  assert(i>=0);
+  if(i<0)
+    return immutable_empty_list;
   return options[i].values;
 }
 
@@ -91,7 +94,8 @@ const std::list<std::string> &cmdlinet::get_values(
   const std::string &option) const
 {
   int i=getoptnr(option);
-  assert(i>=0);
+  if(i<0)
+    return immutable_empty_list;
   return options[i].values;
 }
 
@@ -184,7 +188,10 @@ bool cmdlinet::parse(int argc, const char **argv, const char *optstring)
       }
 
       if(optnr<0)
+      {
+        unknown_arg=argv[i];
         return true;
+      }
       options[optnr].isset=true;
       if(options[optnr].hasval)
       {

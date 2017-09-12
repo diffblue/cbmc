@@ -1,0 +1,9 @@
+CORE
+test.class
+--refine-strings --show-goto-functions
+// Enable multi-line checking
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+char \([*]malloc_site.[0-9]*\)\[INFINITY\(\)\];\n\s*//.*\n\s*malloc_site.[0-9]*\s*=\s*MALLOC\(char \[INFINITY\(\)\], 2ull? \* INFINITY\(\)\);\n\s*//.*\n\s*cprover_string_array.[0-9]*\s*=\s*malloc_site.\d*;
+--

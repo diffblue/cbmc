@@ -18,6 +18,7 @@ Date:   April 2010
 #include <iostream>
 #include <cstdio>
 
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/tempfile.h>
 
@@ -101,7 +102,7 @@ std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   }
   else
   {
-    assert(false);
+    UNREACHABLE;
     return -1;
   }
 

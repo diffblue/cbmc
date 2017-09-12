@@ -20,7 +20,7 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
   case cpp_scopet::QUALIFIED: return out << "QUALIFIED";
   case cpp_scopet::SCOPE_ONLY: return out << "SCOPE_ONLY";
   case cpp_scopet::RECURSIVE: return out << "RECURSIVE";
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   return out;

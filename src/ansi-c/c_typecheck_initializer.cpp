@@ -344,7 +344,7 @@ void c_typecheck_baset::designator_enter(
     entry.subtype=vector_type.subtype();
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   designator.push_entry(entry);
 }
@@ -478,7 +478,7 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       dest=&(dest->op0());
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   // second phase: assign value

@@ -24,13 +24,17 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message) = 0;
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted) = 0;
 
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location);
+    const source_locationt &location,
+    bool preformatted);
 
   virtual void flush(unsigned level)
   {
@@ -60,18 +64,22 @@ protected:
 class null_message_handlert:public message_handlert
 {
 public:
-  virtual void print(unsigned level, const std::string &message)
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted)
   {
-    message_handlert::print(level, message);
+    message_handlert::print(level, message, preformatted);
   }
 
   virtual void print(
     unsigned level,
     const std::string &message,
     int sequence_number,
-    const source_locationt &location)
+    const source_locationt &location,
+    bool preformatted)
   {
-    print(level, message);
+    print(level, message, preformatted);
   }
 };
 
@@ -82,9 +90,12 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message)
+  virtual void print(
+    unsigned level,
+    const std::string &message,
+    bool preformatted)
   {
-    message_handlert::print(level, message);
+    message_handlert::print(level, message, preformatted);
 
     if(verbosity>=level)
       out << message << '\n';
@@ -126,7 +137,9 @@ public:
 
   message_handlert &get_message_handler()
   {
-    INVARIANT(message_handler!=nullptr, "message handler is set");
+    INVARIANT(
+      message_handler!=nullptr,
+      "message handler should be set before calling get_message_handler");
     return *message_handler;
   }
 
@@ -159,20 +172,23 @@ public:
       unsigned _message_level,
       messaget &_message):
       message_level(_message_level),
-      message(_message)
+      message(_message),
+      preformatted(false)
     {
     }
 
     mstreamt(const mstreamt &other):
       message_level(other.message_level),
       message(other.message),
-      source_location(other.source_location)
+      source_location(other.source_location),
+      preformatted(false)
     {
     }
 
     unsigned message_level;
     messaget &message;
     source_locationt source_location;
+    bool preformatted;
 
     template <class T>
     mstreamt &operator << (const T &x)
@@ -198,12 +214,20 @@ public:
         m.message_level,
         m.str(),
         -1,
-        m.source_location);
+        m.source_location,
+        m.preformatted);
       m.message.message_handler->flush(m.message_level);
     }
+    m.preformatted=false;
     m.clear(); // clears error bits
     m.str(std::string()); // clears the string
     m.source_location.clear();
+    return m;
+  }
+
+  static mstreamt &preformatted_output(mstreamt &m)
+  {
+    m.preformatted=true;
     return m;
   }
 
@@ -214,50 +238,50 @@ public:
     return m;
   }
 
-  mstreamt &get_mstream(unsigned message_level)
+  mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
     return mstream;
   }
 
-  mstreamt &error()
+  mstreamt &error() const
   {
     return get_mstream(M_ERROR);
   }
 
-  mstreamt &warning()
+  mstreamt &warning() const
   {
     return get_mstream(M_WARNING);
   }
 
-  mstreamt &result()
+  mstreamt &result() const
   {
     return get_mstream(M_RESULT);
   }
 
-  mstreamt &status()
+  mstreamt &status() const
   {
     return get_mstream(M_STATUS);
   }
 
-  mstreamt &statistics()
+  mstreamt &statistics() const
   {
     return get_mstream(M_STATISTICS);
   }
 
-  mstreamt &progress()
+  mstreamt &progress() const
   {
     return get_mstream(M_PROGRESS);
   }
 
-  mstreamt &debug()
+  mstreamt &debug() const
   {
     return get_mstream(M_DEBUG);
   }
 
 protected:
   message_handlert *message_handler;
-  mstreamt mstream;
+  mutable mstreamt mstream;
 };
 
 #endif // CPROVER_UTIL_MESSAGE_H

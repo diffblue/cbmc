@@ -20,9 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <specc/specc_language.h>
 #endif
 
-#ifdef HAVE_JAVA_BYTECODE
 #include <java_bytecode/java_bytecode_language.h>
-#endif
 
 void goto_diff_languagest::register_languages()
 {
@@ -33,7 +31,5 @@ void goto_diff_languagest::register_languages()
   register_language(new_specc_language);
   #endif
 
-  #ifdef HAVE_JAVA_BYTECODE
   register_language(new_java_bytecode_language);
-  #endif
 }

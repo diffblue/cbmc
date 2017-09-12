@@ -77,7 +77,10 @@ def get_linker_script_data(script):
     # script is a whitespace.
     text = " %s" % text
 
-    close_brace     = re.compile(r"\s}")
+    # Lex out comments
+    text = re.sub(r"/\*.*?\*/", " ", text)
+
+    close_brace     = re.compile(r"\s}(\s*>\s*\w+)?")
     memory_cmd      = re.compile(r"\sMEMORY\s*{")
     sections_cmd    = re.compile(r"\sSECTIONS\s*{")
     assign_current  = re.compile(r"\s(?P<sym>\w+)\s*=\s*\.\s*;")
@@ -256,6 +259,7 @@ def close_brace_fun(state, _, buf):
             sym = state["end-valid"].group("sym")
             info("'%s' marks the end of section '%s'", sym, sec)
             state["sections"][sec]["end"] = sym
+            state["end-valid"] = None
         else:
         # Linker script assigned end-of-section to a symbol, but not
         # the start. this is useless to us.
@@ -388,7 +392,7 @@ def symbols_from(object_file):
 
 def match_up_addresses(script_data, symbol_table):
     ret = []
-    for data in script_data["sections"].values():
+    for name, data in script_data["sections"].items():
         ok = False
         if "size" in data and "start" in data:
             ok = True
@@ -404,6 +408,7 @@ def match_up_addresses(script_data, symbol_table):
                 region["start"] = {"sym": sym, "val": value}
             if "end" in data and sym == data["end"]:
                 region["end"] = {"sym": sym, "val": value}
+            region["section"] = name
         append = False
         if "size" in region and "start" in region:
             append = True
@@ -424,6 +429,9 @@ def get_region_range(region):
         e_var = region["end"]["sym"]
         ret["start"] = start
         ret["size"] = size
+        ret["start-symbol"] = s_var
+        ret["end-symbol"] = e_var
+        ret["has-end-symbol"] = True
         ret["annot"] = "__CPROVER_allocated_memory(%s, %d);" % (hex(start), size)
         ret["commt"] = "from %s to %s" % (s_var, e_var)
     elif "size" in region:
@@ -433,10 +441,14 @@ def get_region_range(region):
         z_var = region["size"]["sym"]
         ret["start"] = start
         ret["size"] = size
+        ret["start-symbol"] = s_var
+        ret["size-symbol"] = z_var
+        ret["has-end-symbol"] = False
         ret["annot"] = "__CPROVER_allocated_memory(%s, %d);" % (hex(start), size)
         ret["commt"] = "from %s for %s bytes" % (s_var, z_var)
     else:
         raise "Malformatted region\n%s" % str(region)
+    ret["section"] = region["section"]
     return ret
 
 
@@ -502,9 +514,9 @@ def main():
 
     regions = match_up_addresses(script_data, symbol_table)
 
-    info(json.dumps(symbol_table, indent=2))
-    info(json.dumps(script_data, indent=2))
-    info(json.dumps(regions, indent=2))
+    info("symbol table %s" % json.dumps(symbol_table, indent=2))
+    info("script data %s" % json.dumps(script_data, indent=2))
+    info("regions %s" % json.dumps(regions, indent=2))
 
     final = json.dumps(final_json_output(regions, symbol_table),
                        indent=2)

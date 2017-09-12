@@ -26,7 +26,9 @@ extern unsigned long long irep_cmp_ne_cnt;
 #ifdef _MSC_VER
 int wmain(int argc, const wchar_t **argv_wide)
 {
-  const char **argv=narrow_argv(argc, argv_wide);
+  auto vec=narrow_argv(argc, argv_wide);
+  auto narrow=to_c_str_array(std::begin(vec), std::end(vec));
+  auto argv=narrow.data();
 #else
 int main(int argc, const char **argv)
 {

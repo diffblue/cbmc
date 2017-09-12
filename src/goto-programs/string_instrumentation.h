@@ -15,16 +15,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_functions.h"
 
 class message_handlert;
+class goto_modelt;
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_programt &dest);
+  symbol_tablet &,
+  message_handlert &,
+  goto_programt &);
 
 void string_instrumentation(
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  goto_functionst &dest);
+  symbol_tablet &,
+  message_handlert &,
+  goto_functionst &);
+
+void string_instrumentation(
+  goto_modelt &,
+  message_handlert &);
 
 exprt is_zero_string(const exprt &what, bool write=false);
 exprt zero_string_length(const exprt &what, bool write=false);

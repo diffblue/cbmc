@@ -64,22 +64,17 @@ int __CPROVER_islessgreaterd(double f, double g) { return (f < g) || (f > g); }
 
 /* FUNCTION: __CPROVER_isunorderedf */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-int __CPROVER_isunorderedf(float f, float g) { return isnanf(f) || isnanf(g); }
+int __CPROVER_isunorderedf(float f, float g)
+{
+  return __CPROVER_isnanf(f) || __CPROVER_isnanf(g);
+}
 
 /* FUNCTION: __CPROVER_isunorderedd */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
-int __CPROVER_isunorderedd(double f, double g) { return isnan(f) || isnan(g); }
-
+int __CPROVER_isunorderedd(double f, double g)
+{
+  return __CPROVER_isnand(f) || __CPROVER_isnand(g);
+}
 
 /* FUNCTION: isfinite */
 
@@ -363,10 +358,12 @@ inline int __fpclassify(double d) {
 
 /* FUNCTION: sin */
 
+double __VERIFIER_nondet_double();
+
 double sin(double x)
 {
   // gross over-approximation
-  double ret;
+  double ret=__VERIFIER_nondet_double();
 
   if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
     __CPROVER_assume(__CPROVER_isnand(ret));
@@ -382,10 +379,12 @@ double sin(double x)
 
 /* FUNCTION: sinl */
 
+long double __VERIFIER_nondet_long_double();
+
 long double sinl(long double x)
 {
   // gross over-approximation
-  long double ret;
+  long double ret=__VERIFIER_nondet_long_double();
 
   if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
     __CPROVER_assume(__CPROVER_isnanld(ret));
@@ -401,10 +400,12 @@ long double sinl(long double x)
 
 /* FUNCTION: sinf */
 
+float __VERIFIER_nondet_float();
+
 float sinf(float x)
 {
   // gross over-approximation
-  float ret;
+  float ret=__VERIFIER_nondet_float();
 
   if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
     __CPROVER_assume(__CPROVER_isnanf(ret));
@@ -420,10 +421,12 @@ float sinf(float x)
 
 /* FUNCTION: cos */
 
+double __VERIFIER_nondet_double();
+
 double cos(double x)
 {
   // gross over-approximation
-  double ret;
+  double ret=__VERIFIER_nondet_double();
 
   if(__CPROVER_isinfd(x) || __CPROVER_isnand(x))
     __CPROVER_assume(__CPROVER_isnand(ret));
@@ -439,10 +442,12 @@ double cos(double x)
 
 /* FUNCTION: cosl */
 
+long double __VERIFIER_nondet_long_double();
+
 long double cosl(long double x)
 {
   // gross over-approximation
-  long double ret;
+  long double ret=__VERIFIER_nondet_long_double();
 
   if(__CPROVER_isinfld(x) || __CPROVER_isnanld(x))
     __CPROVER_assume(__CPROVER_isnanld(ret));
@@ -458,11 +463,13 @@ long double cosl(long double x)
 
 /* FUNCTION: cosf */
 
+float __VERIFIER_nondet_float();
+
 float cosf(float x)
 {
 __CPROVER_hide:;
   // gross over-approximation
-  float ret;
+  float ret=__VERIFIER_nondet_float();
 
   if(__CPROVER_isinff(x) || __CPROVER_isnanf(x))
     __CPROVER_assume(__CPROVER_isnanf(ret));
@@ -512,11 +519,6 @@ __CPROVER_hide:;
 
 /* FUNCTION: nan */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 double nan(const char *str) {
   // the 'str' argument is not yet used
  __CPROVER_hide:;
@@ -525,11 +527,6 @@ double nan(const char *str) {
 }
 
 /* FUNCTION: nanf */
-
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
 
 float nanf(const char *str) {
   // the 'str' argument is not yet used
@@ -540,21 +537,12 @@ float nanf(const char *str) {
 
 /* FUNCTION: nanl */
 
-#ifndef __CPROVER_MATH_H_INCLUDED
-#include <math.h>
-#define __CPROVER_MATH_H_INCLUDED
-#endif
-
 long double nanl(const char *str) {
   // the 'str' argument is not yet used
  __CPROVER_hide:;
   (void)*str;
   return 0.0/0.0;
 }
-
-
-
-
 
 /* FUNCTION: nextUpf */
 
@@ -738,6 +726,8 @@ __CPROVER_hide:;
 
 float nextUpf(float f);
 
+float __VERIFIER_nondet_float();
+
 float sqrtf(float f)
 {
  __CPROVER_hide:;
@@ -750,7 +740,7 @@ float sqrtf(float f)
     return f;
   else if (__CPROVER_isnormalf(f))
   {
-    float lower;    // Intentionally non-deterministic
+    float lower=__VERIFIER_nondet_float();
     __CPROVER_assume(lower > 0.0f);
     __CPROVER_assume(__CPROVER_isnormalf(lower));
     // Tighter bounds can be given but are dependent on the
@@ -795,7 +785,7 @@ float sqrtf(float f)
     // With respect to the algebra of floating point number
     // all subnormals seem to be perfect squares, thus ...
 
-    float root;    // Intentionally non-deterministic
+    float root=__VERIFIER_nondet_float();
     __CPROVER_assume(root >= 0.0f);
 
     __CPROVER_assume(root * root == f);
@@ -823,6 +813,8 @@ float sqrtf(float f)
 
 double nextUp(double d);
 
+double __VERIFIER_nondet_double();
+
 double sqrt(double d)
 {
  __CPROVER_hide:;
@@ -835,7 +827,7 @@ double sqrt(double d)
     return d;
   else if (__CPROVER_isnormald(d))
   {
-    double lower;    // Intentionally non-deterministic
+    double lower=__VERIFIER_nondet_double();
     __CPROVER_assume(lower > 0.0);
     __CPROVER_assume(__CPROVER_isnormald(lower));
 
@@ -867,7 +859,7 @@ double sqrt(double d)
     //assert(fpclassify(d) == FP_SUBNORMAL);
     //assert(d > 0.0);
 
-    double root;    // Intentionally non-deterministic
+    double root=__VERIFIER_nondet_double();
     __CPROVER_assume(root >= 0.0);
 
     __CPROVER_assume(root * root == d);
@@ -892,6 +884,8 @@ double sqrt(double d)
 
 long double nextUpl(long double d);
 
+long double __VERIFIER_nondet_long_double();
+
 long double sqrtl(long double d)
 {
  __CPROVER_hide:;
@@ -904,7 +898,7 @@ long double sqrtl(long double d)
     return d;
   else if (__CPROVER_isnormalld(d))
   {
-    long double lower;    // Intentionally non-deterministic
+    long double lower=__VERIFIER_nondet_long_double();
     __CPROVER_assume(lower > 0.0l);
     __CPROVER_assume(__CPROVER_isnormalld(lower));
 
@@ -936,7 +930,7 @@ long double sqrtl(long double d)
     //assert(fpclassify(d) == FP_SUBNORMAL);
     //assert(d > 0.0l);
 
-    long double root;    // Intentionally non-deterministic
+    long double root=__VERIFIER_nondet_long_double();
     __CPROVER_assume(root >= 0.0l);
 
     __CPROVER_assume(root * root == d);
@@ -2316,7 +2310,7 @@ long double fabsl (long double d);
 
 long double copysignl(long double x, long double y)
 {
-  long double abs = fabs(x);
+  long double abs = fabsl(x);
   return (signbit(y)) ? -abs : abs;
 }
 

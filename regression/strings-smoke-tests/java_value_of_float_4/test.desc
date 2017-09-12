@@ -1,0 +1,10 @@
+THOROUGH
+test.class
+--refine-strings --function test.check
+^EXIT=10$
+^SIGNAL=0$
+assertion.* test.java line 8 .* SUCCESS$
+assertion.* test.java line 9 .* SUCCESS$
+assertion.* test.java line 10 .* SUCCESS$
+assertion.* test.java line 11 .* FAILURE$
+--

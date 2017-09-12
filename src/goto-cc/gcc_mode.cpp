@@ -19,23 +19,37 @@ Author: CM Wintersteiger, 2006
 #include <sysexits.h>
 #endif
 
+#include <algorithm>
+#include <cstddef>
 #include <cstdio>
 #include <iostream>
+#include <iterator>
 #include <fstream>
 #include <cstring>
+#include <numeric>
+#include <sstream>
 
+#include <json/json_parser.h>
+
+#include <util/expr.h>
+#include <util/c_types.h>
+#include <util/arith_tools.h>
 #include <util/string2int.h>
 #include <util/invariant.h>
 #include <util/tempdir.h>
+#include <util/tempfile.h>
 #include <util/config.h>
 #include <util/prefix.h>
 #include <util/suffix.h>
 #include <util/get_base_name.h>
 #include <util/run.h>
+#include <util/replace_symbol.h>
+
+#include <goto-programs/read_goto_binary.h>
 
 #include <cbmc/version.h>
 
-#include "compile.h"
+#include "linker_script_merge.h"
 
 static std::string compiler_name(
   const cmdlinet &cmdline,
@@ -95,6 +109,7 @@ gcc_modet::gcc_modet(
   produce_hybrid_binary(_produce_hybrid_binary),
   act_as_ld(base_name=="ld" ||
             base_name.find("goto-ld")!=std::string::npos),
+  goto_binary_tmp_suffix(".goto-cc-saved"),
 
   // Keys are architectures specified in configt::set_arch().
   // Values are lists of GCC architectures that can be supplied as
@@ -318,6 +333,14 @@ int gcc_modet::doit()
 
   unsigned int verbosity=1;
 
+  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
+    verbosity=2;
+
+  if(cmdline.isset("verbosity"))
+    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
+
+  gcc_message_handler.set_verbosity(verbosity);
+
   bool act_as_bcc=
     base_name=="bcc" ||
     base_name.find("goto-bcc")!=std::string::npos;
@@ -337,10 +360,16 @@ int gcc_modet::doit()
       std::cout << "gcc version 3.4.4 (goto-cc " CBMC_VERSION ")\n";
   }
 
+  compilet compiler(cmdline,
+                    gcc_message_handler,
+                    cmdline.isset("Werror") &&
+                    cmdline.isset("Wextra") &&
+                    !cmdline.isset("Wno-error"));
+
   if(cmdline.isset("version"))
   {
     if(produce_hybrid_binary)
-      return run_gcc();
+      return run_gcc(compiler);
 
     std::cout << '\n' <<
       "Copyright (C) 2006-2014 Daniel Kroening, Christoph Wintersteiger\n" <<
@@ -354,19 +383,11 @@ int gcc_modet::doit()
   if(cmdline.isset("dumpversion"))
   {
     if(produce_hybrid_binary)
-      return run_gcc();
+      return run_gcc(compiler);
 
     std::cout << "3.4.4\n";
     return EX_OK;
   }
-
-  if(cmdline.isset("Wall") || cmdline.isset("Wextra"))
-    verbosity=2;
-
-  if(cmdline.isset("verbosity"))
-    verbosity=unsafe_string2unsigned(cmdline.get_value("verbosity"));
-
-  gcc_message_handler.set_verbosity(verbosity);
 
   if(act_as_ld)
   {
@@ -390,6 +411,24 @@ int gcc_modet::doit()
       debug() << "GCC mode" << eom;
   }
 
+  // determine actions to be undertaken
+  if(act_as_ld)
+    compiler.mode=compilet::LINK_LIBRARY;
+  else if(cmdline.isset('S'))
+    compiler.mode=compilet::ASSEMBLE_ONLY;
+  else if(cmdline.isset('c'))
+    compiler.mode=compilet::COMPILE_ONLY;
+  else if(cmdline.isset('E'))
+  {
+    compiler.mode=compilet::PREPROCESS_ONLY;
+    UNREACHABLE;
+  }
+  else if(cmdline.isset("shared") ||
+          cmdline.isset('r')) // really not well documented
+    compiler.mode=compilet::COMPILE_LINK;
+  else
+    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
+
   // In gcc mode, we have just pass on to gcc to handle the following:
   // * if -M or -MM is given, we do dependencies only
   // * preprocessing (-E)
@@ -402,7 +441,7 @@ int gcc_modet::doit()
           cmdline.isset("MM") ||
           cmdline.isset('E') ||
           !cmdline.have_infile_arg())
-    return run_gcc(); // exit!
+    return run_gcc(compiler); // exit!
 
   // get configuration
   config.set(cmdline);
@@ -488,30 +527,6 @@ int gcc_modet::doit()
   // -fshort-double makes double the same as float
   if(cmdline.isset("fshort-double"))
     config.ansi_c.double_width=config.ansi_c.single_width;
-
-  // determine actions to be undertaken
-  compilet compiler(cmdline,
-                    gcc_message_handler,
-                    cmdline.isset("Werror") &&
-                    cmdline.isset("Wextra") &&
-                    !cmdline.isset("Wno-error"));
-
-  if(act_as_ld)
-    compiler.mode=compilet::LINK_LIBRARY;
-  else if(cmdline.isset('S'))
-    compiler.mode=compilet::ASSEMBLE_ONLY;
-  else if(cmdline.isset('c'))
-    compiler.mode=compilet::COMPILE_ONLY;
-  else if(cmdline.isset('E'))
-  {
-    compiler.mode=compilet::PREPROCESS_ONLY;
-    UNREACHABLE;
-  }
-  else if(cmdline.isset("shared") ||
-          cmdline.isset('r')) // really not well documented
-    compiler.mode=compilet::COMPILE_LINK;
-  else
-    compiler.mode=compilet::COMPILE_LINK_EXECUTABLE;
 
   switch(compiler.mode)
   {
@@ -695,10 +710,10 @@ int gcc_modet::doit()
 
   if(compiler.source_files.empty() &&
      compiler.object_files.empty())
-    return run_gcc(); // exit!
+    return run_gcc(compiler); // exit!
 
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
-    return asm_output(act_as_bcc, compiler.source_files);
+    return asm_output(act_as_bcc, compiler.source_files, compiler);
 
   // do all the rest
   if(compiler.doit())
@@ -707,7 +722,7 @@ int gcc_modet::doit()
   // We can generate hybrid ELF and Mach-O binaries
   // containing both executable machine code and the goto-binary.
   if(produce_hybrid_binary && !act_as_bcc)
-    return gcc_hybrid_binary();
+    return gcc_hybrid_binary(compiler);
 
   return EX_OK;
 }
@@ -791,8 +806,7 @@ int gcc_modet::preprocess(
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
 
-/// run gcc or clang with original command line
-int gcc_modet::run_gcc()
+int gcc_modet::run_gcc(const compilet &compiler)
 {
   PRECONDITION(!cmdline.parsed_argv.empty());
 
@@ -801,6 +815,28 @@ int gcc_modet::run_gcc()
   new_argv.reserve(cmdline.parsed_argv.size());
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
+
+  if(compiler.wrote_object_files())
+  {
+    // Undefine all __CPROVER macros for the system compiler
+    std::map<irep_idt, std::size_t> arities;
+    compiler.cprover_macro_arities(arities);
+    for(const auto &pair : arities)
+    {
+      std::ostringstream addition;
+      addition << "-D" << id2string(pair.first) << "(";
+      std::vector<char> params(pair.second);
+      std::iota(params.begin(), params.end(), 'a');
+      for(std::vector<char>::iterator it=params.begin(); it!=params.end(); ++it)
+      {
+        addition << *it;
+        if(it+1!=params.end())
+          addition << ",";
+      }
+      addition << ")= ";
+      new_argv.push_back(addition.str());
+    }
+  }
 
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
@@ -813,7 +849,7 @@ int gcc_modet::run_gcc()
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
 
-int gcc_modet::gcc_hybrid_binary()
+int gcc_modet::gcc_hybrid_binary(compilet &compiler)
 {
   {
     bool have_files=false;
@@ -861,23 +897,26 @@ int gcc_modet::gcc_hybrid_binary()
   if(output_files.empty() ||
      (output_files.size()==1 &&
       output_files.front()=="/dev/null"))
-    return run_gcc();
+    return EX_OK;
 
   debug() << "Running " << native_tool_name
           << " to generate hybrid binary" << eom;
 
   // save the goto-cc output files
+  std::list<std::string> goto_binaries;
   for(std::list<std::string>::const_iterator
       it=output_files.begin();
       it!=output_files.end();
       it++)
   {
-    int result=rename(it->c_str(), (*it+".goto-cc-saved").c_str());
+    std::string bin_name=*it+goto_binary_tmp_suffix;
+    int result=rename(it->c_str(), bin_name.c_str());
     if(result!=0)
     {
       error() << "Rename failed: " << std::strerror(errno) << eom;
       return result;
     }
+    goto_binaries.push_back(bin_name);
   }
 
   std::string objcopy_cmd;
@@ -893,7 +932,19 @@ int gcc_modet::gcc_hybrid_binary()
   }
   objcopy_cmd+="objcopy";
 
-  int result=run_gcc();
+  int result=run_gcc(compiler);
+
+  if(result==0)
+  {
+    linker_script_merget ls_merge(
+        compiler, output_files, goto_binaries, cmdline, gcc_message_handler);
+    const int fail=ls_merge.add_linker_script_definitions();
+    if(fail!=0)
+    {
+      error() << "Unable to merge linker script symbols" << eom;
+      return fail;
+    }
+  }
 
   // merge output from gcc with goto-binaries
   // using objcopy, or do cleanup if an earlier call failed
@@ -903,7 +954,7 @@ int gcc_modet::gcc_hybrid_binary()
       it++)
   {
     debug() << "merging " << *it << eom;
-    std::string saved=*it+".goto-cc-saved";
+    std::string saved=*it+goto_binary_tmp_suffix;
 
     #ifdef __linux__
     if(result==0 && !cmdline.isset('c'))
@@ -931,11 +982,12 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(objcopy_argv[0], objcopy_argv, "", "");
     }
 
-    result=remove(saved.c_str());
-    if(result!=0)
+    int remove_result=remove(saved.c_str());
+    if(remove_result!=0)
     {
       error() << "Remove failed: " << std::strerror(errno) << eom;
-      return result;
+      if(result==0)
+        result=remove_result;
     }
 
     #elif defined(__APPLE__)
@@ -957,11 +1009,12 @@ int gcc_modet::gcc_hybrid_binary()
       result=run(lipo_argv[0], lipo_argv, "", "");
     }
 
-    result=remove(saved.c_str());
-    if(result!=0)
+    int remove_result=remove(saved.c_str());
+    if(remove_result!=0)
     {
       error() << "Remove failed: " << std::strerror(errno) << eom;
-      return result;
+      if(result==0)
+        result=remove_result;
     }
 
     #else
@@ -975,7 +1028,8 @@ int gcc_modet::gcc_hybrid_binary()
 
 int gcc_modet::asm_output(
   bool act_as_bcc,
-  const std::list<std::string> &preprocessed_source_files)
+  const std::list<std::string> &preprocessed_source_files,
+  const compilet &compiler)
 {
   {
     bool have_files=false;
@@ -996,7 +1050,7 @@ int gcc_modet::asm_output(
     debug() << "Running " << native_tool_name
       << " to generate native asm output" << eom;
 
-    int result=run_gcc();
+    int result=run_gcc(compiler);
     if(result!=0)
       // native tool failed
       return result;

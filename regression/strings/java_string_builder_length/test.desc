@@ -1,8 +1,0 @@
-FUTURE
-test_sb_length.class
---string-refine
-^EXIT=10$
-^SIGNAL=0$
-\[assertion.1\] assertion at file test_sb_length.java line 6: SUCCESS$
-\[assertion.2\] assertion at file test_sb_length.java line 8: FAILURE$
---

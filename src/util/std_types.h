@@ -362,35 +362,49 @@ public:
     return is_class()?ID_private:ID_public;
   }
 
-  const irept::subt &bases() const
+  class baset:public exprt
   {
-    return find(ID_bases).get_sub();
+  public:
+    baset():exprt(ID_base)
+    {
+    }
+
+    explicit baset(const typet &base):exprt(ID_base, base)
+    {
+    }
+  };
+
+  typedef std::vector<baset> basest;
+
+  const basest &bases() const
+  {
+    return (const basest &)find(ID_bases).get_sub();
   }
 
-  irept::subt &bases()
+  basest &bases()
   {
-    return add(ID_bases).get_sub();
+    return (basest &)add(ID_bases).get_sub();
   }
 
   void add_base(const typet &base)
   {
-    bases().push_back(exprt(ID_base, base));
+    bases().push_back(baset(base));
   }
 
   bool has_base(const irep_idt &id) const
   {
-    const irept::subt &b=bases();
-
-    forall_irep(it, b)
+    for(const auto &b : bases())
     {
-      assert(it->id()==ID_base);
-      const irept &type=it->find(ID_type);
-      assert(type.id()==ID_symbol);
-      if(type.get(ID_identifier)==id)
+      if(to_symbol_type(b.type()).get(ID_identifier)==id)
         return true;
     }
 
     return false;
+  }
+
+  bool is_abstract() const
+  {
+    return get_bool(ID_abstract);
   }
 };
 
@@ -884,6 +898,16 @@ public:
     set(ID_C_inlined, value);
   }
 
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
+  }
+
   // this produces the list of parameter identifiers
   std::vector<irep_idt> parameter_identifiers() const
   {
@@ -1369,16 +1393,6 @@ inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 class pointer_typet:public bitvector_typet
 {
 public:
-  pointer_typet():bitvector_typet(ID_pointer)
-  {
-  }
-
-  // this one will go away; use the one with width
-  explicit pointer_typet(const typet &_subtype):
-    bitvector_typet(ID_pointer, _subtype)
-  {
-  }
-
   pointer_typet(const typet &_subtype, std::size_t width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
@@ -1420,18 +1434,6 @@ inline pointer_typet &to_pointer_type(typet &type)
 class reference_typet:public pointer_typet
 {
 public:
-  reference_typet()
-  {
-    set(ID_C_reference, true);
-  }
-
-  // this one will go away; use the one with width
-  explicit reference_typet(const typet &_subtype):
-    pointer_typet(_subtype)
-  {
-    set(ID_C_reference, true);
-  }
-
   reference_typet(const typet &_subtype, std::size_t _width):
     pointer_typet(_subtype, _width)
   {
