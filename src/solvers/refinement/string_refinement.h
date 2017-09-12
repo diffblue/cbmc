@@ -99,8 +99,6 @@ private:
 
   void add_equivalence(const irep_idt & lhs, const exprt & rhs);
 
-  void display_index_set();
-
   void add_lemma(const exprt &lemma,
                  bool simplify=true,
                  bool add_to_index_set=true);

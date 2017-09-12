@@ -96,29 +96,34 @@ string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
 
 /// display the current index set, for debugging
-void string_refinementt::display_index_set()
+static void display_index_set(
+  const messaget& message,
+  const namespacet& ns,
+  const std::map<exprt, std::set<exprt>>& current_index_set,
+  const std::map<exprt, std::set<exprt>>& index_set)
 {
   std::size_t count=0;
   std::size_t count_current=0;
   for(const auto &i : index_set)
   {
     const exprt &s=i.first;
-    debug() << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
+    message.debug() << "IS(" << from_expr(ns, "", s) << ")=={" << message.eom;
 
     for(auto j : i.second)
     {
-      if(current_index_set[i.first].find(j)!=current_index_set[i.first].end())
+      const auto it=current_index_set.find(i.first);
+      if(it!=current_index_set.end() && it->second.find(j)!=it->second.end())
       {
         count_current++;
-        debug() << "**";
+        message.debug() << "**";
       }
-      debug() << "  " << from_expr(ns, "", j) << ";" << eom;
+      message.debug() << "  " << from_expr(ns, "", j) << ";" << message.eom;
       count++;
     }
-    debug() << "}"  << eom;
+    message.debug() << "}"  << message.eom;
   }
-  debug() << count << " elements in index set (" << count_current
-          << " newly added)" << eom;
+  message.debug() << count << " elements in index set (" << count_current
+          << " newly added)" << message.eom;
 }
 
 /// compute the index set for all formulas, instantiate the formulas with the
@@ -592,7 +597,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         }
       }
 
-      display_index_set();
+      display_index_set(*this, ns, current_index_set, index_set);
       debug()<< "instantiating NOT_CONTAINS constraints" << eom;
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
