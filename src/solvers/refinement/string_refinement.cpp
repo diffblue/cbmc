@@ -54,10 +54,20 @@ optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
 template<>
 optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
 {
-  if (const auto tmp=expr_cast<mp_integer>(expr))
+  if(const auto tmp=expr_cast<mp_integer>(expr))
   {
     if(tmp->is_long() && *tmp >= 0)
       return tmp->to_long();
+  }
+  return { };
+}
+
+template<>
+optionalt<string_exprt> expr_cast<string_exprt>(const exprt& expr)
+{
+  if(is_refined_string_type(expr.type()))
+  {
+    return to_string_expr(expr);
   }
   return { };
 }
@@ -343,11 +353,10 @@ bool string_refinementt::add_axioms_for_string_assigns(
 /// last value that has been initialized.
 void string_refinementt::concretize_string(const exprt &expr)
 {
-  if(is_refined_string_type(expr.type()))
+  if(const auto str=expr_cast<string_exprt>(expr))
   {
-    const string_exprt str=to_string_expr(expr);
-    const exprt length=get(str.length());
-    exprt content=str.content();
+    const exprt length=get(str->length());
+    exprt content=str->content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
     const auto string_length=expr_cast_v<std::size_t>(length);
@@ -355,17 +364,17 @@ void string_refinementt::concretize_string(const exprt &expr)
       string_length<=generator.max_string_length,
       string_refinement_invariantt("string length must be less than the max "
         "length"));
-    if(index_set[str.content()].empty())
+    if(index_set[str->content()].empty())
       return;
 
     std::map<std::size_t, exprt> map;
 
-    for(const auto &i : index_set[str.content()])
+    for(const auto &i : index_set[str->content()])
     {
       const exprt simple_i=simplify_expr(get(i), ns);
       if(const auto index=expr_cast<std::size_t>(simple_i))
       {
-        const exprt str_i=simplify_expr(str[simple_i], ns);
+        const exprt str_i=simplify_expr((*str)[simple_i], ns);
         const exprt value=simplify_expr(get(str_i), ns);
         map.emplace(*index, value);
       }
@@ -377,7 +386,7 @@ void string_refinementt::concretize_string(const exprt &expr)
     }
     array_exprt arr(to_array_type(content.type()));
     arr.operands()=fill_in_map_as_vector(map);
-    debug() << "Concretized " << from_expr(ns, "", str.content())
+    debug() << "Concretized " << from_expr(ns, "", str->content())
             << " = " << from_expr(ns, "", arr) << eom;
     found_content[content]=arr;
   }
@@ -399,24 +408,22 @@ void string_refinementt::concretize_results()
 /// `found_length`
 void string_refinementt::concretize_lengths()
 {
-  for(const auto &it : symbol_resolve)
+  for(const auto &pair : symbol_resolve)
   {
-    if(is_refined_string_type(it.second.type()))
+    if(const auto str=expr_cast<string_exprt>(pair.second))
     {
-      string_exprt str=to_string_expr(it.second);
-      exprt length=get(str.length());
-      exprt content=str.content();
+      exprt length=get(str->length());
+      exprt content=str->content();
       replace_expr(symbol_resolve, content);
       found_length[content]=length;
      }
   }
   for(const auto &it : generator.get_created_strings())
   {
-    if(is_refined_string_type(it.type()))
+    if(const auto str=expr_cast<string_exprt>(it))
     {
-      string_exprt str=to_string_expr(it);
-      exprt length=get(str.length());
-      exprt content=str.content();
+      exprt length=get(str->length());
+      exprt content=str->content();
       replace_expr(symbol_resolve, content);
       found_length[content]=length;
      }
@@ -794,20 +801,19 @@ void string_refinementt::debug_model()
   const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
-    if(is_refined_string_type(it.second.type()))
+    if(const auto refined=expr_cast<string_exprt>(it.second))
     {
       debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
-      string_exprt refined=to_string_expr(it.second);
       debug() << indent << indent << "in_map: "
-              << from_expr(ns, "", refined) << eom;
+              << from_expr(ns, "", *refined) << eom;
       debug() << indent << indent << "resolved: "
-              << from_expr(ns, "", refined) << eom;
-      const exprt &econtent=refined.content();
-      const exprt &elength=refined.length();
+              << from_expr(ns, "", *refined) << eom;
+      const exprt &econtent=refined->content();
+      const exprt &elength=refined->length();
 
       exprt len=supert::get(elength);
       len=simplify_expr(len, ns);
-      exprt arr=get_array(econtent, len);
+      const exprt arr=get_array(econtent, len);
       if(arr.id()==ID_array)
         debug() << indent << indent << "as_string: \""
                 << string_of_array(to_array_expr(arr)) << "\"\n";
@@ -1680,11 +1686,11 @@ std::vector<exprt> string_refinementt::instantiate_not_contains(
 /// \return an expression containing no array-list
 exprt substitute_array_lists(exprt expr, size_t string_max_length)
 {
-  for(size_t i=0; i<expr.operands().size(); ++i)
+  for(auto& operand : expr.operands())
   {
     // TODO: only copy when necessary
-    exprt op=(expr.operands()[i]);
-    expr.operands()[i]=substitute_array_lists(op, string_max_length);
+    const exprt op(operand);
+    operand=substitute_array_lists(op, string_max_length);
   }
 
   if(expr.id()=="array-list")
@@ -1729,14 +1735,16 @@ exprt string_refinementt::get(const exprt &expr) const
     if(it!=found_length.end())
       return get_array(ecopy, it->second);
   }
-  else if(is_refined_string_type(ecopy.type()) && ecopy.id()==ID_struct)
+  else if(ecopy.id()==ID_struct)
   {
-    const string_exprt &string=to_string_expr(ecopy);
-    const exprt &content=string.content();
-    const exprt &length=string.length();
+    if (const auto string=expr_cast<string_exprt>(ecopy))
+    {
+      const exprt &content=string->content();
+      const exprt &length=string->length();
 
-    const exprt arr=get_array(content, length);
-    ecopy=string_exprt(length, arr, string.type());
+      const exprt arr=get_array(content, length);
+      ecopy=string_exprt(length, arr, string->type());
+    }
   }
 
   ecopy=supert::get(ecopy);
