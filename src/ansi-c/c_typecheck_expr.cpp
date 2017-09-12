@@ -1594,8 +1594,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     {
       // Make it void *.
       // gcc and clang issue a warning for this.
-      expr.type()=typet(ID_pointer);
-      expr.type().subtype()=typet(ID_empty);
+      expr.type()=pointer_type(empty_typet());
       implicit_typecast(operands[1], expr.type());
       implicit_typecast(operands[2], expr.type());
     }

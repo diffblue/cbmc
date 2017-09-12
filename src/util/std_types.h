@@ -1391,6 +1391,7 @@ public:
 inline const pointer_typet &to_pointer_type(const typet &type)
 {
   assert(type.id()==ID_pointer);
+  assert(!type.get(ID_width).empty());
   return static_cast<const pointer_typet &>(type);
 }
 
@@ -1400,6 +1401,7 @@ inline const pointer_typet &to_pointer_type(const typet &type)
 inline pointer_typet &to_pointer_type(typet &type)
 {
   assert(type.id()==ID_pointer);
+  assert(!type.get(ID_width).empty());
   return static_cast<pointer_typet &>(type);
 }
 
@@ -1428,6 +1430,7 @@ public:
 inline const reference_typet &to_reference_type(const typet &type)
 {
   assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  assert(!type.get(ID_width).empty());
   return static_cast<const reference_typet &>(type);
 }
 
@@ -1437,6 +1440,7 @@ inline const reference_typet &to_reference_type(const typet &type)
 inline reference_typet &to_reference_type(typet &type)
 {
   assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  assert(!type.get(ID_width).empty());
   return static_cast<reference_typet &>(type);
 }
 
