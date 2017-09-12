@@ -38,7 +38,7 @@ void bv_refinementt::approximationt::add_under_assumption(literalt l)
 
 bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
 {
-  if(!do_arithmetic_refinement)
+  if(!config_.refine_arithmetic)
     return SUB::convert_floatbv_op(expr);
 
   if(ns.follow(expr.type()).id()!=ID_floatbv ||
@@ -52,7 +52,7 @@ bvt bv_refinementt::convert_floatbv_op(const exprt &expr)
 
 bvt bv_refinementt::convert_mult(const exprt &expr)
 {
-  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+  if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
     return SUB::convert_mult(expr);
 
   // we catch any multiplication
@@ -100,7 +100,7 @@ bvt bv_refinementt::convert_mult(const exprt &expr)
 
 bvt bv_refinementt::convert_div(const div_exprt &expr)
 {
-  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+  if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
     return SUB::convert_div(expr);
 
   // we catch any division
@@ -118,7 +118,7 @@ bvt bv_refinementt::convert_div(const div_exprt &expr)
 
 bvt bv_refinementt::convert_mod(const mod_exprt &expr)
 {
-  if(!do_arithmetic_refinement || expr.type().id()==ID_fixedbv)
+  if(!config_.refine_arithmetic || expr.type().id()==ID_fixedbv)
     return SUB::convert_mod(expr);
 
   // we catch any mod
@@ -228,7 +228,7 @@ void bv_refinementt::check_SAT(approximationt &a)
 
     // if(a.over_state==1) { debug() << "DISAGREEMENT!\n"; exit(1); }
 
-    if(a.over_state<max_node_refinement)
+    if(a.over_state<config_.max_node_refinement)
     {
       bvt r;
       float_utilst float_utils(prop);

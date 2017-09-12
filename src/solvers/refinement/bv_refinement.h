@@ -20,11 +20,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class bv_refinementt:public bv_pointerst
 {
-public:
-  struct infot
+private:
+  struct configt
   {
-    const namespacet *ns=nullptr;
-    propt *prop=nullptr;
     ui_message_handlert::uit ui=ui_message_handlert::uit::PLAIN;
     /// Max number of times we refine a formula node
     unsigned max_node_refinement=5;
@@ -32,6 +30,12 @@ public:
     bool refine_arrays=true;
     /// Enable arithmetic refinement
     bool refine_arithmetic=true;
+  };
+public:
+  struct infot : public configt
+  {
+    const namespacet *ns=nullptr;
+    propt *prop=nullptr;
   };
 
   explicit bv_refinementt(const infot &info);
@@ -103,18 +107,12 @@ private:
 
   // MEMBERS
 
-  // Maximum number of times we refine a formula node
-  const unsigned max_node_refinement;
-  // Refinement toggles
-  const bool do_array_refinement;
-  const bool do_arithmetic_refinement;
   bool progress;
   std::vector<approximationt> approximations;
   bvt parent_assumptions;
-
 protected:
   // use gui format
-  ui_message_handlert::uit ui;
+  configt config_;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H

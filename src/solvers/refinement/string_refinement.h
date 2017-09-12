@@ -31,13 +31,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 class string_refinementt final: public bv_refinementt
 {
-public:
-  /// string_refinementt constructor arguments
-  struct infot
-  {
-    const namespacet *ns=nullptr;
-    propt *prop=nullptr;
-    ui_message_handlert::uit ui=ui_message_handlert::uit::PLAIN;
+private:
+  struct configt {
     unsigned refinement_bound=0;
     size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Make non-deterministic character arrays have at least one character
@@ -46,11 +41,11 @@ public:
     bool trace=false;
     /// Make non-deterministic characters printable
     bool string_printable=false;
-    unsigned max_node_refinement=5;
-    bool refine_arrays=false;
-    bool refine_arithmetic=false;
     bool use_counter_example=false;
   };
+public:
+  /// string_refinementt constructor arguments
+  struct infot:public bv_refinementt::infot, public configt { };
 
   explicit string_refinementt(const infot &);
 

@@ -14,11 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bv_refinementt::bv_refinementt(const infot &info):
   bv_pointerst(*info.ns, *info.prop),
-  max_node_refinement(info.max_node_refinement),
-  do_array_refinement(info.refine_arrays),
-  do_arithmetic_refinement(info.refine_arithmetic),
   progress(false),
-  ui(info.ui)
+  config_(info)
 {
   // check features we need
   PRECONDITION(prop.has_set_assumptions());
@@ -44,7 +41,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
-    if(ui==ui_message_handlert::uit::XML_UI)
+    if(config_.ui==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
