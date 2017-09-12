@@ -33,6 +33,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
+#include <util/optional.h>
 
 static bool validate(const string_refinementt::infot &info)
 {
@@ -300,19 +301,26 @@ bool string_refinementt::add_axioms_for_string_assigns(
 /// Generic case doesn't exist, specialize for different types accordingly
 /// TODO: this should go to util
 template<typename T>
-T expr_cast(const exprt&);
+optionalt<T> expr_cast(const exprt&);
 
 template<>
-std::size_t expr_cast<std::size_t>(const exprt& val_expr)
+optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
 {
-  mp_integer val_mb;
-  if(to_integer(val_expr, val_mb))
-    throw std::bad_cast();
-  if(!val_mb.is_long())
-    throw std::bad_cast();
-  if(val_mb<0)
-    throw std::bad_cast();
-  return val_mb.to_long();
+  mp_integer out;
+  if(to_integer(expr, out))
+    return { };
+  return out;
+}
+
+template<>
+optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
+{
+  if (const auto tmp=expr_cast<mp_integer>(expr))
+  {
+    if(tmp->is_long() && *tmp >= 0)
+      return tmp->to_long();
+  }
+  return { };
 }
 
 /// If the expression is of type string, then adds constants to the index set to
@@ -336,8 +344,9 @@ void string_refinementt::concretize_string(const exprt &expr)
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
     const auto string_length=expr_cast<std::size_t>(length);
+    INVARIANT(string_length, "Bad integer conversion");
     INVARIANT(
-      string_length<=generator.max_string_length,
+      *string_length<=generator.max_string_length,
       string_refinement_invariantt("string length must be less than the max "
         "length"));
     if(index_set[str.content()].empty())
@@ -350,7 +359,7 @@ void string_refinementt::concretize_string(const exprt &expr)
       const exprt simple_i=simplify_expr(get(i), ns);
       mp_integer mpi_index;
       bool conversion_failure=to_integer(simple_i, mpi_index);
-      if(!conversion_failure && mpi_index>=0 && mpi_index<string_length)
+      if(!conversion_failure && mpi_index>=0 && mpi_index<*string_length)
       {
         const exprt str_i=simplify_expr(str[simple_i], ns);
         const exprt value=simplify_expr(get(str_i), ns);
@@ -896,8 +905,9 @@ exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
     const with_exprt with_expr=to_with_expr(it);
     const exprt &then_expr=with_expr.new_value();
     const auto index=expr_cast<std::size_t>(with_expr.where());
-    if(index<string_max_length)
-      initial_map.emplace(index, then_expr);
+    INVARIANT(index, "Bad integer conversion");
+    if(*index<string_max_length)
+      initial_map.emplace(*index, then_expr);
   }
 
   array_exprt result(to_array_type(expr.type()));
