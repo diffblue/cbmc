@@ -98,11 +98,9 @@ generator_info(const string_refinementt::infot &in)
 
 string_refinementt::string_refinementt(const infot &info, bool):
   supert(info),
-  use_counter_example(false),
-  do_concretizing(info.trace),
-  initial_loop_bound(info.refinement_bound),
-  generator(generator_info(info)),
-  non_empty_string(info.string_non_empty) { }
+  config_(info),
+  loop_bound_(info.refinement_bound),
+  generator(generator_info(info)) { }
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
@@ -560,7 +558,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   cur.clear();
   add_instantiations();
 
-  while((initial_loop_bound--)>0)
+  while((loop_bound_--)>0)
   {
     decision_proceduret::resultt res=supert::dec_solve();
 
@@ -591,7 +589,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       if(current_index_set.empty())
       {
         debug() << "current index set is empty" << eom;
-        if(do_concretizing)
+        if(config_.trace)
         {
           concretize_results();
           return resultt::D_SATISFIABLE;
@@ -1232,7 +1230,7 @@ bool string_refinementt::check_axioms()
     debug() << violated_not_contains.size()
             << " not_contains string axioms can be violated" << eom;
 
-    if(use_counter_example)
+    if(config_.use_counter_example)
     {
       // TODO: add counter examples for not_contains?
 
@@ -1757,7 +1755,7 @@ bool string_refinementt::is_axiom_sat(
   info.refine_arithmetic=true;
   info.refine_arrays=true;
   info.max_node_refinement=5;
-  info.ui=config_.ui;
+  info.ui=supert::config_.ui;
   supert solver(info);
   solver << axiom;
 

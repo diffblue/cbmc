@@ -49,7 +49,6 @@ public:
 
   explicit string_refinementt(const infot &);
 
-
   virtual std::string decision_procedure_text() const override
   {
     return "string refinement loop with "+prop.solver_text();
@@ -61,8 +60,6 @@ protected:
   decision_proceduret::resultt dec_solve() override;
 
 private:
-  const bool use_counter_example;
-  const bool do_concretizing;
   // Base class
   typedef bv_refinementt supert;
 
@@ -72,11 +69,9 @@ private:
   string_refinementt(const infot &, bool);
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
-  unsigned initial_loop_bound;
-
+  const configt config_;
+  unsigned loop_bound_;
   string_constraint_generatort generator;
-
-  const bool non_empty_string;
   expr_sett nondet_arrays;
 
   // Simple constraints that have been given to the solver
