@@ -35,6 +35,40 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <java_bytecode/java_types.h>
 #include <util/optional.h>
 
+/// Convert exprt to a specific type. Throw bad_cast if conversion
+/// cannot be performed
+/// Generic case doesn't exist, specialize for different types accordingly
+/// TODO: this should go to util
+template<typename T>
+optionalt<T> expr_cast(const exprt&);
+
+template<>
+optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
+{
+  mp_integer out;
+  if(to_integer(expr, out))
+    return { };
+  return out;
+}
+
+template<>
+optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
+{
+  if (const auto tmp=expr_cast<mp_integer>(expr))
+  {
+    if(tmp->is_long() && *tmp >= 0)
+      return tmp->to_long();
+  }
+  return { };
+}
+
+template<typename T>
+T expr_cast_v(const exprt& expr) {
+  const auto maybe=expr_cast<T>(expr);
+  INVARIANT(maybe, "Bad conversion");
+  return *maybe;
+}
+
 static bool validate(const string_refinementt::infot &info)
 {
   PRECONDITION(info.ns);
@@ -296,33 +330,6 @@ bool string_refinementt::add_axioms_for_string_assigns(
   return true;
 }
 
-/// Convert exprt to a specific type. Throw bad_cast if conversion
-/// cannot be performed
-/// Generic case doesn't exist, specialize for different types accordingly
-/// TODO: this should go to util
-template<typename T>
-optionalt<T> expr_cast(const exprt&);
-
-template<>
-optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
-{
-  mp_integer out;
-  if(to_integer(expr, out))
-    return { };
-  return out;
-}
-
-template<>
-optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
-{
-  if (const auto tmp=expr_cast<mp_integer>(expr))
-  {
-    if(tmp->is_long() && *tmp >= 0)
-      return tmp->to_long();
-  }
-  return { };
-}
-
 /// If the expression is of type string, then adds constants to the index set to
 /// force the solver to pick concrete values for each character, and fill the
 /// maps `found_length` and `found_content`.
@@ -343,10 +350,9 @@ void string_refinementt::concretize_string(const exprt &expr)
     exprt content=str.content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
-    const auto string_length=expr_cast<std::size_t>(length);
-    INVARIANT(string_length, "Bad integer conversion");
+    const auto string_length=expr_cast_v<std::size_t>(length);
     INVARIANT(
-      *string_length<=generator.max_string_length,
+      string_length<=generator.max_string_length,
       string_refinement_invariantt("string length must be less than the max "
         "length"));
     if(index_set[str.content()].empty())
@@ -357,14 +363,11 @@ void string_refinementt::concretize_string(const exprt &expr)
     for(const auto &i : index_set[str.content()])
     {
       const exprt simple_i=simplify_expr(get(i), ns);
-      mp_integer mpi_index;
-      bool conversion_failure=to_integer(simple_i, mpi_index);
-      if(!conversion_failure && mpi_index>=0 && mpi_index<*string_length)
+      if(const auto index=expr_cast<std::size_t>(simple_i))
       {
         const exprt str_i=simplify_expr(str[simple_i], ns);
         const exprt value=simplify_expr(get(str_i), ns);
-        std::size_t index=mpi_index.to_long();
-        map.emplace(index, value);
+        map.emplace(*index, value);
       }
       else
       {
@@ -904,10 +907,9 @@ exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
     // statements
     const with_exprt with_expr=to_with_expr(it);
     const exprt &then_expr=with_expr.new_value();
-    const auto index=expr_cast<std::size_t>(with_expr.where());
-    INVARIANT(index, "Bad integer conversion");
-    if(*index<string_max_length)
-      initial_map.emplace(*index, then_expr);
+    const auto index=expr_cast_v<std::size_t>(with_expr.where());
+    if(index<string_max_length)
+      initial_map.emplace(index, then_expr);
   }
 
   array_exprt result(to_array_type(expr.type()));
@@ -1026,23 +1028,18 @@ static exprt negation_of_not_contains_constraint(
   const symbol_exprt &univ_var)
 {
   // If the for all is vacuously true, the negation is false.
-  exprt lbu=axiom.univ_lower_bound();
-  exprt ubu=axiom.univ_upper_bound();
+  const exprt lbu=axiom.univ_lower_bound();
+  const exprt ubu=axiom.univ_upper_bound();
   if(lbu.id()==ID_constant && ubu.id()==ID_constant)
   {
-    mp_integer lb_int, ub_int;
-    to_integer(to_constant_expr(lbu), lb_int);
-    to_integer(to_constant_expr(ubu), ub_int);
-    if(ub_int<=lb_int)
+    const auto lb_int=expr_cast<mp_integer>(lbu);
+    const auto ub_int=expr_cast<mp_integer>(ubu);
+    if(!lb_int || !ub_int || *ub_int<=*lb_int)
       return false_exprt();
   }
 
-  exprt lbe=axiom.exists_lower_bound();
-  exprt ube=axiom.exists_upper_bound();
-
-  mp_integer lbe_int, ube_int;
-  to_integer(to_constant_expr(lbe), lbe_int);
-  to_integer(to_constant_expr(ube), ube_int);
+  const auto lbe=expr_cast_v<mp_integer>(axiom.exists_lower_bound());
+  const auto ube=expr_cast_v<mp_integer>(axiom.exists_upper_bound());
 
   // If the premise is false, the implication is trivially true, so the
   // negation is false.
@@ -1056,7 +1053,7 @@ static exprt negation_of_not_contains_constraint(
   // The negated existential becomes an universal, and this is the unrolling of
   // that universal quantifier.
   std::vector<exprt> conjuncts;
-  for(mp_integer i=lbe_int; i<ube_int; ++i)
+  for(mp_integer i=lbe; i<ube; ++i)
   {
     const constant_exprt i_exprt=from_integer(i, univ_var.type());
     const equal_exprt equal_chars(
@@ -1085,10 +1082,9 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   exprt ub=axiom.upper_bound();
   if(lb.id()==ID_constant && ub.id()==ID_constant)
   {
-    mp_integer lb_int, ub_int;
-    to_integer(to_constant_expr(lb), lb_int);
-    to_integer(to_constant_expr(ub), ub_int);
-    if(ub_int<=lb_int)
+    const auto lb_int=expr_cast<mp_integer>(lb);
+    const auto ub_int=expr_cast<mp_integer>(ub);
+    if(!lb_int || !ub_int || ub_int<=lb_int)
       return false_exprt();
   }
 
@@ -1512,18 +1508,12 @@ static std::vector<exprt> sub_arrays(const exprt &array_expr)
 void string_refinementt::add_to_index_set(const exprt &s, exprt i)
 {
   simplify(i, ns);
-  if(i.id()==ID_constant)
+  if(i.id()!=ID_constant || expr_cast<size_t>(i))
   {
-    mp_integer mpi;
-    to_integer(i, mpi);
-    if(mpi<0)
-      return;
+    for(const auto &sub : sub_arrays(s))
+      if(index_set[sub].insert(i).second)
+        current_index_set[sub].insert(i);
   }
-
-  std::vector<exprt> subs=sub_arrays(s);
-  for(const auto &sub : subs)
-    if(index_set[sub].insert(i).second)
-      current_index_set[sub].insert(i);
 }
 
 void string_refinementt::initial_index_set(const string_constraintt &axiom)
@@ -1707,14 +1697,13 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
     array_typet arr_type(char_type, infinity_exprt(char_type));
     exprt ret_expr=array_of_exprt(from_integer(0, char_type), arr_type);
 
-    for(size_t i=0; i<expr.operands().size()/2; i++)
+    for(size_t i=0; i<expr.operands().size(); i+=2)
     {
-      const exprt &index=expr.operands()[i*2];
-      const exprt &value=expr.operands()[i*2+1];
-      mp_integer index_value;
-      bool not_constant=to_integer(index, index_value);
-      if(not_constant ||
-         (index_value>=0 && index_value<string_max_length))
+      const exprt &index=expr.operands()[i];
+      const exprt &value=expr.operands()[i+1];
+      const auto index_value=expr_cast<std::size_t>(index);
+      if(!index.is_constant() ||
+         (index_value && *index_value<string_max_length))
         ret_expr=with_exprt(ret_expr, index, value);
     }
     return ret_expr;
