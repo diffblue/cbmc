@@ -28,10 +28,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 
 string_constraint_generatort::string_constraint_generatort(
-  const string_constraint_generatort::infot& info):
+  const string_constraint_generatort::infot& info, const namespacet& ns):
   max_string_length(info.string_max_length),
   m_force_printable_characters(info.string_printable),
-  m_ns(*info.ns) { }
+  m_ns(ns) { }
 
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {

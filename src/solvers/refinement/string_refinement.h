@@ -34,18 +34,18 @@ class string_refinementt final: public bv_refinementt
 private:
   struct configt {
     unsigned refinement_bound=0;
-    size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Make non-deterministic character arrays have at least one character
     bool string_non_empty=false;
     /// Concretize strings after solver is finished
     bool trace=false;
-    /// Make non-deterministic characters printable
-    bool string_printable=false;
     bool use_counter_example=false;
   };
 public:
   /// string_refinementt constructor arguments
-  struct infot:public bv_refinementt::infot, public configt { };
+  struct infot:
+    public bv_refinementt::infot,
+    public string_constraint_generatort::infot,
+    public configt { };
 
   explicit string_refinementt(const infot &);
 

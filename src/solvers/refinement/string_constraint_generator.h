@@ -40,14 +40,14 @@ public:
   /// Arguments pack for the string_constraint_generator constructor
   struct infot
   {
-    const namespacet *ns=nullptr;
     /// Max length of non-deterministic strings
     size_t string_max_length=std::numeric_limits<size_t>::max();
     /// Prefer printable characters in non-deterministic strings
     bool string_printable=false;
   };
 
-  explicit string_constraint_generatort(const infot& info);
+  explicit string_constraint_generatort(
+    const infot& info, const namespacet& ns);
 
   /// Axioms are of three kinds: universally quantified string constraint,
   /// not contains string constraints and simple formulas.

@@ -86,21 +86,11 @@ static bool validate(const string_refinementt::infot &info)
   return true;
 }
 
-static string_constraint_generatort::infot
-generator_info(const string_refinementt::infot &in)
-{
-  string_constraint_generatort::infot out;
-  out.ns=in.ns;
-  out.string_max_length=in.string_max_length;
-  out.string_printable=in.string_printable;
-  return out;
-}
-
 string_refinementt::string_refinementt(const infot &info, bool):
   supert(info),
   config_(info),
   loop_bound_(info.refinement_bound),
-  generator(generator_info(info)) { }
+  generator(info, *info.ns) { }
 
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
