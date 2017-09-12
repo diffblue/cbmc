@@ -193,9 +193,11 @@ void uncaught_exceptions_analysist::output(
   {
     const auto fn=it->first;
     const exceptions_mapt::const_iterator found=exceptions_map.find(fn);
-    INVARIANT(
-      found!=exceptions_map.end(),
-      "each function expected to be recorded in `exceptions_map`");
+    // Functions like __CPROVER_assert and __CPROVER_assume are replaced by
+    // explicit GOTO instructions and will not show up in exceptions_map.
+    if(found==exceptions_map.end())
+      continue;
+
     const auto &fs=found->second;
     if(!fs.empty())
     {
