@@ -14,6 +14,10 @@ command line:
 
   goto-cc --native-compiler=arm-none-eabi-gcc -mcpu=cortex-a15 -c source.c
 
+On Ubuntu, you can get a suitable compiler using:
+
+  sudo apt install gcc-arm-none-eabi
+
 preproc.i is already pre-processed so that it can be linked in without
 needing to invoke a pre-processor from a cross-compile toolchain on your
 local machine. Linking it together with the ARM object file, while
