@@ -412,13 +412,10 @@ void value_set_fit::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array ||
-                   type.id()==ID_incomplete_array ||
-                   type.id()=="#REF#",
-                   "operand 0 of index expression must be an array");
-
-    get_value_set_rec(expr.op0(), dest, "[]"+suffix,
-                      original_type, ns, recursion_set);
+    if(type.id()==ID_array ||
+       type.id()==ID_incomplete_array)
+      get_value_set_rec(expr.op0(), dest, "[]"+suffix,
+                        original_type, ns, recursion_set);
 
     return;
   }
@@ -1292,12 +1289,9 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    DATA_INVARIANT(type.id()==ID_array ||
-                   type.id()==ID_incomplete_array ||
-                   type.id()=="#REF#",
-                   "operand 0 of index expression must be an array");
-
-    assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
+    if(type.id()==ID_array ||
+       type.id()==ID_incomplete_array)
+      assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
   }
   else if(lhs.id()==ID_member)
   {
@@ -1363,6 +1357,9 @@ void value_set_fit::do_function_call(
   const namespacet &ns)
 {
   const symbolt &symbol=ns.lookup(function);
+
+  if(symbol.type.id()!=ID_code)
+    return;
 
   const code_typet &type=to_code_type(symbol.type);
   const code_typet::parameterst &parameter_types=type.parameters();
