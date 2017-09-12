@@ -56,6 +56,7 @@ build_script:
     call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" x64
     sed -i "s/BUILD_ENV[ ]*=.*/BUILD_ENV = MSVC/" src/config.inc
     make -C src -j2
+    make -C src symex.dir -j2
 
 test_script:
 - cmd: |
