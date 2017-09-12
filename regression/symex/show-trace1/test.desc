@@ -1,6 +1,6 @@
 CORE
 main.c
---show-trace
+--trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

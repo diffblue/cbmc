@@ -12,6 +12,7 @@ DIRS = ansi-c \
        invariants \
        strings \
        strings-smoke-tests \
+       symex \
        test-script \
        # Empty last line
 
