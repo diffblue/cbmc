@@ -111,6 +111,11 @@ test_script:
     rmdir /s /q cbmc-java\tableswitch2
     rmdir /s /q goto-gcc
     rmdir /s /q goto-instrument\slice08
+    rmdir /s /q symex\va_args_10
+    rmdir /s /q symex\va_args_2
+    rmdir /s /q symex\va_args_3
+    rmdir /s /q symex\va_args_5
+    rmdir /s /q symex\va_args_6
 
     make test
 
