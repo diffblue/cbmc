@@ -173,7 +173,7 @@ install:
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
   - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
-  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2 clobber.dir memory-models.dir musketeer.dir
+  - make -C src "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2 clobber.dir memory-models.dir
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
