@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
+    message(STATUS "Rule launch compile: ${CCACHE_PROGRAM}")
  endif()
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
@@ -19,7 +20,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR
     #   Ensure NDEBUG is not set for release builds
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
     #   Enable lots of warnings
-    set(CMAKE_CXX_FLAGS "-Wall -Wpedantic -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic -Werror")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     #   This would be the place to enable warnings for Windows builds, although
     #   config.inc doesn't seem to do that currently
