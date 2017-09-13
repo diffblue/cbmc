@@ -7,7 +7,6 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-cc-cbmc \
        goto-cc-goto-analyzer \
-       goto-cc-symex \
        goto-diff \
        goto-gcc \
        goto-instrument \
@@ -15,7 +14,6 @@ DIRS = ansi-c \
        invariants \
        strings \
        strings-smoke-tests \
-       symex \
        test-script \
        # Empty last line
 
