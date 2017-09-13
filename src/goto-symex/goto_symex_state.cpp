@@ -511,11 +511,7 @@ void goto_symex_statet::rename(
     if(expr.id()==ID_with)
       expr.type()=to_with_expr(expr).old().type();
     else if(expr.id()==ID_if)
-    {
-      assert(to_if_expr(expr).true_case().type()==
-             to_if_expr(expr).false_case().type());
       expr.type()=to_if_expr(expr).true_case().type();
-    }
   }
 }
 
