@@ -137,7 +137,7 @@ protected:
 
   static irep_idt get_stub_return_symbol_name(const irep_idt &function_id);
 
-  bool generate_opaque_stubs;
+  bool generate_opaque_stubs=false;
   bool language_options_initialized=false;
 
 private:
