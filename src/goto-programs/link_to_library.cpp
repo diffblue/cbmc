@@ -45,8 +45,8 @@ void link_to_library(
 
   while(true)
   {
-    std::set<irep_idt> called_functions;
-    compute_called_functions(goto_functions, called_functions);
+    std::set<irep_idt> called_functions=
+      compute_called_functions(goto_functions);
 
     // eliminate those for which we already have a body
 
