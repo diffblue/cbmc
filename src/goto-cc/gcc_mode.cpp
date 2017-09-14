@@ -795,10 +795,12 @@ int gcc_modet::preprocess(
   INVARIANT(new_argv.size()>=1, "No program name in argv");
   new_argv[0]=native_tool_name.c_str();
 
+  /*
   debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     debug() << " " << new_argv[i];
   debug() << eom;
+  */
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, stdout_file);
 }
@@ -838,10 +840,12 @@ int gcc_modet::run_gcc(const compilet &compiler)
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
 
+  /*
   debug() << "RUN:";
   for(std::size_t i=0; i<new_argv.size(); i++)
     debug() << " " << new_argv[i];
   debug() << eom;
+  */
 
   return run(new_argv[0], new_argv, cmdline.stdin_file, "");
 }
