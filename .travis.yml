@@ -39,32 +39,6 @@ jobs:
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env: COMPILER="ccache g++-5"
 
-    # OS X using g++
-    - stage: Test different OS/CXX/Flags
-      os: osx
-      sudo: false
-      compiler: gcc
-      cache: ccache
-      before_install:
-          #we create symlink to non-ccache gcc, to be used in tests
-        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
-      env: COMPILER="ccache g++"
-
-    # OS X using clang++
-    - stage: Test different OS/CXX/Flags
-      os: osx
-      sudo: false
-      compiler: clang
-      cache: ccache
-      before_install:
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
-        - export PATH=/usr/local/opt/ccache/libexec:$PATH
-      env:
-        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
-        - CCACHE_CPP2=yes
-
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
@@ -152,18 +126,6 @@ jobs:
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
-
-    - stage: Test different OS/CXX/Flags
-      os: osx
-      cache: ccache
-      env:
-        - BUILD_SYSTEM=cmake
-        - CCACHE_CPP2=yes
-      install:
-        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
-        - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE)
-
 
   allow_failures:
     - <<: *linter-stage
