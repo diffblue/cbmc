@@ -17,9 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory> // unique_ptr
 
 #include "message.h"
+#include "symbol_table.h"
 
-class symbol_tablet;
-class symbol_table_baset;
 class language_filet;
 class languaget;
 
@@ -104,7 +103,9 @@ public:
     const irep_idt &id,
     symbol_tablet &symbol_table)
   {
-    return lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+    PRECONDITION(symbol_table.symbols.count(id)!=0);
+    if(has_lazy_method(id))
+      lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
   }
 
   void clear()
