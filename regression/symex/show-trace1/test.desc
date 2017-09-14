@@ -1,6 +1,6 @@
-CORE
+KNOWNBUG
 main.c
---show-trace
+--trace
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
@@ -9,3 +9,5 @@ main.c
 ^  k=6 .*$
 --
 ^warning: ignoring
+--
+diffblue/cbmc#1361

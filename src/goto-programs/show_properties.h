@@ -14,17 +14,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 
-class goto_functionst;
 class namespacet;
 class goto_modelt;
+class symbol_tablet;
+class goto_functionst;
+
+void show_properties(
+  const goto_modelt &,
+  ui_message_handlert::uit ui);
 
 void show_properties(
   const namespacet &ns,
   ui_message_handlert::uit ui,
   const goto_functionst &goto_functions);
-
-void show_properties(
-  const goto_modelt &,
-  ui_message_handlert::uit ui);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H

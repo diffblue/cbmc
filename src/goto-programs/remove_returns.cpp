@@ -384,10 +384,8 @@ void remove_returnst::restore(goto_functionst &goto_functions)
 }
 
 /// restores return statements
-void restore_returns(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void restore_returns(goto_modelt &goto_model)
 {
-  remove_returnst rr(symbol_table);
-  rr.restore(goto_functions);
+  remove_returnst rr(goto_model.symbol_table);
+  rr.restore(goto_model.goto_functions);
 }

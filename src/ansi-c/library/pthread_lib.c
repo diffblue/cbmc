@@ -523,10 +523,10 @@ extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
 inline int pthread_create(
-  pthread_t *thread,
-  const pthread_attr_t *attr,
-  void * (*start_routine)(void *),
-  void *arg)
+  pthread_t *thread, // must not be null
+  const pthread_attr_t *attr, // may be null
+  void * (*start_routine)(void *), // must not be null
+  void *arg) // may be null
 {
   __CPROVER_HIDE:;
   unsigned long this_thread_id;
@@ -534,11 +534,8 @@ inline int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
 
-  if(thread)
-  {
-    // pthread_t is a pointer type on some systems
-    *thread=(pthread_t)this_thread_id;
-  }
+  // pthread_t is a pointer type on some systems
+  *thread=(pthread_t)this_thread_id;
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");

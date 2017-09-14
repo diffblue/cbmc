@@ -213,7 +213,7 @@ void remove_exceptionst::add_exceptional_returns(
       new_symbol.base_name=id2string(function_symbol.base_name)+EXC_SUFFIX;
       new_symbol.name=id2string(function_symbol.name)+EXC_SUFFIX;
       new_symbol.mode=function_symbol.mode;
-      new_symbol.type=typet(ID_pointer, empty_typet());
+      new_symbol.type=pointer_type(empty_typet());
       symbol_table.add(new_symbol);
 
       // initialize the exceptional return with NULL
@@ -584,9 +584,7 @@ void remove_exceptions(
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(goto_modelt &goto_model)
 {
-  std::map<irep_idt, std::set<irep_idt>> exceptions_map;
-  remove_exceptionst remove_exceptions(
+  remove_exceptions(
     goto_model.symbol_table,
-    exceptions_map);
-  remove_exceptions(goto_model.goto_functions);
+    goto_model.goto_functions);
 }

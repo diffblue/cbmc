@@ -14,13 +14,10 @@ Date: September 2011
 #ifndef CPROVER_GOTO_INSTRUMENT_CALL_SEQUENCES_H
 #define CPROVER_GOTO_INSTRUMENT_CALL_SEQUENCES_H
 
-#include <goto-programs/goto_functions.h>
+class goto_modelt;
 
-void show_call_sequences(const goto_functionst &goto_functions);
-void check_call_sequence(const goto_functionst &goto_functions);
-
-void list_calls_and_arguments(
-  const namespacet &ns,
-  const goto_functionst &goto_functions);
+void show_call_sequences(const goto_modelt &);
+void check_call_sequence(const goto_modelt &);
+void list_calls_and_arguments(const goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CALL_SEQUENCES_H

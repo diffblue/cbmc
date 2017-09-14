@@ -14,12 +14,12 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_GCC_MODE_H
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
-#include <util/cout_message.h>
-
 #include "compile.h"
 #include "goto_cc_mode.h"
 
-class compilet;
+#include <util/cout_message.h>
+
+#include <set>
 
 class gcc_modet:public goto_cc_modet
 {

@@ -28,6 +28,8 @@ Date: May 2016
 #include <json/json_parser.h>
 #include <util/message.h>
 
+namespace
+{
 class basic_blockst
 {
 public:
@@ -237,7 +239,7 @@ public:
     }
   }
 
-  void output(std::ostream &out)
+  void output(std::ostream &out) const
   {
     for(block_mapt::const_iterator
         b_it=block_map.begin();
@@ -289,6 +291,7 @@ protected:
     block_info.source_location.set_basic_block_covered_lines(covered_lines);
   }
 };
+}
 
 bool coverage_goalst::get_coverage_goals(
   const std::string &coverage_file,

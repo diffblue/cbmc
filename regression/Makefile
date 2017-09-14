@@ -5,6 +5,9 @@ DIRS = ansi-c \
        cbmc-java-inheritance \
        cpp \
        goto-analyzer \
+       goto-cc-cbmc \
+       goto-cc-goto-analyzer \
+       goto-cc-goto-symex \
        goto-diff \
        goto-gcc \
        goto-instrument \
@@ -12,6 +15,7 @@ DIRS = ansi-c \
        invariants \
        strings \
        strings-smoke-tests \
+       symex \
        test-script \
        # Empty last line
 

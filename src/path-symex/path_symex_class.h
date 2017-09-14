@@ -93,6 +93,7 @@ protected:
   void assign_rec(
     path_symex_statet &state,
     exprt::operandst &guard, // instantiated
+    const exprt &full_lhs, // not instantiated, no recursion
     const exprt &ssa_lhs, // instantiated, recursion here
     const exprt &ssa_rhs); // instantiated
 

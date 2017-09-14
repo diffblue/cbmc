@@ -64,7 +64,7 @@ public:
     const goto_functionst &,
     const namespacet &);
 
-  void output(const goto_functionst &);
+  void output(const goto_functionst &) const;
 
   void operator()(
     const goto_functionst &,

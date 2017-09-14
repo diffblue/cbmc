@@ -290,8 +290,7 @@ Function: make_pointer
 
 static void make_pointer(const YYSTYPE dest)
 {
-  set(dest, ID_pointer);
-  stack_type(dest).subtype()=typet(ID_abstract);
+  stack_type(dest)=pointer_type(typet(ID_abstract));
 }
 
 /*******************************************************************\

@@ -13,9 +13,9 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 
 #include <iostream>
 
-void show_natural_loops(const goto_functionst &goto_functions)
+void show_natural_loops(const goto_modelt &goto_model)
 {
-  forall_goto_functions(it, goto_functions)
+  forall_goto_functions(it, goto_model.goto_functions)
   {
     std::cout << "*** " << it->first << '\n';
 

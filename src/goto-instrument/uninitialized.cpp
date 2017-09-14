@@ -194,26 +194,23 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
   }
 }
 
-void add_uninitialized_locals_assertions(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void add_uninitialized_locals_assertions(goto_modelt &goto_model)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
-    uninitializedt uninitialized(symbol_table);
+    uninitializedt uninitialized(goto_model.symbol_table);
 
     uninitialized.add_assertions(f_it->second.body);
   }
 }
 
 void show_uninitialized(
-  const class symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   std::ostream &out)
 {
-  const namespacet ns(symbol_table);
+  const namespacet ns(goto_model.symbol_table);
 
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     if(f_it->second.body_available())
     {

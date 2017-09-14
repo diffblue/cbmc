@@ -436,10 +436,11 @@ void escape_analysist::insert_cleanup(
 }
 
 void escape_analysist::instrument(
-  goto_functionst &goto_functions,
-  const namespacet &ns)
+  goto_modelt &goto_model)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  const namespacet ns(goto_model.symbol_table);
+
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {

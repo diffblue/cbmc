@@ -17,12 +17,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 #include <unordered_set>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class call_grapht
 {
 public:
   call_grapht();
+  explicit call_grapht(const goto_modelt &);
   explicit call_grapht(const goto_functionst &);
 
   void output_dot(std::ostream &out) const;

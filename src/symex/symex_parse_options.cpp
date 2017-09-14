@@ -26,23 +26,24 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cpp/cpp_language.h>
 #include <java_bytecode/java_bytecode_language.h>
 
-#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_convert_functions.h>
-#include <goto-programs/show_properties.h>
-#include <goto-programs/set_properties.h>
-#include <goto-programs/read_goto_binary.h>
-#include <goto-programs/loop_ids.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/link_to_library.h>
+#include <goto-programs/loop_ids.h>
+#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_exceptions.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_instanceof.h>
+#include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
+#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_vector.h>
 #include <goto-programs/remove_virtual_functions.h>
-#include <goto-programs/remove_exceptions.h>
-#include <goto-programs/remove_instanceof.h>
-#include <goto-programs/remove_unused_functions.h>
+#include <goto-programs/set_properties.h>
+#include <goto-programs/show_properties.h>
+#include <goto-programs/xml_goto_trace.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -59,7 +60,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 symex_parse_optionst::symex_parse_optionst(int argc, const char **argv):
   parse_options_baset(SYMEX_OPTIONS, argc, argv),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "Symex " CBMC_VERSION)
 {
 }
@@ -304,6 +305,7 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
     goto_check(options, goto_model);
 
     // remove stuff
+    remove_returns(goto_model);
     remove_complex(goto_model);
     remove_vector(goto_model);
     // remove function pointers
@@ -341,42 +343,15 @@ bool symex_parse_optionst::process_goto_program(const optionst &options)
 
     if(cmdline.isset("cover"))
     {
-      std::string criterion=cmdline.get_value("cover");
-
-      coverage_criteriont c;
-
-      if(criterion=="assertion" || criterion=="assertions")
-        c=coverage_criteriont::ASSERTION;
-      else if(criterion=="path" || criterion=="paths")
-        c=coverage_criteriont::PATH;
-      else if(criterion=="branch" || criterion=="branches")
-        c=coverage_criteriont::BRANCH;
-      else if(criterion=="location" || criterion=="locations")
-        c=coverage_criteriont::LOCATION;
-      else if(criterion=="decision" || criterion=="decisions")
-        c=coverage_criteriont::DECISION;
-      else if(criterion=="condition" || criterion=="conditions")
-        c=coverage_criteriont::CONDITION;
-      else if(criterion=="mcdc")
-        c=coverage_criteriont::MCDC;
-      else if(criterion=="cover")
-        c=coverage_criteriont::COVER;
-      else
-      {
-        error() << "unknown coverage criterion" << eom;
-        return true;
-      }
-
       status() << "Instrumenting coverage goals" << eom;
-      instrument_cover_goals(
-        symbol_table, goto_model.goto_functions, c, get_message_handler());
-      goto_model.goto_functions.update();
+      if(instrument_cover_goals(cmdline, goto_model, get_message_handler()))
+        return true;
     }
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_model.goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return true;
     }
 
@@ -612,7 +587,7 @@ void symex_parse_optionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
-    " --function name              set main function name\n"
+    HELP_FUNCTIONS
     "\n"
     "Java Bytecode frontend options:\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP

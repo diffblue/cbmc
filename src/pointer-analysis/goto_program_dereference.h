@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/namespace.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 #include "value_sets.h"
 #include "value_set_dereference.h"
@@ -99,29 +99,28 @@ protected:
 void dereference(
   goto_programt::const_targett target,
   exprt &expr,
-  const namespacet &ns,
-  value_setst &value_sets);
+  const namespacet &,
+  value_setst &);
 
 void remove_pointers(
-  goto_programt &goto_program,
-  symbol_tablet &symbol_table,
-  value_setst &value_sets);
+  goto_modelt &,
+  value_setst &);
 
 void remove_pointers(
-  goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
-  value_setst &value_sets);
+  goto_functionst &,
+  symbol_tablet &,
+  value_setst &);
 
 void pointer_checks(
-  goto_programt &goto_program,
-  symbol_tablet &symbol_table,
-  const optionst &options,
-  value_setst &value_sets);
+  goto_programt &,
+  symbol_tablet &,
+  const optionst &,
+  value_setst &);
 
 void pointer_checks(
-  goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
-  const optionst &options,
-  value_setst &value_sets);
+  goto_functionst &,
+  symbol_tablet &,
+  const optionst &,
+  value_setst &);
 
 #endif // CPROVER_POINTER_ANALYSIS_GOTO_PROGRAM_DEREFERENCE_H

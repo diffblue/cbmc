@@ -34,21 +34,6 @@ goto_symex_statet::goto_symex_statet():
 
 goto_symex_statet::~goto_symex_statet()=default;
 
-void goto_symex_statet::initialize(const goto_functionst &goto_functions)
-{
-  goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(goto_functionst::entry_point());
-
-  if(it==goto_functions.function_map.end())
-    throw "program has no entry point";
-
-  const goto_programt &body=it->second.body;
-
-  source=symex_targett::sourcet(body);
-  top().end_of_function=--body.instructions.end();
-  top().calling_location.pc=top().end_of_function;
-}
-
 void goto_symex_statet::level0t::operator()(
   ssa_exprt &ssa_expr,
   const namespacet &ns,

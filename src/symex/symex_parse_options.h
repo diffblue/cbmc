@@ -17,8 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
-
-#include <langapi/language_ui.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
 
@@ -30,7 +29,7 @@ class goto_functionst;
 class optionst;
 
 #define SYMEX_OPTIONS \
-  "(function):" \
+  OPT_FUNCTIONS \
   "D:I:" \
   "(depth):(context-bound):(branch-bound):(unwind):(max-search-time):" \
   OPT_GOTO_CHECK \
@@ -55,7 +54,7 @@ class optionst;
 
 class symex_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit();
@@ -80,6 +79,11 @@ protected:
   void eval_verbosity();
 
   std::string get_test(const goto_tracet &goto_trace);
+
+  ui_message_handlert::uit get_ui() const
+  {
+    return ui_message_handler.get_ui();
+  }
 };
 
 #endif // CPROVER_SYMEX_SYMEX_PARSE_OPTIONS_H

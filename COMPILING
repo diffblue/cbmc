@@ -171,7 +171,7 @@ Follow these instructions:
    BUILD_ENV = MSVC
 
    Open the Visual Studio Command prompt, and then bash.exe -login from
-   Cygwin from in there. 
+   Cygwin from in there.
 
 3) Type cd src; make - that should do it.
 
@@ -181,6 +181,53 @@ Follow these instructions:
 is helpful for GUI-based tasks, e.g., the class viewer, debugging, etc., and
 can be used for building with MSBuild.  Note that you still need to run
 flex/bison using "make generated_files" before opening the project.
+
+
+WORKING WITH CMAKE (EXPERIMENTAL)
+---------------------------------
+
+There is an experimental build based on CMake instead of hand-written
+makefiles. It should work on a wider variety of systems than the standard
+makefile build, and can integrate better with IDEs and static-analysis tools.
+
+0) Run `cmake --version`. If you get a command-not-found error, or the installed
+   version is lower than 3.2, go and install a new version. Most Linux
+   distributions have a package for CMake, and Mac users can get it through
+   Homebrew.  Windows users should download it manually from cmake.org.
+
+1) Create a directory to store your build:
+   `mkdir build`
+   Run this from the *top level* folder of the project. This is different from
+   the other builds, which require you to `cd src` first.
+
+2) Generate build files with CMake:
+   `cmake -H. -Bbuild`
+   This command tells CMake to use the configuration in the current directory,
+   and to generate build files into the `build` directory.
+   This is the point to specify custom build settings, such as compilers and
+   build back-ends. You can use clang (for example) by adding the argument
+   `-DCMAKE_CXX_COMPILER=clang++` to the command line. You can also tell
+   CMake to generate IDE projects by supplying the `-G` flag.
+   Run `cmake -G` for a comprehensive list of supported back-ends.
+
+   Generally it is not necessary to manually specify individual compiler or
+   linker flags, as CMake defines a number of "build modes" including Debug
+   and Release modes. To build in a particular mode, add the flag
+   `-DCMAKE_BUILD_TYPE=Debug` (or `Release`) to the initial invocation.
+
+   If you *do* need to manually add flags, use `-DCMAKE_CXX_FLAGS=...` and
+   `-DCMAKE_EXE_LINKER_FLAGS=...`. This is useful for enabling clang's
+   sanitizers.
+
+   Finally, to enable building universal binaries on macOS, you can pass the
+   flag `-DCMAKE_OSX_ARCHITECTURES=i386;x86_64`. If you don't supply this flag,
+   the build will just be for the architecture of your machine.
+
+3) Run the build:
+   `cmake --build build`
+   This command tells CMake to invoke the correct tool to run the build in the
+   `build` directory. You can also use the build back-end directly by invoking
+   `make`, `ninja`, or opening the generated IDE project as appropriate.
 
 
 WORKING WITH ECLIPSE

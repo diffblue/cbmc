@@ -123,6 +123,10 @@ public:
 
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
 
+  virtual bool generate_start_function(
+    const irep_idt &entry_function_symbol_id,
+    class symbol_tablet &symbol_table)=0;
+
   // constructor / destructor
 
   languaget() { }
@@ -141,7 +145,7 @@ protected:
 
   static irep_idt get_stub_return_symbol_name(const irep_idt &function_id);
 
-  bool generate_opaque_stubs;
+  bool generate_opaque_stubs=false;
   bool language_options_initialized=false;
 
 private:

@@ -71,6 +71,8 @@ public:
     typedef data_typet::const_iterator const_iterator;
     // NOLINTNEXTLINE(readability/identifiers)
     typedef data_typet::value_type value_type;
+    // NOLINTNEXTLINE(readability/identifiers)
+    typedef data_typet::key_type key_type;
 
     iterator begin() { return data.begin(); }
     const_iterator begin() const { return data.begin(); }
@@ -83,12 +85,12 @@ public:
     size_t size() const { return data.size(); }
     bool empty() const { return data.empty(); }
 
-    void erase(unsigned i) { data.erase(i); }
-    void erase(iterator it) { data.erase(it); }
+    void erase(key_type i) { data.erase(i); }
+    void erase(const_iterator it) { data.erase(it); }
 
-    objectt &operator[](unsigned i) { return data[i]; }
-    objectt &at(unsigned i) { return data.at(i); }
-    const objectt &at(unsigned i) const { return data.at(i); }
+    objectt &operator[](key_type i) { return data[i]; }
+    objectt &at(key_type i) { return data.at(i); }
+    const objectt &at(key_type i) const { return data.at(i); }
 
     template <typename It>
     void insert(It b, It e) { data.insert(b, e); }

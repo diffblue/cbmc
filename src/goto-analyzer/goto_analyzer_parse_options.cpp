@@ -58,7 +58,7 @@ goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
   const char **argv):
   parse_options_baset(GOTO_ANALYSER_OPTIONS, argc, argv),
-  language_uit(cmdline, ui_message_handler),
+  messaget(ui_message_handler),
   ui_message_handler(cmdline, "GOTO-ANALYZER " CBMC_VERSION)
 {
 }
@@ -494,6 +494,7 @@ void goto_analyzer_parse_optionst::help()
     " --classpath dir/jar          set the classpath\n"
     " --main-class class-name      set the name of the main class\n"
     JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"

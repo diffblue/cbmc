@@ -372,8 +372,7 @@ void c_typecastt::implicit_typecast_arithmetic(
   case PTR:
     if(expr_type.id()==ID_array)
     {
-      new_type.id(ID_pointer);
-      new_type.subtype()=expr_type.subtype();
+      new_type=pointer_type(expr_type.subtype());
       break;
     }
     return;

@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <ansi-c/expr2c.h>
 
+#include <goto-programs/goto_model.h>
+
 #define MAXWIDTH 62
 
 class document_propertiest
@@ -361,15 +363,15 @@ void document_propertiest::doit()
 }
 
 void document_properties_html(
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   std::ostream &out)
 {
-  document_propertiest(goto_functions, out).html();
+  document_propertiest(goto_model.goto_functions, out).html();
 }
 
 void document_properties_latex(
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   std::ostream &out)
 {
-  document_propertiest(goto_functions, out).latex();
+  document_propertiest(goto_model.goto_functions, out).latex();
 }

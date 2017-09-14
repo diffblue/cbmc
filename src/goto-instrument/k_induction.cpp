@@ -150,10 +150,10 @@ void k_inductiont::k_induction()
 }
 
 void k_induction(
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   bool base_case, bool step_case,
   unsigned k)
 {
-  Forall_goto_functions(it, goto_functions)
+  Forall_goto_functions(it, goto_model.goto_functions)
     k_inductiont(it->second, base_case, step_case, k);
 }

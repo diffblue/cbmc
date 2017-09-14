@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 #define CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H
 
-#include <langapi/language_ui.h>
+#include <util/ui_message.h>
 
 #include <solvers/flattening/bv_pointers.h>
 
@@ -25,7 +25,7 @@ public:
   {
     const namespacet *ns=nullptr;
     propt *prop=nullptr;
-    language_uit::uit ui=language_uit::uit::PLAIN;
+    ui_message_handlert::uit ui=ui_message_handlert::uit::PLAIN;
     /// Max number of times we refine a formula node
     unsigned max_node_refinement=5;
     /// Enable array refinement
@@ -114,7 +114,7 @@ private:
 
 protected:
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 };
 
 #endif // CPROVER_SOLVERS_REFINEMENT_BV_REFINEMENT_H

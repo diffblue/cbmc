@@ -284,24 +284,25 @@ void goto_function_inline(
 }
 
 jsont goto_function_inline_and_log(
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const irep_idt function,
-  const namespacet &ns,
   message_handlert &message_handler,
   bool adjust_function,
   bool caching)
 {
+  const namespacet ns(goto_model.symbol_table);
+
   goto_inlinet goto_inline(
-    goto_functions,
+    goto_model.goto_functions,
     ns,
     message_handler,
     adjust_function,
     caching);
 
   goto_functionst::function_mapt::iterator f_it=
-    goto_functions.function_map.find(function);
+    goto_model.goto_functions.function_map.find(function);
 
-  if(f_it==goto_functions.function_map.end())
+  if(f_it==goto_model.goto_functions.function_map.end())
     return jsont();
 
   goto_functionst::goto_functiont &goto_function=f_it->second;
@@ -326,8 +327,8 @@ jsont goto_function_inline_and_log(
   }
 
   goto_inline.goto_inline(function, goto_function, inline_map, true);
-  goto_functions.update();
-  goto_functions.compute_loop_numbers();
+  goto_model.goto_functions.update();
+  goto_model.goto_functions.compute_loop_numbers();
 
   return goto_inline.output_inline_log_json();
 }
