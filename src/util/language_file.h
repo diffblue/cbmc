@@ -17,9 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory> // unique_ptr
 
 #include "message.h"
+#include "symbol_table.h"
 
-class symbol_tablet;
-class symbol_table_baset;
 class language_filet;
 class languaget;
 
@@ -92,11 +91,6 @@ public:
 
   bool interfaces(symbol_tablet &symbol_table);
 
-  bool has_lazy_method(const irep_idt &id)
-  {
-    return lazy_method_map.count(id)!=0;
-  }
-
   // The method must have been added to the symbol table and registered
   // in lazy_method_map (currently always in language_filest::typecheck)
   // for this to be legal.
@@ -104,7 +98,10 @@ public:
     const irep_idt &id,
     symbol_tablet &symbol_table)
   {
-    return lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+    PRECONDITION(symbol_table.has_symbol(id));
+    lazy_method_mapt::iterator it=lazy_method_map.find(id);
+    if(it!=lazy_method_map.end())
+      it->second->convert_lazy_method(id, symbol_table);
   }
 
   void clear()
