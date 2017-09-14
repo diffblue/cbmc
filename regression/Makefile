@@ -7,7 +7,7 @@ DIRS = ansi-c \
        goto-analyzer \
        goto-cc-cbmc \
        goto-cc-goto-analyzer \
-       goto-cc-goto-symex \
+       goto-cc-symex \
        goto-diff \
        goto-gcc \
        goto-instrument \

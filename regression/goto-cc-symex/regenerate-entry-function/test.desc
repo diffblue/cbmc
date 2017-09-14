@@ -1,7 +1,7 @@
 CORE
 main.c
 "--function fun --show-goto-functions"
-^\s*return.=fun\(x\);$
+fun\(x\);$
 ^EXIT=6$
 ^SIGNAL=0$
 --
