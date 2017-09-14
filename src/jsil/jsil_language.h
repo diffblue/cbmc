@@ -55,7 +55,7 @@ public:
     const namespacet &ns) override;
 
   std::unique_ptr<pretty_printert>
-    get_pretty_printer(const namespacet &);
+    get_pretty_printer(const namespacet &) override;
 
   virtual bool to_expr(
     const std::string &code,
