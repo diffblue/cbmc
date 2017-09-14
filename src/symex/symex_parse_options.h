@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
 
@@ -28,7 +29,7 @@ class goto_functionst;
 class optionst;
 
 #define SYMEX_OPTIONS \
-  "(function):" \
+  OPT_FUNCTIONS \
   "D:I:" \
   "(depth):(context-bound):(branch-bound):(unwind):(max-search-time):" \
   OPT_GOTO_CHECK \

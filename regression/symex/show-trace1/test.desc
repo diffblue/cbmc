@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --trace
 ^EXIT=10$
@@ -9,3 +9,5 @@ main.c
 ^  k=6 .*$
 --
 ^warning: ignoring
+--
+diffblue/cbmc#1361

@@ -106,6 +106,30 @@ void java_bytecode_languaget::modules_provided(std::set<std::string> &modules)
   // modules.insert(translation_unit(parse_path));
 }
 
+/// Generate a _start function for a specific function.
+/// \param entry_function_symbol_id: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the _start method was generated correctly
+bool java_bytecode_languaget::generate_start_function(
+  const irep_idt &entry_function_symbol_id,
+  symbol_tablet &symbol_table)
+{
+  const auto res=
+    get_main_symbol(
+      symbol_table, entry_function_symbol_id, get_message_handler());
+
+  return generate_java_start_function(
+    res.main_function,
+    symbol_table,
+    get_message_handler(),
+    assume_inputs_non_null,
+    max_nondet_array_length,
+    max_nondet_tree_depth,
+    *pointer_type_selector);
+}
+
 /// ANSI-C preprocessing
 bool java_bytecode_languaget::preprocess(
   std::istream &instream,

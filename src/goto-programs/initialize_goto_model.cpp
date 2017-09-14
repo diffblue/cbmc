@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 #include <langapi/language_ui.h>
 
+#include <goto-programs/rebuild_goto_start_function.h>
+
 #include "goto_convert_functions.h"
 #include "read_goto_binary.h"
 
@@ -129,6 +131,20 @@ bool initialize_goto_model(
 
       if(read_object_and_link(file, goto_model, message_handler))
         return true;
+    }
+
+    if(cmdline.isset("function"))
+    {
+      const std::string &function_id=cmdline.get_value("function");
+      rebuild_goto_start_functiont start_function_rebuilder(
+        msg.get_message_handler(),
+        goto_model.symbol_table,
+        goto_model.goto_functions);
+
+      if(start_function_rebuilder(function_id))
+      {
+        return 6;
+      }
     }
 
     msg.status() << "Generating GOTO Program" << messaget::eom;

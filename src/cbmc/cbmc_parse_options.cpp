@@ -51,6 +51,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -624,7 +625,23 @@ int cbmc_parse_optionst::get_goto_program(
   try
   {
     if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
+    // Remove all binaries from the command line as they
+    // are already compiled
       return 6;
+
+    if(cmdline.isset("function"))
+    {
+      const std::string &function_id=cmdline.get_value("function");
+      rebuild_goto_start_functiont start_function_rebuilder(
+        get_message_handler(),
+        goto_model.symbol_table,
+        goto_model.goto_functions);
+
+      if(start_function_rebuilder(function_id))
+      {
+        return 6;
+      }
+    }
 
     if(cmdline.isset("show-symbol-table"))
     {
@@ -992,7 +1009,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
-    " --function name              set main function name\n"
+    HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
     " --show-parse-tree            show parse tree\n"
