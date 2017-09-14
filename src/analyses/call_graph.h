@@ -22,6 +22,7 @@ class call_grapht
 public:
   call_grapht();
   explicit call_grapht(const goto_modelt &);
+  explicit call_grapht(const goto_functionst &);
 
   void output_dot(std::ostream &out) const;
   void output(std::ostream &out) const;

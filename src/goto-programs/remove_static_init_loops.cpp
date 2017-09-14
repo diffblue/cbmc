@@ -109,6 +109,19 @@ void remove_static_init_loops(
   optionst &options,
   message_handlert &msg)
 {
-  remove_static_init_loopst remove_loops(goto_model.symbol_table);
-  remove_loops.unwind_enum_static(goto_model.goto_functions, options, msg);
+  remove_static_init_loops(
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    options,
+    msg);
+}
+
+void remove_static_init_loops(
+  const symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
+  optionst &options,
+  message_handlert &msg)
+{
+  remove_static_init_loopst remove_loops(symbol_table);
+  remove_loops.unwind_enum_static(goto_functions, options, msg);
 }
