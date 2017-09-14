@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/memory_info.h>
 #include <util/invariant.h>
-#include <util/overlay_map.h>
 
 #include <ansi-c/c_preprocess.h>
 
@@ -101,8 +100,6 @@ void cbmc_parse_optionst::eval_verbosity()
 
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
-  overlay_map<int, int> omap;
-
   if(config.set(cmdline))
   {
     usage_error();
