@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.2)
+
+# CBMC only uses part of minisat2.
+# This CMakeLists is designed to build just the parts that are needed.
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+add_library(minisat2-condensed
+    minisat/simp/SimpSolver.cc
+    minisat/core/Solver.cc
+)
+
+set(CBMC_INCLUDE_DIR "" CACHE PATH "The path to CBMC util headers")
+
+target_include_directories(minisat2-condensed
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CBMC_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS minisat2-condensed EXPORT minisat-condensed-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+install(DIRECTORY . DESTINATION include FILES_MATCHING PATTERN "*.h")
+
+install(EXPORT minisat-condensed-targets DESTINATION lib/cmake/minisat-condensed)

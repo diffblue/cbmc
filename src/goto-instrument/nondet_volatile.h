@@ -12,14 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 #define CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 bool is_volatile(
-  const symbol_tablet &symbol_table,
-  const typet &type);
+  const symbol_tablet &,
+  const typet &);
 
-void nondet_volatile(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions);
+void nondet_volatile(goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H

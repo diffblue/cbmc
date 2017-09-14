@@ -59,8 +59,8 @@ sub load($) {
   return @data;
 }
 
-sub test($$$$$) {
-  my ($name, $test, $t_level, $cmd, $ign) = @_;
+sub test($$$$$$) {
+  my ($name, $test, $t_level, $cmd, $ign, $dry_run) = @_;
   my ($level, $input, $options, $grep_options, @results) = load("$test");
 
   # If the 4th line is activate-multi-line-match we enable multi-line checks
@@ -106,6 +106,11 @@ sub test($$$$$) {
 
   my $failed = 2;
   if($level & $t_level) {
+
+    if ($dry_run) {
+      return 0;
+    }
+
     $failed = run($name, $input, $cmd, $options, $output);
 
     if(!$failed) {
@@ -211,6 +216,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   -c CMD     run tests on CMD - required option
   -i <regex> options in test.desc matching the specified perl regex are ignored
   -j <num>   run <num> tests in parallel (requires Thread::Pool::Simple)
+  -n         dry-run: print the tests that would be run, but don't actually run them
   -h         show this help and exit
   -C         core: run all essential tests (default if none of C/T/F/K are given)
   -T         thorough: run expensive tests
@@ -249,9 +255,9 @@ EOF
 use Getopt::Std;
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_i, $opt_j, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K); # the variables for getopt
+our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K); # the variables for getopt
 $opt_j = 0;
-getopts('c:i:j:hCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:i:j:nhCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 (!$opt_j || $has_thread_pool) or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_h and &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
@@ -260,7 +266,7 @@ $t_level += 2 if($opt_T);
 $t_level += 4 if($opt_F);
 $t_level += 8 if($opt_K);
 $t_level += 1 if($opt_C || 0 == $t_level);
-
+my $dry_run = $opt_n;
 
 
 open LOG,">tests.log";
@@ -287,7 +293,7 @@ sub do_test($)
   my @files = glob "$test/*.desc";
   for (0..$#files){
     defined($pool) or print "  Running $files[$_]";
-    $failed_skipped = test($test, $files[$_], $t_level, $opt_c, $opt_i);
+    $failed_skipped = test($test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run);
 
     lock($skips);
     defined($pool) and print "  Running $test $files[$_]";

@@ -60,19 +60,21 @@ build_script:
 test_script:
 - cmd: |
     cd regression
-    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" ansi-c/Makefile
-    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" cpp/Makefile
-    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-instrument/chain.sh
-    sed -i "15s/.*/$goto_cc $name.c/" goto-instrument/chain.sh
-    sed -i "16i mv $name.exe $name.gb" goto-instrument/chain.sh
-    sed -i "23s/.*/  $goto_cc ${name}-mod.c/" goto-instrument/chain.sh
-    sed -i "24i   mv ${name}-mod.exe $name-mod.gb" goto-instrument/chain.sh
-    cat goto-instrument/chain.sh
 
-    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-instrument-typedef/chain.sh || true
-    sed -i "12s/.*/$GC $NAME.c --function fun/" goto-instrument-typedef/chain.sh || true
-    sed -i "13i mv $NAME.exe $NAME.gb" goto-instrument-typedef/chain.sh || true
-    cat goto-instrument-typedef/chain.sh || true
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-cc-cbmc/chain.sh || true
+    sed -i "11s/.*/$GC $NAME.c/" goto-cc-cbmc/chain.sh || true
+    sed -i "12i mv $NAME.exe $NAME.gb" goto-cc-cbmc/chain.sh || true
+    cat goto-cc-cbmc/chain.sh || true
+
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-cc-goto-analyzer/chain.sh || true
+    sed -i "11s/.*/$gc $name.c/" goto-cc-goto-analyzer/chain.sh || true
+    sed -i "12i mv $name.exe $name.gb" goto-cc-goto-analyzer/chain.sh || true
+    cat goto-cc-goto-analyzer/chain.sh || true
+
+    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-cc-symex/chain.sh || true
+    sed -i "11s/.*/$gc $name.c/" goto-cc-symex/chain.sh || true
+    sed -i "12i mv $name.exe $name.gb" goto-cc-symex/chain.sh || true
+    cat goto-cc-symex/chain.sh || true
 
     rem HACK disable failing tests
     rmdir /s /q ansi-c\arch_flags_mcpu_bad
@@ -111,6 +113,11 @@ test_script:
     rmdir /s /q cbmc-java\tableswitch2
     rmdir /s /q goto-gcc
     rmdir /s /q goto-instrument\slice08
+    rmdir /s /q symex\va_args_10
+    rmdir /s /q symex\va_args_2
+    rmdir /s /q symex\va_args_3
+    rmdir /s /q symex\va_args_5
+    rmdir /s /q symex\va_args_6
 
     make test
 

@@ -15,9 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/json.h>
 #include <util/json_expr.h>
-#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
 
-class goto_functionst;
+class goto_modelt;
 
 // -1: do not unwind loop
 typedef std::map<irep_idt, std::map<unsigned, int>> unwind_sett;
@@ -66,10 +66,29 @@ public:
   }
 
   void operator()(
-    goto_functionst &goto_functions,
+    goto_functionst &,
     const unwind_sett &unwind_set,
     const int k=-1, // -1: no global bound
     const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL);
+
+  void operator()(
+    goto_modelt &goto_model,
+    const unsigned k, // global bound
+    const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL)
+  {
+    const unwind_sett unwind_set;
+    operator()(goto_model.goto_functions, unwind_set, k, unwind_strategy);
+  }
+
+  void operator()(
+    goto_modelt &goto_model,
+    const unwind_sett &unwind_set,
+    const int k=-1, // -1: no global bound
+    const unwind_strategyt unwind_strategy=unwind_strategyt::PARTIAL)
+  {
+    operator()(
+      goto_model.goto_functions, unwind_set, k, unwind_strategy);
+  }
 
   // unwind log
 

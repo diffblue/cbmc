@@ -14,9 +14,9 @@ Author: Peter Schrammel
 
 #include <util/ui_message.h>
 
-class goto_functionst;
 class namespacet;
 class goto_modelt;
+class goto_functionst;
 
 #define OPT_SHOW_GOTO_FUNCTIONS \
   "(show-goto-functions)"

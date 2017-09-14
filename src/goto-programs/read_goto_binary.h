@@ -14,10 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-class symbol_tablet;
 class goto_functionst;
-class message_handlert;
 class goto_modelt;
+class message_handlert;
+class symbol_tablet;
 
 bool read_goto_binary(
   const std::string &filename,

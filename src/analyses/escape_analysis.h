@@ -95,9 +95,7 @@ private:
 class escape_analysist:public ait<escape_domaint>
 {
 public:
-  void instrument(
-    goto_functionst &,
-    const namespacet &);
+  void instrument(goto_modelt &);
 
 protected:
   virtual void initialize(const goto_functionst &_goto_functions)

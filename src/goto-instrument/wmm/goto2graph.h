@@ -20,13 +20,12 @@ Date: 2012
 #include <util/namespace.h>
 #include <util/message.h>
 
-#include <goto-programs/goto_program.h>
+#include <goto-programs/goto_model.h>
 
 #include "event_graph.h"
 #include "wmm.h"
 
-class symbol_tablet;
-class goto_functionst;
+class goto_modelt;
 class value_setst;
 class local_may_aliast;
 
@@ -329,11 +328,10 @@ public:
   std::multimap<irep_idt, source_locationt> id2cycloc;
 
   instrumentert(
-    symbol_tablet &_symbol_table,
-    goto_functionst &_goto_f,
+    goto_modelt &_goto_model,
     messaget &_message):
-    ns(_symbol_table),
-    goto_functions(_goto_f),
+    ns(_goto_model.symbol_table),
+    goto_functions(_goto_model.goto_functions),
     render_po_aligned(true),
     render_by_file(false),
     render_by_function(false),

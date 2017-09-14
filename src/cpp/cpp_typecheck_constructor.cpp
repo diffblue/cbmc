@@ -41,17 +41,17 @@ static void copy_parent(
   exprt &op0=code.op0().op0();
 
   op0.operands().push_back(exprt("cpp-this"));
-  op0.type().id(ID_pointer);
-  op0.type().subtype()=cpp_namet(parent_base_name, source_location).as_type();
+  op0.type()=
+    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
   op0.add_source_location()=source_location;
 
   code.operands().push_back(exprt("explicit-typecast"));
   exprt &op1=code.op1();
 
-  op1.type().id(ID_pointer);
+  op0.type()=
+    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
   op1.type().set(ID_C_reference, true);
   op1.type().subtype().set(ID_C_constant, true);
-  op1.type().subtype()=cpp_namet(parent_base_name, source_location).as_type();
 
   op1.operands().push_back(exprt(ID_cpp_name));
   op1.op0().get_sub().push_back(irept(ID_name));
@@ -420,9 +420,8 @@ void cpp_typecheckt::default_assignop(
   args_decl_declor.name().get_sub().back().add(ID_identifier).id(arg_name);
   args_decl_declor.add_source_location()=source_location;
 
-  args_decl_declor.type().id(ID_pointer);
+  args_decl_declor.type()=pointer_type(typet(ID_nil));
   args_decl_declor.type().set(ID_C_reference, true);
-  args_decl_declor.type().subtype().make_nil();
   args_decl_declor.value().make_nil();
 }
 

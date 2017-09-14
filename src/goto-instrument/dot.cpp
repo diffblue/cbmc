@@ -25,11 +25,9 @@ Author: Daniel Kroening, kroening@kroening.com
 class dott
 {
 public:
-  dott(
-    const goto_functionst &_goto_functions,
-    const namespacet &_ns):
-    ns(_ns),
-    goto_functions(_goto_functions),
+  explicit dott(
+    const goto_modelt &_goto_model):
+    goto_model(_goto_model),
     subgraphscount(0)
   {
   }
@@ -37,8 +35,7 @@ public:
   void output(std::ostream &out);
 
 protected:
-  const namespacet &ns;
-  const goto_functionst &goto_functions;
+  const goto_modelt &goto_model;
 
   unsigned subgraphscount;
 
@@ -91,6 +88,8 @@ void dott::write_dot_subgraph(
   }
   else
   {
+    const namespacet ns(goto_model.symbol_table);
+
     std::set<goto_programt::const_targett> seen;
     goto_programt::const_targetst worklist;
     worklist.push_back(instructions.begin());
@@ -265,7 +264,7 @@ void dott::output(std::ostream &out)
 
   std::list<exprt> clusters;
 
-  forall_goto_functions(it, goto_functions)
+  forall_goto_functions(it, goto_model.goto_functions)
     if(it->second.body_available())
       write_dot_subgraph(out, id2string(it->first), it->second.body);
 
@@ -350,11 +349,8 @@ void dott::write_edge(
   out << ";\n";
 }
 
-void dot(
-  const goto_functionst &src,
-  const namespacet &ns,
-  std::ostream &out)
+void dot(const goto_modelt &src, std::ostream &out)
 {
-  dott dot(src, ns);
+  dott dot(src);
   dot.output(out);
 }

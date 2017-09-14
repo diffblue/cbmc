@@ -16,8 +16,7 @@ Date: June 2015
 #include <ostream>
 
 void horn_encoding(
-  const goto_functionst &,
-  const namespacet &,
+  const goto_modelt &,
   std::ostream &out)
 {
 }

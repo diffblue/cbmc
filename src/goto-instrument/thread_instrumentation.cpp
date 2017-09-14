@@ -9,7 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "thread_instrumentation.h"
 
 #include <util/c_types.h>
+
 #include <ansi-c/string_constant.h>
+
+#include <goto-programs/goto_model.h>
 
 static bool has_start_thread(const goto_programt &goto_program)
 {
@@ -53,12 +56,12 @@ void thread_exit_instrumentation(goto_programt &goto_program)
   end->function=function;
 }
 
-void thread_exit_instrumentation(goto_functionst &goto_functions)
+void thread_exit_instrumentation(goto_modelt &goto_model)
 {
   // we'll look for START THREAD
   std::set<irep_idt> thread_fkts;
 
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     if(has_start_thread(f_it->second.body))
     {
@@ -77,9 +80,8 @@ void thread_exit_instrumentation(goto_functionst &goto_functions)
 
   // now instrument
   for(const auto &fkt : thread_fkts)
-  {
-    thread_exit_instrumentation(goto_functions.function_map.at(fkt).body);
-  }
+    thread_exit_instrumentation(
+      goto_model.goto_functions.function_map.at(fkt).body);
 }
 
 void mutex_init_instrumentation(
@@ -118,16 +120,14 @@ void mutex_init_instrumentation(
   }
 }
 
-void mutex_init_instrumentation(
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void mutex_init_instrumentation(goto_modelt &goto_model)
 {
   // get pthread_mutex_lock
 
   symbol_tablet::symbolst::const_iterator f_it=
-    symbol_table.symbols.find("pthread_mutex_lock");
+    goto_model.symbol_table.symbols.find("pthread_mutex_lock");
 
-  if(f_it==symbol_table.symbols.end())
+  if(f_it==goto_model.symbol_table.symbols.end())
     return;
 
   // get type of lock argument
@@ -140,7 +140,7 @@ void mutex_init_instrumentation(
   if(lock_type.id()!=ID_pointer)
     return;
 
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     mutex_init_instrumentation(
-      symbol_table, f_it->second.body, lock_type.subtype());
+      goto_model.symbol_table, f_it->second.body, lock_type.subtype());
 }

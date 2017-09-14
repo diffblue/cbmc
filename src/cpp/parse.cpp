@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/c_types.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
 
@@ -3015,7 +3016,7 @@ bool Parser::optPtrOperator(typet &ptrs)
 
     if(t=='*')
     {
-      typet op(ID_pointer);
+      typet op=pointer_type(typet(ID_nil));
       cpp_tokent tk;
       lex.get_token(tk);
       set_location(op, tk);
@@ -3078,7 +3079,7 @@ bool Parser::optPtrOperator(typet &ptrs)
     {
       cpp_tokent tk;
       lex.get_token(tk);
-      typet op(ID_pointer);
+      typet op=pointer_type(typet(ID_nil));
       op.set(ID_C_reference, true);
       set_location(op, tk);
       t_list.push_front(op);
@@ -3087,7 +3088,7 @@ bool Parser::optPtrOperator(typet &ptrs)
     {
       cpp_tokent tk;
       lex.get_token(tk);
-      typet op(ID_pointer);
+      typet op=pointer_type(typet(ID_nil));
       op.set(ID_C_rvalue_reference, true);
       set_location(op, tk);
       t_list.push_front(op);
@@ -3530,7 +3531,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   std::cout << std::string(__indent, ' ') << "Parser::rPtrToMember 0\n";
   #endif
 
-  irept ptm(ID_pointer);
+  typet ptm=pointer_type(typet(ID_nil));
   irept &name = ptm.add("to-member");
   name=cpp_namet();
   irept::subt &components=name.get_sub();
@@ -6477,7 +6478,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_NULLPTR:
     lex.get_token(tk);
-    exp=constant_exprt(ID_NULL, typet(ID_pointer, typet(ID_nullptr)));
+    exp=constant_exprt(ID_NULL, pointer_type(typet(ID_nullptr)));
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";

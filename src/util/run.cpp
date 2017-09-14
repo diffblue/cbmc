@@ -127,10 +127,13 @@ int run(
         dup2(stdin_fd, STDIN_FILENO);
       if(stdout_fd!=STDOUT_FILENO)
         dup2(stdout_fd, STDOUT_FILENO);
+
+      errno=0;
       execvp(what.c_str(), _argv.data());
 
       /* usually no return */
-      return 1;
+      perror(std::string("execvp "+what+" failed").c_str());
+      exit(1);
     }
     else /* fork() returns new pid to the parent process */
     {

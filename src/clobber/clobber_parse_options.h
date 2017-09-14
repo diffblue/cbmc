@@ -54,17 +54,13 @@ public:
 protected:
   ui_message_handlert ui_message_handler;
 
-  void get_command_line_options(optionst &options);
-
-  bool get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
+  void get_command_line_options(optionst &);
 
   bool process_goto_program(
     const optionst &options,
-    goto_functionst &goto_functions);
+    goto_modelt &);
 
-  bool set_properties(goto_functionst &goto_functions);
+  bool set_properties(goto_functionst &);
 
   void report_success();
   void report_failure();

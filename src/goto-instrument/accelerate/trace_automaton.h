@@ -54,7 +54,7 @@ class automatont
 
   std::size_t count_transitions();
 
-  void output(std::ostream &str);
+  void output(std::ostream &str) const;
 
   void clear()
   {

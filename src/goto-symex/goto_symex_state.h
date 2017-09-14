@@ -42,8 +42,6 @@ public:
   symex_targett::sourcet source;
   symex_targett *symex_target;
 
-  void initialize(const goto_functionst &goto_functions);
-
   // we have a two-level renaming
 
   typedef std::map<irep_idt, irep_idt> original_identifierst;

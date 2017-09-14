@@ -23,12 +23,6 @@ void goto_convert(
   goto_functionst &functions,
   message_handlert &);
 
-// confusing, will go away
-void goto_convert(
-  symbol_tablet &symbol_table,
-  goto_modelt &dest,
-  message_handlert &);
-
 // convert it all!
 void goto_convert(
   goto_modelt &,

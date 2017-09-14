@@ -19,6 +19,11 @@ call_grapht::call_grapht()
 {
 }
 
+call_grapht::call_grapht(const goto_modelt &goto_model):
+  call_grapht(goto_model.goto_functions)
+{
+}
+
 call_grapht::call_grapht(const goto_functionst &goto_functions)
 {
   forall_goto_functions(f_it, goto_functions)

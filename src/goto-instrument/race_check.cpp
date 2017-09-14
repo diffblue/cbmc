@@ -294,29 +294,29 @@ void race_check(
 
 void race_check(
   value_setst &value_sets,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
-  w_guardst w_guards(symbol_table);
+  w_guardst w_guards(goto_model.symbol_table);
 
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->first!=goto_functionst::entry_point() &&
        f_it->first!=CPROVER_PREFIX "initialize")
       race_check(
         value_sets,
-        symbol_table,
+        goto_model.symbol_table,
         L_M_ARG(f_it->second)
         f_it->second.body,
         w_guards);
 
   // get "main"
   goto_functionst::function_mapt::iterator
-    m_it=goto_functions.function_map.find(goto_functions.entry_point());
+    m_it=goto_model.goto_functions.function_map.find(
+      goto_model.goto_functions.entry_point());
 
-  if(m_it==goto_functions.function_map.end())
+  if(m_it==goto_model.goto_functions.function_map.end())
     throw "race check instrumentation needs an entry point";
 
   goto_programt &main=m_it->second.body;
   w_guards.add_initialization(main);
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }

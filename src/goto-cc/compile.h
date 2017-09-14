@@ -18,7 +18,7 @@ Date: June 2006
 #include <util/rename_symbol.h>
 
 #include <langapi/language_ui.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class compilet:public language_uit
 {
@@ -67,6 +67,7 @@ public:
     const std::string &,
     const symbol_tablet &,
     goto_functionst &);
+
   bool write_bin_object_file(
     const std::string &,
     const symbol_tablet &,

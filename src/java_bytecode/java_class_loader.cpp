@@ -207,7 +207,7 @@ void java_class_loadert::read_jar_file(
     // does it end on .class?
     if(has_suffix(file_name, ".class"))
     {
-      status() << "read class file " << file_name << " from " << file << eom;
+      debug() << "read class file " << file_name << " from " << file << eom;
       irep_idt class_name=file_to_class_name(file_name);
 
       // record

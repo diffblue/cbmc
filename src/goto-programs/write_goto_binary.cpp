@@ -17,18 +17,20 @@ Author: CM Wintersteiger
 #include <util/irep_serialization.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/goto_model.h>
+
 /// Writes a goto program to disc, using goto binary format ver 2
 bool write_goto_binary_v3(
   std::ostream &out,
-  const symbol_tablet &lsymbol_table,
-  const goto_functionst &functions,
+  const symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
   irep_serializationt &irepconverter)
 {
   // first write symbol table
 
-  write_gb_word(out, lsymbol_table.symbols.size());
+  write_gb_word(out, symbol_table.symbols.size());
 
-  forall_symbols(it, lsymbol_table.symbols)
+  forall_symbols(it, symbol_table.symbols)
   {
     // Since version 2, symbols are not converted to ireps,
     // instead they are saved in a custom binary format
@@ -72,13 +74,13 @@ bool write_goto_binary_v3(
   // now write functions, but only those with body
 
   unsigned cnt=0;
-  forall_goto_functions(it, functions)
+  forall_goto_functions(it, goto_functions)
     if(it->second.body_available())
       cnt++;
 
   write_gb_word(out, cnt);
 
-  for(const auto &fct : functions.function_map)
+  for(const auto &fct : goto_functions.function_map)
   {
     if(fct.second.body_available())
     {
@@ -122,8 +124,21 @@ bool write_goto_binary_v3(
 /// Writes a goto program to disc
 bool write_goto_binary(
   std::ostream &out,
-  const symbol_tablet &lsymbol_table,
-  const goto_functionst &functions,
+  const goto_modelt &goto_model,
+  int version)
+{
+  return write_goto_binary(
+    out,
+    goto_model.symbol_table,
+    goto_model.goto_functions,
+    version);
+}
+
+/// Writes a goto program to disc
+bool write_goto_binary(
+  std::ostream &out,
+  const symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
   int version)
 {
   // header
@@ -143,8 +158,7 @@ bool write_goto_binary(
 
   case 3:
     return write_goto_binary_v3(
-      out, lsymbol_table, functions,
-      irepconverter);
+      out, symbol_table, goto_functions, irepconverter);
 
   default:
     throw "unknown goto binary version";
@@ -156,8 +170,7 @@ bool write_goto_binary(
 /// Writes a goto program to disc
 bool write_goto_binary(
   const std::string &filename,
-  const symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   std::ofstream out(filename, std::ios::binary);
@@ -170,5 +183,5 @@ bool write_goto_binary(
     return true;
   }
 
-  return write_goto_binary(out, symbol_table, goto_functions);
+  return write_goto_binary(out, goto_model);
 }

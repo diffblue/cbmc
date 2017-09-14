@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.2)
+
+# CBMC only uses part of glucose.
+# This CMakeLists is designed to build just the parts that are needed.
+
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
+set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+add_library(glucose-condensed
+    simp/SimpSolver.cc
+    core/Solver.cc
+)
+
+target_include_directories(glucose-condensed
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include>
+)
+
+install(TARGETS glucose-condensed EXPORT glucose-condensed-targets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
+)
+
+install(DIRECTORY . DESTINATION include FILES_MATCHING PATTERN "*.h")
+
+install(EXPORT glucose-condensed-targets DESTINATION lib/cmake/glucose-condensed)
