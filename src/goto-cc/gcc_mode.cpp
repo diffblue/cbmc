@@ -815,6 +815,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
   for(const auto &a : cmdline.parsed_argv)
     new_argv.push_back(a.arg);
 
+  #if 0
   if(compiler.wrote_object_files())
   {
     // Undefine all __CPROVER macros for the system compiler
@@ -836,6 +837,7 @@ int gcc_modet::run_gcc(const compilet &compiler)
       new_argv.push_back(addition.str());
     }
   }
+  #endif
 
   // overwrite argv[0]
   new_argv[0]=native_tool_name;
