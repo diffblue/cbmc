@@ -2,10 +2,12 @@
 public class CustomVSATest {
 
   public Object never_read;
-  public Object normal_field;
-  public CustomVSATest unknown_field_ref;
 
-  public static CustomVSATest unknown_global_ref;
+  public static Object cause;
+  public static Object effect;
+  public static Object first_effect_read;
+  public static Object second_effect_read;
+  public static Object maybe_unknown_read;
 
   public static void test() {
 
@@ -30,21 +32,14 @@ public class CustomVSATest {
     // This should acquire a "*" unknown-object, even though
     // it is obvious what it points to:
     Object maybe_unknown = new Object();
+    maybe_unknown_read=maybe_unknown;
 
-    // Both of these fields, despite being initialised, should be
-    // considered to point to some unknown target, and so the reads
-    // through them return some unknown entity:
+    effect = new Object();
+    first_effect_read = effect;
 
-    CustomVSATest outer = new CustomVSATest();
-    outer.unknown_field_ref = new CustomVSATest();
-    outer.unknown_field_ref.normal_field = new Object();
-
-    Object get_unknown_field = outer.unknown_field_ref.normal_field;
-
-    unknown_global_ref = new CustomVSATest();
-    unknown_global_ref.normal_field = new Object();
-
-    Object get_unknown_global = unknown_global_ref.normal_field;
+    // Under our custom VSA, this write should cause effect to become null:
+    cause = new Object();
+    second_effect_read = effect;
 
   }
 
