@@ -71,11 +71,6 @@ test_script:
     sed -i "12i mv $name.exe $name.gb" goto-cc-goto-analyzer/chain.sh || true
     cat goto-cc-goto-analyzer/chain.sh || true
 
-    sed -i "s/goto-cc\/goto-cc/goto-cc\/goto-cl/" goto-cc-symex/chain.sh || true
-    sed -i "11s/.*/$gc $name.c/" goto-cc-symex/chain.sh || true
-    sed -i "12i mv $name.exe $name.gb" goto-cc-symex/chain.sh || true
-    cat goto-cc-symex/chain.sh || true
-
     rem HACK disable failing tests
     rmdir /s /q ansi-c\arch_flags_mcpu_bad
     rmdir /s /q ansi-c\arch_flags_mcpu_good
@@ -113,11 +108,6 @@ test_script:
     rmdir /s /q cbmc-java\tableswitch2
     rmdir /s /q goto-gcc
     rmdir /s /q goto-instrument\slice08
-    rmdir /s /q symex\va_args_10
-    rmdir /s /q symex\va_args_2
-    rmdir /s /q symex\va_args_3
-    rmdir /s /q symex\va_args_5
-    rmdir /s /q symex\va_args_6
 
     make test
 
