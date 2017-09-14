@@ -1492,7 +1492,7 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
-    type.id(ID_pointer);
+    type=pointer_type(type.subtype());
     type.remove(ID_size);
     type.remove(ID_C_constant);
   }
