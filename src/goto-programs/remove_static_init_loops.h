@@ -19,9 +19,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 class goto_modelt;
+class symbol_tablet;
+class goto_functionst;
 
 void remove_static_init_loops(
   const goto_modelt &,
+  optionst &,
+  message_handlert &);
+
+void remove_static_init_loops(
+  const symbol_tablet &symbol_table,
+  const goto_functionst &goto_functions,
   optionst &,
   message_handlert &);
 
