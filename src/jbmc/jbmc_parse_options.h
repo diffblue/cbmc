@@ -78,6 +78,10 @@ public:
     const char **argv,
     const std::string &extra_options);
 
+  void process_goto_function(
+    goto_functionst::goto_functiont &function, symbol_tablet &symbol_table);
+  bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
+
 protected:
   ui_message_handlert ui_message_handler;
 
@@ -85,7 +89,7 @@ protected:
   void get_command_line_options(optionst &);
   int get_goto_program(
     std::unique_ptr<goto_modelt> &goto_model, const optionst &);
-  bool process_goto_program(goto_modelt &goto_model, const optionst &);
+
   bool set_properties(goto_modelt &goto_model);
   int do_bmc(bmct &, goto_modelt &goto_model);
 };
