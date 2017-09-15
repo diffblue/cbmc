@@ -74,40 +74,53 @@ bool remove_instanceoft::contains_instanceof(
   return false;
 }
 
-/// Replaces an expression like e instanceof A with e.@class_identifier == "A"
-/// Or a big-or of similar expressions if we know of subtypes that also satisfy
+/// Replaces an expression like e instanceof A with e.\@class_identifier == "A"
+/// or a big-or of similar expressions if we know of subtypes that also satisfy
 /// the given test.
-/// \par parameters: Expression to lower `expr` and the `goto_program` and
-/// instruction `this_inst` it belongs to.
-/// \return Side-effect on `expr` replacing it with an explicit clsid test
+/// \param expr: Expression to lower (the code or the guard of an instruction)
+/// \param goto_program: program the expression belongs to
+/// \param this_inst: instruction the expression is found at
+/// \param inst_switch: set of instructions to switch around once we're done
 void remove_instanceoft::lower_instanceof(
   exprt &expr,
   goto_programt &goto_program,
   goto_programt::targett this_inst,
   instanceof_instt &inst_switch)
 {
-  if(expr.id()==ID_java_instanceof)
+  if(expr.id()!=ID_java_instanceof)
   {
+    Forall_operands(it, expr)
+      lower_instanceof(*it, goto_program, this_inst, inst_switch);
+    return;
+  }
+
     const exprt &check_ptr=expr.op0();
-    assert(check_ptr.type().id()==ID_pointer);
+    INVARIANT(
+      check_ptr.type().id()==ID_pointer,
+      "instanceof first operand should be a pointer");
     const exprt &target_arg=expr.op1();
-    assert(target_arg.id()==ID_type);
+    INVARIANT(
+      target_arg.id()==ID_type,
+      "instanceof second operand should be a type");
     const typet &target_type=target_arg.type();
 
     // Find all types we know about that satisfy the given requirement:
-    assert(target_type.id()==ID_symbol);
+    INVARIANT(
+      target_type.id()==ID_symbol,
+      "instanceof second operand should have a simple type");
     const irep_idt &target_name=
       to_symbol_type(target_type).get_identifier();
     std::vector<irep_idt> children=
       class_hierarchy.get_children_trans(target_name);
     children.push_back(target_name);
 
-    assert(!children.empty() && "Unable to execute instanceof");
-
-    // Insert an instruction before this one that assigns the clsid we're
-    // checking against to a temporary, as GOTO program if-expressions should
+    // Insert an instruction before the new check that assigns the clsid we're
+    // checking for to a temporary, as GOTO program if-expressions should
     // not contain derefs.
-
+    // We actually insert the assignment instruction after the existing one.
+    // This will briefly be ill-formed (use before def of instanceof_tmp) but the
+    // two will subsequently switch places. This makes sure that the inserted
+    // assignement doesn't end up before any labels pointing at this instruction.
     symbol_typet jlo("java::java.lang.Object");
     exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
 
@@ -126,10 +139,7 @@ void remove_instanceoft::lower_instanceof(
     newinst->source_location=this_inst->source_location;
     newinst->function=this_inst->function;
 
-    // Insert the check instruction after the existing one.
-    // This will briefly be ill-formed (use before def of
-    // instanceof_tmp) but the two will subsequently switch
-    // places in lower_instanceof(goto_programt &) below.
+    // Remember to switch the instructions
     inst_switch.push_back(make_pair(this_inst, newinst));
     // Replace the instanceof construct with a big-or.
     exprt::operandst or_ops;
@@ -140,20 +150,14 @@ void remove_instanceoft::lower_instanceof(
       or_ops.push_back(test);
     }
     expr=disjunction(or_ops);
-  }
-  else
-  {
-    Forall_operands(it, expr)
-      lower_instanceof(*it, goto_program, this_inst, inst_switch);
-  }
 }
 
-/// See function above
-/// \par parameters: GOTO program instruction `target` whose instanceof
-///   expressions,
-/// if any, should be replaced with explicit tests, and the
-/// `goto_program` it is part of.
-/// \return Side-effect on `target` as above.
+/// Replaces expressions like e instanceof A with e.\@class_identifier == "A"
+/// or a big-or of similar expressions if we know of subtypes that also satisfy
+/// the given test. Does this for the code or guard at a specific instruction.
+/// \param goto_program: program to process
+/// \param target: instruction to check for instanceof expressions
+/// \param inst_switch: set of instructions to switch around once we're done
 void remove_instanceoft::lower_instanceof(
   goto_programt &goto_program,
   goto_programt::targett target,
@@ -167,35 +171,39 @@ void remove_instanceoft::lower_instanceof(
   // code (e.g. a guarded-goto), but this assertion checks that this
   // assumption is correct and remains true on future evolution of the
   // allowable goto instruction types.
-  assert(!(code_iof && guard_iof));
+  INVARIANT(
+    !(code_iof && guard_iof), "instanceof code should not have a guard");
   if(code_iof)
     lower_instanceof(target->code, goto_program, target, inst_switch);
   if(guard_iof)
     lower_instanceof(target->guard, goto_program, target, inst_switch);
 }
 
-/// See function above
-/// \par parameters: `goto_program`, all of whose instanceof expressions will
-/// be replaced by explicit class-identifier tests.
-/// \return Side-effect on `goto_program` as above.
+/// Replace every instanceof in the passed function body with an explicit
+/// class-identifier test.
+/// Extra auxiliary variables may be introduced into symbol_table.
+/// \param goto_program: The function body to work on.
+/// \return true if one or more instanceof expressions have been replaced
 bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
 {
   instanceof_instt inst_switch;
-  Forall_goto_program_instructions(target, goto_program)
-    lower_instanceof(goto_program, target, inst_switch);
-  if(!inst_switch.empty())
+  for(goto_programt::instructionst::iterator target=
+      goto_program.instructions.begin();
+    target!=goto_program.instructions.end();
+    ++target)
   {
-    for(auto &p : inst_switch)
-    {
-      const goto_programt::targett &this_inst=p.first;
-      const goto_programt::targett &newinst=p.second;
-      this_inst->swap(*newinst);
-    }
-    goto_program.update();
-    return true;
+    lower_instanceof(goto_program, target, inst_switch);
   }
-  else
+  if(inst_switch.empty())
     return false;
+  for(auto &p : inst_switch)
+  {
+    const goto_programt::targett &this_inst=p.first;
+    const goto_programt::targett &newinst=p.second;
+    this_inst->swap(*newinst);
+  }
+  goto_program.update();
+  return true;
 }
 
 /// See function above
@@ -226,6 +234,5 @@ void remove_instanceof(
 
 void remove_instanceof(goto_modelt &goto_model)
 {
-  remove_instanceof(
-    goto_model.symbol_table, goto_model.goto_functions);
+  remove_instanceof(goto_model.symbol_table, goto_model.goto_functions);
 }
