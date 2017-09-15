@@ -26,13 +26,12 @@
 
 class java_string_library_preprocesst;
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
+// Pair of class id and methodt
+typedef
+  std::pair<irep_idt, const java_bytecode_parse_treet::methodt *>
   lazy_method_valuet;
-
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+// Map from method id to lazy_method_valuet
+typedef std::map<irep_idt, lazy_method_valuet> lazy_methodst;
 
 typedef std::function<void(
   const symbolt &,

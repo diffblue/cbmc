@@ -142,7 +142,9 @@ bool ci_lazy_methodst::operator()(
           needed_classes,
           symbol_table);
         method_converter(
-          *parsed_method.first, *parsed_method.second, new_lazy_methods);
+          *symbol_table.lookup(parsed_method.first),
+          *parsed_method.second,
+          new_lazy_methods);
         gather_virtual_callsites(
           symbol_table.lookup_ref(mname).value,
           virtual_callsites);
