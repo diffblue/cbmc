@@ -107,9 +107,6 @@ private:
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);
 
-  void concretize_string(const exprt &expr);
-  void concretize_results();
-
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;
 

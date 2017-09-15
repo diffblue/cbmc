@@ -456,17 +456,27 @@ bool string_refinementt::add_axioms_for_string_assigns(
 /// same value as the next index that is present in the index set.
 /// We do so by traversing the array backward, remembering the
 /// last value that has been initialized.
-void string_refinementt::concretize_string(const exprt &expr)
+static void concretize_string(
+  std::function<exprt(const exprt&)> get,
+  std::map<exprt, exprt> &found_length,
+  std::map<exprt, array_exprt> &found_content,
+  const replace_mapt &symbol_resolve,
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::size_t max_string_length,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const exprt &expr)
 {
   if(const auto str=expr_cast<string_exprt>(expr))
   {
+    const auto& eom=messaget::eom;
     const exprt length=get(str->length());
     exprt content=str->content();
     replace_expr(symbol_resolve, content);
     found_length[content]=length;
     const auto string_length=expr_cast_v<std::size_t>(length);
     INVARIANT(
-      string_length<=generator.max_string_length,
+      string_length<=max_string_length,
       string_refinement_invariantt("string length must be less than the max "
         "length"));
     if(index_set[str->content()].empty())
@@ -485,14 +495,14 @@ void string_refinementt::concretize_string(const exprt &expr)
       }
       else
       {
-        debug() << "concretize_string: ignoring out of bound index: "
-                << from_expr(ns, "", simple_i) << eom;
+        stream << "concretize_string: ignoring out of bound index: "
+               << from_expr(ns, "", simple_i) << eom;
       }
     }
     array_exprt arr(to_array_type(content.type()));
     arr.operands()=fill_in_map_as_vector(map);
-    debug() << "Concretized " << from_expr(ns, "", str->content())
-            << " = " << from_expr(ns, "", arr) << eom;
+    stream << "Concretized " << from_expr(ns, "", str->content())
+           << " = " << from_expr(ns, "", arr) << eom;
     found_content[content]=arr;
   }
 }
@@ -500,16 +510,44 @@ void string_refinementt::concretize_string(const exprt &expr)
 /// For each string whose length has been solved, add constants to the index set
 /// to force the solver to pick concrete values for each character, and fill the
 /// map `found_length`
-void string_refinementt::concretize_results()
+std::vector<exprt> concretize_results(
+  std::function<exprt(const exprt&)> get,
+  std::map<exprt, exprt> &found_length,
+  std::map<exprt, array_exprt> &found_content,
+  const replace_mapt &symbol_resolve,
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::size_t max_string_length,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const std::set<string_exprt> &created_strings,
+  const std::map<exprt, std::set<exprt>>& current_index_set,
+  const std::vector<string_constraintt> &universal_axioms)
 {
-  for(const auto &it : symbol_resolve)
-    concretize_string(it.second);
-  for(const auto &it : generator.get_created_strings())
-    concretize_string(it);
-  for (const auto& lemma :
-        generate_instantiations(current_index_set, universal_axioms))
-    add_lemma(lemma);
-  display_current_index_set(debug(), ns, current_index_set);
+  for(const auto &it : symbol_resolve) {
+    concretize_string(
+      get,
+      found_length,
+      found_content,
+      symbol_resolve,
+      index_set,
+      max_string_length,
+      stream,
+      ns,
+      it.second);
+  }
+  for(const auto &expr : created_strings) {
+    concretize_string(
+      get,
+      found_length,
+      found_content,
+      symbol_resolve,
+      index_set,
+      max_string_length,
+      stream,
+      ns,
+      expr);
+  }
+  return generate_instantiations(current_index_set, universal_axioms);
 }
 
 /// For each string whose length has been solved, add constants to the map
@@ -763,7 +801,21 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         debug() << "current index set is empty" << eom;
         if(config_.trace)
         {
-          concretize_results();
+          const auto lemmas = concretize_results(
+            [this](const exprt& expr){ return this->get(expr); },
+            found_length,
+            found_content,
+            symbol_resolve,
+            index_set,
+            generator.max_string_length,
+            debug(),
+            ns,
+            generator.get_created_strings(),
+            current_index_set,
+            universal_axioms);
+          for (const auto& lemma : lemmas)
+            add_lemma(lemma);
+          display_current_index_set(debug(), ns, current_index_set);
           return resultt::D_SATISFIABLE;
         }
         else
