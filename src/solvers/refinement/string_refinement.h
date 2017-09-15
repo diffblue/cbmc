@@ -102,9 +102,6 @@ private:
 
   void debug_model();
 
-  exprt get_array(const exprt &arr, const exprt &size) const;
-  exprt get_array(const exprt &arr) const;
-
   std::string string_of_array(const array_exprt &arr);
 };
 #endif

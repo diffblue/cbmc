@@ -102,6 +102,10 @@ static std::vector<exprt> instantiate_not_contains(
   const std::map<exprt, std::set<exprt>>& index_set,
   const string_constraint_generatort &generator);
 
+static exprt get_array(
+  std::function<exprt(const exprt&)> super_get,
+  const exprt &arr);
+
 /// Convert exprt to a specific type. Throw bad_cast if conversion
 /// cannot be performed
 /// Generic case doesn't exist, specialize for different types accordingly
@@ -902,10 +906,15 @@ void string_refinementt::add_lemma(
 /// \par parameters: an expression representing an array and an expression
 /// representing an integer
 /// \return an array expression or an array_of_exprt
-exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
+static exprt get_array(
+  std::function<exprt(const exprt&)> super_get,
+  const namespacet &ns,
+  std::size_t max_string_length,
+  const exprt &arr,
+  const exprt &size)
 {
-  exprt arr_val=simplify_expr(get_array(arr), ns);
-  exprt size_val=supert::get(size);
+  exprt arr_val=simplify_expr(get_array(super_get, arr), ns);
+  exprt size_val=super_get(size);
   size_val=simplify_expr(size_val, ns);
   typet char_type=arr.type().subtype();
   typet index_type=size.type();
@@ -933,7 +942,7 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
   array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
-  if(n>generator.max_string_length)
+  if(n>max_string_length)
   {
 #if 0
     debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
@@ -984,9 +993,11 @@ exprt string_refinementt::get_array(const exprt &arr, const exprt &size) const
 /// get a model of an array of unknown size and infer the size if possible
 /// \par parameters: an expression representing an array
 /// \return an expression
-exprt string_refinementt::get_array(const exprt &arr) const
+static exprt get_array(
+  std::function<exprt(const exprt&)> super_get,
+  const exprt &arr)
 {
-  exprt arr_model=supert::get(arr);
+  exprt arr_model=super_get(arr);
   if(arr_model.id()==ID_array)
   {
     array_typet &arr_type=to_array_type(arr_model.type());
@@ -1016,6 +1027,9 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
 /// solver to constant expressions given by the current model
 void string_refinementt::debug_model()
 {
+  const auto super_get = [this](const exprt& expr) {
+    return supert::get(expr);
+  };
   const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
@@ -1031,7 +1045,11 @@ void string_refinementt::debug_model()
 
       exprt len=supert::get(elength);
       len=simplify_expr(len, ns);
-      const exprt arr=get_array(econtent, len);
+      const exprt arr=get_array(
+        super_get,
+        ns,
+        generator.max_string_length,
+        econtent, len);
       if(arr.id()==ID_array)
         debug() << indent << indent << "as_string: \""
                 << string_of_array(to_array_expr(arr)) << "\"\n";
@@ -1053,7 +1071,7 @@ void string_refinementt::debug_model()
       debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
       debug() << indent << indent << "resolved: "
               << from_expr(ns, "", arr) << "\n";
-      exprt arr_model=get_array(arr);
+      exprt arr_model=get_array(super_get, arr);
       debug() << indent << indent << "char_array: "
               << from_expr(ns, "", arr_model) << eom;
     }
@@ -1977,6 +1995,9 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
+  const auto super_get = [this](const exprt& expr) {
+    return supert::get(expr);
+  };
   exprt ecopy(expr);
   replace_expr(symbol_resolve, ecopy);
   if(is_char_array(ns, ecopy.type()))
@@ -1987,7 +2008,12 @@ exprt string_refinementt::get(const exprt &expr) const
 
     auto it=found_length.find(ecopy);
     if(it!=found_length.end())
-      return get_array(ecopy, it->second);
+      return get_array(
+        super_get,
+        ns,
+        generator.max_string_length,
+        ecopy,
+        it->second);
   }
   else if(ecopy.id()==ID_struct)
   {
@@ -1996,7 +2022,12 @@ exprt string_refinementt::get(const exprt &expr) const
       const exprt &content=string->content();
       const exprt &length=string->length();
 
-      const exprt arr=get_array(content, length);
+      const exprt arr=get_array(
+        super_get,
+        ns,
+        generator.max_string_length,
+        content,
+        length);
       ecopy=string_exprt(length, arr, string->type());
     }
   }
