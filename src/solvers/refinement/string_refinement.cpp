@@ -22,6 +22,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <sstream>
 #include <iomanip>
 #include <stack>
+#include <functional>
 #include <ansi-c/string_constant.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
@@ -36,22 +37,39 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <util/optional.h>
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
+
 static exprt instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val);
 static bool is_char_array(const namespacet &ns, const typet &type);
+
 exprt substitute_array_lists(exprt expr, size_t string_max_length);
+
 exprt concretize_arrays_in_expression(
   exprt expr, std::size_t string_max_length);
+
 static bool is_valid_string_constraint(
   messaget::mstreamt& stream,
   const namespacet& ns,
   const string_constraintt &expr);
+
 static bool is_axiom_sat(
   const namespacet& ns,
   ui_message_handlert::uit ui,
   const exprt &axiom,
   const symbol_exprt& var,
   exprt &witness);
+
+static std::pair<bool, std::vector<exprt>> check_axioms(
+  const std::vector<string_constraintt> &universal_axioms,
+  const std::vector<string_not_contains_constraintt> &not_contains_axioms,
+  string_constraint_generatort &generator,
+  std::function<exprt(const exprt&)> get,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  std::size_t max_string_length,
+  bool use_counter_example,
+  ui_message_handlert::uit ui,
+  const replace_mapt& symbol_resolve);
 
 exprt simplify_sum(const exprt &f);
 
@@ -606,8 +624,23 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {
-    if(!check_axioms())
+    bool success;
+    std::vector<exprt> lemmas;
+    std::tie(success, lemmas)=check_axioms(
+      universal_axioms,
+      not_contains_axioms,
+      generator,
+      [this](const exprt& expr){ return this->get(expr); },
+      debug(),
+      ns,
+      generator.max_string_length,
+      config_.use_counter_example,
+      supert::config_.ui,
+      symbol_resolve);
+    if(!success)
     {
+      for (const auto& lemma : lemmas)
+        add_lemma(lemma);
       debug() << "check_SAT: got SAT but the model is not correct" << eom;
     }
     else
@@ -630,11 +663,25 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     decision_proceduret::resultt res=supert::dec_solve();
 
-    switch(res)
+    if (res == resultt::D_SATISFIABLE)
     {
-    case resultt::D_SATISFIABLE:
-      if(!check_axioms())
+      bool success;
+      std::vector<exprt> lemmas;
+      std::tie(success, lemmas)=check_axioms(
+        universal_axioms,
+        not_contains_axioms,
+        generator,
+        [this](const exprt& expr){ return this->get(expr); },
+        debug(),
+        ns,
+        generator.max_string_length,
+        config_.use_counter_example,
+        supert::config_.ui,
+        symbol_resolve);
+      if(!success)
       {
+        for (const auto& lemma : lemmas)
+          add_lemma(lemma);
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
       }
       else
@@ -683,8 +730,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
-      break;
-    default:
+    } else {
       debug() << "check_SAT: default return " << static_cast<int>(res) << eom;
       return res;
     }
@@ -1188,15 +1234,26 @@ exprt concretize_arrays_in_expression(exprt expr, std::size_t string_max_length)
 
 /// return true if the current model satisfies all the axioms
 /// \return a Boolean
-bool string_refinementt::check_axioms()
+static std::pair<bool, std::vector<exprt>> check_axioms(
+  const std::vector<string_constraintt> &universal_axioms,
+  const std::vector<string_not_contains_constraintt> &not_contains_axioms,
+  string_constraint_generatort &generator,
+  std::function<exprt(const exprt&)> get,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  std::size_t max_string_length,
+  bool use_counter_example,
+  ui_message_handlert::uit ui,
+  const replace_mapt& symbol_resolve)
 {
-  debug() << "string_refinementt::check_axioms:" << eom;
-  debug_model();
+  const auto eom = messaget::eom;
+  stream << "string_refinementt::check_axioms:" << eom;
+  // debug_model();
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;
 
-  debug() << "string_refinement::check_axioms: " << universal_axioms.size()
+  stream << "string_refinement::check_axioms: " << universal_axioms.size()
           << " universal axioms:" << eom;
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
@@ -1212,43 +1269,43 @@ bool string_refinementt::check_axioms()
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
 
-    debug() << "  "<< i << ".\n"
-            << "    - axiom:\n"
-            << "       " << from_expr(ns, "", axiom) << eom;
-    debug() << "    - axiom_in_model:\n"
-            << "       " << from_expr(ns, "", axiom_in_model) << eom;
-    debug() << "    - negated_axiom:\n"
-            << "       " << from_expr(ns, "", negaxiom) << eom;
+    stream << "  "<< i << ".\n"
+           << "    - axiom:\n"
+           << "       " << from_expr(ns, "", axiom) << eom;
+    stream << "    - axiom_in_model:\n"
+           << "       " << from_expr(ns, "", axiom_in_model) << eom;
+    stream << "    - negated_axiom:\n"
+           << "       " << from_expr(ns, "", negaxiom) << eom;
 
     exprt with_concretized_arrays=concretize_arrays_in_expression(
-      negaxiom, generator.max_string_length);
-    debug() << "    - negated_axiom_with_concretized_array_access:\n"
-            << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
+      negaxiom, max_string_length);
+    stream << "    - negated_axiom_with_concretized_array_access:\n"
+           << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
 
     substitute_array_access(with_concretized_arrays);
-    debug() << "    - negated_axiom_without_array_access:\n"
-            << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
+    stream << "    - negated_axiom_without_array_access:\n"
+           << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
     exprt witness;
 
     bool is_sat=is_axiom_sat(
-      ns, supert::config_.ui, with_concretized_arrays, univ_var, witness);
+      ns, ui, with_concretized_arrays, univ_var, witness);
 
     if(is_sat)
     {
-      debug() << "  - violated_for: "
-              << univ_var.get_identifier()
-              << " = " << from_expr(ns, "", witness) << eom;
+      stream << "  - violated_for: "
+             << univ_var.get_identifier()
+             << " = " << from_expr(ns, "", witness) << eom;
       violated[i]=witness;
     }
     else
-      debug() << "  - correct" << eom;
+      stream << "  - correct" << eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
   std::map<std::size_t, exprt> violated_not_contains;
 
-  debug() << "there are " << not_contains_axioms.size()
-          << " not_contains axioms" << eom;
+  stream << "there are " << not_contains_axioms.size()
+         << " not_contains axioms" << eom;
   for(size_t i=0; i<not_contains_axioms.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom=not_contains_axioms[i];
@@ -1273,39 +1330,40 @@ bool string_refinementt::check_axioms()
 
     exprt negaxiom=negation_of_not_contains_constraint(
       nc_axiom_in_model, univ_var);
-    debug() << "(string_refinementt::check_axioms) Adding negated constraint: "
-            << from_expr(ns, "", negaxiom) << eom;
+    stream << "(string_refinementt::check_axioms) Adding negated constraint: "
+           << from_expr(ns, "", negaxiom) << eom;
     substitute_array_access(negaxiom);
     exprt witness;
 
-    bool is_sat=is_axiom_sat(ns, supert::config_.ui, negaxiom, univ_var, witness);
+    bool is_sat=is_axiom_sat(ns, ui, negaxiom, univ_var, witness);
 
     if(is_sat)
     {
-      debug() << "string constraint can be violated for "
-              << univ_var.get_identifier()
-              << " = " << from_expr(ns, "", witness) << eom;
+      stream << "string constraint can be violated for "
+             << univ_var.get_identifier()
+             << " = " << from_expr(ns, "", witness) << eom;
       violated_not_contains[i]=witness;
     }
   }
 
   if(violated.empty() && violated_not_contains.empty())
   {
-    debug() << "no violated property" << eom;
-    return true;
+    stream << "no violated property" << eom;
+    return { true, std::vector<exprt>() };
   }
   else
   {
-    debug() << violated.size()
-            << " universal string axioms can be violated" << eom;
-    debug() << violated_not_contains.size()
-            << " not_contains string axioms can be violated" << eom;
+    stream << violated.size()
+           << " universal string axioms can be violated" << eom;
+    stream << violated_not_contains.size()
+           << " not_contains string axioms can be violated" << eom;
 
-    if(config_.use_counter_example)
+    if(use_counter_example)
     {
       // TODO: add counter examples for not_contains?
 
       // Checking if the current solution satisfies the constraints
+      std::vector<exprt> lemmas;
       for(const auto &v : violated)
       {
         const exprt &val=v.second;
@@ -1316,14 +1374,14 @@ bool string_refinementt::check_axioms()
         implies_exprt instance(premise, body);
         replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
-        debug() << "adding counter example " << from_expr(ns, "", instance)
+        stream << "adding counter example " << from_expr(ns, "", instance)
                 << eom;
-        add_lemma(instance);
+        lemmas.push_back(instance);
       }
+      return { false, lemmas };
     }
-
-    return false;
   }
+  return { false, std::vector<exprt>() };
 }
 
 /// \par parameters: an expression with only addition and subtraction

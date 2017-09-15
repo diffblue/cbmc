@@ -97,8 +97,6 @@ private:
   // Content of char arrays found during concretization
   std::map<exprt, array_exprt> found_content;
 
-  void add_equivalence(const irep_idt & lhs, const exprt & rhs);
-
   void add_lemma(const exprt &lemma,
                  bool simplify=true,
                  bool add_to_index_set=true);
@@ -108,7 +106,6 @@ private:
   void set_to(const exprt &expr, bool value) override;
 
   void debug_model();
-  bool check_axioms();
 
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
   void update_index_set(const exprt &formula);
