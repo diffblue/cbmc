@@ -1011,7 +1011,7 @@ static exprt get_array(
 /// should only be used for debugging.
 /// \par parameters: a constant array expression and a integer expression
 /// \return a string
-std::string string_refinementt::string_of_array(const array_exprt &arr)
+static std::string string_of_array(const array_exprt &arr)
 {
   unsigned n;
   if(arr.type().id()!=ID_array)
@@ -1025,39 +1025,44 @@ std::string string_refinementt::string_of_array(const array_exprt &arr)
 
 /// Display part of the current model by mapping the variables created by the
 /// solver to constant expressions given by the current model
-void string_refinementt::debug_model()
+void debug_model(
+  const replace_mapt &symbol_resolve,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  std::size_t max_string_length,
+  std::function<exprt(const exprt&)> super_get,
+  const std::vector<symbol_exprt> &boolean_symbols,
+  const std::vector<symbol_exprt> &index_symbols)
 {
-  const auto super_get = [this](const exprt& expr) {
-    return supert::get(expr);
-  };
+  const auto eom = messaget::eom;
   const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
     if(const auto refined=expr_cast<string_exprt>(it.second))
     {
-      debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
-      debug() << indent << indent << "in_map: "
-              << from_expr(ns, "", *refined) << eom;
-      debug() << indent << indent << "resolved: "
-              << from_expr(ns, "", *refined) << eom;
+      stream << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
+      stream << indent << indent << "in_map: "
+             << from_expr(ns, "", *refined) << eom;
+      stream << indent << indent << "resolved: "
+             << from_expr(ns, "", *refined) << eom;
       const exprt &econtent=refined->content();
       const exprt &elength=refined->length();
 
-      exprt len=supert::get(elength);
+      exprt len=super_get(elength);
       len=simplify_expr(len, ns);
       const exprt arr=get_array(
         super_get,
         ns,
-        generator.max_string_length,
+        max_string_length,
         econtent, len);
       if(arr.id()==ID_array)
-        debug() << indent << indent << "as_string: \""
-                << string_of_array(to_array_expr(arr)) << "\"\n";
+        stream << indent << indent << "as_string: \""
+               << string_of_array(to_array_expr(arr)) << "\"\n";
       else
-        debug() << indent << indent << "as_char_array: "
-                << from_expr(ns, "", arr) << "\n";
+        stream << indent << indent << "as_char_array: "
+               << from_expr(ns, "", arr) << "\n";
 
-      debug() << indent << indent << "size: " << from_expr(ns, "", len) << eom;
+      stream << indent << indent << "size: " << from_expr(ns, "", len) << eom;
     }
     else
     {
@@ -1068,25 +1073,25 @@ void string_refinementt::debug_model()
           "handled"));
       exprt arr=it.second;
       replace_expr(symbol_resolve, arr);
-      debug() << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
-      debug() << indent << indent << "resolved: "
+      stream << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
+      stream << indent << indent << "resolved: "
               << from_expr(ns, "", arr) << "\n";
       exprt arr_model=get_array(super_get, arr);
-      debug() << indent << indent << "char_array: "
-              << from_expr(ns, "", arr_model) << eom;
+      stream << indent << indent << "char_array: "
+             << from_expr(ns, "", arr_model) << eom;
     }
   }
 
-  for(const auto it : generator.get_boolean_symbols())
+  for(const auto it : boolean_symbols)
   {
-      debug() << " - " << it.get_identifier() << ": "
-              << from_expr(ns, "", supert::get(it)) << eom;
+      stream << " - " << it.get_identifier() << ": "
+             << from_expr(ns, "", super_get(it)) << eom;
   }
 
-  for(const auto it : generator.get_index_symbols())
+  for(const auto it : index_symbols)
   {
-     debug() << " - " << it.get_identifier() << ": "
-             << from_expr(ns, "", supert::get(it)) << eom;
+     stream << " - " << it.get_identifier() << ": "
+            << from_expr(ns, "", super_get(it)) << eom;
   }
 }
 
@@ -1382,7 +1387,16 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 {
   const auto eom = messaget::eom;
   stream << "string_refinementt::check_axioms:" << eom;
-  // debug_model();
+
+  #if 0
+  debug_model(symbol_resolve,
+    stream,
+    ns,
+    max_string_length,
+    get,
+    generator.get_boolean_symbols(),
+    generator.get_index_symbols());
+  #endif
 
   // Maps from indexes of violated universal axiom to a witness of violation
   std::map<size_t, exprt> violated;

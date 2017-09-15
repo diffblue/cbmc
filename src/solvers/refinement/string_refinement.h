@@ -99,9 +99,5 @@ private:
                  bool add_to_index_set=true);
 
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
-
-  void debug_model();
-
-  std::string string_of_array(const array_exprt &arr);
 };
 #endif
