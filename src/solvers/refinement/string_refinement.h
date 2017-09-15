@@ -103,13 +103,7 @@ private:
                  bool simplify=true,
                  bool add_to_index_set=true);
 
-  exprt substitute_function_applications(exprt expr);
-  typet substitute_java_string_types(typet type);
-  exprt substitute_java_strings(exprt expr);
-  exprt substitute_array_with_expr(const exprt &expr, const exprt &index) const;
-  void substitute_array_access(exprt &expr) const;
   void add_symbol_to_symbol_map(const exprt &lhs, const exprt &rhs);
-  bool is_char_array(const typet &type) const;
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
   void set_to(const exprt &expr, bool value) override;
 
@@ -144,39 +138,4 @@ private:
 
   std::string string_of_array(const array_exprt &arr);
 };
-
-exprt substitute_array_lists(exprt expr, size_t string_max_length);
-
-exprt concretize_arrays_in_expression(
-  exprt expr, std::size_t string_max_length);
-
-/// Convert index-value map to a vector of values. If a value for an
-/// index is not defined, set it to the value referenced by the next higher
-/// index. The length of the resulting vector is the key of the map's
-/// last element + 1
-/// \param index_value: map containing values of specific vector cells
-/// \return Vector containing values as described in the map
-template <typename T>
-std::vector<T> fill_in_map_as_vector(
-  const std::map<std::size_t, T> &index_value)
-{
-  std::vector<T> result;
-  if(!index_value.empty())
-  {
-    result.resize(index_value.rbegin()->first+1);
-    for(auto it=index_value.rbegin(); it!=index_value.rend(); ++it)
-    {
-      const std::size_t index=it->first;
-      const T value=it->second;
-      const auto next=std::next(it);
-      const std::size_t leftmost_index_to_pad=
-        next!=index_value.rend()
-        ? next->first+1
-        : 0;
-      for(std::size_t j=leftmost_index_to_pad; j<=index; j++)
-        result[j]=value;
-    }
-  }
-  return result;
-}
 #endif

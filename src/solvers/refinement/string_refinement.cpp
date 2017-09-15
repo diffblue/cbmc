@@ -35,8 +35,14 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <java_bytecode/java_types.h>
 #include <util/optional.h>
 
+static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 static exprt instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val);
+static bool is_char_array(const namespacet &ns, const typet &type);
+exprt substitute_array_lists(exprt expr, size_t string_max_length);
+exprt concretize_arrays_in_expression(
+  exprt expr, std::size_t string_max_length);
+
 exprt simplify_sum(const exprt &f);
 
 /// Convert exprt to a specific type. Throw bad_cast if conversion
@@ -82,6 +88,37 @@ T expr_cast_v(const exprt& expr) {
   INVARIANT(maybe, "Bad conversion");
   return *maybe;
 }
+
+/// Convert index-value map to a vector of values. If a value for an
+/// index is not defined, set it to the value referenced by the next higher
+/// index. The length of the resulting vector is the key of the map's
+/// last element + 1
+/// \param index_value: map containing values of specific vector cells
+/// \return Vector containing values as described in the map
+template <typename T>
+static std::vector<T> fill_in_map_as_vector(
+  const std::map<std::size_t, T> &index_value)
+{
+  std::vector<T> result;
+  if(!index_value.empty())
+  {
+    result.resize(index_value.rbegin()->first+1);
+    for(auto it=index_value.rbegin(); it!=index_value.rend(); ++it)
+    {
+      const std::size_t index=it->first;
+      const T value=it->second;
+      const auto next=std::next(it);
+      const std::size_t leftmost_index_to_pad=
+        next!=index_value.rend()
+        ? next->first+1
+        : 0;
+      for(std::size_t j=leftmost_index_to_pad; j<=index; j++)
+        result[j]=value;
+    }
+  }
+  return result;
+}
+
 
 static bool validate(const string_refinementt::infot &info)
 {
@@ -263,13 +300,14 @@ void string_refinementt::set_char_array_equality(
 /// remove functions applications and create the necessary axioms
 /// \par parameters: an expression containing function applications
 /// \return an expression containing no function application
-exprt string_refinementt::substitute_function_applications(exprt expr)
+exprt substitute_function_applications(
+  string_constraint_generatort& generator, exprt expr)
 {
   for(size_t i=0; i<expr.operands().size(); ++i)
   {
     // TODO: only copy when necessary
     exprt op(expr.operands()[i]);
-    expr.operands()[i]=substitute_function_applications(op);
+    expr.operands()[i]=substitute_function_applications(generator, op);
   }
 
   if(expr.id()==ID_function_application)
@@ -286,10 +324,10 @@ exprt string_refinementt::substitute_function_applications(exprt expr)
 /// TODO: this is only for java char array and does not work for other languages
 /// \param type: a type
 /// \return true if the given type is an array of java characters
-bool string_refinementt::is_char_array(const typet &type) const
+static bool is_char_array(const namespacet &ns, const typet &type)
 {
   if(type.id()==ID_symbol)
-    return is_char_array(ns.follow(type));
+    return is_char_array(ns, ns.follow(type));
 
   return (type.id()==ID_array && type.subtype()==java_char_type());
 }
@@ -302,7 +340,7 @@ bool string_refinementt::is_char_array(const typet &type) const
 bool string_refinementt::add_axioms_for_string_assigns(
   const exprt &lhs, const exprt &rhs)
 {
-  if(is_char_array(rhs.type()))
+  if(is_char_array(ns, rhs.type()))
   {
     set_char_array_equality(lhs, rhs);
     if(rhs.id() == ID_symbol || rhs.id() == ID_array)
@@ -444,10 +482,10 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     const exprt &rhs=eq_expr.rhs();
 
     // The assignment of a string equality to false is not supported.
-    PRECONDITION(value || !is_char_array(rhs.type()));
+    PRECONDITION(value || !is_char_array(ns, rhs.type()));
     PRECONDITION(value || !is_refined_string_type(rhs.type()));
 
-    PRECONDITION(lhs.id()==ID_symbol || !is_char_array(rhs.type()));
+    PRECONDITION(lhs.id()==ID_symbol || !is_char_array(ns, rhs.type()));
     PRECONDITION(lhs.id()==ID_symbol || !is_refined_string_type(rhs.type()));
 
     // If lhs is not a symbol, let supert::set_to() handle it.
@@ -470,7 +508,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     debug() << "(sr::set_to) " << from_expr(ns, "", lhs)
             << " = " << from_expr(ns, "", rhs) << eom;
 
-    const exprt subst_rhs=substitute_function_applications(rhs);
+    const exprt subst_rhs=substitute_function_applications(generator, rhs);
     if(lhs.type()!=subst_rhs.type())
     {
       if(lhs.type().id()!=ID_array ||
@@ -832,7 +870,7 @@ void string_refinementt::debug_model()
     else
     {
       INVARIANT(
-        is_char_array(it.second.type()),
+        is_char_array(ns, it.second.type()),
         string_refinement_invariantt("symbol_resolve should only map to "
           "refined_strings or to char_arrays, and refined_strings are already "
           "handled"));
@@ -868,8 +906,7 @@ void string_refinementt::debug_model()
 ///   expression
 /// \param index: An index with which to build the equality condition
 /// \return An expression containing no 'with' expression
-exprt string_refinementt::substitute_array_with_expr(
-  const exprt &expr, const exprt &index) const
+static exprt substitute_array_with_expr(const exprt &expr, const exprt &index)
 {
   if(expr.id()==ID_with)
   {
@@ -941,7 +978,7 @@ exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
 ///    `arr2 := {34}`, the constructed expression will be: `g1 ? 12 : 34`
 /// \param expr: an expression containing array accesses
 /// \return an expression containing no array access
-void string_refinementt::substitute_array_access(exprt &expr) const
+static void substitute_array_access(exprt &expr)
 {
   for(auto &op : expr.operands())
     substitute_array_access(op);
@@ -1732,7 +1769,7 @@ exprt string_refinementt::get(const exprt &expr) const
 {
   exprt ecopy(expr);
   replace_expr(symbol_resolve, ecopy);
-  if(is_char_array(ecopy.type()))
+  if(is_char_array(ns, ecopy.type()))
   {
     auto it_content=found_content.find(ecopy);
     if(it_content!=found_content.end())
