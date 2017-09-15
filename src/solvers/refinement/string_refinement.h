@@ -102,8 +102,6 @@ private:
 
   void debug_model();
 
-  void set_char_array_equality(const exprt &lhs, const exprt &rhs);
-
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;
 

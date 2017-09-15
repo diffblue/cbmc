@@ -336,22 +336,24 @@ void add_symbol_to_symbol_map(
 
 /// add axioms if the rhs is a character array
 /// \par parameters: the rhs and lhs of an equality over character arrays
-void string_refinementt::set_char_array_equality(
-  const exprt &lhs, const exprt &rhs)
+std::vector<exprt> set_char_array_equality(const exprt &lhs, const exprt &rhs)
 {
   PRECONDITION(lhs.id()==ID_symbol);
 
   if(rhs.id()==ID_array && rhs.type().id()==ID_array)
   {
+    std::vector<exprt> lemmas;
     const typet &index_type=to_array_type(rhs.type()).size().type();
     for(size_t i=0, ilim=rhs.operands().size(); i!=ilim; ++i)
     {
       // Introduce axioms to map symbolic rhs to its char array.
       index_exprt arraycell(rhs, from_integer(i, index_type));
       equal_exprt arrayeq(arraycell, rhs.operands()[i]);
-      add_lemma(arrayeq, false);
+      lemmas.push_back(arrayeq);
     }
+    return lemmas;
   }
+  return { };
   // At least for Java (as it is currently pre-processed), we need not consider
   // other cases, because all character arrays find themselves on the rhs of an
   // equality. Note that this might not be the case for other languages.
@@ -402,7 +404,9 @@ bool string_refinementt::add_axioms_for_string_assigns(
 {
   if(is_char_array(ns, rhs.type()))
   {
-    set_char_array_equality(lhs, rhs);
+    for (const auto& lemma : set_char_array_equality(lhs, rhs))
+      add_lemma(lemma, false);
+
     if(rhs.id() == ID_symbol || rhs.id() == ID_array)
     {
       add_symbol_to_symbol_map(
