@@ -50,13 +50,10 @@ public:
   explicit string_refinementt(const infot &);
 
   virtual std::string decision_procedure_text() const override
-  {
-    return "string refinement loop with "+prop.solver_text();
-  }
+  { return "string refinement loop with "+prop.solver_text(); }
 
   exprt get(const exprt &expr) const override;
-
-protected:
+  void set_to(const exprt &expr, bool value) override;
   decision_proceduret::resultt dec_solve() override;
 
 private:
@@ -102,7 +99,6 @@ private:
                  bool add_to_index_set=true);
 
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
-  void set_to(const exprt &expr, bool value) override;
 
   void debug_model();
 
