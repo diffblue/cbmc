@@ -1,12 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-src=../../../src
+goto_cc=$1
+goto_analyzer=$2
+is_windows=$3
 
-gc=$src/goto-cc/goto-cc
-goto_analyzer=$src/goto-analyzer/goto-analyzer
+options=${*:4:$#-4}
+name=${*:$#}
+name=${name%.c}
 
-options=$1
-name=${2%.c}
+if [[ "${is_windows}" == "true" ]]; then
+  "${goto_cc}" "${name}.c"
+  mv "${name}.exe" "${name}.gb"
+else
+  "${goto_cc}" "${name}.c" -o "${name}.gb"
+fi
 
-$gc $name.c -o $name.gb
-$goto_analyzer $name.gb $options
+"${goto_analyzer}" "${name}.gb" ${options}
