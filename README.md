@@ -1,4 +1,5 @@
 [![Build Status][travis_img]][travis] [![Build Status][appveyor_img]][appveyor]
+[![Build Status][coverity_img]][coverity]
 
 [CProver Wiki](http://www.cprover.org/wiki)
 
@@ -48,3 +49,5 @@ License
 [travis_img]: https://travis-ci.org/diffblue/cbmc.svg?branch=master
 [appveyor]: https://ci.appveyor.com/project/diffblue/cbmc/
 [appveyor_img]: https://ci.appveyor.com/api/projects/status/github/diffblue/cbmc?svg=true&branch=master
+[coverity]: https://scan.coverity.com/projects/diffblue-cbmc
+[coverity_img]: https://scan.coverity.com/projects/13552/badge.svg
