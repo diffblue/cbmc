@@ -97,7 +97,5 @@ private:
   void add_lemma(const exprt &lemma,
                  bool simplify=true,
                  bool add_to_index_set=true);
-
-  bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
 };
 #endif

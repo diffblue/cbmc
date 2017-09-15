@@ -403,14 +403,17 @@ static bool is_char_array(const namespacet &ns, const typet &type)
 /// \param rhs: right and side of the equality
 /// \return true if the assignemnt needs to be handled by the parent class
 ///         via `set_to`
-bool string_refinementt::add_axioms_for_string_assigns(
-  const exprt &lhs, const exprt &rhs)
+bool add_axioms_for_string_assigns(
+  replace_mapt& symbol_resolve,
+  std::map<exprt, std::list<exprt>> &reverse_symbol_resolve,
+  string_constraint_generatort& generator,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const exprt &lhs,
+  const exprt &rhs)
 {
   if(is_char_array(ns, rhs.type()))
   {
-    for (const auto& lemma : set_char_array_equality(lhs, rhs))
-      add_lemma(lemma, false);
-
     if(rhs.id() == ID_symbol || rhs.id() == ID_array)
     {
       add_symbol_to_symbol_map(
@@ -440,7 +443,8 @@ bool string_refinementt::add_axioms_for_string_assigns(
     }
     else
     {
-      warning() << "ignoring char array " << from_expr(ns, "", rhs) << eom;
+      stream << "ignoring char array " << from_expr(ns, "", rhs)
+             << messaget::eom;
       return true;
     }
   }
@@ -651,8 +655,24 @@ void string_refinementt::set_to(const exprt &expr, bool value)
       }
     }
 
-    if(value && !add_axioms_for_string_assigns(lhs, subst_rhs))
-      return;
+    if(value)
+    {
+      if(is_char_array(ns, rhs.type()))
+      {
+        for (const auto& lemma : set_char_array_equality(lhs, rhs))
+          add_lemma(lemma, false);
+      }
+      const bool not_handled=add_axioms_for_string_assigns(
+        symbol_resolve,
+        reverse_symbol_resolve,
+        generator,
+        warning(),
+        ns,
+        lhs,
+        subst_rhs);
+      if (!not_handled)
+        return;
+    }
 
     // Push the substituted equality to the list of axioms to be given to
     // supert::set_to.
