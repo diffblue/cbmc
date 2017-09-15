@@ -98,6 +98,9 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
+  bool generate_support_functions(
+    symbol_tablet &symbol_table) override;
+
   bool typecheck(
     symbol_tablet &context,
     const std::string &module) override;
@@ -153,10 +156,6 @@ public:
   virtual void lazy_methods_provided(std::set<irep_idt> &) const override;
   virtual void convert_lazy_method(
     const irep_idt &id, symbol_tablet &) override;
-
-  virtual bool generate_start_function(
-    const irep_idt &entry_function_symbol_id,
-    class symbol_tablet &symbol_table) override;
 
 protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);

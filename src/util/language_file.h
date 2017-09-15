@@ -83,6 +83,8 @@ public:
 
   void show_parse(std::ostream &out);
 
+  bool generate_support_functions(symbol_tablet &symbol_table);
+
   bool typecheck(symbol_tablet &symbol_table);
 
   bool final(symbol_tablet &symbol_table);
