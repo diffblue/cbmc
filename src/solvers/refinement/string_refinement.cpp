@@ -266,8 +266,11 @@ static void depends_in_symbol_map(const exprt &expr, std::vector<exprt> &accu)
 /// \param rhs: an expression to map it to, which should be either a symbol
 ///             a string_exprt, an array_exprt, an array_of_exprt or an
 ///             if_exprt with branches of the previous kind
-void string_refinementt::add_symbol_to_symbol_map(
-  const exprt &lhs, const exprt &rhs)
+void add_symbol_to_symbol_map(
+  replace_mapt& symbol_resolve,
+  std::map<exprt, std::list<exprt>> &reverse_symbol_resolve,
+  const exprt &lhs,
+  const exprt &rhs)
 {
   PRECONDITION(lhs.id()==ID_symbol);
   PRECONDITION(rhs.id()==ID_symbol ||
@@ -373,18 +376,29 @@ bool string_refinementt::add_axioms_for_string_assigns(
     set_char_array_equality(lhs, rhs);
     if(rhs.id() == ID_symbol || rhs.id() == ID_array)
     {
-      add_symbol_to_symbol_map(lhs, rhs);
+      add_symbol_to_symbol_map(
+        symbol_resolve,
+        reverse_symbol_resolve,
+        lhs,
+        rhs);
       return false;
     }
     else if(rhs.id()==ID_nondet_symbol)
     {
       add_symbol_to_symbol_map(
-        lhs, generator.fresh_symbol("nondet_array", lhs.type()));
+        symbol_resolve,
+        reverse_symbol_resolve,
+        lhs,
+        generator.fresh_symbol("nondet_array", lhs.type()));
       return false;
     }
     else if(rhs.id()==ID_if)
     {
-      add_symbol_to_symbol_map(lhs, rhs);
+      add_symbol_to_symbol_map(
+        symbol_resolve,
+        reverse_symbol_resolve,
+        lhs,
+        rhs);
       return true;
     }
     else
@@ -396,7 +410,11 @@ bool string_refinementt::add_axioms_for_string_assigns(
   if(is_refined_string_type(rhs.type()))
   {
     exprt refined_rhs=generator.add_axioms_for_refined_string(rhs);
-    add_symbol_to_symbol_map(lhs, refined_rhs);
+    add_symbol_to_symbol_map(
+      symbol_resolve,
+      reverse_symbol_resolve,
+      lhs,
+      refined_rhs);
     return false;
   }
   // Other cases are to be handled by supert::set_to.

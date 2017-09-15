@@ -101,7 +101,6 @@ private:
                  bool simplify=true,
                  bool add_to_index_set=true);
 
-  void add_symbol_to_symbol_map(const exprt &lhs, const exprt &rhs);
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
   void set_to(const exprt &expr, bool value) override;
 
