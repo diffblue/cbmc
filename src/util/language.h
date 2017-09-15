@@ -29,6 +29,12 @@ class namespacet;
 class typet;
 class cmdlinet;
 
+#define OPT_FUNCTIONS \
+  "(function):"
+
+#define HELP_FUNCTIONS \
+  " --function name              set main function name\n"
+
 class languaget:public messaget
 {
 public:
@@ -45,6 +51,17 @@ public:
   virtual bool parse(
     std::istream &instream,
     const std::string &path)=0;
+
+  /// Create language-specific support functions, such as __CPROVER_start,
+  /// __CPROVER_initialize and language-specific library functions.
+  /// This runs after the `typecheck` phase but before lazy function loading.
+  /// Anything that must wait until lazy function loading is done can be
+  /// deferred until `final`, which runs after lazy function loading is
+  /// complete. Functions introduced here are visible to lazy loading and
+  /// can influence its decisions (e.g. picking the types of input parameters
+  /// and globals), whereas anything introduced during `final` cannot.
+  virtual bool generate_support_functions(
+    symbol_tablet &symbol_table)=0;
 
   // add external dependencies of a given module to set
 
@@ -66,11 +83,10 @@ public:
   virtual void convert_lazy_method(const irep_idt &id, symbol_tablet &)
   { }
 
-  // final adjustments, e.g., initialization and call to main()
-
+  /// Final adjustments, e.g. initializing stub functions and globals that
+  /// were discovered during function loading
   virtual bool final(
-    symbol_tablet &symbol_table,
-    bool generate_start_function);
+    symbol_tablet &symbol_table);
 
   // type check interfaces of currently parsed file
 
@@ -122,10 +138,6 @@ public:
   virtual std::unique_ptr<languaget> new_language()=0;
 
   void set_should_generate_opaque_method_stubs(bool should_generate_stubs);
-
-  virtual bool generate_start_function(
-    const irep_idt &entry_function_symbol_id,
-    class symbol_tablet &symbol_table)=0;
 
   // constructor / destructor
 

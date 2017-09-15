@@ -52,7 +52,6 @@ public:
 protected:
   const cmdlinet &_cmdline;
   ui_message_handlert &ui_message_handler;
-  bool generate_start_function;
 };
 
 #endif // CPROVER_LANGAPI_LANGUAGE_UI_H

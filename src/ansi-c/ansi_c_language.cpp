@@ -37,22 +37,6 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
   modules.insert(get_base_name(parse_path, true));
 }
 
-/// Generate a _start function for a specific function
-/// \param entry_function_symbol_id: The symbol for the function that should be
-///   used as the entry point
-/// \param symbol_table: The symbol table for the program. The new _start
-///   function symbol will be added to this table
-/// \return Returns false if the _start method was generated correctly
-bool ansi_c_languaget::generate_start_function(
-  const irep_idt &entry_function_symbol_id,
-  symbol_tablet &symbol_table)
-{
-  return generate_ansi_c_start_function(
-    symbol_table.symbols.at(entry_function_symbol_id),
-    symbol_table,
-    *message_handler);
-}
-
 /// ANSI-C preprocessing
 bool ansi_c_languaget::preprocess(
   std::istream &instream,
@@ -141,19 +125,19 @@ bool ansi_c_languaget::typecheck(
   return false;
 }
 
-bool ansi_c_languaget::final(
-  symbol_tablet &symbol_table,
-  bool create_start_function)
+bool ansi_c_languaget::generate_support_functions(
+  symbol_tablet &symbol_table)
 {
+  // Note this can happen here because C doesn't currently
+  // support lazy loading at the symbol-table level, and therefore
+  // function bodies have already been populated and external stub
+  // symbols created during the typecheck() phase. If it gains lazy
+  // loading support then stubs will need to be created during
+  // function body parsing, or else generate-stubs moved to the
+  // final phase.
   generate_opaque_method_stubs(symbol_table);
-
-  if(create_start_function)
-  {
-    if(ansi_c_entry_point(symbol_table, get_message_handler()))
-      return true;
-  }
-
-  return false;
+  // This creates __CPROVER_start and __CPROVER_initialize:
+  return ansi_c_entry_point(symbol_table, get_message_handler());
 }
 
 void ansi_c_languaget::show_parse(std::ostream &out)

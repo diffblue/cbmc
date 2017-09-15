@@ -18,7 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/std_types.h>
 
-bool languaget::final(symbol_tablet &symbol_table, bool generate_start_function)
+bool languaget::final(symbol_tablet &symbol_table)
 {
   return false;
 }

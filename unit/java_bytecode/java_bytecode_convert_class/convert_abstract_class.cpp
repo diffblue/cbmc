@@ -45,7 +45,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
-      java_lang->final(new_symbol_table, false);
+      java_lang->final(new_symbol_table);
 
       REQUIRE(new_symbol_table.has_symbol("java::I"));
       THEN("The symbol type should be abstract")
@@ -66,7 +66,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
-      java_lang->final(new_symbol_table, false);
+      java_lang->final(new_symbol_table);
 
       REQUIRE(new_symbol_table.has_symbol("java::A"));
       THEN("The symbol type should be abstract")
@@ -87,7 +87,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
-      java_lang->final(new_symbol_table, false);
+      java_lang->final(new_symbol_table);
 
       REQUIRE(new_symbol_table.has_symbol("java::C"));
       THEN("The symbol type should not be abstract")
@@ -108,7 +108,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
-      java_lang->final(new_symbol_table, false);
+      java_lang->final(new_symbol_table);
 
       REQUIRE(new_symbol_table.has_symbol("java::Implementor"));
       THEN("The symbol type should not be abstract")
@@ -130,7 +130,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
-      java_lang->final(new_symbol_table, false);
+      java_lang->final(new_symbol_table);
 
       REQUIRE(new_symbol_table.has_symbol("java::Extendor"));
       THEN("The symbol type should not be abstract")

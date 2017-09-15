@@ -13,6 +13,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unordered_set>
 #include <iostream>
 
+#include <linking/static_lifetime_init.h>
+
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/std_types.h>
@@ -34,13 +36,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-#define INITIALIZE CPROVER_PREFIX "initialize"
-
 static void create_initialize(symbol_tablet &symbol_table)
 {
+  // If __CPROVER_initialize already exists, replace it. It may already exist
+  // if a GOTO binary provided it. This behaviour mirrors the ANSI-C frontend.
+  symbol_table.symbols.erase(INITIALIZE_FUNCTION);
+
   symbolt initialize;
-  initialize.name=INITIALIZE;
-  initialize.base_name=INITIALIZE;
+  initialize.name=INITIALIZE_FUNCTION;
+  initialize.base_name=INITIALIZE_FUNCTION;
   initialize.mode=ID_java;
 
   code_typet type;
@@ -59,8 +63,7 @@ static void create_initialize(symbol_tablet &symbol_table)
 
   initialize.value=init_code;
 
-  if(symbol_table.add(initialize))
-    throw "failed to add "+std::string(INITIALIZE);
+  symbol_table.add(initialize);
 }
 
 static bool should_init_symbol(const symbolt &sym)
@@ -94,7 +97,7 @@ void java_static_lifetime_init(
   unsigned max_nondet_tree_depth,
   const select_pointer_typet &pointer_type_selector)
 {
-  symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE);
+  symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
 
   // We need to zero out all static variables, or nondet-initialize if they're
@@ -548,11 +551,11 @@ bool generate_java_start_function(
   // build call to initialization function
   {
     symbol_tablet::symbolst::iterator init_it=
-      symbol_table.symbols.find(INITIALIZE);
+      symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())
     {
-      message.error() << "failed to find " INITIALIZE " symbol"
+      message.error() << "failed to find " INITIALIZE_FUNCTION " symbol"
                       << messaget::eom;
       return true; // give up with error
     }

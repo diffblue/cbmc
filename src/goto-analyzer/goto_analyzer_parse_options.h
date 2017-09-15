@@ -14,10 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/language.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
-#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
 

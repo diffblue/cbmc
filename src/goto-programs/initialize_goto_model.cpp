@@ -29,7 +29,6 @@ Author: Daniel Kroening, kroening@kroening.com
 bool initialize_goto_model(
   goto_modelt &goto_model,
   const cmdlinet &cmdline,
-  bool generate_start_function,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
@@ -54,12 +53,11 @@ bool initialize_goto_model(
         sources.push_back(file);
     }
 
+    language_filest language_files;
+    language_files.set_message_handler(message_handler);
+
     if(!sources.empty())
     {
-      language_filest language_files;
-
-      language_files.set_message_handler(message_handler);
-
       for(const auto &filename : sources)
       {
         #ifdef _MSC_VER
@@ -115,17 +113,6 @@ bool initialize_goto_model(
         msg.error() << "CONVERSION ERROR" << messaget::eom;
         return true;
       }
-
-      if(binaries.empty())
-      {
-        if(language_files.final(
-          goto_model.symbol_table,
-          generate_start_function))
-        {
-          msg.error() << "CONVERSION ERROR" << messaget::eom;
-          return true;
-        }
-      }
     }
 
     for(const auto &file : binaries)
@@ -136,18 +123,39 @@ bool initialize_goto_model(
         return true;
     }
 
-    if(cmdline.isset("function"))
+    bool binaries_provided_start=
+      goto_model.symbol_table.has_symbol(goto_functionst::entry_point());
+
+    bool entry_point_generation_failed=false;
+
+    if(binaries_provided_start && cmdline.isset("function"))
     {
-      const std::string &function_id=cmdline.get_value("function");
-      rebuild_goto_start_functiont start_function_rebuilder(
+      // Rebuild the entry-point, using the language annotation of the
+      // existing __CPROVER_start function:
+      rebuild_goto_start_functiont rebuild_existing_start(
         msg.get_message_handler(),
         goto_model.symbol_table,
         goto_model.goto_functions);
+      entry_point_generation_failed=rebuild_existing_start();
+    }
+    else if(!binaries_provided_start)
+    {
+      // Allow all language front-ends to try to provide the user-specified
+      // (--function) entry-point, or some language-specific default:
+      entry_point_generation_failed=
+        language_files.generate_support_functions(goto_model.symbol_table);
+    }
 
-      if(start_function_rebuilder(function_id))
-      {
-        return 6;
-      }
+    if(entry_point_generation_failed)
+    {
+      msg.error() << "SUPPORT FUNCTION GENERATION ERROR" << messaget::eom;
+      return true;
+    }
+
+    if(language_files.final(goto_model.symbol_table))
+    {
+      msg.error() << "FINAL STAGE CONVERSION ERROR" << messaget::eom;
+      return true;
     }
 
     msg.status() << "Generating GOTO Program" << messaget::eom;
