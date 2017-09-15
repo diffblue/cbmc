@@ -71,6 +71,18 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   ui_message_handlert::uit ui,
   const replace_mapt& symbol_resolve);
 
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const string_constraintt &axiom);
+
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const std::vector<string_constraintt>  &string_axioms);
+
 exprt simplify_sum(const exprt &f);
 
 /// Convert exprt to a specific type. Throw bad_cast if conversion
@@ -669,7 +681,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     }
   }
 
-  initial_index_set(universal_axioms);
+  initial_index_set(index_set, current_index_set, ns, universal_axioms);
   update_index_set(cur);
   cur.clear();
   for (const auto& lemma :
@@ -1602,11 +1614,14 @@ static bool find_qvar(const exprt index, const symbol_exprt &qvar)
 /// add to the index set all the indices that appear in the formulas and the
 /// upper bound minus one
 /// \par parameters: a list of string constraints
-void string_refinementt::initial_index_set(
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
   const std::vector<string_constraintt>  &string_axioms)
 {
   for(const auto &axiom : string_axioms)
-    initial_index_set(axiom);
+    initial_index_set(index_set, current_index_set, ns, axiom);
 }
 
 /// add to the index set all the indices that appear in the formulas
@@ -1644,7 +1659,11 @@ static std::vector<exprt> sub_arrays(const exprt &array_expr)
 /// add to the index set all the indices that appear in the formula and the
 /// upper bound minus one
 /// \par parameters: a string constraint
-void string_refinementt::add_to_index_set(const exprt &s, exprt i)
+static void add_to_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const exprt &s, exprt i)
 {
   simplify(i, ns);
   if(i.id()!=ID_constant || expr_cast<size_t>(i))
@@ -1655,7 +1674,11 @@ void string_refinementt::add_to_index_set(const exprt &s, exprt i)
   }
 }
 
-void string_refinementt::initial_index_set(const string_constraintt &axiom)
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const string_constraintt &axiom)
 {
   symbol_exprt qvar=axiom.univ_var();
   std::list<exprt> to_process;
@@ -1675,7 +1698,7 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var)
       {
-        add_to_index_set(s, i);
+        add_to_index_set(index_set, current_index_set, ns, s, i);
       }
       else
       {
@@ -1685,7 +1708,7 @@ void string_refinementt::initial_index_set(const string_constraintt &axiom)
           axiom.upper_bound(),
           from_integer(1, axiom.upper_bound().type()));
         replace_expr(qvar, kminus1, e);
-        add_to_index_set(s, e);
+        add_to_index_set(index_set, current_index_set, ns, s, e);
       }
     }
     else
@@ -1713,7 +1736,7 @@ void string_refinementt::update_index_set(const exprt &formula)
         s.type().id()==ID_array,
         string_refinement_invariantt("index expressions must index on arrays"));
       exprt simplified=simplify_sum(i);
-      add_to_index_set(s, simplified);
+      add_to_index_set(index_set, current_index_set, ns, s, simplified);
     }
     else
     {

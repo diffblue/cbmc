@@ -105,9 +105,6 @@ private:
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
   void update_index_set(const exprt &formula);
   void update_index_set(const std::vector<exprt> &cur);
-  void initial_index_set(const string_constraintt &axiom);
-  void initial_index_set(const std::vector<string_constraintt> &string_axioms);
-  void add_to_index_set(const exprt &s, exprt i);
 
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);
