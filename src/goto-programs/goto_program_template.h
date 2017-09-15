@@ -361,6 +361,7 @@ public:
     }
   };
 
+  // Never try to change this to vector-we mutate the list while iterating
   typedef std::list<instructiont> instructionst;
 
   typedef typename instructionst::iterator targett;
