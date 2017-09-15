@@ -1076,6 +1076,9 @@ int gcc_modet::asm_output(
       output_files.begin()->second=="/dev/null"))
     return EX_OK;
 
+  #if 0
+  // The below disturbs some scripts that rummage through assembly
+  // output.
   debug()
     << "Appending preprocessed sources to generate hybrid asm output"
     << eom;
@@ -1107,6 +1110,7 @@ int gcc_modet::asm_output(
       os << comment << comment << line << '\n';
     }
   }
+  #endif
 
   return EX_OK;
 }
