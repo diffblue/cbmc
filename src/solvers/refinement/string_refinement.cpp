@@ -46,6 +46,12 @@ static bool is_valid_string_constraint(
   messaget::mstreamt& stream,
   const namespacet& ns,
   const string_constraintt &expr);
+static bool is_axiom_sat(
+  const namespacet& ns,
+  ui_message_handlert::uit ui,
+  const exprt &axiom,
+  const symbol_exprt& var,
+  exprt &witness);
 
 exprt simplify_sum(const exprt &f);
 
@@ -1224,7 +1230,8 @@ bool string_refinementt::check_axioms()
             << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
     exprt witness;
 
-    bool is_sat=is_axiom_sat(with_concretized_arrays, univ_var, witness);
+    bool is_sat=is_axiom_sat(
+      ns, supert::config_.ui, with_concretized_arrays, univ_var, witness);
 
     if(is_sat)
     {
@@ -1271,7 +1278,7 @@ bool string_refinementt::check_axioms()
     substitute_array_access(negaxiom);
     exprt witness;
 
-    bool is_sat=is_axiom_sat(negaxiom, univ_var, witness);
+    bool is_sat=is_axiom_sat(ns, supert::config_.ui, negaxiom, univ_var, witness);
 
     if(is_sat)
     {
@@ -1810,18 +1817,22 @@ exprt string_refinementt::get(const exprt &expr) const
 /// \param [out] witness: the witness of the satisfying assignment if one
 ///   exists. If UNSAT, then behaviour is undefined.
 /// \return: true if axiom is SAT, false if UNSAT
-bool string_refinementt::is_axiom_sat(
-  const exprt &axiom, const symbol_exprt& var, exprt &witness)
+static bool is_axiom_sat(
+  const namespacet& ns,
+  ui_message_handlert::uit ui,
+  const exprt &axiom,
+  const symbol_exprt& var,
+  exprt &witness)
 {
   satcheck_no_simplifiert sat_check;
-  supert::infot info;
+  bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=&sat_check;
   info.refine_arithmetic=true;
   info.refine_arrays=true;
   info.max_node_refinement=5;
-  info.ui=supert::config_.ui;
-  supert solver(info);
+  info.ui=ui;
+  bv_refinementt solver(info);
   solver << axiom;
 
   switch(solver())

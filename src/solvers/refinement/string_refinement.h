@@ -109,8 +109,6 @@ private:
 
   void debug_model();
   bool check_axioms();
-  bool is_axiom_sat(
-    const exprt &axiom, const symbol_exprt& var, exprt &witness);
 
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
   void update_index_set(const exprt &formula);
@@ -121,11 +119,6 @@ private:
 
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);
-
-  exprt compute_inverse_function(
-    const exprt &qvar, const exprt &val, const exprt &f);
-
-  std::map<exprt, int> map_representation_of_sum(const exprt &f) const;
 
   void concretize_string(const exprt &expr);
   void concretize_results();
