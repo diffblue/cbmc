@@ -42,6 +42,10 @@ static bool is_char_array(const namespacet &ns, const typet &type);
 exprt substitute_array_lists(exprt expr, size_t string_max_length);
 exprt concretize_arrays_in_expression(
   exprt expr, std::size_t string_max_length);
+static bool is_valid_string_constraint(
+  messaget::mstreamt& stream,
+  const namespacet& ns,
+  const string_constraintt &expr);
 
 exprt simplify_sum(const exprt &f);
 
@@ -563,12 +567,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     replace_expr(symbol_resolve, axiom);
     if(axiom.id()==ID_string_constraint)
     {
-      string_constraintt c=to_string_constraint(axiom);
+      string_constraintt nc_axiom=
+        to_string_constraint(axiom);
+      is_valid_string_constraint(error(), ns, nc_axiom);
       DATA_INVARIANT(
-        is_valid_string_constraint(c),
+        is_valid_string_constraint(error(), ns, nc_axiom),
         string_refinement_invariantt(
           "string constraints satisfy their invariant"));
-      universal_axioms.push_back(c);
+      universal_axioms.push_back(nc_axiom);
     }
     else if(axiom.id()==ID_string_not_contains_constraint)
     {
@@ -1938,21 +1944,24 @@ static bool universal_only_in_index(const string_constraintt &expr)
 /// \related string_constraintt
 /// \param [in] expr: the string constraint to check
 /// \return whether the constraint satisfies the invariant
-bool string_refinementt::is_valid_string_constraint(
+static bool is_valid_string_constraint(
+  messaget::mstreamt& stream,
+  const namespacet& ns,
   const string_constraintt &expr)
 {
+  const auto eom = messaget::eom;
   // Condition 1: The premise cannot contain any string indices
   const array_index_mapt premise_indices=gather_indices(expr.premise());
   if(!premise_indices.empty())
   {
-    error() << "Premise has indices: " << from_expr(ns, "", expr) << ", map: {";
+    stream << "Premise has indices: " << from_expr(ns, "", expr) << ", map: {";
     for(const auto &pair : premise_indices)
     {
-      error() << from_expr(ns, "", pair.first) << ": {";
+      stream << from_expr(ns, "", pair.first) << ": {";
       for(const auto &i : pair.second)
-        error() << from_expr(ns, "", i) <<  ", ";
+        stream << from_expr(ns, "", i) <<  ", ";
     }
-    error() << "}}" << eom;
+    stream << "}}" << eom;
     return false;
   }
 
@@ -1970,8 +1979,8 @@ bool string_refinementt::is_valid_string_constraint(
       const exprt result=simplify_expr(equals, ns);
       if(result.is_false())
       {
-        error() << "Indices not equal: " << from_expr(ns, "", expr) << ", str: "
-                << from_expr(ns, "", pair.first) << eom;
+        stream << "Indices not equal: " << from_expr(ns, "", expr) << ", str: "
+               << from_expr(ns, "", pair.first) << eom;
         return false;
       }
     }
@@ -1979,8 +1988,8 @@ bool string_refinementt::is_valid_string_constraint(
     // Condition 3: f must be linear
     if(!is_linear_arithmetic_expr(rep))
     {
-      error() << "f is not linear: " << from_expr(ns, "", expr) << ", str: "
-              << from_expr(ns, "", pair.first) << eom;
+      stream << "f is not linear: " << from_expr(ns, "", expr) << ", str: "
+             << from_expr(ns, "", pair.first) << eom;
       return false;
     }
 
@@ -1988,8 +1997,8 @@ bool string_refinementt::is_valid_string_constraint(
     // body
     if(!universal_only_in_index(expr))
     {
-      error() << "Universal variable outside of index:"
-              << from_expr(ns, "", expr) << eom;
+      stream << "Universal variable outside of index:"
+             << from_expr(ns, "", expr) << eom;
       return false;
     }
   }

@@ -127,8 +127,6 @@ private:
 
   std::map<exprt, int> map_representation_of_sum(const exprt &f) const;
 
-  bool is_valid_string_constraint(const string_constraintt &expr);
-
   void concretize_string(const exprt &expr);
   void concretize_results();
   void concretize_lengths();
