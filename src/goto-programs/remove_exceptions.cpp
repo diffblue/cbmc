@@ -12,6 +12,7 @@ Date:   December 2016
 /// Remove exception handling
 
 #include "remove_exceptions.h"
+#include "remove_instanceof.h"
 
 #ifdef DEBUG
 #include <iostream>
@@ -43,8 +44,9 @@ Date:   December 2016
 /// (in instruction->code.exception_list()) and a corresponding GOTO program
 /// target for each (in instruction->targets).
 /// Thrown instructions are currently always matched to tags using
-/// java_instanceof, so a language frontend wanting to use this class
-/// must use exceptions with a Java-compatible structure.
+/// java_instanceof, optionally lowered to a check on the @class_identifier
+/// field, so a language frontend wanting to use this class must use
+/// exceptions with a Java-compatible structure.
 ///
 /// CATCH with a code_pop_catcht operand terminates a try-block begun by
 /// a code_push_catcht. At present the try block consists of the instructions
@@ -72,9 +74,6 @@ Date:   December 2016
 /// instructions copy back to an ordinary local variable (or other expression)
 /// and set \#exception_value back to null, indicating the exception has been
 /// caught and normal control flow resumed.
-///
-/// Note that remove_exceptions introduces java_instanceof comparisons at
-/// present, so a remove_instanceof may be necessary after it completes.
 class remove_exceptionst
 {
   typedef std::vector<std::pair<
@@ -84,9 +83,11 @@ class remove_exceptionst
 public:
   explicit remove_exceptionst(
     symbol_tablet &_symbol_table,
-    std::map<irep_idt, std::set<irep_idt>> &_exceptions_map):
-    symbol_table(_symbol_table),
-    exceptions_map(_exceptions_map)
+    std::map<irep_idt, std::set<irep_idt>> &_exceptions_map,
+    bool remove_added_instanceof)
+    : symbol_table(_symbol_table),
+      exceptions_map(_exceptions_map),
+      remove_added_instanceof(remove_added_instanceof)
   {
   }
 
@@ -95,6 +96,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   std::map<irep_idt, std::set<irep_idt>> &exceptions_map;
+  bool remove_added_instanceof;
 
   void add_exceptional_returns(
     const irep_idt &function_id,
@@ -346,6 +348,9 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
         binary_predicate_exprt check(exc_thrown, ID_java_instanceof, expr);
         t_exc->guard=check;
+
+        if(remove_added_instanceof)
+          remove_instanceof(t_exc, goto_program, symbol_table);
       }
     }
   }
@@ -575,17 +580,21 @@ void remove_exceptionst::operator()(goto_functionst &goto_functions)
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(
   symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  remove_exceptions_typest type)
 {
   const namespacet ns(symbol_table);
   std::map<irep_idt, std::set<irep_idt>> exceptions_map;
   uncaught_exceptions(goto_functions, ns, exceptions_map);
-  remove_exceptionst remove_exceptions(symbol_table, exceptions_map);
+  remove_exceptionst remove_exceptions(
+    symbol_table,
+    exceptions_map,
+    type == remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
   remove_exceptions(goto_functions);
 }
 
 /// removes throws/CATCH-POP/CATCH-PUSH
-void remove_exceptions(goto_modelt &goto_model)
+void remove_exceptions(goto_modelt &goto_model, remove_exceptions_typest type)
 {
-  remove_exceptions(goto_model.symbol_table, goto_model.goto_functions);
+  remove_exceptions(goto_model.symbol_table, goto_model.goto_functions, type);
 }

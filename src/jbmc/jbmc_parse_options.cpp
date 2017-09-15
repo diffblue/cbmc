@@ -649,6 +649,8 @@ void jbmc_parse_optionst::process_goto_function(
     // Remove inline assembler; this needs to happen before
     // adding the library.
     remove_asm(function, symbol_table);
+    // Removal of RTTI inspection:
+    remove_instanceof(function, symbol_table);
   }
 
   catch(const char *e)
@@ -692,10 +694,9 @@ bool jbmc_parse_optionst::process_goto_functions(
       cmdline.isset("pointer-check"));
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
-    // remove catch and throw (introduces instanceof)
-    remove_exceptions(goto_model);
-    // Similar removal of RTTI inspection:
-    remove_instanceof(goto_model);
+    // remove catch and throw (introduces instanceof but request it is removed)
+    remove_exceptions(
+      goto_model, remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
