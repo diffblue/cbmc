@@ -97,6 +97,11 @@ static void update_index_set(
   const namespacet &ns,
   const exprt &formula);
 
+static std::vector<exprt> instantiate_not_contains(
+  const string_not_contains_constraintt &axiom,
+  const std::map<exprt, std::set<exprt>>& index_set,
+  const string_constraint_generatort &generator);
+
 /// Convert exprt to a specific type. Throw bad_cast if conversion
 /// cannot be performed
 /// Generic case doesn't exist, specialize for different types accordingly
@@ -832,7 +837,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       {
         debug()<< "constraint " << i << eom;
         const std::vector<exprt> lemmas=
-          instantiate_not_contains(not_contains_axioms[i]);
+          instantiate_not_contains(
+            not_contains_axioms[i], index_set, generator);
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
@@ -1902,19 +1908,23 @@ static exprt instantiate(
 /// substituting the quantifiers and generating axioms.
 /// \param [in] axiom: the axiom to instantiate
 /// \return the lemmas produced through instantiation
-std::vector<exprt> string_refinementt::instantiate_not_contains(
-  const string_not_contains_constraintt &axiom)
+static std::vector<exprt> instantiate_not_contains(
+  const string_not_contains_constraintt &axiom,
+  const std::map<exprt, std::set<exprt>>& index_set,
+  const string_constraint_generatort &generator)
 {
   const string_exprt s0=to_string_expr(axiom.s0());
   const string_exprt s1=to_string_expr(axiom.s1());
 
-  debug() << "instantiate not contains " << from_expr(ns, "", s0) << " : "
-          << from_expr(ns, "", s1) << eom;
-  const expr_sett index_set0=index_set[s0.content()];
-  const expr_sett index_set1=index_set[s1.content()];
-
-  return ::instantiate_not_contains(
-    axiom, index_set0, index_set1, generator);
+  // debug() << "instantiate not contains " << from_expr(ns, "", s0) << " : "
+  //         << from_expr(ns, "", s1) << eom;
+  const auto& i0=index_set.find(s0.content());
+  const auto& i1=index_set.find(s1.content());
+  if (i0 != index_set.end() && i1 != index_set.end()) {
+    return ::instantiate_not_contains(
+      axiom, i0->second, i1->second, generator);
+  }
+  return { };
 }
 
 /// Replace array-lists by 'with' expressions.

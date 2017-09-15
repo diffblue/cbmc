@@ -104,9 +104,6 @@ private:
 
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
 
-  std::vector<exprt> instantiate_not_contains(
-    const string_not_contains_constraintt &axiom);
-
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;
 
