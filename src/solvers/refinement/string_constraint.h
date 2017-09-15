@@ -49,7 +49,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
     is another implication which can be pushed in to \f$L(n)\f$.
 */
 
-class string_constraintt: public exprt
+class string_constraintt final: public exprt
 {
 public:
   // String constraints are of the form
@@ -88,8 +88,8 @@ public:
     const symbol_exprt &_univ_var,
     const exprt &bound_inf,
     const exprt &bound_sup,
-    const exprt &prem,
-    const exprt &body):
+    const exprt &prem, // Index guard
+    const exprt &body): // value constraint
     exprt(ID_string_constraint)
   {
     copy_to_operands(prem, body);
@@ -155,7 +155,7 @@ inline std::string from_expr(
     from_expr(ns, identifier, expr.body());
 }
 
-class string_not_contains_constraintt: public exprt
+class string_not_contains_constraintt final: public exprt
 {
 public:
   // string_not contains_constraintt are formula of the form:

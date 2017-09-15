@@ -48,27 +48,27 @@ string_exprt string_constraint_generatort::add_axioms_for_code_point(
 
   binary_relation_exprt small(code_point, ID_lt, hex010000);
   implies_exprt a1(small, res.axiom_for_has_length(1));
-  m_axioms.push_back(a1);
+  lemmas_.push_back(a1);
 
   implies_exprt a2(not_exprt(small), res.axiom_for_has_length(2));
-  m_axioms.push_back(a2);
+  lemmas_.push_back(a2);
 
   typecast_exprt code_point_as_char(code_point, ref_type.get_char_type());
   implies_exprt a3(small, equal_exprt(res[0], code_point_as_char));
-  m_axioms.push_back(a3);
+  lemmas_.push_back(a3);
 
   plus_exprt first_char(
     hexD800, div_exprt(minus_exprt(code_point, hex010000), hex0400));
   implies_exprt a4(
     not_exprt(small),
     equal_exprt(res[0], typecast_exprt(first_char, ref_type.get_char_type())));
-  m_axioms.push_back(a4);
+  lemmas_.push_back(a4);
 
   plus_exprt second_char(hexDC00, mod_exprt(code_point, hex0400));
   implies_exprt a5(
     not_exprt(small),
     equal_exprt(res[1], typecast_exprt(second_char, ref_type.get_char_type())));
-  m_axioms.push_back(a5);
+  lemmas_.push_back(a5);
 
   return res;
 }
@@ -141,8 +141,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_at(
     str[plus_exprt_with_overflow_check(pos, index1)]);
   exprt return_pair=and_exprt(is_high_surrogate(str[pos]), is_low);
 
-  m_axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
-  m_axioms.push_back(
+  lemmas_.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
+  lemmas_.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char1_as_int)));
   return result;
 }
@@ -172,8 +172,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
   exprt return_pair=and_exprt(
     is_high_surrogate(char1), is_low_surrogate(char2));
 
-  m_axioms.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
-  m_axioms.push_back(
+  lemmas_.push_back(implies_exprt(return_pair, equal_exprt(result, pair)));
+  lemmas_.push_back(
     implies_exprt(not_exprt(return_pair), equal_exprt(result, char2_as_int)));
   return result;
 }
@@ -193,8 +193,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
   symbol_exprt result=fresh_symbol("code_point_count", return_type);
   minus_exprt length(end, begin);
   div_exprt minimum(length, from_integer(2, length.type()));
-  m_axioms.push_back(binary_relation_exprt(result, ID_le, length));
-  m_axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
+  lemmas_.push_back(binary_relation_exprt(result, ID_le, length));
+  lemmas_.push_back(binary_relation_exprt(result, ID_ge, minimum));
 
   return result;
 }
@@ -217,8 +217,8 @@ exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   exprt minimum=plus_exprt_with_overflow_check(index, offset);
   exprt maximum=plus_exprt_with_overflow_check(
     index, plus_exprt_with_overflow_check(offset, offset));
-  m_axioms.push_back(binary_relation_exprt(result, ID_le, maximum));
-  m_axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
+  lemmas_.push_back(binary_relation_exprt(result, ID_le, maximum));
+  lemmas_.push_back(binary_relation_exprt(result, ID_ge, minimum));
 
   return result;
 }
