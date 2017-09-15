@@ -109,7 +109,6 @@ private:
 
   void concretize_string(const exprt &expr);
   void concretize_results();
-  void concretize_lengths();
 
   exprt get_array(const exprt &arr, const exprt &size) const;
   exprt get_array(const exprt &arr) const;

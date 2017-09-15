@@ -514,7 +514,11 @@ void string_refinementt::concretize_results()
 
 /// For each string whose length has been solved, add constants to the map
 /// `found_length`
-void string_refinementt::concretize_lengths()
+void concretize_lengths(
+  std::map<exprt, exprt> &found_length,
+  std::function<exprt(const exprt&)> get,
+  const replace_mapt &symbol_resolve,
+  const std::set<string_exprt> &created_strings)
 {
   for(const auto &pair : symbol_resolve)
   {
@@ -524,9 +528,9 @@ void string_refinementt::concretize_lengths()
       exprt content=str->content();
       replace_expr(symbol_resolve, content);
       found_length[content]=length;
-     }
+    }
   }
-  for(const auto &it : generator.get_created_strings())
+  for(const auto &it : created_strings)
   {
     if(const auto str=expr_cast<string_exprt>(it))
     {
@@ -688,7 +692,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     else
     {
       debug() << "check_SAT: the model is correct" << eom;
-      concretize_lengths();
+      concretize_lengths(
+        found_length,
+        [](const exprt& expr){ return expr; },
+        symbol_resolve,
+        generator.get_created_strings());
       return resultt::D_SATISFIABLE;
     }
   }
@@ -729,7 +737,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       else
       {
         debug() << "check_SAT: the model is correct" << eom;
-        concretize_lengths();
+        concretize_lengths(
+          found_length,
+          [](const exprt& expr){ return expr; },
+          symbol_resolve,
+          generator.get_created_strings());
         return resultt::D_SATISFIABLE;
       }
 
