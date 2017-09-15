@@ -113,7 +113,6 @@ private:
   bool add_axioms_for_string_assigns(const exprt &lhs, const exprt &rhs);
   void set_to(const exprt &expr, bool value) override;
 
-  void add_instantiations();
   void debug_model();
   bool check_axioms();
   bool is_axiom_sat(
@@ -126,9 +125,6 @@ private:
   void initial_index_set(const std::vector<string_constraintt> &string_axioms);
   void add_to_index_set(const exprt &s, exprt i);
 
-  exprt instantiate(
-    const string_constraintt &axiom, const exprt &str, const exprt &val);
-
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);
 
@@ -136,12 +132,8 @@ private:
     const exprt &qvar, const exprt &val, const exprt &f);
 
   std::map<exprt, int> map_representation_of_sum(const exprt &f) const;
-  exprt sum_over_map(
-    std::map<exprt, int> &m, const typet &type, bool negated=false) const;
 
   bool is_valid_string_constraint(const string_constraintt &expr);
-
-  exprt simplify_sum(const exprt &f) const;
 
   void concretize_string(const exprt &expr);
   void concretize_results();

@@ -35,6 +35,10 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <java_bytecode/java_types.h>
 #include <util/optional.h>
 
+static exprt instantiate(
+  const string_constraintt &axiom, const exprt &str, const exprt &val);
+exprt simplify_sum(const exprt &f);
+
 /// Convert exprt to a specific type. Throw bad_cast if conversion
 /// cannot be performed
 /// Generic case doesn't exist, specialize for different types accordingly
@@ -97,17 +101,18 @@ string_refinementt::string_refinementt(const infot &info):
 
 /// display the current index set, for debugging
 static void display_index_set(
-  const messaget& message,
+  messaget::mstreamt stream,
   const namespacet& ns,
   const std::map<exprt, std::set<exprt>>& current_index_set,
   const std::map<exprt, std::set<exprt>>& index_set)
 {
+  const auto eom = messaget::eom;
   std::size_t count=0;
   std::size_t count_current=0;
   for(const auto &i : index_set)
   {
     const exprt &s=i.first;
-    message.debug() << "IS(" << from_expr(ns, "", s) << ")=={" << message.eom;
+    stream << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
 
     for(auto j : i.second)
     {
@@ -115,41 +120,53 @@ static void display_index_set(
       if(it!=current_index_set.end() && it->second.find(j)!=it->second.end())
       {
         count_current++;
-        message.debug() << "**";
+        stream << "**";
       }
-      message.debug() << "  " << from_expr(ns, "", j) << ";" << message.eom;
+      stream << "  " << from_expr(ns, "", j) << ";" << eom;
       count++;
     }
-    message.debug() << "}"  << message.eom;
+    stream << "}"  << eom;
   }
-  message.debug() << count << " elements in index set (" << count_current
-          << " newly added)" << message.eom;
+  stream << count << " elements in index set (" << count_current
+          << " newly added)" << eom;
 }
 
 /// compute the index set for all formulas, instantiate the formulas with the
 /// found indexes, and add them as lemmas.
-void string_refinementt::add_instantiations()
+
+static void display_current_index_set(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const std::map<exprt, std::set<exprt>> &current_index_set)
 {
-  debug() << "string_constraint_generatort::add_instantiations: "
-          << "going through the current index set:" << eom;
+  const auto eom=messaget::eom;
+  stream << "string_constraint_generatort::add_instantiations: "
+         << "going through the current index set:" << eom;
   for(const auto &i : current_index_set)
   {
     const exprt &s=i.first;
-    debug() << "IS(" << from_expr(ns, "", s) << ")=={";
+    stream << "IS(" << from_expr(ns, "", s) << ")=={";
 
     for(const auto &j : i.second)
-      debug() << from_expr(ns, "", j) << "; ";
-    debug() << "}"  << eom;
+      stream << from_expr(ns, "", j) << "; ";
+    stream << "}"  << eom;
+  }
+}
 
+static std::vector<exprt> generate_instantiations(
+  const std::map<exprt, std::set<exprt>> &current_index_set,
+  const std::vector<string_constraintt>& universal_axioms)
+{
+  std::vector<exprt> lemmas;
+  for(const auto &i : current_index_set)
+  {
     for(const auto &ua : universal_axioms)
     {
       for(const auto &j : i.second)
-      {
-        exprt lemma=instantiate(ua, s, j);
-        add_lemma(lemma);
-      }
+        lemmas.push_back(instantiate(ua, i.first, j));
     }
   }
+  return lemmas;
 }
 
 /// List the simple expressions on which the expression depends in the
@@ -381,7 +398,10 @@ void string_refinementt::concretize_results()
     concretize_string(it.second);
   for(const auto &it : generator.get_created_strings())
     concretize_string(it);
-  add_instantiations();
+  for (const auto& lemma :
+        generate_instantiations(current_index_set, universal_axioms))
+    add_lemma(lemma);
+  display_current_index_set(debug(), ns, current_index_set);
 }
 
 /// For each string whose length has been solved, add constants to the map
@@ -551,7 +571,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(universal_axioms);
   update_index_set(cur);
   cur.clear();
-  add_instantiations();
+  for (const auto& lemma :
+         generate_instantiations(current_index_set, universal_axioms))
+    add_lemma(lemma);
+  display_current_index_set(debug(), ns, current_index_set);
 
   while((loop_bound_--)>0)
   {
@@ -579,7 +602,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       current_index_set.clear();
       update_index_set(cur);
       cur.clear();
-      add_instantiations();
+      for (const auto& lemma :
+            generate_instantiations(current_index_set, universal_axioms))
+        add_lemma(lemma);
+      display_current_index_set(debug(), ns, current_index_set);
 
       if(current_index_set.empty())
       {
@@ -597,7 +623,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         }
       }
 
-      display_index_set(*this, ns, current_index_set, index_set);
+      display_index_set(debug(), ns, current_index_set, index_set);
       debug()<< "instantiating NOT_CONTAINS constraints" << eom;
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
@@ -1254,8 +1280,7 @@ bool string_refinementt::check_axioms()
 /// \return a map where each leaf of the input is mapped to the number of times
 ///   it is added. For instance, expression $x + x - y$ would give the map x ->
 ///   2, y -> -1.
-std::map<exprt, int> string_refinementt::map_representation_of_sum(
-  const exprt &f) const
+static std::map<exprt, int> map_representation_of_sum(const exprt &f)
 {
   // number of time the leaf should be added (can be negative)
   std::map<exprt, int> elems;
@@ -1297,8 +1322,10 @@ std::map<exprt, int> string_refinementt::map_representation_of_sum(
 /// \return a expression for the sum of each element in the map a number of
 ///   times given by the corresponding integer in the map. For a map x -> 2, y
 ///   -> -1 would give an expression $x + x - y$.
-exprt string_refinementt::sum_over_map(
-  std::map<exprt, int> &m, const typet &type, bool negated) const
+static exprt sum_over_map(
+  std::map<exprt, int> &m,
+  const typet &type,
+  bool negated = false)
 {
   exprt sum=nil_exprt();
   mp_integer constants=0;
@@ -1368,7 +1395,7 @@ exprt string_refinementt::sum_over_map(
 
 /// \par parameters: an expression with only plus and minus expr
 /// \return an equivalent expression in a canonical form
-exprt string_refinementt::simplify_sum(const exprt &f) const
+exprt simplify_sum(const exprt &f)
 {
   std::map<exprt, int> map=map_representation_of_sum(f);
   return sum_over_map(map, f.type());
@@ -1381,7 +1408,7 @@ exprt string_refinementt::simplify_sum(const exprt &f) const
 ///   a function of $qvar$, i.e. the value that is necessary for qvar for f to
 ///   be equal to val. For instance, if `f` corresponds to the expression $q +
 ///   x$, `compute_inverse_function(q,v,f)` returns an expression for $v - x$.
-exprt string_refinementt::compute_inverse_function(
+static exprt compute_inverse_function(
   const exprt &qvar, const exprt &val, const exprt &f)
 {
   exprt positive, negative;
@@ -1409,8 +1436,8 @@ exprt string_refinementt::compute_inverse_function(
       string_refinement_invariantt("a proper function must have exactly one "
         "occurrences after reduction, or it canceled out, and it does not have "
         " one"));
-    debug() << "in string_refinementt::compute_inverse_function:"
-            << " warning: occurrences of qvar canceled out " << eom;
+    // debug() << "in string_refinementt::compute_inverse_function:"
+    //         << " warning: occurrences of qvar canceled out " << eom;
   }
 
   elems.erase(it);
@@ -1605,7 +1632,7 @@ public:
 /// \param [in] str: the string which must be indexed
 /// \param [in] qvar: the universal variable that must be in the index
 /// \return an index expression in `expr` on `str` containing `qvar`
-exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
+static exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
   find_index_visitort v(str, qvar);
   expr.visit(v);
@@ -1619,7 +1646,7 @@ exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 ///   For instance, if `axiom` corresponds to $\forall q. s[q+x]='a' &&
 ///   t[q]='b'$, `instantiate(axiom,s,v)` would return an expression for
 ///   $s[v]='a' && t[v-x]='b'$.
-exprt string_refinementt::instantiate(
+static exprt instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val)
 {
   exprt idx=find_index(axiom.body(), str, axiom.univ_var());
