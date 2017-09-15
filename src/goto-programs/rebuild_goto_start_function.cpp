@@ -47,8 +47,9 @@ bool rebuild_goto_start_functiont::operator()(
   const irep_idt &mode=get_entry_point_mode();
 
   // Get the relevant languaget to generate the new entry point with
-  std::unique_ptr<languaget> language=get_language_from_mode(mode);
-  INVARIANT(language, "No language found for mode: "+id2string(mode));
+  std::unique_ptr<languaget> language=
+    std::unique_ptr<languaget>(get_language_from_mode(mode));
+  assert(language);
   language->set_message_handler(get_message_handler());
 
   // To create a new entry point we must first remove the old one

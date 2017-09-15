@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
 
 #include <util/irep.h>
+#include <util/symbol.h>
 
 bool java_entry_point(
   class symbol_tablet &symbol_table,
@@ -37,8 +38,6 @@ bool generate_java_start_function(
   class symbol_tablet &symbol_table,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
-  const select_pointer_typet &pointer_type_selector);
+  size_t max_nondet_array_length);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H

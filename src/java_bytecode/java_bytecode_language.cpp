@@ -108,9 +108,7 @@ bool java_bytecode_languaget::generate_start_function(
     symbol_table,
     get_message_handler(),
     assume_inputs_non_null,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
-    *pointer_type_selector);
+    max_nondet_array_length);
 }
 
 /// ANSI-C preprocessing

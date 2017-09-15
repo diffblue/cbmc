@@ -56,5 +56,3 @@ bool languaget::type_to_name(
   name=type.pretty();
   return false;
 }
-
-}
