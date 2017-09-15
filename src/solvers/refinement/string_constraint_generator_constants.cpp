@@ -45,12 +45,12 @@ exprt string_constraint_generatort::add_axioms_for_constant(
     const exprt idx = from_integer(i, index_type);
     const exprt c = from_integer(str[i], char_type);
     const equal_exprt lemma(res[idx], c);
-    axioms.push_back(implies_exprt(guard, lemma));
+    lemmas.push_back(implies_exprt(guard, lemma));
   }
 
   const exprt s_length = from_integer(str.size(), index_type);
 
-  axioms.push_back(implies_exprt(guard, equal_exprt(res.length(), s_length)));
+  lemmas.push_back(implies_exprt(guard, equal_exprt(res.length(), s_length)));
   return from_integer(0, get_return_code_type());
 }
 
@@ -63,7 +63,7 @@ exprt string_constraint_generatort::add_axioms_for_empty_string(
 {
   PRECONDITION(f.arguments().size() == 2);
   exprt length = f.arguments()[0];
-  axioms.push_back(equal_exprt(length, from_integer(0, length.type())));
+  lemmas.push_back(equal_exprt(length, from_integer(0, length.type())));
   return from_integer(0, get_return_code_type());
 }
 

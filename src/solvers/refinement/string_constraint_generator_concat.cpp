@@ -49,20 +49,20 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   exprt res_length=plus_exprt_with_overflow_check(
     s1.length(), minus_exprt(end_index, start_index));
   implies_exprt a1(prem, equal_exprt(res.length(), res_length));
-  axioms.push_back(a1);
+  lemmas.push_back(a1);
 
   implies_exprt a2(not_exprt(prem), equal_exprt(res.length(), s1.length()));
-  axioms.push_back(a2);
+  lemmas.push_back(a2);
 
   symbol_exprt idx=fresh_univ_index("QA_index_concat", res.length().type());
   string_constraintt a3(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
-  axioms.push_back(a3);
+  constraints.push_back(a3);
 
   symbol_exprt idx2=fresh_univ_index("QA_index_concat2", res.length().type());
   equal_exprt res_eq(
     res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start_index, idx2)]);
   string_constraintt a4(idx2, minus_exprt(end_index, start_index), res_eq);
-  axioms.push_back(a4);
+  constraints.push_back(a4);
 
   // We should have a enum type for the possible error codes
   return from_integer(0, res.length().type());
@@ -87,14 +87,14 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   const typet &index_type = res.length().type();
   const equal_exprt a1(
     res.length(), plus_exprt(s1.length(), from_integer(1, index_type)));
-  axioms.push_back(a1);
+  lemmas.push_back(a1);
 
   symbol_exprt idx = fresh_univ_index("QA_index_concat_char", index_type);
   string_constraintt a2(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
-  axioms.push_back(a2);
+  constraints.push_back(a2);
 
   equal_exprt a3(res[s1.length()], c);
-  axioms.push_back(a3);
+  lemmas.push_back(a3);
 
   // We should have a enum type for the possible error codes
   return from_integer(0, get_return_code_type());
