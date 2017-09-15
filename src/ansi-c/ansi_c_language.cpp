@@ -50,7 +50,8 @@ bool ansi_c_languaget::generate_start_function(
   return generate_ansi_c_start_function(
     symbol_table.symbols.at(entry_function_symbol_id),
     symbol_table,
-    *message_handler);
+    *message_handler,
+    wrap_entry_point_in_while());
 }
 
 /// ANSI-C preprocessing

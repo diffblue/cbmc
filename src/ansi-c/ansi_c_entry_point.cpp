@@ -204,7 +204,8 @@ bool ansi_c_entry_point(
   if(static_lifetime_init(symbol_table, symbol.location, message_handler))
     return true;
 
-  return generate_ansi_c_start_function(symbol, symbol_table, message_handler);
+  return generate_ansi_c_start_function(
+    symbol, symbol_table, message_handler, wrap_entry_point);
 }
 
 
@@ -218,7 +219,8 @@ bool ansi_c_entry_point(
 bool generate_ansi_c_start_function(
   const symbolt &symbol,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  bool wrap_entry_point)
 {
   PRECONDITION(!symbol.value.is_nil());
   code_blockt init_code;
