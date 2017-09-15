@@ -103,8 +103,6 @@ private:
   void debug_model();
 
   void set_char_array_equality(const exprt &lhs, const exprt &rhs);
-  void update_index_set(const exprt &formula);
-  void update_index_set(const std::vector<exprt> &cur);
 
   std::vector<exprt> instantiate_not_contains(
     const string_not_contains_constraintt &axiom);

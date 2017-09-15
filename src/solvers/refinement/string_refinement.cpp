@@ -85,6 +85,18 @@ static void initial_index_set(
 
 exprt simplify_sum(const exprt &f);
 
+static void update_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const std::vector<exprt> &cur);
+
+static void update_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const exprt &formula);
+
 /// Convert exprt to a specific type. Throw bad_cast if conversion
 /// cannot be performed
 /// Generic case doesn't exist, specialize for different types accordingly
@@ -682,7 +694,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 
   initial_index_set(index_set, current_index_set, ns, universal_axioms);
-  update_index_set(cur);
+  update_index_set(index_set, current_index_set, ns, cur);
   cur.clear();
   for (const auto& lemma :
          generate_instantiations(current_index_set, universal_axioms))
@@ -727,7 +739,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // and instantiating universal formulas with this indices.
       // We will then relaunch the solver with these added lemmas.
       current_index_set.clear();
-      update_index_set(cur);
+      update_index_set(index_set, current_index_set, ns, cur);
       cur.clear();
       for (const auto& lemma :
             generate_instantiations(current_index_set, universal_axioms))
@@ -1626,10 +1638,14 @@ static void initial_index_set(
 
 /// add to the index set all the indices that appear in the formulas
 /// \par parameters: a list of string constraints
-void string_refinementt::update_index_set(const std::vector<exprt> &cur)
+static void update_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const std::vector<exprt> &cur)
 {
   for(const auto &axiom : cur)
-    update_index_set(axiom);
+    update_index_set(index_set, current_index_set, ns, axiom);
 }
 
 /// An expression representing an array of characters can be in the form of an
@@ -1719,7 +1735,11 @@ static void initial_index_set(
 
 /// add to the index set all the indices that appear in the formula
 /// \par parameters: a string constraint
-void string_refinementt::update_index_set(const exprt &formula)
+static void update_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const exprt &formula)
 {
   std::list<exprt> to_process;
   to_process.push_back(formula);
