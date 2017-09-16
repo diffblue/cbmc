@@ -88,6 +88,8 @@ void rd_range_domaint::transform(
   // initial (non-deterministic) value
   else if(from->is_decl())
     transform_assign(ns, from, from, *rd);
+  else if(from->is_other())
+    transform_other(ns, from, from, *rd);
 
 #if 0
   // handle return values
@@ -330,6 +332,14 @@ void rd_range_domaint::transform_assign(
     for(const auto &range : ranges)
       gen(from, identifier, range.first, range.second);
   }
+}
+
+void rd_range_domaint::transform_other(
+  const namespacet &ns,
+  locationt from,
+  locationt to,
+  reaching_definitions_analysist &rd)
+{
 }
 
 void rd_range_domaint::kill(

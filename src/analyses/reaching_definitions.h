@@ -214,6 +214,11 @@ private:
     locationt from,
     locationt to,
     reaching_definitions_analysist &rd);
+  void transform_other(
+    const namespacet &ns,
+    locationt from,
+    locationt to,
+    reaching_definitions_analysist &rd);
 
   void kill(
     const irep_idt &identifier,
