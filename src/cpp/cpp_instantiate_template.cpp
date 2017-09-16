@@ -415,13 +415,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
       static_cast<const exprt &>(
         template_symbol.value.find("template_methods"));
 
-    for(unsigned i=0; i<template_methods.operands().size(); i++)
+    for(auto &tm : template_methods.operands())
     {
       cpp_saved_scope.restore();
 
       cpp_declarationt method_decl=
         static_cast<const cpp_declarationt &>(
-          static_cast<const irept &>(template_methods.operands()[i]));
+          static_cast<const irept &>(tm));
 
       // copy the type of the template method
       template_typet method_type=

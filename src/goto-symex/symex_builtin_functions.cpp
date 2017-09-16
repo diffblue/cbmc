@@ -299,7 +299,7 @@ void goto_symext::symex_printf(
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
 
-  for(unsigned i=1; i<operands.size(); i++)
+  for(std::size_t i=1; i<operands.size(); i++)
     args.push_back(operands[i]);
 
   const irep_idt format_string=
@@ -324,7 +324,7 @@ void goto_symext::symex_input(
 
   std::list<exprt> args;
 
-  for(unsigned i=1; i<code.operands().size(); i++)
+  for(std::size_t i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
@@ -349,7 +349,7 @@ void goto_symext::symex_output(
 
   std::list<exprt> args;
 
-  for(unsigned i=1; i<code.operands().size(); i++)
+  for(std::size_t i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
@@ -470,7 +470,7 @@ void goto_symext::symex_trace(
 
     irep_idt event=code.arguments()[1].op0().get(ID_value);
 
-    for(unsigned j=2; j<code.arguments().size(); j++)
+    for(std::size_t j=2; j<code.arguments().size(); j++)
     {
       exprt var(code.arguments()[j]);
       state.rename(var, ns);

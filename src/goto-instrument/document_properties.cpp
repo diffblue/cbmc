@@ -78,7 +78,7 @@ void document_propertiest::strip_space(std::list<linet> &lines)
   for(std::list<linet>::const_iterator it=lines.begin();
       it!=lines.end(); it++)
   {
-    for(unsigned j=0; j<strip && j<it->text.size(); j++)
+    for(std::size_t j=0; j<strip && j<it->text.size(); j++)
       if(it->text[j]!=' ')
       {
         strip=j;
@@ -104,7 +104,7 @@ std::string escape_latex(const std::string &s, bool alltt)
 {
   std::string dest;
 
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::size_t i=0; i<s.size(); i++)
   {
     if(s[i]=='\\' || s[i]=='{' || s[i]=='}')
       dest+="\\";
@@ -125,7 +125,7 @@ std::string escape_html(const std::string &s)
 {
   std::string dest;
 
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::size_t i=0; i<s.size(); i++)
   {
     switch(s[i])
     {
@@ -141,7 +141,7 @@ std::string escape_html(const std::string &s)
 
 bool is_empty(const std::string &s)
 {
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::size_t i=0; i<s.size(); i++)
     if(isgraph(s[i]))
       return false;
 

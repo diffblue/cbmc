@@ -572,7 +572,7 @@ void goto_checkt::integer_overflow_check(
     // The overflow checks are binary!
     // We break these up.
 
-    for(unsigned i=1; i<expr.operands().size(); i++)
+    for(std::size_t i=1; i<expr.operands().size(); i++)
     {
       exprt tmp;
 

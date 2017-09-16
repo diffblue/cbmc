@@ -252,7 +252,7 @@ void cpp_declarator_convertert::combine_types(
     if(decl_code_type.return_type()==symbol_code_type.return_type() &&
        decl_code_type.parameters().size()==symbol_code_type.parameters().size())
     {
-      for(unsigned i=0; i<decl_code_type.parameters().size(); i++)
+      for(std::size_t i=0; i<decl_code_type.parameters().size(); i++)
       {
         const code_typet::parametert &decl_parameter=
           decl_code_type.parameters()[i];

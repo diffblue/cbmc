@@ -139,7 +139,7 @@ public:
   typedef std::map<irep_idt, new_scopet> id_mapt;
   id_mapt id_map;
 
-  unsigned anon_count;
+  std::size_t anon_count;
 
   new_scopet *parent;
 
@@ -382,7 +382,7 @@ protected:
   bool rMSCuuidof(exprt &);
   bool rMSC_if_existsExpr(exprt &);
 
-  unsigned number_of_errors;
+  std::size_t number_of_errors;
   irep_idt current_function;
 
   void merge_types(const typet &src, typet &dest);
@@ -488,7 +488,7 @@ bool Parser::SyntaxError()
 
   cpp_tokent t[ERROR_TOKENS];
 
-  for(unsigned i=0; i<ERROR_TOKENS; i++)
+  for(std::size_t i=0; i<ERROR_TOKENS; i++)
     lex.LookAhead(i, t[i]);
 
   if(t[0].kind!='\0')
@@ -499,7 +499,7 @@ bool Parser::SyntaxError()
 
     std::string message="parse error before `";
 
-    for(unsigned i=0; i<ERROR_TOKENS; i++)
+    for(std::size_t i=0; i<ERROR_TOKENS; i++)
       if(t[i].kind!='\0')
       {
         if(i!=0)
@@ -1695,7 +1695,7 @@ bool Parser::rOtherDeclaration(
 
     assert(!type_name.get_sub().empty());
 
-    for(unsigned i=0; i < type_name.get_sub().size(); i++)
+    for(std::size_t i=0; i < type_name.get_sub().size(); i++)
     {
       if(type_name.get_sub()[i].id() == ID_operator)
       {

@@ -126,16 +126,16 @@ protected:
     goto_programt &dest,
     goto_programt::const_targett target,
     const code_function_callt::argumentst &arguments,
-    unsigned format_string_inx,
-    unsigned argument_start_inx,
+    std::size_t format_string_inx,
+    std::size_t argument_start_inx,
     const std::string &function_name);
 
   void do_format_string_write(
     goto_programt &dest,
     goto_programt::const_targett target,
     const code_function_callt::argumentst &arguments,
-    unsigned format_string_inx,
-    unsigned argument_start_inx,
+    std::size_t format_string_inx,
+    std::size_t argument_start_inx,
     const std::string &function_name);
 
   bool is_string_type(const typet &t) const
@@ -392,8 +392,8 @@ void string_instrumentationt::do_format_string_read(
   goto_programt &dest,
   goto_programt::const_targett target,
   const code_function_callt::argumentst &arguments,
-  unsigned format_string_inx,
-  unsigned argument_start_inx,
+  std::size_t format_string_inx,
+  std::size_t argument_start_inx,
   const std::string &function_name)
 {
   const exprt &format_arg=arguments[format_string_inx];
@@ -405,7 +405,7 @@ void string_instrumentationt::do_format_string_read(
     format_token_listt token_list=
       parse_format_string(format_arg.op0().op0().get_string(ID_value));
 
-    unsigned args=0;
+    std::size_t args=0;
 
     for(const auto &token : token_list)
     {
@@ -459,7 +459,7 @@ void string_instrumentationt::do_format_string_read(
     comment += function_name;
     format_ass->source_location.set_comment(comment);
 
-    for(unsigned i=2; i<arguments.size(); i++)
+    for(std::size_t i=2; i<arguments.size(); i++)
     {
       const exprt &arg=arguments[i];
       const typet &arg_type=ns.follow(arguments[i].type());
@@ -495,8 +495,8 @@ void string_instrumentationt::do_format_string_write(
   goto_programt &dest,
   goto_programt::const_targett target,
   const code_function_callt::argumentst &arguments,
-  unsigned format_string_inx,
-  unsigned argument_start_inx,
+  std::size_t format_string_inx,
+  std::size_t argument_start_inx,
   const std::string &function_name)
 {
   const exprt &format_arg=arguments[format_string_inx];
@@ -508,7 +508,7 @@ void string_instrumentationt::do_format_string_write(
     format_token_listt token_list=
       parse_format_string(format_arg.op0().op0().get_string(ID_value));
 
-    unsigned args=0;
+    std::size_t args=0;
 
     for(const auto &token : token_list)
     {
@@ -600,7 +600,7 @@ void string_instrumentationt::do_format_string_write(
   }
   else // non-const format string
   {
-    for(unsigned i=argument_start_inx; i<arguments.size(); i++)
+    for(std::size_t i=argument_start_inx; i<arguments.size(); i++)
     {
       const typet &arg_type=ns.follow(arguments[i].type());
 

@@ -151,7 +151,7 @@ void c_typecheck_baset::typecheck_asm(codet &code)
 
     typecheck_expr(code.op0());
 
-    for(unsigned i=1; i<code.operands().size(); i++)
+    for(std::size_t i=1; i<code.operands().size(); i++)
     {
       exprt &list=code.operands()[i];
       Forall_operands(it, list)

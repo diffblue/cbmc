@@ -159,7 +159,7 @@ bool base_type_eqt::base_type_eq_rec(
     if(components1.size()!=components2.size())
       return false;
 
-    for(unsigned i=0; i<components1.size(); i++)
+    for(std::size_t i=0; i<components1.size(); i++)
     {
       const typet &subtype1=components1[i].type();
       const typet &subtype2=components2[i].type();
@@ -190,7 +190,7 @@ bool base_type_eqt::base_type_eq_rec(
     if(parameters1.size()!=parameters2.size())
       return false;
 
-    for(unsigned i=0; i<parameters1.size(); i++)
+    for(std::size_t i=0; i<parameters1.size(); i++)
     {
       const typet &subtype1=parameters1[i].type();
       const typet &subtype2=parameters2[i].type();

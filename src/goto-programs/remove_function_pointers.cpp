@@ -182,7 +182,7 @@ bool remove_function_pointerst::is_type_compatible(
     if(call_parameters.size()!=function_parameters.size())
       return false;
 
-    for(unsigned i=0; i<call_parameters.size(); i++)
+    for(std::size_t i=0; i<call_parameters.size(); i++)
       if(!arg_is_type_compatible(call_parameters[i].type(),
                                  function_parameters[i].type()))
         return false;
@@ -203,7 +203,7 @@ void remove_function_pointerst::fix_argument_types(
   code_function_callt::argumentst &call_arguments=
     function_call.arguments();
 
-  for(unsigned i=0; i<function_parameters.size(); i++)
+  for(std::size_t i=0; i<function_parameters.size(); i++)
   {
     if(i<call_arguments.size())
     {

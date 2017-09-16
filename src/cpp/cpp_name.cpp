@@ -19,9 +19,9 @@ irep_idt cpp_namet::get_base_name() const
   const subt &sub=get_sub();
 
   // find last "::"
-  unsigned base=0;
+  std::size_t base=0;
 
-  for(unsigned i=0; i<sub.size(); i++)
+  for(std::size_t i=0; i<sub.size(); i++)
   {
     if(sub[i].id()=="::")
       base=i+1;
