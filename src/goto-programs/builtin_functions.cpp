@@ -1113,7 +1113,8 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
   }
-  else if(identifier==CPROVER_PREFIX "assert")
+  else if(identifier==CPROVER_PREFIX "assert" ||
+          identifier==CPROVER_PREFIX "precondition")
   {
     if(arguments.size()!=2)
     {
@@ -1123,16 +1124,28 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
+    bool is_precondition=
+      identifier==CPROVER_PREFIX "precondition";
+
     const irep_idt description=
       get_string_constant(arguments[1]);
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments[0];
     t->source_location=function.source_location();
-    t->source_location.set(
-      "user-provided",
-      !function.source_location().is_built_in());
-    t->source_location.set_property_class(ID_assertion);
+
+    if(is_precondition)
+    {
+      t->source_location.set_property_class(ID_precondition);
+    }
+    else
+    {
+      t->source_location.set(
+        "user-provided",
+        !function.source_location().is_built_in());
+      t->source_location.set_property_class(ID_assertion);
+    }
+
     t->source_location.set_comment(description);
 
     // let's double-check the type of the argument

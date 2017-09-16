@@ -3,7 +3,7 @@ main.c
 --cover location --unwind 10
 ^EXIT=0$
 ^SIGNAL=0$
-^\*\* 4 of 4 covered
+^\*\* 5 of .* covered
 --
 ^warning: ignoring
 ^\[.*<builtin-library-

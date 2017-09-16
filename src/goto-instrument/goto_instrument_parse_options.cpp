@@ -259,7 +259,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-value-sets"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
@@ -275,7 +274,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-global-may-alias"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
       parameter_assignments(goto_model);
 
@@ -292,7 +290,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-local-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       parameter_assignments(goto_model);
 
       // recalculate numbers, etc.
@@ -316,7 +313,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
       parameter_assignments(goto_model);
 
@@ -341,7 +337,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-escape-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
       parameter_assignments(goto_model);
 
@@ -358,7 +353,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("custom-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
       parameter_assignments(goto_model);
 
@@ -388,7 +382,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-points-to"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
@@ -405,7 +398,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-intervals"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
       goto_model.goto_functions.update();
@@ -434,7 +426,6 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("list-calls-args"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       list_calls_and_arguments(goto_model);
 
@@ -448,7 +439,6 @@ int goto_instrument_parse_optionst::doit()
       if(!cmdline.isset("inline"))
       {
         do_indirect_call_and_rtti_removal();
-        do_partial_inlining();
 
         // recalculate numbers, etc.
         goto_model.goto_functions.update();
@@ -977,8 +967,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("show-custom-bitvector-analysis") ||
      cmdline.isset("custom-bitvector-analysis"))
   {
-    do_partial_inlining();
-
     status() << "Propagating Constants" << eom;
     constant_propagator_ait constant_propagator_ai(goto_model);
     remove_skip(goto_model);
@@ -987,7 +975,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("escape-analysis"))
   {
     do_indirect_call_and_rtti_removal();
-    do_partial_inlining();
     do_remove_returns();
     parameter_assignments(goto_model);
 
@@ -1082,9 +1069,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("partial-inline"))
   {
     do_indirect_call_and_rtti_removal();
-
-    status() << "Partial inlining" << eom;
-    goto_partial_inline(goto_model, get_message_handler(), true);
+    do_partial_inlining();
 
     goto_model.goto_functions.update();
     goto_model.goto_functions.compute_loop_numbers();
@@ -1172,7 +1157,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
-    do_partial_inlining();
 
     status() << "Pointer Analysis" << eom;
     value_set_analysist value_set_analysis(ns);

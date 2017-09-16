@@ -145,14 +145,13 @@ inline void free(void *ptr)
 {
   __CPROVER_HIDE:;
   // If ptr is NULL, no operation is performed.
+  __CPROVER_precondition(ptr==0 || __CPROVER_DYNAMIC_OBJECT(ptr),
+                         "free argument must be dynamic object");
+  __CPROVER_precondition(ptr==0 || __CPROVER_POINTER_OFFSET(ptr)==0,
+                         "free argument has offset zero");
+
   if(ptr!=0)
   {
-    // is it dynamic?
-    __CPROVER_assert(__CPROVER_DYNAMIC_OBJECT(ptr),
-                     "free argument is dynamic object");
-    __CPROVER_assert(__CPROVER_POINTER_OFFSET(ptr)==0,
-                     "free argument has offset zero");
-
     // catch double free
     if(__CPROVER_deallocated==ptr)
       __CPROVER_assert(0, "double free");
