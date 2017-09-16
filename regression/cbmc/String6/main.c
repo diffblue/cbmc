@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-void free(void *);
+#include <stdlib.h>
 
 int main()
 {
@@ -8,8 +8,12 @@ int main()
 
   assert(strcmp(str, "Hello")==0);
   assert(strncmp(str, "Hello", 5)==0);
+
+  #ifndef _MSC_VER
   assert(strcasecmp(str, "HELLO")==0);
   assert(strncasecmp(str, "HELLO", 5)==0);
+  #endif
+
   assert(strcmp(str, "\xff")<0);
   assert(strncmp("ASDxx", "ASDyy", 3)==0);
 
