@@ -68,6 +68,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cbmc_solvers.h"
 #include "bmc.h"
+#include "bmc_clustering.h"
 #include "version.h"
 #include "xml_interface.h"
 
@@ -158,6 +159,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
     options.set_option("trace", true);
+
+  if(cmdline.isset("clustering"))
+  {
+    options.set_option("clustering", true);
+      options.set_option("trace", true);
+  }
 
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);
@@ -572,14 +579,24 @@ int cbmc_parse_optionst::doit()
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
 
-  bmct bmc(
-    options,
-    goto_model.symbol_table,
-    get_message_handler(),
-    prop_conv);
+  std::unique_ptr<bmct> bmc;
+  if(options.get_bool_option("clustering"))
+  {
+    bmc=std::unique_ptr<bmct>(
+      new bmc_clusteringt(
+        options,
+        goto_model.symbol_table,
+        ui_message_handler,
+        prop_conv,
+        goto_model.goto_functions,
+        cbmc_solvers));
+  }
+  else
+    bmc=std::unique_ptr<bmct>(
+      new bmct(options, goto_model.symbol_table, ui_message_handler, prop_conv));
 
   // do actual BMC
-  return do_bmc(bmc);
+  return do_bmc(*bmc);
 }
 
 bool cbmc_parse_optionst::set_properties()

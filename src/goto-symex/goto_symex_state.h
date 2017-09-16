@@ -38,9 +38,16 @@ public:
   // distance from entry
   unsigned depth;
 
+  std::string id;
+
   guardt guard;
   symex_targett::sourcet source;
   symex_targett *symex_target;
+  std::size_t total_vccs, remaining_vccs;
+
+  std::list<symex_targett::sourcet> locations;
+
+  void initialize(const goto_functionst &goto_functions);
 
   // we have a two-level renaming
 
@@ -197,7 +204,8 @@ public:
     propagationt propagation;
     unsigned atomic_section_id;
 
-    explicit goto_statet(const goto_symex_statet &s):
+    // explicit
+    goto_statet(const goto_symex_statet &s):
       depth(s.depth),
       level2_current_names(s.level2.current_names),
       value_set(s.value_set),
@@ -342,7 +350,7 @@ public:
 
   void switch_to_thread(unsigned t);
   bool record_events;
-  std::unique_ptr<const dirtyt> dirty;
+  const dirtyt* dirty;
 };
 
 #endif // CPROVER_GOTO_SYMEX_GOTO_SYMEX_STATE_H

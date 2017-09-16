@@ -28,6 +28,7 @@ public:
 
   struct sourcet
   {
+    bool if_branch=false;
     unsigned thread_nr;
     goto_programt::const_targett pc;
     bool is_set;
@@ -38,7 +39,8 @@ public:
     {
     }
 
-    explicit sourcet(
+    // explicit
+    sourcet(
       goto_programt::const_targett _pc):
       thread_nr(0),
       pc(_pc),
@@ -46,7 +48,8 @@ public:
     {
     }
 
-    explicit sourcet(const goto_programt &_goto_program):
+    // explicit
+    sourcet(const goto_programt &_goto_program):
       thread_nr(0),
       pc(_goto_program.instructions.begin()),
       is_set(true)

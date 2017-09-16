@@ -34,14 +34,17 @@ void goto_symext::symex_goto(statet &state)
      state.guard.is_false())
   {
     if(!state.guard.is_false())
-      target.location(state.guard.as_expr(), state.source);
+      state.symex_target->location(state.guard.as_expr(), state.source);
 
     // next instruction
     symex_transition(state);
     return; // nothing to do
   }
 
-  target.goto_instruction(state.guard.as_expr(), new_guard, state.source);
+  state.symex_target->goto_instruction(
+    state.guard.as_expr(),
+    new_guard,
+    state.source);
 
   assert(!instruction.targets.empty());
 
@@ -163,7 +166,7 @@ void goto_symext::symex_goto(statet &state)
 
       guardt guard;
 
-      target.assignment(
+      state.symex_target->assignment(
         guard.as_expr(),
         new_lhs, new_lhs, guard_symbol_expr,
         new_rhs,
@@ -204,7 +207,7 @@ void goto_symext::symex_step_goto(statet &state, bool taken)
   state.guard.guard_expr(guard);
   do_simplify(guard);
 
-  target.assumption(state.guard.as_expr(), guard, state.source);
+  state.symex_target->assumption(state.guard.as_expr(), guard, state.source);
 }
 
 void goto_symext::merge_gotos(statet &state)
@@ -361,7 +364,7 @@ void goto_symext::phi_function(
     dest_state.assignment(new_lhs, rhs, ns, true, true);
     dest_state.record_events=record_events;
 
-    target.assignment(
+    dest_state.symex_target->assignment(
       true_exprt(),
       new_lhs, new_lhs, new_lhs.get_original_expr(),
       rhs,
