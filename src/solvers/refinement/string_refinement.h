@@ -94,8 +94,6 @@ private:
   // Content of char arrays found during concretization
   std::map<exprt, array_exprt> found_content;
 
-  void add_lemma(const exprt &lemma,
-                 bool simplify=true,
-                 bool add_to_index_set=true);
+  void add_lemma(const exprt &lemma, bool simplify=true);
 };
 #endif

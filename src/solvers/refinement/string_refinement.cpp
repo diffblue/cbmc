@@ -896,13 +896,12 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 /// \par parameters: a lemma and Boolean value stating whether the lemma should
 /// be added to the index set.
 void string_refinementt::add_lemma(
-  const exprt &lemma, bool _simplify, bool add_to_index_set)
+  const exprt &lemma, bool _simplify)
 {
   if(!seen_instances.insert(lemma).second)
     return;
 
-  if(add_to_index_set)
-    cur.push_back(lemma);
+  cur.push_back(lemma);
 
   exprt simple_lemma=lemma;
   if(_simplify)
