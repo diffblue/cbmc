@@ -23,8 +23,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/bv_refinement.h>
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <util/refined_string_type.h>
+#include <util/replace_expr.h>
 #include <util/string_expr.h>
 #include <langapi/language_util.h>
+#include <java_bytecode/java_types.h>
 
 /*! \brief Universally quantified string constraint
 
@@ -49,52 +51,37 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
     is another implication which can be pushed in to \f$L(n)\f$.
 */
 
-class string_constraintt final: public exprt
+struct string_constraintt final
 {
-public:
+  exprt premise=true_exprt(); // Index guard
+  exprt body; // value constraint
+  symbol_exprt univ_var;
+  exprt lower_bound=from_integer(0, java_int_type());
+  exprt upper_bound;
   // String constraints are of the form
   // forall univ_var in [lower_bound,upper_bound[. premise => body
-
-  const exprt &premise() const
+  void replace(replace_mapt& symbol_resolve)
   {
-    return op0();
-  }
+    replace_expr(symbol_resolve, premise);
+    replace_expr(symbol_resolve, body);
+    replace_expr(symbol_resolve, univ_var);
+    replace_expr(symbol_resolve, upper_bound);
+    replace_expr(symbol_resolve, lower_bound);
+  };
 
-  const exprt &body() const
-  {
-    return op1();
-  }
+  string_constraintt() = delete;
 
-  const symbol_exprt &univ_var() const
-  {
-    return to_symbol_expr(op2());
-  }
-
-  const exprt &upper_bound() const
-  {
-    return op3();
-  }
-
-  const exprt &lower_bound() const
-  {
-    return operands()[4];
-  }
-
- private:
-  string_constraintt();
-
- public:
   string_constraintt(
     const symbol_exprt &_univ_var,
     const exprt &bound_inf,
     const exprt &bound_sup,
-    const exprt &prem, // Index guard
-    const exprt &body): // value constraint
-    exprt(ID_string_constraint)
-  {
-    copy_to_operands(prem, body);
-    copy_to_operands(_univ_var, bound_sup, bound_inf);
-  }
+    const exprt &prem,
+    const exprt &body):
+    premise(prem),
+    body(body),
+    univ_var(_univ_var),
+    lower_bound(bound_inf),
+    upper_bound(bound_sup) { }
 
   // Default bound inferior is 0
   string_constraintt(
@@ -104,7 +91,7 @@ public:
     const exprt &body):
     string_constraintt(
       _univ_var,
-      from_integer(0, _univ_var.type()),
+      from_integer(0, java_int_type()),
       bound_sup,
       prem,
       body)
@@ -121,22 +108,10 @@ public:
   exprt univ_within_bounds() const
   {
     return and_exprt(
-      binary_relation_exprt(lower_bound(), ID_le, univ_var()),
-      binary_relation_exprt(upper_bound(), ID_gt, univ_var()));
+      binary_relation_exprt(lower_bound, ID_le, univ_var),
+      binary_relation_exprt(upper_bound, ID_gt, univ_var));
   }
 };
-
-extern inline const string_constraintt &to_string_constraint(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<const string_constraintt &>(expr);
-}
-
-extern inline string_constraintt &to_string_constraint(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<string_constraintt &>(expr);
-}
 
 /// Used for debug printing.
 /// \param [in] ns: namespace for `from_expr`
@@ -148,11 +123,11 @@ inline std::string from_expr(
   const irep_idt &identifier,
   const string_constraintt &expr)
 {
-  return "forall "+from_expr(ns, identifier, expr.univ_var())+" in ["+
-    from_expr(ns, identifier, expr.lower_bound())+", "+
-    from_expr(ns, identifier, expr.upper_bound())+"). "+
-    from_expr(ns, identifier, expr.premise())+" => "+
-    from_expr(ns, identifier, expr.body());
+  return "forall "+from_expr(ns, identifier, expr.univ_var)+" in ["+
+    from_expr(ns, identifier, expr.lower_bound)+", "+
+    from_expr(ns, identifier, expr.upper_bound)+"). "+
+    from_expr(ns, identifier, expr.premise)+" => "+
+    from_expr(ns, identifier, expr.body);
 }
 
 class string_not_contains_constraintt final: public exprt
