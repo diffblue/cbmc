@@ -85,9 +85,9 @@ json_objectt show_goto_functions_jsont::convert(
           json_arrayt operand_array;
           for(const exprt &operand : instruction.code.operands())
           {
-            json_objectt operand_object;
-            no_comments_irep_converter.convert_from_irep(
-              operand, operand_object);
+            json_objectt operand_object=
+              no_comments_irep_converter.convert_from_irep(
+                operand);
             operand_array.push_back(operand_object);
           }
           instruction_entry["operands"]=operand_array;
@@ -95,10 +95,9 @@ json_objectt show_goto_functions_jsont::convert(
 
         if(!instruction.guard.is_true())
         {
-          json_objectt guard_object;
-          no_comments_irep_converter.convert_from_irep(
-            instruction.guard,
-            guard_object);
+          json_objectt guard_object=
+            no_comments_irep_converter.convert_from_irep(
+              instruction.guard);
 
           instruction_entry["guard"]=guard_object;
         }
@@ -109,8 +108,10 @@ json_objectt show_goto_functions_jsont::convert(
       json_function["instructions"]=json_instruction_array;
     }
   }
+
   json_objectt json_result;
   json_result["functions"]=json_functions;
+
   return json_result;
 }
 
