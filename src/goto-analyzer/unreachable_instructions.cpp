@@ -128,8 +128,8 @@ void unreachable_instructions(
 {
   json_arrayt json_result;
 
-  std::set<irep_idt> called;
-  compute_called_functions(goto_model, called);
+  std::set<irep_idt> called=
+    compute_called_functions(goto_model);
 
   const namespacet ns(goto_model.symbol_table);
 
@@ -191,8 +191,8 @@ static void list_functions(
 {
   json_arrayt json_result;
 
-  std::set<irep_idt> called;
-  compute_called_functions(goto_model, called);
+  std::set<irep_idt> called=
+    compute_called_functions(goto_model);
 
   const namespacet ns(goto_model.symbol_table);
 
