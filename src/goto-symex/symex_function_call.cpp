@@ -282,8 +282,8 @@ void goto_symext::symex_function_call_code(
 
   // read the arguments -- before the locality renaming
   exprt::operandst arguments=call.arguments();
-  for(unsigned i=0; i<arguments.size(); i++)
-    state.rename(arguments[i], ns);
+  for(auto &a : arguments)
+    state.rename(a, ns);
 
   // produce a new frame
   assert(!state.call_stack().empty());

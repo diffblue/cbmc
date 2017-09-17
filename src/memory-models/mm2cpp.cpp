@@ -37,9 +37,8 @@ std::string mm2cppt::text2c(const irep_idt &src)
   std::string result;
   result.reserve(src.size());
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(const auto ch : id2string(src))
   {
-    char ch=src[i];
     if(isalnum(ch))
       result+=ch;
     else
