@@ -514,7 +514,7 @@ void goto_convertt::do_cpp_new(
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
-    for(unsigned i=0; i<code_type.parameters().size(); i++)
+    for(std::size_t i=0; i<code_type.parameters().size(); i++)
       if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
         new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
 

@@ -599,7 +599,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // create symbols for the parameters
         code_typet::parameterst &args=code_type.parameters();
-        unsigned i=0;
+        std::size_t i=0;
         for(auto &arg : args)
         {
           irep_idt base_name=arg.get_base_name();
@@ -640,7 +640,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           expr_call.arguments().reserve(args.size());
           expr_call.arguments().push_back(late_cast);
 
-          for(unsigned i=1; i < args.size(); i++)
+          for(std::size_t i=1; i < args.size(); i++)
           {
             expr_call.arguments().push_back(
               namespacet(symbol_table).lookup(
@@ -657,7 +657,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           code_func.arguments().reserve(args.size());
           code_func.arguments().push_back(late_cast);
 
-          for(unsigned i=1; i < args.size(); i++)
+          for(std::size_t i=1; i < args.size(); i++)
           {
             code_func.arguments().push_back(
               namespacet(symbol_table).lookup(

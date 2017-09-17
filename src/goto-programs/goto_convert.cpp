@@ -172,7 +172,7 @@ void goto_convertt::finish_gotos(goto_programt &dest)
       bool stack_is_prefix=true;
       if(label_stack.size()>goto_stack.size())
         stack_is_prefix=false;
-      for(unsigned i=0, ilim=label_stack.size();
+      for(std::size_t i=0, ilim=label_stack.size();
           i!=ilim && stack_is_prefix;
           ++i)
       {
@@ -2189,7 +2189,7 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler)
 {
-  const unsigned errors_before=
+  const std::size_t errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
   goto_convertt goto_convert(symbol_table, message_handler);

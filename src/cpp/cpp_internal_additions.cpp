@@ -20,7 +20,7 @@ std::string c2cpp(const std::string &s)
 
   result.reserve(s.size());
 
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::size_t i=0; i<s.size(); i++)
   {
     char ch=s[i];
 

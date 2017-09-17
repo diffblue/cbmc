@@ -78,7 +78,7 @@ irept cpp_exception_list(
   cpp_exception_list_rec(src, ns, "", ids);
   result.get_sub().resize(ids.size());
 
-  for(unsigned i=0; i<ids.size(); i++)
+  for(std::size_t i=0; i<ids.size(); i++)
     result.get_sub()[i].id(ids[i]);
 
   return result;

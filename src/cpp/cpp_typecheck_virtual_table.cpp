@@ -23,7 +23,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
   const struct_typet &struct_type=to_struct_type(symbol.type);
 
-  for(unsigned i=0; i < struct_type.components().size(); i++)
+  for(std::size_t i=0; i < struct_type.components().size(); i++)
   {
     const struct_typet::componentt &compo=struct_type.components()[i];
     if(!compo.get_bool("is_virtual"))
@@ -83,7 +83,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
     exprt values(ID_struct, symbol_typet(vt_symb_type.name));
 
-    for(unsigned i=0; i < vt_type.components().size(); i++)
+    for(std::size_t i=0; i < vt_type.components().size(); i++)
     {
       const struct_typet::componentt &compo=vt_type.components()[i];
       std::map<irep_idt, exprt>::const_iterator cit2 =

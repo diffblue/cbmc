@@ -794,7 +794,7 @@ void value_set_fivrnst::assign(
   {
     const struct_typet &struct_type=to_struct_type(type);
 
-    unsigned no=0;
+    std::size_t no=0;
 
     for(struct_typet::componentst::const_iterator
         c_it=struct_type.components().begin();
@@ -1165,7 +1165,7 @@ void value_set_fivrnst::do_function_call(
   to_function=from_function;
   to_target_index=from_target_index;
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
@@ -1187,7 +1187,7 @@ void value_set_fivrnst::do_function_call(
 
   // now assign to 'actual actuals'
 
-  unsigned i=0;
+  std::size_t i=0;
 
   for(code_typet::parameterst::const_iterator
       it=parameter_types.begin();

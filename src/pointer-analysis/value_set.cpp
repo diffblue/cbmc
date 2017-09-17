@@ -1435,7 +1435,7 @@ void value_sett::do_function_call(
   // to avoid overwriting actuals that are needed for recursive
   // calls
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::dummy_arg_"+std::to_string(i);
     exprt dummy_lhs=symbol_exprt(identifier, arguments[i].type());
