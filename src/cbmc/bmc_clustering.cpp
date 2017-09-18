@@ -63,6 +63,12 @@ safety_checkert::resultt bmc_clusteringt::step(
 
     if(symex_state.call_stack().empty())
     {
+      if(symex().learning_symex)
+      {
+        symex().backtrack_learn(symex_state);
+        //symex().print_learnt_map();
+      }
+
       if(!symex().states.empty())
       {
         pick_up_a_new_state();
@@ -71,6 +77,9 @@ safety_checkert::resultt bmc_clusteringt::step(
       }
       else break;
     }
+
+    if(symex().learning_symex)
+      symex().add_latest_learnt_info(symex_state, goto_functions);
 
     if(symex_state.source.pc->type==ASSERT)
     {
@@ -91,11 +100,12 @@ safety_checkert::resultt bmc_clusteringt::step(
     {
       goto_symext::statet state=symex_state;
       // depth-first
-      if(!symex_state.locations.back().if_branch)
+      if(symex_state.locations.back().goto_branch
+        ==symex_targett::sourcet::EMPTY)
       {
-        state.locations.back().if_branch=true;
         if(reachable_if())
         {
+          state.locations.back().goto_branch=symex_targett::sourcet::IF;
           symex().states.push_back(state);
           ++symex().recorded_states;
           equations.push_back(equation);
@@ -103,8 +113,9 @@ safety_checkert::resultt bmc_clusteringt::step(
           continue;
         }
 
-        if(reachable_else())
+        else // if(reachable_else())
         {
+          state.locations.back().goto_branch=symex_targett::sourcet::ELSE;
           symex().add_goto_else_assumption(symex_state, goto_functions);
           continue;
         }
@@ -114,6 +125,7 @@ safety_checkert::resultt bmc_clusteringt::step(
       {
         if(reachable_else())
         {
+          state.locations.back().goto_branch=symex_targett::sourcet::ELSE;
           symex().add_goto_else_assumption(symex_state, goto_functions);
           continue;
         }
@@ -130,6 +142,9 @@ safety_checkert::resultt bmc_clusteringt::step(
 
   report_success();
 
+  result() << "#Visited states: "
+    << (symex().recorded_states-symex().states.size())
+    << eom;
   return safety_checkert::resultt::SAFE;
 }
 
@@ -353,9 +368,22 @@ void bmc_clusteringt::setup_clustering_unwind()
 
 void bmc_clusteringt::pick_up_a_new_state()
 {
-  symex_state=symex().states.back();
-  symex().states.pop_back();
-  equation=equations.back();
-  equations.pop_back();
+  if(symex_method=="fifo")
+  {
+    // fifo
+    symex_state=symex().states.front();
+    symex().states.erase(symex().states.begin());
+    equation=equations.front();
+    equations.erase(equations.begin());
+  }
+  else
+  {
+    // dfs
+    symex_state=symex().states.back();
+    symex().states.pop_back();
+    equation=equations.back();
+    equations.pop_back();
+  }
+
   symex().create_a_cluster(symex_state, equation);
 }

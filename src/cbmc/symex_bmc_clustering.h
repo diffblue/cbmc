@@ -67,6 +67,15 @@ class symex_bmc_clusteringt:
 
   virtual void symex_guard_goto(statet &state, const exprt &guard);
 
+  bool learning_symex;
+  typedef std::map<symex_targett::sourcet, exprt> learnt_mapt;
+  learnt_mapt learnt_map;
+  void backtrack_learn(statet &state);
+  void print_learnt_map();
+  void add_latest_learnt_info(
+    statet &state,
+    const goto_functionst &goto_functions);
+
 protected:
 };
 

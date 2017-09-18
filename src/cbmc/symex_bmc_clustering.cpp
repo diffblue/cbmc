@@ -64,6 +64,13 @@ void symex_bmc_clusteringt::operator()(
   while(!state.call_stack().empty())
   {
     state.locations.push_back(state.source);
+
+    if(learning_symex)
+    {
+      if(learnt_map.find(state.source)==learnt_map.end())
+        learnt_map[state.source]=false_exprt();
+    }
+
 #if 0
     std::cout << "[inside operator]: " << state.source.pc->source_location
       << ", " << state.source.pc->type
@@ -435,4 +442,87 @@ void symex_bmc_clusteringt::symex_guard_goto(statet &state, const exprt &guard)
       new_state.guard.add(guard_expr);
     }
   }
+}
+
+void symex_bmc_clusteringt::backtrack_learn(statet &state)
+{
+  exprt learnt_expr=true_exprt();
+  for(auto it=state.locations.rbegin(); it!=state.locations.rend(); ++it)
+  {
+    if(it->pc->type==ASSERT)
+      learnt_expr=and_exprt(learnt_expr, it->pc->guard);
+    else if(it->pc->type==ASSUME)
+      learnt_expr=or_exprt(learnt_expr, it->pc->guard);
+    else if(it->pc->type==GOTO)
+    {
+      // manual weakest-pre for goto
+      codet code=it->pc->code;
+      code.set_statement(ID_assume);
+      code.operands().push_back(it->pc->guard);
+      if(it->goto_branch==symex_targett::sourcet::goto_brancht::IF)
+        code.op0().make_not();
+      learnt_expr=wp(code, learnt_expr, ns);
+      exprt tmp(it->pc->guard);
+      if(it->goto_branch==symex_targett::sourcet::goto_brancht::IF)
+        tmp.make_not();
+
+      POSTCONDITION(learnt_expr.operands().size()==2);
+
+      or_exprt or_expr;
+      or_expr.operands().push_back(learnt_expr.op0());
+      or_expr.operands().push_back(learnt_expr.op1());
+      or_expr.op0().make_not();
+      // manually (!A||B)&&C to !A&&C || B&&C
+      or_expr.op0()=and_exprt(or_expr.op0(), tmp);
+      or_expr.op1()=and_exprt(or_expr.op1(), tmp);
+      learnt_expr=or_expr;
+    }
+    else if(it->pc->type==ASSIGN)
+    {
+      learnt_expr=wp(it->pc->code, learnt_expr, ns);
+    }
+
+    if(it->pc->incoming_edges.size()>1)
+    {
+      bool backwards_loop=false;
+      for(auto &in: it->pc->incoming_edges)
+      {
+        if(it->pc->location_number<in->location_number)
+        {
+          backwards_loop=true;
+          break;
+        }
+      }
+      if(backwards_loop)
+        continue;
+      learnt_map[*it]=or_exprt(learnt_map[*it], learnt_expr);
+    }
+  }
+  for(auto &x: learnt_map) do_simplify(x.second);
+}
+
+void symex_bmc_clusteringt::print_learnt_map()
+{
+  std::cout << "\n[***The map learnt ***]\n";
+  for(auto &x: learnt_map)
+  {
+    if(x.second.is_false()) continue;
+    std::cout << x.first.pc->source_location;
+    std::cout << ": ";
+    std::cout << from_expr(x.second) << "\n";
+  }
+}
+
+void symex_bmc_clusteringt::add_latest_learnt_info(
+  statet &state,
+  const goto_functionst &goto_functions)
+{
+  auto &x=state.locations.back();
+  if(learnt_map[x].is_false()) return; //continue;
+  std::cout << "Added learnt info: " << from_expr(learnt_map[x]) << ", "
+    << state.source.pc->source_location << "\n";
+  exprt tmp(learnt_map[x]);
+  tmp.make_not();
+  clean_expr(tmp, state, false);
+  vcc(tmp, "", state);
 }

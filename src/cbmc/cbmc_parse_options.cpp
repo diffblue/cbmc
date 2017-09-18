@@ -163,7 +163,17 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("clustering"))
   {
     options.set_option("clustering", true);
-      options.set_option("trace", true);
+    options.set_option("trace", true);
+    if(cmdline.isset("learning-symex"))
+      options.set_option("learning-symex", true);
+    else
+      options.set_option("learning-symex", false);
+    if(cmdline.isset("symex-method"))
+    {
+      options.set_option(
+        "symex-method",
+        cmdline.get_value("symex-method"));
+    }
   }
 
   if(cmdline.isset("localize-faults"))

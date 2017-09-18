@@ -69,7 +69,7 @@ class optionst;
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
-  "(clustering)" \
+  "(clustering)(learning-symex)(symex-method):" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
 class cbmc_parse_optionst:

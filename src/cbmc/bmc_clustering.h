@@ -41,6 +41,9 @@ public:
       goto_functions(_goto_functions),
       symex_clustering(ns, new_symbol_table, equation)
   {
+    symex().learning_symex=options.get_bool_option("learning-symex");
+    if(options.get_option("symex-method")=="fifo")
+      symex_method="fifo";
     symex().constant_propagation=options.get_bool_option("propagation");
     equations.push_back(equation);
     symex().create_a_cluster(symex_state, equations[0]);
@@ -66,6 +69,7 @@ public:
 
   void do_conversion(prop_convt &prop_conv);
 protected:
+  std::string symex_method="dfs";
   const goto_functionst &goto_functions;
 
   goto_symext::statet symex_state;
