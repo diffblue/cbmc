@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 
-#include <iostream>
-
 #include <util/time_stopping.h>
 #include <util/xml.h>
 #include <util/xml_expr.h>
@@ -185,10 +183,6 @@ void bmc_covert::satisfying_assignment()
       goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
       break;
     }
-
-  #if 0
-  show_goto_trace(std::cout, bmc.ns, test.goto_trace);
-  #endif
 }
 
 bool bmc_covert::operator()()
@@ -220,8 +214,6 @@ bool bmc_covert::operator()()
   // Do conversion to next solver layer
 
   bmc.do_conversion();
-
-  // bmc.equation.output(std::cout);
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
@@ -278,26 +270,25 @@ bool bmc_covert::operator()()
   {
     case ui_message_handlert::uit::PLAIN:
     {
-      status() << "\n** coverage results:" << eom;
+      result() << "\n** coverage results:" << eom;
 
       for(const auto &g : goal_map)
       {
         const goalt &goal=g.second;
 
-        status() << "[" << g.first << "]";
+        result() << "[" << g.first << "]";
 
         if(goal.source_location.is_not_nil())
-          status() << ' ' << goal.source_location;
+          result() << ' ' << goal.source_location;
 
         if(!goal.description.empty())
-          status() << ' ' << goal.description;
+          result() << ' ' << goal.description;
 
-        status() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
-                 << eom;
+        result() << ": " << (goal.satisfied?"SATISFIED":"FAILED")
+                 << '\n';
       }
 
-      status() << '\n';
-
+      result() << eom;
       break;
     }
 
@@ -315,7 +306,7 @@ bool bmc_covert::operator()()
         if(goal.source_location.is_not_nil())
           xml_result.new_element()=xml(goal.source_location);
 
-        std::cout << xml_result << "\n";
+        result() << xml_result;
       }
 
       for(const auto &test : tests)
@@ -348,7 +339,7 @@ bool bmc_covert::operator()()
           xml_goal.set_attribute("id", id2string(goal_id));
         }
 
-        std::cout << xml_result << "\n";
+        result() << xml_result;
       }
       break;
     }
@@ -404,7 +395,8 @@ bool bmc_covert::operator()()
           goal_refs.push_back(json_stringt(id2string(goal_id)));
         }
       }
-      std::cout << ",\n" << json_result;
+
+      result() << json_result;
       break;
     }
   }
@@ -422,10 +414,12 @@ bool bmc_covert::operator()()
 
   if(bmc.ui==ui_message_handlert::uit::PLAIN)
   {
-    std::cout << "Test suite:" << '\n';
+    result() << "Test suite:" << '\n';
 
     for(const auto &test : tests)
-      std::cout << get_test(test.goto_trace) << '\n';
+      result() << get_test(test.goto_trace) << '\n';
+
+    result() << eom;
   }
 
   return false;
