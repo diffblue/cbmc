@@ -142,9 +142,7 @@ bool initialize_goto_model(
         goto_model.goto_functions);
 
       if(start_function_rebuilder(function_id))
-      {
-        return 6;
-      }
+        return true;
     }
 
     msg.status() << "Generating GOTO Program" << messaget::eom;
