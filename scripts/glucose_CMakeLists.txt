@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.2)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
 set(CMAKE_OSX_ARCHITECTURES "i386;x86_64")
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 add_library(glucose-condensed
     simp/SimpSolver.cc
