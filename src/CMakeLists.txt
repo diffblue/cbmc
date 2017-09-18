@@ -101,8 +101,12 @@ ExternalProject_Add(minisat2-extern
     PREFIX ${extern_location}
     URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
     PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat-2.2.1-patch
-          COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat2_CMakeLists.txt CMakeLists.txt
-          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCBMC_INCLUDE_DIR:path=${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat2_CMakeLists.txt CMakeLists.txt
+    CMAKE_ARGS
+      "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
+      "-DCBMC_INCLUDE_DIR:path=${CMAKE_CURRENT_SOURCE_DIR}"
+      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
     BUILD_BYPRODUCTS ${minisat_lib}
 )
 
@@ -125,8 +129,11 @@ ExternalProject_Add(glucose-extern
     PREFIX ${extern_location}
     URL http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
     PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/glucose-syrup-patch
-          COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/glucose_CMakeLists.txt CMakeLists.txt
-          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
+    COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/glucose_CMakeLists.txt CMakeLists.txt
+    CMAKE_ARGS
+      "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
+      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
     BUILD_BYPRODUCTS ${glucose_lib}
 )
 
