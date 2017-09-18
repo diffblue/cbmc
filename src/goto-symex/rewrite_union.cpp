@@ -119,6 +119,13 @@ static void rewrite_union(
 }
 
 void rewrite_union(
+  goto_functionst::goto_functiont &goto_function,
+  const symbol_tablet &symbol_table)
+{
+  rewrite_union(goto_function, namespacet(symbol_table));
+}
+
+void rewrite_union(
   goto_functionst &goto_functions,
   const namespacet &ns)
 {
@@ -128,6 +135,6 @@ void rewrite_union(
 
 void rewrite_union(goto_modelt &goto_model)
 {
-  namespacet ns(goto_model.symbol_table);
-  rewrite_union(goto_model.goto_functions, ns);
+  rewrite_union(
+    goto_model.goto_functions, namespacet(goto_model.symbol_table));
 }

@@ -22,26 +22,19 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 class remove_instanceoft
 {
 public:
-  remove_instanceoft(
-    symbol_tablet &_symbol_table,
-    goto_functionst &_goto_functions):
-    symbol_table(_symbol_table),
-    ns(_symbol_table),
-    goto_functions(_goto_functions)
+  explicit remove_instanceoft(symbol_tablet &symbol_table)
+  : symbol_table(symbol_table), ns(symbol_table)
   {
-    class_hierarchy(_symbol_table);
+    class_hierarchy(symbol_table);
   }
 
-  // Lower instanceof for all functions:
-  void lower_instanceof();
+  // Lower instanceof for a single functions
+  bool lower_instanceof(goto_programt &);
 
 protected:
   symbol_tablet &symbol_table;
   namespacet ns;
   class_hierarchyt class_hierarchy;
-  goto_functionst &goto_functions;
-
-  bool lower_instanceof(goto_programt &);
 
   bool lower_instanceof(goto_programt &, goto_programt::targett);
 
@@ -174,33 +167,38 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
   return true;
 }
 
-/// See function above
-/// \return Side-effects on this->goto_functions, replacing every instanceof in
-///   every function with an explicit test.
-void remove_instanceoft::lower_instanceof()
+
+/// Replace every instanceof in the passed function with an explicit
+/// class-identifier test.
+/// Extra auxiliary variables may be introduced into symbol_table.
+/// \param function: The function to work on.
+/// \param symbol_table: The symbol table to add symbols to.
+void remove_instanceof(
+  goto_functionst::goto_functiont &function,
+  symbol_tablet &symbol_table)
 {
+  remove_instanceoft rem(symbol_table);
+  rem.lower_instanceof(function.body);
+}
+
+/// Replace every instanceof in every function with an explicit
+/// class-identifier test.
+/// Extra auxiliary variables may be introduced into symbol_table.
+/// \param goto_functions: The functions to work on.
+/// \param symbol_table: The symbol table to add symbols to.
+void remove_instanceof(
+  goto_functionst &goto_functions,
+  symbol_tablet &symbol_table)
+{
+  remove_instanceoft rem(symbol_table);
   bool changed=false;
   for(auto &f : goto_functions.function_map)
-    changed=(lower_instanceof(f.second.body) || changed);
+    changed=rem.lower_instanceof(f.second.body) || changed;
   if(changed)
     goto_functions.compute_location_numbers();
 }
 
-/// See function above
-/// \par parameters: `goto_functions`, a function map, and the corresponding
-/// `symbol_table`.
-/// \return Side-effects on goto_functions, replacing every instanceof in every
-///   function with an explicit test. Extra auxiliary variables may be
-///   introduced into `symbol_table`.
-void remove_instanceof(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
-{
-  remove_instanceoft rem(symbol_table, goto_functions);
-  rem.lower_instanceof();
-}
-
 void remove_instanceof(goto_modelt &goto_model)
 {
-  remove_instanceof(goto_model.symbol_table, goto_model.goto_functions);
+  remove_instanceof(goto_model.goto_functions, goto_model.symbol_table);
 }
