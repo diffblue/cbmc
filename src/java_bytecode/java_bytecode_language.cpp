@@ -42,11 +42,14 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   string_refinement_enabled=cmd.isset("refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   if(cmd.isset("java-max-input-array-length"))
-    max_nondet_array_length=
+    object_factory_parameters.max_nondet_array_length=
       std::stoi(cmd.get_value("java-max-input-array-length"));
   if(cmd.isset("java-max-input-tree-depth"))
-    max_nondet_tree_depth=
+    object_factory_parameters.max_nondet_tree_depth=
       std::stoi(cmd.get_value("java-max-input-tree-depth"));
+  if(cmd.isset("string-max-input-length"))
+    object_factory_parameters.max_nondet_string_length=
+      std::stoi(cmd.get_value("string-max-input-length"));
   if(cmd.isset("java-max-vla-length"))
     max_user_array_length=std::stoi(cmd.get_value("java-max-vla-length"));
   if(cmd.isset("lazy-methods-context-sensitive"))
@@ -125,8 +128,7 @@ bool java_bytecode_languaget::generate_start_function(
     symbol_table,
     get_message_handler(),
     assume_inputs_non_null,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    object_factory_parameters,
     *pointer_type_selector);
 }
 
@@ -402,8 +404,7 @@ bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
       main_class,
       get_message_handler(),
       assume_inputs_non_null,
-      max_nondet_array_length,
-      max_nondet_tree_depth,
+      object_factory_parameters,
       get_pointer_type_selector());
 }
 

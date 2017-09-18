@@ -58,15 +58,7 @@ class java_object_factoryt
   /// methods in this class.
   const source_locationt &loc;
 
-  /// Maximum value for the non-deterministically-chosen length of an array.
-  const size_t max_nondet_array_length;
-
-  /// Used to prevent the methods in this class to loop infinitely during the
-  /// generation of code that allocates/initializes data structures of recursive
-  /// data types or unbounded depth. We bound the maximum number of times we
-  /// dereference a pointer using a 'depth counter'. We set a pointer to null if
-  /// such depth becomes >= than this maximum value.
-  const size_t max_nondet_tree_depth;
+  const object_factory_parameterst object_factory_parameters;
 
   /// This is employed in conjunction with the depth above. Every time the
   /// non-det generator visits a type, the type is added to this set. We forbid
@@ -107,14 +99,12 @@ public:
   java_object_factoryt(
     std::vector<const symbolt *> &_symbols_created,
     const source_locationt &loc,
-    size_t _max_nondet_array_length,
-    size_t _max_nondet_tree_depth,
+    const object_factory_parameterst _object_factory_parameters,
     symbol_tablet &_symbol_table,
     const select_pointer_typet &pointer_type_selector):
       symbols_created(_symbols_created),
       loc(loc),
-      max_nondet_array_length(_max_nondet_array_length),
-      max_nondet_tree_depth(_max_nondet_tree_depth),
+      object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
       ns(_symbol_table),
       pointer_type_selector(pointer_type_selector)
@@ -591,7 +581,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     // If this is a recursive type of some kind AND the depth is exceeded, set
     // the pointer to null.
     if(!recursion_set_entry.insert_entry(struct_tag) &&
-      depth>=max_nondet_tree_depth)
+      depth>=object_factory_parameters.max_nondet_tree_depth)
     {
       if(update_in_place==update_in_placet::NO_UPDATE_IN_PLACE)
       {
@@ -760,6 +750,19 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   return new_symbol.symbol_expr();
 }
 
+/// Get max value for an integral type
+/// \param type:
+///   Type to find maximum value for
+/// \return Maximum integral valu
+static size_t max_value(const typet& type)
+{
+  if(type.id()==ID_signedbv)
+    return std::numeric_limits<int32_t>::max();
+  else if(type.id()==ID_unsignedbv)
+    return std::numeric_limits<uint32_t>::max();
+  UNREACHABLE;
+}
+
 /// Initializes an object tree rooted at `expr`, allocating child objects as
 /// necessary and nondet-initializes their members, or if MUST_UPDATE_IN_PLACE
 /// is set, re-initializes already-allocated objects.
@@ -863,6 +866,30 @@ void java_object_factoryt::gen_nondet_struct_init(
         true,    // allow_null always true for sub-objects
         depth,
         substruct_in_place);
+
+      if(name=="length")
+      {
+        if(class_identifier=="java.lang.String" ||
+           class_identifier=="java.lang.StringBuffer" ||
+           class_identifier=="java.lang.StringBuilder")
+        {
+          if(object_factory_parameters.max_nondet_string_length <=
+             max_value(me.type()))
+          {
+            exprt max_length=from_integer(
+              object_factory_parameters.max_nondet_string_length, me.type());
+            assignments.add(code_assumet(
+              binary_relation_exprt(me, ID_le, max_length)));
+          }
+        }
+        else
+        {
+          INVARIANT(
+            class_identifier!="java.lang.CharSequence" &&
+              class_identifier!="java.lang.AbstractStringBuilder",
+            "Trying to initialize abstract class");
+        }
+      }
     }
   }
 }
@@ -1043,7 +1070,8 @@ void java_object_factoryt::gen_nondet_array_init(
   const typet &element_type=
     static_cast<const typet &>(expr.type().subtype().find(ID_C_element_type));
 
-  auto max_length_expr=from_integer(max_nondet_array_length, java_int_type());
+  auto max_length_expr=from_integer(
+    object_factory_parameters.max_nondet_array_length, java_int_type());
 
   // In NO_UPDATE_IN_PLACE mode we allocate a new array and recursively
   // initialize its elements
@@ -1198,8 +1226,7 @@ exprt object_factory(
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &parameters,
   allocation_typet alloc_type,
   const source_locationt &loc,
   const select_pointer_typet &pointer_type_selector)
@@ -1226,8 +1253,7 @@ exprt object_factory(
   java_object_factoryt state(
     symbols_created,
     loc,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    parameters,
     symbol_table,
     pointer_type_selector);
   code_blockt assignments;
@@ -1279,12 +1305,8 @@ exprt object_factory(
 ///   when \p allow_null is false (as this parameter is not inherited by
 ///   subsequent recursive calls).  Has no effect when \p expr is not
 ///   pointer-typed.
-/// \param max_nondet_array_length:
-///   Upper bound on size of initialized arrays.
-/// \param max_nondet_tree_depth:
-///   Maximum depth in the object hirearchy (counted as the number of times a
-///   pointer is deferenced) created by the initialization code that will be
-///   emitted here.
+/// \param object_factory_parameters:
+///   Parameters for the generation of non deterministic objects.
 /// \param pointer_type_selector:
 ///   The pointer_selector to use to resolve pointer types where required.
 /// \param update_in_place:
@@ -1304,8 +1326,7 @@ void gen_nondet_init(
   bool skip_classid,
   allocation_typet alloc_type,
   bool allow_null,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
 {
@@ -1314,8 +1335,7 @@ void gen_nondet_init(
   java_object_factoryt state(
     symbols_created,
     loc,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    object_factory_parameters,
     symbol_table,
     pointer_type_selector);
   code_blockt assignments;
@@ -1338,13 +1358,13 @@ void gen_nondet_init(
 }
 
 /// Call object_factory() above with a default (identity) pointer_type_selector
-exprt object_factory(const typet &type,
+exprt object_factory(
+  const typet &type,
   const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   allocation_typet alloc_type,
   const source_locationt &location)
 {
@@ -1355,23 +1375,22 @@ exprt object_factory(const typet &type,
     init_code,
     allow_null,
     symbol_table,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    object_factory_parameters,
     alloc_type,
     location,
     pointer_type_selector);
 }
 
 /// Call gen_nondet_init() above with a default (identity) pointer_type_selector
-void gen_nondet_init(const exprt &expr,
+void gen_nondet_init(
+  const exprt &expr,
   code_blockt &init_code,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
   bool allow_null,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place)
 {
   select_pointer_typet pointer_type_selector;
@@ -1383,8 +1402,7 @@ void gen_nondet_init(const exprt &expr,
     skip_classid,
     alloc_type,
     allow_null,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    object_factory_parameters,
     pointer_type_selector,
     update_in_place);
 }

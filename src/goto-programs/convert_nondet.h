@@ -18,26 +18,24 @@ class goto_functionst;
 class symbol_tablet;
 class goto_modelt;
 class message_handlert;
+struct object_factory_parameterst;
 
 /// Replace calls to nondet library functions with an internal nondet
 /// representation.
 /// \param goto_functions: The set of goto programs to modify.
 /// \param symbol_table: The symbol table to query/update.
 /// \param message_handler: For error logging.
-/// \param max_nondet_array_length: The maximum length of any new arrays.
-/// \param max_nondet_tree_depth: Maximum depth for object hierarchy on input
-///   parameterers.
+/// \param object_factory_parameters: Parameters for the generation of nondet
+///   objects.
 void convert_nondet(
   goto_functionst &,
   symbol_tablet &,
   message_handlert &,
-  std::size_t max_nondet_array_length,
-  std::size_t max_nondet_tree_depth);
+  const object_factory_parameterst &object_factory_parameters);
 
 void convert_nondet(
   goto_modelt &,
   message_handlert &,
-  std::size_t max_nondet_array_length,
-  std::size_t max_nondet_tree_depth);
+  const object_factory_parameterst &object_factory_parameters);
 
 #endif
