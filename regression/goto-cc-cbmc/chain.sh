@@ -1,12 +1,18 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-SRC=../../../src
+goto_cc=$1
+cbmc=$2
+is_windows=$3
 
-GC=$SRC/goto-cc/goto-cc
-CBMC=$SRC/cbmc/cbmc
+options=${*:4:$#-4}
+name=${*:$#}
+name=${name%.c}
 
-OPTS=$1
-NAME=${2%.c}
+if [[ "${is_windows}" == "true" ]]; then
+  "${goto_cc}" "${name}.c"
+  mv "${name}.exe" "${name}.gb"
+else
+  "${goto_cc}" "${name}.c" -o "${name}.gb"
+fi
 
-$GC $NAME.c -o $NAME.gb
-$CBMC $NAME.gb $OPTS
+"${cbmc}" "${name}.gb" ${options}
