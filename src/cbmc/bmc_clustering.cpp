@@ -81,6 +81,9 @@ safety_checkert::resultt bmc_clusteringt::step(
         std::cout << "\n" << "Counterexample:" << "\n";
         show_goto_trace(std::cout, ns, goto_trace);
         result() << "VERIFICATION FAILED" << eom;
+        result() << "#Visited states: "
+          << (symex().recorded_states-symex().states.size())
+          << eom;
         return safety_checkert::resultt::UNSAFE;
       }
     }
@@ -94,6 +97,7 @@ safety_checkert::resultt bmc_clusteringt::step(
         if(reachable_if())
         {
           symex().states.push_back(state);
+          ++symex().recorded_states;
           equations.push_back(equation);
           symex().add_goto_if_assumption(symex_state, goto_functions);
           continue;
@@ -146,10 +150,15 @@ safety_checkert::resultt bmc_clusteringt::run(
 {
   safety_checkert::resultt result;
 
+  absolute_timet sat_start=current_time();
+
   result=step(goto_functions);
 
   if(options.get_bool_option("show-vcc"))
     show_vcc();
+
+  absolute_timet sat_stop=current_time();
+  status() << "Runtime: " << (sat_stop-sat_start) << "s" << eom;
 
   return result;
 }

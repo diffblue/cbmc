@@ -51,6 +51,7 @@ class symex_bmc_clusteringt:
       const goto_functionst &goto_functions);
 
   std::vector<statet> states;
+  int recorded_states=1;
 
   static int counter;
 
