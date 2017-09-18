@@ -46,6 +46,7 @@ SRC = accelerate/accelerate.cpp \
       rw_set.cpp \
       show_locations.cpp \
       skip_loops.cpp \
+      splice_call.cpp \
       stack_depth.cpp \
       thread_instrumentation.cpp \
       undefined_functions.cpp \
