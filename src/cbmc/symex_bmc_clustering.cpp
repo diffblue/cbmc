@@ -485,7 +485,7 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
     if(it->pc->incoming_edges.size()>1)
     {
       bool backwards_loop=false;
-      for(auto &in: it->pc->incoming_edges)
+      for(auto &in : it->pc->incoming_edges)
       {
         if(it->pc->location_number<in->location_number)
         {
@@ -498,15 +498,16 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       learnt_map[*it]=or_exprt(learnt_map[*it], learnt_expr);
     }
   }
-  for(auto &x: learnt_map) do_simplify(x.second);
+  for(auto &x : learnt_map) do_simplify(x.second);
 }
 
 void symex_bmc_clusteringt::print_learnt_map()
 {
   std::cout << "\n[***The map learnt ***]\n";
-  for(auto &x: learnt_map)
+  for(auto &x : learnt_map)
   {
-    if(x.second.is_false()) continue;
+    if(x.second.is_false())
+      continue;
     std::cout << x.first.pc->source_location;
     std::cout << ": ";
     std::cout << from_expr(x.second) << "\n";
@@ -518,7 +519,8 @@ void symex_bmc_clusteringt::add_latest_learnt_info(
   const goto_functionst &goto_functions)
 {
   auto &x=state.locations.back();
-  if(learnt_map[x].is_false()) return; //continue;
+  if(learnt_map[x].is_false())
+    return;
   std::cout << "Added learnt info: " << from_expr(learnt_map[x]) << ", "
     << state.source.pc->source_location << "\n";
   exprt tmp(learnt_map[x]);

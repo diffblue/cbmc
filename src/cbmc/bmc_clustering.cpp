@@ -66,7 +66,7 @@ safety_checkert::resultt bmc_clusteringt::step(
       if(symex().learning_symex)
       {
         symex().backtrack_learn(symex_state);
-        //symex().print_learnt_map();
+        // symex().print_learnt_map();
       }
 
       if(!symex().states.empty())
