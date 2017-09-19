@@ -46,8 +46,7 @@ public:
     bool string_printable=false;
   };
 
-  explicit string_constraint_generatort(
-    const infot& info, const namespacet& ns);
+  string_constraint_generatort(const infot& info, const namespacet& ns);
 
   /// Axioms are of three kinds: universally quantified string constraint,
   /// not contains string constraints and simple formulas.
@@ -80,6 +79,11 @@ public:
     const function_application_exprt &expr);
 
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
+
+  /// remove functions applications and create the necessary axioms
+  /// \par parameters: an expression containing function applications
+  /// \return an expression containing no function application
+  exprt substitute_function_applications(const exprt& expr);
 
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);

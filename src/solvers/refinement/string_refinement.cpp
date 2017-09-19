@@ -39,32 +39,34 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
 static exprt instantiate(
-  const string_constraintt &axiom, const exprt &str, const exprt &val);
+  messaget::mstreamt &stream,
+  const string_constraintt &axiom,
+  const exprt &str,
+  const exprt &val);
 static bool is_char_array(const namespacet &ns, const typet &type);
 
 static bool is_valid_string_constraint(
-  messaget::mstreamt& stream,
-  const namespacet& ns,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
   const string_constraintt &expr);
 
-static bool is_axiom_sat(
-  const namespacet& ns,
+static optionalt<exprt> find_counter_example(
+  const namespacet &ns,
   ui_message_handlert::uit ui,
   const exprt &axiom,
-  const symbol_exprt& var,
-  exprt &witness);
+  const symbol_exprt &var);
 
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::vector<string_constraintt> &universal_axioms,
   const std::vector<string_not_contains_constraintt> &not_contains_axioms,
   string_constraint_generatort &generator,
-  std::function<exprt(const exprt&)> get,
+  std::function<exprt(const exprt &)> get,
   messaget::mstreamt &stream,
   const namespacet &ns,
   std::size_t max_string_length,
   bool use_counter_example,
   ui_message_handlert::uit ui,
-  const replace_mapt& symbol_resolve);
+  const replace_mapt &symbol_resolve);
 
 static void initial_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
@@ -93,12 +95,14 @@ static void update_index_set(
   const exprt &formula);
 
 static std::vector<exprt> instantiate_not_contains(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
   const string_not_contains_constraintt &axiom,
-  const std::map<exprt, std::set<exprt>>& index_set,
+  const std::map<exprt, std::set<exprt>> &index_set,
   const string_constraint_generatort &generator);
 
 static exprt get_array(
-  std::function<exprt(const exprt&)> super_get,
+  std::function<exprt(const exprt &)> super_get,
   const exprt &arr);
 
 /// Convert exprt to a specific type. Throw bad_cast if conversion
@@ -106,10 +110,10 @@ static exprt get_array(
 /// Generic case doesn't exist, specialize for different types accordingly
 /// TODO: this should go to util
 template<typename T>
-optionalt<T> expr_cast(const exprt&);
+optionalt<T> expr_cast(const exprt &);
 
 template<>
-optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
+optionalt<mp_integer> expr_cast<mp_integer>(const exprt &expr)
 {
   mp_integer out;
   if(to_integer(expr, out))
@@ -118,7 +122,7 @@ optionalt<mp_integer> expr_cast<mp_integer>(const exprt& expr)
 }
 
 template<>
-optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
+optionalt<std::size_t> expr_cast<std::size_t>(const exprt &expr)
 {
   if(const auto tmp=expr_cast<mp_integer>(expr))
   {
@@ -129,7 +133,7 @@ optionalt<std::size_t> expr_cast<std::size_t>(const exprt& expr)
 }
 
 template<>
-optionalt<string_exprt> expr_cast<string_exprt>(const exprt& expr)
+optionalt<string_exprt> expr_cast<string_exprt>(const exprt &expr)
 {
   if(is_refined_string_type(expr.type()))
   {
@@ -139,7 +143,7 @@ optionalt<string_exprt> expr_cast<string_exprt>(const exprt& expr)
 }
 
 template<typename T>
-T expr_cast_v(const exprt& expr)
+T expr_cast_v(const exprt &expr)
 {
   const auto maybe=expr_cast<T>(expr);
   INVARIANT(maybe, "Bad conversion");
@@ -163,7 +167,7 @@ static std::vector<T> fill_in_map_as_vector(
     for(auto it=index_value.rbegin(); it!=index_value.rend(); ++it)
     {
       const std::size_t index=it->first;
-      const T value=it->second;
+      const T& value=it->second;
       const auto next=std::next(it);
       const std::size_t leftmost_index_to_pad=
         next!=index_value.rend()
@@ -196,11 +200,11 @@ string_refinementt::string_refinementt(const infot &info):
 /// display the current index set, for debugging
 static void display_index_set(
   messaget::mstreamt stream,
-  const namespacet& ns,
-  const std::map<exprt, std::set<exprt>>& current_index_set,
-  const std::map<exprt, std::set<exprt>>& index_set)
+  const namespacet &ns,
+  const std::map<exprt, std::set<exprt>> &current_index_set,
+  const std::map<exprt, std::set<exprt>> &index_set)
 {
-  const auto eom = messaget::eom;
+  const auto eom=messaget::eom;
   std::size_t count=0;
   std::size_t count_current=0;
   for(const auto &i : index_set)
@@ -222,7 +226,7 @@ static void display_index_set(
     stream << "}"  << eom;
   }
   stream << count << " elements in index set (" << count_current
-          << " newly added)" << eom;
+         << " newly added)" << eom;
 }
 
 /// compute the index set for all formulas, instantiate the formulas with the
@@ -248,8 +252,9 @@ static void display_current_index_set(
 }
 
 static std::vector<exprt> generate_instantiations(
+  messaget::mstreamt &stream,
   const std::map<exprt, std::set<exprt>> &current_index_set,
-  const std::vector<string_constraintt>& universal_axioms)
+  const std::vector<string_constraintt> &universal_axioms)
 {
   std::vector<exprt> lemmas;
   for(const auto &i : current_index_set)
@@ -257,7 +262,7 @@ static std::vector<exprt> generate_instantiations(
     for(const auto &ua : universal_axioms)
     {
       for(const auto &j : i.second)
-        lemmas.push_back(instantiate(ua, i.first, j));
+        lemmas.push_back(instantiate(stream, ua, i.first, j));
     }
   }
   return lemmas;
@@ -296,7 +301,7 @@ static void depends_in_symbol_map(const exprt &expr, std::vector<exprt> &accu)
 ///             a string_exprt, an array_exprt, an array_of_exprt or an
 ///             if_exprt with branches of the previous kind
 void add_symbol_to_symbol_map(
-  replace_mapt& symbol_resolve,
+  replace_mapt &symbol_resolve,
   std::map<exprt, std::list<exprt>> &reverse_symbol_resolve,
   const exprt &lhs,
   const exprt &rhs)
@@ -359,28 +364,6 @@ std::vector<exprt> set_char_array_equality(const exprt &lhs, const exprt &rhs)
   // equality. Note that this might not be the case for other languages.
 }
 
-/// remove functions applications and create the necessary axioms
-/// \par parameters: an expression containing function applications
-/// \return an expression containing no function application
-exprt substitute_function_applications(
-  string_constraint_generatort& generator, exprt expr)
-{
-  for(size_t i=0; i<expr.operands().size(); ++i)
-  {
-    // TODO: only copy when necessary
-    exprt op(expr.operands()[i]);
-    expr.operands()[i]=substitute_function_applications(generator, op);
-  }
-
-  if(expr.id()==ID_function_application)
-  {
-    function_application_exprt f=to_function_application_expr(expr);
-    return generator.add_axioms_for_function_application(f);
-  }
-
-  return expr;
-}
-
 /// distinguish char array from other types
 ///
 /// TODO: this is only for java char array and does not work for other languages
@@ -399,10 +382,10 @@ static bool is_char_array(const namespacet &ns, const typet &type)
 /// \param rhs: right and side of the equality
 /// \return true if the assignemnt needs to be handled by the parent class
 ///         via `set_to`
-bool add_axioms_for_string_assigns(
-  replace_mapt& symbol_resolve,
+std::pair<bool, std::vector<exprt>> add_axioms_for_string_assigns(
+  replace_mapt &symbol_resolve,
   std::map<exprt, std::list<exprt>> &reverse_symbol_resolve,
-  string_constraint_generatort& generator,
+  string_constraint_generatort &generator,
   messaget::mstreamt &stream,
   const namespacet &ns,
   const exprt &lhs,
@@ -410,14 +393,15 @@ bool add_axioms_for_string_assigns(
 {
   if(is_char_array(ns, rhs.type()))
   {
-    if(rhs.id() == ID_symbol || rhs.id() == ID_array)
+    std::vector<exprt> lemmas=set_char_array_equality(lhs, rhs);
+    if(rhs.id()==ID_symbol || rhs.id()==ID_array)
     {
       add_symbol_to_symbol_map(
         symbol_resolve,
         reverse_symbol_resolve,
         lhs,
         rhs);
-      return false;
+      return { false, std::move(lemmas) };
     }
     else if(rhs.id()==ID_nondet_symbol)
     {
@@ -426,7 +410,7 @@ bool add_axioms_for_string_assigns(
         reverse_symbol_resolve,
         lhs,
         generator.fresh_symbol("nondet_array", lhs.type()));
-      return false;
+      return { false, std::move(lemmas) };
     }
     else if(rhs.id()==ID_if)
     {
@@ -435,13 +419,13 @@ bool add_axioms_for_string_assigns(
         reverse_symbol_resolve,
         lhs,
         rhs);
-      return true;
+      return { true, std::move(lemmas) };
     }
     else
     {
       stream << "ignoring char array " << from_expr(ns, "", rhs)
              << messaget::eom;
-      return true;
+      return { true, std::move(lemmas) };
     }
   }
   if(is_refined_string_type(rhs.type()))
@@ -452,10 +436,10 @@ bool add_axioms_for_string_assigns(
       reverse_symbol_resolve,
       lhs,
       refined_rhs);
-    return false;
+    return { false, std::vector<exprt>() };
   }
   // Other cases are to be handled by supert::set_to.
-  return true;
+  return { true, std::vector<exprt>() };
 }
 
 /// If the expression is of type string, then adds constants to the index set to
@@ -470,19 +454,18 @@ bool add_axioms_for_string_assigns(
 /// We do so by traversing the array backward, remembering the
 /// last value that has been initialized.
 static void concretize_string(
-  std::function<exprt(const exprt&)> get,
+  const std::function<exprt(const exprt &)> get,
   std::map<exprt, exprt> &found_length,
   std::map<exprt, array_exprt> &found_content,
   const replace_mapt &symbol_resolve,
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::size_t max_string_length,
+  const std::map<exprt, std::set<exprt>> &index_set,
+  const std::size_t max_string_length,
   messaget::mstreamt &stream,
   const namespacet &ns,
   const exprt &expr)
 {
   if(const auto str=expr_cast<string_exprt>(expr))
   {
-    const auto& eom=messaget::eom;
     const exprt length=get(str->length());
     exprt content=str->content();
     replace_expr(symbol_resolve, content);
@@ -492,12 +475,13 @@ static void concretize_string(
       string_length<=max_string_length,
       string_refinement_invariantt("string length must be less than the max "
         "length"));
-    if(index_set[str->content()].empty())
+    const auto it=index_set.find(str->content());
+    if(it==index_set.end() || it->second.empty())
       return;
 
     std::map<std::size_t, exprt> map;
 
-    for(const auto &i : index_set[str->content()])
+    for(const auto &i : it->second)
     {
       const exprt simple_i=simplify_expr(get(i), ns);
       if(const auto index=expr_cast<std::size_t>(simple_i))
@@ -509,13 +493,13 @@ static void concretize_string(
       else
       {
         stream << "concretize_string: ignoring out of bound index: "
-               << from_expr(ns, "", simple_i) << eom;
+               << from_expr(ns, "", simple_i) << messaget::eom;
       }
     }
     array_exprt arr(to_array_type(content.type()));
     arr.operands()=fill_in_map_as_vector(map);
     stream << "Concretized " << from_expr(ns, "", str->content())
-           << " = " << from_expr(ns, "", arr) << eom;
+           << "=" << from_expr(ns, "", arr) << messaget::eom;
     found_content[content]=arr;
   }
 }
@@ -524,16 +508,16 @@ static void concretize_string(
 /// to force the solver to pick concrete values for each character, and fill the
 /// map `found_length`
 std::vector<exprt> concretize_results(
-  std::function<exprt(const exprt&)> get,
+  const std::function<exprt(const exprt &)> get,
   std::map<exprt, exprt> &found_length,
   std::map<exprt, array_exprt> &found_content,
   const replace_mapt &symbol_resolve,
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::size_t max_string_length,
+  const std::map<exprt, std::set<exprt>> &index_set,
+  const std::size_t max_string_length,
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::set<string_exprt> &created_strings,
-  const std::map<exprt, std::set<exprt>>& current_index_set,
+  const std::map<exprt, std::set<exprt>> &current_index_set,
   const std::vector<string_constraintt> &universal_axioms)
 {
   for(const auto &it : symbol_resolve)
@@ -562,14 +546,14 @@ std::vector<exprt> concretize_results(
       ns,
       expr);
   }
-  return generate_instantiations(current_index_set, universal_axioms);
+  return generate_instantiations(stream, current_index_set, universal_axioms);
 }
 
 /// For each string whose length has been solved, add constants to the map
 /// `found_length`
 void concretize_lengths(
   std::map<exprt, exprt> &found_length,
-  std::function<exprt(const exprt&)> get,
+  const std::function<exprt(const exprt &)> get,
   const replace_mapt &symbol_resolve,
   const std::set<string_exprt> &created_strings)
 {
@@ -633,9 +617,9 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     // Preprocessing to remove function applications.
     debug() << "(sr::set_to) " << from_expr(ns, "", lhs)
-            << " = " << from_expr(ns, "", rhs) << eom;
+            << "=" << from_expr(ns, "", rhs) << eom;
 
-    const exprt subst_rhs=substitute_function_applications(generator, rhs);
+    const exprt subst_rhs=generator.substitute_function_applications(rhs);
     if(lhs.type()!=subst_rhs.type())
     {
       if(lhs.type().id()!=ID_array ||
@@ -655,12 +639,9 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     if(value)
     {
-      if(is_char_array(ns, rhs.type()))
-      {
-        for(const auto& lemma : set_char_array_equality(lhs, rhs))
-          add_lemma(lemma, false);
-      }
-      const bool not_handled=add_axioms_for_string_assigns(
+      bool not_handled;
+      std::vector<exprt> lemmas;
+      std::tie(not_handled, lemmas)=add_axioms_for_string_assigns(
         symbol_resolve,
         reverse_symbol_resolve,
         generator,
@@ -668,6 +649,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
         ns,
         lhs,
         subst_rhs);
+      for(const auto &lemma : lemmas)
+        add_lemma(lemma, false);
       if(!not_handled)
         return;
     }
@@ -735,7 +718,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   found_length.clear();
   found_content.clear();
 
-  const auto get = [this](const exprt& expr) { return this->get(expr); };
+  const auto get=[this](const exprt &expr) { return this->get(expr); };
 
   // Initial try without index set
   decision_proceduret::resultt res=supert::dec_solve();
@@ -756,7 +739,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       symbol_resolve);
     if(!success)
     {
-      for(const auto& lemma : lemmas)
+      for(const auto &lemma : lemmas)
         add_lemma(lemma);
       debug() << "check_SAT: got SAT but the model is not correct" << eom;
     }
@@ -775,8 +758,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_set, current_index_set, ns, universal_axioms);
   update_index_set(index_set, current_index_set, ns, cur);
   cur.clear();
-  for(const auto& lemma :
-        generate_instantiations(current_index_set, universal_axioms))
+  for(const auto &lemma :
+        generate_instantiations(debug(), current_index_set, universal_axioms))
     add_lemma(lemma);
   display_current_index_set(debug(), ns, current_index_set);
 
@@ -801,7 +784,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         symbol_resolve);
       if(!success)
       {
-        for(const auto& lemma : lemmas)
+        for(const auto &lemma : lemmas)
           add_lemma(lemma);
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
       }
@@ -824,8 +807,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       current_index_set.clear();
       update_index_set(index_set, current_index_set, ns, cur);
       cur.clear();
-      for(const auto& lemma :
-            generate_instantiations(current_index_set, universal_axioms))
+      for(const auto &lemma :
+            generate_instantiations(
+              debug(), current_index_set, universal_axioms))
         add_lemma(lemma);
       display_current_index_set(debug(), ns, current_index_set);
 
@@ -834,7 +818,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         debug() << "current index set is empty" << eom;
         if(config_.trace)
         {
-          const auto lemmas = concretize_results(
+          const auto lemmas=concretize_results(
             get,
             found_length,
             found_content,
@@ -846,7 +830,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
             generator.get_created_strings(),
             current_index_set,
             universal_axioms);
-          for(const auto& lemma : lemmas)
+          for(const auto &lemma : lemmas)
             add_lemma(lemma);
           display_current_index_set(debug(), ns, current_index_set);
           return resultt::D_SATISFIABLE;
@@ -860,13 +844,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       }
 
       display_index_set(debug(), ns, current_index_set, index_set);
-      debug()<< "instantiating NOT_CONTAINS constraints" << eom;
+      debug() << "instantiating NOT_CONTAINS constraints" << '\n';
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
-        debug()<< "constraint " << i << eom;
+        debug() << "constraint " << i << '\n';
         const std::vector<exprt> lemmas=
           instantiate_not_contains(
-            not_contains_axioms[i], index_set, generator);
+            debug(), ns, not_contains_axioms[i], index_set, generator);
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
@@ -898,7 +882,7 @@ bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
 /// \par parameters: a lemma and Boolean value stating whether the lemma should
 /// be added to the index set.
 void string_refinementt::add_lemma(
-  const exprt &lemma, bool _simplify)
+  const exprt &lemma, const bool _simplify)
 {
   if(!seen_instances.insert(lemma).second)
     return;
@@ -928,9 +912,9 @@ void string_refinementt::add_lemma(
 /// representing an integer
 /// \return an array expression or an array_of_exprt
 static exprt get_array(
-  std::function<exprt(const exprt&)> super_get,
+  const std::function<exprt(const exprt &)> super_get,
   const namespacet &ns,
-  std::size_t max_string_length,
+  const std::size_t max_string_length,
   const exprt &arr,
   const exprt &size)
 {
@@ -1015,7 +999,7 @@ static exprt get_array(
 /// \par parameters: an expression representing an array
 /// \return an expression
 static exprt get_array(
-  std::function<exprt(const exprt&)> super_get,
+  const std::function<exprt(const exprt &)> super_get,
   const exprt &arr)
 {
   exprt arr_model=super_get(arr);
@@ -1050,22 +1034,21 @@ void debug_model(
   const replace_mapt &symbol_resolve,
   messaget::mstreamt &stream,
   const namespacet &ns,
-  std::size_t max_string_length,
-  std::function<exprt(const exprt&)> super_get,
+  const std::size_t max_string_length,
+  const std::function<exprt(const exprt &)> super_get,
   const std::vector<symbol_exprt> &boolean_symbols,
   const std::vector<symbol_exprt> &index_symbols)
 {
-  const auto eom = messaget::eom;
   const std::string indent("  ");
   for(auto it : symbol_resolve)
   {
     if(const auto refined=expr_cast<string_exprt>(it.second))
     {
-      stream << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n";
-      stream << indent << indent << "in_map: "
-             << from_expr(ns, "", *refined) << eom;
-      stream << indent << indent << "resolved: "
-             << from_expr(ns, "", *refined) << eom;
+      stream << "- " << from_expr(ns, "", to_symbol_expr(it.first)) << ":\n"
+             << indent << indent << "in_map: "
+             << from_expr(ns, "", *refined) << '\n'
+             << indent << indent << "resolved: "
+             << from_expr(ns, "", *refined) << '\n';
       const exprt &econtent=refined->content();
       const exprt &elength=refined->length();
 
@@ -1083,7 +1066,7 @@ void debug_model(
         stream << indent << indent << "as_char_array: "
                << from_expr(ns, "", arr) << "\n";
 
-      stream << indent << indent << "size: " << from_expr(ns, "", len) << eom;
+      stream << indent << indent << "size: " << from_expr(ns, "", len) << '\n';
     }
     else
     {
@@ -1099,21 +1082,22 @@ void debug_model(
               << from_expr(ns, "", arr) << "\n";
       exprt arr_model=get_array(super_get, arr);
       stream << indent << indent << "char_array: "
-             << from_expr(ns, "", arr_model) << eom;
+             << from_expr(ns, "", arr_model) << '\n';
     }
   }
 
   for(const auto it : boolean_symbols)
   {
       stream << " - " << it.get_identifier() << ": "
-             << from_expr(ns, "", super_get(it)) << eom;
+             << from_expr(ns, "", super_get(it)) << '\n';
   }
 
   for(const auto it : index_symbols)
   {
      stream << " - " << it.get_identifier() << ": "
-            << from_expr(ns, "", super_get(it)) << eom;
+            << from_expr(ns, "", super_get(it)) << '\n';
   }
+  stream << messaget::eom;
 }
 
 /// Create a new expression where 'with' expressions on arrays are replaced by
@@ -1156,7 +1140,9 @@ static exprt substitute_array_with_expr(const exprt &expr, const exprt &index)
 /// \param string_max_length: bound on the length of strings
 /// \return an array expression with filled in values, or expr if it is simply
 ///   an `ARRAY_OF(x)` expression
-exprt fill_in_array_with_expr(const exprt &expr, std::size_t string_max_length)
+exprt fill_in_array_with_expr(
+  const exprt &expr,
+  const std::size_t string_max_length)
 {
   PRECONDITION(expr.type().id()==ID_array);
   PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
@@ -1398,15 +1384,15 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::vector<string_constraintt> &universal_axioms,
   const std::vector<string_not_contains_constraintt> &not_contains_axioms,
   string_constraint_generatort &generator,
-  std::function<exprt(const exprt&)> get,
+  std::function<exprt(const exprt &)> get,
   messaget::mstreamt &stream,
   const namespacet &ns,
   std::size_t max_string_length,
   bool use_counter_example,
   ui_message_handlert::uit ui,
-  const replace_mapt& symbol_resolve)
+  const replace_mapt &symbol_resolve)
 {
-  const auto eom = messaget::eom;
+  const auto eom=messaget::eom;
   stream << "string_refinementt::check_axioms:" << eom;
 
   #if 0
@@ -1423,7 +1409,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   std::map<size_t, exprt> violated;
 
   stream << "string_refinement::check_axioms: " << universal_axioms.size()
-          << " universal axioms:" << eom;
+         << " universal axioms:" << eom;
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
     const string_constraintt &axiom=universal_axioms[i];
@@ -1438,36 +1424,34 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
 
-    stream << "  "<< i << ".\n"
+    stream << "  " << i << ".\n"
            << "    - axiom:\n"
-           << "       " << from_expr(ns, "", axiom) << eom;
+           << "       " << from_expr(ns, "", axiom) << '\n';
     stream << "    - axiom_in_model:\n"
-           << "       " << from_expr(ns, "", axiom_in_model) << eom;
+           << "       " << from_expr(ns, "", axiom_in_model) << '\n';
     stream << "    - negated_axiom:\n"
-           << "       " << from_expr(ns, "", negaxiom) << eom;
+           << "       " << from_expr(ns, "", negaxiom) << '\n';
 
     exprt with_concretized_arrays=concretize_arrays_in_expression(
       negaxiom, max_string_length);
     stream << "    - negated_axiom_with_concretized_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
+           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
 
     substitute_array_access(with_concretized_arrays);
     stream << "    - negated_axiom_without_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << eom;
+           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
     exprt witness;
 
-    bool is_sat=is_axiom_sat(
-      ns, ui, with_concretized_arrays, univ_var, witness);
-
-    if(is_sat)
+    if(const auto witness=
+       find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
       stream << "  - violated_for: "
              << univ_var.get_identifier()
-             << " = " << from_expr(ns, "", witness) << eom;
-      violated[i]=witness;
+             << "=" << from_expr(ns, "", *witness) << '\n';
+      violated[i]=*witness;
     }
     else
-      stream << "  - correct" << eom;
+      stream << "  - correct" << '\n';
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
@@ -1502,16 +1486,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     stream << "(string_refinementt::check_axioms) Adding negated constraint: "
            << from_expr(ns, "", negaxiom) << eom;
     substitute_array_access(negaxiom);
-    exprt witness;
 
-    bool is_sat=is_axiom_sat(ns, ui, negaxiom, univ_var, witness);
-
-    if(is_sat)
+    if(const auto witness=find_counter_example(ns, ui, negaxiom, univ_var))
     {
       stream << "string constraint can be violated for "
              << univ_var.get_identifier()
-             << " = " << from_expr(ns, "", witness) << eom;
-      violated_not_contains[i]=witness;
+             << "=" << from_expr(ns, "", *witness) << eom;
+      violated_not_contains[i]=*witness;
     }
   }
 
@@ -1544,7 +1525,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         replace_expr(symbol_resolve, instance);
         replace_expr(axiom.univ_var(), val, instance);
         stream << "adding counter example " << from_expr(ns, "", instance)
-                << eom;
+               << eom;
         lemmas.push_back(instance);
       }
       return { false, lemmas };
@@ -1602,7 +1583,7 @@ static std::map<exprt, int> map_representation_of_sum(const exprt &f)
 static exprt sum_over_map(
   std::map<exprt, int> &m,
   const typet &type,
-  bool negated = false)
+  bool negated=false)
 {
   exprt sum=nil_exprt();
   mp_integer constants=0;
@@ -1686,7 +1667,10 @@ exprt simplify_sum(const exprt &f)
 ///   be equal to val. For instance, if `f` corresponds to the expression $q +
 ///   x$, `compute_inverse_function(q,v,f)` returns an expression for $v - x$.
 static exprt compute_inverse_function(
-  const exprt &qvar, const exprt &val, const exprt &f)
+  messaget::mstreamt &stream,
+  const exprt &qvar,
+  const exprt &val,
+  const exprt &f)
 {
   exprt positive, negative;
   // number of time the element should be added (can be negative)
@@ -1713,8 +1697,8 @@ static exprt compute_inverse_function(
       string_refinement_invariantt("a proper function must have exactly one "
         "occurrences after reduction, or it canceled out, and it does not have "
         " one"));
-    // debug() << "in string_refinementt::compute_inverse_function:"
-    //         << " warning: occurrences of qvar canceled out " << eom;
+    stream << "in string_refinementt::compute_inverse_function:"
+           << " warning: occurrences of qvar canceled out " << messaget::eom;
   }
 
   elems.erase(it);
@@ -1806,10 +1790,12 @@ static void add_to_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
   std::map<exprt, std::set<exprt>> &current_index_set,
   const namespacet &ns,
-  const exprt &s, exprt i)
+  const exprt &s,
+  exprt i)
 {
   simplify(i, ns);
-  if(i.id()!=ID_constant || expr_cast<size_t>(i))
+  const bool is_size_t=expr_cast<size_t>(i).has_value();
+  if(i.id()!=ID_constant || is_size_t)
   {
     for(const auto &sub : sub_arrays(s))
       if(index_set[sub].insert(i).second)
@@ -1922,7 +1908,7 @@ public:
 };
 
 /// Finds an index on `str` used in `expr` that contains `qvar`, for instance
-/// with arguments ``(str[k] == 'a')``, `str`, and `k`, the function should
+/// with arguments ``(str[k]=='a')``, `str`, and `k`, the function should
 /// return `k`.
 /// \param [in] expr: the expression to search
 /// \param [in] str: the string which must be indexed
@@ -1944,13 +1930,16 @@ static exprt find_index(
 ///   t[q]='b'$, `instantiate(axiom,s,v)` would return an expression for
 ///   $s[v]='a' && t[v-x]='b'$.
 static exprt instantiate(
-  const string_constraintt &axiom, const exprt &str, const exprt &val)
+  messaget::mstreamt &stream,
+  const string_constraintt &axiom,
+  const exprt &str,
+  const exprt &val)
 {
   exprt idx=find_index(axiom.body(), str, axiom.univ_var());
   if(idx.is_nil())
     return true_exprt();
 
-  exprt r=compute_inverse_function(axiom.univ_var(), val, idx);
+  exprt r=compute_inverse_function(stream, axiom.univ_var(), val, idx);
   implies_exprt instance(axiom.premise(), axiom.body());
   replace_expr(axiom.univ_var(), r, instance);
   // We are not sure the index set contains only positive numbers
@@ -1967,17 +1956,19 @@ static exprt instantiate(
 /// \param [in] axiom: the axiom to instantiate
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate_not_contains(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
   const string_not_contains_constraintt &axiom,
-  const std::map<exprt, std::set<exprt>>& index_set,
+  const std::map<exprt, std::set<exprt>> &index_set,
   const string_constraint_generatort &generator)
 {
   const string_exprt s0=to_string_expr(axiom.s0());
   const string_exprt s1=to_string_expr(axiom.s1());
 
-  // debug() << "instantiate not contains " << from_expr(ns, "", s0) << " : "
-  //         << from_expr(ns, "", s1) << eom;
-  const auto& i0=index_set.find(s0.content());
-  const auto& i1=index_set.find(s1.content());
+  stream << "instantiate not contains " << from_expr(ns, "", s0) << " : "
+         << from_expr(ns, "", s1) << messaget::eom;
+  const auto &i0=index_set.find(s0.content());
+  const auto &i1=index_set.find(s1.content());
   if(i0!=index_set.end() && i1!=index_set.end())
   {
     return ::instantiate_not_contains(
@@ -1995,7 +1986,7 @@ static std::vector<exprt> instantiate_not_contains(
 /// \return an expression containing no array-list
 exprt substitute_array_lists(exprt expr, size_t string_max_length)
 {
-  for(auto& operand : expr.operands())
+  for(auto &operand : expr.operands())
   {
     // TODO: only copy when necessary
     const exprt op(operand);
@@ -2032,7 +2023,7 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get=[this](const exprt& expr)
+  const auto super_get=[this](const exprt &expr)
   { return supert::get(expr); };
   exprt ecopy(expr);
   replace_expr(symbol_resolve, ecopy);
@@ -2078,15 +2069,13 @@ exprt string_refinementt::get(const exprt &expr) const
 /// in `witness`. If UNSAT, then what witness is is undefined.
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
-/// \param [out] witness: the witness of the satisfying assignment if one
-///   exists. If UNSAT, then behaviour is undefined.
-/// \return: true if axiom is SAT, false if UNSAT
-static bool is_axiom_sat(
-  const namespacet& ns,
-  ui_message_handlert::uit ui,
+/// \return: the witness of the satisfying assignment if one
+/// exists. If UNSAT, then behaviour is undefined.
+static optionalt<exprt> find_counter_example(
+  const namespacet &ns,
+  const ui_message_handlert::uit ui,
   const exprt &axiom,
-  const symbol_exprt& var,
-  exprt &witness)
+  const symbol_exprt &var)
 {
   satcheck_no_simplifiert sat_check;
   bv_refinementt::infot info;
@@ -2099,21 +2088,10 @@ static bool is_axiom_sat(
   bv_refinementt solver(info);
   solver << axiom;
 
-  switch(solver())
-  {
-  case decision_proceduret::resultt::D_SATISFIABLE:
-    {
-      witness=solver.get(var);
-      return true;
-    }
-  case decision_proceduret::resultt::D_UNSATISFIABLE:
-    return false;
-  case decision_proceduret::resultt::D_ERROR:
-  default:
-    INVARIANT(false, string_refinement_invariantt("failure in checking axiom"));
-    // To tell the compiler that the previous line bails
-    throw 0;
-  }
+  if(solver()==decision_proceduret::resultt::D_SATISFIABLE)
+    return solver.get(var);
+  else
+    return { };
 }
 
 /// \related string_constraintt
@@ -2220,11 +2198,11 @@ static bool universal_only_in_index(const string_constraintt &expr)
 /// \param [in] expr: the string constraint to check
 /// \return whether the constraint satisfies the invariant
 static bool is_valid_string_constraint(
-  messaget::mstreamt& stream,
-  const namespacet& ns,
+  messaget::mstreamt &stream,
+  const namespacet &ns,
   const string_constraintt &expr)
 {
-  const auto eom = messaget::eom;
+  const auto eom=messaget::eom;
   // Condition 1: The premise cannot contain any string indices
   const array_index_mapt premise_indices=gather_indices(expr.premise());
   if(!premise_indices.empty())

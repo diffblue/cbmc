@@ -628,3 +628,19 @@ exprt string_constraint_generatort::add_axioms_for_to_char_array(
   string_exprt str=get_string_expr(args(f, 1)[0]);
   return str.content();
 }
+
+exprt string_constraint_generatort::substitute_function_applications(
+  const exprt &expr)
+{
+  exprt copy=expr;
+  for(exprt &operand : copy.operands())
+    operand=substitute_function_applications(exprt(operand));
+
+  if(copy.id()==ID_function_application)
+  {
+    function_application_exprt f=to_function_application_expr(copy);
+    return this->add_axioms_for_function_application(f);
+  }
+
+  return copy;
+}

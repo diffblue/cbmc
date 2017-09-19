@@ -34,7 +34,7 @@ class string_refinementt final: public bv_refinementt
 private:
   struct configt
   {
-    unsigned refinement_bound=0;
+    std::size_t refinement_bound=0;
     /// Make non-deterministic character arrays have at least one character
     bool string_non_empty=false;
     /// Concretize strings after solver is finished
@@ -50,7 +50,7 @@ public:
 
   explicit string_refinementt(const infot &);
 
-  virtual std::string decision_procedure_text() const override
+  std::string decision_procedure_text() const override
   { return "string refinement loop with "+prop.solver_text(); }
 
   exprt get(const exprt &expr) const override;
@@ -68,7 +68,7 @@ private:
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);
 
   const configt config_;
-  unsigned loop_bound_;
+  std::size_t loop_bound_;
   string_constraint_generatort generator;
   expr_sett nondet_arrays;
 
@@ -98,7 +98,7 @@ private:
   void add_lemma(const exprt &lemma, bool simplify=true);
 };
 
-exprt substitute_array_lists(exprt expr, size_t string_max_length);
+exprt substitute_array_lists(exprt expr, std::size_t string_max_length);
 exprt concretize_arrays_in_expression(
   exprt expr, std::size_t string_max_length);
 #endif

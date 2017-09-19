@@ -45,7 +45,7 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
-      std::cout << xml << '\n';
+      status() << xml << '\n';
     }
 
     switch(prop_solve())
