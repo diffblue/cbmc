@@ -139,7 +139,8 @@ optionalt<string_exprt> expr_cast<string_exprt>(const exprt& expr)
 }
 
 template<typename T>
-T expr_cast_v(const exprt& expr) {
+T expr_cast_v(const exprt& expr)
+{
   const auto maybe=expr_cast<T>(expr);
   INVARIANT(maybe, "Bad conversion");
   return *maybe;
@@ -535,7 +536,8 @@ std::vector<exprt> concretize_results(
   const std::map<exprt, std::set<exprt>>& current_index_set,
   const std::vector<string_constraintt> &universal_axioms)
 {
-  for(const auto &it : symbol_resolve) {
+  for(const auto &it : symbol_resolve)
+  {
     concretize_string(
       get,
       found_length,
@@ -547,7 +549,8 @@ std::vector<exprt> concretize_results(
       ns,
       it.second);
   }
-  for(const auto &expr : created_strings) {
+  for(const auto &expr : created_strings)
+  {
     concretize_string(
       get,
       found_length,
@@ -654,7 +657,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     {
       if(is_char_array(ns, rhs.type()))
       {
-        for (const auto& lemma : set_char_array_equality(lhs, rhs))
+        for(const auto& lemma : set_char_array_equality(lhs, rhs))
           add_lemma(lemma, false);
       }
       const bool not_handled=add_axioms_for_string_assigns(
@@ -665,7 +668,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
         ns,
         lhs,
         subst_rhs);
-      if (!not_handled)
+      if(!not_handled)
         return;
     }
 
@@ -753,7 +756,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       symbol_resolve);
     if(!success)
     {
-      for (const auto& lemma : lemmas)
+      for(const auto& lemma : lemmas)
         add_lemma(lemma);
       debug() << "check_SAT: got SAT but the model is not correct" << eom;
     }
@@ -772,8 +775,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   initial_index_set(index_set, current_index_set, ns, universal_axioms);
   update_index_set(index_set, current_index_set, ns, cur);
   cur.clear();
-  for (const auto& lemma :
-         generate_instantiations(current_index_set, universal_axioms))
+  for(const auto& lemma :
+        generate_instantiations(current_index_set, universal_axioms))
     add_lemma(lemma);
   display_current_index_set(debug(), ns, current_index_set);
 
@@ -781,7 +784,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     decision_proceduret::resultt res=supert::dec_solve();
 
-    if (res == resultt::D_SATISFIABLE)
+    if(res==resultt::D_SATISFIABLE)
     {
       bool success;
       std::vector<exprt> lemmas;
@@ -798,7 +801,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         symbol_resolve);
       if(!success)
       {
-        for (const auto& lemma : lemmas)
+        for(const auto& lemma : lemmas)
           add_lemma(lemma);
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
       }
@@ -821,7 +824,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       current_index_set.clear();
       update_index_set(index_set, current_index_set, ns, cur);
       cur.clear();
-      for (const auto& lemma :
+      for(const auto& lemma :
             generate_instantiations(current_index_set, universal_axioms))
         add_lemma(lemma);
       display_current_index_set(debug(), ns, current_index_set);
@@ -843,7 +846,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
             generator.get_created_strings(),
             current_index_set,
             universal_axioms);
-          for (const auto& lemma : lemmas)
+          for(const auto& lemma : lemmas)
             add_lemma(lemma);
           display_current_index_set(debug(), ns, current_index_set);
           return resultt::D_SATISFIABLE;
@@ -867,7 +870,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
-    } else {
+    }
+    else
+    {
       debug() << "check_SAT: default return " << static_cast<int>(res) << eom;
       return res;
     }
@@ -1923,7 +1928,8 @@ public:
 /// \param [in] str: the string which must be indexed
 /// \param [in] qvar: the universal variable that must be in the index
 /// \return an index expression in `expr` on `str` containing `qvar`
-static exprt find_index(const exprt &expr, const exprt &str, const symbol_exprt &qvar)
+static exprt find_index(
+  const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
   find_index_visitort v(str, qvar);
   expr.visit(v);
@@ -1972,7 +1978,8 @@ static std::vector<exprt> instantiate_not_contains(
   //         << from_expr(ns, "", s1) << eom;
   const auto& i0=index_set.find(s0.content());
   const auto& i1=index_set.find(s1.content());
-  if (i0 != index_set.end() && i1 != index_set.end()) {
+  if(i0!=index_set.end() && i1!=index_set.end())
+  {
     return ::instantiate_not_contains(
       axiom, i0->second, i1->second, generator);
   }
@@ -2025,9 +2032,8 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get = [this](const exprt& expr) {
-    return supert::get(expr);
-  };
+  const auto super_get=[this](const exprt& expr)
+  { return supert::get(expr); };
   exprt ecopy(expr);
   replace_expr(symbol_resolve, ecopy);
   if(is_char_array(ns, ecopy.type()))
@@ -2047,7 +2053,7 @@ exprt string_refinementt::get(const exprt &expr) const
   }
   else if(ecopy.id()==ID_struct)
   {
-    if (const auto string=expr_cast<string_exprt>(ecopy))
+    if(const auto string=expr_cast<string_exprt>(ecopy))
     {
       const exprt &content=string->content();
       const exprt &length=string->length();

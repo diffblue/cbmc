@@ -32,7 +32,7 @@ private:
     bool refine_arithmetic=true;
   };
 public:
-  struct infot : public configt
+  struct infot:public configt
   {
     const namespacet *ns=nullptr;
     propt *prop=nullptr;

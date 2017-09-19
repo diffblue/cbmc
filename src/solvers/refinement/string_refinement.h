@@ -32,7 +32,8 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 class string_refinementt final: public bv_refinementt
 {
 private:
-  struct configt {
+  struct configt
+  {
     unsigned refinement_bound=0;
     /// Make non-deterministic character arrays have at least one character
     bool string_non_empty=false;
@@ -98,5 +99,6 @@ private:
 };
 
 exprt substitute_array_lists(exprt expr, size_t string_max_length);
-exprt concretize_arrays_in_expression(exprt expr, std::size_t string_max_length);
+exprt concretize_arrays_in_expression(
+  exprt expr, std::size_t string_max_length);
 #endif
