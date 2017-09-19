@@ -12,11 +12,16 @@ file 'object.arm' was compiled from 'source.c' with goto-cc along with
 an ARM cross-compiler on a 64-bit platform with the following command
 line:
 
-  goto-cc --native-compiler=arm-none-eabi-gcc -mthumb -c source.c
+  goto-cc -o object.arm --native-compiler=arm-none-eabi-gcc -mthumb -c source.c
 
-On Ubuntu, you can get a suitable compiler using:
+To regenerate object.arm on an x86_64 machine, you will need to install
+an ARM-32 cross compiler and pass the name of that compiler to the
+--native-compiler flag. On Ubuntu, you can get a suitable compiler
+using:
 
   sudo apt install gcc-arm-none-eabi
+
+which will install arm-none-eabi-gcc (amongst other things).
 
 preproc.i is already pre-processed so that it can be linked in without
 needing to invoke a pre-processor from a cross-compile toolchain on your
