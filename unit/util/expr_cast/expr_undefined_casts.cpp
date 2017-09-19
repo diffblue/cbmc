@@ -19,31 +19,32 @@ SCENARIO("expr_dynamic_cast",
 {
   symbol_exprt symbol_expr;
 
-  GIVEN("A const exprt pointer to a symbolt")
+  GIVEN("A const exprt reference to a symbolt")
   {
-    const exprt *expr_ptr=&symbol_expr;
+    const exprt &expr=symbol_expr;
 
-    THEN("Casting from exprt pointer to ieee_float_op_exprt should not compile")
+    THEN("Casting from exprt reference to ieee_float_op_exprt "
+         "should not compile")
     {
       // This shouldn't compile
-      expr_dynamic_cast<const ieee_float_op_exprt *>(expr_ptr);
+      expr_dynamic_cast<const ieee_float_op_exprt &>(expr);
     }
-    THEN("Casting from exprt pointer to shift_exprt should not compile")
+    THEN("Casting from exprt reference to shift_exprt should not compile")
     {
       // This shouldn't compile
-      expr_dynamic_cast<const shift_exprt *>(expr_ptr);
+      expr_dynamic_cast<const shift_exprt &>(expr);
     }
     THEN(
-      "Casting from exprt pointer to non-pointer/reference should not compile")
+      "Casting from exprt reference to non-reference should not compile")
     {
       // This shouldn't compile
-      expr_dynamic_cast<symbol_exprt>(expr_ptr);
+      expr_dynamic_cast<symbol_exprt>(expr);
     }
     THEN(
       "Casting from const exprt reference to non-const symbol_exprt reference "
       "should not compile")
     {
-      expr_dynamic_cast<symbol_exprt *>(expr_ptr);
+      expr_dynamic_cast<symbol_exprt &>(expr);
     }
   }
 }

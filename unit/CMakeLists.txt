@@ -21,6 +21,9 @@ list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/cpp_scanner.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/float_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
+
+    # Intended to fail to compile
+    ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
 )
 
 add_executable(unit ${sources} ${headers})

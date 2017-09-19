@@ -16,32 +16,35 @@ SCENARIO("expr_dynamic_cast",
 {
   symbol_exprt symbol_expr;
 
-  GIVEN("A const exprt pointer to a symbolt")
+  GIVEN("A const exprt reference to a symbolt")
   {
-    const exprt *expr_ptr=&symbol_expr;
+    const exprt &expr=symbol_expr;
 
-    THEN("Casting from exprt pointer to symbol_exprt pointer returns non-null")
+    THEN("Try-casting from exprt reference to symbol_exprt pointer "
+         "returns a value")
     {
-      REQUIRE(expr_dynamic_cast<const symbol_exprt *>(expr_ptr)!=nullptr);
+      REQUIRE(expr_try_dynamic_cast<const symbol_exprt &>(expr).has_value());
     }
 
-    THEN("Casting from exprt pointer to transt pointer returns null")
+    THEN("Casting from exprt pointer to transt pointer doesn't return a value")
     {
-      REQUIRE(expr_dynamic_cast<const transt *>(expr_ptr)==nullptr);
+      REQUIRE(!expr_try_dynamic_cast<const transt &>(expr).has_value());
     }
   }
-  GIVEN("A exprt pointer to a symbolt")
+  GIVEN("A exprt reference to a symbolt")
   {
-    exprt *expr_ptr=&symbol_expr;
+    exprt &expr=symbol_expr;
 
-    THEN("Casting from exprt pointer to symbol_exprt pointer returns non-null")
+    THEN("Casting from exprt reference to symbol_exprt reference "
+         "returns a value")
     {
-      REQUIRE(expr_dynamic_cast<symbol_exprt *>(expr_ptr)!=nullptr);
+      REQUIRE(expr_try_dynamic_cast<symbol_exprt &>(expr).has_value());
     }
 
-    THEN("Casting from exprt pointer to transt pointer returns null")
+    THEN("Casting from exprt reference to transt reference "
+         "doesn't return a value")
     {
-      REQUIRE(expr_dynamic_cast<transt *>(expr_ptr)==nullptr);
+      REQUIRE(!expr_try_dynamic_cast<transt &>(expr).has_value());
     }
   }
   GIVEN("A const exprt reference to a symbolt")
