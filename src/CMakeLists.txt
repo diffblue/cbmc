@@ -89,63 +89,6 @@ set(extern_location ${CMAKE_CURRENT_BINARY_DIR}/extern)
 set(extern_include_directory ${extern_location}/include)
 file(MAKE_DIRECTORY ${extern_include_directory})
 
-################################################################################
-
-set(minisat_lib ${extern_location}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minisat2-condensed${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-#   minisat download: This downloads minisat2, then patches it.  Then, it
-#   injects a minimal CMakeLists.txt so that we can build just the bits we
-#   actually want, without having to update the provided makefile.
-
-ExternalProject_Add(minisat2-extern
-    PREFIX ${extern_location}
-    URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-    PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat-2.2.1-patch
-    COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/minisat2_CMakeLists.txt CMakeLists.txt
-    CMAKE_ARGS
-      "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
-      "-DCBMC_INCLUDE_DIR:path=${CMAKE_CURRENT_SOURCE_DIR}"
-      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-    BUILD_BYPRODUCTS ${minisat_lib}
-)
-
-add_library(minisat2-condensed STATIC IMPORTED)
-set_target_properties(minisat2-condensed PROPERTIES
-    IMPORTED_LOCATION ${minisat_lib}
-    INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory}"
-)
-add_dependencies(minisat2-condensed minisat2-extern)
-
-################################################################################
-
-set(glucose_lib ${extern_location}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}glucose-condensed${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-#   glucose download: This downloads glucose, then patches it.  Then, it
-#   injects a minimal CMakeLists.txt so that we can build just the bits we
-#   actually want, without having to update the provided makefile.
-
-ExternalProject_Add(glucose-extern
-    PREFIX ${extern_location}
-    URL http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
-    PATCH_COMMAND patch -p1 -i ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/glucose-syrup-patch
-    COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../scripts/glucose_CMakeLists.txt CMakeLists.txt
-    CMAKE_ARGS
-      "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
-      "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-      "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
-    BUILD_BYPRODUCTS ${glucose_lib}
-)
-
-add_library(glucose-condensed STATIC IMPORTED)
-set_target_properties(glucose-condensed PROPERTIES
-    IMPORTED_LOCATION ${glucose_lib}
-    INTERFACE_INCLUDE_DIRECTORIES "${extern_include_directory}"
-)
-add_dependencies(glucose-condensed glucose-extern)
-
-################################################################################
-
 #   Override add_executable to automatically sign the target on OSX.
 function(add_executable name)
     _add_executable(${name} ${ARGN})
