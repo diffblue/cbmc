@@ -632,7 +632,10 @@ protected:
 
     void write(serializert &serializer)
     {
-      serializer.serialize("value", *it);
+      // We are only going to write this to the store but it needs to be
+      // non-const to do that
+      serializer.serialize(
+        "value", const_cast<typename collectiont::value_type &>(*it));
       ++it;
     }
   };
