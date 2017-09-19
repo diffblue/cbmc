@@ -18,7 +18,8 @@ bool java_is_array_type(const typet &type);
 void generate_class_stub(
   const irep_idt &class_name,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler);
+  message_handlert &message_handler,
+  const struct_union_typet::componentst &componentst);
 
 /// Returns the number of JVM local variables (slots) taken by a local variable
 /// that, when translated to goto, has type \p t.
@@ -65,6 +66,14 @@ irep_idt resolve_friendly_method_name(
 /// \param expr: expression to dereference and check
 /// \param type: expected result type (typically expr.type().subtype())
 dereference_exprt checked_dereference(const exprt &expr, const typet &type);
+
+/// Add the components in components_to_add to the class denoted
+/// by class symbol.
+/// \param class_symbol The symbol representing the class we want to modify.
+/// \param components_to_add The vector with the components we want to add.
+void java_add_components_to_class(
+  symbolt &class_symbol,
+  const struct_union_typet::componentst &components_to_add);
 
 size_t find_closing_delimiter(
   const std::string &src,

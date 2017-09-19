@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader.h"
 #include "java_utils.h"
 #include <java_bytecode/ci_lazy_methods.h>
+#include <java_bytecode/generate_java_generic_type.h>
 
 #include "expr2java.h"
 
@@ -238,11 +239,21 @@ bool java_bytecode_languaget::typecheck(
     get_message_handler());
 
   // now typecheck all
-  if(java_bytecode_typecheck(
-       symbol_table, get_message_handler(), string_refinement_enabled))
-    return true;
+  bool res=java_bytecode_typecheck(
+    symbol_table, get_message_handler(), string_refinement_enabled);
+  // NOTE (FOTIS): There is some unintuitive logic here, where
+  // java_bytecode_check will return TRUE if typechecking failed, and FALSE
+  // if everything went well...
+  if(res)
+  {
+    // there is no point in continuing to concretise
+    // the generic types if typechecking failed.
+    return res;
+  }
 
-  return false;
+  instantiate_generics(get_message_handler(), symbol_table);
+
+  return res;
 }
 
 bool java_bytecode_languaget::generate_support_functions(

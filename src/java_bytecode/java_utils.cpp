@@ -67,7 +67,8 @@ const std::string java_class_to_package(const std::string &canonical_classname)
 void generate_class_stub(
   const irep_idt &class_name,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler)
+  message_handlert &message_handler,
+  const struct_union_typet::componentst &componentst)
 {
   class_typet class_type;
 
@@ -100,6 +101,7 @@ void generate_class_stub(
   {
     // create the class identifier etc
     java_root_class(res.first);
+    java_add_components_to_class(res.first, componentst);
   }
 }
 
@@ -229,4 +231,23 @@ size_t find_closing_delimiter(
   }
   // did not find corresponding closing '>'
   return std::string::npos;
+}
+
+/// Add the components in components_to_add to the class denoted by
+/// class symbol.
+/// \param class_symbol The symbol representing the class we want to modify.
+/// \param components_to_add The vector with the components we want to add.
+void java_add_components_to_class(
+  symbolt &class_symbol,
+  const struct_union_typet::componentst &components_to_add)
+{
+  PRECONDITION(class_symbol.is_type);
+  PRECONDITION(class_symbol.type.id()==ID_struct);
+  struct_typet &struct_type=to_struct_type(class_symbol.type);
+  struct_typet::componentst &components=struct_type.components();
+
+  for(const struct_union_typet::componentt &component : components_to_add)
+  {
+    components.push_back(component);
+  }
 }

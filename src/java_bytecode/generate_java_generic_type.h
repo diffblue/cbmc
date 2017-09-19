@@ -1,12 +1,13 @@
 /*******************************************************************\
 
- Module: MODULE NAME
+ Module: Generate Java Generic Type - Instantiate a generic class with
+         concrete type information.
 
  Author: DiffBlue Limited. All rights reserved.
 
 \*******************************************************************/
-#ifndef GENERATE_JAVA_GENERIC_TYPE_H
-#define GENERATE_JAVA_GENERIC_TYPE_H
+#ifndef CPROVER_JAVA_BYTECODE_GENERATE_JAVA_GENERIC_TYPE_H
+#define CPROVER_JAVA_BYTECODE_GENERATE_JAVA_GENERIC_TYPE_H
 
 #include <util/message.h>
 #include <util/symbol_table.h>
@@ -17,20 +18,21 @@ class generate_java_generic_typet
 {
 public:
   generate_java_generic_typet(
-    symbol_tablet &symbol_table,
     message_handlert &message_handler);
 
   symbolt operator()(
-    const java_type_with_generic_typet &existing_generic_type);
+    const java_generic_typet &existing_generic_type,
+    symbol_tablet &symbol_table) const;
 private:
   irep_idt build_generic_tag(
-    const java_type_with_generic_typet &existing_generic_type,
-    const java_class_typet &original_class);
-
-  symbol_tablet &symbol_table;
+    const java_generic_typet &existing_generic_type,
+    const java_class_typet &original_class) const;
 
   message_handlert &message_handler;
-
 };
 
-#endif // GENERATE_JAVA_GENERIC_TYPE_H
+void instantiate_generics(
+  message_handlert &message_handler,
+  symbol_tablet &symbol_table);
+
+#endif // CPROVER_JAVA_BYTECODE_GENERATE_JAVA_GENERIC_TYPE_H

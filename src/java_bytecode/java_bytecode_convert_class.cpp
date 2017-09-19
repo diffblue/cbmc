@@ -63,7 +63,8 @@ public:
       generate_class_stub(
         parse_tree.parsed_class.name,
         symbol_table,
-        get_message_handler());
+        get_message_handler(),
+        struct_union_typet::componentst{});
   }
 
   typedef java_bytecode_parse_treet::classt classt;
