@@ -42,11 +42,6 @@ static exprt instantiate(
   const string_constraintt &axiom, const exprt &str, const exprt &val);
 static bool is_char_array(const namespacet &ns, const typet &type);
 
-exprt substitute_array_lists(exprt expr, size_t string_max_length);
-
-exprt concretize_arrays_in_expression(
-  exprt expr, std::size_t string_max_length);
-
 static bool is_valid_string_constraint(
   messaget::mstreamt& stream,
   const namespacet& ns,

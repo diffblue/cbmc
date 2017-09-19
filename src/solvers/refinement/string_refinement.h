@@ -96,4 +96,7 @@ private:
 
   void add_lemma(const exprt &lemma, bool simplify=true);
 };
+
+exprt substitute_array_lists(exprt expr, size_t string_max_length);
+exprt concretize_arrays_in_expression(exprt expr, std::size_t string_max_length);
 #endif

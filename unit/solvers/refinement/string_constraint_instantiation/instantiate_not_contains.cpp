@@ -154,8 +154,7 @@ SCENARIO("instantiate_not_contains",
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
-    info.ns=&empty_ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     exprt res=generator.add_axioms_for_function_application(func);
     std::string axioms;
     std::vector<string_not_contains_constraintt> nc_axioms;
@@ -242,8 +241,7 @@ SCENARIO("instantiate_not_contains",
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
-    info.ns=&empty_ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     generator.witness[vacuous]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -301,8 +299,7 @@ SCENARIO("instantiate_not_contains",
     symbol_tablet symtab;
     namespacet ns(symtab);
     string_constraint_generatort::infot info;
-    info.ns=&ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -361,8 +358,7 @@ SCENARIO("instantiate_not_contains",
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
-    info.ns=&empty_ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -423,8 +419,7 @@ SCENARIO("instantiate_not_contains",
     namespacet empty_ns(symtab);
 
     string_constraint_generatort::infot info;
-    info.ns=&empty_ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
@@ -483,8 +478,7 @@ SCENARIO("instantiate_not_contains",
     symbol_tablet symtab;
     namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
-    info.ns=&empty_ns;
-    string_constraint_generatort generator(info);
+    string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
       generator.fresh_symbol("w", t.witness_type());
 
