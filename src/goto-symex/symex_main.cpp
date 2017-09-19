@@ -140,7 +140,7 @@ void goto_symext::operator()(
   state.top().end_of_function=--goto_program.instructions.end();
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
-  state.dirty=util_make_unique<dirtyt>(goto_functions).get();
+  state.dirty=util_make_unique<dirtyt>(goto_functions).release();
 
   symex_transition(state, state.source.pc);
 
