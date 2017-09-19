@@ -737,6 +737,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   found_length.clear();
   found_content.clear();
 
+  const auto get = [this](const exprt& expr) { return this->get(expr); };
+
   // Initial try without index set
   decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
@@ -747,7 +749,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       universal_axioms,
       not_contains_axioms,
       generator,
-      [this](const exprt& expr){ return this->get(expr); },
+      get,
       debug(),
       ns,
       generator.max_string_length,
@@ -765,7 +767,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       debug() << "check_SAT: the model is correct" << eom;
       concretize_lengths(
         found_length,
-        [](const exprt& expr){ return expr; },
+        get,
         symbol_resolve,
         generator.get_created_strings());
       return resultt::D_SATISFIABLE;
@@ -792,7 +794,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         universal_axioms,
         not_contains_axioms,
         generator,
-        [this](const exprt& expr){ return this->get(expr); },
+        get,
         debug(),
         ns,
         generator.max_string_length,
@@ -810,7 +812,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         debug() << "check_SAT: the model is correct" << eom;
         concretize_lengths(
           found_length,
-          [](const exprt& expr){ return expr; },
+          get,
           symbol_resolve,
           generator.get_created_strings());
         return resultt::D_SATISFIABLE;
@@ -835,7 +837,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         if(config_.trace)
         {
           const auto lemmas = concretize_results(
-            [this](const exprt& expr){ return this->get(expr); },
+            get,
             found_length,
             found_content,
             symbol_resolve,
