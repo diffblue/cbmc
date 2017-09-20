@@ -32,7 +32,7 @@ class java_bytecode_convert_methodt:public messaget
 {
 public:
   java_bytecode_convert_methodt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
     safe_pointer<ci_lazy_methods_neededt> _lazy_methods,
@@ -59,7 +59,7 @@ public:
   }
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const size_t max_array_length;
   safe_pointer<ci_lazy_methods_neededt> lazy_methods;
 

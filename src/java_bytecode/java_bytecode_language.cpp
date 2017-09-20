@@ -328,27 +328,45 @@ void java_bytecode_languaget::lazy_methods_provided(
     methods.insert(kv.first);
 }
 
-/// Promote a lazy-converted method (one whose type is known but whose body
-/// hasn't been converted) into a fully- elaborated one.
-/// \par parameters: `id`: method ID to convert
-/// `symtab`: global symbol table
-/// \return Amends the symbol table entry for function `id`, which should be a
-///   lazy method provided by this instance of `java_bytecode_languaget`. It
-///   should initially have a nil value. After this method completes, it will
-///   have a value representing the method body, identical to that produced
-///   using eager method conversion.
+/// \brief Promote a lazy-converted method (one whose type is known but whose
+/// body hasn't been converted) into a fully- elaborated one.
+/// \remarks Amends the symbol table entry for function `function_id`, which
+/// should be a lazy method provided by this instance of
+/// `java_bytecode_languaget`. It should initially have a nil value. After
+/// this method completes, it will have a value representing the method body,
+/// identical to that produced using eager method conversion.
+/// \param function_id: method ID to convert
+/// \param symtab: global symbol table
 void java_bytecode_languaget::convert_lazy_method(
-  const irep_idt &id,
+  const irep_idt &function_id,
   symbol_tablet &symtab)
 {
-  const auto &lazy_method_entry=lazy_methods.at(id);
+  journalling_symbol_tablet symbol_table=
+    journalling_symbol_tablet::wrap(symtab);
+
+  const auto &lazy_method_entry=lazy_methods.at(function_id);
   java_bytecode_convert_method(
-    *symtab.lookup(lazy_method_entry.first),
+    *symbol_table.lookup(lazy_method_entry.first),
     *lazy_method_entry.second,
-    symtab,
+    symbol_table,
     get_message_handler(),
     max_user_array_length,
     string_preprocess);
+
+  symbolt &symbol=*symbol_table.get_writeable(function_id);
+  // Instrument runtime exceptions (unless symbol is a stub)
+  if(symbol.value.is_not_nil())
+  {
+    java_bytecode_instrument_symbol(
+      symbol_table,
+      symbol,
+      throw_runtime_exceptions,
+      get_message_handler());
+  }
+
+  // now typecheck this function
+  java_bytecode_typecheck_updated_symbols(
+    symbol_table, get_message_handler(), string_refinement_enabled);
 }
 
 /// Replace methods of the String library that are in the symbol table by code
