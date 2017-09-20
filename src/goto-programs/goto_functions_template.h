@@ -49,6 +49,13 @@ public:
     return *this;
   }
 
+  void unload(const irep_idt &name)
+  {
+    const auto &it=function_map.find(name);
+    if(it!=function_map.end())
+      function_map.erase(it);
+  }
+
   void clear()
   {
     function_map.clear();
