@@ -691,7 +691,7 @@ void compilet::add_compiler_specific_defines(configt &config) const
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, dest, get_message_handler());
+  goto_convert_functionst converter(symbol_table, get_message_handler());
 
   // the compilation may add symbols!
 
@@ -724,7 +724,7 @@ void compilet::convert_symbols(goto_functionst &dest)
           s_it->second.value.is_not_nil())
       {
         debug() << "Compiling " << s_it->first << eom;
-        converter.convert_function(s_it->first);
+        converter.convert_function(s_it->first, dest.function_map[s_it->first]);
         symbol_table.get_writeable_ref(*it).value=exprt("compiled");
       }
     }
