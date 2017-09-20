@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/convert_nondet.h>
-#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
@@ -480,10 +480,12 @@ int jbmc_parse_optionst::doit()
     return 0;
   }
 
-  int get_goto_program_ret=get_goto_program(options);
-
+  std::unique_ptr<goto_modelt> goto_model_ptr;
+  int get_goto_program_ret=get_goto_program(goto_model_ptr, options);
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
+
+  goto_modelt &goto_model = *goto_model_ptr;
 
   if(cmdline.isset("show-properties"))
   {
@@ -491,7 +493,7 @@ int jbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  if(set_properties())
+  if(set_properties(goto_model))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
   // unwinds <clinit> loops to number of enum elements
@@ -529,10 +531,10 @@ int jbmc_parse_optionst::doit()
     prop_conv);
 
   // do actual BMC
-  return do_bmc(bmc);
+  return do_bmc(bmc, goto_model);
 }
 
-bool jbmc_parse_optionst::set_properties()
+bool jbmc_parse_optionst::set_properties(goto_modelt &goto_model)
 {
   try
   {
@@ -561,6 +563,7 @@ bool jbmc_parse_optionst::set_properties()
 }
 
 int jbmc_parse_optionst::get_goto_program(
+  std::unique_ptr<goto_modelt> &goto_model,
   const optionst &options)
 {
   if(cmdline.args.empty())
@@ -571,28 +574,41 @@ int jbmc_parse_optionst::get_goto_program(
 
   try
   {
-    goto_model=initialize_goto_model(cmdline, get_message_handler());
+    lazy_goto_modelt lazy_goto_model(get_message_handler());
+    lazy_goto_model.initialize(cmdline);
 
+    status() << "Generating GOTO Program" << messaget::eom;
+    lazy_goto_model.load_all_functions();
+
+    // Show the symbol table before process_goto_functions mangles return
+    // values, etc
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table(goto_model, ui_message_handler.get_ui());
+      show_symbol_table(
+        lazy_goto_model.symbol_table, ui_message_handler.get_ui());
       return 0;
     }
 
-    if(process_goto_program(options))
+    // Move the model out of the local lazy_goto_model
+    // and into the caller's goto_model
+    goto_model=lazy_goto_modelt::freeze(std::move(lazy_goto_model));
+    if(goto_model == nullptr)
+      return 6;
+
+    if(process_goto_program(*goto_model, options))
       return 6;
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(ui_message_handler.get_ui(), goto_model);
+      show_loop_ids(ui_message_handler.get_ui(), *goto_model);
       return 0;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      show_goto_functions(goto_model, ui_message_handler.get_ui());
+      show_goto_functions(*goto_model, ui_message_handler.get_ui());
       return 0;
     }
 
@@ -626,6 +642,7 @@ int jbmc_parse_optionst::get_goto_program(
 }
 
 bool jbmc_parse_optionst::process_goto_program(
+  goto_modelt &goto_model,
   const optionst &options)
 {
   try
@@ -790,7 +807,7 @@ bool jbmc_parse_optionst::process_goto_program(
 }
 
 /// invoke main modules
-int jbmc_parse_optionst::do_bmc(bmct &bmc)
+int jbmc_parse_optionst::do_bmc(bmct &bmc, goto_modelt &goto_model)
 {
   bmc.set_ui(ui_message_handler.get_ui());
 

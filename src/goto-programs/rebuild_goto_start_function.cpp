@@ -8,7 +8,6 @@
 
 #include "rebuild_goto_start_function.h"
 
-#include <goto-programs/goto_functions.h>
 #include <util/language.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
@@ -17,22 +16,21 @@
 #include <langapi/mode.h>
 #include <memory>
 
-/// To rebuild the _start funciton in the event the program was compiled into
+/// To rebuild the _start function in the event the program was compiled into
 /// GOTO with a different entry function selected.
+/// \param goto_model: The goto functions (to replace the body of the _start
+///   function) and symbol table (to replace the _start function symbol) of the
+///   program.
 /// \param _message_handler: The message handler to report any messages with
-/// \param symbol_table: The symbol table of the program (to replace the _start
-///   functions symbo)
-/// \param goto_functions: The goto functions of the program (to replace the
-///   body of the _start function).
-rebuild_goto_start_functiont::rebuild_goto_start_functiont(
-  message_handlert &_message_handler,
+template<typename goto_modelt>
+rebuild_goto_start_function_baset<goto_modelt>::
+rebuild_goto_start_function_baset(
   const cmdlinet &cmdline,
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions):
-    messaget(_message_handler),
+  goto_modelt &goto_model,
+  message_handlert &message_handler):
+    messaget(message_handler),
     cmdline(cmdline),
-    symbol_table(symbol_table),
-    goto_functions(goto_functions)
+    goto_model(goto_model)
 {
 }
 
@@ -44,7 +42,8 @@ rebuild_goto_start_functiont::rebuild_goto_start_functiont(
 /// called from _start
 /// \return Returns true if either the symbol is not found, or something went
 ///   wrong with generating the start_function. False otherwise.
-bool rebuild_goto_start_functiont::operator()()
+template<typename goto_modelt>
+bool rebuild_goto_start_function_baset<goto_modelt>::operator()()
 {
   const irep_idt &mode=get_entry_point_mode();
 
@@ -58,19 +57,12 @@ bool rebuild_goto_start_functiont::operator()()
   remove_existing_entry_point();
 
   bool return_code=
-    language->generate_support_functions(symbol_table);
+    language->generate_support_functions(goto_model.symbol_table);
 
-  // Remove the function from the goto_functions so it is copied back in
+  // Remove the function from the goto functions so it is copied back in
   // from the symbol table during goto_convert
   if(!return_code)
-  {
-    const auto &start_function=
-      goto_functions.function_map.find(goto_functionst::entry_point());
-    if(start_function!=goto_functions.function_map.end())
-    {
-      goto_functions.function_map.erase(start_function);
-    }
-  }
+    goto_model.goto_functions.unload(goto_functionst::entry_point());
 
   return return_code;
 }
@@ -78,23 +70,27 @@ bool rebuild_goto_start_functiont::operator()()
 /// Find out the mode of the current entry point to determine the mode of the
 /// replacement entry point
 /// \return A mode string saying which language to use
-irep_idt rebuild_goto_start_functiont::get_entry_point_mode() const
+template<typename goto_modelt>
+irep_idt
+rebuild_goto_start_function_baset<goto_modelt>::get_entry_point_mode() const
 {
   const symbolt &current_entry_point=
-    *symbol_table.lookup(goto_functionst::entry_point());
+    *goto_model.symbol_table.lookup(goto_functionst::entry_point());
   return current_entry_point.mode;
 }
 
 /// Eliminate the existing entry point function symbol and any symbols created
 /// in that scope from the symbol table.
-void rebuild_goto_start_functiont::remove_existing_entry_point()
+template<typename goto_modelt>
+void
+rebuild_goto_start_function_baset<goto_modelt>::remove_existing_entry_point()
 {
   // Remove the function itself
-  symbol_table.remove(goto_functionst::entry_point());
+  goto_model.symbol_table.remove(goto_functionst::entry_point());
 
   // And any symbols created in the scope of the entry point
   std::vector<irep_idt> entry_point_symbols;
-  for(const auto &symbol_entry : symbol_table.symbols)
+  for(const auto &symbol_entry : goto_model.symbol_table.symbols)
   {
     const bool is_entry_point_symbol=
       has_prefix(
@@ -107,6 +103,9 @@ void rebuild_goto_start_functiont::remove_existing_entry_point()
 
   for(const irep_idt &entry_point_symbol : entry_point_symbols)
   {
-    symbol_table.remove(entry_point_symbol);
+    goto_model.symbol_table.remove(entry_point_symbol);
   }
 }
+
+template class rebuild_goto_start_function_baset<goto_modelt>;
+template class rebuild_goto_start_function_baset<lazy_goto_modelt>;

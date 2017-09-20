@@ -1,36 +1,43 @@
-/*******************************************************************\
-
-Module: Get a Goto Program
-
-Author: Daniel Kroening, kroening@kroening.com
-
-\*******************************************************************/
+// Copyright 2017 Diffblue Limited. All Rights Reserved.
 
 /// \file
-/// Get a Goto Program
+/// Model for lazy loading of functions
 
-#include "initialize_goto_model.h"
-
-#include <fstream>
-#include <iostream>
-
-#include <util/language.h>
-#include <util/config.h>
-#include <util/unicode.h>
+#include "lazy_goto_model.h"
+#include "read_goto_binary.h"
+#include "rebuild_goto_start_function.h"
 
 #include <langapi/mode.h>
-#include <langapi/language_ui.h>
 
-#include <goto-programs/rebuild_goto_start_function.h>
+#include <util/cmdline.h>
+#include <util/config.h>
+#include <util/language.h>
+#include <util/unicode.h>
 
-#include "goto_convert_functions.h"
-#include "read_goto_binary.h"
+#include <fstream>
 
-goto_modelt initialize_goto_model(
-  const cmdlinet &cmdline,
-  message_handlert &message_handler)
+lazy_goto_modelt::lazy_goto_modelt(message_handlert &message_handler)
+  : goto_model(new goto_modelt()),
+    symbol_table(goto_model->symbol_table),
+    goto_functions(goto_model->goto_functions),
+    message_handler(message_handler)
+{
+  language_files.set_message_handler(message_handler);
+}
+
+lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
+  : goto_model(std::move(other.goto_model)),
+    symbol_table(goto_model->symbol_table),
+    goto_functions(goto_model->goto_functions),
+    language_files(std::move(other.language_files)),
+    message_handler(other.message_handler)
+{
+}
+
+void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
 {
   messaget msg(message_handler);
+
   const std::vector<std::string> &files=cmdline.args;
   if(files.empty())
   {
@@ -50,31 +57,25 @@ goto_modelt initialize_goto_model(
       sources.push_back(file);
   }
 
-  language_filest language_files;
-  language_files.set_message_handler(message_handler);
-
-  goto_modelt goto_model;
-
   if(!sources.empty())
   {
     for(const auto &filename : sources)
     {
-      #ifdef _MSC_VER
+#ifdef _MSC_VER
       std::ifstream infile(widen(filename));
-      #else
+#else
       std::ifstream infile(filename);
-      #endif
+#endif
 
       if(!infile)
       {
         msg.error() << "failed to open input file `" << filename
-          << '\'' << messaget::eom;
+                    << '\'' << messaget::eom;
         throw 0;
       }
 
-      std::pair<language_filest::file_mapt::iterator, bool>
-        result=language_files.file_map.insert(
-          std::pair<std::string, language_filet>(filename, language_filet()));
+      std::pair<language_filest::file_mapt::iterator, bool> result =
+        language_files.file_map.emplace(filename, language_filet());
 
       language_filet &lf=result.first->second;
 
@@ -107,7 +108,7 @@ goto_modelt initialize_goto_model(
 
     msg.status() << "Converting" << messaget::eom;
 
-    if(language_files.typecheck(goto_model.symbol_table))
+    if(language_files.typecheck(symbol_table))
     {
       msg.error() << "CONVERSION ERROR" << messaget::eom;
       throw 0;
@@ -118,12 +119,15 @@ goto_modelt initialize_goto_model(
   {
     msg.status() << "Reading GOTO program from file" << messaget::eom;
 
-    if(read_object_and_link(file, goto_model, message_handler))
+    if(read_object_and_link(
+      file, symbol_table, goto_functions, message_handler))
+    {
       throw 0;
+    }
   }
 
-  bool binaries_provided_start=
-    goto_model.symbol_table.has_symbol(goto_functionst::entry_point());
+  bool binaries_provided_start =
+    symbol_table.has_symbol(goto_functionst::entry_point());
 
   bool entry_point_generation_failed=false;
 
@@ -131,10 +135,8 @@ goto_modelt initialize_goto_model(
   {
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
-    rebuild_goto_start_functiont rebuild_existing_start(
-      cmdline,
-      goto_model,
-      msg.get_message_handler());
+    rebuild_lazy_goto_start_functiont rebuild_existing_start(
+      cmdline, *this, message_handler);
     entry_point_generation_failed=rebuild_existing_start();
   }
   else if(!binaries_provided_start)
@@ -151,7 +153,7 @@ goto_modelt initialize_goto_model(
     // Allow all language front-ends to try to provide the user-specified
     // (--function) entry-point, or some language-specific default:
     entry_point_generation_failed=
-      language_files.generate_support_functions(goto_model.symbol_table);
+      language_files.generate_support_functions(symbol_table);
   }
 
   if(entry_point_generation_failed)
@@ -160,22 +162,18 @@ goto_modelt initialize_goto_model(
     throw 0;
   }
 
-  if(language_files.final(goto_model.symbol_table))
+  if(language_files.final(symbol_table))
   {
     msg.error() << "FINAL STAGE CONVERSION ERROR" << messaget::eom;
     throw 0;
   }
 
-  msg.status() << "Generating GOTO Program" << messaget::eom;
-
-  goto_convert(
-    goto_model.symbol_table,
-    goto_model.goto_functions,
-    message_handler);
-
   // stupid hack
-  config.set_object_bits_from_symbol_table(
-    goto_model.symbol_table);
+  config.set_object_bits_from_symbol_table(symbol_table);
+}
 
-  return goto_model;
+/// Eagerly loads all functions from the symbol table.
+void lazy_goto_modelt::load_all_functions() const
+{
+  goto_convert(*goto_model, message_handler);
 }
