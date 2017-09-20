@@ -138,6 +138,7 @@ bool initialize_goto_model(
       const std::string &function_id=cmdline.get_value("function");
       rebuild_goto_start_functiont start_function_rebuilder(
         msg.get_message_handler(),
+        cmdline,
         goto_model.symbol_table,
         goto_model.goto_functions);
 

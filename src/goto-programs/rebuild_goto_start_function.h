@@ -10,6 +10,7 @@
 #define CPROVER_GOTO_PROGRAMS_REBUILD_GOTO_START_FUNCTION_H
 
 #include <util/message.h>
+class cmdlinet;
 
 class symbol_tablet;
 class goto_functionst;
@@ -25,6 +26,7 @@ class rebuild_goto_start_functiont: public messaget
 public:
   rebuild_goto_start_functiont(
     message_handlert &_message_handler,
+    const cmdlinet &cmdline,
     symbol_tablet &symbol_table,
     goto_functionst &goto_functions);
 
@@ -35,6 +37,7 @@ private:
 
   void remove_existing_entry_point();
 
+  const cmdlinet &cmdline;
   symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
 };
