@@ -882,13 +882,6 @@ void java_object_factoryt::gen_nondet_struct_init(
               binary_relation_exprt(me, ID_le, max_length)));
           }
         }
-        else
-        {
-          INVARIANT(
-            class_identifier!="java.lang.CharSequence" &&
-              class_identifier!="java.lang.AbstractStringBuilder",
-            "Trying to initialize abstract class");
-        }
       }
     }
   }
