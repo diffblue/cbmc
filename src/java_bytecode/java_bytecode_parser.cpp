@@ -125,6 +125,7 @@ protected:
   void rbytecode(methodt::instructionst &);
   void get_class_refs();
   void get_class_refs_rec(const typet &);
+  void parse_local_variable_type_table(methodt &method);
 
   void skip_bytes(std::size_t bytes)
   {
@@ -333,19 +334,45 @@ void java_bytecode_parsert::get_class_refs()
     }
   }
 
-  for(const auto &m : parse_tree.parsed_class.fields)
+  for(const auto &field : parse_tree.parsed_class.fields)
   {
-    typet t=java_type_from_string(m.signature);
-    get_class_refs_rec(t);
+    typet field_type;
+    if(field.signature.has_value())
+    {
+      field_type=java_type_from_string(
+        field.signature.value(),
+        "java::"+id2string(parse_tree.parsed_class.name));
+    }
+    else
+      field_type=java_type_from_string(field.descriptor);
+
+    get_class_refs_rec(field_type);
   }
 
-  for(const auto &m : parse_tree.parsed_class.methods)
+  for(const auto &method : parse_tree.parsed_class.methods)
   {
-    typet t=java_type_from_string(m.signature);
-    get_class_refs_rec(t);
-    for(const auto &var : m.local_variable_table)
+    typet method_type;
+    if(method.signature.has_value())
     {
-      typet var_type=java_type_from_string(var.signature);
+      method_type=java_type_from_string(
+        method.signature.value(),
+        "java::"+id2string(parse_tree.parsed_class.name));
+    }
+    else
+      method_type=java_type_from_string(method.descriptor);
+
+    get_class_refs_rec(method_type);
+    for(const auto &var : method.local_variable_table)
+    {
+      typet var_type;
+      if(var.signature.has_value())
+      {
+        var_type=java_type_from_string(
+          var.signature.value(),
+          "java::"+id2string(parse_tree.parsed_class.name));
+      }
+      else
+        var_type=java_type_from_string(var.descriptor);
       get_class_refs_rec(var_type);
     }
   }
@@ -628,7 +655,8 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     field.is_static=(access_flags&ACC_STATIC)!=0;
     field.is_final=(access_flags&ACC_FINAL)!=0;
     field.is_enum=(access_flags&ACC_ENUM)!=0;
-    field.signature=id2string(pool_entry(descriptor_index).s);
+
+    field.descriptor=id2string(pool_entry(descriptor_index).s);
     field.is_public=(access_flags&ACC_PUBLIC)!=0;
     field.is_protected=(access_flags&ACC_PROTECTED)!=0;
     field.is_private=(access_flags&ACC_PRIVATE)!=0;
@@ -936,13 +964,18 @@ void java_bytecode_parsert::rmethod_attribute(methodt &method)
       it->source_location
         .set_function(
           "java::"+id2string(parse_tree.parsed_class.name)+"."+
-          id2string(method.name)+":"+method.signature);
+          id2string(method.name)+":"+method.descriptor);
     }
 
     // line number of method
     if(!method.instructions.empty())
       method.source_location.set_line(
         method.instructions.begin()->source_location.get_line());
+  }
+  else if(attribute_name=="Signature")
+  {
+    u2 signature_index=read_u2();
+    method.signature=id2string(pool_entry(signature_index).s);
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")
@@ -960,7 +993,12 @@ void java_bytecode_parsert::rfield_attribute(fieldt &field)
 
   irep_idt attribute_name=pool_entry(attribute_name_index).s;
 
-  if(attribute_name=="RuntimeInvisibleAnnotations" ||
+  if(attribute_name=="Signature")
+  {
+    u2 signature_index=read_u2();
+    field.signature=id2string(pool_entry(signature_index).s);
+  }
+  else if(attribute_name=="RuntimeInvisibleAnnotations" ||
      attribute_name=="RuntimeVisibleAnnotations")
   {
     rRuntimeAnnotation_attribute(field.annotations);
@@ -1022,11 +1060,15 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
 
       method.local_variable_table[i].index=index;
       method.local_variable_table[i].name=pool_entry(name_index).s;
-      method.local_variable_table[i].signature=
+      method.local_variable_table[i].descriptor=
         id2string(pool_entry(descriptor_index).s);
       method.local_variable_table[i].start_pc=start_pc;
       method.local_variable_table[i].length=length;
     }
+  }
+  else if(attribute_name=="LocalVariableTypeTable")
+  {
+    parse_local_variable_type_table(method);
   }
   else if(attribute_name=="StackMapTable")
   {
@@ -1307,6 +1349,11 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
       }
     }
   }
+  else if(attribute_name=="Signature")
+  {
+    u2 signature_index=read_u2();
+    parsed_class.signature=id2string(pool_entry(signature_index).s);
+  }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")
   {
@@ -1356,7 +1403,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   method.is_native=(access_flags&ACC_NATIVE)!=0;
   method.name=pool_entry(name_index).s;
   method.base_name=pool_entry(name_index).s;
-  method.signature=id2string(pool_entry(descriptor_index).s);
+  method.descriptor=id2string(pool_entry(descriptor_index).s);
 
   size_t flags=(method.is_public?1:0)+
     (method.is_protected?1:0)+
@@ -1400,4 +1447,43 @@ bool java_bytecode_parse(
   }
 
   return java_bytecode_parse(in, parse_tree, message_handler);
+}
+
+/// Parses the local variable type table of a method. The LVTT holds generic
+/// type information for variables in the local variable table (LVT). At most as
+/// many variables as present in the LVT can be in the LVTT.
+void java_bytecode_parsert::parse_local_variable_type_table(methodt &method)
+{
+  u2 local_variable_type_table_length=read_u2();
+
+  INVARIANT(
+    local_variable_type_table_length<=method.local_variable_table.size(),
+    "Local variable type table cannot have more elements "
+    "than the local variable table.");
+  for(std::size_t i=0; i<local_variable_type_table_length; i++)
+  {
+    u2 start_pc=read_u2();
+    u2 length=read_u2();
+    u2 name_index=read_u2();
+    u2 signature_index=read_u2();
+    u2 index=read_u2();
+
+    bool found=false;
+    for(auto &lvar : method.local_variable_table)
+    {
+      // compare to entry in LVT
+      if(lvar.index==index &&
+         lvar.name==pool_entry(name_index).s &&
+         lvar.start_pc==start_pc &&
+         lvar.length==length)
+      {
+        found=true;
+        lvar.signature=id2string(pool_entry(signature_index).s);
+        break;
+      }
+    }
+    INVARIANT(
+      found,
+      "Entry in LocalVariableTypeTable must be present in LVT");
+  }
 }

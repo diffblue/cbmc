@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_language.h"
 #include "java_utils.h"
 
+#include <util/c_types.h>
 #include <util/arith_tools.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
@@ -101,6 +102,25 @@ void java_bytecode_convert_classt::convert(const classt &c)
   }
 
   java_class_typet class_type;
+  if(c.signature.has_value())
+  {
+    java_generics_class_typet generic_class_type;
+#ifdef DEBUG
+    std::cout << "INFO: found generic class signature "
+              << c.signature.value()
+              << " in parsed class "
+              << c.name << "\n";
+#endif
+    for(auto t : java_generic_type_from_string(
+          id2string(c.name),
+          c.signature.value()))
+    {
+      generic_class_type.generic_types()
+        .push_back(to_java_generic_parameter(t));
+    }
+
+    class_type=generic_class_type;
+  }
 
   class_type.set_tag(c.name);
   class_type.set(ID_base_name, c.name);
@@ -174,7 +194,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
     const irep_idt method_identifier=
       id2string(qualified_classname)+
       "."+id2string(method.name)+
-      ":"+method.signature;
+      ":"+method.descriptor;
     // Always run the lazy pre-stage, as it symbol-table
     // registers the function.
     debug() << "Adding symbol:  method '" << method_identifier << "'" << eom;
@@ -195,7 +215,48 @@ void java_bytecode_convert_classt::convert(
   symbolt &class_symbol,
   const fieldt &f)
 {
-  typet field_type=java_type_from_string(f.signature);
+  typet field_type;
+  if(f.signature.has_value())
+  {
+    field_type=java_type_from_string(
+      f.signature.value(),
+      id2string(class_symbol.name));
+
+    /// this is for a free type variable, e.g., a field of the form `T f;`
+    if(is_java_generic_parameter(field_type))
+    {
+#ifdef DEBUG
+      std::cout << "fieldtype: generic "
+                << to_java_generic_parameter(field_type).type_variable()
+                     .get_identifier()
+                << " name " << f.name << "\n";
+#endif
+    }
+
+    /// this is for a field that holds a generic type, wither with instantiated
+    /// or with free type variables, e.g., `List<T> l;` or `List<Integer> l;`
+    else if(is_java_generic_type(field_type))
+    {
+      java_generic_typet &with_gen_type=
+        to_java_generic_type(field_type);
+#ifdef DEBUG
+      std::cout << "fieldtype: generic container type "
+                << std::to_string(with_gen_type.generic_type_variables().size())
+                << " type " << with_gen_type.id()
+                << " name " << f.name
+                << " subtype id " << with_gen_type.subtype().id() << "\n";
+#endif
+      field_type=with_gen_type;
+    }
+
+    /// This case is not possible, a field is either a non-instantiated type
+    /// variable or a generics container type.
+    INVARIANT(
+      !is_java_generic_inst_parameter(field_type),
+      "Cannot be an instantiated type variable here.");
+  }
+  else
+    field_type=java_type_from_string(f.descriptor);
 
   // is this a static field?
   if(f.is_static)
