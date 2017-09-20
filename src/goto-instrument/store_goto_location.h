@@ -8,12 +8,12 @@ Date: August 2017
 
 \*******************************************************************/
 
-#ifndef STORE_GOTO_LOCATION_H
-#define STORE_GOTO_LOCATION_H
+#ifndef CPROVER_GOTO_INSTRUMENT_STORE_GOTO_LOCATION_H
+#define CPROVER_GOTO_INSTRUMENT_STORE_GOTO_LOCATION_H
 
 
 #include <goto-programs/goto_program.h>
 
 void store_goto_locations(goto_programt &goto_program);
 
-#endif // STORE_GOTO_LOCATION_H
+#endif // CPROVER_GOTO_INSTRUMENT_STORE_GOTO_LOCATION_H

@@ -233,9 +233,11 @@ xmlt ai_baset::output_xml(
       i_it->source_location.as_string());
     auto original_location = i_it->source_location.get_goto_location();
     if(original_location!="")
+    {
       location.set_attribute(
-        "originalGOTOLocation",
+        "original_GOTO_Location",
         id2string(original_location));
+    }
 
     location.new_element(find_state(i_it).output_xml(*this, ns));
 

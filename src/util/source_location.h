@@ -142,12 +142,12 @@ public:
 
   void set_goto_location(unsigned location)
   {
-    set("GOTO_location", location);
+    set(ID_original_GOTO_location, location);
   }
 
   const irep_idt get_goto_location() const
   {
-    return get("GOTO_location");
+    return get(ID_original_GOTO_location);
   }
 
   static bool is_built_in(const std::string &s)

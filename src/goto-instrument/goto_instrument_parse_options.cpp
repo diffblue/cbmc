@@ -436,10 +436,9 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("store-goto-locations"))
     {
-      Forall_goto_functions(it, goto_functions)
+      for(auto &function : goto_functions.function_map)
       {
-        auto &function_body = it->second.body;
-        store_goto_locations(function_body);
+        store_goto_locations(function.second.body);
       }
     }
 
