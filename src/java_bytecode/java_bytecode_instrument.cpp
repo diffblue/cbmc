@@ -598,7 +598,9 @@ void java_bytecode_instrument_symbol(
     message_handler);
   INVARIANT(
     symbol.value.id()==ID_code,
-    "java_bytecode_instrument expects a code-typed symbol");
+    "java_bytecode_instrument expects a code-typed symbol but was called with"
+      " " + id2string(symbol.name) + " which has a value with an id of " +
+      id2string(symbol.value.id()));
   instrument(symbol.value);
 }
 

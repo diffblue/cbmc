@@ -38,40 +38,51 @@ void java_bytecode_typecheckt::typecheck()
 {
   // The hash table iterators are not stable,
   // and we might add new symbols.
-
-  std::vector<irep_idt> identifiers;
+  journalling_symbol_tablet::changesett identifiers;
   identifiers.reserve(symbol_table.symbols.size());
   forall_symbols(s_it, symbol_table.symbols)
-    identifiers.push_back(s_it->first);
+    identifiers.insert(s_it->first);
+  typecheck(identifiers);
+}
 
+void java_bytecode_typecheckt::typecheck(
+  const journalling_symbol_tablet::changesett &identifiers)
+{
   // We first check all type symbols,
   // recursively doing base classes first.
   for(const irep_idt &id : identifiers)
   {
     symbolt &symbol=*symbol_table.get_writeable(id);
-    if(!symbol.is_type)
-      continue;
-    typecheck_type_symbol(symbol);
+    if(symbol.is_type)
+      typecheck_type_symbol(symbol);
   }
-
   // We now check all non-type symbols
   for(const irep_idt &id : identifiers)
   {
     symbolt &symbol=*symbol_table.get_writeable(id);
-    if(symbol.is_type)
-      continue;
-    typecheck_non_type_symbol(symbol);
+    if(!symbol.is_type)
+      typecheck_non_type_symbol(symbol);
   }
 }
 
 bool java_bytecode_typecheck(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   bool string_refinement_enabled)
 {
   java_bytecode_typecheckt java_bytecode_typecheck(
     symbol_table, message_handler, string_refinement_enabled);
   return java_bytecode_typecheck.typecheck_main();
+}
+
+void java_bytecode_typecheck_updated_symbols(
+  journalling_symbol_tablet &symbol_table,
+  message_handlert &message_handler,
+  bool string_refinement_enabled)
+{
+  java_bytecode_typecheckt java_bytecode_typecheck(
+    symbol_table, message_handler, string_refinement_enabled);
+  return java_bytecode_typecheck.typecheck(symbol_table.get_updated());
 }
 
 bool java_bytecode_typecheck(
