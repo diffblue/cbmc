@@ -1754,10 +1754,11 @@ codet java_string_library_preprocesst::make_string_length_code(
 ///   supported String functions, nil_exprt otherwise.
 exprt java_string_library_preprocesst::code_for_function(
   const irep_idt &function_id,
-  const code_typet &type,
-  const source_locationt &loc,
+  const symbolt &symbol,
   symbol_table_baset &symbol_table)
 {
+  const code_typet &type=to_code_type(symbol.type);
+  const source_locationt &loc=symbol.location;
   auto it_id=cprover_equivalent_to_java_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_function.end())
     return make_function_from_call(it_id->second, type, loc, symbol_table);
