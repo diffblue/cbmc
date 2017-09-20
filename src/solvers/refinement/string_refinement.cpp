@@ -99,6 +99,7 @@ static std::vector<exprt> instantiate_not_contains(
   const namespacet &ns,
   const string_not_contains_constraintt &axiom,
   const std::map<exprt, std::set<exprt>> &index_set,
+  const std::map<exprt, std::set<exprt>> &current_index_set,
   const string_constraint_generatort &generator);
 
 static exprt get_array(
@@ -850,7 +851,12 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         debug() << "constraint " << i << '\n';
         const std::vector<exprt> lemmas=
           instantiate_not_contains(
-            debug(), ns, not_contains_axioms[i], index_set, generator);
+            debug(),
+            ns,
+            not_contains_axioms[i],
+            index_set,
+            current_index_set,
+            generator);
         for(const exprt &lemma : lemmas)
           add_lemma(lemma);
       }
@@ -1510,23 +1516,26 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     if(use_counter_example)
     {
-      // TODO: add counter examples for not_contains?
+      stream << "Adding counter-examples: " << eom;
+      // TODO: add counter-examples for universal constraints?
 
-      // Checking if the current solution satisfies the constraints
       std::vector<exprt> lemmas;
-      for(const auto &v : violated)
+      for(const auto &v : violated_not_contains)
       {
         const exprt &val=v.second;
-        const string_constraintt &axiom=universal_axioms[v.first];
+        const string_not_contains_constraintt &axiom=
+          not_contains_axioms[v.first];
 
-        exprt premise(axiom.premise());
-        exprt body(axiom.body());
-        implies_exprt instance(premise, body);
-        replace_expr(symbol_resolve, instance);
-        replace_expr(axiom.univ_var(), val, instance);
-        stream << "adding counter example " << from_expr(ns, "", instance)
-               << eom;
-        lemmas.push_back(instance);
+        const exprt func_val=generator.get_witness_of(axiom, val);
+        const exprt comp_val=simplify_sum(plus_exprt(val, func_val));
+
+        std::set<std::pair<exprt, exprt>> indices;
+        indices.insert(std::pair<exprt, exprt>(comp_val, func_val));
+        const exprt counter=::instantiate_not_contains(
+          axiom, indices, generator)[0];
+
+        stream << "    -  " << from_expr(ns, "", counter) << eom;
+        lemmas.push_back(counter);
       }
       return { false, lemmas };
     }
@@ -1960,19 +1969,36 @@ static std::vector<exprt> instantiate_not_contains(
   const namespacet &ns,
   const string_not_contains_constraintt &axiom,
   const std::map<exprt, std::set<exprt>> &index_set,
+  const std::map<exprt, std::set<exprt>> &current_index_set,
   const string_constraint_generatort &generator)
 {
-  const string_exprt s0=to_string_expr(axiom.s0());
-  const string_exprt s1=to_string_expr(axiom.s1());
+  const string_exprt &s0=axiom.s0();
+  const string_exprt &s1=axiom.s1();
 
   stream << "instantiate not contains " << from_expr(ns, "", s0) << " : "
          << from_expr(ns, "", s1) << messaget::eom;
-  const auto &i0=index_set.find(s0.content());
-  const auto &i1=index_set.find(s1.content());
-  if(i0!=index_set.end() && i1!=index_set.end())
+
+  const auto &index_set0=index_set.find(s0.content());
+  const auto &index_set1=index_set.find(s1.content());
+  const auto &current_index_set0=current_index_set.find(s0.content());
+  const auto &current_index_set1=current_index_set.find(s1.content());
+
+  if(index_set0!=index_set.end() &&
+     index_set1!=index_set.end() &&
+     current_index_set0!=index_set.end() &&
+     current_index_set1!=index_set.end())
   {
-    return ::instantiate_not_contains(
-      axiom, i0->second, i1->second, generator);
+    typedef std::pair<exprt, exprt> expr_pairt;
+    std::set<expr_pairt> index_pairs;
+
+    for(const auto &ic0 : current_index_set0->second)
+      for(const auto &i1 : index_set1->second)
+        index_pairs.insert(expr_pairt(ic0, i1));
+    for(const auto &ic1 : current_index_set1->second)
+      for(const auto &i0 : index_set0->second)
+        index_pairs.insert(expr_pairt(i0, ic1));
+
+    return ::instantiate_not_contains(axiom, index_pairs, generator);
   }
   return { };
 }

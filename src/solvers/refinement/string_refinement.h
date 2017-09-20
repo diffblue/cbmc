@@ -39,7 +39,7 @@ private:
     bool string_non_empty=false;
     /// Concretize strings after solver is finished
     bool trace=false;
-    bool use_counter_example=false;
+    bool use_counter_example=true;
   };
 public:
   /// string_refinementt constructor arguments
