@@ -5,6 +5,5 @@ else()
 endif()
 
 add_test_pl_tests(
-    "goto-cc-goto-analyzer"
     "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-analyzer> ${is_windows}"
 )
