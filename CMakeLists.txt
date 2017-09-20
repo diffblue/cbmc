@@ -6,6 +6,8 @@ if(CCACHE_PROGRAM)
     message(STATUS "Rule launch compile: ${CCACHE_PROGRAM}")
  endif()
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
 
 include(GNUInstallDirs)
