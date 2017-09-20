@@ -14,7 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
-#include <goto-programs/rebuild_goto_start_function.h>
+#include <util/language.h>
 
 #include <analyses/goto_check.h>
 

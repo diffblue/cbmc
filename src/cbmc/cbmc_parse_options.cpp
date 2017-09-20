@@ -51,7 +51,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
-#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -628,20 +627,6 @@ int cbmc_parse_optionst::get_goto_program(
     // Remove all binaries from the command line as they
     // are already compiled
       return 6;
-
-    if(cmdline.isset("function"))
-    {
-      const std::string &function_id=cmdline.get_value("function");
-      rebuild_goto_start_functiont start_function_rebuilder(
-        get_message_handler(),
-        goto_model.symbol_table,
-        goto_model.goto_functions);
-
-      if(start_function_rebuilder(function_id))
-      {
-        return 6;
-      }
-    }
 
     if(cmdline.isset("show-symbol-table"))
     {

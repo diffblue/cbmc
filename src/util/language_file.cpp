@@ -165,9 +165,8 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
   return false;
 }
 
-bool language_filest::final(
-  symbol_tablet &symbol_table,
-  bool generate_start_function)
+bool language_filest::generate_support_functions(
+  symbol_tablet &symbol_table)
 {
   std::set<std::string> languages;
 
@@ -175,7 +174,23 @@ bool language_filest::final(
       it!=file_map.end(); it++)
   {
     if(languages.insert(it->second.language->id()).second)
-      if(it->second.language->final(symbol_table, generate_start_function))
+      if(it->second.language->generate_support_functions(symbol_table))
+        return true;
+  }
+
+  return false;
+}
+
+bool language_filest::final(
+  symbol_tablet &symbol_table)
+{
+  std::set<std::string> languages;
+
+  for(file_mapt::iterator it=file_map.begin();
+      it!=file_map.end(); it++)
+  {
+    if(languages.insert(it->second.language->id()).second)
+      if(it->second.language->final(symbol_table))
         return true;
   }
 

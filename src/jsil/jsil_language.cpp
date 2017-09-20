@@ -42,22 +42,6 @@ bool jsil_languaget::interfaces(symbol_tablet &symbol_table)
   return false;
 }
 
-/// Generate a _start function for a specific function
-/// \param entry_function_symbol_id: The symbol for the function that should be
-///   used as the entry point
-/// \param symbol_table: The symbol table for the program. The new _start
-///   function symbol will be added to this table
-/// \return Returns false if the _start method was generated correctly
-bool jsil_languaget::generate_start_function(
-  const irep_idt &entry_function_symbol_id,
-  symbol_tablet &symbol_table)
-{
-  // TODO(tkiley): This should be implemented if this language
-  // is used.
-  UNREACHABLE;
-  return true;
-}
-
 bool jsil_languaget::preprocess(
   std::istream &instream,
   const std::string &path,
@@ -103,19 +87,12 @@ bool jsil_languaget::typecheck(
   return false;
 }
 
-bool jsil_languaget::final(
-  symbol_tablet &symbol_table,
-  bool create_start_function)
+bool jsil_languaget::generate_support_functions(
+  symbol_tablet &symbol_table)
 {
-  if(create_start_function)
-  {
-    if(jsil_entry_point(
-         symbol_table,
-         get_message_handler()))
-      return true;
-  }
-
-  return false;
+  return jsil_entry_point(
+    symbol_table,
+    get_message_handler());
 }
 
 void jsil_languaget::show_parse(std::ostream &out)

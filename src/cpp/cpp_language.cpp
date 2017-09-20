@@ -54,22 +54,6 @@ void cpp_languaget::modules_provided(std::set<std::string> &modules)
   modules.insert(get_base_name(parse_path, true));
 }
 
-/// Generate a _start function for a specific function
-/// \param entry_function_symbol_id: The symbol for the function that should be
-///   used as the entry point
-/// \param symbol_table: The symbol table for the program. The new _start
-///   function symbol will be added to this table
-/// \return Returns false if the _start method was generated correctly
-bool cpp_languaget::generate_start_function(
-  const irep_idt &entry_function_symbol_id,
-  symbol_tablet &symbol_table)
-{
-  return generate_ansi_c_start_function(
-    symbol_table.lookup(entry_function_symbol_id),
-    symbol_table,
-    *message_handler);
-}
-
 /// ANSI-C preprocessing
 bool cpp_languaget::preprocess(
   std::istream &instream,
@@ -151,17 +135,10 @@ bool cpp_languaget::typecheck(
   return linking(symbol_table, new_symbol_table, get_message_handler());
 }
 
-bool cpp_languaget::final(
-  symbol_tablet &symbol_table,
-  bool create_start_function)
+bool cpp_languaget::generate_support_functions(
+  symbol_tablet &symbol_table)
 {
-  if(create_start_function)
-  {
-    if(ansi_c_entry_point(symbol_table, get_message_handler()))
-      return true;
-  }
-
-  return false;
+  return ansi_c_entry_point(symbol_table, get_message_handler());
 }
 
 void cpp_languaget::show_parse(std::ostream &out)

@@ -41,8 +41,7 @@ rebuild_goto_start_functiont::rebuild_goto_start_functiont(
 /// called from _start
 /// \return Returns true if either the symbol is not found, or something went
 ///   wrong with generating the start_function. False otherwise.
-bool rebuild_goto_start_functiont::operator()(
-  const irep_idt &entry_function)
+bool rebuild_goto_start_functiont::operator()()
 {
   const irep_idt &mode=get_entry_point_mode();
 
@@ -55,7 +54,7 @@ bool rebuild_goto_start_functiont::operator()(
   remove_existing_entry_point();
 
   bool return_code=
-    language->generate_start_function(entry_function, symbol_table);
+    language->generate_support_functions(symbol_table);
 
   // Remove the function from the goto_functions so it is copied back in
   // from the symbol table during goto_convert

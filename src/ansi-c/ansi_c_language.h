@@ -31,13 +31,12 @@ public:
     std::istream &instream,
     const std::string &path) override;
 
+  bool generate_support_functions(
+    symbol_tablet &symbol_table) override;
+
   bool typecheck(
     symbol_tablet &symbol_table,
     const std::string &module) override;
-
-  bool final(
-    symbol_tablet &symbol_table,
-    bool create_start_function) override;
 
   void show_parse(std::ostream &out) override;
 
@@ -76,10 +75,6 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
-
-  virtual bool generate_start_function(
-    const irep_idt &entry_function_symbol_id,
-    class symbol_tablet &symbol_table) override;
 
 protected:
   ansi_c_parse_treet parse_tree;

@@ -25,8 +25,7 @@ language_uit::language_uit(
   const cmdlinet &cmdline,
   ui_message_handlert &_ui_message_handler):
   _cmdline(cmdline),
-  ui_message_handler(_ui_message_handler),
-  generate_start_function(true)
+  ui_message_handler(_ui_message_handler)
 {
   set_message_handler(ui_message_handler);
 }
@@ -121,7 +120,7 @@ bool language_uit::final()
   bool stubs_enabled=_cmdline.isset("generate-opaque-stubs");
   language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
 
-  if(language_files.final(symbol_table, generate_start_function))
+  if(language_files.final(symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;

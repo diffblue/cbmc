@@ -28,7 +28,7 @@ public:
     symbol_tablet &symbol_table,
     goto_functionst &goto_functions);
 
-  bool operator()(const irep_idt &entry_function);
+  bool operator()();
 
 private:
   irep_idt get_entry_point_mode() const;
