@@ -102,16 +102,18 @@ void java_bytecode_convert_classt::convert(const classt &c)
   }
 
   java_class_typet class_type;
-  if(c.has_signature)
+  if(c.signature.has_value())
   {
     java_generics_class_typet generic_class_type;
 #ifdef DEBUG
     std::cout << "INFO: found generic class signature "
-              << c.signature
+              << c.signature.value()
               << " in parsed class "
               << c.name << "\n";
 #endif
-    for(auto t : java_generic_type_from_string(id2string(c.name), c.signature))
+    for(auto t : java_generic_type_from_string(
+          id2string(c.name),
+          c.signature.value()))
     {
       generic_class_type.generic_types()
         .push_back(to_java_generic_parameter(t));
@@ -214,9 +216,11 @@ void java_bytecode_convert_classt::convert(
   const fieldt &f)
 {
   typet field_type;
-  if(f.has_signature)
+  if(f.signature.has_value())
   {
-    field_type=java_type_from_string(f.signature, id2string(class_symbol.name));
+    field_type=java_type_from_string(
+      f.signature.value(),
+      id2string(class_symbol.name));
 
     /// this is for a free type variable, e.g., a field of the form `T f;`
     if(is_java_generic_parameter(field_type))

@@ -264,14 +264,15 @@ void java_bytecode_convert_method_lazy(
 {
   symbolt method_symbol;
   typet member_type;
-  if(m.has_signature)
+  if(m.signature.has_value())
   {
 #ifdef DEBUG
     std::cout << "method " << m.name
-              << " has signature " << m.signature << "\n";
+              << " has signature " << m.signature.value() << "\n";
 #endif
-    member_type=
-      java_type_from_string(m.signature, id2string(class_symbol.name));
+    member_type=java_type_from_string(
+      m.signature.value(),
+      id2string(class_symbol.name));
   }
   else
     member_type=java_type_from_string(m.descriptor);
@@ -362,8 +363,12 @@ void java_bytecode_convert_methodt::convert(
     // e.g. my.package.ClassName.myMethodName:(II)I::anIntParam, and then a
     // symbol_exprt with the parameter and its type
     typet t;
-    if(v.has_signature)
-      t=java_type_from_string(v.signature, id2string(class_symbol.name));
+    if(v.signature.has_value())
+    {
+      t=java_type_from_string(
+        v.signature.value(),
+        id2string(class_symbol.name));
+    }
     else
       t=java_type_from_string(v.descriptor);
 

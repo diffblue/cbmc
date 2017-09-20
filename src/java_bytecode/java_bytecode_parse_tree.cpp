@@ -28,7 +28,6 @@ void java_bytecode_parse_treet::classt::swap(
   std::swap(other.is_public, is_public);
   std::swap(other.is_protected, is_protected);
   std::swap(other.is_private, is_private);
-  std::swap(other.has_signature, has_signature);
   std::swap(other.signature, signature);
   other.implements.swap(implements);
   other.fields.swap(fields);
