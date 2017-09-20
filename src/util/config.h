@@ -12,6 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <list>
 
+#include <util/std_code.h>
+
 #include "ieee_float.h"
 #include "irep.h"
 
@@ -160,5 +162,16 @@ public:
 };
 
 extern configt config;
+
+/// Command line option (to be shared by the different tools)
+/// (This contains the actual string, needed in config.cpp)
+#define WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING "wrap-entry-point-in-while"
+
+/// Command line option (to be shared by the different tools)
+#define WRAP_ENTRY_POINT_IN_WHILE_TRUE "(" WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING ")"
+
+/// Command line help text
+#define HELP_WRAP_ENTRY_POINT_IN_WHILE_TRUE \
+  " --wrap-entry-point-in-while  wrap the designated entry point function in a while(true) statement\n" // NOLINT(*)
 
 #endif // CPROVER_UTIL_CONFIG_H

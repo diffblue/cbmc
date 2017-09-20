@@ -135,8 +135,7 @@ bool cpp_languaget::typecheck(
 
 bool cpp_languaget::final(symbol_tablet &symbol_table)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler(),
-     config.ansi_c.wrap_entry_point_in_while))
+  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
   {
     return true;
   }

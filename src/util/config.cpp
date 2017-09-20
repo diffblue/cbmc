@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "cprover_prefix.h"
 
-#include "langapi/wrap_entry_point.h"
-
 configt config;
 
 void configt::ansi_ct::set_16()
