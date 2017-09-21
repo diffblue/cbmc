@@ -16,15 +16,29 @@ Author: Daniel Kroening, kroening@kroening.com
 ///   there is a symbol with the same name already in the symbol table.
 bool symbol_tablet::add(const symbolt &symbol)
 {
-  if(!symbols.insert(std::pair<irep_idt, symbolt>(symbol.name, symbol)).second)
+  std::pair<symbolst::iterator, bool> result=
+    symbols.emplace(symbol.name, symbol);
+  if(!result.second)
     return true;
-
-  symbol_base_map.insert(
-    std::pair<irep_idt, irep_idt>(symbol.base_name, symbol.name));
-  symbol_module_map.insert(
-    std::pair<irep_idt, irep_idt>(symbol.module, symbol.name));
-
+  add_base_and_module(result.first);
   return false;
+}
+
+/// Move a new symbol to the symbol table
+/// \remark: This is a nicer interface than move but achieves the same result
+/// \param symbol: The symbol to be added to the symbol table
+/// \return Returns an optional reference to the newly inserted symbol, without
+///   a value if a symbol with the same name already exists in the symbol table
+optionalt<std::reference_wrapper<symbolt>> symbol_tablet::insert(
+  symbolt &&symbol)
+{
+  // Add the symbol to the table or retrieve existing symbol with the same name
+  std::pair<symbolst::iterator, bool> result=
+    symbols.emplace(symbol.name, std::move(symbol));
+  if(!result.second)
+    return optionalt<std::reference_wrapper<symbolt>>();
+  add_base_and_module(result.first);
+  return std::ref(result.first->second);
 }
 
 /// Move a symbol into the symbol table. If there is already a symbol with the
@@ -55,15 +69,39 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
     return true;
   }
 
-  symbol_base_map.emplace(symbol.base_name, symbol.name);
-  symbol_module_map.emplace(symbol.module, symbol.name);
-
   // Move the provided symbol into the symbol table
   result.first->second.swap(symbol);
+
+  add_base_and_module(result.first);
+
   // Return the address of the new symbol in the table
   new_symbol=&result.first->second;
 
   return false;
+}
+
+void symbol_tablet::add_base_and_module(symbolst::iterator added_symbol)
+{
+  symbolt &symbol=added_symbol->second;
+  try
+  {
+    symbol_base_mapt::iterator base_result=
+      symbol_base_map.emplace(symbol.base_name, symbol.name);
+    try
+    {
+      symbol_module_map.emplace(symbol.module, symbol.name);
+    }
+    catch(...)
+    {
+      symbol_base_map.erase(base_result);
+      throw;
+    }
+  }
+  catch(...)
+  {
+    symbols.erase(added_symbol);
+    throw;
+  }
 }
 
 /// Remove a symbol from the symbol table

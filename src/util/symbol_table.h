@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 #include <unordered_map>
 
+#include <util/optional.h>
+
 #include "symbol.h"
 
 #define forall_symbols(it, expr) \
@@ -60,12 +62,15 @@ public:
 
   bool add(const symbolt &symbol);
 
+  optionalt<std::reference_wrapper<symbolt>> insert(symbolt &&symbol);
   bool move(symbolt &symbol, symbolt *&new_symbol);
-
   // this will go away, use add instead
   bool move(symbolt &symbol)
   { symbolt *new_symbol; return move(symbol, new_symbol); }
+private:
+  void add_base_and_module(symbolst::iterator added_symbol);
 
+public:
   void clear()
   {
     symbols.clear();
