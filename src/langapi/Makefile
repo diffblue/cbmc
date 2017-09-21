@@ -2,7 +2,6 @@ SRC = language_ui.cpp \
       language_util.cpp \
       languages.cpp \
       mode.cpp \
-      wrap_entry_point.cpp \
       # Empty last line
 INCLUDES= -I ..
 

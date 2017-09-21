@@ -757,6 +757,9 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset('I'))
     ansi_c.include_paths=cmdline.get_values('I');
 
+  ansi_c.wrap_entry_point_in_while=
+    cmdline.isset(WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING);
+
   if(cmdline.isset("classpath"))
   {
     // Specifying -classpath or -cp overrides any setting of the

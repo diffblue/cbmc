@@ -106,10 +106,9 @@ graphs in DOT format.
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/config.h>
 
 #include <langapi/language_ui.h>
-#include <langapi/wrap_entry_point.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
 

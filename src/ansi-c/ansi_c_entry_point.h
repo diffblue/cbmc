@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 bool ansi_c_entry_point(
   symbol_tablet &symbol_table,
   const std::string &standard_main,
-  message_handlert &message_handler,
-  bool wrap_entry_point);
+  message_handlert &message_handler);
 
 #endif // CPROVER_ANSI_C_ANSI_C_ENTRY_POINT_H

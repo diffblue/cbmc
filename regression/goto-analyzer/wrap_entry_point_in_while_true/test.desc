@@ -1,9 +1,9 @@
 CORE
 main.c
---show-goto-functions --wrap-entry-point-in-while
+--wrap-entry-point-in-while --show-goto-functions
 ^EXIT=6$
 ^SIGNAL=0$
 ^     1: IF FALSE THEN GOTO 2$
-^        main\(argc', argv'\);$
+^        main\(\);$
 ^        GOTO 1$
 --

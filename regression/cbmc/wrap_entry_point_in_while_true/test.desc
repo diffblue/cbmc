@@ -1,8 +1,10 @@
 CORE
 main.c
---show-goto-functions --wrap-entry-point-in-while
-^EXIT=0$
+--wrap-entry-point-in-while --unwind 100
+^EXIT=10$
 ^SIGNAL=0$
-^     1: main\(argc', argv'\);$
-^        GOTO 1$
+^\[main.assertion.1\] assertion g == 0: FAILURE$
+^VERIFICATION FAILED$
+--
+^VERIFICATION SUCCESSFUL$
 --
