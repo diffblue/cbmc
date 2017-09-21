@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions --store-goto-locations
+^EXIT=0$
+^SIGNAL=0$
+Original GOTO location
+--
+--

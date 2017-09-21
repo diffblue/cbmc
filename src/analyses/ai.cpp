@@ -169,6 +169,9 @@ jsont ai_baset::output_json(
     location["sourceLocation"]=
       json_stringt(i_it->source_location.as_string());
     location["abstractState"]=find_state(i_it).output_json(*this, ns);
+    auto original_location = i_it->source_location.get_goto_location();
+    if(original_location!="")
+      location["originalGOTOLocation"]=json_stringt(id2string(original_location));
 
     // Ideally we need output_instruction_json
     std::ostringstream out;
@@ -228,6 +231,13 @@ xmlt ai_baset::output_xml(
     location.set_attribute(
       "source_location",
       i_it->source_location.as_string());
+    auto original_location = i_it->source_location.get_goto_location();
+    if(original_location!="")
+    {
+      location.set_attribute(
+        "original_GOTO_Location",
+        id2string(original_location));
+    }
 
     location.new_element(find_state(i_it).output_xml(*this, ns));
 

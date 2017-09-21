@@ -78,6 +78,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):" \
+  "(store-goto-locations)" \
   "(remove-calls-nobody)"
 
 class goto_instrument_parse_optionst:

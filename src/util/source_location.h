@@ -140,6 +140,16 @@ public:
     return get_bool(ID_hide);
   }
 
+  void set_goto_location(unsigned location)
+  {
+    set(ID_original_GOTO_location, location);
+  }
+
+  const irep_idt get_goto_location() const
+  {
+    return get(ID_original_GOTO_location);
+  }
+
   static bool is_built_in(const std::string &s)
   {
     std::string built_in1="<built-in-"; // "<built-in-additions>";

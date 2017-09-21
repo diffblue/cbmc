@@ -95,6 +95,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
+#include "store_goto_location.h"
+
 void goto_instrument_parse_optionst::eval_verbosity()
 {
   unsigned int v=8;
@@ -430,6 +432,14 @@ int goto_instrument_parse_optionst::doit()
     {
       show_call_sequences(goto_functions);
       return 0;
+    }
+
+    if(cmdline.isset("store-goto-locations"))
+    {
+      for(auto &function : goto_functions.function_map)
+      {
+        store_goto_locations(function.second.body);
+      }
     }
 
     if(cmdline.isset("check-call-sequence"))
