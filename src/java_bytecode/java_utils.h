@@ -66,4 +66,10 @@ irep_idt resolve_friendly_method_name(
 /// \param type: expected result type (typically expr.type().subtype())
 dereference_exprt checked_dereference(const exprt &expr, const typet &type);
 
+size_t find_closing_delimiter(
+  const std::string &src,
+  size_t position,
+  char open_char,
+  char close_char);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H
