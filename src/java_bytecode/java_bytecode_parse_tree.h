@@ -12,7 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
-#include <util/optional.h>
 #include <util/std_code.h>
 #include <util/std_types.h>
 
@@ -55,8 +54,7 @@ public:
   class membert
   {
   public:
-    std::string descriptor;
-    optionalt<std::string> signature;
+    std::string signature;
     irep_idt name;
     bool is_public, is_protected, is_private, is_static, is_final;
     annotationst annotations;
@@ -64,8 +62,8 @@ public:
     virtual void output(std::ostream &out) const = 0;
 
     membert():
-      is_public(false), is_protected(false),
-      is_private(false), is_static(false), is_final(false)
+      is_public(false), is_protected(false), is_private(false),
+      is_static(false), is_final(false)
     {
     }
   };
@@ -102,8 +100,7 @@ public:
     {
     public:
       irep_idt name;
-      std::string descriptor;
-      optionalt<std::string> signature;
+      std::string signature;
       std::size_t index;
       std::size_t start_pc;
       std::size_t length;
@@ -177,7 +174,7 @@ public:
 
     typedef std::list<irep_idt> implementst;
     implementst implements;
-    optionalt<std::string> signature;
+
     typedef std::list<fieldt> fieldst;
     typedef std::list<methodt> methodst;
     fieldst fields;
