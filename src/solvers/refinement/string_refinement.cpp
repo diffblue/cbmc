@@ -19,20 +19,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <solvers/refinement/string_refinement.h>
 
-#include <sstream>
 #include <iomanip>
 #include <stack>
 #include <functional>
-#include <ansi-c/string_constant.h>
-#include <util/cprover_prefix.h>
 #include <util/expr_iterator.h>
-#include <util/replace_expr.h>
-#include <util/refined_string_type.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
-#include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
-#include <langapi/language_util.h>
 #include <java_bytecode/java_types.h>
 #include <util/optional.h>
 
@@ -86,7 +79,7 @@ static void update_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
   std::map<exprt, std::set<exprt>> &current_index_set,
   const namespacet &ns,
-  const std::vector<exprt> &cur);
+  const std::vector<exprt> &current_constraints);
 
 static void update_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
@@ -690,14 +683,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     replace_expr(symbol_resolve, axiom);
     if(axiom.id()==ID_string_constraint)
     {
-      string_constraintt nc_axiom=
+      string_constraintt univ_axiom=
         to_string_constraint(axiom);
-      is_valid_string_constraint(error(), ns, nc_axiom);
+      is_valid_string_constraint(error(), ns, univ_axiom);
       DATA_INVARIANT(
-        is_valid_string_constraint(error(), ns, nc_axiom),
+        is_valid_string_constraint(error(), ns, univ_axiom),
         string_refinement_invariantt(
           "string constraints satisfy their invariant"));
-      universal_axioms.push_back(nc_axiom);
+      universal_axioms.push_back(univ_axiom);
     }
     else if(axiom.id()==ID_string_not_contains_constraint)
     {
@@ -725,9 +718,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {
-    bool success;
-    std::vector<exprt> lemmas;
-    std::tie(success, lemmas)=check_axioms(
+    bool satisfied;
+    std::vector<exprt> counter_examples;
+    std::tie(satisfied, counter_examples)=check_axioms(
       universal_axioms,
       not_contains_axioms,
       generator,
@@ -738,10 +731,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       config_.use_counter_example,
       supert::config_.ui,
       symbol_resolve);
-    if(!success)
+    if(!satisfied)
     {
-      for(const auto &lemma : lemmas)
-        add_lemma(lemma);
+      for(const auto &counter : counter_examples)
+        add_lemma(counter);
       debug() << "check_SAT: got SAT but the model is not correct" << eom;
     }
     else
@@ -757,11 +750,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 
   initial_index_set(index_set, current_index_set, ns, universal_axioms);
-  update_index_set(index_set, current_index_set, ns, cur);
-  cur.clear();
-  for(const auto &lemma :
+  update_index_set(index_set, current_index_set, ns, current_constraints);
+  current_constraints.clear();
+  for(const auto &instance :
         generate_instantiations(debug(), current_index_set, universal_axioms))
-    add_lemma(lemma);
+    add_lemma(instance);
   display_current_index_set(debug(), ns, current_index_set);
 
   while((loop_bound_--)>0)
@@ -770,9 +763,9 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
     if(res==resultt::D_SATISFIABLE)
     {
-      bool success;
-      std::vector<exprt> lemmas;
-      std::tie(success, lemmas)=check_axioms(
+      bool satisfied;
+      std::vector<exprt> counter_examples;
+      std::tie(satisfied, counter_examples)=check_axioms(
         universal_axioms,
         not_contains_axioms,
         generator,
@@ -783,10 +776,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         config_.use_counter_example,
         supert::config_.ui,
         symbol_resolve);
-      if(!success)
+      if(!satisfied)
       {
-        for(const auto &lemma : lemmas)
-          add_lemma(lemma);
+        for(const auto &counter : counter_examples)
+          add_lemma(counter);
         debug() << "check_SAT: got SAT but the model is not correct" << eom;
       }
       else
@@ -806,8 +799,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // and instantiating universal formulas with this indices.
       // We will then relaunch the solver with these added lemmas.
       current_index_set.clear();
-      update_index_set(index_set, current_index_set, ns, cur);
-      cur.clear();
+      update_index_set(index_set, current_index_set, ns, current_constraints);
+      current_constraints.clear();
       for(const auto &lemma :
             generate_instantiations(
               debug(), current_index_set, universal_axioms))
@@ -849,7 +842,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
         debug() << "constraint " << i << '\n';
-        const std::vector<exprt> lemmas=
+        const std::vector<exprt> instances=
           instantiate_not_contains(
             debug(),
             ns,
@@ -857,8 +850,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
             index_set,
             current_index_set,
             generator);
-        for(const exprt &lemma : lemmas)
-          add_lemma(lemma);
+        for(const exprt &instance : instances)
+          add_lemma(instance);
       }
     }
     else
@@ -872,18 +865,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   return resultt::D_ERROR;
 }
 
-/// fills as many 0 as necessary in the bit vectors to have the right width
-/// \par parameters: a Boolean and a expression with the desired type
-/// \return a bit vector
-bvt string_refinementt::convert_bool_bv(const exprt &boole, const exprt &orig)
-{
-  bvt ret;
-  ret.push_back(convert(boole));
-  size_t width=boolbv_width(orig.type());
-  ret.resize(width, const_literal(false));
-  return ret;
-}
-
 /// add the given lemma to the solver
 /// \par parameters: a lemma and Boolean value stating whether the lemma should
 /// be added to the index set.
@@ -893,7 +874,7 @@ void string_refinementt::add_lemma(
   if(!seen_instances.insert(lemma).second)
     return;
 
-  cur.push_back(lemma);
+  current_constraints.push_back(lemma);
 
   exprt simple_lemma=lemma;
   if(_simplify)
@@ -1762,9 +1743,9 @@ static void update_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
   std::map<exprt, std::set<exprt>> &current_index_set,
   const namespacet &ns,
-  const std::vector<exprt> &cur)
+  const std::vector<exprt> &current_constraints)
 {
-  for(const auto &axiom : cur)
+  for(const auto &axiom : current_constraints)
     update_index_set(index_set, current_index_set, ns, axiom);
 }
 
