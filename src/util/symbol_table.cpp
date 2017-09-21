@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symbol_table.h"
 
 #include <ostream>
+#include <util/invariant.h>
 
 /// Add a new symbol to the symbol table
 /// \param symbol: The symbol to be added to the symbol table
@@ -109,35 +110,39 @@ void symbol_tablet::add_base_and_module(symbolst::iterator added_symbol)
 /// \return Returns a boolean indicating whether the process failed
 bool symbol_tablet::remove(const irep_idt &name)
 {
-  symbolst::iterator entry=symbols.find(name);
-
+  symbolst::const_iterator entry=symbols.find(name);
   if(entry==symbols.end())
     return true;
 
-  for(symbol_base_mapt::iterator
-      it=symbol_base_map.lower_bound(entry->second.base_name),
-      it_end=symbol_base_map.upper_bound(entry->second.base_name);
-      it!=it_end;
-      ++it)
-    if(it->second==name)
-    {
-      symbol_base_map.erase(it);
-      break;
-    }
+  const symbolt &symbol=entry->second;
 
-  for(symbol_module_mapt::iterator
-      it=symbol_module_map.lower_bound(entry->second.module),
-      it_end=symbol_module_map.upper_bound(entry->second.module);
-      it!=it_end;
-      ++it)
-    if(it->second==name)
-    {
-      symbol_module_map.erase(it);
-      break;
-    }
+  symbol_base_mapt::const_iterator
+    base_it=symbol_base_map.lower_bound(entry->second.base_name),
+    base_it_end=symbol_base_map.upper_bound(entry->second.base_name);
+  while(base_it!=base_it_end && base_it->second!=name)
+    ++base_it;
+  INVARIANT(
+    base_it!=base_it_end,
+    "symbolt::base_name should not be changed "
+    "after it is added to the symbol_table "
+    "(name: "+id2string(symbol.name)+", "
+    "current base_name: "+id2string(symbol.base_name)+")");
+  symbol_base_map.erase(base_it);
+
+  symbol_module_mapt::const_iterator
+    module_it=symbol_module_map.lower_bound(entry->second.module),
+    module_it_end=symbol_module_map.upper_bound(entry->second.module);
+  while(module_it!=module_it_end && module_it->second!=name)
+    ++module_it;
+  INVARIANT(
+    module_it!=module_it_end,
+    "symbolt::module should not be changed "
+    "after it is added to the symbol_table "
+    "(name: "+id2string(symbol.name)+", "
+    "current module: "+id2string(symbol.module)+")");
+  symbol_module_map.erase(module_it);
 
   symbols.erase(entry);
-
   return false;
 }
 
