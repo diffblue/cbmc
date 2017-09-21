@@ -53,7 +53,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::vector<string_constraintt> &universal_axioms,
   const std::vector<string_not_contains_constraintt> &not_contains_axioms,
   string_constraint_generatort &generator,
-  std::function<exprt(const exprt &)> get,
+  const std::function<exprt(const exprt &)> &get,
   messaget::mstreamt &stream,
   const namespacet &ns,
   std::size_t max_string_length,
@@ -96,45 +96,57 @@ static std::vector<exprt> instantiate_not_contains(
   const string_constraint_generatort &generator);
 
 static exprt get_array(
-  std::function<exprt(const exprt &)> super_get,
+  const std::function<exprt(const exprt &)> &super_get,
   const exprt &arr);
 
 /// Convert exprt to a specific type. Throw bad_cast if conversion
 /// cannot be performed
 /// Generic case doesn't exist, specialize for different types accordingly
 /// TODO: this should go to util
+
+// Tag dispatching struct
+
 template<typename T>
-optionalt<T> expr_cast(const exprt &);
+struct expr_cast_implt final { };
 
 template<>
-optionalt<mp_integer> expr_cast<mp_integer>(const exprt &expr)
+struct expr_cast_implt<mp_integer> final
 {
-  mp_integer out;
-  if(to_integer(expr, out))
-    return { };
-  return out;
-}
-
-template<>
-optionalt<std::size_t> expr_cast<std::size_t>(const exprt &expr)
-{
-  if(const auto tmp=expr_cast<mp_integer>(expr))
+  optionalt<mp_integer> operator()(const exprt &expr) const
   {
-    if(tmp->is_long() && *tmp >= 0)
-      return tmp->to_long();
+    mp_integer out;
+    if(to_integer(expr, out))
+      return {};
+    return out;
   }
-  return { };
-}
+};
 
 template<>
-optionalt<string_exprt> expr_cast<string_exprt>(const exprt &expr)
+struct expr_cast_implt<std::size_t> final
 {
-  if(is_refined_string_type(expr.type()))
+  optionalt<std::size_t> operator()(const exprt &expr) const
   {
-    return to_string_expr(expr);
+    if(const auto tmp=expr_cast_implt<mp_integer>()(expr))
+      if(tmp->is_long() && *tmp>=0)
+        return tmp->to_long();
+    return {};
   }
-  return { };
-}
+};
+
+template<>
+struct expr_cast_implt<string_exprt> final
+{
+  optionalt<string_exprt> operator()(const exprt &expr) const
+  {
+    if(is_refined_string_type(expr.type()))
+      return to_string_expr(expr);
+    return {};
+  }
+};
+
+template<typename T>
+optionalt<T> expr_cast(const exprt& expr)
+{ return expr_cast_implt<T>()(expr); }
 
 template<typename T>
 T expr_cast_v(const exprt &expr)
@@ -206,7 +218,7 @@ static void display_index_set(
     const exprt &s=i.first;
     stream << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
 
-    for(auto j : i.second)
+    for(const auto &j : i.second)
     {
       const auto it=current_index_set.find(i.first);
       if(it!=current_index_set.end() && it->second.find(j)!=it->second.end())
@@ -696,7 +708,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       string_not_contains_constraintt nc_axiom=
         to_string_not_contains_constraint(axiom);
-      refined_string_typet rtype=to_refined_string_type(nc_axiom.s0().type());
+      const refined_string_typet &rtype=
+        to_refined_string_type(nc_axiom.s0().type());
       const typet &index_type=rtype.get_index_type();
       array_typet witness_type(index_type, infinity_exprt(index_type));
       generator.witness[nc_axiom]=
@@ -715,7 +728,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   const auto get=[this](const exprt &expr) { return this->get(expr); };
 
   // Initial try without index set
-  decision_proceduret::resultt res=supert::dec_solve();
+  const decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {
     bool satisfied;
@@ -759,7 +772,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   while((loop_bound_--)>0)
   {
-    decision_proceduret::resultt res=supert::dec_solve();
+    const decision_proceduret::resultt res=supert::dec_solve();
 
     if(res==resultt::D_SATISFIABLE)
     {
@@ -899,7 +912,7 @@ void string_refinementt::add_lemma(
 /// representing an integer
 /// \return an array expression or an array_of_exprt
 static exprt get_array(
-  const std::function<exprt(const exprt &)> super_get,
+  const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   const std::size_t max_string_length,
   const exprt &arr,
@@ -909,7 +922,7 @@ static exprt get_array(
   exprt size_val=super_get(size);
   size_val=simplify_expr(size_val, ns);
   typet char_type=arr.type().subtype();
-  typet index_type=size.type();
+  const typet &index_type=size.type();
   array_typet empty_ret_type(char_type, from_integer(0, index_type));
   array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
 
@@ -986,7 +999,7 @@ static exprt get_array(
 /// \par parameters: an expression representing an array
 /// \return an expression
 static exprt get_array(
-  const std::function<exprt(const exprt &)> super_get,
+  const std::function<exprt(const exprt &)> &super_get,
   const exprt &arr)
 {
   exprt arr_model=super_get(arr);
@@ -1022,7 +1035,7 @@ void debug_model(
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::size_t max_string_length,
-  const std::function<exprt(const exprt &)> super_get,
+  const std::function<exprt(const exprt &)> &super_get,
   const std::vector<symbol_exprt> &boolean_symbols,
   const std::vector<symbol_exprt> &index_symbols)
 {
@@ -1073,13 +1086,13 @@ void debug_model(
     }
   }
 
-  for(const auto it : boolean_symbols)
+  for(const auto &it : boolean_symbols)
   {
       stream << " - " << it.get_identifier() << ": "
              << from_expr(ns, "", super_get(it)) << '\n';
   }
 
-  for(const auto it : index_symbols)
+  for(const auto &it : index_symbols)
   {
      stream << " - " << it.get_identifier() << ": "
             << from_expr(ns, "", super_get(it)) << '\n';
@@ -1268,8 +1281,8 @@ static exprt negation_of_not_contains_constraint(
   const symbol_exprt &univ_var)
 {
   // If the for all is vacuously true, the negation is false.
-  const exprt lbu=axiom.univ_lower_bound();
-  const exprt ubu=axiom.univ_upper_bound();
+  const exprt &lbu=axiom.univ_lower_bound();
+  const exprt &ubu=axiom.univ_upper_bound();
   if(lbu.id()==ID_constant && ubu.id()==ID_constant)
   {
     const auto lb_int=expr_cast<mp_integer>(lbu);
@@ -1318,8 +1331,8 @@ static exprt negation_of_not_contains_constraint(
 static exprt negation_of_constraint(const string_constraintt &axiom)
 {
   // If the for all is vacuously true, the negation is false.
-  exprt lb=axiom.lower_bound();
-  exprt ub=axiom.upper_bound();
+  const exprt &lb=axiom.lower_bound();
+  const exprt &ub=axiom.upper_bound();
   if(lb.id()==ID_constant && ub.id()==ID_constant)
   {
     const auto lb_int=expr_cast<mp_integer>(lb);
@@ -1371,7 +1384,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const std::vector<string_constraintt> &universal_axioms,
   const std::vector<string_not_contains_constraintt> &not_contains_axioms,
   string_constraint_generatort &generator,
-  std::function<exprt(const exprt &)> get,
+  const std::function<exprt(const exprt &)> &get,
   messaget::mstreamt &stream,
   const namespacet &ns,
   std::size_t max_string_length,
@@ -1400,11 +1413,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(size_t i=0; i<universal_axioms.size(); i++)
   {
     const string_constraintt &axiom=universal_axioms[i];
-    const symbol_exprt univ_var=axiom.univ_var();
-    const exprt bound_inf=axiom.lower_bound();
-    const exprt bound_sup=axiom.upper_bound();
-    const exprt prem=axiom.premise();
-    const exprt body=axiom.body();
+    const symbol_exprt &univ_var=axiom.univ_var();
+    const exprt &bound_inf=axiom.lower_bound();
+    const exprt &bound_sup=axiom.upper_bound();
+    const exprt &prem=axiom.premise();
+    const exprt &body=axiom.body();
 
     const string_constraintt axiom_in_model(
       univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
@@ -1427,9 +1440,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     substitute_array_access(with_concretized_arrays);
     stream << "    - negated_axiom_without_array_access:\n"
            << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
-    exprt witness;
 
-    if(const auto witness=
+    if(const auto &witness=
        find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
       stream << "  - violated_for: "
@@ -1449,13 +1461,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(size_t i=0; i<not_contains_axioms.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom=not_contains_axioms[i];
-    const exprt univ_bound_inf=nc_axiom.univ_lower_bound();
-    const exprt univ_bound_sup=nc_axiom.univ_upper_bound();
-    const exprt prem=nc_axiom.premise();
-    const exprt exists_bound_inf=nc_axiom.exists_lower_bound();
-    const exprt exists_bound_sup=nc_axiom.exists_upper_bound();
-    const string_exprt s0=nc_axiom.s0();
-    const string_exprt s1=nc_axiom.s1();
+    const exprt &univ_bound_inf=nc_axiom.univ_lower_bound();
+    const exprt &univ_bound_sup=nc_axiom.univ_upper_bound();
+    const exprt &prem=nc_axiom.premise();
+    const exprt &exists_bound_inf=nc_axiom.exists_lower_bound();
+    const exprt &exists_bound_sup=nc_axiom.exists_upper_bound();
+    const string_exprt &s0=nc_axiom.s0();
+    const string_exprt &s1=nc_axiom.s1();
 
     symbol_exprt univ_var=generator.fresh_univ_index(
       "not_contains_univ_var", nc_axiom.s0().length().type());
@@ -1474,7 +1486,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
            << from_expr(ns, "", negaxiom) << eom;
     substitute_array_access(negaxiom);
 
-    if(const auto witness=find_counter_example(ns, ui, negaxiom, univ_var))
+    if(const auto &witness=find_counter_example(ns, ui, negaxiom, univ_var))
     {
       stream << "string constraint can be violated for "
              << univ_var.get_identifier()
@@ -1717,7 +1729,7 @@ public:
 /// look for the symbol and return true if it is found
 /// \par parameters: an index expression and a symbol qvar
 /// \return a Boolean
-static bool find_qvar(const exprt index, const symbol_exprt &qvar)
+static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
 {
   find_qvar_visitort v2(qvar);
   index.visit(v2);
@@ -1784,7 +1796,7 @@ static void add_to_index_set(
   exprt i)
 {
   simplify(i, ns);
-  const bool is_size_t=expr_cast<size_t>(i).has_value();
+  const bool is_size_t=expr_cast<std::size_t>(i).has_value();
   if(i.id()!=ID_constant || is_size_t)
   {
     for(const auto &sub : sub_arrays(s))
@@ -1799,7 +1811,7 @@ static void initial_index_set(
   const namespacet &ns,
   const string_constraintt &axiom)
 {
-  symbol_exprt qvar=axiom.univ_var();
+  const symbol_exprt &qvar=axiom.univ_var();
   std::list<exprt> to_process;
   to_process.push_back(axiom.body());
 
@@ -2116,9 +2128,9 @@ public:
   {
     if(expr.id()==ID_index)
     {
-      const index_exprt index=to_index_expr(expr);
-      const exprt s(index.array());
-      const exprt i(index.index());
+      const index_exprt &index=to_index_expr(expr);
+      const exprt &s(index.array());
+      const exprt &i(index.index());
       indices[s].push_back(i);
     }
   }
