@@ -1,8 +1,7 @@
-KNOWNBUG
+CORE
 DetectSplitPackagesTask.class
 --show-symbol-table
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-cf. https://diffblue.atlassian.net/browse/TG-610

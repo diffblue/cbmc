@@ -79,7 +79,7 @@ bool ci_lazy_methodst::operator()(
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
           id2string(method.name)+":"+
-          id2string(method.descriptor);
+          id2string(method.signature);
         method_worklist2.push_back(methodid);
       }
     }
@@ -505,3 +505,4 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
   else
     return irep_idt();
 }
+
