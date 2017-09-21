@@ -760,6 +760,11 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       return resultt::D_SATISFIABLE;
     }
   }
+  else
+  {
+    debug() << "check_SAT: got UNSAT or ERROR" << eom;
+    return res;
+  }
 
   initial_index_set(index_set, current_index_set, ns, universal_axioms);
   update_index_set(index_set, current_index_set, ns, current_constraints);
@@ -812,44 +817,21 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // We will then relaunch the solver with these added lemmas.
       current_index_set.clear();
       update_index_set(index_set, current_index_set, ns, current_constraints);
-      current_constraints.clear();
-      for(const auto &lemma :
-            generate_instantiations(
-              debug(), current_index_set, universal_axioms))
-        add_lemma(lemma);
-      display_current_index_set(debug(), ns, current_index_set);
 
       if(current_index_set.empty())
       {
         debug() << "current index set is empty" << eom;
-        if(config_.trace)
-        {
-          const auto lemmas=concretize_results(
-            get,
-            found_length,
-            found_content,
-            symbol_resolve,
-            index_set,
-            generator.max_string_length,
-            debug(),
-            ns,
-            generator.get_created_strings(),
-            current_index_set,
-            universal_axioms);
-          for(const auto &lemma : lemmas)
-            add_lemma(lemma);
-          display_current_index_set(debug(), ns, current_index_set);
-          return resultt::D_SATISFIABLE;
-        }
-        else
-        {
-          debug() << "check_SAT: the model is correct and "
-                  << "does not need concretizing" << eom;
-          return resultt::D_SATISFIABLE;
-        }
+        return resultt::D_ERROR;
       }
 
       display_index_set(debug(), ns, current_index_set, index_set);
+      current_constraints.clear();
+      for(const auto &instance :
+        generate_instantiations(
+          debug(), current_index_set, universal_axioms))
+        add_lemma(instance);
+      display_current_index_set(debug(), ns, current_index_set);
+
       debug() << "instantiating NOT_CONTAINS constraints" << '\n';
       for(unsigned i=0; i<not_contains_axioms.size(); i++)
       {
