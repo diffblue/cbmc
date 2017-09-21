@@ -608,7 +608,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
     // If lhs is not a symbol, let supert::set_to() handle it.
     if(lhs.id()!=ID_symbol)
     {
-      non_string_axioms.push_back(std::make_pair(expr, value));
+      non_string_axioms.emplace_back(expr, value);
       return;
     }
 
@@ -663,8 +663,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 
     // Push the substituted equality to the list of axioms to be given to
     // supert::set_to.
-    non_string_axioms.push_back(
-      std::make_pair(equal_exprt(lhs, subst_rhs), value));
+    non_string_axioms.emplace_back(equal_exprt(lhs, subst_rhs), value);
   }
   // Push the unmodified equality to the list of axioms to be given to
   // supert::set_to.
@@ -672,7 +671,7 @@ void string_refinementt::set_to(const exprt &expr, bool value)
   {
     // TODO: Verify that the expression contains no string.
     // This will be easy once exprt iterators will have been implemented.
-    non_string_axioms.push_back(std::make_pair(expr, value));
+    non_string_axioms.emplace_back(expr, value);
   }
 }
 
@@ -1546,7 +1545,7 @@ static std::map<exprt, int> map_representation_of_sum(const exprt &f)
   std::map<exprt, int> elems;
 
   std::list<std::pair<exprt, bool> > to_process;
-  to_process.push_back(std::make_pair(f, true));
+  to_process.emplace_back(f, true);
 
   while(!to_process.empty())
   {
@@ -1556,16 +1555,16 @@ static std::map<exprt, int> map_representation_of_sum(const exprt &f)
     if(cur.id()==ID_plus)
     {
       for(const auto &op : cur.operands())
-        to_process.push_back(std::make_pair(op, positive));
+        to_process.emplace_back(op, positive);
     }
     else if(cur.id()==ID_minus)
     {
-      to_process.push_back(std::make_pair(cur.op1(), !positive));
-      to_process.push_back(std::make_pair(cur.op0(), positive));
+      to_process.emplace_back(cur.op1(), !positive);
+      to_process.emplace_back(cur.op0(), positive);
     }
     else if(cur.id()==ID_unary_minus)
     {
-      to_process.push_back(std::make_pair(cur.op0(), !positive));
+      to_process.emplace_back(cur.op0(), !positive);
     }
     else
     {
