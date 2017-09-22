@@ -15,7 +15,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 
 #include "invariant.h"
+#include "json.h"
 #include "source_location.h"
+#include "xml.h"
 
 class message_handlert
 {
@@ -24,7 +26,17 @@ public:
   {
   }
 
-  virtual void print(unsigned level, const std::string &message) = 0;
+  virtual void print(unsigned level, const std::string &message)=0;
+
+  virtual void print(unsigned level, const xmlt &xml)
+  {
+    // no-op by default
+  }
+
+  virtual void print(unsigned level, const jsont &json)
+  {
+    // no-op by default
+  }
 
   virtual void print(
     unsigned level,
@@ -126,7 +138,9 @@ public:
 
   message_handlert &get_message_handler()
   {
-    INVARIANT(message_handler!=nullptr, "message handler is set");
+    INVARIANT(
+      message_handler!=nullptr,
+      "message handler should be set before calling get_message_handler");
     return *message_handler;
   }
 
@@ -174,6 +188,26 @@ public:
     messaget &message;
     source_locationt source_location;
 
+    mstreamt &operator << (const xmlt &data)
+    {
+      *this << eom; // force end of previous message
+      if(message.message_handler)
+      {
+        message.message_handler->print(message_level, data);
+      }
+      return *this;
+    }
+
+    mstreamt &operator << (const json_objectt &data)
+    {
+      *this << eom; // force end of previous message
+      if(message.message_handler)
+      {
+        message.message_handler->print(message_level, data);
+      }
+      return *this;
+    }
+
     template <class T>
     mstreamt &operator << (const T &x)
     {
@@ -214,50 +248,50 @@ public:
     return m;
   }
 
-  mstreamt &get_mstream(unsigned message_level)
+  mstreamt &get_mstream(unsigned message_level) const
   {
     mstream.message_level=message_level;
     return mstream;
   }
 
-  mstreamt &error()
+  mstreamt &error() const
   {
     return get_mstream(M_ERROR);
   }
 
-  mstreamt &warning()
+  mstreamt &warning() const
   {
     return get_mstream(M_WARNING);
   }
 
-  mstreamt &result()
+  mstreamt &result() const
   {
     return get_mstream(M_RESULT);
   }
 
-  mstreamt &status()
+  mstreamt &status() const
   {
     return get_mstream(M_STATUS);
   }
 
-  mstreamt &statistics()
+  mstreamt &statistics() const
   {
     return get_mstream(M_STATISTICS);
   }
 
-  mstreamt &progress()
+  mstreamt &progress() const
   {
     return get_mstream(M_PROGRESS);
   }
 
-  mstreamt &debug()
+  mstreamt &debug() const
   {
     return get_mstream(M_DEBUG);
   }
 
 protected:
   message_handlert *message_handler;
-  mstreamt mstream;
+  mutable mstreamt mstream;
 };
 
 #endif // CPROVER_UTIL_MESSAGE_H

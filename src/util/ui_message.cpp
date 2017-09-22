@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "xml.h"
 #include "json.h"
 #include "xml_expr.h"
+#include "json_expr.h"
 #include "cout_message.h"
 #include "cmdline.h"
 
@@ -116,6 +117,50 @@ void ui_message_handlert::print(
 
 void ui_message_handlert::print(
   unsigned level,
+  const xmlt &data)
+{
+  if(verbosity>=level)
+  {
+    switch(get_ui())
+    {
+    case uit::PLAIN:
+      INVARIANT(false, "Cannot print xml data on PLAIN UI");
+      break;
+    case uit::XML_UI:
+      std::cout << data << '\n';
+      flush(level);
+      break;
+    case uit::JSON_UI:
+      INVARIANT(false, "Cannot print xml data on JSON UI");
+      break;
+    }
+  }
+}
+
+void ui_message_handlert::print(
+  unsigned level,
+  const jsont &data)
+{
+  if(verbosity>=level)
+  {
+    switch(get_ui())
+    {
+    case uit::PLAIN:
+      INVARIANT(false, "Cannot print json data on PLAIN UI");
+      break;
+    case uit::XML_UI:
+      INVARIANT(false, "Cannot print json data on XML UI");
+      break;
+    case uit::JSON_UI:
+      std::cout << ',' << '\n' << data;
+      flush(level);
+      break;
+    }
+  }
+}
+
+void ui_message_handlert::print(
+  unsigned level,
   const std::string &message,
   int sequence_number,
   const source_locationt &location)
@@ -200,11 +245,9 @@ void ui_message_handlert::json_ui_msg(
 {
   json_objectt result;
 
-  #if 0
   if(location.is_not_nil() &&
      !location.get_file().empty())
-    result.new_element(xml(location));
-  #endif
+    result["sourceLocation"] = json(location);
 
   result["messageType"] = json_stringt(type);
   result["messageText"] = json_stringt(msg1);

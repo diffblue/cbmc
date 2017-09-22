@@ -98,3 +98,14 @@ void split_string(
   left=result[0];
   right=result[1];
 }
+
+std::string trim_from_last_delimiter(
+  const std::string &s,
+  const char delim)
+{
+  std::string result="";
+  const size_t index=s.find_last_of(delim);
+  if(index!=std::string::npos)
+    result=s.substr(0, index);
+  return result;
+}

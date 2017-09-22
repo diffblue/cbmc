@@ -15,12 +15,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <map>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class call_grapht
 {
 public:
   call_grapht();
+  explicit call_grapht(const goto_modelt &);
   explicit call_grapht(const goto_functionst &);
 
   void output_dot(std::ostream &out) const;
@@ -31,6 +32,7 @@ public:
   grapht graph;
 
   void add(const irep_idt &caller, const irep_idt &callee);
+  call_grapht get_inverted() const;
 
 protected:
   void add(const irep_idt &function,

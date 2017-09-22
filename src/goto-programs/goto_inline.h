@@ -65,9 +65,8 @@ void goto_function_inline(
   bool caching=true);
 
 jsont goto_function_inline_and_log(
-  goto_functionst &goto_functions,
+  goto_modelt &,
   const irep_idt function,
-  const namespacet &ns,
   message_handlert &message_handler,
   bool adjust_function=false,
   bool caching=true);

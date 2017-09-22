@@ -15,19 +15,20 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 #include <util/parse_options.h>
 
-#include <langapi/language_ui.h>
-
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
+
+#include <java_bytecode/java_bytecode_language.h>
 
 class bmct;
 class goto_functionst;
 class optionst;
 
 #define GOTO_ANALYSER_OPTIONS \
-  "(function):" \
+  OPT_FUNCTIONS \
   "D:I:(std89)(std99)(std11)" \
   "(classpath):(cp):(main-class):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
@@ -45,11 +46,12 @@ class optionst;
   "(unreachable-instructions)(unreachable-functions)" \
   "(reachable-functions)" \
   "(intervals)(show-intervals)" \
-  "(non-null)(show-non-null)"
+  "(non-null)(show-non-null)" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit() override;
@@ -70,7 +72,10 @@ protected:
 
   void eval_verbosity();
 
-  bool has_entry_point;
+  ui_message_handlert::uit get_ui()
+  {
+    return ui_message_handler.get_ui();
+  }
 };
 
 #endif // CPROVER_GOTO_ANALYZER_GOTO_ANALYZER_PARSE_OPTIONS_H

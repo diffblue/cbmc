@@ -24,10 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 
 #include <langapi/mode.h>
-#include <langapi/languages.h>
 #include <langapi/language_util.h>
-
-#include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
@@ -58,32 +55,33 @@ void bmct::error_trace()
   switch(ui)
   {
   case ui_message_handlert::uit::PLAIN:
-    std::cout << "\n" << "Counterexample:" << "\n";
-    show_goto_trace(std::cout, ns, goto_trace);
+    result() << "Counterexample:" << eom;
+    show_goto_trace(result(), ns, goto_trace);
+    result() << eom;
     break;
 
   case ui_message_handlert::uit::XML_UI:
     {
       xmlt xml;
       convert(ns, goto_trace, xml);
-      std::cout << xml << "\n";
+      status() << xml;
     }
     break;
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_arrayt &result_array=json_result["results"].make_array();
-      json_objectt &result=result_array.push_back().make_object();
+      json_objectt json;
+      json_arrayt &result_array=json["results"].make_array();
+      json_objectt &json_result=result_array.push_back().make_object();
       const goto_trace_stept &step=goto_trace.steps.back();
-      result["property"]=
+      json_result["property"]=
         json_stringt(id2string(step.pc->source_location.get_property_id()));
-      result["description"]=
+      json_result["description"]=
         json_stringt(id2string(step.pc->source_location.get_comment()));
-      result["status"]=json_stringt("failed");
-      jsont &json_trace=result["trace"];
+      json_result["status"]=json_stringt("failed");
+      jsont &json_trace=json_result["trace"];
       convert(ns, goto_trace, json_trace);
-      std::cout << ",\n" << json_result;
+      status() << json_result;
     }
     break;
   }
@@ -175,8 +173,7 @@ void bmct::report_success()
     {
       xmlt xml("cprover-status");
       xml.data="SUCCESS";
-      std::cout << xml;
-      std::cout << "\n";
+      result() << xml;
     }
     break;
 
@@ -184,7 +181,7 @@ void bmct::report_success()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("success");
-      std::cout << ",\n" << json_result;
+      result() << json_result;
     }
     break;
   }
@@ -203,8 +200,7 @@ void bmct::report_failure()
     {
       xmlt xml("cprover-status");
       xml.data="FAILURE";
-      std::cout << xml;
-      std::cout << "\n";
+      result() << xml;
     }
     break;
 
@@ -212,7 +208,7 @@ void bmct::report_failure()
     {
       json_objectt json_result;
       json_result["cProverStatus"]=json_stringt("failure");
-      std::cout << ",\n" << json_result;
+      result() << json_result;
     }
     break;
   }
@@ -221,8 +217,6 @@ void bmct::report_failure()
 void bmct::show_program()
 {
   unsigned count=1;
-
-  languagest languages(ns, new_ansi_c_language());
 
   std::cout << "\n" << "Program constraints:" << "\n";
 
@@ -233,13 +227,14 @@ void bmct::show_program()
 
     if(step.is_assignment())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") " << string_value << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -248,14 +243,15 @@ void bmct::show_program()
     }
     else if(step.is_assert())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSERT("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -264,14 +260,15 @@ void bmct::show_program()
     }
     else if(step.is_assume())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") ASSUME("
                 << string_value <<") " << "\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -280,8 +277,8 @@ void bmct::show_program()
     }
     else if(step.is_constraint())
     {
-      std::string string_value;
-      languages.from_expr(step.cond_expr, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.cond_expr);
       std::cout << "(" << count << ") CONSTRAINT("
                 << string_value <<") " << "\n";
 
@@ -289,15 +286,16 @@ void bmct::show_program()
     }
     else if(step.is_shared_read() || step.is_shared_write())
     {
-      std::string string_value;
-      languages.from_expr(step.ssa_lhs, string_value);
+      std::string string_value=
+        from_expr(ns, "", step.ssa_lhs);
       std::cout << "(" << count << ") SHARED_"
                 << (step.is_shared_write()?"WRITE":"READ")
                 << "(" << string_value <<")\n";
 
       if(!step.guard.is_true())
       {
-        languages.from_expr(step.guard, string_value);
+        std::string string_value=
+          from_expr(ns, "", step.guard);
         std::cout << std::string(std::to_string(count).size()+3, ' ');
         std::cout << "guard: " << string_value << "\n";
       }
@@ -314,11 +312,11 @@ safety_checkert::resultt bmct::run(
   std::unique_ptr<memory_model_baset> memory_model;
 
   if(mm.empty() || mm=="sc")
-    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_sct(ns));
+    memory_model=util_make_unique<memory_model_sct>(ns);
   else if(mm=="tso")
-    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_tsot(ns));
+    memory_model=util_make_unique<memory_model_tsot>(ns);
   else if(mm=="pso")
-    memory_model=std::unique_ptr<memory_model_baset>(new memory_model_psot(ns));
+    memory_model=util_make_unique<memory_model_psot>(ns);
   else
   {
     error() << "Invalid memory model " << mm

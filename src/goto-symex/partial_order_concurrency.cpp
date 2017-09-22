@@ -133,7 +133,7 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
   else if(event->is_shared_read())
     return id2string(id(event))+"$rclk$"+std::to_string(axiom);
   else
-    assert(false);
+    UNREACHABLE;
 
   return "";
 }
@@ -156,7 +156,7 @@ symbol_exprt partial_order_concurrencyt::clock(
       std::to_string(numbering[event])+"$spwnclk$"+std::to_string(axiom);
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   return symbol_exprt(identifier, clock_type);
 }

@@ -25,6 +25,9 @@ void java_bytecode_parse_treet::classt::swap(
   std::swap(other.is_enum, is_enum);
   std::swap(other.enum_elements, enum_elements);
   std::swap(other.is_abstract, is_abstract);
+  std::swap(other.is_public, is_public);
+  std::swap(other.is_protected, is_protected);
+  std::swap(other.is_private, is_private);
   other.implements.swap(implements);
   other.fields.swap(fields);
   other.methods.swap(methods);

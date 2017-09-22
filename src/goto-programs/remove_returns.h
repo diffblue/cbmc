@@ -29,6 +29,8 @@ void remove_returns(goto_modelt &);
 // reverse the above operations
 void restore_returns(symbol_tablet &, goto_functionst &);
 
+void restore_returns(goto_modelt &);
+
 code_typet original_return_type(
   const symbol_tablet &symbol_table,
   const irep_idt &function_id);

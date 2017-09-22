@@ -492,7 +492,7 @@ void symex_target_equationt::convert_assertions(
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
 
-  unsigned number_of_assertions=count_assertions();
+  std::size_t number_of_assertions=count_assertions();
 
   if(number_of_assertions==0)
     return;
@@ -511,7 +511,7 @@ void symex_target_equationt::convert_assertions(
         prop_conv.set_to_true(step.cond_expr);
     }
 
-    assert(false); // unreachable
+    UNREACHABLE; // unreachable
   }
 
   // We do (NOT a1) OR (NOT a2) ...
@@ -557,7 +557,7 @@ void symex_target_equationt::convert_assertions(
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
-  unsigned io_count=0;
+  std::size_t io_count=0;
 
   for(auto &step : SSA_steps)
     if(!step.ignore)
@@ -695,7 +695,7 @@ void symex_target_equationt::SSA_stept::output(
   case goto_trace_stept::typet::GOTO:
     out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
 
-  default: assert(false);
+  default: UNREACHABLE;
   }
 
   if(is_assert() || is_assume() || is_assignment() || is_constraint())

@@ -221,7 +221,7 @@ void goto_convertt::do_printf(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void goto_convertt::do_scanf(
@@ -326,7 +326,7 @@ void goto_convertt::do_scanf(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void goto_convertt::do_input(
@@ -514,7 +514,7 @@ void goto_convertt::do_cpp_new(
     new_call.lhs()=tmp_symbol_expr;
     new_call.add_source_location()=rhs.source_location();
 
-    for(unsigned i=0; i<code_type.parameters().size(); i++)
+    for(std::size_t i=0; i<code_type.parameters().size(); i++)
       if(new_call.arguments()[i].type()!=code_type.parameters()[i].type())
         new_call.arguments()[i].make_typecast(code_type.parameters()[i].type());
 
@@ -664,14 +664,21 @@ void goto_convertt::do_java_new_array(
   t_n->code=code_assignt(lhs, malloc_expr);
   t_n->source_location=location;
 
-  // multi-dimensional?
-
   assert(ns.follow(object_type).id()==ID_struct);
   const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
   assert(struct_type.components().size()==3);
 
-  // if it's an array, we need to set the length field
+  // Init base class:
   dereference_exprt deref(lhs, object_type);
+  exprt zero_object=
+    zero_initializer(object_type, location, ns, get_message_handler());
+  set_class_identifier(
+    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
+  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
+  t_i->code=code_assignt(deref, zero_object);
+  t_i->source_location=location;
+
+  // if it's an array, we need to set the length field
   member_exprt length(
     deref,
     struct_type.components()[1].get_name(),
@@ -685,7 +692,20 @@ void goto_convertt::do_java_new_array(
     deref,
     struct_type.components()[2].get_name(),
     struct_type.components()[2].type());
-  side_effect_exprt data_cpp_new_expr(ID_cpp_new_array, data.type());
+
+  // Allocate a (struct realtype**) instead of a (void**) if possible.
+  const irept &given_element_type=object_type.find(ID_C_element_type);
+  typet allocate_data_type;
+  exprt cast_data_member;
+  if(given_element_type.is_not_nil())
+  {
+    allocate_data_type=
+      pointer_type(static_cast<const typet &>(given_element_type));
+  }
+  else
+    allocate_data_type=data.type();
+
+  side_effect_exprt data_java_new_expr(ID_java_new_array, allocate_data_type);
 
   // The instruction may specify a (hopefully small) upper bound on the
   // array size, in which case we allocate a fixed-length array that may
@@ -694,25 +714,48 @@ void goto_convertt::do_java_new_array(
   // backend.
   const irept size_bound=rhs.find(ID_length_upper_bound);
   if(size_bound.is_nil())
-    data_cpp_new_expr.set(ID_size, rhs.op0());
+    data_java_new_expr.set(ID_size, rhs.op0());
   else
-    data_cpp_new_expr.set(ID_size, size_bound);
+    data_java_new_expr.set(ID_size, size_bound);
+
+  // Must directly assign the new array to a temporary
+  // because goto-symex will notice `x=side_effect_exprt` but not
+  // `x=typecast_exprt(side_effect_exprt(...))`
+  symbol_exprt new_array_data_symbol=
+    new_tmp_symbol(
+      data_java_new_expr.type(),
+      "new_array_data",
+      dest,
+      location)
+    .symbol_expr();
+  goto_programt::targett t_p2=dest.add_instruction(ASSIGN);
+  t_p2->code=code_assignt(new_array_data_symbol, data_java_new_expr);
+  t_p2->source_location=location;
+
   goto_programt::targett t_p=dest.add_instruction(ASSIGN);
-  t_p->code=code_assignt(data, data_cpp_new_expr);
+  exprt cast_java_new=new_array_data_symbol;
+  if(cast_java_new.type()!=data.type())
+    cast_java_new=typecast_exprt(cast_java_new, data.type());
+  t_p->code=code_assignt(data, cast_java_new);
   t_p->source_location=location;
 
   // zero-initialize the data
-  exprt zero_element=
-    zero_initializer(
-      data.type().subtype(),
-      location,
-      ns,
-      get_message_handler());
-  codet array_set(ID_array_set);
-  array_set.copy_to_operands(data, zero_element);
-  goto_programt::targett t_d=dest.add_instruction(OTHER);
-  t_d->code=array_set;
-  t_d->source_location=location;
+  if(!rhs.get_bool(ID_skip_initialize))
+  {
+    exprt zero_element=
+      zero_initializer(
+        data.type().subtype(),
+        location,
+        ns,
+        get_message_handler());
+    codet array_set(ID_array_set);
+    array_set.copy_to_operands(new_array_data_symbol, zero_element);
+    goto_programt::targett t_d=dest.add_instruction(OTHER);
+    t_d->code=array_set;
+    t_d->source_location=location;
+  }
+
+  // multi-dimensional?
 
   if(rhs.operands().size()>=2)
   {
@@ -790,7 +833,7 @@ void goto_convertt::cpp_new_initializer(
       convert(to_code(initializer), dest);
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 }
 
@@ -1070,7 +1113,8 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
   }
-  else if(identifier==CPROVER_PREFIX "assert")
+  else if(identifier==CPROVER_PREFIX "assert" ||
+          identifier==CPROVER_PREFIX "precondition")
   {
     if(arguments.size()!=2)
     {
@@ -1080,16 +1124,28 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
 
+    bool is_precondition=
+      identifier==CPROVER_PREFIX "precondition";
+
     const irep_idt description=
       get_string_constant(arguments[1]);
 
     goto_programt::targett t=dest.add_instruction(ASSERT);
     t->guard=arguments[0];
     t->source_location=function.source_location();
-    t->source_location.set(
-      "user-provided",
-      !function.source_location().is_built_in());
-    t->source_location.set_property_class(ID_assertion);
+
+    if(is_precondition)
+    {
+      t->source_location.set_property_class(ID_precondition);
+    }
+    else
+    {
+      t->source_location.set(
+        "user-provided",
+        !function.source_location().is_built_in());
+      t->source_location.set_property_class(ID_assertion);
+    }
+
     t->source_location.set_comment(description);
 
     // let's double-check the type of the argument
@@ -1353,7 +1409,7 @@ void goto_convertt::do_function_call_symbol(
   }
   else if(identifier=="__builtin_unreachable")
   {
-    // says something like assert(false);
+    // says something like UNREACHABLE;
   }
   else if(identifier==ID_gcc_builtin_va_arg)
   {

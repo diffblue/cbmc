@@ -296,7 +296,7 @@ void custom_bitvector_domaint::transform(
             else if(identifier=="__CPROVER_clear_may")
               mode=modet::CLEAR_MAY;
             else
-              assert(false);
+              UNREACHABLE;
 
             exprt lhs=code_function_call.arguments()[0];
 
@@ -411,7 +411,7 @@ void custom_bitvector_domaint::transform(
         else if(statement=="clear_may")
           mode=modet::CLEAR_MAY;
         else
-          assert(false);
+          UNREACHABLE;
 
         exprt lhs=instruction.code.op0();
 
@@ -682,14 +682,13 @@ void custom_bitvector_analysist::instrument(goto_functionst &)
 }
 
 void custom_bitvector_analysist::check(
-  const namespacet &ns,
-  const goto_functionst &goto_functions,
+  const goto_modelt &goto_model,
   bool use_xml,
   std::ostream &out)
 {
   unsigned pass=0, fail=0, unknown=0;
 
-  forall_goto_functions(f_it, goto_functions)
+  forall_goto_functions(f_it, goto_model.goto_functions)
   {
     if(!f_it->second.body.has_assertion())
        continue;
@@ -715,6 +714,7 @@ void custom_bitvector_analysist::check(
           continue;
 
         exprt tmp=eval(i_it->guard, i_it);
+        const namespacet ns(goto_model.symbol_table);
         result=simplify_expr(tmp, ns);
 
         description=i_it->source_location.get_comment();
@@ -744,6 +744,7 @@ void custom_bitvector_analysist::check(
         if(!description.empty())
           out << ", " << description;
         out << ": ";
+        const namespacet ns(goto_model.symbol_table);
         out << from_expr(ns, f_it->first, result);
         out << '\n';
       }

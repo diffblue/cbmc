@@ -1,0 +1,8 @@
+FUTURE
+test_append_object.class
+--refine-strings
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Issue: diffblue/test-gen#82

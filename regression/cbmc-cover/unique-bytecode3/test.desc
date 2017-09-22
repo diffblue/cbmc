@@ -1,0 +1,9 @@
+CORE
+Test.class
+--cover location --show-properties --verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+^java::Test\.<clinit>:\(\)V block 2, location 4: bytecode-index 1 already instrumented
+^java::Test\.<clinit>:\(\)V block 2: location 5, bytecode-index 3 selected for instrumentation
+--
+^Ignoring block 2 location .* file Test\.java line 3 function java::Test\.<clinit>:\(\)V bytecode-index .* \(bytecode-index already instrumented\)

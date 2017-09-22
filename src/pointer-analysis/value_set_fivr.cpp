@@ -232,8 +232,8 @@ void value_set_fivrt::flatten_rec(
   const entryt &e,
   object_mapt &dest,
   flatten_seent &seen,
-        unsigned at_function,
-        unsigned at_index) const
+  unsigned at_function,
+  unsigned at_index) const
 {
   #if 0
   std::cout << "FLATTEN_REC: " << e.identifier << e.suffix << '\n';
@@ -1107,7 +1107,7 @@ void value_set_fivrt::assign(
   {
     const struct_typet &struct_type=to_struct_type(type);
 
-    unsigned no=0;
+    std::size_t no=0;
 
     for(struct_typet::componentst::const_iterator
         c_it=struct_type.components().begin();
@@ -1514,7 +1514,7 @@ void value_set_fivrt::do_function_call(
   to_function=from_function;
   to_target_index=from_target_index;
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
@@ -1536,7 +1536,7 @@ void value_set_fivrt::do_function_call(
 
   // now assign to 'actual actuals'
 
-  unsigned i=0;
+  std::size_t i=0;
 
   for(code_typet::parameterst::const_iterator
       it=parameter_types.begin();
@@ -1586,7 +1586,7 @@ void value_set_fivrt::apply_code(
   else if(statement==ID_function_call)
   {
     // shouldn't be here
-    assert(false);
+    UNREACHABLE;
   }
   else if(statement==ID_assign ||
           statement==ID_init)

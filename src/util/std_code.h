@@ -1039,13 +1039,40 @@ class side_effect_expr_nondett:public side_effect_exprt
 public:
   side_effect_expr_nondett():side_effect_exprt(ID_nondet)
   {
+    set_nullable(true);
   }
 
   explicit side_effect_expr_nondett(const typet &_type):
     side_effect_exprt(ID_nondet, _type)
   {
+    set_nullable(true);
+  }
+
+  void set_nullable(bool nullable)
+  {
+    set(ID_is_nondet_nullable, nullable);
+  }
+
+  bool get_nullable() const
+  {
+    return get_bool(ID_is_nondet_nullable);
   }
 };
+
+inline side_effect_expr_nondett &to_side_effect_expr_nondet(exprt &expr)
+{
+  auto &side_effect_expr_nondet=to_side_effect_expr(expr);
+  assert(side_effect_expr_nondet.get_statement()==ID_nondet);
+  return static_cast<side_effect_expr_nondett &>(side_effect_expr_nondet);
+}
+
+inline const side_effect_expr_nondett &to_side_effect_expr_nondet(
+  const exprt &expr)
+{
+  const auto &side_effect_expr_nondet=to_side_effect_expr(expr);
+  assert(side_effect_expr_nondet.get_statement()==ID_nondet);
+  return static_cast<const side_effect_expr_nondett &>(side_effect_expr_nondet);
+}
 
 /*! \brief A function call side effect
 */
@@ -1125,34 +1152,153 @@ inline const side_effect_expr_throwt &to_side_effect_expr_throw(
   assert(expr.get(ID_statement)==ID_throw);
   return static_cast<const side_effect_expr_throwt &>(expr);
 }
-/*! \brief A side effect that pushes/pops a catch handler
-*/
-class side_effect_expr_catcht:public side_effect_exprt
+
+/// Pushes an exception handler, of the form:
+/// exception_tag1 -> label1
+/// exception_tag2 -> label2
+/// ...
+/// When used in a GOTO program instruction, the corresponding
+/// opcode must be CATCH, and the instruction's `targets` must
+/// be in one-to-one correspondence with the exception tags.
+/// The labels may be unspecified for the case where
+/// there is no corresponding source-language label, in whic
+/// case the GOTO instruction targets must be set at the same
+/// time.
+class code_push_catcht:public codet
 {
 public:
-  side_effect_expr_catcht():side_effect_exprt(ID_push_catch)
+  code_push_catcht():codet(ID_push_catch)
   {
+    set(ID_exception_list, irept(ID_exception_list));
   }
-  explicit side_effect_expr_catcht(const irept &exception_list):
-    side_effect_exprt(ID_push_catch)
+
+  class exception_list_entryt:public irept
   {
-    set(ID_exception_list, exception_list);
+  public:
+    exception_list_entryt()
+    {
+    }
+
+    explicit exception_list_entryt(const irep_idt &tag)
+    {
+      set(ID_tag, tag);
+    }
+
+    exception_list_entryt(const irep_idt &tag, const irep_idt &label)
+    {
+      set(ID_tag, tag);
+      set(ID_label, label);
+    }
+
+    void set_tag(const irep_idt &tag)
+    {
+      set(ID_tag, tag);
+    }
+
+    const irep_idt &get_tag() const {
+      return get(ID_tag);
+    }
+
+    void set_label(const irep_idt &label)
+    {
+      set(ID_label, label);
+    }
+
+    const irep_idt &get_label() const {
+      return get(ID_label);
+    }
+  };
+
+  typedef std::vector<exception_list_entryt> exception_listt;
+
+  code_push_catcht(
+    const irep_idt &tag,
+    const irep_idt &label):
+    codet(ID_push_catch)
+  {
+    set(ID_exception_list, irept(ID_exception_list));
+    exception_list().push_back(exception_list_entryt(tag, label));
+  }
+
+  exception_listt &exception_list() {
+    return (exception_listt &)find(ID_exception_list).get_sub();
+  }
+
+  const exception_listt &exception_list() const {
+    return (const exception_listt &)find(ID_exception_list).get_sub();
   }
 };
 
-static inline side_effect_expr_catcht &to_side_effect_expr_catch(exprt &expr)
+static inline code_push_catcht &to_code_push_catch(codet &code)
 {
-  assert(expr.id()==ID_side_effect);
-  assert(expr.get(ID_statement)==ID_push_catch);
-  return static_cast<side_effect_expr_catcht &>(expr);
+  assert(code.get_statement()==ID_push_catch);
+  return static_cast<code_push_catcht &>(code);
 }
 
-static inline const side_effect_expr_catcht &to_side_effect_expr_catch(
-  const exprt &expr)
+static inline const code_push_catcht &to_code_push_catch(const codet &code)
 {
-  assert(expr.id()==ID_side_effect);
-  assert(expr.get(ID_statement)==ID_push_catch);
-  return static_cast<const side_effect_expr_catcht &>(expr);
+  assert(code.get_statement()==ID_push_catch);
+  return static_cast<const code_push_catcht &>(code);
+}
+
+/// Pops an exception handler from the stack of active handlers
+/// (i.e. whichever handler was most recently pushed by a
+/// `code_push_catcht`).
+class code_pop_catcht:public codet
+{
+public:
+  code_pop_catcht():codet(ID_pop_catch)
+  {
+  }
+};
+
+static inline code_pop_catcht &to_code_pop_catch(codet &code)
+{
+  assert(code.get_statement()==ID_pop_catch);
+  return static_cast<code_pop_catcht &>(code);
+}
+
+static inline const code_pop_catcht &to_code_pop_catch(const codet &code)
+{
+  assert(code.get_statement()==ID_pop_catch);
+  return static_cast<const code_pop_catcht &>(code);
+}
+
+/// A statement that catches an exception, assigning the exception
+/// in flight to an expression (e.g. Java catch(Exception e) might be expressed
+/// landingpadt(symbol_expr("e", ...)))
+class code_landingpadt:public codet
+{
+ public:
+  code_landingpadt():codet(ID_exception_landingpad)
+  {
+    operands().resize(1);
+  }
+  explicit code_landingpadt(const exprt &catch_expr):
+  codet(ID_exception_landingpad)
+  {
+    copy_to_operands(catch_expr);
+  }
+  const exprt &catch_expr() const
+  {
+    return op0();
+  }
+  exprt &catch_expr()
+  {
+    return op0();
+  }
+};
+
+static inline code_landingpadt &to_code_landingpad(codet &code)
+{
+  assert(code.get_statement()==ID_exception_landingpad);
+  return static_cast<code_landingpadt &>(code);
+}
+
+static inline const code_landingpadt &to_code_landingpad(const codet &code)
+{
+  assert(code.get_statement()==ID_exception_landingpad);
+  return static_cast<const code_landingpadt &>(code);
 }
 
 /*! \brief A try/catch block

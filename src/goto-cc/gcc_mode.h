@@ -14,9 +14,12 @@ Date: June 2006
 #ifndef CPROVER_GOTO_CC_GCC_MODE_H
 #define CPROVER_GOTO_CC_GCC_MODE_H
 
+#include "compile.h"
+#include "goto_cc_mode.h"
+
 #include <util/cout_message.h>
 
-#include "goto_cc_mode.h"
+#include <set>
 
 class gcc_modet:public goto_cc_modet
 {
@@ -37,6 +40,9 @@ protected:
   const bool act_as_ld;
   std::string native_tool_name;
 
+  const std::string goto_binary_tmp_suffix;
+
+  /// \brief Associate CBMC architectures with processor names
   const std::map<std::string, std::set<std::string>> arch_map;
 
   int preprocess(
@@ -45,13 +51,15 @@ protected:
     const std::string &dest,
     bool act_as_bcc);
 
-  int run_gcc(); // call gcc with original command line
+  /// \brief call gcc with original command line
+  int run_gcc(const compilet &compiler);
 
-  int gcc_hybrid_binary();
+  int gcc_hybrid_binary(compilet &compiler);
 
   int asm_output(
     bool act_as_bcc,
-    const std::list<std::string> &preprocessed_source_files);
+    const std::list<std::string> &preprocessed_source_files,
+    const compilet &compiler);
 
   static bool needs_preprocessing(const std::string &);
 };

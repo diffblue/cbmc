@@ -328,7 +328,7 @@ bool compilet::is_elf_file(const std::string &file_name)
   {
     char buf[4];
     for(std::size_t i=0; i<4; i++)
-      buf[i] = in.get();
+      buf[i]=static_cast<char>(in.get());
     if(buf[0]==0x7f && buf[1]=='E' &&
         buf[2]=='L' && buf[3]=='F')
       return true;
@@ -368,7 +368,7 @@ bool compilet::link()
     symbol_table.remove(goto_functionst::entry_point());
     compiled_functions.function_map.erase(goto_functionst::entry_point());
 
-    if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+    if(ansi_c_entry_point(symbol_table, get_message_handler()))
       return true;
 
     // entry_point may (should) add some more functions.
@@ -379,7 +379,7 @@ bool compilet::link()
       output_file_executable, symbol_table, compiled_functions))
     return true;
 
-  return false;
+  return add_written_cprover_symbols(symbol_table);
 }
 
 /// parses source files and writes object files, or keeps the symbols in the
@@ -430,6 +430,9 @@ bool compilet::compile()
       if(write_object_file(cfn, symbol_table, compiled_functions))
         return true;
 
+      if(add_written_cprover_symbols(symbol_table))
+        return true;
+
       symbol_table.clear(); // clean symbol table for next source file.
       compiled_functions.clear();
     }
@@ -457,7 +460,7 @@ bool compilet::parse(const std::string &file_name)
     return true;
   }
 
-  languaget *languagep;
+  std::unique_ptr<languaget> languagep;
 
   // Using '-x', the type of a file can be overridden;
   // otherwise, it's guessed from the extension.
@@ -478,8 +481,7 @@ bool compilet::parse(const std::string &file_name)
     return true;
   }
 
-  languaget &language=*languagep;
-  language.set_message_handler(get_message_handler());
+  languagep->set_message_handler(get_message_handler());
 
   language_filet language_file;
 
@@ -489,7 +491,7 @@ bool compilet::parse(const std::string &file_name)
 
   language_filet &lf=res.first->second;
   lf.filename=file_name;
-  lf.language=languagep;
+  lf.language=std::move(languagep);
 
   if(mode==PREPROCESS_ONLY)
   {
@@ -511,13 +513,13 @@ bool compilet::parse(const std::string &file_name)
       }
     }
 
-    language.preprocess(infile, file_name, *os);
+    lf.language->preprocess(infile, file_name, *os);
   }
   else
   {
     statistics() << "Parsing: " << file_name << eom;
 
-    if(language.parse(infile, file_name))
+    if(lf.language->parse(infile, file_name))
     {
       if(get_ui()==ui_message_handlert::uit::PLAIN)
         error() << "PARSING ERROR" << eom;
@@ -617,6 +619,7 @@ bool compilet::write_bin_object_file(
                << "; " << cnt << " have a body." << eom;
 
   outfile.close();
+  wrote_object=true;
 
   return false;
 }
@@ -651,6 +654,7 @@ compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
 {
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
+  wrote_object=false;
   working_directory=get_current_working_directory();
 }
 
@@ -724,4 +728,29 @@ void compilet::convert_symbols(goto_functionst &dest)
       }
     }
   }
+}
+
+bool compilet::add_written_cprover_symbols(const symbol_tablet &symbol_table)
+{
+  for(const auto &pair : symbol_table.symbols)
+  {
+    const irep_idt &name=pair.second.name;
+    const typet &new_type=pair.second.type;
+    if(!(has_prefix(id2string(name), CPROVER_PREFIX) && new_type.id()==ID_code))
+      continue;
+
+    bool inserted;
+    std::map<irep_idt, symbolt>::iterator old;
+    std::tie(old, inserted)=written_macros.insert({name, pair.second});
+
+    if(!inserted && old->second.type!=new_type)
+    {
+      error() << "Incompatible CPROVER macro symbol types:" << eom
+              << old->second.type.pretty() << "(at " << old->second.location
+              << ")" << eom << "and" << eom << new_type.pretty()
+              << "(at " << pair.second.location << ")" << eom;
+      return true;
+    }
+  }
+  return false;
 }

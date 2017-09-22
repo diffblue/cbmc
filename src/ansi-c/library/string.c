@@ -55,7 +55,7 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   char ch;
   do
   {
-    char ch=src[j];
+    ch=src[j];
     dst[i]=ch;
     i++;
     j++;
@@ -298,7 +298,6 @@ inline char *strncat(char *dst, const char *src, size_t n)
 inline int strcmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcmp zero-termination of 1st argument");
@@ -340,7 +339,6 @@ inline int strcmp(const char *s1, const char *s2)
 inline int strcasecmp(const char *s1, const char *s2)
 {
   __CPROVER_HIDE:;
-  if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strcasecmp zero-termination of 1st argument");
@@ -385,7 +383,6 @@ inline int strcasecmp(const char *s1, const char *s2)
 inline int strncmp(const char *s1, const char *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_assert(__CPROVER_is_zero_string(s1) || __CPROVER_buffer_size(s1)>=n, "strncmp zero-termination of 1st argument");
   __CPROVER_assert(__CPROVER_is_zero_string(s2) || __CPROVER_buffer_size(s2)>=n, "strncmp zero-termination of 2nd argument");
@@ -424,7 +421,6 @@ inline int strncmp(const char *s1, const char *s2, size_t n)
 inline int strncasecmp(const char *s1, const char *s2, size_t n)
 {
   __CPROVER_HIDE:;
-  if(s1!=0 && s1==s2) return 0;
   #ifdef __CPROVER_STRING_ABSTRACTION
   int retval;
   __CPROVER_assert(__CPROVER_is_zero_string(s1), "strncasecmp zero-termination of 1st argument");

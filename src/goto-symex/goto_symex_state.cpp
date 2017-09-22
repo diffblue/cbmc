@@ -32,20 +32,7 @@ goto_symex_statet::goto_symex_statet():
   new_frame();
 }
 
-void goto_symex_statet::initialize(const goto_functionst &goto_functions)
-{
-  goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(goto_functionst::entry_point());
-
-  if(it==goto_functions.function_map.end())
-    throw "program has no entry point";
-
-  const goto_programt &body=it->second.body;
-
-  source=symex_targett::sourcet(body);
-  top().end_of_function=--body.instructions.end();
-  top().calling_location.pc=top().end_of_function;
-}
+goto_symex_statet::~goto_symex_statet()=default;
 
 void goto_symex_statet::level0t::operator()(
   ssa_exprt &ssa_expr,
@@ -302,7 +289,7 @@ static void assert_l1_renaming(const exprt &expr)
   if(check_renaming_l1(expr))
   {
     std::cerr << expr.pretty() << '\n';
-    assert(false);
+    UNREACHABLE;
   }
   #else
   (void)expr;
@@ -315,7 +302,7 @@ static void assert_l2_renaming(const exprt &expr)
   if(check_renaming(expr))
   {
     std::cerr << expr.pretty() << '\n';
-    assert(false);
+    UNREACHABLE;
   }
   #else
   (void)expr;
@@ -437,7 +424,7 @@ void goto_symex_statet::set_ssa_indices(
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 

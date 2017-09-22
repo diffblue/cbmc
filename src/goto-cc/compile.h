@@ -18,7 +18,7 @@ Date: June 2006
 #include <util/rename_symbol.h>
 
 #include <langapi/language_ui.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 class compilet:public language_uit
 {
@@ -67,10 +67,28 @@ public:
     const std::string &,
     const symbol_tablet &,
     goto_functionst &);
+
   bool write_bin_object_file(
     const std::string &,
     const symbol_tablet &,
     goto_functionst &);
+
+  /// \brief Has this compiler written any object files?
+  bool wrote_object_files() const { return wrote_object; }
+
+  /// \brief `__CPROVER_...` macros written to object files and their arities
+  ///
+  /// \return A mapping from every `__CPROVER` macro that this compiler
+  /// wrote to one or more object files, to how many parameters that
+  /// `__CPROVER` macro has.
+  void cprover_macro_arities(std::map<irep_idt,
+                                      std::size_t> &cprover_macros) const
+  {
+    PRECONDITION(wrote_object);
+    for(const auto &pair : written_macros)
+      cprover_macros.insert({pair.first,
+        to_code_type(pair.second.type).parameters().size()});
+  }
 
 protected:
   cmdlinet &cmdline;
@@ -81,6 +99,16 @@ protected:
   void add_compiler_specific_defines(class configt &config) const;
 
   void convert_symbols(goto_functionst &dest);
+
+  bool add_written_cprover_symbols(const symbol_tablet &symbol_table);
+  std::map<irep_idt, symbolt> written_macros;
+
+  // clients must only call add_written_cprover_symbols() if an object
+  // file has been written. The case where an object file was written
+  // but there were no __CPROVER symbols in the goto-program is distinct
+  // from the case where the user forgot to write an object file before
+  // calling add_written_cprover_symbols().
+  bool wrote_object;
 };
 
 #endif // CPROVER_GOTO_CC_COMPILE_H

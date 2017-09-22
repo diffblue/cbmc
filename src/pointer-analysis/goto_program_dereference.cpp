@@ -108,10 +108,8 @@ void goto_program_dereferencet::dereference_rec(
 
     guardt old_guard=guard;
 
-    for(unsigned i=0; i<expr.operands().size(); i++)
+    for(auto &op : expr.operands())
     {
-      exprt &op=expr.operands()[i];
-
       if(!op.is_boolean())
         throw expr.id_string()+" takes Boolean operands only, but got "+
               op.pretty();
@@ -392,18 +390,18 @@ void remove_pointers(
 }
 
 void remove_pointers(
-  goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
+  goto_modelt &goto_model,
   value_setst &value_sets)
 {
-  namespacet ns(symbol_table);
+  namespacet ns(goto_model.symbol_table);
 
   optionst options;
 
   goto_program_dereferencet
-    goto_program_dereference(ns, symbol_table, options, value_sets);
+    goto_program_dereference(
+      ns, goto_model.symbol_table, options, value_sets);
 
-  Forall_goto_functions(it, goto_functions)
+  Forall_goto_functions(it, goto_model.goto_functions)
     goto_program_dereference.dereference_program(it->second.body);
 }
 

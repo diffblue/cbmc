@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/language.h>
 #include <util/cmdline.h>
+#include <util/config.h>
 #include <util/unicode.h>
 
 #include "mode.h"
@@ -36,11 +37,9 @@ language_uit::~language_uit()
 
 bool language_uit::parse()
 {
-  for(unsigned i=0; i<_cmdline.args.size(); i++)
-  {
-    if(parse(_cmdline.args[i]))
+  for(const auto &filename : _cmdline.args)
+    if(parse(filename))
       return true;
-  }
 
   return false;
 }
@@ -115,11 +114,17 @@ bool language_uit::final()
 {
   language_files.set_message_handler(*message_handler);
 
+  // Enable/disable stub generation for opaque methods
+  bool stubs_enabled=_cmdline.isset("generate-opaque-stubs");
+  language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
+
   if(language_files.final(symbol_table))
   {
     error() << "CONVERSION ERROR" << eom;
     return true;
   }
+
+  config.set_object_bits_from_symbol_table(symbol_table);
 
   return false;
 }
@@ -165,25 +170,27 @@ void language_uit::show_symbol_table_plain(
   {
     const symbolt &symbol=ns.lookup(id);
 
-    languaget *ptr;
+    std::unique_ptr<languaget> ptr;
 
     if(symbol.mode=="")
+    {
       ptr=get_default_language();
+    }
     else
     {
       ptr=get_language_from_mode(symbol.mode);
-      if(ptr==nullptr)
-        throw "symbol "+id2string(symbol.name)+" has unknown mode";
     }
 
-    std::unique_ptr<languaget> p(ptr);
+    if(!ptr)
+      throw "symbol "+id2string(symbol.name)+" has unknown mode";
+
     std::string type_str, value_str;
 
     if(symbol.type.is_not_nil())
-      p->from_type(symbol.type, type_str, ns);
+      ptr->from_type(symbol.type, type_str, ns);
 
     if(symbol.value.is_not_nil())
-      p->from_expr(symbol.value, value_str, ns);
+      ptr->from_expr(symbol.value, value_str, ns);
 
     if(brief)
     {

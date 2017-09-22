@@ -25,7 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/language_util.h>
 #include <util/c_types.h>
 
-const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank;
+const value_set_fit::object_map_dt value_set_fit::object_map_dt::blank{};
+
 object_numberingt value_set_fit::object_numbering;
 hash_numbering<irep_idt, irep_id_hash> value_set_fit::function_numbering;
 
@@ -206,11 +207,11 @@ void value_set_fit::flatten_rec(
         }
 
         forall_objects(oit, temp.read())
-          insert(dest, oit);
+          insert(dest, *oit);
       }
     }
     else
-      insert(dest, it);
+      insert(dest, *it);
   }
 
   if(generalize_index) // this means we had recursive symbols in there
@@ -222,9 +223,9 @@ void value_set_fit::flatten_rec(
   seen.erase(identifier + e.suffix);
 }
 
-exprt value_set_fit::to_expr(object_map_dt::const_iterator it) const
+exprt value_set_fit::to_expr(const object_map_dt::value_type &it) const
 {
-  const exprt &object=object_numbering[it->first];
+  const exprt &object=object_numbering[it.first];
 
   if(object.id()==ID_invalid ||
      object.id()==ID_unknown)
@@ -234,8 +235,8 @@ exprt value_set_fit::to_expr(object_map_dt::const_iterator it) const
 
   od.object()=object;
 
-  if(it->second.offset_is_set)
-    od.offset()=from_integer(it->second.offset, index_type());
+  if(it.second.offset_is_set)
+    od.offset()=from_integer(it.second.offset, index_type());
 
   od.type()=od.object().type();
 
@@ -244,7 +245,7 @@ exprt value_set_fit::to_expr(object_map_dt::const_iterator it) const
 
 bool value_set_fit::make_union(const value_set_fit::valuest &new_values)
 {
-  assert(0);
+  UNREACHABLE;
   bool result=false;
 
   for(valuest::const_iterator
@@ -287,7 +288,7 @@ bool value_set_fit::make_union(object_mapt &dest, const object_mapt &src) const
 
   forall_objects(it, src.read())
   {
-    if(insert(dest, it))
+    if(insert(dest, *it))
       result=true;
   }
 
@@ -340,7 +341,7 @@ void value_set_fit::get_value_set(
   }
 
   forall_objects(fit, flat_map.read())
-    value_set.push_back(to_expr(fit));
+    value_set.push_back(to_expr(*fit));
 
   #if 0
   // Sanity check!
@@ -744,11 +745,11 @@ void value_set_fit::get_reference_set(
         }
 
         forall_objects(it, omt.read())
-          dest.insert(to_expr(it));
+          dest.insert(to_expr(*it));
       }
     }
     else
-      dest.insert(to_expr(it));
+      dest.insert(to_expr(*it));
   }
 }
 
@@ -761,7 +762,7 @@ void value_set_fit::get_reference_set_sharing(
   get_reference_set_sharing(expr, object_map, ns);
 
   forall_objects(it, object_map.read())
-    dest.insert(to_expr(it));
+    dest.insert(to_expr(*it));
 }
 
 void value_set_fit::get_reference_set_sharing_rec(
@@ -833,13 +834,13 @@ void value_set_fit::get_reference_set_sharing_rec(
           }
 
           forall_objects(it2, t2.read())
-            insert(dest, it2);
+            insert(dest, *it2);
         }
         else
           insert(dest, exprt(ID_unknown, obj.type().subtype()));
       }
       else
-        insert(dest, it);
+        insert(dest, *it);
     }
 
     #if 0
@@ -989,7 +990,7 @@ void value_set_fit::assign(
   {
     const struct_union_typet &struct_type=to_struct_union_type(type);
 
-    unsigned no=0;
+    std::size_t no=0;
 
     for(struct_typet::componentst::const_iterator
         c_it=struct_type.components().begin();
@@ -1182,7 +1183,7 @@ void value_set_fit::do_free(
           to_dynamic_object_expr(object);
 
         if(to_mark.count(dynamic_object.get_instance())==0)
-          set(new_object_map, o_it);
+          set(new_object_map, *o_it);
         else
         {
           // adjust
@@ -1194,7 +1195,7 @@ void value_set_fit::do_free(
         }
       }
       else
-        set(new_object_map, o_it);
+        set(new_object_map, *o_it);
     }
 
     if(changed)
@@ -1367,7 +1368,7 @@ void value_set_fit::do_function_call(
   // to avoid overwriting actuals that are needed for recursive
   // calls
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     const std::string identifier="value_set::" + id2string(function) + "::" +
                                  "argument$"+std::to_string(i);
@@ -1378,7 +1379,7 @@ void value_set_fit::do_function_call(
 
   // now assign to 'actual actuals'
 
-  unsigned i=0;
+  std::size_t i=0;
 
   for(code_typet::parameterst::const_iterator
       it=parameter_types.begin();
@@ -1428,7 +1429,7 @@ void value_set_fit::apply_code(
   else if(statement==ID_function_call)
   {
     // shouldn't be here
-    assert(false);
+    UNREACHABLE;
   }
   else if(statement==ID_assign ||
           statement==ID_init)

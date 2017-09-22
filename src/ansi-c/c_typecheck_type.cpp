@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/pointer_offset_size.h>
 
-#include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "ansi_c_declaration.h"
 #include "padding.h"
@@ -76,7 +75,10 @@ void c_typecheck_baset::typecheck_type(typet &type)
   else if(type.id()==ID_array)
     typecheck_array_type(to_array_type(type));
   else if(type.id()==ID_pointer)
+  {
     typecheck_type(type.subtype());
+    INVARIANT(!type.get(ID_width).empty(), "pointers must have width");
+  }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
     typecheck_compound_type(to_struct_union_type(type));
@@ -380,7 +382,7 @@ void c_typecheck_baset::typecheck_custom_type(typet &type)
     type.set(ID_f, integer2string(f_int));
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void c_typecheck_baset::typecheck_code_type(code_typet &type)
@@ -658,7 +660,7 @@ void c_typecheck_baset::typecheck_vector_type(vector_typet &type)
   }
 
   // the subtype must have constant size
-  exprt size_expr=c_sizeof(type.subtype(), *this);
+  exprt size_expr=size_of_expr(type.subtype(), *this);
 
   simplify(size_expr, *this);
 
@@ -759,7 +761,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
       else if(compound_symbol.type.id()==ID_union)
         compound_symbol.type.id(ID_incomplete_union);
       else
-        assert(false);
+        UNREACHABLE;
 
       symbolt *new_symbol;
       move_symbol(compound_symbol, new_symbol);
@@ -1490,7 +1492,7 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
-    type.id(ID_pointer);
+    type=pointer_type(type.subtype());
     type.remove(ID_size);
     type.remove(ID_C_constant);
   }

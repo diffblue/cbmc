@@ -48,8 +48,11 @@ json_objectt show_goto_functions_jsont::convert(
     json_function["name"]=json_stringt(id2string(function_name));
     json_function["isBodyAvailable"]=
       jsont::json_boolean(function.body_available());
-    bool is_internal=(has_prefix(id2string(function_name), CPROVER_PREFIX) ||
-                      function_name==goto_functions.entry_point());
+    bool is_internal=
+      has_prefix(id2string(function_name), CPROVER_PREFIX) ||
+      has_prefix(id2string(function_name), "java::array[") ||
+      has_prefix(id2string(function_name), "java::org.cprover") ||
+      has_prefix(id2string(function_name), "java::java");
     json_function["isInternal"]=jsont::json_boolean(is_internal);
 
     if(function.body_available())
@@ -82,9 +85,9 @@ json_objectt show_goto_functions_jsont::convert(
           json_arrayt operand_array;
           for(const exprt &operand : instruction.code.operands())
           {
-            json_objectt operand_object;
-            no_comments_irep_converter.convert_from_irep(
-              operand, operand_object);
+            json_objectt operand_object=
+              no_comments_irep_converter.convert_from_irep(
+                operand);
             operand_array.push_back(operand_object);
           }
           instruction_entry["operands"]=operand_array;
@@ -92,10 +95,9 @@ json_objectt show_goto_functions_jsont::convert(
 
         if(!instruction.guard.is_true())
         {
-          json_objectt guard_object;
-          no_comments_irep_converter.convert_from_irep(
-            instruction.guard,
-            guard_object);
+          json_objectt guard_object=
+            no_comments_irep_converter.convert_from_irep(
+              instruction.guard);
 
           instruction_entry["guard"]=guard_object;
         }
@@ -106,8 +108,10 @@ json_objectt show_goto_functions_jsont::convert(
       json_function["instructions"]=json_instruction_array;
     }
   }
+
   json_objectt json_result;
   json_result["functions"]=json_functions;
+
   return json_result;
 }
 

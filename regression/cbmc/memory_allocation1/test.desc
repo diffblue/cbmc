@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 \[main.pointer_dereference.2\] dereference failure: pointer invalid in \*p: SUCCESS
 \[main.assertion.1\] assertion \*p==42: SUCCESS
-\[main.pointer_dereference.14\] dereference failure: pointer invalid in p\[\(signed( long)? long int\)1\]: FAILURE
+\[main.pointer_dereference.14\] dereference failure: pointer invalid in p\[.*1\]: FAILURE
 \[main.assertion.2\] assertion \*\(p\+1\)==42: SUCCESS
 \*\* 12 of 26 failed \(2 iterations\)
 --

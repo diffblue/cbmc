@@ -11,8 +11,8 @@ Author: Peter Schrammel
 
 #include "goto_diff_parse_options.h"
 
-#include <fstream>
 #include <cstdlib> // exit()
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -20,6 +20,7 @@ Author: Peter Schrammel
 #include <util/config.h>
 #include <util/language.h>
 #include <util/options.h>
+#include <util/make_unique.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -318,14 +319,10 @@ int goto_diff_parse_optionst::doit()
     return 0;
   }
 
-  std::unique_ptr<goto_difft> goto_diff;
-  goto_diff = std::unique_ptr<goto_difft>(
-    new syntactic_difft(goto_model1, goto_model2, get_message_handler()));
-  goto_diff->set_ui(get_ui());
-
-  (*goto_diff)();
-
-  goto_diff->output_functions(std::cout);
+  syntactic_difft sd(goto_model1, goto_model2, get_message_handler());
+  sd.set_ui(get_ui());
+  sd();
+  sd.output_functions(std::cout);
 
   return 0;
 }
@@ -347,7 +344,6 @@ int goto_diff_parse_optionst::get_goto_program(
       return 6;
 
     config.set(cmdline);
-    config.set_from_symbol_table(goto_model.symbol_table);
 
     // This one is done.
     cmdline.args.erase(cmdline.args.begin());
@@ -435,14 +431,14 @@ bool goto_diff_parse_optionst::process_goto_program(
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return true;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      show_goto_functions(ns, get_ui(), goto_functions);
+      show_goto_functions(goto_model, get_ui());
       return true;
     }
   }

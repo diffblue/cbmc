@@ -60,7 +60,8 @@ void goto_symext::symex_assign(
       throw "symex_assign: unexpected function call: "+id2string(identifier);
     }
     else if(statement==ID_cpp_new ||
-            statement==ID_cpp_new_array)
+            statement==ID_cpp_new_array ||
+            statement==ID_java_new_array)
       symex_cpp_new(state, lhs, side_effect_expr);
     else if(statement==ID_malloc)
       symex_malloc(state, lhs, side_effect_expr);
@@ -471,7 +472,7 @@ void goto_symext::symex_assign_byte_extract(
   else if(lhs.id()==ID_byte_extract_big_endian)
     new_rhs.id(ID_byte_update_big_endian);
   else
-    assert(false);
+    UNREACHABLE;
 
   new_rhs.copy_to_operands(lhs.op(), lhs.offset(), rhs);
   new_rhs.type()=lhs.op().type();

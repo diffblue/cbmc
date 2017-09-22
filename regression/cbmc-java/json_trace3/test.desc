@@ -1,0 +1,10 @@
+CORE
+Test.class
+--cover location --trace --json-ui --unwind 5
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+"lhs": "dynamic_2_array\[1L\]",\n *"mode": "java",\n *"sourceLocation": \{\n *"bytecodeIndex": "15",\n *"file": "Test\.java",\n *"function": "java::Test\.main:\(\[J\)V",\n *"line": "6"\n *\},\n *"stepType": "assignment",\n *"thread": 0,\n *"value": \{\n *"binary": "0000000000000000000000000000000000000000000000000000000000000001",\n *"data": "1L",\n *"name": "integer",\n *"type": "long",\n *"width": 64
+--
+"name": "unknown"
+^warning: ignoring

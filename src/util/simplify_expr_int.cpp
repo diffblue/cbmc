@@ -581,7 +581,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
       else if(expr.id()==ID_bitxor)
         new_expr.id(ID_xor);
       else
-        assert(false);
+        UNREACHABLE;
 
       Forall_operands(it, new_expr)
       {
@@ -664,7 +664,7 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
     result=false;
   }
 
-  // now erase zeros out of bitor, bitxor
+  // now erase 'all zeros' out of bitor, bitxor
 
   if(expr.id()==ID_bitor || expr.id()==ID_bitxor)
   {
@@ -674,6 +674,28 @@ bool simplify_exprt::simplify_bitwise(exprt &expr)
         ) // no it++
     {
       if(it->is_zero() && expr.operands().size()>1)
+      {
+        it=expr.operands().erase(it);
+        result=false;
+      }
+      else
+        it++;
+    }
+  }
+
+  // now erase 'all ones' out of bitand
+
+  if(expr.id()==ID_bitand)
+  {
+    for(exprt::operandst::iterator
+        it=expr.operands().begin();
+        it!=expr.operands().end();
+        ) // no it++
+    {
+      if(it->is_constant() &&
+         id2string(to_constant_expr(*it).get_value()).find('0')==
+           std::string::npos &&
+         expr.operands().size()>1)
       {
         it=expr.operands().erase(it);
         result=false;
@@ -1244,7 +1266,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       else if(expr.id()==ID_lt)
         expr.make_bool(f0<f1);
       else
-        assert(false);
+        UNREACHABLE;
 
       return false;
     }
@@ -1266,7 +1288,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       else if(expr.id()==ID_lt)
         expr.make_bool(f0<f1);
       else
-        assert(false);
+        UNREACHABLE;
 
       return false;
     }
@@ -1293,7 +1315,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       else if(expr.id()==ID_lt)
         expr.make_bool(r0<r1);
       else
-        assert(false);
+        UNREACHABLE;
 
       return false;
     }
@@ -1320,7 +1342,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       else if(expr.id()==ID_lt)
         expr.make_bool(v0<v1);
       else
-        assert(false);
+        UNREACHABLE;
 
       return false;
     }
@@ -1355,7 +1377,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     return simplify_inequality_not_constant(expr);
   }
 
-  assert(false);
+  UNREACHABLE;
   return false;
 }
 
@@ -1494,7 +1516,7 @@ bool simplify_exprt::simplify_inequality_not_constant(exprt &expr)
         else
         {
           tmp=false;
-          assert(0);
+          UNREACHABLE;
         }
 
         if(first)

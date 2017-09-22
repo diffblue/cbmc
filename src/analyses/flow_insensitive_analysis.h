@@ -25,7 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class flow_insensitive_abstract_domain_baset
 {
 public:
-  flow_insensitive_abstract_domain_baset()
+  flow_insensitive_abstract_domain_baset():
+    changed(false)
   {
   }
 

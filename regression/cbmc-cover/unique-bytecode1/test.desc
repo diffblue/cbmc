@@ -1,0 +1,7 @@
+CORE
+Test.class
+--cover location --show-properties --verbosity 10
+^EXIT=0$
+^SIGNAL=0$
+--
+^Ignoring block .* java::Test\.main

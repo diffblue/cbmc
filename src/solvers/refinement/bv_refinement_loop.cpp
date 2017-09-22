@@ -12,21 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/xml.h>
 
-bv_refinementt::bv_refinementt(
-  const namespacet &_ns, propt &_prop):
-  bv_pointerst(_ns, _prop),
-  max_node_refinement(5),
-  do_array_refinement(true),
-  do_arithmetic_refinement(true)
+bv_refinementt::bv_refinementt(const infot &info):
+  bv_pointerst(*info.ns, *info.prop),
+  progress(false),
+  config_(info)
 {
   // check features we need
-  assert(prop.has_set_assumptions());
-  assert(prop.has_set_to());
-  assert(prop.has_is_in_conflict());
-}
-
-bv_refinementt::~bv_refinementt()
-{
+  PRECONDITION(prop.has_set_assumptions());
+  PRECONDITION(prop.has_set_to());
+  PRECONDITION(prop.has_is_in_conflict());
 }
 
 decision_proceduret::resultt bv_refinementt::dec_solve()
@@ -47,11 +41,11 @@ decision_proceduret::resultt bv_refinementt::dec_solve()
     status() << "BV-Refinement: iteration " << iteration << eom;
 
     // output the very same information in a structured fashion
-    if(ui==ui_message_handlert::uit::XML_UI)
+    if(config_.ui==ui_message_handlert::uit::XML_UI)
     {
       xmlt xml("refinement-iteration");
       xml.data=std::to_string(iteration);
-      std::cout << xml << '\n';
+      status() << xml << '\n';
     }
 
     switch(prop_solve())
@@ -94,17 +88,16 @@ decision_proceduret::resultt bv_refinementt::prop_solve()
   // this puts the underapproximations into effect
   bvt assumptions=parent_assumptions;
 
-  for(approximationst::const_iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
+  for(const approximationt &approximation : approximations)
   {
     assumptions.insert(
       assumptions.end(),
-      a_it->over_assumptions.begin(), a_it->over_assumptions.end());
+      approximation.over_assumptions.begin(),
+      approximation.over_assumptions.end());
     assumptions.insert(
       assumptions.end(),
-      a_it->under_assumptions.begin(), a_it->under_assumptions.end());
+      approximation.under_assumptions.begin(),
+      approximation.under_assumptions.end());
   }
 
   prop.set_assumptions(assumptions);
@@ -125,40 +118,16 @@ void bv_refinementt::check_SAT()
 
   arrays_overapproximated();
 
-  for(approximationst::iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
-    check_SAT(*a_it);
+  for(approximationt &approximation : this->approximations)
+    check_SAT(approximation);
 }
 
 void bv_refinementt::check_UNSAT()
 {
   progress=false;
 
-  for(approximationst::iterator
-      a_it=approximations.begin();
-      a_it!=approximations.end();
-      a_it++)
-    check_UNSAT(*a_it);
-}
-
-void bv_refinementt::set_to(const exprt &expr, bool value)
-{
-  #if 0
-  unsigned prev=prop.no_variables();
-  SUB::set_to(expr, value);
-  unsigned n=prop.no_variables()-prev;
-  std::cout << n << " EEE " << expr.id() << "@" << expr.type().id();
-  forall_operands(it, expr)
-    std::cout << " " << it->id() << "@" << it->type().id();
-  if(expr.id()=="=" && expr.operands().size()==2)
-    forall_operands(it, expr.op1())
-      std::cout << " " << it->id() << "@" << it->type().id();
-  std::cout << '\n';
-  #else
-  SUB::set_to(expr, value);
-  #endif
+  for(approximationt &approximation : this->approximations)
+    check_UNSAT(approximation);
 }
 
 void bv_refinementt::set_assumptions(const bvt &_assumptions)

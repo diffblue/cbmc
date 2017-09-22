@@ -17,10 +17,9 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include <cassert>
-
 #include "expr.h"
 #include "mp_arith.h"
+#include "invariant.h"
 
 class constant_exprt;
 
@@ -141,7 +140,7 @@ public:
 */
 inline const symbol_typet &to_symbol_type(const typet &type)
 {
-  assert(type.id()==ID_symbol);
+  PRECONDITION(type.id()==ID_symbol);
   return static_cast<const symbol_typet &>(type);
 }
 
@@ -150,7 +149,7 @@ inline const symbol_typet &to_symbol_type(const typet &type)
 */
 inline symbol_typet &to_symbol_type(typet &type)
 {
-  assert(type.id()==ID_symbol);
+  PRECONDITION(type.id()==ID_symbol);
   return static_cast<symbol_typet &>(type);
 }
 
@@ -276,8 +275,7 @@ public:
 */
 inline const struct_union_typet &to_struct_union_type(const typet &type)
 {
-  assert(type.id()==ID_struct ||
-         type.id()==ID_union);
+  PRECONDITION(type.id()==ID_struct || type.id()==ID_union);
   return static_cast<const struct_union_typet &>(type);
 }
 
@@ -286,8 +284,7 @@ inline const struct_union_typet &to_struct_union_type(const typet &type)
 */
 inline struct_union_typet &to_struct_union_type(typet &type)
 {
-  assert(type.id()==ID_struct ||
-         type.id()==ID_union);
+  PRECONDITION(type.id()==ID_struct || type.id()==ID_union);
   return static_cast<struct_union_typet &>(type);
 }
 
@@ -316,7 +313,7 @@ public:
 */
 inline const struct_typet &to_struct_type(const typet &type)
 {
-  assert(type.id()==ID_struct);
+  PRECONDITION(type.id()==ID_struct);
   return static_cast<const struct_typet &>(type);
 }
 
@@ -325,7 +322,7 @@ inline const struct_typet &to_struct_type(const typet &type)
 */
 inline struct_typet &to_struct_type(typet &type)
 {
-  assert(type.id()==ID_struct);
+  PRECONDITION(type.id()==ID_struct);
   return static_cast<struct_typet &>(type);
 }
 
@@ -362,35 +359,49 @@ public:
     return is_class()?ID_private:ID_public;
   }
 
-  const irept::subt &bases() const
+  class baset:public exprt
   {
-    return find(ID_bases).get_sub();
+  public:
+    baset():exprt(ID_base)
+    {
+    }
+
+    explicit baset(const typet &base):exprt(ID_base, base)
+    {
+    }
+  };
+
+  typedef std::vector<baset> basest;
+
+  const basest &bases() const
+  {
+    return (const basest &)find(ID_bases).get_sub();
   }
 
-  irept::subt &bases()
+  basest &bases()
   {
-    return add(ID_bases).get_sub();
+    return (basest &)add(ID_bases).get_sub();
   }
 
   void add_base(const typet &base)
   {
-    bases().push_back(exprt(ID_base, base));
+    bases().push_back(baset(base));
   }
 
   bool has_base(const irep_idt &id) const
   {
-    const irept::subt &b=bases();
-
-    forall_irep(it, b)
+    for(const auto &b : bases())
     {
-      assert(it->id()==ID_base);
-      const irept &type=it->find(ID_type);
-      assert(type.id()==ID_symbol);
-      if(type.get(ID_identifier)==id)
+      if(to_symbol_type(b.type()).get(ID_identifier)==id)
         return true;
     }
 
     return false;
+  }
+
+  bool is_abstract() const
+  {
+    return get_bool(ID_abstract);
   }
 };
 
@@ -406,7 +417,7 @@ public:
 */
 inline const class_typet &to_class_type(const typet &type)
 {
-  assert(type.id()==ID_struct);
+  PRECONDITION(type.id()==ID_struct);
   return static_cast<const class_typet &>(type);
 }
 
@@ -415,7 +426,7 @@ inline const class_typet &to_class_type(const typet &type)
 */
 inline class_typet &to_class_type(typet &type)
 {
-  assert(type.id()==ID_struct);
+  PRECONDITION(type.id()==ID_struct);
   return static_cast<class_typet &>(type);
 }
 
@@ -441,7 +452,7 @@ public:
 */
 inline const union_typet &to_union_type(const typet &type)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id()==ID_union);
   return static_cast<const union_typet &>(type);
 }
 
@@ -450,7 +461,7 @@ inline const union_typet &to_union_type(const typet &type)
 */
 inline union_typet &to_union_type(typet &type)
 {
-  assert(type.id()==ID_union);
+  PRECONDITION(type.id()==ID_union);
   return static_cast<union_typet &>(type);
 }
 
@@ -494,9 +505,9 @@ public:
 */
 inline const tag_typet &to_tag_type(const typet &type)
 {
-  assert(type.id()==ID_c_enum_tag ||
-         type.id()==ID_struct_tag ||
-         type.id()==ID_union_tag);
+  PRECONDITION(type.id()==ID_c_enum_tag ||
+               type.id()==ID_struct_tag ||
+               type.id()==ID_union_tag);
   return static_cast<const tag_typet &>(type);
 }
 
@@ -505,9 +516,9 @@ inline const tag_typet &to_tag_type(const typet &type)
 */
 inline tag_typet &to_tag_type(typet &type)
 {
-  assert(type.id()==ID_c_enum_tag ||
-         type.id()==ID_struct_tag ||
-         type.id()==ID_union_tag);
+  PRECONDITION(type.id()==ID_c_enum_tag ||
+               type.id()==ID_struct_tag ||
+               type.id()==ID_union_tag);
   return static_cast<tag_typet &>(type);
 }
 
@@ -535,7 +546,7 @@ public:
 */
 inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 {
-  assert(type.id()==ID_struct_tag);
+  PRECONDITION(type.id()==ID_struct_tag);
   return static_cast<const struct_tag_typet &>(type);
 }
 
@@ -544,7 +555,7 @@ inline const struct_tag_typet &to_struct_tag_type(const typet &type)
 */
 inline struct_tag_typet &to_struct_tag_type(typet &type)
 {
-  assert(type.id()==ID_struct_tag);
+  PRECONDITION(type.id()==ID_struct_tag);
   return static_cast<struct_tag_typet &>(type);
 }
 
@@ -572,7 +583,7 @@ public:
 */
 inline const union_tag_typet &to_union_tag_type(const typet &type)
 {
-  assert(type.id()==ID_union_tag);
+  PRECONDITION(type.id()==ID_union_tag);
   return static_cast<const union_tag_typet &>(type);
 }
 
@@ -581,7 +592,7 @@ inline const union_tag_typet &to_union_tag_type(const typet &type)
 */
 inline union_tag_typet &to_union_tag_type(typet &type)
 {
-  assert(type.id()==ID_union_tag);
+  PRECONDITION(type.id()==ID_union_tag);
   return static_cast<union_tag_typet &>(type);
 }
 
@@ -618,7 +629,7 @@ public:
 */
 inline const enumeration_typet &to_enumeration_type(const typet &type)
 {
-  assert(type.id()==ID_enumeration);
+  PRECONDITION(type.id()==ID_enumeration);
   return static_cast<const enumeration_typet &>(type);
 }
 
@@ -627,7 +638,7 @@ inline const enumeration_typet &to_enumeration_type(const typet &type)
 */
 inline enumeration_typet &to_enumeration_type(typet &type)
 {
-  assert(type.id()==ID_enumeration);
+  PRECONDITION(type.id()==ID_enumeration);
   return static_cast<enumeration_typet &>(type);
 }
 
@@ -679,7 +690,7 @@ public:
 */
 inline const c_enum_typet &to_c_enum_type(const typet &type)
 {
-  assert(type.id()==ID_c_enum);
+  PRECONDITION(type.id()==ID_c_enum);
   return static_cast<const c_enum_typet &>(type);
 }
 
@@ -688,7 +699,7 @@ inline const c_enum_typet &to_c_enum_type(const typet &type)
 */
 inline c_enum_typet &to_c_enum_type(typet &type)
 {
-  assert(type.id()==ID_c_enum);
+  PRECONDITION(type.id()==ID_c_enum);
   return static_cast<c_enum_typet &>(type);
 }
 
@@ -716,7 +727,7 @@ public:
 */
 inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 {
-  assert(type.id()==ID_c_enum_tag);
+  PRECONDITION(type.id()==ID_c_enum_tag);
   return static_cast<const c_enum_tag_typet &>(type);
 }
 
@@ -725,7 +736,7 @@ inline const c_enum_tag_typet &to_c_enum_tag_type(const typet &type)
 */
 inline c_enum_tag_typet &to_c_enum_tag_type(typet &type)
 {
-  assert(type.id()==ID_c_enum_tag);
+  PRECONDITION(type.id()==ID_c_enum_tag);
   return static_cast<c_enum_tag_typet &>(type);
 }
 
@@ -858,6 +869,16 @@ public:
     set(ID_C_inlined, value);
   }
 
+  const irep_idt &get_access() const
+  {
+    return get(ID_access);
+  }
+
+  void set_access(const irep_idt &access)
+  {
+    return set(ID_access, access);
+  }
+
   // this produces the list of parameter identifiers
   std::vector<irep_idt> parameter_identifiers() const
   {
@@ -883,7 +904,7 @@ public:
 */
 inline const code_typet &to_code_type(const typet &type)
 {
-  assert(type.id()==ID_code);
+  PRECONDITION(type.id()==ID_code);
   return static_cast<const code_typet &>(type);
 }
 
@@ -892,7 +913,7 @@ inline const code_typet &to_code_type(const typet &type)
 */
 inline code_typet &to_code_type(typet &type)
 {
-  assert(type.id()==ID_code);
+  PRECONDITION(type.id()==ID_code);
   return static_cast<code_typet &>(type);
 }
 
@@ -945,7 +966,7 @@ public:
 */
 inline const array_typet &to_array_type(const typet &type)
 {
-  assert(type.id()==ID_array);
+  PRECONDITION(type.id()==ID_array);
   return static_cast<const array_typet &>(type);
 }
 
@@ -954,7 +975,7 @@ inline const array_typet &to_array_type(const typet &type)
 */
 inline array_typet &to_array_type(typet &type)
 {
-  assert(type.id()==ID_array);
+  PRECONDITION(type.id()==ID_array);
   return static_cast<array_typet &>(type);
 }
 
@@ -985,7 +1006,7 @@ public:
 */
 inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
 {
-  assert(type.id()==ID_array);
+  PRECONDITION(type.id()==ID_array);
   return static_cast<const incomplete_array_typet &>(type);
 }
 
@@ -994,7 +1015,7 @@ inline const incomplete_array_typet &to_incomplete_array_type(const typet &type)
 */
 inline incomplete_array_typet &to_incomplete_array_type(typet &type)
 {
-  assert(type.id()==ID_array);
+  PRECONDITION(type.id()==ID_array);
   return static_cast<incomplete_array_typet &>(type);
 }
 
@@ -1050,32 +1071,32 @@ public:
 */
 inline const bitvector_typet &to_bitvector_type(const typet &type)
 {
-  assert(type.id()==ID_signedbv ||
-         type.id()==ID_unsignedbv ||
-         type.id()==ID_fixedbv ||
-         type.id()==ID_floatbv ||
-         type.id()==ID_verilog_signedbv ||
-         type.id()==ID_verilog_unsignedbv ||
-         type.id()==ID_bv ||
-         type.id()==ID_pointer ||
-         type.id()==ID_c_bit_field ||
-         type.id()==ID_c_bool);
+  PRECONDITION(type.id()==ID_signedbv ||
+               type.id()==ID_unsignedbv ||
+               type.id()==ID_fixedbv ||
+               type.id()==ID_floatbv ||
+               type.id()==ID_verilog_signedbv ||
+               type.id()==ID_verilog_unsignedbv ||
+               type.id()==ID_bv ||
+               type.id()==ID_pointer ||
+               type.id()==ID_c_bit_field ||
+               type.id()==ID_c_bool);
 
   return static_cast<const bitvector_typet &>(type);
 }
 
 inline bitvector_typet &to_bitvector_type(typet &type)
 {
-  assert(type.id()==ID_signedbv ||
-         type.id()==ID_unsignedbv ||
-         type.id()==ID_fixedbv ||
-         type.id()==ID_floatbv ||
-         type.id()==ID_verilog_signedbv ||
-         type.id()==ID_verilog_unsignedbv ||
-         type.id()==ID_bv ||
-         type.id()==ID_pointer ||
-         type.id()==ID_c_bit_field ||
-         type.id()==ID_c_bool);
+  PRECONDITION(type.id()==ID_signedbv ||
+               type.id()==ID_unsignedbv ||
+               type.id()==ID_fixedbv ||
+               type.id()==ID_floatbv ||
+               type.id()==ID_verilog_signedbv ||
+               type.id()==ID_verilog_unsignedbv ||
+               type.id()==ID_bv ||
+               type.id()==ID_pointer ||
+               type.id()==ID_c_bit_field ||
+               type.id()==ID_c_bool);
 
   return static_cast<bitvector_typet &>(type);
 }
@@ -1107,7 +1128,7 @@ public:
 */
 inline const bv_typet &to_bv_type(const typet &type)
 {
-  assert(type.id()==ID_bv);
+  PRECONDITION(type.id()==ID_bv);
   return static_cast<const bv_typet &>(type);
 }
 
@@ -1116,7 +1137,7 @@ inline const bv_typet &to_bv_type(const typet &type)
 */
 inline bv_typet &to_bv_type(typet &type)
 {
-  assert(type.id()==ID_bv);
+  PRECONDITION(type.id()==ID_bv);
   return static_cast<bv_typet &>(type);
 }
 
@@ -1153,7 +1174,7 @@ public:
 */
 inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 {
-  assert(type.id()==ID_unsignedbv);
+  PRECONDITION(type.id()==ID_unsignedbv);
   return static_cast<const unsignedbv_typet &>(type);
 }
 
@@ -1162,7 +1183,7 @@ inline const unsignedbv_typet &to_unsignedbv_type(const typet &type)
 */
 inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 {
-  assert(type.id()==ID_unsignedbv);
+  PRECONDITION(type.id()==ID_unsignedbv);
   return static_cast<unsignedbv_typet &>(type);
 }
 
@@ -1199,7 +1220,7 @@ public:
 */
 inline const signedbv_typet &to_signedbv_type(const typet &type)
 {
-  assert(type.id()==ID_signedbv);
+  PRECONDITION(type.id()==ID_signedbv);
   return static_cast<const signedbv_typet &>(type);
 }
 
@@ -1208,7 +1229,7 @@ inline const signedbv_typet &to_signedbv_type(const typet &type)
 */
 inline signedbv_typet &to_signedbv_type(typet &type)
 {
-  assert(type.id()==ID_signedbv);
+  PRECONDITION(type.id()==ID_signedbv);
   return static_cast<signedbv_typet &>(type);
 }
 
@@ -1246,7 +1267,7 @@ public:
 */
 inline const fixedbv_typet &to_fixedbv_type(const typet &type)
 {
-  assert(type.id()==ID_fixedbv);
+  PRECONDITION(type.id()==ID_fixedbv);
   return static_cast<const fixedbv_typet &>(type);
 }
 
@@ -1285,7 +1306,7 @@ public:
 */
 inline const floatbv_typet &to_floatbv_type(const typet &type)
 {
-  assert(type.id()==ID_floatbv);
+  PRECONDITION(type.id()==ID_floatbv);
   return static_cast<const floatbv_typet &>(type);
 }
 
@@ -1318,7 +1339,7 @@ public:
 */
 inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 {
-  assert(type.id()==ID_c_bit_field);
+  PRECONDITION(type.id()==ID_c_bit_field);
   return static_cast<const c_bit_field_typet &>(type);
 }
 
@@ -1334,7 +1355,7 @@ inline const c_bit_field_typet &to_c_bit_field_type(const typet &type)
 */
 inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 {
-  assert(type.id()==ID_c_bit_field);
+  PRECONDITION(type.id()==ID_c_bit_field);
   return static_cast<c_bit_field_typet &>(type);
 }
 
@@ -1343,16 +1364,6 @@ inline c_bit_field_typet &to_c_bit_field_type(typet &type)
 class pointer_typet:public bitvector_typet
 {
 public:
-  pointer_typet():bitvector_typet(ID_pointer)
-  {
-  }
-
-  // this one will go away; use the one with width
-  explicit pointer_typet(const typet &_subtype):
-    bitvector_typet(ID_pointer, _subtype)
-  {
-  }
-
   pointer_typet(const typet &_subtype, std::size_t width):
     bitvector_typet(ID_pointer, _subtype, width)
   {
@@ -1376,7 +1387,8 @@ public:
 */
 inline const pointer_typet &to_pointer_type(const typet &type)
 {
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id()==ID_pointer);
+  PRECONDITION(!type.get(ID_width).empty());
   return static_cast<const pointer_typet &>(type);
 }
 
@@ -1385,7 +1397,8 @@ inline const pointer_typet &to_pointer_type(const typet &type)
 */
 inline pointer_typet &to_pointer_type(typet &type)
 {
-  assert(type.id()==ID_pointer);
+  PRECONDITION(type.id()==ID_pointer);
+  PRECONDITION(!type.get(ID_width).empty());
   return static_cast<pointer_typet &>(type);
 }
 
@@ -1394,18 +1407,6 @@ inline pointer_typet &to_pointer_type(typet &type)
 class reference_typet:public pointer_typet
 {
 public:
-  reference_typet()
-  {
-    set(ID_C_reference, true);
-  }
-
-  // this one will go away; use the one with width
-  explicit reference_typet(const typet &_subtype):
-    pointer_typet(_subtype)
-  {
-    set(ID_C_reference, true);
-  }
-
   reference_typet(const typet &_subtype, std::size_t _width):
     pointer_typet(_subtype, _width)
   {
@@ -1425,7 +1426,8 @@ public:
 */
 inline const reference_typet &to_reference_type(const typet &type)
 {
-  assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  PRECONDITION(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  PRECONDITION(!type.get(ID_width).empty());
   return static_cast<const reference_typet &>(type);
 }
 
@@ -1434,7 +1436,8 @@ inline const reference_typet &to_reference_type(const typet &type)
 */
 inline reference_typet &to_reference_type(typet &type)
 {
-  assert(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  PRECONDITION(type.id()==ID_pointer && type.get_bool(ID_C_reference));
+  PRECONDITION(!type.get(ID_width).empty());
   return static_cast<reference_typet &>(type);
 }
 
@@ -1472,7 +1475,7 @@ public:
 */
 inline const c_bool_typet &to_c_bool_type(const typet &type)
 {
-  assert(type.id()==ID_c_bool);
+  PRECONDITION(type.id()==ID_c_bool);
   return static_cast<const c_bool_typet &>(type);
 }
 
@@ -1481,7 +1484,7 @@ inline const c_bool_typet &to_c_bool_type(const typet &type)
 */
 inline c_bool_typet &to_c_bool_type(typet &type)
 {
-  assert(type.id()==ID_c_bool);
+  PRECONDITION(type.id()==ID_c_bool);
   return static_cast<c_bool_typet &>(type);
 }
 
@@ -1507,7 +1510,7 @@ public:
 */
 inline const string_typet &to_string_type(const typet &type)
 {
-  assert(type.id()==ID_string);
+  PRECONDITION(type.id()==ID_string);
   return static_cast<const string_typet &>(type);
 }
 
@@ -1545,7 +1548,7 @@ public:
 */
 inline const range_typet &to_range_type(const typet &type)
 {
-  assert(type.id()==ID_range);
+  PRECONDITION(type.id()==ID_range);
   return static_cast<const range_typet &>(type);
 }
 
@@ -1588,7 +1591,7 @@ public:
 */
 inline const vector_typet &to_vector_type(const typet &type)
 {
-  assert(type.id()==ID_vector);
+  PRECONDITION(type.id()==ID_vector);
   return static_cast<const vector_typet &>(type);
 }
 
@@ -1597,7 +1600,7 @@ inline const vector_typet &to_vector_type(const typet &type)
 */
 inline vector_typet &to_vector_type(typet &type)
 {
-  assert(type.id()==ID_vector);
+  PRECONDITION(type.id()==ID_vector);
   return static_cast<vector_typet &>(type);
 }
 
@@ -1628,7 +1631,7 @@ public:
 */
 inline const complex_typet &to_complex_type(const typet &type)
 {
-  assert(type.id()==ID_complex);
+  PRECONDITION(type.id()==ID_complex);
   return static_cast<const complex_typet &>(type);
 }
 
@@ -1637,7 +1640,7 @@ inline const complex_typet &to_complex_type(const typet &type)
 */
 inline complex_typet &to_complex_type(typet &type)
 {
-  assert(type.id()==ID_complex);
+  PRECONDITION(type.id()==ID_complex);
   return static_cast<complex_typet &>(type);
 }
 

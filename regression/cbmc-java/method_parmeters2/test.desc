@@ -1,0 +1,10 @@
+CORE
+method_parameters.class
+--verbosity 10 --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The purpose of the test is ensuring that the bytecode -> symbol table AST
+generation happens correctly. The generated .class file DOES contain LVTs, i.e.,
+it has been compiled with with "javac -g".

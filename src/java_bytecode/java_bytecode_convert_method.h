@@ -15,10 +15,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/message.h>
 #include <util/safe_pointer.h>
-#include "character_refine_preprocess.h"
+#include "java_string_library_preprocess.h"
 
 #include "java_bytecode_parse_tree.h"
-#include "ci_lazy_methods.h"
+#include <java_bytecode/ci_lazy_methods_needed.h>
 
 class class_hierarchyt;
 
@@ -28,8 +28,8 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<ci_lazy_methodst> lazy_methods,
-  const character_refine_preprocesst &character_refine);
+  safe_pointer<ci_lazy_methods_neededt> lazy_methods,
+  java_string_library_preprocesst &string_preprocess);
 
 inline void java_bytecode_convert_method(
   const symbolt &class_symbol,
@@ -37,7 +37,7 @@ inline void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  const character_refine_preprocesst &character_preprocess)
+  java_string_library_preprocesst &string_preprocess)
 {
   java_bytecode_convert_method(
     class_symbol,
@@ -45,8 +45,8 @@ inline void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
-    safe_pointer<ci_lazy_methodst>::create_null(),
-    character_preprocess);
+    safe_pointer<ci_lazy_methods_neededt>::create_null(),
+    string_preprocess);
 }
 
 void java_bytecode_convert_method_lazy(

@@ -41,6 +41,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/parameter_assignments.h>
 #include <goto-programs/slice_global_inits.h>
+#include <goto-programs/show_symbol_table.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -95,6 +96,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "model_argc_argv.h"
 #include "undefined_functions.h"
 #include "remove_function.h"
+#include "splice_call.h"
 
 void goto_instrument_parse_optionst::eval_verbosity()
 {
@@ -199,10 +201,10 @@ int goto_instrument_parse_optionst::doit()
         }
 
         goto_unwindt goto_unwind;
-        goto_unwind(goto_functions, unwind_set, k, unwind_strategy);
+        goto_unwind(goto_model, unwind_set, k, unwind_strategy);
 
-        goto_functions.update();
-        goto_functions.compute_loop_numbers();
+        goto_model.goto_functions.update();
+        goto_model.goto_functions.compute_loop_numbers();
 
         if(cmdline.isset("log"))
         {
@@ -234,11 +236,11 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-threaded"))
     {
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
-      is_threadedt is_threaded(goto_functions);
+      is_threadedt is_threaded(goto_model);
 
-      forall_goto_functions(f_it, goto_functions)
+      forall_goto_functions(f_it, goto_model.goto_functions)
       {
         std::cout << "////\n";
         std::cout << "//// Function: " << f_it->first << '\n';
@@ -258,34 +260,30 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-value-sets"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
       status() << "Pointer Analysis" << eom;
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
       value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_functions);
-
-      show_value_sets(get_ui(), goto_functions, value_set_analysis);
+      value_set_analysis(goto_model.goto_functions);
+      show_value_sets(get_ui(), goto_model, value_set_analysis);
       return 0;
     }
 
     if(cmdline.isset("show-global-may-alias"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
+      parameter_assignments(goto_model);
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
-      namespacet ns(symbol_table);
       global_may_alias_analysist global_may_alias_analysis;
-      global_may_alias_analysis(goto_functions, ns);
-      global_may_alias_analysis.output(ns, goto_functions, std::cout);
+      global_may_alias_analysis(goto_model);
+      global_may_alias_analysis.output(goto_model, std::cout);
 
       return 0;
     }
@@ -293,15 +291,14 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-local-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
-      parameter_assignments(symbol_table, goto_functions);
+      parameter_assignments(goto_model);
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
-      forall_goto_functions(it, goto_functions)
+      forall_goto_functions(it, goto_model.goto_functions)
       {
         local_bitvector_analysist local_bitvector_analysis(it->second);
         std::cout << ">>>>\n";
@@ -317,25 +314,23 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-custom-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
+      parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_functions, get_message_handler());
+      remove_unused_functions(goto_model, get_message_handler());
 
       if(!cmdline.isset("inline"))
       {
-        thread_exit_instrumentation(goto_functions);
-        mutex_init_instrumentation(symbol_table, goto_functions);
+        thread_exit_instrumentation(goto_model);
+        mutex_init_instrumentation(goto_model);
       }
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
-      namespacet ns(symbol_table);
       custom_bitvector_analysist custom_bitvector_analysis;
-      custom_bitvector_analysis(goto_functions, ns);
-      custom_bitvector_analysis.output(ns, goto_functions, std::cout);
+      custom_bitvector_analysis(goto_model);
+      custom_bitvector_analysis.output(goto_model, std::cout);
 
       return 0;
     }
@@ -343,19 +338,15 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-escape-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
+      parameter_assignments(goto_model);
 
       // recalculate numbers, etc.
-      goto_functions.update();
-
-      namespacet ns(symbol_table);
+      goto_model.goto_functions.update();
 
       escape_analysist escape_analysis;
-      escape_analysis(goto_functions, ns);
-
-      escape_analysis.output(ns, goto_functions, std::cout);
+      escape_analysis(goto_model);
+      escape_analysis.output(goto_model, std::cout);
 
       return 0;
     }
@@ -363,28 +354,26 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("custom-bitvector-analysis"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
       do_remove_returns();
-      parameter_assignments(symbol_table, goto_functions);
+      parameter_assignments(goto_model);
 
-      remove_unused_functions(goto_functions, get_message_handler());
+      remove_unused_functions(goto_model, get_message_handler());
 
       if(!cmdline.isset("inline"))
       {
-        thread_exit_instrumentation(goto_functions);
-        mutex_init_instrumentation(symbol_table, goto_functions);
+        thread_exit_instrumentation(goto_model);
+        mutex_init_instrumentation(goto_model);
       }
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       custom_bitvector_analysist custom_bitvector_analysis;
-      custom_bitvector_analysis(goto_functions, ns);
+      custom_bitvector_analysis(goto_model);
       custom_bitvector_analysis.check(
-        ns,
-        goto_functions,
+        goto_model,
         cmdline.isset("xml-ui"),
         std::cout);
 
@@ -394,16 +383,15 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-points-to"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       status() << "Pointer Analysis" << eom;
       points_tot points_to;
-      points_to(goto_functions);
+      points_to(goto_model);
       points_to.output(std::cout);
       return 0;
     }
@@ -411,72 +399,67 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("show-intervals"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
       // recalculate numbers, etc.
-      goto_functions.update();
+      goto_model.goto_functions.update();
 
       status() << "Interval Analysis" << eom;
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
       ait<interval_domaint> interval_analysis;
-      interval_analysis(goto_functions, ns);
-
-      interval_analysis.output(ns, goto_functions, std::cout);
+      interval_analysis(goto_model);
+      interval_analysis.output(goto_model, std::cout);
       return 0;
     }
 
     if(cmdline.isset("show-call-sequences"))
     {
-      show_call_sequences(goto_functions);
+      show_call_sequences(goto_model);
       return 0;
     }
 
     if(cmdline.isset("check-call-sequence"))
     {
       do_remove_returns();
-      check_call_sequence(goto_functions);
+      check_call_sequence(goto_model);
       return 0;
     }
 
     if(cmdline.isset("list-calls-args"))
     {
       do_indirect_call_and_rtti_removal();
-      do_partial_inlining();
 
-      namespacet ns(symbol_table);
-      list_calls_and_arguments(ns, goto_functions);
+      list_calls_and_arguments(goto_model);
 
       return 0;
     }
 
     if(cmdline.isset("show-rw-set"))
     {
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       if(!cmdline.isset("inline"))
       {
         do_indirect_call_and_rtti_removal();
-        do_partial_inlining();
 
         // recalculate numbers, etc.
-        goto_functions.update();
+        goto_model.goto_functions.update();
       }
 
       status() << "Pointer Analysis" << eom;
       value_set_analysist value_set_analysis(ns);
-      value_set_analysis(goto_functions);
+      value_set_analysis(goto_model.goto_functions);
 
       const symbolt &symbol=ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
 
       std::cout <<
-        rw_set_functiont(value_set_analysis, ns, goto_functions, main);
+        rw_set_functiont(value_set_analysis, goto_model, main);
       return 0;
     }
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table();
+      ::show_symbol_table(goto_model, get_ui());
       return 0;
     }
 
@@ -484,11 +467,10 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
 
-      const namespacet ns(symbol_table);
+      const namespacet ns(goto_model.symbol_table);
       reaching_definitions_analysist rd_analysis(ns);
-      rd_analysis(goto_functions, ns);
-
-      rd_analysis.output(ns, goto_functions, std::cout);
+      rd_analysis(goto_model);
+      rd_analysis.output(goto_model, std::cout);
 
       return 0;
     }
@@ -497,11 +479,10 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
 
-      const namespacet ns(symbol_table);
+      const namespacet ns(goto_model.symbol_table);
       dependence_grapht dependence_graph(ns);
-      dependence_graph(goto_functions, ns);
-
-      dependence_graph.output(ns, goto_functions, std::cout);
+      dependence_graph(goto_model);
+      dependence_graph.output(goto_model, std::cout);
       dependence_graph.output_dot(std::cout);
 
       return 0;
@@ -509,79 +490,78 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("count-eloc"))
     {
-      count_eloc(goto_functions);
+      count_eloc(goto_model);
       return 0;
     }
 
     if(cmdline.isset("list-eloc"))
     {
-      list_eloc(goto_functions);
+      list_eloc(goto_model);
       return 0;
     }
 
     if(cmdline.isset("print-path-lengths"))
     {
-      print_path_lengths(goto_functions);
+      print_path_lengths(goto_model);
       return 0;
     }
 
     if(cmdline.isset("list-symbols"))
     {
-      show_symbol_table(true);
+      show_symbol_table_brief(goto_model, get_ui());
       return 0;
     }
 
     if(cmdline.isset("show-uninitialized"))
     {
-      show_uninitialized(symbol_table, goto_functions, std::cout);
+      show_uninitialized(goto_model, std::cout);
       return 0;
     }
 
     if(cmdline.isset("interpreter"))
     {
       status() << "Starting interpreter" << eom;
-      interpreter(symbol_table, goto_functions);
+      interpreter(goto_model, get_message_handler());
       return 0;
     }
 
     if(cmdline.isset("show-claims") ||
        cmdline.isset("show-properties"))
     {
-      const namespacet ns(symbol_table);
-      show_properties(ns, get_ui(), goto_functions);
+      const namespacet ns(goto_model.symbol_table);
+      show_properties(goto_model, get_ui());
       return 0;
     }
 
     if(cmdline.isset("document-claims-html") ||
        cmdline.isset("document-properties-html"))
     {
-      document_properties_html(goto_functions, std::cout);
+      document_properties_html(goto_model, std::cout);
       return 0;
     }
 
     if(cmdline.isset("document-claims-latex") ||
        cmdline.isset("document-properties-latex"))
     {
-      document_properties_latex(goto_functions, std::cout);
+      document_properties_latex(goto_model, std::cout);
       return 0;
     }
 
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return 0;
     }
 
     if(cmdline.isset("show-natural-loops"))
     {
-      const namespacet ns(symbol_table);
-      show_natural_loops(goto_functions);
+      show_natural_loops(goto_model, std::cout);
       return 0;
     }
 
     if(cmdline.isset("print-internal-representation"))
     {
-      for(auto const &pair : goto_functions.function_map)
+      for(auto const &pair : goto_model.goto_functions.function_map)
         for(auto const &ins : pair.second.body.instructions)
         {
           if(ins.code.is_not_nil())
@@ -594,28 +574,27 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-goto-functions"))
     {
-      namespacet ns(symbol_table);
-      show_goto_functions(ns, get_ui(), goto_functions);
+      namespacet ns(goto_model.symbol_table);
+      show_goto_functions(goto_model, get_ui());
       return 0;
     }
 
     if(cmdline.isset("list-undefined-functions"))
     {
-      const namespacet ns(symbol_table);
-      list_undefined_functions(goto_functions, ns, std::cout);
+      list_undefined_functions(goto_model, std::cout);
       return 0;
     }
 
     // experimental: print structs
     if(cmdline.isset("show-struct-alignment"))
     {
-      print_struct_alignment_problems(symbol_table, std::cout);
+      print_struct_alignment_problems(goto_model.symbol_table, std::cout);
       return 0;
     }
 
     if(cmdline.isset("show-locations"))
     {
-      show_locations(get_ui(), goto_functions);
+      show_locations(get_ui(), goto_model);
       return 0;
     }
 
@@ -624,11 +603,12 @@ int goto_instrument_parse_optionst::doit()
       const bool is_cpp=cmdline.isset("dump-cpp");
       const bool h_libc=!cmdline.isset("no-system-headers");
       const bool h_all=cmdline.isset("use-all-headers");
-      namespacet ns(symbol_table);
+      const bool harness=cmdline.isset("harness");
+      namespacet ns(goto_model.symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
       // applied
-      restore_returns(symbol_table, goto_functions);
+      restore_returns(goto_model);
 
       if(cmdline.args.size()==2)
       {
@@ -642,18 +622,29 @@ int goto_instrument_parse_optionst::doit()
           error() << "failed to write to `" << cmdline.args[1] << "'";
           return 10;
         }
-        (is_cpp ? dump_cpp : dump_c)(goto_functions, h_libc, h_all, ns, out);
+        (is_cpp ? dump_cpp : dump_c)(
+          goto_model.goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          out);
       }
       else
         (is_cpp ? dump_cpp : dump_c)(
-          goto_functions, h_libc, h_all, ns, std::cout);
+          goto_model.goto_functions,
+          h_libc,
+          h_all,
+          harness,
+          ns,
+          std::cout);
 
       return 0;
     }
 
     if(cmdline.isset("call-graph"))
     {
-      call_grapht call_graph(goto_functions);
+      call_grapht call_graph(goto_model);
 
       if(cmdline.isset("xml"))
         call_graph.output_xml(std::cout);
@@ -667,7 +658,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("dot"))
     {
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       if(cmdline.args.size()==2)
       {
@@ -682,10 +673,10 @@ int goto_instrument_parse_optionst::doit()
           return 10;
         }
 
-        dot(goto_functions, ns, out);
+        dot(goto_model, out);
       }
       else
-        dot(goto_functions, ns, std::cout);
+        dot(goto_model, std::cout);
 
       return 0;
     }
@@ -694,21 +685,21 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
 
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       status() << "Performing full inlining" << eom;
-      goto_inline(goto_functions, ns, ui_message_handler);
+      goto_inline(goto_model, get_message_handler());
 
       status() << "Accelerating" << eom;
-      accelerate_functions(goto_functions, symbol_table, cmdline.isset("z3"));
-      remove_skip(goto_functions);
-      goto_functions.update();
+      accelerate_functions(goto_model, cmdline.isset("z3"));
+      remove_skip(goto_model);
+      goto_model.goto_functions.update();
     }
 
     if(cmdline.isset("horn-encoding"))
     {
       status() << "Horn-clause encoding" << eom;
-      namespacet ns(symbol_table);
+      namespacet ns(goto_model.symbol_table);
 
       if(cmdline.args.size()==2)
       {
@@ -725,10 +716,10 @@ int goto_instrument_parse_optionst::doit()
           return 1;
         }
 
-        horn_encoding(goto_functions, ns, out);
+        horn_encoding(goto_model, out);
       }
       else
-        horn_encoding(goto_functions, ns, std::cout);
+        horn_encoding(goto_model, std::cout);
 
       return 0;
     }
@@ -738,14 +729,13 @@ int goto_instrument_parse_optionst::doit()
       do_indirect_call_and_rtti_removal();
 
       status() << "Removing unused functions" << eom;
-      remove_unused_functions(goto_functions, get_message_handler());
+      remove_unused_functions(goto_model.goto_functions, get_message_handler());
     }
 
     if(cmdline.isset("undefined-function-is-assume-false"))
     {
       do_indirect_call_and_rtti_removal();
-
-      undefined_function_abort_path(goto_functions);
+      undefined_function_abort_path(goto_model);
     }
 
     // write new binary?
@@ -754,7 +744,7 @@ int goto_instrument_parse_optionst::doit()
       status() << "Writing GOTO program to `" << cmdline.args[1] << "'" << eom;
 
       if(write_goto_binary(
-        cmdline.args[1], symbol_table, goto_functions, get_message_handler()))
+        cmdline.args[1], goto_model, get_message_handler()))
         return 1;
       else
         return 0;
@@ -800,15 +790,15 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   status() << "Function Pointer Removal" << eom;
   remove_function_pointers(
     get_message_handler(),
-    symbol_table,
-    goto_functions,
+    goto_model,
     cmdline.isset("pointer-check"));
   status() << "Virtual function removal" << eom;
-  remove_virtual_functions(symbol_table, goto_functions);
+  remove_virtual_functions(goto_model);
   status() << "Catch and throw removal" << eom;
-  remove_exceptions(symbol_table, goto_functions);
+  // This introduces instanceof, so order is important:
+  remove_exceptions(goto_model);
   status() << "Java instanceof removal" << eom;
-  remove_instanceof(symbol_table, goto_functions);
+  remove_instanceof(goto_model);
 }
 
 /// Remove function pointers that can be resolved by analysing const variables
@@ -826,8 +816,7 @@ void goto_instrument_parse_optionst::do_remove_const_function_pointers_only()
   status() << "Removing const function pointers only" << eom;
   remove_function_pointers(
     get_message_handler(),
-    symbol_table,
-    goto_functions,
+    goto_model,
     cmdline.isset("pointer-check"),
     true); // abort if we can't resolve via const pointers
 }
@@ -842,8 +831,7 @@ void goto_instrument_parse_optionst::do_partial_inlining()
   if(!cmdline.isset("inline"))
   {
     status() << "Partial Inlining" << eom;
-    const namespacet ns(symbol_table);
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, ui_message_handler);
   }
 }
 
@@ -855,7 +843,7 @@ void goto_instrument_parse_optionst::do_remove_returns()
   remove_returns_done=true;
 
   status() << "Removing returns" << eom;
-  remove_returns(symbol_table, goto_functions);
+  remove_returns(goto_model);
 }
 
 void goto_instrument_parse_optionst::get_goto_program()
@@ -863,11 +851,10 @@ void goto_instrument_parse_optionst::get_goto_program()
   status() << "Reading GOTO program from `" << cmdline.args[0] << "'" << eom;
 
   if(read_goto_binary(cmdline.args[0],
-    symbol_table, goto_functions, get_message_handler()))
+    goto_model, get_message_handler()))
     throw 0;
 
   config.set(cmdline);
-  config.set_from_symbol_table(symbol_table);
 }
 
 void goto_instrument_parse_optionst::instrument_goto_program()
@@ -917,13 +904,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Adding gotos to skip loops" << eom;
     if(skip_loops(
-        goto_functions,
+        goto_model,
         cmdline.get_value("skip-loops"),
         get_message_handler()))
       throw 0;
   }
 
-  namespacet ns(symbol_table);
+  namespacet ns(goto_model.symbol_table);
 
   // initialize argv with valid pointers
   if(cmdline.isset("model-argc-argv"))
@@ -934,8 +921,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Adding up to " << max_argc
              << " command line arguments" << eom;
     if(model_argc_argv(
-        symbol_table,
-        goto_functions,
+        goto_model,
         max_argc,
         get_message_handler()))
       throw 0;
@@ -944,8 +930,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("remove-function-body"))
   {
     remove_functions(
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.get_values("remove-function-body"),
       get_message_handler());
   }
@@ -960,7 +945,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       config.ansi_c.defines.push_back("__CPROVER_CUSTOM_BITVECTOR_ANALYSIS");
 
     // add the library
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
+    link_to_library(goto_model, get_message_handler());
   }
 
   // now do full inlining, if requested
@@ -972,51 +957,48 @@ void goto_instrument_parse_optionst::instrument_goto_program()
        cmdline.isset("custom-bitvector-analysis"))
     {
       do_remove_returns();
-      thread_exit_instrumentation(goto_functions);
-      mutex_init_instrumentation(symbol_table, goto_functions);
+      thread_exit_instrumentation(goto_model);
+      mutex_init_instrumentation(goto_model);
     }
 
     status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler);
+    goto_inline(goto_model, get_message_handler());
   }
 
   if(cmdline.isset("show-custom-bitvector-analysis") ||
      cmdline.isset("custom-bitvector-analysis"))
   {
-    do_partial_inlining();
-
     status() << "Propagating Constants" << eom;
-    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
-    remove_skip(goto_functions);
+    constant_propagator_ait constant_propagator_ai(goto_model);
+    remove_skip(goto_model);
   }
 
   if(cmdline.isset("escape-analysis"))
   {
     do_indirect_call_and_rtti_removal();
-    do_partial_inlining();
     do_remove_returns();
-    parameter_assignments(symbol_table, goto_functions);
+    parameter_assignments(goto_model);
 
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     status() << "Escape Analysis" << eom;
     escape_analysist escape_analysis;
-    escape_analysis(goto_functions, ns);
-    escape_analysis.instrument(goto_functions, ns);
+    escape_analysis(goto_model);
+    escape_analysis.instrument(goto_model);
 
     // inline added functions, they are often small
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, get_message_handler());
 
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
   }
 
   // verify and set invariants and pre/post-condition pairs
   if(cmdline.isset("apply-code-contracts"))
   {
     status() << "Applying Code Contracts" << eom;
-    code_contracts(symbol_table, goto_functions);
+    code_contracts(goto_model);
   }
 
   // replace function pointers, if explicitly requested
@@ -1043,9 +1025,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(!cmdline.isset("log"))
     {
       goto_function_inline(
-        goto_functions,
+        goto_model,
         function,
-        ns,
         ui_message_handler,
         true,
         caching);
@@ -1057,9 +1038,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
       jsont result=
         goto_function_inline_and_log(
-          goto_functions,
+          goto_model,
           function,
-          ns,
           ui_message_handler,
           true,
           caching);
@@ -1083,19 +1063,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       }
     }
 
-    goto_functions.update();
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.update();
+    goto_model.goto_functions.compute_loop_numbers();
   }
 
   if(cmdline.isset("partial-inline"))
   {
     do_indirect_call_and_rtti_removal();
+    do_partial_inlining();
 
-    status() << "Partial inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler, true);
-
-    goto_functions.update();
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.update();
+    goto_model.goto_functions.compute_loop_numbers();
   }
 
   // now do full inlining, if requested
@@ -1107,12 +1085,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
        cmdline.isset("custom-bitvector-analysis"))
     {
       do_remove_returns();
-      thread_exit_instrumentation(goto_functions);
-      mutex_init_instrumentation(symbol_table, goto_functions);
+      thread_exit_instrumentation(goto_model);
+      mutex_init_instrumentation(goto_model);
     }
 
     status() << "Performing full inlining" << eom;
-    goto_inline(goto_functions, ns, ui_message_handler, true);
+    goto_inline(goto_model, get_message_handler(), true);
   }
 
   if(cmdline.isset("constant-propagator"))
@@ -1121,19 +1099,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     status() << "Propagating Constants" << eom;
 
-    constant_propagator_ait constant_propagator_ai(goto_functions, ns);
-
-    remove_skip(goto_functions);
+    constant_propagator_ait constant_propagator_ai(goto_model);
+    remove_skip(goto_model);
   }
 
   // add generic checks, if needed
-  goto_check(ns, options, goto_functions);
+  goto_check(options, goto_model);
 
   // check for uninitalized local variables
   if(cmdline.isset("uninitialized-check"))
   {
     status() << "Adding checks for uninitialized local variables" << eom;
-    add_uninitialized_locals_assertions(symbol_table, goto_functions);
+    add_uninitialized_locals_assertions(goto_model);
   }
 
   // check for maximum call stack size
@@ -1141,8 +1118,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Adding check for maximum call stack size" << eom;
     stack_depth(
-      symbol_table,
-      goto_functions,
+      goto_model,
       unsafe_string2unsigned(cmdline.get_value("stack-depth")));
   }
 
@@ -1152,14 +1128,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Adding nondeterministic initialization of static/global "
                 "variables" << eom;
-    nondet_static(ns, goto_functions);
+    nondet_static(goto_model);
   }
 
   if(cmdline.isset("slice-global-inits"))
   {
     status() << "Slicing away initializations of unused global variables"
              << eom;
-    slice_global_inits(ns, goto_functions);
+    slice_global_inits(goto_model);
   }
 
   if(cmdline.isset("string-abstraction"))
@@ -1169,9 +1145,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     status() << "String Abstraction" << eom;
     string_abstraction(
-      symbol_table,
-      get_message_handler(),
-      goto_functions);
+      goto_model,
+      get_message_handler());
   }
 
   // some analyses require function pointer removal and partial inlining
@@ -1183,29 +1158,22 @@ void goto_instrument_parse_optionst::instrument_goto_program()
      cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
-    do_partial_inlining();
 
     status() << "Pointer Analysis" << eom;
     value_set_analysist value_set_analysis(ns);
-    value_set_analysis(goto_functions);
+    value_set_analysis(goto_model.goto_functions);
 
     if(cmdline.isset("remove-pointers"))
     {
       // removing pointers
       status() << "Removing Pointers" << eom;
-      remove_pointers(
-        goto_functions,
-        symbol_table,
-        value_set_analysis);
+      remove_pointers(goto_model, value_set_analysis);
     }
 
     if(cmdline.isset("race-check"))
     {
       status() << "Adding Race Checks" << eom;
-      race_check(
-        value_set_analysis,
-        symbol_table,
-        goto_functions);
+      race_check(value_set_analysis, goto_model);
     }
 
     if(cmdline.isset("mm"))
@@ -1213,8 +1181,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       // TODO: move to wmm/weak_mem, and copy goto_functions AFTER some of the
       // modifications. Do the analysis on the copy, after remove_asm, and
       // instrument the original (without remove_asm)
-      remove_asm(symbol_table, goto_functions);
-      goto_functions.update();
+      remove_asm(goto_model);
+      goto_model.goto_functions.update();
 
       std::string mm=cmdline.get_value("mm");
       memory_modelt model;
@@ -1282,8 +1250,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         weak_memory(
           model,
           value_set_analysis,
-          symbol_table,
-          goto_functions,
+          goto_model,
           cmdline.isset("scc"),
           inst_strategy,
           unwind_loops,
@@ -1307,8 +1274,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       status() << "Instrumenting interrupt handler" << eom;
       interrupt(
         value_set_analysis,
-        symbol_table,
-        goto_functions,
+        goto_model,
         cmdline.get_value("isr"));
     }
 
@@ -1316,32 +1282,26 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     if(cmdline.isset("mmio"))
     {
       status() << "Instrumenting memory-mapped I/O" << eom;
-      mmio(
-        value_set_analysis,
-        symbol_table,
-        goto_functions);
+      mmio(value_set_analysis, goto_model);
     }
 
     if(cmdline.isset("concurrency"))
     {
       status() << "Sequentializing concurrency" << eom;
-      concurrency(
-        value_set_analysis,
-        symbol_table,
-        goto_functions);
+      concurrency(value_set_analysis, goto_model);
     }
   }
 
   if(cmdline.isset("interval-analysis"))
   {
     status() << "Interval analysis" << eom;
-    interval_analysis(ns, goto_functions);
+    interval_analysis(goto_model);
   }
 
   if(cmdline.isset("havoc-loops"))
   {
     status() << "Havocking loops" << eom;
-    havoc_loops(goto_functions);
+    havoc_loops(goto_model);
   }
 
   if(cmdline.isset("k-induction"))
@@ -1362,15 +1322,14 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Instrumenting k-induction for k=" << k << ", "
              << (base_case?"base case":"step case") << eom;
 
-    k_induction(goto_functions, base_case, step_case, k);
+    k_induction(goto_model, base_case, step_case, k);
   }
 
   if(cmdline.isset("function-enter"))
   {
     status() << "Function enter instrumentation" << eom;
     function_enter(
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.get_value("function-enter"));
   }
 
@@ -1378,8 +1337,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Function exit instrumentation" << eom;
     function_exit(
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.get_value("function-exit"));
   }
 
@@ -1387,55 +1345,69 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     status() << "Branch instrumentation" << eom;
     branch(
-      symbol_table,
-      goto_functions,
+      goto_model,
       cmdline.get_value("branch"));
   }
 
   // add failed symbols
-  add_failed_symbols(symbol_table);
+  add_failed_symbols(goto_model.symbol_table);
 
   // recalculate numbers, etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 
   // add loop ids
-  goto_functions.compute_loop_numbers();
+  goto_model.goto_functions.compute_loop_numbers();
 
   // label the assertions
-  label_properties(goto_functions);
+  label_properties(goto_model);
 
   // nondet volatile?
   if(cmdline.isset("nondet-volatile"))
   {
     status() << "Making volatile variables non-deterministic" << eom;
-    nondet_volatile(symbol_table, goto_functions);
+    nondet_volatile(goto_model);
   }
 
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
   {
+    do_indirect_call_and_rtti_removal();
+
     status() << "Performing a reachability slice" << eom;
     if(cmdline.isset("property"))
-      reachability_slicer(goto_functions, cmdline.get_values("property"));
+      reachability_slicer(goto_model, cmdline.get_values("property"));
     else
-      reachability_slicer(goto_functions);
+      reachability_slicer(goto_model);
   }
 
   // full slice?
   if(cmdline.isset("full-slice"))
   {
-    remove_returns(symbol_table, goto_functions);
     do_indirect_call_and_rtti_removal();
+    do_remove_returns();
 
     status() << "Performing a full slice" << eom;
     if(cmdline.isset("property"))
-      property_slicer(goto_functions, ns, cmdline.get_values("property"));
+      property_slicer(goto_model, cmdline.get_values("property"));
     else
-      full_slicer(goto_functions, ns);
+      full_slicer(goto_model);
+  }
+
+  // splice option
+  if(cmdline.isset("splice-call"))
+  {
+    status() << "Performing call splicing" << eom;
+    std::string callercallee=cmdline.get_value("splice-call");
+    if(splice_call(
+        goto_model.goto_functions,
+        callercallee,
+        goto_model.symbol_table,
+        get_message_handler()))
+      throw 0;
   }
 
   // recalculate numbers, etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }
 
 /// display command line help
@@ -1468,6 +1440,7 @@ void goto_instrument_parse_optionst::help()
     " --show-symbol-table          show symbol table\n"
     " --list-symbols               list symbols with type information\n"
     HELP_SHOW_GOTO_FUNCTIONS
+    " --drop-unused-functions      drop functions trivially unreachable from main function\n" // NOLINT(*)
     " --print-internal-representation\n" // NOLINTNEXTLINE(*)
     "                              show verbose internal representation of the program\n"
     " --list-undefined-functions   list functions without body\n"
@@ -1475,6 +1448,8 @@ void goto_instrument_parse_optionst::help()
     " --show-natural-loops         show natural loop heads\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --list-calls-args            list all function calls with their arguments\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --print-path-lengths         print statistics about control-flow graph paths\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1497,6 +1472,7 @@ void goto_instrument_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n" // NOLINT(*)
     " --check-invariant function   instruments invariant checking function\n"
     " --remove-pointers            converts pointer arithmetic to base+offset expressions\n" // NOLINT(*)
+    " --splice-call caller,callee  prepends a call to callee in the body of caller\n"  // NOLINT(*)
     // NOLINTNEXTLINE(whitespace/line_length)
     " --undefined-function-is-assume-false\n" // NOLINTNEXTLINE(whitespace/line_length)
     "                              convert each call to an undefined function to assume(false)\n"
@@ -1545,6 +1521,7 @@ void goto_instrument_parse_optionst::help()
     "Other options:\n"
     " --no-system-headers          with --dump-c/--dump-cpp: generate C source expanding libc includes\n" // NOLINT(*)
     " --use-all-headers            with --dump-c/--dump-cpp: generate C source with all includes\n" // NOLINT(*)
+    " --harness                    with --dump-c/--dump-cpp: include input generator in output\n" // NOLINT(*)
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"

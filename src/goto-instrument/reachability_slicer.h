@@ -12,12 +12,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H
 #define CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H
 
-#include <goto-programs/goto_functions.h>
+#include <list>
+#include <string>
 
-void reachability_slicer(goto_functionst &goto_functions);
+class goto_modelt;
+
+void reachability_slicer(goto_modelt &);
 
 void reachability_slicer(
-  goto_functionst &goto_functions,
+  goto_modelt &,
   const std::list<std::string> &properties);
 
 #endif // CPROVER_GOTO_INSTRUMENT_REACHABILITY_SLICER_H

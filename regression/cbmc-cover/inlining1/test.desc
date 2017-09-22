@@ -3,9 +3,9 @@ main.c
 --cover branch
 ^EXIT=0$
 ^SIGNAL=0$
-^\[my_func.coverage.1\] file main.c line 3 function my_func function my_func block 1 branch false: SATISFIED$
-^\[my_func.coverage.2\] file main.c line 3 function my_func function my_func block 1 branch true: FAILED$
-^\[my_func.coverage.3\] file main.c line 3 function my_func function my_func block 2 branch false: FAILED$
-^\[my_func.coverage.4\] file main.c line 3 function my_func function my_func block 2 branch true: SATISFIED$
+^\[main.coverage.1\] file main.c line 15 function main entry point: SATISFIED$
+^\[my_func.coverage.1\] file main.c line 5 function my_func entry point: SATISFIED$
+^\[my_func.coverage.2\] file main.c line 5 function my_func block 1 branch false: SATISFIED$
+^\[my_func.coverage.3\] file main.c line 5 function my_func block 1 branch true: SATISFIED$
 --
 ^warning: ignoring

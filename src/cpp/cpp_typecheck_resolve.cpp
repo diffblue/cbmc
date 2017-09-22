@@ -30,7 +30,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 
 cpp_typecheck_resolvet::cpp_typecheck_resolvet(cpp_typecheckt &_cpp_typecheck):
-  cpp_typecheck(_cpp_typecheck)
+  cpp_typecheck(_cpp_typecheck),
+  original_scope(nullptr) // set in resolve_scope()
 {
 }
 
@@ -404,7 +405,7 @@ void cpp_typecheck_resolvet::filter(
       break;
 
     default:
-      assert(false);
+      UNREACHABLE;
     }
 
     if(match)
@@ -2077,7 +2078,7 @@ void cpp_typecheck_resolvet::apply_template_args(
 
   // We never try 'unassigned' template arguments.
   if(template_args_tc.has_unassigned())
-    assert(false);
+    UNREACHABLE;
 
   // a template is always a declaration
   const cpp_declarationt &cpp_declaration=

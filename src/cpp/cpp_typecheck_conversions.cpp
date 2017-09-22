@@ -1280,11 +1280,8 @@ bool cpp_typecheckt::reference_binding(
     if(reference_compatible(expr, type, rank))
     {
       {
-        address_of_exprt tmp;
+        address_of_exprt tmp(expr, reference_type(expr.type()));
         tmp.add_source_location()=expr.source_location();
-        tmp.object()=expr;
-        tmp.type()=pointer_type(tmp.op0().type());
-        tmp.type().set(ID_C_reference, true);
         new_expr.swap(tmp);
       }
 
@@ -1411,10 +1408,7 @@ bool cpp_typecheckt::reference_binding(
 
   if(user_defined_conversion_sequence(arg_expr, type.subtype(), new_expr, rank))
   {
-    address_of_exprt tmp;
-    tmp.type()=pointer_type(new_expr.type());
-    tmp.object()=new_expr;
-    tmp.type().set(ID_C_reference, true);
+    address_of_exprt tmp(new_expr, reference_type(new_expr.type()));
     tmp.add_source_location()=new_expr.source_location();
     new_expr.swap(tmp);
     return true;
@@ -1750,7 +1744,7 @@ bool cpp_typecheckt::dynamic_typecast(
     {
       if(!e.get_bool(ID_C_lvalue))
         return false;
-      assert(0); // currently not supported
+      UNREACHABLE; // currently not supported
     }
     else if(follow(type.subtype()).id()==ID_struct)
     {

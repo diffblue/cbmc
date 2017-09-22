@@ -14,11 +14,15 @@ Author: CM Wintersteiger
 
 #include <util/message.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 void remove_unused_functions(
-  goto_functionst &functions,
-  message_handlert &message_handler);
+  goto_functionst &,
+  message_handlert &);
+
+void remove_unused_functions(
+  goto_modelt &,
+  message_handlert &);
 
 void find_used_functions(
   const irep_idt &current,

@@ -46,6 +46,7 @@ SRC = accelerate/accelerate.cpp \
       rw_set.cpp \
       show_locations.cpp \
       skip_loops.cpp \
+      splice_call.cpp \
       stack_depth.cpp \
       thread_instrumentation.cpp \
       undefined_functions.cpp \
@@ -65,6 +66,7 @@ SRC = accelerate/accelerate.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
+      ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
@@ -89,11 +91,6 @@ include ../config.inc
 include ../common
 
 all: goto-instrument$(EXEEXT)
-
-ifneq ($(wildcard ../java_bytecode/Makefile),)
-  OBJ += ../java_bytecode/java_bytecode$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JAVA_BYTECODE
-endif
 
 ifneq ($(LIB_GLPK),)
   LIBS += $(LIB_GLPK)

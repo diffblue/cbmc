@@ -58,31 +58,24 @@ static void finish_catch_push_targets(goto_programt &dest)
   // in the second pass set the targets
   Forall_goto_program_instructions(it, dest)
   {
-    if(it->is_catch())
+    if(it->is_catch() && it->code.get_statement()==ID_push_catch)
     {
-      bool handler_added=true;
-      irept exceptions=it->code.find(ID_exception_list);
+      // Populate `targets` with a GOTO instruction target per
+      // exception handler if it isn't already populated.
+      // (Java handlers, for example, need this finish step; C++
+      //  handlers will already be populated by now)
 
-      if(exceptions.is_nil() &&
-         it->code.has_operands())
-        exceptions=it->code.op0().find(ID_exception_list);
-
-      const irept::subt &exception_list=exceptions.get_sub();
-
-      if(!exception_list.empty())
+      if(it->targets.empty())
       {
-        // in this case we have a CATCH_PUSH
-        irept handlers=it->code.find(ID_label);
-        if(handlers.is_nil() &&
-           it->code.has_operands())
-          handlers=it->code.op0().find(ID_label);
-        const irept::subt &handler_list=handlers.get_sub();
+        bool handler_added=true;
+        const code_push_catcht::exception_listt &handler_list=
+          to_code_push_catch(it->code).exception_list();
 
-        // some handlers may not have been converted (if there was no
-        // exception to be caught); in such a situation we abort
         for(const auto &handler : handler_list)
         {
-          if(label_targets.find(handler.id())==label_targets.end())
+          // some handlers may not have been converted (if there was no
+          // exception to be caught); in such a situation we abort
+          if(label_targets.find(handler.get_label())==label_targets.end())
           {
             handler_added=false;
             break;
@@ -93,14 +86,7 @@ static void finish_catch_push_targets(goto_programt &dest)
           continue;
 
         for(const auto &handler : handler_list)
-        {
-          std::map<irep_idt,
-                   goto_programt::targett>::const_iterator handler_it=
-            label_targets.find(handler.id());
-          assert(handler_it!=label_targets.end());
-          // set the target
-          it->targets.push_back(handler_it->second);
-        }
+          it->targets.push_back(label_targets.at(handler.get_label()));
       }
     }
   }
@@ -186,7 +172,7 @@ void goto_convertt::finish_gotos(goto_programt &dest)
       bool stack_is_prefix=true;
       if(label_stack.size()>goto_stack.size())
         stack_is_prefix=false;
-      for(unsigned i=0, ilim=label_stack.size();
+      for(std::size_t i=0, ilim=label_stack.size();
           i!=ilim && stack_is_prefix;
           ++i)
       {
@@ -295,6 +281,9 @@ void goto_convertt::finish_guarded_gotos(goto_programt &dest)
     // Simplify: remove whatever code was generated for the condition
     // and attach the original guard to the goto instruction.
     gg.gotoiter->guard=gg.guard;
+    // inherit the source location (otherwise the guarded goto will
+    // have the source location of the else branch)
+    gg.gotoiter->source_location=gg.ifiter->source_location;
     // goto_programt doesn't provide an erase operation,
     // perhaps for a good reason, so let's be cautious and just
     // flatten the unneeded instructions into skips.
@@ -376,21 +365,13 @@ void goto_convertt::convert_switch_case(
   const code_switch_caset &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "switch-case statement expected to have two operands"
-            << eom;
-    throw 0;
-  }
-
   goto_programt tmp;
   convert(code.code(), tmp);
 
   goto_programt::targett target=tmp.instructions.begin();
   dest.destructive_append(tmp);
 
-  // default?
+  // is a default target given?
 
   if(code.is_default())
     targets.set_default(target);
@@ -566,6 +547,10 @@ void goto_convertt::convert(
     forall_operands(it, code)
       convert(to_code(*it), dest);
   }
+  else if(statement==ID_push_catch ||
+          statement==ID_pop_catch ||
+          statement==ID_exception_landingpad)
+    copy(code, CATCH, dest);
   else
     copy(code, OTHER, dest);
 
@@ -857,7 +842,7 @@ void goto_convertt::convert_cpp_delete(
   else if(code.get_statement()==ID_cpp_delete)
     delete_identifier="__delete";
   else
-    assert(false);
+    UNREACHABLE;
 
   if(destructor.is_not_nil())
   {
@@ -876,7 +861,7 @@ void goto_convertt::convert_cpp_delete(
       convert(tmp_code, dest);
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   // now do "free"
@@ -1225,6 +1210,7 @@ void goto_convertt::convert_switch(
   //   default: Pd;
   // }
   // --------------------
+  // location
   // x: if(v==x) goto X;
   // y: if(v==y) goto Y;
   //    goto d;
@@ -1233,13 +1219,19 @@ void goto_convertt::convert_switch(
   // d: Pd;
   // z: ;
 
-  if(code.operands().size()<2)
-  {
-    error().source_location=code.find_source_location();
-    error() << "switch takes at least two operands" << eom;
-    throw 0;
-  }
+  // we first add a 'location' node for the switch statement,
+  // which would otherwise not be recorded
+  dest.add_instruction()->make_location(
+    code.source_location());
 
+  // get the location of the end of the body, but
+  // default to location of switch, if none
+  source_locationt body_end_location=
+    code.body().get_statement()==ID_block?
+      to_code_block(code.body()).end_location():
+      code.source_location();
+
+  // do the value we switch over
   exprt argument=code.value();
 
   goto_programt sideeffects;
@@ -1252,7 +1244,7 @@ void goto_convertt::convert_switch(
   goto_programt tmp_z;
   goto_programt::targett z=tmp_z.add_instruction();
   z->make_skip();
-  z->source_location=code.source_location();
+  z->source_location=body_end_location;
 
   // set the new targets -- continue stays as is
   targets.set_break(z);
@@ -1261,13 +1253,23 @@ void goto_convertt::convert_switch(
   targets.cases_map.clear();
 
   goto_programt tmp;
-
-  forall_operands(it, code)
-    if(it!=code.operands().begin())
-      convert(to_code(*it), tmp);
+  convert(code.body(), tmp);
 
   goto_programt tmp_cases;
 
+  // The case number represents which case this corresponds to in the sequence
+  // of case statements.
+  //
+  // switch (x)
+  // {
+  // case 2:  // case_number 1
+  //   ...;
+  // case 3:  // case_number 2
+  //   ...;
+  // case 10: // case_number 3
+  //   ...;
+  // }
+  size_t case_number=1;
   for(auto &case_pair : targets.cases)
   {
     const caset &case_ops=case_pair.second;
@@ -1276,10 +1278,15 @@ void goto_convertt::convert_switch(
 
     exprt guard_expr=case_guard(argument, case_ops);
 
+    source_locationt source_location=case_ops.front().find_source_location();
+    source_location.set_case_number(std::to_string(case_number));
+    case_number++;
+    guard_expr.add_source_location()=source_location;
+
     goto_programt::targett x=tmp_cases.add_instruction();
     x->make_goto(case_pair.first);
     x->guard.swap(guard_expr);
-    x->source_location=case_ops.front().find_source_location();
+    x->source_location=source_location;
   }
 
   {
@@ -1806,7 +1813,7 @@ void goto_convertt::generate_ifthenelse(
      true_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
-    // if(some) { label: assert(0); }
+    // if(some) { label: assert(false); }
     true_case.instructions.back().guard=boolean_negate(guard);
     dest.destructive_append(true_case);
     true_case.instructions.clear();
@@ -1819,7 +1826,7 @@ void goto_convertt::generate_ifthenelse(
      false_case.instructions.back().labels.empty())
   {
     // The above conjunction deliberately excludes the instance
-    // if(some) ... else { label: assert(0); }
+    // if(some) ... else { label: assert(false); }
     false_case.instructions.back().guard=guard;
     dest.destructive_append(false_case);
     false_case.instructions.clear();
@@ -2182,7 +2189,7 @@ void goto_convert(
   goto_programt &dest,
   message_handlert &message_handler)
 {
-  const unsigned errors_before=
+  const std::size_t errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
   goto_convertt goto_convert(symbol_table, message_handler);

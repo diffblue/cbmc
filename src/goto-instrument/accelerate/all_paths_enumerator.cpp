@@ -68,17 +68,17 @@ int all_paths_enumeratort::backtrack(patht &path)
     return 0;
   }
 
-  path_nodet &node=path.back();
+  goto_programt::targett node_loc=path.back().loc;
   path.pop_back();
 
-  path_nodet &parent=path.back();
-  const auto succs=goto_program.get_successors(parent.loc);
+  goto_programt::targett parent_loc=path.back().loc;
+  const auto succs=goto_program.get_successors(parent_loc);
 
   unsigned int ret=0;
 
   for(const auto &succ : succs)
   {
-    if(succ==node.loc)
+    if(succ==node_loc)
       break;
 
     ret++;
@@ -104,8 +104,8 @@ void all_paths_enumeratort::complete_path(patht &path, int succ)
   if(path.empty())
     return;
 
-  path_nodet &node=path.back();
-  extend_path(path, node.loc, succ);
+  goto_programt::targett node_loc=path.back().loc;
+  extend_path(path, node_loc, succ);
 
   goto_programt::targett end=path.back().loc;
 

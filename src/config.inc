@@ -26,6 +26,42 @@ MINISAT2 = ../../minisat-2.2.1
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
 
+ifneq ($(PRECOSAT),)
+  CP_CXXFLAGS += -DSATCHECK_PRECOSAT
+endif
+
+ifneq ($(PICOSAT),)
+  CP_CXXFLAGS += -DSATCHECK_PICOSAT
+endif
+
+ifneq ($(LINGELING),)
+  CP_CXXFLAGS += -DSATCHECK_LINGELING
+endif
+
+ifneq ($(CHAFF),)
+  CP_CXXFLAGS += -DSATCHECK_CHAFF
+endif
+
+ifneq ($(BOOLEFORCE),)
+  CP_CXXFLAGS += -DSATCHECK_BOOLEFORCE
+endif
+
+ifneq ($(MINISAT),)
+  CP_CXXFLAGS += -DSATCHECK_MINISAT
+endif
+
+ifneq ($(MINISAT2),)
+  CP_CXXFLAGS += -DSATCHECK_MINISAT2
+endif
+
+ifneq ($(GLUCOSE),)
+  CP_CXXFLAGS += -DSATCHECK_GLUCOSE
+endif
+
+ifneq ($(SMVSAT),)
+  CP_CXXFLAGS += -DSATCHECK_SMVSAT
+endif
+
 # Signing identity for MacOS Gatekeeper
 
 OSX_IDENTITY="Developer ID Application: Daniel Kroening"

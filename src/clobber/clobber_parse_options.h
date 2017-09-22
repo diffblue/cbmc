@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 #include <goto-programs/show_goto_functions.h>
 
+#include <java_bytecode/java_bytecode_language.h>
+
 class goto_functionst;
 class optionst;
 
@@ -32,7 +34,8 @@ class optionst;
   "(version)" \
   "(string-abstraction)" \
   "(show-locs)(show-vcc)(show-properties)(show-trace)" \
-  "(property):"
+  "(property):" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS
 
 class clobber_parse_optionst:
   public parse_options_baset,
@@ -51,17 +54,13 @@ public:
 protected:
   ui_message_handlert ui_message_handler;
 
-  void get_command_line_options(optionst &options);
-
-  bool get_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
+  void get_command_line_options(optionst &);
 
   bool process_goto_program(
     const optionst &options,
-    goto_functionst &goto_functions);
+    goto_modelt &);
 
-  bool set_properties(goto_functionst &goto_functions);
+  bool set_properties(goto_functionst &);
 
   void report_success();
   void report_failure();

@@ -110,11 +110,11 @@ class constant_propagator_ait:public ait<constant_propagator_domaint>
 {
 public:
   constant_propagator_ait(
-    goto_functionst &goto_functions,
-    const namespacet &ns)
+    goto_modelt &goto_model)
   {
-    operator()(goto_functions, ns);
-    replace(goto_functions, ns);
+    const namespacet ns(goto_model.symbol_table);
+    operator()(goto_model.goto_functions, ns);
+    replace(goto_model.goto_functions, ns);
   }
 
   constant_propagator_ait(

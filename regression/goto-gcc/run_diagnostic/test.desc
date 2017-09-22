@@ -1,0 +1,10 @@
+CORE
+main.i
+--native-compiler /no/such/tool
+^EXIT=1$
+^SIGNAL=0$
+^execvp /no/such/tool failed: No such file or directory$
+--
+^Remove failed
+^warning: ignoring
+^CONVERSION ERROR$

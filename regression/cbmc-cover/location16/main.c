@@ -1,5 +1,3 @@
-#include <assert.h>
-
 int func(int a)
 {
   int b = a*2;
@@ -10,7 +8,8 @@ int func(int a)
     b += 10;
   }
 
-  assert(0);
+  // assert() is platform-dependent and changes set of coverage goals
+  __CPROVER_assert(0, "");
 
   return b;
 }

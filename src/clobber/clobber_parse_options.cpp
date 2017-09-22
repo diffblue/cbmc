@@ -24,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 #include <cpp/cpp_language.h>
 
-#include <goto-programs/goto_convert_functions.h>
+#include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/show_properties.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/read_goto_binary.h>
@@ -120,34 +120,33 @@ int clobber_parse_optionst::doit()
 
   eval_verbosity();
 
-  goto_functionst goto_functions;
+  goto_modelt goto_model;
 
   try
   {
-    if(get_goto_program(options, goto_functions))
+    if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
       return 6;
 
-    label_properties(goto_functions);
+    label_properties(goto_model);
 
     if(cmdline.isset("show-properties"))
     {
-      const namespacet ns(symbol_table);
-      show_properties(ns, get_ui(), goto_functions);
+      show_properties(goto_model, get_ui());
       return 0;
     }
 
-    set_properties(goto_functions);
+    set_properties(goto_model.goto_functions);
 
     // do instrumentation
 
-    const namespacet ns(symbol_table);
+    const namespacet ns(goto_model.symbol_table);
 
     std::ofstream out("simulator.c");
 
     if(!out)
       throw std::string("failed to create file simulator.c");
 
-    dump_c(goto_functions, true, false, ns, out);
+    dump_c(goto_model.goto_functions, true, false, false, ns, out);
 
     status() << "instrumentation complete; compile and execute simulator.c"
              << eom;
@@ -189,166 +188,42 @@ bool clobber_parse_optionst::set_properties(goto_functionst &goto_functions)
   return false;
 }
 
-bool clobber_parse_optionst::get_goto_program(
-  const optionst &options,
-  goto_functionst &goto_functions)
-{
-  if(cmdline.args.empty())
-  {
-    error() << "Please provide a program to verify" << eom;
-    return true;
-  }
-
-  {
-    if(cmdline.args.size()==1 &&
-       is_goto_binary(cmdline.args[0]))
-    {
-      status() << "Reading GOTO program from file" << eom;
-
-      if(read_goto_binary(cmdline.args[0],
-           symbol_table, goto_functions, get_message_handler()))
-        return true;
-
-      config.set_from_symbol_table(symbol_table);
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return true;
-      }
-
-      irep_idt entry_point=goto_functions.entry_point();
-
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "The goto binary has no entry point; please complete linking"
-                << eom;
-        return true;
-      }
-    }
-    else if(cmdline.isset("show-parse-tree"))
-    {
-      if(cmdline.args.size()!=1)
-      {
-        error() << "Please give one source file only" << eom;
-        return true;
-      }
-
-      std::string filename=cmdline.args[0];
-
-      #ifdef _MSC_VER
-      std::ifstream infile(widen(filename));
-      #else
-      std::ifstream infile(filename);
-      #endif
-
-      if(!infile)
-      {
-        error() << "failed to open input file `" << filename << "'" << eom;
-        return true;
-      }
-
-      languaget *language=get_language_from_filename(filename);
-
-      if(language==nullptr)
-      {
-        error() << "failed to figure out type of file `" <<  filename << "'"
-                << eom;
-        return true;
-      }
-
-      language->set_message_handler(get_message_handler());
-
-      status() << "Parsing " << filename << eom;
-
-      if(language->parse(infile, filename))
-      {
-        error() << "PARSING ERROR" << eom;
-        return true;
-      }
-
-      language->show_parse(std::cout);
-      return true;
-    }
-    else
-    {
-      if(parse() ||
-         typecheck() ||
-         final())
-        return true;
-
-      // we no longer need any parse trees or language files
-      clear_parse();
-
-      if(cmdline.isset("show-symbol-table"))
-      {
-        show_symbol_table();
-        return true;
-      }
-
-      irep_idt entry_point=goto_functions.entry_point();
-
-      if(symbol_table.symbols.find(entry_point)==symbol_table.symbols.end())
-      {
-        error() << "No entry point; please provide a main function" << eom;
-        return true;
-      }
-
-      status() << "Generating GOTO Program" << eom;
-
-      goto_convert(symbol_table, goto_functions, ui_message_handler);
-    }
-
-    // finally add the library
-    #if 0
-    link_to_library(symbol_table, goto_functions, ui_message_handler);
-    #endif
-
-    if(process_goto_program(options, goto_functions))
-      return true;
-  }
-
-  return false;
-}
-
 bool clobber_parse_optionst::process_goto_program(
   const optionst &options,
-  goto_functionst &goto_functions)
+  goto_modelt &goto_model)
 {
   {
-    namespacet ns(symbol_table);
-
     // do partial inlining
     status() << "Partial Inlining" << eom;
-    goto_partial_inline(goto_functions, ns, ui_message_handler);
+    goto_partial_inline(goto_model, get_message_handler());
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
-    goto_check(ns, options, goto_functions);
+    goto_check(options, goto_model);
 
     // recalculate numbers, etc.
-    goto_functions.update();
+    goto_model.goto_functions.update();
 
     // add loop ids
-    goto_functions.compute_loop_numbers();
+    goto_model.goto_functions.compute_loop_numbers();
 
     // if we aim to cover, replace
     // all assertions by false to prevent simplification
 
     if(cmdline.isset("cover-assertions"))
-      make_assertions_false(goto_functions);
+      make_assertions_false(goto_model);
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(get_ui(), goto_functions);
+      show_loop_ids(get_ui(), goto_model);
       return true;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      show_goto_functions(ns, get_ui(), goto_functions);
+      show_goto_functions(goto_model, get_ui());
       return true;
     }
   }
@@ -434,7 +309,7 @@ void clobber_parse_optionst::report_success()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -459,7 +334,7 @@ void clobber_parse_optionst::show_counterexample(
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -482,7 +357,7 @@ void clobber_parse_optionst::report_failure()
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 }
 
@@ -536,6 +411,8 @@ void clobber_parse_optionst::help()
     " --round-to-plus-inf          IEEE floating point rounding mode\n"
     " --round-to-minus-inf         IEEE floating point rounding mode\n"
     " --round-to-zero              IEEE floating point rounding mode\n"
+    "\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
     "\n"
     "Program instrumentation options:\n"
     HELP_GOTO_CHECK

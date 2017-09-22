@@ -5,6 +5,8 @@
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+int __VERIFIER_nondet_int();
+
 inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 {
   __CPROVER_HIDE:;
@@ -17,7 +19,7 @@ inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
   (void)type;
   #endif
 
-  int result;
+  int result=__VERIFIER_nondet_int();
   return result;
 }
 
@@ -27,6 +29,8 @@ inline int pthread_mutexattr_settype(pthread_mutexattr_t *attr, int type)
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
+
+int __VERIFIER_nondet_int();
 
 inline int pthread_cancel(pthread_t thread)
 {
@@ -38,7 +42,7 @@ inline int pthread_cancel(pthread_t thread)
                    "pthread_cancel must be given valid thread ID");
   #endif
 
-  int result;
+  int result=__VERIFIER_nondet_int();
   return result;
 }
 
@@ -519,10 +523,10 @@ extern __CPROVER_thread_local unsigned long __CPROVER_thread_id;
 extern unsigned long __CPROVER_next_thread_id;
 
 inline int pthread_create(
-  pthread_t *thread,
-  const pthread_attr_t *attr,
-  void * (*start_routine)(void *),
-  void *arg)
+  pthread_t *thread, // must not be null
+  const pthread_attr_t *attr, // may be null
+  void * (*start_routine)(void *), // must not be null
+  void *arg) // may be null
 {
   __CPROVER_HIDE:;
   unsigned long this_thread_id;
@@ -530,15 +534,8 @@ inline int pthread_create(
   this_thread_id=++__CPROVER_next_thread_id;
   __CPROVER_atomic_end();
 
-  if(thread)
-  {
-    #ifdef __APPLE__
-    // pthread_t is a pointer type on the Mac
-    *thread=(pthread_t)this_thread_id;
-    #else
-    *thread=this_thread_id;
-    #endif
-  }
+  // pthread_t is a pointer type on some systems
+  *thread=(pthread_t)this_thread_id;
 
   #ifdef __CPROVER_CUSTOM_BITVECTOR_ANALYSIS
   __CPROVER_set_must(thread, "pthread-id");
@@ -729,6 +726,8 @@ int pthread_spin_trylock(pthread_spinlock_t *lock)
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
 
+int __VERIFIER_nondet_int();
+
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
 inline int pthread_barrier_init(
@@ -745,7 +744,7 @@ inline int pthread_barrier_init(
   __CPROVER_clear_may(barrier, "barrier-destroyed");
   #endif
 
-  int result;
+  int result=__VERIFIER_nondet_int();
   return result;
 }
 #endif
@@ -756,6 +755,8 @@ inline int pthread_barrier_init(
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
+
+int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
@@ -773,7 +774,7 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
   __CPROVER_set_may(barrier, "barrier-destroyed");
   #endif
 
-  int result;
+  int result=__VERIFIER_nondet_int();
   return result;
 }
 #endif
@@ -784,6 +785,8 @@ inline int pthread_barrier_destroy(pthread_barrier_t *barrier)
 #include <pthread.h>
 #define __CPROVER_PTHREAD_H_INCLUDED
 #endif
+
+int __VERIFIER_nondet_int();
 
 // no pthread_barrier_t on the Mac
 #ifndef __APPLE__
@@ -800,7 +803,7 @@ inline int pthread_barrier_wait(pthread_barrier_t *barrier)
                    "pthread barrier must not be destroyed");
   #endif
 
-  int result;
+  int result=__VERIFIER_nondet_int();
   return result;
 }
 #endif

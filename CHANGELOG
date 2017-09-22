@@ -10,6 +10,7 @@
 * GOTO-INSTRUMENT: New option --remove-function-body
 * GOTO-INSTRUMENT: New option --use-all-headers, changed --use-system-headers to
   --no-system-headers
+* GOTO-INSTRUMENT: dump-c can output the generated environment via --harness
 
 
 5.7

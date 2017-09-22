@@ -15,12 +15,10 @@ Date: September 2011
 #define CPROVER_GOTO_INSTRUMENT_MMIO_H
 
 class value_setst;
-class symbol_tablet;
-class goto_functionst;
+class goto_modelt;
 
 void mmio(
-  value_setst &value_sets,
-  class symbol_tablet &symbol_table,
-  goto_functionst &goto_functions);
+  value_setst &,
+  goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_MMIO_H

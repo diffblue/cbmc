@@ -33,9 +33,13 @@ std::ostream &goto_programt::output_instruction(
   return output_instruction(ns, identifier, out, *it);
 }
 
-/// Writes to out a two line string representation of the specific instruction.
-/// It is of the format: // {location} file {source file} line {line in source
-/// file} {representation of the instruction}
+/// Writes to \p out a two/three line string representation of a given
+/// \p instruction. The output is of the format:
+/// ```
+///   // {location} file {source file} line {line in source file}
+///   // Labels: {list-of-labels}
+///   {representation of the instruction}
+/// ```
 /// \param ns: the namespace to resolve the expressions in
 /// \param identifier: the identifier used to find a symbol to identify the
 ///   source language
@@ -157,7 +161,17 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case CATCH:
-    if(!instruction.targets.empty())
+  {
+    if(instruction.code.get_statement()==ID_exception_landingpad)
+    {
+      const auto &landingpad=to_code_landingpad(instruction.code);
+      out << "EXCEPTION LANDING PAD ("
+          << from_type(ns, identifier, landingpad.catch_expr().type())
+          << ' '
+          << from_expr(ns, identifier, landingpad.catch_expr())
+          << ")";
+    }
+    else if(instruction.code.get_statement()==ID_push_catch)
     {
       out << "CATCH-PUSH ";
 
@@ -166,10 +180,9 @@ std::ostream &goto_programt::output_instruction(
         instruction.code.find(ID_exception_list).get_sub();
       assert(instruction.targets.size()==exception_list.size());
       for(instructiont::targetst::const_iterator
-          gt_it=instruction.targets.begin();
+            gt_it=instruction.targets.begin();
           gt_it!=instruction.targets.end();
-          gt_it++,
-          i++)
+          gt_it++, i++)
       {
         if(gt_it!=instruction.targets.begin())
           out << ", ";
@@ -177,11 +190,18 @@ std::ostream &goto_programt::output_instruction(
             << (*gt_it)->target_number;
       }
     }
-    else
+    else if(instruction.code.get_statement()==ID_pop_catch)
+    {
       out << "CATCH-POP";
+    }
+    else
+    {
+      UNREACHABLE;
+    }
 
     out << '\n';
     break;
+  }
 
   case ATOMIC_BEGIN:
     out << "ATOMIC_BEGIN" << '\n';
@@ -192,12 +212,9 @@ std::ostream &goto_programt::output_instruction(
     break;
 
   case START_THREAD:
-    out << "START THREAD ";
-
-    if(instruction.targets.size()==1)
-      out << instruction.targets.front()->target_number;
-
-    out << '\n';
+    out << "START THREAD "
+        << instruction.get_target()->target_number
+        << '\n';
     break;
 
   case END_THREAD:
@@ -480,6 +497,4 @@ std::string as_string(
   default:
     throw "unknown statement";
   }
-
-  return "";
 }

@@ -18,13 +18,21 @@ Date:   April 2010
 #include <iostream>
 #include <cstdio>
 
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/tempfile.h>
 
 goto_cc_cmdlinet::~goto_cc_cmdlinet()
 {
   if(!stdin_file.empty())
-    remove(stdin_file.c_str());
+  {
+    int result=remove(stdin_file.c_str());
+    if(result!=0)
+    {
+      // Let's print the error to stderr instead of ignoring it completely
+      std::perror("Remove failed");
+    }
+  }
 }
 
 bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
@@ -94,7 +102,7 @@ std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
   }
   else
   {
-    assert(false);
+    UNREACHABLE;
     return -1;
   }
 

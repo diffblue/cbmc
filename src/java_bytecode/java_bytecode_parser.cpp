@@ -279,6 +279,9 @@ void java_bytecode_parsert::rClassFile()
 
   parsed_class.is_abstract=(access_flags&ACC_ABSTRACT)!=0;
   parsed_class.is_enum=(access_flags&ACC_ENUM)!=0;
+  parsed_class.is_public=(access_flags&ACC_PUBLIC)!=0;
+  parsed_class.is_protected=(access_flags&ACC_PROTECTED)!=0;
+  parsed_class.is_private=(access_flags&ACC_PRIVATE)!=0;
   parsed_class.name=
     constant(this_class).type().get(ID_C_base_name);
 
@@ -1034,7 +1037,7 @@ void java_bytecode_parsert::rcode_attribute(methodt &method)
     for(size_t i=0; i<stack_map_entries; i++)
     {
       u1 frame_type=read_u1();
-      if(0<=frame_type && frame_type<=63)
+      if(frame_type<=63)
       {
         method.stack_map_table[i].type=methodt::stack_map_table_entryt::SAME;
         method.stack_map_table[i].locals.resize(0);

@@ -12,9 +12,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// Add a new symbol to the symbol table
 /// \param symbol: The symbol to be added to the symbol table
-/// \return Returns a boolean indicating whether the process failed, which
-///   should only happen if there is a symbol with the same name already in the
-///   symbol table
+/// \return Returns true if the process failed, which should only happen if
+///   there is a symbol with the same name already in the symbol table.
 bool symbol_tablet::add(const symbolt &symbol)
 {
   if(!symbols.insert(std::pair<irep_idt, symbolt>(symbol.name, symbol)).second)

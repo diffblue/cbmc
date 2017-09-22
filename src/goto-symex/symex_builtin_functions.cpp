@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/prefix.h>
 #include <util/string2int.h>
-
+#include <util/invariant_utils.h>
 #include <util/c_types.h>
 
 #include <linking/zero_initializer.h>
@@ -165,20 +165,20 @@ void goto_symext::symex_malloc(
 
   new_symbol_table.add(value_symbol);
 
-  address_of_exprt rhs;
+  exprt rhs;
 
   if(object_type.id()==ID_array)
   {
-    rhs.type()=pointer_type(value_symbol.type.subtype());
     index_exprt index_expr(value_symbol.type.subtype());
     index_expr.array()=value_symbol.symbol_expr();
     index_expr.index()=from_integer(0, index_type());
-    rhs.op0()=index_expr;
+    rhs=address_of_exprt(
+      index_expr, pointer_type(value_symbol.type.subtype()));
   }
   else
   {
-    rhs.op0()=value_symbol.symbol_expr();
-    rhs.type()=pointer_type(value_symbol.type);
+    rhs=address_of_exprt(
+      value_symbol.symbol_expr(), pointer_type(value_symbol.type));
   }
 
   if(rhs.type()!=lhs.type())
@@ -299,7 +299,7 @@ void goto_symext::symex_printf(
   const exprt::operandst &operands=tmp_rhs.operands();
   std::list<exprt> args;
 
-  for(unsigned i=1; i<operands.size(); i++)
+  for(std::size_t i=1; i<operands.size(); i++)
     args.push_back(operands[i]);
 
   const irep_idt format_string=
@@ -324,7 +324,7 @@ void goto_symext::symex_input(
 
   std::list<exprt> args;
 
-  for(unsigned i=1; i<code.operands().size(); i++)
+  for(std::size_t i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
@@ -349,7 +349,7 @@ void goto_symext::symex_output(
 
   std::list<exprt> args;
 
-  for(unsigned i=1; i<code.operands().size(); i++)
+  for(std::size_t i=1; i<code.operands().size(); i++)
   {
     args.push_back(code.operands()[i]);
     state.rename(args.back(), ns);
@@ -361,6 +361,11 @@ void goto_symext::symex_output(
   target.output(state.guard.as_expr(), state.source, output_id, args);
 }
 
+/// Handles side effects of type 'new' for C++ and 'new array'
+/// for C++ and Java language modes
+/// \param state: Symex state
+/// \param lhs: left-hand side of assignment
+/// \param code: right-hand side containing side effect
 void goto_symext::symex_cpp_new(
   statet &state,
   const exprt &lhs,
@@ -371,7 +376,8 @@ void goto_symext::symex_cpp_new(
   if(code.type().id()!=ID_pointer)
     throw "new expected to return pointer";
 
-  do_array=(code.get(ID_statement)==ID_cpp_new_array);
+  do_array=(code.get(ID_statement)==ID_cpp_new_array ||
+            code.get(ID_statement)==ID_java_new_array);
 
   dynamic_counter++;
 
@@ -384,7 +390,13 @@ void goto_symext::symex_cpp_new(
              "dynamic_"+count_string+"_value";
   symbol.name="symex_dynamic::"+id2string(symbol.base_name);
   symbol.is_lvalue=true;
-  symbol.mode=ID_cpp;
+  if(code.get(ID_statement)==ID_cpp_new_array ||
+     code.get(ID_statement)==ID_cpp_new)
+    symbol.mode=ID_cpp;
+  else if(code.get(ID_statement)==ID_java_new_array)
+    symbol.mode=ID_java;
+  else
+    INVARIANT_WITH_IREP(false, "Unexpected side effect expression", code);
 
   if(do_array)
   {
@@ -397,7 +409,6 @@ void goto_symext::symex_cpp_new(
   else
     symbol.type=code.type().subtype();
 
-  // symbol.type.set("#active", symbol_expr(active_symbol));
   symbol.type.set("#dynamic", true);
 
   new_symbol_table.add(symbol);
@@ -425,7 +436,10 @@ void goto_symext::symex_cpp_delete(
   statet &state,
   const codet &code)
 {
-  // bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
+  // TODO
+  #if 0
+  bool do_array=code.get(ID_statement)==ID_cpp_delete_array;
+  #endif
 }
 
 void goto_symext::symex_trace(
@@ -456,7 +470,7 @@ void goto_symext::symex_trace(
 
     irep_idt event=code.arguments()[1].op0().get(ID_value);
 
-    for(unsigned j=2; j<code.arguments().size(); j++)
+    for(std::size_t j=2; j<code.arguments().size(); j++)
     {
       exprt var(code.arguments()[j]);
       state.rename(var, ns);

@@ -76,17 +76,12 @@ public:
     return inline_log.output_inline_log_json();
   }
 
-  // is bp call
-  static bool is_bp_call(goto_programt::const_targett target);
-  // is normal or bp call
-  static bool is_call(goto_programt::const_targett target);
   // get call info of normal or bp call
   static void get_call(
     goto_programt::const_targett target,
     exprt &lhs,
     exprt &function,
-    exprt::operandst &arguments,
-    exprt &constrain);
+    exprt::operandst &arguments);
 
   class goto_inline_logt
   {
@@ -175,8 +170,7 @@ protected:
     goto_programt::targett target,
     const exprt &lhs,
     const symbol_exprt &function,
-    const exprt::operandst &arguments,
-    const exprt &constrain);
+    const exprt::operandst &arguments);
 
   void insert_function_nobody(
     goto_programt &dest,
@@ -187,8 +181,7 @@ protected:
 
   void replace_return(
     goto_programt &body,
-    const exprt &lhs,
-    const exprt &constrain);
+    const exprt &lhs);
 
   void parameter_assignments(
     const goto_programt::targett target,

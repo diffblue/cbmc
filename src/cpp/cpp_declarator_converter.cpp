@@ -26,7 +26,8 @@ cpp_declarator_convertert::cpp_declarator_convertert(
   is_template_parameter(false),
   is_friend(false),
   linkage_spec(_cpp_typecheck.current_linkage_spec),
-  cpp_typecheck(_cpp_typecheck)
+  cpp_typecheck(_cpp_typecheck),
+  is_code(false)
 {
 }
 
@@ -90,7 +91,7 @@ symbolt &cpp_declarator_convertert::convert(
     // adjust template type
     if(final_type.id()==ID_template)
     {
-      assert(0);
+      UNREACHABLE;
       typet tmp;
       tmp.swap(final_type.subtype());
       final_type.swap(tmp);
@@ -251,7 +252,7 @@ void cpp_declarator_convertert::combine_types(
     if(decl_code_type.return_type()==symbol_code_type.return_type() &&
        decl_code_type.parameters().size()==symbol_code_type.parameters().size())
     {
-      for(unsigned i=0; i<decl_code_type.parameters().size(); i++)
+      for(std::size_t i=0; i<decl_code_type.parameters().size(); i++)
       {
         const code_typet::parametert &decl_parameter=
           decl_code_type.parameters()[i];

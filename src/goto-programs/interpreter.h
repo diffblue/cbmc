@@ -12,10 +12,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 #define CPROVER_GOTO_PROGRAMS_INTERPRETER_H
 
-#include "goto_functions.h"
+#include <util/message.h>
+
+#include "goto_model.h"
 
 void interpreter(
-  const symbol_tablet &symbol_table,
-  const goto_functionst &goto_functions);
+  const goto_modelt &,
+  message_handlert &);
 
 #endif // CPROVER_GOTO_PROGRAMS_INTERPRETER_H

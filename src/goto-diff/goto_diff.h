@@ -13,9 +13,9 @@ Author: Peter Schrammel
 #define CPROVER_GOTO_DIFF_GOTO_DIFF_H
 
 #include <goto-programs/goto_model.h>
-#include <langapi/language_ui.h>
-#include <util/message.h>
+
 #include <util/json.h>
+#include <util/ui_message.h>
 
 #include <ostream>
 
@@ -37,14 +37,14 @@ public:
 
   virtual bool operator()()=0;
 
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
   virtual std::ostream &output_functions(std::ostream &out) const;
 
 protected:
   const goto_modelt &goto_model1;
   const goto_modelt &goto_model2;
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 
   unsigned total_functions_count;
   typedef std::set<irep_idt> irep_id_sett;

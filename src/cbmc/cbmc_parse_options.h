@@ -14,10 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
-
-#include <langapi/language_ui.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
+
+#include <java_bytecode/java_bytecode_language.h>
 
 #include "xml_interface.h"
 
@@ -26,11 +27,13 @@ class goto_functionst;
 class optionst;
 
 #define CBMC_OPTIONS \
-  "(program-only)(function):(preprocess)(slice-by-trace):" \
+  "(program-only)(preprocess)(slice-by-trace):" \
+  OPT_FUNCTIONS \
   "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
   "D:I:(c89)(c99)(c11)(cpp89)(cpp99)(cpp11)" \
+  "(object-bits):" \
   "(classpath):(cp):(main-class):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   OPT_GOTO_CHECK \
@@ -41,6 +44,11 @@ class optionst;
   "(no-sat-preprocessor)" \
   "(no-pretty-names)(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
+  "(refine-strings)" \
+  "(string-non-empty)" \
+  "(string-printable)" \
+  "(string-max-length):" \
+  "(string-max-input-length):" \
   "(aig)(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
   "(show-goto-functions)(show-loops)" \
@@ -59,16 +67,15 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
-  "(java-max-vla-length):(java-unwind-enum-static)" \
-  "(java-cp-include-files):" \
+  JAVA_BYTECODE_LANGUAGE_OPTIONS \
+  "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
-  "(lazy-methods)" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
 class cbmc_parse_optionst:
   public parse_options_baset,
   public xml_interfacet,
-  public language_uit
+  public messaget
 {
 public:
   virtual int doit() override;
@@ -81,35 +88,17 @@ public:
     const std::string &extra_options);
 
 protected:
+  goto_modelt goto_model;
   ui_message_handlert ui_message_handler;
-  virtual void register_languages();
-
-  virtual void get_command_line_options(optionst &options);
-
-  virtual int do_bmc(
-    bmct &bmc,
-    const goto_functionst &goto_functions);
-
-  virtual int get_goto_program(
-    const optionst &options,
-    expr_listt &bmc_constraints,
-    goto_functionst &goto_functions);
-
-  virtual bool process_goto_program(
-    const optionst &options,
-    goto_functionst &goto_functions);
-
-  bool set_properties(goto_functionst &goto_functions);
 
   void eval_verbosity();
-
-  // get any additional stuff before finalizing the goto program
-  virtual int get_modules(expr_listt &bmc_constraints)
-  {
-    return -1; // continue
-  }
-
+  void register_languages();
+  void get_command_line_options(optionst &);
   void preprocessing();
+  int get_goto_program(const optionst &);
+  bool process_goto_program(const optionst &);
+  bool set_properties();
+  int do_bmc(bmct &);
 };
 
 #endif // CPROVER_CBMC_CBMC_PARSE_OPTIONS_H

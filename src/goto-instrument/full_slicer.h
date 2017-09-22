@@ -12,15 +12,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 #define CPROVER_GOTO_INSTRUMENT_FULL_SLICER_H
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 void full_slicer(
-  goto_functionst &goto_functions,
-  const namespacet &ns);
+  goto_functionst &,
+  const namespacet &);
+
+void full_slicer(goto_modelt &);
 
 void property_slicer(
-  goto_functionst &goto_functions,
-  const namespacet &ns,
+  goto_functionst &,
+  const namespacet &,
+  const std::list<std::string> &properties);
+
+void property_slicer(
+  goto_modelt &,
   const std::list<std::string> &properties);
 
 class slicing_criteriont

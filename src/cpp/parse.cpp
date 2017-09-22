@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
+#include <util/c_types.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
 
@@ -138,7 +139,7 @@ public:
   typedef std::map<irep_idt, new_scopet> id_mapt;
   id_mapt id_map;
 
-  unsigned anon_count;
+  std::size_t anon_count;
 
   new_scopet *parent;
 
@@ -201,7 +202,8 @@ class Parser // NOLINT(readability/identifiers)
 public:
   explicit Parser(cpp_parsert &_cpp_parser):
     lex(_cpp_parser.token_buffer),
-    parser(_cpp_parser)
+    parser(_cpp_parser),
+    max_errors(10)
   {
     root_scope.kind=new_scopet::kindt::NAMESPACE;
     current_scope=&root_scope;
@@ -380,7 +382,7 @@ protected:
   bool rMSCuuidof(exprt &);
   bool rMSC_if_existsExpr(exprt &);
 
-  unsigned number_of_errors;
+  std::size_t number_of_errors;
   irep_idt current_function;
 
   void merge_types(const typet &src, typet &dest);
@@ -486,7 +488,7 @@ bool Parser::SyntaxError()
 
   cpp_tokent t[ERROR_TOKENS];
 
-  for(unsigned i=0; i<ERROR_TOKENS; i++)
+  for(std::size_t i=0; i<ERROR_TOKENS; i++)
     lex.LookAhead(i, t[i]);
 
   if(t[0].kind!='\0')
@@ -497,7 +499,7 @@ bool Parser::SyntaxError()
 
     std::string message="parse error before `";
 
-    for(unsigned i=0; i<ERROR_TOKENS; i++)
+    for(std::size_t i=0; i<ERROR_TOKENS; i++)
       if(t[i].kind!='\0')
       {
         if(i!=0)
@@ -1025,7 +1027,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     break;
 
    default:
-    assert(0);
+    UNREACHABLE;
     break;
   }
 
@@ -1693,7 +1695,7 @@ bool Parser::rOtherDeclaration(
 
     assert(!type_name.get_sub().empty());
 
-    for(unsigned i=0; i < type_name.get_sub().size(); i++)
+    for(std::size_t i=0; i < type_name.get_sub().size(); i++)
     {
       if(type_name.get_sub()[i].id() == ID_operator)
       {
@@ -1940,7 +1942,7 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
     case TOK_VIRTUAL:  member_spec.set_virtual(true); break;
     case TOK_FRIEND:   member_spec.set_friend(true); break;
     case TOK_EXPLICIT: member_spec.set_explicit(true); break;
-    default: assert(false);
+    default: UNREACHABLE;
     }
 
     t=lex.LookAhead(0);
@@ -1977,7 +1979,7 @@ bool Parser::optStorageSpec(cpp_storage_spect &storage_spec)
     case TOK_MUTABLE: storage_spec.set_mutable(); break;
     case TOK_GCC_ASM: storage_spec.set_asm(); break;
     case TOK_THREAD_LOCAL: storage_spec.set_thread_local(); break;
-    default: assert(false);
+    default: UNREACHABLE;
     }
 
     set_location(storage_spec, tk);
@@ -2047,7 +2049,7 @@ bool Parser::optCvQualify(typet &cv)
         break;
 
       default:
-        assert(false);
+        UNREACHABLE;
         break;
       }
     }
@@ -3014,7 +3016,7 @@ bool Parser::optPtrOperator(typet &ptrs)
 
     if(t=='*')
     {
-      pointer_typet op;
+      typet op=pointer_type(typet(ID_nil));
       cpp_tokent tk;
       lex.get_token(tk);
       set_location(op, tk);
@@ -3077,7 +3079,7 @@ bool Parser::optPtrOperator(typet &ptrs)
     {
       cpp_tokent tk;
       lex.get_token(tk);
-      typet op(ID_pointer);
+      typet op=pointer_type(typet(ID_nil));
       op.set(ID_C_reference, true);
       set_location(op, tk);
       t_list.push_front(op);
@@ -3086,7 +3088,7 @@ bool Parser::optPtrOperator(typet &ptrs)
     {
       cpp_tokent tk;
       lex.get_token(tk);
-      typet op(ID_pointer);
+      typet op=pointer_type(typet(ID_nil));
       op.set(ID_C_rvalue_reference, true);
       set_location(op, tk);
       t_list.push_front(op);
@@ -3529,7 +3531,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
   std::cout << std::string(__indent, ' ') << "Parser::rPtrToMember 0\n";
   #endif
 
-  irept ptm(ID_pointer);
+  typet ptm=pointer_type(typet(ID_nil));
   irept &name = ptm.add("to-member");
   name=cpp_namet();
   irept::subt &components=name.get_sub();
@@ -4204,7 +4206,7 @@ bool Parser::rClassSpec(typet &spec)
   else if(t==TOK_UNION)
     spec=typet(ID_union);
   else
-    assert(false);
+    UNREACHABLE;
 
   set_location(spec, tk);
 
@@ -4313,7 +4315,7 @@ bool Parser::rBaseSpecifiers(irept &bases)
         break;
 
        default:
-        assert(0);
+        UNREACHABLE;
       }
 
       t=lex.LookAhead(0);
@@ -4437,7 +4439,7 @@ bool Parser::rClassMember(cpp_itemt &member)
       break;
 
     default:
-      assert(0);
+      UNREACHABLE;
     }
 
     set_location(member, tk1);
@@ -5486,7 +5488,7 @@ bool Parser::rUnaryExpr(exprt &exp)
       break;
 
     default:
-      assert(0);
+      UNREACHABLE;
     }
 
     exp.move_to_operands(right);
@@ -6392,7 +6394,7 @@ bool Parser::rTypePredicate(exprt &expr)
     break;
 
   default:
-    assert(false);
+    UNREACHABLE;
   }
 
   return true;
@@ -6476,7 +6478,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
 
   case TOK_NULLPTR:
     lex.get_token(tk);
-    exp=constant_exprt(ID_NULL, typet(ID_pointer, typet(ID_nullptr)));
+    exp=constant_exprt(ID_NULL, pointer_type(typet(ID_nullptr)));
     set_location(exp, tk);
     #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rPrimaryExpr 6\n";

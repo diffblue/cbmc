@@ -36,6 +36,22 @@ void ansi_c_languaget::modules_provided(std::set<std::string> &modules)
   modules.insert(get_base_name(parse_path, true));
 }
 
+/// Generate a _start function for a specific function
+/// \param entry_function_symbol_id: The symbol for the function that should be
+///   used as the entry point
+/// \param symbol_table: The symbol table for the program. The new _start
+///   function symbol will be added to this table
+/// \return Returns false if the _start method was generated correctly
+bool ansi_c_languaget::generate_start_function(
+  const irep_idt &entry_function_symbol_id,
+  symbol_tablet &symbol_table)
+{
+  return generate_ansi_c_start_function(
+    symbol_table.symbols.at(entry_function_symbol_id),
+    symbol_table,
+    *message_handler);
+}
+
 /// ANSI-C preprocessing
 bool ansi_c_languaget::preprocess(
   std::istream &instream,
@@ -126,7 +142,8 @@ bool ansi_c_languaget::typecheck(
 
 bool ansi_c_languaget::final(symbol_tablet &symbol_table)
 {
-  if(ansi_c_entry_point(symbol_table, "main", get_message_handler()))
+  generate_opaque_method_stubs(symbol_table);
+  if(ansi_c_entry_point(symbol_table, get_message_handler()))
     return true;
 
   return false;
@@ -137,9 +154,9 @@ void ansi_c_languaget::show_parse(std::ostream &out)
   parse_tree.output(out);
 }
 
-languaget *new_ansi_c_language()
+std::unique_ptr<languaget> new_ansi_c_language()
 {
-  return new ansi_c_languaget;
+  return util_make_unique<ansi_c_languaget>();
 }
 
 bool ansi_c_languaget::from_expr(

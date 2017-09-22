@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// Program Transformation
 
 #include "remove_skip.h"
+#include "goto_model.h"
 
 static bool is_skip(goto_programt::instructionst::iterator it)
 {
@@ -27,16 +28,13 @@ static bool is_skip(goto_programt::instructionst::iterator it)
     if(it->guard.is_false())
       return true;
 
-    if(it->targets.size()!=1)
-      return false;
-
     goto_programt::instructionst::iterator next_it=it;
     next_it++;
 
     // A branch to the next instruction is a skip
     // We also require the guard to be 'true'
     return it->guard.is_true() &&
-           it->targets.front()==next_it;
+           it->get_target()==next_it;
   }
 
   if(it->is_other())
@@ -160,3 +158,9 @@ void remove_skip(goto_functionst &goto_functions)
   Forall_goto_functions(f_it, goto_functions)
     remove_skip(f_it->second.body);
 }
+
+void remove_skip(goto_modelt &goto_model)
+{
+  remove_skip(goto_model.goto_functions);
+}
+

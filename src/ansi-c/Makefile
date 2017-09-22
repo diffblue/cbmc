@@ -14,7 +14,6 @@ SRC = anonymous_member.cpp \
       c_nondet_symbol_factory.cpp \
       c_preprocess.cpp \
       c_qualifiers.cpp \
-      c_sizeof.cpp \
       c_storage_spec.cpp \
       c_typecast.cpp \
       c_typecheck_argc_argv.cpp \
@@ -93,19 +92,7 @@ else
   platform_unavail = library/java.io.c library/threads.c
 endif
 library_check: library/*.c
-	for f in $(filter-out $(platform_unavail), $^) ; do \
-		cp $$f __libcheck.c ; \
-		sed -i 's/__builtin_[^v]/s&/' __libcheck.c ; \
-		sed -i 's/__sync_/s&/' __libcheck.c ; \
-		sed -i 's/__noop/s&/' __libcheck.c ; \
-		$(CC) -std=gnu99 -E -include library/cprover.h -D__CPROVER_bool=_Bool \
-			-D__CPROVER_thread_local=__thread -DLIBRARY_CHECK -o __libcheck.i __libcheck.c ; \
-		$(CC) -S -Wall -Werror -pedantic -Wextra -std=gnu99 __libcheck.i -o __libcheck.s \
-			-Wno-unused-label -Wno-uninitialized ; \
-		ec=$$? ; \
-		$(RM) __libcheck.s __libcheck.i __libcheck.c ; \
-		[ $$ec -eq 0 ] || exit $$ec ; \
-	done
+	./library_check.sh $(filter-out $(platform_unavail), $^)
 	touch $@
 
 cprover_library.inc: library/converter$(EXEEXT) library/*.c

@@ -3,6 +3,7 @@ main.c
 --cover branch --unwind 6
 ^EXIT=0$
 ^SIGNAL=0$
-^\*\* 23 of 23 covered \(100.0%\)$
+^\*\* .* of .* covered \(.*\)$
 --
 ^warning: ignoring
+^\[main.coverage.*\] file main.c line .* function main block .* branch .*: FAILED$

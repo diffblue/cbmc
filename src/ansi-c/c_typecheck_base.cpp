@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "c_typecheck_base.h"
 
+#include <util/invariant.h>
 #include <util/std_types.h>
 #include <util/prefix.h>
 #include <util/config.h>
@@ -256,6 +257,16 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // this is ok, just use old type
     new_symbol.type=old_symbol.type;
   }
+  else if(final_old.id()==ID_array &&
+          to_array_type(final_old).size().is_nil() &&
+          initial_new.id()==ID_array &&
+          to_array_type(initial_new).size().is_not_nil() &&
+          final_old.subtype()==initial_new.subtype())
+  {
+    // update the type to enable the use of sizeof(x) on the
+    // right-hand side of a definition of x
+    old_symbol.type=new_symbol.type;
+  }
 
   // do initializer, this may change the type
   if(follow(new_symbol.type).id()!=ID_code &&
@@ -386,36 +397,14 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
   if(final_old!=final_new)
   {
     if(final_old.id()==ID_array &&
-            to_array_type(final_old).size().is_nil() &&
-            final_new.id()==ID_array &&
-            to_array_type(final_new).size().is_not_nil() &&
-            final_old.subtype()==final_new.subtype())
+       to_array_type(final_old).size().is_nil() &&
+       final_new.id()==ID_array &&
+       to_array_type(final_new).size().is_not_nil() &&
+       final_old.subtype()==final_new.subtype())
     {
-      // this is also ok
-      if(old_symbol.type.id()==ID_symbol)
-      {
-        // fix the symbol, not just the type
-        const irep_idt identifier=
-          to_symbol_type(old_symbol.type).get_identifier();
-
-        symbol_tablet::symbolst::iterator s_it=
-          symbol_table.symbols.find(identifier);
-
-        if(s_it==symbol_table.symbols.end())
-        {
-          error().source_location=old_symbol.location;
-          error() << "typecheck_redefinition_non_type: "
-                  << "failed to find symbol `" << identifier << "'"
-                  << eom;
-          throw 0;
-        }
-
-        symbolt &symbol=s_it->second;
-
-        symbol.type=final_new;
-      }
-      else
-        old_symbol.type=new_symbol.type;
+      // we don't do symbol types for arrays anymore
+      PRECONDITION(old_symbol.type.id()!=ID_symbol);
+      old_symbol.type=new_symbol.type;
     }
     else if((final_old.id()==ID_incomplete_c_enum ||
              final_old.id()==ID_c_enum) &&

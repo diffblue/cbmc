@@ -80,6 +80,29 @@ mp_integer member_offset(
   return offsets->second;
 }
 
+mp_integer member_offset_bits(
+  const struct_typet &type,
+  const irep_idt &member,
+  const namespacet &ns)
+{
+  mp_integer offset=0;
+  const struct_typet::componentst &components=type.components();
+
+  for(const auto &comp : components)
+  {
+    if(comp.get_name()==member)
+      break;
+
+    mp_integer member_bits=pointer_offset_bits(comp.type(), ns);
+    if(member_bits==-1)
+      return member_bits;
+
+    offset+=member_bits;
+  }
+
+  return offset;
+}
+
 mp_integer pointer_offset_size(
   const typet &type,
   const namespacet &ns)
@@ -188,13 +211,10 @@ mp_integer pointer_offset_bits(
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
           type.id()==ID_bv ||
-          type.id()==ID_c_bool)
+          type.id()==ID_c_bool ||
+          type.id()==ID_c_bit_field)
   {
     return to_bitvector_type(type).get_width();
-  }
-  else if(type.id()==ID_c_bit_field)
-  {
-    return to_c_bit_field_type(type).get_width();
   }
   else if(type.id()==ID_c_enum)
   {
@@ -210,6 +230,10 @@ mp_integer pointer_offset_bits(
   }
   else if(type.id()==ID_pointer)
   {
+    // the following is an MS extension
+    if(type.get_bool(ID_C_ptr32))
+      return 32;
+
     return config.ansi_c.pointer_width;
   }
   else if(type.id()==ID_symbol)
@@ -225,7 +249,7 @@ mp_integer pointer_offset_bits(
     return 32;
   }
   else
-    return mp_integer(-1);
+    return -1;
 }
 
 exprt member_offset_expr(
@@ -385,7 +409,8 @@ exprt size_of_expr(
     const union_typet::componentst &components=
       union_type.components();
 
-    mp_integer result=0;
+    mp_integer max_bytes=0;
+    exprt result=from_integer(0, size_type());
 
     // compute max
 
@@ -395,35 +420,52 @@ exprt size_of_expr(
         it++)
     {
       const typet &subtype=it->type();
-      mp_integer sub_size;
+      exprt sub_size;
 
-      if(subtype.id()==ID_c_bit_field)
+      mp_integer sub_bits=pointer_offset_bits(subtype, ns);
+
+      if(sub_bits==-1)
       {
-        std::size_t bits=to_c_bit_field_type(subtype).get_width();
-        sub_size=bits/8;
-        if((bits%8)!=0)
-          ++sub_size;
+        max_bytes=-1;
+
+        sub_size=size_of_expr(subtype, ns);
+        if(sub_size.is_nil())
+          return nil_exprt();
       }
       else
-        sub_size=pointer_offset_size(subtype, ns);
-
-      if(sub_size==-1)
       {
-        result=-1;
-        break;
+        mp_integer sub_bytes=(sub_bits+7)/8;
+
+        if(max_bytes>=0)
+        {
+          if(max_bytes<sub_bytes)
+          {
+            max_bytes=sub_bytes;
+            result=from_integer(sub_bytes, size_type());
+          }
+
+          continue;
+        }
+
+        sub_size=from_integer(sub_bytes, size_type());
       }
-      if(sub_size>result)
-        result=sub_size;
+
+      result=if_exprt(
+        binary_relation_exprt(result, ID_lt, sub_size),
+        sub_size, result);
+
+      simplify(result, ns);
     }
 
-    return from_integer(result, size_type());
+    return result;
   }
   else if(type.id()==ID_signedbv ||
           type.id()==ID_unsignedbv ||
           type.id()==ID_fixedbv ||
           type.id()==ID_floatbv ||
           type.id()==ID_bv ||
-          type.id()==ID_c_bool)
+          type.id()==ID_c_bool ||
+          type.id()==ID_c_bit_field)
   {
     std::size_t width=to_bitvector_type(type).get_width();
     std::size_t bytes=width/8;
@@ -449,6 +491,10 @@ exprt size_of_expr(
   }
   else if(type.id()==ID_pointer)
   {
+    // the following is an MS extension
+    if(type.get_bool(ID_C_ptr32))
+      return from_integer(4, size_type());
+
     std::size_t width=config.ansi_c.pointer_width;
     std::size_t bytes=width/8;
     if(bytes*8!=width)

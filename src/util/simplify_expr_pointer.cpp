@@ -78,7 +78,8 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
         if(!to_integer(expr.op1(), index) &&
            step_size!=-1)
         {
-          pointer_typet pointer_type;
+          pointer_typet pointer_type=
+            to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
           pointer_type.subtype()=expr.type();
           typecast_exprt typecast_expr(
             from_integer(step_size*index+address, index_type()), pointer_type);
@@ -114,7 +115,8 @@ bool simplify_exprt::simplify_address_of_arg(exprt &expr)
           mp_integer offset=member_offset(struct_type, member, ns);
           if(offset!=-1)
           {
-            pointer_typet pointer_type;
+            pointer_typet pointer_type=
+              to_pointer_type(to_dereference_expr(expr.op0()).pointer().type());
             pointer_type.subtype()=expr.type();
             typecast_exprt typecast_expr(
               from_integer(address+offset, index_type()), pointer_type);
@@ -375,14 +377,41 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
 
     return false;
   }
-  else if(ptr.id()==ID_constant &&
-          ptr.get(ID_value)==ID_NULL)
+  else if(ptr.id()==ID_constant)
   {
-    expr=from_integer(0, expr.type());
+    constant_exprt &c_ptr=to_constant_expr(ptr);
 
-    simplify_node(expr);
+    if(c_ptr.get_value()==ID_NULL ||
+       c_ptr.value_is_zero_string())
+    {
+      expr=from_integer(0, expr.type());
 
-    return false;
+      simplify_node(expr);
+
+      return false;
+    }
+    else
+    {
+      // this is a pointer, we can't use to_integer
+      mp_integer number=binary2integer(id2string(c_ptr.get_value()), false);
+      // a null pointer would have been caught above, return value 0
+      // will indicate that conversion failed
+      if(number==0)
+        return true;
+
+      // The constant address consists of OBJECT-ID || OFFSET.
+      mp_integer offset_bits=
+        pointer_offset_bits(ptr.type(), ns)-config.bv_encoding.object_bits;
+      number%=power(2, offset_bits);
+
+      expr=from_integer(number, expr.type());
+
+      simplify_node(expr);
+
+      return false;
+    }
+
+    return true;
   }
 
   return true;

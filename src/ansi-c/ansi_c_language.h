@@ -10,7 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 #define CPROVER_ANSI_C_ANSI_C_LANGUAGE_H
 
+/*! \defgroup gr_ansi_c ANSI-C front-end */
+
+#include <memory>
+
 #include <util/language.h>
+#include <util/make_unique.h>
 
 #include "ansi_c_parse_tree.h"
 
@@ -59,8 +64,8 @@ public:
     exprt &expr,
     const namespacet &ns) override;
 
-  languaget *new_language() override
-  { return new ansi_c_languaget; }
+  std::unique_ptr<languaget> new_language() override
+  { return util_make_unique<ansi_c_languaget>(); }
 
   std::string id() const override { return "C"; }
   std::string description() const override { return "ANSI-C 99"; }
@@ -68,11 +73,15 @@ public:
 
   void modules_provided(std::set<std::string> &modules) override;
 
+  virtual bool generate_start_function(
+    const irep_idt &entry_function_symbol_id,
+    class symbol_tablet &symbol_table) override;
+
 protected:
   ansi_c_parse_treet parse_tree;
   std::string parse_path;
 };
 
-languaget *new_ansi_c_language();
+std::unique_ptr<languaget> new_ansi_c_language();
 
 #endif // CPROVER_ANSI_C_ANSI_C_LANGUAGE_H

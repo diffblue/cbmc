@@ -216,7 +216,7 @@ public:
     ssa_exprt ssa_lhs;
     exprt ssa_full_lhs, original_full_lhs;
     exprt ssa_rhs;
-    assignment_typet assignment_type=assignment_typet::STATE;
+    assignment_typet assignment_type;
 
     // for ASSUME/ASSERT/GOTO/CONSTRAINT
     exprt cond_expr;
@@ -247,6 +247,7 @@ public:
       ssa_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       original_full_lhs(static_cast<const exprt &>(get_nil_irep())),
       ssa_rhs(static_cast<const exprt &>(get_nil_irep())),
+      assignment_type(assignment_typet::STATE),
       cond_expr(static_cast<const exprt &>(get_nil_irep())),
       cond_literal(const_literal(false)),
       formatted(false),
@@ -260,9 +261,9 @@ public:
       std::ostream &out) const;
   };
 
-  unsigned count_assertions() const
+  std::size_t count_assertions() const
   {
-    unsigned i=0;
+    std::size_t i=0;
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
@@ -271,9 +272,9 @@ public:
     return i;
   }
 
-  unsigned count_ignored_SSA_steps() const
+  std::size_t count_ignored_SSA_steps() const
   {
-    unsigned i=0;
+    std::size_t i=0;
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
@@ -285,7 +286,7 @@ public:
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
 
-  SSA_stepst::iterator get_SSA_step(unsigned s)
+  SSA_stepst::iterator get_SSA_step(std::size_t s)
   {
     SSA_stepst::iterator it=SSA_steps.begin();
     for(; s!=0; s--)

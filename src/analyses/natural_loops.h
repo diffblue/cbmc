@@ -16,8 +16,7 @@ Author: Georg Weissenbacher, georg@weissenbacher.name
 #include <iosfwd>
 #include <set>
 
-#include <goto-programs/goto_program.h>
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 #include "cfg_dominators.h"
 
@@ -70,7 +69,9 @@ class natural_loopst:
 typedef natural_loops_templatet<goto_programt, goto_programt::targett>
     natural_loops_mutablet;
 
-void show_natural_loops(const goto_functionst &goto_functions);
+void show_natural_loops(
+  const goto_modelt &,
+  std::ostream &out);
 
 /// Finds all back-edges and computes the natural loops
 #ifdef DEBUG
@@ -93,23 +94,21 @@ void natural_loops_templatet<P, T>::compute(P &program)
   {
     if(m_it->is_backwards_goto())
     {
-      for(const auto &target : m_it->targets)
-      {
-        if(target->location_number<=m_it->location_number)
-        {
-          const nodet &node=
-            cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
+      const auto &target=m_it->get_target();
 
-#ifdef DEBUG
-          std::cout << "Computing loop for "
-                    << m_it->location_number << " -> "
-                    << target->location_number << "\n";
-#endif
-          if(node.dominators.find(target)!=node.dominators.end())
-          {
-            compute_natural_loop(m_it, target);
-          }
-        }
+      if(target->location_number<=m_it->location_number)
+      {
+        const nodet &node=
+          cfg_dominators.cfg[cfg_dominators.cfg.entry_map[m_it]];
+
+        #ifdef DEBUG
+        std::cout << "Computing loop for "
+                  << m_it->location_number << " -> "
+                  << target->location_number << "\n";
+        #endif
+
+        if(node.dominators.find(target)!=node.dominators.end())
+          compute_natural_loop(m_it, target);
       }
     }
   }

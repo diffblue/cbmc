@@ -13,12 +13,19 @@ Author: Daniel Kroening
 
 #include "json_goto_trace.h"
 
-#include <cassert>
-
 #include <util/json_expr.h>
+#include <util/arith_tools.h>
+#include <util/config.h>
+#include <util/invariant.h>
+#include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
 
+/// Produce a json representation of a trace.
+/// \param ns: a namespace
+/// \param goto_trace: a trace in a goto program
+/// \param dest: referecence to a json object in which the goto trace will be
+///   added
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -59,6 +66,7 @@ void convert(
 
         json_failure["stepType"]=json_stringt("failure");
         json_failure["hidden"]=jsont::json_boolean(step.hidden);
+        json_failure["internal"]=jsont::json_boolean(step.internal);
         json_failure["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_failure["reason"]=json_stringt(id2string(step.comment));
         json_failure["property"]=json_stringt(id2string(property_id));
@@ -82,16 +90,11 @@ void convert(
         std::string value_string, binary_string, type_string, full_lhs_string;
         json_objectt full_lhs_value;
 
-        if(step.full_lhs.is_not_nil())
-          full_lhs_string=from_expr(ns, identifier, step.full_lhs);
-
-#if 0
-        if(it.full_lhs_value.is_not_nil())
-          full_lhs_value_string=from_expr(ns, identifier, it.full_lhs_value);
-#endif
-
-        if(step.full_lhs_value.is_not_nil())
-          full_lhs_value = json(step.full_lhs_value, ns);
+        DATA_INVARIANT(
+          step.full_lhs.is_not_nil(),
+          "full_lhs in assignment must not be nil");
+        exprt simplified=simplify_expr(step.full_lhs, ns);
+        full_lhs_string=from_expr(ns, identifier, simplified);
 
         const symbolt *symbol;
         irep_idt base_name, display_name;
@@ -104,11 +107,22 @@ void convert(
             type_string=from_type(ns, identifier, symbol->type);
 
           json_assignment["mode"]=json_stringt(id2string(symbol->mode));
+          exprt simplified=simplify_expr(step.full_lhs_value, ns);
+
+          full_lhs_value=json(simplified, ns, symbol->mode);
+        }
+        else
+        {
+          DATA_INVARIANT(
+            step.full_lhs_value.is_not_nil(),
+            "full_lhs_value in assignment must not be nil");
+          full_lhs_value=json(step.full_lhs_value, ns, ID_unknown);
         }
 
         json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
         json_assignment["hidden"]=jsont::json_boolean(step.hidden);
+        json_assignment["internal"]=jsont::json_boolean(step.internal);
         json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));
 
         json_assignment["assignmentType"]=
@@ -126,9 +140,19 @@ void convert(
 
         json_output["stepType"]=json_stringt("output");
         json_output["hidden"]=jsont::json_boolean(step.hidden);
+        json_output["internal"]=jsont::json_boolean(step.internal);
         json_output["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_output["outputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
+        json_output["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_output["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -136,7 +160,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
@@ -150,9 +174,19 @@ void convert(
 
         json_input["stepType"]=json_stringt("input");
         json_input["hidden"]=jsont::json_boolean(step.hidden);
+        json_input["internal"]=jsont::json_boolean(step.internal);
         json_input["thread"]=json_numbert(std::to_string(step.thread_nr));
         json_input["inputID"]=json_stringt(id2string(step.io_id));
 
+        // Recovering the mode from the function
+        irep_idt mode;
+        const symbolt *function_name;
+        if(ns.lookup(source_location.get_function(), function_name))
+          // Failed to find symbol
+          mode=ID_unknown;
+        else
+          mode=function_name->mode;
+        json_input["mode"]=json_stringt(id2string(mode));
         json_arrayt &json_values=json_input["values"].make_array();
 
         for(const auto &arg : step.io_args)
@@ -160,7 +194,7 @@ void convert(
           if(arg.is_nil())
             json_values.push_back(json_stringt(""));
           else
-            json_values.push_back(json(arg, ns));
+            json_values.push_back(json(arg, ns, mode));
         }
 
         if(!json_location.is_null())
@@ -178,6 +212,7 @@ void convert(
 
         json_call_return["stepType"]=json_stringt(tag);
         json_call_return["hidden"]=jsont::json_boolean(step.hidden);
+        json_call_return["internal"]=jsont::json_boolean(step.internal);
         json_call_return["thread"]=json_numbert(std::to_string(step.thread_nr));
 
         const symbolt &symbol=ns.lookup(step.identifier);
@@ -201,6 +236,7 @@ void convert(
           json_objectt &json_location_only=dest_array.push_back().make_object();
           json_location_only["stepType"]=json_stringt("location-only");
           json_location_only["hidden"]=jsont::json_boolean(step.hidden);
+          json_location_only["internal"]=jsont::json_boolean(step.internal);
           json_location_only["thread"]=
             json_numbert(std::to_string(step.thread_nr));
           json_location_only["sourceLocation"]=json_location;

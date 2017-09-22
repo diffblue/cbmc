@@ -1,0 +1,8 @@
+CORE
+test.class
+--lazy-methods --verbosity 10 --function test.f --lazy-methods-extra-entry-point test.sety
+^EXIT=6$
+^SIGNAL=0$
+entry point 'test\.sety' is ambiguous between:
+test\.sety:\(I\)V
+test\.sety:\(F\)V

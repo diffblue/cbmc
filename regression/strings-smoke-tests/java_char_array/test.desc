@@ -1,0 +1,13 @@
+CORE
+test_char_array.class
+--refine-strings
+^EXIT=10$
+^SIGNAL=0$
+.*assertion.* test_char_array.java line 9 .* SUCCESS$
+.*assertion.* test_char_array.java line 10 .* SUCCESS$
+.*assertion.* test_char_array.java line 11 .* SUCCESS$
+.*assertion.* test_char_array.java line 13 .* FAILURE$
+.*assertion.* test_char_array.java line 15 .* FAILURE$
+.*assertion.* test_char_array.java line 17 .* FAILURE$
+^VERIFICATION FAILED$
+--

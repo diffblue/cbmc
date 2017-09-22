@@ -27,7 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void inv_object_storet::output(std::ostream &out) const
 {
-  for(unsigned i=0; i<entries.size(); i++)
+  for(std::size_t i=0; i<entries.size(); i++)
     out << "STORE " << i << ": " << to_string(i, "") << '\n';
 }
 
@@ -61,7 +61,7 @@ unsigned inv_object_storet::add(const exprt &expr)
 
   assert(s!="");
 
-  unsigned n=map.number(s);
+  mapt::number_type n=map.number(s);
 
   if(n>=entries.size())
   {
@@ -188,11 +188,11 @@ void invariant_sett::add(
   unsigned f_r=eq_set.find(p.first);
   unsigned s_r=eq_set.find(p.second);
 
-  for(unsigned f=0; f<eq_set.size(); f++)
+  for(std::size_t f=0; f<eq_set.size(); f++)
   {
     if(eq_set.find(f)==f_r)
     {
-      for(unsigned s=0; s<eq_set.size(); s++)
+      for(std::size_t s=0; s<eq_set.size(); s++)
         if(eq_set.find(s)==s_r)
           dest.insert(std::pair<unsigned, unsigned>(f, s));
     }
@@ -209,7 +209,7 @@ void invariant_sett::add_eq(const std::pair<unsigned, unsigned> &p)
   bool constant_seen=false;
   mp_integer c;
 
-  for(unsigned i=0; i<eq_set.size(); i++)
+  for(std::size_t i=0; i<eq_set.size(); i++)
   {
     if(eq_set.find(i)==r)
     {
@@ -319,12 +319,12 @@ void invariant_sett::output(
   INVARIANT_STRUCTURED(
     object_store!=nullptr, nullptr_exceptiont, "Object store is null");
 
-  for(unsigned i=0; i<eq_set.size(); i++)
+  for(std::size_t i=0; i<eq_set.size(); i++)
     if(eq_set.is_root(i) &&
        eq_set.count(i)>=2)
     {
       bool first=true;
-      for(unsigned j=0; j<eq_set.size(); j++)
+      for(std::size_t j=0; j<eq_set.size(); j++)
         if(eq_set.find(j)==i)
         {
           if(first)
@@ -367,7 +367,7 @@ void invariant_sett::add_type_bounds(const exprt &expr, const typet &type)
 
   if(type.id()==ID_unsignedbv)
   {
-    unsigned op_width=to_unsignedbv_type(type).get_width();
+    std::size_t op_width=to_unsignedbv_type(type).get_width();
 
     if(op_width<=8)
     {
@@ -474,7 +474,7 @@ void invariant_sett::strengthen_rec(const exprt &expr)
       }
     }
     else
-      assert(false);
+      UNREACHABLE;
   }
   else if(expr.id()==ID_equal)
   {
@@ -673,7 +673,7 @@ tvt invariant_sett::implies_rec(const exprt &expr) const
     else if(expr.id()==ID_notequal)
       return is_ne(p);
     else
-      assert(false);
+      UNREACHABLE;
   }
 
   return tvt::unknown();
@@ -852,7 +852,7 @@ exprt invariant_sett::get_constant(const exprt &expr) const
     unsigned r=eq_set.find(a);
 
     // is it a constant?
-    for(unsigned i=0; i<eq_set.size(); i++)
+    for(std::size_t i=0; i<eq_set.size(); i++)
       if(eq_set.find(i)==r)
       {
         const exprt &e=object_store->get_expr(i);
@@ -938,8 +938,8 @@ bool invariant_sett::make_union(const invariant_sett &other)
   eq_set.intersection(other.eq_set);
 
   // inequalities
-  unsigned old_ne_set=ne_set.size();
-  unsigned old_le_set=le_set.size();
+  std::size_t old_ne_set=ne_set.size();
+  std::size_t old_le_set=le_set.size();
 
   intersection(ne_set, other.ne_set);
   intersection(le_set, other.le_set);

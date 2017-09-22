@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "std_types.h"
 #include "config.h"
+#include "invariant.h"
 
 #include "c_types.h"
 
@@ -67,7 +68,7 @@ unsignedbv_typet size_type()
   else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
     return unsigned_long_long_int_type();
   else
-    assert(false); // aaah!
+    INVARIANT(false, "width of size type"); // aaah!
 }
 
 signedbv_typet signed_size_type()
@@ -249,7 +250,7 @@ bitvector_typet long_double_type()
       // not quite right. The extra bits beyond 80 are usually padded.
     }
     else
-      assert(false);
+      INVARIANT(false, "width of long double");
 
     result.set(ID_C_c_type, ID_long_double);
 
@@ -290,17 +291,17 @@ signedbv_typet pointer_diff_type()
   else if(config.ansi_c.pointer_width==config.ansi_c.long_long_int_width)
     return signed_long_long_int_type();
   else
-    assert(false); // aaah!
+    INVARIANT(false, "width of pointer difference");
 }
 
 pointer_typet pointer_type(const typet &subtype)
 {
-  return pointer_typet(subtype);
+  return pointer_typet(subtype, config.ansi_c.pointer_width);
 }
 
 reference_typet reference_type(const typet &subtype)
 {
-  return reference_typet(subtype);
+  return reference_typet(subtype, config.ansi_c.pointer_width);
 }
 
 typet void_type()

@@ -29,4 +29,8 @@ void split_string(
   std::string &right,
   bool strip=false);
 
+std::string trim_from_last_delimiter(
+  const std::string &s,
+  const char delim);
+
 #endif

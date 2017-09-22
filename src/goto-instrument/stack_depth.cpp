@@ -13,13 +13,14 @@ Date: November 2011
 
 #include "stack_depth.h"
 
+#include <util/c_types.h>
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/arith_tools.h>
 #include <util/cprover_prefix.h>
 
-#include <goto-programs/goto_functions.h>
+#include <goto-programs/goto_model.h>
 
 symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
 {
@@ -83,14 +84,15 @@ void stack_depth(
 }
 
 void stack_depth(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
+  goto_modelt &goto_model,
   const int depth)
 {
-  const symbol_exprt sym=add_stack_depth_symbol(symbol_table);
+  const symbol_exprt sym=
+    add_stack_depth_symbol(goto_model.symbol_table);
+
   const exprt depth_expr(from_integer(depth, sym.type()));
 
-  Forall_goto_functions(f_it, goto_functions)
+  Forall_goto_functions(f_it, goto_model.goto_functions)
     if(f_it->second.body_available() &&
         f_it->first!=CPROVER_PREFIX "initialize" &&
         f_it->first!=goto_functionst::entry_point())
@@ -98,8 +100,11 @@ void stack_depth(
 
   // initialize depth to 0
   goto_functionst::function_mapt::iterator
-    i_it=goto_functions.function_map.find(CPROVER_PREFIX "initialize");
-  assert(i_it!=goto_functions.function_map.end());
+    i_it=goto_model.goto_functions.function_map.find(
+      CPROVER_PREFIX "initialize");
+  DATA_INVARIANT(
+    i_it!=goto_model.goto_functions.function_map.end(),
+    "__CPROVER_initialize must exist");
 
   goto_programt &init=i_it->second.body;
   goto_programt::targett first=init.instructions.begin();
@@ -110,5 +115,5 @@ void stack_depth(
   it->function=first->function;
 
   // update counters etc.
-  goto_functions.update();
+  goto_model.goto_functions.update();
 }

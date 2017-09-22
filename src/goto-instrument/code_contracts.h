@@ -14,11 +14,8 @@ Date: February 2016
 #ifndef CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
 #define CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H
 
-class goto_functionst;
-class symbol_tablet;
+class goto_modelt;
 
-void code_contracts(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions);
+void code_contracts(goto_modelt &);
 
 #endif // CPROVER_GOTO_INSTRUMENT_CODE_CONTRACTS_H

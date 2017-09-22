@@ -319,7 +319,7 @@ bool escape_domaint::merge(
   {
     const std::set<irep_idt> &b_cleanup=cleanup.second.cleanup_functions;
     std::set<irep_idt> &a_cleanup=cleanup_map[cleanup.first].cleanup_functions;
-    unsigned old_size=a_cleanup.size();
+    auto old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size)
       changed=true;
@@ -379,7 +379,7 @@ void escape_domaint::check_lhs(
     {
       // count the aliases
 
-      unsigned count=0;
+      std::size_t count=0;
 
       for(const auto &alias : aliases)
       {
@@ -436,10 +436,11 @@ void escape_analysist::insert_cleanup(
 }
 
 void escape_analysist::instrument(
-  goto_functionst &goto_functions,
-  const namespacet &ns)
+  goto_modelt &goto_model)
 {
-  Forall_goto_functions(f_it, goto_functions)
+  const namespacet ns(goto_model.symbol_table);
+
+  Forall_goto_functions(f_it, goto_model.goto_functions)
   {
     Forall_goto_program_instructions(i_it, f_it->second.body)
     {

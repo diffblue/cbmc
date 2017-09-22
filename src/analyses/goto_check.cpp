@@ -572,7 +572,7 @@ void goto_checkt::integer_overflow_check(
     // The overflow checks are binary!
     // We break these up.
 
-    for(unsigned i=1; i<expr.operands().size(); i++)
+    for(std::size_t i=1; i<expr.operands().size(); i++)
     {
       exprt tmp;
 
@@ -833,7 +833,7 @@ void goto_checkt::nan_check(
           equal_exprt(expr.op1(), minus_inf)));
   }
   else
-    assert(false);
+    UNREACHABLE;
 
   isnan.make_not();
 
@@ -909,7 +909,7 @@ void goto_checkt::pointer_validity_check(
   const exprt &access_ub,
   const irep_idt &mode)
 {
-  if(mode!=ID_java && !enable_pointer_check)
+  if(!enable_pointer_check)
     return;
 
   const exprt &pointer=expr.op0();
@@ -1702,6 +1702,10 @@ void goto_checkt::goto_check(
 
         if(!it->source_location.get_column().empty())
           i_it->source_location.set_column(it->source_location.get_column());
+
+        if(!it->source_location.get_java_bytecode_index().empty())
+          i_it->source_location.set_java_bytecode_index(
+            it->source_location.get_java_bytecode_index());
       }
 
       if(i_it->function.empty())

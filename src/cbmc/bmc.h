@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <util/options.h>
+#include <util/ui_message.h>
 
 #include <solvers/prop/prop.h>
 #include <solvers/prop/prop_conv.h>
@@ -23,7 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
-#include <langapi/language_ui.h>
+
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/safety_checker.h>
 
@@ -56,7 +57,7 @@ public:
   // additional stuff
   expr_listt bmc_constraints;
 
-  void set_ui(language_uit::uit _ui) { ui=_ui; }
+  void set_ui(ui_message_handlert::uit _ui) { ui=_ui; }
 
   // the safety_checkert interface
   virtual resultt operator()(
@@ -74,7 +75,7 @@ protected:
   prop_convt &prop_conv;
 
   // use gui format
-  language_uit::uit ui;
+  ui_message_handlert::uit ui;
 
   virtual decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);
@@ -113,6 +114,8 @@ protected:
 
   friend class bmc_all_propertiest;
   friend class bmc_covert;
+  template <template <class goalt> class covert>
+  friend class bmc_goal_covert;
   friend class fault_localizationt;
 };
 

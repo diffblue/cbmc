@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^EXIT=10$
+^SIGNAL=0$
+VERIFICATION FAILED
+--
+^warning: ignoring
+--
+When compiling CBMC with -DDEBUG uncaught exception analysis prints an
+exceptions map per function.  This test ensures that meta-functions which are
+replaced by explicit GOTO instructions (e.g. __CPROVER_assert, __CPROVER_assume)
+and thus do not occur as explicit function calls in the final GOTO program are
+handled correctly.

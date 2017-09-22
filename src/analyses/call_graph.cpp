@@ -18,6 +18,11 @@ call_grapht::call_grapht()
 {
 }
 
+call_grapht::call_grapht(const goto_modelt &goto_model):
+  call_grapht(goto_model.goto_functions)
+{
+}
+
 call_grapht::call_grapht(const goto_functionst &goto_functions)
 {
   forall_goto_functions(f_it, goto_functions)
@@ -47,6 +52,16 @@ void call_grapht::add(
   const irep_idt &callee)
 {
   graph.insert(std::pair<irep_idt, irep_idt>(caller, callee));
+}
+
+/// Returns an inverted copy of this call graph
+/// \return Inverted (callee -> caller) call graph
+call_grapht call_grapht::get_inverted() const
+{
+  call_grapht result;
+  for(const auto &caller_callee : graph)
+    result.add(caller_callee.second, caller_callee.first);
+  return result;
 }
 
 void call_grapht::output_dot(std::ostream &out) const

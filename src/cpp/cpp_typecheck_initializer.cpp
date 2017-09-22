@@ -12,11 +12,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 
 #include <linking/zero_initializer.h>
-#include <util/c_types.h>
-#include <ansi-c/c_sizeof.h>
 
 #include "cpp_util.h"
 
@@ -121,7 +121,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         symbol.value.type().add("to-member") = resolved_expr.op0().type();
       }
       else
-        assert(false);
+        UNREACHABLE;
 
       if(symbol.type != symbol.value.type())
       {
@@ -228,8 +228,6 @@ void cpp_typecheckt::zero_initializer(
   }
   else if(final_type.id()==ID_union)
   {
-    c_sizeoft c_sizeof(*this);
-
     // Select the largest component for zero-initialization
     mp_integer max_comp_size=0;
 
@@ -244,7 +242,7 @@ void cpp_typecheckt::zero_initializer(
       if(component.type().id()==ID_code)
         continue;
 
-      exprt component_size=c_sizeof(component.type());
+      exprt component_size=size_of_expr(component.type(), *this);
 
       mp_integer size_int;
       if(!to_integer(component_size, size_int))

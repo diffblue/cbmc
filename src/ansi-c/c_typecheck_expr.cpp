@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 
 #include "c_typecast.h"
-#include "c_sizeof.h"
 #include "c_qualifiers.h"
 #include "string_constant.h"
 #include "anonymous_member.h"
@@ -77,7 +76,7 @@ void c_typecheck_baset::add_rounding_mode(exprt &expr)
       else if(expr.id()==ID_minus)
         expr.id(ID_floatbv_minus);
       else
-        assert(false);
+        UNREACHABLE;
 
       expr.op2()=from_integer(0, unsigned_int_type());
     }
@@ -556,7 +555,9 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
           if(type.id()==ID_struct)
           {
-            exprt o=c_offsetof(to_struct_type(type), component_name, *this);
+            exprt o=
+              member_offset_expr(
+                to_struct_type(type), component_name, *this);
 
             if(o.is_nil())
             {
@@ -597,7 +598,8 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
                 if(type.id()==ID_struct)
                 {
                   exprt o=
-                    c_offsetof(to_struct_type(type), c_it->get_name(), *this);
+                    member_offset_expr(
+                      to_struct_type(type), c_it->get_name(), *this);
 
                   if(o.is_nil())
                   {
@@ -649,7 +651,7 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
       // still need to typecheck index
       typecheck_expr(index);
 
-      exprt sub_size=c_sizeof(type.subtype(), *this);
+      exprt sub_size=size_of_expr(type.subtype(), *this);
       if(index.type()!=size_type())
         index.make_typecast(size_type());
       result=plus_exprt(result, mult_exprt(sub_size, index));
@@ -875,7 +877,7 @@ void c_typecheck_baset::typecheck_side_effect_statement_expression(
   else if(last_statement==ID_function_call)
   {
     // this is suspected to be dead
-    assert(false);
+    UNREACHABLE;
 
     // make the last statement an expression
 
@@ -946,7 +948,13 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
     throw 0;
   }
 
-  exprt new_expr=c_sizeof(type, *this);
+  if(type.id()==ID_empty &&
+     expr.operands().size()==1 &&
+     expr.op0().id()==ID_dereference &&
+     expr.op0().op0().type()==pointer_type(void_type()))
+    type=char_type();
+
+  exprt new_expr=size_of_expr(type, *this);
 
   if(new_expr.is_nil())
   {
@@ -1092,7 +1100,14 @@ void c_typecheck_baset::typecheck_expr_typecast(exprt &expr)
     // or an expression for a pointer or scalar.
     // We produce a compound_literal expression.
     exprt tmp(ID_compound_literal, expr.type());
-    tmp.move_to_operands(op);
+    tmp.copy_to_operands(op);
+
+    // handle the case of TYPE being an array with unspecified size
+    if(op.id()==ID_array &&
+       expr.type().id()==ID_array &&
+       to_array_type(expr.type()).size().is_nil())
+      tmp.type()=op.type();
+
     expr=tmp;
     expr.set(ID_C_lvalue, true); // these are l-values
     return;
@@ -1579,8 +1594,7 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     {
       // Make it void *.
       // gcc and clang issue a warning for this.
-      expr.type()=typet(ID_pointer);
-      expr.type().subtype()=typet(ID_empty);
+      expr.type()=pointer_type(empty_typet());
       implicit_typecast(operands[1], expr.type());
       implicit_typecast(operands[2], expr.type());
     }
@@ -2632,7 +2646,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     throw 0;
   }
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     exprt &op=arguments[i];
 
@@ -2852,7 +2866,7 @@ void c_typecheck_baset::typecheck_expr_binary_arithmetic(exprt &expr)
         else if(expr.id()==ID_bitxor)
           expr.id(ID_xor);
         else
-          assert(false);
+          UNREACHABLE;
         expr.type()=type0;
         return;
       }
@@ -3010,7 +3024,7 @@ void c_typecheck_baset::typecheck_expr_pointer_arithmetic(exprt &expr)
     else
     {
       p_op=int_op=nullptr;
-      assert(false);
+      UNREACHABLE;
     }
 
     const typet &int_op_type=follow(int_op->type());

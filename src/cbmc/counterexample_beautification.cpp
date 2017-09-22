@@ -74,7 +74,7 @@ counterexample_beautificationt::get_failed_property(
        prop_conv.l_get(it->cond_literal).is_false())
       return it;
 
-  assert(false);
+  UNREACHABLE;
   return equation.SSA_steps.end();
 }
 
