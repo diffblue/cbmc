@@ -19,6 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "invariant.h"
 #include "std_types.h"
+#include "expr_cast.h"
+
 
 /*! \defgroup gr_std_expr Conversion to specific expressions
  *  Conversion to subclasses of @ref exprt
@@ -76,6 +78,16 @@ inline transt &to_trans_expr(exprt &expr)
     "Transition systems must have three operands");
   return static_cast<transt &>(expr);
 }
+
+template<> inline bool can_cast_expr<transt>(const exprt &base)
+{
+  return base.id()==ID_trans;
+}
+inline void validate_expr(const transt &value)
+{
+  validate_operands(value, 3, "Transition systems must have three operands");
+}
+
 
 /*! \brief Expression to hold a symbol (variable)
 */
@@ -216,6 +228,16 @@ inline symbol_exprt &to_symbol_expr(exprt &expr)
   return static_cast<symbol_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<symbol_exprt>(const exprt &base)
+{
+  return base.id()==ID_symbol;
+}
+inline void validate_expr(const symbol_exprt &value)
+{
+  validate_operands(value, 0, "Symbols must not have operands");
+}
+
+
 /*! \brief Generic base class for unary expressions
 */
 class unary_exprt:public exprt
@@ -295,6 +317,12 @@ inline unary_exprt &to_unary_expr(exprt &expr)
   return static_cast<unary_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<unary_exprt>(const exprt &base)
+{
+  return base.operands().size()==1;
+}
+
+
 /*! \brief absolute value
 */
 class abs_exprt:public unary_exprt
@@ -340,6 +368,16 @@ inline abs_exprt &to_abs_expr(exprt &expr)
     "Absolute value must have one operand");
   return static_cast<abs_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<abs_exprt>(const exprt &base)
+{
+  return base.id()==ID_abs;
+}
+inline void validate_expr(const abs_exprt &value)
+{
+  validate_operands(value, 1, "Absolute value must have one operand");
+}
+
 
 /*! \brief The unary minus expression
 */
@@ -393,6 +431,16 @@ inline unary_minus_exprt &to_unary_minus_expr(exprt &expr)
     "Unary minus must have one operand");
   return static_cast<unary_minus_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<unary_minus_exprt>(const exprt &base)
+{
+  return base.id()==ID_unary_minus;
+}
+inline void validate_expr(const unary_minus_exprt &value)
+{
+  validate_operands(value, 1, "Unary minus must have one operand");
+}
+
 
 /*! \brief A generic base class for expressions that are predicates,
            i.e., boolean-typed.
@@ -540,6 +588,12 @@ inline binary_exprt &to_binary_expr(exprt &expr)
   return static_cast<binary_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<binary_exprt>(const exprt &base)
+{
+  return base.operands().size()==2;
+}
+
+
 /*! \brief A generic base class for expressions that are predicates,
            i.e., boolean-typed, and that take exactly two arguments.
 */
@@ -635,6 +689,12 @@ inline binary_relation_exprt &to_binary_relation_expr(exprt &expr)
   return static_cast<binary_relation_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<binary_relation_exprt>(const exprt &base)
+{
+  return can_cast_expr<binary_exprt>(base);
+}
+
+
 /*! \brief A generic base class for multi-ary expressions
 */
 class multi_ary_exprt:public exprt
@@ -697,6 +757,7 @@ inline multi_ary_exprt &to_multi_ary_expr(exprt &expr)
   return static_cast<multi_ary_exprt &>(expr);
 }
 
+
 /*! \brief The plus expression
 */
 class plus_exprt:public multi_ary_exprt
@@ -753,6 +814,16 @@ inline plus_exprt &to_plus_expr(exprt &expr)
   return static_cast<plus_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<plus_exprt>(const exprt &base)
+{
+  return base.id()==ID_plus;
+}
+inline void validate_expr(const plus_exprt &value)
+{
+  validate_operands(value, 2, "Plus must have two or more operands", true);
+}
+
+
 /*! \brief binary minus
 */
 class minus_exprt:public binary_exprt
@@ -800,6 +871,16 @@ inline minus_exprt &to_minus_expr(exprt &expr)
     "Minus must have two or more operands");
   return static_cast<minus_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<minus_exprt>(const exprt &base)
+{
+  return base.id()==ID_minus;
+}
+inline void validate_expr(const minus_exprt &value)
+{
+  validate_operands(value, 2, "Minus must have two or more operands", true);
+}
+
 
 /*! \brief binary multiplication
 */
@@ -849,6 +930,16 @@ inline mult_exprt &to_mult_expr(exprt &expr)
   return static_cast<mult_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<mult_exprt>(const exprt &base)
+{
+  return base.id()==ID_mult;
+}
+inline void validate_expr(const mult_exprt &value)
+{
+  validate_operands(value, 2, "Multiply must have two or more operands", true);
+}
+
+
 /*! \brief division (integer and real)
 */
 class div_exprt:public binary_exprt
@@ -897,6 +988,16 @@ inline div_exprt &to_div_expr(exprt &expr)
   return static_cast<div_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<div_exprt>(const exprt &base)
+{
+  return base.id()==ID_div;
+}
+inline void validate_expr(const div_exprt &value)
+{
+  validate_operands(value, 2, "Divide must have two operands");
+}
+
+
 /*! \brief binary modulo
 */
 class mod_exprt:public binary_exprt
@@ -940,6 +1041,16 @@ inline mod_exprt &to_mod_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==2, "Modulo must have two operands");
   return static_cast<mod_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<mod_exprt>(const exprt &base)
+{
+  return base.id()==ID_mod;
+}
+inline void validate_expr(const mod_exprt &value)
+{
+  validate_operands(value, 2, "Modulo must have two operands");
+}
+
 
 /*! \brief remainder of division
 */
@@ -985,6 +1096,16 @@ inline rem_exprt &to_rem_expr(exprt &expr)
   return static_cast<rem_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<rem_exprt>(const exprt &base)
+{
+  return base.id()==ID_rem;
+}
+inline void validate_expr(const rem_exprt &value)
+{
+  validate_operands(value, 2, "Remainder must have two operands");
+}
+
+
 /*! \brief exponentiation
  */
 class power_exprt:public binary_exprt
@@ -1028,6 +1149,16 @@ inline power_exprt &to_power_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==2, "Power must have two operands");
   return static_cast<power_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<power_exprt>(const exprt &base)
+{
+  return base.id()==ID_power;
+}
+inline void validate_expr(const power_exprt &value)
+{
+  validate_operands(value, 2, "Power must have two operands");
+}
+
 
 /*! \brief falling factorial power
  */
@@ -1077,6 +1208,17 @@ inline factorial_power_exprt &to_factorial_expr(exprt &expr)
   return static_cast<factorial_power_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<factorial_power_exprt>(
+  const exprt &base)
+{
+  return base.id()==ID_factorial_power;
+}
+inline void validate_expr(const factorial_power_exprt &value)
+{
+  validate_operands(value, 2, "Factorial power must have two operands");
+}
+
+
 /*! \brief equality
 */
 class equal_exprt:public binary_relation_exprt
@@ -1118,6 +1260,16 @@ inline equal_exprt &to_equal_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==2, "Equality must have two operands");
   return static_cast<equal_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<equal_exprt>(const exprt &base)
+{
+  return base.id()==ID_equal;
+}
+inline void validate_expr(const equal_exprt &value)
+{
+  validate_operands(value, 2, "Equality must have two operands");
+}
+
 
 /*! \brief inequality
 */
@@ -1164,6 +1316,16 @@ inline notequal_exprt &to_notequal_expr(exprt &expr)
     "Inequality must have two operands");
   return static_cast<notequal_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<notequal_exprt>(const exprt &base)
+{
+  return base.id()==ID_notequal;
+}
+inline void validate_expr(const notequal_exprt &value)
+{
+  validate_operands(value, 2, "Inequality must have two operands");
+}
+
 
 /*! \brief array index operator
 */
@@ -1247,6 +1409,16 @@ inline index_exprt &to_index_expr(exprt &expr)
   return static_cast<index_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<index_exprt>(const exprt &base)
+{
+  return base.id()==ID_index;
+}
+inline void validate_expr(const index_exprt &value)
+{
+  validate_operands(value, 2, "Array index must have two operands");
+}
+
+
 /*! \brief array constructor from single element
 */
 class array_of_exprt:public unary_exprt
@@ -1304,6 +1476,16 @@ inline array_of_exprt &to_array_of_expr(exprt &expr)
   return static_cast<array_of_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<array_of_exprt>(const exprt &base)
+{
+  return base.id()==ID_array_of;
+}
+inline void validate_expr(const array_of_exprt &value)
+{
+  validate_operands(value, 1, "'Array of' must have one operand");
+}
+
+
 /*! \brief array constructor from list of elements
 */
 class array_exprt:public exprt
@@ -1344,6 +1526,12 @@ inline array_exprt &to_array_expr(exprt &expr)
   return static_cast<array_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<array_exprt>(const exprt &base)
+{
+  return base.id()==ID_array;
+}
+
+
 /*! \brief vector constructor from list of elements
 */
 class vector_exprt:public exprt
@@ -1383,6 +1571,12 @@ inline vector_exprt &to_vector_expr(exprt &expr)
   PRECONDITION(expr.id()==ID_vector);
   return static_cast<vector_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<vector_exprt>(const exprt &base)
+{
+  return base.id()==ID_vector;
+}
+
 
 /*! \brief union constructor from single element
 */
@@ -1459,6 +1653,16 @@ inline union_exprt &to_union_expr(exprt &expr)
   return static_cast<union_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<union_exprt>(const exprt &base)
+{
+  return base.id()==ID_union;
+}
+inline void validate_expr(const union_exprt &value)
+{
+  validate_operands(value, 1, "Union constructor must have one operand");
+}
+
+
 /*! \brief struct constructor from list of elements
 */
 class struct_exprt:public exprt
@@ -1498,6 +1702,12 @@ inline struct_exprt &to_struct_expr(exprt &expr)
   PRECONDITION(expr.id()==ID_struct);
   return static_cast<struct_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<struct_exprt>(const exprt &base)
+{
+  return base.id()==ID_struct;
+}
+
 
 /*! \brief complex constructor from a pair of numbers
 */
@@ -1570,6 +1780,16 @@ inline complex_exprt &to_complex_expr(exprt &expr)
     "Complex constructor must have two operands");
   return static_cast<complex_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<complex_exprt>(const exprt &base)
+{
+  return base.id()==ID_complex;
+}
+inline void validate_expr(const complex_exprt &value)
+{
+  validate_operands(value, 2, "Complex constructor must have two operands");
+}
+
 
 class namespacet;
 
@@ -1653,6 +1873,17 @@ inline object_descriptor_exprt &to_object_descriptor_expr(exprt &expr)
   return static_cast<object_descriptor_exprt &>(expr);
 }
 
+template<>
+inline bool can_cast_expr<object_descriptor_exprt>(const exprt &base)
+{
+  return base.id()==ID_object_descriptor;
+}
+inline void validate_expr(const object_descriptor_exprt &value)
+{
+  validate_operands(value, 2, "Object descriptor must have two operands");
+}
+
+
 /*! \brief TO_BE_DOCUMENTED
 */
 class dynamic_object_exprt:public exprt
@@ -1720,6 +1951,16 @@ inline dynamic_object_exprt &to_dynamic_object_expr(exprt &expr)
   return static_cast<dynamic_object_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<dynamic_object_exprt>(const exprt &base)
+{
+  return base.id()==ID_dynamic_object;
+}
+inline void validate_expr(const dynamic_object_exprt &value)
+{
+  validate_operands(value, 2, "Dynamic object must have two operands");
+}
+
+
 /*! \brief semantic type conversion
 */
 class typecast_exprt:public exprt
@@ -1777,6 +2018,16 @@ inline typecast_exprt &to_typecast_expr(exprt &expr)
     "Typecast must have one operand");
   return static_cast<typecast_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<typecast_exprt>(const exprt &base)
+{
+  return base.id()==ID_typecast;
+}
+inline void validate_expr(const typecast_exprt &value)
+{
+  validate_operands(value, 1, "Typecast must have one operand");
+}
+
 
 /*! \brief semantic type conversion from/to floating-point formats
 */
@@ -1845,6 +2096,17 @@ inline floatbv_typecast_exprt &to_floatbv_typecast_expr(exprt &expr)
     "Float typecast must have two operands");
   return static_cast<floatbv_typecast_exprt &>(expr);
 }
+
+template<>
+inline bool can_cast_expr<floatbv_typecast_exprt>(const exprt &base)
+{
+  return base.id()==ID_floatbv_typecast;
+}
+inline void validate_expr(const floatbv_typecast_exprt &value)
+{
+  validate_operands(value, 2, "Float typecast must have two operands");
+}
+
 
 /*! \brief boolean AND
 */
@@ -1920,6 +2182,16 @@ inline and_exprt &to_and_expr(exprt &expr)
   return static_cast<and_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<and_exprt>(const exprt &base)
+{
+  return base.id()==ID_and;
+}
+// inline void validate_expr(const and_exprt &value)
+// {
+//   validate_operands(value, 2, "And must have two or more operands", true);
+// }
+
+
 /*! \brief boolean implication
 */
 class implies_exprt:public binary_exprt
@@ -1961,6 +2233,16 @@ inline implies_exprt &to_implies_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==2, "Implies must have two operands");
   return static_cast<implies_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<implies_exprt>(const exprt &base)
+{
+  return base.id()==ID_implies;
+}
+inline void validate_expr(const implies_exprt &value)
+{
+  validate_operands(value, 2, "Implies must have two operands");
+}
+
 
 /*! \brief boolean OR
 */
@@ -2036,6 +2318,16 @@ inline or_exprt &to_or_expr(exprt &expr)
   return static_cast<or_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<or_exprt>(const exprt &base)
+{
+  return base.id()==ID_or;
+}
+// inline void validate_expr(const or_exprt &value)
+// {
+//   validate_operands(value, 2, "Or must have two or more operands", true);
+// }
+
+
 /*! \brief Bit-wise negation of bit-vectors
 */
 class bitnot_exprt:public unary_exprt
@@ -2079,6 +2371,15 @@ inline bitnot_exprt &to_bitnot_expr(exprt &expr)
   //                "Bit-wise not must have one operand");
   return static_cast<bitnot_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<bitnot_exprt>(const exprt &base)
+{
+  return base.id()==ID_bitnot;
+}
+// inline void validate_expr(const bitnot_exprt &value)
+// {
+//   validate_operands(value, 1, "Bit-wise not must have one operand");
+// }
 
 
 /*! \brief Bit-wise OR
@@ -2128,6 +2429,20 @@ inline bitor_exprt &to_bitor_expr(exprt &expr)
   return static_cast<bitor_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<bitor_exprt>(const exprt &base)
+{
+  return base.id()==ID_bitor;
+}
+// inline void validate_expr(const bitor_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     2,
+//     "Bit-wise or must have two or more operands",
+//     true);
+// }
+
+
 /*! \brief Bit-wise XOR
 */
 class bitxor_exprt:public multi_ary_exprt
@@ -2173,6 +2488,20 @@ inline bitxor_exprt &to_bitxor_expr(exprt &expr)
   //   "Bit-wise xor must have two or more operands");
   return static_cast<bitxor_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<bitxor_exprt>(const exprt &base)
+{
+  return base.id()==ID_bitxor;
+}
+// inline void validate_expr(const bitxor_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     2,
+//     "Bit-wise xor must have two or more operands",
+//     true);
+// }
+
 
 /*! \brief Bit-wise AND
 */
@@ -2220,6 +2549,20 @@ inline bitand_exprt &to_bitand_expr(exprt &expr)
   //   "Bit-wise and must have two or more operands");
   return static_cast<bitand_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<bitand_exprt>(const exprt &base)
+{
+  return base.id()==ID_bitand;
+}
+// inline void validate_expr(const bitand_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     2,
+//     "Bit-wise and must have two or more operands",
+//     true);
+// }
+
 
 /*! \brief A base class for shift operators
 */
@@ -2294,6 +2637,15 @@ inline shift_exprt &to_shift_expr(exprt &expr)
     "Shifts must have two operands");
   return static_cast<shift_exprt &>(expr);
 }
+
+// The to_*_expr function for this type doesn't do any checks before casting,
+// therefore the implementation is essentially a static_cast.
+// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
+// inline void validate_expr(const shift_exprt &value)
+// {
+//   validate_operands(value, 2, "Shifts must have two operands");
+// }
+
 
 /*! \brief Left shift
 */
@@ -2428,6 +2780,16 @@ inline replication_exprt &to_replication_expr(exprt &expr)
   return static_cast<replication_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<replication_exprt>(const exprt &base)
+{
+  return base.id()==ID_replication;
+}
+inline void validate_expr(const replication_exprt &value)
+{
+  validate_operands(value, 2, "Bit-wise replication must have two operands");
+}
+
+
 /*! \brief Extracts a single bit of a bit-vector operand
 */
 class extractbit_exprt:public binary_predicate_exprt
@@ -2498,6 +2860,16 @@ inline extractbit_exprt &to_extractbit_expr(exprt &expr)
     "Extract bit must have two operands");
   return static_cast<extractbit_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<extractbit_exprt>(const exprt &base)
+{
+  return base.id()==ID_extractbit;
+}
+inline void validate_expr(const extractbit_exprt &value)
+{
+  validate_operands(value, 2, "Extract bit must have two operands");
+}
+
 
 /*! \brief Extracts a sub-range of a bit-vector operand
 */
@@ -2587,6 +2959,16 @@ inline extractbits_exprt &to_extractbits_expr(exprt &expr)
   return static_cast<extractbits_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<extractbits_exprt>(const exprt &base)
+{
+  return base.id()==ID_extractbits;
+}
+inline void validate_expr(const extractbits_exprt &value)
+{
+  validate_operands(value, 3, "Extract bits must have three operands");
+}
+
+
 /*! \brief Operator to return the address of an object
 */
 class address_of_exprt:public unary_exprt
@@ -2636,6 +3018,16 @@ inline address_of_exprt &to_address_of_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==1, "Address of must have one operand");
   return static_cast<address_of_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<address_of_exprt>(const exprt &base)
+{
+  return base.id()==ID_address_of;
+}
+inline void validate_expr(const address_of_exprt &value)
+{
+  validate_operands(value, 1, "Address of must have one operand");
+}
+
 
 /*! \brief Boolean negation
 */
@@ -2689,6 +3081,16 @@ inline not_exprt &to_not_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==1, "Not must have one operand");
   return static_cast<not_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<not_exprt>(const exprt &base)
+{
+  return base.id()==ID_not;
+}
+inline void validate_expr(const not_exprt &value)
+{
+  validate_operands(value, 1, "Not must have one operand");
+}
+
 
 /*! \brief Operator to dereference a pointer
 */
@@ -2759,6 +3161,16 @@ inline dereference_exprt &to_dereference_expr(exprt &expr)
     "Dereference must have one operand");
   return static_cast<dereference_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<dereference_exprt>(const exprt &base)
+{
+  return base.id()==ID_dereference;
+}
+inline void validate_expr(const dereference_exprt &value)
+{
+  validate_operands(value, 1, "Dereference must have one operand");
+}
+
 
 /*! \brief The trinary if-then-else operator
 */
@@ -2848,6 +3260,16 @@ inline if_exprt &to_if_expr(exprt &expr)
   return static_cast<if_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<if_exprt>(const exprt &base)
+{
+  return base.id()==ID_if;
+}
+inline void validate_expr(const if_exprt &value)
+{
+  validate_operands(value, 3, "If-then-else must have three operands");
+}
+
+
 /*! \brief Operator to update elements in structs and arrays
     \remark This expression will eventually be replaced by separate
             array and struct update operators.
@@ -2931,6 +3353,19 @@ inline with_exprt &to_with_expr(exprt &expr)
   return static_cast<with_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<with_exprt>(const exprt &base)
+{
+  return base.id()==ID_with;
+}
+inline void validate_expr(const with_exprt &value)
+{
+  validate_operands(
+    value,
+    3,
+    "Array/structure update must have three operands");
+}
+
+
 class index_designatort:public exprt
 {
 public:
@@ -2982,6 +3417,16 @@ inline index_designatort &to_index_designator(exprt &expr)
   return static_cast<index_designatort &>(expr);
 }
 
+template<> inline bool can_cast_expr<index_designatort>(const exprt &base)
+{
+  return base.id()==ID_index_designator;
+}
+inline void validate_expr(const index_designatort &value)
+{
+  validate_operands(value, 1, "Index designator must have one operand");
+}
+
+
 class member_designatort:public exprt
 {
 public:
@@ -3027,6 +3472,16 @@ inline member_designatort &to_member_designator(exprt &expr)
     "Member designator must not have operands");
   return static_cast<member_designatort &>(expr);
 }
+
+template<> inline bool can_cast_expr<member_designatort>(const exprt &base)
+{
+  return base.id()==ID_member_designator;
+}
+inline void validate_expr(const member_designatort &value)
+{
+  validate_operands(value, 0, "Member designator must not have operands");
+}
+
 
 /*! \brief Operator to update elements in structs and arrays
 */
@@ -3120,6 +3575,19 @@ inline update_exprt &to_update_expr(exprt &expr)
   return static_cast<update_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<update_exprt>(const exprt &base)
+{
+  return base.id()==ID_update;
+}
+inline void validate_expr(const update_exprt &value)
+{
+  validate_operands(
+    value,
+    3,
+    "Array/structure update must have three operands");
+}
+
+
 #if 0
 /*! \brief update of one element of an array
 */
@@ -3201,7 +3669,18 @@ inline array_update_exprt &to_array_update_expr(exprt &expr)
     "Array update must have three operands");
   return static_cast<array_update_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<array_update_exprt>(const exprt &base)
+{
+  return base.id()==ID_array_update;
+}
+inline void validate_expr(const array_update_exprt &value)
+{
+  validate_operands(value, 3, "Array update must have three operands");
+}
+
 #endif
+
 
 /*! \brief Extract member of struct or union
 */
@@ -3325,6 +3804,16 @@ inline member_exprt &to_member_expr(exprt &expr)
   return static_cast<member_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<member_exprt>(const exprt &base)
+{
+  return base.id()==ID_member;
+}
+inline void validate_expr(const member_exprt &value)
+{
+  validate_operands(value, 1, "Extract member must have one operand");
+}
+
+
 /*! \brief Evaluates to true if the operand is NaN
 */
 class isnan_exprt:public unary_predicate_exprt
@@ -3366,6 +3855,16 @@ inline isnan_exprt &to_isnan_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==1, "Is NaN must have one operand");
   return static_cast<isnan_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<isnan_exprt>(const exprt &base)
+{
+  return base.id()==ID_isnan;
+}
+inline void validate_expr(const isnan_exprt &value)
+{
+  validate_operands(value, 1, "Is NaN must have one operand");
+}
+
 
 /*! \brief Evaluates to true if the operand is infinite
 */
@@ -3413,6 +3912,16 @@ inline isinf_exprt &to_isinf_expr(exprt &expr)
   return static_cast<isinf_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<isinf_exprt>(const exprt &base)
+{
+  return base.id()==ID_isinf;
+}
+inline void validate_expr(const isinf_exprt &value)
+{
+  validate_operands(value, 1, "Is infinite must have one operand");
+}
+
+
 /*! \brief Evaluates to true if the operand is finite
 */
 class isfinite_exprt:public unary_predicate_exprt
@@ -3455,6 +3964,16 @@ inline isfinite_exprt &to_isfinite_expr(exprt &expr)
   return static_cast<isfinite_exprt &>(expr);
 }
 
+template<> inline bool can_cast_expr<isfinite_exprt>(const exprt &base)
+{
+  return base.id()==ID_isfinite;
+}
+inline void validate_expr(const isfinite_exprt &value)
+{
+  validate_operands(value, 1, "Is finite must have one operand");
+}
+
+
 /*! \brief Evaluates to true if the operand is a normal number
 */
 class isnormal_exprt:public unary_predicate_exprt
@@ -3496,6 +4015,16 @@ inline isnormal_exprt &to_isnormal_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==1, "Is normal must have one operand");
   return static_cast<isnormal_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<isnormal_exprt>(const exprt &base)
+{
+  return base.id()==ID_isnormal;
+}
+inline void validate_expr(const isnormal_exprt &value)
+{
+  validate_operands(value, 1, "Is normal must have one operand");
+}
+
 
 /*! \brief IEEE-floating-point equality
 */
@@ -3542,6 +4071,17 @@ inline ieee_float_equal_exprt &to_ieee_float_equal_expr(exprt &expr)
     "IEEE equality must have two operands");
   return static_cast<ieee_float_equal_exprt &>(expr);
 }
+
+template<>
+inline bool can_cast_expr<ieee_float_equal_exprt>(const exprt &base)
+{
+  return base.id()==ID_ieee_float_equal;
+}
+inline void validate_expr(const ieee_float_equal_exprt &value)
+{
+  validate_operands(value, 2, "IEEE equality must have two operands");
+}
+
 
 /*! \brief IEEE floating-point disequality
 */
@@ -3590,6 +4130,17 @@ inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
     "IEEE inequality must have two operands");
   return static_cast<ieee_float_notequal_exprt &>(expr);
 }
+
+template<>
+inline bool can_cast_expr<ieee_float_notequal_exprt>(const exprt &base)
+{
+  return base.id()==ID_ieee_float_notequal;
+}
+inline void validate_expr(const ieee_float_notequal_exprt &value)
+{
+  validate_operands(value, 2, "IEEE inequality must have two operands");
+}
+
 
 /*! \brief IEEE floating-point operations
 */
@@ -3671,6 +4222,20 @@ inline ieee_float_op_exprt &to_ieee_float_op_expr(exprt &expr)
   return static_cast<ieee_float_op_exprt &>(expr);
 }
 
+// The to_*_expr function for this type doesn't do any checks before casting,
+// therefore the implementation is essentially a static_cast.
+// Enabling expr_dynamic_cast would hide this; instead use static_cast directly.
+// template<>
+// inline void validate_expr<ieee_float_op_exprt>(
+//   const ieee_float_op_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     3,
+//     "IEEE float operations must have three arguments");
+// }
+
+
 /*! \brief An expression denoting a type
 */
 class type_exprt:public exprt
@@ -3742,6 +4307,12 @@ inline constant_exprt &to_constant_expr(exprt &expr)
   PRECONDITION(expr.id()==ID_constant);
   return static_cast<constant_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<constant_exprt>(const exprt &base)
+{
+  return base.id()==ID_constant;
+}
+
 
 /*! \brief The boolean constant true
 */
@@ -3864,6 +4435,17 @@ inline function_application_exprt &to_function_application_expr(exprt &expr)
   return static_cast<function_application_exprt &>(expr);
 }
 
+template<>
+inline bool can_cast_expr<function_application_exprt>(const exprt &base)
+{
+  return base.id()==ID_function_application;
+}
+inline void validate_expr(const function_application_exprt &value)
+{
+  validate_operands(value, 2, "Function application must have two operands");
+}
+
+
 /*! \brief Concatenation of bit-vector operands
  *
  * This expression takes any number of operands
@@ -3921,6 +4503,22 @@ inline concatenation_exprt &to_concatenation_expr(exprt &expr)
   //   "Concatenation must have two or more operands");
   return static_cast<concatenation_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<concatenation_exprt>(const exprt &base)
+{
+  return base.id()==ID_concatenation;
+}
+// template<>
+// inline void validate_expr<concatenation_exprt>(
+//   const concatenation_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     2,
+//     "Concatenation must have two or more operands",
+//     true);
+// }
+
 
 /*! \brief An expression denoting infinity
 */
@@ -4001,6 +4599,16 @@ inline let_exprt &to_let_expr(exprt &expr)
   DATA_INVARIANT(expr.operands().size()==3, "Let must have three operands");
   return static_cast<let_exprt &>(expr);
 }
+
+template<> inline bool can_cast_expr<let_exprt>(const exprt &base)
+{
+  return base.id()==ID_let;
+}
+inline void validate_expr(const let_exprt &value)
+{
+  validate_operands(value, 3, "Let must have three operands");
+}
+
 
 /*! \brief A forall expression
 */
