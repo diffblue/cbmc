@@ -450,15 +450,31 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
   for(auto it=state.locations.rbegin(); it!=state.locations.rend(); ++it)
   {
     if(it->pc->type==ASSERT)
+    {
+      std::cout << "backtrack learn: " <<it->pc->source_location
+        << ", assert: " << from_expr(it->pc->guard) << "\n";
       learnt_expr=and_exprt(learnt_expr, it->pc->guard);
+      std::cout << "***learnt: " << from_expr(learnt_expr) << "\n";
+    }
     else if(it->pc->type==ASSUME)
       learnt_expr=or_exprt(learnt_expr, it->pc->guard);
     else if(it->pc->type==GOTO)
     {
+      exprt expr=it->pc->guard;
+      std::cout << "backtrack learn: " <<it->pc->source_location
+        << ", goto: " << from_expr(expr) << "\n";
+      if(it->goto_branch==symex_targett::sourcet::goto_brancht::IF)
+        expr.make_not();
+      learnt_expr=and_exprt(learnt_expr, expr);
+      std::cout << "***learnt: " << from_expr(learnt_expr) << "\n";
+      std::cout << "[learnt]: " << from_expr(learnt_map[*it]) << "\n";
+#if 0
       // manual weakest-pre for goto
       codet code=it->pc->code;
       code.set_statement(ID_assume);
       code.operands().push_back(it->pc->guard);
+      std::cout << "it->goto_branch: " << it->goto_branch
+        << ", " << from_expr(code.op0()) << "\n";
       if(it->goto_branch==symex_targett::sourcet::goto_brancht::IF)
         code.op0().make_not();
       learnt_expr=wp(code, learnt_expr, ns);
@@ -476,14 +492,18 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       or_expr.op0()=and_exprt(or_expr.op0(), tmp);
       or_expr.op1()=and_exprt(or_expr.op1(), tmp);
       learnt_expr=or_expr;
+#endif
     }
     else if(it->pc->type==ASSIGN)
     {
       learnt_expr=wp(it->pc->code, learnt_expr, ns);
     }
 
-    if(it->pc->incoming_edges.size()>1)
+    if(it->pc->type==GOTO) // it->pc->incoming_edges.size()>1)
     {
+      if(it->pc->guard.is_true() || it->pc->guard.is_false())
+        continue;
+#if 0
       bool backwards_loop=false;
       for(auto &in : it->pc->incoming_edges)
       {
@@ -495,7 +515,10 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       }
       if(backwards_loop)
         continue;
+#endif
       learnt_map[*it]=or_exprt(learnt_map[*it], learnt_expr);
+      do_simplify(learnt_map[*it]);
+      std::cout << "[learnt-B]: " << from_expr(learnt_map[*it]) << "\n\n";
     }
   }
   for(auto &x : learnt_map) do_simplify(x.second);
@@ -521,10 +544,12 @@ void symex_bmc_clusteringt::add_latest_learnt_info(
   auto &x=state.locations.back();
   if(learnt_map[x].is_false())
     return;
-  std::cout << "Added learnt info: " << from_expr(learnt_map[x]) << ", "
+  std::cout << "Added learnt info: " << x.pc->source_location << ","
+    << from_expr(learnt_map[x]) << ", "
     << state.source.pc->source_location << "\n";
   exprt tmp(learnt_map[x]);
   tmp.make_not();
   clean_expr(tmp, state, false);
-  vcc(tmp, "", state);
+  symex_assume(state, tmp);
+  //vcc(tmp, "", state);
 }

@@ -66,7 +66,7 @@ safety_checkert::resultt bmc_clusteringt::step(
       if(symex().learning_symex)
       {
         symex().backtrack_learn(symex_state);
-        // symex().print_learnt_map();
+        symex().print_learnt_map();
       }
 
       if(!symex().states.empty())
@@ -79,16 +79,19 @@ safety_checkert::resultt bmc_clusteringt::step(
     }
 
     if(symex().learning_symex)
-      symex().add_latest_learnt_info(symex_state, goto_functions);
+    {
+      if(symex_state.source.pc->type==GOTO)
+        symex().add_latest_learnt_info(symex_state, goto_functions);
+    }
 
     if(symex_state.source.pc->type==ASSERT)
     {
       if(violated_assert())
       {
-        goto_tracet &goto_trace=safety_checkert::error_trace;
-        build_goto_trace(equation, prop_conv, ns, goto_trace);
-        std::cout << "\n" << "Counterexample:" << "\n";
-        show_goto_trace(std::cout, ns, goto_trace);
+        // goto_tracet &goto_trace=safety_checkert::error_trace;
+        // build_goto_trace(equation, prop_conv, ns, goto_trace);
+        // std::cout << "\n" << "Counterexample:" << "\n";
+        // show_goto_trace(std::cout, ns, goto_trace);
         result() << "VERIFICATION FAILED" << eom;
         result() << "#Visited states: "
           << (symex().recorded_states-symex().states.size())
@@ -98,7 +101,8 @@ safety_checkert::resultt bmc_clusteringt::step(
     }
     else
     {
-      goto_symext::statet state=symex_state;
+      goto_symext::statet &state=symex_state;
+      std::cout << "goto-branch: " << symex_state.locations.back().goto_branch << "\n";
       // depth-first
       if(symex_state.locations.back().goto_branch
         ==symex_targett::sourcet::EMPTY)
@@ -178,7 +182,8 @@ safety_checkert::resultt bmc_clusteringt::run(
   return result;
 }
 
-decision_proceduret::resultt bmc_clusteringt::run_and_clear_decision_procedure()
+decision_proceduret::resultt bmc_clusteringt::
+run_and_clear_decision_procedure(const bool ce)
 {
   prop_conv.set_all_frozen();
 
@@ -186,6 +191,14 @@ decision_proceduret::resultt bmc_clusteringt::run_and_clear_decision_procedure()
   prop_convt &prop_conv2=cbmc_solvers.get_solver().release()->prop_conv();
 
   decision_proceduret::resultt result=run_decision_procedure(prop_conv2);
+
+  if(result==decision_proceduret::resultt::D_SATISFIABLE && ce)
+  {
+    goto_tracet &goto_trace=safety_checkert::error_trace;
+    build_goto_trace(equation, prop_conv2, ns, goto_trace);
+    std::cout << "\n" << "Counterexample:" << "\n";
+    show_goto_trace(std::cout, ns, goto_trace);
+  }
 
   return result;
 }
@@ -206,7 +219,7 @@ bool bmc_clusteringt::violated_assert()
   if(num==equation.SSA_steps.size())
     return false;
 
-  decision_proceduret::resultt result=run_and_clear_decision_procedure();
+  decision_proceduret::resultt result=run_and_clear_decision_procedure(true);
 
   if(result==decision_proceduret::resultt::D_SATISFIABLE)
     return true;
@@ -223,7 +236,7 @@ void bmc_clusteringt::clear(symex_target_equationt &equation)
 
 bool bmc_clusteringt::reachable_if()
 {
-#if 0
+#if 1
   std::cout << "\n[(goto-symex^2)]: reachable if\n";
   std::cout << "[source]: " << symex_state.source.pc->source_location << "\n";
   std::cout << "[type]: " << symex_state.source.pc->type << "\n";
@@ -237,6 +250,7 @@ bool bmc_clusteringt::reachable_if()
   std::size_t num=equation.SSA_steps.size();
   clear(equation);
   symex().mock_goto_if_condition(symex_state, goto_functions);
+  show_vcc();
   if(num==equation.SSA_steps.size())
     return false;
   decision_proceduret::resultt result=run_and_clear_decision_procedure();
@@ -253,7 +267,7 @@ bool bmc_clusteringt::reachable_if()
 
 bool bmc_clusteringt::reachable_else()
 {
-#if 0
+#if 1
   std::cout << "\n[(goto-symex^2)]: reachable else\n";
   std::cout << "[source]: " << symex_state.source.pc->source_location << "\n";
   std::cout << "[type]: " << symex_state.source.pc->type << "\n";
@@ -267,6 +281,7 @@ bool bmc_clusteringt::reachable_else()
   std::size_t num=equation.SSA_steps.size();
   clear(equation);
   symex().mock_goto_else_condition(symex_state, goto_functions);
+  show_vcc();
   if(num==equation.SSA_steps.size())
     return false;
   decision_proceduret::resultt result=run_and_clear_decision_procedure();

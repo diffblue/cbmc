@@ -86,7 +86,8 @@ protected:
     return symex_clustering;
   }
 
-  decision_proceduret::resultt run_and_clear_decision_procedure();
+  decision_proceduret::resultt
+  run_and_clear_decision_procedure(const bool ce=false);
   bool reachable_if();
   bool reachable_else();
   bool violated_assert();
