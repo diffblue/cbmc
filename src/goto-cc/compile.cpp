@@ -704,8 +704,8 @@ void compilet::convert_symbols(goto_functionst &dest)
     typedef std::set<irep_idt> symbols_sett;
     symbols_sett symbols;
 
-    Forall_symbols(it, symbol_table.symbols)
-      symbols.insert(it->first);
+    for(const auto &named_symbol : symbol_table.symbols)
+      symbols.insert(named_symbol.first);
 
     // the symbol table iterators aren't stable
     for(symbols_sett::const_iterator
@@ -713,7 +713,8 @@ void compilet::convert_symbols(goto_functionst &dest)
         it!=symbols.end();
         ++it)
     {
-      symbol_tablet::symbolst::iterator s_it=symbol_table.symbols.find(*it);
+      symbol_tablet::symbolst::const_iterator s_it=
+        symbol_table.symbols.find(*it);
       assert(s_it!=symbol_table.symbols.end());
 
       if(s_it->second.type.id()==ID_code &&
@@ -724,7 +725,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first);
-        s_it->second.value=exprt("compiled");
+        symbol_table.get_writeable(*it).value=exprt("compiled");
       }
     }
   }

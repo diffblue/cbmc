@@ -166,7 +166,7 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
 
 /// \param symbol_table: a symbol_table containing an entry for java Strings
 /// \return the type of data fields in java Strings.
-typet string_data_type(symbol_tablet symbol_table)
+typet string_data_type(const symbol_tablet &symbol_table)
 {
   symbolt sym=symbol_table.lookup("java::java.lang.String");
   typet concrete_type=sym.type;

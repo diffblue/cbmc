@@ -156,7 +156,7 @@ void goto_symext::parameter_assignments(
       symbol.base_name="va_arg"+std::to_string(va_count);
       symbol.type=it1->type();
 
-      new_symbol_table.move(symbol);
+      new_symbol_table.insert(std::move(symbol));
 
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 

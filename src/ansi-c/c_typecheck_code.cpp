@@ -287,7 +287,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
     irep_idt identifier=d_it->get_name();
 
     // look it up
-    symbol_tablet::symbolst::iterator s_it=
+    symbol_tablet::symbolst::const_iterator s_it=
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -298,7 +298,7 @@ void c_typecheck_baset::typecheck_decl(codet &code)
       throw 0;
     }
 
-    symbolt &symbol=s_it->second;
+    const symbolt &symbol=s_it->second;
 
     // This must not be an incomplete type, unless it's 'extern'
     // or a typedef.

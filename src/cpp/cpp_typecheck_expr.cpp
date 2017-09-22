@@ -1238,15 +1238,13 @@ void cpp_typecheckt::typecheck_expr_member(
   if(expr.type().id()==ID_code)
   {
     // Check if the function body has to be typechecked
-    symbol_tablet::symbolst::iterator it=
+    symbol_tablet::symbolst::const_iterator it=
       symbol_table.symbols.find(component_name);
 
     assert(it!=symbol_table.symbols.end());
 
-    symbolt &func_symb=it->second;
-
-    if(func_symb.value.id()=="cpp_not_typechecked")
-      func_symb.value.set("is_used", true);
+    if(it->second.value.id()=="cpp_not_typechecked")
+      symbol_table.get_writeable(component_name).value.set("is_used", true);
   }
 }
 
@@ -2204,10 +2202,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
            type.id()==ID_code &&
            type.find(ID_return_type).id()==ID_destructor)
         {
-          symbol_tablet::symbolst::iterator s_it=
-            symbol_table.symbols.find(it->get(ID_name));
-          assert(s_it!=symbol_table.symbols.end());
-          add_method_body(&(s_it->second));
+          add_method_body(&symbol_table.get_writeable(it->get(ID_name)));
           break;
         }
       }
@@ -2376,7 +2371,7 @@ void cpp_typecheckt::typecheck_method_application(
   member_expr.swap(expr.function());
 
   const symbolt &symbol=lookup(member_expr.get(ID_component_name));
-  add_method_body(&(symbol_table.symbols.find(symbol.name)->second));
+  add_method_body(&symbol_table.get_writeable(symbol.name));
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(symbol));
@@ -2418,7 +2413,7 @@ void cpp_typecheckt::typecheck_method_application(
   if(symbol.value.id()=="cpp_not_typechecked" &&
      !symbol.value.get_bool("is_used"))
   {
-    symbol_table.symbols[symbol.name].value.set("is_used", true);
+    symbol_table.get_writeable(symbol.name).value.set("is_used", true);
   }
 }
 
@@ -2681,15 +2676,13 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
   if(expr.id()==ID_symbol)
   {
     // Check if the function body has to be typechecked
-    symbol_tablet::symbolst::iterator it=
+    symbol_tablet::symbolst::const_iterator it=
       symbol_table.symbols.find(expr.get(ID_identifier));
 
     assert(it != symbol_table.symbols.end());
 
-    symbolt &func_symb=it->second;
-
-    if(func_symb.value.id()=="cpp_not_typechecked")
-      func_symb.value.set("is_used", true);
+    if(it->second.value.id()=="cpp_not_typechecked")
+      symbol_table.get_writeable(it->first).value.set("is_used", true);
   }
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);

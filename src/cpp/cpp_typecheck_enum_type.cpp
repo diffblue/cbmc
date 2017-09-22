@@ -121,14 +121,14 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
   // check if we have it
 
-  symbol_tablet::symbolst::iterator previous_symbol=
+  symbol_tablet::symbolst::const_iterator previous_symbol=
     symbol_table.symbols.find(symbol_name);
 
   if(previous_symbol!=symbol_table.symbols.end())
   {
     // we do!
 
-    symbolt &symbol=previous_symbol->second;
+    const symbolt &symbol=previous_symbol->second;
 
     if(has_body)
     {

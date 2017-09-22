@@ -45,7 +45,7 @@ code_function_callt function_to_call(
     new_symbol.base_name=id;
     new_symbol.type=function_type;
 
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
 
     s_it=symbol_table.symbols.find(id);
     assert(s_it!=symbol_table.symbols.end());

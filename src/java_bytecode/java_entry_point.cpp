@@ -40,7 +40,7 @@ static void create_initialize(symbol_tablet &symbol_table)
 {
   // If __CPROVER_initialize already exists, replace it. It may already exist
   // if a GOTO binary provided it. This behaviour mirrors the ANSI-C frontend.
-  symbol_table.symbols.erase(INITIALIZE_FUNCTION);
+  symbol_table.remove(INITIALIZE_FUNCTION);
 
   symbolt initialize;
   initialize.name=INITIALIZE_FUNCTION;
@@ -96,7 +96,7 @@ void java_static_lifetime_init(
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
 {
-  symbolt &initialize_symbol=symbol_table.lookup(INITIALIZE_FUNCTION);
+  symbolt &initialize_symbol=symbol_table.get_writeable(INITIALIZE_FUNCTION);
   code_blockt &code_block=to_code_block(to_code(initialize_symbol.value));
 
   // We need to zero out all static variables, or nondet-initialize if they're
@@ -541,7 +541,7 @@ bool generate_java_start_function(
 
   // build call to initialization function
   {
-    symbol_tablet::symbolst::iterator init_it=
+    symbol_tablet::symbolst::const_iterator init_it=
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())
@@ -668,7 +668,7 @@ bool generate_java_start_function(
   new_symbol.value.swap(init_code);
   new_symbol.mode=ID_java;
 
-  if(symbol_table.move(new_symbol))
+  if(!symbol_table.insert(std::move(new_symbol)))
   {
     message.error() << "failed to move main symbol" << messaget::eom;
     return true;

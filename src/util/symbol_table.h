@@ -21,10 +21,6 @@
   for(symbol_tablet::symbolst::const_iterator it=(expr).begin(); \
       it!=(expr).end(); ++it)
 
-#define Forall_symbols(it, expr) \
-  for(symbol_tablet::symbolst::iterator it=(expr).begin(); \
-      it!=(expr).end(); ++it)
-
 typedef std::multimap<irep_idt, irep_idt> symbol_base_mapt;
 typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
 
@@ -46,37 +42,84 @@ class symbol_tablet
 public:
   typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
 
-  symbolst symbols;
-  symbol_base_mapt symbol_base_map;
-  symbol_module_mapt symbol_module_map;
+private:
+  symbolst internal_symbols;
+  symbol_base_mapt internal_symbol_base_map;
+  symbol_module_mapt internal_symbol_module_map;
+
+public:
+  const symbolst &symbols;
+  const symbol_base_mapt &symbol_base_map;
+  const symbol_module_mapt &symbol_module_map;
+
+  symbol_tablet()
+    : symbols(internal_symbols),
+      symbol_base_map(internal_symbol_base_map),
+      symbol_module_map(internal_symbol_module_map)
+  {
+  }
+
+  symbol_tablet(const symbol_tablet &other)
+    : internal_symbols(other.internal_symbols),
+      internal_symbol_base_map(other.internal_symbol_base_map),
+      internal_symbol_module_map(other.symbol_module_map),
+      symbols(internal_symbols),
+      symbol_base_map(internal_symbol_base_map),
+      symbol_module_map(internal_symbol_module_map)
+  {
+  }
+
+  symbol_tablet &operator=(const symbol_tablet &other)
+  {
+    internal_symbols=other.internal_symbols;
+    internal_symbol_base_map=other.internal_symbol_base_map;
+    internal_symbol_module_map=other.symbol_module_map;
+    return *this;
+  }
+
+  symbol_tablet(symbol_tablet &&other)
+    : internal_symbols(std::move(other.internal_symbols)),
+      internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
+      internal_symbol_module_map(std::move(other.symbol_module_map)),
+      symbols(internal_symbols),
+      symbol_base_map(internal_symbol_base_map),
+      symbol_module_map(internal_symbol_module_map)
+  {
+  }
+
+  symbol_tablet &operator=(symbol_tablet &&other)
+  {
+    internal_symbols=std::move(other.internal_symbols);
+    internal_symbol_base_map=std::move(other.internal_symbol_base_map);
+    internal_symbol_module_map=std::move(other.symbol_module_map);
+    return *this;
+  }
 
   bool add(const symbolt &symbol);
-
   optionalt<std::reference_wrapper<symbolt>> insert(symbolt &&symbol);
   bool move(symbolt &symbol, symbolt *&new_symbol);
-  // this will go away, use add instead
-  bool move(symbolt &symbol)
-  { symbolt *new_symbol; return move(symbol, new_symbol); }
 private:
   void add_base_and_module(symbolst::iterator added_symbol);
 
 public:
   void clear()
   {
-    symbols.clear();
-    symbol_base_map.clear();
-    symbol_module_map.clear();
+    internal_symbols.clear();
+    internal_symbol_base_map.clear();
+    internal_symbol_module_map.clear();
   }
 
   bool remove(const irep_idt &name);
+
+  void erase(const symbolst::const_iterator &entry);
 
   void show(std::ostream &out) const;
 
   void swap(symbol_tablet &other)
   {
-    symbols.swap(other.symbols);
-    symbol_base_map.swap(other.symbol_base_map);
-    symbol_module_map.swap(other.symbol_module_map);
+    internal_symbols.swap(other.internal_symbols);
+    internal_symbol_base_map.swap(other.internal_symbol_base_map);
+    internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
 
   bool has_symbol(const irep_idt &name) const
@@ -84,8 +127,8 @@ public:
     return symbols.find(name)!=symbols.end();
   }
 
-  symbolt &lookup(const irep_idt &identifier);
   const symbolt &lookup(const irep_idt &identifier) const;
+  symbolt &get_writeable(const irep_idt &identifier);
 };
 
 std::ostream &operator << (

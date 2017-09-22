@@ -809,8 +809,8 @@ void string_instrumentationt::do_strerror(
     new_symbol_buf.pretty_name=new_symbol_buf.base_name;
     new_symbol_buf.name=new_symbol_buf.base_name;
 
-    symbol_table.move(new_symbol_buf);
-    symbol_table.move(new_symbol_size);
+    symbol_table.insert(std::move(new_symbol_buf));
+    symbol_table.insert(std::move(new_symbol_size));
   }
 
   const symbolt &symbol_size=ns.lookup(identifier_size);
@@ -885,7 +885,7 @@ void string_instrumentationt::invalidate_buffer(
     new_symbol.is_lvalue=true;
     new_symbol.is_static_lifetime=true;
 
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
   }
 
   const symbolt &cntr_sym=ns.lookup(cntr_id);

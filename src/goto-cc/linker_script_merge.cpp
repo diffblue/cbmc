@@ -168,17 +168,17 @@ int linker_script_merget::pointerize_linker_defined_symbols(
   // First, pointerize the actual linker-defined symbols
   for(const auto &pair : linker_values)
   {
-    const auto &entry=symbol_table.symbols.find(pair.first);
-    if(entry==symbol_table.symbols.end())
+    if(!symbol_table.has_symbol(pair.first))
       continue;
-    entry->second.type=pointer_type(char_type());
-    entry->second.is_extern=false;
-    entry->second.value=pair.second.second;
+    symbolt &entry=symbol_table.get_writeable(pair.first);
+    entry.type=pointer_type(char_type());
+    entry.is_extern=false;
+    entry.value=pair.second.second;
   }
 
   // Next, find all occurrences of linker-defined symbols that are _values_
   // of some symbol in the symbol table, and pointerize them too
-  for(auto &pair : symbol_table.symbols)
+  for(const auto &pair : symbol_table.symbols)
   {
     std::list<symbol_exprt> to_pointerize;
     symbols_to_pointerize(linker_values, pair.second.value, to_pointerize);
@@ -188,7 +188,9 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     debug() << "Pointerizing the symbol-table value of symbol " << pair.first
             << eom;
     int fail=pointerize_subexprs_of(
-        pair.second.value, to_pointerize, linker_values);
+      symbol_table.get_writeable(pair.first).value,
+      to_pointerize,
+      linker_values);
     if(to_pointerize.empty() && fail==0)
       continue;
     ret=1;

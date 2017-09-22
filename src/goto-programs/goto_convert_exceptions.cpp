@@ -264,7 +264,7 @@ symbol_exprt goto_convertt::exception_flag()
     new_symbol.is_thread_local=true;
     new_symbol.is_file_local=false;
     new_symbol.type=bool_typet();
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
   }
 
   return symbol_exprt(id, bool_typet());

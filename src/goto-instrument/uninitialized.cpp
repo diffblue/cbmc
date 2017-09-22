@@ -93,7 +93,7 @@ void uninitializedt::add_assertions(goto_programt &goto_program)
     new_symbol.is_file_local=true;
     new_symbol.is_lvalue=true;
 
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
   }
 
   Forall_goto_program_instructions(i_it, goto_program)

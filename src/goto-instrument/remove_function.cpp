@@ -51,7 +51,7 @@ void remove_function(
     message.status() << "Removing body of " << identifier
                      << messaget::eom;
     entry->second.clear();
-    goto_model.symbol_table.lookup(identifier).value.make_nil();
+    goto_model.symbol_table.get_writeable(identifier).value.make_nil();
   }
 }
 
