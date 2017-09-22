@@ -31,11 +31,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
-static exprt instantiate(
-  messaget::mstreamt &stream,
-  const string_constraintt &axiom,
-  const exprt &str,
-  const exprt &val);
 static bool is_char_array(const namespacet &ns, const typet &type);
 
 static bool is_valid_string_constraint(
@@ -71,7 +66,14 @@ static void initial_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
   std::map<exprt, std::set<exprt>> &current_index_set,
   const namespacet &ns,
-  const std::vector<string_constraintt>  &string_axioms);
+  const string_not_contains_constraintt &axiom);
+
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const std::vector<string_constraintt>  &string_axioms,
+  const std::vector<string_not_contains_constraintt> &nc_axioms);
 
 exprt simplify_sum(const exprt &f);
 
@@ -87,9 +89,13 @@ static void update_index_set(
   const namespacet &ns,
   const exprt &formula);
 
-static std::vector<exprt> instantiate_not_contains(
+static exprt instantiate(
   messaget::mstreamt &stream,
-  const namespacet &ns,
+  const string_constraintt &axiom,
+  const exprt &str,
+  const exprt &val);
+
+static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const std::map<exprt, std::set<exprt>> &index_set,
   const std::map<exprt, std::set<exprt>> &current_index_set,
@@ -259,17 +265,27 @@ static void display_current_index_set(
 
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
+  const namespacet &ns,
+  string_constraint_generatort &generator,
+  const std::map<exprt, std::set<exprt>> &index_set,
   const std::map<exprt, std::set<exprt>> &current_index_set,
-  const std::vector<string_constraintt> &universal_axioms)
+  const std::vector<string_constraintt> &universal_axioms,
+  const std::vector<string_not_contains_constraintt> &not_contains_axioms)
 {
   std::vector<exprt> lemmas;
   for(const auto &i : current_index_set)
   {
-    for(const auto &ua : universal_axioms)
+    for(const auto &univ_axiom : universal_axioms)
     {
       for(const auto &j : i.second)
-        lemmas.push_back(instantiate(stream, ua, i.first, j));
+        lemmas.push_back(instantiate(stream, univ_axiom, i.first, j));
     }
+  }
+  for(const auto &nc_axiom : not_contains_axioms)
+  {
+    for(const auto &instance :
+      instantiate(nc_axiom, index_set, current_index_set, generator))
+      lemmas.push_back(instance);
   }
   return lemmas;
 }
@@ -766,11 +782,23 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     return res;
   }
 
-  initial_index_set(index_set, current_index_set, ns, universal_axioms);
+  initial_index_set(
+    index_set,
+    current_index_set,
+    ns,
+    universal_axioms,
+    not_contains_axioms);
   update_index_set(index_set, current_index_set, ns, current_constraints);
   current_constraints.clear();
   for(const auto &instance :
-        generate_instantiations(debug(), current_index_set, universal_axioms))
+        generate_instantiations(
+          debug(),
+          ns,
+          generator,
+          index_set,
+          current_index_set,
+          universal_axioms,
+          not_contains_axioms))
     add_lemma(instance);
   display_current_index_set(debug(), ns, current_index_set);
 
@@ -824,29 +852,19 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         return resultt::D_ERROR;
       }
 
+      display_current_index_set(debug(), ns, current_index_set);
       display_index_set(debug(), ns, current_index_set, index_set);
       current_constraints.clear();
       for(const auto &instance :
         generate_instantiations(
-          debug(), current_index_set, universal_axioms))
+          debug(),
+          ns,
+          generator,
+          index_set,
+          current_index_set,
+          universal_axioms,
+          not_contains_axioms))
         add_lemma(instance);
-      display_current_index_set(debug(), ns, current_index_set);
-
-      debug() << "instantiating NOT_CONTAINS constraints" << '\n';
-      for(unsigned i=0; i<not_contains_axioms.size(); i++)
-      {
-        debug() << "constraint " << i << '\n';
-        const std::vector<exprt> instances=
-          instantiate_not_contains(
-            debug(),
-            ns,
-            not_contains_axioms[i],
-            index_set,
-            current_index_set,
-            generator);
-        for(const exprt &instance : instances)
-          add_lemma(instance);
-      }
     }
     else
     {
@@ -1463,17 +1481,34 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom=negation_of_not_contains_constraint(
       nc_axiom_in_model, univ_var);
-    stream << "(string_refinementt::check_axioms) Adding negated constraint: "
-           << from_expr(ns, "", negaxiom) << eom;
-    substitute_array_access(negaxiom);
 
-    if(const auto &witness=find_counter_example(ns, ui, negaxiom, univ_var))
+    stream << "  " << i << ".\n"
+           << "    - axiom:\n"
+           << "       " << from_expr(ns, "", nc_axiom) << '\n';
+    stream << "    - axiom_in_model:\n"
+           << "       " << from_expr(ns, "", nc_axiom_in_model) << '\n';
+    stream << "    - negated_axiom:\n"
+           << "       " << from_expr(ns, "", negaxiom) << '\n';
+
+    exprt with_concretized_arrays=concretize_arrays_in_expression(
+      negaxiom, max_string_length);
+    stream << "    - negated_axiom_with_concretized_array_access:\n"
+           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
+
+    substitute_array_access(with_concretized_arrays);
+    stream << "    - negated_axiom_without_array_access:\n"
+           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
+
+    if(const auto &witness=
+      find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
-      stream << "string constraint can be violated for "
+      stream << "  - violated_for: "
              << univ_var.get_identifier()
-             << "=" << from_expr(ns, "", *witness) << eom;
+             << "=" << from_expr(ns, "", *witness) << '\n';
       violated_not_contains[i]=*witness;
     }
+    else
+      stream << "  - correct" << '\n';
   }
 
   if(violated.empty() && violated_not_contains.empty())
@@ -1724,9 +1759,12 @@ static void initial_index_set(
   std::map<exprt, std::set<exprt>> &index_set,
   std::map<exprt, std::set<exprt>> &current_index_set,
   const namespacet &ns,
-  const std::vector<string_constraintt>  &string_axioms)
+  const std::vector<string_constraintt>  &string_axioms,
+  const std::vector<string_not_contains_constraintt> &nc_axioms)
 {
   for(const auto &axiom : string_axioms)
+    initial_index_set(index_set, current_index_set, ns, axiom);
+  for(const auto &axiom : nc_axioms)
     initial_index_set(index_set, current_index_set, ns, axiom);
 }
 
@@ -1827,6 +1865,41 @@ static void initial_index_set(
       forall_operands(it, cur)
         to_process.push_back(*it);
   }
+}
+
+static void initial_index_set(
+  std::map<exprt, std::set<exprt>> &index_set,
+  std::map<exprt, std::set<exprt>> &current_index_set,
+  const namespacet &ns,
+  const string_not_contains_constraintt &axiom)
+{
+  auto it=axiom.premise().depth_begin();
+  const auto end=axiom.premise().depth_end();
+  while(it!=end)
+  {
+    if(it->id()==ID_index)
+    {
+      const exprt &s=it->op0();
+      const exprt &i=it->op1();
+
+      // cur is of the form s[i] and no quantified variable appears in i
+      add_to_index_set(index_set, current_index_set, ns, s, i);
+
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+
+  minus_exprt kminus1(
+    axiom.exists_upper_bound(),
+    from_integer(1, axiom.exists_upper_bound().type()));
+  add_to_index_set(
+    index_set,
+    current_index_set,
+    ns,
+    axiom.s1().content(),
+    kminus1);
 }
 
 /// add to the index set all the indices that appear in the formula
@@ -1938,9 +2011,7 @@ static exprt instantiate(
 /// substituting the quantifiers and generating axioms.
 /// \param [in] axiom: the axiom to instantiate
 /// \return the lemmas produced through instantiation
-static std::vector<exprt> instantiate_not_contains(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
+static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
   const std::map<exprt, std::set<exprt>> &index_set,
   const std::map<exprt, std::set<exprt>> &current_index_set,
@@ -1948,9 +2019,6 @@ static std::vector<exprt> instantiate_not_contains(
 {
   const string_exprt &s0=axiom.s0();
   const string_exprt &s1=axiom.s1();
-
-  stream << "instantiate not contains " << from_expr(ns, "", s0) << " : "
-         << from_expr(ns, "", s1) << messaget::eom;
 
   const auto &index_set0=index_set.find(s0.content());
   const auto &index_set1=index_set.find(s1.content());
