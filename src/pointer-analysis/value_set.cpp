@@ -1615,6 +1615,10 @@ void value_sett::apply_code_rec(
   {
     // doesn't do anything
   }
+  else if(statement==ID_dead)
+  {
+    // ignore (could potentially prune value set in future)
+  }
   else
   {
     // std::cerr << code.pretty() << '\n';
