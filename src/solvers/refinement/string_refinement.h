@@ -29,6 +29,12 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #define MAX_NB_REFINEMENT 100
 
+struct index_set_pairt
+{
+  std::map<exprt, std::set<exprt>> cumulative;
+  std::map<exprt, std::set<exprt>> current;
+};
+
 class string_refinementt final: public bv_refinementt
 {
 private:
@@ -74,7 +80,6 @@ private:
   expr_sett seen_instances;
 
   std::vector<string_constraintt> universal_axioms;
-
   std::vector<string_not_contains_constraintt> not_contains_axioms;
 
   // Unquantified lemmas that have newly been added
@@ -82,8 +87,8 @@ private:
 
   // See the definition in the PASS article
   // Warning: this is indexed by array_expressions and not string expressions
-  std::map<exprt, expr_sett> current_index_set;
-  std::map<exprt, expr_sett> index_set;
+
+  index_set_pairt index_sets;
   replace_mapt symbol_resolve;
   std::map<exprt, exprt_listt> reverse_symbol_resolve;
   std::list<std::pair<exprt, bool>> non_string_axioms;

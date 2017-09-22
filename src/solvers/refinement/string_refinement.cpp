@@ -55,20 +55,17 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const replace_mapt &symbol_resolve);
 
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const string_constraintt &axiom);
 
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const string_not_contains_constraintt &axiom);
 
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const std::vector<string_constraintt>  &string_axioms,
   const std::vector<string_not_contains_constraintt> &nc_axioms);
@@ -76,14 +73,12 @@ static void initial_index_set(
 exprt simplify_sum(const exprt &f);
 
 static void update_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const std::vector<exprt> &current_constraints);
 
 static void update_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const exprt &formula);
 
@@ -95,8 +90,7 @@ static exprt instantiate(
 
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
-  const std::map<exprt, std::set<exprt>> &index_set,
-  const std::map<exprt, std::set<exprt>> &current_index_set,
+  const index_set_pairt &index_set,
   const string_constraint_generatort &generator);
 
 static exprt get_array(
@@ -211,21 +205,20 @@ string_refinementt::string_refinementt(const infot &info):
 static void display_index_set(
   messaget::mstreamt stream,
   const namespacet &ns,
-  const std::map<exprt, std::set<exprt>> &current_index_set,
-  const std::map<exprt, std::set<exprt>> &index_set)
+  const index_set_pairt &index_set)
 {
   const auto eom=messaget::eom;
   std::size_t count=0;
   std::size_t count_current=0;
-  for(const auto &i : index_set)
+  for(const auto &i : index_set.cumulative)
   {
     const exprt &s=i.first;
     stream << "IS(" << from_expr(ns, "", s) << ")=={" << eom;
 
     for(const auto &j : i.second)
     {
-      const auto it=current_index_set.find(i.first);
-      if(it!=current_index_set.end() && it->second.find(j)!=it->second.end())
+      const auto it=index_set.current.find(i.first);
+      if(it!=index_set.current.end() && it->second.find(j)!=it->second.end())
       {
         count_current++;
         stream << "**";
@@ -243,13 +236,12 @@ static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
   const namespacet &ns,
   string_constraint_generatort &generator,
-  const std::map<exprt, std::set<exprt>> &index_set,
-  const std::map<exprt, std::set<exprt>> &current_index_set,
+  const index_set_pairt &index_set,
   const std::vector<string_constraintt> &universal_axioms,
   const std::vector<string_not_contains_constraintt> &not_contains_axioms)
 {
   std::vector<exprt> lemmas;
-  for(const auto &i : current_index_set)
+  for(const auto &i : index_set.current)
   {
     for(const auto &univ_axiom : universal_axioms)
     {
@@ -260,7 +252,7 @@ static std::vector<exprt> generate_instantiations(
   for(const auto &nc_axiom : not_contains_axioms)
   {
     for(const auto &instance :
-      instantiate(nc_axiom, index_set, current_index_set, generator))
+      instantiate(nc_axiom, index_set, generator))
       lemmas.push_back(instance);
   }
   return lemmas;
@@ -758,21 +750,19 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   }
 
   initial_index_set(
-    index_set,
-    current_index_set,
+    index_sets,
     ns,
     universal_axioms,
     not_contains_axioms);
-  update_index_set(index_set, current_index_set, ns, current_constraints);
-  display_index_set(debug(), ns, current_index_set, index_set);
+  update_index_set(index_sets, ns, current_constraints);
+  display_index_set(debug(), ns, index_sets);
   current_constraints.clear();
   for(const auto &instance :
         generate_instantiations(
           debug(),
           ns,
           generator,
-          index_set,
-          current_index_set,
+          index_sets,
           universal_axioms,
           not_contains_axioms))
     add_lemma(instance);
@@ -818,24 +808,23 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // the property we are checking by adding more indices to the index set,
       // and instantiating universal formulas with this indices.
       // We will then relaunch the solver with these added lemmas.
-      current_index_set.clear();
-      update_index_set(index_set, current_index_set, ns, current_constraints);
+      index_sets.current.clear();
+      update_index_set(index_sets, ns, current_constraints);
 
-      if(current_index_set.empty())
+      if(index_sets.current.empty())
       {
         debug() << "current index set is empty" << eom;
         return resultt::D_ERROR;
       }
 
-      display_index_set(debug(), ns, current_index_set, index_set);
+      display_index_set(debug(), ns, index_sets);
       current_constraints.clear();
       for(const auto &instance :
         generate_instantiations(
           debug(),
           ns,
           generator,
-          index_set,
-          current_index_set,
+          index_sets,
           universal_axioms,
           not_contains_axioms))
         add_lemma(instance);
@@ -1730,28 +1719,26 @@ static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
 /// upper bound minus one
 /// \par parameters: a list of string constraints
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const std::vector<string_constraintt>  &string_axioms,
   const std::vector<string_not_contains_constraintt> &nc_axioms)
 {
   for(const auto &axiom : string_axioms)
-    initial_index_set(index_set, current_index_set, ns, axiom);
+    initial_index_set(index_set, ns, axiom);
   for(const auto &axiom : nc_axioms)
-    initial_index_set(index_set, current_index_set, ns, axiom);
+    initial_index_set(index_set, ns, axiom);
 }
 
 /// add to the index set all the indices that appear in the formulas
 /// \par parameters: a list of string constraints
 static void update_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const std::vector<exprt> &current_constraints)
 {
   for(const auto &axiom : current_constraints)
-    update_index_set(index_set, current_index_set, ns, axiom);
+    update_index_set(index_set, ns, axiom);
 }
 
 /// An expression representing an array of characters can be in the form of an
@@ -1782,8 +1769,7 @@ static std::vector<exprt> sub_arrays(const exprt &array_expr)
 /// upper bound minus one
 /// \par parameters: a string constraint
 static void add_to_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const exprt &s,
   exprt i)
@@ -1793,14 +1779,13 @@ static void add_to_index_set(
   if(i.id()!=ID_constant || is_size_t)
   {
     for(const auto &sub : sub_arrays(s))
-      if(index_set[sub].insert(i).second)
-        current_index_set[sub].insert(i);
+      if(index_set.cumulative[sub].insert(i).second)
+        index_set.current[sub].insert(i);
   }
 }
 
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const string_constraintt &axiom)
 {
@@ -1822,7 +1807,7 @@ static void initial_index_set(
       // if cur is of the form s[i] and no quantified variable appears in i
       if(!has_quant_var)
       {
-        add_to_index_set(index_set, current_index_set, ns, s, i);
+        add_to_index_set(index_set, ns, s, i);
       }
       else
       {
@@ -1832,7 +1817,7 @@ static void initial_index_set(
           axiom.upper_bound(),
           from_integer(1, axiom.upper_bound().type()));
         replace_expr(qvar, kminus1, e);
-        add_to_index_set(index_set, current_index_set, ns, s, e);
+        add_to_index_set(index_set, ns, s, e);
       }
     }
     else
@@ -1842,8 +1827,7 @@ static void initial_index_set(
 }
 
 static void initial_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const string_not_contains_constraintt &axiom)
 {
@@ -1857,7 +1841,7 @@ static void initial_index_set(
       const exprt &i=it->op1();
 
       // cur is of the form s[i] and no quantified variable appears in i
-      add_to_index_set(index_set, current_index_set, ns, s, i);
+      add_to_index_set(index_set, ns, s, i);
 
       it.next_sibling_or_parent();
     }
@@ -1868,19 +1852,13 @@ static void initial_index_set(
   minus_exprt kminus1(
     axiom.exists_upper_bound(),
     from_integer(1, axiom.exists_upper_bound().type()));
-  add_to_index_set(
-    index_set,
-    current_index_set,
-    ns,
-    axiom.s1().content(),
-    kminus1);
+  add_to_index_set(index_set, ns, axiom.s1().content(), kminus1);
 }
 
 /// add to the index set all the indices that appear in the formula
 /// \par parameters: a string constraint
 static void update_index_set(
-  std::map<exprt, std::set<exprt>> &index_set,
-  std::map<exprt, std::set<exprt>> &current_index_set,
+  index_set_pairt &index_set,
   const namespacet &ns,
   const exprt &formula)
 {
@@ -1899,7 +1877,7 @@ static void update_index_set(
         s.type().id()==ID_array,
         string_refinement_invariantt("index expressions must index on arrays"));
       exprt simplified=simplify_sum(i);
-      add_to_index_set(index_set, current_index_set, ns, s, simplified);
+      add_to_index_set(index_set, ns, s, simplified);
     }
     else
     {
@@ -1987,22 +1965,21 @@ static exprt instantiate(
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
-  const std::map<exprt, std::set<exprt>> &index_set,
-  const std::map<exprt, std::set<exprt>> &current_index_set,
+  const index_set_pairt &index_set,
   const string_constraint_generatort &generator)
 {
   const string_exprt &s0=axiom.s0();
   const string_exprt &s1=axiom.s1();
 
-  const auto &index_set0=index_set.find(s0.content());
-  const auto &index_set1=index_set.find(s1.content());
-  const auto &current_index_set0=current_index_set.find(s0.content());
-  const auto &current_index_set1=current_index_set.find(s1.content());
+  const auto &index_set0=index_set.cumulative.find(s0.content());
+  const auto &index_set1=index_set.cumulative.find(s1.content());
+  const auto &current_index_set0=index_set.current.find(s0.content());
+  const auto &current_index_set1=index_set.current.find(s1.content());
 
-  if(index_set0!=index_set.end() &&
-     index_set1!=index_set.end() &&
-     current_index_set0!=index_set.end() &&
-     current_index_set1!=index_set.end())
+  if(index_set0!=index_set.cumulative.end() &&
+     index_set1!=index_set.cumulative.end() &&
+     current_index_set0!=index_set.current.end() &&
+     current_index_set1!=index_set.current.end())
   {
     typedef std::pair<exprt, exprt> expr_pairt;
     std::set<expr_pairt> index_pairs;
