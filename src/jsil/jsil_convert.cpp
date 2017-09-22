@@ -50,7 +50,7 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
 
     if(symbol_table.has_symbol(new_symbol.name))
     {
-      symbolt &s=symbol_table.lookup(new_symbol.name);
+      const symbolt &s=symbol_table.lookup(new_symbol.name);
       if(s.value.id()=="no-body-just-yet")
       {
         symbol_table.remove(s.name);

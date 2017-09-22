@@ -200,7 +200,7 @@ void remove_exceptionst::add_exceptional_returns(
        || has_uncaught_exceptions)
     {
       // look up the function symbol
-      symbol_tablet::symbolst::iterator s_it=
+      symbol_tablet::symbolst::const_iterator s_it=
         symbol_table.symbols.find(function_id);
 
       INVARIANT(

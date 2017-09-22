@@ -488,7 +488,7 @@ void java_bytecode_convert_methodt::convert(
   INVARIANT(
     s_it!=symbol_table.symbols.end(),
     "the symbol was there earlier on this function; it must be there now");
-  symbol_table.symbols.erase(s_it);
+  symbol_table.erase(s_it);
 
   // Insert the method symbol in the symbol table
   symbol_table.add(method_symbol);

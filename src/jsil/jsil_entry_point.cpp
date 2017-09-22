@@ -129,7 +129,7 @@ bool jsil_entry_point(
   // build call to initialization function
 
   {
-    symbol_tablet::symbolst::iterator init_it=
+    symbol_tablet::symbolst::const_iterator init_it=
       symbol_table.symbols.find(CPROVER_PREFIX "initialize");
 
     if(init_it==symbol_table.symbols.end())
@@ -162,7 +162,7 @@ bool jsil_entry_point(
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
 
-  if(symbol_table.move(new_symbol))
+  if(!symbol_table.insert(std::move(new_symbol)))
   {
     messaget message;
     message.set_message_handler(message_handler);

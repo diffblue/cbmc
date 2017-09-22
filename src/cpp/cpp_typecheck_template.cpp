@@ -107,14 +107,12 @@ void cpp_typecheckt::typecheck_class_template(
 
   // check if we have it already
 
-  symbol_tablet::symbolst::iterator previous_symbol=
-    symbol_table.symbols.find(symbol_name);
-
-  if(previous_symbol!=symbol_table.symbols.end())
+  if(symbol_table.has_symbol(symbol_name))
   {
     // there already
+    auto &previous_symbol=symbol_table.get_writeable(symbol_name);
     cpp_declarationt &previous_declaration=
-      to_cpp_declaration(previous_symbol->second.type);
+      to_cpp_declaration(previous_symbol.type);
 
     bool previous_has_body=
       previous_declaration.type().find(ID_body).is_not_nil();
@@ -126,7 +124,7 @@ void cpp_typecheckt::typecheck_class_template(
       error() << "template struct `" << base_name
               << "' defined previously\n"
               << "location of previous definition: "
-              << previous_symbol->second.location << eom;
+              << previous_symbol.location << eom;
       throw 0;
     }
 
@@ -138,7 +136,7 @@ void cpp_typecheckt::typecheck_class_template(
         previous_declaration.template_type(),
         declaration.template_type());
 
-      previous_symbol->second.type.swap(declaration);
+      previous_symbol.type.swap(declaration);
 
       #if 0
       std::cout << "*****\n";
@@ -244,7 +242,7 @@ void cpp_typecheckt::typecheck_function_template(
 
   // check if we have it already
 
-  symbol_tablet::symbolst::iterator previous_symbol=
+  symbol_tablet::symbolst::const_iterator previous_symbol=
     symbol_table.symbols.find(symbol_name);
 
   if(previous_symbol!=symbol_table.symbols.end())
@@ -265,7 +263,7 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value)
     {
-      previous_symbol->second.type.swap(declaration);
+      symbol_table.get_writeable(symbol_name).type.swap(declaration);
       cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 
@@ -384,7 +382,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   const cpp_idt &cpp_id=**(id_set.begin());
   symbolt &template_symbol=
-    symbol_table.symbols.find(cpp_id.identifier)->second;
+    symbol_table.get_writeable(cpp_id.identifier);
 
   exprt &template_methods=static_cast<exprt &>(
     template_symbol.value.add("template_methods"));
@@ -576,12 +574,12 @@ void cpp_typecheckt::convert_class_template_specialization(
     throw 0;
   }
 
-  symbol_tablet::symbolst::iterator s_it=
+  symbol_tablet::symbolst::const_iterator s_it=
     symbol_table.symbols.find((*id_set.begin())->identifier);
 
   assert(s_it!=symbol_table.symbols.end());
 
-  symbolt &template_symbol=s_it->second;
+  const symbolt &template_symbol=s_it->second;
 
   if(!template_symbol.type.get_bool(ID_is_template))
   {

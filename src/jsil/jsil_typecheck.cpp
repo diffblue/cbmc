@@ -48,7 +48,7 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
       throw 0;
     }
 
-    symbolt &s=symbol_table.lookup(id);
+    symbolt &s=symbol_table.get_writeable(id);
     if(s.type.id().empty() || s.type.is_nil())
       s.type=type;
     else
@@ -749,11 +749,11 @@ void jsil_typecheckt::typecheck_function_call(
 
     if(symbol_table.has_symbol(id))
     {
-      symbolt &s=symbol_table.lookup(id);
+      const symbolt &s=symbol_table.lookup(id);
 
       if(s.type.id()==ID_code)
       {
-        code_typet &codet=to_code_type(s.type);
+        const code_typet &codet=to_code_type(s.type);
 
         for(std::size_t i=0; i<codet.parameters().size(); i++)
         {
@@ -894,8 +894,7 @@ void jsil_typecheckt::typecheck()
   // recursively doing base classes first.
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.symbols[id];
-
+    symbolt &symbol=symbol_table.get_writeable(id);
     if(symbol.is_type)
       typecheck_type_symbol(symbol);
   }
@@ -903,8 +902,7 @@ void jsil_typecheckt::typecheck()
   // We now check all non-type symbols
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.symbols[id];
-
+    symbolt &symbol=symbol_table.get_writeable(id);
     if(!symbol.is_type)
       typecheck_non_type_symbol(symbol);
   }

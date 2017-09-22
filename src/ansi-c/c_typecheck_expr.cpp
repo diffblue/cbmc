@@ -485,7 +485,7 @@ void c_typecheck_baset::typecheck_expr_builtin_va_arg(exprt &expr)
   symbol.name=ID_gcc_builtin_va_arg;
   symbol.type=symbol_type;
 
-  symbol_table.move(symbol);
+  symbol_table.insert(std::move(symbol));
 }
 
 void c_typecheck_baset::typecheck_expr_cw_va_arg_typeof(exprt &expr)
@@ -704,7 +704,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       declaration.declarators().front().get_name();
 
     // look it up
-    symbol_tablet::symbolst::iterator s_it=
+    symbol_tablet::symbolst::const_iterator s_it=
       symbol_table.symbols.find(identifier);
 
     if(s_it==symbol_table.symbols.end())
@@ -715,7 +715,7 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       throw 0;
     }
 
-    symbolt &symbol=s_it->second;
+    const symbolt &symbol=s_it->second;
 
     if(symbol.is_type || symbol.is_extern || symbol.is_static_lifetime ||
        !is_complete_type(symbol.type) || symbol.type.id()==ID_code)

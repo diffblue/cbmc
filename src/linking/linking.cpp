@@ -1030,7 +1030,7 @@ void linkingt::duplicate_non_type_symbol(
 
 void linkingt::duplicate_type_symbol(
   symbolt &old_symbol,
-  symbolt &new_symbol)
+  const symbolt &new_symbol)
 {
   assert(new_symbol.is_type);
 
@@ -1208,78 +1208,73 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
 {
   namespacet src_ns(src_symbol_table);
 
-  for(id_sett::const_iterator
-      it=needs_to_be_renamed.begin();
-      it!=needs_to_be_renamed.end();
-      it++)
+  for(const irep_idt &id : needs_to_be_renamed)
   {
-    symbolt &new_symbol=src_symbol_table.symbols[*it];
+    symbolt &new_symbol=src_symbol_table.get_writeable(id);
 
     irep_idt new_identifier;
 
     if(new_symbol.is_type)
-      new_identifier=type_to_name(src_ns, *it, new_symbol.type);
+      new_identifier=type_to_name(src_ns, id, new_symbol.type);
     else
-      new_identifier=rename(*it);
+      new_identifier=rename(id);
 
     new_symbol.name=new_identifier;
 
     #ifdef DEBUG
-    debug() << "LINKING: renaming " << *it << " to "
+    debug() << "LINKING: renaming " << id << " to "
             << new_identifier << eom;
     #endif
 
     if(new_symbol.is_type)
-      rename_symbol.insert_type(*it, new_identifier);
+      rename_symbol.insert_type(id, new_identifier);
     else
-      rename_symbol.insert_expr(*it, new_identifier);
+      rename_symbol.insert_expr(id, new_identifier);
   }
 }
 
 void linkingt::copy_symbols()
 {
+  std::map<irep_idt, symbolt> src_symbols;
   // First apply the renaming
-  Forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &named_symbol : src_symbol_table.symbols)
   {
+    symbolt symbol=named_symbol.second;
     // apply the renaming
-    rename_symbol(s_it->second.type);
-    rename_symbol(s_it->second.value);
+    rename_symbol(symbol.type);
+    rename_symbol(symbol.value);
+    // Add to vector
+    src_symbols.emplace(named_symbol.first, std::move(symbol));
   }
 
   // Move over all the non-colliding ones
   id_sett collisions;
 
-  Forall_symbols(s_it, src_symbol_table.symbols)
+  for(const auto &named_symbol : src_symbols)
   {
     // renamed?
-    if(s_it->first!=s_it->second.name)
+    if(named_symbol.first!=named_symbol.second.name)
     {
       // new
-      main_symbol_table.add(s_it->second);
+      main_symbol_table.add(named_symbol.second);
     }
     else
     {
-      symbol_tablet::symbolst::iterator
-        m_it=main_symbol_table.symbols.find(s_it->first);
-
-      if(m_it==main_symbol_table.symbols.end())
+      if(!main_symbol_table.has_symbol(named_symbol.first))
       {
         // new
-        main_symbol_table.add(s_it->second);
+        main_symbol_table.add(named_symbol.second);
       }
       else
-        collisions.insert(s_it->first);
+        collisions.insert(named_symbol.first);
     }
   }
 
   // Now do the collisions
-  for(id_sett::const_iterator
-      i_it=collisions.begin();
-      i_it!=collisions.end();
-      i_it++)
+  for(const irep_idt &collision : collisions)
   {
-    symbolt &old_symbol=main_symbol_table.symbols[*i_it];
-    symbolt &new_symbol=src_symbol_table.symbols[*i_it];
+    symbolt &old_symbol=main_symbol_table.get_writeable(collision);
+    symbolt &new_symbol=src_symbols.at(collision);
 
     if(new_symbol.is_type)
       duplicate_type_symbol(old_symbol, new_symbol);
@@ -1288,12 +1283,15 @@ void linkingt::copy_symbols()
   }
 
   // Apply type updates to initializers
-  Forall_symbols(s_it, main_symbol_table.symbols)
+  for(const auto &named_symbol : main_symbol_table.symbols)
   {
-    if(!s_it->second.is_type &&
-       !s_it->second.is_macro &&
-       s_it->second.value.is_not_nil())
-      object_type_updates(s_it->second.value);
+    if(!named_symbol.second.is_type &&
+       !named_symbol.second.is_macro &&
+       named_symbol.second.value.is_not_nil())
+    {
+      object_type_updates(
+        main_symbol_table.get_writeable(named_symbol.first).value);
+    }
   }
 }
 

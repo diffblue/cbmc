@@ -224,7 +224,7 @@ void java_bytecode_convert_classt::convert(
     // Do we have the static field symbol already?
     const auto s_it=symbol_table.symbols.find(new_symbol.name);
     if(s_it!=symbol_table.symbols.end())
-      symbol_table.symbols.erase(s_it); // erase, we stubbed it
+      symbol_table.erase(s_it); // erase, we stubbed it
 
     if(symbol_table.add(new_symbol))
       assert(false && "failed to add static field symbol");

@@ -100,7 +100,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
   }
 
   // see if we have it already
-  symbol_tablet::symbolst::iterator old_it=
+  symbol_tablet::symbolst::const_iterator old_it=
     symbol_table.symbols.find(symbol.name);
 
   if(old_it==symbol_table.symbols.end())
@@ -121,10 +121,11 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
       throw 0;
     }
 
+    symbolt & existing_symbol=symbol_table.get_writeable(symbol.name);
     if(symbol.is_type)
-      typecheck_redefinition_type(old_it->second, symbol);
+      typecheck_redefinition_type(existing_symbol, symbol);
     else
-      typecheck_redefinition_non_type(old_it->second, symbol);
+      typecheck_redefinition_non_type(existing_symbol, symbol);
   }
 }
 
@@ -350,10 +351,10 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
           {
             const irep_idt &identifier=p_it->get_identifier();
 
-            symbol_tablet::symbolst::iterator p_s_it=
+            symbol_tablet::symbolst::const_iterator p_s_it=
               symbol_table.symbols.find(identifier);
             if(p_s_it!=symbol_table.symbols.end())
-              symbol_table.symbols.erase(p_s_it);
+              symbol_table.erase(p_s_it);
           }
         }
         else
@@ -732,10 +733,7 @@ void c_typecheck_baset::typecheck_declaration(
       // add code contract (if any); we typecheck this after the
       // function body done above, so as to have parameter symbols
       // available
-      symbol_tablet::symbolst::iterator s_it=
-        symbol_table.symbols.find(identifier);
-      assert(s_it!=symbol_table.symbols.end());
-      symbolt &new_symbol=s_it->second;
+      symbolt &new_symbol=symbol_table.get_writeable(identifier);
 
       typecheck_spec_expr(contract, ID_C_spec_requires);
 

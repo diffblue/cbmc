@@ -22,12 +22,6 @@ irep_idt failed_symbol_id(const irep_idt &id)
 
 void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
 {
-  if(!symbol.is_lvalue)
-    return;
-
-  if(symbol.type.get(ID_C_failed_symbol)!="")
-    return;
-
   if(symbol.type.id()==ID_pointer)
   {
     symbolt new_symbol;
@@ -45,8 +39,19 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
     if(new_symbol.type.id()==ID_pointer)
       add_failed_symbol(new_symbol, symbol_table); // recursive call
 
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
   }
+}
+
+void add_failed_symbol(const symbolt &symbol, symbol_tablet &symbol_table)
+{
+  if(!symbol.is_lvalue)
+    return;
+
+  if(symbol.type.get(ID_C_failed_symbol)!="")
+    return;
+
+  add_failed_symbol(symbol_table.get_writeable(symbol.name), symbol_table);
 }
 
 void add_failed_symbols(symbol_tablet &symbol_table)
@@ -54,19 +59,12 @@ void add_failed_symbols(symbol_tablet &symbol_table)
   // the symbol table iterators are not stable, and
   // we are adding new symbols, this
   // is why we need a list of pointers
-  typedef std::list< ::symbolt *> symbol_listt;
-  symbol_listt symbol_list;
+  std::list<const symbolt *> symbol_list;
+  for(auto &named_symbol : symbol_table.symbols)
+    symbol_list.push_back(&(named_symbol.second));
 
-  Forall_symbols(it, symbol_table.symbols)
-    symbol_list.push_back(&(it->second));
-
-  for(symbol_listt::const_iterator
-      it=symbol_list.begin();
-      it!=symbol_list.end();
-      it++)
-  {
-    add_failed_symbol(**it, symbol_table);
-  }
+  for(const symbolt *symbol : symbol_list)
+    add_failed_symbol(*symbol, symbol_table);
 }
 
 exprt get_failed_symbol(

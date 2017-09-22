@@ -190,8 +190,8 @@ static void remove_vector(symbolt &symbol)
 /// removes vector data type
 static void remove_vector(symbol_tablet &symbol_table)
 {
-  Forall_symbols(it, symbol_table.symbols)
-    remove_vector(it->second);
+  for(const auto &named_symbol : symbol_table.symbols)
+    remove_vector(symbol_table.get_writeable(named_symbol.first));
 }
 
 /// removes vector data type

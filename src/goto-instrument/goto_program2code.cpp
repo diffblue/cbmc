@@ -133,11 +133,8 @@ void goto_program2codet::scan_for_varargs()
   {
     system_headers.insert("stdarg.h");
 
-    symbol_tablet::symbolst::iterator it=
-      symbol_table.symbols.find(func_name);
-    assert(it!=symbol_table.symbols.end());
-
-    code_typet &code_type=to_code_type(it->second.type);
+    code_typet &code_type=
+      to_code_type(symbol_table.get_writeable(func_name).type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator
@@ -1671,12 +1668,10 @@ void goto_program2codet::remove_const(typet &type)
     if(!const_removed.insert(identifier).second)
       return;
 
-    symbol_tablet::symbolst::iterator it=
-      symbol_table.symbols.find(identifier);
-    assert(it!=symbol_table.symbols.end());
-    assert(it->second.is_type);
+    symbolt &symbol=symbol_table.get_writeable(identifier);
+    assert(symbol.is_type);
 
-    remove_const(it->second.type);
+    remove_const(symbol.type);
   }
   else if(type.id()==ID_array)
     remove_const(type.subtype());
@@ -1959,7 +1954,7 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
         symbol.type=code_type;
         id=symbol.name;
 
-        symbol_table.move(symbol);
+        symbol_table.insert(std::move(symbol));
       }
 
       const symbolt &symbol=ns.lookup(id);
