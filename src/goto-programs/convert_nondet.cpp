@@ -136,13 +136,20 @@ void convert_nondet(
   message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters)
 {
-  for(auto &goto_program : goto_functions.function_map)
+  const namespacet ns(symbol_table);
+
+  for(auto &f_it : goto_functions.function_map)
   {
-    convert_nondet(
-      goto_program.second.body,
-      symbol_table,
-      message_handler,
-      object_factory_parameters);
+    const symbolt &symbol=ns.lookup(f_it.first);
+
+    if(symbol.mode==ID_java)
+    {
+      convert_nondet(
+        f_it.second.body,
+        symbol_table,
+        message_handler,
+        object_factory_parameters);
+    }
   }
 
   goto_functions.compute_location_numbers();
