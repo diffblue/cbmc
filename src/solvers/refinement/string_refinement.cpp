@@ -21,13 +21,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 #include <iomanip>
 #include <stack>
-#include <functional>
 #include <util/expr_iterator.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <java_bytecode/java_types.h>
-#include <util/optional.h>
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
@@ -239,28 +237,6 @@ static void display_index_set(
   }
   stream << count << " elements in index set (" << count_current
          << " newly added)" << eom;
-}
-
-/// compute the index set for all formulas, instantiate the formulas with the
-/// found indexes, and add them as lemmas.
-
-static void display_current_index_set(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const std::map<exprt, std::set<exprt>> &current_index_set)
-{
-  const auto eom=messaget::eom;
-  stream << "string_constraint_generatort::add_instantiations: "
-         << "going through the current index set:" << eom;
-  for(const auto &i : current_index_set)
-  {
-    const exprt &s=i.first;
-    stream << "IS(" << from_expr(ns, "", s) << ")=={";
-
-    for(const auto &j : i.second)
-      stream << from_expr(ns, "", j) << "; ";
-    stream << "}"  << eom;
-  }
 }
 
 static std::vector<exprt> generate_instantiations(
@@ -712,7 +688,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       string_constraintt univ_axiom=
         to_string_constraint(axiom);
-      is_valid_string_constraint(error(), ns, univ_axiom);
       DATA_INVARIANT(
         is_valid_string_constraint(error(), ns, univ_axiom),
         string_refinement_invariantt(
@@ -789,6 +764,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     universal_axioms,
     not_contains_axioms);
   update_index_set(index_set, current_index_set, ns, current_constraints);
+  display_index_set(debug(), ns, current_index_set, index_set);
   current_constraints.clear();
   for(const auto &instance :
         generate_instantiations(
@@ -800,7 +776,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
           universal_axioms,
           not_contains_axioms))
     add_lemma(instance);
-  display_current_index_set(debug(), ns, current_index_set);
 
   while((loop_bound_--)>0)
   {
@@ -852,7 +827,6 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         return resultt::D_ERROR;
       }
 
-      display_current_index_set(debug(), ns, current_index_set);
       display_index_set(debug(), ns, current_index_set, index_set);
       current_constraints.clear();
       for(const auto &instance :
