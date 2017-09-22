@@ -389,6 +389,20 @@ typet java_type_from_string(
 
       return java_reference_type(symbol_type);
     }
+  case '*':
+  {
+    // parse name of type variable
+    INVARIANT(src[src.size()-1]==';', "Generic type name must end on ';'.");
+    PRECONDITION(!class_name.empty());
+//    INVARIANT(
+//      src.substr(1, src.size()-2)=="*",
+//      "Wildcard types do not have a name");
+    irep_idt type_var_name(class_name+"::*");
+    return java_generic_parametert(
+      type_var_name,
+      java_type_from_string("Ljava/lang/Object;").subtype());
+  }
+
 
   default:
     return nil_typet();
