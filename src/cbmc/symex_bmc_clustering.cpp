@@ -551,5 +551,4 @@ void symex_bmc_clusteringt::add_latest_learnt_info(
   tmp.make_not();
   clean_expr(tmp, state, false);
   symex_assume(state, tmp);
-  //vcc(tmp, "", state);
 }

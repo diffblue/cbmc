@@ -102,7 +102,6 @@ safety_checkert::resultt bmc_clusteringt::step(
     else
     {
       goto_symext::statet &state=symex_state;
-      std::cout << "goto-branch: " << symex_state.locations.back().goto_branch << "\n";
       // depth-first
       if(symex_state.locations.back().goto_branch
         ==symex_targett::sourcet::EMPTY)
