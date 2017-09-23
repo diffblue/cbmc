@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class local_bitvector_analysist
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   explicit local_bitvector_analysist(
     const goto_functiont &_goto_function):
@@ -178,17 +178,17 @@ public:
 protected:
   void build(const goto_functiont &goto_function);
 
-  typedef std::stack<unsigned> work_queuet;
+  using work_queuet = std::stack<unsigned>;
 
   numbering<irep_idt> pointers;
 
   // pointers -> flagst
   // This is a vector, so it's fast.
-  typedef expanding_vectort<flagst> points_tot;
+  using points_tot = expanding_vectort<flagst>;
 
   static bool merge(points_tot &a, points_tot &b);
 
-  typedef std::vector<points_tot> loc_infost;
+  using loc_infost = std::vector<points_tot>;
   loc_infost loc_infos;
 
   void assign_lhs(

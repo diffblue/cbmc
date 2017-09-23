@@ -32,14 +32,14 @@ protected:
 
   // This gives us the choice symbol for an R-W pair;
   // built by the method below.
-  typedef std::map<
-    std::pair<event_it, event_it>, symbol_exprt> choice_symbolst;
+  using choice_symbolst =
+    std::map<std::pair<event_it, event_it>, symbol_exprt>;
   choice_symbolst choice_symbols;
 
   void read_from(symex_target_equationt &equation);
 
   // maps thread numbers to an event list
-  typedef std::map<unsigned, event_listt> per_thread_mapt;
+  using per_thread_mapt = std::map<unsigned, event_listt>;
 };
 
 #endif // CPROVER_GOTO_SYMEX_MEMORY_MODEL_H

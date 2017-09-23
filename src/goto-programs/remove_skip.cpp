@@ -77,8 +77,8 @@ void remove_skip(goto_programt &goto_program)
     old_size=goto_program.instructions.size();
 
     // maps deleted instructions to their replacement
-    typedef std::map<goto_programt::targett, goto_programt::targett>
-      new_targetst;
+    using new_targetst =
+      std::map<goto_programt::targett, goto_programt::targett>;
     new_targetst new_targets;
 
     // remove skip statements

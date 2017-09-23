@@ -20,7 +20,7 @@ Purpose: Find a satisfying assignment that minimizes a given set
 #include <solvers/flattening/bv_pointers.h>
 #include <solvers/sat/satcheck.h>
 
-typedef std::set<exprt> minimization_listt;
+using minimization_listt = std::set<exprt>;
 
 class bv_minimizet:public messaget
 {

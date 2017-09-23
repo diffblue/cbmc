@@ -36,8 +36,8 @@ public:
   struct goalt
   {
     // a property holds if all instances of it are true
-    typedef std::vector<symex_target_equationt::SSA_stepst::iterator>
-      instancest;
+    using instancest =
+      std::vector<symex_target_equationt::SSA_stepst::iterator>;
     instancest instances;
     std::string description;
 
@@ -81,7 +81,7 @@ public:
     }
   };
 
-  typedef std::map<irep_idt, goalt> goal_mapt;
+  using goal_mapt = std::map<irep_idt, goalt>;
   goal_mapt goal_map;
 
 protected:

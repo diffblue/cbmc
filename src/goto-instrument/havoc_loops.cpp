@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class havoc_loopst
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   havoc_loopst(
     function_modifiest &_function_modifies,
@@ -42,8 +42,8 @@ protected:
   function_modifiest &function_modifies;
   natural_loops_mutablet natural_loops;
 
-  typedef std::set<exprt> modifiest;
-  typedef const natural_loops_mutablet::natural_loopt loopt;
+  using modifiest = std::set<exprt>;
+  using loopt = const natural_loops_mutablet::natural_loopt;
 
   void havoc_loops();
 

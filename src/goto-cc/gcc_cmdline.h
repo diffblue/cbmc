@@ -27,7 +27,7 @@ public:
   }
 
 protected:
-  typedef std::vector<std::string> argst;
+  using argst = std::vector<std::string>;
 
   bool parse_arguments(const argst &args, bool in_spec_file);
   void parse_specs();

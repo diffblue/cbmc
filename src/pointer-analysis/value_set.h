@@ -37,7 +37,7 @@ public:
   unsigned location_number;
   static object_numberingt object_numbering;
 
-  typedef irep_idt idt;
+  using idt = irep_idt;
 
   class objectt
   {
@@ -60,18 +60,18 @@ public:
 
   class object_map_dt
   {
-    typedef std::map<unsigned, objectt> data_typet;
+    using data_typet = std::map<unsigned, objectt>;
     data_typet data;
 
   public:
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
+    using iterator = data_typet::iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
+    using const_iterator = data_typet::const_iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::value_type value_type;
+    using value_type = data_typet::value_type;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::key_type key_type;
+    using key_type = data_typet::key_type;
 
     iterator begin() { return data.begin(); }
     const_iterator begin() const { return data.begin(); }
@@ -107,7 +107,7 @@ public:
 
   exprt to_expr(const object_map_dt::value_type &it) const;
 
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<object_map_dt>;
 
   void set(object_mapt &dest, const object_map_dt::value_type &it) const
   {
@@ -156,14 +156,14 @@ public:
     }
   };
 
-  typedef std::set<exprt> expr_sett;
+  using expr_sett = std::set<exprt>;
 
-  typedef std::set<unsigned int> dynamic_object_id_sett;
+  using dynamic_object_id_sett = std::set<unsigned int>;
 
   #ifdef USE_DSTRING
-  typedef std::map<idt, entryt> valuest;
+  using valuest = std::map<idt, entryt>;
   #else
-  typedef std::unordered_map<idt, entryt, string_hash> valuest;
+  using valuest = std::unordered_map<idt, entryt, string_hash>;
   #endif
 
   void get_value_set(

@@ -29,8 +29,8 @@ Date: 2012
 class messaget;
 class namespacet;
 
-typedef grapht<abstract_eventt> wmm_grapht;
-typedef wmm_grapht::node_indext event_idt;
+using wmm_grapht = grapht<abstract_eventt>;
+using event_idt = wmm_grapht::node_indext;
 
 class event_grapht
 {
@@ -38,7 +38,7 @@ public:
   /* critical cycle */
   class critical_cyclet final
   {
-    typedef std::list<event_idt> data_typet;
+    using data_typet = std::list<event_idt>;
     data_typet data;
 
     event_grapht &egraph;
@@ -67,11 +67,11 @@ public:
     bool has_user_defined_fence;
 
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
+    using iterator = data_typet::iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
+    using const_iterator = data_typet::const_iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::value_type value_type;
+    using value_type = data_typet::value_type;
 
     iterator begin() { return data.begin(); }
     const_iterator begin() const { return data.begin(); }

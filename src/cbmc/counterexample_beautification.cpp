@@ -95,7 +95,7 @@ void counterexample_beautificationt::operator()(
                      << messaget::eom;
 
     // compute weights for guards
-    typedef std::map<literalt, unsigned> guard_countt;
+    using guard_countt = std::map<literalt, unsigned>;
     guard_countt guard_count;
 
     for(symex_target_equationt::SSA_stepst::const_iterator

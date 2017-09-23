@@ -20,19 +20,19 @@ Author: Daniel Kroening, kroening@kroening.com,
 #ifdef QBF_CORE_SQUOLEM
 
 #include "qbf_squolem_core.h"
-typedef qbf_squolem_coret qbf_coret;
+using qbf_coret = qbf_squolem_coret;
 
 #else
 #ifdef QBF_CORE_SKIZZO
 
 #include "qbf_skizzo_core.h"
-typedef qbf_skizzo_coret qbf_coret;
+using qbf_coret = qbf_skizzo_coret;
 
 #else
 #ifdef QBF_CORE_BDD
 
 #include "qbf_bdd_core.h"
-typedef qbf_bdd_coret qbf_coret;
+using qbf_coret = qbf_bdd_coret;
 
 #else
 

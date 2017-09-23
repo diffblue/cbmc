@@ -18,8 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ai.h"
 #include "interval_template.h"
 
-typedef interval_templatet<mp_integer> integer_intervalt;
-typedef interval_templatet<ieee_floatt> ieee_float_intervalt;
+using integer_intervalt = interval_templatet<mp_integer>;
+using ieee_float_intervalt = interval_templatet<ieee_floatt>;
 
 class interval_domaint:public ai_domain_baset
 {
@@ -102,8 +102,8 @@ public:
 protected:
   bool bottom;
 
-  typedef std::map<irep_idt, integer_intervalt> int_mapt;
-  typedef std::map<irep_idt, ieee_float_intervalt> float_mapt;
+  using int_mapt = std::map<irep_idt, integer_intervalt>;
+  using float_mapt = std::map<irep_idt, ieee_float_intervalt>;
 
   int_mapt int_map;
   float_mapt float_map;

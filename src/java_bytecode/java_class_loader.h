@@ -50,7 +50,7 @@ public:
     java_class_loader_limitt &limit, const irep_idt &class_name);
 
   /// Maps class names to the bytecode parse trees.
-  typedef std::map<irep_idt, java_bytecode_parse_treet> class_mapt;
+  using class_mapt = std::map<irep_idt, java_bytecode_parse_treet>;
   class_mapt class_map;
 
   /// Load jar archive(from cache if already loaded)
@@ -72,13 +72,13 @@ public:
     };
 
     /// Maps class names to jar file entries.
-    typedef std::map<irep_idt, entryt> entriest;
+    using entriest = std::map<irep_idt, entryt>;
     entriest entries;
   };
 
   /// Maps .jar filesystem paths to .class file descriptors (see
   /// jar_map_entryt).
-  typedef std::map<irep_idt, jar_map_entryt> jar_mapt;
+  using jar_mapt = std::map<irep_idt, jar_map_entryt>;
   jar_mapt jar_map;
 
   /// List of filesystem paths to .jar files that will be used, in the given

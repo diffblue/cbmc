@@ -76,7 +76,7 @@ public:
   */
   static bool has_dereference(const exprt &expr);
 
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
+  using expr_sett = std::unordered_set<exprt, irep_hash>;
 
 private:
   const namespacet &ns;

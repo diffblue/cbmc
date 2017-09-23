@@ -23,10 +23,10 @@ class qbf_bdd_certificatet:public qdimacs_coret
 protected:
   Cudd *bdd_manager;
 
-  typedef std::vector<BDD*> model_bddst;
+  using model_bddst = std::vector<BDD*>;
   model_bddst model_bdds;
 
-  typedef std::unordered_map<unsigned, exprt> function_cachet;
+  using function_cachet = std::unordered_map<unsigned, exprt>;
   function_cachet function_cache;
 
 public:
@@ -43,7 +43,7 @@ public:
 class qbf_bdd_coret:public qbf_bdd_certificatet
 {
 private:
-  typedef std::vector<BDD*> bdd_variable_mapt;
+  using bdd_variable_mapt = std::vector<BDD*>;
   bdd_variable_mapt bdd_variable_map;
 
   BDD *matrix;

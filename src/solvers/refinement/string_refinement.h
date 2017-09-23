@@ -59,10 +59,10 @@ public:
 
 private:
   // Base class
-  typedef bv_refinementt supert;
+  using supert = bv_refinementt;
 
-  typedef std::set<exprt> expr_sett;
-  typedef std::list<exprt> exprt_listt;
+  using expr_sett = std::set<exprt>;
+  using exprt_listt = std::list<exprt>;
 
   string_refinementt(const infot &, bool);
   bvt convert_bool_bv(const exprt &boole, const exprt &orig);

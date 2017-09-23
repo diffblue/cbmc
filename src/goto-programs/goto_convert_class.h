@@ -256,7 +256,7 @@ protected:
   // exceptions
   //
 
-  typedef std::vector<codet> destructor_stackt;
+  using destructor_stackt = std::vector<codet>;
 
   symbol_exprt exception_flag();
   void unwind_destructor_stack(
@@ -277,15 +277,14 @@ protected:
   void finish_computed_gotos(goto_programt &dest);
   void finish_guarded_gotos(goto_programt &dest);
 
-  typedef std::map<irep_idt,
-                   std::pair<goto_programt::targett, destructor_stackt>>
-    labelst;
-  typedef std::list<std::pair<goto_programt::targett, destructor_stackt>>
-    gotost;
-  typedef std::list<goto_programt::targett> computed_gotost;
-  typedef exprt::operandst caset;
-  typedef std::list<std::pair<goto_programt::targett, caset> > casest;
-  typedef std::map<goto_programt::targett, casest::iterator> cases_mapt;
+  using labelst =
+    std::map<irep_idt, std::pair<goto_programt::targett, destructor_stackt>>;
+  using gotost =
+    std::list<std::pair<goto_programt::targett, destructor_stackt>>;
+  using computed_gotost = std::list<goto_programt::targett>;
+  using caset = exprt::operandst;
+  using casest = std::list<std::pair<goto_programt::targett, caset> >;
+  using cases_mapt = std::map<goto_programt::targett, casest::iterator>;
 
   struct targetst
   {
@@ -471,7 +470,7 @@ protected:
     goto_programt::targett gotoiter;
     exprt guard;
   };
-  typedef std::list<guarded_gotot> guarded_gotost;
+  using guarded_gotost = std::list<guarded_gotot>;
   guarded_gotost guarded_gotos;
 
   exprt case_guard(

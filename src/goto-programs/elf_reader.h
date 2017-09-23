@@ -20,20 +20,20 @@ Author:
 // http://www.skyfree.org/linux/references/ELF_Format.pdf
 // http://downloads.openwatcom.org/ftp/devel/docs/elf-64-gen.pdf
 
-typedef unsigned short Elf32_Half; // 2  NOLINT(readability/identifiers)
-typedef unsigned int Elf32_Word; // 4  NOLINT(readability/identifiers)
-typedef unsigned int Elf32_Off; // 4  NOLINT(readability/identifiers)
-typedef unsigned int Elf32_Addr; // 4  NOLINT(readability/identifiers)
+using Elf32_Half = unsigned short; // 2  NOLINT(readability/identifiers)
+using Elf32_Word = unsigned int; // 4  NOLINT(readability/identifiers)
+using Elf32_Off = unsigned int; // 4  NOLINT(readability/identifiers)
+using Elf32_Addr = unsigned int; // 4  NOLINT(readability/identifiers)
 
-typedef unsigned short Elf64_Half; // 2  NOLINT(readability/identifiers)
-typedef unsigned int Elf64_Word; // 4  NOLINT(readability/identifiers)
-typedef unsigned long long int Elf64_Xword; // 8 NOLINT(readability/identifiers)
-typedef unsigned long long int Elf64_Off; // 8  NOLINT(readability/identifiers)
-typedef unsigned long long int Elf64_Addr; // 8  NOLINT(readability/identifiers)
+using Elf64_Half = unsigned short; // 2  NOLINT(readability/identifiers)
+using Elf64_Word = unsigned int; // 4  NOLINT(readability/identifiers)
+using Elf64_Xword = unsigned long long int; // 8 NOLINT(readability/identifiers)
+using Elf64_Off = unsigned long long int; // 8  NOLINT(readability/identifiers)
+using Elf64_Addr = unsigned long long int; // 8  NOLINT(readability/identifiers)
 
 #define EI_NIDENT 16
 
-typedef struct
+struct Elf32_Ehdr
 {
   unsigned char e_ident[EI_NIDENT]; /* Magic number and other info */
   Elf32_Half    e_type;             /* Object file type */
@@ -49,9 +49,9 @@ typedef struct
   Elf32_Half    e_shentsize;        /* Section header table entry size */
   Elf32_Half    e_shnum;            /* Section header table entry count */
   Elf32_Half    e_shstrndx;         /* Section header string table index */
-} Elf32_Ehdr;
+};
 
-typedef struct
+struct Elf64_Ehdr
 {
   unsigned char e_ident[16];        /* ELF identification */
   Elf64_Half    e_type;             /* Object file type */
@@ -67,9 +67,9 @@ typedef struct
   Elf64_Half    e_shentsize;        /* Size of section header entry */
   Elf64_Half    e_shnum;            /* Number of section header entries */
   Elf64_Half    e_shstrndx;         /* Section name string table index */
-} Elf64_Ehdr;
+};
 
-typedef struct
+struct Elf32_Shdr
 {
   Elf32_Word    sh_name;            /* Section name (string tbl index) */
   Elf32_Word    sh_type;            /* Section type */
@@ -81,9 +81,9 @@ typedef struct
   Elf32_Word    sh_info;            /* Additional section information */
   Elf32_Word    sh_addralign;       /* Section alignment */
   Elf32_Word    sh_entsize;         /* Entry size if section holds table */
-} Elf32_Shdr;
+};
 
-typedef struct
+struct Elf64_Shdr
 {
   Elf64_Word    sh_name;            /* Section name */
   Elf64_Word    sh_type;            /* Section type */
@@ -95,7 +95,7 @@ typedef struct
   Elf64_Word    sh_info;            /* Miscellaneous information */
   Elf64_Xword   sh_addralign;       /* Address alignment boundary */
   Elf64_Xword   sh_entsize;         /* Size of entries, if section has table */
-} Elf64_Shdr;
+};
 
 class elf_readert
 {
@@ -112,10 +112,10 @@ public:
   bool little_endian;
 
   // section header table
-  typedef std::vector<Elf32_Shdr> elf32_section_header_tablet;
+  using elf32_section_header_tablet = std::vector<Elf32_Shdr>;
   elf32_section_header_tablet elf32_section_header_table;
 
-  typedef std::vector<Elf64_Shdr> elf64_section_header_tablet;
+  using elf64_section_header_tablet = std::vector<Elf64_Shdr>;
   elf64_section_header_tablet elf64_section_header_table;
 
   // string table

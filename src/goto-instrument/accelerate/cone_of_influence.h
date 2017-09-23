@@ -18,7 +18,7 @@ Author: Matt Lewis
 #include <util/ref_expr_set.h>
 #include <util/symbol_table.h>
 
-typedef std::unordered_set<exprt, irep_hash> expr_sett;
+using expr_sett = std::unordered_set<exprt, irep_hash>;
 
 void cone_of_influence(goto_programt &program,
     expr_sett &targets,
@@ -45,7 +45,7 @@ class cone_of_influencet
       expr_sett &targets);
   void gather_rvalues(const exprt &expr, expr_sett &rvals);
 
-  typedef std::unordered_map<unsigned int, expr_sett> cone_mapt;
+  using cone_mapt = std::unordered_map<unsigned int, expr_sett>;
   cone_mapt cone_map;
 
   const goto_programt &program;

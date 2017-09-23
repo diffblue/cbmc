@@ -28,7 +28,7 @@ public:
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
 
-  typedef std::multimap<irep_idt, irep_idt> grapht;
+  using grapht = std::multimap<irep_idt, irep_idt>;
   grapht graph;
 
   void add(const irep_idt &caller, const irep_idt &callee);

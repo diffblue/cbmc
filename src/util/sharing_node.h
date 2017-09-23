@@ -38,18 +38,18 @@ class sharing_nodet
 public:
   friend void sharing_node_test();
 
-  typedef keyT key_type;
-  typedef valueT mapped_type;
+  using key_type = keyT;
+  using mapped_type = valueT;
 
-  typedef predT key_equal;
+  using key_equal = predT;
 
-  typedef sharing_nodet<key_type, mapped_type, key_equal> self_type;
+  using self_type = sharing_nodet<key_type, mapped_type, key_equal>;
 
-  typedef std::map<unsigned, self_type> subt;
-  typedef std::list<self_type> containert;
+  using subt = std::map<unsigned, self_type>;
+  using containert = std::list<self_type>;
 
-  typedef const std::pair<const self_type &, const bool> const_find_type;
-  typedef const std::pair<self_type &, const bool> find_type;
+  using const_find_type = const std::pair<const self_type &, const bool>;
+  using find_type = const std::pair<self_type &, const bool>;
 
   sharing_nodet() : data(empty_data)
   {

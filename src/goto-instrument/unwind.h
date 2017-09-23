@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_modelt;
 
 // -1: do not unwind loop
-typedef std::map<irep_idt, std::map<unsigned, int>> unwind_sett;
+using unwind_sett = std::map<irep_idt, std::map<unsigned, int>>;
 
 void parse_unwindset(const std::string &us, unwind_sett &unwind_set);
 
@@ -122,7 +122,7 @@ public:
       assert(r.second); // did not exist yet
     }
 
-    typedef std::map<goto_programt::const_targett, unsigned> location_mapt;
+    using location_mapt = std::map<goto_programt::const_targett, unsigned>;
     location_mapt location_map;
   };
 

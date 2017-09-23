@@ -156,7 +156,7 @@ void link_goto_model(
   goto_modelt &src,
   message_handlert &message_handler)
 {
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
+  using id_sett = std::unordered_set<irep_idt, irep_id_hash>;
   id_sett weak_symbols;
 
   forall_symbols(it, dest.symbol_table.symbols)

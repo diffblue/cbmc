@@ -22,7 +22,7 @@ class pointer_logict
 {
 public:
   // this numbers the objects
-  typedef hash_numbering<exprt, irep_hash> objectst;
+  using objectst = hash_numbering<exprt, irep_hash>;
   objectst objects;
 
   struct pointert

@@ -38,7 +38,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   // will go away,
   // to be replaced by a factory class option to static_analysist
@@ -67,7 +67,7 @@ public:
   {
   }
 
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
+  using expr_sett = std::unordered_set<exprt, irep_hash>;
 
   // will go away
   virtual void get_reference_set(
@@ -97,8 +97,8 @@ protected:
 class static_analysis_baset
 {
 public:
-  typedef domain_baset statet;
-  typedef goto_programt::const_targett locationt;
+  using statet = domain_baset;
+  using locationt = goto_programt::const_targett;
 
   explicit static_analysis_baset(const namespacet &_ns):
     ns(_ns),
@@ -179,7 +179,7 @@ protected:
     const irep_idt &identifier,
     std::ostream &out) const;
 
-  typedef std::map<unsigned, locationt> working_sett;
+  using working_sett = std::map<unsigned, locationt>;
 
   locationt get_next(working_sett &working_set);
 
@@ -221,10 +221,10 @@ protected:
   // for concurrent fixedpoint
   virtual bool merge_shared(statet &a, const statet &b, locationt to)=0;
 
-  typedef std::set<irep_idt> functions_donet;
+  using functions_donet = std::set<irep_idt>;
   functions_donet functions_done;
 
-  typedef std::set<irep_idt> recursion_sett;
+  using recursion_sett = std::set<irep_idt>;
   recursion_sett recursion_set;
 
   void generate_states(
@@ -257,7 +257,7 @@ protected:
   virtual const statet &get_state(locationt l) const=0;
   virtual std::unique_ptr<statet> make_temporary_state(statet &s)=0;
 
-  typedef domain_baset::expr_sett expr_sett;
+  using expr_sett = domain_baset::expr_sett;
 
   virtual void get_reference_set(
     locationt l,
@@ -276,7 +276,7 @@ public:
   {
   }
 
-  typedef goto_programt::const_targett locationt;
+  using locationt = goto_programt::const_targett;
 
   T &operator[](locationt l)
   {
@@ -308,7 +308,7 @@ public:
   }
 
 protected:
-  typedef std::map<locationt, T> state_mapt;
+  using state_mapt = std::map<locationt, T>;
   state_mapt state_map;
 
   virtual statet &get_state(locationt l)

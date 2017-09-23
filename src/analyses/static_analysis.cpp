@@ -442,8 +442,8 @@ void static_analysis_baset::concurrent_fixedpoint(
   generate_state(sh_target);
   statet &shared_state=get_state(sh_target);
 
-  typedef std::list<std::pair<goto_programt const*,
-                              goto_programt::const_targett> > thread_wlt;
+  using thread_wlt =
+    std::list<std::pair<goto_programt const*, goto_programt::const_targett>>;
   thread_wlt thread_wl;
 
   forall_goto_functions(it, goto_functions)

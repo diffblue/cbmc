@@ -18,14 +18,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_zcore.h"
 
-typedef satcheck_zcoret satcheck_coret;
+using satcheck_coret = satcheck_zcoret;
 
 #else
 #ifdef SATCHECK_CORE_BOOLEFORCE
 
 #include "satcheck_booleforce.h"
 
-typedef satcheck_booleforce_coret satcheck_coret;
+using satcheck_coret = satcheck_booleforce_coret;
 
 #else
 
@@ -33,7 +33,7 @@ typedef satcheck_booleforce_coret satcheck_coret;
 
 #include "satcheck_minisat.h"
 
-typedef satcheck_minisat1_coret satcheck_coret;
+using satcheck_coret = satcheck_minisat1_coret;
 
 #else
 #error NO SAT CHECKER WITH CORE EXTRACTOR

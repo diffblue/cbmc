@@ -19,8 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "arith_tools.h"
 #include "invariant.h"
 
-typedef BigInt::ullong_t ullong_t; // NOLINT(readability/identifiers)
-typedef BigInt::llong_t llong_t; // NOLINT(readability/identifiers)
+using ullong_t = BigInt::ullong_t; // NOLINT(readability/identifiers)
+using llong_t = BigInt::llong_t; // NOLINT(readability/identifiers)
 
 mp_integer operator>>(const mp_integer &a, const mp_integer &b)
 {

@@ -25,8 +25,8 @@ class empty_cfg_nodet
 template<class T, typename I>
 struct cfg_base_nodet:public graph_nodet<empty_edget>, public T
 {
-  typedef typename graph_nodet<empty_edget>::edget edget;
-  typedef typename graph_nodet<empty_edget>::edgest edgest;
+  using edget = typename graph_nodet<empty_edget>::edget;
+  using edgest = typename graph_nodet<empty_edget>::edgest;
 
   I PC;
 };
@@ -62,20 +62,20 @@ template<class T,
 class cfg_baset:public grapht< cfg_base_nodet<T, I> >
 {
 public:
-  typedef std::size_t entryt;
+  using entryt = std::size_t;
 
   class entry_mapt final
   {
-    typedef std::map<goto_programt::const_targett, entryt> data_typet;
+    using data_typet = std::map<goto_programt::const_targett, entryt>;
     data_typet data;
 
   public:
     grapht< cfg_base_nodet<T, I> > &container;
 
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
+    using iterator = data_typet::iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
+    using const_iterator = data_typet::const_iterator;
 
     template <typename U>
     const_iterator find(U &&u) const { return data.find(std::forward<U>(u)); }

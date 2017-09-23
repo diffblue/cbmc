@@ -61,7 +61,7 @@ public:
   }
 
   // get the variables in decl statements
-  typedef std::set<irep_idt> decl_identifierst;
+  using decl_identifierst = std::set<irep_idt>;
   void get_decl_identifiers(decl_identifierst &decl_identifiers) const;
 };
 
@@ -90,7 +90,7 @@ inline bool operator<(
 }
 
 // NOLINTNEXTLINE(readability/identifiers)
-typedef struct const_target_hash_templatet<codet, exprt> const_target_hash;
+using const_target_hash = struct const_target_hash_templatet<codet, exprt>;
 
 std::list<exprt> objects_read(const goto_programt::instructiont &);
 std::list<exprt> objects_written(const goto_programt::instructiont &);

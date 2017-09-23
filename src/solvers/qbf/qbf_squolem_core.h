@@ -49,7 +49,7 @@ public:
   virtual const exprt f_get(literalt l);
 
 private:
-  typedef std::unordered_map<unsigned, exprt> function_cachet;
+  using function_cachet = std::unordered_map<unsigned, exprt>;
     function_cachet function_cache;
 
   const exprt f_get_cnf(WitnessStack *wsp);

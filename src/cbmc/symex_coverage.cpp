@@ -84,8 +84,7 @@ protected:
       conditions;
   };
 
-  typedef std::map<unsigned, coverage_linet>
-    coverage_lines_mapt;
+  using coverage_lines_mapt = std::map<unsigned, coverage_linet>;
 
   void compute_coverage_lines(
     const goto_programt &goto_program,
@@ -303,7 +302,7 @@ void symex_coveraget::compute_overall_coverage(
   const goto_functionst &goto_functions,
   coverage_recordt &dest) const
 {
-  typedef std::map<irep_idt, coverage_recordt> file_recordst;
+  using file_recordst = std::map<irep_idt, coverage_recordt>;
   file_recordst file_records;
 
   forall_goto_functions(gf_it, goto_functions)

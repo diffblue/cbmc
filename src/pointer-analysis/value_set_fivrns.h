@@ -49,7 +49,7 @@ public:
     to_target_index = inx;
   }
 
-  typedef irep_idt idt;
+  using idt = irep_idt;
 
   class objectt
   {
@@ -77,13 +77,13 @@ public:
     object_map_dt() {}
     static const object_map_dt blank;
 
-    typedef std::map<unsigned, objectt> objmapt;
+    using objmapt = std::map<unsigned, objectt>;
     objmapt objmap;
 
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef objmapt::const_iterator const_iterator;
+    using const_iterator = objmapt::const_iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef objmapt::iterator iterator;
+    using iterator = objmapt::iterator;
 
     const_iterator find(unsigned k) { return objmap.find(k); }
     iterator begin() { return objmap.begin(); }
@@ -131,8 +131,8 @@ public:
       }
     };
 
-    typedef std::list<validity_ranget> vrange_listt;
-    typedef std::map<unsigned, vrange_listt> validity_rangest;
+    using vrange_listt = std::list<validity_ranget>;
+    using validity_rangest = std::map<unsigned, vrange_listt>;
     validity_rangest validity_ranges;
 
     bool set_valid_at(unsigned inx, unsigned f, unsigned line);
@@ -141,7 +141,7 @@ public:
 
   exprt to_expr(object_map_dt::const_iterator it) const;
 
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<object_map_dt>;
 
   void set(object_mapt &dest, object_map_dt::const_iterator it) const
   {
@@ -219,14 +219,14 @@ public:
     }
   };
 
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
+  using expr_sett = std::unordered_set<exprt, irep_hash>;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  using dynamic_object_id_sett = std::unordered_set<unsigned int>;
 
   #ifdef USE_DSTRING
-  typedef std::map<idt, entryt> valuest;
+  using valuest = std::map<idt, entryt>;
   #else
-  typedef std::unordered_map<idt, entryt, string_hash> valuest;
+  using valuest = std::unordered_map<idt, entryt, string_hash>;
   #endif
 
   void get_value_set(

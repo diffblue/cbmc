@@ -27,8 +27,8 @@ struct xml_edget
 
 struct xml_graph_nodet:public graph_nodet<xml_edget>
 {
-  typedef graph_nodet<xml_edget>::edget edget;
-  typedef graph_nodet<xml_edget>::edgest edgest;
+  using edget = graph_nodet<xml_edget>::edget;
+  using edgest = graph_nodet<xml_edget>::edgest;
 
   std::string node_name;
   irep_idt file;
@@ -63,7 +63,7 @@ public:
     return grapht<xml_graph_nodet>::add_node();
   }
 
-  typedef std::map<std::string, std::string> key_valuest;
+  using key_valuest = std::map<std::string, std::string>;
   key_valuest key_values;
 };
 

@@ -56,13 +56,13 @@ protected:
 #endif
   };
 
-  typedef cfg_baset<cfg_nodet> cfgt;
+  using cfgt = cfg_baset<cfg_nodet>;
   cfgt cfg;
 
-  typedef std::vector<cfgt::entryt> dep_node_to_cfgt;
-  typedef std::stack<cfgt::entryt> queuet;
-  typedef std::list<cfgt::entryt> jumpst;
-  typedef std::unordered_map<irep_idt, queuet, irep_id_hash> decl_deadt;
+  using dep_node_to_cfgt = std::vector<cfgt::entryt>;
+  using queuet = std::stack<cfgt::entryt>;
+  using jumpst = std::list<cfgt::entryt>;
+  using decl_deadt = std::unordered_map<irep_idt, queuet, irep_id_hash>;
 
   void fixedpoint(
     goto_functionst &goto_functions,

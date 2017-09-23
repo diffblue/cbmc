@@ -701,7 +701,7 @@ void compilet::convert_symbols(goto_functionst &dest)
   {
     before=symbol_table.symbols.size();
 
-    typedef std::set<irep_idt> symbols_sett;
+    using symbols_sett = std::set<irep_idt>;
     symbols_sett symbols;
 
     Forall_symbols(it, symbol_table.symbols)

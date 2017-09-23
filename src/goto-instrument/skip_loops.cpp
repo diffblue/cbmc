@@ -18,8 +18,8 @@ Date: January 2016
 
 #include <goto-programs/goto_model.h>
 
-typedef std::set<unsigned> loop_idst;
-typedef std::map<irep_idt, loop_idst> loop_mapt;
+using loop_idst = std::set<unsigned int>;
+using loop_mapt = std::map<irep_idt, loop_idst>;
 
 static bool skip_loops(
   goto_programt &goto_program,

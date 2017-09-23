@@ -63,7 +63,7 @@ public:
     make_top();
   }
 
-  typedef union_find<irep_idt> aliasest;
+  using aliasest = union_find<irep_idt>;
   aliasest aliases;
 
   struct cleanupt
@@ -74,7 +74,7 @@ public:
   // We track a set of 'cleanup functions' for specific
   // identifiers. The cleanup functions are executed
   // once the last pointer to an object is lost.
-  typedef std::map<irep_idt, cleanupt> cleanup_mapt;
+  using cleanup_mapt = std::map<irep_idt, cleanupt>;
   cleanup_mapt cleanup_map;
 
 private:

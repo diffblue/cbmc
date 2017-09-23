@@ -169,7 +169,7 @@ protected:
     }
   };
 
-  typedef std::unordered_set<statet, state_hash> statest;
+  using statest = std::unordered_set<statet, state_hash>;
   statest states;
 };
 

@@ -51,7 +51,7 @@ public:
   { return (typet &)add(ID_subtype); }
   #endif
 
-  typedef std::vector<typet> subtypest;
+  using subtypest = std::vector<typet>;
 
   subtypest &subtypes()
   #ifdef SUBTYPES_IN_GETSUB
@@ -142,7 +142,7 @@ public:
   explicit type_with_subtypest(const irep_idt &_id):typet(_id) { }
 
   #if 0
-  typedef std::vector<typet> subtypest;
+  using subtypest = std::vector<typet>;
 
   subtypest &subtypes()
   { return (subtypest &)add(ID_subtypes).get_sub(); }

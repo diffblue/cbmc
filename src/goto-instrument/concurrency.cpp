@@ -69,10 +69,10 @@ protected:
     symbol_exprt array_symbol;
   };
 
-  typedef std::map<irep_idt, shared_vart> shared_varst;
+  using shared_varst = std::map<irep_idt, shared_vart>;
   shared_varst shared_vars;
 
-  typedef std::map<irep_idt, thread_local_vart> thread_local_varst;
+  using thread_local_varst = std::map<irep_idt, thread_local_vart>;
   thread_local_varst thread_local_vars;
 };
 

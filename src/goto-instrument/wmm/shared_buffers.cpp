@@ -497,7 +497,7 @@ void shared_bufferst::nondet_flush(
   {
     if(cycles.find(object)!=cycles.end())
     {
-      typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+      using m_itt = std::multimap<irep_idt, source_locationt>::iterator;
       std::pair<m_itt, m_itt> ran=cycles_loc.equal_range(object);
       for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
         if(ran_it->second==source_location)
@@ -999,7 +999,7 @@ bool shared_bufferst::is_buffered_in_general(
   }
   else
   {
-    typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+    using m_itt = std::multimap<irep_idt, source_locationt>::iterator;
     std::pair<m_itt, m_itt> ran=cycles_loc.equal_range(identifier);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)
       if(ran_it->second==source_location)

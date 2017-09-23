@@ -42,8 +42,8 @@ public:
   const exprt guard;
 };
 
-typedef std::list<path_nodet> patht;
-typedef std::list<patht> pathst;
+using patht = std::list<path_nodet>;
+using pathst = std::list<patht>;
 
 void output_path(
   const patht &path,

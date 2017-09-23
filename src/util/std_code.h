@@ -684,7 +684,7 @@ public:
     return op1();
   }
 
-  typedef exprt::operandst argumentst;
+  using argumentst = exprt::operandst;
 
   argumentst &arguments()
   {
@@ -1209,7 +1209,7 @@ public:
     }
   };
 
-  typedef std::vector<exception_list_entryt> exception_listt;
+  using exception_listt = std::vector<exception_list_entryt>;
 
   code_push_catcht(
     const irep_idt &tag,

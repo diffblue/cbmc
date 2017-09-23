@@ -137,7 +137,7 @@ public:
   }
 
 protected:
-  typedef std::vector<const symbol_tablet *> symbol_table_listt;
+  using symbol_table_listt = std::vector<const symbol_tablet *>;
   symbol_table_listt symbol_table_list;
 };
 

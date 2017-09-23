@@ -167,23 +167,23 @@ protected:
       identifier.value=tmp;
   }
 
-  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
-    identifier_mapt;
+  using identifier_mapt =
+    std::unordered_map<irep_idt, identifiert, irep_id_hash>;
 
   identifier_mapt identifier_map;
 
   unsigned array_index_bits;
 
   // for replacing 'array_of' expressions
-  typedef std::map<exprt, irep_idt> array_of_mapt;
+  using array_of_mapt = std::map<exprt, irep_idt>;
   array_of_mapt array_of_map;
 
   // for replacing 'array' expressions
-  typedef std::map<exprt, irep_idt> array_expr_mapt;
+  using array_expr_mapt = std::map<exprt, irep_idt>;
   array_expr_mapt array_expr_map;
 
   // for replacing string constants
-  typedef std::map<exprt, exprt> string2array_mapt;
+  using string2array_mapt = std::map<exprt, exprt>;
   string2array_mapt string2array_map;
 
   exprt ce_value(

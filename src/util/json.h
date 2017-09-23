@@ -122,10 +122,10 @@ protected:
 
 public:
   // should become protected
-  typedef std::vector<jsont> arrayt;
+  using arrayt = std::vector<jsont>;
   arrayt array;
 
-  typedef std::map<std::string, jsont> objectt;
+  using objectt = std::map<std::string, jsont>;
   objectt object;
 
   std::string value;

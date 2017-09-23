@@ -88,11 +88,11 @@ public:
   }
 
 protected:
-  typedef std::unordered_set<merged_irept, merged_irep_hash> merged_irep_storet;
+  using merged_irep_storet = std::unordered_set<merged_irept, merged_irep_hash>;
   merged_irep_storet merged_irep_store;
 
-  typedef std::unordered_set<to_be_merged_irept, to_be_merged_irep_hash>
-    to_be_merged_irep_storet;
+  using to_be_merged_irep_storet =
+    std::unordered_set<to_be_merged_irept, to_be_merged_irep_hash>;
   to_be_merged_irep_storet to_be_merged_irep_store;
 
   const merged_irept &merged(const irept &);
@@ -108,7 +108,7 @@ public:
   void operator()(irept &);
 
 protected:
-  typedef std::unordered_set<irept, irep_hash> irep_storet;
+  using irep_storet = std::unordered_set<irept, irep_hash>;
   irep_storet irep_store;
 
   const irept &merged(const irept &irep);
@@ -120,7 +120,7 @@ public:
   void operator()(irept &);
 
 protected:
-  typedef std::unordered_set<irept, irep_full_hash, irep_full_eq> irep_storet;
+  using irep_storet = std::unordered_set<irept, irep_full_hash, irep_full_eq>;
   irep_storet irep_store;
 
   const irept &merged(const irept &irep);

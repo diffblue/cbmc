@@ -181,7 +181,7 @@ void build_goto_trace(
   // Furthermore, read-events need to occur before write
   // events with the same clock.
 
-  typedef std::map<mp_integer, goto_tracet::stepst> time_mapt;
+  using time_mapt = std::map<mp_integer, goto_tracet::stepst>;
   time_mapt time_map;
 
   mp_integer current_time=0;

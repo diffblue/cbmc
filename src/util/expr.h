@@ -50,7 +50,7 @@ class const_unique_depth_iteratort;
 class exprt:public irept
 {
 public:
-  typedef std::vector<exprt> operandst;
+  using operandst = std::vector<exprt>;
 
   // constructors
   exprt() { }
@@ -178,7 +178,7 @@ public:
   const_unique_depth_iteratort unique_depth_cend() const;
 };
 
-typedef std::list<exprt> expr_listt;
+using expr_listt = std::list<exprt>;
 
 class expr_visitort
 {

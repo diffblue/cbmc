@@ -58,7 +58,7 @@ public:
   }
 
 protected:
-  typedef typename std::map<V, std::size_t> inner_mapt;
+  using inner_mapt = typename std::map<V, std::size_t>;
   std::vector<typename inner_mapt::const_iterator> values;
   std::unordered_map<irep_idt, inner_mapt, irep_id_hash> value_map;
 };
@@ -161,8 +161,8 @@ public:
     const namespacet &ns);
 
   // each element x represents a range of bits [x.first, x.second)
-  typedef std::multimap<range_spect, range_spect> rangest;
-  typedef std::map<locationt, rangest> ranges_at_loct;
+  using rangest = std::multimap<range_spect, range_spect>;
+  using ranges_at_loct = std::map<locationt, rangest>;
 
   const ranges_at_loct &get(const irep_idt &identifier) const;
   void clear_cache(const irep_idt &identifier) const
@@ -175,19 +175,19 @@ private:
 
   sparse_bitvector_analysist<reaching_definitiont> *bv_container;
 
-  typedef std::set<std::size_t> values_innert;
+  using values_innert = std::set<std::size_t>;
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, values_innert> valuest;
+  using valuest = std::map<irep_idt, values_innert>;
   #else
-  typedef std::unordered_map<irep_idt, values_innert, irep_id_hash> valuest;
+  using valuest = std::unordered_map<irep_idt, values_innert, irep_id_hash>;
   #endif
   valuest values;
 
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, ranges_at_loct> export_cachet;
+  using export_cachet = std::map<irep_idt, ranges_at_loct>;
   #else
-  typedef std::unordered_map<irep_idt, ranges_at_loct, irep_id_hash>
-    export_cachet;
+  using export_cachet =
+    std::unordered_map<irep_idt, ranges_at_loct, irep_id_hash>;
   #endif
   mutable export_cachet export_cache;
 

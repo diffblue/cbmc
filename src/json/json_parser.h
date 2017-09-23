@@ -21,7 +21,7 @@ int yyjsonparse();
 class json_parsert:public parsert
 {
 public:
-  typedef std::stack<jsont, std::vector<jsont> > stackt;
+  using stackt = std::stack<jsont, std::vector<jsont>>;
   stackt stack;
 
   jsont &top() { return stack.top(); }

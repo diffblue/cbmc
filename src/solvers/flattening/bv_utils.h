@@ -114,12 +114,12 @@ public:
     bvt &rem);
 
   #ifdef COMPACT_EQUAL_CONST
-  typedef std::set<bvt> equal_const_registeredt;
+  using equal_const_registeredt = std::set<bvt>;
   equal_const_registeredt equal_const_registered;
   void equal_const_register(const bvt &var);
 
-  typedef std::pair<bvt, bvt> var_constant_pairt;
-  typedef std::map<var_constant_pairt, literalt> equal_const_cachet;
+  using var_constant_pairt = std::pair<bvt, bvt>;
+  using equal_const_cachet = std::map<var_constant_pairt, literalt>;
   equal_const_cachet equal_const_cache;
 
   literalt equal_const_rec(bvt &var, bvt &constant);

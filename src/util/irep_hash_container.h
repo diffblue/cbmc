@@ -47,20 +47,19 @@ protected:
     }
   };
 
-  typedef std::unordered_map<const void *, size_t, pointer_hasht>
-    ptr_hasht;
+  using ptr_hasht = std::unordered_map<const void *, size_t, pointer_hasht>;
   ptr_hasht ptr_hash;
 
   // this is the second level: content
 
-  typedef std::vector<size_t> packedt;
+  using packedt = std::vector<size_t>;
 
   struct vector_hasht
   {
     size_t operator()(const packedt &p) const;
   };
 
-  typedef hash_numbering<packedt, vector_hasht> numberingt;
+  using numberingt = hash_numbering<packedt, vector_hasht>;
   numberingt numbering;
 
   void pack(const irept &irep, packedt &);

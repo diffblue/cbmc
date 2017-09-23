@@ -53,7 +53,7 @@ public:
     }
   };
 
-  typedef std::unordered_map<irep_idt, entryt, irep_id_hash> entriest;
+  using entriest = std::unordered_map<irep_idt, entryt, irep_id_hash>;
   entriest r_entries, w_entries;
 
   void swap(rw_set_baset &other)

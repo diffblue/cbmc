@@ -22,9 +22,9 @@ public:
   explicit partial_order_concurrencyt(const namespacet &_ns);
   virtual ~partial_order_concurrencyt();
 
-  typedef symex_target_equationt::SSA_stept eventt;
-  typedef symex_target_equationt::SSA_stepst eventst;
-  typedef eventst::const_iterator event_it;
+  using eventt = symex_target_equationt::SSA_stept;
+  using eventst = symex_target_equationt::SSA_stepst;
+  using event_it = eventst::const_iterator;
 
   // the name of a clock variable for a shared read/write
   enum axiomt
@@ -42,7 +42,7 @@ public:
 protected:
   const namespacet &ns;
 
-  typedef std::vector<event_it> event_listt;
+  using event_listt = std::vector<event_it>;
 
   // lists of reads and writes per address
   struct a_rect
@@ -50,14 +50,14 @@ protected:
     event_listt reads, writes;
   };
 
-  typedef std::map<irep_idt, a_rect> address_mapt;
+  using address_mapt = std::map<irep_idt, a_rect>;
   address_mapt address_map;
 
   void build_event_lists(symex_target_equationt &);
   void add_init_writes(symex_target_equationt &);
 
   // a per-thread numbering of the events
-  typedef std::map<event_it, unsigned> numberingt;
+  using numberingt = std::map<event_it, unsigned>;
   numberingt numbering;
 
   // produces the symbol ID for an event
@@ -103,13 +103,13 @@ class memory_model_baset;
 
 class numbered_evtst
 {
-  typedef abstract_eventt evtt;
+  using evtt = abstract_eventt;
 
 public:
-  typedef std::vector<evtt const*> ordered_evtst;
+  using ordered_evtst = std::vector<evtt const*>;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef ordered_evtst::const_iterator const_iterator;
-  typedef std::map<evtt const*, ordered_evtst::size_type> ordered_evts_mapt;
+  using const_iterator = ordered_evtst::const_iterator;
+  using ordered_evts_mapt = std::map<evtt const*, ordered_evtst::size_type>;
 
   void add_event(const evtt &evt)
   {
@@ -203,12 +203,12 @@ public:
     AC_N_AXIOMS=4
   };
 
-  typedef abstract_eventt evtt;
-  typedef std::map<evtt const*, std::map<evtt const*, exprt> > adj_matrixt;
-  typedef adj_matrixt adj_matricest[AC_N_AXIOMS];
-  typedef std::list<evtt const*> per_valuet;
-  typedef std::map<irep_idt, per_valuet> per_address_mapt;
-  typedef std::vector<numbered_evtst> numbered_per_thread_evtst;
+  using evtt = abstract_eventt;
+  using adj_matrixt = std::map<evtt const*, std::map<evtt const*, exprt> >;
+  using ]; = adj_matrixt adj_matricest[AC_N_AXIOM
+  using per_valuet = std::list<evtt const*>;
+  using per_address_mapt = std::map<irep_idt, per_valuet>;
+  using numbered_per_thread_evtst = std::vector<numbered_evtst>;
 
   partial_order_concurrencyt(
       memory_model_baset &_memory_model,
@@ -316,19 +316,19 @@ private:
   static std::string check_to_string(const acyclict check);
 
   // map point-wise order to a single Boolean symbol
-  typedef std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt>>
+  using std::pair<evtt const*, std::pair<unsigned, evtt::event_dirt>>
     evt_dir_pairt;
-  typedef std::map<std::pair<evt_dir_pairt, evt_dir_pairt>,
-          symbol_exprt> pointwise_mapt;
+  using pointwise_mapt =
+    std::map<std::pair<evt_dir_pairt, evt_dir_pairt>, symbol_exprt>;
   pointwise_mapt edge_cache[AC_N_AXIOMS];
-  typedef std::map<evtt const*,
-          std::list<std::pair<evtt const*, std::pair<exprt, std::string> > > >
-            edge_to_guardt;
+  using edge_to_guardt = std::map<
+    evtt const*,
+    std::list<std::pair<evtt const*, std::pair<exprt, std::string>>>>;
   edge_to_guardt edge_to_guard[AC_N_AXIOMS];
 
   void add_sub_clock_rules();
 
-  typedef std::map<std::pair<irep_idt, irep_idt>, symbol_exprt> clock_mapt;
+  using clock_mapt = std::map<std::pair<irep_idt, irep_idt>, symbol_exprt>;
   clock_mapt clock_constraint_cache;
   symbol_exprt add_clock_constraint(
       const symbol_exprt &n1_sym,

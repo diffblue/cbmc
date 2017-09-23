@@ -44,17 +44,17 @@ public:
 
   // we have a two-level renaming
 
-  typedef std::map<irep_idt, irep_idt> original_identifierst;
+  using original_identifierst = std::map<irep_idt, irep_idt>;
 
   // we remember all L1 renamings
-  typedef std::set<irep_idt> l1_historyt;
+  using l1_historyt = std::set<irep_idt>;
   l1_historyt l1_history;
 
   struct renaming_levelt
   {
     virtual ~renaming_levelt() { }
 
-    typedef std::map<irep_idt, std::pair<ssa_exprt, unsigned> > current_namest;
+    using current_namest = std::map<irep_idt, std::pair<ssa_exprt, unsigned> >;
     current_namest current_names;
 
     unsigned current_count(const irep_idt &identifier) const
@@ -136,7 +136,7 @@ public:
   class propagationt
   {
   public:
-    typedef std::map<irep_idt, exprt> valuest;
+    using valuest = std::map<irep_idt, exprt>;
     valuest values;
     void operator()(exprt &expr);
 
@@ -178,7 +178,7 @@ protected:
   void get_l1_name(exprt &expr) const;
 
   // this maps L1 names to (L2) types
-  typedef std::unordered_map<irep_idt, typet, irep_id_hash> l1_typest;
+  using l1_typest = std::unordered_map<irep_idt, typet, irep_id_hash>;
   l1_typest l1_types;
 
 public:
@@ -228,9 +228,9 @@ public:
   };
 
   // gotos
-  typedef std::list<goto_statet> goto_state_listt;
-  typedef std::map<goto_programt::const_targett, goto_state_listt>
-    goto_state_mapt;
+  using goto_state_listt = std::list<goto_statet>;
+  using goto_state_mapt =
+    std::map<goto_programt::const_targett, goto_state_listt>;
 
   // stack frames -- these are used for function calls and
   // for exceptions
@@ -248,7 +248,7 @@ public:
 
     renaming_levelt::current_namest old_level1;
 
-    typedef std::set<irep_idt> local_objectst;
+    using local_objectst = std::set<irep_idt>;
     local_objectst local_objects;
 
     framet():
@@ -258,7 +258,7 @@ public:
     }
 
     // exceptions
-    typedef std::map<irep_idt, goto_programt::targett> catch_mapt;
+    using catch_mapt = std::map<irep_idt, goto_programt::targett>;
     catch_mapt catch_map;
 
     // loop and recursion unwinding
@@ -273,12 +273,12 @@ public:
       unsigned count;
       bool is_recursion;
     };
-    typedef std::unordered_map<irep_idt, loop_infot, irep_id_hash>
-      loop_iterationst;
+    using loop_iterationst =
+      std::unordered_map<irep_idt, loop_infot, irep_id_hash>;
     loop_iterationst loop_iterations;
   };
 
-  typedef std::vector<framet> call_stackt;
+  using call_stackt = std::vector<framet>;
 
   call_stackt &call_stack()
   {
@@ -310,12 +310,12 @@ public:
 
   // threads
   unsigned atomic_section_id;
-  typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>
-    read_in_atomic_sectiont;
-  typedef std::list<guardt> a_s_w_entryt;
-  typedef std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
-    written_in_atomic_sectiont;
+  using a_s_r_entryt = std::pair<unsigned, std::list<guardt> >;
+  using read_in_atomic_sectiont =
+    std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash>;
+  using a_s_w_entryt = std::list<guardt>;
+  using written_in_atomic_sectiont =
+    std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>;
   read_in_atomic_sectiont read_in_atomic_section;
   written_in_atomic_sectiont written_in_atomic_section;
 
@@ -334,7 +334,7 @@ public:
     }
   };
 
-  typedef std::vector<threadt> threadst;
+  using threadst = std::vector<threadt>;
   threadst threads;
 
   bool l2_thread_read_encoding(ssa_exprt &expr, const namespacet &ns);

@@ -60,8 +60,8 @@ public:
   {
   }
 
-  typedef aig_nodet nodet;
-  typedef std::vector<nodet> nodest;
+  using nodet = aig_nodet;
+  using nodest = std::vector<nodet>;
   nodest nodes;
 
   void clear()
@@ -69,8 +69,8 @@ public:
     nodes.clear();
   }
 
-  typedef std::set<literalt::var_not> terminal_sett;
-  typedef std::map<literalt::var_not, terminal_sett> terminalst;
+  using terminal_sett = std::set<literalt::var_not>;
+  using terminalst = std::map<literalt::var_not, terminal_sett>;
 
   // produces the support set
   // should get re-written
@@ -144,7 +144,7 @@ std::ostream &operator << (std::ostream &, const aigt &);
 class aig_plus_constraintst:public aigt
 {
 public:
-  typedef std::vector<literalt> constraintst;
+  using constraintst = std::vector<literalt>;
   constraintst constraints;
 
   void clear()

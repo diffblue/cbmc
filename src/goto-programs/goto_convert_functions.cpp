@@ -36,7 +36,7 @@ void goto_convert_functionst::goto_convert()
 {
   // warning! hash-table iterators are not stable
 
-  typedef std::list<irep_idt> symbol_listt;
+  using symbol_listt = std::list<irep_idt>;
   symbol_listt symbol_list;
 
   forall_symbols(it, symbol_table.symbols)

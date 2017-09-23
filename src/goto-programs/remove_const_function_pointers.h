@@ -23,8 +23,8 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 class remove_const_function_pointerst:public messaget
 {
 public:
-  typedef std::unordered_set<exprt, irep_hash> functionst;
-  typedef std::list<exprt> expressionst;
+  using functionst = std::unordered_set<exprt, irep_hash>;
+  using expressionst = std::list<exprt>;
   remove_const_function_pointerst(
     message_handlert &message_handler,
     const namespacet &ns,

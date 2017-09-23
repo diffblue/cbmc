@@ -175,10 +175,10 @@ public:
 
     // The below will eventually become a single target only.
     /// The target for gotos and for start_thread nodes
-    typedef typename std::list<instructiont>::iterator targett;
-    typedef typename std::list<instructiont>::const_iterator const_targett;
-    typedef std::list<targett> targetst;
-    typedef std::list<const_targett> const_targetst;
+    using targett = typename std::list<instructiont>::iterator;
+    using const_targett = typename std::list<instructiont>::const_iterator;
+    using targetst = std::list<targett>;
+    using const_targetst = std::list<const_targett>;
 
     /// The list of successor instructions
     targetst targets;
@@ -205,7 +205,7 @@ public:
     }
 
     /// Goto target labels
-    typedef std::list<irep_idt> labelst;
+    using labelst = std::list<irep_idt>;
     labelst labels;
 
     // will go away
@@ -362,12 +362,12 @@ public:
   };
 
   // Never try to change this to vector-we mutate the list while iterating
-  typedef std::list<instructiont> instructionst;
+  using instructionst = std::list<instructiont>;
 
-  typedef typename instructionst::iterator targett;
-  typedef typename instructionst::const_iterator const_targett;
-  typedef typename std::list<targett> targetst;
-  typedef typename std::list<const_targett> const_targetst;
+  using targett = typename instructionst::iterator;
+  using const_targett = typename instructionst::const_iterator;
+  using targetst = typename std::list<targett>;
+  using const_targetst = typename std::list<const_targett>;
 
   /// The list of instructions in the goto program
   instructionst instructions;
@@ -726,7 +726,7 @@ void goto_program_templatet<codeT, guardT>::copy_from(
   const goto_program_templatet<codeT, guardT> &src)
 {
   // Definitions for mapping between the two programs
-  typedef std::map<const_targett, targett> targets_mappingt;
+  using targets_mappingt = std::map<const_targett, targett>;
   targets_mappingt targets_mapping;
 
   clear();

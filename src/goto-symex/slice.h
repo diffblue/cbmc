@@ -26,7 +26,7 @@ void slice(symex_target_equationt &equation,
 
 // Collects "open" variables that are used but not assigned
 
-typedef std::unordered_set<irep_idt, irep_id_hash> symbol_sett;
+using symbol_sett = std::unordered_set<irep_idt, irep_id_hash>;
 
 void collect_open_variables(
   const symex_target_equationt &equation,

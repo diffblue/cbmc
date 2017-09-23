@@ -65,8 +65,8 @@ public:
         get_message_handler());
   }
 
-  typedef java_bytecode_parse_treet::classt classt;
-  typedef java_bytecode_parse_treet::fieldt fieldt;
+  using classt = java_bytecode_parse_treet::classt;
+  using fieldt = java_bytecode_parse_treet::fieldt;
 
 protected:
   symbol_tablet &symbol_table;

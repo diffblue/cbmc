@@ -25,8 +25,8 @@ public:
   enum modeltypet { M_TRUE, M_FALSE, M_DONTCARE, M_COMPLEX };
   virtual modeltypet m_get(literalt a) const=0;
 
-  typedef std::pair<exprt, unsigned> symbol_mapt;
-  typedef std::map<unsigned, symbol_mapt> variable_mapt;
+  using symbol_mapt = std::pair<exprt, unsigned>;
+  using variable_mapt = std::map<unsigned, symbol_mapt>;
   variable_mapt variable_map;  // variable -> symbol/index map
   virtual const exprt f_get(literalt v)=0;
 

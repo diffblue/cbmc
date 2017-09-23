@@ -2095,7 +2095,7 @@ static optionalt<exprt> find_counter_example(
 }
 
 /// \related string_constraintt
-typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
+using array_index_mapt = std::map<exprt, std::vector<exprt>>;
 
 /// \related string_constraintt
 class gather_indices_visitort: public const_expr_visitort
@@ -2169,7 +2169,7 @@ static bool universal_only_in_index(const string_constraintt &expr)
   // The unsigned int represents index depth we are. For example, if we are
   // considering the fragment `a[b[x]]` (not inside an index expression), then
   // the stack would look something like `[..., (a, 0), (b, 1), (x, 2)]`.
-  typedef std::pair<exprt, unsigned> valuet;
+  using valuet = std::pair<exprt, unsigned>;
   std::stack<valuet> stack;
   // We start at 0 since expr is not an index expression, so expr.body() is not
   // in an index expression.

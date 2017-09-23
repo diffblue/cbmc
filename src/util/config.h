@@ -142,7 +142,7 @@ public:
 
   struct javat
   {
-    typedef std::list<std::string> classpatht;
+    using classpatht = std::list<std::string>;
     classpatht classpath;
     irep_idt main_class;
 

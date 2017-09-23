@@ -45,9 +45,8 @@ public:
     NEW
   };
 
-  typedef std::list<std::pair<goto_programt::const_targett,
-                              differencet> >
-    goto_program_difft;
+  using goto_program_difft =
+    std::list<std::pair<goto_programt::const_targett, differencet>>;
 
   void get_diff(
     const irep_idt &function,
@@ -59,8 +58,8 @@ protected:
   const goto_functionst &new_goto_functions;
   const namespacet ns_new;
 
-  typedef std::vector<differencet> differencest;
-  typedef std::map<irep_idt, differencest> differences_mapt;
+  using differencest = std::vector<differencet>;
+  using differences_mapt = std::map<irep_idt, differencest>;
 
   differences_mapt differences_map;
 

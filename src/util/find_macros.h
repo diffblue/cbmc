@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class exprt;
 class namespacet;
 
-typedef std::unordered_set<irep_idt, irep_id_hash> find_macros_sett;
+using find_macros_sett = std::unordered_set<irep_idt, irep_id_hash>;
 
 void find_macros(
   const exprt &src,

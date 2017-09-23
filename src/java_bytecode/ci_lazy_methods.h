@@ -26,18 +26,15 @@
 
 class java_string_library_preprocesst;
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
-  lazy_method_valuet;
+using lazy_method_valuet =
+  std::pair<const symbolt *, const java_bytecode_parse_treet::methodt *>;
 
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+using lazy_methodst = std::map<irep_idt, lazy_method_valuet>;
 
-typedef std::function<void(
+using method_convertert = std::function<void(
   const symbolt &,
   const java_bytecode_parse_treet::methodt &,
-  ci_lazy_methods_neededt)> method_convertert;
+  ci_lazy_methods_neededt)>;
 
 class ci_lazy_methodst:public messaget
 {

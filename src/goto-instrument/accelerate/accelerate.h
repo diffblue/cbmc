@@ -106,8 +106,8 @@ class acceleratet
   subsumed_pathst subsumed;
   acceleration_utilst utils;
 
-  typedef std::map<goto_programt::targett, goto_programt::targetst>
-    overflow_mapt;
+  using overflow_mapt =
+    std::map<goto_programt::targett, goto_programt::targetst>;
   overflow_mapt overflow_locs;
 
   expr_mapt dirty_vars_map;

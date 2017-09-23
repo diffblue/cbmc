@@ -64,7 +64,7 @@ public:
     error_labels=_options.get_list_option("error-label");
   }
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   void goto_check(goto_functiont &goto_function, const irep_idt &mode);
 
@@ -110,7 +110,7 @@ protected:
     const guardt &guard);
 
   goto_programt new_code;
-  typedef std::set<exprt> assertionst;
+  using assertionst = std::set<exprt>;
   assertionst assertions;
 
   void invalidate(const exprt &lhs);
@@ -138,11 +138,11 @@ protected:
   bool enable_built_in_assertions;
   bool enable_assumptions;
 
-  typedef optionst::value_listt error_labelst;
+  using error_labelst = optionst::value_listt;
   error_labelst error_labels;
 
-  typedef std::pair<exprt, exprt> allocationt;
-  typedef std::list<allocationt> allocationst;
+  using allocationt = std::pair<exprt, exprt>;
+  using allocationst = std::list<allocationt>;
   allocationst allocations;
 };
 

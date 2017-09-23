@@ -33,13 +33,13 @@ public:
       void output(std::ostream &) const;
     };
 
-    typedef std::vector<element_value_pairt> element_value_pairst;
+    using element_value_pairst = std::vector<element_value_pairt>;
     element_value_pairst element_value_pairs;
 
     void output(std::ostream &) const;
   };
 
-  typedef std::vector<annotationt> annotationst;
+  using annotationst = std::vector<annotationt>;
 
   class instructiont
   {
@@ -47,7 +47,7 @@ public:
     source_locationt source_location;
     unsigned address;
     irep_idt statement;
-    typedef std::vector<exprt> argst;
+    using argst = std::vector<exprt>;
     argst args;
   };
 
@@ -75,7 +75,7 @@ public:
     bool is_native, is_abstract, is_synchronized;
     source_locationt source_location;
 
-    typedef std::vector<instructiont> instructionst;
+    using instructionst = std::vector<instructiont>;
     instructionst instructions;
 
     instructiont &add_instruction()
@@ -93,7 +93,7 @@ public:
       symbol_typet catch_type;
     };
 
-    typedef std::vector<exceptiont> exception_tablet;
+    using exception_tablet = std::vector<exceptiont>;
     exception_tablet exception_table;
 
     class local_variablet
@@ -106,7 +106,7 @@ public:
       std::size_t length;
     };
 
-    typedef std::vector<local_variablet> local_variable_tablet;
+    using local_variable_tablet = std::vector<local_variablet>;
     local_variable_tablet local_variable_table;
 
     class verification_type_infot
@@ -134,16 +134,16 @@ public:
       size_t chops;
       size_t appends;
 
-      typedef std::vector<verification_type_infot>
-        local_verification_type_infot;
-      typedef std::vector<verification_type_infot>
-        stack_verification_type_infot;
+      using local_verification_type_infot =
+        std::vector<verification_type_infot>;
+      using stack_verification_type_infot =
+        std::vector<verification_type_infot>;
 
       local_verification_type_infot locals;
       stack_verification_type_infot stack;
     };
 
-    typedef std::vector<stack_map_table_entryt> stack_map_tablet;
+    using stack_map_tablet = std::vector<stack_map_table_entryt>;
     stack_map_tablet stack_map_table;
 
     virtual void output(std::ostream &out) const;
@@ -172,11 +172,11 @@ public:
     bool is_public=false, is_protected=false, is_private=false;
     size_t enum_elements=0;
 
-    typedef std::list<irep_idt> implementst;
+    using implementst = std::list<irep_idt>;
     implementst implements;
 
-    typedef std::list<fieldt> fieldst;
-    typedef std::list<methodt> methodst;
+    using fieldst = std::list<fieldt>;
+    using methodst = std::list<methodt>;
     fieldst fields;
     methodst methods;
     annotationst annotations;
@@ -209,7 +209,7 @@ public:
 
   void output(std::ostream &out) const;
 
-  typedef std::set<irep_idt> class_refst;
+  using class_refst = std::set<irep_idt>;
   class_refst class_refs;
 
   bool loading_successful;

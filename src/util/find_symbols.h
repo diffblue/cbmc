@@ -19,7 +19,7 @@ class exprt;
 class symbol_exprt;
 class typet;
 
-typedef std::unordered_set<irep_idt, irep_id_hash> find_symbols_sett;
+using find_symbols_sett = std::unordered_set<irep_idt, irep_id_hash>;
 
 void find_symbols(
   const exprt &src,

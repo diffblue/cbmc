@@ -21,7 +21,7 @@ Author: Michael Tautschnig, mt@eecs.qmul.ac.uk
 // collide with std::stack included by graph.h
 #include "xml_parser.h"
 
-typedef std::map<std::string, graphmlt::node_indext> name_mapt;
+using name_mapt = std::map<std::string, graphmlt::node_indext>;
 
 static graphmlt::node_indext add_node(
   const std::string &name,

@@ -94,18 +94,18 @@ private:
 class format_elementt
 {
 public:
-  typedef enum {SPECIFIER, TEXT} format_typet;
+  enum class format_typet {SPECIFIER, TEXT};
 
   explicit format_elementt(format_typet _type): type(_type), fstring("")
   {
   }
 
-  explicit format_elementt(std::string s): type(TEXT), fstring(s)
+  explicit format_elementt(std::string s): type(format_typet::TEXT), fstring(s)
   {
   }
 
   explicit format_elementt(string_constraint_generatort::format_specifiert fs):
-    type(SPECIFIER),
+    type(format_typet::SPECIFIER),
     fstring("")
   {
     fspec.push_back(fs);
@@ -113,12 +113,12 @@ public:
 
   bool is_format_specifier() const
   {
-    return type==SPECIFIER;
+    return type==format_typet::SPECIFIER;
   }
 
   bool is_format_text() const
   {
-    return type==TEXT;
+    return type==format_typet::TEXT;
   }
 
   string_constraint_generatort::format_specifiert get_format_specifier() const

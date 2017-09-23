@@ -48,10 +48,10 @@ struct simplify_expr_cachet
 {
 public:
   #if 1
-  typedef std::unordered_map<
-    exprt, exprt, irep_full_hash, irep_full_eq> containert;
+  using containert =
+    std::unordered_map<exprt, exprt, irep_full_hash, irep_full_eq>;
   #else
-  typedef std::unordered_map<exprt, exprt, irep_hash> containert;
+  using containert = std::unordered_map<exprt, exprt, irep_hash>;
   #endif
 
   containert container_normal;

@@ -50,7 +50,7 @@ struct datat
 
 class data_dpt final
 {
-  typedef std::set<datat> data_typet;
+  using data_typet = std::set<datat>;
   data_typet data;
   unsigned class_nb;
 

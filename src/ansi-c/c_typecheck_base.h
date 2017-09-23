@@ -69,7 +69,7 @@ protected:
   const irep_idt mode;
   symbolt current_symbol;
 
-  typedef std::unordered_map<irep_idt, typet, irep_id_hash> id_type_mapt;
+  using id_type_mapt = std::unordered_map<irep_idt, typet, irep_id_hash>;
   id_type_mapt parameter_map;
 
   // overload to use language specific syntax
@@ -268,7 +268,7 @@ protected:
            src.id()==ID_c_bit_field;
   }
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> asm_label_mapt;
+  using asm_label_mapt = std::unordered_map<irep_idt, irep_idt, irep_id_hash>;
   asm_label_mapt asm_label_map;
 
   void apply_asm_label(const irep_idt &asm_label, symbolt &symbol);

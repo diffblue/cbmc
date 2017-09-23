@@ -52,7 +52,7 @@ protected:
     irep_idt class_id;
   };
 
-  typedef std::vector<functiont> functionst;
+  using functionst = std::vector<functiont>;
   void get_functions(const exprt &, functionst &);
   void get_child_functions_rec(
     const irep_idt &,

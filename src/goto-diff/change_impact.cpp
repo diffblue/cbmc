@@ -34,11 +34,11 @@ Date: April 2016
 #endif
   };
 
-  typedef cfg_baset<cfg_nodet> cfgt;
+  using cfgt = cfg_baset<cfg_nodet>;
   cfgt cfg;
 
-  typedef std::vector<cfgt::entryt> dep_node_to_cfgt;
-  typedef std::stack<cfgt::entryt> queuet;
+  using dep_node_to_cfgt = std::vector<cfgt::entryt>;
+  using queuet = std::stack<cfgt::entryt>;
 
   inline void add_to_queue(
     queuet &queue,
@@ -239,10 +239,10 @@ protected:
     DEL_CTRL_DEP=1<<5
   };
 
-  typedef std::map<goto_programt::const_targett, unsigned>
-    goto_program_change_impactt;
-  typedef std::map<irep_idt, goto_program_change_impactt>
-    goto_functions_change_impactt;
+  using goto_program_change_impactt =
+    std::map<goto_programt::const_targett, unsigned>;
+  using goto_functions_change_impactt =
+    std::map<irep_idt, goto_program_change_impactt>;
 
   goto_functions_change_impactt old_change_impact, new_change_impact;
 
@@ -485,9 +485,8 @@ void change_impactt::propogate_dep_back(
 void change_impactt::operator()()
 {
   // sorted iteration over intersection(old functions, new functions)
-  typedef std::map<irep_idt,
-                   goto_functionst::function_mapt::const_iterator>
-                     function_mapt;
+  using function_mapt =
+    std::map<irep_idt, goto_functionst::function_mapt::const_iterator>;
 
   function_mapt old_funcs, new_funcs;
 

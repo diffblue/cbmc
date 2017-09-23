@@ -136,7 +136,7 @@ public:
     }
   }
 
-  typedef std::map<irep_idt, new_scopet> id_mapt;
+  using id_mapt = std::map<irep_idt, new_scopet>;
   id_mapt id_map;
 
   std::size_t anon_count;

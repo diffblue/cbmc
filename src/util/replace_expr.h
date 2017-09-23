@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "expr.h"
 
-typedef std::unordered_map<exprt, exprt, irep_hash> replace_mapt;
+using replace_mapt = std::unordered_map<exprt, exprt, irep_hash>;
 
 bool replace_expr(const exprt &what, const exprt &by, exprt &dest);
 bool replace_expr(const replace_mapt &what, exprt &dest);

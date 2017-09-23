@@ -283,7 +283,7 @@ public:
     return i;
   }
 
-  typedef std::list<SSA_stept> SSA_stepst;
+  using SSA_stepst = std::list<SSA_stept>;
   SSA_stepst SSA_steps;
 
   SSA_stepst::iterator get_SSA_step(std::size_t s)

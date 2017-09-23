@@ -53,7 +53,7 @@ public:
 
   // managing the objectives
 
-  typedef long long signed int weightt;
+  using weightt = long long;
 
   // adds an objective with given weight
   void objective(
@@ -72,7 +72,7 @@ public:
   };
 
   // the map of objectives, sorted by weight
-  typedef std::map<weightt, std::vector<objectivet> > objectivest;
+  using objectivest = std::map<weightt, std::vector<objectivet> >;
   objectivest objectives;
 
 protected:

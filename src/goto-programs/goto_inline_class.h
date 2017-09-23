@@ -35,18 +35,18 @@ public:
   {
   }
 
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   // call that should be inlined
   // false:    inline non-transitively
   // true:     inline transitively
-  typedef std::pair<goto_programt::targett, bool> callt;
+  using callt = std::pair<goto_programt::targett, bool>;
 
   // list of calls that should be inlined
-  typedef std::list<callt> call_listt;
+  using call_listt = std::list<callt>;
 
   // list of calls per function that should be inlined
-  typedef std::map<irep_idt, call_listt> inline_mapt;
+  using inline_mapt = std::map<irep_idt, call_listt>;
 
   // handle given goto function
   // force_full:
@@ -115,9 +115,8 @@ public:
     jsont output_inline_log_json() const;
 
     // map from segment start to inline info
-    typedef std::map<
-      goto_programt::const_targett,
-      goto_inline_log_infot> log_mapt;
+    using log_mapt =
+      std::map<goto_programt::const_targett, goto_inline_log_infot>;
 
     log_mapt log_map;
   };
@@ -197,16 +196,16 @@ protected:
     goto_programt &dest);
 
   // goto functions that were already inlined transitively
-  typedef goto_functionst::function_mapt cachet;
+  using cachet = goto_functionst::function_mapt;
   cachet cache;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> finished_sett;
+  using finished_sett = std::unordered_set<irep_idt, irep_id_hash>;
   finished_sett finished_set;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> recursion_sett;
+  using recursion_sett = std::unordered_set<irep_idt, irep_id_hash>;
   recursion_sett recursion_set;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> no_body_sett;
+  using no_body_sett = std::unordered_set<irep_idt, irep_id_hash>;
   no_body_sett no_body_set;
 };
 

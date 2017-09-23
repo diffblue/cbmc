@@ -39,7 +39,7 @@ public:
 class language_filet final
 {
 public:
-  typedef std::set<std::string> modulest;
+  using modulest = std::set<std::string>;
   modulest modules;
 
   std::unique_ptr<languaget> language;
@@ -60,16 +60,16 @@ public:
 class language_filest:public messaget
 {
 public:
-  typedef std::map<std::string, language_filet> file_mapt;
+  using file_mapt = std::map<std::string, language_filet>;
   file_mapt file_map;
 
   // Contains pointers into file_mapt!
-  typedef std::map<std::string, language_modulet> module_mapt;
+  using module_mapt = std::map<std::string, language_modulet>;
   module_mapt module_map;
 
   // Contains pointers into filemapt!
   // This is safe-ish as long as this is std::map.
-  typedef std::map<irep_idt, language_filet *> lazy_method_mapt;
+  using lazy_method_mapt = std::map<irep_idt, language_filet *>;
   lazy_method_mapt lazy_method_map;
 
   void clear_files()

@@ -26,7 +26,7 @@ public:
 
   std::string as_string() const;
 
-  typedef std::vector<std::string> componentst;
+  using componentst = std::vector<std::string>;
   componentst components;
 
 protected:

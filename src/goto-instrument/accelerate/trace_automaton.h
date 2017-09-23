@@ -21,8 +21,8 @@ Author: Matt Lewis
 #include <set>
 #include <iosfwd>
 
-typedef unsigned int statet;
-typedef std::set<statet> state_sett;
+using statet = unsigned int;
+using state_sett = std::set<statet>;
 
 class automatont
 {
@@ -74,10 +74,10 @@ class automatont
   static const statet no_state;
 
 // protected:
-  typedef std::multimap<goto_programt::targett, statet> transitionst;
-  typedef std::pair<transitionst::iterator, transitionst::iterator>
-    transition_ranget;
-  typedef std::vector<transitionst> transition_tablet;
+  using transitionst = std::multimap<goto_programt::targett, statet>;
+  using transition_ranget =
+    std::pair<transitionst::iterator, transitionst::iterator>;
+  using transition_tablet = std::vector<transitionst>;
 
   statet init_state;
   unsigned num_states;
@@ -112,9 +112,9 @@ class trace_automatont
     states.insert(dta.accept_states.begin(), dta.accept_states.end());
   }
 
-  typedef std::pair<statet, statet> state_pairt;
-  typedef std::multimap<goto_programt::targett, state_pairt> sym_mapt;
-  typedef std::pair<sym_mapt::iterator, sym_mapt::iterator> sym_range_pairt;
+  using state_pairt = std::pair<statet, statet>;
+  using sym_mapt = std::multimap<goto_programt::targett, state_pairt>;
+  using sym_range_pairt = std::pair<sym_mapt::iterator, sym_mapt::iterator>;
 
   void get_transitions(sym_mapt &transitions);
 
@@ -123,7 +123,7 @@ class trace_automatont
     return dta.num_states;
   }
 
-  typedef std::set<goto_programt::targett> alphabett;
+  using alphabett = std::set<goto_programt::targett>;
   alphabett alphabet;
 
  protected:
@@ -147,7 +147,7 @@ class trace_automatont
   statet find_dstate(state_sett &s);
   void add_dtrans(state_sett &s, goto_programt::targett a, state_sett &t);
 
-  typedef std::map<state_sett, statet> state_mapt;
+  using state_mapt = std::map<state_sett, statet>;
 
   goto_programt &goto_program;
   goto_programt::targett epsilon;
