@@ -581,7 +581,7 @@ codet character_refine_preprocesst::convert_is_identifier_ignorable_int(
 }
 
 /// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.isIdeographic:(C)Z
+/// the java method Character.isIdeographic:(I)Z
 /// \param target: a position in a goto program
 codet character_refine_preprocesst::convert_is_ideographic(
   conversion_inputt &target)
@@ -753,7 +753,7 @@ codet character_refine_preprocesst::convert_is_lower_case_int(
 }
 
 /// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.isLowSurrogate:(I)Z
+/// the java method Character.isLowSurrogate:(C)Z
 /// \param target: a position in a goto program
 codet character_refine_preprocesst::convert_is_low_surrogate(
   conversion_inputt &target)
@@ -1127,7 +1127,7 @@ exprt character_refine_preprocesst::expr_of_low_surrogate(
 }
 
 /// Converts function call to an assignment of an expression corresponding to
-/// the java method Character.lowSurrogate:(I)Z
+/// the java method Character.lowSurrogate:(I)C
 /// \param target: a position in a goto program
 codet character_refine_preprocesst::convert_low_surrogate(
   conversion_inputt &target)
@@ -1394,7 +1394,7 @@ void character_refine_preprocesst::initialize_conversion_table()
   //   "(Ljava.lang.CharSequence;I)I"
   // Not supported "java::java.lang.Character.codePointCount:([CII)I"
   // Not supported "java::java.lang.Character.codePointCount:"
-  //   "(Ljava.lang.CharSequence;I)I"
+  //   "(Ljava.lang.CharSequence;II)I"
   // Not supported "java::java.lang.Character.compareTo:"
   //   "(Ljava.lang.Character;)I"
 
@@ -1422,11 +1422,11 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_get_numeric_value_int;
   conversion_table["java::java.lang.Character.getType:(C)I"]=
       &character_refine_preprocesst::convert_get_type_char;
-  conversion_table["java::java.lang.Character.getType:(I)Z"]=
+  conversion_table["java::java.lang.Character.getType:(I)I"]=
       &character_refine_preprocesst::convert_get_type_int;
   conversion_table["java::java.lang.Character.hashCode:()I"]=
       &character_refine_preprocesst::convert_hash_code;
-  conversion_table["java::java.lang.Character.highSurrogate:(C)Z"]=
+  conversion_table["java::java.lang.Character.highSurrogate:(I)C"]=
       &character_refine_preprocesst::convert_high_surrogate;
   conversion_table["java::java.lang.Character.isAlphabetic:(I)Z"]=
       &character_refine_preprocesst::convert_is_alphabetic;
@@ -1446,7 +1446,7 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_is_identifier_ignorable_char;
   conversion_table["java::java.lang.Character.isIdentifierIgnorable:(I)Z"]=
       &character_refine_preprocesst::convert_is_identifier_ignorable_int;
-  conversion_table["java::java.lang.Character.isIdeographic:(C)Z"]=
+  conversion_table["java::java.lang.Character.isIdeographic:(I)Z"]=
       &character_refine_preprocesst::convert_is_ideographic;
   conversion_table["java::java.lang.Character.isISOControl:(C)Z"]=
       &character_refine_preprocesst::convert_is_ISO_control_char;
@@ -1476,7 +1476,7 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_is_lower_case_char;
   conversion_table["java::java.lang.Character.isLowerCase:(I)Z"]=
       &character_refine_preprocesst::convert_is_lower_case_int;
-  conversion_table["java::java.lang.Character.isLowSurrogate:(I)Z"]=
+  conversion_table["java::java.lang.Character.isLowSurrogate:(C)Z"]=
       &character_refine_preprocesst::convert_is_low_surrogate;
   conversion_table["java::java.lang.Character.isMirrored:(C)Z"]=
       &character_refine_preprocesst::convert_is_mirrored_char;
@@ -1516,7 +1516,7 @@ void character_refine_preprocesst::initialize_conversion_table()
       &character_refine_preprocesst::convert_is_whitespace_char;
   conversion_table["java::java.lang.Character.isWhitespace:(I)Z"]=
       &character_refine_preprocesst::convert_is_whitespace_int;
-  conversion_table["java::java.lang.Character.lowSurrogate:(I)Z"]=
+  conversion_table["java::java.lang.Character.lowSurrogate:(I)C"]=
       &character_refine_preprocesst::convert_is_low_surrogate;
 
   // Not supported "java::java.lang.Character.offsetByCodePoints:([CIIII)I"
@@ -1528,7 +1528,7 @@ void character_refine_preprocesst::initialize_conversion_table()
   conversion_table["java::java.lang.Character.toChars:(I)[C"]=
       &character_refine_preprocesst::convert_to_chars;
 
-  // Not supported "java::java.lang.Character.toChars:(I[CI])I"
+  // Not supported "java::java.lang.Character.toChars:(I[CI)I"
 
   conversion_table["java::java.lang.Character.toCodePoint:(CC)I"]=
       &character_refine_preprocesst::convert_to_code_point;
