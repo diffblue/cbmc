@@ -253,13 +253,15 @@ void rw_range_sett::get_objects_index(
     sub_size=
       to_range_spect(pointer_offset_bits(vector_type.subtype(), ns));
   }
-  else
+  else if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
 
     sub_size=
       to_range_spect(pointer_offset_bits(array_type.subtype(), ns));
   }
+  else
+    return;
 
   const exprt simp_index=simplify_expr(expr.index(), ns);
 
