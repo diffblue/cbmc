@@ -11,12 +11,9 @@
 #include <solvers/refinement/string_constraint_instantiation.h>
 
 #include <solvers/sat/satcheck.h>
-#include <solvers/refinement/bv_refinement.h>
 #include <java_bytecode/java_types.h>
 #include <langapi/mode.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
 #include <util/simplify_expr.h>
 
 /// \class Types used throughout the test. Currently it is impossible to
@@ -48,7 +45,7 @@ const tt t;
 /// Creates a `constant_exprt` of the proper length type.
 /// \param [in] i: integer to convert
 /// \return corresponding `constant_exprt`
-constant_exprt from_integer(const mp_integer i)
+constant_exprt from_integer(const mp_integer &i)
 {
   return from_integer(i, t.length_type());
 }
@@ -79,6 +76,17 @@ std::set<exprt> full_index_set(const string_exprt &s)
   for(mp_integer i=0; i<n; ++i)
     ret.insert(from_integer(i));
   return ret;
+}
+
+/// Create the cartesian product of two sets.
+template<class T, class U>
+std::set<std::pair<T, U>> product(const std::set<T> ts, const std::set<U> us)
+{
+  std::set<std::pair<T, U>> s;
+  for(const auto &t : ts)
+    for(const auto &u : us)
+      s.insert(std::pair<T, U>(t, u));
+  return s;
 }
 
 /// Simplifies, and returns the conjunction of the lemmas.
@@ -152,7 +160,7 @@ SCENARIO("instantiate_not_contains",
 
     // Generating the corresponding axioms and simplifying, recording info
     symbol_tablet symtab;
-    namespacet empty_ns(symtab);
+    const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
     exprt res=generator.add_axioms_for_function_application(func);
@@ -196,7 +204,7 @@ SCENARIO("instantiate_not_contains",
       for(const auto &axiom : nc_axioms)
       {
         const std::vector<exprt> l=instantiate_not_contains(
-          axiom, index_set_ab, index_set_b, generator);
+          axiom, product(index_set_ab, index_set_b), generator);
         lemmas.insert(lemmas.end(), l.begin(), l.end());
       }
 
@@ -239,7 +247,7 @@ SCENARIO("instantiate_not_contains",
 
     // Create witness for axiom
     symbol_tablet symtab;
-    namespacet empty_ns(symtab);
+    const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
     generator.witness[vacuous]=
@@ -255,7 +263,7 @@ SCENARIO("instantiate_not_contains",
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
-        vacuous, index_set_a, index_set_a, generator);
+        vacuous, product(index_set_a, index_set_a), generator);
 
       const exprt conj=combine_lemmas(lemmas, ns);
       const std::string info=create_info(lemmas, ns);
@@ -297,7 +305,7 @@ SCENARIO("instantiate_not_contains",
 
     // Create witness for axiom
     symbol_tablet symtab;
-    namespacet ns(symtab);
+    const namespacet ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
@@ -314,7 +322,7 @@ SCENARIO("instantiate_not_contains",
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
-        trivial, index_set_a, index_set_b, generator);
+        trivial, product(index_set_a, index_set_b), generator);
 
       const exprt conj=combine_lemmas(lemmas, ns);
       const std::string info=create_info(lemmas, ns);
@@ -356,7 +364,7 @@ SCENARIO("instantiate_not_contains",
 
     // Create witness for axiom
     symbol_tablet symtab;
-    namespacet empty_ns(symtab);
+    const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
@@ -374,7 +382,7 @@ SCENARIO("instantiate_not_contains",
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
-        trivial, index_set_a, index_set_empty, generator);
+        trivial, product(index_set_a, index_set_empty), generator);
 
       const exprt conj=combine_lemmas(lemmas, ns);
       const std::string info=create_info(lemmas, ns);
@@ -416,7 +424,7 @@ SCENARIO("instantiate_not_contains",
 
     // Create witness for axiom
     symbol_tablet symtab;
-    namespacet empty_ns(symtab);
+    const namespacet empty_ns(symtab);
 
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
@@ -433,7 +441,7 @@ SCENARIO("instantiate_not_contains",
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
-        trivial, index_set_ab, index_set_ab, generator);
+        trivial, product(index_set_ab, index_set_ab), generator);
 
       const exprt conj=combine_lemmas(lemmas, ns);
       const std::string info=create_info(lemmas, ns);
@@ -476,7 +484,7 @@ SCENARIO("instantiate_not_contains",
 
     // Create witness for axiom
     symbol_tablet symtab;
-    namespacet empty_ns(symtab);
+    const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
     generator.witness[trivial]=
@@ -493,7 +501,7 @@ SCENARIO("instantiate_not_contains",
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
-        trivial, index_set_ab, index_set_cd, generator);
+        trivial, product(index_set_ab, index_set_cd), generator);
 
       const exprt conj=combine_lemmas(lemmas, ns);
       const std::string info=create_info(lemmas, ns);
