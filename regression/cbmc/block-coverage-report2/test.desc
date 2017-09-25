@@ -1,0 +1,12 @@
+CORE
+main.c
+--cover location
+block 1 \(lines main.c:main:12,13\): SATISFIED
+block 2 \(lines main.c:main:14\): SATISFIED
+block 3 \(lines main.c:main:15,16\): SATISFIED
+block 4 \(lines main.c:main:16,17\): SATISFIED
+block 5 \(lines main.c:main:18\): SATISFIED
+block 6 \(lines main.c:main:14,19,20\): SATISFIED
+block 7 \(lines main.c:main:22,24\): SATISFIED
+block 1 \(lines main.c:foo:5,6,7,8\): SATISFIED
+--

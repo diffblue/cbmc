@@ -18,6 +18,7 @@ Date: May 2016
 #include <iterator>
 #include <unordered_set>
 #include <regex>
+#include <sstream>
 
 #include <util/format_number_range.h>
 #include <util/prefix.h>
@@ -30,6 +31,122 @@ Date: May 2016
 
 namespace
 {
+/// The lines of source code contribuing to a basic block.
+///
+/// Represent a line of source code by a file name and line number.
+/// One line of source code may contribute to many basic blocks of a
+/// goto program.
+///
+/// The lines contributing to a basic block: A basic block is
+/// generally a sequence of consecutive instructions ending with a
+/// goto.  Exceptions: (1) The block will not continue past an
+/// instruction that is itself the target of a goto (so a block may
+/// not end with a goto).  (2) The block will continue past an
+/// unconditional goto (a goto with guard true) to the target of that
+/// goto if that target is reachable only by that goto (so the
+/// instructions may not be consecutive).
+///
+/// The files contributing to a basic block:  The lines contributing to a
+/// block can come from multiple files via function inlining and
+/// definitions in include files.
+class source_linest
+{
+public:
+  /// A set of source code line numbers from a single a function
+  typedef std::set<unsigned int> linest;
+  /// A set of source code line numbers from multiple functions
+  /// (represented by a mapping from a string "file:function" to a set
+  /// of line numbers from that function in that file).
+  typedef std::map<std::string, linest> block_linest;
+  block_linest block_lines;
+
+  /// Insert a source code line number given by a source location into
+  /// the set of source code line numbers.
+  ///
+  /// @param loc is a source location
+  void insert(source_locationt const &loc)
+  {
+    if(loc.get_file().empty() || loc.is_built_in())
+      return;
+    std::string file=id2string(loc.get_file());
+
+    if(loc.get_function().empty())
+      return;
+    std::string func=id2string(loc.get_function());
+
+    if(loc.get_line().empty())
+      return;
+    unsigned int line=safe_string2unsigned(id2string(loc.get_line()));
+
+    block_lines[file+":"+func].insert(line);
+  }
+
+  /// Print a list of objects to a stream separated by a delimeter.
+  ///
+  /// @param os is an output stream
+  /// @param start is an iterator pointing to the first object
+  /// @param end is an iterator pointing past the last object
+  /// @param delim is a string to use as the separating delimeter
+  template <typename Iter>
+  void to_stream(std::ostream &os,
+                 Iter start,
+                 Iter end,
+                 std::string const &delim) const
+  {
+    if(start==end)
+      return;
+
+    to_stream(os, *start++);
+    while(start!=end) { os << delim; to_stream(os, *start++); }
+  }
+
+  /// A string representing the lines of source code in a goto basic block.
+  ///
+  /// A source code line is represented by a triple
+  /// "file:function:line" for a given line in a given function in a
+  /// given file.  Triples are ordered by sorting lexicographically.
+  /// Triples from the same function are grouped (collapsed) into a
+  /// single triple "file:function:n1,n2,n3,n4" where n1, n2, n3, n4
+  /// are line numbers in ascending order.  Triples are separated by a
+  /// semicolon.  Blocks are usually so small that collapsing consecutive
+  /// integers into a group n1-n4 is not worth the effort.
+  ///
+  /// @return The string representing the lines of source code in a
+  /// goto basic block.
+  std::string to_string() const
+  {
+    std::stringstream ss;
+    to_stream(ss, block_lines);
+    return ss.str();
+  }
+
+  /// Print "file:function:lineset" separated by ";" to a stream
+  void to_stream(std::ostream &os, block_linest const &block_lines) const
+  {
+    to_stream(os, block_lines.cbegin(), block_lines.cend(), "; ");
+  }
+
+  /// Print "file:function" and "lineset" separated by ":" to a stream
+  void to_stream(std::ostream &os, std::pair<std::string, linest> const &pair)
+    const
+  {
+    os << pair.first << ":";
+    to_stream(os, pair.second);
+  }
+
+  /// Print line numbers separated by "," to a stream
+  void to_stream(std::ostream &os, linest const &lines) const
+  {
+    to_stream(os, lines.cbegin(), lines.cend(), ",");
+  }
+
+  /// Print line number to a stream
+  void to_stream(std::ostream &os, unsigned int const line) const
+  {
+    os << line;
+  }
+};
+
 class basic_blockst
 {
 public:
@@ -78,7 +195,10 @@ public:
       // update lines belonging to block
       const irep_idt &line=it->source_location.get_line();
       if(!line.empty())
+      {
         block_info.lines.insert(unsafe_string2unsigned(id2string(line)));
+        block_info.source_lines.insert(it->source_location);
+      }
 
       // set representative program location to instrument
       if(!it->source_location.is_nil() &&
@@ -130,6 +250,15 @@ public:
   {
     INVARIANT(block_nr<block_infos.size(), "block number out of range");
     return block_infos.at(block_nr).source_location;
+  }
+
+  /// \param block_nr a block number
+  /// \return  the source lines contributing to the given block
+  const source_linest &source_lines_of(
+    unsigned block_nr)
+  {
+    INVARIANT(block_nr<block_infos.size(), "block number out of range");
+    return block_infos.at(block_nr).source_lines;
   }
 
   /// Select an instruction to be instrumented for each basic block such that
@@ -268,6 +397,8 @@ protected:
     // map block numbers to source code locations
     /// the set of lines belonging to this block
     std::unordered_set<unsigned> lines;
+    /// the set of lines belonging to this block with file names
+    source_linest source_lines;
   };
 
   typedef std::vector<block_infot> block_infost;
@@ -1330,7 +1461,10 @@ void instrument_cover_goals(
              !source_location.is_built_in() &&
              cover_curr_function)
           {
-            std::string comment="block "+b;
+            std::string comment="block "+b
+              + " (lines "
+              + basic_blocks.source_lines_of(block_nr).to_string()
+              + ")";
             const irep_idt function=i_it->function;
             goto_program.insert_before_swap(i_it);
             i_it->make_assertion(false_exprt());
