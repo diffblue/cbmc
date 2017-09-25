@@ -68,7 +68,7 @@ public:
 
 protected:
   const optionst &options;
-  symbol_tablet new_symbol_table;
+  concrete_symbol_tablet new_symbol_table;
   namespacet ns;
   symex_target_equationt equation;
   symex_bmct symex;

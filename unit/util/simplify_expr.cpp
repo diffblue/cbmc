@@ -18,7 +18,7 @@
 
 TEST_CASE("Simplify pointer_offset(address of array index)")
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   array_typet array_type(char_type(), from_integer(2, size_type()));
@@ -38,7 +38,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)")
 
 TEST_CASE("Simplify const pointer offset")
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   // build a numeric constant of some pointer type

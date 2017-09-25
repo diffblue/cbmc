@@ -42,7 +42,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       java_lang->parse(java_code_stream, "I.class");
 
-      symbol_tablet new_symbol_table;
+      concrete_symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
       java_lang->final(new_symbol_table);
@@ -63,7 +63,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       java_lang->parse(java_code_stream, "A.class");
 
-      symbol_tablet new_symbol_table;
+      concrete_symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
       java_lang->final(new_symbol_table);
@@ -84,7 +84,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       java_lang->parse(java_code_stream, "C.class");
 
-      symbol_tablet new_symbol_table;
+      concrete_symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
       java_lang->final(new_symbol_table);
@@ -105,7 +105,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       java_lang->parse(java_code_stream, "Implementor.class");
 
-      symbol_tablet new_symbol_table;
+      concrete_symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
       java_lang->final(new_symbol_table);
@@ -127,7 +127,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       java_lang->parse(java_code_stream, "Extendor.class");
 
-      symbol_tablet new_symbol_table;
+      concrete_symbol_tablet new_symbol_table;
       java_lang->typecheck(new_symbol_table, "");
 
       java_lang->final(new_symbol_table);

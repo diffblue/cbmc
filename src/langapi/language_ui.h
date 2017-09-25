@@ -21,7 +21,7 @@ class language_uit:public messaget
 {
 public:
   language_filest language_files;
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
 
   language_uit(
     const cmdlinet &cmdline,

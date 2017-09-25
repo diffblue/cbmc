@@ -24,7 +24,7 @@ static exprt actual(
 {
   const typet char_type=unsignedbv_typet(16);
   const constant_exprt chr=from_integer(int_value, char_type);
-  symbol_tablet symtab;
+  concrete_symbol_tablet symtab;
   const namespacet ns(symtab);
 
   return simplify_expr(

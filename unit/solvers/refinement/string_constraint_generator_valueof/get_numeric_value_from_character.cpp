@@ -25,7 +25,7 @@ static exprt actual(
   const unsigned long radix_ul)
 {
   const constant_exprt chr=from_integer(character, char_type);
-  symbol_tablet symtab;
+  concrete_symbol_tablet symtab;
   const namespacet ns(symtab);
   return simplify_expr(
     get_numeric_value_from_character(

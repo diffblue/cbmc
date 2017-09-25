@@ -58,7 +58,7 @@ SCENARIO("ai_domain_baset::ai_simplify_lhs",
   ansi_c_languaget language;
   language.set_message_handler(message_handler);
 
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   constant_simplification_mockt mock_ai_domain;

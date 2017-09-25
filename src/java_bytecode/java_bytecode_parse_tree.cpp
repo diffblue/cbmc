@@ -82,7 +82,7 @@ void java_bytecode_parse_treet::classt::output(std::ostream &out) const
 
 void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   out << '@' << type2java(type, ns);
@@ -108,7 +108,7 @@ void java_bytecode_parse_treet::annotationt::output(std::ostream &out) const
 void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
   std::ostream &out) const
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   out << '"' << element_name << '"' << '=';
@@ -117,7 +117,7 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
 
 void java_bytecode_parse_treet::methodt::output(std::ostream &out) const
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   for(const auto &annotation : annotations)

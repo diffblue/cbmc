@@ -5,6 +5,20 @@
 #include <ostream>
 #include <util/invariant.h>
 
+
+/// Find a symbol in the symbol table.
+/// \param identifier: The name of the symbol to look for
+/// \return Returns an optional reference to the found symbol, without a value
+///   if a symbol with the given name does not exist in the symbol table
+symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
+  const irep_idt &identifier) const
+{
+  symbolst::const_iterator it=symbols.find(identifier);
+  if(it==symbols.end())
+    return opt_const_symbol_reft();
+  return std::cref(it->second);
+}
+
 /// Add a new symbol to the symbol table
 /// \param symbol: The symbol to be added to the symbol table
 /// \return Returns true if the process failed, which should only happen if
@@ -14,41 +28,10 @@ bool symbol_tablet::add(const symbolt &symbol)
   return !insert(symbol).second;
 }
 
-std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
-{
-  // Add the symbol to the table or retrieve existing symbol with the same name
-  std::pair<symbolst::iterator, bool> result=
-    internal_symbols.emplace(symbol.name, std::move(symbol));
-  symbolt &new_symbol=result.first->second;
-  if(result.second)
-  {
-    try
-    {
-      symbol_base_mapt::iterator base_result=
-        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
-      try
-      {
-        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
-      }
-      catch(...)
-      {
-        internal_symbol_base_map.erase(base_result);
-        throw;
-      }
-    }
-    catch(...)
-    {
-      internal_symbols.erase(result.first);
-      throw;
-    }
-  }
-  return std::make_pair(std::ref(new_symbol), result.second);
-}
-
 /// Move a symbol into the symbol table. If there is already a symbol with the
 /// same name then symbol is unchanged, new_symbol points to the symbol with the
 /// same name and true is returned. Otherwise, the symbol is moved into the
-/// symbol table, symbol is set to be empty, new_symbol points to its new
+/// symbol table, symbol is destroyed, new_symbol points to its new
 /// location in the symbol table and false is returned
 /// \param symbol: The symbol to be added to the symbol table
 /// \param new_symbol: Pointer which the function will set to either point to
@@ -93,7 +76,71 @@ bool symbol_tablet::remove(const irep_idt &name)
   return false;
 }
 
-void symbol_tablet::erase(const symbolst::const_iterator &entry)
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+void symbol_tablet::show(std::ostream &out) const
+{
+  out << "\n" << "Symbols:" << "\n";
+
+  forall_symbols(it, symbols)
+    out << it->second;
+}
+
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+/// \param symbol_table: The symbol table to print out
+std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
+{
+  symbol_table.show(out);
+  return out;
+}
+
+
+/// Find a symbol in the symbol table.
+/// \param identifier: The name of the symbol to look for
+/// \return Returns an optional reference to the found symbol, without a value
+///   if a symbol with the given name does not exist in the symbol table
+symbol_tablet::opt_symbol_reft concrete_symbol_tablet::get_writeable(
+  const irep_idt &identifier)
+{
+  symbolst::iterator it=internal_symbols.find(identifier);
+  if(it==symbols.end())
+    return opt_symbol_reft();
+  return std::ref(it->second);
+}
+
+std::pair<symbolt &, bool> concrete_symbol_tablet::insert(symbolt symbol)
+{
+  // Add the symbol to the table or retrieve existing symbol with the same name
+  std::pair<symbolst::iterator, bool> result=
+    internal_symbols.emplace(symbol.name, std::move(symbol));
+  symbolt &new_symbol=result.first->second;
+  if(result.second)
+  {
+    try
+    {
+      symbol_base_mapt::iterator base_result=
+        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
+      try
+      {
+        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
+      }
+      catch(...)
+      {
+        internal_symbol_base_map.erase(base_result);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      internal_symbols.erase(result.first);
+      throw;
+    }
+  }
+  return std::make_pair(std::ref(new_symbol), result.second);
+}
+
+void concrete_symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
 
@@ -125,48 +172,4 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
   internal_symbol_module_map.erase(module_it);
 
   internal_symbols.erase(entry);
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-void symbol_tablet::show(std::ostream &out) const
-{
-  out << "\n" << "Symbols:" << "\n";
-
-  forall_symbols(it, symbols)
-    out << it->second;
-}
-
-/// Find a symbol in the symbol table. Throws a string if no such symbol is
-/// found.
-/// \param identifier: The name of the symbol to look for
-/// \return The symbol in the symbol table with the correct name
-symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
-  const irep_idt &identifier) const
-{
-  symbolst::const_iterator it=symbols.find(identifier);
-  if(it==symbols.end())
-    return opt_const_symbol_reft();
-  return std::ref(it->second);
-}
-
-/// Find a symbol in the symbol table.
-/// \param identifier: The name of the symbol to look for
-/// \return The symbol in the symbol table with the correct name
-symbol_tablet::opt_symbol_reft symbol_tablet::get_writeable(
-  const irep_idt &identifier)
-{
-  symbolst::iterator it=internal_symbols.find(identifier);
-  if(it==symbols.end())
-    return opt_symbol_reft();
-  return std::ref(it->second);
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-/// \param symbol_table: The symbol table to print out
-std::ostream &operator << (std::ostream &out, const symbol_tablet &symbol_table)
-{
-  symbol_table.show(out);
-  return out;
 }

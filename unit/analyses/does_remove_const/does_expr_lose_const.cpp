@@ -24,7 +24,7 @@
 SCENARIO("does_expr_lose_const",
   "[core][analyses][does_remove_const][does_expr_remove_const]")
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   goto_programt program;
   does_remove_constt does_remove_const(program, ns);

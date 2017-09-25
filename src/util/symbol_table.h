@@ -35,7 +35,7 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
       it!=it_end; ++it)
 
 
-/// \brief The symbol table
+/// \brief The base for symbol table implementations
 /// \ingroup gr_symbol_table
 class symbol_tablet
 {
@@ -45,63 +45,29 @@ public:
     opt_const_symbol_reft;
   typedef optionalt<std::reference_wrapper<symbolt>> opt_symbol_reft;
 
-private:
-  symbolst internal_symbols;
-  symbol_base_mapt internal_symbol_base_map;
-  symbol_module_mapt internal_symbol_module_map;
-
 public:
   const symbolst &symbols;
   const symbol_base_mapt &symbol_base_map;
   const symbol_module_mapt &symbol_module_map;
 
-  symbol_tablet()
-    : symbols(internal_symbols),
-      symbol_base_map(internal_symbol_base_map),
-      symbol_module_map(internal_symbol_module_map)
+protected:
+  symbol_tablet(
+      const symbolst &symbols,
+      const symbol_base_mapt &symbol_base_map,
+      const symbol_module_mapt &symbol_module_map)
+    : symbols(symbols),
+      symbol_base_map(symbol_base_map),
+      symbol_module_map(symbol_module_map)
   {
   }
 
-  symbol_tablet(const symbol_tablet &other)
-    : internal_symbols(other.internal_symbols),
-      internal_symbol_base_map(other.internal_symbol_base_map),
-      internal_symbol_module_map(other.symbol_module_map),
-      symbols(internal_symbols),
-      symbol_base_map(internal_symbol_base_map),
-      symbol_module_map(internal_symbol_module_map)
-  {
-  }
-
-  symbol_tablet &operator=(const symbol_tablet &other)
-  {
-    // Copy to temp and then call move assignment
-    return *this=symbol_tablet(other);
-  }
-
-  symbol_tablet(symbol_tablet &&other)
-    : internal_symbols(std::move(other.internal_symbols)),
-      internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
-      internal_symbol_module_map(std::move(other.symbol_module_map)),
-      symbols(internal_symbols),
-      symbol_base_map(internal_symbol_base_map),
-      symbol_module_map(internal_symbol_module_map)
-  {
-  }
-
-  symbol_tablet &operator=(symbol_tablet &&other)
-  {
-    internal_symbols=std::move(other.internal_symbols);
-    internal_symbol_base_map=std::move(other.internal_symbol_base_map);
-    internal_symbol_module_map=std::move(other.symbol_module_map);
-    return *this;
-  }
-
+public:
   bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name)!=symbols.end();
   }
   opt_const_symbol_reft lookup(const irep_idt &identifier) const;
-  opt_symbol_reft get_writeable(const irep_idt &identifier);
+  virtual opt_symbol_reft get_writeable(const irep_idt &identifier)=0;
 
   bool add(const symbolt &symbol);
   /// Move or copy a new symbol to the symbol table
@@ -112,32 +78,104 @@ public:
   /// \return Returns a reference to the newly inserted symbol or to the
   /// existing symbol if a symbol with the same name already exists in the
   /// symbol table, along with a bool that is true if a new symbol was inserted.
-  std::pair<symbolt &, bool> insert(symbolt symbol);
+  virtual std::pair<symbolt &, bool> insert(symbolt symbol)=0;
   bool move(symbolt &symbol, symbolt *&new_symbol);
 
-  void clear()
-  {
-    internal_symbols.clear();
-    internal_symbol_base_map.clear();
-    internal_symbol_module_map.clear();
-  }
-
   bool remove(const irep_idt &name);
-
-  void erase(const symbolst::const_iterator &entry);
+  virtual void erase(const symbolst::const_iterator &entry)=0;
+  virtual void clear()=0;
 
   void show(std::ostream &out) const;
+};
 
-  void swap(symbol_tablet &other)
+std::ostream &operator<<(
+  std::ostream &out,
+  const symbol_tablet &symbol_table);
+
+
+/// \brief A symbol table that actually contains the maps of symbols
+/// \ingroup gr_symbol_table
+class concrete_symbol_tablet:public symbol_tablet
+{
+private:
+  symbolst internal_symbols;
+  symbol_base_mapt internal_symbol_base_map;
+  symbol_module_mapt internal_symbol_module_map;
+
+public:
+  concrete_symbol_tablet()
+    : symbol_tablet(
+        internal_symbols,
+        internal_symbol_base_map,
+        internal_symbol_module_map)
+  {
+  }
+
+  concrete_symbol_tablet(const symbol_tablet &other)
+    : symbol_tablet(
+        internal_symbols,
+        internal_symbol_base_map,
+        internal_symbol_module_map),
+      internal_symbols(other.symbols),
+      internal_symbol_base_map(other.symbol_base_map),
+      internal_symbol_module_map(other.symbol_module_map)
+  {
+  }
+
+  concrete_symbol_tablet &operator=(const symbol_tablet &other)
+  {
+    // Copy to temp and then call move assignment
+    return *this=concrete_symbol_tablet(other);
+  }
+
+  concrete_symbol_tablet(const concrete_symbol_tablet &other)
+    : concrete_symbol_tablet(static_cast<const symbol_tablet &>(other))
+  {
+  }
+
+  concrete_symbol_tablet &operator=(const concrete_symbol_tablet &other)
+  {
+    // Copy to temp and then call move assignment
+    return *this=concrete_symbol_tablet(other);
+  }
+
+  concrete_symbol_tablet(concrete_symbol_tablet &&other)
+    : symbol_tablet(
+        internal_symbols,
+        internal_symbol_base_map,
+        internal_symbol_module_map),
+      internal_symbols(std::move(other.internal_symbols)),
+      internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
+      internal_symbol_module_map(std::move(other.symbol_module_map))
+  {
+  }
+
+  concrete_symbol_tablet &operator=(concrete_symbol_tablet &&other)
+  {
+    internal_symbols=std::move(other.internal_symbols);
+    internal_symbol_base_map=std::move(other.internal_symbol_base_map);
+    internal_symbol_module_map=std::move(other.symbol_module_map);
+    return *this;
+  }
+
+  void swap(concrete_symbol_tablet &other)
   {
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
-};
 
-std::ostream &operator << (
-  std::ostream &out,
-  const symbol_tablet &symbol_table);
+  virtual opt_symbol_reft get_writeable(const irep_idt &identifier) override;
+
+  virtual std::pair<symbolt &, bool> insert(symbolt symbol) override;
+
+  virtual void erase(const symbolst::const_iterator &entry) override;
+  virtual void clear() override
+  {
+    internal_symbols.clear();
+    internal_symbol_base_map.clear();
+    internal_symbol_module_map.clear();
+  }
+};
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H

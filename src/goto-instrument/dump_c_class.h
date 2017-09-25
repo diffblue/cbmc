@@ -48,7 +48,7 @@ public:
 
 protected:
   const goto_functionst &goto_functions;
-  symbol_tablet copied_symbol_table;
+  concrete_symbol_tablet copied_symbol_table;
   const namespacet ns;
   std::unique_ptr<languaget> language;
   const bool harness;

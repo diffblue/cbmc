@@ -23,7 +23,7 @@
 SCENARIO("is_type_at_least_as_const",
   "[core][analyses][does_remove_const][is_type_at_least_as_const]")
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   goto_programt program;
   does_remove_constt does_remove_const(program, ns);
