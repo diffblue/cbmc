@@ -134,7 +134,7 @@ void goto_program2codet::scan_for_varargs()
     system_headers.insert("stdarg.h");
 
     code_typet &code_type=
-      to_code_type(symbol_table.get_writeable(func_name).type);
+      to_code_type(symbol_table.get_writeable(func_name)->get().type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator
@@ -1668,7 +1668,7 @@ void goto_program2codet::remove_const(typet &type)
     if(!const_removed.insert(identifier).second)
       return;
 
-    symbolt &symbol=symbol_table.get_writeable(identifier);
+    symbolt &symbol=*symbol_table.get_writeable(identifier);
     assert(symbol.is_type);
 
     remove_const(symbol.type);

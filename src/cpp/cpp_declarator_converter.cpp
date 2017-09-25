@@ -98,7 +98,10 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // try static first
-    if(!cpp_typecheck.symbol_table.has_symbol(final_identifier))
+    symbol_tablet::opt_symbol_reft maybe_symbol=
+      cpp_typecheck.symbol_table.get_writeable(final_identifier);
+
+    if(!maybe_symbol)
     {
       // adjust type if it's a non-static member function
       if(final_type.id()==ID_code)
@@ -108,7 +111,8 @@ symbolt &cpp_declarator_convertert::convert(
       get_final_identifier();
 
       // try again
-      if(!cpp_typecheck.symbol_table.has_symbol(final_identifier))
+      maybe_symbol=cpp_typecheck.symbol_table.get_writeable(final_identifier);
+      if(!maybe_symbol)
       {
         cpp_typecheck.error().source_location=
           declarator.name().source_location();
@@ -120,7 +124,7 @@ symbolt &cpp_declarator_convertert::convert(
       }
     }
 
-    symbolt &symbol=cpp_typecheck.symbol_table.get_writeable(final_identifier);
+    symbolt &symbol=*maybe_symbol;
 
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
@@ -187,10 +191,11 @@ symbolt &cpp_declarator_convertert::convert(
     }
 
     // already there?
-    if(!cpp_typecheck.symbol_table.has_symbol(final_identifier))
+    symbol_tablet::opt_symbol_reft maybe_symbol=
+      cpp_typecheck.symbol_table.get_writeable(final_identifier);
+    if(!maybe_symbol)
       return convert_new_symbol(storage_spec, member_spec, declarator);
-
-    symbolt &symbol=cpp_typecheck.symbol_table.get_writeable(final_identifier);
+    symbolt &symbol=*maybe_symbol;
 
     if(!storage_spec.is_extern())
       symbol.is_extern = false;

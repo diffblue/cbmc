@@ -153,7 +153,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   for(const irep_idt &d_it : dynamic_initializations)
   {
-    const symbolt &symbol=symbol_table.lookup(d_it);
+    const symbolt &symbol=*symbol_table.lookup(d_it);
 
     if(symbol.is_extern)
       continue;
@@ -178,7 +178,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
       // Make it nil to get zero initialization by
       // __CPROVER_initialize
-      symbol_table.get_writeable(d_it).value.make_nil();
+      symbol_table.get_writeable(d_it)->get().value.make_nil();
     }
     else
     {
@@ -231,7 +231,7 @@ void cpp_typecheckt::do_not_typechecked()
          symbol.value.get_bool("is_used"))
       {
         assert(symbol.type.id()==ID_code);
-        symbolt &symbol=symbol_table.get_writeable(named_symbol.first);
+        symbolt &symbol=*symbol_table.get_writeable(named_symbol.first);
 
         if(symbol.base_name=="operator=")
         {
@@ -260,7 +260,7 @@ void cpp_typecheckt::do_not_typechecked()
   for(const auto &named_symbol : symbol_table.symbols)
   {
     if(named_symbol.second.value.id()=="cpp_not_typechecked")
-      symbol_table.get_writeable(named_symbol.first).value.make_nil();
+      symbol_table.get_writeable(named_symbol.first)->get().value.make_nil();
   }
 }
 
@@ -285,8 +285,8 @@ void cpp_typecheckt::clean_up()
             symbol.type.id()==ID_union)
     {
       // remove methods from 'components'
-      struct_union_typet &struct_union_type=
-        to_struct_union_type(symbol_table.get_writeable(cur_it->first).type);
+      struct_union_typet &struct_union_type=to_struct_union_type(
+        symbol_table.get_writeable(cur_it->first)->get().type);
 
       const struct_union_typet::componentst &components=
         struct_union_type.components();

@@ -725,7 +725,7 @@ void compilet::convert_symbols(goto_functionst &dest)
       {
         debug() << "Compiling " << s_it->first << eom;
         converter.convert_function(s_it->first);
-        symbol_table.get_writeable(*it).value=exprt("compiled");
+        symbol_table.get_writeable(*it)->get().value=exprt("compiled");
       }
     }
   }

@@ -121,7 +121,7 @@ void c_typecheck_baset::typecheck_symbol(symbolt &symbol)
       throw 0;
     }
 
-    symbolt & existing_symbol=symbol_table.get_writeable(symbol.name);
+    symbolt & existing_symbol=*symbol_table.get_writeable(symbol.name);
     if(symbol.is_type)
       typecheck_redefinition_type(existing_symbol, symbol);
     else
@@ -733,7 +733,7 @@ void c_typecheck_baset::typecheck_declaration(
       // add code contract (if any); we typecheck this after the
       // function body done above, so as to have parameter symbols
       // available
-      symbolt &new_symbol=symbol_table.get_writeable(identifier);
+      symbolt &new_symbol=*symbol_table.get_writeable(identifier);
 
       typecheck_spec_expr(contract, ID_C_spec_requires);
 

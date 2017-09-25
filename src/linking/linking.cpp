@@ -1210,7 +1210,7 @@ void linkingt::rename_symbols(const id_sett &needs_to_be_renamed)
 
   for(const irep_idt &id : needs_to_be_renamed)
   {
-    symbolt &new_symbol=src_symbol_table.get_writeable(id);
+    symbolt &new_symbol=*src_symbol_table.get_writeable(id);
 
     irep_idt new_identifier;
 
@@ -1273,7 +1273,7 @@ void linkingt::copy_symbols()
   // Now do the collisions
   for(const irep_idt &collision : collisions)
   {
-    symbolt &old_symbol=main_symbol_table.get_writeable(collision);
+    symbolt &old_symbol=*main_symbol_table.get_writeable(collision);
     symbolt &new_symbol=src_symbols.at(collision);
 
     if(new_symbol.is_type)
@@ -1290,7 +1290,7 @@ void linkingt::copy_symbols()
        named_symbol.second.value.is_not_nil())
     {
       object_type_updates(
-        main_symbol_table.get_writeable(named_symbol.first).value);
+        main_symbol_table.get_writeable(named_symbol.first)->get().value);
     }
   }
 }

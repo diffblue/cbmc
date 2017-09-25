@@ -81,7 +81,7 @@ bool rebuild_goto_start_functiont::operator()()
 irep_idt rebuild_goto_start_functiont::get_entry_point_mode() const
 {
   const symbolt &current_entry_point=
-    symbol_table.lookup(goto_functionst::entry_point());
+    *symbol_table.lookup(goto_functionst::entry_point());
   return current_entry_point.mode;
 }
 

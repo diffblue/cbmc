@@ -75,7 +75,7 @@ void cpp_typecheckt::convert_anonymous_union(
 
   // do scoping
   symbolt union_symbol=
-    symbol_table.get_writeable(follow(symbol.type).get(ID_name));
+    *symbol_table.get_writeable(follow(symbol.type).get(ID_name));
   const irept::subt &components=union_symbol.type.add(ID_components).get_sub();
 
   forall_irep(it, components)
@@ -105,7 +105,7 @@ void cpp_typecheckt::convert_anonymous_union(
     id.is_member=true;
   }
 
-  symbol_table.get_writeable(union_symbol.name).type.set(
+  symbol_table.get_writeable(union_symbol.name)->get().type.set(
     "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);

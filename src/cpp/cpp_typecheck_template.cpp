@@ -107,10 +107,12 @@ void cpp_typecheckt::typecheck_class_template(
 
   // check if we have it already
 
-  if(symbol_table.has_symbol(symbol_name))
+  symbol_tablet::opt_symbol_reft maybe_symbol=
+    symbol_table.get_writeable(symbol_name);
+  if(maybe_symbol)
   {
     // there already
-    auto &previous_symbol=symbol_table.get_writeable(symbol_name);
+    symbolt &previous_symbol=*maybe_symbol;
     cpp_declarationt &previous_declaration=
       to_cpp_declaration(previous_symbol.type);
 
@@ -263,7 +265,7 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value)
     {
-      symbol_table.get_writeable(symbol_name).type.swap(declaration);
+      symbol_table.get_writeable(symbol_name)->get().type.swap(declaration);
       cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 
@@ -382,7 +384,7 @@ void cpp_typecheckt::typecheck_class_template_member(
 
   const cpp_idt &cpp_id=**(id_set.begin());
   symbolt &template_symbol=
-    symbol_table.get_writeable(cpp_id.identifier);
+    *symbol_table.get_writeable(cpp_id.identifier);
 
   exprt &template_methods=static_cast<exprt &>(
     template_symbol.value.add("template_methods"));

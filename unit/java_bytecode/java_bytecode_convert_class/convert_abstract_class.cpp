@@ -29,7 +29,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
 
       THEN("The symbol type should be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::I");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::I");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -44,7 +44,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
         load_java_class("A", "./java_bytecode/java_bytecode_convert_class");
       THEN("The symbol type should be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::A");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::A");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -59,7 +59,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
         load_java_class("C", "./java_bytecode/java_bytecode_convert_class");
       THEN("The symbol type should not be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::C");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::C");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -77,7 +77,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::Implementor");
+          *new_symbol_table.lookup("java::Implementor");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -95,7 +95,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::Extender");
+          *new_symbol_table.lookup("java::Extender");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);

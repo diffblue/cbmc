@@ -41,6 +41,9 @@ class symbol_tablet
 {
 public:
   typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
+  typedef optionalt<std::reference_wrapper<const symbolt>>
+    opt_const_symbol_reft;
+  typedef optionalt<std::reference_wrapper<symbolt>> opt_symbol_reft;
 
 private:
   symbolst internal_symbols;
@@ -95,8 +98,15 @@ public:
     return *this;
   }
 
+  bool has_symbol(const irep_idt &name) const
+  {
+    return symbols.find(name)!=symbols.end();
+  }
+  opt_const_symbol_reft lookup(const irep_idt &identifier) const;
+  opt_symbol_reft get_writeable(const irep_idt &identifier);
+
   bool add(const symbolt &symbol);
-  optionalt<std::reference_wrapper<symbolt>> insert(symbolt &&symbol);
+  opt_symbol_reft insert(symbolt &&symbol);
   bool move(symbolt &symbol, symbolt *&new_symbol);
 private:
   void add_base_and_module(symbolst::iterator added_symbol);
@@ -121,14 +131,6 @@ public:
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
-
-  bool has_symbol(const irep_idt &name) const
-  {
-    return symbols.find(name)!=symbols.end();
-  }
-
-  const symbolt &lookup(const irep_idt &identifier) const;
-  symbolt &get_writeable(const irep_idt &identifier);
 };
 
 std::ostream &operator << (

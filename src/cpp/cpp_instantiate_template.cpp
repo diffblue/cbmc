@@ -372,7 +372,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // been instantiated using these arguments
   {
     // need non-const handle on template symbol
-    symbolt &s=symbol_table.get_writeable(template_symbol.name);
+    symbolt &s=*symbol_table.get_writeable(template_symbol.name);
     irept &instantiated_with=s.value.add("instantiated_with");
     instantiated_with.get_sub().push_back(specialization_template_args);
   }
@@ -451,7 +451,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   if(is_template_method)
   {
-    symbolt &symb=symbol_table.get_writeable(class_name);
+    symbolt &symb=*symbol_table.get_writeable(class_name);
 
     assert(new_decl.declarators().size() == 1);
 
