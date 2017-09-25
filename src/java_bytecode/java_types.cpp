@@ -261,7 +261,8 @@ typet java_type_from_string(
       const typet subtype=
         java_type_from_string(src.substr(1, std::string::npos), class_name);
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
-         subtype_letter=='[')   // Array-of-arrays
+         subtype_letter=='[' || // Array-of-arrays
+         subtype_letter=='T')   // Array of generic types
         subtype_letter='A';
       typet tmp=java_array_type(std::tolower(subtype_letter));
       tmp.subtype().set(ID_C_element_type, subtype);
