@@ -12,6 +12,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "message.h"
 
+#define UI_MESSAGE_OPTIONS \
+  "(json-ui)" \
+  "(xml-ui)" \
+  // End of options
+
 class ui_message_handlert:public message_handlert
 {
 public:

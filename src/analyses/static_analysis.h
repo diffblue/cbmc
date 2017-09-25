@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory>
 #include <unordered_set>
 
+#include <util/json.h>
 #include <util/make_unique.h>
 
 #include <goto-programs/goto_functions.h>
@@ -157,6 +158,11 @@ public:
     output(goto_program, "", out);
   }
 
+  jsont output_json(const goto_programt &goto_program) const
+  {
+    return output_json(goto_program, "");
+  }
+
   virtual bool has_location(locationt l) const=0;
 
   void insert(locationt l)
@@ -182,6 +188,10 @@ protected:
     const goto_programt &goto_program,
     const irep_idt &identifier,
     std::ostream &out) const;
+
+  virtual jsont output_json(
+    const goto_programt &goto_program,
+    const irep_idt &identifier) const;
 
   typedef std::map<unsigned, locationt> working_sett;
 

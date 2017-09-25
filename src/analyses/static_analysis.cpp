@@ -110,6 +110,30 @@ void static_analysis_baset::output(
   }
 }
 
+jsont static_analysis_baset::output_json(
+  const goto_programt &goto_program,
+  const irep_idt &identifier) const
+{
+  json_arrayt retval;
+
+  forall_goto_program_instructions(i_it, goto_program)
+  {
+    std::ostringstream out;
+    out << "**** " << i_it->location_number << " "
+        << i_it->source_location << "\n";
+
+    get_state(i_it).output(ns, out);
+    out << "\n";
+    #if 1
+    goto_program.output_instruction(ns, identifier, out, i_it);
+    out << "\n";
+    #endif
+    retval.push_back(json_stringt(out.str()));
+  }
+
+  return retval;
+}
+
 void static_analysis_baset::generate_states(
   const goto_functionst &goto_functions)
 {
