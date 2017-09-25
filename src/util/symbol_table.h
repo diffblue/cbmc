@@ -1,23 +1,12 @@
-/*******************************************************************\
+// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
 
-Module:
+/// \file
+/// Symbol table
 
-Author: Daniel Kroening, kroening@kroening.com
-
-\*******************************************************************/
-
+/// \defgroup gr_symbol_table Symbol Table
 
 #ifndef CPROVER_UTIL_SYMBOL_TABLE_H
 #define CPROVER_UTIL_SYMBOL_TABLE_H
-
-/*! \file util/symbol_table.h
- * \brief Symbol table
- *
- * \author Daniel Kroening <kroening@kroening.com>
-*/
-
-/*! \defgroup gr_symbol_table Symbol Table
-*/
 
 #include <iosfwd>
 #include <map>
@@ -26,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/optional.h>
 
 #include "symbol.h"
+
 
 #define forall_symbols(it, expr) \
   for(symbol_tablet::symbolst::const_iterator it=(expr).begin(); \
@@ -48,9 +38,9 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
                                          it_end=(expr).upper_bound(module); \
       it!=it_end; ++it)
 
-/*! \brief The symbol table
-    \ingroup gr_symbol_table
-*/
+
+/// \brief The symbol table
+/// \ingroup gr_symbol_table
 class symbol_tablet
 {
 public:
