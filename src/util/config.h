@@ -27,17 +27,17 @@ public:
   struct ansi_ct
   {
     // for ANSI-C
-    unsigned int_width;
-    unsigned long_int_width;
-    unsigned bool_width;
-    unsigned char_width;
-    unsigned short_int_width;
-    unsigned long_long_int_width;
-    unsigned pointer_width;
-    unsigned single_width;
-    unsigned double_width;
-    unsigned long_double_width;
-    unsigned wchar_t_width;
+    std::size_t int_width;
+    std::size_t long_int_width;
+    std::size_t bool_width;
+    std::size_t char_width;
+    std::size_t short_int_width;
+    std::size_t long_long_int_width;
+    std::size_t pointer_width;
+    std::size_t single_width;
+    std::size_t double_width;
+    std::size_t long_double_width;
+    std::size_t wchar_t_width;
 
     // various language options
     bool char_is_unsigned, wchar_t_is_unsigned;
@@ -65,11 +65,11 @@ public:
     void set_LP32();  // int=16, long=32, pointer=32
 
     // minimum alignment (in structs) measured in bytes
-    unsigned alignment;
+    std::size_t alignment;
 
     // maximum minimum size of the operands for a machine
     // instruction (in bytes)
-    unsigned memory_operand_size;
+    std::size_t memory_operand_size;
 
     enum class endiannesst { NO_ENDIANNESS, IS_LITTLE_ENDIAN, IS_BIG_ENDIAN };
     endiannesst endianness;
@@ -119,7 +119,7 @@ public:
 
     bool string_abstraction;
 
-    static const unsigned default_object_bits=8;
+    static const std::size_t default_object_bits=8;
   } ansi_c;
 
   struct cppt
@@ -132,7 +132,7 @@ public:
     void set_cpp11() { cpp_standard=cpp_standardt::CPP11; }
     void set_cpp14() { cpp_standard=cpp_standardt::CPP14; }
 
-    static const unsigned default_object_bits=8;
+    static const std::size_t default_object_bits=8;
   } cpp;
 
   struct verilogt
@@ -146,16 +146,16 @@ public:
     classpatht classpath;
     irep_idt main_class;
 
-    static const unsigned default_object_bits=16;
+    static const std::size_t default_object_bits=16;
   } java;
 
   struct bv_encodingt
   {
     // number of bits to encode heap object addresses
-    unsigned object_bits;
+    std::size_t object_bits;
     bool is_object_bits_default;
 
-    static const unsigned default_object_bits=8;
+    static const std::size_t default_object_bits=8;
   } bv_encoding;
 
   // this is the function to start executing

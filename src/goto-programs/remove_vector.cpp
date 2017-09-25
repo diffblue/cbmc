@@ -97,7 +97,7 @@ static void remove_vector(exprt &expr)
       array_exprt array_expr(array_type);
       array_expr.operands().resize(integer2size_t(dimension));
 
-      for(unsigned i=0; i<array_expr.operands().size(); i++)
+      for(std::size_t i=0; i<array_expr.operands().size(); i++)
       {
         exprt index=from_integer(i, array_type.size().type());
 
@@ -123,7 +123,7 @@ static void remove_vector(exprt &expr)
       array_exprt array_expr(array_type);
       array_expr.operands().resize(integer2size_t(dimension));
 
-      for(unsigned i=0; i<array_expr.operands().size(); i++)
+      for(std::size_t i=0; i<array_expr.operands().size(); i++)
       {
         exprt index=from_integer(i, array_type.size().type());
 

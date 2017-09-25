@@ -20,26 +20,29 @@ Author: Thomas Kiley, thomas.kiley@diffblue.com
 /// for the different sub trees.
 /// \param include_comments: when writing JSON, should the comments
 /// sub tree be included.
-json_irept::json_irept(bool include_comments):
-  include_comments(include_comments)
-{}
+json_irept::json_irept(bool _include_comments):
+  include_comments(_include_comments)
+{
+}
 
 /// To convert to JSON from an irep structure by recursively generating JSON
 /// for the different sub trees.
 /// \param irep: The irep structure to turn into json
-/// \param json: The json object to be filled up.
-void json_irept::convert_from_irep(const irept &irep, jsont &json) const
+/// \return: The json object.
+json_objectt json_irept::convert_from_irep(const irept &irep) const
 {
-  json_objectt &irep_object=json.make_object();
+  json_objectt irep_object;
+
   if(irep.id()!=ID_nil)
     irep_object["id"]=json_stringt(irep.id_string());
 
   convert_sub_tree("sub", irep.get_sub(), irep_object);
   convert_named_sub_tree("namedSub", irep.get_named_sub(), irep_object);
+
   if(include_comments)
-  {
     convert_named_sub_tree("comment", irep.get_comments(), irep_object);
-  }
+
+  return irep_object;
 }
 
 /// To convert to JSON from a list of ireps that are in an unlabelled subtree.
@@ -48,6 +51,7 @@ void json_irept::convert_from_irep(const irept &irep, jsont &json) const
 /// \param sub_tree_id: the name to give the subtree in the parent object
 /// \param sub_trees: the list of subtrees to parse
 /// \param parent: the parent JSON object who should be added to
+
 void json_irept::convert_sub_tree(
   const std::string &sub_tree_id,
   const irept::subt &sub_trees,
@@ -58,8 +62,7 @@ void json_irept::convert_sub_tree(
     json_arrayt sub_objects;
     for(const irept &sub_tree : sub_trees)
     {
-      json_objectt sub_object;
-      convert_from_irep(sub_tree, sub_object);
+      json_objectt sub_object=convert_from_irep(sub_tree);
       sub_objects.push_back(sub_object);
     }
     parent[sub_tree_id]=sub_objects;
@@ -83,8 +86,7 @@ void json_irept::convert_named_sub_tree(
     json_objectt sub_objects;
     for(const auto &sub_tree : sub_trees)
     {
-      json_objectt sub_object;
-      convert_from_irep(sub_tree.second, sub_object);
+      json_objectt sub_object=convert_from_irep(sub_tree.second);
       sub_objects[id2string(sub_tree.first)]=sub_object;
     }
     parent[sub_tree_id]=sub_objects;
@@ -94,7 +96,7 @@ void json_irept::convert_named_sub_tree(
 /// Deserialize a JSON irep representation.
 /// \param input: json object to convert
 /// \return result - irep equivalent of input
-void json_irept::convert_from_json(const jsont &in, irept &out) const
+irept json_irept::convert_from_json(const jsont &in) const
 {
   std::vector<std::string> have_keys;
   for(const auto &keyval : in.object)
@@ -104,17 +106,16 @@ void json_irept::convert_from_json(const jsont &in, irept &out) const
     throw "irep JSON representation is missing one of needed keys: "
       "'id', 'sub', 'namedSub', 'comment'";
 
-  out.id(in["id"].value);
+  irept out(in["id"].value);
 
   for(const auto &sub : in["sub"].array)
-  {
-    out.get_sub().push_back(irept());
-    convert_from_json(sub, out.get_sub().back());
-  }
+    out.get_sub().push_back(convert_from_json(sub));
 
   for(const auto &named_sub : in["namedSub"].object)
-    convert_from_json(named_sub.second, out.add(named_sub.first));
+    out.add(named_sub.first)=convert_from_json(named_sub.second);
 
   for(const auto &comment : in["comment"].object)
-    convert_from_json(comment.second, out.add(comment.first));
+    out.add(comment.first)=convert_from_json(comment.second);
+
+  return out;
 }

@@ -54,7 +54,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     number_of_sections=elf32_header.e_shnum;
 
     // iterate over these
-    for(unsigned i=0; i<elf32_section_header_table.size(); i++)
+    for(std::size_t i=0; i<elf32_section_header_table.size(); i++)
     {
       // go to right place
       in.seekg(elf32_header.e_shoff+i*elf32_header.e_shentsize);
@@ -101,7 +101,7 @@ elf_readert::elf_readert(std::istream &_in):in(_in)
     number_of_sections=elf64_header.e_shnum;
 
     // iterate over these
-    for(unsigned i=0; i<elf64_section_header_table.size(); i++)
+    for(std::size_t i=0; i<elf64_section_header_table.size(); i++)
     {
       // go to right place
       in.seekg(elf64_header.e_shoff+i*elf64_header.e_shentsize);
@@ -141,7 +141,7 @@ std::string elf_readert::get_string(std::streampos index) const
 
 bool elf_readert::has_section(const std::string &name) const
 {
-  for(unsigned i=0; i<number_of_sections; i++)
+  for(std::size_t i=0; i<number_of_sections; i++)
     if(section_name(i)==name)
       return true;
 

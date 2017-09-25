@@ -21,7 +21,7 @@ void lisp2irep(const lispexprt &src, irept &dest)
 
   dest.id(src[0].value);
 
-  for(unsigned i=1; i<src.size(); i++)
+  for(std::size_t i=1; i<src.size(); i++)
     if(!src[i].is_nil())
     {
       const std::string &name=src[i].value;

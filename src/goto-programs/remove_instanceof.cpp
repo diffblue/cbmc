@@ -15,6 +15,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "class_identifier.h"
 
 #include <util/fresh_symbol.h>
+#include <java_bytecode/java_types.h>
 
 #include <sstream>
 
@@ -44,7 +45,8 @@ protected:
 
   bool lower_instanceof(goto_programt &, goto_programt::targett);
 
-  int lower_instanceof(exprt &, goto_programt &, goto_programt::targett);
+  std::size_t lower_instanceof(
+    exprt &, goto_programt &, goto_programt::targett);
 };
 
 /// Replaces an expression like e instanceof A with e.\@class_identifier == "A"
@@ -54,23 +56,28 @@ protected:
 /// \param goto_program: program the expression belongs to
 /// \param this_inst: instruction the expression is found at
 /// \return number of instanceof expressions that have been replaced
-int remove_instanceoft::lower_instanceof(
+std::size_t remove_instanceoft::lower_instanceof(
   exprt &expr,
   goto_programt &goto_program,
   goto_programt::targett this_inst)
 {
   if(expr.id()!=ID_java_instanceof)
   {
-    int replacements=0;
+    std::size_t replacements=0;
     Forall_operands(it, expr)
       replacements+=lower_instanceof(*it, goto_program, this_inst);
     return replacements;
   }
 
+  INVARIANT(
+    expr.operands().size()==2,
+    "java_instanceof should have two operands");
+
   const exprt &check_ptr=expr.op0();
   INVARIANT(
     check_ptr.type().id()==ID_pointer,
     "instanceof first operand should be a pointer");
+
   const exprt &target_arg=expr.op1();
   INVARIANT(
     target_arg.id()==ID_type,
@@ -94,7 +101,7 @@ int remove_instanceoft::lower_instanceof(
   // This will briefly be ill-formed (use before def of instanceof_tmp) but the
   // two will subsequently switch places. This makes sure that the inserted
   // assignement doesn't end up before any labels pointing at this instruction.
-  symbol_typet jlo("java::java.lang.Object");
+  symbol_typet jlo=to_symbol_type(java_lang_object_type().subtype());
   exprt object_clsid=get_class_identifier_field(check_ptr, jlo, ns);
 
   symbolt &newsym=
@@ -135,7 +142,7 @@ bool remove_instanceoft::lower_instanceof(
   goto_programt &goto_program,
   goto_programt::targett target)
 {
-  int replacements=
+  std::size_t replacements=
     lower_instanceof(target->code, goto_program, target)+
     lower_instanceof(target->guard, goto_program, target);
 

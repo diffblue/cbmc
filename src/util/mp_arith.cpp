@@ -56,7 +56,7 @@ std::ostream &operator<<(std::ostream &out, const mp_integer &n)
 /// \return mp_integer
 const mp_integer string2integer(const std::string &n, unsigned base)
 {
-  for(unsigned i=0; i<n.size(); i++)
+  for(std::size_t i=0; i<n.size(); i++)
     if(!(isalnum(n[i]) || (n[i]=='-' && i==0)))
       return 0;
 

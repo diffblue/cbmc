@@ -138,7 +138,7 @@ void goto_symext::parameter_assignments(
   if(function_type.has_ellipsis())
   {
     // These are va_arg arguments; their types may differ from call to call
-    unsigned va_count=0;
+    std::size_t va_count=0;
     const symbolt *va_sym=nullptr;
     while(!ns.lookup(
         id2string(function_identifier)+"::va_arg"+std::to_string(va_count),
@@ -282,8 +282,8 @@ void goto_symext::symex_function_call_code(
 
   // read the arguments -- before the locality renaming
   exprt::operandst arguments=call.arguments();
-  for(unsigned i=0; i<arguments.size(); i++)
-    state.rename(arguments[i], ns);
+  for(auto &a : arguments)
+    state.rename(a, ns);
 
   // produce a new frame
   assert(!state.call_stack().empty());

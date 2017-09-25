@@ -319,7 +319,7 @@ bool escape_domaint::merge(
   {
     const std::set<irep_idt> &b_cleanup=cleanup.second.cleanup_functions;
     std::set<irep_idt> &a_cleanup=cleanup_map[cleanup.first].cleanup_functions;
-    unsigned old_size=a_cleanup.size();
+    auto old_size=a_cleanup.size();
     a_cleanup.insert(b_cleanup.begin(), b_cleanup.end());
     if(a_cleanup.size()!=old_size)
       changed=true;
@@ -379,7 +379,7 @@ void escape_domaint::check_lhs(
     {
       // count the aliases
 
-      unsigned count=0;
+      std::size_t count=0;
 
       for(const auto &alias : aliases)
       {

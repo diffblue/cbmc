@@ -28,10 +28,10 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/ssa_expr.h>
 
 string_constraint_generatort::string_constraint_generatort(
-  const string_constraint_generatort::infot& info):
+  const string_constraint_generatort::infot& info, const namespacet& ns):
   max_string_length(info.string_max_length),
   m_force_printable_characters(info.string_printable),
-  m_ns(*info.ns) { }
+  m_ns(ns) { }
 
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {
@@ -627,4 +627,20 @@ exprt string_constraint_generatort::add_axioms_for_to_char_array(
 {
   string_exprt str=get_string_expr(args(f, 1)[0]);
   return str.content();
+}
+
+exprt string_constraint_generatort::substitute_function_applications(
+  const exprt &expr)
+{
+  exprt copy=expr;
+  for(exprt &operand : copy.operands())
+    operand=substitute_function_applications(exprt(operand));
+
+  if(copy.id()==ID_function_application)
+  {
+    function_application_exprt f=to_function_application_expr(copy);
+    return this->add_axioms_for_function_application(f);
+  }
+
+  return copy;
 }

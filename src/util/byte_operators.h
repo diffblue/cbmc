@@ -17,30 +17,29 @@ Author: Daniel Kroening, kroening@kroening.com
  * \date   Sun Jul 31 21:54:44 BST 2011
 */
 
-#include "expr.h"
+#include "std_expr.h"
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class byte_extract_exprt:public exprt
+class byte_extract_exprt:public binary_exprt
 {
 public:
-  explicit byte_extract_exprt(irep_idt _id):exprt(_id)
+  explicit byte_extract_exprt(irep_idt _id):binary_exprt(_id)
   {
-    operands().resize(2);
   }
 
   explicit byte_extract_exprt(irep_idt _id, const typet &_type):
-    exprt(_id, _type)
+    binary_exprt(_id, _type)
   {
-    operands().resize(2);
   }
 
   byte_extract_exprt(
     irep_idt _id,
     const exprt &_op, const exprt &_offset, const typet &_type):
-    exprt(_id, _type)
+    binary_exprt(_id, _type)
   {
-    copy_to_operands(_op, _offset);
+    op()=_op;
+    offset()=_offset;
   }
 
   exprt &op() { return op0(); }

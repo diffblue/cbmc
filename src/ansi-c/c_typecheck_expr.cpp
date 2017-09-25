@@ -2646,7 +2646,7 @@ void c_typecheck_baset::typecheck_function_call_arguments(
     throw 0;
   }
 
-  for(unsigned i=0; i<arguments.size(); i++)
+  for(std::size_t i=0; i<arguments.size(); i++)
   {
     exprt &op=arguments[i];
 

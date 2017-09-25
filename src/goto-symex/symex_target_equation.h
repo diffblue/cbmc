@@ -261,9 +261,9 @@ public:
       std::ostream &out) const;
   };
 
-  unsigned count_assertions() const
+  std::size_t count_assertions() const
   {
-    unsigned i=0;
+    std::size_t i=0;
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
@@ -272,9 +272,9 @@ public:
     return i;
   }
 
-  unsigned count_ignored_SSA_steps() const
+  std::size_t count_ignored_SSA_steps() const
   {
-    unsigned i=0;
+    std::size_t i=0;
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
@@ -286,7 +286,7 @@ public:
   typedef std::list<SSA_stept> SSA_stepst;
   SSA_stepst SSA_steps;
 
-  SSA_stepst::iterator get_SSA_step(unsigned s)
+  SSA_stepst::iterator get_SSA_step(std::size_t s)
   {
     SSA_stepst::iterator it=SSA_steps.begin();
     for(; s!=0; s--)

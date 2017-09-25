@@ -86,10 +86,12 @@ struct procedure_local_cfg_baset<
   {
     return args.second.begin()->first;
   }
+
   unsigned get_last_node(const method_with_amapt &args) const
   {
     return (--args.second.end())->first;
   }
+
   unsigned nodes_empty(const method_with_amapt &args) const
   {
     return args.second.empty();
@@ -485,7 +487,7 @@ static void populate_live_range_holes(
     merge_into,
     expanded_live_range_start,
     sorted_by_startpc[0]->var.start_pc);
-  for(unsigned idx=0; idx<sorted_by_startpc.size()-1; ++idx)
+  for(std::size_t idx=0; idx<sorted_by_startpc.size()-1; ++idx)
   {
     maybe_add_hole(
       merge_into,

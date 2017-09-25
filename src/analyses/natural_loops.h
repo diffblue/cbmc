@@ -69,7 +69,9 @@ class natural_loopst:
 typedef natural_loops_templatet<goto_programt, goto_programt::targett>
     natural_loops_mutablet;
 
-void show_natural_loops(const goto_modelt &);
+void show_natural_loops(
+  const goto_modelt &,
+  std::ostream &out);
 
 /// Finds all back-edges and computes the natural loops
 #ifdef DEBUG

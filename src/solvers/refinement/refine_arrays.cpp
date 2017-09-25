@@ -29,7 +29,7 @@ void bv_refinementt::post_process_arrays()
   update_index_map(true);
 
   // we don't actually add any constraints
-  lazy_arrays=do_array_refinement;
+  lazy_arrays=config_.refine_arrays;
   add_array_constraints();
   freeze_lazy_constraints();
 }
@@ -37,7 +37,7 @@ void bv_refinementt::post_process_arrays()
 /// check whether counterexample is spurious
 void bv_refinementt::arrays_overapproximated()
 {
-  if(!do_array_refinement)
+  if(!config_.refine_arrays)
     return;
 
   unsigned nb_active=0;

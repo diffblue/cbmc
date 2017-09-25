@@ -34,8 +34,7 @@ static goto_programt::targett insert_nondet_init_code(
   const goto_programt::targett &target,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth)
+  const object_factory_parameterst &object_factory_parameters)
 {
   // Return if the instruction isn't an assignment
   const auto next_instr=std::next(target);
@@ -91,8 +90,7 @@ static goto_programt::targett insert_nondet_init_code(
     true,
     allocation_typet::DYNAMIC,
     nullable,
-    max_nondet_array_length,
-    max_nondet_tree_depth,
+    object_factory_parameters,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Convert this code into goto instructions
@@ -117,8 +115,7 @@ void convert_nondet(
   goto_programt &goto_program,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth)
+  const object_factory_parameterst &object_factory_parameters)
 {
   for(auto instruction_iterator=goto_program.instructions.begin(),
         end=goto_program.instructions.end();
@@ -129,8 +126,7 @@ void convert_nondet(
       instruction_iterator,
       symbol_table,
       message_handler,
-      max_nondet_array_length,
-      max_nondet_tree_depth);
+      object_factory_parameters);
   }
 }
 
@@ -138,8 +134,7 @@ void convert_nondet(
   goto_functionst &goto_functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth)
+  const object_factory_parameterst &object_factory_parameters)
 {
   for(auto &goto_program : goto_functions.function_map)
   {
@@ -147,8 +142,7 @@ void convert_nondet(
       goto_program.second.body,
       symbol_table,
       message_handler,
-      max_nondet_array_length,
-      max_nondet_tree_depth);
+      object_factory_parameters);
   }
 
   goto_functions.compute_location_numbers();
@@ -159,13 +153,11 @@ void convert_nondet(
 void convert_nondet(
   goto_modelt &goto_model,
   message_handlert &message_handler,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth)
+  const object_factory_parameterst& object_factory_parameters)
 {
   convert_nondet(
     goto_model.goto_functions,
     goto_model.symbol_table,
     message_handler,
-    max_nondet_array_length,
-    max_nondet_tree_depth);
+    object_factory_parameters);
 }

@@ -1,3 +1,5 @@
+// Discussion point: is the branch below one goal or two?
+
 inline void my_func(int x)
 {
   if(x)

@@ -1,0 +1,7 @@
+CORE
+Test.class
+--refine-strings --string-max-length 30
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--

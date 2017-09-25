@@ -127,7 +127,7 @@ void goto_convertt::convert_try_catch(
   // add a goto to the end of the 'try' block
   dest.add_instruction()->make_goto(end_target);
 
-  for(unsigned i=1; i<code.operands().size(); i++)
+  for(std::size_t i=1; i<code.operands().size(); i++)
   {
     const codet &block=to_code(code.operands()[i]);
 

@@ -66,13 +66,22 @@ void compute_address_taken_functions(
     compute_address_taken_functions(it->second.body, address_taken);
 }
 
+/// get all functions whose address is taken
+std::set<irep_idt> compute_address_taken_functions(
+  const goto_functionst &goto_functions)
+{
+  std::set<irep_idt> address_taken;
+  compute_address_taken_functions(goto_functions, address_taken);
+  return address_taken;
+}
+
 /// computes the functions that are (potentially) called
-void compute_called_functions(
-  const goto_functionst &goto_functions,
-  std::set<irep_idt> &functions)
+std::set<irep_idt> compute_called_functions(
+  const goto_functionst &goto_functions)
 {
   std::set<irep_idt> working_queue;
   std::set<irep_idt> done;
+  std::set<irep_idt> functions;
 
   // start from entry point
   working_queue.insert(goto_functions.entry_point());
@@ -109,12 +118,13 @@ void compute_called_functions(
       }
     }
   }
+
+  return functions;
 }
 
 /// computes the functions that are (potentially) called
-void compute_called_functions(
-  const goto_modelt &goto_model,
-  std::set<irep_idt> &functions)
+std::set<irep_idt> compute_called_functions(
+  const goto_modelt &goto_model)
 {
-  compute_called_functions(goto_model.goto_functions, functions);
+  return compute_called_functions(goto_model.goto_functions);
 }

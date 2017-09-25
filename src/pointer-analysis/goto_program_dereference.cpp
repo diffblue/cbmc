@@ -108,10 +108,8 @@ void goto_program_dereferencet::dereference_rec(
 
     guardt old_guard=guard;
 
-    for(unsigned i=0; i<expr.operands().size(); i++)
+    for(auto &op : expr.operands())
     {
-      exprt &op=expr.operands()[i];
-
       if(!op.is_boolean())
         throw expr.id_string()+" takes Boolean operands only, but got "+
               op.pretty();

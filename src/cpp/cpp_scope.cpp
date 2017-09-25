@@ -187,7 +187,7 @@ void cpp_scopet::lookup_identifier(
     id_set.insert(this);
 
   #if 0
-  for(unsigned i=0; i<parents_size(); i++)
+  for(std::size_t i=0; i<parents_size(); i++)
   {
     cpp_idt &parent= get_parent(i);
     if(parent.identifier == identifier

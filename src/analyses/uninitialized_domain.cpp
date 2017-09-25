@@ -81,7 +81,7 @@ bool uninitialized_domaint::merge(
   locationt from,
   locationt to)
 {
-  unsigned old_uninitialized=uninitialized.size();
+  auto old_uninitialized=uninitialized.size();
 
   uninitialized.insert(
     other.uninitialized.begin(),

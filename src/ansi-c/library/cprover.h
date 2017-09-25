@@ -19,6 +19,7 @@ extern const void *__CPROVER_memory_leak;
 
 void __CPROVER_assume(__CPROVER_bool assumption) __attribute__((__noreturn__));
 void __CPROVER_assert(__CPROVER_bool assertion, const char *description);
+void __CPROVER_precondition(__CPROVER_bool assertion, const char *description);
 
 __CPROVER_bool __CPROVER_is_zero_string(const void *);
 __CPROVER_size_t __CPROVER_zero_string_length(const void *);

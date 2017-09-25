@@ -241,9 +241,9 @@ typet java_type_from_string(const std::string &src)
         return nil_typet();
       std::string class_name=src.substr(1, src.size()-2);
 
-      for(unsigned i=0; i<class_name.size(); i++)
-        if(class_name[i]=='/')
-          class_name[i]='.';
+      for(auto &letter : class_name)
+        if(letter=='/')
+          letter='.';
 
       std::string identifier="java::"+class_name;
       symbol_typet symbol_type(identifier);

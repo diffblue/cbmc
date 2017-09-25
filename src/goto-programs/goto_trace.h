@@ -35,7 +35,7 @@ Date: July 2005
 class goto_trace_stept
 {
 public:
-  unsigned step_nr;
+  std::size_t step_nr;
 
   bool is_assignment() const      { return type==typet::ASSIGNMENT; }
   bool is_assume() const          { return type==typet::ASSUME; }

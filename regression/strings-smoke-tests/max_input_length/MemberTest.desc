@@ -1,0 +1,7 @@
+CORE
+MemberTest.class
+--refine-strings --string-max-length 29 --java-assume-inputs-non-null
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--

@@ -492,7 +492,7 @@ void symex_target_equationt::convert_assertions(
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
 
-  unsigned number_of_assertions=count_assertions();
+  std::size_t number_of_assertions=count_assertions();
 
   if(number_of_assertions==0)
     return;
@@ -557,7 +557,7 @@ void symex_target_equationt::convert_assertions(
 void symex_target_equationt::convert_io(
   decision_proceduret &dec_proc)
 {
-  unsigned io_count=0;
+  std::size_t io_count=0;
 
   for(auto &step : SSA_steps)
     if(!step.ignore)

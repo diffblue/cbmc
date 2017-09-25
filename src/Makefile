@@ -1,10 +1,10 @@
 DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
-       assembler analyses java_bytecode path-symex \
-       json goto-analyzer jsil symex goto-diff clobber \
+       assembler analyses java_bytecode \
+       json goto-analyzer jsil goto-diff clobber \
        memory-models miniz
 
-all: cbmc.dir goto-cc.dir goto-instrument.dir symex.dir goto-analyzer.dir goto-diff.dir
+all: cbmc.dir goto-cc.dir goto-instrument.dir goto-analyzer.dir goto-diff.dir
 
 ###############################################################################
 
@@ -37,10 +37,6 @@ goto-diff.dir: languages goto-programs.dir pointer-analysis.dir \
                linking.dir analyses.dir solvers.dir json.dir
 
 goto-cc.dir: languages pointer-analysis.dir goto-programs.dir linking.dir
-
-symex.dir: languages goto-programs.dir pointer-analysis.dir \
-           goto-symex.dir linking.dir analyses.dir solvers.dir \
-           path-symex.dir goto-instrument.dir
 
 # building for a particular directory
 

@@ -419,10 +419,7 @@ int gcc_modet::doit()
   else if(cmdline.isset('c'))
     compiler.mode=compilet::COMPILE_ONLY;
   else if(cmdline.isset('E'))
-  {
     compiler.mode=compilet::PREPROCESS_ONLY;
-    UNREACHABLE;
-  }
   else if(cmdline.isset("shared") ||
           cmdline.isset('r')) // really not well documented
     compiler.mode=compilet::COMPILE_LINK;

@@ -122,26 +122,26 @@ public:
   std::streampos string_table_offset;
   std::string get_string(std::streampos index) const;
 
-  std::string elf32_section_name(unsigned index) const
+  std::string elf32_section_name(std::size_t index) const
   {
     return get_string(elf32_section_header_table[index].sh_name);
   }
 
-  std::string elf64_section_name(unsigned index) const
+  std::string elf64_section_name(std::size_t index) const
   {
     return get_string(elf64_section_header_table[index].sh_name);
   }
 
-  unsigned number_of_sections;
+  std::size_t number_of_sections;
 
-  std::string section_name(unsigned index) const
+  std::string section_name(std::size_t index) const
   {
     return
       elf_class==ELF32?elf32_section_name(index):
                        elf64_section_name(index);
   }
 
-  std::streampos section_offset(unsigned index) const
+  std::streampos section_offset(std::size_t index) const
   {
     return
       elf_class==ELF32?elf32_section_header_table[index].sh_offset:

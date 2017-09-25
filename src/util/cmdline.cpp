@@ -101,7 +101,7 @@ const std::list<std::string> &cmdlinet::get_values(
 
 int cmdlinet::getoptnr(char option) const
 {
-  for(unsigned i=0; i<options.size(); i++)
+  for(std::size_t i=0; i<options.size(); i++)
     if(options[i].optchar==option)
       return i;
 
@@ -110,7 +110,7 @@ int cmdlinet::getoptnr(char option) const
 
 int cmdlinet::getoptnr(const std::string &option) const
 {
-  for(unsigned i=0; i<options.size(); i++)
+  for(std::size_t i=0; i<options.size(); i++)
     if(options[i].optstring==option)
       return i;
 

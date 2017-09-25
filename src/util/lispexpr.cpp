@@ -23,7 +23,7 @@ std::string lispexprt::expr2string() const
 
     case List:
       result="(";
-      for(unsigned j=0; j<size(); j++)
+      for(std::size_t j=0; j<size(); j++)
       {
         if((j+1)==size() && size()!=1)
         {
@@ -151,7 +151,7 @@ std::string escape(const std::string &s)
 {
   std::string result;
 
-  for(unsigned i=0; i<s.size(); i++)
+  for(std::size_t i=0; i<s.size(); i++)
   {
     if(s[i]=='\\' || s[i]=='"')
       result+='\\';

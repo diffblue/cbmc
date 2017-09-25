@@ -353,7 +353,7 @@ json_objectt json(
     result["name"]=json_stringt("array");
     json_arrayt &elements=result["elements"].make_array();
 
-    unsigned index=0;
+    std::size_t index=0;
 
     forall_operands(it, expr)
     {
@@ -377,7 +377,7 @@ json_objectt json(
         "number of struct components should match with its type");
 
       json_arrayt &members=result["members"].make_array();
-      for(unsigned m=0; m<expr.operands().size(); m++)
+      for(std::size_t m=0; m<expr.operands().size(); m++)
       {
         json_objectt &e=members.push_back().make_object();
         e["value"]=json(expr.operands()[m], ns, mode);

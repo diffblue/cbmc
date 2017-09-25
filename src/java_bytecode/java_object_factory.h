@@ -73,6 +73,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 
 #include <java_bytecode/select_pointer_type.h>
+#include <java_bytecode/java_bytecode_language.h>
 
 /// Selects the kind of allocation used by java_object_factory et al.
 enum class allocation_typet
@@ -91,8 +92,7 @@ exprt object_factory(
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &parameters,
   allocation_typet alloc_type,
   const source_locationt &location,
   const select_pointer_typet &pointer_type_selector);
@@ -103,8 +103,7 @@ exprt object_factory(
   code_blockt &init_code,
   bool allow_null,
   symbol_tablet &symbol_table,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   allocation_typet alloc_type,
   const source_locationt &location);
 
@@ -123,8 +122,7 @@ void gen_nondet_init(
   bool skip_classid,
   allocation_typet alloc_type,
   bool allow_null,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place);
 
@@ -136,8 +134,7 @@ void gen_nondet_init(
   bool skip_classid,
   allocation_typet alloc_type,
   bool allow_null,
-  size_t max_nondet_array_length,
-  size_t max_nondet_tree_depth,
+  const object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place);
 
 exprt allocate_dynamic_object(
