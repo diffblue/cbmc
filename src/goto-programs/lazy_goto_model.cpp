@@ -189,11 +189,33 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
 /// Eagerly loads all functions from the symbol table.
 void lazy_goto_modelt::load_all_functions()
 {
-  goto_convert(*goto_model, language_files.get_message_handler());
-  // As lazy goto functions are no longer required language files is done with
-  language_files.clear();
-}
+  std::vector<irep_idt> fn_ids_to_convert;
+  symbol_tablet::symbolst::size_type table_size;
+  symbol_tablet::symbolst::size_type new_table_size=symbol_table.symbols.size();
+  do
+  {
+    table_size=new_table_size;
 
+    // Find symbols that correspond to functions
+    fn_ids_to_convert.clear();
+    for(const auto &named_symbol : symbol_table.symbols)
+    {
+      if(is_function_symbol(named_symbol.second))
+        fn_ids_to_convert.push_back(named_symbol.first);
+    }
+
+    // Access all functions to convert them
+    for(const irep_idt &symbol_name : fn_ids_to_convert)
+      goto_functions.at(symbol_name);
+
+    // Repeat while new symbols are being added in case any of those are
+    // stubbed functions. Even stubs can create new stubs while being
+    // converted if they are special stubs (e.g. string functions)
+    new_table_size=symbol_table.symbols.size();
+  } while(new_table_size!=table_size);
+
+  goto_model->goto_functions.compute_location_numbers();
+}
 
 bool lazy_goto_modelt::freeze()
 {
