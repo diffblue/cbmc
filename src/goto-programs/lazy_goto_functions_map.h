@@ -120,6 +120,11 @@ public:
 
   void unload(const key_type &name) const { goto_functions.erase(name); }
 
+  void ensure_function_loaded(const key_type &name) const
+  {
+    ensure_function_loaded_internal(name);
+  }
+
 private:
   // This returns a non-const reference, but if you use this method from a
   // const method then you should not return such a reference without making it

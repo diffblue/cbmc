@@ -11,6 +11,7 @@
 
 #include <util/cmdline.h>
 #include <util/config.h>
+#include <util/journalling_symbol_table.h>
 #include <util/language.h>
 #include <util/unicode.h>
 
@@ -184,12 +185,6 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
     throw 0;
   }
 
-  if(language_files.final(symbol_table))
-  {
-    msg.error() << "FINAL STAGE CONVERSION ERROR" << messaget::eom;
-    throw 0;
-  }
-
   // stupid hack
   config.set_object_bits_from_symbol_table(symbol_table);
 }
@@ -203,6 +198,24 @@ void lazy_goto_modelt::load_all_functions() const
 
 bool lazy_goto_modelt::finalize()
 {
+  messaget msg(message_handler);
+  journalling_symbol_tablet symbol_table=
+    journalling_symbol_tablet::wrap(this->symbol_table);
+  if(language_files.final(symbol_table))
+  {
+    msg.error() << "CONVERSION ERROR" << messaget::eom;
+    return true;
+  }
+  for(const irep_idt &updated_symbol_id : symbol_table.get_updated())
+  {
+    if(symbol_table.lookup_ref(updated_symbol_id).is_function())
+    {
+      // Re-convert any that already exist
+      goto_functions.unload(updated_symbol_id);
+      goto_functions.ensure_function_loaded(updated_symbol_id);
+    }
+  }
+
   language_files.clear();
 
   return post_process_functions(*goto_model);
