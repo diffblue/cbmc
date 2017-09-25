@@ -35,6 +35,12 @@ struct index_set_pairt
   std::map<exprt, std::set<exprt>> current;
 };
 
+struct string_axiomst
+{
+  std::vector<string_constraintt> universal;
+  std::vector<string_not_contains_constraintt> not_contains;
+};
+
 class string_refinementt final: public bv_refinementt
 {
 private:
@@ -79,8 +85,7 @@ private:
   // Simple constraints that have been given to the solver
   expr_sett seen_instances;
 
-  std::vector<string_constraintt> universal_axioms;
-  std::vector<string_not_contains_constraintt> not_contains_axioms;
+  string_axiomst axioms;
 
   // Unquantified lemmas that have newly been added
   std::vector<exprt> current_constraints;
