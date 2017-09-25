@@ -86,7 +86,8 @@ void generate_class_stub(
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
 
-  auto res=symbol_table.insert(std::move(new_symbol));
+  optionalt<std::reference_wrapper<symbolt>> res=
+    symbol_table.insert(std::move(new_symbol));
 
   if(!res)
   {
