@@ -357,7 +357,7 @@ typet java_type_from_string(
 #ifdef DEBUG
             std::cout << " generic type var " << gen_type.id() << " bound "
                       << to_symbol_type(gen_type.subtype()).get_identifier()
-                      << "\n2";
+                      << "\n";
 #endif
             result.generic_type_variables().push_back(gen_type);
           }
