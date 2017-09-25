@@ -115,7 +115,8 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
   const symbolt &symbol=entry->second;
 
   symbol_base_mapt::const_iterator
-    base_it=symbol_base_map.lower_bound(entry->second.base_name),
+    base_it=symbol_base_map.lower_bound(entry->second.base_name);
+  symbol_base_mapt::const_iterator
     base_it_end=symbol_base_map.upper_bound(entry->second.base_name);
   while(base_it!=base_it_end && base_it->second!=symbol.name)
     ++base_it;
