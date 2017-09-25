@@ -85,7 +85,15 @@ protected:
   void get_command_line_options(optionst &);
   int get_goto_program(
     std::unique_ptr<goto_modelt> &goto_model, const optionst &);
-  bool process_goto_program(goto_modelt &goto_model, const optionst &);
+
+public:
+  void process_goto_function(
+    const irep_idt &function_name,
+    goto_functionst::goto_functiont &function,
+    symbol_tablet &symbol_table);
+  bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
+
+protected:
   bool set_properties(goto_modelt &goto_model);
   int do_bmc(bmct &, goto_modelt &goto_model);
 };

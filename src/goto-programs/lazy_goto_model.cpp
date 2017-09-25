@@ -16,10 +16,24 @@
 
 #include <fstream>
 
-lazy_goto_modelt::lazy_goto_modelt(message_handlert &message_handler)
+lazy_goto_modelt::lazy_goto_modelt(
+  post_process_functiont post_process_function,
+  post_process_functionst post_process_functions,
+  message_handlert &message_handler)
   : goto_model(new goto_modelt()),
     symbol_table(goto_model->symbol_table),
-    goto_functions(goto_model->goto_functions)
+    goto_functions(
+      goto_model->goto_functions.function_map,
+      language_files,
+      goto_model->symbol_table,
+      [this, post_process_function](
+        const irep_idt &function_name,
+        goto_functionst::goto_functiont &function) -> void
+      {
+        post_process_function(function_name, function, symbol_table);
+      },
+      message_handler),
+    post_process_functions(std::move(post_process_functions))
 {
   language_files.set_message_handler(message_handler);
 }
@@ -28,7 +42,11 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
   : goto_model(std::move(other.goto_model)),
     language_files(std::move(other.language_files)),
     symbol_table(goto_model->symbol_table),
-    goto_functions(goto_model->goto_functions)
+    goto_functions(
+      goto_model->goto_functions.function_map,
+      language_files,
+      goto_model->symbol_table,
+      std::move(other.goto_functions))
 {
 }
 
@@ -113,15 +131,12 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
     }
   }
 
-  for(const auto &file : binaries)
+  for(const std::string &file : binaries)
   {
     msg.status() << "Reading GOTO program from file" << messaget::eom;
 
-    if(read_object_and_link(
-      file, symbol_table, goto_functions, msg.get_message_handler()))
-    {
+    if(read_object_and_link(file, *goto_model, msg.get_message_handler()))
       throw 0;
-    }
   }
 
   bool binaries_provided_start =
@@ -176,4 +191,10 @@ void lazy_goto_modelt::load_all_functions()
   goto_convert(*goto_model, language_files.get_message_handler());
   // As lazy goto functions are no longer required language files is done with
   language_files.clear();
+}
+
+
+bool lazy_goto_modelt::freeze()
+{
+  return post_process_functions(*goto_model);
 }

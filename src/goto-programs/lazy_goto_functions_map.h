@@ -93,6 +93,21 @@ public:
   {
   }
 
+  lazy_goto_functions_mapt(
+    underlying_mapt &goto_functions,
+    language_filest &language_files,
+    symbol_tablet &symbol_table,
+    const lazy_goto_functions_mapt & other)
+  : goto_functions(goto_functions),
+    language_files(language_files),
+    symbol_table(symbol_table),
+    convert_functions(
+      symbol_table,
+      other.convert_functions.get_message_handler()),
+    post_process_function(other.post_process_function)
+  {
+  }
+
   /// Gets the number of functions in the map.
   /// \return The number of functions in the map.
   size_type size() const
@@ -126,6 +141,13 @@ public:
   mapped_type at(const key_type &name)
   {
     return ensure_entry_loaded(name).second;
+  }
+
+  void unload(const key_type &name) const
+  {
+    const auto &it=goto_functions.find(name);
+    if(it!=goto_functions.end())
+      goto_functions.erase(it);
   }
 
 private:
