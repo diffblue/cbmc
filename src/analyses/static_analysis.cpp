@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 #include <memory>
 
+#include <util/json_irep.h>
 #include <util/std_expr.h>
 #include <util/std_code.h>
 
@@ -115,20 +116,28 @@ jsont static_analysis_baset::output_json(
   const irep_idt &identifier) const
 {
   json_arrayt retval;
+  json_irept irep_converter(true);
 
   forall_goto_program_instructions(i_it, goto_program)
   {
-    std::ostringstream out;
-    out << "**** " << i_it->location_number << " "
-        << i_it->source_location << "\n";
-
-    get_state(i_it).output(ns, out);
-    out << "\n";
-    #if 1
-    goto_program.output_instruction(ns, identifier, out, i_it);
-    out << "\n";
-    #endif
-    retval.push_back(json_stringt(out.str()));
+    json_objectt instruction_object;
+    instruction_object["location_number"]=
+      json_numbert(std::to_string(i_it->location_number));
+    instruction_object["source_location"]=
+      irep_converter.convert_from_irep(i_it->source_location);
+    instruction_object["code"]=
+      irep_converter.convert_from_irep(i_it->code);
+    {
+      std::ostringstream pretty_type;
+      pretty_type << i_it->type;
+      instruction_object["instruction_type"]=json_stringt(pretty_type.str());
+    }
+    {
+      std::ostringstream state_text;
+      get_state(i_it).output(ns, state_text);
+      instruction_object["state"]=json_stringt(state_text.str());
+    }
+    retval.push_back(instruction_object);
   }
 
   return retval;
