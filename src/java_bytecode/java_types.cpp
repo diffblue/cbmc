@@ -195,6 +195,26 @@ typet java_type_from_string(
   //  - type variables are similar to object types but have the prefix 'T'
   switch(src[0])
   {
+  case '<':
+    {
+      // The method signature can optionally have a collection of formal
+      // type parameters (e.g. on generic methods on non-generic classes
+      // or generic static methods). For now we skip over this part of the
+      // signature and continue parsing the rest of the signature as normal
+      size_t closing_generic=find_closing_delimiter(src, 0, '<', '>');
+      const typet &method_type=java_type_from_string(
+        src.substr(closing_generic+1, std::string::npos), class_name);
+
+      // This invariant being violated means that tkiley has not understood
+      // part of the signature spec.
+      // Only class and method signatures can start with a '<' and classes are
+      // handled separately.
+      INVARIANT(
+        method_type.id()==ID_code,
+        "This should correspond to method signatures only");
+
+      return method_type;
+    }
   case '(': // function type
     {
       std::size_t e_pos=src.rfind(')');

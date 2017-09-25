@@ -273,6 +273,7 @@ void java_bytecode_convert_method_lazy(
     member_type=java_type_from_string(
       m.signature.value(),
       id2string(class_symbol.name));
+    INVARIANT(member_type.id()==ID_code, "Must be code type");
   }
   else
     member_type=java_type_from_string(m.descriptor);
