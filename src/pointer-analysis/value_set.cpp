@@ -20,6 +20,7 @@
 #include <util/arith_tools.h>
 #include <util/pointer_offset_size.h>
 #include <util/cprover_prefix.h>
+#include <util/json_irep.h>
 
 #include <util/c_types.h>
 
@@ -190,6 +191,33 @@ void value_sett::output(
 
     out << " } \n";
   }
+}
+
+jsont value_sett::output_json(const namespacet &) const
+{
+  json_arrayt retval;
+  json_irept irep_converter(true);
+
+  for(const auto &name_values : values)
+  {
+    json_objectt json_entry;
+
+    json_entry["id"]=json_stringt(id2string(name_values.second.identifier));
+    json_entry["suffix"]=json_stringt(id2string(name_values.second.suffix));
+
+    json_arrayt vals;
+    for(const auto &obj_entry : name_values.second.object_map.read())
+    {
+      vals.push_back(
+        irep_converter.convert_from_irep(object_numbering[obj_entry.first]));
+    }
+
+    json_entry["values"]=vals;
+
+    retval.push_back(json_entry);
+  }
+
+  return retval;
 }
 
 exprt value_sett::to_expr(const object_map_dt::value_type &it) const

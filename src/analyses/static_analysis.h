@@ -68,6 +68,11 @@ public:
   {
   }
 
+  virtual jsont output_json(const namespacet &ns) const
+  {
+    return json_stringt("");
+  }
+
   typedef std::unordered_set<exprt, irep_hash> expr_sett;
 
   // will go away

@@ -30,34 +30,39 @@ public:
     return value_set.make_union(other.value_set);
   }
 
-  virtual void output(
+  void output(
     const namespacet &ns,
-    std::ostream &out) const
+    std::ostream &out) const override
   {
     value_set.output(ns, out);
   }
 
-  virtual void initialize(
+  jsont output_json(const namespacet &ns) const override
+  {
+    return value_set.output_json(ns);
+  }
+
+  void initialize(
     const namespacet &ns,
-    locationt l)
+    locationt l) override
   {
     value_set.clear();
     value_set.location_number=l->location_number;
     value_set.function=l->function;
   }
 
-  virtual void get_reference_set(
+  void get_reference_set(
     const namespacet &ns,
     const exprt &expr,
-    value_setst::valuest &dest)
+    value_setst::valuest &dest) override
   {
     value_set.get_reference_set(expr, dest, ns);
   }
 
-  virtual void transform(
+  void transform(
     const namespacet &ns,
     locationt from_l,
-    locationt to_l)
+    locationt to_l) override
   {
     switch(from_l->type)
     {

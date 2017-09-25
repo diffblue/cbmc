@@ -132,11 +132,7 @@ jsont static_analysis_baset::output_json(
       pretty_type << i_it->type;
       instruction_object["instruction_type"]=json_stringt(pretty_type.str());
     }
-    {
-      std::ostringstream state_text;
-      get_state(i_it).output(ns, state_text);
-      instruction_object["state"]=json_stringt(state_text.str());
-    }
+    instruction_object["state"]=get_state(i_it).output_json(ns);
     retval.push_back(instruction_object);
   }
 

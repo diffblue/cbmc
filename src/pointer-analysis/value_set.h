@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <set>
 
+#include <util/json.h>
 #include <util/mp_arith.h>
 #include <util/reference_counting.h>
 
@@ -205,6 +206,8 @@ public:
   void output(
     const namespacet &ns,
     std::ostream &out) const;
+
+  jsont output_json(const namespacet &) const;
 
   valuest values;
 
