@@ -1,10 +1,4 @@
-/*******************************************************************\
-
-Module:
-
-Author: Daniel Kroening, kroening@kroening.com
-
-\*******************************************************************/
+// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
 
 #include "symbol_table.h"
 
