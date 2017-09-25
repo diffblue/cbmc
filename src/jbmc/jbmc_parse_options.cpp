@@ -591,6 +591,8 @@ int jbmc_parse_optionst::get_goto_program(
     // Move the model out of the local lazy_goto_model
     // and into the caller's goto_model
     goto_model=lazy_goto_modelt::freeze(std::move(lazy_goto_model));
+    if(goto_model == nullptr)
+      return 6;
 
     // show it?
     if(cmdline.isset("show-loops"))

@@ -62,6 +62,11 @@ public:
 public:
   void initialize(const cmdlinet &cmdline);
 
+private:
+  static bool is_function_symbol(const symbolt &symbol)
+  { return !symbol.is_type && !symbol.is_macro && symbol.type.id()==ID_code; }
+
+public:
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions();
 

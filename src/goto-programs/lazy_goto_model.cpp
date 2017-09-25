@@ -13,6 +13,7 @@
 #include <util/config.h>
 #include <util/language.h>
 #include <util/unicode.h>
+#include <util/journalling_symbol_table.h>
 
 #include <fstream>
 
@@ -196,5 +197,23 @@ void lazy_goto_modelt::load_all_functions()
 
 bool lazy_goto_modelt::freeze()
 {
+  messaget msg(language_files.get_message_handler());
+  journalling_symbol_tablet symbol_table=
+    journalling_symbol_tablet::wrap(this->symbol_table);
+  if(language_files.final(symbol_table))
+  {
+    msg.error() << "FINAL STAGE CONVERSION ERROR" << messaget::eom;
+    return false;
+  }
+  for(const irep_idt &updated_symbol_id : symbol_table.get_updated())
+  {
+    if(is_function_symbol(*symbol_table.lookup(updated_symbol_id)))
+    {
+      // Re-convert any that already exist
+      goto_functions.unload(updated_symbol_id);
+      goto_functions.at(updated_symbol_id);
+    }
+  }
+
   return post_process_functions(*goto_model);
 }
