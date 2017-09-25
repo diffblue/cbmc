@@ -705,7 +705,8 @@ void goto_convertt::do_java_new_array(
   else
     allocate_data_type=data.type();
 
-  side_effect_exprt data_java_new_expr(ID_java_new_array, allocate_data_type);
+  side_effect_exprt data_java_new_expr(
+    ID_java_new_array_data, allocate_data_type);
 
   // The instruction may specify a (hopefully small) upper bound on the
   // array size, in which case we allocate a fixed-length array that may
