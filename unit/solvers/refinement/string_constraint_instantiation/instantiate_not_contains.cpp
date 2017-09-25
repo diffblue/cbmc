@@ -56,12 +56,28 @@ constant_exprt from_integer(const mp_integer &i)
 array_string_exprt make_string_exprt(const std::string &str)
 {
   const constant_exprt length=from_integer(str.length(), t.length_type());
-  array_exprt content(t.array_type());
+  array_exprt content(array_typet(t.char_type(), length));
 
   for(const char c : str)
     content.copy_to_operands(from_integer(c, t.char_type()));
 
-  return array_string_exprt(length, content, t.string_type());
+  return to_array_string_expr(content);
+}
+
+/// Return a pointer to the data array of an array_string_exprt
+/// \param arr: char array representing a string
+/// \return pointer to the first character of the array
+exprt get_data_pointer(const array_string_exprt &arr)
+{
+  return address_of_exprt(index_exprt(arr, from_integer(0, t.length_type())));
+}
+
+/// Creates a `string_exprt` of the proper string type.
+/// \param [in] str: string to convert
+/// \return corresponding `string_exprt`
+refined_string_exprt make_refined_string_exprt(const array_string_exprt &arr)
+{
+  return refined_string_exprt(arr.length(), get_data_pointer(arr));
 }
 
 /// For a constant `string_exprt`, creates a full index set.
@@ -97,7 +113,6 @@ exprt combine_lemmas(const std::vector<exprt> &lemmas, const namespacet &ns)
 {
   // Conjunction of new lemmas
   exprt conj=conjunction(lemmas);
-
   // Simplify
   simplify(conj, ns);
 
@@ -146,12 +161,20 @@ SCENARIO("instantiate_not_contains",
   symbol_tablet symtbl;
   const namespacet ns(symtbl);
 
+  // Creating strings
+  const auto ab_array = make_string_exprt("ab");
+  const auto b_array = make_string_exprt("b");
+  const auto a_array = make_string_exprt("a");
+  const auto empty_array = make_string_exprt("");
+  const auto cd_array = make_string_exprt("cd");
+  const auto ab = make_refined_string_exprt(ab_array);
+  const auto b = make_refined_string_exprt(b_array);
+  const auto a = make_refined_string_exprt(a_array);
+  const auto empty = make_refined_string_exprt(empty_array);
+  const auto cd = make_refined_string_exprt(cd_array);
+
   GIVEN("The not_contains axioms of String.lastIndexOf(String, Int)")
   {
-    // Creating strings
-    const string_exprt ab=make_string_exprt("ab");
-    const string_exprt b=make_string_exprt("b");
-
     // Creating "ab".lastIndexOf("b", 0)
     function_application_exprt func(
       symbol_exprt(ID_cprover_string_last_index_of_func), t.length_type());
@@ -194,8 +217,8 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab=full_index_set(ab);
-      const std::set<exprt> index_set_b=full_index_set(b);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array);
+      const std::set<exprt> index_set_b = full_index_set(b_array);
 
       // List of new lemmas to be returned
       std::vector<exprt> lemmas;
@@ -228,9 +251,6 @@ SCENARIO("instantiate_not_contains",
 
   GIVEN("A vacuously true not_contains axioms")
   {
-    // Creating strings
-    const string_exprt a=make_string_exprt("a");
-
     // Make
     // forall x in [0, 0). true => (exists y in [0, 1).
     //   { .=1, .={ (char)'a' } }[x+y] != { .=1, .={ (char)'b' } }[y]
@@ -242,8 +262,8 @@ SCENARIO("instantiate_not_contains",
       true_exprt(),
       from_integer(0),
       from_integer(1),
-      a,
-      a);
+      a_array,
+      a_array);
 
     // Create witness for axiom
     symbol_tablet symtab;
@@ -259,7 +279,7 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a=full_index_set(a);
+      const std::set<exprt> index_set_a = full_index_set(a_array);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
@@ -285,10 +305,6 @@ SCENARIO("instantiate_not_contains",
 
   GIVEN("A trivially false (via empty existential) not_contains axioms")
   {
-    // Creating strings
-    const string_exprt a=make_string_exprt("a");
-    const string_exprt b=make_string_exprt("b");
-
     // Make
     // forall x in [0, 1). true => (exists y in [0, 0).
     //   { .=1, .={ (char)'a' } }[x+y] != { .=1, .={ (char)'b' } }[y]
@@ -300,8 +316,8 @@ SCENARIO("instantiate_not_contains",
       true_exprt(),
       from_integer(0),
       from_integer(0),
-      a,
-      b);
+      a_array,
+      b_array);
 
     // Create witness for axiom
     symbol_tablet symtab;
@@ -317,8 +333,8 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a=full_index_set(a);
-      const std::set<exprt> index_set_b=full_index_set(b);
+      const std::set<exprt> index_set_a = full_index_set(a_array);
+      const std::set<exprt> index_set_b = full_index_set(b_array);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
@@ -344,10 +360,6 @@ SCENARIO("instantiate_not_contains",
 
   GIVEN("A not_contains axioms with an non-empty and empty string")
   {
-    // Creating strings
-    const string_exprt a=make_string_exprt("a");
-    const string_exprt empty=make_string_exprt("");
-
     // Make
     // forall x in [0, 1). true => (exists y in [0, 0).
     //   { .=1, .={ (char)'a' } }[x+y] != { .=0, .={ } }[y]
@@ -359,8 +371,8 @@ SCENARIO("instantiate_not_contains",
       true_exprt(),
       from_integer(0),
       from_integer(0),
-      a,
-      empty);
+      a_array,
+      empty_array);
 
     // Create witness for axiom
     symbol_tablet symtab;
@@ -376,7 +388,7 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_a=full_index_set(a);
+      const std::set<exprt> index_set_a = full_index_set(a_array);
       const std::set<exprt> index_set_empty=
         {generator.fresh_exist_index("z", t.length_type())};
 
@@ -404,9 +416,6 @@ SCENARIO("instantiate_not_contains",
 
   GIVEN("A not_contains on the same string twice (hence is false)")
   {
-    // Creating strings
-    const string_exprt ab=make_string_exprt("ab");
-
     // Make
     // forall x in [0, 2). true => (exists y in [0, 2).
     //   { .=2, .={ (char)'a', (char)'b'} }[x+y] !=
@@ -419,8 +428,8 @@ SCENARIO("instantiate_not_contains",
       true_exprt(),
       from_integer(0),
       from_integer(2),
-      ab,
-      ab);
+      ab_array,
+      ab_array);
 
     // Create witness for axiom
     symbol_tablet symtab;
@@ -437,7 +446,7 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab=full_index_set(ab);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
@@ -463,10 +472,6 @@ SCENARIO("instantiate_not_contains",
 
   GIVEN("A not_contains on two string with no chars in common (hence is true)")
   {
-    // Creating strings
-    const string_exprt ab=make_string_exprt("ab");
-    const string_exprt cd=make_string_exprt("cd");
-
     // Make
     // forall x in [0, 2). true => (exists y in [0, 2).
     //   { .=2, .={ (char)'a', (char)'b'} }[x+y] !=
@@ -479,8 +484,8 @@ SCENARIO("instantiate_not_contains",
       true_exprt(),
       from_integer(0),
       from_integer(2),
-      ab,
-      cd);
+      ab_array,
+      cd_array);
 
     // Create witness for axiom
     symbol_tablet symtab;
@@ -496,8 +501,8 @@ SCENARIO("instantiate_not_contains",
     WHEN("we instantiate and simplify")
     {
       // Making index sets
-      const std::set<exprt> index_set_ab=full_index_set(ab);
-      const std::set<exprt> index_set_cd=full_index_set(cd);
+      const std::set<exprt> index_set_ab = full_index_set(ab_array);
+      const std::set<exprt> index_set_cd = full_index_set(cd_array);
 
       // Instantiate the lemmas
       std::vector<exprt> lemmas=instantiate_not_contains(
