@@ -454,7 +454,7 @@ std::vector<typet> java_generic_type_from_string(
   const std::string &src)
 {
   /// the class signature is of the form <TX:Bound_X;TY:Bound_Y;>base_class
-  size_t signature_end=src.find('>');
+  size_t signature_end=find_closing_delimiter(src, 0, '<', '>');
   INVARIANT(
     src[0]=='<' && signature_end!=std::string::npos,
     "Class signature has unexpected format");
@@ -463,7 +463,7 @@ std::vector<typet> java_generic_type_from_string(
   PRECONDITION(signature[signature.size()-1]==';');
 
   std::vector<typet> types;
-  size_t var_sep=signature.find(';');
+  size_t var_sep=signature.rfind(';');
   while(var_sep!=std::string::npos)
   {
     size_t bound_sep=signature.find(':');
