@@ -149,6 +149,7 @@ string_refinementt::string_refinementt(const infot &info, bool):
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
 
+#ifdef DEBUG
 /// display the current index set, for debugging
 static void display_index_set(
   messaget::mstreamt &stream,
@@ -179,6 +180,7 @@ static void display_index_set(
   stream << count << " elements in index set (" << count_current
          << " newly added)" << eom;
 }
+#endif
 
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
