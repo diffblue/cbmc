@@ -97,7 +97,11 @@ reference_typet java_array_type(const char subtype)
   case 'j': subtype_str="long"; break;
   case 'l': subtype_str="long"; break;
   case 'a': subtype_str="reference"; break;
-  default: UNREACHABLE;
+  default:
+#ifdef DEBUG
+    std::cout << "Unrecognised subtype str: " << subtype << std::endl;
+#endif
+    UNREACHABLE;
   }
 
   irep_idt class_name="array["+subtype_str+"]";
