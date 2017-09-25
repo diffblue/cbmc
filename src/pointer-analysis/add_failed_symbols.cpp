@@ -51,7 +51,7 @@ void add_failed_symbol(const symbolt &symbol, symbol_tablet &symbol_table)
   if(symbol.type.get(ID_C_failed_symbol)!="")
     return;
 
-  add_failed_symbol(symbol_table.get_writeable(symbol.name), symbol_table);
+  add_failed_symbol(*symbol_table.get_writeable(symbol.name), symbol_table);
 }
 
 void add_failed_symbols(symbol_tablet &symbol_table)

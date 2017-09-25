@@ -48,9 +48,11 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;
 
-    if(symbol_table.has_symbol(new_symbol.name))
+    symbol_tablet::opt_const_symbol_reft maybe_symbol=
+      symbol_table.lookup(new_symbol.name);
+    if(maybe_symbol)
     {
-      const symbolt &s=symbol_table.lookup(new_symbol.name);
+      const symbolt &s=*maybe_symbol;
       if(s.value.id()=="no-body-just-yet")
       {
         symbol_table.remove(s.name);

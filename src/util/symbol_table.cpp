@@ -24,14 +24,13 @@ bool symbol_tablet::add(const symbolt &symbol)
 /// \param symbol: The symbol to be added to the symbol table
 /// \return Returns an optional reference to the newly inserted symbol, without
 ///   a value if a symbol with the same name already exists in the symbol table
-optionalt<std::reference_wrapper<symbolt>> symbol_tablet::insert(
-  symbolt &&symbol)
+symbol_tablet::opt_symbol_reft symbol_tablet::insert(symbolt &&symbol)
 {
   // Add the symbol to the table or retrieve existing symbol with the same name
   std::pair<symbolst::iterator, bool> result=
     internal_symbols.emplace(symbol.name, std::move(symbol));
   if(!result.second)
-    return optionalt<std::reference_wrapper<symbolt>>();
+    return opt_symbol_reft();
   add_base_and_module(result.first);
   return std::ref(result.first->second);
 }
@@ -158,26 +157,25 @@ void symbol_tablet::show(std::ostream &out) const
 /// found.
 /// \param identifier: The name of the symbol to look for
 /// \return The symbol in the symbol table with the correct name
-const symbolt &symbol_tablet::lookup(const irep_idt &identifier) const
+symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
+  const irep_idt &identifier) const
 {
   symbolst::const_iterator it=symbols.find(identifier);
-
   if(it==symbols.end())
-    throw "symbol "+id2string(identifier)+" not found";
-
-  return it->second;
+    return opt_const_symbol_reft();
+  return std::ref(it->second);
 }
 
 /// Find a symbol in the symbol table.
 /// \param identifier: The name of the symbol to look for
 /// \return The symbol in the symbol table with the correct name
-symbolt &symbol_tablet::get_writeable(const irep_idt &identifier)
+symbol_tablet::opt_symbol_reft symbol_tablet::get_writeable(
+  const irep_idt &identifier)
 {
   symbolst::iterator it=internal_symbols.find(identifier);
-  INVARIANT(
-    it!=symbols.end(),
-    "symbol "+id2string(identifier)+" should be in the symbol map");
-  return it->second;
+  if(it==symbols.end())
+    return opt_symbol_reft();
+  return std::ref(it->second);
 }
 
 /// Print the contents of the symbol table

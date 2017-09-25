@@ -50,7 +50,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       REQUIRE(new_symbol_table.has_symbol("java::I"));
       THEN("The symbol type should be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::I");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::I");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -71,7 +71,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       REQUIRE(new_symbol_table.has_symbol("java::A"));
       THEN("The symbol type should be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::A");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::A");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -92,7 +92,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       REQUIRE(new_symbol_table.has_symbol("java::C"));
       THEN("The symbol type should not be abstract")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::C");
+        const symbolt &class_symbol=*new_symbol_table.lookup("java::C");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -114,7 +114,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::Implementor");
+          *new_symbol_table.lookup("java::Implementor");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -136,7 +136,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::Extendor");
+          *new_symbol_table.lookup("java::Extendor");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);

@@ -42,13 +42,15 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
   {
     const irep_idt &id=to_symbol_expr(expr).get_identifier();
 
-    if(!symbol_table.has_symbol(id))
+    symbol_tablet::opt_symbol_reft maybe_symbol=
+      symbol_table.get_writeable(id);
+    if(!maybe_symbol)
     {
       error() << "unexpected symbol: " << id << eom;
       throw 0;
     }
 
-    symbolt &s=symbol_table.get_writeable(id);
+    symbolt &s=*maybe_symbol;
     if(s.type.id().empty() || s.type.is_nil())
       s.type=type;
     else
@@ -747,9 +749,10 @@ void jsil_typecheckt::typecheck_function_call(
   {
     const irep_idt &id=to_symbol_expr(f).get_identifier();
 
-    if(symbol_table.has_symbol(id))
+    symbol_tablet::opt_const_symbol_reft maybe_symbol=symbol_table.lookup(id);
+    if(maybe_symbol)
     {
-      const symbolt &s=symbol_table.lookup(id);
+      const symbolt &s=*maybe_symbol;
 
       if(s.type.id()==ID_code)
       {
@@ -894,7 +897,7 @@ void jsil_typecheckt::typecheck()
   // recursively doing base classes first.
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.get_writeable(id);
+    symbolt &symbol=*symbol_table.get_writeable(id);
     if(symbol.is_type)
       typecheck_type_symbol(symbol);
   }
@@ -902,7 +905,7 @@ void jsil_typecheckt::typecheck()
   // We now check all non-type symbols
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.get_writeable(id);
+    symbolt &symbol=*symbol_table.get_writeable(id);
     if(!symbol.is_type)
       typecheck_non_type_symbol(symbol);
   }

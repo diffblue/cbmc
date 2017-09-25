@@ -773,7 +773,7 @@ void polynomial_acceleratort::stash_variables(
       it!=vars.end();
       ++it)
   {
-    symbolt orig=symbol_table.lookup(*it);
+    symbolt orig=*symbol_table.lookup(*it);
     symbolt stashed_sym=utils.fresh_symbol("polynomial::stash", orig.type);
     substitution[orig.symbol_expr()]=stashed_sym.symbol_expr();
     program.assign(stashed_sym.symbol_expr(), orig.symbol_expr());

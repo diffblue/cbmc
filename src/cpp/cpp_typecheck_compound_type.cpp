@@ -159,17 +159,19 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // check if we have it already
 
-  if(symbol_table.has_symbol(symbol_name))
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(symbol_name);
+  if(maybe_symbol)
   {
     // we do!
-    const symbolt &symbol=symbol_table.lookup(symbol_name);
+    const symbolt &symbol=*maybe_symbol;
 
     if(has_body)
     {
       if(symbol.type.id()=="incomplete_"+type.id_string())
       {
         // a previously incomplete struct/union becomes complete
-        symbolt &symbol=symbol_table.get_writeable(symbol_name);
+        symbolt &symbol=*symbol_table.get_writeable(symbol_name);
         symbol.type.swap(type);
         typecheck_compound_body(symbol);
       }
@@ -551,7 +553,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         put_compound_into_scope(compo);
       }
 
-      typet &vt=symbol_table.get_writeable(vt_name).type;
+      typet &vt=symbol_table.get_writeable(vt_name)->get().type;
       INVARIANT(vt.id()==ID_struct, "Virtual tables must be stored as struct");
       struct_typet &virtual_table=to_struct_type(vt);
 
@@ -1408,7 +1410,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   struct_typet::componentst &components)
 {
   symbolt &struct_union_symbol=
-    symbol_table.get_writeable(follow(declaration.type()).get(ID_name));
+    *symbol_table.get_writeable(follow(declaration.type()).get(ID_name));
 
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())

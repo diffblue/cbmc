@@ -61,7 +61,7 @@ void remove_returnst::replace_returns(
     return;
 
   // look up the function symbol
-  symbolt &function_symbol=symbol_table.get_writeable(function_id);
+  symbolt &function_symbol=*symbol_table.get_writeable(function_id);
 
   // make the return type 'void'
   f_it->second.type.return_type()=empty_typet();
@@ -249,7 +249,7 @@ bool remove_returnst::restore_returns(
     return true;
 
   // look up the function symbol
-  symbolt &function_symbol=symbol_table.get_writeable(function_id);
+  symbolt &function_symbol=*symbol_table.get_writeable(function_id);
 
   // restore the return type
   f_it->second.type=original_return_type(symbol_table, function_id);

@@ -87,7 +87,7 @@ void languaget::generate_opaque_method_stubs(symbol_tablet &symbol_table)
       if(is_symbol_opaque_function(symbol_entry.second))
       {
         symbolt &symbol=
-          symbol_table.get_writeable(symbol_entry.second.name);
+          *symbol_table.get_writeable(symbol_entry.second.name);
 
         generate_opaque_parameter_symbols(symbol, symbol_table);
 

@@ -444,7 +444,7 @@ typet interpretert::get_type(const irep_idt &id) const
 {
   dynamic_typest::const_iterator it=dynamic_types.find(id);
   if(it==dynamic_types.end())
-    return symbol_table.lookup(id).type;
+    return symbol_table.lookup(id)->get().type;
   return it->second;
 }
 
@@ -1041,7 +1041,7 @@ exprt interpretert::get_value(const irep_idt &id)
   if(findit!=dynamic_types.end())
     get_type=findit->second;
   else
-    get_type=symbol_table.lookup(id).type;
+    get_type=symbol_table.lookup(id)->get().type;
 
   symbol_exprt symbol_expr(id, get_type);
   mp_integer whole_lhs_object_address=evaluate_address(symbol_expr);
