@@ -607,6 +607,36 @@ void *memset(void *s, int c, size_t n)
   return s;
 }
 
+/* FUNCTION: __builtin_memset */
+
+void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
+{
+  __CPROVER_HIDE:;
+  #ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_assert(__CPROVER_buffer_size(s)>=n, "memset buffer overflow");
+  //  for(size_t i=0; i<n ; i++) s[i]=c;
+  if(__CPROVER_is_zero_string(s) &&
+     n > __CPROVER_zero_string_length(s))
+  {
+    __CPROVER_is_zero_string(s)=1;
+  }
+  else if(c==0)
+  {
+    __CPROVER_is_zero_string(s)=1;
+    __CPROVER_zero_string_length(s)=0;
+  }
+  else
+    __CPROVER_is_zero_string(s)=0;
+  #else
+  //char *sp=s;
+  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+  unsigned char s_n[n];
+  __CPROVER_array_set(s_n, (unsigned char)c);
+  __CPROVER_array_replace((unsigned char*)s, s_n);
+  #endif
+  return s;
+}
+
 /* FUNCTION: __builtin___memset_chk */
 
 void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_t size)
