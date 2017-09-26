@@ -227,13 +227,6 @@ private:
   exprt add_axioms_from_bool(const array_string_exprt &res, const exprt &i);
   exprt add_axioms_from_char(const function_application_exprt &f);
   exprt add_axioms_from_char(const array_string_exprt &res, const exprt &i);
-  array_string_exprt
-  add_axioms_from_char_array(const function_application_exprt &f);
-  array_string_exprt add_axioms_from_char_array(
-    const exprt &length,
-    const exprt &data,
-    const exprt &offset,
-    const exprt &count);
   exprt add_axioms_for_index_of(
     const array_string_exprt &str,
     const exprt &c,
@@ -306,15 +299,9 @@ private:
     const array_string_exprt &expr);
   exprt add_axioms_for_trim(const function_application_exprt &f);
 
-  // Add axioms corresponding to the String.valueOf([CII) function
-  // TODO: not working correctly at the moment
-  array_string_exprt
-  add_axioms_for_value_of(const function_application_exprt &f);
-
   exprt add_axioms_for_code_point(
     const array_string_exprt &res,
     const exprt &code_point);
-  array_string_exprt add_axioms_for_java_char_array(const exprt &char_array);
   array_string_exprt add_axioms_for_if(const if_exprt &expr);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);
 
