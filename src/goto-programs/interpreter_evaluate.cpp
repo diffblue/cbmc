@@ -21,8 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <string.h>
 
-/// reads a memory address and loads it into the dest variable marks cell as
-/// read before written if cell has never been written
+/// Reads a memory address and loads it into the `dest` variable.
+/// Marks cell as `READ_BEFORE_WRITTEN` if cell has never been written.
 void interpretert::read(
   const mp_integer &address,
   mp_vectort &dest) const
@@ -102,7 +102,9 @@ void interpretert::clear_input_flags()
   }
 }
 
-/// \return Number of leaf primitive types; returns true on error
+/// \param ty: a type
+/// \param [out] result: Number of leaf primitive types in `ty`
+/// \return returns true on error
 bool interpretert::count_type_leaves(const typet &ty, mp_integer &result)
 {
   if(ty.id()==ID_struct)
@@ -299,6 +301,9 @@ bool interpretert::memory_offset_to_byte_offset(
   }
 }
 
+/// Evaluate an expression
+/// \param expr: expression to evaluate
+/// \param [out] dest: vector in which the result of the evaluation is stored
 void interpretert::evaluate(
   const exprt &expr,
   mp_vectort &dest)
