@@ -429,118 +429,11 @@ std::pair<bool, std::vector<exprt>> add_axioms_for_string_assigns(
   return { true, std::vector<exprt>() };
 }
 
-/// If the expression is of type string, then adds constants to the index set to
-/// force the solver to pick concrete values for each character, and fill the
-/// maps `found_length` and `found_content`.
-///
-/// The way this is done is by looking for the length of the string,
-/// then for each `i` in the index set, look at the value found by
-/// the solver and put it in the `result` table.
-/// For indexes that are not present in the index set, we put the
-/// same value as the next index that is present in the index set.
-/// We do so by traversing the array backward, remembering the
-/// last value that has been initialized.
-static void concretize_string(
-  const std::function<exprt(const exprt &)> get,
-  std::map<exprt, exprt> &found_length,
-  std::map<exprt, array_exprt> &found_content,
-  const replace_mapt &symbol_resolve,
-  const std::map<exprt, std::set<exprt>> &index_set,
-  const std::size_t max_string_length,
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const exprt &expr)
-{
-  if(const auto str=expr_cast<string_exprt>(expr))
-  {
-    const exprt length=get(str->length());
-    exprt content=str->content();
-    replace_expr(symbol_resolve, content);
-    found_length[content]=length;
-    const auto string_length=expr_cast_v<std::size_t>(length);
-    INVARIANT(
-      string_length<=max_string_length,
-      string_refinement_invariantt("string length must be less than the max "
-        "length"));
-    const auto it=index_set.find(str->content());
-    if(it==index_set.end() || it->second.empty())
-      return;
-
-    std::map<std::size_t, exprt> map;
-
-    for(const auto &i : it->second)
-    {
-      const exprt simple_i=simplify_expr(get(i), ns);
-      if(const auto index=expr_cast<std::size_t>(simple_i))
-      {
-        const exprt str_i=simplify_expr((*str)[simple_i], ns);
-        const exprt value=simplify_expr(get(str_i), ns);
-        map.emplace(*index, value);
-      }
-      else
-      {
-        stream << "concretize_string: ignoring out of bound index: "
-               << from_expr(ns, "", simple_i) << messaget::eom;
-      }
-    }
-    array_exprt arr(to_array_type(content.type()));
-    arr.operands()=fill_in_map_as_vector(map);
-    stream << "Concretized " << from_expr(ns, "", str->content())
-           << "=" << from_expr(ns, "", arr) << messaget::eom;
-    found_content[content]=arr;
-  }
-}
-
-/// For each string whose length has been solved, add constants to the index set
-/// to force the solver to pick concrete values for each character, and fill the
-/// map `found_length`
-std::vector<exprt> concretize_results(
-  const std::function<exprt(const exprt &)> get,
-  std::map<exprt, exprt> &found_length,
-  std::map<exprt, array_exprt> &found_content,
-  const replace_mapt &symbol_resolve,
-  const std::map<exprt, std::set<exprt>> &index_set,
-  const std::size_t max_string_length,
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const std::set<string_exprt> &created_strings,
-  const std::map<exprt, std::set<exprt>> &current_index_set,
-  const std::vector<string_constraintt> &universal_axioms)
-{
-  for(const auto &it : symbol_resolve)
-  {
-    concretize_string(
-      get,
-      found_length,
-      found_content,
-      symbol_resolve,
-      index_set,
-      max_string_length,
-      stream,
-      ns,
-      it.second);
-  }
-  for(const auto &expr : created_strings)
-  {
-    concretize_string(
-      get,
-      found_length,
-      found_content,
-      symbol_resolve,
-      index_set,
-      max_string_length,
-      stream,
-      ns,
-      expr);
-  }
-  return generate_instantiations(stream, current_index_set, universal_axioms);
-}
-
 /// For each string whose length has been solved, add constants to the map
 /// `found_length`
 void concretize_lengths(
   std::map<exprt, exprt> &found_length,
-  const std::function<exprt(const exprt &)> get,
+  const std::function<exprt(const exprt &)> &get,
   const replace_mapt &symbol_resolve,
   const std::set<string_exprt> &created_strings)
 {
@@ -2032,8 +1925,8 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get=[this](const exprt &expr)
-  { return supert::get(expr); };
+  const std::function<exprt(const exprt &)> super_get=[this](const exprt &expr)
+  { return (exprt) supert::get(expr); };
   exprt ecopy(expr);
   replace_expr(symbol_resolve, ecopy);
   if(is_char_array(ns, ecopy.type()))
