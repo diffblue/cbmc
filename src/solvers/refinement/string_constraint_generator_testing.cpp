@@ -128,7 +128,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   //     || (s1.length > witness>=0
   //       &&s1[witness]!=s0[witness + s0.length-s1.length]
 
-  implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0));
+  implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
   m_axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_suffix", index_type);
@@ -142,8 +142,9 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   exprt shifted=plus_exprt(
     witness, minus_exprt(s1.length(), s0.length()));
   or_exprt constr3(
-    and_exprt(s0.axiom_for_length_gt(s1),
-              equal_exprt(witness, from_integer(-1, index_type))),
+    and_exprt(
+      s0.axiom_for_length_gt(s1.length()),
+      equal_exprt(witness, from_integer(-1, index_type))),
     and_exprt(
       notequal_exprt(s0[witness], s1[shifted]),
       and_exprt(
@@ -198,7 +199,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   //      (forall startpos <= |s0| - |s1|.
   //         exists witness < |s1|. s1[witness] != s0[witness + startpos])
 
-  implies_exprt a1(contains, s0.axiom_for_length_ge(s1));
+  const implies_exprt a1(contains, s0.axiom_for_length_ge(s1.length()));
   m_axioms.push_back(a1);
 
   minus_exprt length_diff(s0.length(), s1.length());
@@ -225,7 +226,7 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   string_not_contains_constraintt a5(
     from_integer(0, index_type),
     plus_exprt(from_integer(1, index_type), length_diff),
-    and_exprt(not_exprt(contains), s0.axiom_for_length_ge(s1)),
+    and_exprt(not_exprt(contains), s0.axiom_for_length_ge(s1.length())),
     from_integer(0, index_type),
     s1.length(),
     s0,
