@@ -91,7 +91,7 @@ void goto_trace_stept::output(
 
   out << "\n";
 
-  if(pc->is_other() || pc->is_assign())
+  if((pc->is_other() && lhs_object.is_not_nil()) || pc->is_assign())
   {
     irep_idt identifier=lhs_object.get_object_name();
     out << "  " << from_expr(ns, identifier, lhs_object.get_original_expr())
@@ -386,14 +386,8 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::CONSTRAINT:
-      UNREACHABLE;
-      break;
-
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-      UNREACHABLE;
-      break;
-
     default:
       UNREACHABLE;
     }
