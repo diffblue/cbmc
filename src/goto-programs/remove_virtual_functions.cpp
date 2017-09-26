@@ -273,7 +273,7 @@ void remove_virtual_functionst::get_functions(
     root_function.class_id=resolved_call.get_class_identifier();
 
     const symbolt &called_symbol=
-      symbol_table.lookup(resolved_call.get_virtual_method_name());
+      *symbol_table.lookup(resolved_call.get_virtual_method_name());
 
     root_function.symbol_expr=called_symbol.symbol_expr();
     root_function.symbol_expr.set(

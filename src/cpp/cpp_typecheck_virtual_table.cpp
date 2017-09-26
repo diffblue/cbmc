@@ -95,7 +95,7 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     }
     vt_symb_var.value=values;
 
-    bool failed=symbol_table.move(vt_symb_var);
+    bool failed=!symbol_table.insert(std::move(vt_symb_var));
     assert(!failed);
   }
 }

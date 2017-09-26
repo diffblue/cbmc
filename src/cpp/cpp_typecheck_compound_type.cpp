@@ -159,20 +159,19 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // check if we have it already
 
-  symbol_tablet::symbolst::iterator previous_symbol=
-    symbol_table.symbols.find(symbol_name);
-
-  if(previous_symbol!=symbol_table.symbols.end())
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(symbol_name);
+  if(maybe_symbol)
   {
     // we do!
-
-    symbolt &symbol=previous_symbol->second;
+    const symbolt &symbol=*maybe_symbol;
 
     if(has_body)
     {
       if(symbol.type.id()=="incomplete_"+type.id_string())
       {
         // a previously incomplete struct/union becomes complete
+        symbolt &symbol=*symbol_table.get_writeable(symbol_name);
         symbol.type.swap(type);
         typecheck_compound_body(symbol);
       }
@@ -523,10 +522,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // get the virtual-table symbol type
       irep_idt vt_name="virtual_table::"+id2string(symbol.name);
 
-      symbol_tablet::symbolst::iterator vtit =
-        symbol_table.symbols.find(vt_name);
-
-      if(vtit==symbol_table.symbols.end())
+      if(!symbol_table.has_symbol(vt_name))
       {
         // first time: create a virtual-table symbol type
         symbolt vt_symb_type;
@@ -540,9 +536,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
         vt_symb_type.type.set(ID_name, vt_symb_type.name);
         vt_symb_type.is_type=true;
 
-        bool failed=symbol_table.move(vt_symb_type);
+        const bool failed=!symbol_table.insert(std::move(vt_symb_type));
         assert(!failed);
-        vtit=symbol_table.symbols.find(vt_name);
 
         // add a virtual-table pointer
         struct_typet::componentt compo;
@@ -558,10 +553,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         put_compound_into_scope(compo);
       }
 
-      assert(vtit->second.type.id()==ID_struct);
-
-      struct_typet &virtual_table=
-        to_struct_type(vtit->second.type);
+      typet &vt=symbol_table.get_writeable(vt_name)->get().type;
+      INVARIANT(vt.id()==ID_struct, "Virtual tables must be stored as struct");
+      struct_typet &virtual_table=to_struct_type(vt);
 
       component.set("virtual_name", virtual_name);
       component.set("is_virtual", is_virtual);
@@ -569,7 +563,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // add an entry to the virtual table
       struct_typet::componentt vt_entry;
       vt_entry.type()=pointer_type(component.type());
-      vt_entry.set_name(id2string(vtit->first)+"::"+virtual_name);
+      vt_entry.set_name(id2string(vt_name)+"::"+virtual_name);
       vt_entry.set(ID_base_name, virtual_name);
       vt_entry.set(ID_pretty_name, virtual_name);
       vt_entry.set(ID_access, ID_public);
@@ -618,7 +612,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg.set(ID_C_identifier, arg_symb.name);
 
           // add the parameter to the symbol table
-          bool failed=symbol_table.move(arg_symb);
+          const bool failed=!symbol_table.insert(std::move(arg_symb));
           assert(!failed);
         }
 
@@ -676,7 +670,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // add the function to the symbol table
         {
-          bool failed=symbol_table.move(func_symb);
+          bool failed=!symbol_table.insert(std::move(func_symb));
           assert(!failed);
         }
 
@@ -1416,7 +1410,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   struct_typet::componentst &components)
 {
   symbolt &struct_union_symbol=
-    symbol_table.symbols[follow(declaration.type()).get(ID_name)];
+    *symbol_table.get_writeable(follow(declaration.type()).get(ID_name));
 
   if(declaration.storage_spec().is_static() ||
      declaration.storage_spec().is_mutable())

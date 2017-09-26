@@ -105,7 +105,7 @@ protected:
 
   void duplicate_type_symbol(
     symbolt &old_symbol,
-    symbolt &new_symbol);
+    const symbolt &new_symbol);
 
   std::string expr_to_string(
     const namespacet &ns,

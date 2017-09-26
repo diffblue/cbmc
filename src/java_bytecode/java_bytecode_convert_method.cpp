@@ -320,7 +320,7 @@ void java_bytecode_convert_methodt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
   method_id=method_identifier;
 
-  const auto &old_sym=symbol_table.lookup(method_identifier);
+  const symbolt &old_sym=*symbol_table.lookup(method_identifier);
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
@@ -488,7 +488,7 @@ void java_bytecode_convert_methodt::convert(
   INVARIANT(
     s_it!=symbol_table.symbols.end(),
     "the symbol was there earlier on this function; it must be there now");
-  symbol_table.symbols.erase(s_it);
+  symbol_table.erase(s_it);
 
   // Insert the method symbol in the symbol table
   symbol_table.add(method_symbol);
@@ -883,14 +883,15 @@ bool java_bytecode_convert_methodt::class_needs_clinit(
     findit_any.first->second=true;
     return true;
   }
-  auto findit_symbol=symbol_table.symbols.find(classname);
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(classname);
   // Stub class?
-  if(findit_symbol==symbol_table.symbols.end())
+  if(!maybe_symbol)
   {
     warning() << "SKIPPED: " << classname << eom;
     return false;
   }
-  const symbolt &class_symbol=symbol_table.lookup(classname);
+  const symbolt &class_symbol=*maybe_symbol;
   for(const auto &base : to_class_type(class_symbol.type).bases())
   {
     if(class_needs_clinit(to_symbol_type(base.type()).get_identifier()))
@@ -948,7 +949,7 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
   init_body.move_to_operands(set_already_run);
   const irep_idt &real_clinit_name=id2string(classname)+".<clinit>:()V";
-  const symbolt &class_symbol=symbol_table.lookup(classname);
+  const symbolt &class_symbol=*symbol_table.lookup(classname);
 
   auto findsymit=symbol_table.symbols.find(real_clinit_name);
   if(findsymit!=symbol_table.symbols.end())
@@ -2831,7 +2832,7 @@ bool java_bytecode_convert_methodt::is_method_inherited(
   if(resolved_call.is_valid())
   {
     const symbolt &function_symbol=
-      symbol_table.lookup(resolved_call.get_virtual_method_name());
+      *symbol_table.lookup(resolved_call.get_virtual_method_name());
 
     INVARIANT(function_symbol.type.id()==ID_code, "Function must be code");
 

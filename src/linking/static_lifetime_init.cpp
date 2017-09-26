@@ -31,13 +31,11 @@ bool static_lifetime_init(
 {
   namespacet ns(symbol_table);
 
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(INITIALIZE_FUNCTION);
-
-  if(s_it==symbol_table.symbols.end())
+  symbol_tablet::opt_symbol_reft maybe_symbol=
+    symbol_table.get_writeable(INITIALIZE_FUNCTION);
+  if(!maybe_symbol)
     return false;
-
-  symbolt &init_symbol=s_it->second;
+  symbolt &init_symbol=*maybe_symbol;
 
   init_symbol.value=code_blockt();
   init_symbol.value.add_source_location()=source_location;
@@ -104,12 +102,9 @@ bool static_lifetime_init(
     {
       // C standard 6.9.2, paragraph 5
       // adjust the type to an array of size 1
-      symbol_tablet::symbolst::iterator it=
-        symbol_table.symbols.find(identifier);
-      assert(it!=symbol_table.symbols.end());
-
-      it->second.type=type;
-      it->second.type.set(ID_size, from_integer(1, size_type()));
+      symbolt &symbol=*symbol_table.get_writeable(identifier);
+      symbol.type=type;
+      symbol.type.set(ID_size, from_integer(1, size_type()));
     }
 
     if(type.id()==ID_incomplete_struct ||

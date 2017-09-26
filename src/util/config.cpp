@@ -1177,10 +1177,11 @@ void configt::set_object_bits_from_symbol_table(
     return;
 
   // set object_bits according to entry point language
-  if(symbol_table.has_symbol(CPROVER_PREFIX "_start"))
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(CPROVER_PREFIX "_start");
+  if(maybe_symbol)
   {
-    const symbolt &entry_point_symbol=
-      symbol_table.lookup(CPROVER_PREFIX "_start");
+    const symbolt &entry_point_symbol=*maybe_symbol;
 
     if(entry_point_symbol.mode==ID_java)
       bv_encoding.object_bits=java.default_object_bits;

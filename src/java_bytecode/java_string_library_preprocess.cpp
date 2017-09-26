@@ -166,9 +166,9 @@ bool java_string_library_preprocesst::is_java_char_array_pointer_type(
 
 /// \param symbol_table: a symbol_table containing an entry for java Strings
 /// \return the type of data fields in java Strings.
-typet string_data_type(symbol_tablet symbol_table)
+static typet string_data_type(const symbol_tablet &symbol_table)
 {
-  symbolt sym=symbol_table.lookup("java::java.lang.String");
+  symbolt sym=*symbol_table.lookup("java::java.lang.String");
   typet concrete_type=sym.type;
   struct_typet struct_type=to_struct_type(concrete_type);
   std::size_t index=struct_type.component_number("data");
@@ -399,7 +399,7 @@ typet java_string_library_preprocesst::get_data_type(
   PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
   if(type.id()==ID_symbol)
   {
-    symbolt sym=symbol_table.lookup(to_symbol_type(type).get_identifier());
+    symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
     CHECK_RETURN(sym.type.id()!=ID_symbol);
     return get_data_type(sym.type, symbol_table);
   }
@@ -418,7 +418,7 @@ typet java_string_library_preprocesst::get_length_type(
   PRECONDITION(type.id()==ID_struct || type.id()==ID_symbol);
   if(type.id()==ID_symbol)
   {
-    symbolt sym=symbol_table.lookup(to_symbol_type(type).get_identifier());
+    symbolt sym=*symbol_table.lookup(to_symbol_type(type).get_identifier());
     CHECK_RETURN(sym.type.id()!=ID_symbol);
     return get_length_type(sym.type, symbol_table);
   }
@@ -726,7 +726,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   code_blockt code;
 
   // A String has a field Object with @clsid = String and @lock = false:
-  const symbolt &jlo_symbol=symbol_table.lookup("java::java.lang.Object");
+  const symbolt &jlo_symbol=*symbol_table.lookup("java::java.lang.Object");
   const struct_typet &jlo_struct=to_struct_type(jlo_symbol.type);
   struct_exprt jlo_init(jlo_struct);
   jlo_init.copy_to_operands(constant_exprt(
@@ -809,7 +809,7 @@ codet java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   typet deref_type;
   if(rhs.type().subtype().id()==ID_symbol)
     deref_type=symbol_table.lookup(
-      to_symbol_type(rhs.type().subtype()).get_identifier()).type;
+      to_symbol_type(rhs.type().subtype()).get_identifier())->get().type;
   else
     deref_type=rhs.type().subtype();
 
@@ -1266,10 +1266,11 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
 
   // Check that the type of the object is in the symbol table,
   // otherwise there is no safe way of finding its value.
-  if(symbol_table.has_symbol(object_type.get_identifier()))
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(object_type.get_identifier());
+  if(maybe_symbol)
   {
-    struct_typet struct_type=to_struct_type(
-      symbol_table.lookup(object_type.get_identifier()).type);
+    struct_typet struct_type=to_struct_type(maybe_symbol->get().type);
     // Check that the type has a value field
     const struct_union_typet::componentt value_comp=
       struct_type.get_component("value");
@@ -1511,7 +1512,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
 
   // > Class class1;
   pointer_typet class_type=
-    java_reference_type(symbol_table.lookup("java::java.lang.Class").type);
+    java_reference_type(symbol_table.lookup("java::java.lang.Class")->get().type);
   symbolt class1_sym=get_fresh_aux_symbol(
     class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
   symbol_exprt class1=class1_sym.symbol_expr();
@@ -1547,8 +1548,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   code.add(code_assignt(string_expr_sym1, string_expr1));
 
   // string1 = (String*) string_expr
-  pointer_typet string_ptr_type=
-    java_reference_type(symbol_table.lookup("java::java.lang.String").type);
+  pointer_typet string_ptr_type=java_reference_type(
+    symbol_table.lookup("java::java.lang.String")->get().type);
   exprt string1=allocate_fresh_string(string_ptr_type, loc, symbol_table, code);
   code.add(
     code_assign_string_expr_to_new_java_string(

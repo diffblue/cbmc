@@ -48,22 +48,18 @@ void java_bytecode_typecheckt::typecheck()
   // recursively doing base classes first.
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.symbols[id];
-
+    symbolt &symbol=*symbol_table.get_writeable(id);
     if(!symbol.is_type)
       continue;
-
     typecheck_type_symbol(symbol);
   }
 
   // We now check all non-type symbols
   for(const irep_idt &id : identifiers)
   {
-    symbolt &symbol=symbol_table.symbols[id];
-
+    symbolt &symbol=*symbol_table.get_writeable(id);
     if(symbol.is_type)
       continue;
-
     typecheck_non_type_symbol(symbol);
   }
 }

@@ -61,11 +61,7 @@ void remove_returnst::replace_returns(
     return;
 
   // look up the function symbol
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(function_id);
-
-  assert(s_it!=symbol_table.symbols.end());
-  symbolt &function_symbol=s_it->second;
+  symbolt &function_symbol=*symbol_table.get_writeable(function_id);
 
   // make the return type 'void'
   f_it->second.type.return_type()=empty_typet();
@@ -246,18 +242,14 @@ bool remove_returnst::restore_returns(
   // do we have X#return_value?
   std::string rv_name=id2string(function_id)+RETURN_VALUE_SUFFIX;
 
-  symbol_tablet::symbolst::iterator rv_it=
+  symbol_tablet::symbolst::const_iterator rv_it=
     symbol_table.symbols.find(rv_name);
 
   if(rv_it==symbol_table.symbols.end())
     return true;
 
   // look up the function symbol
-  symbol_tablet::symbolst::iterator s_it=
-    symbol_table.symbols.find(function_id);
-
-  assert(s_it!=symbol_table.symbols.end());
-  symbolt &function_symbol=s_it->second;
+  symbolt &function_symbol=*symbol_table.get_writeable(function_id);
 
   // restore the return type
   f_it->second.type=original_return_type(symbol_table, function_id);
@@ -265,7 +257,7 @@ bool remove_returnst::restore_returns(
 
   // remove the return_value symbol from the symbol_table
   irep_idt rv_name_id=rv_it->second.name;
-  symbol_table.symbols.erase(rv_it);
+  symbol_table.erase(rv_it);
 
   goto_programt &goto_program=f_it->second.body;
 

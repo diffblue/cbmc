@@ -72,7 +72,7 @@ void record_function_outputs(
     codet output(ID_output);
     output.operands().resize(2);
 
-    const symbolt &return_symbol=symbol_table.lookup("return'");
+    const symbolt &return_symbol=*symbol_table.lookup("return'");
 
     output.op0()=
       address_of_exprt(
@@ -212,7 +212,7 @@ bool generate_ansi_c_start_function(
   // build call to initialization function
 
   {
-    symbol_tablet::symbolst::iterator init_it=
+    symbol_tablet::symbolst::const_iterator init_it=
       symbol_table.symbols.find(INITIALIZE_FUNCTION);
 
     if(init_it==symbol_table.symbols.end())
@@ -478,11 +478,11 @@ bool generate_ansi_c_start_function(
   new_symbol.value.swap(init_code);
   new_symbol.mode=symbol.mode;
 
-  if(symbol_table.move(new_symbol))
+  if(!symbol_table.insert(std::move(new_symbol)))
   {
     messaget message;
     message.set_message_handler(message_handler);
-    message.error() << "failed to move main symbol" << messaget::eom;
+    message.error() << "failed to insert main symbol" << messaget::eom;
     return true;
   }
 
