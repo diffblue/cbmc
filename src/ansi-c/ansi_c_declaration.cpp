@@ -98,7 +98,7 @@ typet ansi_c_declarationt::full_type(
   // this gets types that are still raw parse trees
   while(p->is_not_nil())
   {
-    if(p->id()==ID_pointer || p->id()==ID_array ||
+    if(p->id()==ID_frontend_pointer || p->id()==ID_array ||
        p->id()==ID_vector || p->id()==ID_c_bit_field ||
        p->id()==ID_block_pointer || p->id()==ID_code)
       p=&p->subtype();

@@ -187,7 +187,7 @@ static void make_subtype(typet &dest, typet &src)
   #endif
 
   assert(src.id()==ID_array ||
-         src.id()==ID_pointer ||
+         src.id()==ID_frontend_pointer ||
          src.id()==ID_code ||
          src.id()==ID_merged_type ||
          src.id()==ID_abstract ||
@@ -207,7 +207,7 @@ static void make_subtype(typet &dest, typet &src)
       sub=&(p->subtypes().back());
     }
 
-    if(sub->id()==ID_pointer ||
+    if(sub->id()==ID_frontend_pointer ||
        sub->id()==ID_array ||
        sub->id()==ID_code)
     {
@@ -292,7 +292,7 @@ static void make_pointer(const YYSTYPE dest)
 {
   // The below deliberately avoids pointer_type().
   // The width is set during conversion.
-  stack_type(dest).id(ID_pointer);
+  stack_type(dest).id(ID_frontend_pointer);
   stack_type(dest).subtype()=typet(ID_abstract);
 }
 

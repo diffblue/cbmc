@@ -3067,7 +3067,7 @@ unary_identifier_declarator:
           // and not the identifier_declarator
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($1).id(ID_pointer);
+          stack_type($1).id(ID_frontend_pointer);
           stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
@@ -3254,7 +3254,7 @@ unary_abstract_declarator:
           $$=$1;
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($$).id(ID_pointer);
+          stack_type($$).id(ID_frontend_pointer);
           stack_type($$).subtype()=typet(ID_abstract);
         }
         | '*' attribute_type_qualifier_list
@@ -3263,7 +3263,7 @@ unary_abstract_declarator:
           // not to the (missing) abstract declarator.
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($1).id(ID_pointer);
+          stack_type($1).id(ID_frontend_pointer);
           stack_type($1).subtype()=typet(ID_abstract);
           $$=merge($2, $1);
         }
@@ -3278,7 +3278,7 @@ unary_abstract_declarator:
           // not to the abstract declarator.
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($1).id(ID_pointer);
+          stack_type($1).id(ID_frontend_pointer);
           stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
@@ -3300,7 +3300,7 @@ parameter_unary_abstract_declarator:
           $$=$1;
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($$).id(ID_pointer);
+          stack_type($$).id(ID_frontend_pointer);
           stack_type($$).subtype()=typet(ID_abstract);
         }
         | '*' attribute_type_qualifier_list
@@ -3309,7 +3309,7 @@ parameter_unary_abstract_declarator:
           // not to the (missing) abstract declarator.
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($1).id(ID_pointer);
+          stack_type($1).id(ID_frontend_pointer);
           stack_type($1).subtype()=typet(ID_abstract);
           $$=merge($2, $1);
         }
@@ -3324,7 +3324,7 @@ parameter_unary_abstract_declarator:
           // not to the (missing) abstract declarator.
           // The below is deliberately not using pointer_type();
           // the width is added during conversion.
-          stack_type($1).id(ID_pointer);
+          stack_type($1).id(ID_frontend_pointer);
           stack_type($1).subtype()=typet(ID_abstract);
           $2=merge($2, $1); // dest=$2
           make_subtype($3, $2); // dest=$3
