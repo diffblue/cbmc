@@ -293,10 +293,17 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
 ///        sequence
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
-/// \param init_code: code block, in which declaration of some arguments may be
-///   added
-/// \return the processed operand
-exprt java_string_library_preprocesst::convert_exprt_to_string_exprt(
+/// \param init_code: code block, in which declaration will be added:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// char *cprover_string_content;
+/// int cprover_string_length;
+/// cprover_string_length = a->length;
+/// cprover_string_content = a->data;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \return the processed operand:
+///         {content=cprover_string_content, length=cprover_string_length}
+refined_string_exprt
+java_string_library_preprocesst::convert_exprt_to_string_exprt(
   const exprt &expr_to_process,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
@@ -358,6 +365,7 @@ exprt::operandst
   code_blockt &init_code)
 {
   PRECONDITION(operands.size()==2);
+  exprt::operandst ops;
   const exprt &op0=operands[0];
   const exprt &op1 = operands[1];
   PRECONDITION(implements_java_char_sequence_pointer(op0.type()));
@@ -650,8 +658,8 @@ exprt make_nondet_infinite_char_array(
     java_char_type(), infinity_exprt(java_int_type()));
   const symbolt data_sym = get_fresh_aux_symbol(
     array_type,
-    "nondet_inifinite_array",
-    "nondet_inifinite_array",
+    "nondet_infinite_array",
+    "nondet_infinite_array",
     loc,
     ID_java,
     symbol_table);

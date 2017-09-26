@@ -169,16 +169,6 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
-  // Auxiliary functions
-  codet code_for_scientific_notation(
-    const exprt &arg,
-    const ieee_float_spect &float_spec,
-    const refined_string_exprt &string_expr,
-    const exprt &tmp_string,
-    const refined_string_typet &refined_string_type,
-    const source_locationt &loc,
-    symbol_tablet &symbol_table);
-
   // Helper functions
   exprt::operandst process_parameters(
     const code_typet::parameterst &params,
@@ -193,7 +183,7 @@ private:
       symbol_tablet &symbol_table,
       code_blockt &init_code);
 
-  exprt convert_exprt_to_string_exprt(
+  refined_string_exprt convert_exprt_to_string_exprt(
     const exprt &deref,
     const source_locationt &loc,
     symbol_tablet &symbol_table,
