@@ -233,7 +233,7 @@ static void display_index_set(
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
   const namespacet &ns,
-  string_constraint_generatort &generator,
+  const string_constraint_generatort &generator,
   const index_set_pairt &index_set,
   const string_axiomst &axioms)
 {
@@ -638,10 +638,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     return res;
   }
 
-  initial_index_set(
-    index_sets,
-    ns,
-    axioms);
+  initial_index_set(index_sets, ns, axioms);
   update_index_set(index_sets, ns, current_constraints);
   display_index_set(debug(), ns, index_sets);
   current_constraints.clear();
@@ -700,7 +697,21 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       if(index_sets.current.empty())
       {
         debug() << "current index set is empty" << eom;
-        return resultt::D_ERROR;
+        if(axioms.not_contains.empty())
+        {
+          debug() << "no not_contains axioms, hence SAT" << eom;
+          concretize_lengths(
+            found_length,
+            get,
+            symbol_resolve,
+            generator.get_created_strings());
+          return resultt::D_SATISFIABLE;
+        }
+        else
+        {
+          debug() << "not_contains axioms exist, hence ERROR" << eom;
+          return resultt::D_ERROR;
+        }
       }
 
       display_index_set(debug(), ns, index_sets);
@@ -1373,9 +1384,28 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     if(use_counter_example)
     {
       stream << "Adding counter-examples: " << eom;
-      // TODO: add counter-examples for universal constraints?
 
       std::vector<exprt> lemmas;
+
+      for(const auto &v : violated)
+      {
+        const exprt &val=v.second;
+        const string_constraintt &axiom=axioms.universal[v.first];
+
+        implies_exprt instance(axiom.premise(), axiom.body());
+        replace_expr(axiom.univ_var(), val, instance);
+        // We are not sure the index set contains only positive numbers
+        exprt bounds=and_exprt(
+          axiom.univ_within_bounds(),
+          binary_relation_exprt(
+            from_integer(0, val.type()), ID_le, val));
+        replace_expr(axiom.univ_var(), val, bounds);
+        const implies_exprt counter(bounds, instance);
+
+        stream << "  -  " << from_expr(ns, "", counter) << eom;
+        lemmas.push_back(counter);
+      }
+
       for(const auto &v : violated_not_contains)
       {
         const exprt &val=v.second;
@@ -1390,7 +1420,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt counter=::instantiate_not_contains(
           axiom, indices, generator)[0];
 
-        stream << "    -  " << from_expr(ns, "", counter) << eom;
+        stream << "  -  " << from_expr(ns, "", counter) << eom;
         lemmas.push_back(counter);
       }
       return { false, lemmas };
@@ -1696,7 +1726,7 @@ static void initial_index_set(
       {
         // otherwise we add k-1
         exprt e(i);
-        minus_exprt kminus1(
+        const minus_exprt kminus1(
           axiom.upper_bound(),
           from_integer(1, axiom.upper_bound().type()));
         replace_expr(qvar, kminus1, e);
@@ -1732,7 +1762,7 @@ static void initial_index_set(
       ++it;
   }
 
-  minus_exprt kminus1(
+  const minus_exprt kminus1(
     axiom.exists_upper_bound(),
     from_integer(1, axiom.exists_upper_bound().type()));
   add_to_index_set(index_set, ns, axiom.s1().content(), kminus1);
