@@ -30,6 +30,7 @@ SRC += unit_tests.cpp \
        util/expr_iterator.cpp \
        util/message.cpp \
        util/simplify_expr.cpp \
+       util/symbol_table.cpp \
        catch_example.cpp \
        # Empty last line
 
