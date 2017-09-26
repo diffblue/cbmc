@@ -12,6 +12,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///   strings
 
 #include <solvers/refinement/string_constraint_generator.h>
+#include "axt.h"
 
 /// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// the substring of `s2` starting at index `start_index` and ending
@@ -39,32 +40,38 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \return integer expression `0`
 exprt string_constraint_generatort::add_axioms_for_concat_substr(
   const array_string_exprt &res,
-  const array_string_exprt &s1,
-  const array_string_exprt &s2,
-  const exprt &start_index,
-  const exprt &end_index)
+  const array_string_exprt &s1_,
+  const array_string_exprt &s2_,
+  const exprt &start_index_,
+  const exprt &end_index_)
 {
-  binary_relation_exprt prem(end_index, ID_gt, start_index);
+  const axt s1(s1_);
+  const axt s1_length(s1_.length());
+  const axt s2(s2_);
+  const axt start_index(start_index_);
+  const axt end_index(end_index_);
 
-  exprt res_length=plus_exprt_with_overflow_check(
-    s1.length(), minus_exprt(end_index, start_index));
-  implies_exprt a1(prem, equal_exprt(res.length(), res_length));
+  const axt res_length = s1_length + end_index - start_index;
+  const axt a1 = end_index > start_index >>= res_length == res.length();
   axioms.push_back(a1);
 
-  implies_exprt a2(not_exprt(prem), equal_exprt(res.length(), s1.length()));
+  const axt a2 = end_index <= start_index >>= s1_length == res.length();
   axioms.push_back(a2);
 
-  symbol_exprt idx=fresh_univ_index("QA_index_concat", res.length().type());
-  string_constraintt a3(idx, s1.length(), equal_exprt(s1[idx], res[idx]));
+  const symbol_exprt idx =
+    fresh_univ_index("QA_index_concat", res.length().type());
+  const string_constraintt a3(idx, s1_length, s1[idx] == axt(res[idx]));
   axioms.push_back(a3);
 
-  symbol_exprt idx2=fresh_univ_index("QA_index_concat2", res.length().type());
-  equal_exprt res_eq(
-    res[plus_exprt(idx2, s1.length())], s2[plus_exprt(start_index, idx2)]);
-  string_constraintt a4(idx2, minus_exprt(end_index, start_index), res_eq);
+  const symbol_exprt idx2 =
+    fresh_univ_index("QA_index_concat2", res.length().type());
+  const string_constraintt a4(
+    idx2,
+    end_index - start_index,
+    axt(res)[axt(idx2) + s1_length] == s2[start_index + idx2]);
   axioms.push_back(a4);
 
-  // We should have a enum type for the possible error codes
+  /// \todo We should have a enum type for the possible error codes
   return from_integer(0, res.length().type());
 }
 
