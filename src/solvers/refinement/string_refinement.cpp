@@ -600,11 +600,15 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
       if(index_sets.current.empty())
       {
-        error() << "dec_solve: current index set is empty, "
-                << "this should not happen" << eom;
-        return resultt::D_ERROR;
+        if(axioms.not_contains.empty())
+        {
+          error() << "dec_solve: current index set is empty, "
+                  << "this should not happen" << eom;
+          return resultt::D_ERROR;
+        }
+        else
+          debug() << "dec_solve: current index set is empty" << eom;
       }
-
       current_constraints.clear();
       for(const auto &instance :
         generate_instantiations(
