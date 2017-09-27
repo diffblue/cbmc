@@ -30,6 +30,18 @@ Date:   April 2017
 
 #include "java_string_library_preprocess.h"
 
+/// \return tag of a struct prefixed by "java::" or symbolic tag
+/// empty string if not symbol or struct
+irep_idt get_tag(const typet &type)
+{
+  if(type.id() == ID_symbol)
+    return to_symbol_type(type).get_identifier();
+  else if(type.id() == ID_struct)
+    return irep_idt("java::" + id2string(to_struct_type(type).get_tag()));
+  else
+    return "";
+}
+
 /// \param type: a type
 /// \param tag: a string
 /// \return Boolean telling whether the type is a struct with the given tag or a
@@ -37,17 +49,7 @@ Date:   April 2017
 bool java_string_library_preprocesst::java_type_matches_tag(
   const typet &type, const std::string &tag)
 {
-  if(type.id()==ID_symbol)
-  {
-    irep_idt tag_id=to_symbol_type(type).get_identifier();
-    return tag_id=="java::"+tag;
-  }
-  else if(type.id()==ID_struct)
-  {
-    irep_idt tag_id=to_struct_type(type).get_tag();
-    return tag_id==tag;
-  }
-  return false;
+  return irep_idt("java::" + tag) == get_tag(type);
 }
 
 /// \param type: a type
