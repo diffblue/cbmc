@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.2)
 
+set(enable_ccache on CACHE BOOL "Whether CCACHE should be used or not when building targets (applies only for Makefile and Ninja generators).")
 find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
+if(CCACHE_PROGRAM AND enable_ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
     message(STATUS "Rule launch compile: ${CCACHE_PROGRAM}")
- endif()
+else()
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
+    message(STATUS "Rule launch compile: '${RULE_LAUNCH_COMPILE}'")
+endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
