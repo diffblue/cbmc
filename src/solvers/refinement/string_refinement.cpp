@@ -1776,7 +1776,8 @@ static void update_index_set(
         s.type().id()==ID_array,
         string_refinement_invariantt("index expressions must index on arrays"));
       exprt simplified=simplify_sum(i);
-      add_to_index_set(index_set, ns, s, simplified);
+      if(s.id() != ID_array) // do not update index set of constant arrays
+        add_to_index_set(index_set, ns, s, simplified);
     }
     else
     {
