@@ -226,12 +226,14 @@ static void substitute_function_applications_in_equations(
     eq.rhs() = substitute_function_applications(eq.rhs(), generator);
 }
 
-/// For now, any unsigned bitvector type is considered a character.
+/// For now, any unsigned bitvector type of width smaller or equal to 16 is
+/// considered a character.
 /// \param type: a type
 /// \return true if the given type represents characters
 bool is_char_type(const typet &type)
 {
-  return type.id() == ID_unsignedbv;
+  return type.id() == ID_unsignedbv &&
+         to_unsignedbv_type(type).get_width() <= 16;
 }
 
 /// Distinguish char array from other types.
@@ -1686,7 +1688,7 @@ static void initial_index_set(
   {
     const exprt &cur = to_process.back();
     to_process.pop_back();
-    if(cur.id()==ID_index)
+    if(cur.id() == ID_index && is_char_type(cur.type()))
     {
       const index_exprt &index_expr = to_index_expr(cur);
       const exprt &s = index_expr.array();
@@ -1732,7 +1734,7 @@ static void initial_index_set(
   const auto end=axiom.premise().depth_end();
   while(it!=end)
   {
-    if(it->id()==ID_index)
+    if(it->id() == ID_index && is_char_type(it->type()))
     {
       const exprt &s=it->op0();
       const exprt &i=it->op1();
@@ -1766,7 +1768,7 @@ static void update_index_set(
   {
     exprt cur=to_process.back();
     to_process.pop_back();
-    if(cur.id()==ID_index)
+    if(cur.id() == ID_index && is_char_type(cur.type()))
     {
       const exprt &s=cur.op0();
       const exprt &i=cur.op1();
