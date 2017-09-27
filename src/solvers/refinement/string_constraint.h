@@ -49,6 +49,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
     We extend this slightly by restricting n to be in a specific range, but this
     is another implication which can be pushed in to \f$L(n)\f$.
+
+    String constraints are of the form
+    forall univ_var in [lower_bound,upper_bound[. premise => body
 */
 
 struct string_constraintt final
@@ -58,60 +61,23 @@ struct string_constraintt final
   symbol_exprt univ_var;
   exprt lower_bound=from_integer(0, java_int_type());
   exprt upper_bound;
-  // String constraints are of the form
-  // forall univ_var in [lower_bound,upper_bound[. premise => body
-  void replace(replace_mapt& symbol_resolve)
-  {
-    replace_expr(symbol_resolve, premise);
-    replace_expr(symbol_resolve, body);
-    replace_expr(symbol_resolve, univ_var);
-    replace_expr(symbol_resolve, upper_bound);
-    replace_expr(symbol_resolve, lower_bound);
-  };
-
-  string_constraintt() = delete;
-
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_inf,
-    const exprt &bound_sup,
-    const exprt &prem,
-    const exprt &body):
-    premise(prem),
-    body(body),
-    univ_var(_univ_var),
-    lower_bound(bound_inf),
-    upper_bound(bound_sup) { }
-
-  // Default bound inferior is 0
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_sup,
-    const exprt &prem,
-    const exprt &body):
-    string_constraintt(
-      _univ_var,
-      from_integer(0, java_int_type()),
-      bound_sup,
-      prem,
-      body)
-  {}
-
-  // Default premise is true
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_sup,
-    const exprt &body):
-    string_constraintt(_univ_var, bound_sup, true_exprt(), body)
-  {}
-
-  exprt univ_within_bounds() const
-  {
-    return and_exprt(
-      binary_relation_exprt(lower_bound, ID_le, univ_var),
-      binary_relation_exprt(upper_bound, ID_gt, univ_var));
-  }
 };
+
+inline void replace(string_constraintt &axiom, const replace_mapt& symbol_resolve)
+{
+  replace_expr(symbol_resolve, axiom.premise);
+  replace_expr(symbol_resolve, axiom.body);
+  replace_expr(symbol_resolve, axiom.univ_var);
+  replace_expr(symbol_resolve, axiom.upper_bound);
+  replace_expr(symbol_resolve, axiom.lower_bound);
+}
+
+inline exprt univ_within_bounds(const string_constraintt &axiom)
+{
+  return and_exprt(
+    binary_relation_exprt(axiom.lower_bound, ID_le, axiom.univ_var),
+    binary_relation_exprt(axiom.upper_bound, ID_gt, axiom.univ_var));
+}
 
 /// Used for debug printing.
 /// \param [in] ns: namespace for `from_expr`

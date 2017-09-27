@@ -39,20 +39,20 @@ string_exprt string_constraint_generatort::add_axioms_for_set_length(
 
   symbol_exprt idx=fresh_univ_index(
     "QA_index_set_length", ref_type.get_index_type());
-  string_constraintt a2(
-    idx,
-    res.length(),
-    s1.axiom_for_length_gt(idx),
-    equal_exprt(s1[idx], res[idx]));
+  string_constraintt a2;
+  a2.univ_var=idx;
+  a2.upper_bound=res.length();
+  a2.premise=s1.axiom_for_length_gt(idx);
+  a2.body=equal_exprt(s1[idx], res[idx]);
   constraints_.push_back(a2);
 
   symbol_exprt idx2=fresh_univ_index(
     "QA_index_set_length2", ref_type.get_index_type());
-  string_constraintt a3(
-    idx2,
-    res.length(),
-    s1.axiom_for_length_le(idx2),
-    equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type())));
+  string_constraintt a3;
+  a3.univ_var=idx2;
+  a3.upper_bound=res.length();
+  a3.premise=s1.axiom_for_length_le(idx2);
+  a3.body=equal_exprt(res[idx2], constant_char(0, ref_type.get_char_type()));
   constraints_.push_back(a3);
 
   return res;
@@ -123,10 +123,10 @@ string_exprt string_constraint_generatort::add_axioms_for_substring(
   lemmas_.push_back(str.axiom_for_length_ge(end));
 
   symbol_exprt idx=fresh_univ_index("QA_index_substring", index_type);
-  string_constraintt a4(idx,
-                        res.length(),
-                        equal_exprt(res[idx],
-                        str[plus_exprt(start, idx)]));
+  string_constraintt a4;
+  a4.univ_var=idx;
+  a4.upper_bound=res.length();
+  a4.body=equal_exprt(res[idx], str[plus_exprt(start, idx)]);
   constraints_.push_back(a4);
   return res;
 }
@@ -175,7 +175,10 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
 
   symbol_exprt n=fresh_univ_index("QA_index_trim", index_type);
   binary_relation_exprt non_print(str[n], ID_le, space_char);
-  string_constraintt a6(n, idx, non_print);
+  string_constraintt a6;
+  a6.univ_var=n;
+  a6.upper_bound=idx;
+  a6.body=non_print;
   constraints_.push_back(a6);
 
   symbol_exprt n2=fresh_univ_index("QA_index_trim2", index_type);
@@ -186,12 +189,18 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
     ID_le,
     space_char);
 
-  string_constraintt a7(n2, bound, eqn2);
+  string_constraintt a7;
+  a7.univ_var=n2;
+  a7.upper_bound=bound;
+  a7.body=eqn2;
   constraints_.push_back(a7);
 
   symbol_exprt n3=fresh_univ_index("QA_index_trim3", index_type);
   equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
-  string_constraintt a8(n3, res.length(), eqn3);
+  string_constraintt a8;
+  a8.univ_var=n3;
+  a8.upper_bound=res.length();
+  a8.body=eqn3;
   constraints_.push_back(a8);
 
   minus_exprt index_before(
@@ -267,7 +276,10 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
     binary_relation_exprt(str[idx], ID_lt, from_integer(0x100, char_type)));
   if_exprt conditional_convert(is_upper_case, converted, non_converted);
 
-  string_constraintt a2(idx, res.length(), conditional_convert);
+  string_constraintt a2;
+  a2.univ_var=idx;
+  a2.upper_bound=res.length();
+  a2.body=conditional_convert;
   constraints_.push_back(a2);
 
   return res;
@@ -308,7 +320,10 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   minus_exprt diff(char_A, char_a);
   equal_exprt convert(res[idx1], plus_exprt(str[idx1], diff));
   implies_exprt body1(is_lower_case, convert);
-  string_constraintt a2(idx1, res.length(), body1);
+  string_constraintt a2;
+  a2.univ_var=idx1;
+  a2.upper_bound=res.length();
+  a2.body=body1;
   constraints_.push_back(a2);
 
   symbol_exprt idx2=fresh_univ_index("QA_upper_case2", index_type);
@@ -317,7 +332,10 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
     binary_relation_exprt(str[idx2], ID_le, char_z)));
   equal_exprt eq(res[idx2], str[idx2]);
   implies_exprt body2(is_not_lower_case, eq);
-  string_constraintt a3(idx2, res.length(), body2);
+  string_constraintt a3;
+  a3.univ_var=idx2;
+  a3.upper_bound=res.length();
+  a3.body=body2;
   constraints_.push_back(a3);
   return res;
 }
@@ -388,7 +406,10 @@ string_exprt string_constraint_generatort::add_axioms_for_replace(
   implies_exprt case2(
     not_exprt(equal_exprt(str[qvar], old_char)),
     equal_exprt(res[qvar], str[qvar]));
-  string_constraintt a2(qvar, res.length(), and_exprt(case1, case2));
+  string_constraintt a2;
+  a2.univ_var=qvar;
+  a2.upper_bound=res.length();
+  a2.body=and_exprt(case1, case2);
   constraints_.push_back(a2);
   return res;
 }

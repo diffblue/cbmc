@@ -52,17 +52,21 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   lemmas_.push_back(a3);
 
   symbol_exprt n=fresh_univ_index("QA_index_of", index_type);
-  string_constraintt a4(
-    n, from_index, index, contains, not_exprt(equal_exprt(str[n], c)));
+  string_constraintt a4;
+  a4.univ_var=n;
+  a4.lower_bound=from_index;
+  a4.upper_bound=index;
+  a4.premise=contains;
+  a4.body=not_exprt(equal_exprt(str[n], c));
   constraints_.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_index_of", index_type);
-  string_constraintt a5(
-    m,
-    from_index,
-    str.length(),
-    not_exprt(contains),
-    not_exprt(equal_exprt(str[m], c)));
+  string_constraintt a5;
+  a5.univ_var=m,
+  a5.lower_bound=from_index,
+  a5.upper_bound=str.length(),
+  a5.premise=not_exprt(contains),
+  a5.body=not_exprt(equal_exprt(str[m], c));
   constraints_.push_back(a5);
 
   return index;
@@ -109,11 +113,11 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   lemmas_.push_back(a2);
 
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
-  string_constraintt a3(
-    qvar,
-    needle.length(),
-    contains,
-    equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]));
+  string_constraintt a3;
+  a3.univ_var=qvar;
+  a3.upper_bound=needle.length();
+  a3.premise=contains;
+  a3.body=equal_exprt(haystack[plus_exprt(qvar, offset)], needle[qvar]);
   constraints_.push_back(a3);
 
   // string_not contains_constraintt are formulas of the form:
@@ -190,7 +194,11 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 
   symbol_exprt qvar=fresh_univ_index("QA_index_of_string", index_type);
   equal_exprt constr3(haystack[plus_exprt(qvar, offset)], needle[qvar]);
-  string_constraintt a3(qvar, needle.length(), contains, constr3);
+  string_constraintt a3;
+  a3.univ_var=qvar;
+  a3.upper_bound=needle.length();
+  a3.premise=contains;
+  a3.body=constr3;
   constraints_.push_back(a3);
 
   // end_index is min(from_index, |str| - |substring|)
@@ -302,20 +310,20 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   lemmas_.push_back(a3);
 
   symbol_exprt n=fresh_univ_index("QA_last_index_of1", index_type);
-  string_constraintt a4(
-    n,
-    plus_exprt(index, index1),
-    from_index_plus_one,
-    contains,
-    not_exprt(equal_exprt(str[n], c)));
+  string_constraintt a4;
+  a4.univ_var=n;
+  a4.lower_bound=plus_exprt(index, index1);
+  a4.upper_bound=from_index_plus_one;
+  a4.premise=contains;
+  a4.body=not_exprt(equal_exprt(str[n], c));
   constraints_.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_last_index_of2", index_type);
-  string_constraintt a5(
-    m,
-    from_index_plus_one,
-    not_exprt(contains),
-    not_exprt(equal_exprt(str[m], c)));
+  string_constraintt a5;
+  a5.univ_var=m;
+  a5.upper_bound=from_index_plus_one;
+  a5.premise=not_exprt(contains);
+  a5.body=not_exprt(equal_exprt(str[m], c));
   constraints_.push_back(a5);
 
   return index;

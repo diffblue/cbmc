@@ -195,7 +195,10 @@ void string_constraint_generatort::add_default_axioms(
     and_exprt printable(
       binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
       binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
-    string_constraintt sc(qvar, s.length(), printable);
+    string_constraintt sc;
+    sc.univ_var=qvar;
+    sc.upper_bound=s.length();
+    sc.body=printable;
     constraints_.push_back(sc);
   }
 }
@@ -286,13 +289,19 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
     implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
-  string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
+  string_constraintt sc1;
+  sc1.univ_var=qvar;
+  sc1.upper_bound=t.length();
+  sc1.body=implies_exprt(expr.cond(), qequal);
   constraints_.push_back(sc1);
   lemmas_.push_back(
     implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
-  string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
+  string_constraintt sc2;
+  sc2.univ_var=qvar2;
+  sc2.upper_bound=f.length();
+  sc2.body=or_exprt(expr.cond(), qequal2);
   constraints_.push_back(sc2);
   return res;
 }

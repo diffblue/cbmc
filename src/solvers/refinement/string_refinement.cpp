@@ -509,7 +509,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   for(string_constraintt constraint : generator.constraints())
   {
-    constraint.replace(symbol_resolve);
+    replace(constraint, symbol_resolve);
     DATA_INVARIANT(
       is_valid_string_constraint(debug(), ns, constraint),
       string_refinement_invariantt(
@@ -1141,7 +1141,7 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   if(axiom.premise==false_exprt())
     return false_exprt();
 
-  and_exprt premise(axiom.premise, axiom.univ_within_bounds());
+  and_exprt premise(axiom.premise, univ_within_bounds(axiom));
   and_exprt negaxiom(premise, not_exprt(axiom.body));
 
   return negaxiom;
@@ -1208,9 +1208,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   {
     const string_constraintt &axiom=axioms.universal[i];
 
-    const string_constraintt axiom_in_model(
-      axiom.univ_var, get(axiom.lower_bound), get(axiom.upper_bound),
-      get(axiom.premise), get(axiom.body));
+    string_constraintt axiom_in_model;
+    axiom_in_model.univ_var=axiom.univ_var;
+    axiom_in_model.lower_bound=get(axiom.lower_bound);
+    axiom_in_model.upper_bound=get(axiom.upper_bound);
+    axiom_in_model.premise=get(axiom.premise);
+    axiom_in_model.body=get(axiom.body);
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
 
@@ -1329,7 +1332,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         replace_expr(axiom.univ_var, val, instance);
         // We are not sure the index set contains only positive numbers
         exprt bounds=and_exprt(
-          axiom.univ_within_bounds(),
+          univ_within_bounds(axiom),
           binary_relation_exprt(
             from_integer(0, val.type()), ID_le, val));
         replace_expr(axiom.univ_var, val, bounds);
@@ -1798,7 +1801,7 @@ static exprt instantiate(
   replace_expr(axiom.univ_var, r, instance);
   // We are not sure the index set contains only positive numbers
   exprt bounds=and_exprt(
-    axiom.univ_within_bounds(),
+    univ_within_bounds(axiom),
     binary_relation_exprt(
       from_integer(0, val.type()), ID_le, val));
   replace_expr(axiom.univ_var, r, bounds);

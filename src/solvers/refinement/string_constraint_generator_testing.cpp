@@ -37,12 +37,12 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   lemmas_.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_isprefix", index_type);
-  string_constraintt a2(
-    qvar,
-    prefix.length(),
-    isprefix,
-    equal_exprt(str[plus_exprt_with_overflow_check(qvar, offset)],
-                prefix[qvar]));
+  string_constraintt a2;
+  a2.univ_var=qvar;
+  a2.upper_bound=prefix.length();
+  a2.premise=isprefix;
+  a2.body=equal_exprt(
+    str[plus_exprt_with_overflow_check(qvar, offset)], prefix[qvar]);
   constraints_.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_isprefix", index_type);
@@ -138,8 +138,11 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   symbol_exprt qvar=fresh_univ_index("QA_suffix", index_type);
   exprt qvar_shifted=plus_exprt(
     qvar, minus_exprt(s1.length(), s0.length()));
-  string_constraintt a2(
-    qvar, s0.length(), issuffix, equal_exprt(s0[qvar], s1[qvar_shifted]));
+  string_constraintt a2;
+  a2.univ_var=qvar;
+  a2.upper_bound=s0.length();
+  a2.premise=issuffix;
+  a2.body=equal_exprt(s0[qvar], s1[qvar_shifted]);
   constraints_.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_suffix", index_type);
@@ -219,8 +222,11 @@ exprt string_constraint_generatort::add_axioms_for_contains(
 
   symbol_exprt qvar=fresh_univ_index("QA_contains", index_type);
   exprt qvar_shifted=plus_exprt(qvar, startpos);
-  string_constraintt a4(
-    qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
+  string_constraintt a4;
+  a4.univ_var=qvar;
+  a4.upper_bound=s1.length();
+  a4.premise=contains;
+  a4.body=equal_exprt(s1[qvar], s0[qvar_shifted]);
   constraints_.push_back(a4);
 
   // We rewrite axiom a4 as:
