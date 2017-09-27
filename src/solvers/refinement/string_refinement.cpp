@@ -145,7 +145,6 @@ string_refinementt::string_refinementt(const infot &info, bool):
 string_refinementt::string_refinementt(const infot &info):
   string_refinementt(info, validate(info)) { }
 
-#ifdef DEBUG
 /// display the current index set, for debugging
 static void display_index_set(
   messaget::mstreamt &stream,
@@ -176,7 +175,6 @@ static void display_index_set(
   stream << count << " elements in index set (" << count_current
          << " newly added)" << eom;
 }
-#endif
 
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
@@ -595,6 +593,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       // We will then relaunch the solver with these added lemmas.
       index_sets.current.clear();
       update_index_set(index_sets, ns, current_constraints);
+
+      display_index_set(debug(), ns, index_sets);
 
       if(index_sets.current.empty())
       {
