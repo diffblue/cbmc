@@ -77,6 +77,15 @@ std::string from_expr(
   const irep_idt &identifier,
   const string_constraintt &expr);
 
+/// Checks the data invariant for \link string_constraintt
+/// \related string_constraintt
+/// \param [in] expr: the string constraint to check
+/// \return whether the constraint satisfies the invariant
+bool is_valid_string_constraint(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const string_constraintt &expr);
+
 class string_not_contains_constraintt final: public exprt
 {
 public:
