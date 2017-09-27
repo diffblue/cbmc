@@ -89,6 +89,15 @@ exprt univ_within_bounds(const string_constraintt &axiom);
 /// \return rendered string
 std::string to_string(const string_constraintt &expr);
 
+/// Checks the data invariant for \link string_constraintt
+/// \related string_constraintt
+/// \param [in] constraint: the string constraint to check
+/// \return whether the constraint satisfies the invariant
+bool is_valid_string_constraint(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const string_constraintt &constraint);
+
 /// Constraints to encode non containement of strings.
 class string_not_contains_constraintt final : public exprt
 {
