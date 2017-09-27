@@ -7,7 +7,6 @@ if(CCACHE_PROGRAM AND enable_ccache)
     message(STATUS "Rule launch compile: ${CCACHE_PROGRAM}")
 else()
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "")
-    message(STATUS "Rule launch compile: '${RULE_LAUNCH_COMPILE}'")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
