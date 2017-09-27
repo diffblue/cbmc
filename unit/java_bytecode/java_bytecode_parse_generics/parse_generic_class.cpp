@@ -237,4 +237,99 @@ SCENARIO(
       }
     }
   }
+  GIVEN("A class with multiple bounds")
+  {
+    THEN("The bounds should be encoded")
+    {
+      REQUIRE(
+        new_symbol_table.has_symbol("java::generics$double_bound_element"));
+      THEN("The symbol should have a generic parameter")
+      {
+        const symbolt &class_symbol=
+          new_symbol_table.lookup("java::generics$double_bound_element");
+        const typet &symbol_type=class_symbol.type;
+
+        REQUIRE(symbol_type.id()==ID_struct);
+        class_typet class_type=to_class_type(symbol_type);
+        REQUIRE(class_type.is_class());
+        java_class_typet java_class_type=to_java_class_type(class_type);
+        REQUIRE(is_java_generics_class_type(java_class_type));
+
+        java_generics_class_typet java_generics_class_type=
+          to_java_generics_class_type(java_class_type);
+        REQUIRE(java_generics_class_type.generic_types().size()==1);
+        typet &type_var=java_generics_class_type.generic_types().front();
+        REQUIRE(is_java_generic_parameter(type_var));
+        java_generic_parametert generic_type_var=
+          to_java_generic_parameter(type_var);
+
+        REQUIRE(
+          generic_type_var.type_variable().get_identifier()==
+          "java::generics$double_bound_element::T");
+        REQUIRE(
+          java_generics_class_type_var(0, java_generics_class_type)==
+          "java::generics$double_bound_element::T");
+        THEN("Bound must be Number and dummyInterface")
+        {
+          // TODO (tkiley): Extend this unit test when bounds are correctly
+          // parsed.
+        }
+      }
+    }
+  }
+  GIVEN("A class with multiple generic parameters")
+  {
+    THEN("Both generic parameters should be encoded")
+    {
+      const symbolt &class_symbol=
+        new_symbol_table.lookup("java::generics$two_elements");
+      const typet &symbol_type=class_symbol.type;
+
+      REQUIRE(symbol_type.id()==ID_struct);
+      class_typet class_type=to_class_type(symbol_type);
+      REQUIRE(class_type.is_class());
+      java_class_typet java_class_type=to_java_class_type(class_type);
+      REQUIRE(is_java_generics_class_type(java_class_type));
+
+      java_generics_class_typet java_generics_class_type=
+        to_java_generics_class_type(java_class_type);
+      //REQUIRE(java_generics_class_type.generic_types().size()==2);
+
+      auto generic_param_iterator=
+        java_generics_class_type.generic_types().cbegin();
+
+      // The first parameter should be called K
+      {
+        const typet &first_param=*generic_param_iterator;
+        REQUIRE(is_java_generic_parameter(first_param));
+        java_generic_parametert generic_type_var=
+          to_java_generic_parameter(first_param);
+
+        REQUIRE(
+          generic_type_var.type_variable().get_identifier()==
+          "java::generics$two_elements::K");
+        REQUIRE(
+          java_generics_class_type_var(0, java_generics_class_type)==
+          "java::generics$two_elements::K");
+      }
+
+      ++generic_param_iterator;
+
+
+      // The second parameter should be called V
+      {
+        const typet &second_param=*generic_param_iterator;
+        REQUIRE(is_java_generic_parameter(second_param));
+        java_generic_parametert generic_type_var=
+          to_java_generic_parameter(second_param);
+
+        REQUIRE(
+          generic_type_var.type_variable().get_identifier()==
+          "java::generics$two_elements::V");
+        REQUIRE(
+          java_generics_class_type_var(0, java_generics_class_type)==
+          "java::generics$two_elements::V");
+      }
+    }
+  }
 }
