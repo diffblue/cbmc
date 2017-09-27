@@ -107,10 +107,30 @@ bool symbol_tablet::remove(const irep_idt &name)
 /// \param out: The ostream to direct output to
 void symbol_tablet::show(std::ostream &out) const
 {
+  show(out, [](const symbolt &){ return true; });
+}
+
+/// Print the contents of the symbol table that meet the filters requirements.
+/// It can be used to for example only print out type symbols:
+/// ```
+/// show(std::cout, [](const symbolt &symbol) { return symbol.is_type; });
+/// ```
+/// \param out: The ostream to direct output to
+/// \param print_condition: A predicate that determines whether a given
+///   symbol should be printed.
+void symbol_tablet::show(
+  std::ostream &out,
+  std::function<bool (const symbolt &)> print_condition) const
+{
   out << "\n" << "Symbols:" << "\n";
 
-  forall_symbols(it, symbols)
-    out << it->second;
+  for(const auto &symbol : symbols)
+  {
+    if(print_condition(symbol.second))
+    {
+      out << symbol.second;
+    }
+  }
 }
 
 /// Find a symbol in the symbol table. Throws a string if no such symbol is

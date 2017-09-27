@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <map>
 #include <unordered_map>
+#include <functional>
 
 #include "symbol.h"
 
@@ -76,6 +77,10 @@ public:
   bool remove(const irep_idt &name);
 
   void show(std::ostream &out) const;
+
+  void show(
+    std::ostream &out,
+    std::function<bool(const symbolt &symbol)> print_condition) const;
 
   void swap(symbol_tablet &other)
   {
