@@ -324,21 +324,10 @@ private:
   exprt get_object_at_index(const exprt &argv, int index);
 };
 
-void declare_function(
-  irep_idt function_name,
-  const typet &type,
-  symbol_tablet &symbol_table);
-
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
   const typet &type,
-  symbol_tablet &symbol_table);
-
-codet code_assign_function_application(
-  const exprt &lhs,
-  const irep_idt &function_name,
-  const exprt::operandst &arguments,
   symbol_tablet &symbol_table);
 
 exprt make_nondet_infinite_char_array(

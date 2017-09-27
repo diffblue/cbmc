@@ -251,7 +251,7 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
 /// \param function_name: a name
 /// \param type: a type
 /// \param symbol_table: symbol table
-void declare_function(
+static void declare_function(
   irep_idt function_name,
   const typet &type,
   symbol_tablet &symbol_table)
@@ -618,7 +618,7 @@ exprt make_function_application(
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// lhs = <function_name>(arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-codet code_assign_function_application(
+static codet code_assign_function_application(
   const exprt &lhs,
   const irep_idt &function_name,
   const exprt::operandst &arguments,

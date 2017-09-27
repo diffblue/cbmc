@@ -29,8 +29,6 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <java_bytecode/java_types.h>
 #include "expr_cast.h"
 
-#include <util/ssa_expr.h> // for char array pointer
-
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
 static bool is_valid_string_constraint(
@@ -89,8 +87,6 @@ static exprt instantiate(
   const exprt &val);
 
 static std::vector<exprt> instantiate(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
   const string_constraint_generatort &generator);
@@ -119,7 +115,7 @@ static std::vector<T> fill_in_map_as_vector(
     for(auto it=index_value.rbegin(); it!=index_value.rend(); ++it)
     {
       const std::size_t index=it->first;
-      const T& value=it->second;
+      const T &value = it->second;
       const auto next=std::next(it);
       const std::size_t leftmost_index_to_pad=
         next!=index_value.rend()
@@ -201,7 +197,7 @@ static std::vector<exprt> generate_instantiations(
   for(const auto &nc_axiom : axioms.not_contains)
   {
     for(const auto &instance :
-        instantiate(stream, ns, nc_axiom, index_set, generator))
+      instantiate(nc_axiom, index_set, generator))
       lemmas.push_back(instance);
   }
   return lemmas;
@@ -214,18 +210,12 @@ static exprt substitute_function_applications(
   exprt expr,
   string_constraint_generatort &generator)
 {
-  for(size_t i = 0; i < expr.operands().size(); ++i)
-  {
-    // TODO: only copy when necessary
-    exprt op(expr.operands()[i]);
-    expr.operands()[i] = substitute_function_applications(op, generator);
-  }
+  for(auto &operand : expr.operands())
+    operand = substitute_function_applications(operand, generator);
 
   if(expr.id() == ID_function_application)
-  {
-    function_application_exprt f = to_function_application_expr(expr);
-    return generator.add_axioms_for_function_application(f);
-  }
+    return generator.add_axioms_for_function_application(
+      to_function_application_expr(expr));
 
   return expr;
 }
@@ -234,7 +224,7 @@ static void substitute_function_applications_in_equations(
   std::vector<equal_exprt> &equations,
   string_constraint_generatort &generator)
 {
-  for(equal_exprt &eq : equations)
+  for(auto &eq : equations)
     eq.rhs() = substitute_function_applications(eq.rhs(), generator);
 }
 
@@ -277,14 +267,14 @@ static bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
   if(type.id() == ID_struct || type.id() == ID_union)
   {
     const struct_union_typet &struct_type = to_struct_union_type(type);
-    for(auto comp : struct_type.components())
+    for(const auto &comp : struct_type.components())
     {
       if(has_char_pointer_subtype(comp.type(), ns))
         return true;
     }
   }
 
-  for(typet t : type.subtypes())
+  for(const auto &t : type.subtypes())
   {
     if(has_char_pointer_subtype(t, ns))
       return true;
@@ -371,12 +361,12 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 }
 
 /// Add association for each char pointer in the equation
-union_find_replacet symbol_solver_from_equations(
+static union_find_replacet symbol_solver_from_equations(
   const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
-  const auto &eom = messaget::eom;
+  const auto eom = messaget::eom;
   const std::string log_message =
     "WARNING string_refinement.cpp symbol_solver_from_equations:";
   union_find_replacet solver;
@@ -411,13 +401,13 @@ union_find_replacet symbol_solver_from_equations(
     {
       if(rhs.type().id() == ID_struct)
       {
-        struct_typet struct_type = to_struct_type(rhs.type());
-        for(auto comp : struct_type.components())
+        const struct_typet &struct_type = to_struct_type(rhs.type());
+        for(const auto &comp : struct_type.components())
         {
           if(is_char_pointer_type(comp.type()))
           {
-            member_exprt lhs_data(lhs, comp.get_name(), comp.type());
-            exprt rhs_data = simplify_expr(
+            const member_exprt lhs_data(lhs, comp.get_name(), comp.type());
+            const exprt rhs_data = simplify_expr(
               member_exprt(rhs, comp.get_name(), comp.type()), ns);
             solver.make_union(lhs_data, rhs_data);
           }
@@ -442,7 +432,7 @@ void output_equations(
   const std::vector<equal_exprt> &equations,
   const namespacet &ns)
 {
-  for(const equal_exprt &eq : equations)
+  for(const auto &eq : equations)
     output << "  * " << from_expr(ns, "", eq.lhs())
            << " == " << from_expr(ns, "", eq.rhs()) << std::endl;
 }
@@ -462,7 +452,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   symbol_resolve = symbol_solver_from_equations(equations, ns, debug());
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
-  for(auto pair : symbol_resolve.to_vector())
+  for(const auto &pair : symbol_resolve.to_vector())
     debug() << from_expr(ns, "", pair.first) << " --> "
             << from_expr(ns, "", pair.second) << eom;
 #endif
@@ -484,7 +474,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   generator.debug_arrays_of_pointers(debug());
 #endif
 
-  for(const exprt &eq : equations)
+  for(const auto &eq : equations)
   {
 #ifdef DEBUG
     debug() << "dec_solve: set_to " << from_expr(ns, "", eq) << eom;
@@ -638,7 +628,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 /// \par parameters: a lemma and Boolean value stating whether the lemma should
 /// be added to the index set.
 void string_refinementt::add_lemma(
-  const exprt &lemma, const bool _simplify)
+  const exprt &lemma,
+  const bool simplify_lemma)
 {
   if(!seen_instances.insert(lemma).second)
     return;
@@ -646,7 +637,7 @@ void string_refinementt::add_lemma(
   current_constraints.push_back(lemma);
 
   exprt simple_lemma=lemma;
-  if(_simplify)
+  if(simplify_lemma)
     simplify(simple_lemma, ns);
 
   if(simple_lemma.is_true())
@@ -695,10 +686,10 @@ static exprt get_array(
   exprt arr_val = simplify_expr(super_get(arr), ns);
   exprt size_val=super_get(size);
   size_val=simplify_expr(size_val, ns);
-  typet char_type=arr.type().subtype();
+  const typet char_type = arr.type().subtype();
   const typet &index_type=size.type();
-  array_typet empty_ret_type(char_type, from_integer(0, index_type));
-  array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
+  const array_typet empty_ret_type(char_type, from_integer(0, index_type));
+  const array_of_exprt empty_ret(from_integer(0, char_type), empty_ret_type);
 
   if(size_val.id()!=ID_constant)
   {
@@ -714,7 +705,7 @@ static exprt get_array(
     return empty_ret;
   }
 
-  array_typet ret_type(char_type, from_integer(n, index_type));
+  const array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
 
   if(n>max_string_length)
@@ -734,12 +725,12 @@ static exprt get_array(
                                    "with, array_of, if, or array, and all "
                                    "cases besides array are handled above"));
     std::map<std::size_t, exprt> initial_map;
-    for(size_t i=0; i<arr_val.operands().size()/2; i++)
+    for(size_t i = 0; i < arr_val.operands().size(); i += 2)
     {
-      exprt index=arr_val.operands()[i*2];
+      exprt index = arr_val.operands()[i];
       unsigned idx;
       if(!to_unsigned_integer(to_constant_expr(index), idx) && idx<n)
-        initial_map[idx]=arr_val.operands()[i*2+1];
+        initial_map[idx] = arr_val.operands()[i + 1];
     }
 
     // Pad the concretized values to the left to assign the uninitialized
@@ -812,14 +803,14 @@ static std::string string_of_array(const array_exprt &arr)
 }
 
 static exprt get_char_array_in_model(
-  const std::function<exprt(const exprt &)> super_get,
+  const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   const std::size_t max_string_length,
   messaget::mstreamt &stream,
   const array_string_exprt &arr)
 {
   const auto &eom = messaget::eom;
-  const std::string indent("  ");
+  static const std::string indent("  ");
   stream << "- " << from_expr(ns, "", arr) << ":\n";
   stream << indent << indent << "- type: " << from_type(ns, "", arr.type())
          << eom;
@@ -855,34 +846,33 @@ void debug_model(
   const std::vector<symbol_exprt> &boolean_symbols,
   const std::vector<symbol_exprt> &index_symbols)
 {
-  const auto &eom = messaget::eom;
-  const std::string indent("  ");
+  static const std::string indent("  ");
   std::set<array_string_exprt> char_array_in_axioms;
 #if 0
   generator.debug_arrays_of_pointers(stream);
 #endif
-  for(auto pair : symbol_resolve.to_vector())
+  for(const auto &pair : symbol_resolve.to_vector())
     char_array_in_axioms.insert(to_array_string_expr(pair.first));
 
-  for(auto arr : char_array_in_axioms)
+  for(const auto &arr : char_array_in_axioms)
   {
     const exprt model =
       get_char_array_in_model(super_get, ns, max_string_length, stream, arr);
 
     stream << "- " << from_expr(ns, "", arr) << ": " << from_expr(ns, "", model)
-           << eom;
+           << messaget::eom;
   }
 
-  for(const auto it : boolean_symbols)
+  for(const auto &symbol : boolean_symbols)
   {
-      stream << " - " << it.get_identifier() << ": "
-             << from_expr(ns, "", super_get(it)) << '\n';
+    stream << " - " << symbol.get_identifier() << ": "
+           << from_expr(ns, "", super_get(symbol)) << '\n';
   }
 
-  for(const auto it : index_symbols)
+  for(const auto &symbol : index_symbols)
   {
-     stream << " - " << it.get_identifier() << ": "
-            << from_expr(ns, "", super_get(it)) << '\n';
+    stream << " - " << symbol.get_identifier() << ": "
+           << from_expr(ns, "", super_get(symbol)) << '\n';
   }
   stream << messaget::eom;
 }
@@ -944,7 +934,7 @@ exprt fill_in_array_with_expr(
   std::map<std::size_t, exprt> initial_map;
 
   // Set the last index to be sure the array will have the right length
-  const auto array_size_opt = expr_cast<std::size_t>(array_type.size());
+  const auto &array_size_opt = expr_cast<std::size_t>(array_type.size());
   if(array_size_opt && *array_size_opt > 0)
     initial_map.emplace(
       *array_size_opt - 1,
@@ -954,7 +944,7 @@ exprt fill_in_array_with_expr(
   {
     // Add to `initial_map` all the pairs (index,value) contained in `WITH`
     // statements
-    const with_exprt with_expr=to_with_expr(it);
+    const with_exprt &with_expr = to_with_expr(it);
     const exprt &then_expr=with_expr.new_value();
     const auto index=expr_cast_v<std::size_t>(with_expr.where());
     if(
@@ -976,12 +966,12 @@ exprt fill_in_array_with_expr(
 exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 {
   PRECONDITION(expr.type().id() == ID_array);
-  array_typet array_type = to_array_type(expr.type());
+  const array_typet &array_type = to_array_type(expr.type());
   PRECONDITION(array_type.subtype().id() == ID_unsignedbv);
 
   // Map of the parts of the array that are initialized
   std::map<std::size_t, exprt> initial_map;
-  const auto array_size_opt = expr_cast<std::size_t>(array_type.size());
+  const auto &array_size_opt = expr_cast<std::size_t>(array_type.size());
 
   if(array_size_opt && *array_size_opt > 0)
     initial_map.emplace(
@@ -1221,7 +1211,7 @@ exprt concretize_arrays_in_expression(
   return expr;
 }
 
-/// return true if the current model satisfies all the axioms
+/// \return true if the current model satisfies all the axioms
 /// \return a Boolean
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const string_axiomst &axioms,
@@ -1572,9 +1562,8 @@ static exprt compute_inverse_function(
       it->second == 0,
       string_refinement_invariantt(
         "a proper function must have exactly one "
-        "occurrences after reduction, or it cancelled out, and it does not "
-        "have "
-        " one"));
+        "occurrences after reduction, or it cancelled out, and it does not"
+        " have one"));
     stream << "in string_refinementt::compute_inverse_function:"
            << " warning: occurrences of qvar cancelled out " << messaget::eom;
   }
@@ -1657,8 +1646,8 @@ static void get_sub_arrays(const exprt &array_expr, std::vector<exprt> &accu)
     }
     else
     {
-      for(auto op : array_expr.operands())
-        get_sub_arrays(op, accu);
+      for(const auto &operand : array_expr.operands())
+        get_sub_arrays(operand, accu);
     }
   }
 }
@@ -1695,11 +1684,11 @@ static void initial_index_set(
 
   while(!to_process.empty())
   {
-    exprt cur=to_process.back();
+    const exprt &cur = to_process.back();
     to_process.pop_back();
     if(cur.id()==ID_index)
     {
-      const index_exprt index_expr = to_index_expr(cur);
+      const index_exprt &index_expr = to_index_expr(cur);
       const exprt &s = index_expr.array();
       const exprt &i = index_expr.index();
 
@@ -1710,7 +1699,7 @@ static void initial_index_set(
       }
       else
       {
-        bool has_quant_var = find_qvar(i, qvar);
+        const bool has_quant_var = find_qvar(i, qvar);
 
         // if cur is of the form s[i] and no quantified variable appears in i
         if(!has_quant_var)
@@ -1720,11 +1709,11 @@ static void initial_index_set(
         else
         {
           // otherwise we add k-1
-          exprt e(i);
+          exprt copy(i);
           const minus_exprt kminus1(
             axiom.upper_bound(), from_integer(1, axiom.upper_bound().type()));
-          replace_expr(qvar, kminus1, e);
-          add_to_index_set(index_set, ns, s, e);
+          replace_expr(qvar, kminus1, copy);
+          add_to_index_set(index_set, ns, s, copy);
         }
       }
     }
@@ -1851,16 +1840,12 @@ static exprt instantiate(
 
 /// Instantiates a quantified formula representing `not_contains` by
 /// substituting the quantifiers and generating axioms.
-/// \param stream: a message stream
-/// \param ns: namespace
 /// \param [in] axiom: the axiom to instantiate
 /// \param index_set: set of indexes
 /// \param current_index_set: set of indexes that have been newly added
 /// \param generator: constraint generator object
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
   const string_not_contains_constraintt &axiom,
   const index_set_pairt &index_set,
   const string_constraint_generatort &generator)
@@ -1903,11 +1888,7 @@ static std::vector<exprt> instantiate(
 exprt substitute_array_lists(exprt expr, size_t string_max_length)
 {
   for(auto &operand : expr.operands())
-  {
-    // TODO: only copy when necessary
-    const exprt op(operand);
-    operand=substitute_array_lists(op, string_max_length);
-  }
+    operand = substitute_array_lists(operand, string_max_length);
 
   if(expr.id()=="array-list")
   {
@@ -1915,7 +1896,7 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
       expr.operands().size()>=2,
       string_refinement_invariantt("array-lists must have at least two "
         "operands"));
-    typet &char_type=expr.operands()[1].type();
+    const typet &char_type = expr.operands()[1].type();
     array_typet arr_type(char_type, infinity_exprt(char_type));
     exprt ret_expr=array_of_exprt(from_integer(0, char_type), arr_type);
 

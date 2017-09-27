@@ -171,7 +171,7 @@ inline const array_string_exprt &to_array_string_expr(const exprt &expr)
   return static_cast<const array_string_exprt &>(expr);
 }
 
-// Represent strings as a sturct with a length field and a content field
+// Represent strings as a struct with a length field and a content field
 class refined_string_exprt : public struct_exprt,
                              public string_exprt<refined_string_exprt>
 {
@@ -180,12 +180,15 @@ public:
   {
   }
 
-  explicit refined_string_exprt(typet type) : struct_exprt(type)
+  explicit refined_string_exprt(const typet &type) : struct_exprt(type)
   {
     operands().resize(2);
   }
 
-  refined_string_exprt(const exprt &_length, const exprt &_content, typet type)
+  refined_string_exprt(
+    const exprt &_length,
+    const exprt &_content,
+    const typet &type)
     : struct_exprt(type)
   {
     copy_to_operands(_length, _content);

@@ -101,7 +101,7 @@ private:
   // Map pointers to array symbols
   std::map<exprt, symbol_exprt> pointer_map;
 
-  void add_lemma(const exprt &lemma, const bool simplify_lemma = true);
+  void add_lemma(const exprt &lemma, const bool _simplify = true);
 };
 
 exprt substitute_array_lists(exprt expr, std::size_t string_max_length);
