@@ -639,6 +639,77 @@ codet java_string_library_preprocesst::code_return_function_application(
   return code_returnt(fun_app);
 }
 
+exprt make_nondet_infinite_char_array(
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code)
+{
+  const array_typet array_type(
+    java_char_type(), infinity_exprt(java_int_type()));
+  const symbolt data_sym = get_fresh_aux_symbol(
+    array_type,
+    "nondet_inifinite_array",
+    "nondet_inifinite_array",
+    loc,
+    ID_java,
+    symbol_table);
+  const symbol_exprt data_expr = data_sym.symbol_expr();
+  code.add(code_declt(data_expr));
+  side_effect_expr_nondett nondet_data(data_expr.type());
+  code.add(code_assignt(data_expr, nondet_data));
+  return data_expr;
+}
+
+void add_pointer_to_array_association(
+  const exprt &pointer,
+  const exprt &array,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code)
+{
+  PRECONDITION(array.type().id() == ID_array);
+  PRECONDITION(pointer.type().id() == ID_pointer);
+  symbolt &return_sym = get_fresh_aux_symbol(
+    java_int_type(),
+    "return_array",
+    "return_array",
+    loc,
+    ID_java,
+    symbol_table);
+  exprt return_expr = return_sym.symbol_expr();
+  code.add(code_declt(return_expr));
+  code.add(
+    code_assign_function_application(
+      return_expr,
+      ID_cprover_associate_array_to_pointer_func,
+      {array, pointer},
+      symbol_table));
+}
+
+void add_array_to_length_association(
+  const exprt &array,
+  const exprt &length,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code)
+{
+  symbolt &return_sym = get_fresh_aux_symbol(
+    java_int_type(),
+    "return_array",
+    "return_array",
+    loc,
+    ID_java,
+    symbol_table);
+  const exprt return_expr = return_sym.symbol_expr();
+  code.add(code_declt(return_expr));
+  code.add(
+    code_assign_function_application(
+      return_expr,
+      ID_cprover_associate_length_to_array_func,
+      {array, length},
+      symbol_table));
+}
+
 /// \param string_expr: a string expression
 /// \param function_name: the name of the function
 /// \param arguments: arguments of the function

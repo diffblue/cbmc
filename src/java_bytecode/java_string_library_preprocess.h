@@ -351,4 +351,23 @@ private:
   exprt get_object_at_index(const exprt &argv, int index);
 };
 
+exprt make_nondet_infinite_char_array(
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code);
+
+void add_pointer_to_array_association(
+  const exprt &pointer,
+  const exprt &array,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code);
+
+void add_array_to_length_association(
+  const exprt &array,
+  const exprt &length,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H
