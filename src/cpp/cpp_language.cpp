@@ -65,8 +65,7 @@ bool cpp_languaget::generate_start_function(
   return generate_ansi_c_start_function(
     symbol_table.lookup(entry_function_symbol_id),
     symbol_table,
-    *message_handler,
-    wrap_entry_point_in_while());
+    *message_handler);
 }
 
 /// ANSI-C preprocessing

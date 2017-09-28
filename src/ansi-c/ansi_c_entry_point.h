@@ -20,7 +20,6 @@ bool ansi_c_entry_point(
 bool generate_ansi_c_start_function(
   const symbolt &symbol,
   symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  bool wrap_entry_point_in_while);
+  message_handlert &message_handler);
 
 #endif // CPROVER_ANSI_C_ANSI_C_ENTRY_POINT_H
