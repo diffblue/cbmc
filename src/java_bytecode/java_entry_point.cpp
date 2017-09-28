@@ -669,7 +669,7 @@ bool generate_java_start_function(
   new_symbol.value.swap(init_code);
   new_symbol.mode=ID_java;
 
-  if(!symbol_table.insert(std::move(new_symbol)))
+  if(!symbol_table.insert(std::move(new_symbol)).second)
   {
     message.error() << "failed to move main symbol" << messaget::eom;
     return true;

@@ -536,7 +536,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         vt_symb_type.type.set(ID_name, vt_symb_type.name);
         vt_symb_type.is_type=true;
 
-        const bool failed=!symbol_table.insert(std::move(vt_symb_type));
+        const bool failed=!symbol_table.insert(std::move(vt_symb_type)).second;
         assert(!failed);
 
         // add a virtual-table pointer
@@ -612,7 +612,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg.set(ID_C_identifier, arg_symb.name);
 
           // add the parameter to the symbol table
-          const bool failed=!symbol_table.insert(std::move(arg_symb));
+          const bool failed=!symbol_table.insert(std::move(arg_symb)).second;
           assert(!failed);
         }
 
@@ -670,7 +670,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
         // add the function to the symbol table
         {
-          bool failed=!symbol_table.insert(std::move(func_symb));
+          bool failed=!symbol_table.insert(std::move(func_symb)).second;
           assert(!failed);
         }
 

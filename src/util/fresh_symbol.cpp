@@ -30,9 +30,8 @@ symbolt &get_fresh_aux_symbol(
   static size_t temporary_counter=0;
   auxiliary_symbolt new_symbol;
 
-  optionalt<std::reference_wrapper<symbolt>> res;
   // Loop until find a name that doesn't clash with a non-auxilliary symbol
-  while(!res)
+  while(true)
   {
     // Distinguish local variables with the same name
     new_symbol.base_name=
@@ -44,7 +43,8 @@ symbolt &get_fresh_aux_symbol(
     new_symbol.type=type;
     new_symbol.location=source_location;
     new_symbol.mode=symbol_mode;
-    res=symbol_table.insert(std::move(new_symbol));
+    std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
+    if(res.second)
+      return res.first;
   }
-  return *res;
 }
