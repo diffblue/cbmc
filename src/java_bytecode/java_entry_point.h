@@ -74,4 +74,12 @@ bool generate_java_start_function(
   const object_factory_parameterst& object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
+bool recreate_initialize(
+  symbol_table_baset &symbol_table,
+  const irep_idt &main_class,
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_ENTRY_POINT_H
