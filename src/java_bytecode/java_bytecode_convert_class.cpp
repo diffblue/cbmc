@@ -103,15 +103,23 @@ void java_bytecode_convert_classt::convert(const classt &c)
               << " in parsed class "
               << c.name << "\n";
 #endif
-    for(auto t : java_generic_type_from_string(
-          id2string(c.name),
-          c.signature.value()))
+    try
     {
-      generic_class_type.generic_types()
-        .push_back(to_java_generic_parameter(t));
+      const std::vector<typet> &generic_types=java_generic_type_from_string(
+        id2string(c.name),
+        c.signature.value());
+      for(const typet &t : generic_types)
+      {
+        generic_class_type.generic_types()
+          .push_back(to_java_generic_parameter(t));
+      }
+      class_type=generic_class_type;
     }
-
-    class_type=generic_class_type;
+    catch(unsupported_java_class_siganture_exceptiont)
+    {
+      // Do nothing: we don't support parsing for example double bounded or
+      // two entry elements
+    }
   }
 
   class_type.set_tag(c.name);

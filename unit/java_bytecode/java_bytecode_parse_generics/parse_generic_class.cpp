@@ -253,8 +253,11 @@ SCENARIO(
         class_typet class_type=to_class_type(symbol_type);
         REQUIRE(class_type.is_class());
         java_class_typet java_class_type=to_java_class_type(class_type);
-        REQUIRE(is_java_generics_class_type(java_class_type));
+        REQUIRE_FALSE(is_java_generics_class_type(java_class_type));
 
+        // TODO (tkiley): Extend this unit test when bounds are correctly
+        // parsed.
+#if 0
         java_generics_class_typet java_generics_class_type=
           to_java_generics_class_type(java_class_type);
         REQUIRE(java_generics_class_type.generic_types().size()==1);
@@ -271,9 +274,9 @@ SCENARIO(
           "java::generics$double_bound_element::T");
         THEN("Bound must be Number and dummyInterface")
         {
-          // TODO (tkiley): Extend this unit test when bounds are correctly
-          // parsed.
+
         }
+#endif
       }
     }
   }
@@ -293,7 +296,7 @@ SCENARIO(
 
       java_generics_class_typet java_generics_class_type=
         to_java_generics_class_type(java_class_type);
-      //REQUIRE(java_generics_class_type.generic_types().size()==2);
+      REQUIRE(java_generics_class_type.generic_types().size()==2);
 
       auto generic_param_iterator=
         java_generics_class_type.generic_types().cbegin();
@@ -327,7 +330,7 @@ SCENARIO(
           generic_type_var.type_variable().get_identifier()==
           "java::generics$two_elements::V");
         REQUIRE(
-          java_generics_class_type_var(0, java_generics_class_type)==
+          java_generics_class_type_var(1, java_generics_class_type)==
           "java::generics$two_elements::V");
       }
     }

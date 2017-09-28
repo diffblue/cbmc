@@ -350,4 +350,16 @@ inline const typet &java_generics_class_type_bound(
   return gen_type.subtype();
 }
 
+
+/// An exception that is raised for unsupported class signature.
+/// Currently we do not parse multiple bounds.
+class unsupported_java_class_siganture_exceptiont:public std::logic_error
+{
+public:
+  unsupported_java_class_siganture_exceptiont():
+    std::logic_error(
+      "Unsupported class signature: multiple bounds")
+  {}
+};
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
