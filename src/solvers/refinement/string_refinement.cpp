@@ -91,7 +91,7 @@ static std::vector<exprt> instantiate(
   const index_set_pairt &index_set,
   const string_constraint_generatort &generator);
 
-static exprt get_array(
+static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   const std::size_t max_string_length,
@@ -675,12 +675,12 @@ void string_refinementt::add_lemma(
   prop.l_set_to_true(convert(simple_lemma));
 }
 
-/// get a model of an array and put it in a certain form. If the size cannot be
-/// obtained or if it is too big, return an empty array.
+/// Get a model of an array and put it in a certain form.
+/// If the model is incomplete or if it is too big, return no value.
 /// \par parameters: an expression representing an array and an expression
 /// representing an integer
-/// \return an array expression or an array_of_exprt
-static exprt get_array(
+/// \return an optional array expression or array_of_exprt
+static optionalt<exprt> get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   const std::size_t max_string_length,
@@ -701,14 +701,14 @@ static exprt get_array(
   {
     stream << "(sr::get_array) string of unknown size: "
            << from_expr(ns, "", size_val) << eom;
-    return empty_ret;
+    return {};
   }
 
   unsigned n;
   if(to_unsigned_integer(to_constant_expr(size_val), n))
   {
     stream << "(sr::get_array) size is not valid" << eom;
-    return empty_ret;
+    return {};
   }
 
   const array_typet ret_type(char_type, from_integer(n, index_type));
@@ -717,7 +717,7 @@ static exprt get_array(
   if(n>max_string_length)
   {
     stream << "(sr::get_array) long string (size=" << n << ")" << eom;
-    return empty_ret;
+    return {};
   }
 
   if(n==0)
@@ -751,45 +751,8 @@ static exprt get_array(
       ret.move_to_operands(arr_val.operands()[i]);
     return ret;
   }
-  else if(arr_val.id() == ID_constant && arr_val.type().id() == ID_pointer)
-  {
-    UNREACHABLE;
-#if 0
-    // simplify_expr does not do this simplification (although from_expr does)
-    if(arr_val.operands().size()==1
-       && arr_val.op0().id()==ID_address_of
-       && arr_val.op0().op0().id()==ID_index
-       && to_index_expr(arr_val.op0().op0()).index().is_zero())
-    {
-      arr_val=to_index_expr(arr_val.op0().op0()).array();
-    }
-    arr_val=simplify_expr(arr_val, ns);
-    auto arr_index_set=get_index_set(index_set, arr_val);
-    if(!arr_index_set.empty())
-    {
-      std::map<std::size_t, exprt> value_map;
-      for(exprt index : arr_index_set)
-      {
-        mp_integer mp_key;
-        to_integer(index, mp_key);
-        exprt val=simplify_expr(get(index_exprt(arr_val, index)), ns);
-        value_map[mp_key.to_long()]=val;
-      }
-
-      std::vector<exprt> concrete_array=fill_in_map_as_vector(value_map);
-      array_exprt arr(ret_type);
-      arr.operands()=concrete_array;
-      return arr;
-    }
-#endif
-  }
-#if 0
-    else
-      stream << "warning: get_array empty index set for "
-                << from_expr(ns, "", arr_val) << eom;
-#endif
-  // default return value is an array of `0`s
-  return array_of_exprt(from_integer(0, char_type), ret_type);
+  else
+    return {};
 }
 
 /// convert the content of a string to a more readable representation. This
@@ -820,25 +783,39 @@ static exprt get_char_array_in_model(
   stream << "- " << from_expr(ns, "", arr) << ":\n";
   stream << indent << indent << "- type: " << from_type(ns, "", arr.type())
          << eom;
-  exprt arr_model = get_array(super_get, ns, max_string_length, stream, arr);
-  stream << indent << indent << "- char_array: " << from_expr(ns, "", arr_model)
-         << eom;
-  arr_model = simplify_expr(arr_model, ns);
-  stream << indent << indent
-         << "- simplified_char_array: " << from_expr(ns, "", arr_model) << eom;
-  const exprt concretized_array =
-    concretize_arrays_in_expression(arr_model, max_string_length, ns);
-  stream << indent << indent
-         << "- concretized_char_array: " << from_expr(ns, "", concretized_array)
-         << eom;
-  if(concretized_array.id() == ID_array)
-    stream << indent << indent << "- as_string: \""
-           << string_of_array(to_array_expr(concretized_array)) << "\"\n";
+  const auto arr_model_opt =
+    get_array(super_get, ns, max_string_length, stream, arr);
+  if(arr_model_opt)
+  {
+    stream << indent << indent
+           << "- char_array: " << from_expr(ns, "", *arr_model_opt) << eom;
+    const exprt simple = simplify_expr(*arr_model_opt, ns);
+    stream << indent << indent
+           << "- simplified_char_array: " << from_expr(ns, "", simple) << eom;
+    const exprt concretized_array =
+      concretize_arrays_in_expression(simple, max_string_length, ns);
+    stream << indent << indent << "- concretized_char_array: "
+           << from_expr(ns, "", concretized_array) << eom;
+
+    if(concretized_array.id() == ID_array)
+    {
+      stream << indent << indent << "- as_string: \""
+             << string_of_array(to_array_expr(concretized_array)) << "\"\n";
+    }
+    else
+    {
+      stream << indent << "- warning: not an array" << eom;
+    }
+
+    stream << indent << indent
+           << "- type: " << from_type(ns, "", concretized_array.type()) << eom;
+    return concretized_array;
+  }
   else
-    stream << indent << "- warning: not an array" << eom;
-  stream << indent << indent
-         << "- type: " << from_type(ns, "", concretized_array.type()) << eom;
-  return concretized_array;
+  {
+    stream << indent << indent << "- incomplete model" << eom;
+    return arr;
+  }
 }
 
 /// Display part of the current model by mapping the variables created by the
@@ -1937,17 +1914,17 @@ exprt string_refinementt::get(const exprt &expr) const
   {
     array_string_exprt &arr = to_array_string_expr(ecopy);
     arr.length() = generator.get_length_of_string_array(arr);
-    exprt arr_model =
+    const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
     // Should be refactored with get array or get array in model
-    arr_model = simplify_expr(arr_model, ns);
-    const exprt concretized_array = concretize_arrays_in_expression(
-      arr_model, generator.max_string_length, ns);
-    debug() << "get " << from_expr(ns, "", expr) << " --> "
-            << from_expr(ns, "", concretized_array) << eom;
-    return concretized_array;
+    if(arr_model_opt)
+    {
+      const exprt arr_model = simplify_expr(*arr_model_opt, ns);
+      const exprt concretized_array = concretize_arrays_in_expression(
+        arr_model, generator.max_string_length, ns);
+      return concretized_array;
+    }
   }
-
   return supert::get(ecopy);
 }
 
