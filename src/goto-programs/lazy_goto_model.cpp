@@ -100,12 +100,7 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
         throw 0;
       }
 
-      std::pair<language_filest::file_mapt::iterator, bool> result =
-        language_files.file_map.emplace(filename, language_filet());
-
-      language_filet &lf=result.first->second;
-
-      lf.filename=filename;
+      language_filet &lf=language_files.add_file(filename);
       lf.language=get_language_from_filename(filename);
 
       if(lf.language==nullptr)

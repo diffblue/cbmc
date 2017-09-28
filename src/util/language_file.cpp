@@ -25,7 +25,10 @@ language_filet::language_filet(const language_filet &rhs):
 /// destructor in the source file, where the full definition is availible.
 language_filet::~language_filet()=default;
 
-language_filet::language_filet()=default;
+language_filet::language_filet(const std::string &filename)
+  : filename(filename)
+{
+}
 
 void language_filet::get_modules()
 {

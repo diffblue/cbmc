@@ -83,25 +83,6 @@ public:
   {
   }
 
-  /// Gets the number of functions in the map.
-  /// \return The number of functions in the map.
-  size_type size() const
-  {
-    return language_files.lazy_method_map.size();
-  }
-
-  /// Returns whether the map contains any mappings.
-  /// \return Whether the map contains any mappings.
-  bool empty() const { return language_files.lazy_method_map.empty(); }
-
-  /// Checks whether a given function exists in the map.
-  /// \param name: The name of the function to search for.
-  /// \return True if the map contains the given function.
-  bool contains(const key_type &name) const
-  {
-    return language_files.lazy_method_map.count(name)!=0;
-  }
-
   /// Gets the body for a given function.
   /// \param name: The name of the function to search for.
   /// \return The function body corresponding to the given function.
