@@ -74,10 +74,8 @@ public:
 
   symbol_tablet &operator=(const symbol_tablet &other)
   {
-    internal_symbols=other.internal_symbols;
-    internal_symbol_base_map=other.internal_symbol_base_map;
-    internal_symbol_module_map=other.symbol_module_map;
-    return *this;
+    // Copy to temp and then call move assignment
+    return *this=symbol_tablet(other);
   }
 
   symbol_tablet(symbol_tablet &&other)
