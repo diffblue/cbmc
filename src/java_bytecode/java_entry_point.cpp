@@ -485,6 +485,49 @@ bool java_entry_point(
     pointer_type_selector);
 }
 
+/// Creates the initialize methods again taking account of symbols added to the
+/// symbol table during instantionation of lazy methods since they were first
+/// created,
+/// \param symbol_table: global symbol table containing symbols to initialize
+/// \param main_class: the class containing the "main" entry point
+/// \param message_handler: message_handlert for logging
+/// \param assume_init_pointers_not_null: specifies behaviour for
+/// java_static_lifetime_init
+/// \param object_factory_parameters: specifies behaviour for
+/// java_static_lifetime_init
+/// \param pointer_type_selector: specifies behaviour for
+/// java_static_lifetime_init
+bool recreate_initialize(
+  symbol_table_baset &symbol_table,
+  const irep_idt &main_class,
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
+{
+  messaget message(message_handler);
+  main_function_resultt res=
+    get_main_symbol(symbol_table, main_class, message_handler);
+  if(res.status!=main_function_resultt::Success)
+  {
+    // No initialization was originally created (yikes!) so we can't recreate
+    // it now
+    return res.status==main_function_resultt::Error;
+  }
+  symbolt symbol=res.main_function;
+
+  create_initialize(symbol_table);
+
+  java_static_lifetime_init(
+    symbol_table,
+    symbol.location,
+    assume_init_pointers_not_null,
+    object_factory_parameters,
+    pointer_type_selector);
+
+  return false;
+}
+
 /// Generate a _start function for a specific function. See
 /// java_entry_point for more details.
 /// \param symbol: The symbol representing the function to call

@@ -393,7 +393,13 @@ bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
   // replace code of String methods calls by code we generate
   replace_string_methods(symbol_table);
 
-  return false;
+  return recreate_initialize(
+    symbol_table,
+    main_class,
+    get_message_handler(),
+    assume_inputs_non_null,
+    object_factory_parameters,
+    get_pointer_type_selector());
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)
