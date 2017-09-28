@@ -60,9 +60,9 @@ bool ci_lazy_methodst::operator()(
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
 
-  auto main_function=
+  main_function_resultt main_function =
     get_main_symbol(symbol_table, main_class, get_message_handler(), true);
-  if(main_function.stop_convert)
+  if(!main_function.is_success())
   {
     // Failed, mark all functions in the given main class(es)
     // reaclass_hierarchyable.

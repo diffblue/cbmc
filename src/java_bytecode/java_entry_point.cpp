@@ -324,9 +324,6 @@ main_function_resultt get_main_symbol(
   message_handlert &message_handler,
   bool allow_no_body)
 {
-  symbolt symbol;
-  main_function_resultt res;
-
   messaget message(message_handler);
 
   // find main symbol
@@ -341,32 +338,25 @@ main_function_resultt get_main_symbol(
 
     if(main_symbol_id==irep_idt())
     {
-      message.error() << "main symbol resolution failed: "
-                      << error_message << messaget::eom;
-      res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
-      return res;
+      message.error()
+        << "main symbol resolution failed: " << error_message << messaget::eom;
+      return main_function_resultt::Error;
     }
 
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(main_symbol_id);
+    const symbolt *symbol = symbol_table.lookup(main_symbol_id);
     INVARIANT(
-      s_it!=symbol_table.symbols.end(),
+      symbol != nullptr,
       "resolve_friendly_method_name should return a symbol-table identifier");
 
-    symbol=s_it->second;
-
     // check if it has a body
-    if(symbol.value.is_nil() && !allow_no_body)
+    if(symbol->value.is_nil() && !allow_no_body)
     {
-      message.error() << "main method `" << main_class
-                      << "' has no body" << messaget::eom;
-      res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
-      return res;
+      message.error()
+        << "main method `" << main_class << "' has no body" << messaget::eom;
+      return main_function_resultt::Error;
     }
+
+    return *symbol; // Return found function
   }
   else
   {
@@ -375,69 +365,49 @@ main_function_resultt get_main_symbol(
 
     // are we given a main class?
     if(main_class.empty())
-    {
-      res.main_function=symbol;
-      res.error_found=false;
-      res.stop_convert=true;
-      return res; // silently ignore
-    }
+      return main_function_resultt::NotFound; // silently ignore
 
-    std::string entry_method=
-      id2string(main_class)+".main";
+    std::string entry_method = id2string(main_class) + ".main";
 
     std::string prefix="java::"+entry_method+":";
 
     // look it up
-    std::set<irep_idt> matches;
+    std::set<const symbolt *> matches;
 
-    for(symbol_tablet::symbolst::const_iterator
-        s_it=symbol_table.symbols.begin();
-        s_it!=symbol_table.symbols.end();
-        s_it++)
+    for(const auto &named_symbol : symbol_table.symbols)
     {
-      if(s_it->second.type.id()==ID_code &&
-         has_prefix(id2string(s_it->first), prefix))
-        matches.insert(s_it->first);
+      if(named_symbol.second.type.id() == ID_code
+        && has_prefix(id2string(named_symbol.first), prefix))
+      {
+        matches.insert(&named_symbol.second);
+      }
     }
 
     if(matches.empty())
-    {
       // Not found, silently ignore
-      res.main_function=symbol;
-      res.error_found=false;
-      res.stop_convert=true;
-      return res;
-    }
+      return main_function_resultt::NotFound;
 
-    if(matches.size()>=2)
+    if(matches.size() > 1)
     {
-      message.error() << "main method in `" << main_class
-                      << "' is ambiguous" << messaget::eom;
-      res.main_function=symbolt();
-      res.error_found=true;
-      res.stop_convert=true;
-      return res;  // give up with error, no main
+      message.error()
+        << "main method in `" << main_class
+        << "' is ambiguous" << messaget::eom;
+      return main_function_resultt::Error;  // give up with error, no main
     }
 
     // function symbol
-    symbol=symbol_table.symbols.find(*matches.begin())->second;
+    const symbolt &symbol = **matches.begin();
 
     // check if it has a body
     if(symbol.value.is_nil() && !allow_no_body)
     {
-      message.error() << "main method `" << main_class
-                      << "' has no body" << messaget::eom;
-      res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
-      return res;  // give up with error
+      message.error()
+        << "main method `" << main_class << "' has no body" << messaget::eom;
+      return main_function_resultt::Error;  // give up with error
     }
-  }
 
-  res.main_function=symbol;
-  res.error_found=false;
-  res.stop_convert=false;
-  return res;  // give up with error
+    return symbol; // Return found function
+  }
 }
 
 /// Given the \p symbol_table and the \p main_class to test, this function
@@ -490,8 +460,8 @@ bool java_entry_point(
   messaget message(message_handler);
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, message_handler);
-  if(res.stop_convert)
-    return res.stop_convert;
+  if(!res.is_success())
+    return true;
   symbolt symbol=res.main_function;
 
   assert(!symbol.value.is_nil());

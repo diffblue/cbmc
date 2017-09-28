@@ -26,12 +26,38 @@ bool java_entry_point(
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
-typedef struct
+struct main_function_resultt
 {
+  enum statust
+  {
+    Success,
+    Error,
+    NotFound
+  } status;
   symbolt main_function;
-  bool error_found;
-  bool stop_convert;
-} main_function_resultt;
+
+  // Implicit conversion doesn't lose information and allows return of status
+  // NOLINTNEXTLINE(runtime/explicit)
+  main_function_resultt(statust status) : status(status)
+  {
+  }
+
+  // Implicit conversion doesn't lose information and allows return of symbol
+  // NOLINTNEXTLINE(runtime/explicit)
+  main_function_resultt(const symbolt &main_function)
+    : status(Success), main_function(main_function)
+  {
+  }
+
+  bool is_success() const
+  {
+    return status == Success;
+  }
+  bool is_error() const
+  {
+    return status == Error;
+  }
+};
 
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(
