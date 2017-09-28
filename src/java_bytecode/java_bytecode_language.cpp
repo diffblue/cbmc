@@ -321,7 +321,7 @@ const select_pointer_typet &
 /// \return Populates `methods` with the complete list of lazy methods that are
 ///   available to convert (those which are valid parameters for
 ///   `convert_lazy_method`)
-void java_bytecode_languaget::lazy_methods_provided(
+void java_bytecode_languaget::get_known_lazy_methods(
   std::set<irep_idt> &methods) const
 {
   for(const auto &kv : lazy_methods)
@@ -337,7 +337,7 @@ void java_bytecode_languaget::lazy_methods_provided(
 /// identical to that produced using eager method conversion.
 /// \param function_id: method ID to convert
 /// \param symtab: global symbol table
-void java_bytecode_languaget::convert_lazy_method(
+bool java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
   symbol_tablet &symtab)
 {
@@ -351,7 +351,10 @@ void java_bytecode_languaget::convert_lazy_method(
   if(symbol.value.is_nil())
   {
     // Not a string library function, lazy load from source
-    const auto &lazy_method_entry=lazy_methods.at(function_id);
+    lazy_methodst::iterator fn_it=lazy_methods.find(function_id);
+    if(fn_it==lazy_methods.end())
+      return false;
+    const lazy_method_valuet &lazy_method_entry=fn_it->second;
     java_bytecode_convert_method(
       *symbol_table.lookup(lazy_method_entry.first),
       *lazy_method_entry.second,
@@ -374,6 +377,7 @@ void java_bytecode_languaget::convert_lazy_method(
   // now typecheck this function
   java_bytecode_typecheck_updated_symbols(
     symbol_table, get_message_handler(), string_refinement_enabled);
+  return true;
 }
 
 bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)

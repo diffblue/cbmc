@@ -47,7 +47,7 @@ public:
 
   void get_modules();
 
-  void convert_lazy_method(
+  bool convert_lazy_method(
     const irep_idt &id,
     symbol_tablet &symbol_table);
 
@@ -91,21 +91,24 @@ public:
 
   bool interfaces(symbol_tablet &symbol_table);
 
-  bool has_lazy_method(const irep_idt &id)
-  {
-    return lazy_method_map.count(id)!=0;
-  }
-
   // The method must have been added to the symbol table and registered
   // in lazy_method_map (currently always in language_filest::typecheck)
   // for this to be legal.
-  void convert_lazy_method(
+  bool convert_lazy_method(
     const irep_idt &id,
     symbol_tablet &symbol_table)
   {
     PRECONDITION(symbol_table.symbols.count(id)!=0);
-    if(has_lazy_method(id))
-      lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+    // Use pre-registered language
+    lazy_method_mapt::iterator it=lazy_method_map.find(id);
+    if(it!=lazy_method_map.end())
+      return lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+    // Give all languages a try at resolving it
+    for(auto &named_file : file_map)
+      if(named_file.second.convert_lazy_method(id, symbol_table))
+        return true;
+    // No implementation
+    return false;
   }
 
   void clear()
