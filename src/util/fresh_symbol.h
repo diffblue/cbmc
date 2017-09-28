@@ -19,6 +19,8 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include <util/symbol_table.h>
 #include <util/type.h>
 
+void reset_temporary_counter();
+
 symbolt &get_fresh_aux_symbol(
   const typet &type,
   const std::string &name_prefix,
