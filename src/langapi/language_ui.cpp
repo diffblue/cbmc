@@ -58,13 +58,7 @@ bool language_uit::parse(const std::string &filename)
     return true;
   }
 
-  std::pair<language_filest::file_mapt::iterator, bool>
-    result=language_files.file_map.insert(
-      std::pair<std::string, language_filet>(filename, language_filet()));
-
-  language_filet &lf=result.first->second;
-
-  lf.filename=filename;
+  language_filet &lf=language_files.add_file(filename);
   lf.language=get_language_from_filename(filename);
 
   if(lf.language==nullptr)
