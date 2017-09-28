@@ -345,8 +345,7 @@ main_function_resultt get_main_symbol(
       message.error() << "main symbol resolution failed: "
                       << error_message << messaget::eom;
       res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
+      res.status=main_function_resultt::Error;
       return res;
     }
 
@@ -364,8 +363,7 @@ main_function_resultt get_main_symbol(
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
       res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
+      res.status=main_function_resultt::Error;
       return res;
     }
   }
@@ -378,8 +376,7 @@ main_function_resultt get_main_symbol(
     if(main_class.empty())
     {
       res.main_function=symbol;
-      res.error_found=false;
-      res.stop_convert=true;
+      res.status=main_function_resultt::NotFound;
       return res; // silently ignore
     }
 
@@ -405,8 +402,7 @@ main_function_resultt get_main_symbol(
     {
       // Not found, silently ignore
       res.main_function=symbol;
-      res.error_found=false;
-      res.stop_convert=true;
+      res.status=main_function_resultt::NotFound;
       return res;
     }
 
@@ -415,8 +411,7 @@ main_function_resultt get_main_symbol(
       message.error() << "main method in `" << main_class
                       << "' is ambiguous" << messaget::eom;
       res.main_function=symbolt();
-      res.error_found=true;
-      res.stop_convert=true;
+      res.status=main_function_resultt::Error;
       return res;  // give up with error, no main
     }
 
@@ -429,16 +424,15 @@ main_function_resultt get_main_symbol(
       message.error() << "main method `" << main_class
                       << "' has no body" << messaget::eom;
       res.main_function=symbol;
-      res.error_found=true;
-      res.stop_convert=true;
+      res.status=main_function_resultt::Error;
       return res;  // give up with error
     }
   }
 
+  // Return found function
   res.main_function=symbol;
-  res.error_found=false;
-  res.stop_convert=false;
-  return res;  // give up with error
+  res.status=main_function_resultt::Success;
+  return res;
 }
 
 /// Given the \p symbol_table and the \p main_class to test, this function
@@ -491,8 +485,8 @@ bool java_entry_point(
   messaget message(message_handler);
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, message_handler);
-  if(res.stop_convert)
-    return res.stop_convert;
+  if(res.status!=main_function_resultt::Success)
+    return true;
   symbolt symbol=res.main_function;
 
   assert(!symbol.value.is_nil());

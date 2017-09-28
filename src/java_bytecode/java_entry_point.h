@@ -28,9 +28,8 @@ bool java_entry_point(
 
 typedef struct
 {
+  enum { Success, Error, NotFound } status;
   symbolt main_function;
-  bool error_found;
-  bool stop_convert;
 } main_function_resultt;
 
 /// Figures out the entry point of the code to verify
