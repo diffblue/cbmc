@@ -11,28 +11,38 @@
 ///   there is a symbol with the same name already in the symbol table.
 bool symbol_tablet::add(const symbolt &symbol)
 {
-  std::pair<symbolst::iterator, bool> result=
-  internal_symbols.emplace(symbol.name, symbol);
-  if(!result.second)
-    return true;
-  add_base_and_module(result.first);
-  return false;
+  return !insert(symbol).second;
 }
 
-/// Move a new symbol to the symbol table
-/// \remark: This is a nicer interface than move but achieves the same result
-/// \param symbol: The symbol to be added to the symbol table
-/// \return Returns an optional reference to the newly inserted symbol, without
-///   a value if a symbol with the same name already exists in the symbol table
-symbol_tablet::opt_symbol_reft symbol_tablet::insert(symbolt &&symbol)
+std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
 {
   // Add the symbol to the table or retrieve existing symbol with the same name
   std::pair<symbolst::iterator, bool> result=
     internal_symbols.emplace(symbol.name, std::move(symbol));
-  if(!result.second)
-    return opt_symbol_reft();
-  add_base_and_module(result.first);
-  return std::ref(result.first->second);
+  symbolt &new_symbol=result.first->second;
+  if(result.second)
+  {
+    try
+    {
+      symbol_base_mapt::iterator base_result=
+        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
+      try
+      {
+        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
+      }
+      catch(...)
+      {
+        internal_symbol_base_map.erase(base_result);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      internal_symbols.erase(result.first);
+      throw;
+    }
+  }
+  return std::make_pair(std::ref(new_symbol), result.second);
 }
 
 /// Move a symbol into the symbol table. If there is already a symbol with the
@@ -53,49 +63,22 @@ symbol_tablet::opt_symbol_reft symbol_tablet::insert(symbolt &&symbol)
 bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
 {
   // Add an empty symbol to the table or retrieve existing symbol with same name
-  std::pair<symbolst::iterator, bool> result=
-    internal_symbols.emplace(symbol.name, symbolt());
-
-  if(!result.second)
+  symbolt temp_symbol;
+  // This is not copying the symbol, this is passing the three required
+  // parameters to insert (just in the symbol)
+  temp_symbol.name=symbol.name;
+  temp_symbol.base_name=symbol.base_name;
+  temp_symbol.module=symbol.module;
+  std::pair<symbolt &, bool> result=insert(std::move(temp_symbol));
+  if(result.second)
   {
-    // Return the address of the symbol that already existed in the table
-    new_symbol=&result.first->second;
-    return true;
+    // Move the provided symbol into the symbol table, this can't be done
+    // earlier
+    result.first.swap(symbol);
   }
-
-  // Move the provided symbol into the symbol table
-  result.first->second.swap(symbol);
-
-  add_base_and_module(result.first);
-
-  // Return the address of the new symbol in the table
-  new_symbol=&result.first->second;
-
-  return false;
-}
-
-void symbol_tablet::add_base_and_module(symbolst::iterator added_symbol)
-{
-  symbolt &symbol=added_symbol->second;
-  try
-  {
-    symbol_base_mapt::iterator base_result=
-      internal_symbol_base_map.emplace(symbol.base_name, symbol.name);
-    try
-    {
-      internal_symbol_module_map.emplace(symbol.module, symbol.name);
-    }
-    catch(...)
-    {
-      internal_symbol_base_map.erase(base_result);
-      throw;
-    }
-  }
-  catch(...)
-  {
-    internal_symbols.erase(added_symbol);
-    throw;
-  }
+  // Return the address of the symbol in the table
+  new_symbol=&result.first;
+  return !result.second;
 }
 
 /// Remove a symbol from the symbol table

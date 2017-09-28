@@ -478,7 +478,7 @@ bool generate_ansi_c_start_function(
   new_symbol.value.swap(init_code);
   new_symbol.mode=symbol.mode;
 
-  if(!symbol_table.insert(std::move(new_symbol)))
+  if(!symbol_table.insert(std::move(new_symbol)).second)
   {
     messaget message;
     message.set_message_handler(message_handler);

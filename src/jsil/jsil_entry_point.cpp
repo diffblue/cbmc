@@ -162,7 +162,7 @@ bool jsil_entry_point(
   new_symbol.type.swap(main_type);
   new_symbol.value.swap(init_code);
 
-  if(!symbol_table.insert(std::move(new_symbol)))
+  if(!symbol_table.insert(std::move(new_symbol)).second)
   {
     messaget message;
     message.set_message_handler(message_handler);

@@ -86,10 +86,9 @@ void generate_class_stub(
   new_symbol.mode=ID_java;
   new_symbol.is_type=true;
 
-  optionalt<std::reference_wrapper<symbolt>> res=
-    symbol_table.insert(std::move(new_symbol));
+  std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
 
-  if(!res)
+  if(!res.second)
   {
     messaget message(message_handler);
     message.warning() <<
@@ -100,7 +99,7 @@ void generate_class_stub(
   else
   {
     // create the class identifier etc
-    java_root_class(*res);
+    java_root_class(res.first);
   }
 }
 
