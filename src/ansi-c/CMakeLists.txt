@@ -38,9 +38,16 @@ endif()
 file(GLOB library_check_sources "library/*.c")
 list(REMOVE_ITEM library_check_sources ${platform_unavail})
 
-add_custom_target(library_check
-    ${CMAKE_CURRENT_SOURCE_DIR}/library_check.sh ${library_check_sources}
+add_custom_command(
+    DEPENDS ${library_check_sources}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/library_check.sh ${library_check_sources}
+    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_custom_target(library_check
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 
 ################################################################################
@@ -88,10 +95,9 @@ add_library(ansi-c
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_power.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_tm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ubsan.inc
+    ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 
 generic_includes(ansi-c)
 
 target_link_libraries(ansi-c util linking goto-programs assembler)
-
-add_dependencies(ansi-c library_check)
