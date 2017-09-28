@@ -288,22 +288,23 @@ exprt::operandst java_string_library_preprocesst::process_parameters(
 }
 
 /// Creates a string_exprt from the input exprt representing a char sequence
-/// \param op_to_process: an operand of a type which implements char sequence
+/// \param expr_to_process: an expression of a type which implements char
+///        sequence
 /// \param loc: location in the source
 /// \param symbol_table: symbol table
 /// \param init_code: code block, in which declaration of some arguments may be
 ///   added
 /// \return the processed operand
 exprt java_string_library_preprocesst::convert_exprt_to_string_exprt(
-  const exprt &op_to_process,
+  const exprt &expr_to_process,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
   code_blockt &init_code)
 {
-  PRECONDITION(implements_java_char_sequence(op_to_process.type()));
+  PRECONDITION(implements_java_char_sequence(expr_to_process.type()));
   string_exprt string_expr=fresh_string_expr(loc, symbol_table, init_code);
   code_assign_java_string_to_string_expr(
-    string_expr, op_to_process, symbol_table, init_code);
+    string_expr, expr_to_process, symbol_table, init_code);
   exprt string_expr_sym=fresh_string_expr_symbol(loc, symbol_table, init_code);
   init_code.add(code_assignt(string_expr_sym, string_expr));
   return string_expr;
