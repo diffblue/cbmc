@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/ui_message.h>
 #include <util/parse_options.h>
+#include <util/config.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_functions.h>
@@ -23,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #define GOTO_INSTRUMENT_OPTIONS \
+  OPT_FUNCTIONS \
   "(all)" \
   "(document-claims-latex)(document-claims-html)" \
   "(document-properties-latex)(document-properties-html)" \
@@ -39,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(minimum-interference)" \
   "(mm):(my-events)" \
   "(unwind):(unwindset):(unwindset-file):" \
+  WRAP_ENTRY_POINT_IN_WHILE_TRUE \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
   "(log):" \
   "(max-var):(max-po-trans):(ignore-arrays)" \

@@ -58,6 +58,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
+#include <analyses/get_entry_function_id.h>
 
 #include <cbmc/version.h>
 
@@ -1463,6 +1464,50 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       full_slicer(goto_functions, ns);
   }
 
+  if(
+     cmdline.isset("function") ||
+     cmdline.isset(WRAP_ENTRY_POINT_IN_WHILE_TRUE_STRING))
+  {
+    if(goto_functions.function_map.count(goto_functionst::entry_point())==0)
+    {
+      // TODO(tkiley): Currently supplying an entry point does not allow
+      // for generating an entry point from scratch as we do not know
+      // what language to generate the entry point for
+      error() << "Cannot modify entry point as no entry point found" << eom;
+      throw std::runtime_error("no existing entry point");
+    }
+
+    irep_idt function_id;
+    if(cmdline.isset("function"))
+    {
+      status() << "Regenerating entry function" << eom;
+      function_id=cmdline.get_value("function");
+    }
+    else
+    {
+      status() << "Wrapping entry point in while(true) loop" << eom;
+      // Get the last function call in the entry function (i.e. the users
+      // function being used as the entry point).
+      function_id=get_entry_function_id(goto_functions);
+    }
+
+    rebuild_goto_start_functiont start_function_rebuilder(
+      get_message_handler(),
+      cmdline,
+      symbol_table,
+      goto_functions);
+
+    if(start_function_rebuilder(function_id))
+    {
+      throw std::runtime_error("regenerating entry point did not work");
+    }
+
+    // TODO(tkiley): If we used here the goto_model this call probably
+    // wouldn't be required.
+    goto_convert(symbol_table, goto_functions, get_message_handler());
+
+  }
+
   // recalculate numbers, etc.
   goto_functions.update();
 }
@@ -1568,6 +1613,8 @@ void goto_instrument_parse_optionst::help()
     " --model-argc-argv <n>        model up to <n> command line arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --remove-function-body <f>   remove the implementation of function <f> (may be repeated)\n"
+    " --function name              Regenerate the entry point with the specified function\n" // NOLINT(*)
+    HELP_WRAP_ENTRY_POINT_IN_WHILE_TRUE
     "\n"
     "Other options:\n"
     " --use-system-headers         with --dump-c/--dump-cpp: generate C source with includes\n" // NOLINT(*)

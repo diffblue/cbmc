@@ -1,0 +1,8 @@
+CORE
+main.c
+--show-goto-functions --wrap-entry-point-in-while
+no existing entry point
+--
+--
+The input binary has no entry point so it doesn't make sense to wrap it in a
+while true
