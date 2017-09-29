@@ -278,18 +278,19 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
   string_exprt t=get_string_expr(expr.true_case());
   PRECONDITION(is_refined_string_type(expr.false_case().type()));
   string_exprt f=get_string_expr(expr.false_case());
-  const refined_string_typet &ref_type=to_refined_string_type(t.type());
-  const typet &index_type=ref_type.get_index_type();
-  string_exprt res=fresh_string(ref_type);
+  const typet &char_type = t.content().type().subtype();
+  const typet &index_type = t.length().type();
+  string_exprt res = fresh_string(index_type, char_type);
 
   m_axioms.push_back(
-    implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
+    implies_exprt(expr.cond(), equal_exprt(res.length(), t.length())));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
   string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
   m_axioms.push_back(sc1);
   m_axioms.push_back(
-    implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
+    implies_exprt(
+      not_exprt(expr.cond()), equal_exprt(res.length(), f.length())));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
   string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
@@ -569,8 +570,7 @@ exprt string_constraint_generatort::add_axioms_for_length(
 /// \return a Boolean expression
 exprt string_constraint_generatort::axiom_for_is_positive_index(const exprt &x)
 {
-  return binary_relation_exprt(
-    x, ID_ge, from_integer(0, x.type()));
+  return binary_relation_exprt(x, ID_ge, from_integer(0, x.type()));
 }
 
 /// add axioms stating that the returned value is equal to the argument

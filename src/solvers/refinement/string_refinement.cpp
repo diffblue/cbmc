@@ -22,6 +22,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <iomanip>
 #include <stack>
 #include <util/expr_iterator.h>
+#include <util/optional.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
@@ -295,9 +296,8 @@ std::vector<exprt> set_char_array_equality(const exprt &lhs, const exprt &rhs)
   // equality. Note that this might not be the case for other languages.
 }
 
-/// distinguish char array from other types
-///
-/// TODO: this is only for java char array and does not work for other languages
+/// Distinguish char array from other types.
+/// For now, any unsigned bitvector type is considered a character.
 /// \param type: a type
 /// \return true if the given type is an array of java characters
 static bool is_char_array(const namespacet &ns, const typet &type)
@@ -403,8 +403,9 @@ void concretize_lengths(
   }
 }
 
-/// add lemmas representing the setting of an expression to a given value
-/// \par parameters: an expression and the value to set it to
+/// Add equation to `m_equation_list` or give them to `supert::set_to`
+/// \param expr: an expression
+/// \param value: the value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id()==ID_bool);
@@ -730,19 +731,15 @@ static exprt get_array(
 
   if(size_val.id()!=ID_constant)
   {
-#if 0
-    debug() << "(sr::get_array) string of unknown size: "
-            << from_expr(ns, "", size_val) << eom;
-#endif
+    stream << "(sr::get_array) string of unknown size: "
+           << from_expr(ns, "", size_val) << eom;
     return empty_ret;
   }
 
   unsigned n;
   if(to_unsigned_integer(to_constant_expr(size_val), n))
   {
-#if 0
-    debug() << "(sr::get_array) size is not valid" << eom;
-#endif
+    stream << "(sr::get_array) size is not valid" << eom;
     return empty_ret;
   }
 
@@ -751,19 +748,12 @@ static exprt get_array(
 
   if(n>max_string_length)
   {
-#if 0
-    debug() << "(sr::get_array) long string (size=" << n << ")" << eom;
-#endif
+    stream << "(sr::get_array) long string (size=" << n << ")" << eom;
     return empty_ret;
   }
 
   if(n==0)
-  {
-#if 0
-    debug() << "(sr::get_array) empty string" << eom;
-#endif
     return empty_ret;
-  }
 
   if(arr_val.id()=="array-list")
   {
@@ -1259,7 +1249,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
   stream << "there are " << axioms.not_contains.size()
          << " not_contains axioms" << eom;
-  for(size_t i=0; i<axioms.not_contains.size(); i++)
+  for(std::size_t i = 0; i < axioms.not_contains.size(); i++)
   {
     const string_not_contains_constraintt &nc_axiom=axioms.not_contains[i];
     const exprt &univ_bound_inf=nc_axiom.univ_lower_bound();
@@ -1283,34 +1273,17 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom=negation_of_not_contains_constraint(
       nc_axiom_in_model, univ_var);
+    stream << "(string_refinementt::check_axioms) Adding negated constraint: "
+           << from_expr(ns, "", negaxiom) << eom;
+    substitute_array_access(negaxiom);
 
-    stream << "  " << i << ".\n"
-           << "    - axiom:\n"
-           << "       " << from_expr(ns, "", nc_axiom) << '\n';
-    stream << "    - axiom_in_model:\n"
-           << "       " << from_expr(ns, "", nc_axiom_in_model) << '\n';
-    stream << "    - negated_axiom:\n"
-           << "       " << from_expr(ns, "", negaxiom) << '\n';
-
-    exprt with_concretized_arrays=concretize_arrays_in_expression(
-      negaxiom, max_string_length);
-    stream << "    - negated_axiom_with_concretized_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
-
-    substitute_array_access(with_concretized_arrays);
-    stream << "    - negated_axiom_without_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
-
-    if(const auto &witness=
-      find_counter_example(ns, ui, with_concretized_arrays, univ_var))
+    if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
     {
-      stream << "  - violated_for: "
-             << univ_var.get_identifier()
-             << "=" << from_expr(ns, "", *witness) << '\n';
+      stream << "string constraint can be violated for "
+             << univ_var.get_identifier() << "=" << from_expr(ns, "", *witness)
+             << eom;
       violated_not_contains[i]=*witness;
     }
-    else
-      stream << "  - correct" << '\n';
   }
 
   if(violated.empty() && violated_not_contains.empty())
@@ -1543,8 +1516,6 @@ static exprt compute_inverse_function(
   elems.erase(it);
   return sum_over_map(elems, f.type(), neg);
 }
-
-
 
 class find_qvar_visitort: public const_expr_visitort
 {

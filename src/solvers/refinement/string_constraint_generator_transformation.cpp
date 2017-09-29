@@ -171,7 +171,7 @@ string_exprt string_constraint_generatort::add_axioms_for_trim(
     from_integer(0, index_type));
   m_axioms.push_back(a4);
 
-  exprt a5=res.axiom_for_length_le(str);
+  exprt a5 = res.axiom_for_length_le(str.length());
   m_axioms.push_back(a5);
 
   symbol_exprt n=fresh_univ_index("QA_index_trim", index_type);
@@ -235,7 +235,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   // where diff is the difference between lower case and upper case characters:
   // diff = 'a'-'A' = 0x20
 
-  exprt a1=res.axiom_for_has_same_length_as(str);
+  equal_exprt a1(res.length(), str.length());
   m_axioms.push_back(a1);
 
   symbol_exprt idx=fresh_univ_index("QA_lower_case", index_type);
@@ -299,7 +299,7 @@ string_exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   // Note that index expressions are only allowed in the body of universal
   // axioms, so we use a trivial premise and push our premise into the body.
 
-  exprt a1=res.axiom_for_has_same_length_as(str);
+  equal_exprt a1(res.length(), str.length());
   m_axioms.push_back(a1);
 
   symbol_exprt idx1=fresh_univ_index("QA_upper_case1", index_type);
@@ -410,7 +410,7 @@ string_exprt string_constraint_generatort::add_axioms_for_replace(
     //    str[qvar]=oldChar => res[qvar]=newChar
     //    !str[qvar]=oldChar => res[qvar]=str[qvar]
 
-    m_axioms.push_back(res.axiom_for_has_same_length_as(str));
+    m_axioms.push_back(equal_exprt(res.length(), str.length()));
 
     symbol_exprt qvar=fresh_univ_index("QA_replace", ref_type.get_index_type());
     implies_exprt case1(

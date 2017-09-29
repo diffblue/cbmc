@@ -311,9 +311,8 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
   const std::size_t max_size,
   const bool strict_formatting)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
-  const typet &index_type=ref_type.get_index_type();
+  const typet &char_type = str.content().type().subtype();
+  const typet &index_type = str.length().type();
 
   const exprt &chr=str[0];
   const equal_exprt starts_with_minus(chr, constant_char('-', char_type));
@@ -399,8 +398,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const exprt &radix,
   const unsigned long radix_ul)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
+  const typet &char_type = str.content().type().subtype();
 
   const equal_exprt starts_with_minus(str[0], constant_char('-', char_type));
   const constant_exprt zero_expr=from_integer(0, type);
@@ -491,8 +489,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   const symbol_exprt input_int=fresh_symbol("parsed_int", type);
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
+  const typet &char_type = str.content().type().subtype();
   const typecast_exprt radix_as_char(radix, char_type);
   const bool strict_formatting=false;
 
