@@ -15,31 +15,14 @@
 #include <util/language.h>
 #include <util/message.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <src/java_bytecode/load_java_class.h>
 
 SCENARIO(
   "java_bytecode_parse_generics",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
-  std::unique_ptr<languaget>java_lang(new_java_bytecode_language());
-
-  // Configure the path loading
-  cmdlinet command_line;
-  command_line.set(
-    "java-cp-include-files",
-    "./java_bytecode/java_bytecode_parse_generics");
-  config.java.classpath.push_back(
-    "./java_bytecode/java_bytecode_parse_generics");
-
-  std::istringstream java_code_stream("ignored");
-  null_message_handlert message_handler;
-
-  // Configure the language, load the class files
-  java_lang->get_language_options(command_line);
-  java_lang->set_message_handler(message_handler);
-  java_lang->parse(java_code_stream, "generics.class");
-  symbol_tablet new_symbol_table;
-  java_lang->typecheck(new_symbol_table, "");
-  java_lang->final(new_symbol_table);
+  const symbol_tablet &new_symbol_table=
+    load_java_class("generics", "./java_bytecode/java_bytecode_parse_generics");
 
   GIVEN("Some class files with Generics")
   {
