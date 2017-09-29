@@ -1208,6 +1208,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const union_find_replacet &symbol_resolve)
 {
   const auto eom=messaget::eom;
+  static const std::string indent = "  ";
+  static const std::string indent2 = "    ";
+
   stream << "string_refinementt::check_axioms:" << eom;
 
   stream << "symbol_resolve:" << eom;
@@ -1245,36 +1248,37 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
 
-    stream << "  " << i << ".\n"
-           << "    - axiom:\n"
-           << "       " << from_expr(ns, "", axiom) << '\n';
-    stream << "    - axiom_in_model:\n"
-           << "       " << from_expr(ns, "", axiom_in_model) << '\n';
-    stream << "    - negated_axiom:\n"
-           << "       " << from_expr(ns, "", negaxiom) << '\n';
+    stream << indent << i << ".\n"
+           << indent2 << "- axiom:\n"
+           << indent2 << indent << from_expr(ns, "", axiom) << '\n';
+    stream << indent2 << "- axiom_in_model:\n"
+           << indent2 << indent << from_expr(ns, "", axiom_in_model) << '\n';
+    stream << indent2 << "- negated_axiom:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
     negaxiom = simplify_expr(negaxiom, ns);
-    stream << "    - simplified_negaxiom:\n"
-           << "       " << from_expr(ns, "", negaxiom) << '\n';
+    stream << indent2 << "- simplified_negaxiom:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
 
     exprt with_concretized_arrays =
       concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-    stream << "    - negated_axiom_with_concretized_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
+    stream << indent2 << "- negated_axiom_with_concretized_array_access:\n"
+           << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
+           << '\n';
 
     substitute_array_access(with_concretized_arrays);
-    stream << "    - negated_axiom_without_array_access:\n"
-           << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
+    stream << indent2 << "- negated_axiom_without_array_access:\n"
+           << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
+           << eom;
 
     if(const auto &witness=
        find_counter_example(ns, ui, with_concretized_arrays, univ_var))
     {
-      stream << "  - violated_for: "
-             << univ_var.get_identifier()
-             << "=" << from_expr(ns, "", *witness) << '\n';
+      stream << indent2 << "- violated_for: " << univ_var.get_identifier()
+             << "=" << from_expr(ns, "", *witness) << eom;
       violated[i]=*witness;
     }
     else
-      stream << "  - correct" << '\n';
+      stream << indent2 << "- correct" << eom;
   }
 
   // Maps from indexes of violated not_contains axiom to a witness of violation
@@ -1304,21 +1308,31 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       to_array_string_expr(get(s0)),
       to_array_string_expr(get(s1)));
 
-    exprt negaxiom = negation_of_not_contains_constraint(
-      to_string_not_contains_constraint(simplify_expr(nc_axiom_in_model, ns)),
-      univ_var);
-    stream << "  " << i << ".\n"
-           << "  - axiom: " << from_expr(ns, "", nc_axiom) << "\n";
-    stream << "  - axiom_in_model: " << from_expr(ns, "", nc_axiom_in_model)
-           << "\n";
-    stream << "  - negated_constraint: " << from_expr(ns, "", negaxiom) << eom;
+    exprt negaxiom =
+      negation_of_not_contains_constraint(nc_axiom_in_model, univ_var);
+    stream << indent << i << ".\n"
+           << indent2 << "- axiom:\n"
+           << indent2 << indent << from_expr(ns, "", nc_axiom) << '\n';
+    stream << indent2 << "- axiom_in_model:\n"
+           << indent2 << indent << from_expr(ns, "", nc_axiom_in_model) << '\n';
+    stream << indent2 << "- negated_axiom:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+
+    negaxiom = simplify_expr(negaxiom, ns);
+    stream << indent2 << "- simplified_negaxiom:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+    negaxiom = concretize_arrays_in_expression(negaxiom, max_string_length, ns);
+    stream << indent2 << "- negated_axiom_with_concretized_array_access:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+
     substitute_array_access(negaxiom);
+    stream << indent2 << "- negated_axiom_without_array_access:\n"
+           << indent2 << indent << from_expr(ns, "", negaxiom) << eom;
 
     if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
     {
-      stream << "string constraint can be violated for "
-             << univ_var.get_identifier() << "=" << from_expr(ns, "", *witness)
-             << eom;
+      stream << indent2 << "- violated_for: " << univ_var.get_identifier()
+             << "=" << from_expr(ns, "", *witness) << eom;
       violated_not_contains[i]=*witness;
     }
   }
