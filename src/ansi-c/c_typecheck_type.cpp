@@ -1492,19 +1492,22 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
+    source_locationt source_location=type.source_location();
     type=pointer_type(type.subtype());
-    type.remove(ID_size);
-    type.remove(ID_C_constant);
+    type.add_source_location()=source_location;
   }
   else if(type.id()==ID_code)
   {
     // see ISO/IEC 9899:1999 page 199 clause 8,
     // may be hidden in typedef
+    source_locationt source_location=type.source_location();
     type=pointer_type(type);
+    type.add_source_location()=source_location;
   }
   else if(type.id()==ID_KnR)
   {
     // any KnR args without type yet?
     type=signed_int_type(); // the default is integer!
+    // no source location
   }
 }
