@@ -7,6 +7,7 @@ SRC = ai.cpp \
       does_remove_const.cpp \
       escape_analysis.cpp \
       flow_insensitive_analysis.cpp \
+      get_entry_function_id.cpp \
       global_may_alias.cpp \
       goto_check.cpp \
       goto_rw.cpp \

@@ -90,6 +90,10 @@ irep_idt rebuild_goto_start_functiont::get_entry_point_mode() const
 /// in that scope from the symbol table.
 void rebuild_goto_start_functiont::remove_existing_entry_point()
 {
+  // If no existing entry point, we don't need to remove it
+  if(!symbol_table.has_symbol(goto_functionst::entry_point()))
+    return;
+
   // Remove the function itself
   symbol_table.remove(goto_functionst::entry_point());
 
