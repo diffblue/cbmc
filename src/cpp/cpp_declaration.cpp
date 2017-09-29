@@ -15,17 +15,17 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_declarationt::output(std::ostream &out) const
 {
-  out << "is_template: " << is_template() << "\n";
-  out << "storage: " << storage_spec().pretty() << "\n";
-  out << "template_type: " << template_type().pretty() << "\n";
-  out << "type: " << type().pretty() << "\n";
+  out << "is_template: " << is_template() << '\n';
+  out << "storage: " << storage_spec().pretty() << '\n';
+  out << "template_type: " << template_type().pretty() << '\n';
+  out << "type: " << type().pretty() << '\n';
 
-  out << "Declarators:" << "\n";
+  out << "Declarators:" << '\n';
 
   for(const auto &it : declarators())
   {
     it.output(out);
-    out << "\n";
+    out << '\n';
   }
 }
 

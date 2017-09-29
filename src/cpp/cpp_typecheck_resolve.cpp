@@ -183,7 +183,7 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
   const cpp_idt &identifier)
 {
 #ifdef DEBUG
-  std::cout << "RESOLVE MAP:" << std::endl;
+  std::cout << "RESOLVE MAP:\n";
   cpp_typecheck.template_map.print(std::cout);
 #endif
 
@@ -1183,8 +1183,8 @@ struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
   if(instance.type.id()!=ID_struct)
   {
     cpp_typecheck.error().source_location=source_location;
-    cpp_typecheck.str << "template `"
-                      << base_name << "' is not a class";
+    cpp_typecheck.error() << "template `"
+                      << base_name << "' is not a class" << messaget::eom;
     throw 0;
   }
 
@@ -1360,11 +1360,11 @@ exprt cpp_typecheck_resolvet::resolve(
   resolve_scope(cpp_name, base_name, template_args);
 
 #ifdef DEBUG
-  std::cout << "base name: " << base_name << std::endl;
-  std::cout << "template args: " << template_args.pretty() << std::endl;
-  std::cout << "original-scope: " << original_scope->prefix << std::endl;
-  std::cout << "scope: "
-            << cpp_typecheck.cpp_scopes.current_scope().prefix << std::endl;
+  std::cout << "base name: " << base_name << '\n';
+  std::cout << "template args: " << template_args.pretty() << '\n';
+  std::cout << "original-scope: " << original_scope->prefix << '\n';
+  std::cout << "scope: " << cpp_typecheck.cpp_scopes.current_scope().prefix
+            << '\n';
 #endif
 
   bool qualified=cpp_name.is_qualified();
@@ -1517,11 +1517,11 @@ exprt cpp_typecheck_resolvet::resolve(
 
   filter(identifiers, want);
 
-  #if 0
-  std::cout << "P0 " << base_name << " " << identifiers.size() << "\n";
+#ifdef DEBUG
+  std::cout << "P0 " << base_name << " " << identifiers.size() << '\n';
   show_identifiers(base_name, identifiers, std::cout);
-  std::cout << "\n";
-  #endif
+  std::cout << '\n';
+#endif
 
   exprt result;
 
@@ -1530,20 +1530,20 @@ exprt cpp_typecheck_resolvet::resolve(
 
   remove_templates(new_identifiers);
 
-  #if 0
-  std::cout << "P1 " << base_name << " " << new_identifiers.size() << "\n";
+#ifdef DEBUG
+  std::cout << "P1 " << base_name << " " << new_identifiers.size() << '\n';
   show_identifiers(base_name, new_identifiers, std::cout);
-  std::cout << "\n";
-  #endif
+  std::cout << '\n';
+#endif
 
   // we only want _exact_ matches, without templates!
   exact_match_functions(new_identifiers, fargs);
 
-  #if 0
-  std::cout << "P2 " << base_name << " " << new_identifiers.size() << "\n";
+#ifdef DEBUG
+  std::cout << "P2 " << base_name << " " << new_identifiers.size() << '\n';
   show_identifiers(base_name, new_identifiers, std::cout);
-  std::cout << "\n";
-  #endif
+  std::cout << '\n';
+#endif
 
   // no exact matches? Try again with function template guessing.
   if(new_identifiers.empty())
@@ -1560,20 +1560,20 @@ exprt cpp_typecheck_resolvet::resolve(
 
     disambiguate_functions(new_identifiers, fargs);
 
-    #if 0
-    std::cout << "P3 " << base_name << " " << new_identifiers.size() << "\n";
+#ifdef DEBUG
+    std::cout << "P3 " << base_name << " " << new_identifiers.size() << '\n';
     show_identifiers(base_name, new_identifiers, std::cout);
-    std::cout << "\n";
-    #endif
+    std::cout << '\n';
+#endif
   }
 
   remove_duplicates(new_identifiers);
 
-  #if 0
-  std::cout << "P4 " << base_name << " " << new_identifiers.size() << "\n";
+#ifdef DEBUG
+  std::cout << "P4 " << base_name << " " << new_identifiers.size() << '\n';
   show_identifiers(base_name, new_identifiers, std::cout);
-  std::cout << "\n";
-  #endif
+  std::cout << '\n';
+#endif
 
   if(new_identifiers.size()==1)
   {
@@ -1601,20 +1601,20 @@ exprt cpp_typecheck_resolvet::resolve(
         << "' does not uniquely resolve:\n";
       show_identifiers(base_name, new_identifiers, cpp_typecheck.error());
 
-      #if 0
+#ifdef DEBUG
       exprt e1=*new_identifiers.begin();
       exprt e2=*(++new_identifiers.begin());
-      cpp_typecheck.str << "e1==e2: " << (e1==e2) << '\n';
-      cpp_typecheck.str << "e1.type==e2.type: " << (e1.type()==e2.type())
-                        << '\n';
-      cpp_typecheck.str << "e1.id()==e2.id(): " << (e1.id()==e2.id())
-                        << '\n';
-      cpp_typecheck.str << "e1.iden==e2.iden: "
-                        << (e1.get(ID_identifier)==e2.get(ID_identifier))
-                        << '\n';
-      cpp_typecheck.str << "e1.iden:: " << e1.get(ID_identifier) << '\n';
-      cpp_typecheck.str << "e2.iden:: " << e2.get(ID_identifier) << '\n';
-      #endif
+      cpp_typecheck.error() << "e1==e2: " << (e1 == e2) << '\n';
+      cpp_typecheck.error()
+        << "e1.type==e2.type: " << (e1.type() == e2.type()) << '\n';
+      cpp_typecheck.error()
+        << "e1.id()==e2.id(): " << (e1.id() == e2.id()) << '\n';
+      cpp_typecheck.error()
+        << "e1.iden==e2.iden: "
+        << (e1.get(ID_identifier) == e2.get(ID_identifier)) << '\n';
+      cpp_typecheck.error() << "e1.iden:: " << e1.get(ID_identifier) << '\n';
+      cpp_typecheck.error() << "e2.iden:: " << e2.get(ID_identifier) << '\n';
+#endif
     }
 
     if(fargs.in_use)

@@ -18,11 +18,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_declaratort::output(std::ostream &out) const
 {
-  out << "  name: " << name().pretty() << "\n";
-  out << "  type: " << type().pretty() << "\n";
-  out << "  value: " << value().pretty() << "\n";
-  out << "  init_args: " << init_args().pretty() << "\n";
-  out << "  method_qualifier: " << method_qualifier().pretty() << "\n";
+  out << "  name: " << name().pretty() << '\n';
+  out << "  type: " << type().pretty() << '\n';
+  out << "  value: " << value().pretty() << '\n';
+  out << "  init_args: " << init_args().pretty() << '\n';
+  out << "  method_qualifier: " << method_qualifier().pretty() << '\n';
 }
 
 typet cpp_declaratort::merge_type(const typet &declaration_type) const

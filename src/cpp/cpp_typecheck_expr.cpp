@@ -2344,7 +2344,7 @@ void cpp_typecheckt::typecheck_method_application(
       static_cast<const cpp_template_args_tct &>(template_args));
     add_method_body(&method_symbol);
 #ifdef DEBUG
-    std::cout << "MAP for " << symbol << ":" << std::endl;
+    std::cout << "MAP for " << symbol << ":\n";
     template_map.print(std::cout);
 #endif
   }
