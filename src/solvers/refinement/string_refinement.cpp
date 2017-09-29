@@ -2003,31 +2003,21 @@ static optionalt<exprt> find_counter_example(
 typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
 
 /// \related string_constraintt
-class gather_indices_visitort: public const_expr_visitort
-{
-public:
-  array_index_mapt indices;
-
-  gather_indices_visitort(): indices() {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr.id()==ID_index)
-    {
-      const index_exprt &index=to_index_expr(expr);
-      const exprt &s(index.array());
-      const exprt &i(index.index());
-      indices[s].push_back(i);
-    }
-  }
-};
-
-/// \related string_constraintt
 static array_index_mapt gather_indices(const exprt &expr)
 {
-  gather_indices_visitort v;
-  expr.visit(v);
-  return v.indices;
+  array_index_mapt indices;
+  // clang-format off
+  std::for_each(
+    expr.depth_begin(),
+    expr.depth_end(),
+    [&](const exprt &expr)
+    {
+      const auto index_expr = expr_try_dynamic_cast<const index_exprt>(expr);
+      if(index_expr)
+        indices[index_expr->array()].push_back(index_expr->index());
+    });
+  // clang-format on
+  return indices;
 }
 
 /// \param expr: an expression
