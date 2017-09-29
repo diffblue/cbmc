@@ -62,7 +62,7 @@ bool ci_lazy_methodst::operator()(
 
   main_function_resultt main_function=
     get_main_symbol(symbol_table, main_class, get_message_handler(), true);
-  if(main_function.status!=main_function_resultt::Success)
+  if(!main_function.is_success())
   {
     // Failed, mark all functions in the given main class(es)
     // reachable.

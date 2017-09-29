@@ -462,7 +462,7 @@ bool java_entry_point(
   messaget message(message_handler);
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, message_handler);
-  if(res.status!=main_function_resultt::Success)
+  if(!res.is_success())
     return true;
   symbolt symbol=res.main_function;
 

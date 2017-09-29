@@ -40,6 +40,9 @@ struct main_function_resultt
     : status(Success), main_function(main_function)
   {
   }
+
+  bool is_success() const { return status==Success; }
+  bool is_error() const { return status==Error; }
 };
 
 /// Figures out the entry point of the code to verify
