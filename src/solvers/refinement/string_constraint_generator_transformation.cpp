@@ -384,10 +384,14 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
   return { };
 }
 
-/// add axioms corresponding to the String.replace java function
-/// \par parameters: function application with three arguments, the first is a
-///   string,
-/// the second and the third are either pair of characters or a pair of strings
+/// Add axioms corresponding to the String.replace java function
+/// Only supports String.replace(char, char) and
+/// String.replace(String, String) for single-character strings
+/// Returns original string in every other case (that behaviour is to
+/// be fixed in the future)
+/// \param f function application with three arguments, the first is a
+/// string, the second and the third are either pair of characters or
+/// a pair of strings
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
