@@ -111,6 +111,7 @@ graphs in DOT format.
 #include <langapi/language_ui.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/show_goto_functions.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 
 #include <analyses/goto_check.h>
 
@@ -119,7 +120,7 @@ class goto_functionst;
 class optionst;
 
 #define GOTO_ANALYSER_OPTIONS \
-  "(function):" \
+  OPT_FUNCTIONS \
   "D:I:(std89)(std99)(std11)" \
   "(classpath):(cp):(main-class):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \

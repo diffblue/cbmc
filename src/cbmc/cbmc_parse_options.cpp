@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/rebuild_goto_start_function.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/show_goto_functions.h>
 
@@ -615,6 +616,8 @@ int cbmc_parse_optionst::get_goto_program(
     cmdlinet::argst binaries;
     binaries.reserve(cmdline.args.size());
 
+    // Remove all binaries from the command line as they
+    // are already compiled
     for(cmdlinet::argst::iterator
         it=cmdline.args.begin();
         it!=cmdline.args.end();
@@ -662,6 +665,21 @@ int cbmc_parse_optionst::get_goto_program(
 
     if(!binaries.empty())
       config.set_from_symbol_table(symbol_table);
+
+    if(cmdline.isset("function"))
+    {
+      const std::string &function_id=cmdline.get_value("function");
+      rebuild_goto_start_functiont start_function_rebuilder(
+        get_message_handler(),
+        cmdline,
+        symbol_table,
+        goto_functions);
+
+      if(start_function_rebuilder(function_id))
+      {
+        return 6;
+      }
+    }
 
     if(cmdline.isset("show-symbol-table"))
     {
@@ -1018,7 +1036,7 @@ void cbmc_parse_optionst::help()
     " --round-to-plus-inf          rounding towards plus infinity\n"
     " --round-to-minus-inf         rounding towards minus infinity\n"
     " --round-to-zero              rounding towards zero\n"
-    " --function name              set main function name\n"
+    HELP_FUNCTIONS
     HELP_WRAP_ENTRY_POINT_IN_WHILE_TRUE
     "\n"
     "Program representations:\n"

@@ -1,0 +1,8 @@
+CORE
+main.c
+"--function fun --cover branch"
+^EXIT=0$
+^SIGNAL=0$
+^x=
+--
+^warning: ignoring

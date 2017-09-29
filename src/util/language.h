@@ -113,6 +113,10 @@ public:
 
   virtual languaget *new_language()=0;
 
+  virtual bool generate_start_function(
+    const irep_idt &entry_function_symbol_id,
+    class symbol_tablet &symbol_table)=0;
+
   // constructor / destructor
 
   languaget() { }

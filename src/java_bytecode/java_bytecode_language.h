@@ -89,6 +89,10 @@ public:
   virtual void convert_lazy_method(
     const irep_idt &id, symbol_tablet &) override;
 
+  virtual bool generate_start_function(
+    const irep_idt &entry_function_symbol_id,
+    class symbol_tablet &symbol_table) override;
+
 protected:
   bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);
 
