@@ -187,7 +187,7 @@ bool ci_lazy_methodst::operator()(
     }
     if(sym.second.type.id()==ID_code)
       gather_needed_globals(sym.second.value, symbol_table, unreachable_symbols);
-      unreachable_symbols.erase(sym.first);
+    unreachable_symbols.erase(sym.first);
   }
 
   debug()
