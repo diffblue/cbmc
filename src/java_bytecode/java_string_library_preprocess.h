@@ -173,8 +173,14 @@ private:
     symbol_tablet &symbol_table,
     code_blockt &init_code);
 
-  void process_single_operand(
-    exprt::operandst &processed_ops,
+  friend exprt convert_exprt_to_string_exprt_unit_test(
+      java_string_library_preprocesst &preprocess,
+      const exprt &deref,
+      const source_locationt &loc,
+      symbol_tablet &symbol_table,
+      code_blockt &init_code);
+
+  exprt convert_exprt_to_string_exprt(
     const exprt &deref,
     const source_locationt &loc,
     symbol_tablet &symbol_table,
@@ -286,8 +292,11 @@ private:
     const source_locationt &loc,
     symbol_tablet &symbol_table);
 
-  codet code_assign_java_string_to_string_expr(
-    const string_exprt &lhs, const exprt &rhs, symbol_tablet &symbol_table);
+  void code_assign_java_string_to_string_expr(
+    const string_exprt &lhs,
+    const exprt &rhs,
+    symbol_tablet &symbol_table,
+    code_blockt &code);
 
   codet code_assign_string_literal_to_string_expr(
     const string_exprt &lhs,

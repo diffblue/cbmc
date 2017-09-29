@@ -1,6 +1,6 @@
 THOROUGH
 StringStartEnd01.class
---refine-strings --unwind 30
+--refine-strings --string-max-length 1000 --unwind 30
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
