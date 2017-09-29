@@ -2054,33 +2054,14 @@ is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
 ///   false otherwise.
 static bool universal_only_in_index(const string_constraintt &expr)
 {
-  // For efficiency, we do a depth-first search of the
-  // body. The exprt visitors do a BFS and hide the stack/queue, so we would
-  // need to store a map from child to parent.
-
-  // The unsigned int represents index depth we are. For example, if we are
-  // considering the fragment `a[b[x]]` (not inside an index expression), then
-  // the stack would look something like `[..., (a, 0), (b, 1), (x, 2)]`.
-  typedef std::pair<exprt, unsigned> valuet;
-  std::stack<valuet> stack;
-  // We start at 0 since expr is not an index expression, so expr.body() is not
-  // in an index expression.
-  stack.push(valuet(expr.body(), 0));
-  while(!stack.empty())
+  for(auto it = expr.body().depth_begin(); it != expr.body().depth_end();)
   {
-    // Inspect current value
-    const valuet cur=stack.top();
-    stack.pop();
-    const exprt e=cur.first;
-    const unsigned index_depth=cur.second;
-    const unsigned child_index_depth=index_depth+(e.id()==ID_index?0:1);
-
-    // If we found the universal variable not in an index_exprt, fail
-    if(e==expr.univ_var() && index_depth==0)
+    if(*it == expr.univ_var())
       return false;
+    if(it->id() == ID_index)
+      it.next_sibling_or_parent();
     else
-      forall_operands(it, e)
-        stack.push(valuet(*it, child_index_depth));
+      ++it;
   }
   return true;
 }
