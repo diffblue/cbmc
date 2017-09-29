@@ -384,15 +384,26 @@ void unified_difft::output(std::ostream &os) const
 
   for(const std::pair<irep_idt, differencest> &p : differences_map)
   {
-    goto_functionst::function_mapt::const_iterator f1=
-      old_goto_functions.function_map.find(p.first);
-    goto_functionst::function_mapt::const_iterator f2=
-      new_goto_functions.function_map.find(p.first);
+    const irep_idt &function=p.first;
+
+    goto_functionst::function_mapt::const_iterator old_fit=
+      old_goto_functions.function_map.find(function);
+    goto_functionst::function_mapt::const_iterator new_fit=
+      new_goto_functions.function_map.find(function);
+
+    const goto_programt &old_goto_program=
+      old_fit==old_goto_functions.function_map.end() ?
+      empty :
+      old_fit->second.body;
+    const goto_programt &new_goto_program=
+      new_fit==new_goto_functions.function_map.end() ?
+      empty :
+      new_fit->second.body;
 
     output_diff(
-      p.first,
-      f1==old_goto_functions.function_map.end()?empty:f1->second.body,
-      f2==new_goto_functions.function_map.end()?empty:f2->second.body,
+      function,
+      old_goto_program,
+      new_goto_program,
       p.second,
       os);
   }
