@@ -13,6 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
+#include "expr_cast.h"
 
 /// add axioms to say that the returned string expression `res` has length `k`
 /// and characters at position `i` in `res` are equal to the character at
@@ -359,38 +360,70 @@ string_exprt string_constraint_generatort::add_axioms_for_char_set(
   return res;
 }
 
-/// add axioms corresponding to the String.replace java function
-/// \par parameters: function application with three arguments, the first is a
-///   string,
-/// the second and the third are characters
+/// Convert two expressions to pair of chars
+/// If both expressions are characters, return pair of them
+/// If both expressions are 1-length strings, return first character of each
+/// Otherwise return empty optional
+/// \param expr1 First expression
+/// \param expr2 Second expression
+/// \return Optional pair of two expressions
+static optionalt<std::pair<exprt, exprt>> to_char_pair(
+  exprt expr1, exprt expr2)
+{
+  if((expr1.type().id()==ID_unsignedbv
+      || expr1.type().id()==ID_char)
+     && (expr2.type().id()==ID_char
+         || expr2.type().id()==ID_unsignedbv))
+    return std::make_pair(expr1, expr2);
+  const auto expr1_str=to_string_expr(expr1);
+  const auto expr2_str=to_string_expr(expr2);
+  const auto expr1_length=expr_cast<size_t>(expr1_str.length());
+  const auto expr2_length=expr_cast<size_t>(expr2_str.length());
+  if(expr1_length && expr2_length && *expr1_length==1 && *expr2_length==1)
+    return std::make_pair(exprt(expr1_str[0]), exprt(expr2_str[0]));
+  return { };
+}
+
+/// Add axioms corresponding to the String.replace java function
+/// Only supports String.replace(char, char) and
+/// String.replace(String, String) for single-character strings
+/// Returns original string in every other case (that behaviour is to
+/// be fixed in the future)
+/// \param f function application with three arguments, the first is a
+/// string, the second and the third are either pair of characters or
+/// a pair of strings
 /// \return a new string expression
 string_exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
 {
   string_exprt str=get_string_expr(args(f, 3)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const exprt &old_char=args(f, 3)[1];
-  const exprt &new_char=args(f, 3)[2];
-  string_exprt res=fresh_string(ref_type);
+  if(const auto maybe_chars=to_char_pair(args(f, 3)[1], args(f, 3)[2]))
+  {
+    const auto old_char=maybe_chars->first;
+    const auto new_char=maybe_chars->second;
+    string_exprt res=fresh_string(ref_type);
 
-  // We add axioms:
-  // a1 : |res| = |str|
-  // a2 : forall qvar, 0<=qvar<|res|,
-  //    str[qvar]=oldChar => res[qvar]=newChar
-  //    !str[qvar]=oldChar => res[qvar]=str[qvar]
+    // We add axioms:
+    // a1 : |res| = |str|
+    // a2 : forall qvar, 0<=qvar<|res|,
+    //    str[qvar]=oldChar => res[qvar]=newChar
+    //    !str[qvar]=oldChar => res[qvar]=str[qvar]
 
-  m_axioms.push_back(res.axiom_for_has_same_length_as(str));
+    m_axioms.push_back(res.axiom_for_has_same_length_as(str));
 
-  symbol_exprt qvar=fresh_univ_index("QA_replace", ref_type.get_index_type());
-  implies_exprt case1(
-    equal_exprt(str[qvar], old_char),
-    equal_exprt(res[qvar], new_char));
-  implies_exprt case2(
-    not_exprt(equal_exprt(str[qvar], old_char)),
-    equal_exprt(res[qvar], str[qvar]));
-  string_constraintt a2(qvar, res.length(), and_exprt(case1, case2));
-  m_axioms.push_back(a2);
-  return res;
+    symbol_exprt qvar=fresh_univ_index("QA_replace", ref_type.get_index_type());
+    implies_exprt case1(
+      equal_exprt(str[qvar], old_char),
+      equal_exprt(res[qvar], new_char));
+    implies_exprt case2(
+      not_exprt(equal_exprt(str[qvar], old_char)),
+      equal_exprt(res[qvar], str[qvar]));
+    string_constraintt a2(qvar, res.length(), and_exprt(case1, case2));
+    m_axioms.push_back(a2);
+    return res;
+  }
+  return str;
 }
 
 /// add axioms corresponding to the StringBuilder.deleteCharAt java function

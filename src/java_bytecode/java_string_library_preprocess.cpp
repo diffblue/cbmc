@@ -1944,6 +1944,9 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.replace:(CC)Ljava/lang/String;"]=
       ID_cprover_string_replace_func;
+  cprover_equivalent_to_java_string_returning_function
+    ["java::java.lang.String.replace:(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;"]= // NOLINT
+      ID_cprover_string_replace_func;
   cprover_equivalent_to_java_function
     ["java::java.lang.String.startsWith:(Ljava/lang/String;)Z"]=
       ID_cprover_string_startswith_func;
