@@ -26,11 +26,21 @@ bool java_entry_point(
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
-typedef struct
+struct main_function_resultt
 {
-  enum { Success, Error, NotFound } status;
+  enum statust { Success, Error, NotFound } status;
   symbolt main_function;
-} main_function_resultt;
+
+  main_function_resultt(statust status)
+    : status(status)
+  {
+  }
+
+  main_function_resultt(const symbolt &main_function)
+    : status(Success), main_function(main_function)
+  {
+  }
+};
 
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(

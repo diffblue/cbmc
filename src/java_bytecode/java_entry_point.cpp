@@ -325,8 +325,6 @@ main_function_resultt get_main_symbol(
   message_handlert &message_handler,
   bool allow_no_body)
 {
-  main_function_resultt res;
-
   messaget message(message_handler);
 
   // find main symbol
@@ -341,10 +339,9 @@ main_function_resultt get_main_symbol(
 
     if(main_symbol_id==irep_idt())
     {
-      message.error() << "main symbol resolution failed: "
-                      << error_message << messaget::eom;
-      res.status=main_function_resultt::Error;
-      return res;
+      message.error()
+        << "main symbol resolution failed: " << error_message << messaget::eom;
+      return main_function_resultt::Error;
     }
 
     symbol_tablet::opt_const_symbol_reft symbol=
@@ -356,17 +353,12 @@ main_function_resultt get_main_symbol(
     // check if it has a body
     if(symbol->get().value.is_nil() && !allow_no_body)
     {
-      message.error() << "main method `" << main_class
-                      << "' has no body" << messaget::eom;
-      res.main_function=*symbol;
-      res.status=main_function_resultt::Error;
-      return res;
+      message.error()
+        << "main method `" << main_class << "' has no body" << messaget::eom;
+      return main_function_resultt::Error;
     }
 
-    // Return found function
-    res.main_function=*symbol;
-    res.status=main_function_resultt::Success;
-    return res;
+    return main_function_resultt(*symbol);   // Return found function
   }
   else
   {
@@ -375,43 +367,34 @@ main_function_resultt get_main_symbol(
 
     // are we given a main class?
     if(main_class.empty())
-    {
-      res.status=main_function_resultt::NotFound;
-      return res; // silently ignore
-    }
+      return main_function_resultt::NotFound;   // silently ignore
 
-    std::string entry_method=
-      id2string(main_class)+".main";
+    std::string entry_method=id2string(main_class)+".main";
 
     std::string prefix="java::"+entry_method+":";
 
     // look it up
     std::set<const symbolt *> matches;
 
-    for(symbol_tablet::symbolst::const_iterator
-        s_it=symbol_table.symbols.begin();
-        s_it!=symbol_table.symbols.end();
-        s_it++)
+    for(const auto &named_symbol : symbol_table.symbols)
     {
-      if(s_it->second.type.id()==ID_code &&
-         has_prefix(id2string(s_it->first), prefix))
-        matches.insert(&s_it->second);
+      if(named_symbol.second.type.id()==ID_code
+        && has_prefix(id2string(named_symbol.first), prefix))
+      {
+        matches.insert(&named_symbol.second);
+      }
     }
 
     if(matches.empty())
-    {
       // Not found, silently ignore
-      res.status=main_function_resultt::NotFound;
-      return res;
-    }
+      return main_function_resultt::NotFound;
 
     if(matches.size()>1)
     {
-      message.error() << "main method in `" << main_class
-                      << "' is ambiguous" << messaget::eom;
-      res.main_function=symbolt();
-      res.status=main_function_resultt::Error;
-      return res;  // give up with error, no main
+      message.error()
+        << "main method in `" << main_class
+        << "' is ambiguous" << messaget::eom;
+      return main_function_resultt::Error;  // give up with error, no main
     }
 
     // function symbol
@@ -420,17 +403,12 @@ main_function_resultt get_main_symbol(
     // check if it has a body
     if(symbol.value.is_nil() && !allow_no_body)
     {
-      message.error() << "main method `" << main_class
-                      << "' has no body" << messaget::eom;
-      res.main_function=symbol;
-      res.status=main_function_resultt::Error;
-      return res;  // give up with error
+      message.error()
+        << "main method `" << main_class << "' has no body" << messaget::eom;
+      return main_function_resultt::Error;  // give up with error
     }
 
-    // Return found function
-    res.main_function=symbol;
-    res.status=main_function_resultt::Success;
-    return res;
+    return symbol;  // Return found function
   }
 }
 
