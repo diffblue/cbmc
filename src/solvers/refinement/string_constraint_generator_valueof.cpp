@@ -94,24 +94,24 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 
   std::string str_true="true";
   implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
-  m_axioms.push_back(a1);
+  lemmas_.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
   {
     exprt chr=from_integer(str_true[i], char_type);
     implies_exprt a2(eq, equal_exprt(res[i], chr));
-    m_axioms.push_back(a2);
+    lemmas_.push_back(a2);
   }
 
   std::string str_false="false";
   implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
-  m_axioms.push_back(a3);
+  lemmas_.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
   {
     exprt chr=from_integer(str_false[i], char_type);
     implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
-    m_axioms.push_back(a4);
+    lemmas_.push_back(a4);
   }
 
   return res;
@@ -221,7 +221,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
   exprt f_char=constant_char('f', char_type);
 
   size_t max_size=8;
-  m_axioms.push_back(
+  lemmas_.push_back(
     and_exprt(res.axiom_for_length_gt(0),
               res.axiom_for_length_le(max_size)));
 
@@ -247,12 +247,12 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
     }
 
     equal_exprt premise(res.axiom_for_has_length(size));
-    m_axioms.push_back(
+    lemmas_.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
     // disallow 0s at the beginning
     if(size>1)
-      m_axioms.push_back(
+      lemmas_.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
   return res;
@@ -288,7 +288,7 @@ string_exprt string_constraint_generatort::add_axioms_from_char(
 {
   string_exprt res=fresh_string(ref_type);
   and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
-  m_axioms.push_back(lemma);
+  lemmas_.push_back(lemma);
   return res;
 }
 
@@ -323,30 +323,30 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 
   // |str| > 0
   const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
-  m_axioms.push_back(non_empty);
+  lemmas_.push_back(non_empty);
 
   if(strict_formatting)
   {
     // str[0] = '-' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(starts_with_minus, starts_with_digit);
-    m_axioms.push_back(correct_first);
+    lemmas_.push_back(correct_first);
   }
   else
   {
     // str[0] = '-' || str[0] = '+' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(
       starts_with_minus, starts_with_digit, starts_with_plus);
-    m_axioms.push_back(correct_first);
+    lemmas_.push_back(correct_first);
   }
 
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
     str.axiom_for_length_ge(from_integer(2, index_type)));
-  m_axioms.push_back(contains_digit);
+  lemmas_.push_back(contains_digit);
 
   // |str| <= max_size
-  m_axioms.push_back(str.axiom_for_length_le(max_size));
+  lemmas_.push_back(str.axiom_for_length_le(max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -358,7 +358,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
       str.axiom_for_length_ge(from_integer(index+1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
-    m_axioms.push_back(character_at_index_is_digit);
+    lemmas_.push_back(character_at_index_is_digit);
   }
 
   if(strict_formatting)
@@ -369,12 +369,12 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
     const implies_exprt no_leading_zero(
       equal_exprt(chr, zero_char),
       str.axiom_for_has_length(from_integer(1, index_type)));
-    m_axioms.push_back(no_leading_zero);
+    lemmas_.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
       starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
-    m_axioms.push_back(no_leading_zero_after_minus);
+    lemmas_.push_back(no_leading_zero_after_minus);
   }
 }
 
@@ -412,7 +412,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   /// Deal with size==1 case separately. There are axioms from
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
-  m_axioms.push_back(
+  lemmas_.push_back(
     implies_exprt(str.axiom_for_has_length(1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
@@ -456,18 +456,18 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     if(!digit_constraints.empty())
     {
       const implies_exprt a5(premise, conjunction(digit_constraints));
-      m_axioms.push_back(a5);
+      lemmas_.push_back(a5);
     }
 
     const implies_exprt a6(
       and_exprt(premise, not_exprt(starts_with_minus)),
       equal_exprt(input_int, sum));
-    m_axioms.push_back(a6);
+    lemmas_.push_back(a6);
 
     const implies_exprt a7(
       and_exprt(premise, starts_with_minus),
       equal_exprt(input_int, unary_minus_exprt(sum)));
-    m_axioms.push_back(a7);
+    lemmas_.push_back(a7);
   }
 }
 

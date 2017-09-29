@@ -33,28 +33,28 @@ string_constraint_generatort::string_constraint_generatort(
   m_force_printable_characters(info.string_printable),
   m_ns(ns) { }
 
-const std::vector<exprt> &string_constraint_generatort::get_axioms() const
-{
-  return m_axioms;
-}
+const std::vector<exprt> &string_constraint_generatort::lemmas() const
+{ return lemmas_; }
+
+const std::vector<string_constraintt>
+&string_constraint_generatort::constraints() const
+{ return constraints_; }
+
+const std::vector<string_not_contains_constraintt>
+&string_constraint_generatort::not_contains_constraints() const
+{ return not_contains_constraints_; }
 
 const std::vector<symbol_exprt> &
 string_constraint_generatort::get_index_symbols() const
-{
-  return m_index_symbols;
-}
+{ return m_index_symbols; }
 
 const std::vector<symbol_exprt> &
 string_constraint_generatort::get_boolean_symbols() const
-{
-  return m_boolean_symbols;
-}
+{ return m_boolean_symbols; }
 
 const std::set<string_exprt> &
 string_constraint_generatort::get_created_strings() const
-{
-  return m_created_strings;
-}
+{ return m_created_strings; }
 
 /// generate constant character expression with character type.
 /// \par parameters: integer representing a character, and a type for
@@ -134,7 +134,7 @@ plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
   implies_exprt no_overflow(equal_exprt(neg1, neg2),
                             equal_exprt(neg1, neg_sum));
 
-  m_axioms.push_back(no_overflow);
+  lemmas_.push_back(no_overflow);
 
   return sum;
 }
@@ -183,10 +183,10 @@ string_exprt string_constraint_generatort::get_string_expr(const exprt &expr)
 void string_constraint_generatort::add_default_axioms(
   const string_exprt &s)
 {
-  m_axioms.push_back(
+  lemmas_.push_back(
     s.axiom_for_length_ge(from_integer(0, s.length().type())));
   if(max_string_length!=std::numeric_limits<size_t>::max())
-    m_axioms.push_back(s.axiom_for_length_le(max_string_length));
+    lemmas_.push_back(s.axiom_for_length_le(max_string_length));
 
   if(m_force_printable_characters)
   {
@@ -195,8 +195,11 @@ void string_constraint_generatort::add_default_axioms(
     and_exprt printable(
       binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
       binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
-    string_constraintt sc(qvar, s.length(), printable);
-    m_axioms.push_back(sc);
+    string_constraintt sc;
+    sc.univ_var=qvar;
+    sc.upper_bound=s.length();
+    sc.body=printable;
+    constraints_.push_back(sc);
   }
 }
 
@@ -282,18 +285,24 @@ string_exprt string_constraint_generatort::add_axioms_for_if(
   const typet &index_type=ref_type.get_index_type();
   string_exprt res=fresh_string(ref_type);
 
-  m_axioms.push_back(
+  lemmas_.push_back(
     implies_exprt(expr.cond(), res.axiom_for_has_same_length_as(t)));
   symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
   equal_exprt qequal(res[qvar], t[qvar]);
-  string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
-  m_axioms.push_back(sc1);
-  m_axioms.push_back(
+  string_constraintt sc1;
+  sc1.univ_var=qvar;
+  sc1.upper_bound=t.length();
+  sc1.body=implies_exprt(expr.cond(), qequal);
+  constraints_.push_back(sc1);
+  lemmas_.push_back(
     implies_exprt(not_exprt(expr.cond()), res.axiom_for_has_same_length_as(f)));
   symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
   equal_exprt qequal2(res[qvar2], f[qvar2]);
-  string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
-  m_axioms.push_back(sc2);
+  string_constraintt sc2;
+  sc2.univ_var=qvar2;
+  sc2.upper_bound=f.length();
+  sc2.body=or_exprt(expr.cond(), qequal2);
+  constraints_.push_back(sc2);
   return res;
 }
 
@@ -615,7 +624,7 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   string_exprt str=get_string_expr(args(f, 2)[0]);
   const refined_string_typet &ref_type=to_refined_string_type(str.type());
   symbol_exprt char_sym=fresh_symbol("char", ref_type.get_char_type());
-  m_axioms.push_back(equal_exprt(char_sym, str[args(f, 2)[1]]));
+  lemmas_.push_back(equal_exprt(char_sym, str[args(f, 2)[1]]));
   return char_sym;
 }
 

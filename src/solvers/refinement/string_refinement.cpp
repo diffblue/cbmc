@@ -26,15 +26,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <java_bytecode/java_types.h>
+#include "expr_cast.h"
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
 static bool is_char_array(const namespacet &ns, const typet &type);
-
-static bool is_valid_string_constraint(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const string_constraintt &expr);
 
 static optionalt<exprt> find_counter_example(
   const namespacet &ns,
@@ -94,63 +90,6 @@ static std::vector<exprt> instantiate(
 static exprt get_array(
   const std::function<exprt(const exprt &)> &super_get,
   const exprt &arr);
-
-/// Convert exprt to a specific type. Throw bad_cast if conversion
-/// cannot be performed
-/// Generic case doesn't exist, specialize for different types accordingly
-/// TODO: this should go to util
-
-// Tag dispatching struct
-
-template<typename T>
-struct expr_cast_implt final { };
-
-template<>
-struct expr_cast_implt<mp_integer> final
-{
-  optionalt<mp_integer> operator()(const exprt &expr) const
-  {
-    mp_integer out;
-    if(to_integer(expr, out))
-      return {};
-    return out;
-  }
-};
-
-template<>
-struct expr_cast_implt<std::size_t> final
-{
-  optionalt<std::size_t> operator()(const exprt &expr) const
-  {
-    if(const auto tmp=expr_cast_implt<mp_integer>()(expr))
-      if(tmp->is_long() && *tmp>=0)
-        return tmp->to_long();
-    return {};
-  }
-};
-
-template<>
-struct expr_cast_implt<string_exprt> final
-{
-  optionalt<string_exprt> operator()(const exprt &expr) const
-  {
-    if(is_refined_string_type(expr.type()))
-      return to_string_expr(expr);
-    return {};
-  }
-};
-
-template<typename T>
-optionalt<T> expr_cast(const exprt& expr)
-{ return expr_cast_implt<T>()(expr); }
-
-template<typename T>
-T expr_cast_v(const exprt &expr)
-{
-  const auto maybe=expr_cast<T>(expr);
-  INVARIANT(maybe, "Bad conversion");
-  return *maybe;
-}
 
 /// Convert index-value map to a vector of values. If a value for an
 /// index is not defined, set it to the value referenced by the next higher
@@ -563,35 +502,30 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(pair.first, pair.second);
   }
 
-  for(exprt axiom : generator.get_axioms())
+  for(string_constraintt constraint : generator.constraints())
   {
-    replace_expr(symbol_resolve, axiom);
-    if(axiom.id()==ID_string_constraint)
-    {
-      string_constraintt univ_axiom=
-        to_string_constraint(axiom);
-      DATA_INVARIANT(
-        is_valid_string_constraint(error(), ns, univ_axiom),
-        string_refinement_invariantt(
-          "string constraints satisfy their invariant"));
-      axioms.universal.push_back(univ_axiom);
-    }
-    else if(axiom.id()==ID_string_not_contains_constraint)
-    {
-      string_not_contains_constraintt nc_axiom=
-        to_string_not_contains_constraint(axiom);
-      const refined_string_typet &rtype=
-        to_refined_string_type(nc_axiom.s0().type());
-      const typet &index_type=rtype.get_index_type();
-      array_typet witness_type(index_type, infinity_exprt(index_type));
-      generator.witness[nc_axiom]=
-        generator.fresh_symbol("not_contains_witness", witness_type);
-      axioms.not_contains.push_back(nc_axiom);
-    }
-    else
-    {
-      add_lemma(axiom);
-    }
+    replace(constraint, symbol_resolve);
+    DATA_INVARIANT(
+      is_valid_string_constraint(debug(), ns, constraint),
+      string_refinement_invariantt(
+        "string constraints satisfy their invariant"));
+    axioms.universal.push_back(constraint);
+  }
+
+  for(auto nc_axiom : generator.not_contains_constraints())
+  {
+    replace_expr(symbol_resolve, nc_axiom);
+    const refined_string_typet rtype=to_refined_string_type(nc_axiom.s0().type());
+    const typet &index_type=rtype.get_index_type();
+    const array_typet witness_type(index_type, infinity_exprt(index_type));
+    generator.witness[nc_axiom]=
+      generator.fresh_symbol("not_contains_witness", witness_type);
+    axioms.not_contains.push_back(nc_axiom);
+  }
+  for(exprt lemma : generator.lemmas())
+  {
+    replace_expr(symbol_resolve, lemma);
+    add_lemma(lemma);
   }
 
   found_length.clear();
@@ -1189,23 +1123,21 @@ static exprt negation_of_not_contains_constraint(
 static exprt negation_of_constraint(const string_constraintt &axiom)
 {
   // If the for all is vacuously true, the negation is false.
-  const exprt &lb=axiom.lower_bound();
-  const exprt &ub=axiom.upper_bound();
-  if(lb.id()==ID_constant && ub.id()==ID_constant)
+  if(axiom.lower_bound.is_constant() && axiom.upper_bound.is_constant())
   {
-    const auto lb_int=expr_cast<mp_integer>(lb);
-    const auto ub_int=expr_cast<mp_integer>(ub);
+    const auto lb_int=expr_cast<mp_integer>(axiom.lower_bound);
+    const auto ub_int=expr_cast<mp_integer>(axiom.upper_bound);
     if(!lb_int || !ub_int || ub_int<=lb_int)
       return false_exprt();
   }
 
   // If the premise is false, the implication is trivially true, so the
   // negation is false.
-  if(axiom.premise()==false_exprt())
+  if(axiom.premise==false_exprt())
     return false_exprt();
 
-  and_exprt premise(axiom.premise(), axiom.univ_within_bounds());
-  and_exprt negaxiom(premise, not_exprt(axiom.body()));
+  and_exprt premise(axiom.premise, univ_within_bounds(axiom));
+  and_exprt negaxiom(premise, not_exprt(axiom.body));
 
   return negaxiom;
 }
@@ -1270,14 +1202,13 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   for(size_t i=0; i<axioms.universal.size(); i++)
   {
     const string_constraintt &axiom=axioms.universal[i];
-    const symbol_exprt &univ_var=axiom.univ_var();
-    const exprt &bound_inf=axiom.lower_bound();
-    const exprt &bound_sup=axiom.upper_bound();
-    const exprt &prem=axiom.premise();
-    const exprt &body=axiom.body();
 
-    const string_constraintt axiom_in_model(
-      univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
+    string_constraintt axiom_in_model;
+    axiom_in_model.univ_var=axiom.univ_var;
+    axiom_in_model.lower_bound=get(axiom.lower_bound);
+    axiom_in_model.upper_bound=get(axiom.upper_bound);
+    axiom_in_model.premise=get(axiom.premise);
+    axiom_in_model.body=get(axiom.body);
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
 
@@ -1298,11 +1229,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     stream << "    - negated_axiom_without_array_access:\n"
            << "       " << from_expr(ns, "", with_concretized_arrays) << '\n';
 
-    if(const auto &witness=
-       find_counter_example(ns, ui, with_concretized_arrays, univ_var))
+    if(const auto witness=
+       find_counter_example(ns, ui, with_concretized_arrays, axiom.univ_var))
     {
       stream << "  - violated_for: "
-             << univ_var.get_identifier()
+             << axiom.univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << '\n';
       violated[i]=*witness;
     }
@@ -1392,14 +1323,14 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt &val=v.second;
         const string_constraintt &axiom=axioms.universal[v.first];
 
-        implies_exprt instance(axiom.premise(), axiom.body());
-        replace_expr(axiom.univ_var(), val, instance);
+        implies_exprt instance(axiom.premise, axiom.body);
+        replace_expr(axiom.univ_var, val, instance);
         // We are not sure the index set contains only positive numbers
         exprt bounds=and_exprt(
-          axiom.univ_within_bounds(),
+          univ_within_bounds(axiom),
           binary_relation_exprt(
             from_integer(0, val.type()), ID_le, val));
-        replace_expr(axiom.univ_var(), val, bounds);
+        replace_expr(axiom.univ_var, val, bounds);
         const implies_exprt counter(bounds, instance);
 
         stream << "  -  " << from_expr(ns, "", counter) << eom;
@@ -1702,9 +1633,9 @@ static void initial_index_set(
   const namespacet &ns,
   const string_constraintt &axiom)
 {
-  const symbol_exprt &qvar=axiom.univ_var();
+  const symbol_exprt &qvar=axiom.univ_var;
   std::list<exprt> to_process;
-  to_process.push_back(axiom.body());
+  to_process.push_back(axiom.body);
 
   while(!to_process.empty())
   {
@@ -1727,8 +1658,8 @@ static void initial_index_set(
         // otherwise we add k-1
         exprt e(i);
         const minus_exprt kminus1(
-          axiom.upper_bound(),
-          from_integer(1, axiom.upper_bound().type()));
+          axiom.upper_bound,
+          from_integer(1, axiom.upper_bound.type()));
         replace_expr(qvar, kminus1, e);
         add_to_index_set(index_set, ns, s, e);
       }
@@ -1856,19 +1787,19 @@ static exprt instantiate(
   const exprt &str,
   const exprt &val)
 {
-  exprt idx=find_index(axiom.body(), str, axiom.univ_var());
+  exprt idx=find_index(axiom.body, str, axiom.univ_var);
   if(idx.is_nil())
     return true_exprt();
 
-  exprt r=compute_inverse_function(stream, axiom.univ_var(), val, idx);
-  implies_exprt instance(axiom.premise(), axiom.body());
-  replace_expr(axiom.univ_var(), r, instance);
+  exprt r=compute_inverse_function(stream, axiom.univ_var, val, idx);
+  implies_exprt instance(axiom.premise, axiom.body);
+  replace_expr(axiom.univ_var, r, instance);
   // We are not sure the index set contains only positive numbers
   exprt bounds=and_exprt(
-    axiom.univ_within_bounds(),
+    univ_within_bounds(axiom),
     binary_relation_exprt(
       from_integer(0, val.type()), ID_le, val));
-  replace_expr(axiom.univ_var(), r, bounds);
+  replace_expr(axiom.univ_var, r, bounds);
   return implies_exprt(bounds, instance);
 }
 
@@ -2024,169 +1955,4 @@ static optionalt<exprt> find_counter_example(
     return solver.get(var);
   else
     return { };
-}
-
-/// \related string_constraintt
-typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
-
-/// \related string_constraintt
-class gather_indices_visitort: public const_expr_visitort
-{
-public:
-  array_index_mapt indices;
-
-  gather_indices_visitort(): indices() {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr.id()==ID_index)
-    {
-      const index_exprt &index=to_index_expr(expr);
-      const exprt &s(index.array());
-      const exprt &i(index.index());
-      indices[s].push_back(i);
-    }
-  }
-};
-
-/// \related string_constraintt
-static array_index_mapt gather_indices(const exprt &expr)
-{
-  gather_indices_visitort v;
-  expr.visit(v);
-  return v.indices;
-}
-
-/// \related string_constraintt
-class is_linear_arithmetic_expr_visitort: public const_expr_visitort
-{
-public:
-  bool correct;
-
-  is_linear_arithmetic_expr_visitort(): correct(true) {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr.id()!=ID_plus && expr.id()!=ID_minus && expr.id()!=ID_unary_minus)
-    {
-      // This represents that the expr is a valid leaf, may not be future proof
-      // or 100% enforced, but is correct prescriptively. All non-sum exprs must
-      // be leaves.
-      correct&=expr.operands().empty();
-    }
-  }
-};
-
-/// \related string_constraintt
-static bool is_linear_arithmetic_expr(const exprt &expr)
-{
-  is_linear_arithmetic_expr_visitort v;
-  expr.visit(v);
-  return v.correct;
-}
-
-/// The universally quantified variable is only allowed to occur in index
-/// expressions in the body of a string constraint. This function returns true
-/// if this is the case and false otherwise.
-/// \related string_constraintt
-/// \param [in] expr: The string constraint to check
-/// \return true if the universal variable only occurs in index expressions,
-///   false otherwise.
-static bool universal_only_in_index(const string_constraintt &expr)
-{
-  // For efficiency, we do a depth-first search of the
-  // body. The exprt visitors do a BFS and hide the stack/queue, so we would
-  // need to store a map from child to parent.
-
-  // The unsigned int represents index depth we are. For example, if we are
-  // considering the fragment `a[b[x]]` (not inside an index expression), then
-  // the stack would look something like `[..., (a, 0), (b, 1), (x, 2)]`.
-  typedef std::pair<exprt, unsigned> valuet;
-  std::stack<valuet> stack;
-  // We start at 0 since expr is not an index expression, so expr.body() is not
-  // in an index expression.
-  stack.push(valuet(expr.body(), 0));
-  while(!stack.empty())
-  {
-    // Inspect current value
-    const valuet cur=stack.top();
-    stack.pop();
-    const exprt e=cur.first;
-    const unsigned index_depth=cur.second;
-    const unsigned child_index_depth=index_depth+(e.id()==ID_index?0:1);
-
-    // If we found the universal variable not in an index_exprt, fail
-    if(e==expr.univ_var() && index_depth==0)
-      return false;
-    else
-      forall_operands(it, e)
-        stack.push(valuet(*it, child_index_depth));
-  }
-  return true;
-}
-
-/// Checks the data invariant for \link string_constraintt
-/// \related string_constraintt
-/// \param [in] expr: the string constraint to check
-/// \return whether the constraint satisfies the invariant
-static bool is_valid_string_constraint(
-  messaget::mstreamt &stream,
-  const namespacet &ns,
-  const string_constraintt &expr)
-{
-  const auto eom=messaget::eom;
-  // Condition 1: The premise cannot contain any string indices
-  const array_index_mapt premise_indices=gather_indices(expr.premise());
-  if(!premise_indices.empty())
-  {
-    stream << "Premise has indices: " << from_expr(ns, "", expr) << ", map: {";
-    for(const auto &pair : premise_indices)
-    {
-      stream << from_expr(ns, "", pair.first) << ": {";
-      for(const auto &i : pair.second)
-        stream << from_expr(ns, "", i) <<  ", ";
-    }
-    stream << "}}" << eom;
-    return false;
-  }
-
-  const array_index_mapt body_indices=gather_indices(expr.body());
-  // Must validate for each string. Note that we have an invariant that the
-  // second value in the pair is non-empty.
-  for(const auto &pair : body_indices)
-  {
-    // Condition 2: All indices of the same string must be the of the same form
-    const exprt rep=pair.second.back();
-    for(size_t j=0; j<pair.second.size()-1; j++)
-    {
-      const exprt i=pair.second[j];
-      const equal_exprt equals(rep, i);
-      const exprt result=simplify_expr(equals, ns);
-      if(result.is_false())
-      {
-        stream << "Indices not equal: " << from_expr(ns, "", expr) << ", str: "
-               << from_expr(ns, "", pair.first) << eom;
-        return false;
-      }
-    }
-
-    // Condition 3: f must be linear
-    if(!is_linear_arithmetic_expr(rep))
-    {
-      stream << "f is not linear: " << from_expr(ns, "", expr) << ", str: "
-             << from_expr(ns, "", pair.first) << eom;
-      return false;
-    }
-
-    // Condition 4: the quantified variable can only occur in indices in the
-    // body
-    if(!universal_only_in_index(expr))
-    {
-      stream << "Universal variable outside of index:"
-             << from_expr(ns, "", expr) << eom;
-      return false;
-    }
-  }
-
-  return true;
 }
