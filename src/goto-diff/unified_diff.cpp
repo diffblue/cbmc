@@ -54,7 +54,6 @@ void unified_difft::get_diff(
     new_fit->second.body;
 
   get_diff(
-    function,
     old_goto_program,
     new_goto_program,
     entry->second,
@@ -62,7 +61,6 @@ void unified_difft::get_diff(
 }
 
 void unified_difft::get_diff(
-  const irep_idt &identifier,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
   const differencest &differences,
@@ -109,7 +107,6 @@ void unified_difft::output_diff(
 {
   goto_program_difft diff;
   get_diff(
-    identifier,
     old_goto_program,
     new_goto_program,
     differences,
