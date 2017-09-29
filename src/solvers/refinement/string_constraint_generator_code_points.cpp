@@ -127,6 +127,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_at(
 {
   const typet &return_type = f.type();
   PRECONDITION(return_type.id()==ID_signedbv);
+  PRECONDITION(f.arguments().size() == 2);
   const string_exprt str = get_string_expr(f.arguments()[0]);
   const exprt &pos = f.arguments()[1];
 
@@ -186,6 +187,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
 exprt string_constraint_generatort::add_axioms_for_code_point_count(
   const function_application_exprt &f)
 {
+  PRECONDITION(f.arguments().size() == 3);
   const string_exprt str = get_string_expr(f.arguments()[0]);
   const exprt &begin = f.arguments()[1];
   const exprt &end = f.arguments()[2];
@@ -208,6 +210,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
 exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   const function_application_exprt &f)
 {
+  PRECONDITION(f.arguments().size() == 3);
   const string_exprt str = get_string_expr(f.arguments()[0]);
   const exprt &index = f.arguments()[1];
   const exprt &offset = f.arguments()[2];

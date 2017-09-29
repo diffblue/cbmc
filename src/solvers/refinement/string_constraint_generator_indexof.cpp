@@ -231,6 +231,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
+  PRECONDITION(args.size() == 2 || args.size() == 3);
   const string_exprt str = get_string_expr(args[0]);
   const exprt &c=args[1];
   const typet &index_type = str.length().type();
@@ -325,6 +326,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {
   const function_application_exprt::argumentst &args=f.arguments();
+  PRECONDITION(args.size() == 2 || args.size() == 3);
   const string_exprt str = get_string_expr(args[0]);
   const exprt c = args[1];
   const typet &index_type = str.length().type();

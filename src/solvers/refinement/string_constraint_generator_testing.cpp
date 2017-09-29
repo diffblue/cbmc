@@ -74,6 +74,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 {
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(args.size() == 2 || args.size() == 3);
   const string_exprt s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
   const string_exprt s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
   const exprt offset =
@@ -89,7 +90,7 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
-
+  PRECONDITION(f.arguments().size() == 1);
   // We add axioms:
   // a1 : is_empty => |s0| = 0
   // a2 : s0 => is_empty

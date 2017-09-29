@@ -62,12 +62,14 @@ public:
   binary_relation_exprt axiom_for_length_ge(
     const exprt &rhs) const
   {
+    PRECONDITION(rhs.type() == length().type());
     return binary_relation_exprt(length(), ID_ge, rhs);
   }
 
   binary_relation_exprt axiom_for_length_gt(
     const exprt &rhs) const
   {
+    PRECONDITION(rhs.type() == length().type());
     return binary_relation_exprt(rhs, ID_lt, length());
   }
 
@@ -91,6 +93,7 @@ public:
   binary_relation_exprt axiom_for_length_le(
     const exprt &rhs) const
   {
+    PRECONDITION(rhs.type() == length().type());
     return binary_relation_exprt(length(), ID_le, rhs);
   }
 
@@ -108,6 +111,7 @@ public:
   binary_relation_exprt axiom_for_length_lt(
     const exprt &rhs) const
   {
+    PRECONDITION(rhs.type() == length().type());
     return binary_relation_exprt(length(), ID_lt, rhs);
   }
 
@@ -119,6 +123,7 @@ public:
 
   equal_exprt axiom_for_has_length(const exprt &rhs) const
   {
+    PRECONDITION(rhs.type() == length().type());
     return equal_exprt(length(), rhs);
   }
 

@@ -23,6 +23,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.arguments().size() == 2);
 
   string_exprt s1 = get_string_expr(f.arguments()[0]);
   string_exprt s2 = get_string_expr(f.arguments()[1]);
@@ -100,6 +101,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
 {
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
+  PRECONDITION(f.arguments().size() == 2);
   const symbol_exprt eq = fresh_boolean("equal_ignore_case");
   const string_exprt s1 = get_string_expr(f.arguments()[0]);
   const string_exprt s2 = get_string_expr(f.arguments()[1]);
@@ -151,6 +153,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
 exprt string_constraint_generatort::add_axioms_for_hash_code(
   const function_application_exprt &f)
 {
+  PRECONDITION(f.arguments().size() == 1);
   const string_exprt str = get_string_expr(f.arguments()[0]);
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
@@ -186,7 +189,9 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
 exprt string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
 {
+  PRECONDITION(f.arguments().size() == 2);
   const typet &return_type=f.type();
+  PRECONDITION(return_type.id() == ID_signedbv);
   const string_exprt &s1 = get_string_expr(f.arguments()[0]);
   const string_exprt &s2 = get_string_expr(f.arguments()[1]);
   const symbol_exprt res = fresh_symbol("compare_to", return_type);
