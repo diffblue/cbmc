@@ -65,13 +65,13 @@ bool ci_lazy_methodst::operator()(
   if(main_function.stop_convert)
   {
     // Failed, mark all functions in the given main class(es)
-    // reaclass_hierarchyable.
-    std::vector<irep_idt> reaclass_hierarchyable_classes;
+    // reachable.
+    std::vector<irep_idt> reachable_classes;
     if(!main_class.empty())
-      reaclass_hierarchyable_classes.push_back(main_class);
+      reachable_classes.push_back(main_class);
     else
-      reaclass_hierarchyable_classes=main_jar_classes;
-    for(const auto &classname : reaclass_hierarchyable_classes)
+      reachable_classes=main_jar_classes;
+    for(const auto &classname : reachable_classes)
     {
       const auto &methods=
         java_class_loader.class_map.at(classname).parsed_class.methods;
