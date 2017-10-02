@@ -48,8 +48,8 @@ then
     "warning: Included by graph for .* not generated, too many nodes. Consider increasing DOT_GRAPH_MAX_NODES.")
   if ! $doxygen --version &>/dev/null
   then
-    echo "Lint script could not be found in the $script_folder directory"
-    echo "Ensure cpplint.py is inside the $script_folder directory then run again"
+    echo "Doxygen is not installed on this PC"
+    echo "Please install before running this script"
     exit 1
   else
     mkdir -p $doxygenlogdir && cd src && $doxygen &> ../$doxygenlog && cd ..
