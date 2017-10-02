@@ -90,12 +90,12 @@ SCENARIO("java_bytecode_convert_abstract_class",
     {
       const symbol_tablet &new_symbol_table=
         load_java_class(
-          "Extendor",
+          "Extender",
           "./java_bytecode/java_bytecode_convert_class");
       THEN("The symbol type should not be abstract")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::Extendor");
+          new_symbol_table.lookup("java::Extender");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
