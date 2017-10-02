@@ -770,7 +770,16 @@ void java_bytecode_convert_methodt::setup_local_variables(
 #endif
     typet t;
     if(v.var.signature.has_value())
-      t=java_type_from_string(v.var.signature.value());
+    {
+      try
+      {
+        t=java_type_from_string(v.var.signature.value());
+      }
+      catch(unsupported_java_class_siganture_exceptiont &e)
+      {
+        t=java_type_from_string(v.var.descriptor);
+      }
+    }
     else
       t=java_type_from_string(v.var.descriptor);
 

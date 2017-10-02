@@ -366,8 +366,9 @@ void java_bytecode_convert_methodt::convert(
     typet t;
     if(v.signature.has_value())
     {
-      t=java_type_from_string(
-        v.signature.value(),
+      t=java_type_from_string_with_exception(
+        v.descriptor,
+        v.signature,
         id2string(class_symbol.name));
     }
     else

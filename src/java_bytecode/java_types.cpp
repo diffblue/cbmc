@@ -325,7 +325,8 @@ typet java_type_from_string(
       {
         std::size_t e_pos=find_closing_delimiter(src, f_pos, '<', '>');
         if(e_pos==std::string::npos)
-          return nil_typet();
+          throw unsupported_java_class_siganture_exceptiont(
+            "recursive generic");
 
         // construct container type
         std::string generic_container_class=src.substr(1, f_pos-1);
@@ -520,7 +521,7 @@ std::vector<typet> java_generic_type_from_string(
   std::string signature(src.substr(1, signature_end-1));
 
   if(signature.find(";:")!=std::string::npos)
-    throw unsupported_java_class_siganture_exceptiont();
+    throw unsupported_java_class_siganture_exceptiont("multiple bounds");
 
   PRECONDITION(signature[signature.size()-1]==';');
 

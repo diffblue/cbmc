@@ -339,8 +339,9 @@ void java_bytecode_parsert::get_class_refs()
     typet field_type;
     if(field.signature.has_value())
     {
-      field_type=java_type_from_string(
-        field.signature.value(),
+      field_type=java_type_from_string_with_exception(
+        field.descriptor,
+        field.signature,
         "java::"+id2string(parse_tree.parsed_class.name));
     }
     else
@@ -354,8 +355,9 @@ void java_bytecode_parsert::get_class_refs()
     typet method_type;
     if(method.signature.has_value())
     {
-      method_type=java_type_from_string(
-        method.signature.value(),
+      method_type=java_type_from_string_with_exception(
+        method.descriptor,
+        method.signature,
         "java::"+id2string(parse_tree.parsed_class.name));
     }
     else
@@ -367,8 +369,9 @@ void java_bytecode_parsert::get_class_refs()
       typet var_type;
       if(var.signature.has_value())
       {
-        var_type=java_type_from_string(
-          var.signature.value(),
+        var_type=java_type_from_string_with_exception(
+          var.descriptor,
+          var.signature,
           "java::"+id2string(parse_tree.parsed_class.name));
       }
       else

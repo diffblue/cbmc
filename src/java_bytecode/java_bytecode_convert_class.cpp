@@ -119,6 +119,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
     {
       // Do nothing: we don't support parsing for example double bounded or
       // two entry elements
+
     }
   }
 
@@ -218,8 +219,9 @@ void java_bytecode_convert_classt::convert(
   typet field_type;
   if(f.signature.has_value())
   {
-    field_type=java_type_from_string(
-      f.signature.value(),
+    field_type=java_type_from_string_with_exception(
+      f.descriptor,
+      f.signature,
       id2string(class_symbol.name));
 
     /// this is for a free type variable, e.g., a field of the form `T f;`

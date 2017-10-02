@@ -356,10 +356,25 @@ inline const typet &java_generics_class_type_bound(
 class unsupported_java_class_siganture_exceptiont:public std::logic_error
 {
 public:
-  unsupported_java_class_siganture_exceptiont():
+  explicit unsupported_java_class_siganture_exceptiont(std::string type):
     std::logic_error(
-      "Unsupported class signature: multiple bounds")
-  {}
+      "Unsupported class signature: "+type)
+  {
+  }
 };
+
+inline typet java_type_from_string_with_exception(
+  const std::string &descriptor,
+  const optionalt<std::string> &signature,
+  const std::string &class_name) {
+  try
+  {
+    return java_type_from_string(signature.value(), class_name);
+  }
+  catch (unsupported_java_class_siganture_exceptiont &e)
+  {
+    return java_type_from_string(descriptor, class_name);
+  }
+}
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
