@@ -28,6 +28,7 @@ Author:
 #include <goto-symex/build_goto_trace.h>
 #include <iostream>
 #include "bmc_clustering.h"
+#include "all_properties_class.h"
 
 /*******************************************************************\
 
@@ -66,10 +67,11 @@ safety_checkert::resultt bmc_clusteringt::step(
       if(symex().learning_symex)
       {
         symex().backtrack_learn(symex_state);
-        symex().print_learnt_map();
+        // symex().print_learnt_map();
+        trace_learning();
       }
 
-      if(!symex().states.empty())
+      if(!symex().states.empty() || preempted)
       {
         pick_up_a_new_state();
         restored_state=true;
@@ -78,20 +80,10 @@ safety_checkert::resultt bmc_clusteringt::step(
       else break;
     }
 
-    if(symex().learning_symex)
-    {
-      if(symex_state.source.pc->type==GOTO)
-        symex().add_latest_learnt_info(symex_state, goto_functions);
-    }
-
     if(symex_state.source.pc->type==ASSERT)
     {
       if(violated_assert())
       {
-        // goto_tracet &goto_trace=safety_checkert::error_trace;
-        // build_goto_trace(equation, prop_conv, ns, goto_trace);
-        // std::cout << "\n" << "Counterexample:" << "\n";
-        // show_goto_trace(std::cout, ns, goto_trace);
         result() << "VERIFICATION FAILED" << eom;
         result() << "#Visited states: "
           << (symex().recorded_states-symex().states.size())
@@ -115,7 +107,6 @@ safety_checkert::resultt bmc_clusteringt::step(
           symex().add_goto_if_assumption(symex_state, goto_functions);
           continue;
         }
-
         else // if(reachable_else())
         {
           state.locations.back().goto_branch=symex_targett::sourcet::ELSE;
@@ -235,7 +226,7 @@ void bmc_clusteringt::clear(symex_target_equationt &equation)
 
 bool bmc_clusteringt::reachable_if()
 {
-#if 1
+#if 0
   std::cout << "\n[(goto-symex^2)]: reachable if\n";
   std::cout << "[source]: " << symex_state.source.pc->source_location << "\n";
   std::cout << "[type]: " << symex_state.source.pc->type << "\n";
@@ -249,7 +240,7 @@ bool bmc_clusteringt::reachable_if()
   std::size_t num=equation.SSA_steps.size();
   clear(equation);
   symex().mock_goto_if_condition(symex_state, goto_functions);
-  show_vcc();
+  // show_vcc();
   if(num==equation.SSA_steps.size())
     return false;
   decision_proceduret::resultt result=run_and_clear_decision_procedure();
@@ -266,7 +257,7 @@ bool bmc_clusteringt::reachable_if()
 
 bool bmc_clusteringt::reachable_else()
 {
-#if 1
+#if 0
   std::cout << "\n[(goto-symex^2)]: reachable else\n";
   std::cout << "[source]: " << symex_state.source.pc->source_location << "\n";
   std::cout << "[type]: " << symex_state.source.pc->type << "\n";
@@ -280,7 +271,7 @@ bool bmc_clusteringt::reachable_else()
   std::size_t num=equation.SSA_steps.size();
   clear(equation);
   symex().mock_goto_else_condition(symex_state, goto_functions);
-  show_vcc();
+  // show_vcc();
   if(num==equation.SSA_steps.size())
     return false;
   decision_proceduret::resultt result=run_and_clear_decision_procedure();
@@ -382,6 +373,12 @@ void bmc_clusteringt::setup_clustering_unwind()
 
 void bmc_clusteringt::pick_up_a_new_state()
 {
+  if(preempted)
+  {
+    preempted=false;
+    return;
+  }
+
   if(symex_method=="fifo")
   {
     // fifo
@@ -400,4 +397,46 @@ void bmc_clusteringt::pick_up_a_new_state()
   }
 
   symex().create_a_cluster(symex_state, equation);
+}
+
+void bmc_clusteringt::trace_learning()
+{
+  goto_symext::statet trace_state=symex_state;
+  symex_state=goto_symext::statet();
+  equation.clear();
+  symex()(
+    symex_state,
+    goto_functions,
+    goto_functions.function_map.at(goto_functions.entry_point()).body,
+    trace_state);
+  bmc_all_propertiest bmc_all_properties(goto_functions, prop_conv, *this);
+  bmc_all_properties.set_message_handler(get_message_handler());
+  bmc_all_properties.trace_solve();
+  auto &goal_map=bmc_all_properties.goal_map;
+
+
+  for(auto &g : goal_map)
+  {
+    if(g.second.status_string()!="SUCCESS")
+      continue;
+
+    for(std::size_t i=0; i<symex().states.size(); ++i)
+    {
+      auto &source=symex().states[i].source;
+      if(g.second.description==
+        (std::to_string(source.loc_count)+"##"+
+        source.pc->source_location.as_string()))
+      {
+        symex_state=symex().states[i];
+        symex().states.erase(symex().states.begin()+i);
+        equation=equations[i];
+        equations.erase(equations.begin()+i);
+        preempted=true;
+        break;
+      }
+    }
+
+    if(preempted)
+      break;
+  }
 }

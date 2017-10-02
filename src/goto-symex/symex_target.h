@@ -30,6 +30,7 @@ public:
   {
     typedef enum {EMPTY, IF, ELSE} goto_brancht;
     goto_brancht goto_branch=goto_brancht::EMPTY;
+    unsigned loc_count=0;
     unsigned thread_nr;
     goto_programt::const_targett pc;
     bool is_set;

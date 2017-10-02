@@ -84,6 +84,8 @@ public:
   typedef std::map<irep_idt, goalt> goal_mapt;
   goal_mapt goal_map;
 
+  safety_checkert::resultt trace_solve();
+
 protected:
   const goto_functionst &goto_functions;
   prop_convt &solver;

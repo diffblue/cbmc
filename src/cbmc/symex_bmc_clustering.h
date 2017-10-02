@@ -26,6 +26,12 @@ class symex_bmc_clusteringt:
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);
 
+  virtual void operator()(
+    statet &state,
+    const goto_functionst &goto_functions,
+    const goto_programt &goto_program,
+    const statet &trace_state);
+
   virtual void mock_goto_if_condition(
     statet &state,
     const goto_functionst &goto_functions);

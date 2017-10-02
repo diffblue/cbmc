@@ -79,6 +79,7 @@ protected:
   virtual resultt run(const goto_functionst &goto_functions);
   virtual resultt step(const goto_functionst &goto_functions);
   virtual void pick_up_a_new_state();
+  bool preempted=false;
 
  private:
   symex_bmc_clusteringt &symex()
@@ -97,6 +98,7 @@ protected:
   std::vector<symex_target_equationt> equations;
 
   void setup_clustering_unwind();
+  void trace_learning();
 };
 
 #endif

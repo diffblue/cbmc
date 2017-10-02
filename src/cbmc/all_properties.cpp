@@ -238,3 +238,92 @@ safety_checkert::resultt bmct::all_properties(
   bmc_all_properties.set_message_handler(get_message_handler());
   return bmc_all_properties();
 }
+
+safety_checkert::resultt bmc_all_propertiest::trace_solve()
+{
+  status() << "Passing problem to " << solver.decision_procedure_text() << eom;
+
+  solver.set_message_handler(get_message_handler());
+
+  // stop the time
+  absolute_timet sat_start=current_time();
+
+  bmc.do_conversion();
+
+  for(symex_target_equationt::SSA_stepst::iterator
+      it=bmc.equation.SSA_steps.begin();
+      it!=bmc.equation.SSA_steps.end();
+      it++)
+  {
+    if(it->is_assert())
+    {
+      irep_idt property_id;
+
+      property_id=it->comment;
+
+      goal_map[property_id]=goalt(*(it->source.pc));
+      goal_map[property_id].description=it->comment;
+      goal_map[property_id].instances.push_back(it);
+    }
+  }
+
+  do_before_solving();
+
+  cover_goalst cover_goals(solver);
+
+  cover_goals.set_message_handler(get_message_handler());
+  cover_goals.register_observer(*this);
+
+
+  for(const auto &g : goal_map)
+  {
+    // Our goal is to falsify a property, i.e., we will
+    // add the negation of the property as goal.
+    // literalt p=!solver.convert(g.second.as_expr());
+    literalt p=solver.convert(g.second.as_expr());
+    cover_goals.add(p);
+  }
+
+  status() << "Running " << solver.decision_procedure_text() << eom;
+
+  bool error=false;
+  decision_proceduret::resultt result=cover_goals();
+
+  if(result==decision_proceduret::resultt::D_ERROR)
+  {
+    error=true;
+    for(auto &g : goal_map)
+      if(g.second.status==goalt::statust::UNKNOWN)
+        g.second.status=goalt::statust::ERROR;
+  }
+  else
+  {
+    for(auto &g : goal_map)
+      if(g.second.status==goalt::statust::UNKNOWN)
+        g.second.status=goalt::statust::SUCCESS;
+  }
+
+
+  // output runtime
+
+  {
+    absolute_timet sat_stop=current_time();
+    status() << "Runtime decision procedure: "
+             << (sat_stop-sat_start) << "s" << eom;
+  }
+
+  // report
+  report(cover_goals);
+
+  if(error)
+    return safety_checkert::resultt::ERROR;
+
+  bool safe=(cover_goals.number_covered()==0);
+
+  // if(safe)
+  //   bmc.report_success(); // legacy, might go away
+  // else
+  //   bmc.report_failure(); // legacy, might go away
+
+  return safe?safety_checkert::resultt::SAFE:safety_checkert::resultt::UNSAFE;
+}
