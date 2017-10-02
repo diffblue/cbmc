@@ -37,6 +37,7 @@ Author: Peter Schrammel
 #include <goto-programs/string_instrumentation.h>
 #include <goto-programs/loop_ids.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_java_new.h>
 
 #include <pointer-analysis/add_failed_symbols.h>
 
@@ -393,6 +394,8 @@ bool goto_diff_parse_optionst::process_goto_program(
   try
   {
     namespacet ns(symbol_table);
+
+    remove_java_new(goto_model, get_message_handler());
 
     // Remove inline assembler; this needs to happen before
     // adding the library.

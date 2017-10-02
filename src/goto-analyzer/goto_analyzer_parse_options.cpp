@@ -37,6 +37,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
+#include <goto-programs/remove_java_new.h>
 
 #include <analyses/is_threaded.h>
 #include <analyses/goto_check.h>
@@ -734,6 +735,8 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     // add the library
     link_to_library(goto_model, ui_message_handler);
     #endif
+
+    remove_java_new(goto_model, get_message_handler());
 
     // remove function pointers
     status() << "Removing function pointers and virtual functions" << eom;

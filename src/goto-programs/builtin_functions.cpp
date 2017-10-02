@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/string_constant.h>
 
 #include "format_strings.h"
+#include "class_identifier.h"
 
 void goto_convertt::do_prob_uniform(
   const exprt &lhs,
@@ -537,68 +538,6 @@ void goto_convertt::do_cpp_new(
   cpp_new_initializer(lhs, rhs, tmp_initializer);
 
   dest.destructive_append(tmp_initializer);
-}
-
-void set_class_identifier(
-  struct_exprt &expr,
-  const namespacet &ns,
-  const symbol_typet &class_type)
-{
-  const struct_typet &struct_type=
-    to_struct_type(ns.follow(expr.type()));
-  const struct_typet::componentst &components=struct_type.components();
-
-  if(components.empty())
-    return;
-  assert(!expr.operands().empty());
-
-  if(components.front().get_name()=="@class_identifier")
-  {
-    assert(expr.op0().id()==ID_constant);
-    expr.op0()=constant_exprt(class_type.get_identifier(), string_typet());
-  }
-  else
-  {
-    assert(expr.op0().id()==ID_struct);
-    set_class_identifier(to_struct_expr(expr.op0()), ns, class_type);
-  }
-}
-
-void goto_convertt::do_java_new(
-  const exprt &lhs,
-  const side_effect_exprt &rhs,
-  goto_programt &dest)
-{
-  PRECONDITION(!lhs.is_nil());
-  PRECONDITION(rhs.operands().empty());
-  PRECONDITION(rhs.type().id() == ID_pointer);
-  source_locationt location=rhs.source_location();
-  typet object_type=rhs.type().subtype();
-
-  // build size expression
-  exprt object_size=size_of_expr(object_type, ns);
-  CHECK_RETURN(object_size.is_not_nil());
-
-  // we produce a malloc side-effect, which stays
-  side_effect_exprt malloc_expr(ID_allocate);
-  malloc_expr.copy_to_operands(object_size);
-  // could use true and get rid of the code below
-  malloc_expr.copy_to_operands(false_exprt());
-  malloc_expr.type()=rhs.type();
-
-  goto_programt::targett t_n=dest.add_instruction(ASSIGN);
-  t_n->code=code_assignt(lhs, malloc_expr);
-  t_n->source_location=location;
-
-  // zero-initialize the object
-  dereference_exprt deref(lhs, object_type);
-  exprt zero_object=
-    zero_initializer(object_type, location, ns, get_message_handler());
-  set_class_identifier(
-    to_struct_expr(zero_object), ns, to_symbol_type(object_type));
-  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-  t_i->code=code_assignt(deref, zero_object);
-  t_i->source_location=location;
 }
 
 void goto_convertt::do_java_new_array(

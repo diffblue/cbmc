@@ -45,6 +45,7 @@ SRC = basic_blocks.cpp \
       remove_exceptions.cpp \
       remove_function_pointers.cpp \
       remove_instanceof.cpp \
+      remove_java_new.cpp \
       remove_returns.cpp \
       remove_skip.cpp \
       remove_static_init_loops.cpp \

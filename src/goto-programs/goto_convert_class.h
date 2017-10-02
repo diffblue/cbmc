@@ -142,11 +142,6 @@ protected:
     const side_effect_exprt &rhs,
     goto_programt &dest);
 
-  void do_java_new(
-    const exprt &lhs,
-    const side_effect_exprt &rhs,
-    goto_programt &dest);
-
   void do_java_new_array(
     const exprt &lhs,
     const side_effect_exprt &rhs,

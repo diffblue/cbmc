@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
+#include <goto-programs/remove_java_new.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -675,6 +676,8 @@ bool jbmc_parse_optionst::process_goto_functions(
 {
   try
   {
+    remove_java_new(goto_model, get_message_handler());
+
     // add the library
     link_to_library(goto_model, get_message_handler());
 
