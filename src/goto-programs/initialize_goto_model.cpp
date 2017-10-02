@@ -117,6 +117,10 @@ bool initialize_goto_model(
 
       if(binaries.empty())
       {
+        // Enable/disable stub generation for opaque methods
+        bool stubs_enabled=cmdline.isset("generate-opaque-stubs");
+        language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
+
         if(language_files.final(goto_model.symbol_table))
         {
           msg.error() << "CONVERSION ERROR" << messaget::eom;
