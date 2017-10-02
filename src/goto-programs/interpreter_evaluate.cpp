@@ -102,6 +102,9 @@ void interpretert::clear_input_flags()
   }
 }
 
+/// Count the number of leaf subtypes of `ty`, a leaf type is a type that is
+/// not an array or a struct. For instance the count for a type such as
+/// `struct { (int[3])[5]; int }` would be 16 = (3 * 5 + 1).
 /// \param ty: a type
 /// \param [out] result: Number of leaf primitive types in `ty`
 /// \return returns true on error
