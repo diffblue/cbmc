@@ -25,9 +25,11 @@
 ///   body of the _start function).
 rebuild_goto_start_functiont::rebuild_goto_start_functiont(
   message_handlert &_message_handler,
+  const cmdlinet &cmdline,
   symbol_tablet &symbol_table,
   goto_functionst &goto_functions):
   messaget(_message_handler),
+  cmdline(cmdline),
   symbol_table(symbol_table),
   goto_functions(goto_functions)
 {
@@ -50,6 +52,7 @@ bool rebuild_goto_start_functiont::operator()(
   std::unique_ptr<languaget> language=get_language_from_mode(mode);
   INVARIANT(language, "No language found for mode: "+id2string(mode));
   language->set_message_handler(get_message_handler());
+  language->get_language_options(cmdline);
 
   // To create a new entry point we must first remove the old one
   remove_existing_entry_point();

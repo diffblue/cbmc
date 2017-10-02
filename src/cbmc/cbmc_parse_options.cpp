@@ -635,6 +635,7 @@ int cbmc_parse_optionst::get_goto_program(
       const std::string &function_id=cmdline.get_value("function");
       rebuild_goto_start_functiont start_function_rebuilder(
         get_message_handler(),
+        cmdline,
         goto_model.symbol_table,
         goto_model.goto_functions);
 
