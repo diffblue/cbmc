@@ -3,6 +3,7 @@
 # Source files for test utilities
 SRC = src/expr/require_expr.cpp \
       src/ansi-c/c_to_expr.cpp \
+      src/java_bytecode/load_java_class.cpp \
       unit_tests.cpp \
       catch_example.cpp \
       util/expr_iterator.cpp \
