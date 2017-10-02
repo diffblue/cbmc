@@ -16,6 +16,7 @@ Date: June 2003
 
 #include <ostream>
 #include <cassert>
+#include <algorithm>
 
 #include <util/std_types.h>
 #include <util/symbol.h>
@@ -166,8 +167,18 @@ void goto_functions_templatet<bodyT>::output(
   const namespacet &ns,
   std::ostream &out) const
 {
+  std::vector<irep_idt> sorted_names;
+  sorted_names.reserve(function_map.size());
   for(const auto &fun : function_map)
+    sorted_names.push_back(fun.first);
+  std::sort(
+    sorted_names.begin(),
+    sorted_names.end(),
+    [](const irep_idt &a, const irep_idt &b)
+    { return as_string(a)<as_string(b); });
+  for(const auto &name : sorted_names)
   {
+    const auto &fun=*function_map.find(name);
     if(fun.second.body_available())
     {
       out << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n";
