@@ -119,8 +119,7 @@ void symbol_tablet::show(std::ostream &out) const
 /// \param print_condition: A predicate that determines whether a given
 ///   symbol should be printed.
 void symbol_tablet::show(
-  std::ostream &out,
-  std::function<bool (const symbolt &)> print_condition) const
+  std::ostream &out, std::function<bool(const symbolt&)> print_condition) const
 {
   out << "\n" << "Symbols:" << "\n";
 
