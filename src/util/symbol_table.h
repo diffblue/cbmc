@@ -47,6 +47,7 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
                                          it_end=(expr).upper_bound(module); \
       it!=it_end; ++it)
 
+
 /*! \brief The symbol table
     \ingroup gr_symbol_table
 */
@@ -78,9 +79,10 @@ public:
 
   void show(std::ostream &out) const;
 
+  using symbol_filter_functiont=std::function<bool(const symbolt &symbol)>;
   void show(
     std::ostream &out,
-    std::function<bool(const symbolt &symbol)> print_condition) const;
+    symbol_filter_functiont print_condition) const;
 
   void swap(symbol_tablet &other)
   {
