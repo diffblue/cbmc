@@ -1,25 +1,3 @@
-interface BasicInterface
-{
-  int getX();
-}
-
-class Foo implements BasicInterface
-{
-  public int x;
-
-  public int getX() {
-    return x;
-  }
-}
-
-class Bar extends Foo
-{}
-
-class SimpleGeneric<T>
-{
-  public T t;
-}
-
 public class WildcardGenericFunctions
 {
   // Test a wild card generic type
