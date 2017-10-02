@@ -47,7 +47,9 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::DEAD: out << "DEAD"; break;
   case goto_trace_stept::typet::OUTPUT: out << "OUTPUT"; break;
   case goto_trace_stept::typet::INPUT: out << "INPUT"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+    out << "ATOMIC_BEGIN";
+    break;
   case goto_trace_stept::typet::ATOMIC_END: out << "ATOMIC_END"; break;
   case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
   case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
