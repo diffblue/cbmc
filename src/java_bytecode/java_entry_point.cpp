@@ -125,18 +125,17 @@ void java_static_lifetime_init(
           if(allow_null && is_non_null_library_global(nameid))
             allow_null=false;
         }
-        auto newsym=object_factory(
-          sym.type,
-          symname,
+        gen_nondet_init(
+          sym.symbol_expr(),
           code_block,
-          allow_null,
           symbol_table,
-          object_factory_parameters,
-          allocation_typet::GLOBAL,
           source_location,
-          pointer_type_selector);
-        code_assignt assignment(sym.symbol_expr(), newsym);
-        code_block.add(assignment);
+          false,
+          allocation_typet::GLOBAL,
+          allow_null,
+          object_factory_parameters,
+          pointer_type_selector,
+          update_in_placet::NO_UPDATE_IN_PLACE);
       }
       else if(sym.value.is_not_nil())
       {
