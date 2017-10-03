@@ -119,6 +119,7 @@ bool java_bytecode_languaget::generate_start_function(
   const irep_idt &entry_function_symbol_id,
   symbol_tablet &symbol_table)
 {
+  PRECONDITION(language_options_initialized);
   const auto res=
     get_main_symbol(
       symbol_table, entry_function_symbol_id, get_message_handler());
@@ -202,6 +203,8 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
+  PRECONDITION(language_options_initialized);
+
   if(string_refinement_enabled)
     string_preprocess.initialize_conversion_table();
 
@@ -387,6 +390,7 @@ void java_bytecode_languaget::replace_string_methods(
 
 bool java_bytecode_languaget::final(symbol_tablet &symbol_table)
 {
+  PRECONDITION(language_options_initialized);
   java_internal_additions(symbol_table);
 
   // replace code of String methods calls by code we generate
