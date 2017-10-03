@@ -210,7 +210,7 @@ std::string fileutl_parse_extension_in_pathname(const std::string &pathname)
   const std::size_t slash_idx=
     fwd_slash_idx==std::string::npos ? bwd_slash_idx :
     bwd_slash_idx==std::string::npos ? fwd_slash_idx :
-                                       std::max(fwd_slash_idx, bwd_slash_idx);
+      std::max(fwd_slash_idx, bwd_slash_idx);
 # elif defined(__linux__) || defined(__APPLE__)
   const std::size_t slash_idx=pathname.find_last_of('/');
 # else
