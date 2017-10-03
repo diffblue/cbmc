@@ -10,6 +10,7 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
@@ -18,6 +19,8 @@
 
 TEST_CASE("Simplify pointer_offset(address of array index)")
 {
+  config.set_arch("none");
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
@@ -38,6 +41,8 @@ TEST_CASE("Simplify pointer_offset(address of array index)")
 
 TEST_CASE("Simplify const pointer offset")
 {
+  config.set_arch("none");
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
