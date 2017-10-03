@@ -30,6 +30,10 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 /// \return true if \a base is of type \a T
 template<typename T> bool can_cast_expr(const exprt &base);
 
+/// Called after casting. Provides a point to assert on the structure of the
+/// expr. By default, this is a no-op, but you can provide an overload to
+/// validate particular types.
+inline void validate_expr(const exprt &) {}
 
 /// \brief Try to cast a constant reference to a generic exprt to a specific
 ///   derived class
