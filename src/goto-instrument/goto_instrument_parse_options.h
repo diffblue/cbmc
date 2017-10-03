@@ -59,6 +59,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-uninitialized)(show-locations)" \
   "(full-slice)(reachability-slice)(slice-global-inits)" \
   "(inline)(partial-inline)(function-inline):(log):(no-caching)" \
+  "(save-code-statistics):" \
   OPT_REMOVE_CONST_FUNCTION_POINTERS \
   "(print-internal-representation)" \
   "(remove-function-pointers)" \
