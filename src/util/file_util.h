@@ -35,6 +35,8 @@ uint64_t fileutl_file_size(std::string const &file_pathname);
 
 std::string fileutl_parse_name_in_pathname(std::string const &file_pathname);
 
+std::string fileutl_parse_extension_in_pathname(std::string const &pathname);
+
 std::string fileutl_parse_path_in_pathname(std::string const &file_pathname);
 
 std::string fileutl_remove_extension(std::string const &filename);

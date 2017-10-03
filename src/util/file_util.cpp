@@ -201,6 +201,12 @@ std::string fileutl_parse_name_in_pathname(std::string const &file_pathname)
   return file_pathname.substr(fileutl_parse_last_dir_pos(file_pathname));
 }
 
+std::string fileutl_parse_extension_in_pathname(std::string const &pathname)
+{
+  const std::size_t idx=pathname.find_last_of('.');
+  return idx==std::string::npos ? std::string("") : pathname.substr(idx);
+}
+
 std::string fileutl_parse_path_in_pathname(std::string const &file_pathname)
 {
   return file_pathname.substr(0U, fileutl_parse_last_dir_pos(file_pathname));
