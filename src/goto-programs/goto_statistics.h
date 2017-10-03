@@ -10,7 +10,7 @@ Author: Marek Trtik
 #define CPROVER_GOTO_PROGRAMS_GOTO_STATISTICS_H
 
 /// \file goto-programs/goto_statistics.h
-/// \brief Computation of statistal properties of a GOTO program.
+/// \brief Computation of statistical properties of a GOTO program.
 
 #include <cstddef>
 #include <util/json.h>
@@ -22,7 +22,7 @@ public:
   goto_statisticst():
     num_functions(0UL),
     num_instructions(0UL),
-    num_genuine_variables(0UL),
+    num_user_variables(0UL),
     num_auxiliary_variables(0UL),
     num_function_calls(0UL),
     num_unconditional_gotos(0UL),
@@ -53,9 +53,9 @@ public:
     return num_instructions;
   }
 
-  std::size_t get_num_genuine_variables() const
+  std::size_t get_num_user_variables() const
   {
-    return num_genuine_variables;
+    return num_user_variables;
   }
 
   std::size_t get_num_auxiliary_variables() const
@@ -86,7 +86,7 @@ public:
 private:
   std::size_t num_functions;
   std::size_t num_instructions;
-  std::size_t num_genuine_variables;
+  std::size_t num_user_variables;
   std::size_t num_auxiliary_variables;
   std::size_t num_function_calls;
   std::size_t num_unconditional_gotos;
