@@ -204,7 +204,18 @@ std::string fileutl_parse_name_in_pathname(std::string const &file_pathname)
 std::string fileutl_parse_extension_in_pathname(const std::string &pathname)
 {
   const std::size_t idx=pathname.find_last_of('.');
+# if defined(WIN32)
+  const std::size_t fwd_slash_idx=pathname.find_last_of('/');
+  const std::size_t bwd_slash_idx=pathname.find_last_of('\\');
+  const std::size_t slash_idx=
+    fwd_slash_idx==std::string::npos ? bwd_slash_idx :
+    bwd_slash_idx==std::string::npos ? fwd_slash_idx :
+                                       std::max(fwd_slash_idx, bwd_slash_idx);
+# elif defined(__linux__) || defined(__APPLE__)
   const std::size_t slash_idx=pathname.find_last_of('/');
+# else
+#   error "Unsuported platform."
+# endif
   return
     idx==std::string::npos || (slash_idx!=std::string::npos && idx<slash_idx) ?
       std::string() : pathname.substr(idx);
