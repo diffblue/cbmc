@@ -204,14 +204,14 @@ inline void invariant_violated_string(
   { \
   if(!(CONDITION)) \
     invariant_violated_string(__FILE__, __this_function__, __LINE__, (REASON)); /* NOLINT */  \
-  } while(0)
+  } while(false)
 
 #define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
   do /* NOLINT */ \
   { \
   if(!(CONDITION)) \
     invariant_violated_structured<TYPENAME>(__FILE__, __this_function__, __LINE__, __VA_ARGS__); /* NOLINT */ \
-  } while(0)
+  } while(false)
 
 #endif // End CPROVER_DO_NOT_CHECK / CPROVER_ASSERT / ... if block
 
