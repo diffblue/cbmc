@@ -480,7 +480,12 @@ void Parser::merge_types(const typet &src, typet &dest)
       dest=tmp;
     }
 
-    dest.copy_to_subtypes(src);
+    // the end of the subtypes container needs to stay the same,
+    // since several analysis functions traverse via the end for
+    // merged_types
+    typet::subtypest &sub=dest.subtypes();
+    sub.emplace(sub.begin(), src);
+    POSTCONDITION(!dest.subtypes().empty());
   }
 }
 
@@ -3199,12 +3204,9 @@ bool Parser::optPtrOperator(typet &ptrs)
       cv.make_nil();
       optCvQualify(cv); // the qualifier is for the pointer
       if(cv.is_not_nil())
-      {
-        merge_types(op, cv);
-        t_list.push_back(cv);
-      }
-      else
-        t_list.push_back(op);
+        merge_types(cv, op);
+
+      t_list.push_back(op);
     }
     else if(t=='^')
     {
@@ -3218,12 +3220,9 @@ bool Parser::optPtrOperator(typet &ptrs)
       cv.make_nil();
       optCvQualify(cv); // the qualifier is for the pointer
       if(cv.is_not_nil())
-      {
-        merge_types(op, cv);
-        t_list.push_back(cv);
-      }
-      else
-        t_list.push_back(op);
+        merge_types(cv, op);
+
+      t_list.push_back(op);
     }
     else if(isPtrToMember(0))
     {
