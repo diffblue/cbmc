@@ -2125,7 +2125,8 @@ void cpp_typecheck_resolvet::apply_template_args(
         const struct_typet &struct_type=
           to_struct_type(type_symb.type);
 
-        assert(struct_type.has_component(new_symbol.name));
+        DATA_INVARIANT(struct_type.has_component(new_symbol.name),
+                       "method should exist in struct");
         member_exprt member(code_type);
         member.set_component_name(new_symbol.name);
         member.struct_op()=*fargs.operands.begin();

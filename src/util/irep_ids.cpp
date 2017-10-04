@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "irep_ids.h"
 
-#include <cassert>
+#include "invariant.h"
 
 #include "string_container.h"
 
@@ -51,6 +51,6 @@ void initialize_string_container()
   {
     unsigned x;
     x=string_container[irep_ids_table[i]];
-    assert(x==i); // sanity check
+    INVARIANT(x==i, "i-th element is inserted at position i"); // sanity check
   }
 }

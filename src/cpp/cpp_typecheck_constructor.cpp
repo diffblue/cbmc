@@ -486,8 +486,8 @@ void cpp_typecheckt::default_assignop_value(
 
       mp_integer size;
       bool to_int=to_integer(size_expr, size);
-      assert(!to_int);
-      assert(size>=0);
+      CHECK_RETURN(!to_int);
+      CHECK_RETURN(size>=0);
 
       exprt::operandst empty_operands;
       for(mp_integer i=0; i < size; ++i)

@@ -185,7 +185,8 @@ void full_slicert::add_jumps(
         if(cfg[entry->second].node_required)
         {
           const irep_idt id2=goto_programt::get_function_id(*d_it);
-          assert(id==id2);
+          INVARIANT(id==id2,
+                    "goto/jump expected to be within a single function");
 
           cfg_post_dominatorst::cfgt::entry_mapt::const_iterator e2=
             pd.cfg.entry_map.find(*d_it);

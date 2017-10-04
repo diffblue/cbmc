@@ -33,10 +33,10 @@ void c_typecheck_baset::do_initializer(
 
   if(type.id()==ID_array)
   {
-    // any arrays must have a size
     const typet &result_type=follow(result.type());
-    assert(result_type.id()==ID_array &&
-           to_array_type(result_type).size().is_not_nil());
+    DATA_INVARIANT(result_type.id()==ID_array &&
+                   to_array_type(result_type).size().is_not_nil(),
+                   "any array must have a size");
 
     // we don't allow initialisation with symbols of array type
     if(result.id()!=ID_array)
@@ -436,9 +436,11 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
         throw 0;
       }
 
-      assert(index<components.size());
-      assert(components[index].type().id()!=ID_code &&
-             !components[index].get_is_padding());
+      DATA_INVARIANT(index<components.size(),
+                     "member designator is bounded by components size");
+      DATA_INVARIANT(components[index].type().id()!=ID_code &&
+                     !components[index].get_is_padding(),
+                     "member designator points at data member");
 
       dest=&(dest->operands()[index]);
     }
@@ -449,7 +451,8 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
       const union_typet::componentst &components=
         union_type.components();
 
-      assert(index<components.size());
+      DATA_INVARIANT(index<components.size(),
+                     "member designator is bounded by components size");
 
       const union_typet::componentt &component=union_type.components()[index];
 

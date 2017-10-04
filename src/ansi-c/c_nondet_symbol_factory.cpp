@@ -236,7 +236,7 @@ exprt c_nondet_symbol_factory(
 
   symbolt *main_symbol_ptr;
   bool moving_symbol_failed=symbol_table.move(main_symbol, main_symbol_ptr);
-  assert(!moving_symbol_failed);
+  CHECK_RETURN(!moving_symbol_failed);
 
   std::vector<symbolt const *> symbols_created;
   symbol_exprt main_symbol_expr=(*main_symbol_ptr).symbol_expr();

@@ -635,7 +635,7 @@ void java_bytecode_parsert::rfields(classt &parsed_class)
     size_t flags=(field.is_public?1:0)+
       (field.is_protected?1:0)+
       (field.is_private?1:0);
-    assert(flags<=1);
+    DATA_INVARIANT(flags<=1, "at most one of public, protected, private");
 
     for(std::size_t j=0; j<attributes_count; j++)
       rfield_attribute(field);
@@ -1361,7 +1361,7 @@ void java_bytecode_parsert::rmethod(classt &parsed_class)
   size_t flags=(method.is_public?1:0)+
     (method.is_protected?1:0)+
     (method.is_private?1:0);
-  assert(flags<=1);
+  DATA_INVARIANT(flags<=1, "at most one of public, protected, private");
   u2 attributes_count=read_u2();
 
   for(std::size_t j=0; j<attributes_count; j++)
