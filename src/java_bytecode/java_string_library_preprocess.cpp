@@ -1501,7 +1501,8 @@ codet java_string_library_preprocesst::make_object_get_class_code(
 
   // > Class class1;
   pointer_typet class_type=
-    java_reference_type(symbol_table.lookup("java::java.lang.Class")->get().type);
+    java_reference_type(
+      symbol_table.lookup("java::java.lang.Class")->get().type);
   symbolt class1_sym=get_fresh_aux_symbol(
     class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
   symbol_exprt class1=class1_sym.symbol_expr();

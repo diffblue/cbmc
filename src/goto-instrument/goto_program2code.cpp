@@ -1669,7 +1669,9 @@ void goto_program2codet::remove_const(typet &type)
       return;
 
     symbolt &symbol=*symbol_table.get_writeable(identifier);
-    assert(symbol.is_type);
+    INVARIANT(
+      symbol.is_type,
+      "Symbol "+id2string(identifier)+" should be a type");
 
     remove_const(symbol.type);
   }
