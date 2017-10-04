@@ -164,8 +164,8 @@ inline void validate_operands(
 {
   DATA_INVARIANT(
     allow_more
-      ? value.operands().size()==number
-      : value.operands().size()>=number,
+      ? value.operands().size()>=number
+      : value.operands().size()==number,
     message);
 }
 
