@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 iterator2.class
 --cover location --unwind 3 --function iterator2.f
 ^EXIT=0$
@@ -6,5 +6,3 @@ iterator2.class
 ^.*SATISFIED$
 --
 ^warning: ignoring
---
-https://diffblue.atlassian.net/browse/TG-610
