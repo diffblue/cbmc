@@ -21,6 +21,7 @@ Author: Daniel Kroening
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
+#include "html_goto_trace.h"
 
 void goto_tracet::output(
   const class namespacet &ns,
@@ -294,6 +295,7 @@ void trace_value(
   const exprt &full_lhs,
   const exprt &value)
 {
+  // default use binary representation
   trace_value(out, ns, lhs_object, full_lhs, value, false);
 }
 
@@ -342,6 +344,10 @@ void show_goto_trace(
   int verbosity,
   bool print_hex)
 {
+  if(verbosity==10)
+    show_html_goto_trace(out, ns, goto_trace);
+  else
+  {
   unsigned prev_step_nr=0;
   bool first_step=true;
 
@@ -504,5 +510,6 @@ void show_goto_trace(
     default:
       UNREACHABLE;
     }
+  }
   }
 }

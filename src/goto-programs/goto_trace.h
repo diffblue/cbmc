@@ -213,6 +213,14 @@ void trace_value(
   const exprt &full_lhs,
   const exprt &value);
 
+void trace_value(
+  std::ostream &out,
+  const namespacet &,
+  const ssa_exprt &lhs_object,
+  const exprt &full_lhs,
+  const exprt &value,
+  bool use_hex);
+
 std::string trace_value_binary(
   const exprt &,
   const namespacet &);
