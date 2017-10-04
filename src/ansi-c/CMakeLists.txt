@@ -40,7 +40,7 @@ list(REMOVE_ITEM library_check_sources ${platform_unavail})
 
 add_custom_command(
     DEPENDS ${library_check_sources}
-    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/library_check.sh ${library_check_sources}
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/library_check.sh ${CMAKE_C_COMPILER} ${library_check_sources}
     COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
