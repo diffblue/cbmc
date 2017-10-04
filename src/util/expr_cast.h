@@ -35,39 +35,11 @@ template<typename T> bool can_cast_expr(const exprt &base);
 /// validate particular types.
 inline void validate_expr(const exprt &) {}
 
-/// \brief Try to cast a constant reference to a generic exprt to a specific
-///   derived class
-/// \tparam T The exprt-derived class to cast to
-/// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T or valueless optional if \a base
-///   is not an instance of \a T
-template<typename T>
-optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
-expr_try_dynamic_cast(const exprt &base)
+namespace detail
 {
-  return expr_try_dynamic_cast<
-    T,
-    typename std::remove_reference<T>::type,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
-    const exprt>(base);
-}
 
-/// \brief Try to cast a reference to a generic exprt to a specific derived
-///   class
-/// \tparam T The exprt-derived class to cast to
-/// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T or valueless optional if \a base is
-///   not an instance of \a T
-template<typename T>
-optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
-expr_try_dynamic_cast(exprt &base)
-{
-  return expr_try_dynamic_cast<
-    T,
-    typename std::remove_reference<T>::type,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
-    exprt>(base);
-}
+// We hide this in a namespace so that only functions that it only
+// participates in overload resolution when explicitly requested.
 
 /// \brief Try to cast a reference to a generic exprt to a specific derived
 ///    class
@@ -97,38 +69,47 @@ optionalt<std::reference_wrapper<TConst>> expr_try_dynamic_cast(TExpr &base)
   return optionalt<std::reference_wrapper<TConst>>(value);
 }
 
-/// \brief Cast a constant reference to a generic exprt to a specific derived
-///   class
+} // namespace detail
+
+/// \brief Try to cast a constant reference to a generic exprt to a specific
+///   derived class
 /// \tparam T The exprt-derived class to cast to
 /// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T
-/// \throw std::bad_cast If \a base is not an instance of \a T
-/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
-///   abort rather than throw if \a base is not an instance of \a T
+/// \return Reference to object of type \a T or valueless optional if \a base
+///   is not an instance of \a T
 template<typename T>
-T expr_dynamic_cast(const exprt &base)
+optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
+expr_try_dynamic_cast(const exprt &base)
 {
-  return expr_dynamic_cast<
+  return detail::expr_try_dynamic_cast<
     T,
+    typename std::remove_reference<T>::type,
     typename std::remove_const<typename std::remove_reference<T>::type>::type,
     const exprt>(base);
 }
 
-/// \brief Cast a reference to a generic exprt to a specific derived class
+/// \brief Try to cast a reference to a generic exprt to a specific derived
+///   class
 /// \tparam T The exprt-derived class to cast to
 /// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T
-/// \throw std::bad_cast If \a base is not an instance of \a T
-/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
-///   abort rather than throw if \a base is not an instance of \a T
+/// \return Reference to object of type \a T or valueless optional if \a base is
+///   not an instance of \a T
 template<typename T>
-T expr_dynamic_cast(exprt &base)
+optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
+expr_try_dynamic_cast(exprt &base)
 {
-  return expr_dynamic_cast<
+  return detail::expr_try_dynamic_cast<
     T,
+    typename std::remove_reference<T>::type,
     typename std::remove_const<typename std::remove_reference<T>::type>::type,
     exprt>(base);
 }
+
+namespace detail
+{
+
+// We hide this in a namespace so that only functions that it only
+// participates in overload resolution when explicitly requested.
 
 /// \brief Cast a reference to a generic exprt to a specific derived class
 /// \tparam T The reference or const reference type to \a TUnderlying to cast to
@@ -159,6 +140,40 @@ T expr_dynamic_cast(TExpr &base)
   return value;
 }
 
+} // namespace detail
+
+/// \brief Cast a constant reference to a generic exprt to a specific derived
+///   class
+/// \tparam T The exprt-derived class to cast to
+/// \param base Reference to a generic \ref exprt
+/// \return Reference to object of type \a T
+/// \throw std::bad_cast If \a base is not an instance of \a T
+/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
+///   abort rather than throw if \a base is not an instance of \a T
+template<typename T>
+T expr_dynamic_cast(const exprt &base)
+{
+  return detail::expr_dynamic_cast<
+    T,
+    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    const exprt>(base);
+}
+
+/// \brief Cast a reference to a generic exprt to a specific derived class
+/// \tparam T The exprt-derived class to cast to
+/// \param base Reference to a generic \ref exprt
+/// \return Reference to object of type \a T
+/// \throw std::bad_cast If \a base is not an instance of \a T
+/// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
+///   abort rather than throw if \a base is not an instance of \a T
+template<typename T>
+T expr_dynamic_cast(exprt &base)
+{
+  return detail::expr_dynamic_cast<
+    T,
+    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    exprt>(base);
+}
 
 inline void validate_operands(
   const exprt &value,
