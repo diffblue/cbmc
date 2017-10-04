@@ -114,26 +114,31 @@ SCENARIO("calculate_max_string_length",
     signedbv_typet(32),
     unsignedbv_typet(32),
     signedbv_typet(64),
-    unsignedbv_typet(64)};
+    unsignedbv_typet(64),
+  };
 
   for(const typet &type : int_types)
   {
-    WHEN(std::string("type = ")+type.pretty())
+    std::string type_str=type.pretty();
+    std::replace(type_str.begin(), type_str.end(), '\n', ' ');
+    WHEN("type = "+type_str)
     {
       for(const unsigned long radix : radixes)
       {
-        WHEN(std::string("radix = ")+std::to_string(radix))
+        WHEN("radix = "+std::to_string(radix))
         {
           size_t actual_value=max_printed_string_length(type, radix);
-          WHEN(std::string("correct value")+type.pretty())
+          THEN("value is correct")
           {
             size_t expected_value=expected_length(radix, type);
-            /// Due to floating point rounding errors, we sometime get one more
-            /// than the actual value, which is perfectly fine for our purposes
-            REQUIRE(expected_value<=actual_value);
-            REQUIRE(expected_value+1>=actual_value);
+            // Due to floating point rounding errors, we sometime get one more
+            // than the actual value, which is perfectly fine for our purposes
+            // Double brackets here prevent Catch trying to decompose a
+            // complex expression
+            REQUIRE((
+              actual_value==expected_value || actual_value==expected_value+1));
           }
-          WHEN(std::string("value is less than with default radix"))
+          THEN("value is no greater than with default radix")
           {
             size_t actual_value_for_default=max_printed_string_length(type, 0);
             REQUIRE(actual_value<=actual_value_for_default);
