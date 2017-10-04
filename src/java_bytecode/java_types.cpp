@@ -201,6 +201,13 @@ typet java_type_from_string(
       // type parameters (e.g. on generic methods on non-generic classes
       // or generic static methods). For now we skip over this part of the
       // signature and continue parsing the rest of the signature as normal
+      // So for example, the following java method:
+      // static void <T, U> foo(T t, U u, int x);
+      // Would have a signature that looks like:
+      // <T:Ljava/lang/Object;U:Ljava/lang/Object;>(TT;TU;I)V
+      // So we skip all inside the angle brackets and parse the rest of the
+      // string:
+      // (TT;TU;I)V
       size_t closing_generic=find_closing_delimiter(src, 0, '<', '>');
       const typet &method_type=java_type_from_string(
         src.substr(closing_generic+1, std::string::npos), class_name);

@@ -117,9 +117,8 @@ void java_bytecode_convert_classt::convert(const classt &c)
     }
     catch(unsupported_java_class_siganture_exceptiont)
     {
-      // Do nothing: we don't support parsing for example double bounded or
-      // two entry elements
-
+      warning() << "we currently don't support parsing for example double "
+        "bounded, recursive and wild card generics" << eom;
     }
   }
 

@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/optional.h>
 
 class java_class_typet:public class_typet
 {
@@ -366,7 +367,8 @@ public:
 inline typet java_type_from_string_with_exception(
   const std::string &descriptor,
   const optionalt<std::string> &signature,
-  const std::string &class_name) {
+  const std::string &class_name)
+{
   try
   {
     return java_type_from_string(signature.value(), class_name);
