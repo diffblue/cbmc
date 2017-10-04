@@ -84,7 +84,7 @@ expr_try_dynamic_cast(const exprt &base)
   return detail::expr_try_dynamic_cast<
     T,
     typename std::remove_reference<T>::type,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    typename std::decay<T>::type,
     const exprt>(base);
 }
 
@@ -101,7 +101,7 @@ expr_try_dynamic_cast(exprt &base)
   return detail::expr_try_dynamic_cast<
     T,
     typename std::remove_reference<T>::type,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    typename std::decay<T>::type,
     exprt>(base);
 }
 
@@ -155,7 +155,7 @@ T expr_dynamic_cast(const exprt &base)
 {
   return detail::expr_dynamic_cast<
     T,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    typename std::decay<T>::type,
     const exprt>(base);
 }
 
@@ -171,7 +171,7 @@ T expr_dynamic_cast(exprt &base)
 {
   return detail::expr_dynamic_cast<
     T,
-    typename std::remove_const<typename std::remove_reference<T>::type>::type,
+    typename std::decay<T>::type,
     exprt>(base);
 }
 
