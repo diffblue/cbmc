@@ -35,7 +35,7 @@ template<typename T> bool can_cast_expr(const exprt &base);
 /// validate particular types.
 inline void validate_expr(const exprt &) {}
 
-namespace detail
+namespace detail // NOLINT
 {
 
 // We hide this in a namespace so that only functions that it only
@@ -50,9 +50,12 @@ namespace detail
 /// \param base Reference to a generic \ref exprt
 /// \return Reference to object of type \a TUnderlying
 ///   or valueless optional if \a base is not an instance of \a TUnderlying
-template<typename T, typename TConst, typename TUnderlying, typename TExpr>
-optionalt<std::reference_wrapper<TConst>> expr_try_dynamic_cast(TExpr &base)
+template <typename T, typename TExpr>
+optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
+expr_try_dynamic_cast(TExpr &base)
 {
+  typedef typename std::decay<T>::type TUnderlying;
+  typedef typename std::remove_reference<T>::type TConst;
   static_assert(
     std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
     "Tried to expr_try_dynamic_cast from something that wasn't an exprt");
@@ -63,10 +66,10 @@ optionalt<std::reference_wrapper<TConst>> expr_try_dynamic_cast(TExpr &base)
     std::is_base_of<exprt, TUnderlying>::value,
     "The template argument T must be derived from exprt.");
   if(!can_cast_expr<TUnderlying>(base))
-    return optionalt<std::reference_wrapper<TConst>>();
+    return {};
   T value=static_cast<T>(base);
   validate_expr(value);
-  return optionalt<std::reference_wrapper<TConst>>(value);
+  return std::reference_wrapper<TConst>(value);
 }
 
 } // namespace detail
@@ -81,11 +84,7 @@ template<typename T>
 optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
 expr_try_dynamic_cast(const exprt &base)
 {
-  return detail::expr_try_dynamic_cast<
-    T,
-    typename std::remove_reference<T>::type,
-    typename std::decay<T>::type,
-    const exprt>(base);
+  return detail::expr_try_dynamic_cast<T>(base);
 }
 
 /// \brief Try to cast a reference to a generic exprt to a specific derived
@@ -98,14 +97,10 @@ template<typename T>
 optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
 expr_try_dynamic_cast(exprt &base)
 {
-  return detail::expr_try_dynamic_cast<
-    T,
-    typename std::remove_reference<T>::type,
-    typename std::decay<T>::type,
-    exprt>(base);
+  return detail::expr_try_dynamic_cast<T>(base);
 }
 
-namespace detail
+namespace detail // NOLINT
 {
 
 // We hide this in a namespace so that only functions that it only
@@ -120,9 +115,10 @@ namespace detail
 /// \throw std::bad_cast If \a base is not an instance of \a TUnderlying
 /// \remark If CBMC assertions (PRECONDITION) are set to abort then this will
 ///   abort rather than throw if \a base is not an instance of \a TUnderlying
-template<typename T, typename TUnderlying, typename TExpr>
+template<typename T, typename TExpr>
 T expr_dynamic_cast(TExpr &base)
 {
+  typedef typename std::decay<T>::type TUnderlying;
   static_assert(
     std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
     "Tried to expr_dynamic_cast from something that wasn't an exprt");
@@ -153,10 +149,7 @@ T expr_dynamic_cast(TExpr &base)
 template<typename T>
 T expr_dynamic_cast(const exprt &base)
 {
-  return detail::expr_dynamic_cast<
-    T,
-    typename std::decay<T>::type,
-    const exprt>(base);
+  return detail::expr_dynamic_cast<T>(base);
 }
 
 /// \brief Cast a reference to a generic exprt to a specific derived class
@@ -169,10 +162,7 @@ T expr_dynamic_cast(const exprt &base)
 template<typename T>
 T expr_dynamic_cast(exprt &base)
 {
-  return detail::expr_dynamic_cast<
-    T,
-    typename std::decay<T>::type,
-    exprt>(base);
+  return detail::expr_dynamic_cast<T>(base);
 }
 
 inline void validate_operands(
