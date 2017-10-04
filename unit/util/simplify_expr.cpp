@@ -8,8 +8,10 @@
 
 #include <catch.hpp>
 
+#include <java_bytecode/java_types.h>
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/namespace.h>
 #include <util/pointer_predicates.h>
 #include <util/simplify_expr.h>
@@ -18,6 +20,8 @@
 
 TEST_CASE("Simplify pointer_offset(address of array index)")
 {
+  config.set_arch("none");
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
@@ -38,6 +42,8 @@ TEST_CASE("Simplify pointer_offset(address of array index)")
 
 TEST_CASE("Simplify const pointer offset")
 {
+  config.set_arch("none");
+
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
@@ -53,4 +59,24 @@ TEST_CASE("Simplify const pointer offset")
   mp_integer offset_value;
   REQUIRE(!to_integer(simp, offset_value));
   REQUIRE(offset_value==1234);
+}
+
+TEST_CASE("Simplify Java boolean -> int -> boolean casts")
+{
+  config.set_arch("none");
+
+  const exprt simplified=simplify_expr(
+    typecast_exprt(
+      typecast_exprt(
+        symbol_exprt(
+          "foo",
+          java_boolean_type()),
+        java_int_type()),
+      java_boolean_type()),
+    namespacet(symbol_tablet()));
+
+  REQUIRE(simplified.id()==ID_symbol);
+  REQUIRE(simplified.type()==java_boolean_type());
+  const auto &symbol=to_symbol_expr(simplified);
+  REQUIRE(symbol.get_identifier()=="foo");
 }

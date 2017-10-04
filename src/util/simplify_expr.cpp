@@ -240,6 +240,18 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   if(expr_type.id()==ID_c_bool &&
      op_type.id()!=ID_bool)
   {
+    // casts from boolean to a signed int and back:
+    // (boolean)(int)boolean -> boolean
+    if(expr.op0().id()==ID_typecast && op_type.id()==ID_signedbv)
+    {
+      const auto &typecast=to_typecast_expr(expr.op0());
+      if(typecast.op().type().id()==ID_c_bool)
+      {
+        expr=typecast.op0();
+        return false;
+      }
+    }
+
     // rewrite (_Bool)x to (_Bool)(x!=0)
     binary_relation_exprt inequality;
     inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
