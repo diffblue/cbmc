@@ -100,19 +100,15 @@ public:
   {
     return symbols.find(name)!=symbols.end();
   }
+
   opt_const_symbol_reft lookup(const irep_idt &identifier) const;
+
   opt_symbol_reft get_writeable(const irep_idt &identifier);
 
   bool add(const symbolt &symbol);
-  /// Move or copy a new symbol to the symbol table
-  /// \remark: This is a nicer interface than move and achieves the same
-  /// result as both move and add
-  /// \param symbol: The symbol to be added to the symbol table - can be
-  /// moved or copied in
-  /// \return Returns a reference to the newly inserted symbol or to the
-  /// existing symbol if a symbol with the same name already exists in the
-  /// symbol table, along with a bool that is true if a new symbol was inserted.
+
   std::pair<symbolt &, bool> insert(symbolt symbol);
+
   bool move(symbolt &symbol, symbolt *&new_symbol);
 
   void clear()

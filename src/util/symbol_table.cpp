@@ -14,6 +14,14 @@ bool symbol_tablet::add(const symbolt &symbol)
   return !insert(symbol).second;
 }
 
+/// Move or copy a new symbol to the symbol table
+/// \remark: This is a nicer interface than move and achieves the same
+/// result as both move and add
+/// \param symbol: The symbol to be added to the symbol table - can be
+/// moved or copied in
+/// \return Returns a reference to the newly inserted symbol or to the
+/// existing symbol if a symbol with the same name already exists in the
+/// symbol table, along with a bool that is true if a new symbol was inserted.
 std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
 {
   // Add the symbol to the table or retrieve existing symbol with the same name
@@ -84,6 +92,7 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
 /// Remove a symbol from the symbol table
 /// \param name: The name of the symbol to remove
 /// \return Returns a boolean indicating whether the process failed
+///   i.e. false if the symbol was removed, or true if it didn't exist.
 bool symbol_tablet::remove(const irep_idt &name)
 {
   symbolst::const_iterator entry=symbols.find(name);
@@ -93,6 +102,8 @@ bool symbol_tablet::remove(const irep_idt &name)
   return false;
 }
 
+/// Remove a symbol from the symbol table
+/// \param entry: an iterator pointing at the symbol to remove
 void symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
@@ -137,10 +148,9 @@ void symbol_tablet::show(std::ostream &out) const
     out << it->second;
 }
 
-/// Find a symbol in the symbol table. Throws a string if no such symbol is
-/// found.
+/// Find a symbol in the symbol table for read-only access.
 /// \param identifier: The name of the symbol to look for
-/// \return The symbol in the symbol table with the correct name
+/// \return an optional reference, set if found, unset otherwise.
 symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
   const irep_idt &identifier) const
 {
@@ -150,9 +160,9 @@ symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
   return std::ref(it->second);
 }
 
-/// Find a symbol in the symbol table.
+/// Find a symbol in the symbol table for read-write access.
 /// \param identifier: The name of the symbol to look for
-/// \return The symbol in the symbol table with the correct name
+/// \return an optional reference, set if found, unset otherwise.
 symbol_tablet::opt_symbol_reft symbol_tablet::get_writeable(
   const irep_idt &identifier)
 {
