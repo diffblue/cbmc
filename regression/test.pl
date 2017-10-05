@@ -45,6 +45,11 @@ sub run($$$$$) {
   system "echo EXIT=$exit_value >>'$name/$output'";
   system "echo SIGNAL=$signal_num >>'$name/$output'";
 
+  if($signal_num == 2) {
+    print "\nProgram under test interrupted; stopping\n";
+    exit 1;
+  }
+
   return $failed;
 }
 
