@@ -161,7 +161,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 {
   GIVEN("A bdd for x&!x")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
@@ -176,7 +176,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x&!x==0")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
@@ -196,7 +196,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x+x==1")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
@@ -216,7 +216,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*y==y*x")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
@@ -237,7 +237,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==2")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);
@@ -257,7 +257,7 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
 
   GIVEN("A bdd for x*x==4")
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     namespacet ns(symbol_table);
     mini_bdd_mgrt bdd_mgr;
     bdd_propt bdd_prop(bdd_mgr);

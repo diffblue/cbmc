@@ -145,7 +145,7 @@ bool jsil_languaget::to_expr(
     result=true;
   else
   {
-    symbol_tablet symbol_table;
+    concrete_symbol_tablet symbol_table;
     result=
       jsil_convert(parse_tree, symbol_table, get_message_handler());
 

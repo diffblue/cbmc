@@ -31,7 +31,7 @@ exprt convert_exprt_to_string_exprt_unit_test(
 TEST_CASE("Convert exprt to string exprt")
 {
   source_locationt loc;
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   code_blockt code;
   java_string_library_preprocesst preprocess;
