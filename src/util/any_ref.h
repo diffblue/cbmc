@@ -78,7 +78,18 @@ private:
 };
 
 template<typename T>
+bool operator==(const T& left, const any_reft &right)
+{ return right==left; }
+
+template<typename T>
 bool operator!=(const any_reft &left, const T &right)
 { return !(left==right); }
 
+template<typename T>
+bool operator!=(const T &left, const any_reft &right)
+{ return !(right==left); }
+
+template<>
+inline bool any_reft::operator==<any_reft>(const any_reft &other) const
+{ return ptr_==other.ptr_ && type_==other.type_; }
 #endif // CPROVER_UTIL_ANY_REF_H
