@@ -804,7 +804,7 @@ void java_object_factoryt::gen_nondet_struct_init(
   PRECONDITION(ns.follow(expr.type()).id()==ID_struct);
   PRECONDITION(struct_type.id()==ID_struct);
 
-  typedef struct_typet::componentst componentst;
+  using componentst = struct_typet::componentst;
   const irep_idt &struct_tag=struct_type.get_tag();
 
   const componentst &components=struct_type.components();

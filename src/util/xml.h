@@ -24,8 +24,8 @@ public:
   explicit xmlt(const std::string &_name):name(_name)
   { }
 
-  typedef std::list<xmlt> elementst;
-  typedef std::map<std::string, std::string> attributest;
+  using elementst = std::list<xmlt>;
+  using attributest = std::map<std::string, std::string>;
 
   std::string name, data;
 

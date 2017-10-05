@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_declarationt:public exprt
 {
 public:
-  typedef std::vector<cpp_declaratort> declaratorst;
+  using declaratorst = std::vector<cpp_declaratort>;
 
   cpp_declarationt():exprt(ID_cpp_declaration)
   {

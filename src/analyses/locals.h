@@ -19,7 +19,7 @@ Date: March 2013
 class localst
 {
 public:
-  typedef goto_functionst::goto_functiont goto_functiont;
+  using goto_functiont = goto_functionst::goto_functiont;
 
   explicit localst(const goto_functiont &goto_function)
   {
@@ -36,7 +36,7 @@ public:
     return locals_map.find(identifier)!=locals_map.end();
   }
 
-  typedef std::map<irep_idt, symbol_exprt> locals_mapt;
+  using locals_mapt = std::map<irep_idt, symbol_exprt>;
   locals_mapt locals_map;
 
 protected:

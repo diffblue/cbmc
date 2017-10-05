@@ -21,7 +21,7 @@ public:
   {
   }
 
-  typedef unsigned int post;
+  using post = unsigned int;
 
   int LookAhead(unsigned offset);
   int get_token(cpp_tokent &token);
@@ -48,7 +48,7 @@ public:
   }
 
 protected:
-  typedef std::list<cpp_tokent> tokenst;
+  using tokenst = std::list<cpp_tokent>;
   tokenst tokens;
 
   std::vector<tokenst::iterator> token_vector;

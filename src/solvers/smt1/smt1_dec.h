@@ -66,7 +66,7 @@ protected:
   struct valuet
   {
     // map from array index to value
-    typedef std::map<std::string, std::string> index_value_mapt;
+    using index_value_mapt = std::map<std::string, std::string>;
     index_value_mapt index_value_map;
     std::string value;
   };

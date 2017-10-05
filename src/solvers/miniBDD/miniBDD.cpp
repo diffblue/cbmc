@@ -203,7 +203,7 @@ protected:
   mini_bddt APP_rec(const mini_bddt &x, const mini_bddt &y);
   mini_bddt APP_non_rec(const mini_bddt &x, const mini_bddt &y);
 
-  typedef std::map<std::pair<unsigned, unsigned>, mini_bddt> Gt;
+  using Gt = std::map<std::pair<unsigned, unsigned>, mini_bddt>;
   Gt G;
 };
 

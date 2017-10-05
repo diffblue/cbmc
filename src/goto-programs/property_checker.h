@@ -45,7 +45,7 @@ public:
   };
 
   // the irep_idt is the property id
-  typedef std::map<irep_idt, property_statust> property_mapt;
+  using property_mapt = std::map<irep_idt, property_statust>;
   property_mapt property_map;
 
 protected:

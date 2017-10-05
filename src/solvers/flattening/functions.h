@@ -39,14 +39,14 @@ public:
 protected:
   prop_convt &prop_conv;
 
-  typedef std::set<function_application_exprt> applicationst;
+  using applicationst = std::set<function_application_exprt>;
 
   struct function_infot
   {
     applicationst applications;
   };
 
-  typedef std::map<exprt, function_infot> function_mapt;
+  using function_mapt = std::map<exprt, function_infot>;
   function_mapt function_map;
 
   virtual void add_function_constraints();

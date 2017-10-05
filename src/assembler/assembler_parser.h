@@ -20,7 +20,7 @@ void assembler_scanner_init();
 class assembler_parsert:public parsert
 {
 public:
-  typedef std::vector<irept> instructiont;
+  using instructiont = std::vector<irept>;
   std::list<instructiont> instructions;
 
   void add_token(const irept &irep)

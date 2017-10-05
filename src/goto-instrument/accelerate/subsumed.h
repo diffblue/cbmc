@@ -30,6 +30,6 @@ public:
   patht residue;
 };
 
-typedef std::list<subsumed_patht> subsumed_pathst;
+using subsumed_pathst = std::list<subsumed_patht>;
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_SUBSUMED_H

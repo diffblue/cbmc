@@ -24,8 +24,8 @@ class template_mapt
 {
 public:
   // this maps template parameters to their instantiated value
-  typedef std::map<irep_idt, typet> type_mapt;
-  typedef std::map<irep_idt, exprt> expr_mapt;
+  using type_mapt = std::map<irep_idt, typet>;
+  using expr_mapt = std::map<irep_idt, exprt>;
   type_mapt type_map;
   expr_mapt expr_map;
 

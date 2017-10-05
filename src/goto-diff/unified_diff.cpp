@@ -218,7 +218,7 @@ void unified_difft::lcss(
     return;
 
   // apply longest common subsequence (LCSS)
-  typedef std::vector<std::vector<std::size_t> > lcss_matrixt;
+  using lcss_matrixt = std::vector<std::vector<std::size_t> >;
   lcss_matrixt lcss_matrix(
     old_count+1,
     std::vector<size_t>(new_count+1, 0));
@@ -337,9 +337,8 @@ void unified_difft::unified_diff(
 
 bool unified_difft::operator()()
 {
-  typedef std::map<irep_idt,
-                   goto_functionst::function_mapt::const_iterator>
-                     function_mapt;
+  using function_mapt =
+    std::map<irep_idt, goto_functionst::function_mapt::const_iterator>;
 
   function_mapt old_funcs, new_funcs;
 

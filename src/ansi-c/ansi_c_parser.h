@@ -68,7 +68,7 @@ public:
   std::string string_literal;
   std::list<exprt> pragma_pack;
 
-  typedef configt::ansi_ct::flavourt modet;
+  using modet = configt::ansi_ct::flavourt;
   modet mode;
 
   // recognize C++98 and C++11 keywords
@@ -77,10 +77,10 @@ public:
   // in C99 and upwards, for(;;) has a scope
   bool for_has_scope;
 
-  typedef ansi_c_identifiert identifiert;
-  typedef ansi_c_scopet scopet;
+  using identifiert = ansi_c_identifiert;
+  using scopet = ansi_c_scopet;
 
-  typedef std::list<scopet> scopest;
+  using scopest = std::list<scopet>;
   scopest scopes;
 
   scopet &root_scope()

@@ -24,7 +24,7 @@ Date: April 2016
 #include <goto-programs/goto_model.h>
 #include <goto-programs/compute_called_functions.h>
 
-typedef std::map<unsigned, goto_programt::const_targett> dead_mapt;
+using dead_mapt = std::map<unsigned, goto_programt::const_targett>;
 
 static void unreachable_instructions(
   const goto_programt &goto_program,

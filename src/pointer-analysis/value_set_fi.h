@@ -50,7 +50,7 @@ public:
     to_target_index = inx;
   }
 
-  typedef irep_idt idt;
+  using idt = irep_idt;
 
   class objectt
   {
@@ -73,16 +73,16 @@ public:
 
   class object_map_dt
   {
-    typedef std::map<unsigned, objectt> data_typet;
+    using data_typet = std::map<unsigned, objectt>;
     data_typet data;
 
   public:
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::iterator iterator;
+    using iterator = data_typet::iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::const_iterator const_iterator;
+    using const_iterator = data_typet::const_iterator;
     // NOLINTNEXTLINE(readability/identifiers)
-    typedef data_typet::value_type value_type;
+    using value_type = data_typet::value_type;
 
     iterator begin() { return data.begin(); }
     const_iterator begin() const { return data.begin(); }
@@ -110,7 +110,7 @@ public:
 
   exprt to_expr(const object_map_dt::value_type &it) const;
 
-  typedef reference_counting<object_map_dt> object_mapt;
+  using object_mapt = reference_counting<object_map_dt>;
 
   void set(object_mapt &dest, const object_map_dt::value_type &it) const
   {
@@ -189,22 +189,22 @@ public:
     }
   };
 
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
+  using expr_sett = std::unordered_set<exprt, irep_hash>;
 
-  typedef std::unordered_set<unsigned int> dynamic_object_id_sett;
+  using dynamic_object_id_sett = std::unordered_set<unsigned int>;
 
   #ifdef USE_DSTRING
-  typedef std::map<idt, entryt> valuest;
-  typedef std::set<idt> flatten_seent;
-  typedef std::unordered_set<idt, irep_id_hash> gvs_recursion_sett;
-  typedef std::unordered_set<idt, irep_id_hash> recfind_recursion_sett;
-  typedef std::unordered_set<idt, irep_id_hash> assign_recursion_sett;
+  using valuest = std::map<idt, entryt>;
+  using flatten_seent = std::set<idt>;
+  using gvs_recursion_sett = std::unordered_set<idt, irep_id_hash>;
+  using recfind_recursion_sett = std::unordered_set<idt, irep_id_hash>;
+  using assign_recursion_sett = std::unordered_set<idt, irep_id_hash>;
   #else
-  typedef std::unordered_map<idt, entryt, string_hash> valuest;
-  typedef std::unordered_set<idt, string_hash> flatten_seent;
-  typedef std::unordered_set<idt, string_hash> gvs_recursion_sett;
-  typedef std::unordered_set<idt, string_hash> recfind_recursion_sett;
-  typedef std::unordered_set<idt, string_hash> assign_recursion_sett;
+  using valuest = std::unordered_map<idt, entryt, string_hash>;
+  using flatten_seent = std::unordered_set<idt, string_hash>;
+  using gvs_recursion_sett = std::unordered_set<idt, string_hash>;
+  using recfind_recursion_sett = std::unordered_set<idt, string_hash>;
+  using assign_recursion_sett = std::unordered_set<idt, string_hash>;
   #endif
 
   void get_value_set(

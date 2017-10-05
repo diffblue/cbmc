@@ -15,6 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/expr.h>
 #include <util/numbering.h>
 
-typedef hash_numbering<exprt, irep_hash> object_numberingt;
+using object_numberingt = hash_numbering<exprt, irep_hash>;
 
 #endif // CPROVER_POINTER_ANALYSIS_OBJECT_NUMBERING_H

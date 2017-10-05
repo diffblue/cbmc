@@ -75,17 +75,17 @@ public:
 
 protected:
   // the 'unsigned' ought to be size_t
-  typedef std::unordered_map<string_ptrt, unsigned, string_ptr_hash>
-    hash_tablet;
+  using hash_tablet =
+    std::unordered_map<string_ptrt, unsigned, string_ptr_hash>;
   hash_tablet hash_table;
 
   unsigned get(const char *s);
   unsigned get(const std::string &s);
 
-  typedef std::list<std::string> string_listt;
+  using string_listt = std::list<std::string>;
   string_listt string_list;
 
-  typedef std::vector<std::string *> string_vectort;
+  using string_vectort = std::vector<std::string *>;
   string_vectort string_vector;
 };
 

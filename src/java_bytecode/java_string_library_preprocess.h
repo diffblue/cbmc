@@ -81,12 +81,10 @@ private:
 
   const refined_string_typet refined_string_type;
 
-  typedef
-    std::function<codet(
-      const code_typet &, const source_locationt &, symbol_tablet &)>
-    conversion_functiont;
+  using conversion_functiont = std::function<
+    codet(const code_typet &, const source_locationt &, symbol_tablet &)>;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> id_mapt;
+  using id_mapt = std::unordered_map<irep_idt, irep_idt, irep_id_hash>;
 
   // Table mapping each java method signature to the code generating function
   std::unordered_map<irep_idt, conversion_functiont, irep_id_hash>

@@ -423,8 +423,8 @@ bool simplify_exprt::simplify_plus(exprt &expr)
 
     // search for a and -a
     // first gather all the a's with -a
-    typedef std::unordered_map<exprt, exprt::operandst::iterator, irep_hash>
-      expr_mapt;
+    using expr_mapt =
+      std::unordered_map<exprt, exprt::operandst::iterator, irep_hash>;
     expr_mapt expr_map;
 
     Forall_expr(it, operands)

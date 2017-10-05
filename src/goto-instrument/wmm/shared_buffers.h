@@ -73,7 +73,7 @@ public:
     typet type;
   };
 
-  typedef std::map<irep_idt, varst> var_mapt;
+  using var_mapt = std::map<irep_idt, varst>;
   var_mapt var_map;
 
   /* instructions in violation cycles (to instrument): */

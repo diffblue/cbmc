@@ -18,10 +18,10 @@
 
 
 // Shortcut access to BigInt scoped things.
-typedef BigInt::llong_t  llong_t;
-typedef BigInt::ullong_t ullong_t;
-typedef BigInt::onedig_t onedig_t;
-typedef BigInt::twodig_t twodig_t;
+using llong_t = BigInt::llong_t;
+using ullong_t = BigInt::ullong_t;
+using onedig_t = BigInt::onedig_t;
+using twodig_t = BigInt::twodig_t;
 
 static const unsigned small	 = BigInt::small;
 static const int     single_bits = sizeof (onedig_t) * CHAR_BIT;

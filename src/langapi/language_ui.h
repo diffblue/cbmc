@@ -42,7 +42,7 @@ public:
   virtual void show_symbol_table_plain(std::ostream &out, bool brief);
   virtual void show_symbol_table_xml_ui(bool brief);
 
-  typedef ui_message_handlert::uit uit;
+  using uit = ui_message_handlert::uit;
 
   uit get_ui()
   {

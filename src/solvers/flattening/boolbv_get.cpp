@@ -326,7 +326,7 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
 
   // search array indices
 
-  typedef std::map<mp_integer, exprt> valuest;
+  using valuest = std::map<mp_integer, exprt>;
   valuest values;
 
   {

@@ -59,7 +59,7 @@ public:
     std::string arg;
   };
 
-  typedef std::list<argt> parsed_argvt;
+  using parsed_argvt = std::list<argt>;
   parsed_argvt parsed_argv;
 
   bool have_infile_arg() const

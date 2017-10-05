@@ -179,7 +179,7 @@ protected:
     cpp_template_args_tct full_template_args;
   };
 
-  typedef std::list<instantiationt> instantiation_stackt;
+  using instantiation_stackt = std::list<instantiationt>;
   instantiation_stackt instantiation_stack;
 
   void show_instantiation_stack(std::ostream &);
@@ -337,7 +337,7 @@ protected:
     instantiation_stackt instantiation_stack;
   };
 
-  typedef std::list<method_bodyt> method_bodiest;
+  using method_bodiest = std::list<method_bodyt>;
   method_bodiest method_bodies;
 
   void add_method_body(symbolt *_method_symbol)
@@ -591,7 +591,7 @@ public:
     bool check_constantness=true);
 
 private:
-  typedef std::list<irep_idt> dynamic_initializationst;
+  using dynamic_initializationst = std::list<irep_idt>;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
 };

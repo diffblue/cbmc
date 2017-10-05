@@ -177,7 +177,7 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
   boolean_assignment.clear();
   boolean_assignment.resize(no_boolean_variables, false);
 
-  typedef std::unordered_map<irep_idt, irept, irep_id_hash> valuest;
+  using valuest = std::unordered_map<irep_idt, irept, irep_id_hash>;
   valuest values;
 
   while(in)

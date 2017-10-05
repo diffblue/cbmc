@@ -28,7 +28,7 @@ Author: Matt Lewis
 #include "accelerator.h"
 #include "cone_of_influence.h"
 
-typedef std::unordered_map<exprt, exprt, irep_hash> expr_mapt;
+using expr_mapt = std::unordered_map<exprt, exprt, irep_hash>;
 
 class acceleration_utilst
 {
@@ -74,8 +74,8 @@ class acceleration_utilst
                       patht &body,
                       exprt &guard);
 
-  typedef std::pair<exprt, exprt> expr_pairt;
-  typedef std::vector<expr_pairt> expr_pairst;
+  using expr_pairt = std::pair<exprt, exprt>;
+  using expr_pairst = std::vector<expr_pairt>;
 
   struct polynomial_array_assignmentt
   {
@@ -84,8 +84,7 @@ class acceleration_utilst
     polynomialt value;
   };
 
-  typedef std::vector<polynomial_array_assignmentt>
-    polynomial_array_assignmentst;
+  using polynomial_array_assignmentst = std::vector<polynomial_array_assignmentt>;
 
   bool do_arrays(goto_programt::instructionst &loop_body,
                  std::map<exprt, polynomialt> &polynomials,

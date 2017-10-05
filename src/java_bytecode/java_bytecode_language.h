@@ -77,12 +77,10 @@ struct object_factory_parameterst final
   size_t max_nondet_tree_depth=MAX_NONDET_TREE_DEPTH;
 };
 
-typedef std::pair<
+using lazy_method_valuet = std::pair<
           const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
-  lazy_method_valuet;
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+          const java_bytecode_parse_treet::methodt *>;
+using lazy_methodst = std::map<irep_idt, lazy_method_valuet>;
 
 class java_bytecode_languaget:public languaget
 {

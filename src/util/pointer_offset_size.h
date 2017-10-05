@@ -27,7 +27,7 @@ class constant_exprt;
 // NOLINTNEXTLINE(readability/identifiers)
 class member_offset_iterator
 {
-  typedef std::pair<size_t, mp_integer> refst;
+  using refst = std::pair<size_t, mp_integer>;
   refst current;
   const struct_typet &type;
   const namespacet &ns;

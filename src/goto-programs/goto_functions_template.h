@@ -28,7 +28,7 @@ public:
   bodyT body;
   code_typet type;
 
-  typedef std::vector<irep_idt> parameter_identifierst;
+  using parameter_identifierst = std::vector<irep_idt>;
   parameter_identifierst parameter_identifiers;
 
   bool body_available() const
@@ -99,8 +99,8 @@ template <class bodyT>
 class goto_functions_templatet
 {
 public:
-  typedef goto_function_templatet<bodyT> goto_functiont;
-  typedef std::map<irep_idt, goto_functiont> function_mapt;
+  using goto_functiont = goto_function_templatet<bodyT>;
+  using function_mapt = std::map<irep_idt, goto_functiont>;
   function_mapt function_map;
 
   goto_functions_templatet()

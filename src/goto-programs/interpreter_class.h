@@ -53,29 +53,29 @@ public:
   };
 
   // A list of such assignments.
-  typedef std::vector<function_assignmentt> function_assignmentst;
+  using function_assignmentst = std::vector<function_assignmentt>;
 
-  typedef std::vector<mp_integer> mp_vectort;
+  using mp_vectort = std::vector<mp_integer>;
 
   // Maps an assignment id to the name of the parameter being assigned
-  typedef std::pair<irep_idt, irep_idt> assignment_idt;
+  using assignment_idt = std::pair<irep_idt, irep_idt>;
 
   // Identifies an expression before and after some change;
-  typedef std::pair<exprt, exprt> diff_pairt;
+  using diff_pairt = std::pair<exprt, exprt>;
 
   // Records a diff between an assignment pre and post conditions
-  typedef std::map<assignment_idt, diff_pairt> side_effects_differencet;
+  using side_effects_differencet = std::map<assignment_idt, diff_pairt>;
 
   // A entry in the input_valuest map
-  typedef std::pair<irep_idt, exprt> input_entryt;
+  using input_entryt = std::pair<irep_idt, exprt>;
 
   // List of the input variables with their corresponding initial values
-  typedef std::map<irep_idt, exprt> input_valuest;
+  using input_valuest = std::map<irep_idt, exprt>;
 
   // List of dynamically allocated symbols that are not in the symbol table
-  typedef std::map<irep_idt, typet> dynamic_typest;
+  using dynamic_typest = std::map<irep_idt, typet>;
 
-  typedef std::map<irep_idt, function_assignmentst> output_valuest;
+  using output_valuest = std::map<irep_idt, function_assignmentst>;
   output_valuest output_values;
 
   // An assignment list annotated with the calling context.
@@ -88,10 +88,10 @@ public:
 
   // list_input_varst maps function identifiers onto a vector of [name = value]
   // assignments per call to that function.
-  typedef std::list<function_assignments_contextt>
-          function_assignments_contextst;
-  typedef std::map<irep_idt, std::list<function_assignments_contextt> >
-          list_input_varst;
+  using function_assignments_contextst =
+    std::list<function_assignments_contextt>;
+  using list_input_varst =
+    std::map<irep_idt, std::list<function_assignments_contextt>>;
 
   const dynamic_typest &get_dynamic_types() { return dynamic_types; }
 
@@ -103,8 +103,8 @@ protected:
 
   const goto_functionst &goto_functions;
 
-  typedef std::unordered_map<irep_idt, std::size_t, irep_id_hash> memory_mapt;
-  typedef std::map<std::size_t, irep_idt> inverse_memory_mapt;
+  using memory_mapt = std::unordered_map<irep_idt, std::size_t, irep_id_hash>;
+  using inverse_memory_mapt = std::map<std::size_t, irep_idt>;
   memory_mapt memory_map;
   inverse_memory_mapt inverse_memory_map;
 
@@ -175,11 +175,11 @@ protected:
     mutable initializedt initialized;
   };
 
-  typedef sparse_vectort<memory_cellt> memoryt;
-  typedef std::map<std::string, const irep_idt &> parameter_sett;
+  using memoryt = sparse_vectort<memory_cellt>;
+  using parameter_sett = std::map<std::string, const irep_idt &>;
   // mapping <structure, field> -> value
-  typedef std::pair<const irep_idt, const irep_idt> struct_member_idt;
-  typedef std::map<struct_member_idt, const exprt> struct_valuest;
+  using struct_member_idt = std::pair<const irep_idt, const irep_idt>;
+  using struct_valuest = std::map<struct_member_idt, const exprt>;
 
   //  The memory is being annotated/reshaped even during reads
   //  (ie to find a read-before-write location) thus memory
@@ -243,7 +243,7 @@ protected:
     unsigned old_stack_pointer;
   };
 
-  typedef std::stack<stack_framet> call_stackt;
+  using call_stackt = std::stack<stack_framet>;
 
   call_stackt call_stack;
   input_valuest input_vars;

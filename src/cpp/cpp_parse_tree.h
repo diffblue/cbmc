@@ -19,7 +19,7 @@ class cpp_parse_treet
 public:
   // the (top-level) declarations/definitions
 
-  typedef std::list<cpp_itemt> itemst;
+  using itemst = std::list<cpp_itemt>;
   itemst items;
 
   void swap(cpp_parse_treet &cpp_parse_tree);

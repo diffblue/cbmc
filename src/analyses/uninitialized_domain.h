@@ -26,7 +26,7 @@ public:
   }
 
   // Locals that are declared but may not be initialized
-  typedef std::set<irep_idt> uninitializedt;
+  using uninitializedt = std::set<irep_idt>;
   uninitializedt uninitialized;
 
   void transform(
@@ -69,7 +69,6 @@ private:
   void assign(const exprt &lhs);
 };
 
-typedef ait<uninitialized_domaint>
-  uninitialized_analysist;
+using uninitialized_analysist = ait<uninitialized_domaint>;
 
 #endif // CPROVER_ANALYSES_UNINITIALIZED_DOMAIN_H

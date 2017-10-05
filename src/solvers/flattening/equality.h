@@ -33,9 +33,9 @@ public:
   }
 
 protected:
-  typedef std::unordered_map<const exprt, unsigned, irep_hash> elementst;
-  typedef std::map<std::pair<unsigned, unsigned>, literalt> equalitiest;
-  typedef std::map<unsigned, exprt> elements_revt;
+  using elementst = std::unordered_map<const exprt, unsigned, irep_hash>;
+  using equalitiest =  std::map<std::pair<unsigned, unsigned>, literalt>;
+  using elements_revt = std::map<unsigned, exprt>;
 
   struct typestructt
   {
@@ -44,7 +44,7 @@ protected:
     equalitiest equalities;
   };
 
-  typedef std::unordered_map<const typet, typestructt, irep_hash> typemapt;
+  using typemapt = std::unordered_map<const typet, typestructt, irep_hash>;
 
   typemapt typemap;
 

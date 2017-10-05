@@ -15,16 +15,16 @@ Author: Daniel Kroening, kroening@kroening.com
 template<typename T>
 class expanding_vectort
 {
-  typedef std::vector<T> data_typet;
+  using data_typet = std::vector<T>;
   data_typet data;
 
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::size_type size_type;
+  using size_type = typename data_typet::size_type;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::iterator iterator;
+  using iterator = typename data_typet::iterator;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::const_iterator const_iterator;
+  using const_iterator = typename data_typet::const_iterator;
 
   T &operator[] (typename std::vector<T>::size_type n)
   {

@@ -24,7 +24,7 @@ public:
 
 protected:
   std::ostream &out;
-  typedef std::map<irep_idt, exprt> let_valuest;
+  using let_valuest = std::map<irep_idt, exprt>;
   let_valuest let_values;
 
   static std::string text2c(const irep_idt &src);

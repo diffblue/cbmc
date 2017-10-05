@@ -39,7 +39,7 @@ class const_unique_depth_iteratort;
 /// Helper class for depth_iterator_baset
 struct depth_iterator_expr_statet final
 {
-  typedef std::vector<exprt>::const_iterator operands_iteratort;
+  using operands_iteratort = std::vector<exprt>::const_iterator;
   inline depth_iterator_expr_statet(
     const exprt &expr,
     operands_iteratort it,
@@ -65,11 +65,11 @@ template<typename depth_iterator_t>
 class depth_iterator_baset
 {
 public:
-  typedef void difference_type;   // NOLINT Required by STL
-  typedef exprt value_type;       // NOLINT
-  typedef const exprt *pointer;   // NOLINT
-  typedef const exprt &reference; // NOLINT
-  typedef std::forward_iterator_tag iterator_category; // NOLINT
+  using difference_type = void;   // NOLINT Required by STL
+  using value_type = exprt;       // NOLINT
+  using pointer = const exprt ;   // NOLINT
+  using reference = const exprt ; // NOLINT
+  using iterator_category = std::forward_iterator_tag; // NOLINT
   bool operator==(const depth_iterator_t &other) const
   {
     return m_stack==other.m_stack;

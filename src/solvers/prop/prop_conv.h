@@ -112,8 +112,8 @@ public:
 
   virtual void clear_cache() { cache.clear();}
 
-  typedef std::map<irep_idt, literalt> symbolst;
-  typedef std::unordered_map<exprt, literalt, irep_hash> cachet;
+  using symbolst = std::map<irep_idt, literalt>;
+  using cachet = std::unordered_map<exprt, literalt, irep_hash>;
 
   const cachet &get_cache() const { return cache; }
   const symbolst &get_symbols() const { return symbols; }

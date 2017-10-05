@@ -101,11 +101,11 @@ public:
   void print_fields(std::ostream &out, unsigned indent=0) const;
 
 protected:
-  typedef std::multimap<irep_idt, cpp_idt> cpp_id_mapt;
+  using cpp_id_mapt = std::multimap<irep_idt, cpp_idt>;
   cpp_id_mapt sub;
 
   // These are used for base classes and 'using' clauses.
-  typedef std::vector<cpp_idt *> scope_listt;
+  using scope_listt = std::vector<cpp_idt *>;
   scope_listt using_scopes, secondary_scopes;
   cpp_idt *parent;
 };

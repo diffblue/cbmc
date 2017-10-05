@@ -39,7 +39,7 @@ public:
   class constraintst
   {
   public:
-    typedef std::list<constraintt> constraint_listt;
+    using constraint_listt = std::list<constraintt>;
     constraint_listt constraint_list;
 
     constraintt &add_constraint()

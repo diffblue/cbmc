@@ -38,7 +38,7 @@ public:
     literalt l;
   };
 
-  typedef std::vector<map_bitt> literal_mapt;
+  using literal_mapt = std::vector<map_bitt>;
 
   class map_entryt
   {
@@ -55,7 +55,7 @@ public:
     std::string get_value(const propt &) const;
   };
 
-  typedef std::unordered_map<irep_idt, map_entryt, irep_id_hash> mappingt;
+  using mappingt = std::unordered_map<irep_idt, map_entryt, irep_id_hash>;
   mappingt mapping;
 
   void show() const;

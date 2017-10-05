@@ -22,7 +22,7 @@ extern const std::unordered_set<exprt, irep_hash> empty_expr_set;
 struct ref_expr_set_dt
 {
   ref_expr_set_dt() {}
-  typedef std::unordered_set<exprt, irep_hash> expr_sett;
+  using expr_sett = std::unordered_set<exprt, irep_hash>;
   expr_sett expr_set;
 
   static const ref_expr_set_dt blank;
@@ -31,7 +31,7 @@ struct ref_expr_set_dt
 class ref_expr_sett:public reference_counting<ref_expr_set_dt>
 {
 public:
-  typedef ref_expr_set_dt::expr_sett expr_sett;
+  using expr_sett = ref_expr_set_dt::expr_sett;
 
   bool empty() const
   {

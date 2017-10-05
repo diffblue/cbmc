@@ -63,7 +63,7 @@ protected:
 
   std::set<irep_idt> address_taken;
 
-  typedef std::map<irep_idt, code_typet> type_mapt;
+  using type_mapt = std::map<irep_idt, code_typet>;
   type_mapt type_map;
 
   bool is_type_compatible(

@@ -19,7 +19,7 @@ public:
   {
   }
 
-  typedef std::vector<class cpp_itemt> itemst;
+  using itemst = std::vector<class cpp_itemt>;
 
   const itemst &items() const
   {

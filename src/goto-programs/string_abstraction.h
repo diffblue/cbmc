@@ -36,7 +36,7 @@ protected:
   namespacet ns;
   unsigned temporary_counter;
 
-  typedef ::std::map< typet, typet > abstraction_types_mapt;
+  using abstraction_types_mapt = ::std::map< typet, typet >;
   abstraction_types_mapt abstraction_types_map;
 
   ::std::set< irep_idt > current_args;
@@ -134,7 +134,7 @@ protected:
   typet string_struct;
   goto_programt initialization;
 
-  typedef std::unordered_map<irep_idt, irep_idt, irep_id_hash> localst;
+  using localst = std::unordered_map<irep_idt, irep_idt, irep_id_hash>;
   localst locals;
 
   void abstract(goto_programt &dest);

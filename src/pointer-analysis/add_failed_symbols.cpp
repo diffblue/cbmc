@@ -54,7 +54,7 @@ void add_failed_symbols(symbol_tablet &symbol_table)
   // the symbol table iterators are not stable, and
   // we are adding new symbols, this
   // is why we need a list of pointers
-  typedef std::list< ::symbolt *> symbol_listt;
+  using symbol_listt = std::list< ::symbolt *>;
   symbol_listt symbol_list;
 
   Forall_symbols(it, symbol_table.symbols)

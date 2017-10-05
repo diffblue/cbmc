@@ -201,7 +201,7 @@ public:
 
   typet full_type(const ansi_c_declaratort &) const;
 
-  typedef std::vector<ansi_c_declaratort> declaratorst;
+  using declaratorst = std::vector<ansi_c_declaratort>;
 
   const declaratorst &declarators() const
   {

@@ -42,7 +42,7 @@ protected:
     std::vector<membert> members;
   };
 
-  typedef std::unordered_map<typet, entryt, irep_hash> cachet;
+  using cachet = std::unordered_map<typet, entryt, irep_hash>;
 
   // the 'mutable' is allow const methods above
   mutable cachet cache;

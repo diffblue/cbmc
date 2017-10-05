@@ -58,8 +58,8 @@ protected:
     goto_programt::const_targett target;
     unsigned score;
   };
-  typedef std::map<literalt, lpointt> lpointst;
-  typedef std::map<irep_idt, lpointst> lpoints_mapt;
+  using lpointst = std::map<literalt, lpointt>;
+  using lpoints_mapt = std::map<irep_idt, lpointst>;
   lpoints_mapt lpoints_map;
 
   // this does the actual work
@@ -70,7 +70,7 @@ protected:
   void freeze_guards();
 
   // specify an lpoint combination to check
-  typedef std::vector<tvt> lpoints_valuet;
+  using lpoints_valuet = std::vector<tvt>;
   bool check(const lpointst &lpoints, const lpoints_valuet &value);
   void update_scores(lpointst &lpoints,
                      const lpoints_valuet &value);

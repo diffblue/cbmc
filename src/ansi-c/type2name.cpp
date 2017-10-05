@@ -17,8 +17,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol.h>
 #include <util/symbol_table.h>
 
-typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
-  symbol_numbert;
+using symbol_numbert =
+  std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>;
 
 static std::string type2name(
   const typet &type,

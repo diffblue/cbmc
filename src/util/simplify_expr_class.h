@@ -132,7 +132,7 @@ public:
 
   virtual bool simplify(exprt &expr);
 
-  typedef std::set<mp_integer> value_listt;
+  using value_listt = std::set<mp_integer>;
   bool get_values(const exprt &expr, value_listt &value_list);
 
   static bool is_bitvector_type(const typet &type)

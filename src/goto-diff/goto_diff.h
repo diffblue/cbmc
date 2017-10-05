@@ -47,7 +47,7 @@ protected:
   ui_message_handlert::uit ui;
 
   unsigned total_functions_count;
-  typedef std::set<irep_idt> irep_id_sett;
+  using irep_id_sett = std::set<irep_idt>;
   irep_id_sett new_functions, modified_functions, deleted_functions;
 
   void convert_function_group(

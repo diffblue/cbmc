@@ -40,9 +40,9 @@ protected:
   mini_bdd_mgrt bdd_mgr;
   mini_bddt root;
 
-  typedef std::unordered_map<exprt, mini_bddt, irep_hash> expr_mapt;
+  using expr_mapt = std::unordered_map<exprt, mini_bddt, irep_hash>;
   expr_mapt expr_map;
-  typedef std::map<unsigned, exprt> node_mapt;
+  using node_mapt = std::map<unsigned, exprt>;
   node_mapt node_map;
 
   mini_bddt from_expr_rec(const exprt &expr);

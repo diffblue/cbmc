@@ -19,8 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 class optionst
 {
 public:
-  typedef std::list<std::string> value_listt;
-  typedef std::map<std::string, value_listt> option_mapt;
+  using value_listt = std::list<std::string>;
+  using option_mapt = std::map<std::string, value_listt>;
 
   const std::string get_option(const std::string &option) const;
   bool get_bool_option(const std::string &option) const;

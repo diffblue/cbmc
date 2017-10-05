@@ -238,7 +238,7 @@ void weak_memory(
   for(std::set<irep_idt>::iterator it=shared_buffers.cycles.begin();
     it!=shared_buffers.cycles.end(); it++)
   {
-    typedef std::multimap<irep_idt, source_locationt>::iterator m_itt;
+    using m_itt = std::multimap<irep_idt, source_locationt>::iterator;
     const std::pair<m_itt, m_itt> ran=
       shared_buffers.cycles_loc.equal_range(*it);
     for(m_itt ran_it=ran.first; ran_it!=ran.second; ran_it++)

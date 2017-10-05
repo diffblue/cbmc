@@ -27,7 +27,7 @@ public:
   // We deliberately don't use size_t here to save some memory
   // on 64-bit machines; i.e., in practice, we restrict ourselves
   // to SAT instances with no more than 2^31 variables.
-  typedef unsigned var_not;
+  using var_not = unsigned int;
 
   // constructors
   literalt()
@@ -194,7 +194,7 @@ inline literalt pos(literalt a) { return a; }
 
 
 // bit-vectors
-typedef std::vector<literalt> bvt;
+using bvt = std::vector<literalt>;
 
 #define forall_literals(it, bv) \
   for(bvt::const_iterator it=(bv).begin(), it_end=(bv).end(); \

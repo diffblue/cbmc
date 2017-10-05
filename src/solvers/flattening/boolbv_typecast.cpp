@@ -536,7 +536,7 @@ bool boolbvt::type_conversion(
         build_offset_map(dest_struct, dest_offsets);
 
         // build name map
-        typedef std::map<irep_idt, std::size_t> op_mapt;
+        using op_mapt = std::map<irep_idt, std::size_t>;
         op_mapt op_map;
 
         for(std::size_t i=0; i<op_comp.size(); i++)

@@ -23,7 +23,7 @@ public:
   {
   }
 
-  typedef std::set<exprt> modifiest;
+  using modifiest = std::set<exprt>;
 
   void get_modifies(
     const local_may_aliast &local_may_alias,
@@ -48,7 +48,7 @@ public:
 protected:
   const goto_functionst &goto_functions;
 
-  typedef std::map<irep_idt, modifiest> function_mapt;
+  using function_mapt = std::map<irep_idt, modifiest>;
   function_mapt function_map;
 };
 

@@ -252,7 +252,7 @@ public:
 
 protected:
   // map program locations to block numbers
-  typedef std::map<goto_programt::const_targett, unsigned> block_mapt;
+  using block_mapt = std::map<goto_programt::const_targett, unsigned>;
   block_mapt block_map;
 
   struct block_infot
@@ -270,7 +270,7 @@ protected:
     std::unordered_set<unsigned> lines;
   };
 
-  typedef std::vector<block_infot> block_infost;
+  using block_infost = std::vector<block_infot>;
   block_infost block_infos;
 
   /// create list of covered lines as CSV string and set as property of source

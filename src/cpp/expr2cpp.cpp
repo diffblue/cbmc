@@ -44,7 +44,7 @@ protected:
     const c_qualifierst &qualifiers,
     const std::string &declarator) override;
 
-  typedef std::unordered_set<std::string, string_hash> id_sett;
+  using id_sett = std::unordered_set<std::string, string_hash>;
 };
 
 std::string expr2cppt::convert_struct(

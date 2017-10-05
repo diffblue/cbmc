@@ -254,8 +254,8 @@ void string_abstractiont::abstract(goto_programt &dest)
 
 void string_abstractiont::declare_define_locals(goto_programt &dest)
 {
-  typedef std::unordered_map<irep_idt, goto_programt::targett, irep_id_hash>
-    available_declst;
+  using available_declst =
+    std::unordered_map<irep_idt, goto_programt::targett, irep_id_hash>;
   available_declst available_decls;
 
   Forall_goto_program_instructions(it, dest)

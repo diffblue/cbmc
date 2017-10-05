@@ -56,25 +56,25 @@ public:
   {
   }
 
-  typedef keyT key_type;
-  typedef valueT mapped_type;
-  typedef std::pair<const key_type, mapped_type> value_type;
+  using key_type = keyT;
+  using mapped_type = valueT;
+  using value_type = std::pair<const key_type, mapped_type>;
 
-  typedef hashT hash;
-  typedef predT key_equal;
+  using hash = hashT;
+  using key_equal = predT;
 
-  typedef sharing_mapt<key_type, mapped_type, hash, key_equal> self_type;
-  typedef sharing_nodet<key_type, mapped_type, key_equal> node_type;
+  using self_type = sharing_mapt<key_type, mapped_type, hash, key_equal>;
+  using node_type = sharing_nodet<key_type, mapped_type, key_equal>;
 
-  typedef size_t size_type;
+  using size_type = size_t;
 
-  typedef const std::pair<const mapped_type &, const bool> const_find_type;
-  typedef const std::pair<mapped_type &, const bool> find_type;
+  using const_find_type = const std::pair<const mapped_type &, const bool>;
+  using find_type = const std::pair<mapped_type &, const bool>;
 
-  typedef std::vector<key_type> keyst;
+  using keyst = std::vector<key_type>;
 
-  typedef typename node_type::subt subt;
-  typedef typename node_type::containert containert;
+  using subt = typename node_type::subt;
+  using containert = typename node_type::containert;
 
   // key-value map
   node_type map;
@@ -168,8 +168,8 @@ public:
 
   // views
 
-  typedef std::pair<const key_type &, const mapped_type &> view_itemt;
-  typedef std::vector<view_itemt> viewt;
+  using view_itemt = std::pair<const key_type &, const mapped_type &>;
+  using viewt = std::vector<view_itemt>;
 
   class delta_view_itemt
   {
@@ -194,7 +194,7 @@ public:
     const mapped_type &other_m;
   };
 
-  typedef std::vector<delta_view_itemt> delta_viewt;
+  using delta_viewt = std::vector<delta_view_itemt>;
 
   void get_view(viewt &view) const;
 
@@ -293,7 +293,7 @@ SHARING_MAPT(void)::get_delta_view(
 {
   assert(delta_view.empty());
 
-  typedef std::pair<const node_type *, const node_type *> stack_itemt;
+  using stack_itemt = std::pair<const node_type *, const node_type *>;
   std::stack<stack_itemt> stack;
 
   if(empty())

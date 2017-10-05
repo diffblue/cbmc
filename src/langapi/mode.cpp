@@ -25,7 +25,7 @@ struct language_entryt
   irep_idt mode;
 };
 
-typedef std::list<language_entryt> languagest;
+using languagest = std::list<language_entryt>;
 languagest languages;
 
 void register_language(language_factoryt factory)

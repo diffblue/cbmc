@@ -63,7 +63,7 @@ public:
   {
   }
 
-  typedef goto_symex_statet statet;
+  using statet = goto_symex_statet;
 
   /** symex all at once, starting from entry point */
   virtual void operator()(
@@ -262,7 +262,7 @@ protected:
   void symex_assign_rec(statet &state, const code_assignt &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
 
-  typedef symex_targett::assignment_typet assignment_typet;
+  using assignment_typet = symex_targett::assignment_typet;
 
   void symex_assign_rec(
     statet &state,

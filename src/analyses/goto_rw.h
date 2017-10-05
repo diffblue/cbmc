@@ -58,7 +58,7 @@ public:
   virtual void output(const namespacet &ns, std::ostream &out) const=0;
 };
 
-typedef int range_spect;
+using range_spect = int;
 
 inline range_spect to_range_spect(const mp_integer &size)
 {
@@ -72,16 +72,16 @@ inline range_spect to_range_spect(const mp_integer &size)
 // each element x represents a range of bits [x.first, x.second.first)
 class range_domaint:public range_domain_baset
 {
-  typedef std::list<std::pair<range_spect, range_spect>> sub_typet;
+  using sub_typet = std::list<std::pair<range_spect, range_spect>>;
   sub_typet data;
 
 public:
   void output(const namespacet &ns, std::ostream &out) const override;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef sub_typet::iterator iterator;
+  using iterator = sub_typet::iterator;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef sub_typet::const_iterator const_iterator;
+  using const_iterator = sub_typet::const_iterator;
 
   iterator begin() { return data.begin(); }
   const_iterator begin() const { return data.begin(); }
@@ -109,10 +109,10 @@ class rw_range_sett
 {
 public:
   #ifdef USE_DSTRING
-  typedef std::map<irep_idt, std::unique_ptr<range_domain_baset>> objectst;
+  using objectst = std::map<irep_idt, std::unique_ptr<range_domain_baset>>;
   #else
-  typedef std::unordered_map<
-    irep_idt, std::unique_ptr<range_domain_baset>, string_hash> objectst;
+  using objectst = std::unordered_map<
+    irep_idt, std::unique_ptr<range_domain_baset>, string_hash>;
   #endif
 
   virtual ~rw_range_sett();
@@ -285,16 +285,16 @@ protected:
 
 class guarded_range_domaint:public range_domain_baset
 {
-  typedef std::multimap<range_spect, std::pair<range_spect, exprt>> sub_typet;
+  using sub_typet = std::multimap<range_spect, std::pair<range_spect, exprt>>;
   sub_typet data;
 
 public:
   virtual void output(const namespacet &ns, std::ostream &out) const override;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef sub_typet::iterator iterator;
+  using iterator = sub_typet::iterator;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef sub_typet::const_iterator const_iterator;
+  using const_iterator = sub_typet::const_iterator;
 
   iterator begin() { return data.begin(); }
   const_iterator begin() const { return data.begin(); }

@@ -25,7 +25,7 @@ public:
   {
   }
 
-  typedef std::list<exprt> valuest;
+  using valuest = std::list<exprt>;
 
   // this is not const to allow a lazy evaluation
   virtual void get_values(

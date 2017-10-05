@@ -65,7 +65,7 @@ void goto_unwindt::copy_segment(
   assert(goto_program.empty());
 
   // build map for branch targets inside the loop
-  typedef std::map<goto_programt::const_targett, unsigned> target_mapt;
+  using target_mapt = std::map<goto_programt::const_targett, unsigned>;
   target_mapt target_map;
 
   unsigned i=0;

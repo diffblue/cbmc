@@ -26,12 +26,12 @@ bool java_entry_point(
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector);
 
-typedef struct
+struct main_function_resultt
 {
   symbolt main_function;
   bool error_found;
   bool stop_convert;
-} main_function_resultt;
+};
 
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(

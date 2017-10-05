@@ -35,7 +35,7 @@ protected:
 
 private:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef float_utilst SUB;
+  using SUB = float_utilst;
 };
 
 #endif // CPROVER_SOLVERS_FLOATBV_FLOAT_APPROXIMATION_H

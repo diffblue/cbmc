@@ -79,7 +79,7 @@ public:
   ///       that is specified in the linker script.
   int add_linker_script_definitions();
 
-  typedef std::map<irep_idt, std::pair<symbol_exprt, exprt>> linker_valuest;
+  using linker_valuest = std::map<irep_idt, std::pair<symbol_exprt, exprt>>;
 
   linker_script_merget(
       compilet &compiler,

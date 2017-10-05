@@ -36,7 +36,7 @@ public:
   bool contains(const exprt &var);
 };
 
-typedef std::map<exprt, exprt> substitutiont;
+using substitutiont = std::map<exprt, exprt>;
 
 class polynomialt
 {
@@ -60,6 +60,6 @@ public:
   int coeff(const exprt &expr);
 };
 
-typedef std::vector<polynomialt> polynomialst;
+using polynomialst = std::vector<polynomialt>;
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_POLYNOMIAL_H

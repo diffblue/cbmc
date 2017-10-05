@@ -24,10 +24,10 @@ template<class P, class T>
 class natural_loops_templatet
 {
 public:
-  typedef std::set<T> natural_loopt;
+  using natural_loopt = std::set<T>;
 
   // map loop headers to loops
-  typedef std::map<T, natural_loopt> loop_mapt;
+  using loop_mapt = std::map<T, natural_loopt>;
 
   loop_mapt loop_map;
 
@@ -54,7 +54,7 @@ public:
 
 protected:
   cfg_dominators_templatet<P, T, false> cfg_dominators;
-  typedef typename cfg_dominators_templatet<P, T, false>::cfgt::nodet nodet;
+  using nodet = typename cfg_dominators_templatet<P, T, false>::cfgt::nodet;
 
   void compute(P &program);
   void compute_natural_loop(T, T);
@@ -66,8 +66,8 @@ class natural_loopst:
 {
 };
 
-typedef natural_loops_templatet<goto_programt, goto_programt::targett>
-    natural_loops_mutablet;
+using natural_loops_mutablet =
+  natural_loops_templatet<goto_programt, goto_programt::targett>;
 
 void show_natural_loops(
   const goto_modelt &,

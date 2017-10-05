@@ -84,7 +84,7 @@ void dump_ct::operator()(std::ostream &os)
   forall_symbols(it, symbols_transparent.symbols)
     copied_symbol_table.add(it->second);
 
-  typedef std::unordered_map<irep_idt, unsigned, irep_id_hash> unique_tagst;
+  using unique_tagst = std::unordered_map<irep_idt, unsigned, irep_id_hash>;
   unique_tagst unique_tags;
 
   // add tags to anonymous union/struct/enum,
@@ -810,7 +810,7 @@ void dump_ct::dump_typedefs(std::ostream &os) const
   // output
   std::map<std::string, typedef_infot> to_insert;
 
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
+  using id_sett = std::unordered_set<irep_idt, irep_id_hash>;
   id_sett typedefs_done;
   std::unordered_map<irep_idt, id_sett, irep_id_hash>
     forward_deps, reverse_deps;

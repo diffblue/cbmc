@@ -58,7 +58,7 @@ public:
 protected:
   const namespacet &ns;
 
-  typedef hash_numbering<irep_idt, irep_id_hash> mapt;
+  using mapt = hash_numbering<irep_idt, irep_id_hash>;
   mapt map;
 
   struct entryt
@@ -81,15 +81,15 @@ public:
   unsigned_union_find eq_set;
 
   // <=
-  typedef std::set<std::pair<unsigned, unsigned> > ineq_sett;
+  using ineq_sett = std::set<std::pair<unsigned, unsigned> >;
   ineq_sett le_set;
 
   // !=
   ineq_sett ne_set;
 
   // bounds
-  typedef interval_templatet<mp_integer> boundst;
-  typedef std::map<unsigned, boundst> bounds_mapt;
+  using boundst = interval_templatet<mp_integer>;
+  using bounds_mapt = std::map<unsigned, boundst>;
   bounds_mapt bounds_map;
 
   bool threaded;

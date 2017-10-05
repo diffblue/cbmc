@@ -114,7 +114,7 @@ public:
 
   // for INPUT/OUTPUT
   irep_idt format_string, io_id;
-  typedef std::list<exprt> io_argst;
+  using io_argst = std::list<exprt>;
   io_argst io_args;
   bool formatted;
 
@@ -151,7 +151,7 @@ public:
 class goto_tracet
 {
 public:
-  typedef std::list<goto_trace_stept> stepst;
+  using stepst = std::list<goto_trace_stept>;
   stepst steps;
 
   irep_idt mode;

@@ -174,8 +174,8 @@ protected:
   void find_symbols_rec(const typet &type, std::set<irep_idt> &recstack);
 
   // letification
-  typedef std::pair<unsigned, symbol_exprt> let_count_idt;
-  typedef std::unordered_map<exprt, let_count_idt, irep_hash> seen_expressionst;
+  using let_count_idt = std::pair<unsigned, symbol_exprt>;
+  using seen_expressionst = std::unordered_map<exprt, let_count_idt, irep_hash>;
   unsigned let_id_count;
   static const unsigned LET_COUNT=2;
 
@@ -274,14 +274,14 @@ protected:
     }
   };
 
-  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
-    identifier_mapt;
+  using identifier_mapt =
+    std::unordered_map<irep_idt, identifiert, irep_id_hash>;
 
   identifier_mapt identifier_map;
 
   // for modeling structs as Z3 datatype, enabled when
   // use_datatype is set
-  typedef std::map<typet, std::string> datatype_mapt;
+  using datatype_mapt = std::map<typet, std::string>;
   datatype_mapt datatype_map;
 
   // for replacing various defined expressions:
@@ -290,12 +290,12 @@ protected:
   // ID_array
   // ID_string_constant
 
-  typedef std::map<exprt, irep_idt> defined_expressionst;
+  using defined_expressionst = std::map<exprt, irep_idt>;
   defined_expressionst defined_expressions;
 
   defined_expressionst object_sizes;
 
-  typedef std::set<std::string> smt2_identifierst;
+  using smt2_identifierst = std::set<std::string>;
   smt2_identifierst smt2_identifiers;
 
   // Boolean part

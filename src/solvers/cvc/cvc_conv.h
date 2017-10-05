@@ -55,8 +55,8 @@ protected:
     }
   };
 
-  typedef std::unordered_map<irep_idt, identifiert, irep_id_hash>
-    identifier_mapt;
+  using identifier_mapt =
+    std::unordered_map<irep_idt, identifiert, irep_id_hash>;
 
   identifier_mapt identifier_map;
 

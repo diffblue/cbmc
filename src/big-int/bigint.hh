@@ -93,33 +93,33 @@ public:
   // twice the size of a digit, i.e. on twodig_t.
 #if defined __GNUG__ || defined __alpha// || defined __TenDRA__
   // Or other true 64 bit CPU.
-  typedef unsigned		onedig_t;
-  typedef unsigned long long	twodig_t;
+  using onedig_t = unsigned int;
+  using twodig_t = unsigned long long;
 #elif defined _MSC_VER // || defined __BORLANDC__ (works but is slower)
   // Like GCC's long long this __int64 actually performs better than
   // unsigned. Though not as much as is the case with gcc.
-  typedef unsigned		onedig_t;
-  typedef unsigned __int64	twodig_t;
+  using onedig_t = unsigned;
+  using twodig_t = unsigned __int64;
 #elif 1
   // Majority (currently) of 32 bit CPUs.
-  typedef unsigned short	onedig_t;
-  typedef unsigned		twodig_t;
+  using onedig_t = unsigned short;
+  using twodig_t = unsigned;
 #else
   // Works on 8/16 bit CPUs just as well.
-  typedef unsigned char		onedig_t;
-  typedef unsigned short	twodig_t;
+  using onedig_t = unsigned char;
+  using twodig_t = unsigned short;
 #endif
 
   // Choose largest integral type to use. Must be >= twodig_t.
 #if defined __GNUG__
-  typedef          long long	 llong_t;
-  typedef unsigned long long	ullong_t;
+  using llong_t = long long;
+  using ullong_t = unsigned long long;
 #elif defined _MSC_VER// || defined __BORLANDC__
-  typedef          __int64	 llong_t;
-  typedef unsigned __int64	ullong_t;
+  using llong_t = __int64;
+  using ullong_t = unsigned __int64;
 #else
-  typedef          long		 llong_t;
-  typedef unsigned long		ullong_t;
+  using llong_t = long;
+  using ullong_t = unsigned long;
 #endif
 
   // Maximum number of onedig_t digits which could also be represented

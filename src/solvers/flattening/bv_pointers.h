@@ -25,7 +25,7 @@ protected:
   pointer_logict pointer_logic;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef boolbvt SUB;
+  using SUB = boolbvt;
 
   unsigned object_bits, offset_bits, bits;
 
@@ -60,7 +60,7 @@ protected:
     exprt expr;
   };
 
-  typedef std::list<postponedt> postponed_listt;
+  using postponed_listt = std::list<postponedt>;
   postponed_listt postponed_list;
 
   void do_postponed(const postponedt &postponed);

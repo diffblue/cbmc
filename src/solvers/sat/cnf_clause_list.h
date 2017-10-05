@@ -40,7 +40,7 @@ public:
 
   virtual size_t no_clauses() const { return clauses.size(); }
 
-  typedef std::list<bvt> clausest;
+  using clausest = std::list<bvt>;
 
   clausest &get_clauses() { return clauses; }
 
@@ -82,7 +82,7 @@ protected:
 class cnf_clause_list_assignmentt:public cnf_clause_listt
 {
 public:
-  typedef std::vector<tvt> assignmentt;
+  using assignmentt = std::vector<tvt>;
 
   assignmentt &get_assignment()
   {

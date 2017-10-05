@@ -38,7 +38,7 @@ public:
   replace_symbolt object_type_updates;
 
 protected:
-  typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
+  using id_sett = std::unordered_set<irep_idt, irep_id_hash>;
 
   bool needs_renaming_type(
     const symbolt &old_symbol,
@@ -173,7 +173,7 @@ protected:
   namespacet ns;
 
   // X -> Y iff Y uses X for new symbol type IDs X and Y
-  typedef std::unordered_map<irep_idt, id_sett, irep_id_hash> used_byt;
+  using used_byt = std::unordered_map<irep_idt, id_sett, irep_id_hash>;
 
   irep_idt rename(irep_idt);
 

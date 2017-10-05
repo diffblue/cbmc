@@ -46,10 +46,10 @@ public:
   void output(std::ostream &out) const;
 
 protected:
-  typedef cfg_baset<empty_cfg_nodet> cfgt;
+  using cfgt = cfg_baset<empty_cfg_nodet>;
   cfgt cfg;
 
-  typedef std::map<object_idt, object_id_sett> value_mapt;
+  using value_mapt = std::map<object_idt, object_id_sett>;
   value_mapt value_map;
 
   void fixedpoint();

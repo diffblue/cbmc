@@ -185,7 +185,7 @@ void linkingt::detailed_conflict_report_rec(
         }
         else if(!base_type_eq(subtype1, subtype2, ns))
         {
-          typedef std::unordered_set<typet, irep_hash> type_sett;
+          using type_sett = std::unordered_set<typet, irep_hash>;
           type_sett parent_types;
 
           exprt e=conflict_path_before;
@@ -567,7 +567,7 @@ void linkingt::duplicate_code_symbol(
       // and see whether they can be cured
       std::string warn_msg;
       bool replace=false;
-      typedef std::deque<std::pair<typet, typet> > conflictst;
+      using conflictst = std::deque<std::pair<typet, typet>>;
       conflictst conflicts;
 
       if(!base_type_eq(old_t.return_type(), new_t.return_type(), ns))

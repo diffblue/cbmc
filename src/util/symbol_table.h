@@ -33,8 +33,8 @@ Author: Daniel Kroening, kroening@kroening.com
   for(symbol_tablet::symbolst::iterator it=(expr).begin(); \
       it!=(expr).end(); ++it)
 
-typedef std::multimap<irep_idt, irep_idt> symbol_base_mapt;
-typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
+using symbol_base_mapt = std::multimap<irep_idt, irep_idt>;
+using symbol_module_mapt = std::multimap<irep_idt, irep_idt>;
 
 #define forall_symbol_base_map(it, expr, base_name) \
   for(symbol_base_mapt::const_iterator it=(expr).lower_bound(base_name), \
@@ -52,7 +52,7 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
 class symbol_tablet
 {
 public:
-  typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
+  using symbolst = std::unordered_map<irep_idt, symbolt, irep_id_hash>;
 
   symbolst symbols;
   symbol_base_mapt symbol_base_map;

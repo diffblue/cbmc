@@ -47,11 +47,11 @@ public:
   {
   }
 
-  typedef java_bytecode_parse_treet::methodt methodt;
-  typedef java_bytecode_parse_treet::instructiont instructiont;
-  typedef methodt::instructionst instructionst;
-  typedef methodt::local_variable_tablet local_variable_tablet;
-  typedef methodt::local_variablet local_variablet;
+  using methodt = java_bytecode_parse_treet::methodt;
+  using instructiont = java_bytecode_parse_treet::instructiont;
+  using instructionst = methodt::instructionst;
+  using local_variable_tablet = methodt::local_variable_tablet;
+  using local_variablet = methodt::local_variablet;
 
   void operator()(const symbolt &class_symbol, const methodt &method)
   {
@@ -96,8 +96,8 @@ public:
     std::vector<holet> holes;
   };
 
-  typedef std::vector<local_variable_with_holest>
-    local_variable_table_with_holest;
+  using local_variable_table_with_holest =
+    std::vector<local_variable_with_holest>;
 
   class variablet
   {
@@ -111,7 +111,7 @@ public:
   };
 
 protected:
-  typedef std::vector<variablet> variablest;
+  using variablest = std::vector<variablet>;
   expanding_vectort<variablest> variables;
   std::set<symbol_exprt> used_local_names;
   bool method_has_this;
@@ -151,7 +151,7 @@ protected:
   irep_idt label(const irep_idt &address);
 
   // JVM Stack
-  typedef std::vector<exprt> stackt;
+  using stackt = std::vector<exprt>;
   stackt stack;
 
   exprt::operandst pop(std::size_t n);
@@ -187,10 +187,10 @@ protected:
   };
 
 public:
-  typedef std::map<unsigned, converted_instructiont> address_mapt;
-  typedef std::pair<const methodt &, const address_mapt &> method_with_amapt;
-  typedef cfg_dominators_templatet<method_with_amapt, unsigned, false>
-    java_cfg_dominatorst;
+  using address_mapt = std::map<unsigned, converted_instructiont>;
+  using method_with_amapt = std::pair<const methodt &, const address_mapt &>;
+  using java_cfg_dominatorst =
+    cfg_dominators_templatet<method_with_amapt, unsigned, false>;
 
 protected:
   void find_initializers(

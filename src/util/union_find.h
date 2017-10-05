@@ -23,7 +23,7 @@ class unsigned_union_find
 {
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef std::size_t size_type;
+  using size_type = std::size_t;
 
 protected:
   struct nodet
@@ -132,19 +132,19 @@ template <typename T>
 // NOLINTNEXTLINE(readability/identifiers)
 class union_find final
 {
-  typedef numbering<T> numbering_typet;
+  using numbering_typet = numbering<T>;
   numbering_typet numbers;
 
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::number_type number_type;
+  using number_type = typename numbering_typet::number_type;
 
 public:
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::size_type size_type;
+  using size_type = typename numbering_typet::size_type;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::iterator iterator;
+  using iterator = typename numbering_typet::iterator;
   // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename numbering_typet::const_iterator const_iterator;
+  using const_iterator = typename numbering_typet::const_iterator;
 
   // true == already in same set
   bool make_union(const T &a, const T &b)
@@ -279,7 +279,7 @@ public:
 
 protected:
   unsigned_union_find uuf;
-  typedef numbering<T> subt;
+  using subt = numbering<T>;
 };
 
 #endif // CPROVER_UTIL_UNION_FIND_H

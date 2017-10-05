@@ -22,7 +22,7 @@ Date: April 2016
 class class_hierarchyt
 {
 public:
-  typedef std::vector<irep_idt> idst;
+  using idst = std::vector<irep_idt>;
 
   class entryt
   {
@@ -30,7 +30,7 @@ public:
     idst parents, children;
   };
 
-  typedef std::map<irep_idt, entryt> class_mapt;
+  using class_mapt = std::map<irep_idt, entryt>;
   class_mapt class_map;
 
   void operator()(const symbol_tablet &);

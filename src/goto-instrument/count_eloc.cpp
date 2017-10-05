@@ -21,9 +21,9 @@ Date: December 2012
 
 #include <goto-programs/cfg.h>
 
-typedef std::unordered_set<irep_idt, irep_id_hash> linest;
-typedef std::unordered_map<irep_idt, linest, irep_id_hash> filest;
-typedef std::unordered_map<irep_idt, filest, irep_id_hash> working_dirst;
+using linest = std::unordered_set<irep_idt, irep_id_hash>;
+using filest = std::unordered_map<irep_idt, linest, irep_id_hash>;
+using working_dirst = std::unordered_map<irep_idt, filest, irep_id_hash>;
 
 static void collect_eloc(
   const goto_modelt &goto_model,
@@ -96,7 +96,7 @@ void print_path_lengths(const goto_modelt &goto_model)
     }
   };
 
-  typedef cfg_baset<visited_cfg_nodet> cfgt;
+  using cfgt = cfg_baset<visited_cfg_nodet>;
   cfgt cfg;
   cfg(goto_model.goto_functions);
 

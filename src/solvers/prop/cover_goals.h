@@ -45,7 +45,7 @@ public:
     }
   };
 
-  typedef std::list<goalt> goalst;
+  using goalst = std::list<goalt>;
   goalst goals;
 
   // statistics
@@ -93,7 +93,7 @@ protected:
   unsigned _iterations;
   prop_convt &prop_conv;
 
-  typedef std::vector<observert *> observerst;
+  using observerst = std::vector<observert *>;
   observerst observers;
 
 private:

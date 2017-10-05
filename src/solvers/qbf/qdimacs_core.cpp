@@ -15,7 +15,7 @@ void qdimacs_coret::simplify_extractbits(exprt &expr) const
 {
   if(expr.id()==ID_and)
   {
-    typedef std::map<exprt, std::set<exprt> > used_bits_mapt;
+    using used_bits_mapt = std::map<exprt, std::set<exprt> >;
     used_bits_mapt used_bits_map;
 
     forall_operands(it, expr)

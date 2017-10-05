@@ -29,16 +29,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #endif
 
 #ifdef USE_DSTRING
-typedef dstringt irep_idt;
-typedef dstringt irep_namet;
+using irep_idt = dstringt;
+using irep_namet = dstringt;
 // NOLINTNEXTLINE(readability/identifiers)
-typedef dstring_hash irep_id_hash;
+using irep_id_hash = dstring_hash;
 #else
 #include "string_hash.h"
-typedef std::string irep_idt;
-typedef std::string irep_namet;
+using irep_idt = std::string;
+using irep_namet = std::string;
 // NOLINTNEXTLINE(readability/identifiers)
-typedef string_hash irep_id_hash;
+using irep_id_hash = string_hash;
 #endif
 
 inline const std::string &id2string(const irep_idt &d)
@@ -88,16 +88,16 @@ class irept
 {
 public:
   // These are not stable.
-  typedef std::vector<irept> subt;
+  using subt = std::vector<irept>;
 
   // named_subt has to provide stable references; with C++11 we could
   // use std::forward_list or std::vector< unique_ptr<T> > to save
   // memory and increase efficiency.
 
   #ifdef SUB_IS_LIST
-  typedef std::list<std::pair<irep_namet, irept> > named_subt;
+  using named_subt = std::list<std::pair<irep_namet, irept> >;
   #else
-  typedef std::map<irep_namet, irept> named_subt;
+  using named_subt = std::map<irep_namet, irept>;
   #endif
 
   bool is_nil() const { return id()==ID_nil; }

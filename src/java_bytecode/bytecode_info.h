@@ -52,13 +52,13 @@ struct bytecode_infot
 
 extern struct bytecode_infot const bytecode_info[];
 
-typedef uint8_t  u1; // NOLINT(readability/identifiers)
-typedef uint16_t u2; // NOLINT(readability/identifiers)
-typedef uint32_t u4; // NOLINT(readability/identifiers)
-typedef uint64_t u8; // NOLINT(readability/identifiers)
-typedef int8_t  s1; // NOLINT(readability/identifiers)
-typedef int16_t s2; // NOLINT(readability/identifiers)
-typedef int32_t s4; // NOLINT(readability/identifiers)
-typedef int64_t s8; // NOLINT(readability/identifiers)
+using u1 = uint8_t ; // NOLINT(readability/identifiers)
+using u2 = uint16_t; // NOLINT(readability/identifiers)
+using u4 = uint32_t; // NOLINT(readability/identifiers)
+using u8 = uint64_t; // NOLINT(readability/identifiers)
+using s1 = int8_t ; // NOLINT(readability/identifiers)
+using s2 = int16_t; // NOLINT(readability/identifiers)
+using s4 = int32_t; // NOLINT(readability/identifiers)
+using s8 = int64_t; // NOLINT(readability/identifiers)
 
 #endif // CPROVER_JAVA_BYTECODE_BYTECODE_INFO_H

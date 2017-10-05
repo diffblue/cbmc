@@ -27,8 +27,8 @@ public:
     current_scope_ptr=&root_scope;
   }
 
-  typedef std::set<cpp_scopet *> scope_sett;
-  typedef std::set<cpp_idt *> id_sett;
+  using scope_sett = std::set<cpp_scopet *>;
+  using id_sett = std::set<cpp_idt *>;
 
   cpp_scopet &current_scope()
   {
@@ -65,7 +65,7 @@ public:
   }
 
   // mapping from function/class/scope names to their cpp_idt
-  typedef std::unordered_map<irep_idt, cpp_idt *, irep_id_hash> id_mapt;
+  using id_mapt = std::unordered_map<irep_idt, cpp_idt *, irep_id_hash>;
   id_mapt id_map;
 
   cpp_scopet *current_scope_ptr;

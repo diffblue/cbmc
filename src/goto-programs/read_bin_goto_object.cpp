@@ -88,9 +88,9 @@ bool read_bin_goto_object_v3(
     irep_idt fname=irepconverter.read_gb_string(in);
     goto_functionst::goto_functiont &f = functions.function_map[fname];
 
-    typedef std::map<goto_programt::targett, std::list<unsigned> > target_mapt;
+    using target_mapt = std::map<goto_programt::targett, std::list<unsigned>>;
     target_mapt target_map;
-    typedef std::map<unsigned, goto_programt::targett> rev_target_mapt;
+    using rev_target_mapt = std::map<unsigned, goto_programt::targett>;
     rev_target_mapt rev_target_map;
 
     bool hidden=false;

@@ -60,7 +60,7 @@ protected:
 
   unsigned cost(const event_grapht::critical_cyclet::delayt &e);
 
-  typedef std::set<event_grapht::critical_cyclet> set_of_cyclest;
+  using set_of_cyclest = std::set<event_grapht::critical_cyclet>;
   void inline instrument_all_inserter(
     const set_of_cyclest &set);
   void inline instrument_one_event_per_cycle_inserter(
@@ -84,7 +84,7 @@ protected:
     memory_modelt model,
     bool hide_internals);
 
-  typedef std::set<goto_programt::instructiont::targett> target_sett;
+  using target_sett = std::set<goto_programt::instructiont::targett>;
 
   class cfg_visitort
   {
@@ -160,8 +160,8 @@ protected:
     unsigned max_thread;
 
     /* relations between irep and Reads/Writes */
-    typedef std::multimap<irep_idt, event_idt> id2nodet;
-    typedef std::pair<irep_idt, event_idt> id2node_pairt;
+    using id2nodet = std::multimap<irep_idt, event_idt>;
+    using id2node_pairt = std::pair<irep_idt, event_idt>;
     id2nodet map_reads, map_writes;
 
     unsigned write_counter;
@@ -170,9 +170,9 @@ protected:
     unsigned fr_rf_counter;
 
     /* previous nodes (fwd analysis) */
-    typedef std::pair<event_idt, event_idt> nodet;
-    typedef std::map<goto_programt::const_targett, std::set<nodet> >
-      incoming_post;
+    using nodet = std::pair<event_idt, event_idt>;
+    using incoming_post =
+      std::map<goto_programt::const_targett, std::set<nodet>>;
 
     incoming_post in_pos;
     std::set<goto_programt::const_targett> updated;
@@ -293,8 +293,8 @@ public:
 
   /* map from function to begin and end of the corresponding part of the
      graph */
-  typedef std::map<irep_idt, std::pair<std::set<event_idt>,
-    std::set<event_idt> > > map_function_nodest;
+  using map_function_nodest =
+    std::map<irep_idt, std::pair<std::set<event_idt>, std::set<event_idt>>>;
   map_function_nodest map_function_graph;
 
   void print_map_function_graph() const

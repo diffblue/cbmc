@@ -77,9 +77,9 @@ Date:   December 2016
 /// present, so a remove_instanceof may be necessary after it completes.
 class remove_exceptionst
 {
-  typedef std::vector<std::pair<
-    irep_idt, goto_programt::targett>> catch_handlerst;
-  typedef std::vector<catch_handlerst> stack_catcht;
+  using catch_handlerst =
+    std::vector<std::pair<irep_idt, goto_programt::targett>>;
+  using stack_catcht = std::vector<catch_handlerst>;
 
 public:
   explicit remove_exceptionst(

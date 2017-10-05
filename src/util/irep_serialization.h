@@ -31,17 +31,17 @@ public:
   class ireps_containert
   {
   public:
-    typedef std::vector<std::pair<bool, irept> > ireps_on_readt;
+    using ireps_on_readt = std::vector<std::pair<bool, irept> >;
     ireps_on_readt ireps_on_read;
 
     irep_full_hash_containert irep_full_hash_container;
-    typedef std::map<unsigned, size_t> ireps_on_writet;
+    using ireps_on_writet = std::map<unsigned, size_t>;
     ireps_on_writet ireps_on_write;
 
-    typedef std::vector<bool> string_mapt;
+    using string_mapt = std::vector<bool>;
     string_mapt string_map;
 
-    typedef std::vector<std::pair<bool, irep_idt> > string_rev_mapt;
+    using string_rev_mapt = std::vector<std::pair<bool, irep_idt> >;
     string_rev_mapt string_rev_map;
 
     void clear()

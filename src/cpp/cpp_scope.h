@@ -25,7 +25,7 @@ public:
     is_scope=true;
   }
 
-  typedef std::set<cpp_idt *> id_sett;
+  using id_sett = std::set<cpp_idt *>;
 
   enum lookup_kindt { SCOPE_ONLY, QUALIFIED, RECURSIVE };
 
