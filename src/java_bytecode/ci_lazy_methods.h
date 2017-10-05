@@ -13,6 +13,7 @@
 #define CPROVER_JAVA_BYTECODE_GATHER_METHODS_LAZILY_H
 
 #include <map>
+#include <unordered_set>
 #include <functional>
 
 #include <util/irep.h>
@@ -90,7 +91,7 @@ private:
   void gather_needed_globals(
     const exprt &e,
     const symbol_tablet &symbol_table,
-    symbol_tablet &needed);
+    std::unordered_set<irep_idt, irep_id_hash> &unreachable);
 
   void gather_field_types(const typet &class_type,
     const namespacet &ns,
