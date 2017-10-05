@@ -174,9 +174,7 @@ void string_abstractiont::add_str_arguments(
     const irep_idt &name,
     goto_functionst::goto_functiont &fct)
 {
-  symbol_tablet::symbolst::iterator sym_entry=symbol_table.symbols.find(name);
-  assert(sym_entry!=symbol_table.symbols.end());
-  symbolt &fct_symbol=sym_entry->second;
+  symbolt &fct_symbol=*symbol_table.get_writeable(name);
 
   code_typet::parameterst &parameters=
     to_code_type(fct.type).parameters();
@@ -234,7 +232,7 @@ void string_abstractiont::add_argument(
   new_symbol.mode=fct_symbol.mode;
   new_symbol.pretty_name=str_args.back().get_base_name();
 
-  symbol_table.move(new_symbol);
+  symbol_table.insert(std::move(new_symbol));
 }
 
 void string_abstractiont::abstract(goto_programt &dest)
@@ -453,7 +451,7 @@ symbol_exprt string_abstractiont::add_dummy_symbol_and_value(
     assignment1->code.add_source_location()=ref_instr->source_location;
   }
 
-  symbol_table.move(new_symbol);
+  symbol_table.insert(std::move(new_symbol));
 
   return sym_expr;
 }
@@ -937,7 +935,7 @@ exprt string_abstractiont::build_unknown(const typet &type, bool write)
   new_symbol.mode=ID_C;
   new_symbol.pretty_name=identifier;
 
-  symbol_table.move(new_symbol);
+  symbol_table.insert(std::move(new_symbol));
 
   return ns.lookup(identifier).symbol_expr();
 }
@@ -989,7 +987,7 @@ void string_abstractiont::build_new_symbol(const symbolt &symbol,
   new_symbol.is_static_lifetime=symbol.is_static_lifetime;
   new_symbol.is_thread_local=symbol.is_thread_local;
 
-  symbol_table.move(new_symbol);
+  symbol_table.insert(std::move(new_symbol));
 
   if(symbol.is_static_lifetime)
   {
@@ -1037,7 +1035,7 @@ bool string_abstractiont::build_symbol_constant(
       assignment1->code=code_assignt(new_symbol.symbol_expr(), value);
     }
 
-    symbol_table.move(new_symbol);
+    symbol_table.insert(std::move(new_symbol));
   }
 
   dest=address_of_exprt(symbol_exprt(identifier, string_struct));

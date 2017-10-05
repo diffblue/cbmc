@@ -68,7 +68,7 @@ exprt remove_const_function_pointerst::replace_const_symbols(
     if(is_const_expression(expression))
     {
       const symbolt &symbol=
-        symbol_table.lookup(expression.get(ID_identifier));
+        *symbol_table.lookup(expression.get(ID_identifier));
       if(symbol.type.id()!=ID_code)
       {
         const exprt &symbol_value=symbol.value;
@@ -105,7 +105,7 @@ exprt remove_const_function_pointerst::resolve_symbol(
   const symbol_exprt &symbol_expr) const
 {
   const symbolt &symbol=
-    symbol_table.lookup(symbol_expr.get_identifier());
+    *symbol_table.lookup(symbol_expr.get_identifier());
   return symbol.value;
 }
 

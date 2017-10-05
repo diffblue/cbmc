@@ -178,7 +178,7 @@ exprt value_set_dereferencet::dereference(
       failure_value=symbol.symbol_expr();
       failure_value.set(ID_C_invalid_object, true);
 
-      new_symbol_table.move(symbol);
+      new_symbol_table.insert(std::move(symbol));
     }
 
     valuet value;

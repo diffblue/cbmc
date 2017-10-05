@@ -38,7 +38,7 @@ symbol_exprt add_stack_depth_symbol(symbol_tablet &symbol_table)
   new_symbol.is_thread_local=true;
   new_symbol.is_lvalue=true;
 
-  symbol_table.move(new_symbol);
+  symbol_table.insert(std::move(new_symbol));
 
   return symbol_exprt(identifier, type);
 }

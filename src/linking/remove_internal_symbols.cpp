@@ -61,15 +61,16 @@ void get_symbols_rec(
   }
 }
 
-/// A symbol is EXPORTED if it is a * non-static function with body that is not
-/// extern inline * symbol used in an EXPORTED symbol * type used in an EXPORTED
-/// symbol
+/// Removes internal symbols from a symbol table
+/// A symbol is EXPORTED if it is a
+/// * non-static function with body that is not extern inline
+/// * symbol used in an EXPORTED symbol
+/// * type used in an EXPORTED symbol
 ///
 ///          Read
 ///          http://gcc.gnu.org/ml/gcc/2006-11/msg00006.html
 ///          on "extern inline"
-/// \par parameters: symbol table
-/// \return symbol table, with internal symbols removed
+/// \param symbol_table: symbol table to clean up
 void remove_internal_symbols(
   symbol_tablet &symbol_table)
 {
@@ -148,16 +149,15 @@ void remove_internal_symbols(
   }
 
   // remove all that are _not_ exported!
-  for(symbol_tablet::symbolst::iterator
+  for(symbol_tablet::symbolst::const_iterator
       it=symbol_table.symbols.begin();
       it!=symbol_table.symbols.end();
       ) // no it++
   {
     if(exported.find(it->first)==exported.end())
     {
-      symbol_tablet::symbolst::iterator next=it;
-      ++next;
-      symbol_table.symbols.erase(it);
+      symbol_tablet::symbolst::const_iterator next=std::next(it);
+      symbol_table.erase(it);
       it=next;
     }
     else

@@ -54,7 +54,7 @@ symbol_tablet load_java_class(
   // Verify that the class was loaded
   const std::string class_symbol_name="java::"+java_class_name;
   REQUIRE(new_symbol_table.has_symbol(class_symbol_name));
-  const symbolt &class_symbol=new_symbol_table.lookup(class_symbol_name);
+  const symbolt &class_symbol=*new_symbol_table.lookup(class_symbol_name);
   REQUIRE(class_symbol.is_type);
   const typet &class_type=class_symbol.type;
   REQUIRE(class_type.id()==ID_struct);

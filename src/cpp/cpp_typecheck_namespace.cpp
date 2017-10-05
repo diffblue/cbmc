@@ -73,7 +73,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
     symbol.module=module;
     symbol.type=typet(ID_namespace);
 
-    if(symbol_table.move(symbol))
+    if(!symbol_table.insert(std::move(symbol)).second)
     {
       error().source_location=symbol.location;
       error() << "cpp_typecheckt::convert_namespace: symbol_table.move() failed"

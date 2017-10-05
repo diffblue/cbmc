@@ -134,10 +134,10 @@ void remove_exceptionst::add_exceptional_returns(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  INVARIANT(
-    symbol_table.has_symbol(function_id),
-    "functions should be recorded in the symbol table");
-  const symbolt &function_symbol=symbol_table.lookup(function_id);
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(function_id);
+  INVARIANT(maybe_symbol, "functions should be recorded in the symbol table");
+  const symbolt &function_symbol=*maybe_symbol;
 
   // for now only add exceptional returns for Java
   if(function_symbol.mode!=ID_java)
@@ -148,10 +148,10 @@ void remove_exceptionst::add_exceptional_returns(
 
   // some methods (e.g. the entry method) have already been added to
   // the symbol table; if you find it, initialise it
-  if(symbol_table.has_symbol(id2string(function_id)+EXC_SUFFIX))
+  maybe_symbol=symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+  if(maybe_symbol)
   {
-    const symbolt &symbol=
-      symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    const symbolt &symbol=*maybe_symbol;
     symbol_exprt lhs_expr_null=symbol.symbol_expr();
     null_pointer_exprt rhs_expr_null((pointer_type(empty_typet())));
     goto_programt::targett t_null=
@@ -200,7 +200,7 @@ void remove_exceptionst::add_exceptional_returns(
        || has_uncaught_exceptions)
     {
       // look up the function symbol
-      symbol_tablet::symbolst::iterator s_it=
+      symbol_tablet::symbolst::const_iterator s_it=
         symbol_table.symbols.find(function_id);
 
       INVARIANT(
@@ -255,10 +255,11 @@ void remove_exceptionst::instrument_exception_handler(
     to_code_landingpad(instr_it->code).catch_expr();
   irep_idt thrown_exception_global=id2string(function_id)+EXC_SUFFIX;
 
-  if(symbol_table.has_symbol(thrown_exception_global))
+  symbol_tablet::opt_const_symbol_reft maybe_symbol=
+    symbol_table.lookup(thrown_exception_global);
+  if(maybe_symbol)
   {
-    const symbol_exprt thrown_global_symbol=
-      symbol_table.lookup(thrown_exception_global).symbol_expr();
+    const symbol_exprt thrown_global_symbol=maybe_symbol->get().symbol_expr();
     // next we reset the exceptional return to NULL
     null_pointer_exprt null_voidptr((pointer_type(empty_typet())));
 
@@ -314,7 +315,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
   // find the symbol corresponding to the caught exceptions
   const symbolt &exc_symbol=
-    symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    *symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add GOTOs implementing the dynamic dispatch of the
@@ -389,7 +390,7 @@ void remove_exceptionst::instrument_throw(
 
   // find the symbol where the thrown exception should be stored:
   const symbolt &exc_symbol=
-        symbol_table.lookup(id2string(func_it->first)+EXC_SUFFIX);
+    *symbol_table.lookup(id2string(func_it->first)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add the assignment with the appropriate cast
@@ -424,19 +425,20 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  const irep_idt &callee_inflight_exception=id2string(callee_id)+EXC_SUFFIX;
-  const irep_idt &local_inflight_exception=id2string(function_id)+EXC_SUFFIX;
+  symbol_tablet::opt_const_symbol_reft callee_inflight_exception=
+    symbol_table.lookup(id2string(callee_id)+EXC_SUFFIX);
+  symbol_tablet::opt_const_symbol_reft local_inflight_exception=
+    symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
 
-  if(symbol_table.has_symbol(callee_inflight_exception) &&
-     symbol_table.has_symbol(local_inflight_exception))
+  if(callee_inflight_exception && local_inflight_exception)
   {
     add_exception_dispatch_sequence(
       func_it, instr_it, stack_catch, locals);
 
     const symbol_exprt callee_inflight_exception_expr=
-      symbol_table.lookup(callee_inflight_exception).symbol_expr();
+      callee_inflight_exception->get().symbol_expr();
     const symbol_exprt local_inflight_exception_expr=
-      symbol_table.lookup(local_inflight_exception).symbol_expr();
+      local_inflight_exception->get().symbol_expr();
 
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(

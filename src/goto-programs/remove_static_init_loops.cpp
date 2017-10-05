@@ -58,21 +58,23 @@ void remove_static_init_loopst::unwind_enum_static(
         const std::string &fname=id2string(ins.function);
         size_t class_prefix_length=fname.find_last_of('.');
         // is the function symbol in the symbol table?
-        if(!symbol_table.has_symbol(ins.function))
+        symbol_tablet::opt_const_symbol_reft maybe_symbol=
+          symbol_table.lookup(ins.function);
+        if(!maybe_symbol)
         {
           message.warning() << "function `" << id2string(ins.function)
                             << "` is not in symbol table" << messaget::eom;
           continue;
         }
         // is Java function and static init?
-        const symbolt &function_name=symbol_table.lookup(ins.function);
+        const symbolt &function_name=*maybe_symbol;
         if(!(function_name.mode==ID_java && has_suffix(fname, java_clinit)))
           continue;
         assert(
           class_prefix_length!=std::string::npos &&
           "could not identify class name");
         const std::string &classname=fname.substr(0, class_prefix_length);
-        const symbolt &class_symbol=symbol_table.lookup(classname);
+        const symbolt &class_symbol=*symbol_table.lookup(classname);
         const class_typet &class_type=to_class_type(class_symbol.type);
         size_t unwinds=class_type.get_size_t(ID_java_enum_static_unwind);
 

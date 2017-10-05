@@ -151,9 +151,9 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
   disable_access_control = true;
 
-  for(const auto &d_it : dynamic_initializations)
+  for(const irep_idt &d_it : dynamic_initializations)
   {
-    symbolt &symbol=symbol_table.symbols.find(d_it)->second;
+    const symbolt &symbol=*symbol_table.lookup(d_it);
 
     if(symbol.is_extern)
       continue;
@@ -178,7 +178,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
 
       // Make it nil to get zero initialization by
       // __CPROVER_initialize
-      symbol.value.make_nil();
+      symbol_table.get_writeable(d_it)->get().value.make_nil();
     }
     else
     {
@@ -210,7 +210,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
   init_symbol.is_type=false;
   init_symbol.is_macro=false;
 
-  symbol_table.move(init_symbol);
+  symbol_table.insert(std::move(init_symbol));
 
   disable_access_control=false;
 }
@@ -223,14 +223,15 @@ void cpp_typecheckt::do_not_typechecked()
   {
     cont = false;
 
-    Forall_symbols(s_it, symbol_table.symbols)
+    for(const auto &named_symbol : symbol_table.symbols)
     {
-      symbolt &symbol=s_it->second;
+      const symbolt &symbol=named_symbol.second;
 
       if(symbol.value.id()=="cpp_not_typechecked" &&
          symbol.value.get_bool("is_used"))
       {
         assert(symbol.type.id()==ID_code);
+        symbolt &symbol=*symbol_table.get_writeable(named_symbol.first);
 
         if(symbol.base_name=="operator=")
         {
@@ -256,37 +257,36 @@ void cpp_typecheckt::do_not_typechecked()
   }
   while(cont);
 
-  Forall_symbols(s_it, symbol_table.symbols)
+  for(const auto &named_symbol : symbol_table.symbols)
   {
-    symbolt &symbol=s_it->second;
-    if(symbol.value.id()=="cpp_not_typechecked")
-      symbol.value.make_nil();
+    if(named_symbol.second.value.id()=="cpp_not_typechecked")
+      symbol_table.get_writeable(named_symbol.first)->get().value.make_nil();
   }
 }
 
 void cpp_typecheckt::clean_up()
 {
-  symbol_tablet::symbolst::iterator it=symbol_table.symbols.begin();
+  symbol_tablet::symbolst::const_iterator it=symbol_table.symbols.begin();
 
   while(it!=symbol_table.symbols.end())
   {
-    symbol_tablet::symbolst::iterator cur_it = it;
+    symbol_tablet::symbolst::const_iterator cur_it = it;
     it++;
 
-    symbolt &symbol = cur_it->second;
+    const symbolt &symbol=cur_it->second;
 
     // erase templates
     if(symbol.type.get_bool(ID_is_template))
     {
-      symbol_table.symbols.erase(cur_it);
+      symbol_table.erase(cur_it);
       continue;
     }
     else if(symbol.type.id()==ID_struct ||
             symbol.type.id()==ID_union)
     {
       // remove methods from 'components'
-      struct_union_typet &struct_union_type=
-        to_struct_union_type(symbol.type);
+      struct_union_typet &struct_union_type=to_struct_union_type(
+        symbol_table.get_writeable(cur_it->first)->get().type);
 
       const struct_union_typet::componentst &components=
         struct_union_type.components();
