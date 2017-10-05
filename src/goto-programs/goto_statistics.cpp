@@ -15,6 +15,8 @@ void goto_statisticst::extend(
 {
   for(auto const &elem : functions.function_map)
   {
+    if(!elem.second.body_available())
+      continue;
     for(const auto &instr : elem.second.body.instructions)
     {
       switch(instr.type)
