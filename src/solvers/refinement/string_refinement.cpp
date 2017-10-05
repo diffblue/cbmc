@@ -42,6 +42,22 @@ static optionalt<exprt> find_counter_example(
   const exprt &axiom,
   const symbol_exprt &var);
 
+/// Check axioms takes the model given by the underlying solver and answers
+/// whether it satisfies the string constraints.
+///
+/// For each string_constraint `a`:
+///   * the negation of `a` is an existential formula `b`;
+///   * we substituted symbols in `b` by their values found in `get`;
+///   * arrays are concretized, meaning we attribute a value for characters that
+///     are unknown to get, for details see concretize_arrays_in_expression;
+///   * `b` is simplified and array accesses are replaced by expressions
+///     without arrays;
+///   * we give lemma `b` to a fresh solver;
+///   * if no counter-example to `b` is found, this means the constraint `a`
+///     is satisfied by the valuation given by get.
+/// \return `true` if the current model satisfies all the axioms,
+///         `false` otherwise with a list of lemmas which are obtained by
+///         instantiating constraints at indexes given by counter-examples.
 static std::pair<bool, std::vector<exprt>> check_axioms(
   const string_axiomst &axioms,
   string_constraint_generatort &generator,
@@ -80,6 +96,16 @@ static void update_index_set(
   const namespacet &ns,
   const exprt &formula);
 
+/// Substitute `qvar` the universally quantified variable of `axiom`, by
+/// an index `val`, in `axiom`, so that the index used for `str` equals `val`.
+/// For instance, if `axiom` corresponds to \f$\forall q.\ s[q+x]='a' \land
+/// t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
+/// \f$s[v]='a' \land t[v-x]='b'\f$.
+/// \param stream: output stream
+/// \param axiom: a universally quantified formula
+/// \param str: an array of char variable
+/// \param val: an index expression
+/// \return `axiom` with substitued `qvar`
 static exprt instantiate(
   messaget::mstreamt &stream,
   const string_constraintt &axiom,
@@ -100,7 +126,8 @@ static optionalt<exprt> get_array(
 
 /// Convert index-value map to a vector of values. If a value for an
 /// index is not defined, set it to the value referenced by the next higher
-/// index. The length of the resulting vector is the key of the map's
+/// index.
+/// The length of the resulting vector is the key of the map's
 /// last element + 1
 /// \param index_value: map containing values of specific vector cells
 /// \return Vector containing values as described in the map
@@ -127,7 +154,6 @@ static std::vector<T> fill_in_map_as_vector(
   }
   return result;
 }
-
 
 static bool validate(const string_refinementt::infot &info)
 {
@@ -176,6 +202,26 @@ static void display_index_set(
          << " newly added)" << eom;
 }
 
+/// Instantiation of all constraints
+///
+/// The string refinement decision procedure works with two types of quantified
+/// axioms, which are of the form \f$\forall x.\ P(x)\f$ (`string_constraintt`)
+/// or of the form
+/// \f$\forall x. P(x) \Rightarrow \exists y .s_0[x+y] \ne s_1[y] \f$
+/// (`string_not_contains_constraintt`).
+/// They are instantiated in a way which depends on their form:
+///   * For formulas of the form \f$\forall x.\ P(x)\f$ if string `str`
+///     appears in `P` indexed by some `f(x)` and `val` is in
+///     the index set of `str` we find `y` such that `f(y)=val` and
+///     add lemma `P(y)`.
+///     (See
+///     `instantiate(messaget::mstreamt&,const string_constraintt&,const exprt &,const exprt&)`
+///      for details)
+///   * For formulas of the form
+///     \f$\forall x. P(x) \Rightarrow \exists y .s_0[x+y] \ne s_1[y]) \f$ we
+///     need to look at the index set of both `s_0` and `s_1`.
+///     (See `instantiate(const string_not_contains_constraintt &axiom)`
+///      for details)
 static std::vector<exprt> generate_instantiations(
   messaget::mstreamt &stream,
   const namespacet &ns,
@@ -309,9 +355,10 @@ void replace_symbols_in_equations(
     symbol_resolve.replace_expr(eq);
 }
 
-/// Add equation to `m_equation_list` or give them to `supert::set_to`
-/// \param expr: an expression
-/// \param value: the value to set it to
+/// Record the constraints to ensure that the expression is true when
+/// the boolean is true and false otherwise.
+/// \param expr: an expression of type `bool`
+/// \param value: the boolean value to set it to
 void string_refinementt::set_to(const exprt &expr, bool value)
 {
   PRECONDITION(expr.type().id()==ID_bool);
@@ -410,9 +457,67 @@ void output_equations(
            << " == " << from_expr(ns, "", eq.rhs()) << std::endl;
 }
 
-/// use a refinement loop to instantiate universal axioms, call the sat solver,
-/// and instantiate more indexes if needed.
-/// \return result of the decision procedure
+/// Main decision procedure of the solver. Looks for a valuation of variables
+/// compatible with the constraints that have been given to `set_to` so far.
+///
+/// The decision procedure initiated by string_refinementt::dec_solve is
+/// composed of several steps detailed below.
+///
+/// ## Symbol resolution
+/// Pointer symbols which are set to be equal by constraints, are replaced by
+/// an single symbol in the solver. The `symbol_solvert` object used for this
+/// substitution is constructed by
+/// `generate_symbol_resolution_from_equations(const std::vector<equal_exprt>&,const namespacet&,messaget::mstreamt&)`.
+/// All these symbols are then replaced using
+/// `replace_symbols_in_equations(const union_find_replacet &, std::vector<equal_exprt> &)`.
+///
+/// ## Conversion to first order formulas:
+/// Each string primitive is converted to a list of first order formulas by the
+/// function `substitute_function_applications_in_equations(std::vector<equal_exprt>&,string_constraint_generatort&)`.
+/// These formulas should be unquantified or be either a `string_constraintt`
+/// or a `string_not_contains_constraintt`.
+/// The constraints corresponding to each primitive can be found by following
+/// the links in section \ref primitives.
+///
+/// Since only arrays appear in the string constraints, during the conversion to
+/// first order formulas, pointers are associated to arrays.
+/// The `string_constraint_generatort` object keeps track of this association.
+/// It can either be set manually using the primitives
+/// `cprover_associate_array_to_pointer` or a fresh array is created.
+///
+/// ## Refinement loop
+/// We use `super_dec_solve` and `super_get` to denote the methods of the
+/// underlying solver (`bv_refinementt` by default).
+/// The refinement loop relies on functions `string_refinementt::check_axioms`
+/// which returns true when the set of quantified constraints `q` is satisfied
+/// by the valuation given by`super_get` and
+/// `string_refinementt::instantiate` which gives propositional formulas
+/// implied by a string constraint.
+/// If the following algorithm returns `SAT` or `UNSAT`, the given constraints
+/// are `SAT` or `UNSAT` respectively:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// is_SAT(unquantified_constraints uq, quantified_constraints q)
+/// {
+///   cur <- uq;
+///   while(limit--) > 0
+///   {
+///     if(super_dec_solve(cur)==SAT)
+///     {
+///       if(check_axioms(q, super_get))
+///       else
+///         for(axiom in q)
+///           cur.add(instantiate(axiom));
+///         return SAT;
+///     }
+///     else
+///       return UNSAT;
+///   }
+///   return ERROR;
+/// }
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \return `resultt::D_SATISFIABLE` if the constraints are satisfiable,
+///   `resultt::D_UNSATISFIABLE` if they are unsatisfiable,
+///   `resultt::D_ERROR` if the limit of iteration was reached.
 decision_proceduret::resultt string_refinementt::dec_solve()
 {
 #ifdef DEBUG
@@ -1403,7 +1508,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   return { false, std::vector<exprt>() };
 }
 
-/// \par parameters: an expression with only addition and subtraction
+/// \param f: an expression with only addition and subtraction
 /// \return a map where each leaf of the input is mapped to the number of times
 ///   it is added. For instance, expression $x + x - y$ would give the map x ->
 ///   2, y -> -1.
@@ -1445,7 +1550,9 @@ static std::map<exprt, int> map_representation_of_sum(const exprt &f)
   return elems;
 }
 
-/// \par parameters: a map from expressions to integers
+/// \param m: a map from expressions to integers
+/// \param type: type for the returned expression
+/// \param negated: optinal Boolean asking to negates the sum
 /// \return a expression for the sum of each element in the map a number of
 ///   times given by the corresponding integer in the map. For a map x -> 2, y
 ///   -> -1 would give an expression $x + x - y$.
@@ -1520,7 +1627,7 @@ static exprt sum_over_map(
     return index_const;
 }
 
-/// \par parameters: an expression with only plus and minus expr
+/// \param f: an expression with only plus and minus expr
 /// \return an equivalent expression in a canonical form
 exprt simplify_sum(const exprt &f)
 {
@@ -1528,13 +1635,16 @@ exprt simplify_sum(const exprt &f)
   return sum_over_map(map, f.type());
 }
 
-/// \par parameters: a symbol qvar, an expression val, an expression f
-///   containing + and −
-/// operations in which qvar should appear exactly once.
-/// \return an expression corresponding of $f^{−1}(val)$ where $f$ is seen as
-///   a function of $qvar$, i.e. the value that is necessary for qvar for f to
-///   be equal to val. For instance, if `f` corresponds to the expression $q +
-///   x$, `compute_inverse_function(q,v,f)` returns an expression for $v - x$.
+/// \param stream: an output stream
+/// \param qvar: a symbol representing a universally quantified variable
+/// \param val: an expression
+/// \param f: an expression containing `+` and `-`
+/// operations in which `qvar` should appear exactly once.
+/// \return an expression corresponding of $f^{-1}(val)$ where $f$ is seen as
+///   a function of $qvar$, i.e. the value that is necessary for `qvar` for `f`
+///   to be equal to `val`. For instance, if `f` corresponds to the expression
+///   $q + x$, `compute_inverse_function(q,v,f)` returns an expression
+///   for $v - x$.
 static exprt compute_inverse_function(
   messaget::mstreamt &stream,
   const exprt &qvar,
@@ -1593,7 +1703,8 @@ public:
 };
 
 /// look for the symbol and return true if it is found
-/// \par parameters: an index expression and a symbol qvar
+/// \param index: an index expression
+/// \param qvar: a symbol expression
 /// \return a Boolean
 static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
 {
@@ -1602,9 +1713,11 @@ static bool find_qvar(const exprt &index, const symbol_exprt &qvar)
   return v2.found;
 }
 
-/// add to the index set all the indices that appear in the formulas and the
-/// upper bound minus one
-/// \par parameters: a list of string constraints
+/// Add to the index set all the indices that appear in the formulas and the
+/// upper bound minus one.
+/// \param index_set: set of indexes to update
+/// \param ns: namespace
+/// \param axioms: a list of string axioms
 static void initial_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
@@ -1616,8 +1729,10 @@ static void initial_index_set(
     initial_index_set(index_set, ns, axiom);
 }
 
-/// add to the index set all the indices that appear in the formulas
-/// \par parameters: a list of string constraints
+/// Add to the index set all the indices that appear in the formulas.
+/// \param index_set: set of indexes to update
+/// \param ns: namespace
+/// \param current_constraints: a vector of string constraints
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
@@ -1655,9 +1770,11 @@ static void get_sub_arrays(const exprt &array_expr, std::vector<exprt> &accu)
   }
 }
 
-/// add to the index set all the indices that appear in the formula and the
-/// upper bound minus one
-/// \par parameters: a string constraint
+/// Add `i` to the index set all the indices that appear in the formula.
+/// \param index_set: set of indexes
+/// \param ns: namespace
+/// \param s: an expression containing strings
+/// \param i: an expression representing an index
 static void add_to_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
@@ -1755,8 +1872,10 @@ static void initial_index_set(
   add_to_index_set(index_set, ns, axiom.s1().content(), kminus1);
 }
 
-/// add to the index set all the indices that appear in the formula
-/// \par parameters: a string constraint
+/// Add to the index set all the indices that appear in the formula
+/// \param index_set: set of indexes
+/// \param ns: namespace
+/// \param formula: a string constraint
 static void update_index_set(
   index_set_pairt &index_set,
   const namespacet &ns,
@@ -1813,13 +1932,18 @@ static exprt find_index(
          :to_index_expr(*it).index();
 }
 
-/// \par parameters: a universally quantified formula `axiom`, an array of char
-/// variable `str`, and an index expression `val`.
-/// \return substitute `qvar` the universally quantified variable of `axiom`, by
-///   an index `val`, in `axiom`, so that the index used for `str` equals `val`.
-///   For instance, if `axiom` corresponds to \f$\forall q. s[q+x]='a' &&
-///   t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
-///   \f$s[v]='a' && t[v-x]='b'\f$.
+/// Instantiates a string constraint by substituting the quantifiers.
+/// For a string constraint of the form \f$\forall q. P(x)\f$,
+/// substitute `qvar` the universally quantified variable of `axiom`, by
+/// an index `val`, in `axiom`, so that the index used for `str` equals `val`.
+/// For instance, if `axiom` corresponds to \f$\forall q. s[q+x]={\tt 'a'} \land
+/// t[q]={\tt 'b'} \f$, `instantiate(axiom,s,v)` would return an expression for
+/// \f$s[v]={\tt 'a'} \land t[v-x]={\tt 'b'}\f$.
+/// \param stream: a message stream
+/// \param axiom: a universally quantified formula `axiom`
+/// \param str: an array of characters
+/// \param val: an index expression
+/// \return instantiated formula
 static exprt instantiate(
   messaget::mstreamt &stream,
   const string_constraintt &axiom,
@@ -1844,9 +1968,20 @@ static exprt instantiate(
 
 /// Instantiates a quantified formula representing `not_contains` by
 /// substituting the quantifiers and generating axioms.
+///
+/// For a formula of the form
+/// \f$\phi = \forall x. P(x) \Rightarrow Q(x, f(x))\f$
+/// let \f$instantiate\_not\_contains(\phi) = ( (f(t) = u) \land
+/// P(t) ) \Rightarrow Q(t, u)\f$.
+/// Then \f$\forall x.\ P(x) \Rightarrow Q(x, f(x)) \models \f$
+/// Axioms of the form \f$\forall x. P(x) \Rightarrow \exists y .Q(x, y) \f$
+/// can be transformed into the the equisatisfiable
+/// formula \f$\forall x. P(x) \Rightarrow Q(x, f(x))\f$ for a new function
+/// symbol `f`. Hence, after transforming axioms of the second type and
+/// by the above lemmas, we can create quantifier free formulas that are
+/// entailed by a (transformed) axiom.
 /// \param [in] axiom: the axiom to instantiate
 /// \param index_set: set of indexes
-/// \param current_index_set: set of indexes that have been newly added
 /// \param generator: constraint generator object
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate(
@@ -1919,9 +2054,13 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
   return expr;
 }
 
-/// evaluation of the expression in the current model
-/// \par parameters: an expression
-/// \return an expression
+/// Evaluates the given expression in the valuation found by
+/// string_refinementt::dec_solve.
+///
+/// The difference with supert::get is that arrays of characters need to be
+/// concretized. See concretize_arrays_in_expression for how it is done.
+/// \param expr: an expression
+/// \return evaluated expression
 exprt string_refinementt::get(const exprt &expr) const
 {
   const auto super_get = [this](const exprt &expr) { // NOLINT
@@ -2033,7 +2172,7 @@ static array_index_mapt gather_indices(const exprt &expr)
 /// \param expr: an expression
 /// \param var: a symbol
 /// \return Boolean telling whether `expr` is a linear function of `var`.
-/// TODO: add unit test
+/// \todo Add unit tests
 /// \related string_constraintt
 static bool
 is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)

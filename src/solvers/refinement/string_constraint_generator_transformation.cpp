@@ -15,14 +15,23 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_constraint_generator.h>
 #include "expr_cast.h"
 
-/// add axioms to say that the returned string expression `res` has length `k`
+/// Reduce or extend a string to have the given length
+///
+/// Add axioms ensuring the returned string expression `res` has length `k`
 /// and characters at position `i` in `res` are equal to the character at
 /// position `i` in `s1` if `i` is smaller that the length of `s1`, otherwise
 /// it is the null character `\u0000`.
-/// \param f: function application with two arguments, the first of which
-///        is a string `s1` and the second an integer `k` which should have
-///        same type as the string length
-/// \return a new string expression `res`
+///
+/// These axioms are:
+///   1. \f$ |{\tt res}|={\tt k} \f$
+///   2. \f$ \forall i<|{\tt res}|.\ i < |s_1|
+///          \Rightarrow {\tt res}[i] = s_1[i] \f$
+///   3. \f$ \forall i<|{\tt res}|.\ i \ge |s_1|
+///          \Rightarrow {\tt res}[i] = 0 \f$
+/// \todo We can reduce the number of constraints by merging 2 and 3.
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `s1`, integer `k`
+/// \return integer expressino equal to `0`
 exprt string_constraint_generatort::add_axioms_for_set_length(
   const function_application_exprt &f)
 {
@@ -60,13 +69,24 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
   return from_integer(0, signedbv_typet(32));
 }
 
-/// add axioms corresponding to the String.substring java function Warning: the
-/// specification may not be correct for the case where the string is shorter
-/// than the end index
-/// \par parameters: function application with one string argument, one start
-///   index
-/// argument and an optional end index argument
-/// \return a new string expression
+/// Substring of a string between two indices
+///
+/// \copybrief string_constraint_generatort::add_axioms_for_substring(
+///   const array_string_exprt &res,
+///   const array_string_exprt &str,
+///   const exprt &start,
+///   const exprt &end)
+/// \link string_constraint_generatort::add_axioms_for_substring(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+///   (More...) \endlink
+/// \warning The specification may not be correct for the case where the string
+/// is shorter than the end index
+/// \todo Should return a integer different from zero when the string is shorter
+///   tan the end index.
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`, integer `start`,
+///           optional integer `end` with default value `|str|`.
+/// \return integer expression which is different from 0 when there is an
+///         exception to signal
 exprt string_constraint_generatort::add_axioms_for_substring(
   const function_application_exprt &f)
 {
@@ -79,12 +99,22 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   return add_axioms_for_substring(res, str, i, j);
 }
 
-/// add axioms stating that the returned string expression is equal to the input
-/// one starting at `start` and ending before `end`
-/// \par parameters: a string expression, an expression for the start index, and
-///   an
-/// expression for the end index
-/// \return a new string expression
+/// Add axioms ensuring that `res` corresponds to the substring of `str`
+/// between indexes `start` and `end`.
+///
+/// These axioms are:
+///   1. \f$ {\tt start} < {\tt end} \Rightarrow
+///          |{\tt res}| = {\tt end} - {\tt start} \f$
+///   2. \f$ {\tt start} \ge {\tt end} \Rightarrow |{\tt res}| = 0 \f$
+///   3. \f$ |{\tt str}| > {\tt end} \f$
+///   4. \f$ \forall i<|{\tt str}|.\ {\tt res}[i]={\tt str}[{\tt start}+i] \f$
+/// \todo Should return code different from 0 if `|str| <= |end|` instead of
+///       adding constraint 3.
+/// \param res: array of characters expression
+/// \param str: array of characters expression
+/// \param start: integer expression
+/// \param end: integer expression
+/// \return integer expression equal to zero
 exprt string_constraint_generatort::add_axioms_for_substring(
   const array_string_exprt &res,
   const array_string_exprt &str,
@@ -96,10 +126,6 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   PRECONDITION(end.type()==index_type);
 
   // We add axioms:
-  // a1 : start < end => |res| = end - start
-  // a2 : start >= end => |res| = 0
-  // a3 : |str| > end
-  // a4 : forall idx<str.length, str[idx]=arg_str[idx+i]
 
   implies_exprt a1(
     binary_relation_exprt(start, ID_lt, end),
@@ -122,9 +148,32 @@ exprt string_constraint_generatort::add_axioms_for_substring(
   return from_integer(0, signedbv_typet(32));
 }
 
-/// add axioms corresponding to the String.trim java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/// Remove leading and trailing whitespaces
+///
+/// Add axioms ensuring `res` corresponds to `str` from which leading and
+/// trailing whitespaces have been removed.
+/// Are considered whitespaces, characters whose ascii code are smaller than
+/// that of ' ' (space).
+///
+/// These axioms are:
+///   1. \f$ idx + |{\tt res}| \le |{\tt str}| \f$ where `idx` represents
+///      the index of the first non-space character.
+///   2. \f$ idx \ge 0 \f$
+///   3. \f$ |{\tt str}| \ge idx \f$
+///   4. \f$ |{\tt res}| \ge 0 \f$
+///   5. \f$ |{\tt res}| \le |{\tt str}| \f$
+///        (this is necessary to prevent exceeding the biggest integer)
+///   6. \f$ \forall n<m.\ {\tt str}[n] \le \lq~\rq \f$
+///   7. \f$ \forall n<|{\tt str}|-m-|{\tt res}|.\ {\tt str}[m+|{\tt res}|+n]
+///          \le \lq~\rq \f$
+///   8. \f$ \forall n<|{\tt res}|.\ {\tt str}[idx+n]={\tt res}[n] \f$
+///   9. \f$ (s[m]>{\tt \lq~\rq} \land s[m+|{\tt res}|-1]>{\tt \lq~\rq})
+///          \lor m=|{\tt res}| \f$
+/// \note Some of the constraints among 1, 2, 3, 4 and 5 seems to be redundant
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`.
+/// \return integer expression which is different from 0 when there is an
+///         exception to signal
 exprt string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &f)
 {
@@ -136,18 +185,6 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   const typet &char_type = str.content().type().subtype();
   const symbol_exprt idx = fresh_exist_index("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
-
-  // We add axioms:
-  // a1 : m + |s1| <= |str|
-  // a2 : idx >= 0
-  // a3 : str >= idx
-  // a4 : |res|>= 0
-  // a5 : |res|<=|str|
-  //        (this is necessary to prevent exceeding the biggest integer)
-  // a6 : forall n<m, str[n]<=' '
-  // a7 : forall n<|str|-m-|s1|, str[m+|s1|+n]<=' '
-  // a8 : forall n<|s1|, s[idx+n]=s1[n]
-  // a9 : (s[m]>' ' &&s[m+|s1|-1]>' ') || m=|s|
 
   exprt a1=str.axiom_for_length_ge(
     plus_exprt_with_overflow_check(idx, res.length()));
@@ -200,9 +237,22 @@ exprt string_constraint_generatort::add_axioms_for_trim(
   return from_integer(0, f.type());
 }
 
-/// add axioms corresponding to the String.toLowerCase java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/// Conversion of a string to lower case
+///
+/// Add axioms ensuring `res` corresponds to `str` in which uppercase characters
+/// have been converted to lowercase.
+/// These axioms are:
+///   1. \f$ |{\tt res}| = |{\tt str}| \f$
+///   2. \f$ \forall i<|{\tt str}|.\ {\tt is\_upper\_case}({\tt str}[i])?
+///      {\tt res}[i]={\tt str}[i]+diff : {\tt res}[i]={\tt str}[i]
+///      \land {\tt str}[i]<{\tt 0x100} \f$
+///      where `diff` is the difference between lower case and upper case
+///      characters: `diff = 'a'-'A' = 0x20`.
+///
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`
+/// \return integer expression which is different from `0` when there is an
+///         exception to signal
 exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const function_application_exprt &f)
 {
@@ -217,17 +267,9 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   const exprt char_A=constant_char('A', char_type);
   const exprt char_Z=constant_char('Z', char_type);
 
-  // TODO: for now, only characters in Basic Latin and Latin-1 supplement
+  // \todo for now, only characters in Basic Latin and Latin-1 supplement
   // are supported (up to 0x100), we should add others using case mapping
   // information from the UnicodeData file.
-
-  // We add axioms:
-  // a1 : |res| = |str|
-  // a2 : forall idx<str.length,
-  //   is_upper_case(str[idx])?
-  //      res[idx]=str[idx]+diff : res[idx]=str[idx]<0x100
-  // where diff is the difference between lower case and upper case characters:
-  // diff = 'a'-'A' = 0x20
 
   equal_exprt a1(res.length(), str.length());
   axioms.push_back(a1);
@@ -268,9 +310,24 @@ exprt string_constraint_generatort::add_axioms_for_to_lower_case(
   return from_integer(0, f.type());
 }
 
-/// add axioms corresponding to the String.toUpperCase java function
-/// \par parameters: function application with one string argument
-/// \return a new string expression
+/// Add axioms ensuring `res` corresponds to `str` in which lowercase characters
+/// have been converted to uppercase.
+///
+/// These axioms are:
+///   1. \f$ |{\tt res}| = |{\tt str}| \f$
+///   2. \f$ \forall i<|{\tt str}|.\ 'a'\le {\tt str}[i]\le 'z'
+///          \Rightarrow {\tt res}[i]={\tt str}[i]+'A'-'a' \f$
+///   3. \f$ \forall i<|{\tt str}|.\ \lnot ('a'\le {\tt str}[i] \le 'z')
+///          \Rightarrow {\tt res}[i]={\tt str}[i] \f$
+/// Note that index expressions are only allowed in the body of universal
+/// axioms, so we use a trivial premise and push our premise into the body.
+///
+/// \todo We can reduce the number of constraints by merging
+///       constraints 2 and 3.
+/// \param res: array of characters expression
+/// \param str: array of characters expression
+/// \return integer expression which is different from `0` when there is an
+///         exception to signal
 exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const array_string_exprt &res,
   const array_string_exprt &str)
@@ -281,16 +338,8 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   exprt char_A=constant_char('A', char_type);
   exprt char_z=constant_char('z', char_type);
 
-  // TODO: add support for locales using case mapping information
+  // \todo Add support for locales using case mapping information
   // from the UnicodeData file.
-
-  // We add axioms:
-  // a1 : |res| = |str|
-  // a2 : forall idx1<str.length, 'a'<=str[idx1]<='z' =>
-  //                                res[idx1]=str[idx1]+'A'-'a'
-  // a3 : forall idx2<str.length, !('a'<=str[idx2]<='z') => res[idx2]=str[idx2]
-  // Note that index expressions are only allowed in the body of universal
-  // axioms, so we use a trivial premise and push our premise into the body.
 
   equal_exprt a1(res.length(), str.length());
   axioms.push_back(a1);
@@ -316,9 +365,16 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   return from_integer(0, signedbv_typet(32));
 }
 
-/// add axioms corresponding to the String.toUpperCase java function
-/// \param f: function application with one string argument
-/// \return a new string expression
+/// Conversion of a string to upper case
+///
+/// \copybrief string_constraint_generatort::add_axioms_for_to_upper_case(
+/// const array_string_exprt &res, const array_string_exprt &str)
+/// \link string_constraint_generatort::add_axioms_for_to_upper_case(const array_string_exprt &res, const array_string_exprt &str)
+///   (More...) \endlink
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`
+/// \return integer expression which is different from `0` when there is an
+///         exception to signal
 exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const function_application_exprt &f)
 {
@@ -329,12 +385,20 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   return add_axioms_for_to_upper_case(res, str);
 }
 
-/// add axioms corresponding stating that the result is similar to that of the
-/// StringBuilder.setCharAt java function Warning: this may be underspecified in
-/// the case wher the index exceed the length of the string
-/// \param f: function application with three arguments, the first is a
-///           string, the second an index and the third a character
-/// \return a new string expression
+/// Set a character to a specific value at an index of the string
+///
+/// Add axioms ensuring that the result `res` is similar to input string `str`
+/// where the character at index `pos` is set to `char`.
+/// These axioms are:
+///   1. \f$ |{\tt res}| = |{\tt str}|\f$
+///   2. \f$ {\tt res}[{\tt pos}]={\tt char}\f$
+///   3. \f$ \forall i<|{\tt res}|.\ i \ne {\tt pos}
+///          \Rightarrow {\tt res}[i] = {\tt str}[i]\f$
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`, integer `pos`,
+///           and character `char`
+/// \return an integer expression which is `1` when `pos` is out of bounds and
+///         `0` otherwise
 exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)
 {
@@ -344,11 +408,6 @@ exprt string_constraint_generatort::add_axioms_for_char_set(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   const exprt &position = f.arguments()[3];
   const exprt &character = f.arguments()[4];
-
-  // We add axioms:
-  // a1 : |res| = |str|
-  // a2 : res[pos]=char
-  // a3 : forall i<|res|. i != pos => res[i] = str[i]
 
   const binary_relation_exprt out_of_bounds(position, ID_ge, str.length());
   axioms.push_back(equal_exprt(res.length(), str.length()));
@@ -386,15 +445,25 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
   return { };
 }
 
-/// Add axioms corresponding to the String.replace java function
+/// Replace a character by another in a string
+///
+/// Add axioms ensuring that `res` corresponds to `str` where occurences of
+/// `old_char` have been replaced by `new_char`.
+/// These axioms are:
+///   1. \f$ |{\tt res}| = |{\tt str}| \f$
+///   2. \f$ \forall i \in 0, |{\tt res}|)
+///          .\ {\tt str}[i]={\tt old\_char}
+///          \Rightarrow {\tt res}[i]={\tt new\_char}
+///          \land {\tt str}[i]\ne {\tt old\_char}
+///          \Rightarrow {\tt res}[i]={\tt str}[i] \f$
 /// Only supports String.replace(char, char) and
 /// String.replace(String, String) for single-character strings
 /// Returns original string in every other case (that behaviour is to
 /// be fixed in the future)
-/// \param f function application with three arguments, the first is a
-/// string, the second and the third are either pair of characters or
-/// a pair of strings
-/// \return a new string expression
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`, character `old_char` and
+///           character `new_char`
+/// \return an integer expression equal to 0
 exprt string_constraint_generatort::add_axioms_for_replace(
   const function_application_exprt &f)
 {
@@ -410,12 +479,6 @@ exprt string_constraint_generatort::add_axioms_for_replace(
   {
     const auto old_char=maybe_chars->first;
     const auto new_char=maybe_chars->second;
-
-    // We add axioms:
-    // a1 : |res| = |str|
-    // a2 : forall qvar, 0<=qvar<|res|,
-    //    str[qvar]=oldChar => res[qvar]=newChar
-    //    !str[qvar]=oldChar => res[qvar]=str[qvar]
 
     axioms.push_back(equal_exprt(res.length(), str.length()));
 
@@ -452,14 +515,20 @@ exprt string_constraint_generatort::add_axioms_for_delete_char_at(
     plus_exprt_with_overflow_check(f.arguments()[3], index_one));
 }
 
-/// add axioms stating that `res` corresponds to the input `str`
-/// where we removed characters between the positions start (included) and end
-/// (not included)
-/// \param res: a string expression
-/// \param str: a string expression
-/// \param start: a start index
-/// \param end: an end index
-/// \return a expression different from zero to signal an exception
+/// Add axioms stating that `res` corresponds to the input `str`
+/// where we removed characters between the positions `start` (included) and
+/// `end` (not included).
+///
+/// These axioms are the same as would be generated for:
+/// `concat(substring(str, 0, start), substring(end, |str|))`
+/// (see \ref add_axioms_for_substring and \ref add_axioms_for_concat_substr).
+/// \todo Should use add_axioms_for_concat_substr instead
+///       of add_axioms_for_concat
+/// \param res: array of characters expression
+/// \param str: array of characters expression
+/// \param start: integer expression
+/// \param end: integer expression
+/// \return integer expression different from zero to signal an exception
 exprt string_constraint_generatort::add_axioms_for_delete(
   const array_string_exprt &res,
   const array_string_exprt &str,
@@ -480,9 +549,14 @@ exprt string_constraint_generatort::add_axioms_for_delete(
   return bitor_exprt(return_code1, bitor_exprt(return_code2, return_code3));
 }
 
-/// add axioms corresponding to the StringBuilder.delete java function
-/// \param f: function application with three arguments: a string
-///   expression, a start index and an end index
+/// Remove a portion of a string
+///
+/// \copybrief string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+/// \link string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+///   (More...) \endlink
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `str`, integer `start`
+///           and integer `end`
 /// \return an integer expression whose value is different from 0 to signal
 ///   an exception
 exprt string_constraint_generatort::add_axioms_for_delete(

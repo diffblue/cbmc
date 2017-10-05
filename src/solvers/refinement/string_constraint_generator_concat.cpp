@@ -21,12 +21,22 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// If `end_index > |s2|` and/or `start_index < 0`, the appended string will
 /// be of length `end_index - start_index` and padded with non-deterministic
 /// values.
-/// \param res: an array of character
-/// \param s1: string expression
-/// \param s2: string expression
-/// \param start_index: expression representing an integer
-/// \param end_index: expression representing an integer
-/// \return a new string expression
+///
+/// These axioms are:
+///   1. \f$end\_index > start\_index \Rightarrow |res| = |s_1| + end\_index -
+///        start\_index
+///     \f$
+///   2. \f$end\_index \le start\_index \Rightarrow res = s_1 \f$
+///   3. \f$\forall i<|s_1|. res[i]=s_1[i] \f$
+///   4. \f$\forall i< end\_index - start\_index.\ res[i+|s_1|]
+///        = s_2[start\_index+i]\f$
+///
+/// \param res: an array of characters expression
+/// \param s1: an array of characters expression
+/// \param s2: an array of characters expression
+/// \param start_index: integer expression
+/// \param end_index: integer expression
+/// \return integer expression `0`
 exprt string_constraint_generatort::add_axioms_for_concat_substr(
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -34,12 +44,6 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   const exprt &start_index,
   const exprt &end_index)
 {
-  // We add axioms:
-  // a1 : end_index > start_index => |res|=|s1|+ end_index - start_index
-  // a2 : end_index <= start_index => res = s1
-  // a3 : forall i<|s1|. res[i]=s1[i]
-  // a4 : forall i< end_index - start_index. res[i+|s1|]=s2[start_index+i]
-
   binary_relation_exprt prem(end_index, ID_gt, start_index);
 
   exprt res_length=plus_exprt_with_overflow_check(
@@ -66,6 +70,11 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
 
 /// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// character `c`.
+/// These axioms are :
+///   * \f$ |res|=|s1|+1 \f$
+///   * \f$ \forall i<|s1|. res[i]=s1[i] \f$
+///   * \f$ res[|s1|]=c \f$
+///
 /// \param res: string expression
 /// \param s1: string expression
 /// \param c: character expression
@@ -75,11 +84,6 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   const array_string_exprt &s1,
   const exprt &c)
 {
-  // We add axioms:
-  // a1 : |res|=|s1|+1
-  // a2 : forall i<|s1|. res[i]=s1[i]
-  // a3 : res[|s1|]=c
-
   const typet &index_type = res.length().type();
   const equal_exprt a1(
     res.length(), plus_exprt(s1.length(), from_integer(1, index_type)));
@@ -96,7 +100,10 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   return from_integer(0, get_return_code_type());
 }
 
-/// Add axioms to say that `res` is equal to the concatenation of `s1` and `s2`.
+/// Add axioms enforcing that `res` is equal to the concatenation of `s1` and
+/// `s2`.
+///
+/// \deprecated should use concat_substr instead
 /// \param res: string_expression corresponding to the result
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
@@ -110,16 +117,17 @@ exprt string_constraint_generatort::add_axioms_for_concat(
   return add_axioms_for_concat_substr(res, s1, s2, index_zero, s2.length());
 }
 
-/// Add axioms enforcing that the returned string expression is equal to the
-/// concatenation of the two string arguments of the function application.
+/// String concatenation
 ///
-/// In case 4 arguments instead of 2 are given the last two arguments are
-/// intepreted as a start index and last index from which we extract a substring
-/// of the second argument: this is similar to the Java
-/// StringBuilder.append(CharSequence s, int start, int end) method.
+/// This primitive accepts 4 or 6 arguments.
+/// \copybrief string_constraint_generatort::add_axioms_for_concat_substr
+/// \link string_constraint_generatort::add_axioms_for_concat_substr
+///   (More...) \endlink
 ///
-/// \param f: function application with two string arguments
-/// \return a new string expression
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `s1`, refined_string `s2`,
+///           optional integer `start_index`, optional integer `end_index`
+/// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_concat(
   const function_application_exprt &f)
 {
@@ -137,6 +145,7 @@ exprt string_constraint_generatort::add_axioms_for_concat(
 /// Add axioms enforcing that the string represented by the two first
 /// expressions is equal to the concatenation of the string argument and
 /// the character argument of the function application.
+/// \todo This should be merged with add_axioms_for_concat.
 /// \param f: function application with a length, pointer, string and character
 ///           argument.
 /// \return code 0 on success
@@ -152,6 +161,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
 }
 
 /// Add axioms corresponding to the StringBuilder.appendCodePoint(I) function
+/// \deprecated java specific
 /// \param f: function application with two arguments: a string and a code point
 /// \return an expression
 exprt string_constraint_generatort::add_axioms_for_concat_code_point(

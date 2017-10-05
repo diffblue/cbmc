@@ -320,13 +320,13 @@ string_constraint_generatort::add_axioms_for_format_specifier(
     return res;
   }
   case format_specifiert::OCTAL_INTEGER:
-    // TODO: conversion of octal not implemented
+  /// \todo Conversion of octal is not implemented.
   case format_specifiert::GENERAL:
-    // TODO: general not implemented
+  /// \todo Conversion for format specifier general is not implemented.
   case format_specifiert::HEXADECIMAL_FLOAT:
-    // TODO: hexadecimal float not implemented
+  /// \todo Conversion of hexadecimal float is not implemented.
   case format_specifiert::DATE_TIME:
-    // TODO: DateTime not implemented
+    /// \todo Conversion of date-time is not implemented
     // For all these unimplemented cases we return a non-deterministic string
     message.warning() << "unimplemented format specifier: " << fs.conversion
                         << message.eom;
@@ -433,9 +433,10 @@ std::string utf16_constant_array_to_java(
   return utf16_little_endian_to_java(out);
 }
 
-/// Add axioms to specify the Java String.format function.
+/// Formatted string using a format string and list of arguments
 ///
-/// TODO: This is correct only if the first argument (ie the format string) is
+/// Add axioms to specify the Java String.format function.
+/// \todo This is correct only if the first argument (ie the format string) is
 /// constant or does not contain format specifiers.
 /// \param f: a function application
 /// \return A string expression representing the return value of the

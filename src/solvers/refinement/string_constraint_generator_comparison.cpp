@@ -13,12 +13,18 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms stating that the result is true exactly when the strings
-/// represented by the arguments are equal. the variable ending in
-/// `witness_unequal` is -1 if the length differs or an index at which the
-/// strings are different
-/// \par parameters: function application with two string arguments
-/// \return a expression of Boolean type
+/// Equality of the content of two strings
+///
+/// Add axioms stating that the result is true exactly when the strings
+/// represented by the arguments are equal.
+/// These axioms are:
+///   1. \f$ eq \Rightarrow |s_1|=|s_2|\f$
+///   2. \f$ \forall i<|s_1|.\ eq \Rightarrow s_1[i]=s_2[i] \f$
+///   3. \f$ \lnot eq \Rightarrow (|s_1| \ne |s_2| \land witness=-1)
+///          \lor (0 \le witness<|s_1| \land s_1[witness] \ne s_2[witness]) \f$
+/// \param f: function application with arguments refined_string `s1` and
+///           refined_string `s2`
+/// \return Boolean expression `eq`
 exprt string_constraint_generatort::add_axioms_for_equals(
   const function_application_exprt &f)
 {
@@ -32,13 +38,6 @@ exprt string_constraint_generatort::add_axioms_for_equals(
 
   typet index_type=s1.length().type();
 
-  // We want to write:
-  // eq <=> (s1.length=s2.length  &&forall i<s1.length. s1[i]=s2[i])
-  // We add axioms:
-  // a1 : eq => s1.length=s2.length
-  // a2 : forall i<s1.length. eq => s1[i]=s2[i]
-  // a3 : !eq => (s1.length!=s2.length && witness=-1)
-  //       || (0<=witness<s1.length &&s1[witness]!=s2[witness])
 
   implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
   axioms.push_back(a1);
@@ -62,11 +61,14 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   return tc_eq;
 }
 
-/// returns an expression which is true when the two given characters are equal
+/// Returns an expression which is true when the two given characters are equal
 /// when ignoring case for ASCII
-/// \par parameters: two character expressions and constant character
-///   expressions
-/// representing 'a', 'A' and 'Z'
+/// \todo The extra constant character arguments are not needed.
+/// \param char1: character expression
+/// \param char2: character expression
+/// \param char_a: constant character 'a'
+/// \param char_A: constant character 'A'
+/// \param char_Z: constant character 'Z'
 /// \return a expression of Boolean type
 exprt string_constraint_generatort::character_equals_ignore_case(
   exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z)
@@ -94,9 +96,19 @@ exprt string_constraint_generatort::character_equals_ignore_case(
   return or_exprt(or_exprt(p1, p2), p3);
 }
 
-/// add axioms corresponding to the String.equalsIgnoreCase java function
-/// \par parameters: function application with two string arguments
-/// \return a Boolean expression
+/// Equality of the content ignoring case of characters
+///
+/// Add axioms ensuring the result is true when the two strings
+/// are equal if case is ignored.
+/// These axioms are:
+///   1. \f$ eq \Rightarrow |s_1|=|s_2|\f$
+///   2. \f$ \forall i \in [0, |s_1|).
+///          \ eq \Rightarrow {\tt equal\_ignore\_case}(s_1[i],s_2[i]) \f$
+///   3. \f$ \lnot eq \Rightarrow |s_1| \ne |s_2| \lor (0 \le witness<|s_1|
+///          \land\lnot {\tt equal\_ignore\_case}(s_1[witness],s_2[witness]) \f$
+/// \param f: function application with arguments refined_string `s1` and
+///           refined_string `s2`
+/// \return Boolean expression `eq`
 exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const function_application_exprt &f)
 {
@@ -110,12 +122,6 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   const exprt char_A = constant_char('A', char_type);
   const exprt char_Z = constant_char('Z', char_type);
   const typet index_type = s1.length().type();
-
-  // We add axioms:
-  // a1 : eq => |s1|=|s2|
-  // a2 : forall qvar, 0<=qvar<|s1|,
-  //  eq => char_equal_ignore_case(s1[qvar],s2[qvar]);
-  // a3 : !eq => |s1|!=s2 || (0 <=witness<|s1| &&!char_equal_ignore_case)
 
   const implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
   axioms.push_back(a1);
@@ -146,10 +152,15 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   return typecast_exprt(eq, f.type());
 }
 
-/// add axioms stating that if two strings are equal then their hash codes are
-/// equals
-/// \par parameters: function application with a string argument
-/// \return a integer expression corresponding to the hash code of the string
+/// Value that is identical for strings with the same content
+///
+/// Add axioms stating that if two strings are equal then the values
+/// returned by this function are equal.
+/// These axioms are, for each string `s` on which hash was called:
+///   * \f$ hash(str)=hash(s) \lor |str| \ne |s|
+///       \lor (|str|=|s| \land \exists i<|s|.\ s[i]\ne str[i]) \f$
+/// \param f: function application with argument refined_string `str`
+/// \return integer expression `hash(str)`
 exprt string_constraint_generatort::add_axioms_for_hash_code(
   const function_application_exprt &f)
 {
@@ -162,12 +173,6 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
     std::make_pair(str, fresh_symbol("hash", return_type)));
   const exprt hash = pair.first->second;
 
-  // for each string s. either:
-  //   c1: hash(str)=hash(s)
-  //   c2: |str|!=|s|
-  //   c3: (|str|==|s| && exists i<|s|. s[i]!=str[i])
-
-  // WARNING: the specification may be incomplete
   for(auto it : hash_code_of_string)
   {
     const symbol_exprt i = fresh_exist_index("index_hash", index_type);
@@ -183,9 +188,25 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   return hash;
 }
 
-/// add axioms corresponding to the String.compareTo java function
-/// \par parameters: function application with two string arguments
-/// \return a integer expression
+/// Lexicographic comparison of two strings
+///
+/// Add axioms ensuring the result corresponds to that of the `String.compareTo`
+/// Java function.
+/// In the lexicographic comparison, `x` representing the first point where the
+/// two strings differ, we add axioms:
+///   * \f$ res=0 \Rightarrow |s1|=|s2|\f$
+///   * \f$ \forall i<|s1|. s1[i]=s2[i] \f$
+///   * \f$ \exists x.\ res\ne 0 \Rightarrow x > 0
+///         \land ((|s1| \ge |s2| \land x<|s1|)
+///                \lor (|s1| \ge |s2| \land x<|s2|)
+///         \land res=s1[x]-s2[x] )
+///         \lor cond2:
+///         (|s1|<|s2| \land x=|s1|) \lor (|s1| > |s2| \land x=|s2|)
+///         \land res=|s1|-|s2|) \f$
+///   * \f$ \forall i'<x. res\ne 0 \Rightarrow s1[i]=s2[i] \f$
+/// \param f: function application with arguments refined_string `s1`
+///           and refined_string `s2`
+/// \return integer expression `res`
 exprt string_constraint_generatort::add_axioms_for_compare_to(
   const function_application_exprt &f)
 {
@@ -196,19 +217,6 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   const array_string_exprt &s2 = get_string_expr(f.arguments()[1]);
   const symbol_exprt res = fresh_symbol("compare_to", return_type);
   const typet &index_type = s1.length().type();
-
-  // In the lexicographic comparison, x is the first point where the two
-  // strings differ.
-  // We add axioms:
-  // a1 : res==0 => |s1|=|s2|
-  // a2 : forall i<|s1|. s1[i]==s2[i]
-  // a3 : exists x.
-  //        res!=0 ==> x > 0
-  //        && ((|s1| <= |s2| && x<|s1|) || (|s1| >= |s2| &&x<|s2|)
-  //        && res=s1[x]-s2[x] )
-  //     || cond2:
-  //       (|s1|<|s2| &&x=|s1|) || (|s1| > |s2| &&x=|s2|) &&res=|s1|-|s2|)
-  // a4 : forall i'<x. res!=0 => s1[i]=s2[i]
 
   const equal_exprt res_null(res, from_integer(0, return_type));
   const implies_exprt a1(res_null, equal_exprt(s1.length(), s2.length()));
@@ -253,9 +261,10 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
   return res;
 }
 
-/// add axioms stating that the return value for two equal string should be the
+/// Add axioms stating that the return value for two equal string should be the
 /// same
-/// \par parameters: function application with one string argument
+/// \deprecated never tested
+/// \param f: function application with one string argument
 /// \return a string expression
 symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   const function_application_exprt &f)
