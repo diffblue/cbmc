@@ -60,42 +60,23 @@ public:
   }
 
   /// Set value for a specified key
-  void set(const key_type &key, const value_type &value)
+  void set(const key_type &key, value_type value)
   {
     auto &map=*data_.back();
     auto it=map.find(key);
     if(it==map.end())
-      map.emplace_hint(it, key, value);
-    else
-      it->second=value;
-  }
-
-  /// Set value for a specified key
-  void set(const key_type &key, value_type &&value)
-  {
-    auto &map=*data_.back();
-    auto it=map.find(key);
-    if(it==map.end())
-      map.emplace_hint(it, key, std::move(value));
+      map.emplace(key, std::move(value));
     else
       it->second=std::move(value);
   }
 
   /// Get a value stored under specified key
   value_type &at(const key_type &key)
-  {
-    if(auto ptr=find<datat, value_type>(data_, key))
-      return *ptr;
-    throw std::out_of_range("Element not found");
-  }
+  { return p_at(data_, key); }
 
   /// Get a value stored under specified key
   const value_type &at(const key_type &key) const
-  {
-    if(const auto ptr=find<const datat, const value_type>(data_, key))
-      return *ptr;
-    throw std::out_of_range("Element not found");
-  }
+  { return p_at(data_, key); }
 
 private:
   /// Creates a map that inherits elements with the "other" map
@@ -106,18 +87,18 @@ private:
       std::make_shared<std::unordered_map<key_type, value_type>>());
   }
 
-  template<typename data_t, typename ret_t>
-  static ret_t *find(data_t &data, const key_type &key)
+  template<typename data_t>
+  static auto p_at(data_t &data, const key_type &key)
+    -> decltype((*data[0])[key])
   {
-    const auto end=data.rend();
-    for(auto it=data.rbegin(); it!=end; ++it)
+    for(auto it=data.rbegin(), end=data.rend(); it!=end; ++it)
     {
       auto &map=(**it);
       const auto pair_it=map.find(key);
       if(pair_it!=map.end())
-        return &pair_it->second;
+        return pair_it->second;
     }
-    return nullptr;
+    throw std::out_of_range("Element not found");
   }
 
   typedef
