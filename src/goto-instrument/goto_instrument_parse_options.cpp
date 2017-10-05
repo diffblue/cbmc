@@ -130,6 +130,29 @@ int goto_instrument_parse_optionst::doit()
     return 0;
   }
 
+  if(cmdline.isset("save-code-statistics"))
+  {
+    // Here we only early-check for requirements and we handle the option later.
+    const std::string out_json_file_pathname=
+      cmdline.get_value("save-code-statistics");
+    if(fileutl_is_directory(out_json_file_pathname))
+    {
+      error() << "The path-name '" << out_json_file_pathname
+              << "'passed to the option '--save-code-statistics' "
+                "represents an existing directory."
+              << eom;
+      return 12;
+    }
+    if(fileutl_parse_extension_in_pathname(out_json_file_pathname)!=".json")
+    {
+      error() << "The file of the path-name '" << out_json_file_pathname
+              << "'passed to the option '--save-code-statistics' does "
+                "not have '.json' extension."
+              << eom;
+      return 13;
+    }
+  }
+
   eval_verbosity();
 
   try
@@ -747,23 +770,22 @@ int goto_instrument_parse_optionst::doit()
       stats.extend(goto_model);
       const std::string out_json_file_pathname=
         cmdline.get_value("save-code-statistics");
-      if(fileutl_is_directory(out_json_file_pathname))
+      INVARIANT(!fileutl_is_directory(out_json_file_pathname),
+                "The early check passed so the JSON file indeed should not be "
+                  " a directory.");
+      INVARIANT(
+        fileutl_parse_extension_in_pathname(out_json_file_pathname)==".json",
+        "The early check passed so the JSON file indeed should have "
+          "'.json' extension.");
+      std::ofstream ofile(out_json_file_pathname);
+      if(!ofile)
       {
-        error() << "The path-name '" << cmdline.args[1]
-                << "'passed to the option '--save-code-statistics' "
-                  "represents an existing directory."
-                << eom;
-        return 12;
-      }
-      if(fileutl_parse_extension_in_pathname(out_json_file_pathname)!=".json")
-      {
-        error() << "The file of the path-name '" << cmdline.args[1]
-                << "'passed to the option '--save-code-statistics' does "
-                  "not have '.json' extension."
+        error() << "Failed to open the JSON file '" << out_json_file_pathname
+                << "' passed to the option '--save-code-statistics' "
+                << "for writing."
                 << eom;
         return 13;
       }
-      std::ofstream ofile(out_json_file_pathname);
       ofile << to_json(stats);
     }
 
