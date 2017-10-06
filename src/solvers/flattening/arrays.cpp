@@ -316,7 +316,7 @@ void arrayst::add_array_Ackermann_constraints()
         i1!=index_set.end();
         i1++)
       for(index_sett::const_iterator
-          i2=index_set.begin();
+          i2=i1;
           i2!=index_set.end();
           i2++)
         if(i1!=i2)
