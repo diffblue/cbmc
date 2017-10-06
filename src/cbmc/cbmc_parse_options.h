@@ -52,6 +52,7 @@ class optionst;
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)" \
   "(drop-unused-functions)" \
+  "(havoc-undefined-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \

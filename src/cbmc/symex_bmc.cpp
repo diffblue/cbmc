@@ -194,7 +194,13 @@ void symex_bmct::no_body(const irep_idt &identifier)
 {
   if(body_warnings.insert(identifier).second)
   {
-    warning() <<
-      "**** WARNING: no body for function " << identifier << eom;
+    warning() << "**** WARNING: no body for function " << identifier;
+
+    if(options.get_bool_option("havoc-undefined-functions"))
+    {
+      warning()
+          << "; assigning non-deterministic values to any pointer arguments";
+    }
+    warning() << eom;
   }
 }
