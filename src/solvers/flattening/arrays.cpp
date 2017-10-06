@@ -348,7 +348,7 @@ void arrayst::add_array_Ackermann_constraints()
 
             // add constraint
             lazy_constraintt lazy(lazy_typet::ARRAY_ACKERMANN,
-              or_exprt(literal_exprt(!indices_equal_lit), values_equal));
+              implies_exprt(literal_exprt(indices_equal_lit), values_equal));
             add_array_constraint(lazy, true); // added lazily
 
 #if 0 // old code for adding, not significantly faster
