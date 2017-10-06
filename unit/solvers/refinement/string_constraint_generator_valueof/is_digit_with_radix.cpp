@@ -3,7 +3,7 @@
  Module: Unit tests for is_digit_with_radix in
    solvers/refinement/string_constraint_generator_valueof.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Limited. All rights reserved.
 
 \*******************************************************************/
 

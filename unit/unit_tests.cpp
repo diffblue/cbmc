@@ -2,7 +2,7 @@
 
  Module: Catch Tests
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Limited. All rights reserved.
 
 \*******************************************************************/
 

@@ -435,7 +435,7 @@ void goto_analyzer_parse_optionst::help()
   std::cout << " * *\n";
 
   std::cout <<
-    "* *                Daniel Kroening, DiffBlue                * *\n"
+    "* *                Daniel Kroening, Diffblue                * *\n"
     "* *                 kroening@kroening.com                   * *\n"
     "\n"
     "Usage:                       Purpose:\n"

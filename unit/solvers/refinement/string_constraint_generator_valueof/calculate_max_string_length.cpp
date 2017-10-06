@@ -3,7 +3,7 @@
  Module: Unit tests for calculate_max_string_length in
    solvers/refinement/string_constraint_generator_valueof.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Limited. All rights reserved.
 
 \*******************************************************************/
 

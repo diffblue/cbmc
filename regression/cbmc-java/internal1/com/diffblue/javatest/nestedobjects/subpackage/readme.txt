@@ -1,2 +1,2 @@
 Source of benchmark:
-https://github.com/DiffBlue-benchmarks/java-test
+https://github.com/Diffblue-benchmarks/java-test

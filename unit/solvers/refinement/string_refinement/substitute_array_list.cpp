@@ -3,7 +3,7 @@
  Module: Unit tests for get_numeric_value_from_character in
    solvers/refinement/string_constraint_generator_valueof.cpp
 
- Author: DiffBlue Limited. All rights reserved.
+ Author: Diffblue Limited. All rights reserved.
 
 \*******************************************************************/
 

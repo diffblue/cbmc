@@ -2,7 +2,7 @@
 
 Module: JAVA Pointer Casts
 
-Author: DiffBlue
+Author: Diffblue
 
 \*******************************************************************/
 

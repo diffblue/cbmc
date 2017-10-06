@@ -4,7 +4,7 @@ public class RegexSubstitution02
 {
    public static void main(String[] args)
    {
-      String firstString = "DiffBlue ***";
+      String firstString = "Diffblue ***";
       String secondString = "Automatic Test Case Generation";
 
       firstString = firstString.replaceAll("\\*", "^");

@@ -1,4 +1,4 @@
-// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
 
 /// \file
 /// Value Set
