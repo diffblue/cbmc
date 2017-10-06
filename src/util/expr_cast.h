@@ -41,8 +41,8 @@ inline void validate_expr(const exprt &) {}
 namespace detail // NOLINT
 {
 
-// We hide these functions in a namespace so that only functions that they only
-// participate in overload resolution when explicitly requested.
+// We hide these functions in a namespace so that they only participate in
+// overload resolution when explicitly requested.
 
 /// \brief Try to cast a reference to a generic exprt to a specific derived
 ///    class
@@ -56,8 +56,7 @@ template <typename T, typename TExpr>
 optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
 expr_try_dynamic_cast(TExpr &base)
 {
-  typedef typename std::decay<T>::type TUnderlyingt;
-  typedef typename std::remove_reference<T>::type TConstt;
+  typedef typename std::decay<T>::type decayt;
   static_assert(
     std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
     "Tried to expr_try_dynamic_cast from something that wasn't an exprt");
@@ -65,30 +64,13 @@ expr_try_dynamic_cast(TExpr &base)
     std::is_reference<T>::value,
     "Tried to convert exprt & to non-reference type");
   static_assert(
-    std::is_base_of<exprt, TUnderlyingt>::value,
+    std::is_base_of<exprt, decayt>::value,
     "The template argument T must be derived from exprt.");
-  if(!can_cast_expr<TUnderlyingt>(base))
+  if(!can_cast_expr<decayt>(base))
     return {};
   T ret=static_cast<T>(base);
   validate_expr(ret);
-  return std::reference_wrapper<TConstt>(ret);
-}
-
-/// \brief Try to cast a reference to a generic exprt to a specific derived
-///    class
-/// \tparam T The reference or const reference type to \a TUnderlying to cast
-///    to
-/// \tparam TExpr The original type to cast from, either exprt or const exprt
-/// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a TUnderlying
-///   or valueless optional if \a base is not an instance of \a TUnderlying
-template <typename T, typename TExpr>
-optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
-expr_try_checked_cast(TExpr &base)
-{
-  typedef typename std::decay<T>::type TUnderlyingt;
-  PRECONDITION(can_cast_expr<TUnderlyingt>(base));
-  return expr_try_checked_cast<T>(base);
+  return std::reference_wrapper<typename std::remove_reference<T>::type>(ret);
 }
 
 } // namespace detail
@@ -119,37 +101,11 @@ expr_try_dynamic_cast(exprt &base)
   return detail::expr_try_dynamic_cast<T>(base);
 }
 
-/// \brief Try to cast a constant reference to a generic exprt to a specific
-///   derived class. Also assert that the expr invariants are not violated.
-/// \tparam T The exprt-derived class to cast to
-/// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T or valueless optional if \a base
-///   is not an instance of \a T
-template<typename T>
-optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
-expr_try_checked_cast(const exprt &base)
-{
-  return detail::expr_try_checked_cast<T>(base);
-}
-
-/// \brief Try to cast a reference to a generic exprt to a specific derived
-///   class. Also assert that the expr invariants are not violated.
-/// \tparam T The exprt-derived class to cast to
-/// \param base Reference to a generic \ref exprt
-/// \return Reference to object of type \a T or valueless optional if \a base is
-///   not an instance of \a T
-template<typename T>
-optionalt<std::reference_wrapper<typename std::remove_reference<T>::type>>
-expr_try_checked_cast(exprt &base)
-{
-  return detail::expr_try_checked_cast<T>(base);
-}
-
 namespace detail // NOLINT
 {
 
-// We hide these functions in a namespace so that only functions that they only
-// participate in overload resolution when explicitly requested.
+// We hide these functions in a namespace so that they only participate in
+// overload resolution when explicitly requested.
 
 /// \brief Cast a reference to a generic exprt to a specific derived class.
 /// \tparam T The reference or const reference type to \a TUnderlying to cast to
@@ -160,7 +116,7 @@ namespace detail // NOLINT
 template<typename T, typename TExpr>
 T expr_dynamic_cast(TExpr &base)
 {
-  typedef typename std::decay<T>::type TUnderlyingt;
+  typedef typename std::decay<T>::type decayt;
   static_assert(
     std::is_same<typename std::remove_const<TExpr>::type, exprt>::value,
     "Tried to expr_dynamic_cast from something that wasn't an exprt");
@@ -168,9 +124,9 @@ T expr_dynamic_cast(TExpr &base)
     std::is_reference<T>::value,
     "Tried to convert exprt & to non-reference type");
   static_assert(
-    std::is_base_of<exprt, TUnderlyingt>::value,
+    std::is_base_of<exprt, decayt>::value,
     "The template argument T must be derived from exprt.");
-  if(!can_cast_expr<TUnderlyingt>(base))
+  if(!can_cast_expr<decayt>(base))
     throw std::bad_cast();
   T ret=static_cast<T>(base);
   validate_expr(ret);
@@ -189,8 +145,7 @@ T expr_dynamic_cast(TExpr &base)
 template<typename T, typename TExpr>
 T expr_checked_cast(TExpr &base)
 {
-  typedef typename std::decay<T>::type TUnderlyingt;
-  PRECONDITION(can_cast_expr<TUnderlyingt>(base));
+  PRECONDITION(can_cast_expr<typename std::decay<T>::type>(base));
   return expr_dynamic_cast<T>(base);
 }
 
