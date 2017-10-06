@@ -823,6 +823,7 @@ IREP_ID_ONE(array_replace)
 IREP_ID_ONE(switch_case_number)
 IREP_ID_ONE(java_array_access)
 IREP_ID_ONE(java_member_access)
+IREP_ID_ONE(integer_dereference)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO
