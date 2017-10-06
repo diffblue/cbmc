@@ -262,6 +262,9 @@ protected:
   void symex_assign_rec(statet &state, const code_assignt &code);
   virtual void symex_assign(statet &state, const code_assignt &code);
 
+  // havocs the given object
+  void havoc_rec(statet &, const guardt &, const exprt &);
+
   typedef symex_targett::assignment_typet assignment_typet;
 
   void symex_assign_rec(

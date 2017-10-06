@@ -114,6 +114,7 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);\n"
+    "void __CPROVER_havoc_object(void *);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
     "__CPROVER_bool __CPROVER_invalid_pointer(const void *);\n"
