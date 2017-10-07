@@ -496,7 +496,7 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       code.operands().clear();
       code.operands().push_back(expr);
       learnt_expr=and_exprt(learnt_expr, code.op0());
-      learnt_expr=simplify_expr(learnt_expr, ns);
+      // learnt_expr=simplify_expr(learnt_expr, ns);
     }
     else if(it->pc->type==ASSIGN ||
       it->pc->type==DECL)
@@ -512,7 +512,7 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
         it->pc->guard.is_false())
         continue;
       learnt_map[*it]=or_exprt(learnt_map[*it], learnt_expr);
-      learnt_map[*it]=simplify_expr(learnt_map[*it], ns);
+      // learnt_map[*it]=simplify_expr(learnt_map[*it], ns);
     }
   }
   for(auto &x : learnt_map)
@@ -609,6 +609,8 @@ void symex_bmc_clusteringt::operator()(
           !branch_cond.is_true();
 
         exprt tmp(learnt_map[state.source]);
+        exprt &learnt_expr=learnt_map[state.source];
+
         clean_expr(tmp, state, false);
         std::string msg=std::to_string(state.source.loc_count)
           + "##" + state.source.pc->source_location.as_string();
@@ -623,10 +625,45 @@ void symex_bmc_clusteringt::operator()(
         }
 
         if(add_learnt)
-          vcc(tmp, msg, state);
+        {
+          // vcc(tmp, msg, state);
+          total_vccs++;
+          state.total_vccs++;
+
+          exprt expr=tmp;
+          rewrite_quantifiers(expr, state);
+          state.rename(expr, ns);
+          do_simplify(expr);
+          if(expr.is_true())
+          {
+            learnt_expr.make_false();
+            continue;
+          }
+          if(expr.is_false())
+          {
+            learnt_expr.make_false();
+            continue;
+          }
+
+          state.guard.guard_expr(expr);
+
+          remaining_vccs++;
+          state.remaining_vccs++;
+          state.symex_target->assertion(
+            state.guard.as_expr(),
+            expr, msg, state.source);
+        }
       }
       continue;
     }
+    else if(state.source.pc->type==ASSERT)
+    {
+      merge_gotos(state);
+      symex_transition(state);
+      continue;
+    }
+
+
     symex_step(goto_functions, state);
   }
 

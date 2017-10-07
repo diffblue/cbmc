@@ -45,8 +45,7 @@ public:
     if(options.get_option("symex-method")=="fifo")
       symex_method="fifo";
     symex().constant_propagation=options.get_bool_option("propagation");
-    equations.push_back(equation);
-    symex().create_a_cluster(symex_state, equations[0]);
+    symex().create_a_cluster(symex_state, equation);
   }
 
   virtual ~bmc_clusteringt() { }
