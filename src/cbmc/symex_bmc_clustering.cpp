@@ -475,6 +475,95 @@ void symex_bmc_clusteringt::symex_guard_goto(statet &state, const exprt &guard)
   }
 }
 
+static bool a_contains_b(const exprt &a, const exprt &b)
+{
+  if(a==b)
+    return true;
+  if(a.id()==ID_plus)
+  {
+    bool simplified=false;
+    for(auto &op : a.operands())
+    {
+      if(a_contains_b(op, b))
+      {
+        if(simplified)
+        {
+          simplified=false;
+           break;
+        }
+        simplified=true;
+        continue;
+      }
+      if(op.id()!=ID_constant)
+      {
+        return false;
+      }
+    }
+    return simplified;
+  }
+  // std::cout << "-----------------------\n";
+  // std::cout << "check: \n" << from_expr(a) << "\n";
+  // std::cout << from_expr(b) << "\n\n";
+  if(a.id()!=ID_and)
+    return false;
+  for(auto &op : a.operands())
+  {
+    // std::cout << "op: " << from_expr(op) << "\n";
+    if(op.id()!=b.id())
+      continue;
+    if(b.id()==ID_lt || b.id()==ID_le)
+    {
+      // std::cout << "op.op1() " << from_expr(op.op1()) << "\n";
+      // std::cout << "b.op1() " << from_expr(b.op1()) << "\n";
+      // std::cout << "op.op0().id " << op.op0().id() << "\n";
+      if(op.op1()!=b.op1())
+        continue;
+      if(op.op0().id()!=ID_plus)
+        continue;
+      bool simplified=false;
+      for(auto &oop : op.op0().operands())
+      {
+        // std::cout << "oop: " << from_expr(oop) << "\n";
+        if(a_contains_b(oop, b.op0()))
+        {
+          if(simplified)
+          {
+            simplified=false;
+            break;
+          }
+          simplified=true;
+          continue;
+        }
+        if(oop.id()!=ID_constant)
+        {
+          simplified=false;
+          break;
+        }
+      }
+      if(simplified)
+        return true;
+    }
+  }
+  return false;
+}
+
+static void let_simplify(exprt &expr)
+{
+  if(expr.id()!=ID_and)
+    return;
+  auto it=expr.operands().begin();
+  while(it!=expr.operands().end())
+  {
+    if(it->is_true())
+      it=expr.operands().erase(it);
+    else it++;
+  }
+  if(expr.operands().size()==1)
+  {
+    expr=expr.operands()[0];
+  }
+}
+
 void symex_bmc_clusteringt::backtrack_learn(statet &state)
 {
   exprt learnt_expr=true_exprt();
@@ -495,8 +584,11 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       code.set_statement(ID_assert);
       code.operands().clear();
       code.operands().push_back(expr);
-      learnt_expr=and_exprt(learnt_expr, code.op0());
-      // learnt_expr=simplify_expr(learnt_expr, ns);
+      bool contained=a_contains_b(learnt_expr, code.op0());
+      if(!code.op0().is_true() && !contained)
+      {
+        learnt_expr=and_exprt(learnt_expr, code.op0());
+      }
     }
     else if(it->pc->type==ASSIGN ||
       it->pc->type==DECL)
@@ -505,6 +597,7 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
     }
 
     nondet_substitute(learnt_expr);
+    let_simplify(learnt_expr);
 
     if(it->pc->type==GOTO)
     {
