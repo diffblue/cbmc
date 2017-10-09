@@ -769,19 +769,8 @@ void java_bytecode_convert_methodt::setup_local_variables(
             << v.var.descriptor << "' holes " << v.holes.size() << eom;
 #endif
     typet t;
-    if(v.var.signature.has_value())
-    {
-      try
-      {
-        t=java_type_from_string(v.var.signature.value());
-      }
-      catch(unsupported_java_class_signature_exceptiont &e)
-      {
-        t=java_type_from_string(v.var.descriptor);
-      }
-    }
-    else
-      t=java_type_from_string(v.var.descriptor);
+    // TODO: might need changing once descriptor/signature issue is resolved
+    t=java_type_from_string(v.var.descriptor);
 
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.var.start_pc << "::" << v.var.name;
