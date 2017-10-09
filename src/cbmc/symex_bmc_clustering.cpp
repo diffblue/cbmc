@@ -475,7 +475,7 @@ void symex_bmc_clusteringt::symex_guard_goto(statet &state, const exprt &guard)
   }
 }
 
-static bool a_contains_b(const exprt &a, const exprt &b)
+bool symex_bmc_clusteringt::a_contains_b(const exprt &a, const exprt &b)
 {
   if(a==b)
     return true;
@@ -501,29 +501,29 @@ static bool a_contains_b(const exprt &a, const exprt &b)
     }
     return simplified;
   }
-  // std::cout << "-----------------------\n";
-  // std::cout << "check: \n" << from_expr(a) << "\n";
-  // std::cout << from_expr(b) << "\n\n";
   if(a.id()!=ID_and)
     return false;
   for(auto &op : a.operands())
   {
-    // std::cout << "op: " << from_expr(op) << "\n";
     if(op.id()!=b.id())
+    {
+      if(op.id()==ID_and)
+      {
+        if(a_contains_b(op, b)) return true;
+      }
       continue;
+    }
     if(b.id()==ID_lt || b.id()==ID_le)
     {
-      // std::cout << "op.op1() " << from_expr(op.op1()) << "\n";
-      // std::cout << "b.op1() " << from_expr(b.op1()) << "\n";
-      // std::cout << "op.op0().id " << op.op0().id() << "\n";
       if(op.op1()!=b.op1())
+      {
         continue;
+      }
       if(op.op0().id()!=ID_plus)
         continue;
       bool simplified=false;
       for(auto &oop : op.op0().operands())
       {
-        // std::cout << "oop: " << from_expr(oop) << "\n";
         if(a_contains_b(oop, b.op0()))
         {
           if(simplified)
@@ -547,13 +547,41 @@ static bool a_contains_b(const exprt &a, const exprt &b)
   return false;
 }
 
-static void let_simplify(exprt &expr)
+static void collect_ops_rec(const exprt &expr, std::vector<exprt> &ops)
+{
+  if(expr.id()==ID_and)
+  {
+    for(auto &op: expr.operands())
+      collect_ops_rec(op, ops);
+  }
+  else
+    ops.push_back(expr);
+}
+
+void symex_bmc_clusteringt::let_simplify(exprt &expr)
 {
   if(expr.id()!=ID_and)
     return;
+
+  std::vector<exprt> ops;
+  collect_ops_rec(expr, ops);
+  expr.operands().swap(ops);
+
   auto it=expr.operands().begin();
   while(it!=expr.operands().end())
   {
+    if(it->id()==ID_lt || it->id()==ID_le)
+    {
+      for(auto jt=expr.operands().begin(); jt!=expr.operands().end(); jt++)
+      {
+        if(jt==it) continue;
+        if(a_contains_b(*jt, *it))
+        {
+          it->make_true();
+          break;
+        }
+      }
+    }
     if(it->is_true())
       it=expr.operands().erase(it);
     else it++;
@@ -566,6 +594,10 @@ static void let_simplify(exprt &expr)
 
 void symex_bmc_clusteringt::backtrack_learn(statet &state)
 {
+  // to apply only locally learnt info ??? 
+  for(auto &x : learnt_map)
+    x.second.make_false();
+
   exprt learnt_expr=true_exprt();
   for(auto it=state.locations.rbegin(); it!=state.locations.rend(); ++it)
   {
@@ -604,12 +636,15 @@ void symex_bmc_clusteringt::backtrack_learn(statet &state)
       if(it->pc->guard.is_true() ||
         it->pc->guard.is_false())
         continue;
-      learnt_map[*it]=or_exprt(learnt_map[*it], learnt_expr);
-      // learnt_map[*it]=simplify_expr(learnt_map[*it], ns);
+      learnt_map[*it]=
+        // or_exprt(learnt_map[*it], learnt_expr);
+        or_exprt(learnt_map[*it], simplify_expr(learnt_expr, ns));
     }
   }
-  for(auto &x : learnt_map)
-    x.second=simplify_expr(x.second, ns);
+  // for(auto &x : learnt_map)
+  // {
+  //   x.second=simplify_expr(x.second, ns);
+  // }
 }
 
 void symex_bmc_clusteringt::print_learnt_map()
@@ -745,6 +780,7 @@ void symex_bmc_clusteringt::operator()(
           state.symex_target->assertion(
             state.guard.as_expr(),
             expr, msg, state.source);
+          return;
         }
       }
       continue;
@@ -755,7 +791,6 @@ void symex_bmc_clusteringt::operator()(
       symex_transition(state);
       continue;
     }
-
 
     symex_step(goto_functions, state);
   }

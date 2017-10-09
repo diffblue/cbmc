@@ -205,7 +205,7 @@ bool bmc_clusteringt::violated_assert()
   clear(equation);
 
   symex().mock_step(symex_state, goto_functions);
-
+  show_vcc();
   if(num==equation.SSA_steps.size())
     return false;
 
@@ -245,6 +245,31 @@ bool bmc_clusteringt::reachable_if()
     return false;
   decision_proceduret::resultt result=run_and_clear_decision_procedure();
 
+  // recover the analysis
+  symex_state=backup_state;
+  equation=tmp;
+
+  --symex().total_vccs;
+  --symex().remaining_vccs;
+
+  return (result==decision_proceduret::resultt::D_SATISFIABLE);
+}
+
+bool bmc_clusteringt::reachable()
+{
+#if 0
+  std::cout << "\n[(goto-symex^2)]: reachable\n";
+  std::cout << "[source]: " << symex_state.source.pc->source_location << "\n";
+  std::cout << "[type]: " << symex_state.source.pc->type << "\n";
+  std::cout << "[guard]:" << from_expr(symex_state.source.pc->guard) << "\n";
+#endif
+
+  // make a snapshot
+  goto_symext::statet backup_state=symex_state;
+  auto tmp=equation;
+
+  decision_proceduret::resultt result=run_and_clear_decision_procedure();
+  // show_vcc();
   // recover the analysis
   symex_state=backup_state;
   equation=tmp;
@@ -404,11 +429,45 @@ void bmc_clusteringt::trace_learning()
   goto_symext::statet trace_state=symex_state;
   symex_state=goto_symext::statet();
   equation.clear();
-  symex()(
-    symex_state,
-    goto_functions,
-    goto_functions.function_map.at(goto_functions.entry_point()).body,
-    trace_state);
+  while(!symex_state.call_stack().empty())
+  {
+    symex()(
+      symex_state,
+      goto_functions,
+      goto_functions.function_map.at(goto_functions.entry_point()).body,
+      trace_state);
+
+    if(symex_state.call_stack().empty())
+      break;
+    if(!reachable())
+    {
+       std::string desc=
+         (*equation.SSA_steps.rbegin()).comment;
+      for(std::size_t i=0; i<symex().states.size(); ++i)
+      {
+        auto &source=symex().states[i].source;
+        if(desc==
+          (std::to_string(source.loc_count)+"##"+
+          source.pc->source_location.as_string()))
+        {
+          std::cout << "[" << desc << "]: SUCCCESS\n";
+          symex_state=symex().states[i];
+          symex().states.erase(symex().states.begin()+i);
+          equation=equations[i];
+          equations.erase(equations.begin()+i);
+          preempted=true;
+          return;
+        }
+      }
+    }
+    else
+    {
+      // clear(equation);
+      equation.SSA_steps.pop_back();
+    }
+  }
+
+#if 0
   bmc_all_propertiest bmc_all_properties(goto_functions, prop_conv, *this);
   bmc_all_properties.set_message_handler(get_message_handler());
   bmc_all_properties.trace_solve();
@@ -439,4 +498,5 @@ void bmc_clusteringt::trace_learning()
     if(preempted)
       break;
   }
+#endif
 }
