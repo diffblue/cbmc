@@ -175,11 +175,11 @@ exprt java_bytecode_promotion(const exprt &expr)
 /// "Ljava/util/List<T>;" or "Ljava/util/List<Integer>;"
 ///
 /// \param src: the string representation as used in the class file
-/// \param class_name: name of class to append to generic type variables
+/// \param class_name_prefix: name of class to append to generic type variables
 /// \returns internal type representation for GOTO programs
 typet java_type_from_string(
   const std::string &src,
-  const std::string &class_name)
+  const std::string &class_name_prefix)
 {
   if(src.empty())
     return nil_typet();
@@ -210,7 +210,7 @@ typet java_type_from_string(
       // (TT;TU;I)V
       size_t closing_generic=find_closing_delimiter(src, 0, '<', '>');
       const typet &method_type=java_type_from_string(
-        src.substr(closing_generic+1, std::string::npos), class_name);
+        src.substr(closing_generic+1, std::string::npos), class_name_prefix);
 
       // This invariant being violated means that tkiley has not understood
       // part of the signature spec.
@@ -233,7 +233,7 @@ typet java_type_from_string(
       result.return_type()=
         java_type_from_string(
           std::string(src, e_pos+1, std::string::npos),
-          class_name);
+          class_name_prefix);
 
       for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
       {
@@ -271,7 +271,7 @@ typet java_type_from_string(
         }
 
         std::string sub_str=src.substr(start, i-start+1);
-        param.type()=java_type_from_string(sub_str, class_name);
+        param.type()=java_type_from_string(sub_str, class_name_prefix);
 
         if(param.type().id()==ID_symbol)
           param.type()=java_reference_type(param.type());
@@ -290,7 +290,8 @@ typet java_type_from_string(
         return nil_typet();
       char subtype_letter=src[1];
       const typet subtype=
-        java_type_from_string(src.substr(1, std::string::npos), class_name);
+        java_type_from_string(src.substr(1, std::string::npos),
+                              class_name_prefix);
       if(subtype_letter=='L' || // [L denotes a reference array of some sort.
          subtype_letter=='[' || // Array-of-arrays
          subtype_letter=='T')   // Array of generic types
@@ -313,8 +314,8 @@ typet java_type_from_string(
   {
     // parse name of type variable
     INVARIANT(src[src.size()-1]==';', "Generic type name must end on ';'.");
-    PRECONDITION(!class_name.empty());
-    irep_idt type_var_name(class_name+"::"+src.substr(1, src.size()-2));
+    PRECONDITION(!class_name_prefix.empty());
+    irep_idt type_var_name(class_name_prefix+"::"+src.substr(1, src.size()-2));
     return java_generic_parametert(
       type_var_name,
       java_type_from_string("Ljava/lang/Object;").subtype());
@@ -324,7 +325,6 @@ typet java_type_from_string(
       // ends on ;
       if(src[src.size()-1]!=';')
         return nil_typet();
-      std::string class_name=src.substr(1, src.size()-2);
 
       std::size_t f_pos=src.find('<', 1);
       // get generic type information
@@ -367,7 +367,8 @@ typet java_type_from_string(
             "Type not terminated with \';\'");
           const size_t end=curr_end-curr_start+1;
           const typet &t=
-            java_type_from_string(src.substr(curr_start, end), class_name);
+            java_type_from_string(src.substr(curr_start, end),
+                                  class_name_prefix);
 #ifdef DEBUG
           std::cout << "INFO: getting type "
                     << src.substr(curr_start, end) << "\n"
@@ -412,6 +413,7 @@ typet java_type_from_string(
 
         return result;
       }
+      std::string class_name=src.substr(1, src.size()-2);
       for(auto &letter : class_name)
         if(letter=='/')
           letter='.';
@@ -427,7 +429,7 @@ typet java_type_from_string(
   case '-':
   {
 #ifdef DEBUG
-    std::cout << class_name << std::endl;
+    std::cout << class_name_prefix << std::endl;
 #endif
     throw unsupported_java_class_siganture_exceptiont("wild card generic");
   }

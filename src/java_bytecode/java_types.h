@@ -72,7 +72,7 @@ bool is_reference_type(char t);
 typet java_type_from_char(char t);
 typet java_type_from_string(
   const std::string &,
-  const std::string &class_name="");
+  const std::string &class_name_prefix="");
 char java_char_from_type(const typet &type);
 std::vector<typet> java_generic_type_from_string(
   const std::string &,
