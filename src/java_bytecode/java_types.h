@@ -354,10 +354,10 @@ inline const typet &java_generics_class_type_bound(
 
 /// An exception that is raised for unsupported class signature.
 /// Currently we do not parse multiple bounds.
-class unsupported_java_class_siganture_exceptiont:public std::logic_error
+class unsupported_java_class_signature_exceptiont:public std::logic_error
 {
 public:
-  explicit unsupported_java_class_siganture_exceptiont(std::string type):
+  explicit unsupported_java_class_signature_exceptiont(std::string type):
     std::logic_error(
       "Unsupported class signature: "+type)
   {
@@ -373,7 +373,7 @@ inline typet java_type_from_string_with_exception(
   {
     return java_type_from_string(signature.value(), class_name);
   }
-  catch (unsupported_java_class_siganture_exceptiont &e)
+  catch (unsupported_java_class_signature_exceptiont &e)
   {
     return java_type_from_string(descriptor, class_name);
   }

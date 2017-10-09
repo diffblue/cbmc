@@ -209,6 +209,11 @@ typet java_type_from_string(
       // string:
       // (TT;TU;I)V
       size_t closing_generic=find_closing_delimiter(src, 0, '<', '>');
+      if(closing_generic==std::string::npos)
+      {
+        throw unsupported_java_class_signature_exceptiont(
+          "Failed to find generic signature closing delimiter");
+      }
       const typet &method_type=java_type_from_string(
         src.substr(closing_generic+1, std::string::npos), class_name_prefix);
 
@@ -332,7 +337,7 @@ typet java_type_from_string(
       {
         std::size_t e_pos=find_closing_delimiter(src, f_pos, '<', '>');
         if(e_pos==std::string::npos)
-          throw unsupported_java_class_siganture_exceptiont(
+          throw unsupported_java_class_signature_exceptiont(
             "recursive generic");
 
         // construct container type
@@ -431,7 +436,7 @@ typet java_type_from_string(
 #ifdef DEBUG
     std::cout << class_name_prefix << std::endl;
 #endif
-    throw unsupported_java_class_siganture_exceptiont("wild card generic");
+    throw unsupported_java_class_signature_exceptiont("wild card generic");
   }
   default:
     return nil_typet();
@@ -489,7 +494,7 @@ std::vector<typet> java_generic_type_from_string(
   std::string signature(src.substr(1, signature_end-1));
 
   if(signature.find(";:")!=std::string::npos)
-    throw unsupported_java_class_siganture_exceptiont("multiple bounds");
+    throw unsupported_java_class_signature_exceptiont("multiple bounds");
 
   PRECONDITION(signature[signature.size()-1]==';');
 

@@ -775,7 +775,7 @@ void java_bytecode_convert_methodt::setup_local_variables(
       {
         t=java_type_from_string(v.var.signature.value());
       }
-      catch(unsupported_java_class_siganture_exceptiont &e)
+      catch(unsupported_java_class_signature_exceptiont &e)
       {
         t=java_type_from_string(v.var.descriptor);
       }
