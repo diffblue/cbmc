@@ -83,7 +83,6 @@ class symex_bmc_clusteringt:
     const goto_functionst &goto_functions);
 
 protected:
-
   void pre_simplify(exprt &expr);
   void let_simplify(exprt &expr);
   bool a_contains_b(const exprt &a, const exprt &b);

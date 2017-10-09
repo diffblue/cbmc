@@ -509,7 +509,8 @@ bool symex_bmc_clusteringt::a_contains_b(const exprt &a, const exprt &b)
     {
       if(op.id()==ID_and)
       {
-        if(a_contains_b(op, b)) return true;
+        if(a_contains_b(op, b))
+          return true;
       }
       continue;
     }
@@ -551,7 +552,7 @@ static void collect_ops_rec(const exprt &expr, std::vector<exprt> &ops)
 {
   if(expr.id()==ID_and)
   {
-    for(auto &op: expr.operands())
+    for(auto &op : expr.operands())
       collect_ops_rec(op, ops);
   }
   else
@@ -574,7 +575,8 @@ void symex_bmc_clusteringt::let_simplify(exprt &expr)
     {
       for(auto jt=expr.operands().begin(); jt!=expr.operands().end(); jt++)
       {
-        if(jt==it) continue;
+        if(jt==it)
+          continue;
         if(a_contains_b(*jt, *it))
         {
           it->make_true();
@@ -594,7 +596,7 @@ void symex_bmc_clusteringt::let_simplify(exprt &expr)
 
 void symex_bmc_clusteringt::backtrack_learn(statet &state)
 {
-  // to apply only locally learnt info ??? 
+  // to apply only locally learnt info ???
   for(auto &x : learnt_map)
     x.second.make_false();
 
