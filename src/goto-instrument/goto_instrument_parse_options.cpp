@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/parameter_assignments.h>
 #include <goto-programs/slice_global_inits.h>
 #include <goto-programs/show_symbol_table.h>
+#include <goto-programs/goto_statistics.h>
 
 #include <pointer-analysis/value_set_analysis.h>
 #include <pointer-analysis/goto_program_dereference.h>
@@ -60,6 +61,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
+
+#include <util/file_util.h>
 
 #include <cbmc/version.h>
 
@@ -125,6 +128,29 @@ int goto_instrument_parse_optionst::doit()
   {
     help();
     return 0;
+  }
+
+  if(cmdline.isset("save-code-statistics"))
+  {
+    // Here we only early-check for requirements and we handle the option later.
+    const std::string out_json_file_pathname=
+      cmdline.get_value("save-code-statistics");
+    if(fileutl_is_directory(out_json_file_pathname))
+    {
+      error() << "The path-name '" << out_json_file_pathname
+              << "'passed to the option '--save-code-statistics' "
+                "represents an existing directory."
+              << eom;
+      return 12;
+    }
+    if(fileutl_parse_extension_in_pathname(out_json_file_pathname)!=".json")
+    {
+      error() << "The file of the path-name '" << out_json_file_pathname
+              << "'passed to the option '--save-code-statistics' does "
+                "not have '.json' extension."
+              << eom;
+      return 13;
+    }
   }
 
   eval_verbosity();
@@ -736,6 +762,31 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
       undefined_function_abort_path(goto_model);
+    }
+
+    if(cmdline.isset("save-code-statistics"))
+    {
+      goto_statisticst stats;
+      stats.extend(goto_model);
+      const std::string out_json_file_pathname=
+        cmdline.get_value("save-code-statistics");
+      INVARIANT(!fileutl_is_directory(out_json_file_pathname),
+                "The early check passed so the JSON file indeed should not be "
+                  " a directory.");
+      INVARIANT(
+        fileutl_parse_extension_in_pathname(out_json_file_pathname)==".json",
+        "The early check passed so the JSON file indeed should have "
+          "'.json' extension.");
+      std::ofstream ofile(out_json_file_pathname);
+      if(!ofile)
+      {
+        error() << "Failed to open the JSON file '" << out_json_file_pathname
+                << "' passed to the option '--save-code-statistics' "
+                << "for writing."
+                << eom;
+        return 13;
+      }
+      ofile << to_json(stats);
     }
 
     // write new binary?
@@ -1450,6 +1501,9 @@ void goto_instrument_parse_optionst::help()
     " --list-calls-args            list all function calls with their arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --print-path-lengths         print statistics about control-flow graph paths\n"
+    " --save-code-statistics       saves a json file with basic statistical data of"
+    "                              the analysed program after all analyses and\n"
+    "                              transformations have been performed on it.\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
