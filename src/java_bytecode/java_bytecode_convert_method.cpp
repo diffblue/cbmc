@@ -263,7 +263,20 @@ void java_bytecode_convert_method_lazy(
   symbol_tablet &symbol_table)
 {
   symbolt method_symbol;
-  typet member_type=java_type_from_string(m.descriptor);
+  typet member_type;
+  if(m.signature.has_value())
+  {
+#ifdef DEBUG
+    std::cout << "method " << m.name
+              << " has signature " << m.signature.value() << "\n";
+#endif
+    member_type=java_type_from_string(
+      m.signature.value(),
+      id2string(class_symbol.name));
+    INVARIANT(member_type.id()==ID_code, "Must be code type");
+  }
+  else
+    member_type=java_type_from_string(m.descriptor);
 
   method_symbol.name=method_identifier;
   method_symbol.base_name=m.base_name;
