@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/expr.h>
 #include <util/expr_iterator.h>
 

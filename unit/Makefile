@@ -1,10 +1,7 @@
 .PHONY: all cprover.dir test
 
 # Source files for test utilities
-SRC = src/expr/require_expr.cpp \
-      src/ansi-c/c_to_expr.cpp \
-      src/java_bytecode/load_java_class.cpp \
-      unit_tests.cpp \
+SRC = unit_tests.cpp \
       catch_example.cpp \
       util/expr_iterator.cpp \
       util/optional.cpp \
@@ -42,6 +39,9 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
+testing-utils/testing-utils$(LIBEXT):
+	$(MAKE) $(MAKEARGS) -C testing-utils
+
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/miniz/miniz$(OBJEXT) \
               ../src/ansi-c/ansi-c$(LIBEXT) \
@@ -58,7 +58,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/solvers/solvers$(LIBEXT) \
               # Empty last line
 
-OBJ += $(CPROVER_LIBS)
+OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 
 TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \

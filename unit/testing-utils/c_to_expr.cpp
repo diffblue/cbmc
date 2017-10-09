@@ -12,7 +12,7 @@
 ///
 #include "c_to_expr.h"
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 c_to_exprt::c_to_exprt():
   message_handler(

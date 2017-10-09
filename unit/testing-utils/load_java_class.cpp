@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #include "load_java_class.h"
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <iostream>
 
 #include <util/config.h>

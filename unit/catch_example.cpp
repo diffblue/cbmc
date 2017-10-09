@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 unsigned int Factorial(unsigned int number)
 {

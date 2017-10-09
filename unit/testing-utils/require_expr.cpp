@@ -14,7 +14,7 @@
 
 #include "require_expr.h"
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/arith_tools.h>
 
 /// Verify a given exprt is an index_exprt with a a constant value equal to the
