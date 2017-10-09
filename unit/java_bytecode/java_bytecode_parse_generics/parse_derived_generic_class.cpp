@@ -32,7 +32,8 @@ SCENARIO(
     std::string class_prefix="java::DerivedGeneric";
     REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
-    const symbolt &derived_symbol=new_symbol_table.lookup(class_prefix);
+    const symbolt &derived_symbol=new_symbol_table.lookup(class_prefix).value
+      ().get();
     REQUIRE(derived_symbol.is_type);
     const typet &derived_type=derived_symbol.type;
     REQUIRE(derived_type.id()==ID_struct);

@@ -32,7 +32,7 @@ SCENARIO(
       THEN("The symbol type should be generic")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$element");
+          new_symbol_table.lookup("java::generics$element").value().get();
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -76,7 +76,7 @@ SCENARIO(
       THEN("The symbol type should be generic")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$bound_element");
+          new_symbol_table.lookup("java::generics$bound_element").value().get();
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -127,7 +127,8 @@ SCENARIO(
 
       THEN("The generic fields should be annotated with concrete types")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::generics");
+        const symbolt &class_symbol=new_symbol_table.lookup("java::generics")
+          .value().get();
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -176,7 +177,8 @@ SCENARIO(
       {
         const symbolt &method_symbol=
           new_symbol_table
-            .lookup("java::generics$bound_element.f:()Ljava/lang/Number;");
+            .lookup("java::generics$bound_element.f:()Ljava/lang/Number;")
+            .value().get();
         const typet &symbol_type=method_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_code);
@@ -231,7 +233,8 @@ SCENARIO(
       THEN("The symbol should have a generic parameter")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$double_bound_element");
+          new_symbol_table.lookup("java::generics$double_bound_element")
+            .value().get();
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -270,7 +273,7 @@ SCENARIO(
     THEN("Both generic parameters should be encoded")
     {
       const symbolt &class_symbol=
-        new_symbol_table.lookup("java::generics$two_elements");
+        new_symbol_table.lookup("java::generics$two_elements").value().get();
       const typet &symbol_type=class_symbol.type;
 
       REQUIRE(symbol_type.id()==ID_struct);
