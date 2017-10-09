@@ -67,7 +67,7 @@ safety_checkert::resultt bmc_clusteringt::step(
       if(symex().learning_symex)
       {
         symex().backtrack_learn(symex_state);
-        // symex().print_learnt_map();
+        symex().print_learnt_map();
         trace_learning();
       }
 
@@ -205,7 +205,7 @@ bool bmc_clusteringt::violated_assert()
   clear(equation);
 
   symex().mock_step(symex_state, goto_functions);
-  show_vcc();
+
   if(num==equation.SSA_steps.size())
     return false;
 
