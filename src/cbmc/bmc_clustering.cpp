@@ -460,11 +460,8 @@ void bmc_clusteringt::trace_learning()
         }
       }
     }
-    else
-    {
-      // clear(equation);
+    if(equation.SSA_steps.back().is_assert())
       equation.SSA_steps.pop_back();
-    }
   }
 
 #if 0
