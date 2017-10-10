@@ -34,6 +34,12 @@ typedef std::multimap<irep_idt, irep_idt> symbol_module_mapt;
                                          it_end=(expr).upper_bound(module); \
       it!=it_end; ++it)
 
+class not_in_symbol_tablet:public std::out_of_range
+{
+public:
+  explicit not_in_symbol_tablet(const irep_idt &id):
+    std::out_of_range("key: " + as_string(id) + " is not in symbol table") {}
+};
 
 /// \brief The symbol table
 /// \ingroup gr_symbol_table
@@ -105,6 +111,9 @@ public:
 
   opt_symbol_reft get_writeable(const irep_idt &identifier);
 
+  const symbolt &at(const irep_idt &id) const { return at_impl(*this, id); }
+  symbolt &at(const irep_idt &id) { return at_impl(*this, id); }
+
   bool add(const symbolt &symbol);
 
   std::pair<symbolt &, bool> insert(symbolt symbol);
@@ -129,6 +138,21 @@ public:
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
+  }
+
+private:
+  template<typename T>
+  static auto at_impl(T &t, const irep_idt &id)
+    -> decltype(std::declval<T>().at(id))
+  {
+    try
+    {
+      return t.internal_symbols.at(id);
+    }
+    catch(const std::out_of_range &)
+    {
+      throw not_in_symbol_tablet(id);
+    }
   }
 };
 
