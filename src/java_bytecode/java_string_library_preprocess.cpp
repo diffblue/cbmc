@@ -35,6 +35,7 @@ Date:   April 2017
 /// empty string if not symbol or struct
 irep_idt get_tag(const typet &type)
 {
+  /// \todo Use follow instead of assuming tag to symbol relationship.
   if(type.id() == ID_symbol)
     return to_symbol_type(type).get_identifier();
   else if(type.id() == ID_struct)
@@ -490,6 +491,12 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
   return string_symbol.symbol_expr();
 }
 
+/// Add declaration of a refined string expr whose content and length are
+/// fresh symbols.
+/// \param loc: source location
+/// \param symbol_table: the symbol table
+/// \param code [out] : code block to which the declaration is added
+/// \return refined string expr with fresh content and length symbols
 refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   const source_locationt &loc,
   symbol_tablet &symbol_table,
@@ -649,6 +656,11 @@ codet java_string_library_preprocesst::code_return_function_application(
   return code_returnt(fun_app);
 }
 
+/// Declare a fresh symbol of type array of character with infinite size.
+/// \param symbol_table: the symbol table
+/// \param loc: source location
+/// \param code [out] : code block where the declaration gets added
+/// \return created symbol expression
 exprt make_nondet_infinite_char_array(
   symbol_tablet &symbol_table,
   const source_locationt &loc,
@@ -670,6 +682,13 @@ exprt make_nondet_infinite_char_array(
   return data_expr;
 }
 
+/// Add a call to a primitive of the string solver, letting it know that
+/// `pointer` points to the first character of `array`.
+/// \param pointer: a character pointer expression
+/// \param array: a character array expression
+/// \param symbol_table: the symbol table
+/// \param loc: source location
+/// \param code [out] : code block to which declaration and calls get added
 void add_pointer_to_array_association(
   const exprt &pointer,
   const exprt &array,
@@ -696,6 +715,13 @@ void add_pointer_to_array_association(
       symbol_table));
 }
 
+/// Add a call to a primitive of the string solver, letting it know that
+/// the actual length of `array` is `length`.
+/// \param array: infinite size character array expression
+/// \param length: integer expression
+/// \param symbol_table: the symbol table
+/// \param loc: source location
+/// \param code [out] : code block to which declaration and calls get added
 void add_array_to_length_association(
   const exprt &array,
   const exprt &length,
@@ -720,6 +746,10 @@ void add_array_to_length_association(
       symbol_table));
 }
 
+/// Create a refined_string_exprt `str` whose content and length are fresh
+/// symbols, calls the string primitive with name `function_name`.
+/// In the arguments of the primitive `str` takes the place of the result and
+/// the following arguments are given by parameter `arguments.
 /// \param function_name: the name of the function
 /// \param arguments: arguments of the function
 /// \param loc: source location
@@ -729,9 +759,9 @@ void add_array_to_length_association(
 /// int return_code;
 /// int str.length;
 /// char str.data[str.length]
-/// return_code = <function_name>_data(str.length, str.data, arguments)
+/// return_code = <function_name>(str.length, str.data, arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/// \return a new string expression
+/// \return refined string expression `str`
 refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -824,7 +854,7 @@ codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
 /// \param [out] code: code block that gets appended the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~
 /// lhs.length=rhs->length
-/// lhs.data=*(rhs->data)
+/// lhs.data=rhs->data
 /// ~~~~~~~~~~~~~~~~~~~~~~
 void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   const refined_string_exprt &lhs,
