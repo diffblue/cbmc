@@ -7,7 +7,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/c_types.h>
 #include <util/expr.h>
 #include <util/std_code.h>

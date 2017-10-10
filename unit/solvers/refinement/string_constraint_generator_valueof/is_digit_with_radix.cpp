@@ -7,7 +7,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <solvers/refinement/string_constraint_generator.h>
 #include <util/namespace.h>

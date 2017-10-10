@@ -3,6 +3,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
+
+file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
+
 list(REMOVE_ITEM sources
     # Used in executables
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD.cpp
@@ -22,9 +25,14 @@ list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/float_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
 
+    # Will be built into a separate library and linked
+    ${testing_utils}
+
     # Intended to fail to compile
     ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
 )
+
+add_subdirectory(testing-utils)
 
 add_executable(unit ${sources} ${headers})
 target_include_directories(unit
@@ -33,7 +41,7 @@ target_include_directories(unit
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(unit ansi-c solvers java_bytecode)
+target_link_libraries(unit testing-utils ansi-c solvers java_bytecode)
 add_test(
     NAME unit
     COMMAND $<TARGET_FILE:unit>

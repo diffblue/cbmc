@@ -9,7 +9,7 @@
 /// \file
 /// Does Remove Const Unit Tests
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <util/c_types.h>
 #include <util/namespace.h>

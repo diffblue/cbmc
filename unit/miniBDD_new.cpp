@@ -9,7 +9,7 @@
 /// \file
 /// Unit tests for miniBDD
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <solvers/miniBDD/miniBDD.h>
 #include <solvers/flattening/boolbv.h>

@@ -7,7 +7,7 @@
 \*******************************************************************/
 
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
+#include <testing-utils/catch.hpp>
 #include <util/irep.h>
 
 // Debug printer for irept

@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <istream>
 #include <memory>
@@ -15,7 +15,7 @@
 #include <util/language.h>
 #include <util/message.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <src/java_bytecode/load_java_class.h>
+#include <testing-utils/load_java_class.h>
 
 SCENARIO("java_bytecode_convert_abstract_class",
   "[core][java_bytecode][java_bytecode_convert_class]")

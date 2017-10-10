@@ -8,7 +8,7 @@ Author:
 
 #include <iostream>
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <analyses/call_graph.h>
 

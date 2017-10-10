@@ -7,7 +7,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <util/arith_tools.h>
 #include <util/std_types.h>

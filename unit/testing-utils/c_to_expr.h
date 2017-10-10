@@ -10,8 +10,8 @@
 /// Utility for converting strings in to exprt, throwing a CATCH exception
 /// if this fails in any way.
 
-#ifndef CPROVER_SRC_ANSI_C_C_TO_EXPR_H
-#define CPROVER_SRC_ANSI_C_C_TO_EXPR_H
+#ifndef CPROVER_TESTING_UTILS_C_TO_EXPR_H
+#define CPROVER_TESTING_UTILS_C_TO_EXPR_H
 
 #include <memory>
 
@@ -32,4 +32,4 @@ private:
   ansi_c_languaget language;
 };
 
-#endif // CPROVER_SRC_ANSI_C_C_TO_EXPR_H
+#endif // CPROVER_TESTING_UTILS_C_TO_EXPR_H

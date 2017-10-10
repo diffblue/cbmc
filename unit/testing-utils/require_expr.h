@@ -12,8 +12,8 @@
 /// Also checks associated properties and returns a casted version of the
 /// expression.
 
-#ifndef CPROVER_SRC_EXPR_REQUIRE_EXPR_H
-#define CPROVER_SRC_EXPR_REQUIRE_EXPR_H
+#ifndef CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
+#define CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
 
 #include <util/std_expr.h>
 
@@ -30,4 +30,4 @@ namespace require_expr
     const exprt &expr, const irep_idt &symbol_name);
 }
 
-#endif // CPROVER_SRC_EXPR_REQUIRE_EXPR_H
+#endif // CPROVER_TESTING_UTILS_REQUIRE_EXPR_H
