@@ -1662,6 +1662,16 @@ void value_sett::apply_code(
   }
   else if(statement==ID_array_set)
   {
+    if(code.operands().size()!=2)
+      throw "array_set expected to have two operands";
+
+    const exprt &data_pointer=code.op0();
+    const exprt &zero_element=code.op1();
+
+    typet element_type=data_pointer.type().subtype();
+    const dereference_exprt lhs(data_pointer, element_type);
+
+    assign(lhs, zero_element, ns, true, false);
   }
   else if(statement==ID_array_copy)
   {
