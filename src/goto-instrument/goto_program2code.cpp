@@ -134,7 +134,7 @@ void goto_program2codet::scan_for_varargs()
     system_headers.insert("stdarg.h");
 
     code_typet &code_type=
-      to_code_type(symbol_table.get_writeable(func_name)->get().type);
+      to_code_type(symbol_table.get_writeable_ref(func_name).type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator

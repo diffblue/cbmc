@@ -48,9 +48,7 @@ bool jsil_convertt::operator()(const jsil_parse_treet &parse_tree)
     if(convert_code(new_symbol, to_code(new_symbol.value)))
       return true;
 
-    symbol_tablet::opt_const_symbol_reft maybe_symbol=
-      symbol_table.lookup(new_symbol.name);
-    if(maybe_symbol)
+    if(const auto maybe_symbol=symbol_table.lookup(new_symbol.name))
     {
       const symbolt &s=*maybe_symbol;
       if(s.value.id()=="no-body-just-yet")

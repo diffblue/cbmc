@@ -208,7 +208,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
       {
         const irep_idt &tag_name=
           to_c_enum_tag_type(type.subtype()).get_identifier();
-        symbol_table.get_writeable(tag_name)->get().type.subtype()=result;
+        symbol_table.get_writeable_ref(tag_name).type.subtype()=result;
       }
 
       type=result;
@@ -782,7 +782,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           type.set(ID_tag, base_name);
 
           typecheck_compound_body(type);
-          symbol_table.get_writeable(s_it->first)->get().type.swap(type);
+          symbol_table.get_writeable_ref(s_it->first).type.swap(type);
         }
       }
       else if(have_body)
@@ -1220,7 +1220,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     {
       // Ok, overwrite the type in the symbol table.
       // This gives us the members and the subtype.
-      symbol_table.get_writeable(symbol.name)->get().type=enum_tag_symbol.type;
+      symbol_table.get_writeable_ref(symbol.name).type=enum_tag_symbol.type;
     }
     else if(symbol.type.id()==ID_c_enum)
     {

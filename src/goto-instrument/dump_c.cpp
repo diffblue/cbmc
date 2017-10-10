@@ -55,7 +55,7 @@ void dump_ct::operator()(std::ostream &os)
       continue;
 
     code_typet &code_type=to_code_type(
-      copied_symbol_table.get_writeable(named_symbol.first)->get().type);
+      copied_symbol_table.get_writeable_ref(named_symbol.first).type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     for(code_typet::parameterst::iterator

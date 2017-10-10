@@ -893,8 +893,7 @@ bool java_bytecode_convert_methodt::class_needs_clinit(
     findit_any.first->second=true;
     return true;
   }
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(classname);
+  const auto maybe_symbol=symbol_table.lookup(classname);
   // Stub class?
   if(!maybe_symbol)
   {

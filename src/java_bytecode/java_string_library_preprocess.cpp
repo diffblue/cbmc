@@ -796,8 +796,8 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 
   typet deref_type;
   if(rhs.type().subtype().id()==ID_symbol)
-    deref_type=symbol_table.lookup(
-      to_symbol_type(rhs.type().subtype()).get_identifier())->get().type;
+    deref_type=symbol_table.lookup_ref(
+      to_symbol_type(rhs.type().subtype()).get_identifier()).type;
   else
     deref_type=rhs.type().subtype();
 
@@ -1252,11 +1252,9 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
 
   // Check that the type of the object is in the symbol table,
   // otherwise there is no safe way of finding its value.
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(object_type.get_identifier());
-  if(maybe_symbol)
+  if(const auto maybe_symbol=symbol_table.lookup(object_type.get_identifier()))
   {
-    struct_typet struct_type=to_struct_type(maybe_symbol->get().type);
+    struct_typet struct_type=to_struct_type(maybe_symbol->type);
     // Check that the type has a value field
     const struct_union_typet::componentt value_comp=
       struct_type.get_component("value");
@@ -1502,7 +1500,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
   // > Class class1;
   pointer_typet class_type=
     java_reference_type(
-      symbol_table.lookup("java::java.lang.Class")->get().type);
+      symbol_table.lookup_ref("java::java.lang.Class").type);
   symbolt class1_sym=get_fresh_aux_symbol(
     class_type, "class_symbol", "class_symbol", loc, ID_java, symbol_table);
   symbol_exprt class1=class1_sym.symbol_expr();
@@ -1539,7 +1537,7 @@ codet java_string_library_preprocesst::make_object_get_class_code(
 
   // string1 = (String*) string_expr
   pointer_typet string_ptr_type=java_reference_type(
-    symbol_table.lookup("java::java.lang.String")->get().type);
+    symbol_table.lookup_ref("java::java.lang.String").type);
   exprt string1=allocate_fresh_string(string_ptr_type, loc, symbol_table, code);
   code.add(
     code_assign_string_expr_to_new_java_string(

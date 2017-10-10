@@ -148,30 +148,6 @@ void symbol_tablet::show(std::ostream &out) const
     out << it->second;
 }
 
-/// Find a symbol in the symbol table for read-only access.
-/// \param identifier: The name of the symbol to look for
-/// \return an optional reference, set if found, unset otherwise.
-symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
-  const irep_idt &identifier) const
-{
-  symbolst::const_iterator it=symbols.find(identifier);
-  if(it==symbols.end())
-    return opt_const_symbol_reft();
-  return std::ref(it->second);
-}
-
-/// Find a symbol in the symbol table for read-write access.
-/// \param identifier: The name of the symbol to look for
-/// \return an optional reference, set if found, unset otherwise.
-symbol_tablet::opt_symbol_reft symbol_tablet::get_writeable(
-  const irep_idt &identifier)
-{
-  symbolst::iterator it=internal_symbols.find(identifier);
-  if(it==symbols.end())
-    return opt_symbol_reft();
-  return std::ref(it->second);
-}
-
 /// Print the contents of the symbol table
 /// \param out: The ostream to direct output to
 /// \param symbol_table: The symbol table to print out

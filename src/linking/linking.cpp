@@ -1290,7 +1290,7 @@ void linkingt::copy_symbols()
        named_symbol.second.value.is_not_nil())
     {
       object_type_updates(
-        main_symbol_table.get_writeable(named_symbol.first)->get().value);
+        main_symbol_table.get_writeable_ref(named_symbol.first).value);
     }
   }
 }
