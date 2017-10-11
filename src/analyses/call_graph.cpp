@@ -107,6 +107,26 @@ call_grapht call_grapht::get_inverted() const
   return result;
 }
 
+std::list<irep_idt>call_grapht::shortest_function_path
+(irep_idt src, irep_idt dest)
+{
+  std::list<irep_idt> result;
+  node_indext src_idx, dest_idx;
+  if(!get_node_index(src, src_idx))
+    throw "unable to find src function in call graph";
+  if(!get_node_index(dest, dest_idx))
+    throw "unable to find destination function in call graph";
+
+  patht path;
+  shortest_path(src_idx, dest_idx, path);
+  for(const auto &n : path)
+  {
+    result.push_back(nodes[n].function_name);
+  }
+  return result;
+}
+
+
 std::unordered_set<irep_idt, irep_id_hash>
 call_grapht::reachable_functions(irep_idt start_function)
 {

@@ -46,6 +46,7 @@ public:
   call_grapht get_inverted() const;
   std::unordered_set<irep_idt, irep_id_hash>
       reachable_functions(irep_idt start);
+  std::list<irep_idt>shortest_function_path(irep_idt src, irep_idt dest);
 
   bool get_node_index(const irep_idt& function_name, node_indext &n) const
   {
