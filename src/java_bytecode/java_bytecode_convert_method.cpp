@@ -1329,8 +1329,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             "java::org.cprover.CProver.assume:(Z)V")
     {
       const code_typet &code_type=to_code_type(arg0.type());
-      // sanity check: function has the right number of args
-      assert(code_type.parameters().size()==1);
+      INVARIANT(code_type.parameters().size()==1,
+                "function expected to have exactly one parameter");
 
       exprt operand = pop(1)[0];
       // we may need to adjust the type of the argument
@@ -1393,7 +1393,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(use_this)
       {
         const exprt &this_arg=call.arguments().front();
-        assert(this_arg.type().id()==ID_pointer);
+        INVARIANT(this_arg.type().id()==ID_pointer,
+                  "first argument must be a pointer");
       }
 
       // do some type adjustment for the arguments,

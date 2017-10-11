@@ -535,7 +535,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         vt_symb_type.is_type=true;
 
         const bool failed=!symbol_table.insert(std::move(vt_symb_type)).second;
-        assert(!failed);
+        CHECK_RETURN(!failed);
 
         // add a virtual-table pointer
         struct_typet::componentt compo;
@@ -611,7 +611,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
           // add the parameter to the symbol table
           const bool failed=!symbol_table.insert(std::move(arg_symb)).second;
-          assert(!failed);
+          CHECK_RETURN(!failed);
         }
 
         // do the body of the function
@@ -669,7 +669,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // add the function to the symbol table
         {
           const bool failed=!symbol_table.insert(std::move(func_symb)).second;
-          assert(!failed);
+          CHECK_RETURN(!failed);
         }
 
         // next base

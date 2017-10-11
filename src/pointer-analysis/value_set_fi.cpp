@@ -412,9 +412,10 @@ void value_set_fit::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    assert(type.id()==ID_array ||
-           type.id()==ID_incomplete_array ||
-           type.id()=="#REF#");
+    DATA_INVARIANT(type.id()==ID_array ||
+                   type.id()==ID_incomplete_array ||
+                   type.id()=="#REF#",
+                   "operand 0 of index expression must be an array");
 
     get_value_set_rec(expr.op0(), dest, "[]"+suffix,
                       original_type, ns, recursion_set);
@@ -429,10 +430,11 @@ void value_set_fit::get_value_set_rec(
     {
       const typet &type=ns.follow(expr.op0().type());
 
-      assert(type.id()==ID_struct ||
-             type.id()==ID_union ||
-             type.id()==ID_incomplete_struct ||
-             type.id()==ID_incomplete_union);
+      DATA_INVARIANT(type.id()==ID_struct ||
+                     type.id()==ID_union ||
+                     type.id()==ID_incomplete_struct ||
+                     type.id()==ID_incomplete_union,
+                     "operand 0 of member expression must be struct or union");
 
       const std::string &component_name=
         expr.get_string(ID_component_name);
@@ -1290,9 +1292,10 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_array ||
-           type.id()==ID_incomplete_array ||
-           type.id()=="#REF#");
+    DATA_INVARIANT(type.id()==ID_array ||
+                   type.id()==ID_incomplete_array ||
+                   type.id()=="#REF#",
+                   "operand 0 of index expression must be an array");
 
     assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, recursion_set);
   }
@@ -1308,10 +1311,11 @@ void value_set_fit::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_struct ||
-           type.id()==ID_union ||
-           type.id()==ID_incomplete_struct ||
-           type.id()==ID_incomplete_union);
+    DATA_INVARIANT(type.id()==ID_struct ||
+                   type.id()==ID_union ||
+                   type.id()==ID_incomplete_struct ||
+                   type.id()==ID_incomplete_union,
+                   "operand 0 of member expression must be struct or union");
 
     assign_rec(lhs.op0(), values_rhs, "."+component_name+suffix,
                ns, recursion_set);

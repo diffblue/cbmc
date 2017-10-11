@@ -54,7 +54,7 @@ void prop_minimizet::fix_objectives()
     }
   }
 
-  assert(found);
+  POSTCONDITION(found);
 }
 
 /// Build constraints that require us to improve on at least one goal, greedily.

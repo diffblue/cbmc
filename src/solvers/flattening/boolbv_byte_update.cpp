@@ -31,7 +31,7 @@ bvt boolbvt::convert_byte_update(const byte_update_exprt &expr)
   else if(expr.id()==ID_byte_update_big_endian)
     little_endian=false;
   else
-    assert(false);
+    UNREACHABLE;
 
   bvt bv=convert_bv(op);
 

@@ -4246,7 +4246,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 bool smt2_convt::use_array_theory(const exprt &expr)
 {
   const typet &type=ns.follow(expr.type());
-  assert(type.id()==ID_array);
+  PRECONDITION(type.id()==ID_array);
   // const array_typet &array_type=to_array_type(ns.follow(expr.type()));
 
   if(use_datatypes)

@@ -117,5 +117,6 @@ typet join_types(const typet &t1, const typet &t2)
   std::cerr << "Tried to join types: "
             << t1.pretty() << " and " << t2.pretty()
             << '\n';
-  assert(!"Couldn't join types");
+
+  INVARIANT(false, "failed to join types");
 }
