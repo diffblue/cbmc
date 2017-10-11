@@ -655,8 +655,12 @@ std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
 template<class N>
 void grapht<N>::output_dot(std::ostream &out) const
 {
+  out << "digraph call_graph {\n";
+
   for(node_indext n=0; n<nodes.size(); n++)
     output_dot_node(out, n);
+
+  out << "}\n";
 }
 
 template<class N>
@@ -668,7 +672,12 @@ void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const
       it=node.out.begin();
       it!=node.out.end();
       it++)
-    out << n << " -> " << it->first << '\n';
+  {
+    out << "  \"" << n << "\" -> "
+        << "\"" << it->first << "\" "
+        << " [arrowhead=\"vee\"];"
+        << "\n";
+  }
 }
 
 #endif // CPROVER_UTIL_GRAPH_H
