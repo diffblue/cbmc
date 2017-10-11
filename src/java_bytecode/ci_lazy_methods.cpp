@@ -280,6 +280,13 @@ void ci_lazy_methodst::initialize_needed_classes(
   lazy_methods.add_needed_class("java::java.lang.String");
   lazy_methods.add_needed_class("java::java.lang.Class");
   lazy_methods.add_needed_class("java::java.lang.Object");
+  // Add the classes that can be produced by `java_bytecode_instrument`:
+  lazy_methods.add_needed_class("java::java.lang.NullPointerException");
+  lazy_methods.add_needed_class("java::java.lang.ArithmeticException");
+  lazy_methods.add_needed_class(
+    "java::java.lang.ArrayIndexOutOfBoundsException");
+  lazy_methods.add_needed_class("java::java.lang.ClassCastException");
+  lazy_methods.add_needed_class("java::java.lang.NegativeArraySizeException");
 }
 
 /// Build up list of methods for types for a pointer and any types it
