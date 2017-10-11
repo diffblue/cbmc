@@ -312,7 +312,7 @@ void remove_exceptionst::add_exception_dispatch_sequence(
 
   // find the symbol corresponding to the caught exceptions
   const symbolt &exc_symbol=
-    *symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
+    symbol_table.lookup_ref(id2string(function_id)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add GOTOs implementing the dynamic dispatch of the
@@ -387,7 +387,7 @@ void remove_exceptionst::instrument_throw(
 
   // find the symbol where the thrown exception should be stored:
   const symbolt &exc_symbol=
-    *symbol_table.lookup(id2string(func_it->first)+EXC_SUFFIX);
+    symbol_table.lookup_ref(id2string(func_it->first)+EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add the assignment with the appropriate cast
