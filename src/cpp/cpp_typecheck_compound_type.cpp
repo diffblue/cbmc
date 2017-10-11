@@ -159,9 +159,7 @@ void cpp_typecheckt::typecheck_compound_type(
 
   // check if we have it already
 
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(symbol_name);
-  if(maybe_symbol)
+  if(const auto maybe_symbol=symbol_table.lookup(symbol_name))
   {
     // we do!
     const symbolt &symbol=*maybe_symbol;
@@ -553,7 +551,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
         put_compound_into_scope(compo);
       }
 
-      typet &vt=symbol_table.get_writeable(vt_name)->get().type;
+      typet &vt=symbol_table.get_writeable_ref(vt_name).type;
       INVARIANT(vt.id()==ID_struct, "Virtual tables must be stored as struct");
       struct_typet &virtual_table=to_struct_type(vt);
 

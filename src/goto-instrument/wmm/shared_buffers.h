@@ -158,11 +158,10 @@ public:
 
   irep_idt choice(const irep_idt &function, const std::string &suffix)
   {
-    symbol_tablet::opt_const_symbol_reft maybe_symbol=
-      symbol_table.lookup(function);
+    const auto maybe_symbol=symbol_table.lookup(function);
     const std::string function_base_name =
       maybe_symbol
-        ? id2string(maybe_symbol->get().base_name)
+        ? id2string(maybe_symbol->base_name)
         : "main";
     return add(function_base_name+"_weak_choice",
       function_base_name+"_weak_choice", suffix, bool_typet());

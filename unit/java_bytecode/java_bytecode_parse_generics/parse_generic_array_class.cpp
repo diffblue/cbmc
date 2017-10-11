@@ -32,8 +32,7 @@ SCENARIO(
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
   const struct_typet &type=to_struct_type(
-    new_symbol_table.lookup(class_prefix)
-      .value().get().type);
+    new_symbol_table.lookup_ref(class_prefix).type);
 
   THEN("There should be a component with name t")
   {
@@ -48,8 +47,7 @@ SCENARIO(
   THEN("The t component is a valid java array")
   {
     const struct_typet &subtype_type=to_struct_type(
-      new_symbol_table.lookup(subtype.get_identifier())
-        .value().get().type);
+      new_symbol_table.lookup_ref(subtype.get_identifier()).type);
     REQUIRE(is_valid_java_array(subtype_type));
   }
 

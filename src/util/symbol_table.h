@@ -41,9 +41,6 @@ class symbol_tablet
 {
 public:
   typedef std::unordered_map<irep_idt, symbolt, irep_id_hash> symbolst;
-  typedef optionalt<std::reference_wrapper<const symbolt>>
-    opt_const_symbol_reft;
-  typedef optionalt<std::reference_wrapper<symbolt>> opt_symbol_reft;
 
 private:
   symbolst internal_symbols;
@@ -101,9 +98,29 @@ public:
     return symbols.find(name)!=symbols.end();
   }
 
-  opt_const_symbol_reft lookup(const irep_idt &identifier) const;
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param id: The name of the symbol to look for
+  /// \return an optional reference, set if found, nullptr otherwise.
+  const symbolt *lookup(const irep_idt &id) const { return lookup_impl(id); }
 
-  opt_symbol_reft get_writeable(const irep_idt &identifier);
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param id: The name of the symbol to look for
+  /// \return an optional reference, set if found, unset otherwise.
+  symbolt *get_writeable(const irep_idt &id) { return lookup_impl(id); }
+
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param id: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  const symbolt &lookup_ref(const irep_idt &id) const
+    { return internal_symbols.at(id); }
+
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param id: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  symbolt &get_writeable_ref(const irep_idt &id)
+    { return internal_symbols.at(id); }
 
   bool add(const symbolt &symbol);
 
@@ -129,6 +146,21 @@ public:
     internal_symbols.swap(other.internal_symbols);
     internal_symbol_base_map.swap(other.internal_symbol_base_map);
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
+  }
+
+private:
+  const symbolt *lookup_impl(const irep_idt &id) const
+    { return lookup_impl(*this, id); }
+
+  symbolt *lookup_impl(const irep_idt &id)
+    { return lookup_impl(*this, id); }
+
+  template<typename T>
+  static auto lookup_impl(T &t, const irep_idt &id)
+    -> decltype(std::declval<T>().lookup_impl(id))
+  {
+    const auto it=t.internal_symbols.find(id);
+    return it==t.internal_symbols.end()?nullptr:&it->second;
   }
 };
 

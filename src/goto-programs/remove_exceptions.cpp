@@ -134,8 +134,7 @@ void remove_exceptionst::add_exceptional_returns(
   const irep_idt &function_id=func_it->first;
   goto_programt &goto_program=func_it->second.body;
 
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(function_id);
+  auto maybe_symbol=symbol_table.lookup(function_id);
   INVARIANT(maybe_symbol, "functions should be recorded in the symbol table");
   const symbolt &function_symbol=*maybe_symbol;
 
@@ -255,11 +254,9 @@ void remove_exceptionst::instrument_exception_handler(
     to_code_landingpad(instr_it->code).catch_expr();
   irep_idt thrown_exception_global=id2string(function_id)+EXC_SUFFIX;
 
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(thrown_exception_global);
-  if(maybe_symbol)
+  if(const auto maybe_symbol=symbol_table.lookup(thrown_exception_global))
   {
-    const symbol_exprt thrown_global_symbol=maybe_symbol->get().symbol_expr();
+    const symbol_exprt thrown_global_symbol=maybe_symbol->symbol_expr();
     // next we reset the exceptional return to NULL
     null_pointer_exprt null_voidptr((pointer_type(empty_typet())));
 
@@ -425,9 +422,9 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  symbol_tablet::opt_const_symbol_reft callee_inflight_exception=
+  const auto callee_inflight_exception=
     symbol_table.lookup(id2string(callee_id)+EXC_SUFFIX);
-  symbol_tablet::opt_const_symbol_reft local_inflight_exception=
+  const auto local_inflight_exception=
     symbol_table.lookup(id2string(function_id)+EXC_SUFFIX);
 
   if(callee_inflight_exception && local_inflight_exception)
@@ -436,9 +433,9 @@ void remove_exceptionst::instrument_function_call(
       func_it, instr_it, stack_catch, locals);
 
     const symbol_exprt callee_inflight_exception_expr=
-      callee_inflight_exception->get().symbol_expr();
+      callee_inflight_exception->symbol_expr();
     const symbol_exprt local_inflight_exception_expr=
-      local_inflight_exception->get().symbol_expr();
+      local_inflight_exception->symbol_expr();
 
     // add a null check (so that instanceof can be applied)
     equal_exprt eq_null(

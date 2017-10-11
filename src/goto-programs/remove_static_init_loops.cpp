@@ -58,8 +58,7 @@ void remove_static_init_loopst::unwind_enum_static(
         const std::string &fname=id2string(ins.function);
         size_t class_prefix_length=fname.find_last_of('.');
         // is the function symbol in the symbol table?
-        symbol_tablet::opt_const_symbol_reft maybe_symbol=
-          symbol_table.lookup(ins.function);
+        const auto maybe_symbol=symbol_table.lookup(ins.function);
         if(!maybe_symbol)
         {
           message.warning() << "function `" << id2string(ins.function)

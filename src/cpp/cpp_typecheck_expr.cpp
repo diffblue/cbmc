@@ -1244,8 +1244,7 @@ void cpp_typecheckt::typecheck_expr_member(
     assert(it!=symbol_table.symbols.end());
 
     if(it->second.value.id()=="cpp_not_typechecked")
-      symbol_table.get_writeable(component_name)->get()
-        .value.set("is_used", true);
+      symbol_table.get_writeable_ref(component_name).value.set("is_used", true);
   }
 }
 
@@ -2203,7 +2202,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
            type.id()==ID_code &&
            type.find(ID_return_type).id()==ID_destructor)
         {
-          add_method_body(&symbol_table.get_writeable(it->get(ID_name))->get());
+          add_method_body(&symbol_table.get_writeable_ref(it->get(ID_name)));
           break;
         }
       }
@@ -2372,7 +2371,7 @@ void cpp_typecheckt::typecheck_method_application(
   member_expr.swap(expr.function());
 
   const symbolt &symbol=lookup(member_expr.get(ID_component_name));
-  add_method_body(&symbol_table.get_writeable(symbol.name)->get());
+  add_method_body(&symbol_table.get_writeable_ref(symbol.name));
 
   // build new function expression
   exprt new_function(cpp_symbol_expr(symbol));
@@ -2414,7 +2413,7 @@ void cpp_typecheckt::typecheck_method_application(
   if(symbol.value.id()=="cpp_not_typechecked" &&
      !symbol.value.get_bool("is_used"))
   {
-    symbol_table.get_writeable(symbol.name)->get().value.set("is_used", true);
+    symbol_table.get_writeable_ref(symbol.name).value.set("is_used", true);
   }
 }
 
@@ -2683,7 +2682,7 @@ void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
     assert(it != symbol_table.symbols.end());
 
     if(it->second.value.id()=="cpp_not_typechecked")
-      symbol_table.get_writeable(it->first)->get().value.set("is_used", true);
+      symbol_table.get_writeable_ref(it->first).value.set("is_used", true);
   }
 
   c_typecheck_baset::typecheck_expr_function_identifier(expr);
