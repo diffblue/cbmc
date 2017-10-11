@@ -28,6 +28,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
+       util/message.cpp \
        util/simplify_expr.cpp \
        catch_example.cpp \
        # Empty last line

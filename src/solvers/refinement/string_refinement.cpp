@@ -145,7 +145,7 @@ string_refinementt::string_refinementt(const infot &info):
 
 /// display the current index set, for debugging
 static void display_index_set(
-  messaget::mstreamt stream,
+  messaget::mstreamt &stream,
   const namespacet &ns,
   const index_set_pairt &index_set)
 {
