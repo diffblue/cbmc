@@ -55,7 +55,7 @@ inline bool can_cast_code_impl(const exprt &expr, const Tag &tag)
 {
   try
   {
-    return expr_dynamic_cast<const codet &>(expr).get_statement()==tag;
+    return expr_dynamic_cast<codet>(expr).get_statement()==tag;
   }
   catch(const std::bad_cast &)
   {
@@ -1246,8 +1246,7 @@ inline bool can_cast_side_effect_expr_impl(const exprt &expr, const Tag &tag)
 {
   try
   {
-    return
-      expr_dynamic_cast<const side_effect_exprt &>(expr).get_statement()==tag;
+    return expr_dynamic_cast<side_effect_exprt>(expr).get_statement()==tag;
   }
   catch(const std::bad_cast &)
   {
