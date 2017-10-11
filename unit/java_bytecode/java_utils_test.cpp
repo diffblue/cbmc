@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <java_bytecode/java_utils.h>
 

@@ -19,6 +19,7 @@ SRC += unit_tests.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        miniBDD_new.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
+       java_bytecode/java_utils_test.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
