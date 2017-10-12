@@ -47,7 +47,7 @@ add_test(
     COMMAND $<TARGET_FILE:unit>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
-set_tests_properties(unit PROPERTIES LABELS CORE)
+set_tests_properties(unit PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(miniBDD miniBDD.cpp)
 target_include_directories(miniBDD
@@ -58,7 +58,7 @@ target_include_directories(miniBDD
 )
 target_link_libraries(miniBDD solvers ansi-c)
 add_test(NAME miniBDD COMMAND $<TARGET_FILE:miniBDD>)
-set_tests_properties(miniBDD PROPERTIES LABELS CORE)
+set_tests_properties(miniBDD PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(string_utils string_utils.cpp)
 target_include_directories(string_utils
@@ -69,7 +69,7 @@ target_include_directories(string_utils
 )
 target_link_libraries(string_utils solvers ansi-c)
 add_test(NAME string_utils COMMAND $<TARGET_FILE:string_utils>)
-set_tests_properties(string_utils PROPERTIES LABELS CORE)
+set_tests_properties(string_utils PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(sharing_node sharing_node.cpp)
 target_include_directories(sharing_node
@@ -80,4 +80,4 @@ target_include_directories(sharing_node
 )
 target_link_libraries(sharing_node util)
 add_test(NAME sharing_node COMMAND $<TARGET_FILE:sharing_node>)
-set_tests_properties(sharing_node PROPERTIES LABELS CORE)
+set_tests_properties(sharing_node PROPERTIES LABELS "CORE;CBMC")
