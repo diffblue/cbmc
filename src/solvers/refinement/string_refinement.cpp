@@ -324,9 +324,8 @@ void string_refinementt::set_to(const exprt &expr, bool value)
   }
   else
   {
-    if(has_char_array_subexpr(expr, ns))
-      warning() << "WARNING: string_refinement.cpp: "
-                   "non string equation has char array subexpr";
+    INVARIANT(
+      !has_char_array_subexpr(expr, ns), "char array only appear in equations");
     supert::set_to(expr, value);
   }
 }
@@ -446,7 +445,13 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 #endif
 
 #ifdef DEBUG
-  generator.debug_arrays_of_pointers(debug());
+  debug() << "dec_solve: arrays_of_pointers:" << eom;
+  for(auto pair : generator.get_arrays_of_pointers())
+  {
+    debug() << "  * " << from_expr(ns, "", pair.first) << "\t--> "
+            << from_expr(ns, "", pair.second) << " : "
+            << from_type(ns, "", pair.second.type()) << eom;
+  }
 #endif
 
   for(const auto &eq : equations)
@@ -1173,6 +1178,44 @@ exprt concretize_arrays_in_expression(
   return expr;
 }
 
+/// Debugging function which outputs the different steps an axiom goes through
+/// to be checked in check axioms.
+static void debug_check_axioms_step(
+  messaget::mstreamt &stream,
+  const namespacet &ns,
+  const exprt &axiom,
+  const exprt &axiom_in_model,
+  const exprt &negaxiom,
+  const exprt &with_concretized_arrays)
+{
+  static const std::string indent = "  ";
+  static const std::string indent2 = "    ";
+  stream << indent2 << "- axiom:\n" << indent2 << indent;
+
+  if(axiom.id() == ID_string_constraint)
+    stream << from_expr(ns, "", to_string_constraint(axiom));
+  else if(axiom.id() == ID_string_not_contains_constraint)
+    stream << from_expr(ns, "", to_string_not_contains_constraint(axiom));
+  else
+    stream << from_expr(ns, "", axiom);
+  stream << '\n' << indent2 << "- axiom_in_model:\n" << indent2 << indent;
+
+  if(axiom_in_model.id() == ID_string_constraint)
+    stream << from_expr(ns, "", to_string_constraint(axiom_in_model));
+  else if(axiom_in_model.id() == ID_string_not_contains_constraint)
+    stream << from_expr(
+      ns, "", to_string_not_contains_constraint(axiom_in_model));
+  else
+    stream << from_expr(ns, "", axiom_in_model);
+
+  stream << '\n'
+         << indent2 << "- negated_axiom:\n"
+         << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+  stream << indent2 << "- negated_axiom_with_concretized_arrays:\n"
+         << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
+         << '\n';
+}
+
 /// \return true if the current model satisfies all the axioms
 /// \return a Boolean
 static std::pair<bool, std::vector<exprt>> check_axioms(
@@ -1227,28 +1270,14 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       univ_var, get(bound_inf), get(bound_sup), get(prem), get(body));
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
-
-    stream << indent << i << ".\n"
-           << indent2 << "- axiom:\n"
-           << indent2 << indent << from_expr(ns, "", axiom) << '\n';
-    stream << indent2 << "- axiom_in_model:\n"
-           << indent2 << indent << from_expr(ns, "", axiom_in_model) << '\n';
-    stream << indent2 << "- negated_axiom:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
     negaxiom = simplify_expr(negaxiom, ns);
-    stream << indent2 << "- simplified_negaxiom:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
-
     exprt with_concretized_arrays =
       concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-    stream << indent2 << "- negated_axiom_with_concretized_array_access:\n"
-           << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
-           << '\n';
-
     substitute_array_access(with_concretized_arrays);
-    stream << indent2 << "- negated_axiom_without_array_access:\n"
-           << indent2 << indent << from_expr(ns, "", with_concretized_arrays)
-           << eom;
+
+    stream << indent << i << ".\n";
+    debug_check_axioms_step(
+      stream, ns, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
     if(const auto &witness=
        find_counter_example(ns, ui, with_concretized_arrays, univ_var))
@@ -1290,24 +1319,16 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     exprt negaxiom =
       negation_of_not_contains_constraint(nc_axiom_in_model, univ_var);
-    stream << indent << i << ".\n"
-           << indent2 << "- axiom:\n"
-           << indent2 << indent << from_expr(ns, "", nc_axiom) << '\n';
-    stream << indent2 << "- axiom_in_model:\n"
-           << indent2 << indent << from_expr(ns, "", nc_axiom_in_model) << '\n';
-    stream << indent2 << "- negated_axiom:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
 
     negaxiom = simplify_expr(negaxiom, ns);
-    stream << indent2 << "- simplified_negaxiom:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
-    negaxiom = concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-    stream << indent2 << "- negated_axiom_with_concretized_array_access:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << '\n';
+    exprt with_concrete_arrays =
+      concretize_arrays_in_expression(negaxiom, max_string_length, ns);
 
-    substitute_array_access(negaxiom);
-    stream << indent2 << "- negated_axiom_without_array_access:\n"
-           << indent2 << indent << from_expr(ns, "", negaxiom) << eom;
+    substitute_array_access(with_concrete_arrays);
+
+    stream << indent << i << ".\n";
+    debug_check_axioms_step(
+      stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
 
     if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
     {
