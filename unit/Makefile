@@ -1,4 +1,4 @@
-.PHONY: all cprover.dir test
+.PHONY: all cprover.dir testing-utils.dir test
 
 # Source files for test utilities
 SRC = unit_tests.cpp \
@@ -41,7 +41,7 @@ include ../src/common
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
 
-testing-utils/testing-utils$(LIBEXT):
+testing-utils.dir:
 	$(MAKE) $(MAKEARGS) -C testing-utils
 
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
@@ -70,7 +70,7 @@ TESTS = unit_tests$(EXEEXT) \
 
 CLEANFILES = $(TESTS)
 
-all: cprover.dir
+all: cprover.dir testing-utils.dir
 	$(MAKE) $(MAKEARGS) $(TESTS)
 
 test: all
