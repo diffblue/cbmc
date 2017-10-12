@@ -1946,15 +1946,8 @@ exprt string_refinementt::get(const exprt &expr) const
     }
     else
     {
-      const auto &arr_of_ptr = generator.get_arrays_of_pointers();
-      const auto arr_in_arr_of_ptr = std::find_if(
-        arr_of_ptr.begin(),
-        arr_of_ptr.end(),
-        [arr](std::pair<exprt, array_string_exprt> pair) {
-          return pair.second == arr;
-        });
-
-      if(arr_in_arr_of_ptr != arr_of_ptr.end())
+      auto set = generator.get_created_strings();
+      if(set.find(arr) != set.end())
       {
         exprt length = super_get(arr.length());
         if(const auto n = expr_cast<std::size_t>(length))

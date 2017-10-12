@@ -309,6 +309,10 @@ string_constraint_generatort::get_string_expr(const exprt &expr)
 void string_constraint_generatort::add_default_axioms(
   const array_string_exprt &s)
 {
+  // If `s` was already added we do nothing.
+  if(!m_created_strings.insert(s).second)
+    return;
+
   m_axioms.push_back(
     s.axiom_for_length_ge(from_integer(0, s.length().type())));
   if(max_string_length!=std::numeric_limits<size_t>::max())
