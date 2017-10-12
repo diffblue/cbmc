@@ -27,7 +27,7 @@ Author: Nathan Phillips <Nathan.Phillips@diffblue.com>
 /// \tparam T The exprt-derived class to check for
 /// \param base Reference to a generic \ref exprt
 /// \return true if \a base is of type \a T
-template<typename T> bool can_cast_expr(const exprt &base);
+template<typename T> inline bool can_cast_expr(const exprt &base);
 
 /// Called after casting.  Provides a point to assert on the structure of the
 /// expr. By default, this is a no-op, but you can provide an overload to
@@ -45,7 +45,8 @@ struct expr_try_dynamic_cast_return_typet final
 {
   static_assert(
     !std::is_reference<Ret>::value,
-    "Ret must be non-qualified");
+    "Ret must not be a reference, i.e. expr_try_dynamic_cast<const thingt> "
+    "rather than expr_try_dynamic_cast<const thing &>");
 
   typedef
     typename std::conditional<
@@ -78,7 +79,7 @@ auto expr_try_dynamic_cast(TExpr &base)
   static_assert(
     std::is_base_of<exprt, T>::value,
     "The template argument T must be derived from exprt.");
-  if(!can_cast_expr<T>(base))
+  if(!can_cast_expr<typename std::remove_const<T>::type>(base))
     return nullptr;
   const auto ret=static_cast<returnt>(&base);
   validate_expr(*ret);
@@ -93,7 +94,8 @@ struct expr_dynamic_cast_return_typet final
 {
   static_assert(
     !std::is_reference<Ret>::value,
-    "Ret must be non-qualified");
+    "Ret must not be a reference, i.e. expr_dynamic_cast<const thingt> rather "
+    "than expr_dynamic_cast<const thing &>");
 
   typedef
     typename std::conditional<
