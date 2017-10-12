@@ -236,22 +236,29 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     return false;
   }
 
-  // eliminate casts to _Bool
-  if(expr_type.id()==ID_c_bool &&
-     op_type.id()!=ID_bool)
+  // circular casts through types shorter than `int`
+  if(op_type==signedbv_typet(32) &&
+     expr.op0().id()==ID_typecast)
   {
-    // casts from boolean to a signed int and back:
-    // (boolean)(int)boolean -> boolean
-    if(expr.op0().id()==ID_typecast && op_type.id()==ID_signedbv)
+    if(expr_type==c_bool_typet(8) ||
+       expr_type==signedbv_typet(8) ||
+       expr_type==signedbv_typet(16) ||
+       expr_type==unsignedbv_typet(16))
     {
-      const auto &typecast=to_typecast_expr(expr.op0());
-      if(typecast.op().type().id()==ID_c_bool)
+      // We checked that the id was ID_typecast in the enclosing `if`
+      const auto &typecast=expr_checked_cast<typecast_exprt>(expr.op0());
+      if(typecast.op().type()==expr_type)
       {
         expr=typecast.op0();
         return false;
       }
     }
+  }
 
+  // eliminate casts to _Bool
+  if(expr_type.id()==ID_c_bool &&
+     op_type.id()!=ID_bool)
+  {
     // rewrite (_Bool)x to (_Bool)(x!=0)
     binary_relation_exprt inequality;
     inequality.id(op_type.id()==ID_floatbv?ID_ieee_float_notequal:ID_notequal);
