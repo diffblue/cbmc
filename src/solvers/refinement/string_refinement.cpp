@@ -821,7 +821,7 @@ static exprt get_char_array_in_model(
 /// Display part of the current model by mapping the variables created by the
 /// solver to constant expressions given by the current model
 void debug_model(
-  const union_find_replacet &symbol_resolve,
+  const string_constraint_generatort &generator,
   messaget::mstreamt &stream,
   const namespacet &ns,
   const std::size_t max_string_length,
@@ -830,19 +830,18 @@ void debug_model(
   const std::vector<symbol_exprt> &index_symbols)
 {
   static const std::string indent("  ");
-  std::set<array_string_exprt> char_array_in_axioms;
-#if 0
-  generator.debug_arrays_of_pointers(stream);
-#endif
-  for(const auto &pair : symbol_resolve.to_vector())
-    char_array_in_axioms.insert(to_array_string_expr(pair.first));
 
-  for(const auto &arr : char_array_in_axioms)
+  stream << "debug_model:" << '\n';
+  for(const auto &pointer_array : generator.get_arrays_of_pointers())
   {
+    const auto arr = pointer_array.second;
     const exprt model =
       get_char_array_in_model(super_get, ns, max_string_length, stream, arr);
 
-    stream << "- " << from_expr(ns, "", arr) << ": " << from_expr(ns, "", model)
+    stream << "- " << from_expr(ns, "", arr) << ":\n"
+           << indent << "- pointer: " << from_expr(ns, "", pointer_array.first)
+           << "\n"
+           << indent << "- model: " << from_expr(ns, "", model)
            << messaget::eom;
   }
 
@@ -1221,6 +1220,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
 #ifdef DEBUG
   debug_model(
+    generator,
     stream,
     ns,
     max_string_length,

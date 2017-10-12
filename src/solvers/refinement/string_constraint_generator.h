@@ -80,15 +80,9 @@ public:
 
   symbol_exprt fresh_exist_index(const irep_idt &prefix, const typet &type);
 
-  void debug_arrays_of_pointers(std::ostream &out)
+  const std::map<exprt, array_string_exprt> &get_arrays_of_pointers() const
   {
-    out << "arrays_of_pointers:" << std::endl;
-    for(auto pair : arrays_of_pointers_)
-    {
-      out << "  * " << from_expr(m_ns, "", pair.first) << "\t--> "
-          << from_expr(m_ns, "", pair.second) << " : "
-          << from_type(m_ns, "", pair.second.type()) << std::endl;
-    }
+    return arrays_of_pointers_;
   }
 
   exprt get_length_of_string_array(const array_string_exprt &s) const;
