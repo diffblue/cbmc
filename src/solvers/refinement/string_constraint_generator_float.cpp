@@ -149,7 +149,7 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 
 /// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
-/// \return a integer expression
+/// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_string_of_float(
   const function_application_exprt &f)
 {
@@ -169,12 +169,12 @@ exprt string_constraint_generatort::add_axioms_from_double(
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
-/// leading zeroes, followed by `'.'` (`'\\u002E'`), followed by one or more
-/// decimal digits representing the fractional part of m. This specification is
-/// correct for inputs that do not exceed 100000 and the function is unspecified
-/// for other values.
+/// leading zeroes, followed by &apos;.&apos;, followed by
+/// one or more decimal digits representing the fractional part of m.
+/// This specification is correct for inputs that do not exceed 100000 and the
+/// function is unspecified for other values.
 ///
-/// TODO: this specification is not correct for negative numbers and
+/// \todo: this specification is not correct for negative numbers and
 /// double precision
 /// \param res: string expression corresponding to the result
 /// \param f: expression representing a float
@@ -474,7 +474,7 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
 /// Add axioms corresponding to the scientific representation of floating point
 /// values
 /// \param f: a function application expression
-/// \return code 0 on succes
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const function_application_exprt &f)
 {

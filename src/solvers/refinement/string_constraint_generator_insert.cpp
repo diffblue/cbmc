@@ -48,8 +48,9 @@ exprt string_constraint_generatort::add_axioms_for_insert(
 
 /// add axioms corresponding to the StringBuilder.insert(int, CharSequence) and
 /// StringBuilder.insert(int, CharSequence, int, int) java functions
-/// \par parameters: function application with three arguments: two strings and
-///   an index
+/// \param f: function application with arguments integer `|res|`, char pointer
+///           `&res[0]`, refined string `s1`, refined string `s2`,
+///           integer `offset`
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_insert(
   const function_application_exprt &f)

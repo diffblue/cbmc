@@ -16,7 +16,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// code point to a utf-16 string
 /// \param res: array of characters corresponding to the result fo the function
 /// \param code_point: an expression representing a java code point
-/// \return an expression
+/// \return integer expression equal to zero
 exprt string_constraint_generatort::add_axioms_for_code_point(
   const array_string_exprt &res,
   const exprt &code_point)
@@ -113,7 +113,7 @@ exprt pair_value(exprt char1, exprt char2, typet return_type)
 }
 
 /// add axioms corresponding to the String.codePointAt java function
-/// \par parameters: function application with two arguments: a string and an
+/// \param f: function application with arguments a string and an
 ///   index
 /// \return a integer expression corresponding to a code point
 exprt string_constraint_generatort::add_axioms_for_code_point_at(
@@ -175,8 +175,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_before(
 
 /// add axioms giving approximate bounds on the result of the
 /// String.codePointCount java function
-/// \par parameters: function application with three arguments: a string and two
-///   indexes
+/// \param f: function application with three arguments string `str`, integer
+///           `begin` and integer `end`.
 /// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_code_point_count(
   const function_application_exprt &f)
@@ -198,8 +198,8 @@ exprt string_constraint_generatort::add_axioms_for_code_point_count(
 /// add axioms giving approximate bounds on the result of the
 /// String.offsetByCodePointCount java function. We approximate the result by
 /// saying the result is between index + offset and index + 2 * offset
-/// \par parameters: function application with three arguments: a string and two
-///   indexes
+/// \param f: function application with arguments string `str`, integer `index`
+///           and integer `offset`.
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   const function_application_exprt &f)

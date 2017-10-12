@@ -241,6 +241,13 @@ string_constraint_generatort::associate_char_array_to_char_pointer(
   return result;
 }
 
+/// Associate a char array to a char pointer.
+/// Insert in `arrays_of_pointers_` a binding from `ptr` to `arr`.
+/// If the length of `arr` is infinite, we create a new integer symbol and add
+/// a binding from `arr` to this length in `length_of_array_`.
+/// This also adds the default axioms for `arr`.
+/// \param f: a function application with argument a character array `arr` and
+/// a character pointer `ptr`.
 exprt string_constraint_generatort::associate_array_to_pointer(
   const function_application_exprt &f)
 {
@@ -263,6 +270,11 @@ exprt string_constraint_generatort::associate_array_to_pointer(
   return from_integer(0, f.type());
 }
 
+/// Associate an integer length to a char array.
+/// This adds an axiom ensuring that `arr.length` and `length` are equal.
+/// \param f: a function application with argument a character array `arr` and
+/// a integer `length`.
+/// \return integer expression equal to 0
 exprt string_constraint_generatort::associate_length_to_array(
   const function_application_exprt &f)
 {

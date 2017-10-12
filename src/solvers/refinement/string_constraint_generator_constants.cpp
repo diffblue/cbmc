@@ -17,8 +17,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// add axioms saying the returned string expression should be equal to the
 /// string constant
-/// \par parameters: a string constant
-/// \return a string expression
+/// \param res: array of characters for the result
+/// \param sval: a string constant
+/// \return integer expression equal to zero
 exprt string_constraint_generatort::add_axioms_for_constant(
   const array_string_exprt &res,
   irep_idt sval)
@@ -52,8 +53,9 @@ exprt string_constraint_generatort::add_axioms_for_constant(
 }
 
 /// add axioms to say that the returned string expression is empty
-/// \par parameters: function application without argument
-/// \return string expression
+/// \param f: function application with arguments integer `length` and character
+///           pointer `ptr`.
+/// \return integer expression equal to zero
 exprt string_constraint_generatort::add_axioms_for_empty_string(
   const function_application_exprt &f)
 {
