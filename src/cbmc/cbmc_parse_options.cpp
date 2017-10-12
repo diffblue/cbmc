@@ -45,7 +45,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_static_init_loops.h>
-#include <goto-programs/replace_java_nondet.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
@@ -63,8 +62,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/add_failed_symbols.h>
 
 #include <langapi/mode.h>
-
-#include "java_bytecode/java_bytecode_language.h"
 
 #include "cbmc_solvers.h"
 #include "bmc.h"
@@ -191,10 +188,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
-
-  // unwind loops in java enum static initialization
-  if(cmdline.isset("java-unwind-enum-static"))
-    options.set_option("java-unwind-enum-static", true);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -545,11 +538,6 @@ int cbmc_parse_optionst::doit()
   if(set_properties())
     return 7; // should contemplate EX_USAGE from sysexits.h
 
-  // unwinds <clinit> loops to number of enum elements
-  // side effect: add this as explicit unwind to unwind set
-  if(options.get_bool_option("java-unwind-enum-static"))
-    remove_static_init_loops(goto_model, options, get_message_handler());
-
   // get solver
   cbmc_solverst cbmc_solvers(
     options,
@@ -757,12 +745,10 @@ bool cbmc_parse_optionst::process_goto_program(
       get_message_handler(),
       goto_model,
       cmdline.isset("pointer-check"));
-    // Java virtual functions -> explicit dispatch tables:
+    // virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof)
     remove_exceptions(goto_model);
-    // Similar removal of RTTI inspection:
-    remove_instanceof(goto_model);
 
     mm_io(goto_model);
 
@@ -774,30 +760,6 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_vector(goto_model);
     remove_complex(goto_model);
     rewrite_union(goto_model);
-
-    // Similar removal of java nondet statements:
-    // TODO Should really get this from java_bytecode_language somehow, but we
-    // don't have an instance of that here.
-    object_factory_parameterst factory_params;
-    factory_params.max_nondet_array_length=
-      cmdline.isset("java-max-input-array-length")
-        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
-        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    factory_params.max_nondet_string_length=
-      cmdline.isset("string-max-input-length")
-        ? std::stoul(cmdline.get_value("string-max-input-length"))
-        : MAX_NONDET_STRING_LENGTH;
-    factory_params.max_nondet_tree_depth=
-      cmdline.isset("java-max-input-tree-depth")
-        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
-        : MAX_NONDET_TREE_DEPTH;
-
-    replace_java_nondet(goto_model);
-
-    convert_nondet(
-      goto_model,
-      get_message_handler(),
-      factory_params);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -873,7 +835,6 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
-    goto_model.goto_functions.update();
   }
 
   catch(const char *e)
@@ -1013,14 +974,6 @@ void cbmc_parse_optionst::help()
     " --error-label label          check that label is unreachable\n"
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
-    "\n"
-    "Java Bytecode frontend options:\n"
-    " --classpath dir/jar          set the classpath\n"
-    " --main-class class-name      set the name of the main class\n"
-    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
-    // This one is handled by cbmc_parse_options not by the Java frontend,
-    // hence its presence here:
-    " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n"
     "\n"
     "Semantic transformations:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
