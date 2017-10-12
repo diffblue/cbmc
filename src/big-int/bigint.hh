@@ -5,6 +5,8 @@
 #ifndef BIGINT_HH
 #define BIGINT_HH
 
+#include <utility>
+
 // This one is pretty simple but has a fair divide implementation.
 // Though I'm not ambitious enough to do that FFT-like stuff.
 //
@@ -166,12 +168,11 @@ public:
   BigInt (llong_t) _fast;
   BigInt (ullong_t) _fast;
   BigInt (BigInt const &) _fast;
+  BigInt (BigInt &&) _fast;
   BigInt (char const *, onedig_t = 10) _fast;
 
-  BigInt &operator= (llong_t) _fast;
-  BigInt &operator= (ullong_t) _fast;
   BigInt &operator= (BigInt const &) _fast;
-  BigInt &operator= (char const *) _fast;
+  BigInt &operator= (BigInt &&) _fast;
 
   // Input conversion from text.
 
@@ -220,8 +221,9 @@ public:
 
   // Eliminate need for explicit casts when comparing.
 
-  int compare (int n) const		{ return compare (llong_t (n)); }
-  int compare (unsigned n) const	{ return compare (ullong_t (n)); }
+  int compare (unsigned long n) const { return compare (static_cast<ullong_t>(n)); }
+  int compare (int n) const           { return compare (static_cast<llong_t> (n)); }
+  int compare (unsigned n) const      { return compare (static_cast<ullong_t>(n)); }
 
   // Tests. These are faster than comparing with 0 or of course %2.
 
@@ -236,101 +238,35 @@ public:
   BigInt &negate()			{ if(!is_zero()) positive = !positive; return *this; }
   BigInt operator-() const		{ return BigInt (*this).negate(); }
 
-  BigInt &operator+= (llong_t) _fast;
-  BigInt &operator-= (llong_t) _fast;
-  BigInt &operator*= (llong_t) _fast;
-  BigInt &operator/= (llong_t) _fast;
-  BigInt &operator%= (llong_t) _fast;
+#define IN_PLACE_OPERATOR(TYPE) \
+  BigInt &operator+= (TYPE) _fast; \
+  BigInt &operator-= (TYPE) _fast; \
+  BigInt &operator*= (TYPE) _fast; \
+  BigInt &operator/= (TYPE) _fast; \
+  BigInt &operator%= (TYPE) _fast;
 
-  BigInt &operator= (unsigned long x) { return (*this)=(ullong_t)x; }
-  BigInt &operator+= (unsigned long x) { return (*this)+=(ullong_t)x; }
-  BigInt &operator-= (unsigned long x) { return (*this)-=(ullong_t)x; }
-  BigInt &operator*= (unsigned long x) { return (*this)*=(ullong_t)x; }
-  BigInt &operator/= (unsigned long x) { return (*this)/=(ullong_t)x; }
-  BigInt &operator%= (unsigned long x) { return (*this)%=(ullong_t)x; }
+  IN_PLACE_OPERATOR(const BigInt &)
+  IN_PLACE_OPERATOR(llong_t)
+  IN_PLACE_OPERATOR(ullong_t)
+#undef IN_PLACE_OPERATOR
 
-  BigInt &operator+= (ullong_t) _fast;
-  BigInt &operator-= (ullong_t) _fast;
-  BigInt &operator*= (ullong_t) _fast;
-  BigInt &operator/= (ullong_t) _fast;
-  BigInt &operator%= (ullong_t) _fast;
+#define OVERLOAD_IN_PLACE_OPERATOR(FROM, TO) \
+  BigInt &operator+=(FROM x) { return operator+=(static_cast<TO>(x)); } \
+  BigInt &operator-=(FROM x) { return operator-=(static_cast<TO>(x)); } \
+  BigInt &operator*=(FROM x) { return operator*=(static_cast<TO>(x)); } \
+  BigInt &operator/=(FROM x) { return operator/=(static_cast<TO>(x)); } \
+  BigInt &operator%=(FROM x) { return operator%=(static_cast<TO>(x)); }
 
-  BigInt &operator+= (BigInt const &) _fast;
-  BigInt &operator-= (BigInt const &) _fast;
-  BigInt &operator*= (BigInt const &) _fast;
-  BigInt &operator/= (BigInt const &) _fasta;
-  BigInt &operator%= (BigInt const &) _fasta;
+  OVERLOAD_IN_PLACE_OPERATOR(unsigned long, ullong_t)
+  OVERLOAD_IN_PLACE_OPERATOR(int, llong_t)
+  OVERLOAD_IN_PLACE_OPERATOR(unsigned, ullong_t)
+#undef OVERLOAD_IN_PLACE_OPERATOR
 
   BigInt &operator++ ()	{ return operator+=(1); } // preincrement
   BigInt &operator-- ()	{ return operator-=(1); } // predecrement
 
   static void div (BigInt const &, BigInt const &,
 		   BigInt &quot, BigInt &rem) _fasta;
-
-  // Avoid the need for explicit casts to [u]llong_t.
-
-  // disabled by DK
-  //operator int() const		{ return int (operator llong_t()); }
-  //operator unsigned() const	{ return unsigned (operator ullong_t()); }
-
-  BigInt &operator = (int n)		{ return operator = (llong_t (n)); }
-  BigInt &operator+= (int n)		{ return operator+= (llong_t (n)); }
-  BigInt &operator-= (int n)		{ return operator-= (llong_t (n)); }
-  BigInt &operator*= (int n)		{ return operator*= (llong_t (n)); }
-  BigInt &operator/= (int n)		{ return operator/= (llong_t (n)); }
-  BigInt &operator%= (int n)		{ return operator%= (llong_t (n)); }
-
-  BigInt &operator = (unsigned n)	{ return operator = (ullong_t (n)); }
-  BigInt &operator+= (unsigned n)	{ return operator+= (ullong_t (n)); }
-  BigInt &operator-= (unsigned n)	{ return operator-= (ullong_t (n)); }
-  BigInt &operator*= (unsigned n)	{ return operator*= (ullong_t (n)); }
-  BigInt &operator/= (unsigned n)	{ return operator/= (ullong_t (n)); }
-  BigInt &operator%= (unsigned n)	{ return operator%= (ullong_t (n)); }
-
-  // Binary arithmetic operators. These are entirely syntactic sugar.
-  // Though there's joy in repetition -- let the preprocessor enjoy.
-
-#define decl_binary(T)							\
-  BigInt operator+ (T b) const		{ return BigInt (*this) += b; }	\
-  BigInt operator- (T b) const		{ return BigInt (*this) -= b; }	\
-  BigInt operator* (T b) const		{ return BigInt (*this) *= b; }	\
-  BigInt operator/ (T b) const		{ return BigInt (*this) /= b; }	\
-  BigInt operator% (T b) const		{ return BigInt (*this) %= b; }
-  decl_binary (int);
-  decl_binary (unsigned);
-  decl_binary (llong_t);
-  decl_binary (ullong_t);
-  decl_binary (BigInt const &);
-#undef decl_binary
-
-  BigInt operator+ (unsigned long b) const	{ return BigInt (*this) += (ullong_t)b; }	\
-  BigInt operator- (unsigned long b) const	{ return BigInt (*this) -= (ullong_t)b; }	\
-  BigInt operator* (unsigned long b) const	{ return BigInt (*this) *= (ullong_t)b; }	\
-  BigInt operator/ (unsigned long b) const	{ return BigInt (*this) /= (ullong_t)b; }	\
-  BigInt operator% (unsigned long b) const	{ return BigInt (*this) %= (ullong_t)b; }
-
-  // Binary comparision operators.
-
-#define decl_binary(T)							\
-  bool operator<  (T b) const		{ return compare (b) < 0; }	\
-  bool operator>  (T b) const		{ return compare (b) > 0; }	\
-  bool operator<= (T b) const		{ return compare (b) <= 0; }	\
-  bool operator>= (T b) const		{ return compare (b) >= 0; }	\
-  bool operator== (T b) const		{ return compare (b) == 0; }	\
-  bool operator!= (T b) const		{ return compare (b) != 0; }
-  decl_binary (int);
-  decl_binary (unsigned);
-  decl_binary (llong_t);
-  decl_binary (ullong_t);
-  decl_binary (BigInt const &);
-#undef decl_binary
-
-  bool operator<  (unsigned long b) const	{ return compare ((ullong_t)b) < 0; }	\
-  bool operator>  (unsigned long b) const	{ return compare ((ullong_t)b) > 0; }	\
-  bool operator<= (unsigned long b) const	{ return compare ((ullong_t)b) <= 0; }	\
-  bool operator>= (unsigned long b) const	{ return compare ((ullong_t)b) >= 0; }	\
-  bool operator== (unsigned long b) const	{ return compare ((ullong_t)b) == 0; }	\
-  bool operator!= (unsigned long b) const	{ return compare ((ullong_t)b) != 0; }
 
   // Returns the largest x such that 2^x <= abs() or 0 if input is 0
   // Not part of original BigInt.
@@ -339,6 +275,14 @@ public:
   // Sets the number to the power of two given by the exponent
   // Not part of original BigInt.
   void setPower2 (unsigned exponent) _fast;
+
+  void swap (BigInt &other)
+  {
+    std::swap(other.size, size);
+    std::swap(other.length, length);
+    std::swap(other.digit, digit);
+    std::swap(other.positive, positive);
+  }
 };
 
 
@@ -350,5 +294,65 @@ BigInt sqrt (BigInt const &) _fast;
 BigInt gcd (const BigInt &, const BigInt &) _fast;
 BigInt modinv (const BigInt &, const BigInt &) _fast;
 
+// Binary arithmetic operators
+
+inline BigInt operator+ (const BigInt &lhs, const BigInt &rhs) { return BigInt(lhs) += rhs; }
+inline BigInt operator- (const BigInt &lhs, const BigInt &rhs) { return BigInt(lhs) -= rhs; }
+inline BigInt operator* (const BigInt &lhs, const BigInt &rhs) { return BigInt(lhs) *= rhs; }
+inline BigInt operator/ (const BigInt &lhs, const BigInt &rhs) { return BigInt(lhs) /= rhs; }
+inline BigInt operator% (const BigInt &lhs, const BigInt &rhs) { return BigInt(lhs) %= rhs; }
+
+// Because the operators `+` and `*` are associative, we can do fast math, no
+// matter which side the BigInt is on.  For the rest of the operators, which
+// are non-associative, we can only get speedups if the primitive type is on
+// the RHS.
+#define BINARY_ARITHMETIC_OPERATORS(OTHER) \
+  inline BigInt operator+ (const BigInt &lhs, OTHER rhs) { return  BigInt(lhs) += rhs; } \
+  inline BigInt operator+ (OTHER lhs, const BigInt &rhs) { return  BigInt(rhs) += lhs; } \
+  inline BigInt operator* (const BigInt &lhs, OTHER rhs) { return  BigInt(lhs) *= rhs; } \
+  inline BigInt operator* (OTHER lhs, const BigInt &rhs) { return  BigInt(rhs) *= lhs; } \
+  inline BigInt operator- (const BigInt &lhs, OTHER rhs) { return  BigInt(lhs) -= rhs; } \
+  inline BigInt operator/ (const BigInt &lhs, OTHER rhs) { return  BigInt(lhs) /= rhs; } \
+  inline BigInt operator% (const BigInt &lhs, OTHER rhs) { return  BigInt(lhs) %= rhs; }
+
+BINARY_ARITHMETIC_OPERATORS(BigInt::llong_t)
+BINARY_ARITHMETIC_OPERATORS(BigInt::ullong_t)
+BINARY_ARITHMETIC_OPERATORS(unsigned long)
+BINARY_ARITHMETIC_OPERATORS(int)
+BINARY_ARITHMETIC_OPERATORS(unsigned)
+#undef BINARY_ARITHMETIC_OPERATORS
+
+// Binary comparison operators
+
+inline bool operator<  (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) < 0; }
+inline bool operator>  (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) > 0; }
+inline bool operator<= (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) <= 0; }
+inline bool operator>= (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) >= 0; }
+inline bool operator== (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) == 0; }
+inline bool operator!= (const BigInt &lhs, const BigInt &rhs) { return lhs.compare(rhs) != 0; }
+
+
+// These operators are all associative, so we can define them all for
+// primitives on the LHS and RHS.
+#define COMPARISON_OPERATORS(OTHER) \
+  inline bool operator<  (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) <  0; } \
+  inline bool operator>  (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) >  0; } \
+  inline bool operator<= (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) <= 0; } \
+  inline bool operator>= (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) >= 0; } \
+  inline bool operator== (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) == 0; } \
+  inline bool operator!= (const BigInt &lhs, OTHER rhs) { return  lhs.compare(rhs) != 0; } \
+  inline bool operator<  (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) <  0; } \
+  inline bool operator>  (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) >  0; } \
+  inline bool operator<= (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) <= 0; } \
+  inline bool operator>= (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) >= 0; } \
+  inline bool operator== (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) == 0; } \
+  inline bool operator!= (OTHER lhs, const BigInt &rhs) { return -rhs.compare(lhs) != 0; }
+
+COMPARISON_OPERATORS(BigInt::llong_t)
+COMPARISON_OPERATORS(BigInt::ullong_t)
+COMPARISON_OPERATORS(unsigned long)
+COMPARISON_OPERATORS(int)
+COMPARISON_OPERATORS(unsigned)
+#undef COMPARISON_OPERATORS
 
 #endif//ndef BIGINT_HH
