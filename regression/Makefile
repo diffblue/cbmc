@@ -14,6 +14,7 @@ DIRS = ansi-c \
        goto-instrument-typedef \
        invariants \
        strings \
+       jbmc-strings \
        strings-smoke-tests \
        test-script \
        # Empty last line
