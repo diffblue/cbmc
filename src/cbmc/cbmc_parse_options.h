@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <java_bytecode/java_bytecode_language.h>
-
 #include "xml_interface.h"
 
 class bmct;
@@ -67,8 +65,6 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
-  JAVA_BYTECODE_LANGUAGE_OPTIONS \
-  "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 
