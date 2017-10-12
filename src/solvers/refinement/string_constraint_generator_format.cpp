@@ -458,9 +458,7 @@ exprt string_constraint_generatort::add_axioms_for_format(
     std::string s=utf16_constant_array_to_java(
       to_array_expr(s1.content()), length);
     // List of arguments after s
-    std::vector<exprt> args(
-      std::next(std::next(std::next(f.arguments().begin()))),
-      f.arguments().end());
+    std::vector<exprt> args(f.arguments().begin() + 3, f.arguments().end());
     return add_axioms_for_format(res, s, args);
   }
   else
