@@ -201,8 +201,9 @@ static std::vector<exprt> generate_instantiations(
   return lemmas;
 }
 
-/// remove functions applications and create the necessary axioms
-/// \par parameters: an expression containing function applications
+/// Remove functions applications and create the necessary axioms.
+/// \param expr: an expression possibly containing function applications
+/// \param generator: generator for the string constraints
 /// \return an expression containing no function application
 static exprt substitute_function_applications(
   exprt expr,
@@ -218,6 +219,10 @@ static exprt substitute_function_applications(
   return expr;
 }
 
+/// Remove functions applications and create the necessary axioms.
+/// \param equations: vector of equations
+/// \param generator: generator for the string constraints
+/// \return vector of equations where function application have been replaced
 static void substitute_function_applications_in_equations(
   std::vector<equal_exprt> &equations,
   string_constraint_generatort &generator)
@@ -228,6 +233,9 @@ static void substitute_function_applications_in_equations(
 
 /// For now, any unsigned bitvector type of width smaller or equal to 16 is
 /// considered a character.
+/// \note type that are not characters maybe detected as characters (for
+/// instance unsigned char in C), this will make dec_solve do unnecessary
+/// steps for these, but should not affect correctness.
 /// \param type: a type
 /// \return true if the given type represents characters
 bool is_char_type(const typet &type)
@@ -293,49 +301,12 @@ static bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
   return false;
 }
 
-///
-void associate_char_array_to_char_pointers(
-  exprt &expr,
-  string_constraint_generatort &generator,
-  std::map<exprt, exprt> &array_of_pointers)
-{
-  for(auto it = expr.depth_begin(); it != expr.depth_end();)
-  {
-    if(it->type().id() == ID_pointer)
-    {
-      if(it->id() == ID_array)
-        ++it;
-      else if(
-        it->id() == ID_address_of && it->op0().id() == ID_index &&
-        it->op0().op0().id() == ID_array)
-      {
-        // We have to be careful not to replace constants
-        PRECONDITION(it->op0().op1().is_zero());
-        // it.mutate()=address_of_exprt(it->op0().op0());
-        it.next_sibling_or_parent();
-      }
-      else
-      {
-        symbol_exprt length_sym =
-          generator.fresh_symbol("data_length", java_int_type());
-        symbol_exprt array_sym = generator.fresh_symbol(
-          "data_array", array_typet(java_char_type(), length_sym));
-
-        array_of_pointers.insert(std::make_pair(*it, array_sym));
-        it.next_sibling_or_parent();
-      }
-    }
-    else
-      ++it;
-  }
-}
-
 void replace_symbols_in_equations(
-  const union_find_replacet &solver,
+  const union_find_replacet &symbol_resolve,
   std::vector<equal_exprt> &equations)
 {
   for(equal_exprt &eq : equations)
-    solver.replace_expr(eq);
+    symbol_resolve.replace_expr(eq);
 }
 
 /// Add equation to `m_equation_list` or give them to `supert::set_to`
@@ -361,14 +332,19 @@ void string_refinementt::set_to(const exprt &expr, bool value)
 }
 
 /// Add association for each char pointer in the equation
-static union_find_replacet symbol_solver_from_equations(
+/// \param equations: vector of equations
+/// \param ns: namespace
+/// \param stream: output stream
+/// \return union_find_replacet where char pointer that have been set equal
+///         by an equation are associated to the same element
+static union_find_replacet generate_symbol_resolution_from_equations(
   const std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
 {
   const auto eom = messaget::eom;
   const std::string log_message =
-    "WARNING string_refinement.cpp symbol_solver_from_equations:";
+    "WARNING string_refinement.cpp generate_symbol_resolution_from_equations:";
   union_find_replacet solver;
   for(const equal_exprt &eq : equations)
   {
@@ -395,7 +371,8 @@ static union_find_replacet symbol_solver_from_equations(
     }
     else if(rhs.id() == ID_function_application)
     {
-      // ignore function application
+      // function applications can be ignored because they will be replaced
+      // in the convert_function_application step of dec_solve
     }
     else if(has_char_pointer_subtype(lhs.type(), ns))
     {
@@ -415,12 +392,9 @@ static union_find_replacet symbol_solver_from_equations(
       }
       else
       {
-        // #ifdef DEBUG
         stream << log_message << "non struct with char pointer subexpr "
                << from_expr(ns, "", rhs) << "\n  * of type "
                << from_type(ns, "", rhs.type()) << eom;
-        // #endif
-        // UNREACHABLE;
       }
     }
   }
@@ -449,7 +423,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   debug() << "dec_solve: Build symbol solver from equations" << eom;
   // This is used by get, that's why we use a class member here
-  symbol_resolve = symbol_solver_from_equations(equations, ns, debug());
+  symbol_resolve =
+    generate_symbol_resolution_from_equations(equations, ns, debug());
 #ifdef DEBUG
   debug() << "symbol resolve:" << eom;
   for(const auto &pair : symbol_resolve.to_vector())
@@ -630,9 +605,10 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   return resultt::D_ERROR;
 }
 
-/// add the given lemma to the solver
-/// \par parameters: a lemma and Boolean value stating whether the lemma should
-/// be added to the index set.
+/// Add the given lemma to the solver.
+/// \param lemma: a Boolean expression
+/// \param simplify_lemma: whether the lemma should be simplified before being
+///        given to the underlying solver.
 void string_refinementt::add_lemma(
   const exprt &lemma,
   const bool simplify_lemma)
@@ -656,7 +632,8 @@ void string_refinementt::add_lemma(
 
   symbol_resolve.replace_expr(simple_lemma);
 
-  // Should be careful for empty arrays
+  // Replace empty arrays with array_of expression because the solver cannot
+  // handle empty arrays.
   for(auto it = simple_lemma.depth_begin(); it != simple_lemma.depth_end();)
   {
     if(it->id() == ID_array && it->operands().empty())
@@ -771,7 +748,15 @@ static std::string string_of_array(const array_exprt &arr)
   return utf16_constant_array_to_java(arr, n);
 }
 
-static exprt get_char_array_in_model(
+/// Debugging function which finds the valuation of the given array in
+/// `super_get` and concretize unknown characters.
+/// \param super_get: give a valuation to variables
+/// \param ns: namespace
+/// \param max_string_length: limit up to which we concretize strings
+/// \param stream: output stream
+/// \param arr: array expression
+/// \return expression corresponding to `arr` in the model
+static exprt get_char_array_and_concretize(
   const std::function<exprt(const exprt &)> &super_get,
   const namespacet &ns,
   const std::size_t max_string_length,
@@ -835,8 +820,8 @@ void debug_model(
   for(const auto &pointer_array : generator.get_arrays_of_pointers())
   {
     const auto arr = pointer_array.second;
-    const exprt model =
-      get_char_array_in_model(super_get, ns, max_string_length, stream, arr);
+    const exprt model = get_char_array_and_concretize(
+      super_get, ns, max_string_length, stream, arr);
 
     stream << "- " << from_expr(ns, "", arr) << ":\n"
            << indent << "- pointer: " << from_expr(ns, "", pointer_array.first)
@@ -906,11 +891,6 @@ exprt fill_in_array_with_expr(
   PRECONDITION(expr.type().id()==ID_array);
   PRECONDITION(expr.id()==ID_with || expr.id()==ID_array_of);
   const array_typet &array_type = to_array_type(expr.type());
-#if 0
-  // Nothing to do for empty array
-  if(expr.id()==ID_array_of)
-    return expr;
-#endif
 
   // Map of the parts of the array that are initialized
   std::map<std::size_t, exprt> initial_map;
@@ -1930,7 +1910,7 @@ exprt string_refinementt::get(const exprt &expr) const
     arr.length() = generator.get_length_of_string_array(arr);
     const auto arr_model_opt =
       get_array(super_get, ns, generator.max_string_length, debug(), arr);
-    // Should be refactored with get array or get array in model
+    // \todo Refactor with get array in model
     if(arr_model_opt)
     {
       const exprt arr_model = simplify_expr(*arr_model_opt, ns);
