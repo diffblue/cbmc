@@ -129,7 +129,7 @@ exprt string_constraint_generatort::add_axioms_for_concat(
   const array_string_exprt s2 = get_string_expr(args[3]);
   const array_string_exprt res = char_array_of_pointer(args[1], args[0]);
   if(args.size() == 6)
-    return add_axioms_for_concat_substr(res, s1, s2, args[2], args[3]);
+    return add_axioms_for_concat_substr(res, s1, s2, args[4], args[5]);
   else // args.size()==4
     return add_axioms_for_concat(res, s1, s2);
 }
