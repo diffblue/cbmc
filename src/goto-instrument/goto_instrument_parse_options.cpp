@@ -413,6 +413,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-call-sequences"))
     {
+      do_indirect_call_and_rtti_removal();
       show_call_sequences(goto_model);
       return 0;
     }
@@ -644,6 +645,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("call-graph"))
     {
+      do_indirect_call_and_rtti_removal();
       call_grapht call_graph(goto_model);
 
       if(cmdline.isset("xml"))
