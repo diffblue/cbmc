@@ -153,8 +153,8 @@ void update_internal_field(
   }
 
   // set internal field to input and output steps
-  if(goto_trace_step.type==goto_trace_stept::typet::OUTPUT ||
-      goto_trace_step.type==goto_trace_stept::typet::INPUT)
+  if(goto_trace_step.type()==goto_trace_stept::typet::OUTPUT ||
+    goto_trace_step.type()==goto_trace_stept::typet::INPUT)
   {
     goto_trace_step.internal=true;
   }

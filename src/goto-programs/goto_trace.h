@@ -80,10 +80,6 @@ public:
     ATOMIC_END
   };
 
-private:
-  typet type_;
-public:
-
   // we may choose to hide a step
   bool hidden;
 
@@ -130,13 +126,11 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
-  typet type() const
-  { return type_; }
+  virtual typet type() const = 0;
 
 protected:
-  goto_trace_stept(typet type):
+  goto_trace_stept():
     step_nr(0),
-    type_(type),
     hidden(false),
     internal(false),
     assignment_type(assignment_typet::STATE),
@@ -154,110 +148,110 @@ protected:
 
 class trace_assignmentt : public goto_trace_stept {
 public:
-  trace_assignmentt():
-    goto_trace_stept(goto_trace_stept::typet::ASSIGNMENT) { }
+  typet type() const override
+  { return goto_trace_stept::typet::ASSIGNMENT; }
 };
 
 class trace_assumet : public goto_trace_stept {
 public:
-  trace_assumet():
-    goto_trace_stept(goto_trace_stept::typet::ASSUME) { }
+  typet type() const override
+  { return goto_trace_stept::typet::ASSUME; }
 };
 
 class trace_assertt : public goto_trace_stept {
 public:
-  trace_assertt():
-    goto_trace_stept(goto_trace_stept::typet::ASSERT) { }
+  typet type() const override
+  { return goto_trace_stept::typet::ASSERT; }
 };
 
 class trace_gotot : public goto_trace_stept {
 public:
-  trace_gotot():
-    goto_trace_stept(goto_trace_stept::typet::GOTO) { }
+  typet type() const override
+  { return goto_trace_stept::typet::GOTO; }
 };
 
 class trace_locationt : public goto_trace_stept {
 public:
-  trace_locationt():
-    goto_trace_stept(goto_trace_stept::typet::LOCATION) { }
+  typet type() const override
+  { return goto_trace_stept::typet::LOCATION; }
 };
 
 class trace_inputt : public goto_trace_stept {
 public:
-  trace_inputt():
-    goto_trace_stept(goto_trace_stept::typet::INPUT) { }
+  typet type() const override
+  { return goto_trace_stept::typet::INPUT; }
 };
 
 class trace_outputt : public goto_trace_stept {
 public:
-  trace_outputt():
-    goto_trace_stept(goto_trace_stept::typet::OUTPUT) { }
+  typet type() const override
+  { return goto_trace_stept::typet::OUTPUT; }
 };
 
 class trace_declt : public goto_trace_stept {
 public:
-  trace_declt():
-    goto_trace_stept(goto_trace_stept::typet::DECL) { }
+  typet type() const override
+  { return goto_trace_stept::typet::DECL; }
 };
 
 class trace_deadt : public goto_trace_stept {
 public:
-  trace_deadt():
-    goto_trace_stept(goto_trace_stept::typet::DEAD) { }
+  typet type() const override
+  { return goto_trace_stept::typet::DEAD; }
 };
 
 class trace_function_callt : public goto_trace_stept {
 public:
-  trace_function_callt():
-    goto_trace_stept(goto_trace_stept::typet::FUNCTION_CALL) { }
+  typet type() const override
+  { return goto_trace_stept::typet::FUNCTION_CALL; }
 };
 
 class trace_function_returnt : public goto_trace_stept {
 public:
-  trace_function_returnt():
-    goto_trace_stept(goto_trace_stept::typet::FUNCTION_RETURN) { }
+  typet type() const override
+  { return goto_trace_stept::typet::FUNCTION_RETURN; }
 };
 
 class trace_constraintt : public goto_trace_stept {
 public:
-  trace_constraintt():
-    goto_trace_stept(goto_trace_stept::typet::CONSTRAINT) { }
+  typet type() const override
+  { return goto_trace_stept::typet::CONSTRAINT; }
 };
 
 class trace_shared_readt : public goto_trace_stept {
 public:
-  trace_shared_readt():
-    goto_trace_stept(goto_trace_stept::typet::SHARED_READ) { }
+  typet type() const override
+  { return goto_trace_stept::typet::SHARED_READ; }
 };
 
 class trace_shared_writet : public goto_trace_stept {
 public:
-  trace_shared_writet():
-    goto_trace_stept(goto_trace_stept::typet::SHARED_WRITE) { }
+  typet type() const override
+  { return goto_trace_stept::typet::SHARED_WRITE; }
 };
 
 class trace_spawnt : public goto_trace_stept {
 public:
-  trace_spawnt():
-    goto_trace_stept(goto_trace_stept::typet::SPAWN) { }
+  typet type() const override
+  { return goto_trace_stept::typet::SPAWN; }
 };
 
 class trace_memory_barriert : public goto_trace_stept {
 public:
-  trace_memory_barriert():
-    goto_trace_stept(goto_trace_stept::typet::MEMORY_BARRIER) { }
+  typet type() const override
+  { return goto_trace_stept::typet::MEMORY_BARRIER; }
 };
 
 class trace_atomic_begint : public goto_trace_stept {
 public:
-  trace_atomic_begint():
-    goto_trace_stept(goto_trace_stept::typet::ATOMIC_BEGIN) { }
+  typet type() const override
+  { return goto_trace_stept::typet::ATOMIC_BEGIN; }
 };
 
 class trace_atomic_endt : public goto_trace_stept {
 public:
-  trace_atomic_endt():
-    goto_trace_stept(goto_trace_stept::typet::ATOMIC_END) { }
+  typet type() const override
+  { return goto_trace_stept::typet::ATOMIC_END; }
 };
 
 /*! \brief TO_BE_DOCUMENTED
