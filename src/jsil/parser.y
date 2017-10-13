@@ -614,7 +614,8 @@ jsil_type: TOK_T_NULL
          | ref_type
          | TOK_T_REFERENCE
          {
-           newstack($$).id(ID_reference);
+           newstack($$).id(ID_pointer);
+           newstack($$).set(ID_C_reference, true);
          }
          ;
 

@@ -193,8 +193,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     // no width
   }
-  else if(type_id==ID_pointer ||
-          type_id==ID_reference)
+  else if(type_id==ID_pointer)
   {
     entry.total_width=config.ansi_c.pointer_width;
   }

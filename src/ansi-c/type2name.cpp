@@ -134,9 +134,12 @@ static std::string type2name(
   else if(type.id()==ID_natural)
     result+='N';
   else if(type.id()==ID_pointer)
-    result+='*';
-  else if(type.id()==ID_reference)
-    result+='&';
+  {
+    if(type.get_bool(ID_C_reference))
+      result+='&';
+    else
+      result+='*';
+  }
   else if(type.id()==ID_code)
   {
     const code_typet &t=to_code_type(type);
