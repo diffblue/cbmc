@@ -252,23 +252,21 @@ void interpretert::step()
   switch(pc->type)
   {
   case GOTO:
-    trace_step=util_make_unique<goto_trace_stept>(goto_trace_stept::typet::GOTO);
+    trace_step=util_make_unique<trace_gotot>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_goto();
     break;
 
   case ASSUME:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::ASSUME);
+    trace_step=util_make_unique<trace_assumet>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_assume();
     break;
 
   case ASSERT:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::ASSERT);
+    trace_step=util_make_unique<trace_assertt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_assert();
@@ -279,8 +277,7 @@ void interpretert::step()
     break;
 
   case DECL:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::DECL);
+    trace_step=util_make_unique<trace_declt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_decl();
@@ -288,21 +285,18 @@ void interpretert::step()
 
   case SKIP:
   case LOCATION:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::LOCATION);
+    trace_step=util_make_unique<trace_locationt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     break;
   case END_FUNCTION:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::FUNCTION_RETURN);
+    trace_step=util_make_unique<trace_function_returnt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     break;
 
   case RETURN:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::FUNCTION_RETURN);
+    trace_step=util_make_unique<trace_function_returnt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     if(call_stack.empty())
@@ -320,59 +314,48 @@ void interpretert::step()
     break;
 
   case ASSIGN:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::ASSIGNMENT);
+    trace_step=util_make_unique<trace_assignmentt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_assign();
     break;
 
   case FUNCTION_CALL:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::FUNCTION_CALL);
+    trace_step=util_make_unique<trace_function_callt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     execute_function_call();
     break;
 
   case START_THREAD:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::SPAWN);
+    trace_step=util_make_unique<trace_spawnt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
 
   case END_THREAD:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::NONE);
-    trace_step->thread_nr=thread_id;
-    trace_step->pc=pc;
     throw "END_THREAD not yet implemented"; // NOLINT(readability/throw)
     break;
 
   case ATOMIC_BEGIN:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::ATOMIC_BEGIN);
+    trace_step=util_make_unique<trace_atomic_begint>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
 
   case ATOMIC_END:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::ATOMIC_END);
+    trace_step=util_make_unique<trace_atomic_endt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
 
   case DEAD:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::DEAD);
+    trace_step=util_make_unique<trace_deadt>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     break;
   case THROW:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::GOTO);
+    trace_step=util_make_unique<trace_gotot>();
     trace_step->thread_nr=thread_id;
     trace_step->pc=pc;
     while(!done && (pc->type!=CATCH))
@@ -396,16 +379,8 @@ void interpretert::step()
     }
     break;
   case CATCH:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::NONE);
-    trace_step->thread_nr=thread_id;
-    trace_step->pc=pc;
     break;
   default:
-    trace_step=util_make_unique<goto_trace_stept>(
-      goto_trace_stept::typet::NONE);
-    trace_step->thread_nr=thread_id;
-    trace_step->pc=pc;
     throw "encountered instruction with undefined instruction type";
   }
   steps.add_step(std::move(trace_step));
