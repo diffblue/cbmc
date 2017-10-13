@@ -613,6 +613,17 @@ void rw_range_set_value_sett::get_objects_dereference(
     new_size=std::min(size, new_size);
   }
 
+  if(object.is_not_nil() && object.id()==ID_symbol &&
+    as_string(to_symbol_expr(object).get_identifier()).find(
+      get_vsderef_dynamic_object_prefix())==0UL)
+  {
+    add(
+      mode,
+      to_symbol_expr(object).get_identifier(),
+      range_start,
+      range_start + new_size);
+  }
+
   // value_set_dereferencet::build_reference_to will turn *p into
   // DYNAMIC_OBJECT(p) ? *p : invalid_objectN
   if(object.is_not_nil() &&

@@ -144,4 +144,6 @@ private:
     const exprt &offset);
 };
 
+const std::string &get_vsderef_dynamic_object_prefix();
+
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DEREFERENCE_H

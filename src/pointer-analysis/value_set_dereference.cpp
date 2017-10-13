@@ -60,6 +60,12 @@ const exprt &value_set_dereferencet::get_symbol(const exprt &expr)
   return expr;
 }
 
+const std::string &get_vsderef_dynamic_object_prefix()
+{
+  static std::string prefix(CPROVER_PREFIX "_VSDEREF_");
+  return prefix;
+}
+
 /// \par parameters: expression dest, to be dereferenced under given guard,
 /// and given mode
 /// \return returns pointer after dereferencing
@@ -344,7 +350,9 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
     result.pointer_guard=dynamic_object_expr;
 
     // can't remove here, turn into *p
-    result.value=dereference_exprt(pointer_expr, dereference_type);
+    result.value=symbol_exprt(
+      get_vsderef_dynamic_object_prefix() + from_expr(root_object),
+      ns.follow(dereference_type));
 
     if(options.get_bool_option("pointer-check"))
     {

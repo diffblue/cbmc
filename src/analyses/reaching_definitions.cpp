@@ -22,6 +22,7 @@ Date: February 2013
 #include <util/make_unique.h>
 
 #include <pointer-analysis/value_set_analysis_fi.h>
+#include <pointer-analysis/value_set_dereference.h>
 
 #include "is_threaded.h"
 #include "dirty.h"
@@ -309,21 +310,25 @@ void rd_range_domaint::transform_assign(
   forall_rw_range_set_w_objects(it, rw_set)
   {
     const irep_idt &identifier=it->first;
-    // ignore symex::invalid_object
+    bool do_kill=is_must_alias;
     const symbolt *symbol_ptr;
     if(ns.lookup(identifier, symbol_ptr))
-      continue;
-    INVARIANT_STRUCTURED(
-      symbol_ptr!=nullptr,
-      nullptr_exceptiont,
-      "Symbol is in symbol table");
+    {
+      if(as_string(identifier).find(get_vsderef_dynamic_object_prefix())!=0UL)
+        // ignore symex::invalid_object
+        continue;
+    }
+    else
+    {
+      do_kill = do_kill &&
+       (!rd.get_is_threaded()(from) ||
+        (!symbol_ptr->is_shared() &&
+         !rd.get_is_dirty()(identifier)));
+    }
 
     const range_domaint &ranges=rw_set.get_ranges(it);
 
-    if(is_must_alias &&
-       (!rd.get_is_threaded()(from) ||
-        (!symbol_ptr->is_shared() &&
-         !rd.get_is_dirty()(identifier))))
+    if(do_kill)
       for(const auto &range : ranges)
         kill(identifier, range.first, range.second);
 
