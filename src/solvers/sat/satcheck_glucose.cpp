@@ -115,7 +115,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 template<typename T>
 propt::resultt satcheck_glucose_baset<T>::prop_solve()
 {
-  assert(status!=ERROR);
+  assert(status!=statust::ERROR);
 
   // We start counting at 1, thus there is one variable fewer.
   {
@@ -155,8 +155,8 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
         messaget::status() <<
           "SAT checker: instance is SATISFIABLE" << eom;
         assert(solver->model.size()!=0);
-        status=SAT;
-        return P_SATISFIABLE;
+        status=statust::SAT;
+        return resultt::P_SATISFIABLE;
       }
       else
       {
@@ -166,8 +166,8 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
     }
   }
 
-  status=UNSAT;
-  return P_UNSATISFIABLE;
+  status=statust::UNSAT;
+  return resultt::P_UNSATISFIABLE;
 }
 
 template<typename T>
