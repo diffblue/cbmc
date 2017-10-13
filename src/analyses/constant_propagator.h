@@ -25,12 +25,12 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai_base,
-    const namespacet &ns);
+    const namespacet &ns) override;
 
   virtual void output(
     std::ostream &out,
     const ai_baset &ai_base,
-    const namespacet &ns) const;
+    const namespacet &ns) const override;
 
   bool merge(
     const constant_propagator_domaint &other,
@@ -41,17 +41,17 @@ public:
     exprt &condition,
     const namespacet &ns) const override;
 
-  virtual void make_bottom()
+  virtual void make_bottom() override
   {
     values.set_to_bottom();
   }
 
-  virtual void make_top()
+  virtual void make_top() override
   {
     values.set_to_top();
   }
 
-  virtual void make_entry()
+  virtual void make_entry() override
   {
     make_top();
   }
