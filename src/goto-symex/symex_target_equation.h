@@ -33,11 +33,8 @@ class SSA_stept
 public:
   virtual ~SSA_stept()=default;
   symex_targett::sourcet source;
-private:
-  const goto_trace_stept::typet type_;
 public:
-  const goto_trace_stept::typet type() const
-  { return type_; }
+  virtual goto_trace_stept::typet type() const = 0;
 
   // NOLINTNEXTLINE(whitespace/line_length)
   bool is_assert() const          { return type()==goto_trace_stept::typet::ASSERT; }
@@ -109,8 +106,7 @@ public:
     const namespacet &ns,
     std::ostream &out) const;
 protected:
-  SSA_stept(goto_trace_stept::typet type):
-    type_(type),
+  SSA_stept():
     hidden(false),
     guard(static_cast<const exprt &>(get_nil_irep())),
     guard_literal(const_literal(false)),
@@ -130,87 +126,104 @@ protected:
 
 class SSA_assertt : public SSA_stept {
 public:
-  SSA_assertt():SSA_stept(goto_trace_stept::typet::ASSERT) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::ASSERT; }
 };
 
 class SSA_assumet : public SSA_stept {
 public:
-  SSA_assumet():SSA_stept(goto_trace_stept::typet::ASSUME) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::ASSUME; }
 };
 
 class SSA_assignmentt : public SSA_stept {
 public:
-  SSA_assignmentt():SSA_stept(goto_trace_stept::typet::ASSIGNMENT) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::ASSIGNMENT; }
 };
 
 class SSA_gotot : public SSA_stept {
 public:
-  SSA_gotot():SSA_stept(goto_trace_stept::typet::GOTO) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::GOTO; }
 };
 
 class SSA_constraintt : public SSA_stept {
 public:
-  SSA_constraintt():SSA_stept(goto_trace_stept::typet::CONSTRAINT) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::CONSTRAINT; }
 };
 
 class SSA_locationt : public SSA_stept {
 public:
-  SSA_locationt():SSA_stept(goto_trace_stept::typet::LOCATION) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::LOCATION; }
 };
 
 class SSA_outputt : public SSA_stept {
 public:
-  SSA_outputt():SSA_stept(goto_trace_stept::typet::OUTPUT) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::OUTPUT; }
 };
 
 class SSA_declt : public SSA_stept {
 public:
-  SSA_declt():SSA_stept(goto_trace_stept::typet::DECL) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::DECL; }
 };
 
 class SSA_function_callt : public SSA_stept {
 public:
-  SSA_function_callt():SSA_stept(goto_trace_stept::typet::FUNCTION_CALL) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::FUNCTION_CALL; }
 };
 
 class SSA_function_returnt : public SSA_stept {
 public:
-  SSA_function_returnt():SSA_stept(goto_trace_stept::typet::FUNCTION_RETURN) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::FUNCTION_RETURN; }
 };
 
 class SSA_shared_readt : public SSA_stept {
 public:
-  SSA_shared_readt():SSA_stept(goto_trace_stept::typet::SHARED_READ) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::SHARED_READ; }
 };
 
 class SSA_shared_writet : public SSA_stept {
 public:
-  SSA_shared_writet():SSA_stept(goto_trace_stept::typet::SHARED_WRITE) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::SHARED_WRITE; }
 };
 
 class SSA_spawnt : public SSA_stept {
 public:
-  SSA_spawnt():SSA_stept(goto_trace_stept::typet::SPAWN) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::SPAWN; }
 };
 
 class SSA_memory_barriert : public SSA_stept {
 public:
-  SSA_memory_barriert():SSA_stept(goto_trace_stept::typet::MEMORY_BARRIER) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::MEMORY_BARRIER; }
 };
 
 class SSA_atomic_begint : public SSA_stept {
 public:
-  SSA_atomic_begint():SSA_stept(goto_trace_stept::typet::ATOMIC_BEGIN) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::ATOMIC_BEGIN; }
 };
 
 class SSA_atomic_endt : public SSA_stept {
 public:
-  SSA_atomic_endt():SSA_stept(goto_trace_stept::typet::ATOMIC_END) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::ATOMIC_END; }
 };
 
 class SSA_inputt : public SSA_stept {
 public:
-  SSA_inputt():SSA_stept(goto_trace_stept::typet::INPUT) {}
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::INPUT; }
 };
 
 
