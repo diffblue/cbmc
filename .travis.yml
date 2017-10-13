@@ -165,6 +165,33 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
+    # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
+    - stage: Test different OS/CXX/Flags
+      os: linux
+      sudo: false
+      compiler: clang
+      cache: ccache
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - libwww-perl
+            - clang-3.7
+            - libstdc++-5-dev
+            - libubsan0
+      before_install:
+        - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
+        - export CCACHE_CPP2=yes
+      env:
+        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
+        # Disable known warnings caused by -DCPROVER_INVARIANT_DO_NOT_CHECK.
+        - EXTRA_CXXFLAGS="-DNDEBUG -DCPROVER_INVARIANT_DO_NOT_CHECK -Wno-return-type -Wno-unused-variable -Wno-sometimes-uninitialized -Wno-unused-function"
+      script: echo "Not running any tests for a debug build."
+
+    # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
       cache: ccache
