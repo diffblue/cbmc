@@ -44,8 +44,9 @@ void cpp_typecheckt::convert_parameter(
   symbol.type=parameter.type();
   symbol.is_state_var=true;
   symbol.is_lvalue=!is_reference(symbol.type);
+  symbol.is_parameter=true;
 
-  assert(!symbol.base_name.empty());
+  INVARIANT(!symbol.base_name.empty(), "parameter has base name");
 
   symbolt *new_symbol;
 
