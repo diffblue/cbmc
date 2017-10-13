@@ -443,7 +443,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       next==equation.SSA_steps.end()?
       sink:step_to_node[next_step_nr];
 
-    switch((*it)->type)
+    switch((*it)->type())
     {
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:

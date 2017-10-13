@@ -578,7 +578,7 @@ void symex_target_equationt::SSA_stept::output(
       out << '\n';
   }
 
-  switch(type)
+  switch(type())
   {
   case goto_trace_stept::typet::ASSERT:
     out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;

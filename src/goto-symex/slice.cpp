@@ -55,7 +55,7 @@ void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
   get_symbols(SSA_step.guard);
 
-  switch(SSA_step.type)
+  switch(SSA_step.type())
   {
   case goto_trace_stept::typet::ASSERT:
     get_symbols(SSA_step.cond_expr);
@@ -157,7 +157,7 @@ void symex_slicet::collect_open_variables(
 
     get_symbols(SSA_step.guard);
 
-    switch(SSA_step.type)
+    switch(SSA_step.type())
     {
     case goto_trace_stept::typet::ASSERT:
       get_symbols(SSA_step.cond_expr);
