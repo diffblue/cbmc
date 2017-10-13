@@ -631,45 +631,24 @@ void dump_ct::cleanup_decl(
   decl.swap(b.op0());
 }
 
-/*******************************************************************\
-
-Function: dump_ct::collect_typedefs
-
-Inputs:
-    type  Type to inspect for ID_C_typedef entry
-    early Set to true to enforce that typedef is dumped before any
-          function declarations or struct definitions
-
-Outputs:
-
-Purpose: Find any typedef names contained in the input type and store
-         their declaration strings in typedef_map for eventual output.
-
-\*******************************************************************/
-
+/// Find any typedef names contained in the input type and store their
+/// declaration strings in typedef_map for eventual output.
+/// \param type: type to inspect for ID_C_typedef entry
+/// \param early: set to true to enforce that typedef is dumped before any
+///   function declarations or struct definitions
 void dump_ct::collect_typedefs(const typet &type, bool early)
 {
   std::unordered_set<irep_idt, irep_id_hash> deps;
   collect_typedefs_rec(type, early, deps);
 }
 
-/*******************************************************************\
-
-Function: dump_ct::collect_typedefs_rec
-
-Inputs:
-    type  Type to inspect for ID_C_typedef entry
-    early Set to true to enforce that typedef is dumped before any
-          function declarations or struct definitions
-    dependencies Typedefs used in the declaration of a given typedef
-
-Outputs:
-
-Purpose: Find any typedef names contained in the input type and store
-         their declaration strings in typedef_map for eventual output.
-
-\*******************************************************************/
-
+/// Find any typedef names contained in the input type and store their
+/// declaration strings in typedef_map for eventual output.
+/// \param type: type to inspect for ID_C_typedef entry
+/// \param early: set to true to enforce that typedef is dumped before any
+///   function declarations or struct definitions
+/// \param [out] dependencies: typedefs used in the declaration of a given
+///   typedef
 void dump_ct::collect_typedefs_rec(
   const typet &type,
   bool early,
@@ -745,19 +724,7 @@ void dump_ct::collect_typedefs_rec(
   dependencies.insert(local_deps.begin(), local_deps.end());
 }
 
-/*******************************************************************\
-
-Function: dump_ct::gather_global_typedefs
-
-Inputs:
-
-Outputs:
-
-Purpose: find all global typdefs in the symbol table and store them
-         in typedef_types
-
-\*******************************************************************/
-
+/// Find all global typdefs in the symbol table and store them in typedef_types
 void dump_ct::gather_global_typedefs()
 {
   // sort the symbols first to ensure deterministic replacement in
@@ -787,19 +754,8 @@ void dump_ct::gather_global_typedefs()
   }
 }
 
-/*******************************************************************\
-
-Function: dump_ct::dump_typedefs
-
-Inputs:
-
-Outputs: os  output stream
-
-Purpose: print all typedefs that are not covered via
-         typedef struct xyz { ... } name;
-
-\*******************************************************************/
-
+/// Print all typedefs that are not covered via typedef struct xyz { ... } name;
+/// \param [out] os: output stream
 void dump_ct::dump_typedefs(std::ostream &os) const
 {
   // we need to compute a topological sort; we do so by picking all
