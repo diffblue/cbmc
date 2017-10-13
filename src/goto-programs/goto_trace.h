@@ -38,24 +38,24 @@ class goto_trace_stept
 public:
   std::size_t step_nr;
 
-  bool is_assignment() const      { return type==typet::ASSIGNMENT; }
-  bool is_assume() const          { return type==typet::ASSUME; }
-  bool is_assert() const          { return type==typet::ASSERT; }
-  bool is_goto() const            { return type==typet::GOTO; }
-  bool is_constraint() const      { return type==typet::CONSTRAINT; }
-  bool is_function_call() const   { return type==typet::FUNCTION_CALL; }
-  bool is_function_return() const { return type==typet::FUNCTION_RETURN; }
-  bool is_location() const        { return type==typet::LOCATION; }
-  bool is_output() const          { return type==typet::OUTPUT; }
-  bool is_input() const           { return type==typet::INPUT; }
-  bool is_decl() const            { return type==typet::DECL; }
-  bool is_dead() const            { return type==typet::DEAD; }
-  bool is_shared_read() const     { return type==typet::SHARED_READ; }
-  bool is_shared_write() const    { return type==typet::SHARED_WRITE; }
-  bool is_spawn() const           { return type==typet::SPAWN; }
-  bool is_memory_barrier() const  { return type==typet::MEMORY_BARRIER; }
-  bool is_atomic_begin() const    { return type==typet::ATOMIC_BEGIN; }
-  bool is_atomic_end() const      { return type==typet::ATOMIC_END; }
+  bool is_assignment() const      { return type()==typet::ASSIGNMENT; }
+  bool is_assume() const          { return type()==typet::ASSUME; }
+  bool is_assert() const          { return type()==typet::ASSERT; }
+  bool is_goto() const            { return type()==typet::GOTO; }
+  bool is_constraint() const      { return type()==typet::CONSTRAINT; }
+  bool is_function_call() const   { return type()==typet::FUNCTION_CALL; }
+  bool is_function_return() const { return type()==typet::FUNCTION_RETURN; }
+  bool is_location() const        { return type()==typet::LOCATION; }
+  bool is_output() const          { return type()==typet::OUTPUT; }
+  bool is_input() const           { return type()==typet::INPUT; }
+  bool is_decl() const            { return type()==typet::DECL; }
+  bool is_dead() const            { return type()==typet::DEAD; }
+  bool is_shared_read() const     { return type()==typet::SHARED_READ; }
+  bool is_shared_write() const    { return type()==typet::SHARED_WRITE; }
+  bool is_spawn() const           { return type()==typet::SPAWN; }
+  bool is_memory_barrier() const  { return type()==typet::MEMORY_BARRIER; }
+  bool is_atomic_begin() const    { return type()==typet::ATOMIC_BEGIN; }
+  bool is_atomic_end() const      { return type()==typet::ATOMIC_END; }
 
   enum class typet
   {
@@ -80,7 +80,9 @@ public:
     ATOMIC_END
   };
 
-  const typet type;
+private:
+  typet type_;
+public:
 
   // we may choose to hide a step
   bool hidden;
@@ -128,10 +130,13 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
+  typet type() const
+  { return type_; }
+
 protected:
   goto_trace_stept(typet type):
     step_nr(0),
-    type(type),
+    type_(type),
     hidden(false),
     internal(false),
     assignment_type(assignment_typet::STATE),

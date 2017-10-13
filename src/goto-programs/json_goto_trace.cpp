@@ -46,7 +46,7 @@ void convert(
     else
       json_location=json_nullt();
 
-    switch(step->type)
+    switch(step->type())
     {
     case goto_trace_stept::typet::ASSERT:
       if(!step->cond_value)
@@ -206,7 +206,7 @@ void convert(
     case goto_trace_stept::typet::FUNCTION_RETURN:
       {
         std::string tag=
-          (step->type==goto_trace_stept::typet::FUNCTION_CALL)?
+          (step->type()==goto_trace_stept::typet::FUNCTION_CALL)?
             "function-call":"function-return";
         json_objectt &json_call_return=dest_array.push_back().make_object();
 

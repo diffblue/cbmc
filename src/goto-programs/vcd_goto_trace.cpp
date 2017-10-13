@@ -126,7 +126,7 @@ void output_vcd(
 
   for(const auto &step : goto_trace.steps)
   {
-    switch(step->type)
+    switch(step->type())
     {
     case goto_trace_stept::typet::ASSIGNMENT:
       {

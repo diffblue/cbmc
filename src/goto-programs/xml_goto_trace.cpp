@@ -38,7 +38,7 @@ void convert(
     if(source_location.is_not_nil() && source_location.get_file()!="")
       xml_location=xml(source_location);
 
-    switch(step->type)
+    switch(step->type())
     {
     case goto_trace_stept::typet::ASSERT:
       if(!step->cond_value)
@@ -179,7 +179,7 @@ void convert(
     case goto_trace_stept::typet::FUNCTION_RETURN:
       {
         std::string tag=
-          (step->type==goto_trace_stept::typet::FUNCTION_CALL)?
+          (step->type()==goto_trace_stept::typet::FUNCTION_CALL)?
           "function_call":"function_return";
         xmlt &xml_call_return=dest.new_element(tag);
 

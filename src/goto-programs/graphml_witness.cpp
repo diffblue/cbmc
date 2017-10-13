@@ -201,7 +201,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     goto_tracet::stepst::const_iterator next=it;
     ++next;
     if(next!=goto_trace.steps.end() &&
-       (*next)->type==goto_trace_stept::typet::ASSIGNMENT &&
+       (*next)->type()==goto_trace_stept::typet::ASSIGNMENT &&
        (*it)->full_lhs==(*next)->full_lhs &&
        (*it)->pc->source_location==(*next)->pc->source_location)
     {
@@ -221,7 +221,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     graphml[node].line=source_location.get_line();
     graphml[node].thread_nr=(*it)->thread_nr;
     graphml[node].is_violation=
-      (*it)->type==goto_trace_stept::typet::ASSERT && !(*it)->cond_value;
+      (*it)->type()==goto_trace_stept::typet::ASSERT && !(*it)->cond_value;
     graphml[node].has_invariant=false;
 
     step_to_node[(*it)->step_nr]=node;
@@ -253,7 +253,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       next==goto_trace.steps.end()?
       sink:step_to_node[(*next)->step_nr];
 
-    switch((*it)->type)
+    switch((*it)->type())
     {
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
@@ -273,7 +273,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           data_l.data=id2string(graphml[from].line);
         }
 
-        if((*it)->type==goto_trace_stept::typet::ASSIGNMENT &&
+        if((*it)->type()==goto_trace_stept::typet::ASSIGNMENT &&
            (*it)->lhs_object_value.is_not_nil() &&
            (*it)->full_lhs.is_not_nil())
         {
@@ -293,7 +293,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
             val_s.data=id2string((*it)->pc->source_location.get_function());
           }
         }
-        else if((*it)->type==goto_trace_stept::typet::GOTO &&
+        else if((*it)->type()==goto_trace_stept::typet::GOTO &&
                 (*it)->pc->is_goto())
         {
           xmlt &val=edge.new_element("data");

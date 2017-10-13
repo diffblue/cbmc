@@ -36,7 +36,7 @@ void goto_trace_stept::output(
 {
   out << "*** ";
 
-  switch(type)
+  switch(type())
   {
   case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
   case goto_trace_stept::typet::ASSUME: out << "ASSUME"; break;
@@ -57,11 +57,11 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
   default:
-    out << "unknown type: " << static_cast<int>(type) << std::endl;
+    out << "unknown type: " << static_cast<int>(type()) << std::endl;
     UNREACHABLE;
   }
 
-  if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
+  if(type()==typet::ASSERT || type()==typet::ASSUME || type()==typet::GOTO)
     out << " (" << cond_value << ")";
 
   if(hidden)
@@ -255,7 +255,7 @@ void show_goto_trace(
     if(step->hidden)
       continue;
 
-    switch(step->type)
+    switch(step->type())
     {
     case goto_trace_stept::typet::ASSERT:
       if(!step->cond_value)
