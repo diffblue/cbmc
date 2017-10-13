@@ -32,7 +32,7 @@ class SSA_stept
 {
 public:
   symex_targett::sourcet source;
-  goto_trace_stept::typet type;
+  const goto_trace_stept::typet type;
 
   // NOLINTNEXTLINE(whitespace/line_length)
   bool is_assert() const          { return type==goto_trace_stept::typet::ASSERT; }
@@ -100,8 +100,8 @@ public:
   // for slicing
   bool ignore=false;
 
-  SSA_stept():
-    type(goto_trace_stept::typet::NONE),
+  SSA_stept(goto_trace_stept::typet type):
+    type(type),
     hidden(false),
     guard(static_cast<const exprt &>(get_nil_irep())),
     guard_literal(const_literal(false)),
