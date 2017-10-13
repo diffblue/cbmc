@@ -53,6 +53,7 @@ void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &,
-  symbol_tablet &symbol_table);
+  symbol_tablet &symbol_table,
+  message_handlert &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_METHOD_H
