@@ -10,7 +10,7 @@ macro(add_test_pl_profile name cmdline flag profile)
         WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
     set_tests_properties("${name}-${profile}" PROPERTIES
-        LABELS "${profile}"
+        LABELS "${profile};CBMC"
     )
 endmacro(add_test_pl_profile)
 
