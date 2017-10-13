@@ -834,7 +834,7 @@ void bv_pointerst::do_postponed(
     assert(bv.size()==saved_bv.size());
 
     disj.push_back(
-      bv_utils.rel(saved_bv, ID_ge, bv, bv_utilst::UNSIGNED));
+      bv_utils.rel(saved_bv, ID_ge, bv, bv_utilst::representationt::UNSIGNED));
 
     assert(postponed.bv.size()==1);
     literalt l=postponed.bv.front();
