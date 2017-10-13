@@ -38,6 +38,12 @@ symbolt generate_java_generic_typet::operator()(
     to_java_class_type(pointer_subtype);
   const irep_idt new_tag=build_generic_tag(
     existing_generic_type, replacement_type);
+
+  const auto expected_symbol="java::"+id2string(new_tag);
+  auto symbol=symbol_table.lookup(expected_symbol);
+  if(symbol)
+    return *symbol;
+
   struct_union_typet::componentst replacement_components=
     replacement_type.components();
 
@@ -86,14 +92,12 @@ symbolt generate_java_generic_typet::operator()(
     pre_modification_size==after_modification_size,
     "All components in the original class should be in the new class");
 
-  const auto expected_symbol="java::"+id2string(new_tag);
-
   generate_class_stub(
     new_tag,
     symbol_table,
     message_handler,
     replacement_components);
-  auto symbol=symbol_table.lookup(expected_symbol);
+  symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
 }
