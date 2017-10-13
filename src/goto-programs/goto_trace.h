@@ -144,19 +144,6 @@ public:
     full_lhs_value.make_nil();
     cond_expr.make_nil();
   }
-
-  std::unique_ptr<goto_trace_stept> clone(typet type)
-  {
-    auto copy = util_make_unique<goto_trace_stept>(type);
-    copy->step_nr = this->step_nr;
-    copy->hidden = this->hidden;
-    copy->internal = this->internal;
-    copy->assignment_type = this->assignment_type;
-    copy->thread_nr = this->thread_nr;
-    copy->cond_value = this->cond_value;
-    copy->formatted = this->formatted;
-    return copy;
-  }
 };
 
 /*! \brief TO_BE_DOCUMENTED

@@ -248,24 +248,29 @@ void interpretert::step()
   next_pc=pc;
   next_pc++;
 
-  steps.add_step(util_make_unique<goto_trace_stept>(goto_trace_stept::typet::NONE));
-  goto_trace_stept &trace_step=steps.get_last_step();
-  trace_step.thread_nr=thread_id;
-  trace_step.pc=pc;
+  std::unique_ptr<goto_trace_stept> trace_step;
   switch(pc->type)
   {
   case GOTO:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::GOTO);
+    trace_step=util_make_unique<goto_trace_stept>(goto_trace_stept::typet::GOTO);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_goto();
     break;
 
   case ASSUME:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSUME);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::ASSUME);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assume();
     break;
 
   case ASSERT:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSERT);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::ASSERT);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assert();
     break;
 
@@ -274,22 +279,32 @@ void interpretert::step()
     break;
 
   case DECL:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::DECL);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::DECL);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_decl();
     break;
 
   case SKIP:
   case LOCATION:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::LOCATION);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::LOCATION);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
   case END_FUNCTION:
-    steps.steps.back() = trace_step.clone(
+    trace_step=util_make_unique<goto_trace_stept>(
       goto_trace_stept::typet::FUNCTION_RETURN);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
 
   case RETURN:
-    steps.steps.back() = trace_step.clone(
+    trace_step=util_make_unique<goto_trace_stept>(
       goto_trace_stept::typet::FUNCTION_RETURN);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     if(call_stack.empty())
       throw "RETURN without call"; // NOLINT(readability/throw)
 
@@ -305,36 +320,61 @@ void interpretert::step()
     break;
 
   case ASSIGN:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSIGNMENT);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::ASSIGNMENT);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assign();
     break;
 
   case FUNCTION_CALL:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::FUNCTION_CALL);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::FUNCTION_CALL);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_function_call();
     break;
 
   case START_THREAD:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::SPAWN);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::SPAWN);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
 
   case END_THREAD:
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::NONE);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "END_THREAD not yet implemented"; // NOLINT(readability/throw)
     break;
 
   case ATOMIC_BEGIN:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ATOMIC_BEGIN);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::ATOMIC_BEGIN);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
 
   case ATOMIC_END:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ATOMIC_END);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::ATOMIC_END);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
 
   case DEAD:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::DEAD);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::DEAD);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
   case THROW:
-    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::GOTO);
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::GOTO);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     while(!done && (pc->type!=CATCH))
     {
       if(pc==function->second.body.instructions.end())
@@ -356,10 +396,19 @@ void interpretert::step()
     }
     break;
   case CATCH:
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::NONE);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
   default:
+    trace_step=util_make_unique<goto_trace_stept>(
+      goto_trace_stept::typet::NONE);
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "encountered instruction with undefined instruction type";
   }
+  steps.add_step(std::move(trace_step));
   pc=next_pc;
 }
 
