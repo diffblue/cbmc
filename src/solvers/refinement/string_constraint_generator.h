@@ -258,7 +258,6 @@ private:
   exprt add_axioms_for_string_of_float(const function_application_exprt &f);
   exprt
   add_axioms_for_string_of_float(const array_string_exprt &res, const exprt &f);
-
   exprt add_axioms_for_fractional_part(
     const array_string_exprt &res,
     const exprt &i,
@@ -285,7 +284,6 @@ private:
     const exprt &start,
     const exprt &end);
   exprt add_axioms_for_substring(const function_application_exprt &f);
-
   exprt add_axioms_for_to_lower_case(const function_application_exprt &f);
   exprt add_axioms_for_to_upper_case(const function_application_exprt &f);
   exprt add_axioms_for_to_upper_case(
