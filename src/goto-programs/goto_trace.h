@@ -38,24 +38,24 @@ class goto_trace_stept
 public:
   std::size_t step_nr;
 
-  bool is_assignment() const      { return type()==typet::ASSIGNMENT; }
-  bool is_assume() const          { return type()==typet::ASSUME; }
-  bool is_assert() const          { return type()==typet::ASSERT; }
-  bool is_goto() const            { return type()==typet::GOTO; }
-  bool is_constraint() const      { return type()==typet::CONSTRAINT; }
-  bool is_function_call() const   { return type()==typet::FUNCTION_CALL; }
-  bool is_function_return() const { return type()==typet::FUNCTION_RETURN; }
-  bool is_location() const        { return type()==typet::LOCATION; }
-  bool is_output() const          { return type()==typet::OUTPUT; }
-  bool is_input() const           { return type()==typet::INPUT; }
-  bool is_decl() const            { return type()==typet::DECL; }
-  bool is_dead() const            { return type()==typet::DEAD; }
-  bool is_shared_read() const     { return type()==typet::SHARED_READ; }
-  bool is_shared_write() const    { return type()==typet::SHARED_WRITE; }
-  bool is_spawn() const           { return type()==typet::SPAWN; }
-  bool is_memory_barrier() const  { return type()==typet::MEMORY_BARRIER; }
-  bool is_atomic_begin() const    { return type()==typet::ATOMIC_BEGIN; }
-  bool is_atomic_end() const      { return type()==typet::ATOMIC_END; }
+  bool is_assignment() const;
+  bool is_assume() const;
+  bool is_assert() const;
+  bool is_goto() const;
+  bool is_constraint() const;
+  bool is_function_call() const;
+  bool is_function_return() const;
+  bool is_location() const;
+  bool is_output() const;
+  bool is_input() const;
+  bool is_decl() const;
+  bool is_dead() const;
+  bool is_shared_read() const;
+  bool is_shared_write() const;
+  bool is_spawn() const;
+  bool is_memory_barrier() const;
+  bool is_atomic_begin() const;
+  bool is_atomic_end() const;
 
   enum class typet
   {
@@ -253,6 +253,48 @@ public:
   typet type() const override
   { return goto_trace_stept::typet::ATOMIC_END; }
 };
+
+inline std::unique_ptr<goto_trace_stept> make_goto_trace_step(
+  goto_trace_stept::typet type)
+{
+  if (type==goto_trace_stept::typet::ASSIGNMENT)
+    return util_make_unique<trace_assignmentt>();
+  if (type==goto_trace_stept::typet::ASSUME)
+    return util_make_unique<trace_assumet>();
+  if (type==goto_trace_stept::typet::ASSERT)
+    return util_make_unique<trace_assertt>();
+  if (type==goto_trace_stept::typet::GOTO)
+    return util_make_unique<trace_gotot>();
+  if (type==goto_trace_stept::typet::LOCATION)
+    return util_make_unique<trace_locationt>();
+  if (type==goto_trace_stept::typet::INPUT)
+    return util_make_unique<trace_inputt>();
+  if (type==goto_trace_stept::typet::OUTPUT)
+    return util_make_unique<trace_outputt>();
+  if (type==goto_trace_stept::typet::DECL)
+    return util_make_unique<trace_declt>();
+  if (type==goto_trace_stept::typet::DEAD)
+    return util_make_unique<trace_deadt>();
+  if (type==goto_trace_stept::typet::FUNCTION_CALL)
+    return util_make_unique<trace_function_callt>();
+  if (type==goto_trace_stept::typet::FUNCTION_RETURN)
+    return util_make_unique<trace_function_returnt>();
+  if (type==goto_trace_stept::typet::CONSTRAINT)
+    return util_make_unique<trace_constraintt>();
+  if (type==goto_trace_stept::typet::SHARED_READ)
+    return util_make_unique<trace_shared_readt>();
+  if (type==goto_trace_stept::typet::SHARED_WRITE)
+    return util_make_unique<trace_shared_writet>();
+  if (type==goto_trace_stept::typet::SPAWN)
+    return util_make_unique<trace_spawnt>();
+  if (type==goto_trace_stept::typet::MEMORY_BARRIER)
+    return util_make_unique<trace_memory_barriert>();
+  if (type==goto_trace_stept::typet::ATOMIC_BEGIN)
+    return util_make_unique<trace_atomic_begint>();
+  if (type==goto_trace_stept::typet::ATOMIC_END)
+    return util_make_unique<trace_atomic_endt>();
+  UNREACHABLE;
+}
 
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex

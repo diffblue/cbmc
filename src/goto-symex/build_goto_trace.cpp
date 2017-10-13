@@ -22,6 +22,7 @@ Author: Daniel Kroening
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
 
+
 #include "partial_order_concurrency.h"
 
 exprt build_full_lhs_rec(
@@ -257,7 +258,7 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(util_make_unique<goto_trace_stept>(SSA_step.type));
+    steps.push_back(make_goto_trace_step(SSA_step.type));
     goto_trace_stept &goto_trace_step=*steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
