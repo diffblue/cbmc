@@ -31,14 +31,14 @@ void bmct::show_vcc_plain(std::ostream &out)
       s_it!=equation.SSA_steps.end();
       s_it++)
   {
-    if(!s_it->is_assert())
+    if(!(*s_it)->is_assert())
       continue;
 
-    if(s_it->source.pc->source_location.is_not_nil())
-      out << s_it->source.pc->source_location << "\n";
+    if((*s_it)->source.pc->source_location.is_not_nil())
+      out << (*s_it)->source.pc->source_location << "\n";
 
-    if(s_it->comment!="")
-      out << s_it->comment << "\n";
+    if((*s_it)->comment!="")
+      out << (*s_it)->comment << "\n";
 
     symex_target_equationt::SSA_stepst::const_iterator
       p_it=equation.SSA_steps.begin();
@@ -48,12 +48,12 @@ void bmct::show_vcc_plain(std::ostream &out)
       last_it=has_threads?equation.SSA_steps.end():s_it;
 
     for(std::size_t count=1; p_it!=last_it; p_it++)
-      if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
+      if((*p_it)->is_assume() || (*p_it)->is_assignment() || (*p_it)->is_constraint())
       {
-        if(!p_it->ignore)
+        if(!(*p_it)->ignore)
         {
           std::string string_value=
-            from_expr(ns, "", p_it->cond_expr);
+            from_expr(ns, "", (*p_it)->cond_expr);
           out << "{-" << count << "} " << string_value << "\n";
 
           #if 0
@@ -69,7 +69,7 @@ void bmct::show_vcc_plain(std::ostream &out)
     out << "|--------------------------" << "\n";
 
     std::string string_value=
-      from_expr(ns, "", s_it->cond_expr);
+      from_expr(ns, "", (*s_it)->cond_expr);
     out << "{" << 1 << "} " << string_value << "\n";
 
     out << "\n";
@@ -89,17 +89,17 @@ void bmct::show_vcc_json(std::ostream &out)
       s_it!=equation.SSA_steps.end();
       s_it++)
   {
-    if(!s_it->is_assert())
+    if(!(*s_it)->is_assert())
       continue;
 
     // vcc object
     json_objectt &object=json_vccs.push_back(jsont()).make_object();
 
-    const source_locationt &source_location=s_it->source.pc->source_location;
+    const source_locationt &source_location=(*s_it)->source.pc->source_location;
     if(source_location.is_not_nil())
       object["sourceLocation"]=json(source_location);
 
-    const std::string &s=s_it->comment;
+    const std::string &s=(*s_it)->comment;
     if(!s.empty())
       object["comment"]=json_stringt(s);
 
@@ -113,19 +113,19 @@ void bmct::show_vcc_json(std::ostream &out)
           =equation.SSA_steps.begin();
         p_it!=last_it; p_it++)
     {
-      if((p_it->is_assume() ||
-         p_it->is_assignment() ||
-         p_it->is_constraint()) &&
-         !p_it->ignore)
+      if(((*p_it)->is_assume() ||
+         (*p_it)->is_assignment() ||
+         (*p_it)->is_constraint()) &&
+         !(*p_it)->ignore)
       {
         std::string string_value=
-          from_expr(ns, "", p_it->cond_expr);
+          from_expr(ns, "", (*p_it)->cond_expr);
         json_constraints.push_back(json_stringt(string_value));
       }
     }
 
     std::string string_value=
-      from_expr(ns, "", s_it->cond_expr);
+      from_expr(ns, "", (*s_it)->cond_expr);
     object["expression"]=json_stringt(string_value);
   }
 

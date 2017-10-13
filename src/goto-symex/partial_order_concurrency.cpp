@@ -38,13 +38,13 @@ void partial_order_concurrencyt::add_init_writes(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(e_it->is_spawn())
+    if((*e_it)->is_spawn())
     {
       spawn_seen=true;
       continue;
     }
-    else if(!e_it->is_shared_read() &&
-            !e_it->is_shared_write())
+    else if(!(*e_it)->is_shared_read() &&
+            !(*e_it)->is_shared_write())
       continue;
 
     const irep_idt &a=address(e_it);
@@ -53,19 +53,19 @@ void partial_order_concurrencyt::add_init_writes(
       continue;
 
     if(spawn_seen ||
-       e_it->is_shared_read() ||
-       !e_it->guard.is_true())
+       (*e_it)->is_shared_read() ||
+       !(*e_it)->guard.is_true())
     {
-      symex_target_equationt::SSA_stept SSA_step(
+      auto SSA_step=util_make_unique<symex_target_equationt::SSA_stept>(
         goto_trace_stept::typet::SHARED_WRITE);
 
-      SSA_step.guard=true_exprt();
+      SSA_step->guard=true_exprt();
       // no SSA L2 index, thus nondet value
-      SSA_step.ssa_lhs=e_it->ssa_lhs;
-      SSA_step.ssa_lhs.remove_level_2();
-      SSA_step.atomic_section_id=0;
-      SSA_step.source=e_it->source;
-      init_steps.push_back(SSA_step);
+      SSA_step->ssa_lhs=(*e_it)->ssa_lhs;
+      SSA_step->ssa_lhs.remove_level_2();
+      SSA_step->atomic_section_id=0;
+      SSA_step->source=(*e_it)->source;
+      init_steps.push_back(std::move(SSA_step));
     }
 
     init_done.insert(a);
@@ -87,17 +87,17 @@ void partial_order_concurrencyt::build_event_lists(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(e_it->is_shared_read() ||
-       e_it->is_shared_write() ||
-       e_it->is_spawn())
+    if((*e_it)->is_shared_read() ||
+       (*e_it)->is_shared_write() ||
+       (*e_it)->is_spawn())
     {
-      unsigned thread_nr=e_it->source.thread_nr;
+      unsigned thread_nr=(*e_it)->source.thread_nr;
 
-      if(!e_it->is_spawn())
+      if(!(*e_it)->is_spawn())
       {
         a_rect &a_rec=address_map[address(e_it)];
 
-        if(e_it->is_shared_read())
+        if((*e_it)->is_shared_read())
           a_rec.reads.push_back(e_it);
         else // must be write
           a_rec.writes.push_back(e_it);
@@ -128,9 +128,9 @@ irep_idt partial_order_concurrencyt::rw_clock_id(
   event_it event,
   axiomt axiom)
 {
-  if(event->is_shared_write())
+  if((*event)->is_shared_write())
     return id2string(id(event))+"$wclk$"+std::to_string(axiom);
-  else if(event->is_shared_read())
+  else if((*event)->is_shared_read())
     return id2string(id(event))+"$rclk$"+std::to_string(axiom);
   else
     UNREACHABLE;
@@ -145,14 +145,14 @@ symbol_exprt partial_order_concurrencyt::clock(
   irep_idt identifier;
   assert(!numbering.empty());
 
-  if(event->is_shared_write())
+  if((*event)->is_shared_write())
     identifier=rw_clock_id(event, axiom);
-  else if(event->is_shared_read())
+  else if((*event)->is_shared_read())
     identifier=rw_clock_id(event, axiom);
-  else if(event->is_spawn())
+  else if((*event)->is_spawn())
   {
     identifier=
-      "t"+std::to_string(event->source.thread_nr+1)+"$"+
+      "t"+std::to_string((*event)->source.thread_nr+1)+"$"+
       std::to_string(numbering[event])+"$spwnclk$"+std::to_string(axiom);
   }
   else
@@ -192,8 +192,8 @@ exprt partial_order_concurrencyt::before(
     if((axioms &ax)==0)
       continue;
 
-    if(e1->atomic_section_id!=0 &&
-       e1->atomic_section_id==e2->atomic_section_id)
+    if((*e1)->atomic_section_id!=0 &&
+       (*e1)->atomic_section_id==(*e2)->atomic_section_id)
       ops.push_back(equal_exprt(clock(e1, ax), clock(e2, ax)));
     else
       ops.push_back(

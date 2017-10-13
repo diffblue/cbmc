@@ -48,7 +48,7 @@ void symex_slicet::slice(symex_target_equationt &equation)
       it=equation.SSA_steps.rbegin();
       it!=equation.SSA_steps.rend();
       it++)
-    slice(*it);
+    slice(**it);
 }
 
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
@@ -153,7 +153,7 @@ void symex_slicet::collect_open_variables(
       it!=equation.SSA_steps.end();
       it++)
   {
-    const symex_target_equationt::SSA_stept &SSA_step=*it;
+    const symex_target_equationt::SSA_stept &SSA_step=**it;
 
     get_symbols(SSA_step.guard);
 
@@ -246,7 +246,7 @@ void simple_slice(symex_target_equationt &equation)
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end();
       it++)
-    if(it->is_assert())
+    if((*it)->is_assert())
       last_assertion=it;
 
   // slice away anything after it
@@ -259,6 +259,6 @@ void simple_slice(symex_target_equationt &equation)
     for(s_it++;
         s_it!=equation.SSA_steps.end();
         s_it++)
-      s_it->ignore=true;
+      (*s_it)->ignore=true;
   }
 }

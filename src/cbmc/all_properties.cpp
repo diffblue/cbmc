@@ -35,7 +35,7 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
     // check whether failed
     for(auto &c : g.second.instances)
     {
-      literalt cond=c->cond_literal;
+      literalt cond=(*c)->cond_literal;
 
       if(solver.l_get(cond).is_false())
       {
@@ -75,19 +75,19 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assert())
+    if((*it)->is_assert())
     {
       irep_idt property_id;
 
-      if(it->source.pc->is_assert())
-        property_id=it->source.pc->source_location.get_property_id();
-      else if(it->source.pc->is_goto())
+      if((*it)->source.pc->is_assert())
+        property_id=(*it)->source.pc->source_location.get_property_id();
+      else if((*it)->source.pc->is_goto())
       {
         // this is likely an unwinding assertion
         property_id=id2string(
-          it->source.pc->source_location.get_function())+".unwind."+
-          std::to_string(it->source.pc->loop_number);
-        goal_map[property_id].description=it->comment;
+          (*it)->source.pc->source_location.get_function())+".unwind."+
+          std::to_string((*it)->source.pc->loop_number);
+        goal_map[property_id].description=(*it)->comment;
       }
       else
         continue;

@@ -198,15 +198,15 @@ void build_goto_trace(
     if(it==end_step)
       end_step_seen=true;
 
-    const symex_target_equationt::SSA_stept &SSA_step=*it;
+    const symex_target_equationt::SSA_stept &SSA_step=**it;
 
     if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
-    if(it->is_constraint() ||
-       it->is_spawn())
+    if((*it)->is_constraint() ||
+       (*it)->is_spawn())
       continue;
-    else if(it->is_atomic_begin())
+    else if((*it)->is_atomic_begin())
     {
       // for atomic sections the timing can only be determined once we see
       // a shared read or write (if there is none, the time will be
@@ -215,12 +215,12 @@ void build_goto_trace(
       current_time*=-1;
       continue;
     }
-    else if(it->is_shared_read() || it->is_shared_write() ||
-            it->is_atomic_end())
+    else if((*it)->is_shared_read() || (*it)->is_shared_write() ||
+            (*it)->is_atomic_end())
     {
       mp_integer time_before=current_time;
 
-      if(it->is_shared_read() || it->is_shared_write())
+      if((*it)->is_shared_read() || (*it)->is_shared_write())
       {
         // these are just used to get the time stamp
         exprt clock_value=prop_conv.get(
@@ -228,7 +228,7 @@ void build_goto_trace(
 
         to_integer(clock_value, current_time);
       }
-      else if(it->is_atomic_end() && current_time<0)
+      else if((*it)->is_atomic_end() && current_time<0)
         current_time*=-1;
 
       assert(current_time>=0);
@@ -248,7 +248,7 @@ void build_goto_trace(
     }
 
     // drop PHI and GUARD assignments altogether
-    if(it->is_assignment() &&
+    if((*it)->is_assignment() &&
        (SSA_step.assignment_type==
           symex_target_equationt::assignment_typet::PHI ||
         SSA_step.assignment_type==
@@ -281,7 +281,7 @@ void build_goto_trace(
     update_internal_field(SSA_step, goto_trace_step, ns);
 
     goto_trace_step.assignment_type=
-      (it->is_assignment()&&
+      ((*it)->is_assignment()&&
        (SSA_step.assignment_type==
           symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
         SSA_step.assignment_type==

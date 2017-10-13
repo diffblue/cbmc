@@ -76,7 +76,7 @@ public:
       std::vector<exprt> tmp;
       tmp.reserve(instances.size());
       for(const auto &inst : instances)
-        tmp.push_back(literal_exprt(inst->cond_literal));
+        tmp.push_back(literal_exprt((*inst)->cond_literal));
       return conjunction(tmp);
     }
   };

@@ -271,7 +271,7 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->is_assert())
+      if((*it)->is_assert())
         i++;
     return i;
   }
@@ -282,12 +282,12 @@ public:
     for(SSA_stepst::const_iterator
         it=SSA_steps.begin();
         it!=SSA_steps.end(); it++)
-      if(it->ignore)
+      if((*it)->ignore)
         i++;
     return i;
   }
 
-  typedef std::list<SSA_stept> SSA_stepst;
+  typedef std::list<std::unique_ptr<SSA_stept>> SSA_stepst;
   SSA_stepst SSA_steps;
 
   SSA_stepst::iterator get_SSA_step(std::size_t s)
@@ -313,7 +313,7 @@ public:
     for(SSA_stepst::const_iterator it=SSA_steps.begin();
         it!=SSA_steps.end();
         it++)
-      if(it->source.thread_nr!=0)
+      if((*it)->source.thread_nr!=0)
         return true;
 
     return false;

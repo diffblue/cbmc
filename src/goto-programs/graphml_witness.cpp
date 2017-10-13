@@ -374,11 +374,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       it!=equation.SSA_steps.end();
       it++, step_nr++) // we cannot replace this by a ranged for
   {
-    const source_locationt &source_location=it->source.pc->source_location;
+    const source_locationt &source_location=(*it)->source.pc->source_location;
 
-    if(it->hidden ||
-       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
-       (it->is_goto() && it->source.pc->guard.is_true()) ||
+    if((*it)->hidden ||
+       (!(*it)->is_assignment() && !(*it)->is_goto() && !(*it)->is_assert()) ||
+       ((*it)->is_goto() && (*it)->source.pc->guard.is_true()) ||
        source_location.is_nil() ||
        source_location.is_built_in() ||
        source_location.get_line().empty())
@@ -392,9 +392,9 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     symex_target_equationt::SSA_stepst::const_iterator next=it;
     ++next;
     if(next!=equation.SSA_steps.end() &&
-       next->is_assignment() &&
-       it->ssa_full_lhs==next->ssa_full_lhs &&
-       it->source.pc->source_location==next->source.pc->source_location)
+       (*next)->is_assignment() &&
+       (*it)->ssa_full_lhs==(*next)->ssa_full_lhs &&
+       (*it)->source.pc->source_location==(*next)->source.pc->source_location)
     {
       step_to_node[step_nr]=sink;
 
@@ -403,11 +403,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
-      std::to_string(it->source.pc->location_number)+"."+
+      std::to_string((*it)->source.pc->location_number)+"."+
       std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->source.thread_nr;
+    graphml[node].thread_nr=(*it)->source.thread_nr;
     graphml[node].is_violation=false;
     graphml[node].has_invariant=false;
 
@@ -434,7 +434,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     std::size_t next_step_nr=step_nr;
     for(++next, ++next_step_nr;
         next!=equation.SSA_steps.end() &&
-        (step_to_node[next_step_nr]==sink || it->source.pc==next->source.pc);
+        (step_to_node[next_step_nr]==sink || (*it)->source.pc==(*next)->source.pc);
         ++next, ++next_step_nr)
     {
       // advance
@@ -443,7 +443,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       next==equation.SSA_steps.end()?
       sink:step_to_node[next_step_nr];
 
-    switch(it->type)
+    switch((*it)->type)
     {
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
@@ -463,26 +463,26 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           data_l.data=id2string(graphml[from].line);
         }
 
-        if((it->is_assignment() ||
-            it->is_decl()) &&
-           it->ssa_rhs.is_not_nil() &&
-           it->ssa_full_lhs.is_not_nil())
+        if(((*it)->is_assignment() ||
+            (*it)->is_decl()) &&
+           (*it)->ssa_rhs.is_not_nil() &&
+           (*it)->ssa_full_lhs.is_not_nil())
         {
-          irep_idt identifier=it->ssa_lhs.get_object_name();
+          irep_idt identifier=(*it)->ssa_lhs.get_object_name();
 
           graphml[to].has_invariant=true;
-          code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
+          code_assignt assign((*it)->ssa_full_lhs, (*it)->ssa_rhs);
           graphml[to].invariant=convert_assign_rec(identifier, assign);
           graphml[to].invariant_scope=
-            id2string(it->source.pc->source_location.get_function());
+            id2string((*it)->source.pc->source_location.get_function());
         }
-        else if(it->is_goto() &&
-                it->source.pc->is_goto())
+        else if((*it)->is_goto() &&
+                (*it)->source.pc->is_goto())
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "sourcecode");
-          const std::string cond=from_expr(ns, "", it->cond_expr);
-            from_expr(ns, "", not_exprt(it->cond_expr));
+          const std::string cond=from_expr(ns, "", (*it)->cond_expr);
+            from_expr(ns, "", not_exprt((*it)->cond_expr));
           val.data="["+cond+"]";
         }
 
