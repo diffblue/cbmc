@@ -104,8 +104,7 @@ void symex_slice_by_tracet::slice_by_trace(
   guardt t_guard;
   t_guard.make_true();
   symex_targett::sourcet empty_source;
-  auto SSA_step=util_make_unique<symex_target_equationt::SSA_stept>(
-    goto_trace_stept::typet::ASSUME);
+  auto SSA_step=util_make_unique<SSA_assumet>();
 
   SSA_step->guard=t_guard.as_expr();
   SSA_step->ssa_lhs.make_nil();
@@ -519,8 +518,7 @@ void symex_slice_by_tracet::assign_merges(
 
     exprt merge_copy(*i);
 
-    auto SSA_step=util_make_unique<symex_target_equationt::SSA_stept>(
-      goto_trace_stept::typet::ASSIGNMENT);
+    auto SSA_step=util_make_unique<SSA_assignmentt>();
 
     SSA_step->guard=t_guard.as_expr();
     SSA_step->ssa_lhs=merge_sym;

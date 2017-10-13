@@ -56,8 +56,7 @@ void partial_order_concurrencyt::add_init_writes(
        (*e_it)->is_shared_read() ||
        !(*e_it)->guard.is_true())
     {
-      auto SSA_step=util_make_unique<symex_target_equationt::SSA_stept>(
-        goto_trace_stept::typet::SHARED_WRITE);
+      auto SSA_step=util_make_unique<SSA_shared_writet>();
 
       SSA_step->guard=true_exprt();
       // no SSA L2 index, thus nondet value

@@ -38,8 +38,7 @@ void symex_target_equationt::shared_read(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::SHARED_READ);
+  auto SSA_step=util_make_unique<SSA_shared_readt>();
   SSA_step->guard=guard;
   SSA_step->ssa_lhs=ssa_object;
   SSA_step->atomic_section_id=atomic_section_id;
@@ -55,8 +54,7 @@ void symex_target_equationt::shared_write(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::SHARED_WRITE);
+  auto SSA_step=util_make_unique<SSA_shared_writet>();
   SSA_step->guard=guard;
   SSA_step->ssa_lhs=ssa_object;
   SSA_step->atomic_section_id=atomic_section_id;
@@ -70,8 +68,7 @@ void symex_target_equationt::spawn(
   const exprt &guard,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::SPAWN);
+  auto SSA_step=util_make_unique<SSA_spawnt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   merge_ireps(*SSA_step);
@@ -82,8 +79,7 @@ void symex_target_equationt::memory_barrier(
   const exprt &guard,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::MEMORY_BARRIER);
+  auto SSA_step=util_make_unique<SSA_memory_barriert>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   merge_ireps(*SSA_step);
@@ -96,8 +92,7 @@ void symex_target_equationt::atomic_begin(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::ATOMIC_BEGIN);
+  auto SSA_step=util_make_unique<SSA_atomic_begint>();
   SSA_step->guard=guard;
   SSA_step->atomic_section_id=atomic_section_id;
   SSA_step->source=source;
@@ -111,8 +106,7 @@ void symex_target_equationt::atomic_end(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::ATOMIC_END);
+  auto SSA_step=util_make_unique<SSA_atomic_endt>();
   SSA_step->guard=guard;
   SSA_step->atomic_section_id=atomic_section_id;
   SSA_step->source=source;
@@ -132,8 +126,7 @@ void symex_target_equationt::assignment(
 {
   assert(ssa_lhs.is_not_nil());
 
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::ASSIGNMENT);
+  auto SSA_step=util_make_unique<SSA_assignmentt>();
 
   SSA_step->guard=guard;
   SSA_step->ssa_lhs=ssa_lhs;
@@ -160,8 +153,7 @@ void symex_target_equationt::decl(
 {
   assert(ssa_lhs.is_not_nil());
 
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::DECL);
+  auto SSA_step=util_make_unique<SSA_declt>();
 
   SSA_step->guard=guard;
   SSA_step->ssa_lhs=ssa_lhs;
@@ -192,8 +184,7 @@ void symex_target_equationt::location(
   const exprt &guard,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::LOCATION);
+  auto SSA_step=util_make_unique<SSA_locationt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   merge_ireps(*SSA_step);
@@ -206,8 +197,7 @@ void symex_target_equationt::function_call(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::FUNCTION_CALL);
+  auto SSA_step=util_make_unique<SSA_function_callt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   SSA_step->identifier=identifier;
@@ -221,8 +211,7 @@ void symex_target_equationt::function_return(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::FUNCTION_RETURN);
+  auto SSA_step=util_make_unique<SSA_function_returnt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   SSA_step->identifier=identifier;
@@ -237,8 +226,7 @@ void symex_target_equationt::output(
   const irep_idt &output_id,
   const std::list<exprt> &args)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::OUTPUT);
+  auto SSA_step=util_make_unique<SSA_outputt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   SSA_step->io_args=args;
@@ -255,8 +243,7 @@ void symex_target_equationt::output_fmt(
   const irep_idt &fmt,
   const std::list<exprt> &args)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::OUTPUT);
+  auto SSA_step=util_make_unique<SSA_outputt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   SSA_step->io_args=args;
@@ -274,8 +261,7 @@ void symex_target_equationt::input(
   const irep_idt &input_id,
   const std::list<exprt> &args)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::INPUT);
+  auto SSA_step=util_make_unique<SSA_inputt>();
   SSA_step->guard=guard;
   SSA_step->source=source;
   SSA_step->io_args=args;
@@ -290,8 +276,7 @@ void symex_target_equationt::assumption(
   const exprt &cond,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::ASSUME);
+  auto SSA_step=util_make_unique<SSA_assumet>();
   SSA_step->guard=guard;
   SSA_step->cond_expr=cond;
   SSA_step->source=source;
@@ -306,8 +291,7 @@ void symex_target_equationt::assertion(
   const std::string &msg,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::ASSERT);
+  auto SSA_step=util_make_unique<SSA_assertt>();
   SSA_step->guard=guard;
   SSA_step->cond_expr=cond;
   SSA_step->source=source;
@@ -322,8 +306,7 @@ void symex_target_equationt::goto_instruction(
   const exprt &cond,
   const sourcet &source)
 {
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::GOTO);
+  auto SSA_step=util_make_unique<SSA_gotot>();
   SSA_step->guard=guard;
   SSA_step->cond_expr=cond;
   SSA_step->source=source;
@@ -338,8 +321,7 @@ void symex_target_equationt::constraint(
   const sourcet &source)
 {
   // like assumption, but with global effect
-  auto SSA_step=util_make_unique<SSA_stept>(
-    goto_trace_stept::typet::CONSTRAINT);
+  auto SSA_step=util_make_unique<SSA_constraintt>();
   SSA_step->guard=true_exprt();
   SSA_step->cond_expr=cond;
   SSA_step->source=source;
