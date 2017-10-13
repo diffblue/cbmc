@@ -1,3 +1,14 @@
+/*******************************************************************\
+
+Module: Unit tests for sharing node
+
+Author: Daniel Poetzl, daniel.poetzl@cs.ox.ac.uk
+
+\*******************************************************************/
+
+/// \file
+/// Unit tests for class sharing_nodet
+
 #include <iostream>
 #include <cassert>
 
@@ -30,7 +41,7 @@ void sharing_node_test()
     assert(sn2.get_sub().size()==3);
 
     p2=sn2.find_child(0);
-    assert(p2!=nullptr);
+    CHECK_RETURN(p2!=nullptr);
 
     p2=sn1.find_child(0);
     assert(p2!=nullptr);
@@ -62,7 +73,7 @@ void sharing_node_test()
     p2=p1;
 
     assert(p1->find_leaf("a")==nullptr);
-    assert(p2->find_leaf("a")==nullptr);
+    CHECK_RETURN(p2->find_leaf("a")==nullptr);
 
     p1->place_leaf("a", "b");
     assert(p2->get_container().size()==1);
@@ -114,15 +125,15 @@ void sharing_node_test()
     assert(sn2.is_internal());
 
     sn1.remove_child(0);
-    assert(sn1c.get_sub().size()==1);
+    INVARIANT(sn1c.get_sub().size()==1, "node has one child");
 
-    assert(sn2c.get_sub().size()==2);
+    INVARIANT(sn2c.get_sub().size()==2, "node has two children");
   }
 }
 
 int main()
 {
-  sharing_node_test();  
+  sharing_node_test();
 
   return 0;
 }
