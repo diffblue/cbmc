@@ -257,8 +257,8 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(goto_trace_stept());
-    goto_trace_stept &goto_trace_step=steps.back();
+    steps.push_back(util_make_unique<goto_trace_stept>());
+    goto_trace_stept &goto_trace_step=*steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
 
@@ -336,7 +336,7 @@ void build_goto_trace(
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
       ++s_it1)
-    if(end_step_seen && end_ptr==&(*s_it1))
+    if(end_step_seen && end_ptr==s_it1->get())
     {
       goto_trace.trim_after(s_it1);
       break;
@@ -346,7 +346,7 @@ void build_goto_trace(
   unsigned step_nr=0;
 
   for(auto &s_it : goto_trace.steps)
-    s_it.step_nr=++step_nr;
+    s_it->step_nr=++step_nr;
 }
 
 void build_goto_trace(
@@ -363,7 +363,7 @@ void build_goto_trace(
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
       s_it1++)
-    if(s_it1->is_assert() && !s_it1->cond_value)
+    if((*s_it1)->is_assert() && !(*s_it1)->cond_value)
     {
       goto_trace.trim_after(s_it1);
       break;

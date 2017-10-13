@@ -140,26 +140,26 @@ static bool filter_out(
   const goto_tracet::stepst::const_iterator &prev_it,
   goto_tracet::stepst::const_iterator &it)
 {
-  if(it->hidden &&
-     (!it->pc->is_assign() ||
-      to_code_assign(it->pc->code).rhs().id()!=ID_side_effect ||
-      to_code_assign(it->pc->code).rhs().get(ID_statement)!=ID_nondet))
+  if((*it)->hidden &&
+     (!(*it)->pc->is_assign() ||
+      to_code_assign((*it)->pc->code).rhs().id()!=ID_side_effect ||
+      to_code_assign((*it)->pc->code).rhs().get(ID_statement)!=ID_nondet))
     return true;
 
-  if(!it->is_assignment() && !it->is_goto() && !it->is_assert())
+  if(!(*it)->is_assignment() && !(*it)->is_goto() && !(*it)->is_assert())
     return true;
 
   // we filter out steps with the same source location
   // TODO: if these are assignments we should accumulate them into
   //       a single edge
   if(prev_it!=goto_trace.steps.end() &&
-     prev_it->pc->source_location==it->pc->source_location)
+     (*prev_it)->pc->source_location==(*it)->pc->source_location)
     return true;
 
-  if(it->is_goto() && it->pc->guard.is_true())
+  if((*it)->is_goto() && (*it)->pc->guard.is_true())
     return true;
 
-  const source_locationt &source_location=it->pc->source_location;
+  const source_locationt &source_location=(*it)->pc->source_location;
 
   if(source_location.is_nil() ||
      source_location.get_file().empty() ||
@@ -192,7 +192,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   {
     if(filter_out(goto_trace, prev_it, it))
     {
-      step_to_node[it->step_nr]=sink;
+      step_to_node[(*it)->step_nr]=sink;
 
       continue;
     }
@@ -201,30 +201,30 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     goto_tracet::stepst::const_iterator next=it;
     ++next;
     if(next!=goto_trace.steps.end() &&
-       next->type==goto_trace_stept::typet::ASSIGNMENT &&
-       it->full_lhs==next->full_lhs &&
-       it->pc->source_location==next->pc->source_location)
+       (*next)->type==goto_trace_stept::typet::ASSIGNMENT &&
+       (*it)->full_lhs==(*next)->full_lhs &&
+       (*it)->pc->source_location==(*next)->pc->source_location)
     {
-      step_to_node[it->step_nr]=sink;
+      step_to_node[(*it)->step_nr]=sink;
 
       continue;
     }
 
     prev_it=it;
 
-    const source_locationt &source_location=it->pc->source_location;
+    const source_locationt &source_location=(*it)->pc->source_location;
 
     const graphmlt::node_indext node=graphml.add_node();
     graphml[node].node_name=
-      std::to_string(it->pc->location_number)+"."+std::to_string(it->step_nr);
+      std::to_string((*it)->pc->location_number)+"."+std::to_string((*it)->step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
-    graphml[node].thread_nr=it->thread_nr;
+    graphml[node].thread_nr=(*it)->thread_nr;
     graphml[node].is_violation=
-      it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
+      (*it)->type==goto_trace_stept::typet::ASSERT && !(*it)->cond_value;
     graphml[node].has_invariant=false;
 
-    step_to_node[it->step_nr]=node;
+    step_to_node[(*it)->step_nr]=node;
   }
 
   // build edges
@@ -233,7 +233,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       it!=goto_trace.steps.end();
       ) // no ++it
   {
-    const std::size_t from=step_to_node[it->step_nr];
+    const std::size_t from=step_to_node[(*it)->step_nr];
 
     if(from==sink)
     {
@@ -244,16 +244,16 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     goto_tracet::stepst::const_iterator next=it;
     for(++next;
         next!=goto_trace.steps.end() &&
-        (step_to_node[next->step_nr]==sink || it->pc==next->pc);
+        (step_to_node[(*next)->step_nr]==sink || (*it)->pc==(*next)->pc);
         ++next)
     {
       // advance
     }
     const std::size_t to=
       next==goto_trace.steps.end()?
-      sink:step_to_node[next->step_nr];
+      sink:step_to_node[(*next)->step_nr];
 
-    switch(it->type)
+    switch((*it)->type)
     {
     case goto_trace_stept::typet::ASSIGNMENT:
     case goto_trace_stept::typet::ASSERT:
@@ -273,35 +273,35 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           data_l.data=id2string(graphml[from].line);
         }
 
-        if(it->type==goto_trace_stept::typet::ASSIGNMENT &&
-           it->lhs_object_value.is_not_nil() &&
-           it->full_lhs.is_not_nil())
+        if((*it)->type==goto_trace_stept::typet::ASSIGNMENT &&
+           (*it)->lhs_object_value.is_not_nil() &&
+           (*it)->full_lhs.is_not_nil())
         {
-          if(!it->lhs_object_value.is_constant() ||
-             !it->lhs_object_value.has_operands() ||
-             !has_prefix(id2string(it->lhs_object_value.op0().get(ID_value)),
+          if(!(*it)->lhs_object_value.is_constant() ||
+             !(*it)->lhs_object_value.has_operands() ||
+             !has_prefix(id2string((*it)->lhs_object_value.op0().get(ID_value)),
                          "INVALID-"))
           {
             xmlt &val=edge.new_element("data");
             val.set_attribute("key", "assumption");
-            code_assignt assign(it->lhs_object, it->lhs_object_value);
-            irep_idt identifier=it->lhs_object.get_identifier();
+            code_assignt assign((*it)->lhs_object, (*it)->lhs_object_value);
+            irep_idt identifier=(*it)->lhs_object.get_identifier();
             val.data=convert_assign_rec(identifier, assign);
 
             xmlt &val_s=edge.new_element("data");
             val_s.set_attribute("key", "assumption.scope");
-            val_s.data=id2string(it->pc->source_location.get_function());
+            val_s.data=id2string((*it)->pc->source_location.get_function());
           }
         }
-        else if(it->type==goto_trace_stept::typet::GOTO &&
-                it->pc->is_goto())
+        else if((*it)->type==goto_trace_stept::typet::GOTO &&
+                (*it)->pc->is_goto())
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "sourcecode");
-          const std::string cond=from_expr(ns, "", it->cond_expr);
+          const std::string cond=from_expr(ns, "", (*it)->cond_expr);
           const std::string neg_cond=
-            from_expr(ns, "", not_exprt(it->cond_expr));
-          val.data="["+(it->cond_value ? cond : neg_cond)+"]";
+            from_expr(ns, "", not_exprt((*it)->cond_expr));
+          val.data="["+((*it)->cond_value ? cond : neg_cond)+"]";
 
           #if 0
           xmlt edge2("edge");
@@ -318,7 +318,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
           xmlt &val2=edge2.new_element("data");
           val2.set_attribute("key", "sourcecode");
-          val2.data="["+(it->cond_value ? neg_cond : cond)+"]";
+          val2.data="["+((*it)->cond_value ? neg_cond : cond)+"]";
 
           graphml[sink].in[from].xml_node=edge2;
           graphml[from].out[sink].xml_node=edge2;

@@ -27,7 +27,7 @@ void goto_tracet::output(
   std::ostream &out) const
 {
   for(const auto &step : steps)
-    step.output(ns, out);
+    step->output(ns, out);
 }
 
 void goto_trace_stept::output(
@@ -252,37 +252,37 @@ void show_goto_trace(
   for(const auto &step : goto_trace.steps)
   {
     // hide the hidden ones
-    if(step.hidden)
+    if(step->hidden)
       continue;
 
-    switch(step.type)
+    switch(step->type)
     {
     case goto_trace_stept::typet::ASSERT:
-      if(!step.cond_value)
+      if(!step->cond_value)
       {
         out << "\n";
         out << "Violated property:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-        out << "  " << step.comment << "\n";
+        if(!step->pc->source_location.is_nil())
+          out << "  " << step->pc->source_location << "\n";
+        out << "  " << step->comment << "\n";
 
-        if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+        if(step->pc->is_assert())
+          out << "  " << from_expr(ns, "", step->pc->guard) << "\n";
 
         out << "\n";
       }
       break;
 
     case goto_trace_stept::typet::ASSUME:
-      if(!step.cond_value)
+      if(!step->cond_value)
       {
         out << "\n";
         out << "Violated assumption:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
+        if(!step->pc->source_location.is_nil())
+          out << "  " << step->pc->source_location << "\n";
 
-        if(step.pc->is_assume())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+        if(step->pc->is_assume())
+          out << "  " << from_expr(ns, "", step->pc->guard) << "\n";
 
         out << "\n";
       }
@@ -295,58 +295,58 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
+      if(step->pc->is_assign() ||
+         step->pc->is_return() || // returns have a lhs!
+         step->pc->is_function_call() ||
+         (step->pc->is_other() && step->lhs_object.is_not_nil()))
       {
-        if(prev_step_nr!=step.step_nr || first_step)
+        if(prev_step_nr!=step->step_nr || first_step)
         {
           first_step=false;
-          prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
+          prev_step_nr=step->step_nr;
+          show_state_header(out, *step, step->pc->source_location, step->step_nr);
         }
 
         // see if the full lhs is something clean
-        if(is_index_member_symbol(step.full_lhs))
+        if(is_index_member_symbol(step->full_lhs))
           trace_value(
-            out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+            out, ns, step->lhs_object, step->full_lhs, step->full_lhs_value);
         else
           trace_value(
-            out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
+            out, ns, step->lhs_object, step->lhs_object, step->lhs_object_value);
       }
       break;
 
     case goto_trace_stept::typet::DECL:
-      if(prev_step_nr!=step.step_nr || first_step)
+      if(prev_step_nr!=step->step_nr || first_step)
       {
         first_step=false;
-        prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
+        prev_step_nr=step->step_nr;
+        show_state_header(out, *step, step->pc->source_location, step->step_nr);
       }
 
-      trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+      trace_value(out, ns, step->lhs_object, step->full_lhs, step->full_lhs_value);
       break;
 
     case goto_trace_stept::typet::OUTPUT:
-      if(step.formatted)
+      if(step->formatted)
       {
         printf_formattert printf_formatter(ns);
-        printf_formatter(id2string(step.format_string), step.io_args);
+        printf_formatter(id2string(step->format_string), step->io_args);
         printf_formatter.print(out);
         out << "\n";
       }
       else
       {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
-        out << "  OUTPUT " << step.io_id << ":";
+        show_state_header(out, *step, step->pc->source_location, step->step_nr);
+        out << "  OUTPUT " << step->io_id << ":";
 
         for(std::list<exprt>::const_iterator
-            l_it=step.io_args.begin();
-            l_it!=step.io_args.end();
+            l_it=step->io_args.begin();
+            l_it!=step->io_args.end();
             l_it++)
         {
-          if(l_it!=step.io_args.begin())
+          if(l_it!=step->io_args.begin())
             out << ";";
           out << " " << from_expr(ns, "", *l_it);
 
@@ -359,15 +359,15 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
-      out << "  INPUT " << step.io_id << ":";
+      show_state_header(out, *step, step->pc->source_location, step->step_nr);
+      out << "  INPUT " << step->io_id << ":";
 
       for(std::list<exprt>::const_iterator
-          l_it=step.io_args.begin();
-          l_it!=step.io_args.end();
+          l_it=step->io_args.begin();
+          l_it!=step->io_args.end();
           l_it++)
       {
-        if(l_it!=step.io_args.begin())
+        if(l_it!=step->io_args.begin())
           out << ";";
         out << " " << from_expr(ns, "", *l_it);
 

@@ -151,7 +151,7 @@ public:
 class goto_tracet
 {
 public:
-  typedef std::list<goto_trace_stept> stepst;
+  typedef std::list<std::unique_ptr<goto_trace_stept>> stepst;
   stepst steps;
 
   irep_idt mode;
@@ -174,16 +174,16 @@ public:
     other.mode.swap(mode);
   }
 
-  void add_step(const goto_trace_stept &step)
+  void add_step(std::unique_ptr<goto_trace_stept> step)
   {
-    steps.push_back(step);
+    steps.push_back(std::move(step));
   }
 
   // retrieves the final step in the trace for manipulation
   // (used to fill a trace from code, hence non-const)
   inline goto_trace_stept &get_last_step()
   {
-    return steps.back();
+    return *steps.back();
   }
 
   // delete all steps after (not including) s

@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
+#include <util/make_unique.h>
 #include <util/message.h>
 #include <json/json_parser.h>
 
@@ -247,7 +248,7 @@ void interpretert::step()
   next_pc=pc;
   next_pc++;
 
-  steps.add_step(goto_trace_stept());
+  steps.add_step(util_make_unique<goto_trace_stept>());
   goto_trace_stept &trace_step=steps.get_last_step();
   trace_step.thread_nr=thread_id;
   trace_step.pc=pc;
