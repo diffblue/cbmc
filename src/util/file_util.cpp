@@ -51,7 +51,7 @@ Date: January 2012
 #endif
 
 /// \return current working directory
-std::string get_current_working_directory()
+std::string fileutil_get_current_working_directory()
 {
   #ifndef _WIN32
   errno=0;
@@ -75,7 +75,7 @@ std::string get_current_working_directory()
 /// deletes all files in 'path' and then the directory itself
 #ifdef _WIN32
 
-void delete_directory_utf16(const std::wstring &path)
+static void delete_directory_utf16(const std::wstring &path)
 {
   std::wstring pattern=path + L"\\*";
   // NOLINTNEXTLINE(readability/identifiers)
@@ -101,7 +101,7 @@ void delete_directory_utf16(const std::wstring &path)
 
 #endif
 
-void delete_directory(const std::string &path)
+void fileutil_delete_directory(const std::string &path)
 {
 #ifdef _WIN32
   delete_directory_utf16(utf8_to_utf16_little_endian(path));
@@ -124,7 +124,7 @@ void delete_directory(const std::string &path)
         throw std::string("Stat failed: ")+std::strerror(errno);
 
       if(S_ISDIR(stbuf.st_mode))
-        delete_directory(sub_path);
+        fileutil_delete_directory(sub_path);
       else
       {
         result=remove(sub_path.c_str());
@@ -140,7 +140,7 @@ void delete_directory(const std::string &path)
 
 /// \par parameters: directory name and file name
 /// \return concatenation of directory and file, if the file path is relative
-std::string concat_dir_file(
+std::string fileutil_concat_dir_file(
   const std::string &directory,
   const std::string &file_name)
 {

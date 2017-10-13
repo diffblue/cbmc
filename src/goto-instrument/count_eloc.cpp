@@ -67,7 +67,7 @@ void list_eloc(const goto_modelt &goto_model)
     {
       std::string file=id2string(lines.first);
       if(!files.first.empty())
-        file=concat_dir_file(id2string(files.first), file);
+        file=fileutil_concat_dir_file(id2string(files.first), file);
 
       for(const irep_idt &line : lines.second)
         std::cout << file << ':' << line << '\n';

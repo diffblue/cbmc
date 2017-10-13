@@ -90,7 +90,7 @@ static void add_to_json(
 
   entry["function"]=json_stringt(id2string(end_function->function));
   entry["fileName"]=
-    json_stringt(concat_dir_file(
+    json_stringt(fileutil_concat_dir_file(
         id2string(end_function->source_location.get_working_directory()),
         id2string(end_function->source_location.get_file())));
 
@@ -174,7 +174,7 @@ static void json_output_function(
 
   entry["function"]=json_stringt(id2string(function));
   entry["file name"]=
-    json_stringt(concat_dir_file(
+    json_stringt(fileutil_concat_dir_file(
         id2string(first_location.get_working_directory()),
         id2string(first_location.get_file())));
   entry["first line"]=
@@ -228,7 +228,7 @@ static void list_functions(
 
     if(!json)
     {
-      os << concat_dir_file(
+      os << fileutil_concat_dir_file(
               id2string(first_location.get_working_directory()),
               id2string(first_location.get_file())) << " "
          << decl.base_name << " "

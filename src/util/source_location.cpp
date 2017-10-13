@@ -30,7 +30,7 @@ std::string source_locationt::as_string(bool print_cwd) const
     dest+="file ";
     if(print_cwd)
       dest+=
-        concat_dir_file(id2string(get_working_directory()), id2string(file));
+        fileutil_concat_dir_file(id2string(get_working_directory()), id2string(file));
     else
       dest+=id2string(file);
   }

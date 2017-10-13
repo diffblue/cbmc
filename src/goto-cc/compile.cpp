@@ -201,7 +201,7 @@ bool compilet::add_input_file(const std::string &file_name)
     }
 
     // unpack now
-    cmd << "ar x " << concat_dir_file(working_directory, file_name);
+    cmd << "ar x " << fileutil_concat_dir_file(working_directory, file_name);
 
     FILE *stream;
 
@@ -655,7 +655,7 @@ compilet::compilet(cmdlinet &_cmdline, ui_message_handlert &mh, bool Werror):
   mode=COMPILE_LINK_EXECUTABLE;
   echo_file_name=false;
   wrote_object=false;
-  working_directory=get_current_working_directory();
+  working_directory=fileutil_get_current_working_directory();
 }
 
 /// cleans up temporary files
@@ -667,7 +667,7 @@ compilet::~compilet()
   for(std::list<std::string>::const_iterator it = tmp_dirs.begin();
       it!=tmp_dirs.end();
       it++)
-    delete_directory(*it);
+    fileutil_delete_directory(*it);
 }
 
 unsigned compilet::function_body_count(const goto_functionst &functions)
