@@ -100,7 +100,8 @@ codet java_bytecode_instrumentt::throw_exception(
     generate_class_stub(
       exc_name,
       symbol_table,
-      get_message_handler());
+      get_message_handler(),
+      struct_union_typet::componentst{});
   }
 
   pointer_typet exc_ptr_type=

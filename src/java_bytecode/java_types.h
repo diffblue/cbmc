@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 
 #include <util/invariant.h>
+#include <algorithm>
+
 #include <util/type.h>
 #include <util/std_types.h>
 #include <util/c_types.h>
@@ -377,6 +379,32 @@ inline typet java_type_from_string_with_exception(
   {
     return java_type_from_string(descriptor, class_name);
   }
+}
+
+/// Get the index in the subtypes array for a given component.
+/// \param t The type we search for the subtypes in.
+/// \param identifier The string identifier of the type of the component.
+/// \return Optional with the size if the identifier was found.
+inline const optionalt<size_t> java_generics_get_index_for_subtype(
+  const java_generics_class_typet &t,
+  const irep_idt &identifier)
+{
+  const std::vector<java_generic_parametert> &gen_types=t.generic_types();
+
+  const auto iter = std::find_if(
+    gen_types.cbegin(),
+    gen_types.cend(),
+    [&identifier](const java_generic_parametert &ref)
+    {
+      return ref.type_variable().get_identifier()==identifier;
+    });
+
+  if(iter==gen_types.cend())
+  {
+    return {};
+  }
+
+  return std::distance(gen_types.cbegin(), iter);
 }
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
