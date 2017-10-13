@@ -323,7 +323,7 @@ typet java_type_from_string(
     irep_idt type_var_name(class_name_prefix+"::"+src.substr(1, src.size()-2));
     return java_generic_parametert(
       type_var_name,
-      java_type_from_string("Ljava/lang/Object;").subtype());
+      to_symbol_type(java_type_from_string("Ljava/lang/Object;").subtype()));
   }
   case 'L':
     {
@@ -403,7 +403,8 @@ typet java_type_from_string(
           // current type
           else
           {
-            java_generic_inst_parametert inst_type(t.subtype());
+            java_generic_inst_parametert inst_type(
+              to_symbol_type(t.subtype()));
 #ifdef DEBUG
             std::cout << " instantiation of generic type var "
                       << to_symbol_type(t.subtype()).get_identifier() << "\n";
@@ -510,7 +511,7 @@ std::vector<typet> java_generic_type_from_string(
 
     java_generic_parametert type_var_type(
       type_var_name,
-      java_type_from_string(bound_type, class_name).subtype());
+      to_symbol_type(java_type_from_string(bound_type, class_name).subtype()));
 
     types.push_back(type_var_type);
     signature=signature.substr(var_sep+1, std::string::npos);

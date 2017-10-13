@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 #define CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
 
@@ -16,7 +15,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/type.h>
 #include <util/std_types.h>
 #include <util/c_types.h>
-#include <util/config.h>
 #include <util/optional.h>
 
 class java_class_typet:public class_typet
@@ -83,10 +81,8 @@ std::vector<typet> java_generic_type_from_string(
 typet java_bytecode_promotion(const typet &);
 exprt java_bytecode_promotion(const exprt &);
 
-bool is_java_array_tag(const irep_idt& tag);
-
-bool is_valid_java_array(const struct_typet &type);
-
+bool is_java_array_tag(const irep_idt &tag);
+bool is_valid_java_array(const struct_typet &);
 
 /// class to hold a Java generic type
 /// upper bound can specify type requirements
@@ -96,14 +92,12 @@ public:
   typedef symbol_typet type_variablet;
   typedef std::vector<type_variablet> type_variablest;
 
-  java_generic_parametert(const irep_idt &_type_var_name, const typet &_bound) :
-    // the reference_typet now needs a pointer width, here it uses the one
-    // defined in the reference_type function from c_types.cpp
-    reference_typet(_bound, config.ansi_c.pointer_width)
+  java_generic_parametert(
+    const irep_idt &_type_var_name,
+    const symbol_typet &_bound):
+    reference_typet(java_reference_type(_bound))
   {
-    PRECONDITION(_bound.id()==ID_symbol);
     set(ID_C_java_generic_parameter, true);
-    // bound must be symbol type
     type_variables().push_back(symbol_typet(_type_var_name));
   }
 
@@ -156,7 +150,7 @@ class java_generic_inst_parametert:public java_generic_parametert
 public:
   // uses empty name for base type variable java_generic_parametert as real name
   // is not known here
-  explicit java_generic_inst_parametert(const typet &type) :
+  explicit java_generic_inst_parametert(const symbol_typet &type):
     java_generic_parametert(irep_idt(), type)
   {
     set(ID_C_java_generic_inst_parameter, true);
@@ -205,26 +199,26 @@ class java_generic_typet:public reference_typet
 public:
   typedef std::vector<java_generic_parametert> generic_type_variablest;
 
-  explicit java_generic_typet(const typet &_type) :
-    reference_typet(_type, config.ansi_c.pointer_width)
+  explicit java_generic_typet(const typet &_type):
+    reference_typet(java_reference_type(_type))
   {
     set(ID_C_java_generic_type, true);
   }
 
-
   /// \return vector of type variables
   const generic_type_variablest &generic_type_variables() const
   {
-    return (const generic_type_variablest &)(find(ID_type_variables).get_sub());
+    return (const generic_type_variablest &)(
+      find(ID_type_variables).get_sub());
   }
 
   /// \return vector of type variables
   generic_type_variablest &generic_type_variables()
   {
-    return (generic_type_variablest &)(add(ID_type_variables).get_sub());
+    return (generic_type_variablest &)(
+      add(ID_type_variables).get_sub());
   }
 };
-
 
 /// \param type: the type to check
 /// \return true if type is java type containing with generics, e.g., List<T>
@@ -353,7 +347,6 @@ inline const typet &java_generics_class_type_bound(
   return gen_type.subtype();
 }
 
-
 /// An exception that is raised for unsupported class signature.
 /// Currently we do not parse multiple bounds.
 class unsupported_java_class_signature_exceptiont:public std::logic_error
@@ -375,7 +368,7 @@ inline typet java_type_from_string_with_exception(
   {
     return java_type_from_string(signature.value(), class_name);
   }
-  catch (unsupported_java_class_signature_exceptiont &e)
+  catch(unsupported_java_class_signature_exceptiont &)
   {
     return java_type_from_string(descriptor, class_name);
   }
@@ -389,7 +382,8 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
   const java_generics_class_typet &t,
   const irep_idt &identifier)
 {
-  const std::vector<java_generic_parametert> &gen_types=t.generic_types();
+  const std::vector<java_generic_parametert> &gen_types=
+    t.generic_types();
 
   const auto iter = std::find_if(
     gen_types.cbegin(),
