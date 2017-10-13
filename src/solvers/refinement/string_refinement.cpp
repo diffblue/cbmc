@@ -1744,34 +1744,6 @@ static void update_index_set(
   }
 }
 
-// Will be used to visit an expression and return the index used
-// with the given char array that contains qvar
-class find_index_visitort: public const_expr_visitort
-{
-private:
-  const exprt &str_;
-  const symbol_exprt &qvar_;
-
-public:
-  exprt index;
-
-  explicit find_index_visitort(
-    const exprt &str, const symbol_exprt &qvar):
-      str_(str),
-      qvar_(qvar),
-      index(nil_exprt()) {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(index.is_nil() && expr.id()==ID_index)
-    {
-      const index_exprt &i=to_index_expr(expr);
-      if(i.array()==str_ && find_qvar(i.index(), qvar_))
-        index=i.index();
-    }
-  }
-};
-
 /// Finds an index on `str` used in `expr` that contains `qvar`, for instance
 /// with arguments ``(str[k]=='a')``, `str`, and `k`, the function should
 /// return `k`.
@@ -1782,9 +1754,19 @@ public:
 static exprt find_index(
   const exprt &expr, const exprt &str, const symbol_exprt &qvar)
 {
-  find_index_visitort v(str, qvar);
-  expr.visit(v);
-  return v.index;
+  const auto it=std::find_if(
+    expr.depth_begin(),
+    expr.depth_end(),
+    [&] (const exprt &e) -> bool
+    {
+      return e.id()==ID_index
+             && to_index_expr(e).array()==str
+             && find_qvar(to_index_expr(e).index(), qvar);
+    });
+
+  return it==expr.depth_end()
+         ?nil_exprt()
+         :to_index_expr(*it).index();
 }
 
 /// \par parameters: a universally quantified formula `axiom`, an array of char
