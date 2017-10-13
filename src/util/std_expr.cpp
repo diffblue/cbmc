@@ -165,18 +165,6 @@ extractbits_exprt::extractbits_exprt(
   lower()=from_integer(_lower, integer_typet());
 }
 
-/*******************************************************************\
-
-Function: address_of_exprt::address_of_exprt
-
-  Inputs:
-
- Outputs:
-
- Purpose:
-
-\*******************************************************************/
-
 address_of_exprt::address_of_exprt(const exprt &_op):
   unary_exprt(ID_address_of, _op, pointer_type(_op.type()))
 {
