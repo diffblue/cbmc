@@ -257,7 +257,7 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(util_make_unique<goto_trace_stept>());
+    steps.push_back(util_make_unique<goto_trace_stept>(SSA_step.type));
     goto_trace_stept &goto_trace_step=*steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
@@ -270,7 +270,6 @@ void build_goto_trace(
         ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
     else
       goto_trace_step.lhs_object.make_nil();
-    goto_trace_step.type=SSA_step.type;
     goto_trace_step.hidden=SSA_step.hidden;
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;

@@ -248,24 +248,24 @@ void interpretert::step()
   next_pc=pc;
   next_pc++;
 
-  steps.add_step(util_make_unique<goto_trace_stept>());
+  steps.add_step(util_make_unique<goto_trace_stept>(goto_trace_stept::typet::NONE));
   goto_trace_stept &trace_step=steps.get_last_step();
   trace_step.thread_nr=thread_id;
   trace_step.pc=pc;
   switch(pc->type)
   {
   case GOTO:
-    trace_step.type=goto_trace_stept::typet::GOTO;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::GOTO);
     execute_goto();
     break;
 
   case ASSUME:
-    trace_step.type=goto_trace_stept::typet::ASSUME;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSUME);
     execute_assume();
     break;
 
   case ASSERT:
-    trace_step.type=goto_trace_stept::typet::ASSERT;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSERT);
     execute_assert();
     break;
 
@@ -274,20 +274,22 @@ void interpretert::step()
     break;
 
   case DECL:
-    trace_step.type=goto_trace_stept::typet::DECL;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::DECL);
     execute_decl();
     break;
 
   case SKIP:
   case LOCATION:
-    trace_step.type=goto_trace_stept::typet::LOCATION;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::LOCATION);
     break;
   case END_FUNCTION:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
+    steps.steps.back() = trace_step.clone(
+      goto_trace_stept::typet::FUNCTION_RETURN);
     break;
 
   case RETURN:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
+    steps.steps.back() = trace_step.clone(
+      goto_trace_stept::typet::FUNCTION_RETURN);
     if(call_stack.empty())
       throw "RETURN without call"; // NOLINT(readability/throw)
 
@@ -303,17 +305,17 @@ void interpretert::step()
     break;
 
   case ASSIGN:
-    trace_step.type=goto_trace_stept::typet::ASSIGNMENT;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ASSIGNMENT);
     execute_assign();
     break;
 
   case FUNCTION_CALL:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_CALL;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::FUNCTION_CALL);
     execute_function_call();
     break;
 
   case START_THREAD:
-    trace_step.type=goto_trace_stept::typet::SPAWN;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::SPAWN);
     throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
 
   case END_THREAD:
@@ -321,18 +323,18 @@ void interpretert::step()
     break;
 
   case ATOMIC_BEGIN:
-    trace_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ATOMIC_BEGIN);
     throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
 
   case ATOMIC_END:
-    trace_step.type=goto_trace_stept::typet::ATOMIC_END;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::ATOMIC_END);
     throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
 
   case DEAD:
-    trace_step.type=goto_trace_stept::typet::DEAD;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::DEAD);
     break;
   case THROW:
-    trace_step.type=goto_trace_stept::typet::GOTO;
+    steps.steps.back() = trace_step.clone(goto_trace_stept::typet::GOTO);
     while(!done && (pc->type!=CATCH))
     {
       if(pc==function->second.body.instructions.end())

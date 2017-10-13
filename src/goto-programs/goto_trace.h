@@ -28,6 +28,7 @@ Date: July 2005
 #include <util/ssa_expr.h>
 
 #include <goto-programs/goto_program.h>
+#include <util/make_unique.h>
 
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
@@ -79,7 +80,7 @@ public:
     ATOMIC_END
   };
 
-  typet type;
+  const typet type;
 
   // we may choose to hide a step
   bool hidden;
@@ -127,9 +128,9 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
-  goto_trace_stept():
+  goto_trace_stept(typet type):
     step_nr(0),
-    type(typet::NONE),
+    type(type),
     hidden(false),
     internal(false),
     assignment_type(assignment_typet::STATE),
@@ -142,6 +143,19 @@ public:
     full_lhs.make_nil();
     full_lhs_value.make_nil();
     cond_expr.make_nil();
+  }
+
+  std::unique_ptr<goto_trace_stept> clone(typet type)
+  {
+    auto copy = util_make_unique<goto_trace_stept>(type);
+    copy->step_nr = this->step_nr;
+    copy->hidden = this->hidden;
+    copy->internal = this->internal;
+    copy->assignment_type = this->assignment_type;
+    copy->thread_nr = this->thread_nr;
+    copy->cond_value = this->cond_value;
+    copy->formatted = this->formatted;
+    return copy;
   }
 };
 
