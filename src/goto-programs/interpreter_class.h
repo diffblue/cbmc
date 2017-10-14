@@ -198,14 +198,17 @@ protected:
 
   struct_typet::componentt get_component(
     const irep_idt &object,
-    unsigned offset);
+    std::size_t offset);
 
   typet get_type(const irep_idt &id) const;
+
   exprt get_value(
     const typet &type,
     std::size_t offset=0,
     bool use_non_det=false);
+
   exprt get_value(const typet &type, mp_vectort &rhs, std::size_t offset=0);
+
   exprt get_value(const irep_idt &id);
 
   void step();
@@ -244,7 +247,7 @@ protected:
     goto_functionst::function_mapt::const_iterator return_function;
     mp_integer return_value_address;
     memory_mapt local_map;
-    unsigned old_stack_pointer;
+    std::size_t old_stack_pointer;
   };
 
   typedef std::stack<stack_framet> call_stackt;

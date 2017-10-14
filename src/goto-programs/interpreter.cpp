@@ -30,7 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "interpreter_class.h"
 #include "remove_returns.h"
 
-const size_t interpretert::npos=std::numeric_limits<size_t>::max();
+const std::size_t interpretert::npos=std::numeric_limits<size_t>::max();
 
 void interpretert::operator()()
 {
@@ -392,7 +392,7 @@ void interpretert::execute_other()
     mp_vectort tmp, rhs;
     evaluate(pc->code.op1(), tmp);
     mp_integer address=evaluate_address(pc->code.op0());
-    size_t size=get_size(pc->code.op0().type());
+    std::size_t size=get_size(pc->code.op0().type());
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -419,7 +419,7 @@ void interpretert::execute_decl()
 /// \par parameters: an object and a memory offset
 struct_typet::componentt interpretert::get_component(
   const irep_idt &object,
-  unsigned offset)
+  std::size_t offset)
 {
   const symbolt &symbol=ns.lookup(object);
   const typet real_type=ns.follow(symbol.type);
@@ -468,7 +468,7 @@ exprt interpretert::get_value(
     for(struct_typet::componentst::const_iterator it=components.begin();
         it!=components.end(); it++)
     {
-      size_t size=get_size(it->type());
+      std::size_t size=get_size(it->type());
       const exprt operand=get_value(it->type(), offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -480,7 +480,7 @@ exprt interpretert::get_value(
     // Get size of array
     exprt result=array_exprt(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    size_t subtype_size=get_size(type.subtype());
+    std::size_t subtype_size=get_size(type.subtype());
     std::size_t count;
     if(size_expr.id()!=ID_constant)
     {
@@ -495,7 +495,7 @@ exprt interpretert::get_value(
 
     // Retrieve the value for each member in the array
     result.reserve_operands(count);
-    for(unsigned i=0; i<count; i++)
+    for(std::size_t i=0; i<count; i++)
     {
       const exprt operand=get_value(
         type.subtype(),
@@ -533,7 +533,7 @@ exprt interpretert::get_value(
     result.reserve_operands(components.size());
     for(const struct_union_typet::componentt &expr : components)
     {
-      size_t size=get_size(expr.type());
+      std::size_t size=get_size(expr.type());
       const exprt operand=get_value(expr.type(), rhs, offset);
       offset+=size;
       result.copy_to_operands(operand);
@@ -546,8 +546,9 @@ exprt interpretert::get_value(
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
-    size_t subtype_size=get_size(type.subtype());
-    unsigned count;
+    std::size_t subtype_size=get_size(type.subtype());
+
+    std::size_t count;
     if(unbounded_size(type))
     {
       count=base_address_to_actual_size(offset)/subtype_size;
@@ -556,12 +557,12 @@ exprt interpretert::get_value(
     {
       mp_integer mp_count;
       to_integer(size_expr, mp_count);
-      count=integer2unsigned(mp_count);
+      count=integer2size_t(mp_count);
     }
 
     // Retrieve the value for each member in the array
     result.reserve_operands(count);
-    for(unsigned i=0; i<count; i++)
+    for(std::size_t i=0; i<count; i++)
     {
       const exprt operand=get_value(type.subtype(), rhs,
           offset+i*subtype_size);
@@ -607,7 +608,7 @@ exprt interpretert::get_value(
       // We want the symbol pointed to
       std::size_t address=integer2size_t(rhs[offset]);
       irep_idt identifier=address_to_identifier(address);
-      size_t offset=address_to_offset(address);
+      std::size_t offset=address_to_offset(address);
       const typet type=get_type(identifier);
       exprt symbol_expr(ID_symbol, type);
       symbol_expr.set(ID_identifier, identifier);
@@ -656,7 +657,7 @@ void interpretert::execute_assign()
   if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());
-    size_t size=get_size(code_assign.lhs().type());
+    std::size_t size=get_size(code_assign.lhs().type());
 
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs ("
@@ -684,9 +685,9 @@ void interpretert::execute_assign()
     side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
     if(side_effect.get_statement()==ID_nondet)
     {
-      unsigned address=integer2unsigned(evaluate_address(code_assign.lhs()));
-      size_t size=get_size(code_assign.lhs().type());
-      for(size_t i=0; i<size; i++)
+      std::size_t address=integer2size_t(evaluate_address(code_assign.lhs()));
+      std::size_t size=get_size(code_assign.lhs().type());
+      for(std::size_t i=0; i<size; i++)
       {
         memory[address+i].initialized=
           memory_cellt::initializedt::READ_BEFORE_WRITTEN;
@@ -803,7 +804,7 @@ void interpretert::execute_function_call()
     for(const auto &id : locals)
     {
       const symbolt &symbol=ns.lookup(id);
-      frame.local_map[id]=integer2unsigned(build_memory_map(id, symbol.type));
+      frame.local_map[id]=integer2size_t(build_memory_map(id, symbol.type));
     }
 
     // assign the arguments
@@ -867,7 +868,7 @@ void interpretert::build_memory_map()
 
 void interpretert::build_memory_map(const symbolt &symbol)
 {
-  size_t size=0;
+  std::size_t size=0;
 
   if(symbol.type.id()==ID_code)
   {
@@ -920,7 +921,7 @@ mp_integer interpretert::build_memory_map(
   const typet &type)
 {
   typet alloc_type=concretize_type(type);
-  size_t size=get_size(alloc_type);
+  std::size_t size=get_size(alloc_type);
   auto it=dynamic_types.find(id);
 
   if(it!=dynamic_types.end())
@@ -970,7 +971,7 @@ bool interpretert::unbounded_size(const typet &type)
 /// get allocated 2^32 address space each (of a 2^64 sized space).
 /// \param type: a structured type
 /// \return Size of the given type
-size_t interpretert::get_size(const typet &type)
+std::size_t interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
     return 2ULL << 32ULL;
@@ -980,7 +981,7 @@ size_t interpretert::get_size(const typet &type)
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    unsigned sum=0;
+    std::size_t sum=0;
 
     for(const auto &comp : components)
     {
@@ -997,7 +998,7 @@ size_t interpretert::get_size(const typet &type)
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    size_t max_size=0;
+    std::size_t max_size=0;
 
     for(const auto &comp : components)
     {
@@ -1025,7 +1026,7 @@ size_t interpretert::get_size(const typet &type)
       mp_integer size_mp;
       bool ret=to_integer(size_const, size_mp);
       CHECK_RETURN(!ret);
-      return subtype_size*integer2unsigned(size_mp);
+      return subtype_size*integer2size_t(size_mp);
     }
     return subtype_size;
   }
