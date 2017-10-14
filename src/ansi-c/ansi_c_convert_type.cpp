@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/config.h>
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 
@@ -221,9 +221,11 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     // We turn ID_frontend_pointer to ID_pointer
     // Pointers have a width, much like integers,
     // which is added here.
-    typet tmp(type);
-    tmp.id(ID_pointer);
-    tmp.set(ID_width, config.ansi_c.pointer_width);
+    pointer_typet tmp(type.subtype(), config.ansi_c.pointer_width);
+    tmp.add_source_location()=type.source_location();
+    const irep_idt typedef_identifier=type.get(ID_C_typedef);
+    if(!typedef_identifier.empty())
+      tmp.set(ID_C_typedef, typedef_identifier);
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)

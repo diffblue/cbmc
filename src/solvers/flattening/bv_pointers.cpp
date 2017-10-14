@@ -96,8 +96,9 @@ bv_pointerst::bv_pointerst(
   pointer_logic(_ns)
 {
   object_bits=config.bv_encoding.object_bits;
-  offset_bits=config.ansi_c.pointer_width-object_bits;
-  bits=config.ansi_c.pointer_width;
+  std::size_t pointer_width=boolbv_width(pointer_type(void_type()));
+  offset_bits=pointer_width-object_bits;
+  bits=pointer_width;
 }
 
 bool bv_pointerst::convert_address_of_rec(
@@ -220,7 +221,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
     throw "convert_pointer_type got non-pointer type";
 
   // make sure the config hasn't been changed
-  assert(bits==config.ansi_c.pointer_width);
+  PRECONDITION(bits==boolbv_width(expr.type()));
 
   if(expr.id()==ID_symbol)
   {
