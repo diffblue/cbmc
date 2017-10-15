@@ -46,6 +46,19 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    make
    ```
 
+4. Linking against an IPASIR SAT solver
+
+   Get an IPASIR package and build picosat by default
+   ```
+   make -C src ipasir-build
+   ```
+
+   Build CBMC with IPASIR and link against the ipasir solver library
+   Note: the LIBSOLVER variable could be pointed towards other solvers
+   ```
+   make -C src IPASIR=../../ipasir LIBSOLVER=$(pwd)/ipasir/libipasir.a
+   ```
+
 # COMPILATION ON SOLARIS 11
 
 1. As root, get the necessary development tools:
