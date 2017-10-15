@@ -6,6 +6,5 @@ main.c
 ^\[main.coverage.1\] file main.c line 7 function main decision/condition `altitude > 2500.* SATISFIED$
 ^\[main.coverage.2\] file main.c line 7 function main decision/condition `altitude > 2500.* SATISFIED$
 ^\*\* .* of .* covered \(100.0%\)$
-^\*\* Used 
 --
 ^warning: ignoring
