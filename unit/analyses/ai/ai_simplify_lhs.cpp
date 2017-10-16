@@ -33,6 +33,16 @@ public:
   {}
   void make_entry() override
   {}
+  bool is_bottom() const override
+  {
+    UNREACHABLE;
+    return true;
+  }
+  bool is_top() const override
+  {
+    UNREACHABLE;
+    return true;
+  }
 
   bool ai_simplify(exprt &condition, const namespacet &ns) const override;
 };
