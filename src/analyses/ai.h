@@ -162,6 +162,17 @@ public:
     fixedpoint(goto_function.body, goto_functions, ns);
   }
 
+  /// Returns the abstract state before the given instruction
+  virtual const ai_domain_baset & abstract_state_before(
+    goto_programt::const_targett t) const = 0;
+
+  /// Returns the abstract state after the given instruction
+  virtual const ai_domain_baset & abstract_state_after(
+    goto_programt::const_targett t) const
+  {
+    return abstract_state_before(std::next(t));
+  }
+
   virtual void clear()
   {
   }
@@ -368,6 +379,12 @@ public:
       throw "failed to find state";
 
     return it->second;
+  }
+
+  const ai_domain_baset & abstract_state_before(
+    goto_programt::const_targett t) const override
+  {
+    return (*this)[t];
   }
 
   void clear() override
