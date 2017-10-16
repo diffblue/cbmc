@@ -1,4 +1,4 @@
-# What architecture?
+# WHAT ARCHITECTURE?
 
 CPROVER now needs a C++11 compliant compiler and works in the following
 environments:
@@ -236,3 +236,73 @@ This will:
  2) Run all the regression tests
  3) Collate the coverage metrics
  4) Provide an HTML report of the current coverage
+
+# USING CLANG-FORMAT
+
+CBMC uses clang-format to ensure that the formatting of new patches is readable
+and consistent. There are two main ways of running clang-format: remotely, and
+locally.
+
+## RUNNING CLANG-FORMAT REMOTELY
+
+When patches are submitted to CBMC, they are automatically run through
+continuous integration (CI). One of the CI checks will run clang-format over
+the diff that your pull request introduces. If clang-format finds formatting
+issues at this point, the build will be failed, and a patch will be produced
+in the CI output that you can apply to your code so that it conforms to the
+style guidelines.
+
+To apply the patch, copy and paste it into a local file (`patch.txt`) and then
+run:
+```
+patch -p1 -i patch.txt
+```
+Now, you can commit and push the formatting fixes.
+
+## RUNNING CLANG-FORMAT LOCALLY
+
+### INSTALLATION
+
+To avoid waiting until you've made a PR to find formatting issues, you can
+install clang-format locally and run it against your code as you are working.
+
+Different versions of clang-format have slightly different behaviors. CBMC uses
+clang-format-3.8 as it is available the repositories for Ubuntu 16.04 and
+Homebrew.
+To install, run:
+```
+sudo apt install clang-format-3.8 # Run this on Ubuntu, Debian etc.
+brew install clang-format-3.8     # Run this on a Mac with Homebrew installed
+```
+
+### FORMATTING A RANGE OF COMMITS
+
+Clang-format is distributed with a driver script called git-clang-format-3.8.
+This script can be used to format git diffs (rather than entire files).
+
+After committing some code, it is recommended to run:
+```
+git-clang-format-3.8 upstream/develop
+```
+*Important:* If your branch is based on a branch other than `upstream/develop`,
+use the name or checksum of that branch instead. It is strongly recommended to
+rebase your work onto the tip of the branch it's based on before running
+`git-clang-format` in this way.
+
+### RETROACTIVELY FORMATTING INDIVIDUAL COMMITS
+
+If your works spans several commits and you'd like to keep the formatting
+correct in each individual commit, you can automatically rewrite the commits
+with correct formatting.
+
+The following command will stop at each commit in the range and run
+clang-format on the diff at that point.  This rewrites git history, so it's
+*unsafe*, and you should back up your branch before running this command:
+```
+git filter-branch --tree-filter 'git-clang-format-3.8 upstream/develop' \
+  -- upstream/develop..HEAD
+```
+*Important*: `upstream/develop` should be changed in *both* places in the
+command above if your work is based on a different branch. It is strongly
+recommended to rebase your work onto the tip of the branch it's based on before
+running `git-clang-format` in this way.
