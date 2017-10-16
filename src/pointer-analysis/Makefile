@@ -11,6 +11,7 @@ SRC = add_failed_symbols.cpp \
       value_set_analysis_fivr.cpp \
       value_set_analysis_fivrns.cpp \
       value_set_dereference.cpp \
+      value_set_domain.cpp \
       value_set_domain_fi.cpp \
       value_set_domain_fivr.cpp \
       value_set_domain_fivrns.cpp \
