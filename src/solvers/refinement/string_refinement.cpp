@@ -1308,7 +1308,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
 
     symbol_exprt univ_var=generator.fresh_univ_index(
       "not_contains_univ_var", nc_axiom.s0().length().type());
-    const string_not_contains_constraintt nc_axiom_in_model(
+    string_not_contains_constraintt nc_axiom_in_model(
       get(univ_bound_inf),
       get(univ_bound_sup),
       get(prem),
@@ -1316,6 +1316,11 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
       get(exists_bound_sup),
       to_array_string_expr(get(s0)),
       to_array_string_expr(get(s1)));
+
+    // necessary so that expressions such as `1 + (3 - (TRUE ? 0 : 0))` do not
+    // appear in bounds
+    nc_axiom_in_model =
+      to_string_not_contains_constraint(simplify_expr(nc_axiom_in_model, ns));
 
     exprt negaxiom =
       negation_of_not_contains_constraint(nc_axiom_in_model, univ_var);
