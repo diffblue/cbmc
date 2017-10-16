@@ -27,9 +27,11 @@ void replace_symbolt::insert(
     old_expr.get_identifier(), new_expr));
 }
 
-bool replace_symbolt::replace(exprt &dest) const
+bool replace_symbolt::replace(
+  exprt &dest,
+  const bool replace_with_const) const
 {
-  bool result=true;
+  bool result=true; // unchanged
 
   // first look at type
 
@@ -42,33 +44,75 @@ bool replace_symbolt::replace(exprt &dest) const
   if(!have_to_replace(dest))
     return result;
 
-  if(dest.id()==ID_symbol)
+  if(dest.id()==ID_member)
   {
+    member_exprt &me=to_member_expr(dest);
+
+    if(!replace(me.struct_op(), replace_with_const)) // Could give non l-value.
+      result=false;
+  }
+  else if(dest.id()==ID_index)
+  {
+    index_exprt &ie=to_index_expr(dest);
+
+    if(!replace(ie.array(), replace_with_const)) // Could give non l-value.
+      result=false;
+
+    if(!replace(ie.index()))
+      result=false;
+  }
+  else if(dest.id()==ID_address_of)
+  {
+    address_of_exprt &aoe=to_address_of_expr(dest);
+
+    if(!replace(aoe.object(), false))
+      result=false;
+  }
+  else if(dest.id()==ID_symbol)
+  {
+    const symbol_exprt &s=to_symbol_expr(dest);
+
     expr_mapt::const_iterator it=
-      expr_map.find(dest.get(ID_identifier));
+      expr_map.find(s.get_identifier());
 
     if(it!=expr_map.end())
     {
-      dest=it->second;
+      const exprt &e=it->second;
+
+      if(!replace_with_const && e.is_constant())  // Would give non l-value.
+        return true;
+
+      dest=e;
+
       return false;
     }
   }
-
-  Forall_operands(it, dest)
-    if(!replace(*it))
-      result=false;
+  else
+  {
+    Forall_operands(it, dest)
+      if(!replace(*it))
+        result=false;
+  }
 
   const irept &c_sizeof_type=dest.find(ID_C_c_sizeof_type);
 
-  if(c_sizeof_type.is_not_nil() &&
-     !replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type))))
-    result=false;
+  if(c_sizeof_type.is_not_nil())
+  {
+    typet &type=static_cast<typet &>(dest.add(ID_C_c_sizeof_type));
+
+    if(!replace(type))
+      result=false;
+  }
 
   const irept &va_arg_type=dest.find(ID_C_va_arg_type);
 
-  if(va_arg_type.is_not_nil() &&
-     !replace(static_cast<typet&>(dest.add(ID_C_va_arg_type))))
-    result=false;
+  if(va_arg_type.is_not_nil())
+  {
+    typet &type=static_cast<typet &>(dest.add(ID_C_va_arg_type));
+
+    if(!replace(type))
+      result=false;
+  }
 
   return result;
 }
