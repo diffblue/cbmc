@@ -82,10 +82,35 @@ const symbolt& specialize_java_generic_methodt::operator()(
   specialized_method.name=
     id2string(specialized_method.name)+signature_decoration;
 
+
+  namespacet ns(symbol_table);
   for(code_typet::parametert &parameter : specialized_code.parameters())
   {
-    typet &parameter_type=parameter.type();
-    instantiate_generic_types(parameter_type, concrete_type_map, symbol_table);
+    if(parameter.get_this())
+    {
+      // If the type of the 'this' parameter is a generic type, modify the
+      // type of the parameter to be the specialized type and not the generic
+      // type.
+      const typet &current_this_type=ns.follow(parameter.type().subtype());
+      INVARIANT(
+        current_this_type.id() == ID_struct,
+        "'this' parameter should always be a class");
+
+      if(is_java_generics_class_type(current_this_type))
+      {
+        const irep_idt &new_this_type_identifier=
+          id2string(current_this_type.get(ID_name))+signature_decoration;
+        parameter.type().subtype().set(ID_identifier, new_this_type_identifier);
+      }
+    }
+    else
+    {
+      typet &parameter_type=parameter.type();
+      instantiate_generic_types(
+        parameter_type,
+        concrete_type_map,
+        symbol_table);
+    }
 
     // Update the symbol name of the parameter to match the newly decorated
     // name of the specialized method.
