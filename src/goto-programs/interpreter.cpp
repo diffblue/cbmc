@@ -392,7 +392,7 @@ void interpretert::execute_other()
     mp_vectort tmp, rhs;
     evaluate(pc->code.op1(), tmp);
     mp_integer address=evaluate_address(pc->code.op0());
-    std::size_t size=get_size(pc->code.op0().type());
+    mp_integer size=get_size(pc->code.op0().type());
     while(rhs.size()<size) rhs.insert(rhs.end(), tmp.begin(), tmp.end());
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs (" << rhs.size() << " vs. "
@@ -419,7 +419,7 @@ void interpretert::execute_decl()
 /// \par parameters: an object and a memory offset
 struct_typet::componentt interpretert::get_component(
   const irep_idt &object,
-  std::size_t offset)
+  const mp_integer &offset)
 {
   const symbolt &symbol=ns.lookup(object);
   const typet real_type=ns.follow(symbol.type);
@@ -429,12 +429,14 @@ struct_typet::componentt interpretert::get_component(
   const struct_typet &struct_type=to_struct_type(real_type);
   const struct_typet::componentst &components=struct_type.components();
 
+  mp_integer tmp_offset=offset;
+
   for(const auto &c : components)
   {
-    if(offset<=0)
+    if(tmp_offset<=0)
       return c;
 
-    offset-=get_size(c.type());
+    tmp_offset-=get_size(c.type());
   }
 
   throw "access out of struct bounds";
@@ -453,7 +455,7 @@ typet interpretert::get_type(const irep_idt &id) const
 /// type
 exprt interpretert::get_value(
   const typet &type,
-  std::size_t offset,
+  const mp_integer &offset,
   bool use_non_det)
 {
   const typet real_type=ns.follow(type);
@@ -465,14 +467,17 @@ exprt interpretert::get_value(
 
     // Retrieve the values for the individual members
     result.reserve_operands(components.size());
-    for(struct_typet::componentst::const_iterator it=components.begin();
-        it!=components.end(); it++)
+
+    mp_integer tmp_offset=offset;
+
+    for(const auto &c : components)
     {
-      std::size_t size=get_size(it->type());
-      const exprt operand=get_value(it->type(), offset);
-      offset+=size;
+      mp_integer size=get_size(c.type());
+      const exprt operand=get_value(c.type(), tmp_offset);
+      tmp_offset+=size;
       result.copy_to_operands(operand);
     }
+
     return result;
   }
   else if(real_type.id()==ID_array)
@@ -480,22 +485,20 @@ exprt interpretert::get_value(
     // Get size of array
     exprt result=array_exprt(to_array_type(real_type));
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
-    std::size_t subtype_size=get_size(type.subtype());
-    std::size_t count;
+    mp_integer subtype_size=get_size(type.subtype());
+    mp_integer count;
     if(size_expr.id()!=ID_constant)
     {
       count=base_address_to_actual_size(offset)/subtype_size;
     }
     else
     {
-      mp_integer mp_count;
-      to_integer(size_expr, mp_count);
-      count=integer2size_t(mp_count);
+      to_integer(size_expr, count);
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(count);
-    for(std::size_t i=0; i<count; i++)
+    result.reserve_operands(integer2size_t(count));
+    for(mp_integer i=0; i<count; ++i)
     {
       const exprt operand=get_value(
         type.subtype(),
@@ -505,11 +508,11 @@ exprt interpretert::get_value(
     return result;
   }
   if(use_non_det &&
-     memory[offset].initialized!=
+     memory[integer2ulong(offset)].initialized!=
      memory_cellt::initializedt::WRITTEN_BEFORE_READ)
     return side_effect_expr_nondett(type);
   mp_vectort rhs;
-  rhs.push_back(memory[offset].value);
+  rhs.push_back(memory[integer2ulong(offset)].value);
   return get_value(type, rhs);
 }
 
@@ -518,7 +521,7 @@ exprt interpretert::get_value(
 exprt interpretert::get_value(
   const typet &type,
   mp_vectort &rhs,
-  std::size_t offset)
+  const mp_integer &offset)
 {
   const typet real_type=ns.follow(type);
   PRECONDITION(!rhs.empty());
@@ -531,11 +534,13 @@ exprt interpretert::get_value(
 
     // Retrieve the values for the individual members
     result.reserve_operands(components.size());
+    mp_integer tmp_offset=offset;
+
     for(const struct_union_typet::componentt &expr : components)
     {
-      std::size_t size=get_size(expr.type());
-      const exprt operand=get_value(expr.type(), rhs, offset);
-      offset+=size;
+      mp_integer size=get_size(expr.type());
+      const exprt operand=get_value(expr.type(), rhs, tmp_offset);
+      tmp_offset+=size;
       result.copy_to_operands(operand);
     }
     return result;
@@ -546,23 +551,21 @@ exprt interpretert::get_value(
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
     // Get size of array
-    std::size_t subtype_size=get_size(type.subtype());
+    mp_integer subtype_size=get_size(type.subtype());
 
-    std::size_t count;
+    mp_integer count;
     if(unbounded_size(type))
     {
       count=base_address_to_actual_size(offset)/subtype_size;
     }
     else
     {
-      mp_integer mp_count;
-      to_integer(size_expr, mp_count);
-      count=integer2size_t(mp_count);
+      to_integer(size_expr, count);
     }
 
     // Retrieve the value for each member in the array
-    result.reserve_operands(count);
-    for(std::size_t i=0; i<count; i++)
+    result.reserve_operands(integer2size_t(count));
+    for(mp_integer i=0; i<count; ++i)
     {
       const exprt operand=get_value(type.subtype(), rhs,
           offset+i*subtype_size);
@@ -573,29 +576,29 @@ exprt interpretert::get_value(
   else if(real_type.id()==ID_floatbv)
   {
     ieee_floatt f(to_floatbv_type(type));
-    f.unpack(rhs[offset]);
+    f.unpack(rhs[integer2size_t(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_fixedbv)
   {
     fixedbvt f;
-    f.from_integer(rhs[offset]);
+    f.from_integer(rhs[integer2size_t(offset)]);
     return f.to_expr();
   }
   else if(real_type.id()==ID_bool)
   {
-    if(rhs[offset]!=0)
+    if(rhs[integer2size_t(offset)]!=0)
       return true_exprt();
     else
       false_exprt();
   }
   else if(real_type.id()==ID_c_bool)
   {
-    return from_integer(rhs[offset]!=0?1:0, type);
+    return from_integer(rhs[integer2size_t(offset)]!=0?1:0, type);
   }
   else if((real_type.id()==ID_pointer) || (real_type.id()==ID_address_of))
   {
-    if(rhs[offset]==0)
+    if(rhs[integer2size_t(offset)]==0)
     {
       // NULL pointer
       constant_exprt result(type);
@@ -603,12 +606,12 @@ exprt interpretert::get_value(
       return result;
     }
 
-    if(rhs[offset]<memory.size())
+    if(rhs[integer2size_t(offset)]<memory.size())
     {
       // We want the symbol pointed to
-      std::size_t address=integer2size_t(rhs[offset]);
+      mp_integer address=rhs[integer2size_t(offset)];
       irep_idt identifier=address_to_identifier(address);
-      std::size_t offset=address_to_offset(address);
+      mp_integer offset=address_to_offset(address);
       const typet type=get_type(identifier);
       exprt symbol_expr(ID_symbol, type);
       symbol_expr.set(ID_identifier, identifier);
@@ -630,19 +633,21 @@ exprt interpretert::get_value(
       return index_expr;
     }
 
-    error() << "interpreter: invalid pointer " << rhs[offset]
+    error() << "interpreter: invalid pointer " << rhs[integer2size_t(offset)]
             << " > object count " << memory.size() << eom;
+
     throw "interpreter: reading from invalid pointer";
   }
   else if(real_type.id()==ID_string)
   {
     // Strings are currently encoded by their irep_idt ID.
     return constant_exprt(
-      irep_idt::make_from_table_index(rhs[offset].to_long()),
+      irep_idt::make_from_table_index(rhs[integer2size_t(offset)].to_long()),
       type);
   }
+
   // Retrieve value of basic data type
-  return from_integer(rhs[offset], type);
+  return from_integer(rhs[integer2ulong(offset)], type);
 }
 
 /// executes the assign statement at the current pc value
@@ -657,7 +662,7 @@ void interpretert::execute_assign()
   if(!rhs.empty())
   {
     mp_integer address=evaluate_address(code_assign.lhs());
-    std::size_t size=get_size(code_assign.lhs().type());
+    mp_integer size=get_size(code_assign.lhs().type());
 
     if(size!=rhs.size())
       error() << "!! failed to obtain rhs ("
@@ -685,11 +690,15 @@ void interpretert::execute_assign()
     side_effect_exprt side_effect=to_side_effect_expr(code_assign.rhs());
     if(side_effect.get_statement()==ID_nondet)
     {
-      std::size_t address=integer2size_t(evaluate_address(code_assign.lhs()));
-      std::size_t size=get_size(code_assign.lhs().type());
-      for(std::size_t i=0; i<size; i++)
+      mp_integer address=
+        integer2size_t(evaluate_address(code_assign.lhs()));
+
+      mp_integer size=
+        get_size(code_assign.lhs().type());
+
+      for(mp_integer i=0; i<size; ++i)
       {
-        memory[address+i].initialized=
+        memory[integer2ulong(address+i)].initialized=
           memory_cellt::initializedt::READ_BEFORE_WRITTEN;
       }
     }
@@ -701,20 +710,21 @@ void interpretert::assign(
   const mp_integer &address,
   const mp_vectort &rhs)
 {
-  for(size_t i=0; i<rhs.size(); i++)
+  for(mp_integer i=0; i<rhs.size(); ++i)
   {
     if((address+i)<memory.size())
     {
-      std::size_t address_val=integer2size_t(address+i);
-      memory_cellt &cell=memory[address_val];
+      mp_integer address_val=address+i;
+      memory_cellt &cell=memory[integer2ulong(address_val)];
       if(show)
       {
         status() << total_steps << " ** assigning "
                  << address_to_identifier(address_val) << "["
-                 << address_to_offset(address_val) << "]:=" << rhs[i]
+                 << address_to_offset(address_val) << "]:="
+                 << rhs[integer2size_t(i)]
                  << "\n" << eom;
       }
-      cell.value=rhs[i];
+      cell.value=rhs[integer2size_t(i)];
       if(cell.initialized==memory_cellt::initializedt::UNKNOWN)
         cell.initialized=memory_cellt::initializedt::WRITTEN_BEFORE_READ;
     }
@@ -745,17 +755,16 @@ void interpretert::execute_function_call()
     to_code_function_call(pc->code);
 
   // function to be called
-  mp_integer a=evaluate_address(function_call.function());
+  mp_integer address=evaluate_address(function_call.function());
 
-  if(a==0)
+  if(address==0)
     throw "function call to NULL";
-  else if(a>=memory.size())
+  else if(address>=memory.size())
     throw "out-of-range function call";
 
   // Retrieve the empty last trace step struct we pushed for this step
   // of the interpreter run to fill it with the corresponding data
   goto_trace_stept &trace_step=steps.get_last_step();
-  std::size_t address=integer2size_t(a);
 #if 0
   const memory_cellt &cell=memory[address];
 #endif
@@ -804,7 +813,7 @@ void interpretert::execute_function_call()
     for(const auto &id : locals)
     {
       const symbolt &symbol=ns.lookup(id);
-      frame.local_map[id]=integer2size_t(build_memory_map(id, symbol.type));
+      frame.local_map[id]=build_memory_map(id, symbol.type);
     }
 
     // assign the arguments
@@ -814,7 +823,7 @@ void interpretert::execute_function_call()
     if(argument_values.size()<parameters.size())
       throw "not enough arguments";
 
-    for(size_t i=0; i<parameters.size(); i++)
+    for(std::size_t i=0; i<parameters.size(); i++)
     {
       const code_typet::parametert &a=parameters[i];
       exprt symbol_expr(ID_symbol, a.type());
@@ -868,7 +877,7 @@ void interpretert::build_memory_map()
 
 void interpretert::build_memory_map(const symbolt &symbol)
 {
-  std::size_t size=0;
+  mp_integer size=0;
 
   if(symbol.type.id()==ID_code)
   {
@@ -881,8 +890,8 @@ void interpretert::build_memory_map(const symbolt &symbol)
 
   if(size!=0)
   {
-    std::size_t address=memory.size();
-    memory.resize(address+size);
+    mp_integer address=memory.size();
+    memory.resize(integer2ulong(address+size));
     memory_map[symbol.name]=address;
     inverse_memory_map[address]=symbol.name;
   }
@@ -921,13 +930,13 @@ mp_integer interpretert::build_memory_map(
   const typet &type)
 {
   typet alloc_type=concretize_type(type);
-  std::size_t size=get_size(alloc_type);
+  mp_integer size=get_size(alloc_type);
   auto it=dynamic_types.find(id);
 
   if(it!=dynamic_types.end())
   {
-    std::size_t address=memory_map[id];
-    std::size_t current_size=base_address_to_alloc_size(address);
+    mp_integer address=memory_map[id];
+    mp_integer current_size=base_address_to_alloc_size(address);
     // current size <= size already recorded
     if(size<=current_size)
       return memory_map[id];
@@ -939,8 +948,8 @@ mp_integer interpretert::build_memory_map(
   if(size==0)
     size=1; // This is a hack to create existence
 
-  std::size_t address=memory.size();
-  memory.resize(address+size);
+  mp_integer address=memory.size();
+  memory.resize(integer2ulong(address+size));
   memory_map[id]=address;
   inverse_memory_map[address]=id;
   dynamic_types.insert(std::pair<const irep_idt, typet>(id, alloc_type));
@@ -971,17 +980,17 @@ bool interpretert::unbounded_size(const typet &type)
 /// get allocated 2^32 address space each (of a 2^64 sized space).
 /// \param type: a structured type
 /// \return Size of the given type
-std::size_t interpretert::get_size(const typet &type)
+mp_integer interpretert::get_size(const typet &type)
 {
   if(unbounded_size(type))
-    return 2ULL << 32ULL;
+    return mp_integer(2) << 32;
 
   if(type.id()==ID_struct)
   {
     const struct_typet::componentst &components=
       to_struct_type(type).components();
 
-    std::size_t sum=0;
+    mp_integer sum=0;
 
     for(const auto &comp : components)
     {
@@ -998,7 +1007,7 @@ std::size_t interpretert::get_size(const typet &type)
     const union_typet::componentst &components=
       to_union_type(type).components();
 
-    std::size_t max_size=0;
+    mp_integer max_size=0;
 
     for(const auto &comp : components)
     {
@@ -1014,7 +1023,7 @@ std::size_t interpretert::get_size(const typet &type)
   {
     const exprt &size_expr=static_cast<const exprt &>(type.find(ID_size));
 
-    size_t subtype_size=get_size(type.subtype());
+    mp_integer subtype_size=get_size(type.subtype());
 
     mp_vectort i;
     evaluate(size_expr, i);
@@ -1026,7 +1035,7 @@ std::size_t interpretert::get_size(const typet &type)
       mp_integer size_mp;
       bool ret=to_integer(size_const, size_mp);
       CHECK_RETURN(!ret);
-      return subtype_size*integer2size_t(size_mp);
+      return subtype_size*size_mp;
     }
     return subtype_size;
   }
@@ -1052,7 +1061,7 @@ exprt interpretert::get_value(const irep_idt &id)
   symbol_exprt symbol_expr(id, get_type);
   mp_integer whole_lhs_object_address=evaluate_address(symbol_expr);
 
-  return get_value(get_type, integer2size_t(whole_lhs_object_address));
+  return get_value(get_type, whole_lhs_object_address);
 }
 
 /// Prints the current state of the memory map Since messaget mdofifies class
@@ -1061,7 +1070,7 @@ void interpretert::print_memory(bool input_flags)
 {
   for(const auto &cell_address : memory)
   {
-    std::size_t i=cell_address.first;
+    mp_integer i=cell_address.first;
     const memory_cellt &cell=cell_address.second;
     const auto identifier=address_to_identifier(i);
     const auto offset=address_to_offset(i);
