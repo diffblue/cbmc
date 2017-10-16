@@ -733,16 +733,6 @@ static optionalt<exprt> get_array(
       ret.move_to_operands(arr_val.operands()[i]);
     return ret;
   }
-  else if(arr_val.id() == ID_symbol)
-  {
-    stream << "(sr::get_array) warning: symbol "
-           << to_symbol_expr(arr_val).get_identifier()
-           << " not found by super_get" << eom;
-    // `super_get` does not know anything about this array so we make one up
-    for(size_t i = 0; i < n; i++)
-      ret.copy_to_operands(exprt(ID_unknown, arr_val.type().subtype()));
-    return ret;
-  }
   else
     return {};
 }
@@ -1953,6 +1943,32 @@ exprt string_refinementt::get(const exprt &expr) const
       const exprt concretized_array = concretize_arrays_in_expression(
         arr_model, generator.max_string_length, ns);
       return concretized_array;
+    }
+    else
+    {
+      const auto &arr_of_ptr = generator.get_arrays_of_pointers();
+      const auto arr_in_arr_of_ptr = std::find_if(
+        arr_of_ptr.begin(),
+        arr_of_ptr.end(),
+        [arr](std::pair<exprt, array_string_exprt> pair) {
+          return pair.second == arr;
+        });
+
+      if(arr_in_arr_of_ptr != arr_of_ptr.end())
+      {
+        exprt length = super_get(arr.length());
+        if(const auto n = expr_cast<std::size_t>(length))
+        {
+          exprt arr_model =
+            array_exprt(array_typet(arr.type().subtype(), length));
+          for(size_t i = 0; i < *n; i++)
+            arr_model.copy_to_operands(exprt(ID_unknown, arr.type().subtype()));
+          const exprt concretized_array = concretize_arrays_in_expression(
+            arr_model, generator.max_string_length, ns);
+          return concretized_array;
+        }
+      }
+      return arr;
     }
   }
   return supert::get(ecopy);
