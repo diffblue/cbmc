@@ -311,7 +311,7 @@ bool value_sett::eval_pointer_offset(
   return mod;
 }
 
-void value_sett::read_value_set(
+void value_sett::get_value_set(
   const exprt &expr,
   value_setst::valuest &dest,
   const namespacet &ns) const
@@ -340,7 +340,7 @@ void value_sett::get_value_set(
 {
   exprt tmp(expr);
   if(!is_simplified)
-    simplifier(tmp, ns);
+    simplify(tmp, ns);
 
   get_value_set_rec(tmp, dest, "", tmp.type(), ns);
 }
@@ -809,7 +809,7 @@ void value_sett::get_value_set_rec(
 
     exprt op1=expr.op1();
     if(eval_pointer_offset(op1, ns))
-      simplifier(op1, ns);
+      simplify(op1, ns);
 
     mp_integer op1_offset;
     const typet &op0_type=ns.follow(expr.op0().type());
@@ -908,7 +908,7 @@ void value_sett::dereference_rec(
     dest=src;
 }
 
-void value_sett::read_reference_set(
+void value_sett::get_reference_set(
   const exprt &expr,
   value_setst::valuest &dest,
   const namespacet &ns) const
@@ -1205,12 +1205,6 @@ void value_sett::assign(
     object_mapt values_rhs;
     get_value_set(rhs, values_rhs, ns, is_simplified);
 
-    // Permit custom subclass to alter the read values prior to write:
-    adjust_assign_rhs_values(rhs, ns, values_rhs);
-
-    // Permit custom subclass to perform global side-effects prior to write:
-    apply_assign_side_effects(lhs, rhs, ns);
-
     assign_rec(lhs, values_rhs, "", ns, add_to_sets);
   }
 }
@@ -1488,7 +1482,7 @@ void value_sett::do_end_function(
   assign(lhs, rhs, ns, false, false);
 }
 
-void value_sett::apply_code_rec(
+void value_sett::apply_code(
   const codet &code,
   const namespacet &ns)
 {
@@ -1497,7 +1491,7 @@ void value_sett::apply_code_rec(
   if(statement==ID_block)
   {
     forall_operands(it, code)
-      apply_code_rec(to_code(*it), ns);
+      apply_code(to_code(*it), ns);
   }
   else if(statement==ID_function_call)
   {
@@ -1615,10 +1609,6 @@ void value_sett::apply_code_rec(
   {
     // doesn't do anything
   }
-  else if(statement==ID_dead)
-  {
-    // ignore (could potentially prune value set in future)
-  }
   else
   {
     // std::cerr << code.pretty() << '\n';
@@ -1704,6 +1694,3 @@ exprt value_sett::make_member(
 
   return member_expr;
 }
-
-value_sett::expr_simplifiert value_sett::default_simplifier=
-  [](exprt &e, const namespacet &ns) { simplify(e, ns); };

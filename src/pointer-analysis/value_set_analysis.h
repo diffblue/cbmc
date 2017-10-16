@@ -14,80 +14,32 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define USE_DEPRECATED_STATIC_ANALYSIS_H
 #include <analyses/static_analysis.h>
-#include <util/xml_expr.h>
-#include <util/xml.h>
 
 #include "value_set_domain.h"
 #include "value_sets.h"
-#include "value_set.h"
 
 class xmlt;
 
-template<class VST>
-class value_set_analysis_baset:
+class value_set_analysist:
   public value_setst,
-  public static_analysist<value_set_domaint<VST> >
+  public static_analysist<value_set_domaint>
 {
 public:
-  typedef value_set_domaint<VST> domaint;
-  typedef static_analysist<domaint> baset;
-  typedef typename baset::locationt locationt;
-
-  explicit value_set_analysis_baset(const namespacet &ns):baset(ns)
+  explicit value_set_analysist(const namespacet &_ns):
+    static_analysist<value_set_domaint>(_ns)
   {
   }
+
+  typedef static_analysist<value_set_domaint> baset;
+
+  // overloading
+  virtual void initialize(const goto_programt &goto_program);
+  virtual void initialize(const goto_functionst &goto_functions);
 
   void convert(
     const goto_programt &goto_program,
     const irep_idt &identifier,
-    xmlt &dest) const
-  {
-    source_locationt previous_location;
-
-    forall_goto_program_instructions(i_it, goto_program)
-    {
-      const source_locationt &location=i_it->source_location;
-
-      if(location==previous_location)
-        continue;
-
-      if(location.is_nil() || location.get_file().empty())
-        continue;
-
-      // find value set
-      const value_sett &value_set=(*this)[i_it].value_set;
-
-      xmlt &i=dest.new_element("instruction");
-      i.new_element()=::xml(location);
-
-      for(value_sett::valuest::const_iterator
-            v_it=value_set.values.begin();
-          v_it!=value_set.values.end();
-          v_it++)
-      {
-        xmlt &var=i.new_element("variable");
-        var.new_element("identifier").data=
-          id2string(v_it->first);
-
-#if 0
-        const value_sett::expr_sett &expr_set=
-          v_it->second.expr_set();
-
-        for(value_sett::expr_sett::const_iterator
-              e_it=expr_set.begin();
-            e_it!=expr_set.end();
-            e_it++)
-        {
-          std::string value_str=
-            from_expr(ns, identifier, *e_it);
-
-          var.new_element("value").data=
-            xmlt::escape(value_str);
-        }
-#endif
-      }
-    }
-  }
+    xmlt &dest) const;
 
 public:
   // interface value_sets
@@ -96,11 +48,9 @@ public:
     const exprt &expr,
     value_setst::valuest &dest)
   {
-    (*this)[l].value_set.read_value_set(expr, dest, baset::ns);
+    (*this)[l].value_set.get_value_set(expr, dest, ns);
   }
 };
-
-typedef value_set_analysis_baset<value_sett> value_set_analysist;
 
 void convert(
   const goto_functionst &goto_functions,

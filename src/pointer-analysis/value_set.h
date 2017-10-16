@@ -24,20 +24,8 @@ class namespacet;
 
 class value_sett
 {
-  typedef std::function<void(exprt &, const namespacet &)> expr_simplifiert;
-
-  static expr_simplifiert default_simplifier;
-
 public:
-  value_sett():
-    location_number(0),
-    simplifier(default_simplifier)
-  {
-  }
-
-  explicit value_sett(expr_simplifiert simplifier):
-    location_number(0),
-    simplifier(std::move(simplifier))
+  value_sett():location_number(0)
   {
   }
 
@@ -178,7 +166,7 @@ public:
   typedef std::unordered_map<idt, entryt, string_hash> valuest;
   #endif
 
-  void read_value_set(
+  void get_value_set(
     const exprt &expr,
     value_setst::valuest &dest,
     const namespacet &ns) const;
@@ -225,10 +213,7 @@ public:
 
   void apply_code(
     const codet &code,
-    const namespacet &ns)
-  {
-    apply_code_rec(code, ns);
-  }
+    const namespacet &ns);
 
   void assign(
     const exprt &lhs,
@@ -247,7 +232,7 @@ public:
     const exprt &lhs,
     const namespacet &ns);
 
-  void read_reference_set(
+  void get_reference_set(
     const exprt &expr,
     value_setst::valuest &dest,
     const namespacet &ns) const;
@@ -257,6 +242,13 @@ public:
     const namespacet &ns) const;
 
 protected:
+  void get_value_set_rec(
+    const exprt &expr,
+    object_mapt &dest,
+    const std::string &suffix,
+    const typet &original_type,
+    const namespacet &ns) const;
+
   void get_value_set(
     const exprt &expr,
     object_mapt &dest,
@@ -280,6 +272,13 @@ protected:
     const exprt &src,
     exprt &dest) const;
 
+  void assign_rec(
+    const exprt &lhs,
+    const object_mapt &values_rhs,
+    const std::string &suffix,
+    const namespacet &ns,
+    bool add_to_sets);
+
   void do_free(
     const exprt &op,
     const namespacet &ns);
@@ -288,67 +287,6 @@ protected:
     const exprt &src,
     const irep_idt &component_name,
     const namespacet &ns);
-
-  // Expression simplification:
-
-private:
-  /// Expression simplification function; by default, plain old
-  /// util/simplify_expr, but can be customised by subclass.
-  expr_simplifiert simplifier;
-
-protected:
-  /// Run registered expression simplifier
-  void run_simplifier(exprt &e, const namespacet &ns)
-  {
-    simplifier(e, ns);
-  }
-
-  // Subclass customisation points:
-
-protected:
-  /// Subclass customisation point for recursion over RHS expression:
-  virtual void get_value_set_rec(
-    const exprt &expr,
-    object_mapt &dest,
-    const std::string &suffix,
-    const typet &original_type,
-    const namespacet &ns) const;
-
-  /// Subclass customisation point for recursion over LHS expression:
-  virtual void assign_rec(
-    const exprt &lhs,
-    const object_mapt &values_rhs,
-    const std::string &suffix,
-    const namespacet &ns,
-    bool add_to_sets);
-
-  /// Subclass customisation point for applying code to this domain:
-  virtual void apply_code_rec(
-    const codet &code,
-    const namespacet &ns);
-
- private:
-  /// Subclass customisation point to filter or otherwise alter the value-set
-  /// returned from get_value_set before it is passed into assign. For example,
-  /// this is used in one subclass to tag and thus differentiate values that
-  /// originated in a particular place, vs. those that have been copied.
-  virtual void adjust_assign_rhs_values(
-    const exprt &rhs,
-    const namespacet &ns,
-    object_mapt &rhs_values) const
-  {
-  }
-
-  /// Subclass customisation point to apply global side-effects to this domain,
-  /// after RHS values are read but before they are written. For example, this
-  /// is used in a recency-analysis plugin to demote existing most-recent
-  /// objects to general case ones.
-  virtual void apply_assign_side_effects(
-    const exprt &lhs,
-    const exprt &rhs,
-    const namespacet &ns)
-  {
-  }
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_H
