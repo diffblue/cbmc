@@ -733,6 +733,16 @@ static optionalt<exprt> get_array(
       ret.move_to_operands(arr_val.operands()[i]);
     return ret;
   }
+  else if(arr_val.id() == ID_symbol)
+  {
+    stream << "(sr::get_array) warning: symbol "
+           << to_symbol_expr(arr_val).get_identifier()
+           << " not found by super_get" << eom;
+    // `super_get` does not know anything about this array so we make one up
+    for(size_t i = 0; i < n; i++)
+      ret.copy_to_operands(exprt(ID_unknown, arr_val.type().subtype()));
+    return ret;
+  }
   else
     return {};
 }
