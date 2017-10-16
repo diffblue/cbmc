@@ -14,6 +14,23 @@
 
 /// \brief A symbol table that records which entries have been updated/removed
 /// \ingroup gr_symbol_table
+/// A caller can pass a `recording_symbol_tablet` into a callee that is
+/// expected to mutate it somehow, then after it has run inspect the recording
+/// table's journal to determine what has changed more cheaply than examining
+/// every symbol.
+///
+/// Example of usage:
+/// ```
+/// concrete_symbol_tablet actual_table;
+/// init_table(actual_table);
+///
+/// recording_symbol_tablet journal(actual_table); // Wraps actual_table
+/// alter_table(journal);
+
+/// for(const auto &added : journal.added())
+/// {
+///   printf("%s was added\n", added.name);
+/// }
 class recording_symbol_tablet:public symbol_tablet
 {
 public:
