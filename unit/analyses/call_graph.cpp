@@ -30,15 +30,13 @@ static symbolt create_void_function_symbol(
   return function;
 }
 
-static bool multimap_key_matches(
-  const std::multimap<irep_idt, irep_idt> &map,
+static bool graph_key_matches(
+  const call_grapht graph,
   const irep_idt &key,
-  const std::set<irep_idt> &values)
+  const std::unordered_set<irep_idt, irep_id_hash> &values)
 {
-  auto matching_values=map.equal_range(key);
-  std::set<irep_idt> matching_set;
-  for(auto it=matching_values.first; it!=matching_values.second; ++it)
-    matching_set.insert(it->second);
+  std::unordered_set<irep_idt, irep_id_hash> matching_set =
+      graph.get_successors(key);
   return matching_set==values;
 }
 
@@ -106,10 +104,11 @@ SCENARIO("call_graph",
     {
       THEN("We expect A -> { A, B }, B -> { C, D }")
       {
-        const auto &check_graph=call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
-        REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B"}));
-        REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
+        REQUIRE(call_graph_from_goto_functions.size()==4);
+        REQUIRE(graph_key_matches
+            (call_graph_from_goto_functions, "A", {"A", "B"}));
+        REQUIRE(graph_key_matches
+            (call_graph_from_goto_functions, "B", {"C", "D"}));
       }
     }
 
@@ -119,12 +118,15 @@ SCENARIO("call_graph",
         call_graph_from_goto_functions.get_inverted();
       THEN("We expect A -> { A }, B -> { A }, C -> { B }, D -> { B }")
       {
-        const auto &check_graph=inverse_call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
-        REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
-        REQUIRE(multimap_key_matches(check_graph, "B", {"A"}));
-        REQUIRE(multimap_key_matches(check_graph, "C", {"B"}));
-        REQUIRE(multimap_key_matches(check_graph, "D", {"B"}));
+        REQUIRE(inverse_call_graph_from_goto_functions.size()==4);
+        REQUIRE(graph_key_matches
+            (inverse_call_graph_from_goto_functions, "A", {"A"}));
+        REQUIRE(graph_key_matches
+            (inverse_call_graph_from_goto_functions, "B", {"A"}));
+        REQUIRE(graph_key_matches
+            (inverse_call_graph_from_goto_functions, "C", {"B"}));
+        REQUIRE(graph_key_matches
+            (inverse_call_graph_from_goto_functions, "D", {"B"}));
       }
     }
 

@@ -263,7 +263,7 @@ public:
   std::list<node_indext> topsort() const;
 
   void output_dot(std::ostream &out) const;
-  void output_dot_node(std::ostream &out, node_indext n) const;
+  virtual void output_dot_node(std::ostream &out, node_indext n) const;
 
 protected:
   class tarjant
