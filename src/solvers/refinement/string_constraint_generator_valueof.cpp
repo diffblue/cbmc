@@ -139,7 +139,7 @@ exprt string_constraint_generatort::add_axioms_from_int_with_radix(
   const exprt &radix,
   size_t max_size)
 {
-  PRECONDITION(max_size==0 || max_size<std::numeric_limits<size_t>::max());
+  PRECONDITION(max_size < std::numeric_limits<size_t>::max());
   const typet &type=input_int.type();
   PRECONDITION(type.id()==ID_signedbv);
 
