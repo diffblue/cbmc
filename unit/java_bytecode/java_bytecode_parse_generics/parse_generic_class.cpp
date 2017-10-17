@@ -6,7 +6,8 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
+#include <testing-utils/load_java_class.h>
 
 #include <istream>
 #include <memory>
@@ -15,7 +16,6 @@
 #include <util/language.h>
 #include <util/message.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <src/java_bytecode/load_java_class.h>
 
 SCENARIO(
   "java_bytecode_parse_generics",
@@ -32,7 +32,7 @@ SCENARIO(
       THEN("The symbol type should be generic")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$element").value().get();
+          new_symbol_table.lookup_ref("java::generics$element");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -76,7 +76,7 @@ SCENARIO(
       THEN("The symbol type should be generic")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$bound_element").value().get();
+          new_symbol_table.lookup_ref("java::generics$bound_element");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -127,8 +127,8 @@ SCENARIO(
 
       THEN("The generic fields should be annotated with concrete types")
       {
-        const symbolt &class_symbol=new_symbol_table.lookup("java::generics")
-          .value().get();
+        const symbolt &class_symbol=
+          new_symbol_table.lookup_ref("java::generics");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -236,8 +236,7 @@ SCENARIO(
       THEN("The symbol should have a generic parameter")
       {
         const symbolt &class_symbol=
-          new_symbol_table.lookup("java::generics$double_bound_element")
-            .value().get();
+          new_symbol_table.lookup_ref("java::generics$double_bound_element");
         const typet &symbol_type=class_symbol.type;
 
         REQUIRE(symbol_type.id()==ID_struct);
@@ -276,7 +275,7 @@ SCENARIO(
     THEN("Both generic parameters should be encoded")
     {
       const symbolt &class_symbol=
-        new_symbol_table.lookup("java::generics$two_elements").value().get();
+        new_symbol_table.lookup_ref("java::generics$two_elements");
       const typet &symbol_type=class_symbol.type;
 
       REQUIRE(symbol_type.id()==ID_struct);
