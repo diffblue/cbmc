@@ -223,8 +223,8 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
     for(size_t j=0; j<size; j++)
     {
       chr=res[j];
-      exprt i=int_of_hex_char(chr);
-      sum=plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(i, type));
+      exprt chr_int = int_of_hex_char(chr);
+      sum = plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(chr_int, type));
       or_exprt is_number(
         and_exprt(
           binary_relation_exprt(chr, ID_ge, zero_char),
