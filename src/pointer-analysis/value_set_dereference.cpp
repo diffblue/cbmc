@@ -351,7 +351,7 @@ value_set_dereferencet::valuet value_set_dereferencet::build_reference_to(
 
     // can't remove here, turn into *p
     result.value=symbol_exprt(
-      get_vsderef_dynamic_object_prefix() + from_expr(root_object),
+      get_vsderef_dynamic_object_prefix()+from_expr(root_object),
       ns.follow(dereference_type));
 
     if(options.get_bool_option("pointer-check"))

@@ -320,7 +320,7 @@ void rd_range_domaint::transform_assign(
     }
     else
     {
-      do_kill = do_kill &&
+      do_kill=do_kill &&
        (!rd.get_is_threaded()(from) ||
         (!symbol_ptr->is_shared() &&
          !rd.get_is_dirty()(identifier)));

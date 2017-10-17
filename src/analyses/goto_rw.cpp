@@ -621,7 +621,7 @@ void rw_range_set_value_sett::get_objects_dereference(
       mode,
       to_symbol_expr(object).get_identifier(),
       range_start,
-      range_start + new_size);
+      range_start+new_size);
   }
 
   // value_set_dereferencet::build_reference_to will turn *p into
