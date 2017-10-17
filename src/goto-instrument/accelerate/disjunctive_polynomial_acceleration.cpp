@@ -65,7 +65,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   {
     if(loop.find(it)!=loop.end())
     {
-      goto_program.output_instruction(ns, "scratch", std::cout, it);
+      goto_program.output_instruction(ns, "scratch", std::cout, *it);
     }
   }
 

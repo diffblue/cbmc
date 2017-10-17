@@ -503,7 +503,7 @@ public:
     const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
-    typename instructionst::const_iterator it) const=0;
+    const typename instructionst::value_type &it) const = 0;
 
   /// Compute the target numbers
   void compute_target_numbers();
@@ -665,11 +665,8 @@ std::ostream &goto_program_templatet<codeT, guardT>::output(
 {
   // output program
 
-  for(typename instructionst::const_iterator
-      it=instructions.begin();
-      it!=instructions.end();
-      ++it)
-    output_instruction(ns, identifier, out, it);
+  for(const auto &instruction : instructions)
+    output_instruction(ns, identifier, out, instruction);
 
   return out;
 }

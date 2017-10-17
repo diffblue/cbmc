@@ -71,7 +71,7 @@ bool polynomial_acceleratort::accelerate(
       it!=body.end();
       ++it)
   {
-    program.output_instruction(ns, "scratch", std::cout, it);
+    program.output_instruction(ns, "scratch", std::cout, *it);
   }
 
   std::cout << "Modified:\n";

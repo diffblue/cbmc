@@ -444,7 +444,7 @@ void goto_inlinet::expand_function_call(
 
 #ifdef DEBUG
   std::cout << "Expanding call:\n";
-  dest.output_instruction(ns, "", std::cout, target);
+  dest.output_instruction(ns, "", std::cout, *target);
 #endif
 
   exprt lhs;
@@ -815,7 +815,7 @@ void goto_inlinet::output_inline_map(
         bool transitive=call.second;
 
         out << "  Call:\n";
-        goto_program.output_instruction(ns, "", out, target);
+        goto_program.output_instruction(ns, "", out, *target);
         out << "  Transitive: " << transitive << "\n";
       }
     }
