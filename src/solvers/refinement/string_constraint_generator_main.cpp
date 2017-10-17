@@ -411,7 +411,7 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
   else if(id==ID_cprover_string_insert_int_func)
     res=add_axioms_for_insert_int(expr);
   else if(id==ID_cprover_string_insert_long_func)
-    res=add_axioms_for_insert_long(expr);
+    res = add_axioms_for_insert_int(expr);
   else if(id==ID_cprover_string_insert_bool_func)
     res=add_axioms_for_insert_bool(expr);
   else if(id==ID_cprover_string_insert_char_func)

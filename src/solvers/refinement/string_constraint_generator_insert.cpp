@@ -99,16 +99,6 @@ exprt string_constraint_generatort::add_axioms_for_insert_int(
   return add_axioms_for_insert(res, s1, s2, offset);
 }
 
-/// add axioms corresponding to the StringBuilder.insert(J) java function
-/// \param f: function application with three arguments: a string, an
-///   integer offset and a long
-/// \return an expression
-exprt string_constraint_generatort::add_axioms_for_insert_long(
-  const function_application_exprt &f)
-{
-  return add_axioms_for_insert_int(f);
-}
-
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a Boolean

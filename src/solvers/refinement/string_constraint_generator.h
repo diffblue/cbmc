@@ -185,7 +185,6 @@ private:
     const exprt &offset);
   exprt add_axioms_for_insert(const function_application_exprt &f);
   exprt add_axioms_for_insert_int(const function_application_exprt &f);
-  exprt add_axioms_for_insert_long(const function_application_exprt &f);
   exprt add_axioms_for_insert_bool(const function_application_exprt &f);
   exprt add_axioms_for_insert_char(const function_application_exprt &f);
   exprt add_axioms_for_insert_float(const function_application_exprt &f);
