@@ -67,11 +67,17 @@ irep_idt custom_bitvector_domaint::object2id(const exprt &src)
     }
     else if(op.id()==ID_typecast)
     {
-      return object2id(dereference_exprt(to_typecast_expr(op).op()));
+      irep_idt op_id=object2id(to_typecast_expr(op).op());
+
+      if(op_id.empty())
+        return irep_idt();
+      else
+        return '*'+id2string(op_id);
     }
     else
     {
       irep_idt op_id=object2id(op);
+
       if(op_id.empty())
         return irep_idt();
       else
@@ -188,9 +194,8 @@ std::set<exprt> custom_bitvector_analysist::aliases(
     std::set<exprt> result;
 
     for(const auto &pointer : pointer_set)
-    {
-      result.insert(dereference_exprt(pointer));
-    }
+      if(pointer.type().id()==ID_pointer)
+        result.insert(dereference_exprt(pointer));
 
     result.insert(src);
 
@@ -300,36 +305,39 @@ void custom_bitvector_domaint::transform(
 
             exprt lhs=code_function_call.arguments()[0];
 
-            if(lhs.is_constant() &&
-               to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
+            if(lhs.type().id()==ID_pointer)
             {
-              if(mode==modet::CLEAR_MAY)
+              if(lhs.is_constant() &&
+                 to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
               {
-                for(auto &bit : may_bits)
-                  clear_bit(bit.second, bit_nr);
+                if(mode==modet::CLEAR_MAY)
+                {
+                  for(auto &bit : may_bits)
+                    clear_bit(bit.second, bit_nr);
 
-                // erase blank ones
-                erase_blank_vectors(may_bits);
+                  // erase blank ones
+                  erase_blank_vectors(may_bits);
+                }
+                else if(mode==modet::CLEAR_MUST)
+                {
+                  for(auto &bit : must_bits)
+                    clear_bit(bit.second, bit_nr);
+
+                  // erase blank ones
+                  erase_blank_vectors(must_bits);
+                }
               }
-              else if(mode==modet::CLEAR_MUST)
+              else
               {
-                for(auto &bit : must_bits)
-                  clear_bit(bit.second, bit_nr);
+                dereference_exprt deref(lhs);
 
-                // erase blank ones
-                erase_blank_vectors(must_bits);
-              }
-            }
-            else
-            {
-              dereference_exprt deref(lhs);
+                // may alias other stuff
+                std::set<exprt> lhs_set=cba.aliases(deref, from);
 
-              // may alias other stuff
-              std::set<exprt> lhs_set=cba.aliases(deref, from);
-
-              for(const auto &lhs : lhs_set)
-              {
-                set_bit(lhs, bit_nr, mode);
+                for(const auto &lhs : lhs_set)
+                {
+                  set_bit(lhs, bit_nr, mode);
+                }
               }
             }
           }
@@ -415,40 +423,43 @@ void custom_bitvector_domaint::transform(
 
         exprt lhs=instruction.code.op0();
 
-        if(lhs.is_constant() &&
-           to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
+        if(lhs.type().id()==ID_pointer)
         {
-          if(mode==modet::CLEAR_MAY)
+          if(lhs.is_constant() &&
+             to_constant_expr(lhs).get_value()==ID_NULL) // NULL means all
           {
-            for(bitst::iterator b_it=may_bits.begin();
-                b_it!=may_bits.end();
-                b_it++)
-              clear_bit(b_it->second, bit_nr);
+            if(mode==modet::CLEAR_MAY)
+            {
+              for(bitst::iterator b_it=may_bits.begin();
+                  b_it!=may_bits.end();
+                  b_it++)
+                clear_bit(b_it->second, bit_nr);
 
-            // erase blank ones
-            erase_blank_vectors(may_bits);
+              // erase blank ones
+              erase_blank_vectors(may_bits);
+            }
+            else if(mode==modet::CLEAR_MUST)
+            {
+              for(bitst::iterator b_it=must_bits.begin();
+                  b_it!=must_bits.end();
+                  b_it++)
+                clear_bit(b_it->second, bit_nr);
+
+              // erase blank ones
+              erase_blank_vectors(must_bits);
+            }
           }
-          else if(mode==modet::CLEAR_MUST)
+          else
           {
-            for(bitst::iterator b_it=must_bits.begin();
-                b_it!=must_bits.end();
-                b_it++)
-              clear_bit(b_it->second, bit_nr);
+            dereference_exprt deref(lhs);
 
-            // erase blank ones
-            erase_blank_vectors(must_bits);
-          }
-        }
-        else
-        {
-          dereference_exprt deref(lhs);
+            // may alias other stuff
+            std::set<exprt> lhs_set=cba.aliases(deref, from);
 
-          // may alias other stuff
-          std::set<exprt> lhs_set=cba.aliases(deref, from);
-
-          for(const auto &lhs : lhs_set)
-          {
-            set_bit(lhs, bit_nr, mode);
+            for(const auto &lhs : lhs_set)
+            {
+              set_bit(lhs, bit_nr, mode);
+            }
           }
         }
       }
@@ -627,6 +638,9 @@ exprt custom_bitvector_domaint::eval(
         custom_bitvector_analysis.get_bit_nr(src.op1());
 
       exprt pointer=src.op0();
+
+      if(pointer.type().id()!=ID_pointer)
+        return src;
 
       if(pointer.is_constant() &&
          to_constant_expr(pointer).get_value()==ID_NULL) // NULL means all
