@@ -29,6 +29,7 @@ SRC = accelerate/accelerate.cpp \
       goto_instrument_main.cpp \
       goto_instrument_parse_options.cpp \
       goto_program2code.cpp \
+      harness_generator.cpp \
       havoc_loops.cpp \
       horn_encoding.cpp \
       interrupt.cpp \

@@ -81,6 +81,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "dump_c.h"
 #include "dot.h"
 #include "havoc_loops.h"
+#include "harness_generator.h"
 #include "k_induction.h"
 #include "function.h"
 #include "branch.h"
@@ -270,6 +271,25 @@ int goto_instrument_parse_optionst::doit()
       value_set_analysis(goto_model.goto_functions);
       show_value_sets(get_ui(), goto_model, value_set_analysis);
       return 0;
+    }
+
+    if(cmdline.isset("harness-generator"))
+    {
+      std::list<std::string> function_names = cmdline.get_values(
+          "harness-generator");
+      if(function_names.size() > 1)
+        status() << "Only one destination allowed, "
+            "using only first function name given\n";
+
+      do_indirect_call_and_rtti_removal();
+
+      // recalculate numbers, etc.
+      goto_model.goto_functions.update();
+
+      harness_generatort harness_generator(
+          goto_model, function_names.front(),
+          get_message_handler());
+     return 0;
     }
 
     if(cmdline.isset("show-global-may-alias"))

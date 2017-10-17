@@ -79,6 +79,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
   "(splice-call):" \
+  "(harness-generator):" \
 
 
 class goto_instrument_parse_optionst:
