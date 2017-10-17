@@ -666,15 +666,12 @@ void grapht<N>::output_dot(std::ostream &out) const
 template<class N>
 void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const
 {
-  const nodet &node=nodes[n];
+  const nodet &node=nodes.at(n);
 
-  for(typename edgest::const_iterator
-      it=node.out.begin();
-      it!=node.out.end();
-      it++)
+  for(const auto &edge : node.out)
   {
     out << "  \"" << n << "\" -> "
-        << "\"" << it->first << "\" "
+        << "\"" << edge.first << "\" "
         << " [arrowhead=\"vee\"];"
         << "\n";
   }
