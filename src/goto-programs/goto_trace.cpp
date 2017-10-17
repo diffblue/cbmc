@@ -57,7 +57,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
   default:
-    out << "unknown type: " << static_cast<int>(type) << std::endl;
+    out << "unknown type: " << static_cast<int>(type) << "\n";
     UNREACHABLE;
   }
 
@@ -117,6 +117,78 @@ void goto_trace_stept::output(
 
   out << "\n";
 }
+
+static std::string expr_to_hex(const exprt & expr)
+{
+  mp_integer value_int=binary2integer
+      (id2string(to_constant_expr(expr).get_value()),
+          false);
+  return "0x" + integer2string(value_int, 16);
+}
+
+std::string trace_value_hex(
+  const exprt &expr,
+  const namespacet &ns)
+{
+  const typet &type=ns.follow(expr.type());
+
+  if(expr.id()==ID_constant)
+  {
+    if(type.id()==ID_unsignedbv ||
+       type.id()==ID_signedbv ||
+       type.id()==ID_bv ||
+       type.id()==ID_fixedbv ||
+       type.id()==ID_floatbv ||
+       type.id()==ID_pointer ||
+       type.id()==ID_c_bit_field ||
+       type.id()==ID_c_bool ||
+       type.id()==ID_c_enum ||
+       type.id()==ID_c_enum_tag)
+    {
+      return expr_to_hex(expr);
+    }
+    else if(type.id()==ID_bool)
+    {
+      return expr.is_true()?"1":"0";
+    }
+  }
+  else if(expr.id()==ID_array)
+  {
+    std::string result;
+
+    forall_operands(it, expr)
+    {
+      if(result=="")
+        result="{ ";
+      else
+        result+=", ";
+      result+=trace_value_hex(*it, ns);
+    }
+
+    return result+" }";
+  }
+  else if(expr.id()==ID_struct)
+  {
+    std::string result="{ ";
+
+    forall_operands(it, expr)
+    {
+      if(it!=expr.operands().begin())
+        result+=", ";
+      result+=trace_value_hex(*it, ns);
+    }
+
+    return result+" }";
+  }
+  else if(expr.id()==ID_union)
+  {
+    assert(expr.operands().size()==1);
+    return trace_value_hex(expr.op0(), ns);
+  }
+
+  return "?";
+}
+
 
 std::string trace_value_binary(
   const exprt &expr,
@@ -186,7 +258,8 @@ void trace_value(
   const namespacet &ns,
   const ssa_exprt &lhs_object,
   const exprt &full_lhs,
-  const exprt &value)
+  const exprt &value,
+  bool hex)
 {
   irep_idt identifier;
 
@@ -202,13 +275,26 @@ void trace_value(
     value_string=from_expr(ns, identifier, value);
 
     // the binary representation
-    value_string+=" ("+trace_value_binary(value, ns)+")";
+    if(hex)
+      value_string += " (" + trace_value_hex(value, ns) + ")";
+    else
+      value_string += " (" + trace_value_binary(value, ns) + ")";
   }
 
   out << "  "
       << from_expr(ns, identifier, full_lhs)
       << "=" << value_string
       << "\n";
+}
+
+void trace_value(
+  std::ostream &out,
+  const namespacet &ns,
+  const ssa_exprt &lhs_object,
+  const exprt &full_lhs,
+  const exprt &value)
+{
+  trace_value(out, ns, lhs_object, full_lhs, value, false);
 }
 
 void show_state_header(
@@ -242,9 +328,19 @@ bool is_index_member_symbol(const exprt &src)
 }
 
 void show_goto_trace(
+    std::ostream &out,
+    const namespacet &ns,
+    const goto_tracet &goto_trace)
+{
+  show_goto_trace(out, ns, goto_trace, 1, false);
+}
+
+void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
-  const goto_tracet &goto_trace)
+  const goto_tracet &goto_trace,
+  int verbosity,
+  bool print_hex)
 {
   unsigned prev_step_nr=0;
   bool first_step=true;
@@ -305,15 +401,19 @@ void show_goto_trace(
           first_step=false;
           prev_step_nr=step.step_nr;
           show_state_header(out, step, step.pc->source_location, step.step_nr);
+          if(verbosity>1)
+            out << "Code:  " << as_string(ns, *step.pc) << "\n";
         }
 
         // see if the full lhs is something clean
         if(is_index_member_symbol(step.full_lhs))
           trace_value(
-            out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+            out, ns, step.lhs_object, step.full_lhs,
+            step.full_lhs_value, print_hex);
         else
           trace_value(
-            out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
+            out, ns, step.lhs_object, step.lhs_object,
+            step.lhs_object_value, print_hex);
       }
       break;
 
@@ -323,9 +423,12 @@ void show_goto_trace(
         first_step=false;
         prev_step_nr=step.step_nr;
         show_state_header(out, step, step.pc->source_location, step.step_nr);
+        if(verbosity>1)
+          out << "Code:  " << as_string(ns, *step.pc) << "\n";
       }
 
-      trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
+      trace_value(out, ns, step.lhs_object, step.full_lhs,
+          step.full_lhs_value, print_hex);
       break;
 
     case goto_trace_stept::typet::OUTPUT:
@@ -339,6 +442,8 @@ void show_goto_trace(
       else
       {
         show_state_header(out, step, step.pc->source_location, step.step_nr);
+        if(verbosity>1)
+          out << "Code:  " << as_string(ns, *step.pc) << "\n";
         out << "  OUTPUT " << step.io_id << ":";
 
         for(std::list<exprt>::const_iterator
@@ -346,12 +451,14 @@ void show_goto_trace(
             l_it!=step.io_args.end();
             l_it++)
         {
-          if(l_it!=step.io_args.begin())
+          if(l_it != step.io_args.begin())
             out << ";";
           out << " " << from_expr(ns, "", *l_it);
 
-          // the binary representation
-          out << " (" << trace_value_binary(*l_it, ns) << ")";
+          if(print_hex)
+            out << " (" << trace_value_hex(*l_it, ns) << ")";
+          else
+            out << " (" << trace_value_binary(*l_it, ns) << ")";
         }
 
         out << "\n";
@@ -360,6 +467,8 @@ void show_goto_trace(
 
     case goto_trace_stept::typet::INPUT:
       show_state_header(out, step, step.pc->source_location, step.step_nr);
+      if(verbosity>1)
+         out << "Code:  " << as_string(ns, *step.pc) << "\n";
       out << "  INPUT " << step.io_id << ":";
 
       for(std::list<exprt>::const_iterator
@@ -371,8 +480,10 @@ void show_goto_trace(
           out << ";";
         out << " " << from_expr(ns, "", *l_it);
 
-        // the binary representation
-        out << " (" << trace_value_binary(*l_it, ns) << ")";
+        if(print_hex)
+          out << " (" << trace_value_hex(*l_it, ns) << ")";
+        else
+          out << " (" << trace_value_binary(*l_it, ns) << ")";
       }
 
       out << "\n";

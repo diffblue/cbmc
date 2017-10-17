@@ -56,7 +56,9 @@ void bmct::error_trace()
   {
   case ui_message_handlert::uit::PLAIN:
     result() << "Counterexample:" << eom;
-    show_goto_trace(result(), ns, goto_trace);
+    show_goto_trace(result(), ns, goto_trace,
+        options.get_signed_int_option("trace-verbosity"),
+        options.get_bool_option("hex"));
     result() << eom;
     break;
 

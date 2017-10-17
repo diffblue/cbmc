@@ -154,7 +154,17 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("trace") ||
      cmdline.isset("stop-on-fail"))
+  {
     options.set_option("trace", true);
+    if(cmdline.isset("hex"))
+      options.set_option("hex", true);
+
+    if(cmdline.isset("trace-verbosity"))
+      options.set_option("trace-verbosity",
+          cmdline.get_value("trace-verbosity"));
+    else
+      options.set_option("trace-verbosity", 1);
+  }
 
   if(cmdline.isset("localize-faults"))
     options.set_option("localize-faults", true);

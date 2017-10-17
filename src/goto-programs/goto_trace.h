@@ -199,11 +199,28 @@ void show_goto_trace(
   const namespacet &,
   const goto_tracet &);
 
+void show_goto_trace(
+  std::ostream &out,
+  const namespacet &,
+  const goto_tracet &,
+  int verbosity,
+  bool print_hex);
+
 void trace_value(
   std::ostream &out,
   const namespacet &,
   const ssa_exprt &lhs_object,
   const exprt &full_lhs,
   const exprt &value);
+
+std::string trace_value_binary(
+  const exprt &,
+  const namespacet &);
+
+std::string trace_value_hex(
+  const exprt &,
+  const namespacet &);
+
+bool is_index_member_symbol(const exprt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H
