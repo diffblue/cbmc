@@ -126,6 +126,53 @@ std::list<irep_idt> call_grapht::shortest_function_path(
   return result;
 }
 
+void call_grapht::reachable_within_n_steps(
+    std::size_t steps,
+    std::unordered_set<irep_idt,
+    irep_id_hash> & function_list)
+{
+  std::list<node_indext> worklist;
+
+  for(const auto &f : function_list)
+  {
+    node_indext start_index;
+    if(get_node_index(f, start_index))
+      worklist.push_back(start_index);
+    else
+      throw "function not found in call graph";
+  }
+
+  // mark end of level 0
+  worklist.push_back(std::numeric_limits<std::size_t>::max());
+  std::size_t depth=0;
+
+  while(!worklist.empty())
+  {
+    const node_indext id = worklist.front();
+    worklist.pop_front();
+
+    // check if we have hit end of level
+    if(id == std::numeric_limits<std::size_t>::max())
+    {
+      depth++;
+      // mark end of next level
+      if(!worklist.empty())
+        worklist.push_back(id);
+      continue;
+    }
+    function_list.insert(nodes[id].function_name);
+
+    if(depth < steps)
+    {
+      for(const auto &o : nodes[id].out)
+      {
+        if(function_list.find(nodes[o.first].function_name)
+            == function_list.end())
+          worklist.push_back(o.first);
+      }
+    }
+  }
+}
 
 std::unordered_set<irep_idt, irep_id_hash>
 call_grapht::reachable_functions(irep_idt start_function)

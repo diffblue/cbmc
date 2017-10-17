@@ -62,6 +62,15 @@ public:
   /// \return list of function names on the shortest path between src and dest
   std::list<irep_idt>shortest_function_path(irep_idt src, irep_idt dest);
 
+  /// \brief get the names of all functions reachable from a list of functions
+  /// within N function call steps.
+  /// \param function_list  list of functions to start from. Functions reachable within
+  /// N function call steps are appended to this list
+  /// \param steps  number of function call steps
+  void reachable_within_n_steps(std::size_t steps,
+      std::unordered_set<irep_idt, irep_id_hash> &function_list);
+
+
   /// get the index of the node that corresponds to a function name
   /// \param[in] function_name function_name passed by reference
   /// \param[out] n variable for the node index to be written to
