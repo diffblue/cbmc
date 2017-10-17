@@ -342,61 +342,6 @@ array_string_exprt string_constraint_generatort::char_array_of_pointer(
   return array;
 }
 
-/// This can throw an exception if the pointer has not been associated to
-/// an array yet.
-array_string_exprt string_constraint_generatort::get_char_array_for_pointer(
-  const exprt &pointer) const
-{
-  return arrays_of_pointers_.at(pointer);
-}
-
-/// add axioms for an if expression which should return a string
-/// \par parameters: an if expression
-/// \return a string expression
-array_string_exprt
-string_constraint_generatort::add_axioms_for_if(const if_exprt &expr)
-{
-  PRECONDITION(is_refined_string_type(expr.true_case().type()));
-  array_string_exprt t = get_string_expr(expr.true_case());
-  PRECONDITION(is_refined_string_type(expr.false_case().type()));
-  array_string_exprt f = get_string_expr(expr.false_case());
-  const typet &char_type = t.content().type().subtype();
-  const typet &index_type = t.length().type();
-  array_string_exprt res = fresh_string(index_type, char_type);
-
-  m_axioms.push_back(
-    implies_exprt(expr.cond(), equal_exprt(res.length(), t.length())));
-  symbol_exprt qvar=fresh_univ_index("QA_string_if_true", index_type);
-  equal_exprt qequal(res[qvar], t[qvar]);
-  string_constraintt sc1(qvar, t.length(), implies_exprt(expr.cond(), qequal));
-  m_axioms.push_back(sc1);
-  m_axioms.push_back(
-    implies_exprt(
-      not_exprt(expr.cond()), equal_exprt(res.length(), f.length())));
-  symbol_exprt qvar2=fresh_univ_index("QA_string_if_false", index_type);
-  equal_exprt qequal2(res[qvar2], f[qvar2]);
-  string_constraintt sc2(qvar2, f.length(), or_exprt(expr.cond(), qequal2));
-  m_axioms.push_back(sc2);
-  return res;
-}
-
-/// if a symbol representing a string is present in the symbol_to_string table,
-/// returns the corresponding string, if the symbol is not yet present, creates
-/// a new string with the correct type depending on whether the mode is java or
-/// c, adds it to the table and returns it.
-/// \par parameters: a symbol expression
-/// \return a string expression
-array_string_exprt string_constraint_generatort::find_or_add_string_of_symbol(
-  const symbol_exprt &sym,
-  const refined_string_typet &ref_type)
-{
-  irep_idt id=sym.get_identifier();
-  array_string_exprt str =
-    fresh_string(ref_type.get_index_type(), ref_type.get_char_type());
-  auto entry=m_unresolved_symbols.insert(std::make_pair(id, str));
-  return entry.first->second;
-}
-
 /// strings contained in this call are converted to objects of type
 /// `string_exprt`, through adding axioms. Axioms are then added to enforce that
 /// the result corresponds to the function application.

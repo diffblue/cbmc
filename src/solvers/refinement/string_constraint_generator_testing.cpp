@@ -156,25 +156,6 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   return tc_issuffix;
 }
 
-/// tells whether the given string is a constant
-/// \param expr: a string expression
-/// \return a Boolean
-bool string_constraint_generatort::is_constant_string(
-  const array_string_exprt &expr)
-{
-  if(expr.id()!=ID_struct ||
-     expr.operands().size()!=2 ||
-     expr.length().id()!=ID_constant ||
-     expr.content().id()!=ID_array)
-    return false;
-  for(const auto &element : expr.content().operands())
-  {
-    if(element.id()!=ID_constant)
-      return false;
-  }
-  return true;
-}
-
 /// add axioms corresponding to the String.contains java function
 /// \par parameters: function application with two string arguments
 /// \return a Boolean expression

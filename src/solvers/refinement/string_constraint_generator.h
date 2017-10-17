@@ -61,8 +61,6 @@ public:
   /// Set of strings that have been created by the generator
   const std::set<array_string_exprt> &get_created_strings() const;
 
-  array_string_exprt get_char_array_for_pointer(const exprt &pointer) const;
-
   exprt get_witness_of(
     const string_not_contains_constraintt &c,
     const exprt &univ_val) const
@@ -100,10 +98,6 @@ private:
   array_string_exprt get_string_expr(const exprt &expr);
   plus_exprt plus_exprt_with_overflow_check(const exprt &op1, const exprt &op2);
 
-  array_string_exprt find_or_add_string_of_symbol(
-    const symbol_exprt &sym,
-    const refined_string_typet &ref_type);
-
   array_string_exprt associate_char_array_to_char_pointer(
     const exprt &char_pointer,
     const typet &char_array_type);
@@ -112,8 +106,6 @@ private:
 
   array_string_exprt
   char_array_of_pointer(const exprt &pointer, const exprt &length);
-
-  static irep_idt extract_java_string(const symbol_exprt &s);
 
   void add_default_axioms(const array_string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
@@ -179,10 +171,6 @@ private:
     const array_string_exprt &res,
     const std::string &s,
     const exprt::operandst &args);
-  exprt add_axioms_for_format_specifier_is_correct(
-    const function_application_exprt &expr);
-  bool add_axioms_for_format_specifier_is_correct(
-    const std::string &s);
 
   array_string_exprt add_axioms_for_format_specifier(
     const format_specifiert &fs,
@@ -216,7 +204,6 @@ private:
   exprt add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
   exprt add_axioms_from_int_hex(const function_application_exprt &f);
   exprt add_axioms_from_long(const function_application_exprt &f);
-  array_string_exprt add_axioms_from_long(const exprt &i, size_t max_size);
   exprt add_axioms_from_bool(const function_application_exprt &f);
   exprt add_axioms_from_bool(const array_string_exprt &res, const exprt &i);
   exprt add_axioms_from_char(const function_application_exprt &f);
@@ -294,7 +281,6 @@ private:
   exprt add_axioms_for_code_point(
     const array_string_exprt &res,
     const exprt &code_point);
-  array_string_exprt add_axioms_for_if(const if_exprt &expr);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);
 
   // Add axioms corresponding the String.codePointCount java function
@@ -343,7 +329,6 @@ private:
   static exprt is_low_surrogate(const exprt &chr);
   static exprt character_equals_ignore_case(
     exprt char1, exprt char2, exprt char_a, exprt char_A, exprt char_Z);
-  static bool is_constant_string(const array_string_exprt &expr);
   unsigned long to_integer_or_default(const exprt &expr, unsigned long def);
 
   // MEMBERS
@@ -352,24 +337,14 @@ public:
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
-  // The integer with the longest string is Integer.MIN_VALUE which is -2^31,
-  // that is -2147483648 so takes 11 characters to write.
-  // The long with the longest string is Long.MIN_VALUE which is -2^63,
-  // approximately -9.223372037*10^18 so takes 20 characters to write.
-  CBMC_CONSTEXPR static const std::size_t MAX_INTEGER_LENGTH=11;
-  CBMC_CONSTEXPR static const std::size_t MAX_LONG_LENGTH=20;
-  CBMC_CONSTEXPR static const std::size_t MAX_FLOAT_LENGTH=15;
-  CBMC_CONSTEXPR static const std::size_t MAX_DOUBLE_LENGTH=30;
   std::set<array_string_exprt> m_created_strings;
   unsigned m_symbol_count=0;
   const messaget m_message;
   const bool m_force_printable_characters;
 
   std::vector<exprt> m_axioms;
-  std::map<irep_idt, array_string_exprt> m_unresolved_symbols;
   std::vector<symbol_exprt> m_boolean_symbols;
   std::vector<symbol_exprt> m_index_symbols;
-  std::map<function_application_exprt, exprt> m_function_application_cache;
   const namespacet m_ns;
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.
