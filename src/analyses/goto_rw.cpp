@@ -613,6 +613,11 @@ void rw_range_set_value_sett::get_objects_dereference(
     new_size=std::min(size, new_size);
   }
 
+  // We must ensure that the artificial reference (introduced in
+  // 'value_set_dereferencet::build_reference_to') to a dynamic object
+  // obtained by dereferencing the pointer in 'deref' gets to the resulting
+  // points-to-set. The following condition check whether the obtained
+  // object is the artificial reference.
   if(object.is_not_nil() && object.id()==ID_symbol &&
     as_string(to_symbol_expr(object).get_identifier()).find(
       get_vsderef_dynamic_object_prefix())==0UL)
