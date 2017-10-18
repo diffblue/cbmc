@@ -1,0 +1,36 @@
+# These owners will be the default owners for everything in the repo.
+*       @kroening @tautschnig @peterschrammel
+
+src/java_bytecode/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli @Degiorgio @NathanJPhillips
+src/jbmc/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli @Degiorgio @NathanJPhillips
+src/miniz/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli
+
+src/ansi-c/ @marek-trtik @kroening @tautschnig
+
+src/cpp/ @marek-trtik @kroening @tautschnig
+
+CMakeLists.txt @reuk @thk123
+
+cmake/ @reuk @thk123
+
+src/solvers/ @martin-cs @romainbrenguier @antlechner @kroening
+
+src/analyses/ @martin-cs @peterschrammel @thk123 @marek-trtik @NathanJPhillips
+
+src/pointer-analysis/ @martin-cs @peterschrammel @thk123 @marek-trtik 
+
+src/goto-analyzer/ @martin-cs @peterschrammel @thk123 @marek-trtik 
+
+src/goto-instrument/ @martin-cs @peterschrammel @thk123 @marek-trtik  
+
+src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @marek-trtik  
+
+src/linking/ @smowton @kroening @tautschnig @peterschrammel @marek-trtik  
+
+unit/ @diffblue/cbmc-developers
+
+regression/ @diffblue/cbmc-developers
+
+.travis.yml @diffblue/devops @thk123 @forejtv @jgwilson42 @rabiamarzhiya
+appveyor.yml @diffblue/devops @thk123 @forejtv @jgwilson42 @rabiamarzhiya
+
