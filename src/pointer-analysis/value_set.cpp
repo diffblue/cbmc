@@ -833,7 +833,7 @@ void value_sett::get_value_set_rec(
 
         found=true;
 
-        member_exprt member(expr.op0(), name, c_it->type());
+        member_exprt member(expr.op0(), *c_it);
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
@@ -1050,9 +1050,7 @@ void value_sett::get_reference_set_rec(
       {
         objectt o=it->second;
 
-        member_exprt member_expr(expr.type());
-        member_expr.op0()=object;
-        member_expr.set_component_name(component_name);
+        member_exprt member_expr(object, component_name, expr.type());
 
         // We cannot introduce a cast from scalar to non-scalar,
         // thus, we can only adjust the types of structs and unions.
@@ -1121,9 +1119,7 @@ void value_sett::assign(
       if(subtype.id()==ID_code ||
          c_it->get_is_padding()) continue;
 
-      member_exprt lhs_member(subtype);
-      lhs_member.set_component_name(name);
-      lhs_member.op0()=lhs;
+      member_exprt lhs_member(lhs, name, subtype);
 
       exprt rhs_member;
 
@@ -1688,9 +1684,7 @@ exprt value_sett::make_member(
 
   // give up
   typet subtype=struct_union_type.component_type(component_name);
-  member_exprt member_expr(subtype);
-  member_expr.op0()=src;
-  member_expr.set_component_name(component_name);
+  member_exprt member_expr(src, component_name, subtype);
 
   return member_expr;
 }

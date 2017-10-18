@@ -200,7 +200,7 @@ void linkingt::detailed_conflict_report_rec(
           conflict_path=conflict_path_before;
           conflict_path.type()=t1;
           conflict_path=
-            member_exprt(conflict_path, components1[i].get_name());
+            member_exprt(conflict_path, components1[i]);
 
           if(depth>0 &&
              parent_types.find(t1)==parent_types.end())
