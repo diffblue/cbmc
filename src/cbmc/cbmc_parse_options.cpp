@@ -35,7 +35,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/mm_io.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_function_pointers.h>
-#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_exceptions.h>
@@ -745,8 +744,6 @@ bool cbmc_parse_optionst::process_goto_program(
       get_message_handler(),
       goto_model,
       cmdline.isset("pointer-check"));
-    // virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof)
     remove_exceptions(goto_model);
 
