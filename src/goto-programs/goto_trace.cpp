@@ -496,7 +496,14 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
+      if(verbosity > 2)
+        out<< "Function call: " << as_string(ns, *step.pc) << "\n";
+      break;
     case goto_trace_stept::typet::FUNCTION_RETURN:
+      if(verbosity > 2)
+        out<< "Function return from: " << as_string(ns, *step.pc) << "\n";
+      break;
+
     case goto_trace_stept::typet::SPAWN:
     case goto_trace_stept::typet::MEMORY_BARRIER:
     case goto_trace_stept::typet::ATOMIC_BEGIN:
