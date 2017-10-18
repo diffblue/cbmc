@@ -529,10 +529,10 @@ public:
   void update();
 
   /// Human-readable loop name
-  static irep_idt loop_id(const_targett target)
+  static irep_idt loop_id(const instructiont &instruction)
   {
-    return id2string(target->function)+"."+
-           std::to_string(target->loop_number);
+    return id2string(instruction.function)+"."+
+           std::to_string(instruction.loop_number);
   }
 
   /// Is the program empty?

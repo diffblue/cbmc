@@ -108,7 +108,7 @@ bool symex_bmct::get_unwind(
   const symex_targett::sourcet &source,
   unsigned unwind)
 {
-  const irep_idt id=goto_programt::loop_id(source.pc);
+  const irep_idt id=goto_programt::loop_id(*source.pc);
 
   // We use the most specific limit we have,
   // and 'infinity' when we have none.
