@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_pointer_casts.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "java_root_class.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -134,15 +135,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   const auto &jlo_struct=to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
   const auto &jls_struct=to_struct_type(ns.follow(string_type));
-
-  jlo_init.copy_to_operands(
-    constant_exprt(
-      "java::java.lang.String",
-      jlo_struct.components()[0].type()));
-  jlo_init.copy_to_operands(
-    from_integer(
-      0,
-      jlo_struct.components()[1].type()));
+  java_root_class_init(jlo_init, jlo_struct, false, "java::java.lang.String");
 
   // If string refinement *is* around, populate the actual
   // contents as well:
