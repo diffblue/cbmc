@@ -629,11 +629,6 @@ static bool add_nondet_string_pointer_initialization(
   const source_locationt &loc,
   code_blockt &code)
 {
-  if(
-    !java_string_library_preprocesst::implements_java_char_sequence_pointer(
-      expr.type()))
-    return true;
-
   const namespacet ns(symbol_table);
   const dereference_exprt obj(expr, expr.type().subtype());
   const struct_typet &struct_type =
@@ -786,12 +781,17 @@ void java_object_factoryt::gen_nondet_pointer_init(
   code_blockt non_null_inst;
 
   if(
+    java_string_library_preprocesst::implements_java_char_sequence_pointer(
+      expr.type()))
+  {
     add_nondet_string_pointer_initialization(
       expr,
       object_factory_parameters.max_nondet_string_length,
       symbol_table,
       loc,
-      assignments))
+      assignments);
+  }
+  else
   {
     gen_pointer_target_init(
       non_null_inst,
