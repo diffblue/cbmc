@@ -17,6 +17,7 @@
 #include <java_bytecode/java_bytecode_language.h>
 #include <iostream>
 #include <testing-utils/load_java_class.h>
+#include <testing-utils/require_symbol.h>
 
 SCENARIO(
   "java_bytecode_parse_derived_generic_class",
@@ -33,12 +34,8 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
     const symbolt &derived_symbol=new_symbol_table.lookup_ref(class_prefix);
-    REQUIRE(derived_symbol.is_type);
-    const typet &derived_type=derived_symbol.type;
-    REQUIRE(derived_type.id()==ID_struct);
-    const class_typet &class_type=to_class_type(derived_type);
-    REQUIRE(class_type.is_class());
-    REQUIRE_FALSE(class_type.get_bool(ID_incomplete_class));
+    const class_typet &derived_class_type=
+      require_symbol::require_complete_class(derived_symbol);
 
     // TODO(tkiley): Currently we do not support extracting information
     // about the base classes generic information.

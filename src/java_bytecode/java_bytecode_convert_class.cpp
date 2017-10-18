@@ -203,7 +203,8 @@ void java_bytecode_convert_classt::convert(const classt &c)
       *class_symbol,
       method_identifier,
       method,
-      symbol_table);
+      symbol_table,
+      get_message_handler());
     lazy_methods[method_identifier]=std::make_pair(class_symbol, &method);
   }
 

@@ -174,57 +174,52 @@ SCENARIO(
           .has_symbol("java::generics$bound_element.f:()Ljava/lang/Number;"));
 
 // TODO: methods should have generic return type (the tests needs to be
-// extended), reintroduce when the issue of signature/descriptor for methods is
-// resolved
-//      THEN("The method should have generic return type")
-//      {
-//        const symbolt &method_symbol=
-//          new_symbol_table
-//            .lookup("java::generics$bound_element.f:()Ljava/lang/Number;")
-//            .value().get();
-//        const typet &symbol_type=method_symbol.type;
-//
-//        REQUIRE(symbol_type.id()==ID_code);
-//
-//        const code_typet &code=to_code_type(symbol_type);
-//      }
+// extended)
+      THEN("The method should have generic return type")
+      {
+        const symbolt &method_symbol=
+          new_symbol_table
+            .lookup_ref("java::generics$bound_element.f:()Ljava/lang/Number;");
+        const typet &symbol_type=method_symbol.type;
+
+        REQUIRE(symbol_type.id()==ID_code);
+
+        const code_typet &code=to_code_type(symbol_type);
+      }
 
       REQUIRE(
         new_symbol_table
           .has_symbol("java::generics$bound_element.g:(Ljava/lang/Number;)V"));
+      THEN("The method should have a generic parameter.")
+      {
+        const symbolt &method_symbol=
+          new_symbol_table
+            .lookup_ref("java::generics$bound_element.g:(Ljava/lang/Number;)V");
+        const typet &symbol_type=method_symbol.type;
 
-// TODO: methods are not recognized as generic, reintroduce when
-// the issue of signature/descriptor for methods is resolved
-//      THEN("The method should have a generic parameter.")
-//      {
-//        const symbolt &method_symbol=
-//          new_symbol_table
-//            .lookup("java::generics$bound_element.g:(Ljava/lang/Number;)V");
-//        const typet &symbol_type=method_symbol.type;
-//
-//        REQUIRE(symbol_type.id()==ID_code);
-//
-//        const code_typet &code=to_code_type(symbol_type);
-//
-//        bool found=false;
-//        for(const auto &p : code.parameters())
-//        {
-//          if(p.get_identifier()==
-//             "java::generics$bound_element.g:(Ljava/lang/Number;)V::e")
-//          {
-//            found=true;
-//            const typet &t=p.type();
-//            REQUIRE(is_java_generic_parameter(p.type()));
-//            const java_generic_parametert &gen_type=
-//              to_java_generic_parameter(p.type());
-//            const symbol_typet &type_var=gen_type.type_variable();
-//            REQUIRE(type_var.get_identifier()==
-//                    "java::generics$bound_element::NUM");
-//            break;
-//          }
-//        }
-//        REQUIRE(found);
-//      }
+        REQUIRE(symbol_type.id()==ID_code);
+
+        const code_typet &code=to_code_type(symbol_type);
+
+        bool found=false;
+        for(const auto &p : code.parameters())
+        {
+          if(p.get_identifier()==
+             "java::generics$bound_element.g:(Ljava/lang/Number;)V::e")
+          {
+            found=true;
+            const typet &t=p.type();
+            REQUIRE(is_java_generic_parameter(p.type()));
+            const java_generic_parametert &gen_type=
+              to_java_generic_parameter(p.type());
+            const symbol_typet &type_var=gen_type.type_variable();
+            REQUIRE(type_var.get_identifier()==
+                    "java::generics$bound_element::NUM");
+            break;
+          }
+        }
+        REQUIRE(found);
+      }
     }
   }
   GIVEN("A class with multiple bounds")
