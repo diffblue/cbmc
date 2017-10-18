@@ -323,6 +323,11 @@ private:
     code_blockt &code);
 
   exprt get_object_at_index(const exprt &argv, int index);
+
+  codet make_init_from_array_code(
+    const code_typet &type,
+    const source_locationt &loc,
+    symbol_tablet &symbol_table);
 };
 
 exprt make_function_application(
