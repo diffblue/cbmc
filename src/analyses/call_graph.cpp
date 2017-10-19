@@ -87,6 +87,64 @@ call_grapht call_grapht::get_inverted() const
   return result;
 }
 
+/// Helper class that maintains a map from function name to grapht node index
+/// and adds nodes to the graph on demand.
+class function_indicest
+{
+  typedef call_grapht::directed_grapht::node_indext node_indext;
+  call_grapht::directed_grapht &graph;
+
+public:
+  std::unordered_map<irep_idt, node_indext, irep_id_hash> function_indices;
+
+  explicit function_indicest(call_grapht::directed_grapht &graph):
+    graph(graph)
+  {
+  }
+
+  node_indext operator[](const irep_idt &function)
+  {
+    auto findit=function_indices.insert({function, 0});
+    if(findit.second)
+    {
+      node_indext new_index=graph.add_node();
+      findit.first->second=new_index;
+      graph[new_index].function=function;
+    }
+    return findit.first->second;
+  }
+};
+
+/// Returns a `grapht` representation of this call graph, suitable for use
+/// with generic grapht algorithms. Note that parallel edges in call_grapht
+/// (e.g. A { B(); B(); } appearing as two A->B edges) will be condensed in
+/// the grapht output, so only one edge will appear. If `collect_callsites`
+/// was set when this call-graph was constructed the edge will be annotated
+/// with the call-site set.
+/// \return grapht representation of this call_grapht
+call_grapht::directed_grapht call_grapht::get_directed_graph() const
+{
+  call_grapht::directed_grapht ret;
+  function_indicest function_indices(ret);
+
+  for(const auto &edge : graph)
+  {
+    auto a_index=function_indices[edge.first];
+    auto b_index=function_indices[edge.second];
+    // Check then create the edge like this to avoid copying the callsites
+    // set once per parallel edge, which could be costly if there are many.
+    if(!ret.has_edge(a_index, b_index))
+    {
+      ret.add_edge(a_index, b_index);
+      if(collect_callsites)
+        ret[a_index].out[b_index].callsites=callsites.at(edge);
+    }
+  }
+
+  ret.nodes_by_name=std::move(function_indices.function_indices);
+  return ret;
+}
+
 std::string call_grapht::format_callsites(const edget &edge) const
 {
   PRECONDITION(collect_callsites);
@@ -143,4 +201,14 @@ void call_grapht::output_xml(std::ostream &out) const
     xmlt::escape_attribute(id2string(edge.second), out);
     out << "\">\n";
   }
+}
+
+optionalt<std::size_t> call_grapht::directed_grapht::get_node_index(
+  const irep_idt &function) const
+{
+  auto findit=nodes_by_name.find(function);
+  if(findit==nodes_by_name.end())
+    return optionalt<node_indext>();
+  else
+    return findit->second;
 }

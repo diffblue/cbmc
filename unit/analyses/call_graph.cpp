@@ -159,5 +159,63 @@ SCENARIO("call_graph",
         }
       }
     }
+
+    WHEN("The call graph is exported as a grapht")
+    {
+      call_grapht::directed_call_grapht exported=
+        call_graph_from_goto_functions.get_directed_graph();
+
+      typedef call_grapht::directed_call_grapht::node_indext node_indext;
+      std::map<irep_idt, node_indext> nodes_by_name;
+      for(node_indext i=0; i<exported.size(); ++i)
+        nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect edges A -> { A, B }, B -> { C, D }")
+      {
+        // Note that means the extra A -> B edge has gone away (the grapht
+        // structure can't represent the parallel edge)
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["A"]));
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["B"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["C"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["D"]));
+      }
+    }
+
+    WHEN("The call graph, with call sites, is exported as a grapht")
+    {
+      call_grapht call_graph_from_goto_functions(goto_model, true);
+      call_grapht::directed_call_grapht exported=
+        call_graph_from_goto_functions.get_directed_graph();
+
+      typedef call_grapht::directed_call_grapht::node_indext node_indext;
+      std::map<irep_idt, node_indext> nodes_by_name;
+      for(node_indext i=0; i<exported.size(); ++i)
+        nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect edges A -> { A, B }, B -> { C, D }")
+      {
+        // Note that means the extra A -> B edge has gone away (the grapht
+        // structure can't represent the parallel edge)
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["A"]));
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["B"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["C"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["D"]));
+      }
+
+      THEN("We expect all edges to have one callsite apart from A -> B with 2")
+      {
+        for(node_indext i=0; i<exported.size(); ++i)
+        {
+          const auto &node=exported[i];
+          for(const auto &edge : node.out)
+          {
+            if(i==nodes_by_name["A"] && edge.first==nodes_by_name["B"])
+              REQUIRE(edge.second.callsites.size()==2);
+            else
+              REQUIRE(edge.second.callsites.size()==1);
+          }
+        }
+      }
+    }
   }
 }

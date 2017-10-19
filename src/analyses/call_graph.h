@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <map>
 
 #include <goto-programs/goto_model.h>
+#include <util/graph.h>
 
 class call_grapht
 {
@@ -40,6 +41,44 @@ public:
   void add(const irep_idt &caller, const irep_idt &callee);
   void add(const irep_idt &caller, const irep_idt &callee, locationt callsite);
   call_grapht get_inverted() const;
+
+  struct edge_with_callsitest
+  {
+    locationst callsites;
+  };
+
+  struct function_nodet:public graph_nodet<edge_with_callsitest>
+  {
+    irep_idt function;
+  };
+
+  /// Directed graph representation of this call graph
+  class directed_grapht : public ::grapht<function_nodet>
+  {
+    friend class call_grapht;
+
+    /// Maps function names onto node indices
+    std::unordered_map<irep_idt, node_indext, irep_id_hash> nodes_by_name;
+
+  public:
+    /// Find the graph node by function name
+    /// \param function: function to find
+    /// \return none if function is not in this graph, or some index otherwise.
+    optionalt<node_indext> get_node_index(const irep_idt &function) const;
+
+    /// Type of the node name -> node index map.
+    typedef
+      std::unordered_map<irep_idt, node_indext, irep_id_hash> nodes_by_namet;
+
+    /// Get the node name -> node index map
+    /// \return node-by-name map
+    const nodes_by_namet &get_nodes_by_name() const
+    {
+      return nodes_by_name;
+    }
+  };
+
+  directed_grapht get_directed_graph() const;
 
 protected:
   void add(const irep_idt &function,
