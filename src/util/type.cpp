@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "type.h"
 
+#include <stack>
+
 void typet::copy_to_subtypes(const typet &type)
 {
   subtypes().push_back(type);
@@ -33,4 +35,34 @@ bool is_number(const typet &type)
          id==ID_signedbv ||
          id==ID_floatbv ||
          id==ID_fixedbv;
+}
+
+template <typename Visitee, typename Visitor>
+void visit_impl(Visitee &visitee, Visitor &visitor)
+{
+  std::stack<decltype(&visitee)> stack;
+  stack.push(&visitee);
+
+  while(!stack.empty())
+  {
+    auto &type = *stack.top();
+    stack.pop();
+
+    visitor(type);
+
+    for(auto &subtype : type.subtypes())
+    {
+      stack.push(&subtype);
+    }
+  }
+}
+
+void visit(typet &visitee, type_visitort &visitor)
+{
+  visit_impl(visitee, visitor);
+}
+
+void visit(const typet &visitee, const_type_visitort &visitor)
+{
+  visit_impl(visitee, visitor);
 }
