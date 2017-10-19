@@ -203,4 +203,21 @@ pre-defined types:
 bool is_number(const typet &type);
 // rational, real, integer, complex, unsignedbv, signedbv, floatbv
 
+class type_visitort
+{
+public:
+  virtual ~type_visitort() = default;
+  virtual void operator()(typet &type) = 0;
+};
+
+class const_type_visitort
+{
+public:
+  virtual ~const_type_visitort() = default;
+  virtual void operator()(const typet &type) = 0;
+};
+
+void visit(typet &type, type_visitort &visitor);
+void visit(const typet &type, const_type_visitort &visitor);
+
 #endif // CPROVER_UTIL_TYPE_H
