@@ -269,11 +269,19 @@ install clang-format locally and run it against your code as you are working.
 Different versions of clang-format have slightly different behaviors. CBMC uses
 clang-format-3.8 as it is available the repositories for Ubuntu 16.04 and
 Homebrew.
-To install, run:
+To install on a Unix-like system, try installing using the system package
+manager:
 ```
-sudo apt install clang-format-3.8 # Run this on Ubuntu, Debian etc.
-brew install clang-format-3.8     # Run this on a Mac with Homebrew installed
+apt-get install clang-format-3.8  # Run this on Ubuntu, Debian etc.
+brew install clang-format@3.8     # Run this on a Mac with Homebrew installed
 ```
+
+If your platform doesn't have a package for clang-format, you can download a
+pre-built binary, or compile clang-format yourself using the appropriate files
+from the [LLVM Downloads page](http://releases.llvm.org/download.html).
+
+An installer for Windows (along with a Visual Studio plugin) can be found at
+the [LLVM Snapshot Builds page](http://llvm.org/builds/).
 
 ### FORMATTING A RANGE OF COMMITS
 
