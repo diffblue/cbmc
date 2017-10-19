@@ -252,7 +252,13 @@ exprt string_constraint_generatort::associate_array_to_pointer(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 2);
-  array_string_exprt array_expr = to_array_string_expr(f.arguments()[0]);
+
+  /// \todo: we allow expression of the form of `arr[0]` instead of `arr` as
+  ///        the array argument but this could go away.
+  array_string_exprt array_expr = to_array_string_expr(
+    f.arguments()[0].id() == ID_index ? to_index_expr(f.arguments()[0]).array()
+                                      : f.arguments()[0]);
+
   const exprt &pointer_expr = f.arguments()[1];
 
   const auto &length = array_expr.length();
