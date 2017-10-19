@@ -105,6 +105,6 @@ elseif("${sat_impl}" STREQUAL "glucose")
     target_link_libraries(solvers glucose-condensed)
 endif()
 
-target_link_libraries(solvers util)
+target_link_libraries(solvers java_bytecode util)
 
 generic_includes(solvers)

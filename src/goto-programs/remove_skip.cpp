@@ -157,6 +157,9 @@ void remove_skip(goto_functionst &goto_functions)
 {
   Forall_goto_functions(f_it, goto_functions)
     remove_skip(f_it->second.body);
+
+  // we may remove targets
+  goto_functions.update();
 }
 
 void remove_skip(goto_modelt &goto_model)

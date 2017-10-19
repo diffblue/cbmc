@@ -1,15 +1,15 @@
 /*******************************************************************\
 
-Module: CBMC Command Line Option Processing
+Module: JBMC Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
 /// \file
-/// CBMC Command Line Option Processing
+/// JBMC Command Line Option Processing
 
-#include "cbmc_parse_options.h"
+#include "jbmc_parse_options.h"
 
 #include <fstream>
 #include <cstdlib> // exit()
@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/memory_info.h>
 #include <util/invariant.h>
 
-#include <ansi-c/c_preprocess.h>
+#include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/convert_nondet.h>
 #include <goto-programs/initialize_goto_model.h>
@@ -32,9 +32,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/mm_io.h>
-#include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_function_pointers.h>
+#include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_exceptions.h>
@@ -44,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
 #include <goto-programs/remove_static_init_loops.h>
+#include <goto-programs/replace_java_nondet.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
@@ -62,31 +62,30 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "cbmc_solvers.h"
-#include "bmc.h"
-#include "version.h"
-#include "xml_interface.h"
+#include <java_bytecode/java_bytecode_language.h>
 
-cbmc_parse_optionst::cbmc_parse_optionst(int argc, const char **argv):
-  parse_options_baset(CBMC_OPTIONS, argc, argv),
-  xml_interfacet(cmdline),
+#include <cbmc/cbmc_solvers.h>
+#include <cbmc/bmc.h>
+#include <cbmc/version.h>
+
+jbmc_parse_optionst::jbmc_parse_optionst(int argc, const char **argv):
+  parse_options_baset(JBMC_OPTIONS, argc, argv),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "JBMC " CBMC_VERSION)
 {
 }
 
-::cbmc_parse_optionst::cbmc_parse_optionst(
+::jbmc_parse_optionst::jbmc_parse_optionst(
   int argc,
   const char **argv,
   const std::string &extra_options):
-  parse_options_baset(CBMC_OPTIONS+extra_options, argc, argv),
-  xml_interfacet(cmdline),
+  parse_options_baset(JBMC_OPTIONS+extra_options, argc, argv),
   messaget(ui_message_handler),
-  ui_message_handler(cmdline, "CBMC " CBMC_VERSION)
+  ui_message_handler(cmdline, "JBMC " CBMC_VERSION)
 {
 }
 
-void cbmc_parse_optionst::eval_verbosity()
+void jbmc_parse_optionst::eval_verbosity()
 {
   // this is our default verbosity
   unsigned int v=messaget::M_STATISTICS;
@@ -101,7 +100,7 @@ void cbmc_parse_optionst::eval_verbosity()
   ui_message_handler.set_verbosity(v);
 }
 
-void cbmc_parse_optionst::get_command_line_options(optionst &options)
+void jbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
   {
@@ -117,27 +116,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("cover"))
     options.set_option("cover", cmdline.get_values("cover"));
-
-  if(cmdline.isset("mm"))
-    options.set_option("mm", cmdline.get_value("mm"));
-
-  if(cmdline.isset("c89"))
-    config.ansi_c.set_c89();
-
-  if(cmdline.isset("c99"))
-    config.ansi_c.set_c99();
-
-  if(cmdline.isset("c11"))
-    config.ansi_c.set_c11();
-
-  if(cmdline.isset("cpp98"))
-    config.cpp.set_cpp98();
-
-  if(cmdline.isset("cpp03"))
-    config.cpp.set_cpp03();
-
-  if(cmdline.isset("cpp11"))
-    config.cpp.set_cpp11();
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -187,6 +165,10 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   // all checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
+
+  // unwind loops in java enum static initialization
+  if(cmdline.isset("java-unwind-enum-static"))
+    options.set_option("java-unwind-enum-static", true);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -282,9 +264,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       "max-node-refinement",
       cmdline.get_value("max-node-refinement"));
 
-  if(cmdline.isset("aig"))
-    options.set_option("aig", true);
-
   // SMT Options
   bool version_set=false;
 
@@ -305,7 +284,6 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("fpa"))
     options.set_option("fpa", true);
-
 
   bool solver_set=false;
 
@@ -373,13 +351,14 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       }
       else
       {
-        assert(options.get_bool_option("smt2"));
+        INVARIANT(options.get_bool_option("smt2"), "smt2 set");
         options.set_option("z3", true), solver_set=true;
       }
     }
   }
+
   // Either have solver and standard version set, or neither.
-  assert(version_set==solver_set);
+  INVARIANT(version_set==solver_set, "solver and version set");
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
@@ -410,7 +389,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 }
 
 /// invoke main modules
-int cbmc_parse_optionst::doit()
+int jbmc_parse_optionst::doit()
 {
   if(cmdline.isset("version"))
   {
@@ -445,38 +424,17 @@ int cbmc_parse_optionst::doit()
   //
   // Print a banner
   //
-  status() << "CBMC version " CBMC_VERSION " "
+  status() << "JBMC version " CBMC_VERSION " "
            << sizeof(void *)*8 << "-bit "
            << config.this_architecture() << " "
            << config.this_operating_system() << eom;
 
-  //
-  // Unwinding of transition systems is done by hw-cbmc.
-  //
-
-  if(cmdline.isset("module") ||
-     cmdline.isset("gen-interface"))
-  {
-    error() << "This version of CBMC has no support for "
-               " hardware modules. Please use hw-cbmc." << eom;
-    return 1; // should contemplate EX_USAGE from sysexits.h
-  }
-
-  register_languages();
-
-  if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(get_message_handler())?8:0;
-
-  if(cmdline.isset("preprocess"))
-  {
-    preprocessing();
-    return 0; // should contemplate EX_OK from sysexits.h
-  }
+  register_language(new_ansi_c_language);
+  register_language(new_java_bytecode_language);
 
   if(cmdline.isset("show-parse-tree"))
   {
-    if(cmdline.args.size()!=1 ||
-       is_goto_binary(cmdline.args[0]))
+    if(cmdline.args.size()!=1)
     {
       error() << "Please give exactly one source file" << eom;
       return 6;
@@ -527,8 +485,7 @@ int cbmc_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
-  if(cmdline.isset("show-claims") || // will go away
-     cmdline.isset("show-properties")) // use this one
+  if(cmdline.isset("show-properties"))
   {
     show_properties(goto_model, ui_message_handler.get_ui());
     return 0; // should contemplate EX_OK from sysexits.h
@@ -537,18 +494,24 @@ int cbmc_parse_optionst::doit()
   if(set_properties())
     return 7; // should contemplate EX_USAGE from sysexits.h
 
+  // unwinds <clinit> loops to number of enum elements
+  // side effect: add this as explicit unwind to unwind set
+  if(options.get_bool_option("java-unwind-enum-static"))
+    remove_static_init_loops(goto_model, options, get_message_handler());
+
   // get solver
-  cbmc_solverst cbmc_solvers(
+  cbmc_solverst jbmc_solvers(
     options,
     goto_model.symbol_table,
     get_message_handler());
-  cbmc_solvers.set_ui(ui_message_handler.get_ui());
 
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+  jbmc_solvers.set_ui(ui_message_handler.get_ui());
+
+  std::unique_ptr<cbmc_solverst::solvert> jbmc_solver;
 
   try
   {
-    cbmc_solver=cbmc_solvers.get_solver();
+    jbmc_solver=jbmc_solvers.get_solver();
   }
 
   catch(const char *error_msg)
@@ -557,7 +520,7 @@ int cbmc_parse_optionst::doit()
     return 1; // should contemplate EX_SOFTWARE from sysexits.h
   }
 
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
+  prop_convt &prop_conv=jbmc_solver->prop_conv();
 
   bmct bmc(
     options,
@@ -569,14 +532,11 @@ int cbmc_parse_optionst::doit()
   return do_bmc(bmc);
 }
 
-bool cbmc_parse_optionst::set_properties()
+bool jbmc_parse_optionst::set_properties()
 {
   try
   {
-    if(cmdline.isset("claim")) // will go away
-      ::set_properties(goto_model, cmdline.get_values("claim"));
-
-    if(cmdline.isset("property")) // use this one
+    if(cmdline.isset("property"))
       ::set_properties(goto_model, cmdline.get_values("property"));
   }
 
@@ -600,7 +560,7 @@ bool cbmc_parse_optionst::set_properties()
   return false;
 }
 
-int cbmc_parse_optionst::get_goto_program(
+int jbmc_parse_optionst::get_goto_program(
   const optionst &options)
 {
   if(cmdline.args.empty())
@@ -668,62 +628,7 @@ int cbmc_parse_optionst::get_goto_program(
   return -1; // no error, continue
 }
 
-void cbmc_parse_optionst::preprocessing()
-{
-  try
-  {
-    if(cmdline.args.size()!=1)
-    {
-      error() << "Please provide one program to preprocess" << eom;
-      return;
-    }
-
-    std::string filename=cmdline.args[0];
-
-    std::ifstream infile(filename);
-
-    if(!infile)
-    {
-      error() << "failed to open input file" << eom;
-      return;
-    }
-
-    std::unique_ptr<languaget> language=get_language_from_filename(filename);
-    language->get_language_options(cmdline);
-
-    if(language==nullptr)
-    {
-      error() << "failed to figure out type of file" << eom;
-      return;
-    }
-
-    language->set_message_handler(get_message_handler());
-
-    if(language->preprocess(infile, filename, std::cout))
-      error() << "PREPROCESSING ERROR" << eom;
-  }
-
-  catch(const char *e)
-  {
-    error() << e << eom;
-  }
-
-  catch(const std::string e)
-  {
-    error() << e << eom;
-  }
-
-  catch(int)
-  {
-  }
-
-  catch(std::bad_alloc)
-  {
-    error() << "Out of memory" << eom;
-  }
-}
-
-bool cbmc_parse_optionst::process_goto_program(
+bool jbmc_parse_optionst::process_goto_program(
   const optionst &options)
 {
   try
@@ -744,10 +649,12 @@ bool cbmc_parse_optionst::process_goto_program(
       get_message_handler(),
       goto_model,
       cmdline.isset("pointer-check"));
+    // Java virtual functions -> explicit dispatch tables:
+    remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof)
     remove_exceptions(goto_model);
-
-    mm_io(goto_model);
+    // Similar removal of RTTI inspection:
+    remove_instanceof(goto_model);
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
@@ -757,6 +664,30 @@ bool cbmc_parse_optionst::process_goto_program(
     remove_vector(goto_model);
     remove_complex(goto_model);
     rewrite_union(goto_model);
+
+    // Similar removal of java nondet statements:
+    // TODO Should really get this from java_bytecode_language somehow, but we
+    // don't have an instance of that here.
+    object_factory_parameterst factory_params;
+    factory_params.max_nondet_array_length=
+      cmdline.isset("java-max-input-array-length")
+        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    factory_params.max_nondet_string_length=
+      cmdline.isset("string-max-input-length")
+        ? std::stoul(cmdline.get_value("string-max-input-length"))
+        : MAX_NONDET_STRING_LENGTH;
+    factory_params.max_nondet_tree_depth=
+      cmdline.isset("java-max-input-tree-depth")
+        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+        : MAX_NONDET_TREE_DEPTH;
+
+    replace_java_nondet(goto_model);
+
+    convert_nondet(
+      goto_model,
+      get_message_handler(),
+      factory_params);
 
     // add generic checks
     status() << "Generic Property Instrumentation" << eom;
@@ -832,6 +763,7 @@ bool cbmc_parse_optionst::process_goto_program(
 
     // remove any skips introduced since coverage instrumentation
     remove_skip(goto_model);
+    goto_model.goto_functions.update();
   }
 
   catch(const char *e)
@@ -861,7 +793,7 @@ bool cbmc_parse_optionst::process_goto_program(
 }
 
 /// invoke main modules
-int cbmc_parse_optionst::do_bmc(bmct &bmc)
+int jbmc_parse_optionst::do_bmc(bmct &bmc)
 {
   bmc.set_ui(ui_message_handler.get_ui());
 
@@ -890,11 +822,11 @@ int cbmc_parse_optionst::do_bmc(bmct &bmc)
 }
 
 /// display command line help
-void cbmc_parse_optionst::help()
+void jbmc_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
+    "* *   JBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
@@ -904,12 +836,11 @@ void cbmc_parse_optionst::help()
     "* *              Daniel Kroening, Edmund Clarke             * *\n"
     "* * Carnegie Mellon University, Computer Science Department * *\n"
     "* *                 kroening@kroening.com                   * *\n"
-    "* *        Protected in part by U.S. patent 7,225,417       * *\n"
     "\n"
     "Usage:                       Purpose:\n"
     "\n"
-    " cbmc [-?] [-h] [--help]      show help\n"
-    " cbmc file.c ...              source file names\n"
+    " jbmc [-?] [-h] [--help]      show help\n"
+    " jbmc class                   name of class to be checked\n"
     "\n"
     "Analysis options:\n"
     " --show-properties            show the properties, but don't run analysis\n" // NOLINT(*)
@@ -918,44 +849,7 @@ void cbmc_parse_optionst::help()
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     "\n"
-    "C/C++ frontend options:\n"
-    " -I path                      set include path (C/C++)\n"
-    " -D macro                     define preprocessor macro (C/C++)\n"
-    " --preprocess                 stop after preprocessing\n"
-    " --16, --32, --64             set width of int\n"
-    " --LP64, --ILP64, --LLP64,\n"
-    "   --ILP32, --LP32            set width of int, long and pointers\n"
-    " --little-endian              allow little-endian word-byte conversions\n"
-    " --big-endian                 allow big-endian word-byte conversions\n"
-    " --unsigned-char              make \"char\" unsigned by default\n"
-    " --mm model                   set memory model (default: sc)\n"
-    " --arch                       set architecture (default: "
-                                   << configt::this_architecture() << ")\n"
-    " --os                         set operating system (default: "
-                                   << configt::this_operating_system() << ")\n"
-    " --c89/99/11                  set C language standard (default: "
-                                   << (configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C89?"c89":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C99?"c99":
-                                       configt::ansi_ct::default_c_standard()==
-                                       configt::ansi_ct::c_standardt::C11?"c11":"") << ")\n" // NOLINT(*)
-    " --cpp98/03/11                set C++ language standard (default: "
-                                   << (configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP98?"cpp98": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP03?"cpp03": // NOLINT(*)
-                                       configt::cppt::default_cpp_standard()==
-                                       configt::cppt::cpp_standardt::CPP11?"cpp11":"") << ")\n" // NOLINT(*)
-    #ifdef _WIN32
-    " --gcc                        use GCC as preprocessor\n"
-    #endif
-    " --no-arch                    don't set up an architecture\n"
-    " --no-library                 disable built-in abstract C library\n"
-    " --round-to-nearest           rounding towards nearest even (default)\n"
-    " --round-to-plus-inf          rounding towards plus infinity\n"
-    " --round-to-minus-inf         rounding towards minus infinity\n"
-    " --round-to-zero              rounding towards zero\n"
+    " --no-library                 disable built-in abstract Java library\n"
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"
@@ -972,9 +866,13 @@ void cbmc_parse_optionst::help()
     " --cover CC                   create test-suite with coverage criterion CC\n" // NOLINT(*)
     " --mm MM                      memory consistency model for concurrent programs\n" // NOLINT(*)
     "\n"
-    "Semantic transformations:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
+    "Java Bytecode frontend options:\n"
+    " --classpath dir/jar          set the classpath\n"
+    " --main-class class-name      set the name of the main class\n"
+    JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP
+    // This one is handled by jbmc_parse_options not by the Java frontend,
+    // hence its presence here:
+    " --java-unwind-enum-static    try to unwind loops in static initialization of enums\n" // NOLINT(*)
     "\n"
     "BMC options:\n"
     " --program-only               only show program expression\n"
@@ -1015,7 +913,6 @@ void cbmc_parse_optionst::help()
     "Other options:\n"
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
-    " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
     " --verbosity #                verbosity level\n"
     "\n";

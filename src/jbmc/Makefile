@@ -1,22 +1,8 @@
-SRC = all_properties.cpp \
-      bmc.cpp \
-      bmc_cover.cpp \
-      bv_cbmc.cpp \
-      cbmc_dimacs.cpp \
-      cbmc_languages.cpp \
-      cbmc_main.cpp \
-      cbmc_parse_options.cpp \
-      cbmc_solvers.cpp \
-      counterexample_beautification.cpp \
-      fault_localization.cpp \
-      show_vcc.cpp \
-      symex_bmc.cpp \
-      symex_coverage.cpp \
-      xml_interface.cpp \
+SRC = jbmc_main.cpp \
+      jbmc_parse_options.cpp \
       # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
-      ../cpp/cpp$(LIBEXT) \
       ../java_bytecode/java_bytecode$(LIBEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
@@ -40,7 +26,20 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../assembler/assembler$(LIBEXT) \
       ../solvers/solvers$(LIBEXT) \
       ../util/util$(LIBEXT) \
-      ../json/json$(LIBEXT)
+      ../miniz/miniz$(OBJEXT) \
+      ../json/json$(LIBEXT) \
+      ../cbmc/all_properties$(OBJEXT) \
+      ../cbmc/bmc$(OBJEXT) \
+      ../cbmc/bmc_cover$(OBJEXT) \
+      ../cbmc/bv_cbmc$(OBJEXT) \
+      ../cbmc/cbmc_dimacs$(OBJEXT) \
+      ../cbmc/cbmc_solvers$(OBJEXT) \
+      ../cbmc/counterexample_beautification$(OBJEXT) \
+      ../cbmc/fault_localization$(OBJEXT) \
+      ../cbmc/show_vcc$(OBJEXT) \
+      ../cbmc/symex_bmc$(OBJEXT) \
+      ../cbmc/symex_coverage$(OBJEXT) \
+      # Empty last line
 
 INCLUDES= -I ..
 
@@ -49,26 +48,16 @@ LIBS =
 include ../config.inc
 include ../common
 
-CLEANFILES = cbmc$(EXEEXT)
+CLEANFILES = jbmc$(EXEEXT)
 
-all: cbmc$(EXEEXT)
-
-ifneq ($(wildcard ../bv_refinement/Makefile),)
-  OBJ += ../bv_refinement/bv_refinement$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_BV_REFINEMENT
-endif
-
-ifneq ($(wildcard ../jsil/Makefile),)
-  OBJ += ../jsil/jsil$(LIBEXT)
-  CP_CXXFLAGS += -DHAVE_JSIL
-endif
+all: jbmc$(EXEEXT)
 
 ###############################################################################
 
-cbmc$(EXEEXT): $(OBJ)
+jbmc$(EXEEXT): $(OBJ)
 	$(LINKBIN)
 
-.PHONY: cbmc-mac-signed
+.PHONY: jbmc-mac-signed
 
-cbmc-mac-signed: cbmc$(EXEEXT)
-	strip cbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) cbmc$(EXEEXT)
+jbmc-mac-signed: jbmc$(EXEEXT)
+	strip jbmc$(EXEEXT) ; codesign -v -s $(OSX_IDENTITY) jbmc$(EXEEXT)

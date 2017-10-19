@@ -2,17 +2,18 @@
 file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
 list(REMOVE_ITEM sources
-    ${CMAKE_CURRENT_SOURCE_DIR}/cbmc_main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/jbmc_main.cpp
 )
-add_library(cbmc-lib ${sources} ${headers})
+add_library(jbmc-lib ${sources} ${headers})
 
-generic_includes(cbmc-lib)
+generic_includes(jbmc-lib)
 
-target_link_libraries(cbmc-lib
+target_link_libraries(jbmc-lib
     analyses
     ansi-c
     assembler
     big-int
+    cbmc-lib
     cpp
     goto-instrument-lib
     goto-programs
@@ -27,9 +28,9 @@ target_link_libraries(cbmc-lib
     xml
 )
 
-add_if_library(cbmc-lib bv_refinement)
-add_if_library(cbmc-lib jsil)
+add_if_library(jbmc-lib bv_refinement)
+add_if_library(jbmc-lib jsil)
 
 # Executable
-add_executable(cbmc cbmc_main.cpp)
-target_link_libraries(cbmc cbmc-lib)
+add_executable(jbmc jbmc_main.cpp)
+target_link_libraries(jbmc jbmc-lib)

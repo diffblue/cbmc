@@ -1,10 +1,11 @@
-DIRS = ansi-c big-int cbmc cpp goto-cc goto-instrument goto-programs \
+DIRS = ansi-c big-int cbmc jbmc cpp goto-cc goto-instrument goto-programs \
        goto-symex langapi pointer-analysis solvers util linking xmllang \
        assembler analyses java_bytecode \
        json goto-analyzer jsil goto-diff clobber \
        memory-models miniz
 
-all: cbmc.dir goto-cc.dir goto-instrument.dir goto-analyzer.dir goto-diff.dir
+all: cbmc.dir jbmc.dir goto-cc.dir goto-instrument.dir \
+     goto-analyzer.dir goto-diff.dir
 
 ###############################################################################
 
@@ -18,9 +19,11 @@ $(patsubst %, %.dir, $(filter-out big-int util, $(DIRS))): util.dir
 
 cpp.dir: ansi-c.dir linking.dir
 
+java_bytecode.dir: miniz.dir
+
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir java_bytecode.dir \
-           jsil.dir miniz.dir
+           jsil.dir
 
 goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
                      goto-symex.dir linking.dir analyses.dir solvers.dir \
@@ -29,6 +32,8 @@ goto-instrument.dir: languages goto-programs.dir pointer-analysis.dir \
 cbmc.dir: languages solvers.dir goto-symex.dir analyses.dir \
           pointer-analysis.dir goto-programs.dir linking.dir \
           goto-instrument.dir
+
+jbmc.dir: java_bytecode.dir cbmc.dir
 
 goto-analyzer.dir: languages analyses.dir goto-programs.dir linking.dir \
                    json.dir goto-instrument.dir
