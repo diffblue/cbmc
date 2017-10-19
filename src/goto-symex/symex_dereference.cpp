@@ -221,8 +221,9 @@ exprt goto_symext::address_arithmetic(
     throw "goto_symext::address_arithmetic does not handle "+expr.id_string();
 
   const typet &expr_type=ns.follow(expr.type());
-  assert((expr_type.id()==ID_array && !keep_array) ||
-         base_type_eq(pointer_type(expr_type), result.type(), ns));
+  INVARIANT((expr_type.id()==ID_array && !keep_array) ||
+            base_type_eq(pointer_type(expr_type), result.type(), ns),
+            "either non-persistent array or pointer to result");
 
   return result;
 }

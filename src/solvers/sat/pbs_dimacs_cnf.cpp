@@ -106,7 +106,7 @@ bool pbs_dimacs_cnft::pbs_solve()
   command += " -a > temp.out";
 
   int res=system(command.c_str());
-  assert(0==res);
+  CHECK_RETURN(0==res);
 
   std::ifstream file("temp.out");
   std::string line;

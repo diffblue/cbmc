@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <solvers/refinement/string_constraint_instantiation.h>
 

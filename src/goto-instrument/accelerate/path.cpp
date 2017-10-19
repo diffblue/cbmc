@@ -22,5 +22,5 @@ void output_path(
   std::ostream &str)
 {
   for(const auto &step : path)
-    program.output_instruction(ns, "path", str, step.loc);
+    program.output_instruction(ns, "path", str, *step.loc);
 }

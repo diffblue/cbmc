@@ -66,8 +66,29 @@ public:
   {
     return symbols.find(name)!=symbols.end();
   }
-  opt_const_symbol_reft lookup(const irep_idt &identifier) const;
-  virtual opt_symbol_reft get_writeable(const irep_idt &identifier)=0;
+
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param id: The name of the symbol to look for
+  /// \return an optional reference, set if found, nullptr otherwise.
+  const symbolt *lookup(const irep_idt &identifier) const;
+
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param id: The name of the symbol to look for
+  /// \return an optional reference, set if found, unset otherwise.
+  virtual symbolt *get_writeable(const irep_idt &identifier)=0;
+
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param id: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  const symbolt &lookup_ref(const irep_idt &id) const
+    { return symbols.at(id); }
+
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param id: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  virtual symbolt &get_writeable_ref(const irep_idt &id)=0;
 
   bool add(const symbolt &symbol);
   /// Move or copy a new symbol to the symbol table
@@ -165,7 +186,9 @@ public:
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
 
-  virtual opt_symbol_reft get_writeable(const irep_idt &identifier) override;
+  virtual symbolt *get_writeable(const irep_idt &identifier) override;
+  virtual symbolt &get_writeable_ref(const irep_idt &identifier) override
+    { return internal_symbols.at(identifier); }
 
   virtual std::pair<symbolt &, bool> insert(symbolt symbol) override;
 

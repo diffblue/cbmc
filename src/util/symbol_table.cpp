@@ -11,13 +11,13 @@
 /// \param identifier: The name of the symbol to look for
 /// \return Returns an optional reference to the found symbol, without a value
 ///   if a symbol with the given name does not exist in the symbol table
-symbol_tablet::opt_const_symbol_reft symbol_tablet::lookup(
+const symbolt *symbol_tablet::lookup(
   const irep_idt &identifier) const
 {
   symbolst::const_iterator it=symbols.find(identifier);
   if(it==symbols.end())
-    return opt_const_symbol_reft();
-  return std::cref(it->second);
+    return nullptr;
+  return &it->second;
 }
 
 /// Add a new symbol to the symbol table
@@ -68,6 +68,7 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
 /// Remove a symbol from the symbol table
 /// \param name: The name of the symbol to remove
 /// \return Returns a boolean indicating whether the process failed
+///   i.e. false if the symbol was removed, or true if it didn't exist.
 bool symbol_tablet::remove(const irep_idt &name)
 {
   symbolst::const_iterator entry=symbols.find(name);
@@ -109,13 +110,13 @@ std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
 /// \param identifier: The name of the symbol to look for
 /// \return Returns an optional reference to the found symbol, without a value
 ///   if a symbol with the given name does not exist in the symbol table
-symbol_tablet::opt_symbol_reft concrete_symbol_tablet::get_writeable(
+symbolt *concrete_symbol_tablet::get_writeable(
   const irep_idt &identifier)
 {
   symbolst::iterator it=internal_symbols.find(identifier);
   if(it==symbols.end())
-    return opt_symbol_reft();
-  return std::ref(it->second);
+    return nullptr;
+  return &it->second;
 }
 
 std::pair<symbolt &, bool> concrete_symbol_tablet::insert(symbolt symbol)

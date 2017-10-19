@@ -21,6 +21,7 @@ SRC = basic_blocks.cpp \
       goto_program.cpp \
       goto_program_irep.cpp \
       goto_program_template.cpp \
+      goto_statistics.cpp \
       goto_trace.cpp \
       graphml_witness.cpp \
       instrument_preconditions.cpp \

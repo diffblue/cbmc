@@ -200,7 +200,7 @@ void linkingt::detailed_conflict_report_rec(
           conflict_path=conflict_path_before;
           conflict_path.type()=t1;
           conflict_path=
-            member_exprt(conflict_path, components1[i].get_name());
+            member_exprt(conflict_path, components1[i]);
 
           if(depth>0 &&
              parent_types.find(t1)==parent_types.end())
@@ -1290,7 +1290,7 @@ void linkingt::copy_symbols()
        named_symbol.second.value.is_not_nil())
     {
       object_type_updates(
-        main_symbol_table.get_writeable(named_symbol.first)->get().value);
+        main_symbol_table.get_writeable_ref(named_symbol.first).value);
     }
   }
 }

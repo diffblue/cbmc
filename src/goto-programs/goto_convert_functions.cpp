@@ -140,13 +140,14 @@ void goto_convert_functionst::convert_function(const irep_idt &identifier)
   const symbolt &symbol=ns.lookup(identifier);
   goto_functionst::goto_functiont &f=functions.function_map[identifier];
 
+  if(f.body_available())
+    return; // already converted
+
   // make tmp variables local to function
   tmp_symbol_prefix=id2string(symbol.name)+"::$tmp::";
   temporary_counter=0;
 
   f.type=to_code_type(symbol.type);
-  if(f.body_available())
-    return; // already converted
 
   if(symbol.value.is_nil() ||
      symbol.value.id()=="compiled") /* goto_inline may have removed the body */

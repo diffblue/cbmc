@@ -170,7 +170,7 @@ static bool build_graph(
   {
     const graphmlt::nodet &n=dest[i];
 
-    assert(!n.node_name.empty());
+    INVARIANT(!n.node_name.empty(), "node should be named");
   }
 
   assert(!entrynode.empty());

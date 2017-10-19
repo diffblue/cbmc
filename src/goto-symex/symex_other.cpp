@@ -17,9 +17,66 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/rename.h>
 #include <util/base_type.h>
 #include <util/std_expr.h>
+#include <util/std_code.h>
 #include <util/byte_operators.h>
 
 #include <util/c_types.h>
+
+void goto_symext::havoc_rec(
+  statet &state,
+  const guardt &guard,
+  const exprt &dest)
+{
+  if(dest.id()==ID_symbol)
+  {
+    exprt lhs;
+
+    if(guard.is_true())
+      lhs=dest;
+    else
+      lhs=if_exprt(
+        guard.as_expr(), dest, exprt("NULL-object", dest.type()));
+
+    code_assignt assignment;
+    assignment.lhs()=lhs;
+    assignment.rhs()=side_effect_expr_nondett(dest.type());
+
+    symex_assign(state, assignment);
+  }
+  else if(dest.id()==ID_byte_extract_little_endian ||
+          dest.id()==ID_byte_extract_big_endian)
+  {
+    havoc_rec(state, guard, to_byte_extract_expr(dest).op());
+  }
+  else if(dest.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(dest);
+
+    guardt guard_t=state.guard;
+    guard_t.add(if_expr.cond());
+    havoc_rec(state, guard_t, if_expr.true_case());
+
+    guardt guard_f=state.guard;
+    guard_f.add(not_exprt(if_expr.cond()));
+    havoc_rec(state, guard_f, if_expr.false_case());
+  }
+  else if(dest.id()==ID_typecast)
+  {
+    havoc_rec(state, guard, to_typecast_expr(dest).op());
+  }
+  else if(dest.id()==ID_index)
+  {
+    havoc_rec(state, guard, to_index_expr(dest).array());
+  }
+  else if(dest.id()==ID_member)
+  {
+    havoc_rec(state, guard, to_member_expr(dest).struct_op());
+  }
+  else
+  {
+    // consider printing a warning
+  }
+}
 
 void goto_symext::symex_other(
   const goto_functionst &goto_functions,
@@ -212,6 +269,17 @@ void goto_symext::symex_other(
   else if(statement==ID_fence)
   {
     target.memory_barrier(state.guard.as_expr(), state.source);
+  }
+  else if(statement==ID_havoc_object)
+  {
+    DATA_INVARIANT(code.operands().size()==1,
+                   "havoc_object must have one operand");
+
+    // we need to add dereferencing for the first operand
+    exprt object=dereference_exprt(code.op0(), empty_typet());
+    clean_expr(object, state, true);
+
+    havoc_rec(state, guardt(), object);
   }
   else
     throw "unexpected statement: "+id2string(statement);

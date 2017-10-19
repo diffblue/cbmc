@@ -114,7 +114,7 @@ void interpretert::show_state()
       ns,
       function->first,
       status(),
-      pc);
+      *pc);
 
   status() << eom;
 }
@@ -417,7 +417,7 @@ void interpretert::execute_decl()
 
 /// retrieves the member at offset
 /// \par parameters: an object and a memory offset
-irep_idt interpretert::get_component_id(
+struct_typet::componentt interpretert::get_component(
   const irep_idt &object,
   unsigned offset)
 {
@@ -428,15 +428,16 @@ irep_idt interpretert::get_component_id(
 
   const struct_typet &struct_type=to_struct_type(real_type);
   const struct_typet::componentst &components=struct_type.components();
-  for(struct_typet::componentst::const_iterator it=components.begin();
-      it!=components.end(); it++)
+
+  for(const auto &c : components)
   {
     if(offset<=0)
-      return it->id();
-    size_t size=get_size(it->type());
-    offset-=size;
+      return c;
+
+    offset-=get_size(c.type());
   }
-  return object;
+
+  throw "access out of struct bounds";
 }
 
 /// returns the type object corresponding to id
@@ -444,7 +445,7 @@ typet interpretert::get_type(const irep_idt &id) const
 {
   dynamic_typest::const_iterator it=dynamic_types.find(id);
   if(it==dynamic_types.end())
-    return symbol_table.lookup(id)->get().type;
+    return symbol_table.lookup_ref(id).type;
   return it->second;
 }
 
@@ -600,6 +601,7 @@ exprt interpretert::get_value(
       result.set_value(ID_NULL);
       return result;
     }
+
     if(rhs[offset]<memory.size())
     {
       // We want the symbol pointed to
@@ -612,15 +614,18 @@ exprt interpretert::get_value(
 
       if(offset==0)
         return address_of_exprt(symbol_expr);
+
       if(ns.follow(type).id()==ID_struct)
       {
-        irep_idt member_id=get_component_id(identifier, offset);
-        member_exprt member_expr(symbol_expr, member_id);
+        const auto c=get_component(identifier, offset);
+        member_exprt member_expr(symbol_expr, c);
         return address_of_exprt(member_expr);
       }
+
       index_exprt index_expr(
         symbol_expr,
         from_integer(offset, integer_typet()));
+
       return index_expr;
     }
 
@@ -1041,7 +1046,7 @@ exprt interpretert::get_value(const irep_idt &id)
   if(findit!=dynamic_types.end())
     get_type=findit->second;
   else
-    get_type=symbol_table.lookup(id)->get().type;
+    get_type=symbol_table.lookup_ref(id).type;
 
   symbol_exprt symbol_expr(id, get_type);
   mp_integer whole_lhs_object_address=evaluate_address(symbol_expr);
@@ -1078,4 +1083,3 @@ void interpreter(
     message_handler);
   interpreter();
 }
-

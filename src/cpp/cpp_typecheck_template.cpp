@@ -107,9 +107,7 @@ void cpp_typecheckt::typecheck_class_template(
 
   // check if we have it already
 
-  symbol_tablet::opt_symbol_reft maybe_symbol=
-    symbol_table.get_writeable(symbol_name);
-  if(maybe_symbol)
+  if(const auto maybe_symbol=symbol_table.get_writeable(symbol_name))
   {
     // there already
     symbolt &previous_symbol=*maybe_symbol;
@@ -265,7 +263,7 @@ void cpp_typecheckt::typecheck_function_template(
 
     if(has_value)
     {
-      symbol_table.get_writeable(symbol_name)->get().type.swap(declaration);
+      symbol_table.get_writeable_ref(symbol_name).type.swap(declaration);
       cpp_scopes.id_map[symbol_name]=&template_scope;
     }
 

@@ -9,31 +9,27 @@ add_library(cbmc-lib ${sources} ${headers})
 generic_includes(cbmc-lib)
 
 target_link_libraries(cbmc-lib
+    analyses
     ansi-c
-    cpp
-    linking
+    assembler
     big-int
+    cpp
+    goto-instrument-lib
     goto-programs
     goto-symex
-    pointer-analysis
-    goto-instrument-lib
-    analyses
+    java_bytecode
+    json
     langapi
-    xml
-    assembler
+    linking
+    pointer-analysis
     solvers
     util
-    json
+    xml
 )
 
 add_if_library(cbmc-lib bv_refinement)
-add_if_library(cbmc-lib java_bytecode)
 add_if_library(cbmc-lib jsil)
-add_if_library(cbmc-lib specc)
-add_if_library(cbmc-lib php)
 
 # Executable
 add_executable(cbmc cbmc_main.cpp)
 target_link_libraries(cbmc cbmc-lib)
-
-install(TARGETS cbmc DESTINATION bin)

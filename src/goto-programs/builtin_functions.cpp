@@ -1159,6 +1159,29 @@ void goto_convertt::do_function_call_symbol(
       throw 0;
     }
   }
+  else if(identifier==CPROVER_PREFIX "havoc_object")
+  {
+    if(arguments.size()!=1)
+    {
+      error().source_location=function.find_source_location();
+      error() << "`" << identifier << "' expected to have one argument"
+              << eom;
+      throw 0;
+    }
+
+    if(lhs.is_not_nil())
+    {
+      error().source_location=function.find_source_location();
+      error() << identifier << " expected not to have LHS" << eom;
+      throw 0;
+    }
+
+    goto_programt::targett t=dest.add_instruction(OTHER);
+    t->source_location=function.source_location();
+    t->code=codet(ID_havoc_object);
+    t->code.add_source_location()=function.source_location();
+    t->code.copy_to_operands(arguments[0]);
+  }
   else if(identifier==CPROVER_PREFIX "printf")
   {
     do_printf(lhs, function, arguments, dest);

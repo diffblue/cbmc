@@ -65,7 +65,7 @@ std::size_t pointer_logict::add_object(const exprt &expr)
 
 exprt pointer_logict::pointer_expr(
   std::size_t object,
-  const typet &type) const
+  const pointer_typet &type) const
 {
   pointert pointer(object, 0);
   return pointer_expr(pointer, type);
@@ -73,7 +73,7 @@ exprt pointer_logict::pointer_expr(
 
 exprt pointer_logict::pointer_expr(
   const pointert &pointer,
-  const typet &type) const
+  const pointer_typet &type) const
 {
   if(pointer.object==null_object) // NULL?
   {
@@ -109,17 +109,7 @@ exprt pointer_logict::pointer_expr(
 
   exprt deep_object=object_rec(pointer.offset, type, object_expr);
 
-  exprt result;
-
-  if(type.id()==ID_pointer)
-    result=exprt(ID_address_of, type);
-  else if(type.id()==ID_reference)
-    result=exprt("reference_to", type);
-  else
-    assert(0);
-
-  result.copy_to_operands(deep_object);
-  return result;
+  return address_of_exprt(deep_object, type);
 }
 
 exprt pointer_logict::object_rec(
@@ -156,14 +146,11 @@ exprt pointer_logict::object_rec(
 
     mp_integer current_offset=0;
 
-    for(struct_typet::componentst::const_iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
+    for(const auto &c : components)
     {
       assert(offset>=current_offset);
 
-      const typet &subtype=it->type();
+      const typet &subtype=c.type();
 
       mp_integer sub_size=pointer_offset_size(subtype, ns);
       assert(sub_size>0);
@@ -172,9 +159,7 @@ exprt pointer_logict::object_rec(
       if(new_offset>offset)
       {
         // found it
-        member_exprt tmp(subtype);
-        tmp.set_component_name(it->get_name());
-        tmp.op0()=src;
+        member_exprt tmp(src, c);
 
         return object_rec(
           offset-current_offset, pointer_type, tmp);

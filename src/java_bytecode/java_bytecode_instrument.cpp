@@ -100,7 +100,8 @@ codet java_bytecode_instrumentt::throw_exception(
     generate_class_stub(
       exc_name,
       symbol_table,
-      get_message_handler());
+      get_message_handler(),
+      struct_union_typet::componentst{});
   }
 
   pointer_typet exc_ptr_type=
@@ -617,5 +618,5 @@ void java_bytecode_instrument(
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
-    instrument(symbol_table.get_writeable(symbol)->get().value);
+    instrument(symbol_table.get_writeable_ref(symbol).value);
 }

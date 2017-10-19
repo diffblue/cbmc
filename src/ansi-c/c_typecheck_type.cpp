@@ -208,7 +208,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
       {
         const irep_idt &tag_name=
           to_c_enum_tag_type(type.subtype()).get_identifier();
-        symbol_table.get_writeable(tag_name)->get().type.subtype()=result;
+        symbol_table.get_writeable_ref(tag_name).type.subtype()=result;
       }
 
       type=result;
@@ -782,7 +782,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
           type.set(ID_tag, base_name);
 
           typecheck_compound_body(type);
-          symbol_table.get_writeable(s_it->first)->get().type.swap(type);
+          symbol_table.get_writeable_ref(s_it->first).type.swap(type);
         }
       }
       else if(have_body)
@@ -1220,7 +1220,7 @@ void c_typecheck_baset::typecheck_c_enum_type(typet &type)
     {
       // Ok, overwrite the type in the symbol table.
       // This gives us the members and the subtype.
-      symbol_table.get_writeable(symbol.name)->get().type=enum_tag_symbol.type;
+      symbol_table.get_writeable_ref(symbol.name).type=enum_tag_symbol.type;
     }
     else if(symbol.type.id()==ID_c_enum)
     {
@@ -1487,19 +1487,22 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
+    source_locationt source_location=type.source_location();
     type=pointer_type(type.subtype());
-    type.remove(ID_size);
-    type.remove(ID_C_constant);
+    type.add_source_location()=source_location;
   }
   else if(type.id()==ID_code)
   {
     // see ISO/IEC 9899:1999 page 199 clause 8,
     // may be hidden in typedef
+    source_locationt source_location=type.source_location();
     type=pointer_type(type);
+    type.add_source_location()=source_location;
   }
   else if(type.id()==ID_KnR)
   {
     // any KnR args without type yet?
     type=signed_int_type(); // the default is integer!
+    // no source location
   }
 }

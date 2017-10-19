@@ -105,7 +105,7 @@ void cpp_typecheckt::convert_anonymous_union(
     id.is_member=true;
   }
 
-  symbol_table.get_writeable(union_symbol.name)->get().type.set(
+  symbol_table.get_writeable_ref(union_symbol.name).type.set(
     "#unnamed_object", symbol.base_name);
 
   code.swap(new_code);

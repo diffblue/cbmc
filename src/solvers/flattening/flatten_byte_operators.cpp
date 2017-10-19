@@ -202,7 +202,7 @@ exprt flatten_byte_extract(
   else if(src.id()==ID_byte_extract_big_endian)
     little_endian=false;
   else
-    assert(false);
+    UNREACHABLE;
 
   // determine an upper bound of the number of bytes we might need
   exprt upper_bound=size_of_expr(src.type(), ns);
@@ -292,7 +292,8 @@ exprt flatten_byte_extract(
   const array_typet &array_type=to_array_type(root.type());
   const typet &subtype=array_type.subtype();
 
-  assert(pointer_offset_bits(subtype, ns)==8);
+  DATA_INVARIANT(pointer_offset_bits(subtype, ns)==8,
+                 "offset bits are byte aligned");
 
   mp_integer size_bits=pointer_offset_bits(unpacked.type(), ns);
   if(size_bits<0)

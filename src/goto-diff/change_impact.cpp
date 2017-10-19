@@ -732,7 +732,7 @@ void change_impactt::output_instruction(char prefix,
   else
   {
     std::cout << prefix;
-    goto_program.output_instruction(ns, function, std::cout, target);
+    goto_program.output_instruction(ns, function, std::cout, *target);
   }
 }
 

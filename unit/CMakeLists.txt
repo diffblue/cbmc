@@ -3,6 +3,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 file(GLOB_RECURSE sources "*.cpp")
 file(GLOB_RECURSE headers "*.h")
+
+file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
+
 list(REMOVE_ITEM sources
     # Used in executables
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD.cpp
@@ -22,9 +25,14 @@ list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/float_utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/ieee_float.cpp
 
+    # Will be built into a separate library and linked
+    ${testing_utils}
+
     # Intended to fail to compile
     ${CMAKE_CURRENT_SOURCE_DIR}/util/expr_cast/expr_undefined_casts.cpp
 )
+
+add_subdirectory(testing-utils)
 
 add_executable(unit ${sources} ${headers})
 target_include_directories(unit
@@ -33,13 +41,13 @@ target_include_directories(unit
     ${CBMC_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(unit ansi-c solvers java_bytecode)
+target_link_libraries(unit testing-utils ansi-c solvers java_bytecode)
 add_test(
     NAME unit
     COMMAND $<TARGET_FILE:unit>
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
-set_tests_properties(unit PROPERTIES LABELS CORE)
+set_tests_properties(unit PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(miniBDD miniBDD.cpp)
 target_include_directories(miniBDD
@@ -50,7 +58,7 @@ target_include_directories(miniBDD
 )
 target_link_libraries(miniBDD solvers ansi-c)
 add_test(NAME miniBDD COMMAND $<TARGET_FILE:miniBDD>)
-set_tests_properties(miniBDD PROPERTIES LABELS CORE)
+set_tests_properties(miniBDD PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(string_utils string_utils.cpp)
 target_include_directories(string_utils
@@ -61,7 +69,7 @@ target_include_directories(string_utils
 )
 target_link_libraries(string_utils solvers ansi-c)
 add_test(NAME string_utils COMMAND $<TARGET_FILE:string_utils>)
-set_tests_properties(string_utils PROPERTIES LABELS CORE)
+set_tests_properties(string_utils PROPERTIES LABELS "CORE;CBMC")
 
 add_executable(sharing_node sharing_node.cpp)
 target_include_directories(sharing_node
@@ -72,4 +80,4 @@ target_include_directories(sharing_node
 )
 target_link_libraries(sharing_node util)
 add_test(NAME sharing_node COMMAND $<TARGET_FILE:sharing_node>)
-set_tests_properties(sharing_node PROPERTIES LABELS CORE)
+set_tests_properties(sharing_node PROPERTIES LABELS "CORE;CBMC")

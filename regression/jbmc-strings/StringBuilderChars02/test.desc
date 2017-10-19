@@ -1,0 +1,8 @@
+FUTURE
+StringBuilderChars02.class
+--refine-strings --string-max-length 1000 --unwind 100
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

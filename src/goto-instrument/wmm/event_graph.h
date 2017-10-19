@@ -406,9 +406,9 @@ public:
 
   event_idt add_node()
   {
-    const event_idt po_no = po_graph.add_node();
-    const event_idt com_no = com_graph.add_node();
-    assert(po_no == com_no);
+    const event_idt po_no=po_graph.add_node();
+    const event_idt com_no=com_graph.add_node();
+    INVARIANT(po_no==com_no, "node added with same id in both graphs");
     return po_no;
   }
 

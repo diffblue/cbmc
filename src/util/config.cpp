@@ -1177,9 +1177,7 @@ void configt::set_object_bits_from_symbol_table(
     return;
 
   // set object_bits according to entry point language
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(CPROVER_PREFIX "_start");
-  if(maybe_symbol)
+  if(const auto maybe_symbol=symbol_table.lookup(CPROVER_PREFIX "_start"))
   {
     const symbolt &entry_point_symbol=*maybe_symbol;
 

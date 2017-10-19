@@ -9,7 +9,7 @@
 /// \file
 /// Unit tests for ai_domain_baset::ai_simplify_lhs
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 
 #include <analyses/ai.h>
 

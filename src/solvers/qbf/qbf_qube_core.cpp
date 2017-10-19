@@ -56,7 +56,7 @@ propt::resultt qbf_qube_coret::prop_solve()
   // solve it
   int res=system((
     "QuBE "+options+" "+qbf_tmp_file+" > "+result_tmp_file).c_str());
-  assert(0==res);
+  CHECK_RETURN(0==res);
 
   bool result=false;
 

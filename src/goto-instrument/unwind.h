@@ -119,7 +119,7 @@ public:
       const unsigned location_number)
     {
       auto r=location_map.insert(std::make_pair(target, location_number));
-      assert(r.second); // did not exist yet
+      INVARIANT(r.second, "target already exists");
     }
 
     typedef std::map<goto_programt::const_targett, unsigned> location_mapt;

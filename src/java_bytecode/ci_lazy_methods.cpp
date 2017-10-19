@@ -79,7 +79,7 @@ bool ci_lazy_methodst::operator()(
       {
         const irep_idt methodid="java::"+id2string(classname)+"."+
           id2string(method.name)+":"+
-          id2string(method.signature);
+          id2string(method.descriptor);
         method_worklist2.push_back(methodid);
       }
     }
@@ -144,7 +144,7 @@ bool ci_lazy_methodst::operator()(
         method_converter(
           *parsed_method.first, *parsed_method.second, new_lazy_methods);
         gather_virtual_callsites(
-          symbol_table.lookup(mname)->get().value,
+          symbol_table.lookup_ref(mname).value,
           virtual_callsites);
         any_new_methods=true;
       }
@@ -507,4 +507,3 @@ irep_idt ci_lazy_methodst::get_virtual_method_target(
   else
     return irep_idt();
 }
-

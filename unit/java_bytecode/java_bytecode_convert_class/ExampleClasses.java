@@ -19,7 +19,7 @@ class C
   }
 }
 
-class Extendor extends A {
+class Extender extends A {
   void method() {
 
   }

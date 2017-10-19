@@ -405,8 +405,9 @@ void value_sett::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    assert(type.id()==ID_array ||
-           type.id()==ID_incomplete_array);
+    DATA_INVARIANT(type.id()==ID_array ||
+                   type.id()==ID_incomplete_array,
+                   "operand 0 of index expression must be an array");
 
     get_value_set_rec(expr.op0(), dest, "[]"+suffix, original_type, ns);
   }
@@ -416,10 +417,11 @@ void value_sett::get_value_set_rec(
 
     const typet &type=ns.follow(expr.op0().type());
 
-    assert(type.id()==ID_struct ||
-           type.id()==ID_union ||
-           type.id()==ID_incomplete_struct ||
-           type.id()==ID_incomplete_union);
+    DATA_INVARIANT(type.id()==ID_struct ||
+                   type.id()==ID_union ||
+                   type.id()==ID_incomplete_struct ||
+                   type.id()==ID_incomplete_union,
+                   "operand 0 of member expression must be struct or union");
 
     const std::string &component_name=
       expr.get_string(ID_component_name);
@@ -866,7 +868,7 @@ void value_sett::get_value_set_rec(
 
         found=true;
 
-        member_exprt member(expr.op0(), name, c_it->type());
+        member_exprt member(expr.op0(), *c_it);
         get_value_set_rec(member, dest, suffix, original_type, ns);
       }
     }
@@ -1120,9 +1122,7 @@ void value_sett::get_reference_set_rec(
       {
         objectt o=it->second;
 
-        member_exprt member_expr(expr.type());
-        member_expr.op0()=object;
-        member_expr.set_component_name(component_name);
+        member_exprt member_expr(object, component_name, expr.type());
 
         // We cannot introduce a cast from scalar to non-scalar,
         // thus, we can only adjust the types of structs and unions.
@@ -1197,9 +1197,7 @@ void value_sett::assign(
       if(subtype.id()==ID_code ||
          c_it->get_is_padding()) continue;
 
-      member_exprt lhs_member(subtype);
-      lhs_member.set_component_name(name);
-      lhs_member.op0()=lhs;
+      member_exprt lhs_member(lhs, name, subtype);
 
       exprt rhs_member;
 
@@ -1441,7 +1439,8 @@ void value_sett::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_array || type.id()==ID_incomplete_array);
+    DATA_INVARIANT(type.id()==ID_array || type.id()==ID_incomplete_array,
+                   "operand 0 of index expression must be an array");
 
     assign_rec(lhs.op0(), values_rhs, "[]"+suffix, ns, true);
   }
@@ -1454,10 +1453,11 @@ void value_sett::assign_rec(
 
     const typet &type=ns.follow(lhs.op0().type());
 
-    assert(type.id()==ID_struct ||
-           type.id()==ID_union ||
-           type.id()==ID_incomplete_struct ||
-           type.id()==ID_incomplete_union);
+    DATA_INVARIANT(type.id()==ID_struct ||
+                   type.id()==ID_union ||
+                   type.id()==ID_incomplete_struct ||
+                   type.id()==ID_incomplete_union,
+                   "operand 0 of member expression must be struct or union");
 
     assign_rec(
       lhs.op0(), values_rhs, "."+component_name+suffix, ns, add_to_sets);
@@ -1775,9 +1775,7 @@ exprt value_sett::make_member(
 
   // give up
   typet subtype=struct_union_type.component_type(component_name);
-  member_exprt member_expr(subtype);
-  member_expr.op0()=src;
-  member_expr.set_component_name(component_name);
+  member_exprt member_expr(src, component_name, subtype);
 
   return member_expr;
 }

@@ -154,8 +154,15 @@ public:
 
   messaget(const messaget &other):
     message_handler(other.message_handler),
-    mstream(other.mstream)
+    mstream(other.mstream, *this)
   {
+  }
+
+  messaget &operator=(const messaget &other)
+  {
+    message_handler=other.message_handler;
+    mstream.assign_from(other.mstream);
+    return *this;
   }
 
   explicit messaget(message_handlert &_message_handler):
@@ -177,12 +184,16 @@ public:
     {
     }
 
-    mstreamt(const mstreamt &other):
+    mstreamt(const mstreamt &other)=delete;
+
+    mstreamt(const mstreamt &other, messaget &_message):
       message_level(other.message_level),
-      message(other.message),
+      message(_message),
       source_location(other.source_location)
     {
     }
+
+    mstreamt &operator=(const mstreamt &other)=delete;
 
     unsigned message_level;
     messaget &message;
@@ -220,6 +231,16 @@ public:
     {
       return func(*this);
     }
+
+  private:
+    void assign_from(const mstreamt &other)
+    {
+      message_level=other.message_level;
+      source_location=other.source_location;
+      // message, the pointer to my enclosing messaget, remains unaltered.
+    }
+
+    friend class messaget;
   };
 
   // Feeding 'eom' into the stream triggers

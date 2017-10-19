@@ -63,7 +63,7 @@ decision_proceduret::resultt cvc_dect::dec_solve()
     "cvcl "+temp_out_filename+" > "+temp_result_filename+" 2>&1";
 
   int res=system(command.c_str());
-  assert(0==res);
+  CHECK_RETURN(0==res);
 
   status() << "Reading result from CVCL" << eom;
 

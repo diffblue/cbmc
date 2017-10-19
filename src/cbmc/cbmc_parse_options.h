@@ -18,8 +18,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
-#include <java_bytecode/java_bytecode_language.h>
-
 #include "xml_interface.h"
 
 class bmct;
@@ -32,9 +30,8 @@ class optionst;
   "(no-simplify)(unwind):(unwindset):(slice-formula)(full-slice)" \
   "(debug-level):(no-propagation)(no-simplify-if)" \
   "(document-subgoals)(outfile):(test-preprocessor)" \
-  "D:I:(c89)(c99)(c11)(cpp89)(cpp99)(cpp11)" \
+  "D:I:(c89)(c99)(c11)(cpp98)(cpp03)(cpp11)" \
   "(object-bits):" \
-  "(classpath):(cp):(main-class):" \
   "(depth):(partial-loops)(no-unwinding-assertions)(unwinding-assertions)" \
   OPT_GOTO_CHECK \
   "(no-assertions)(no-assumptions)" \
@@ -67,8 +64,6 @@ class optionst;
   "(string-abstraction)(no-arch)(arch):" \
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
-  JAVA_BYTECODE_LANGUAGE_OPTIONS \
-  "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
 

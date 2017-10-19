@@ -72,6 +72,8 @@ public:
   {
     return time_periodt(t-other.t);
   }
+
+  friend class absolute_timet;
 };
 
 class absolute_timet:public fine_timet
@@ -88,6 +90,16 @@ public:
   time_periodt operator-(const absolute_timet &other)
   {
     return time_periodt(t-other.t);
+  }
+
+  absolute_timet operator+(const time_periodt &other)
+  {
+    return absolute_timet(t+other.t);
+  }
+
+  bool operator>=(const absolute_timet &other)
+  {
+    return t>=other.t;
   }
 };
 

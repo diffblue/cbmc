@@ -11,6 +11,17 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 
 #include "fresh_symbol.h"
 
+// This needs to be outside get_fresh_aux_symbol
+// to make it available for both reset_temporary_counter
+// and get_fresh_aux_symbol
+static size_t temporary_counter=0;
+
+// This is useful with loading multiple GOTO models
+void reset_temporary_counter()
+{
+  temporary_counter=0;
+}
+
 /// Installs a fresh-named symbol with the requested name pattern
 /// \par parameters: `type`: type of new symbol
 /// `name_prefix`, `basename_prefix`: new symbol will be named
@@ -27,7 +38,6 @@ symbolt &get_fresh_aux_symbol(
   const irep_idt &symbol_mode,
   symbol_tablet &symbol_table)
 {
-  static size_t temporary_counter=0;
   auxiliary_symbolt new_symbol;
 
   // Loop until find a name that doesn't clash with a non-auxilliary symbol

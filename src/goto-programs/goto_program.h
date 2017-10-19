@@ -28,13 +28,7 @@ public:
     const class namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
-    instructionst::const_iterator it) const;
-
-  std::ostream &output_instruction(
-    const class namespacet &ns,
-    const irep_idt &identifier,
-    std::ostream &out,
-    const instructiont &instruction) const;
+    const instructiont &instruction) const override;
 
   goto_programt() { }
 

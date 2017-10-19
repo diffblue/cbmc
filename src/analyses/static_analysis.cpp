@@ -105,7 +105,7 @@ void static_analysis_baset::output(
     get_state(i_it).output(ns, out);
     out << "\n";
     #if 1
-    goto_program.output_instruction(ns, identifier, out, i_it);
+    goto_program.output_instruction(ns, identifier, out, *i_it);
     out << "\n";
     #endif
   }

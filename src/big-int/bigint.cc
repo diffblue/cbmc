@@ -464,6 +464,12 @@ BigInt::BigInt (BigInt const &y)
   memcpy (digit, y.digit, length * sizeof (onedig_t));
 }
 
+BigInt::BigInt (BigInt &&y)
+  : BigInt()
+{
+  swap(y);
+}
+
 BigInt::BigInt (char const *s, onedig_t b)
   : size (adjust_size (small)),
     length (0),
@@ -473,40 +479,18 @@ BigInt::BigInt (char const *s, onedig_t b)
   scan (s, b);
 }
 
-
-BigInt &
-BigInt::operator= (llong_t l)
-{
-  reallocate (small);
-  assign (l);
-  return *this;
-}
-
-BigInt &
-BigInt::operator= (ullong_t ul)
-{
-  reallocate (small);
-  assign (ul);
-  return *this;
-}
-
 BigInt &
 BigInt::operator= (BigInt const &y)
 {
-  if (&y != this)
-    {
-      reallocate (y.length);
-      length = y.length;
-      positive = y.positive;
-      memcpy (digit, y.digit, length * sizeof (onedig_t));
-    }
+  BigInt copy(y);
+  swap(copy);
   return *this;
 }
 
 BigInt &
-BigInt::operator= (char const *s)
+BigInt::operator= (BigInt &&y)
 {
-  scan (s);
+  swap(y);
   return *this;
 }
 
