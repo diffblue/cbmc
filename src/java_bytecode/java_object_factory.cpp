@@ -637,17 +637,14 @@ static bool add_nondet_string_pointer_initialization(
   if(!struct_type.has_component("data") || !struct_type.has_component("length"))
     return true;
 
-  const symbolt tmp_object_sym = new_tmp_symbol(symbol_table, loc, struct_type);
-  // Note that it is fine to use a tmp_object here as this should only be used
-  // in __CPROVER_start whose scope covers all the program execution.
-  const symbol_exprt tmp_object = tmp_object_sym.symbol_expr();
-  // struct java.lang.String tmp_object;
-  code.add(code_declt(tmp_object));
+  allocate_dynamic_object_with_decl(expr, symbol_table, loc, code);
+
   code.add(
     initialize_nondet_string_struct(
-      tmp_object, max_nondet_string_length, loc, symbol_table));
-  // expr = &tmp_object;
-  code.add(code_assignt(expr, address_of_exprt(tmp_object), loc));
+      dereference_exprt(expr, struct_type),
+      max_nondet_string_length,
+      loc,
+      symbol_table));
   return false;
 }
 
