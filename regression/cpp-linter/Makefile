@@ -1,16 +1,10 @@
 default: tests.log
 
 test:
-	@if ! ../test.pl -c python ../../../scripts/cpplint.py ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c "python ../../../scripts/cpplint.py"
 
 tests.log: ../test.pl
-	@if ! ../test.pl -c "python ../../../scripts/cpplint.py" ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c "python ../../../scripts/cpplint.py"
 
 show:
 	@for dir in *; do \

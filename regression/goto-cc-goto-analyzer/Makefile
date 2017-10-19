@@ -12,17 +12,11 @@ else
 endif
 
 test:
-	@if ! ../test.pl -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)' ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
 
 tests.log:
 	pwd
-	@if ! ../test.pl -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)' ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-analyzer/goto-analyzer $(is_windows)'
 
 show:
 	@for dir in *; do \

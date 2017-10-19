@@ -2,17 +2,11 @@ default: tests.log
 
 test:
 	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@if ! ../test.pl -c ../../../src/goto-cc/goto-gcc ; then \
-	  ../failed-tests-printer.pl ; \
-	  exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/goto-cc/goto-gcc
 
 tests.log: ../test.pl
 	-@ln -s goto-cc ../../src/goto-cc/goto-gcc
-	@if ! ../test.pl -c ../../../src/goto-cc/goto-gcc ; then \
-	  ../failed-tests-printer.pl ; \
-	  exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/goto-cc/goto-gcc
 
 show:
 	@for dir in *; do \

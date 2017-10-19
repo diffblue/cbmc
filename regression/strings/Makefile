@@ -1,28 +1,16 @@
 default: tests.log
 
 test:
-	@if ! ../test.pl -c ../../../src/cbmc/cbmc ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/cbmc/cbmc
 
 testfuture:
-	@if ! ../test.pl -c ../../../src/cbmc/cbmc -CF ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/cbmc/cbmc -CF
 
 testall:
-	@if ! ../test.pl -c ../../../src/cbmc/cbmc -CFTK ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/cbmc/cbmc -CFTK
 
 tests.log: ../test.pl
-	@if ! ../test.pl -c ../../../src/cbmc/cbmc ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../../../src/cbmc/cbmc
 
 show:
 	@for dir in *; do \
