@@ -3,7 +3,8 @@ language: cpp
 jobs:
   include:
 
-    - stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+    - &formatting-stage
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       env: NAME="clang-format"
       addons:
         apt:
@@ -191,6 +192,7 @@ jobs:
       script: echo "This is coverity build. No need for tests."
 
   allow_failures:
+    - <<: *formatting-stage
     - <<: *linter-stage
 
 install:
