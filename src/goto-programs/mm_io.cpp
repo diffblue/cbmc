@@ -118,13 +118,13 @@ void mm_io(
   irep_idt id_r=CPROVER_PREFIX "mm_io_r";
   irep_idt id_w=CPROVER_PREFIX "mm_io_w";
 
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=symbol_table.lookup(id_r);
+  auto maybe_symbol=symbol_table.lookup(id_r);
   if(maybe_symbol)
-    mm_io_r=maybe_symbol->get().symbol_expr();
+    mm_io_r=maybe_symbol->symbol_expr();
 
   maybe_symbol=symbol_table.lookup(id_w);
   if(maybe_symbol)
-    mm_io_w=maybe_symbol->get().symbol_expr();
+    mm_io_w=maybe_symbol->symbol_expr();
 
   for(auto & f : goto_functions.function_map)
     mm_io(mm_io_r, mm_io_w, f.second, ns);

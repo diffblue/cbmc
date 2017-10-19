@@ -76,7 +76,6 @@ protected:
     differencest &differences) const;
 
   void get_diff(
-    const irep_idt &identifier,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
     const differencest &differences,

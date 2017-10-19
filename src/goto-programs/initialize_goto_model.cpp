@@ -134,12 +134,22 @@ bool initialize_goto_model(
       // existing __CPROVER_start function:
       rebuild_goto_start_functiont rebuild_existing_start(
         msg.get_message_handler(),
+        cmdline,
         goto_model.symbol_table,
         goto_model.goto_functions);
       entry_point_generation_failed=rebuild_existing_start();
     }
     else if(!binaries_provided_start)
     {
+      // Unsure of the rationale for only generating stubs when there are no
+      // GOTO binaries in play; simply mirroring old code in language_uit here.
+      if(binaries.empty())
+      {
+        // Enable/disable stub generation for opaque methods
+        bool stubs_enabled=cmdline.isset("generate-opaque-stubs");
+        language_files.set_should_generate_opaque_method_stubs(stubs_enabled);
+      }
+
       // Allow all language front-ends to try to provide the user-specified
       // (--function) entry-point, or some language-specific default:
       entry_point_generation_failed=

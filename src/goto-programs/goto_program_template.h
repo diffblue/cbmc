@@ -503,7 +503,7 @@ public:
     const namespacet &ns,
     const irep_idt &identifier,
     std::ostream &out,
-    typename instructionst::const_iterator it) const=0;
+    const typename instructionst::value_type &it) const = 0;
 
   /// Compute the target numbers
   void compute_target_numbers();
@@ -529,10 +529,10 @@ public:
   void update();
 
   /// Human-readable loop name
-  static irep_idt loop_id(const_targett target)
+  static irep_idt loop_id(const instructiont &instruction)
   {
-    return id2string(target->function)+"."+
-           std::to_string(target->loop_number);
+    return id2string(instruction.function)+"."+
+           std::to_string(instruction.loop_number);
   }
 
   /// Is the program empty?
@@ -665,11 +665,8 @@ std::ostream &goto_program_templatet<codeT, guardT>::output(
 {
   // output program
 
-  for(typename instructionst::const_iterator
-      it=instructions.begin();
-      it!=instructions.end();
-      ++it)
-    output_instruction(ns, identifier, out, it);
+  for(const auto &instruction : instructions)
+    output_instruction(ns, identifier, out, instruction);
 
   return out;
 }

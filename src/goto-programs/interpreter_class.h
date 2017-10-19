@@ -16,12 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/invariant.h>
+#include <util/std_types.h>
 #include <util/sparse_vector.h>
+#include <util/message.h>
 
 #include "goto_functions.h"
 #include "goto_trace.h"
 #include "json_goto_trace.h"
-#include "util/message.h"
 
 class interpretert:public messaget
 {
@@ -195,7 +196,10 @@ protected:
   bool unbounded_size(const typet &);
   size_t get_size(const typet &type);
 
-  irep_idt get_component_id(const irep_idt &object, unsigned offset);
+  struct_typet::componentt get_component(
+    const irep_idt &object,
+    unsigned offset);
+
   typet get_type(const irep_idt &id) const;
   exprt get_value(
     const typet &type,

@@ -14,6 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/type.h>
 
-void cpp_convert_plain_type(typet &type);
+void cpp_convert_plain_type(typet &);
 
 #endif // CPROVER_CPP_CPP_CONVERT_TYPE_H

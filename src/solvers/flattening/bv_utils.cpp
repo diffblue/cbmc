@@ -385,7 +385,7 @@ literalt bv_utilst::overflow_add(
     return carry_out(op0, op1, const_literal(false));
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 literalt bv_utilst::overflow_sub(
@@ -410,7 +410,7 @@ literalt bv_utilst::overflow_sub(
     return !carry_out(op0, inverted(op1), const_literal(true));
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void bv_utilst::adder_no_overflow(
@@ -797,7 +797,7 @@ bvt bv_utilst::multiplier(
   {
   case representationt::SIGNED: return signed_multiplier(op0, op1);
   case representationt::UNSIGNED: return unsigned_multiplier(op0, op1);
-  default: assert(false);
+  default: UNREACHABLE;
   }
 }
 
@@ -812,7 +812,7 @@ bvt bv_utilst::multiplier_no_overflow(
     return signed_multiplier_no_overflow(op0, op1);
   case representationt::UNSIGNED:
     return unsigned_multiplier_no_overflow(op0, op1);
-  default: assert(false);
+  default: UNREACHABLE;
   }
 }
 
@@ -1278,7 +1278,7 @@ literalt bv_utilst::rel(
   else if(id==ID_gt)
     return lt_or_le(false, bv1, bv0, rep); // swapped
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 bool bv_utilst::is_constant(const bvt &bv)

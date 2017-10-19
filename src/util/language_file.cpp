@@ -41,9 +41,8 @@ void language_filet::convert_lazy_method(
 
 void language_filest::show_parse(std::ostream &out)
 {
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
-    it->second.language->show_parse(out);
+  for(const auto &file : file_map)
+    file.second.language->show_parse(out);
 }
 
 /// Turn on or off stub generation for all the languages
@@ -60,32 +59,31 @@ void language_filest::set_should_generate_opaque_method_stubs(
 
 bool language_filest::parse()
 {
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
     // open file
 
-    std::ifstream infile(it->first);
+    std::ifstream infile(file.first);
 
     if(!infile)
     {
-      error() << "Failed to open " << it->first << eom;
+      error() << "Failed to open " << file.first << eom;
       return true;
     }
 
     // parse it
 
-    languaget &language=*(it->second.language);
+    languaget &language=*(file.second.language);
 
-    if(language.parse(infile, it->first))
+    if(language.parse(infile, file.first))
     {
-      error() << "Parsing of " << it->first << " failed" << eom;
+      error() << "Parsing of " << file.first << " failed" << eom;
       return true;
     }
 
     // what is provided?
 
-    it->second.get_modules();
+    file.second.get_modules();
   }
 
   return false;
@@ -95,10 +93,9 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 {
   // typecheck interfaces
 
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
-    if(it->second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table))
       return true;
   }
 
@@ -106,11 +103,10 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 
   unsigned collision_counter=0;
 
-  for(file_mapt::iterator fm_it=file_map.begin();
-      fm_it!=file_map.end(); fm_it++)
+  for(auto &file : file_map)
   {
     const language_filet::modulest &modules=
-      fm_it->second.modules;
+      file.second.modules;
 
     for(language_filet::modulest::const_iterator
         mo_it=modules.begin();
@@ -127,7 +123,7 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
       }
 
       language_modulet module;
-      module.file=&fm_it->second;
+      module.file=&file.second;
       module.name=module_name;
       module_map.insert(
         std::pair<std::string, language_modulet>(module.name, module));
@@ -136,29 +132,27 @@ bool language_filest::typecheck(symbol_tablet &symbol_table)
 
   // typecheck files
 
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
-    if(it->second.modules.empty())
+    if(file.second.modules.empty())
     {
-      if(it->second.language->typecheck(symbol_table, ""))
+      if(file.second.language->typecheck(symbol_table, ""))
         return true;
       // register lazy methods.
       // TODO: learn about modules and generalise this
       // to module-providing languages if required.
       std::set<irep_idt> lazy_method_ids;
-      it->second.language->lazy_methods_provided(lazy_method_ids);
+      file.second.language->lazy_methods_provided(lazy_method_ids);
       for(const auto &id : lazy_method_ids)
-        lazy_method_map[id]=&it->second;
+        lazy_method_map[id]=&file.second;
     }
   }
 
   // typecheck modules
 
-  for(module_mapt::iterator it=module_map.begin();
-      it!=module_map.end(); it++)
+  for(auto &module : module_map)
   {
-    if(typecheck_module(symbol_table, it->second))
+    if(typecheck_module(symbol_table, module.second))
       return true;
   }
 
@@ -170,11 +164,10 @@ bool language_filest::generate_support_functions(
 {
   std::set<std::string> languages;
 
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
-    if(languages.insert(it->second.language->id()).second)
-      if(it->second.language->generate_support_functions(symbol_table))
+    if(languages.insert(file.second.language->id()).second)
+      if(file.second.language->generate_support_functions(symbol_table))
         return true;
   }
 
@@ -186,11 +179,10 @@ bool language_filest::final(
 {
   std::set<std::string> languages;
 
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
-    if(languages.insert(it->second.language->id()).second)
-      if(it->second.language->final(symbol_table))
+    if(languages.insert(file.second.language->id()).second)
+      if(file.second.language->final(symbol_table))
         return true;
   }
 
@@ -200,10 +192,9 @@ bool language_filest::final(
 bool language_filest::interfaces(
   symbol_tablet &symbol_table)
 {
-  for(file_mapt::iterator it=file_map.begin();
-      it!=file_map.end(); it++)
+  for(auto &file : file_map)
   {
-    if(it->second.language->interfaces(symbol_table))
+    if(file.second.language->interfaces(symbol_table))
       return true;
   }
 

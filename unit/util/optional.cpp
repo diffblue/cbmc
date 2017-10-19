@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include "catch.hpp"
+#include <testing-utils/catch.hpp>
 #include <util/optional.h>
 
 TEST_CASE("Optional without a value", "[core][util][optional]")

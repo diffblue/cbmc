@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/numbering.h>
 
 class namespacet;
+class pointer_typet;
 
 class pointer_logict
 {
@@ -42,12 +43,12 @@ public:
   // converts an (object,offset) pair to an expression
   exprt pointer_expr(
     const pointert &pointer,
-    const typet &type) const;
+    const pointer_typet &type) const;
 
   // converts an (object,0) pair to an expression
   exprt pointer_expr(
     std::size_t object,
-    const typet &type) const;
+    const pointer_typet &type) const;
 
   ~pointer_logict();
   explicit pointer_logict(const namespacet &_ns);

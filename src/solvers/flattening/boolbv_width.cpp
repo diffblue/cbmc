@@ -11,7 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <algorithm>
 
 #include <util/arith_tools.h>
-#include <util/config.h>
+#include <util/invariant.h>
 #include <util/std_types.h>
 
 boolbv_widtht::boolbv_widtht(const namespacet &_ns):ns(_ns)
@@ -193,10 +193,10 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   {
     // no width
   }
-  else if(type_id==ID_pointer ||
-          type_id==ID_reference)
+  else if(type_id==ID_pointer)
   {
-    entry.total_width=config.ansi_c.pointer_width;
+    entry.total_width=to_pointer_type(type).get_width();
+    DATA_INVARIANT(entry.total_width!=0, "pointer must have width");
   }
   else if(type_id==ID_symbol)
     entry=get_entry(ns.follow(type));

@@ -204,7 +204,8 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
      expr.op0().id()==ID_typecast &&
      expr.op0().operands().size()==1 &&
      (op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv) &&
-     to_bitvector_type(op_type).get_width()>=config.ansi_c.pointer_width)
+     to_bitvector_type(op_type).get_width()>=
+     to_bitvector_type(expr_type).get_width())
   {
     exprt tmp=expr.op0().op0();
     expr.op0().swap(tmp);
@@ -235,6 +236,25 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     simplify_node(inequality);
     expr.swap(inequality);
     return false;
+  }
+
+  // circular casts through types shorter than `int`
+  if(op_type==signedbv_typet(32) &&
+     expr.op0().id()==ID_typecast)
+  {
+    if(expr_type==c_bool_typet(8) ||
+       expr_type==signedbv_typet(8) ||
+       expr_type==signedbv_typet(16) ||
+       expr_type==unsignedbv_typet(16))
+    {
+      // We checked that the id was ID_typecast in the enclosing `if`
+      const auto &typecast=expr_checked_cast<typecast_exprt>(expr.op0());
+      if(typecast.op().type()==expr_type)
+      {
+        expr=typecast.op0();
+        return false;
+      }
+    }
   }
 
   // eliminate casts to _Bool

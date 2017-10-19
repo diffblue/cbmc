@@ -409,7 +409,7 @@ int monomialt::compare(monomialt &other)
     return -1;
   }
 
-  assert(!"NOTREACHEDBITCHES");
+  UNREACHABLE;
 }
 
 int polynomialt::max_degree(const exprt &var)

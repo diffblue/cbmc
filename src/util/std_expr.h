@@ -1329,32 +1329,28 @@ inline void validate_expr(const notequal_exprt &value)
 
 /*! \brief array index operator
 */
-class index_exprt:public exprt
+class index_exprt:public binary_exprt
 {
 public:
-  index_exprt():exprt(ID_index)
+  index_exprt():binary_exprt(ID_index)
   {
-    operands().resize(2);
   }
 
-  explicit index_exprt(const typet &_type):exprt(ID_index, _type)
+  explicit index_exprt(const typet &_type):binary_exprt(ID_index, _type)
   {
-    operands().resize(2);
   }
 
   index_exprt(const exprt &_array, const exprt &_index):
-    exprt(ID_index, _array.type().subtype())
+    binary_exprt(_array, ID_index, _index, _array.type().subtype())
   {
-    copy_to_operands(_array, _index);
   }
 
   index_exprt(
     const exprt &_array,
     const exprt &_index,
     const typet &_type):
-    exprt(ID_index, _type)
+    binary_exprt(_array, ID_index, _index, _type)
   {
-    copy_to_operands(_array, _index);
   }
 
   exprt &array()
@@ -1795,12 +1791,11 @@ class namespacet;
 
 /*! \brief split an expression into a base object and a (byte) offset
 */
-class object_descriptor_exprt:public exprt
+class object_descriptor_exprt:public binary_exprt
 {
 public:
-  object_descriptor_exprt():exprt(ID_object_descriptor)
+  object_descriptor_exprt():binary_exprt(ID_object_descriptor)
   {
-    operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
@@ -1886,28 +1881,26 @@ inline void validate_expr(const object_descriptor_exprt &value)
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class dynamic_object_exprt:public exprt
+class dynamic_object_exprt:public binary_exprt
 {
 public:
   enum recencyt { MOST_RECENT_ALLOCATION, ANY_ALLOCATION, RECENCY_UNSET };
 
-  dynamic_object_exprt():exprt(ID_dynamic_object)
+  dynamic_object_exprt():binary_exprt(ID_dynamic_object)
   {
-    operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
 
   explicit dynamic_object_exprt(const typet &type):
-    exprt(ID_dynamic_object, type)
+    binary_exprt(ID_dynamic_object, type)
   {
-    operands().resize(2);
     op0().id(ID_unknown);
     op1().id(ID_unknown);
   }
 
   explicit dynamic_object_exprt(bool recent):
-    exprt(ID_dynamic_object)
+    binary_exprt(ID_dynamic_object)
   {
     operands().resize(2);
     op0().id(ID_unknown);
@@ -1916,7 +1909,7 @@ public:
   }
 
   dynamic_object_exprt(const typet &type, bool recent):
-    exprt(ID_dynamic_object, type)
+    binary_exprt(ID_dynamic_object, type)
   {
     operands().resize(2);
     op0().id(ID_unknown);
@@ -1991,6 +1984,7 @@ template<> inline bool can_cast_expr<dynamic_object_exprt>(const exprt &base)
 {
   return base.id()==ID_dynamic_object;
 }
+
 inline void validate_expr(const dynamic_object_exprt &value)
 {
   validate_operands(value, 2, "Dynamic object must have two operands");
@@ -1999,18 +1993,16 @@ inline void validate_expr(const dynamic_object_exprt &value)
 
 /*! \brief semantic type conversion
 */
-class typecast_exprt:public exprt
+class typecast_exprt:public unary_exprt
 {
 public:
-  explicit typecast_exprt(const typet &_type):exprt(ID_typecast, _type)
+  explicit typecast_exprt(const typet &_type):unary_exprt(ID_typecast, _type)
   {
-    operands().resize(1);
   }
 
   typecast_exprt(const exprt &op, const typet &_type):
-    exprt(ID_typecast, _type)
+    unary_exprt(ID_typecast, op, _type)
   {
-    copy_to_operands(op);
   }
 
   exprt &op()
@@ -3067,17 +3059,17 @@ inline void validate_expr(const address_of_exprt &value)
 
 /*! \brief Boolean negation
 */
-class not_exprt:public exprt
+class not_exprt:public unary_exprt
 {
 public:
-  explicit not_exprt(const exprt &op):exprt(ID_not, bool_typet())
+  explicit not_exprt(const exprt &op):
+    unary_exprt(ID_not, op) // type from op.type()
   {
-    copy_to_operands(op);
+    PRECONDITION(op.type().id()==ID_bool);
   }
 
-  not_exprt():exprt(ID_not, bool_typet())
+  not_exprt():unary_exprt(ID_not, bool_typet())
   {
-    operands().resize(1);
   }
 
   exprt &op()
@@ -3122,6 +3114,7 @@ template<> inline bool can_cast_expr<not_exprt>(const exprt &base)
 {
   return base.id()==ID_not;
 }
+
 inline void validate_expr(const not_exprt &value)
 {
   validate_operands(value, 1, "Not must have one operand");
@@ -3130,30 +3123,27 @@ inline void validate_expr(const not_exprt &value)
 
 /*! \brief Operator to dereference a pointer
 */
-class dereference_exprt:public exprt
+class dereference_exprt:public unary_exprt
 {
 public:
-  explicit dereference_exprt(const typet &type):
-    exprt(ID_dereference, type)
+  dereference_exprt():unary_exprt(ID_dereference)
   {
-    operands().resize(1);
+  }
+
+  explicit dereference_exprt(const typet &type):
+    unary_exprt(ID_dereference, type)
+  {
   }
 
   explicit dereference_exprt(const exprt &op):
-    exprt(ID_dereference)
+    unary_exprt(ID_dereference, op, op.type().subtype())
   {
-    copy_to_operands(op);
+    PRECONDITION(op.type().id()==ID_pointer);
   }
 
   dereference_exprt(const exprt &op, const typet &type):
-    exprt(ID_dereference, type)
+    unary_exprt(ID_dereference, op, type)
   {
-    copy_to_operands(op);
-  }
-
-  dereference_exprt():exprt(ID_dereference)
-  {
-    operands().resize(1);
   }
 
   exprt &pointer()
@@ -3720,39 +3710,33 @@ inline void validate_expr(const array_update_exprt &value)
 
 /*! \brief Extract member of struct or union
 */
-class member_exprt:public exprt
+class member_exprt:public unary_exprt
 {
 public:
-  explicit member_exprt(const exprt &op):exprt(ID_member)
+  // deprecated, and will go away -- use either of the two below
+  explicit member_exprt(const typet &_type):unary_exprt(ID_member, _type)
   {
-    copy_to_operands(op);
-  }
-
-  explicit member_exprt(const typet &_type):exprt(ID_member, _type)
-  {
-    operands().resize(1);
-  }
-
-  member_exprt(const exprt &op, const irep_idt &component_name):
-    exprt(ID_member)
-  {
-    copy_to_operands(op);
-    set_component_name(component_name);
   }
 
   member_exprt(
     const exprt &op,
     const irep_idt &component_name,
     const typet &_type):
-    exprt(ID_member, _type)
+    unary_exprt(ID_member, op, _type)
   {
-    copy_to_operands(op);
     set_component_name(component_name);
   }
 
-  member_exprt():exprt(ID_member)
+  member_exprt(
+    const exprt &op,
+    const struct_typet::componentt &c):
+    unary_exprt(ID_member, op, c.type())
   {
-    operands().resize(1);
+    set_component_name(c.get_name());
+  }
+
+  member_exprt():unary_exprt(ID_member)
+  {
   }
 
   irep_idt get_component_name() const
@@ -3768,11 +3752,6 @@ public:
   std::size_t get_component_number() const
   {
     return get_size_t(ID_component_number);
-  }
-
-  void set_component_number(std::size_t component_number)
-  {
-    set(ID_component_number, component_number);
   }
 
   // will go away, use compound()
@@ -3805,6 +3784,7 @@ public:
     {
       return static_cast<const member_exprt &>(op).symbol();
     }
+
     return to_symbol_expr(op);
   }
 };
@@ -4395,18 +4375,18 @@ public:
 
 /*! \brief application of (mathematical) function
 */
-class function_application_exprt:public exprt
+class function_application_exprt:public binary_exprt
 {
 public:
-  function_application_exprt():exprt(ID_function_application)
+  function_application_exprt():binary_exprt(ID_function_application)
   {
-    operands().resize(2);
+    op0()=symbol_exprt();
   }
 
   explicit function_application_exprt(const typet &_type):
-    exprt(ID_function_application, _type)
+    binary_exprt(ID_function_application, _type)
   {
-    operands().resize(2);
+    op0()=symbol_exprt();
   }
 
   function_application_exprt(
@@ -4416,14 +4396,14 @@ public:
     function()=_function;
   }
 
-  exprt &function()
+  symbol_exprt &function()
   {
-    return op0();
+    return static_cast<symbol_exprt &>(op0());
   }
 
-  const exprt &function() const
+  const symbol_exprt &function() const
   {
-    return op0();
+    return static_cast<const symbol_exprt &>(op0());
   }
 
   typedef exprt::operandst argumentst;
@@ -4648,12 +4628,11 @@ inline void validate_expr(const let_exprt &value)
 
 /*! \brief A forall expression
 */
-class forall_exprt:public exprt
+class forall_exprt:public binary_exprt
 {
 public:
-  forall_exprt():exprt(ID_forall)
+  forall_exprt():binary_exprt(ID_forall)
   {
-    operands().resize(2);
     op0()=symbol_exprt();
   }
 
@@ -4680,12 +4659,11 @@ public:
 
 /*! \brief An exists expression
 */
-class exists_exprt:public exprt
+class exists_exprt:public binary_exprt
 {
 public:
-  exists_exprt():exprt(ID_exists)
+  exists_exprt():binary_exprt(ID_exists)
   {
-    operands().resize(2);
     op0()=symbol_exprt();
   }
 

@@ -122,7 +122,7 @@ void ai_baset::output(
     find_state(i_it).output(out, *this, ns);
     out << "\n";
     #if 1
-    goto_program.output_instruction(ns, identifier, out, i_it);
+    goto_program.output_instruction(ns, identifier, out, *i_it);
     out << "\n";
     #endif
   }
@@ -174,7 +174,7 @@ jsont ai_baset::output_json(
 
     // Ideally we need output_instruction_json
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, i_it);
+    goto_program.output_instruction(ns, identifier, out, *i_it);
     location["instruction"]=json_stringt(out.str());
 
     contents.push_back(location);
@@ -235,7 +235,7 @@ xmlt ai_baset::output_xml(
 
     // Ideally we need output_instruction_xml
     std::ostringstream out;
-    goto_program.output_instruction(ns, identifier, out, i_it);
+    goto_program.output_instruction(ns, identifier, out, *i_it);
     location.set_attribute("instruction", out.str());
 
     function_body.new_element(location);

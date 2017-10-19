@@ -1333,19 +1333,24 @@ exprt string_abstractiont::member(const exprt &a, whatt what)
 {
   if(a.is_nil())
     return a;
+
   assert(type_eq(a.type(), string_struct, ns) ||
       is_ptr_string_struct(a.type()));
 
-  member_exprt result(build_type(what));
-  result.struct_op()=a.type().id()==ID_pointer?
+  exprt struct_op=
+    a.type().id()==ID_pointer?
     dereference_exprt(a, string_struct):a;
+
+  irep_idt component_name;
 
   switch(what)
   {
-  case whatt::IS_ZERO: result.set_component_name("is_zero"); break;
-  case whatt::SIZE: result.set_component_name("size"); break;
-  case whatt::LENGTH: result.set_component_name("length"); break;
+  case whatt::IS_ZERO: component_name="is_zero"; break;
+  case whatt::SIZE: component_name="size"; break;
+  case whatt::LENGTH: component_name="length"; break;
   }
+
+  member_exprt result(struct_op, component_name, build_type(what));
 
   return result;
 }

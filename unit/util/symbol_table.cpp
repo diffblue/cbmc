@@ -2,7 +2,7 @@
 
 /// \file Tests for symbol_tablet
 
-#include <catch.hpp>
+#include <testing-utils/catch.hpp>
 #include <util/recording_symbol_table.h>
 
 SCENARIO("recording_symbol_table",
@@ -30,11 +30,11 @@ SCENARIO("recording_symbol_table",
       THEN(
         "The symbol table should return a symbol from a lookup of that name")
       {
-        REQUIRE(symbol_table.lookup(symbol_name1).has_value());
+        REQUIRE(symbol_table.lookup(symbol_name1));
       }
       THEN("The symbol table should return the same symbol from a lookup")
       {
-        REQUIRE(&result.first==&symbol_table.lookup(symbol_name1)->get());
+        REQUIRE(&result.first==symbol_table.lookup(symbol_name1));
       }
       THEN("The added symbol should appear in the updated collection")
       {
@@ -86,18 +86,18 @@ SCENARIO("recording_symbol_table",
             "The original symbol table should return a symbol from a lookup "
               "of that name")
           {
-            REQUIRE(symbol_table.lookup(symbol_name2).has_value());
+            REQUIRE(symbol_table.lookup(symbol_name2));
           }
           THEN(
             "The new symbol table should return a symbol from a lookup "
               "of that name")
           {
-            REQUIRE(symbol_table2.lookup(symbol_name2).has_value());
+            REQUIRE(symbol_table2.lookup(symbol_name2));
           }
           THEN(
             "The new symbol table should return the same symbol from a lookup")
           {
-            REQUIRE(&result.first==&symbol_table2.lookup(symbol_name2)->get());
+            REQUIRE(&result.first==symbol_table2.lookup(symbol_name2));
           }
           THEN(
             "The added symbol should appear in the updated collection of the "
@@ -125,8 +125,8 @@ SCENARIO("recording_symbol_table",
               "Both symbol tables should return a symbol from a lookup "
                 "of that name")
             {
-              REQUIRE(symbol_table.lookup(symbol_name1).has_value());
-              REQUIRE(symbol_table2.lookup(symbol_name1).has_value());
+              REQUIRE(symbol_table.lookup(symbol_name1));
+              REQUIRE(symbol_table2.lookup(symbol_name1));
             }
             THEN(
               "The added symbol should appear in the updated collection "
@@ -157,8 +157,8 @@ SCENARIO("recording_symbol_table",
             }
             THEN("The second symbol should not appear in either map")
             {
-              REQUIRE(!symbol_table.lookup(symbol_name2).has_value());
-              REQUIRE(!symbol_table2.lookup(symbol_name2).has_value());
+              REQUIRE(!symbol_table.lookup(symbol_name2));
+              REQUIRE(!symbol_table2.lookup(symbol_name2));
             }
             THEN(
               "The second symbol should not appear in the updated "
@@ -184,8 +184,8 @@ SCENARIO("recording_symbol_table",
             }
             THEN("The first symbol should not appear in either map")
             {
-              REQUIRE(!symbol_table.lookup(symbol_name1).has_value());
-              REQUIRE(!symbol_table2.lookup(symbol_name1).has_value());
+              REQUIRE(!symbol_table.lookup(symbol_name1));
+              REQUIRE(!symbol_table2.lookup(symbol_name1));
             }
             THEN(
               "The first symbol should not appear in the updated "
@@ -227,17 +227,17 @@ SCENARIO("recording_symbol_table",
                 "Both symbol tables should return a symbol from a lookup "
                   "of that name")
               {
-                REQUIRE(symbol_table.lookup(symbol_name1).has_value());
-                REQUIRE(symbol_table2.lookup(symbol_name1).has_value());
+                REQUIRE(symbol_table.lookup(symbol_name1));
+                REQUIRE(symbol_table2.lookup(symbol_name1));
               }
               THEN(
                 "Both symbol tables should return the same symbol from a "
                   "lookup")
               {
                 REQUIRE(
-                  &result.first==&symbol_table.lookup(symbol_name1)->get());
+                  &result.first==symbol_table.lookup(symbol_name1));
                 REQUIRE(
-                  &result.first==&symbol_table2.lookup(symbol_name1)->get());
+                  &result.first==symbol_table2.lookup(symbol_name1));
               }
               THEN(
                 "The added symbol should appear in the updated collection of "
@@ -262,8 +262,8 @@ SCENARIO("recording_symbol_table",
                 }
                 THEN("The first symbol should not appear in either map")
                 {
-                  REQUIRE(!symbol_table.lookup(symbol_name1).has_value());
-                  REQUIRE(!symbol_table2.lookup(symbol_name1).has_value());
+                  REQUIRE(!symbol_table.lookup(symbol_name1));
+                  REQUIRE(!symbol_table2.lookup(symbol_name1));
                 }
                 THEN(
                   "The first symbol should not appear in the updated "
@@ -298,8 +298,8 @@ SCENARIO("recording_symbol_table",
             }
             THEN("The second symbol should not appear in either map")
             {
-              REQUIRE(!symbol_table.lookup(symbol_name2).has_value());
-              REQUIRE(!symbol_table2.lookup(symbol_name2).has_value());
+              REQUIRE(!symbol_table.lookup(symbol_name2));
+              REQUIRE(!symbol_table2.lookup(symbol_name2));
             }
             THEN(
               "The second symbol should not appear in the updated "

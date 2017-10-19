@@ -31,8 +31,7 @@ bool static_lifetime_init(
 {
   namespacet ns(symbol_table);
 
-  symbol_tablet::opt_symbol_reft maybe_symbol=
-    symbol_table.get_writeable(INITIALIZE_FUNCTION);
+  const auto maybe_symbol=symbol_table.get_writeable(INITIALIZE_FUNCTION);
   if(!maybe_symbol)
     return false;
   symbolt &init_symbol=*maybe_symbol;

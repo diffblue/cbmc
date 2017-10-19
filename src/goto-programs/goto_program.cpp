@@ -17,22 +17,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-/// See below.
-/// \param ns: the namespace to resolve the expressions in
-/// \param identifier: the identifier used to find a symbol to identify the
-///   source language
-/// \param out: the stream to write the goto string to
-/// \param it: an iterator pointing to the instruction to convert
-/// \return See below.
-std::ostream &goto_programt::output_instruction(
-  const class namespacet &ns,
-  const irep_idt &identifier,
-  std::ostream &out,
-  instructionst::const_iterator it) const
-{
-  return output_instruction(ns, identifier, out, *it);
-}
-
 /// Writes to \p out a two/three line string representation of a given
 /// \p instruction. The output is of the format:
 /// ```

@@ -42,8 +42,7 @@ void jsil_typecheckt::update_expr_type(exprt &expr, const typet &type)
   {
     const irep_idt &id=to_symbol_expr(expr).get_identifier();
 
-    symbol_tablet::opt_symbol_reft maybe_symbol=
-      symbol_table.get_writeable(id);
+    const auto maybe_symbol=symbol_table.get_writeable(id);
     if(!maybe_symbol)
     {
       error() << "unexpected symbol: " << id << eom;
@@ -180,7 +179,7 @@ void jsil_typecheckt::typecheck_expr_main(exprt &expr)
             expr.id()=="builtin_object" ||
             expr.id()=="user_object" ||
             expr.id()=="object" ||
-            expr.id()==ID_reference ||
+            expr.id()==ID_pointer ||
             expr.id()==ID_member ||
             expr.id()=="variable")
       expr.type()=jsil_kind();
@@ -749,8 +748,7 @@ void jsil_typecheckt::typecheck_function_call(
   {
     const irep_idt &id=to_symbol_expr(f).get_identifier();
 
-    symbol_tablet::opt_const_symbol_reft maybe_symbol=symbol_table.lookup(id);
-    if(maybe_symbol)
+    if(const symbolt *maybe_symbol=symbol_table.lookup(id))
     {
       const symbolt &s=*maybe_symbol;
 

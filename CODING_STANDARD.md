@@ -182,6 +182,11 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 - Avoid `assert`. If the condition is an actual invariant, use INVARIANT,
   PRECONDITION, POSTCONDITION, CHECK_RETURN, UNREACHABLE or DATA_INVARIANT. If
   there are possible reasons why it might fail, throw an exception.
+- All raw pointers (such as those returned by `symbol_tablet::lookup`) are
+  assumed to be non-owning, and should not be `delete`d. Raw pointers that
+  point to heap-allocated memory should be private data members of an object
+  which safely manages the pointer. As such, `new` should only be used in
+  constructors, and `delete` in destructors. Never use `malloc` or `free`.
 
 # Architecture-specific code
 - Avoid if possible.

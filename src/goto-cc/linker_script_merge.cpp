@@ -168,8 +168,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
   // First, pointerize the actual linker-defined symbols
   for(const auto &pair : linker_values)
   {
-    symbol_tablet::opt_symbol_reft maybe_symbol=
-      symbol_table.get_writeable(pair.first);
+    const auto maybe_symbol=symbol_table.get_writeable(pair.first);
     if(!maybe_symbol)
       continue;
     symbolt &entry=*maybe_symbol;
@@ -190,7 +189,7 @@ int linker_script_merget::pointerize_linker_defined_symbols(
     debug() << "Pointerizing the symbol-table value of symbol " << pair.first
             << eom;
     int fail=pointerize_subexprs_of(
-      symbol_table.get_writeable(pair.first)->get().value,
+      symbol_table.get_writeable_ref(pair.first).value,
       to_pointerize,
       linker_values);
     if(to_pointerize.empty() && fail==0)

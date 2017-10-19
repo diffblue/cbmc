@@ -1,0 +1,9 @@
+CORE
+StringCompare05.class
+--refine-strings --string-max-length 1000
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[.*assertion\.1\] .* line 9 .* FAILURE$
+--
+^warning: ignoring

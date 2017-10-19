@@ -248,22 +248,93 @@ const exprt java_bytecode_convert_methodt::variable(
   }
 }
 
+/// Returns the member type for a method, based on signature or descriptor
+/// \param descriptor
+///   descriptor of the method
+/// \param signature
+///   signature of the method
+/// \param class_name
+///   string containing the name of the corresponding class
+/// \param method_name
+///   string containing the name of the method
+/// \param message_handler
+///   message handler to collect warnings
+/// \return
+///   the constructed member type
+typet member_type_lazy(const std::string &descriptor,
+                       const optionalt<std::string> &signature,
+                       const std::string &class_name,
+                       const std::string &method_name,
+                       message_handlert &message_handler)
+{
+  // In order to construct the method type, we can either use signature or
+  // descriptor. Since only signature contains the generics info, we want to
+  // use signature whenever possible. We revert to using descriptor if (1) the
+  // signature does not exist, (2) an unsupported generics are present or
+  // (3) in the special case when the number of parameters in the descriptor
+  // does not match the number of parameters in the signature - e.g. for
+  // certain types of inner classes and enums (see unit tests for examples).
+
+  messaget message(message_handler);
+
+  typet member_type_from_descriptor=java_type_from_string(descriptor);
+  INVARIANT(member_type_from_descriptor.id()==ID_code, "Must be code type");
+  if(signature.has_value())
+  {
+    try
+    {
+      typet member_type_from_signature=java_type_from_string(
+        signature.value(),
+        class_name);
+      INVARIANT(member_type_from_signature.id()==ID_code, "Must be code type");
+      if(to_code_type(member_type_from_signature).parameters().size()==
+         to_code_type(member_type_from_descriptor).parameters().size())
+      {
+        return member_type_from_signature;
+      }
+      else
+      {
+        message.warning() << "method: " << class_name << "." << method_name
+          << "\n signature: " << signature.value() << "\n descriptor: "
+          << descriptor << "\n different number of parameters, reverting to "
+          "descriptor" << message.eom;
+      }
+    }
+    catch(unsupported_java_class_signature_exceptiont &e)
+    {
+      message.warning() << "method: " << class_name << "." << method_name
+        << "\n could not parse signature: " << signature.value() << "\n "
+        << e.what() << "\n" << " reverting to descriptor: "
+        << descriptor << message.eom;
+    }
+  }
+  return member_type_from_descriptor;
+}
+
 /// This creates a method symbol in the symtab, but doesn't actually perform
 /// method conversion just yet. The caller should call
 /// java_bytecode_convert_method later to give the symbol/method a body.
 /// \par parameters: `class_symbol`: class this method belongs to
-/// `method_identifier`: fully qualified method name, including type signature
+/// `method_identifier`: fully qualified method name, including type descriptor
 ///   (e.g. "x.y.z.f:(I)")
 /// `m`: parsed method object to convert
 /// `symbol_table`: global symbol table (will be modified)
+/// `message_handler`: message handler to collect warnings
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,
   const irep_idt &method_identifier,
   const java_bytecode_parse_treet::methodt &m,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  message_handlert &message_handler)
 {
   symbolt method_symbol;
-  typet member_type=java_type_from_string(m.signature);
+
+  typet member_type=member_type_lazy(
+    m.descriptor,
+    m.signature,
+    id2string(class_symbol.name),
+    id2string(m.base_name),
+    message_handler);
 
   method_symbol.name=method_identifier;
   method_symbol.base_name=m.base_name;
@@ -317,7 +388,7 @@ void java_bytecode_convert_methodt::convert(
   // to retrieve the symbol (constructed by java_bytecode_convert_method_lazy)
   // associated to the method
   const irep_idt method_identifier=
-    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.signature;
+    id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
   method_id=method_identifier;
 
   const symbolt &old_sym=*symbol_table.lookup(method_identifier);
@@ -350,7 +421,17 @@ void java_bytecode_convert_methodt::convert(
     // Construct a fully qualified name for the parameter v,
     // e.g. my.package.ClassName.myMethodName:(II)I::anIntParam, and then a
     // symbol_exprt with the parameter and its type
-    typet t=java_type_from_string(v.signature);
+    typet t;
+    if(v.signature.has_value())
+    {
+      t=java_type_from_string_with_exception(
+        v.descriptor,
+        v.signature,
+        id2string(class_symbol.name));
+    }
+    else
+      t=java_type_from_string(v.descriptor);
+
     std::ostringstream id_oss;
     id_oss << method_id << "::" << v.name;
     irep_idt identifier(id_oss.str());
@@ -883,8 +964,7 @@ bool java_bytecode_convert_methodt::class_needs_clinit(
     findit_any.first->second=true;
     return true;
   }
-  symbol_tablet::opt_const_symbol_reft maybe_symbol=
-    symbol_table.lookup(classname);
+  const auto maybe_symbol=symbol_table.lookup(classname);
   // Stub class?
   if(!maybe_symbol)
   {
@@ -1320,8 +1400,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             "java::org.cprover.CProver.assume:(Z)V")
     {
       const code_typet &code_type=to_code_type(arg0.type());
-      // sanity check: function has the right number of args
-      assert(code_type.parameters().size()==1);
+      INVARIANT(code_type.parameters().size()==1,
+                "function expected to have exactly one parameter");
 
       exprt operand = pop(1)[0];
       // we may need to adjust the type of the argument
@@ -1384,7 +1464,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       if(use_this)
       {
         const exprt &this_arg=call.arguments().front();
-        assert(this_arg.type().id()==ID_pointer);
+        INVARIANT(this_arg.type().id()==ID_pointer,
+                  "first argument must be a pointer");
       }
 
       // do some type adjustment for the arguments,

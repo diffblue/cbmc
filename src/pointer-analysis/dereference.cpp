@@ -264,9 +264,9 @@ exprt dereferencet::dereference_typecast(
     return dereference_rec(op, offset, type); // just pass down
   else if(op_type.id()==ID_signedbv || op_type.id()==ID_unsignedbv)
   {
-    // We got an integer-typed address A. We turn this back (!)
-    // into *(type *)(A+offset), and then let some other layer
-    // worry about it.
+    // We got an integer-typed address A. We turn this
+    // into integer_dereference(A+offset),
+    // and then let some other layer worry about it.
 
     exprt integer=op;
 
@@ -274,10 +274,7 @@ exprt dereferencet::dereference_typecast(
       integer=
         plus_exprt(offset, typecast_exprt(op, offset.type()));
 
-    exprt new_typecast=
-      typecast_exprt(integer, pointer_type(type));
-
-    return dereference_exprt(new_typecast, type);
+    return unary_exprt(ID_integer_dereference, integer, type);
   }
   else
     throw "dereferencet: unexpected cast";

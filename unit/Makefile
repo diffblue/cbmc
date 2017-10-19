@@ -1,9 +1,7 @@
-.PHONY: all cprover.dir test
+.PHONY: all cprover.dir testing-utils.dir test
 
 # Source files for test utilities
-SRC = src/expr/require_expr.cpp \
-      src/ansi-c/c_to_expr.cpp \
-      unit_tests.cpp \
+SRC = unit_tests.cpp \
       catch_example.cpp \
       util/expr_iterator.cpp \
       util/optional.cpp \
@@ -19,7 +17,10 @@ SRC += unit_tests.cpp \
        analyses/does_remove_const/does_type_preserve_const_correctness.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
+       java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
        miniBDD_new.cpp \
+       java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
+       java_bytecode/java_utils_test.cpp \
        solvers/refinement/string_constraint_generator_valueof/calculate_max_string_length.cpp \
        solvers/refinement/string_constraint_generator_valueof/get_numeric_value_from_character.cpp \
        solvers/refinement/string_constraint_generator_valueof/is_digit_with_radix.cpp \
@@ -28,6 +29,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
+       util/message.cpp \
        util/simplify_expr.cpp \
        catch_example.cpp \
        # Empty last line
@@ -39,6 +41,9 @@ include ../src/common
 
 cprover.dir:
 	$(MAKE) $(MAKEARGS) -C ../src
+
+testing-utils.dir:
+	$(MAKE) $(MAKEARGS) -C testing-utils
 
 CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/miniz/miniz$(OBJEXT) \
@@ -56,7 +61,7 @@ CPROVER_LIBS =../src/java_bytecode/java_bytecode$(LIBEXT) \
               ../src/solvers/solvers$(LIBEXT) \
               # Empty last line
 
-OBJ += $(CPROVER_LIBS)
+OBJ += $(CPROVER_LIBS) testing-utils/testing-utils$(LIBEXT)
 
 TESTS = unit_tests$(EXEEXT) \
         miniBDD$(EXEEXT) \
@@ -66,7 +71,7 @@ TESTS = unit_tests$(EXEEXT) \
 
 CLEANFILES = $(TESTS)
 
-all: cprover.dir
+all: cprover.dir testing-utils.dir
 	$(MAKE) $(MAKEARGS) $(TESTS)
 
 test: all

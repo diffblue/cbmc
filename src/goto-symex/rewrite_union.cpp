@@ -42,12 +42,42 @@ static bool have_to_rewrite_union(
   return false;
 }
 
+// inside an address of (&x), unions can simply
+// be type casts and don't have to be re-written!
+void rewrite_union_address_of(
+  exprt &expr,
+  const namespacet &ns)
+{
+  if(!have_to_rewrite_union(expr, ns))
+    return;
+
+  if(expr.id()==ID_index)
+  {
+    rewrite_union_address_of(to_index_expr(expr).array(), ns);
+    rewrite_union(to_index_expr(expr).index(), ns);
+  }
+  else if(expr.id()==ID_member)
+    rewrite_union_address_of(to_member_expr(expr).struct_op(), ns);
+  else if(expr.id()==ID_symbol)
+  {
+    // done!
+  }
+  else if(expr.id()==ID_dereference)
+    rewrite_union(to_dereference_expr(expr).pointer(), ns);
+}
+
 /// We rewrite u.c for unions u into byte_extract(u, 0), and { .c = v } into
 /// byte_update(NIL, 0, v)
 void rewrite_union(
   exprt &expr,
   const namespacet &ns)
 {
+  if(expr.id()==ID_address_of)
+  {
+    rewrite_union_address_of(to_address_of_expr(expr).object(), ns);
+    return;
+  }
+
   if(!have_to_rewrite_union(expr, ns))
     return;
 

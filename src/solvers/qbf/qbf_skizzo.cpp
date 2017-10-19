@@ -61,7 +61,7 @@ propt::resultt qbf_skizzot::prop_solve()
   // solve it
   int res=system((
     "sKizzo "+qbf_tmp_file+options+" > "+result_tmp_file).c_str());
-  assert(0==res);
+  CHECK_RETURN(0==res);
 
   bool result=false;
 

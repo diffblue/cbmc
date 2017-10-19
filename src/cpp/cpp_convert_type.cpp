@@ -159,6 +159,22 @@ void cpp_convert_typet::read_rec(const typet &type)
     tmp.id(ID_empty);
     other.push_back(tmp);
   }
+  else if(type.id()==ID_frontend_pointer)
+  {
+    // add width and turn into ID_pointer
+    pointer_typet tmp(type.subtype(), config.ansi_c.pointer_width);
+    tmp.add_source_location()=type.source_location();
+    if(type.get_bool(ID_C_reference))
+      tmp.set(ID_C_reference, true);
+    if(type.get_bool(ID_C_rvalue_reference))
+      tmp.set(ID_C_rvalue_reference, true);
+    other.push_back(tmp);
+  }
+  else if(type.id()==ID_pointer)
+  {
+    // ignore, we unfortunately convert multiple times
+    other.push_back(type);
+  }
   else
   {
     other.push_back(type);
@@ -549,7 +565,6 @@ void cpp_convert_plain_type(typet &type)
   if(type.id()==ID_cpp_name ||
      type.id()==ID_struct ||
      type.id()==ID_union ||
-     type.id()==ID_pointer ||
      type.id()==ID_array ||
      type.id()==ID_code ||
      type.id()==ID_unsignedbv ||

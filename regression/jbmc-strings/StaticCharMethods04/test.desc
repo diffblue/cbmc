@@ -1,0 +1,9 @@
+CORE
+StaticCharMethods04.class
+--refine-strings --string-max-length 1000
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+^\[.*assertion\.1\] .* line 6 .* FAILURE$
+--
+^warning: ignoring

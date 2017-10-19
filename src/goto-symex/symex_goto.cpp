@@ -78,7 +78,7 @@ void goto_symext::symex_goto(statet &state)
     }
 
     unsigned &unwind=
-      frame.loop_iterations[goto_programt::loop_id(state.source.pc)].count;
+      frame.loop_iterations[goto_programt::loop_id(*state.source.pc)].count;
     unwind++;
 
     // continue unwinding?

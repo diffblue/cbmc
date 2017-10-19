@@ -276,7 +276,7 @@ int goto_instrument_parse_optionst::doit()
 
         forall_goto_program_instructions(i_it, goto_program)
         {
-          goto_program.output_instruction(ns, "", std::cout, i_it);
+          goto_program.output_instruction(ns, "", std::cout, *i_it);
           std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
                     << "\n\n";
         }
@@ -439,6 +439,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-call-sequences"))
     {
+      do_indirect_call_and_rtti_removal();
       show_call_sequences(goto_model);
       return 0;
     }
@@ -670,6 +671,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("call-graph"))
     {
+      do_indirect_call_and_rtti_removal();
       call_grapht call_graph(goto_model);
 
       if(cmdline.isset("xml"))

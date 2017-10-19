@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_class_loader.h"
 #include "java_utils.h"
 #include <java_bytecode/ci_lazy_methods.h>
+#include <java_bytecode/generate_java_generic_type.h>
 
 #include "expr2java.h"
 
@@ -179,6 +180,8 @@ bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
+  PRECONDITION(language_options_initialized);
+
   java_internal_additions(symbol_table);
 
   if(string_refinement_enabled)
@@ -236,16 +239,28 @@ bool java_bytecode_languaget::typecheck(
     get_message_handler());
 
   // now typecheck all
-  if(java_bytecode_typecheck(
-       symbol_table, get_message_handler(), string_refinement_enabled))
-    return true;
+  bool res=java_bytecode_typecheck(
+    symbol_table, get_message_handler(), string_refinement_enabled);
+  // NOTE (FOTIS): There is some unintuitive logic here, where
+  // java_bytecode_check will return TRUE if typechecking failed, and FALSE
+  // if everything went well...
+  if(res)
+  {
+    // there is no point in continuing to concretise
+    // the generic types if typechecking failed.
+    return res;
+  }
 
-  return false;
+  instantiate_generics(get_message_handler(), symbol_table);
+
+  return res;
 }
 
 bool java_bytecode_languaget::generate_support_functions(
   symbol_tablet &symbol_table)
 {
+  PRECONDITION(language_options_initialized);
+
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, get_message_handler());
   if(!res.is_success())
@@ -386,8 +401,11 @@ void java_bytecode_languaget::replace_string_methods(
 bool java_bytecode_languaget::final(
   symbol_tablet &symbol_table)
 {
+  PRECONDITION(language_options_initialized);
+
   // replace code of String methods calls by code we generate
   replace_string_methods(symbol_table);
+
   return false;
 }
 
