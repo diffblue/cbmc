@@ -114,7 +114,7 @@ void interpretert::show_state()
       ns,
       function->first,
       status(),
-      pc);
+      *pc);
 
   status() << eom;
 }
