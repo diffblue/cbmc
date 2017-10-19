@@ -54,6 +54,7 @@ SCENARIO("call_graph",
     // {
     //    A();
     //    B();
+    //    B();
     // }
     // void B()
     // {
@@ -72,8 +73,11 @@ SCENARIO("call_graph",
       call1.function()=symbol_exprt("A", void_function_type);
       code_function_callt call2;
       call2.function()=symbol_exprt("B", void_function_type);
+      code_function_callt call3;
+      call3.function()=symbol_exprt("B", void_function_type);
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
+      calls.move_to_operands(call3);
 
       goto_model.symbol_table.add(
         create_void_function_symbol("A", calls));
@@ -104,12 +108,16 @@ SCENARIO("call_graph",
 
     WHEN("A call graph is constructed from the GOTO functions")
     {
-      THEN("We expect A -> { A, B }, B -> { C, D }")
+      THEN("We expect A -> { A, B, B }, B -> { C, D }")
       {
         const auto &check_graph=call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
-        REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B"}));
+        REQUIRE(check_graph.size()==5);
+        REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B", "B"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
+      }
+      THEN("No callsite data should be collected")
+      {
+        REQUIRE(call_graph_from_goto_functions.callsites.empty());
       }
     }
 
@@ -117,17 +125,39 @@ SCENARIO("call_graph",
     {
       call_grapht inverse_call_graph_from_goto_functions=
         call_graph_from_goto_functions.get_inverted();
-      THEN("We expect A -> { A }, B -> { A }, C -> { B }, D -> { B }")
+      THEN("We expect A -> { A }, B -> { A, A }, C -> { B }, D -> { B }")
       {
         const auto &check_graph=inverse_call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
+        REQUIRE(check_graph.size()==5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
-        REQUIRE(multimap_key_matches(check_graph, "B", {"A"}));
+        REQUIRE(multimap_key_matches(check_graph, "B", {"A", "A"}));
         REQUIRE(multimap_key_matches(check_graph, "C", {"B"}));
         REQUIRE(multimap_key_matches(check_graph, "D", {"B"}));
       }
     }
 
+    WHEN("A call graph is constructed with call-site tracking")
+    {
+      call_grapht call_graph_from_goto_functions(goto_model, true);
+      THEN("We expect two callsites for the A -> B edge, one for all others")
+      {
+        const auto &check_callsites=call_graph_from_goto_functions.callsites;
+        for(const auto &edge : call_graph_from_goto_functions.graph)
+        {
+          if(edge==call_grapht::grapht::value_type("A", "B"))
+            REQUIRE(check_callsites.at(edge).size()==2);
+          else
+            REQUIRE(check_callsites.at(edge).size()==1);
+        }
+      }
+      WHEN("Such a graph is inverted")
+      {
+        call_grapht inverted=call_graph_from_goto_functions.get_inverted();
+        THEN("The callsite data should be discarded")
+        {
+          REQUIRE(inverted.callsites.empty());
+        }
+      }
+    }
   }
-
 }
