@@ -396,7 +396,11 @@ if($opt_p && $failures != 0) {
         $printed_this_test = 1;
         print "\n\n";
         print "Failed test: $current_test\n";
-        system("cat $current_test/$output_file");
+        open FH, "<$current_test/$output_file";
+        while (my $f = <FH>) {
+          print $f;
+        }
+        close FH;
         print "\n\nFailed $descriptor_file lines:\n";
       }
       print "$_\n";
