@@ -68,27 +68,39 @@ public:
   }
 
   /// Find a symbol in the symbol table for read-only access.
-  /// \param id: The name of the symbol to look for
-  /// \return an optional reference, set if found, nullptr otherwise.
-  const symbolt *lookup(const irep_idt &identifier) const;
+  /// \param identifier: The name of the symbol to look for
+  /// \return an optional pointer, set if found, nullptr otherwise.
+  const symbolt *lookup(const irep_idt &identifier) const
+  {
+    symbolst::const_iterator it=symbols.find(identifier);
+    if(it==symbols.end())
+      return nullptr;
+    return &it->second;
+  }
 
   /// Find a symbol in the symbol table for read-write access.
-  /// \param id: The name of the symbol to look for
-  /// \return an optional reference, set if found, unset otherwise.
+  /// \param identifier: The name of the symbol to look for
+  /// \return an optional pointer, set if found, nullptr otherwise.
   virtual symbolt *get_writeable(const irep_idt &identifier)=0;
 
   /// Find a symbol in the symbol table for read-only access.
-  /// \param id: The name of the symbol to look for
+  /// \param identifier: The name of the symbol to look for
   /// \return A reference to the symbol
   /// \throw `std::out_of_range` if no such symbol exists
-  const symbolt &lookup_ref(const irep_idt &id) const
-    { return symbols.at(id); }
+  const symbolt &lookup_ref(const irep_idt &identifier) const
+  { return symbols.at(identifier); }
 
   /// Find a symbol in the symbol table for read-write access.
-  /// \param id: The name of the symbol to look for
+  /// \param identifier: The name of the symbol to look for
   /// \return A reference to the symbol
   /// \throw `std::out_of_range` if no such symbol exists
-  virtual symbolt &get_writeable_ref(const irep_idt &id)=0;
+  symbolt &get_writeable_ref(const irep_idt &identifier)
+  {
+    symbolt *symbol=get_writeable(identifier);
+    if(symbol==nullptr)
+      throw std::out_of_range("identifier not found in symbol_table");
+    return *symbol;
+  }
 
   bool add(const symbolt &symbol);
   /// Move or copy a new symbol to the symbol table
@@ -103,6 +115,8 @@ public:
   bool move(symbolt &symbol, symbolt *&new_symbol);
 
   bool remove(const irep_idt &name);
+  /// Remove a symbol from the symbol table
+  /// \param entry: an iterator pointing at the symbol to remove
   virtual void erase(const symbolst::const_iterator &entry)=0;
   virtual void clear()=0;
 
@@ -187,8 +201,6 @@ public:
   }
 
   virtual symbolt *get_writeable(const irep_idt &identifier) override;
-  virtual symbolt &get_writeable_ref(const irep_idt &identifier) override
-    { return internal_symbols.at(identifier); }
 
   virtual std::pair<symbolt &, bool> insert(symbolt symbol) override;
 

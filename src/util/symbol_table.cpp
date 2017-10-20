@@ -7,19 +7,6 @@
 #include <util/invariant.h>
 
 
-/// Find a symbol in the symbol table.
-/// \param identifier: The name of the symbol to look for
-/// \return Returns an optional reference to the found symbol, without a value
-///   if a symbol with the given name does not exist in the symbol table
-const symbolt *symbol_tablet::lookup(
-  const irep_idt &identifier) const
-{
-  symbolst::const_iterator it=symbols.find(identifier);
-  if(it==symbols.end())
-    return nullptr;
-  return &it->second;
-}
-
 /// Add a new symbol to the symbol table
 /// \param symbol: The symbol to be added to the symbol table
 /// \return Returns true if the process failed, which should only happen if
@@ -106,12 +93,7 @@ std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
 }
 
 
-/// Find a symbol in the symbol table.
-/// \param identifier: The name of the symbol to look for
-/// \return Returns an optional reference to the found symbol, without a value
-///   if a symbol with the given name does not exist in the symbol table
-symbolt *concrete_symbol_tablet::get_writeable(
-  const irep_idt &identifier)
+symbolt *concrete_symbol_tablet::get_writeable(const irep_idt &identifier)
 {
   symbolst::iterator it=internal_symbols.find(identifier);
   if(it==symbols.end())

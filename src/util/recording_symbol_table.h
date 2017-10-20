@@ -56,15 +56,8 @@ public:
   virtual symbolt *get_writeable(const irep_idt &identifier) override
   {
     symbolt *result=base_symbol_table.get_writeable(identifier);
-    if(result)
+    if(result!=nullptr)
       on_update(identifier);
-    return result;
-  }
-
-  virtual symbolt &get_writeable_ref(const irep_idt &identifier) override
-  {
-    symbolt &result=base_symbol_table.get_writeable_ref(identifier);
-    on_update(identifier);
     return result;
   }
 
