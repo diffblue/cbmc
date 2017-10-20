@@ -1,4 +1,4 @@
-class DerivedGeneric extends SimpleGeneric<Foo>
+class DerivedGeneric extends Generic<Interface_Implementation>
 {
 
 }

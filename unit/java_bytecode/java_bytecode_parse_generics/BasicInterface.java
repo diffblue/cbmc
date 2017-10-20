@@ -1,4 +1,0 @@
-interface BasicInterface
-{
-  int getX();
-}

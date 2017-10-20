@@ -43,7 +43,7 @@ SCENARIO(
          " descriptor")
   {
     const std::string func_name=".<init>";
-    const std::string func_descriptor=":(LOuter;LAbstractGenericClass;)V";
+    const std::string func_descriptor = ":(LOuter;LAbstractGeneric;)V";
     const std::string process_func_name=
       inner_prefix+func_name+func_descriptor;
     REQUIRE(new_symbol_table.has_symbol(process_func_name));

@@ -2,9 +2,9 @@ public class Outer<T>
 {
   private class Inner
   {
-    private final AbstractGenericClass<T> u;
+    private final AbstractGeneric<T> u;
 
-    Inner (AbstractGenericClass<T> t)
+    Inner (AbstractGeneric<T> t)
     {
       this.u = t;
     }

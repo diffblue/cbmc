@@ -1,4 +1,4 @@
-class Foo implements BasicInterface
+class Interface_Implementation implements Interface
 {
   public int x;
 

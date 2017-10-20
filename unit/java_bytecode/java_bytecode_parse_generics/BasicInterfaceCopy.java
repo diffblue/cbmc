@@ -1,4 +1,0 @@
-interface BasicInterfaceCopy
-{
-  int getX();
-}

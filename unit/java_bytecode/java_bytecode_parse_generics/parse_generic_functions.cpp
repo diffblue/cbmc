@@ -31,7 +31,7 @@ SCENARIO(
   THEN("There should be a symbol for processSimpleGeneric")
   {
     const std::string func_name=".processSimpleGeneric";
-    const std::string func_descriptor=":(LSimpleGeneric;)V";
+    const std::string func_descriptor = ":(LGeneric;)V";
     const std::string process_func_name=class_prefix+func_name+func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
@@ -40,7 +40,7 @@ SCENARIO(
   THEN("There should be a symbol for processUpperBoundInterfaceGeneric")
   {
     const std::string func_name=".processUpperBoundInterfaceGeneric";
-    const std::string func_descriptor=":(LSimpleGeneric;)V";
+    const std::string func_descriptor = ":(LGeneric;)V";
     const std::string process_func_name=class_prefix+func_name+func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
@@ -49,7 +49,7 @@ SCENARIO(
   THEN("There should be a symbol for processUpperBoundClassGeneric")
   {
     const std::string func_name=".processUpperBoundClassGeneric";
-    const std::string func_descriptor=":(LSimpleGeneric;)V";
+    const std::string func_descriptor = ":(LGeneric;)V";
     const std::string process_func_name=class_prefix+func_name+func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
@@ -58,7 +58,7 @@ SCENARIO(
   THEN("There should be a symbol for processDoubleUpperBoundClassGeneric")
   {
     const std::string func_name=".processDoubleUpperBoundClassGeneric";
-    const std::string func_descriptor=":(LSimpleGeneric;)V";
+    const std::string func_descriptor = ":(LGeneric;)V";
     const std::string process_func_name=class_prefix+func_name+func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
@@ -67,7 +67,7 @@ SCENARIO(
   THEN("There should be a symbol for processDoubleUpperBoundInterfaceGeneric")
   {
     const std::string func_name=".processDoubleUpperBoundInterfaceGeneric";
-    const std::string func_descriptor=":(LSimpleGeneric;)V";
+    const std::string func_descriptor = ":(LGeneric;)V";
     const std::string process_func_name=class_prefix+func_name+func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
