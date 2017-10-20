@@ -379,7 +379,7 @@ void show_goto_trace(
       if(!step.cond_value)
       {
         out << "\n";
-        out << "Violated assumption:" << "\n";
+        out << "Assumption:" << "\n";
         if(!step.pc->source_location.is_nil())
           out << "  " << step.pc->source_location << "\n";
 
