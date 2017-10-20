@@ -88,22 +88,37 @@ smt2_dect::solvert cbmc_solverst::get_smt2_solver_type() const
   return s;
 }
 
+/// Create satcheck object based on options object
+/// \param options Options object
+/// \param use_simplifier If set to true, creates satchecker with simplifier
+/// \param message_handler message handler for satchecker
+/// \return Unique pointer holding a satcheck instance
+static std::unique_ptr<propt> make_satcheck(
+  const optionst &options,
+  bool use_simplifier,
+  message_handlert &message_handler)
+{
+  const auto satcheck_info = parse_satcheck_info(options);
+  std::unique_ptr<propt> satcheck;
+  if(use_simplifier)
+    satcheck = util_make_unique<satcheckt>();
+  else
+    satcheck = util_make_unique<satcheck_no_simplifiert>();
+  satcheck->set_message_handler(message_handler);
+  satcheck->set_random_seed(satcheck_info.random_seed);
+  satcheck->set_random_var_freq(satcheck_info.random_var_freq);
+  return satcheck;
+}
+
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_default()
 {
   auto solver=util_make_unique<solvert>();
 
-  if(options.get_bool_option("beautify") ||
-     !options.get_bool_option("sat-preprocessor")) // no simplifier
-  {
-    // simplifier won't work with beautification
-    solver->set_prop(util_make_unique<satcheck_no_simplifiert>());
-  }
-  else // with simplifier
-  {
-    solver->set_prop(util_make_unique<satcheckt>());
-  }
+  const bool use_simplifier = !options.get_bool_option("beautify") &&
+                              options.get_bool_option("sat-preprocessor");
 
-  solver->prop().set_message_handler(get_message_handler());
+  solver->set_prop(
+    make_satcheck(options, use_simplifier, get_message_handler()));
 
   auto bv_cbmc=util_make_unique<bv_cbmct>(ns, solver->prop());
 
@@ -133,23 +148,16 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_dimacs()
 
 std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_bv_refinement()
 {
-  std::unique_ptr<propt> prop=[this]() -> std::unique_ptr<propt>
-  {
-    // We offer the option to disable the SAT preprocessor
-    if(options.get_bool_option("sat-preprocessor"))
-    {
-      no_beautification();
-      return util_make_unique<satcheckt>();
-    }
-    return util_make_unique<satcheck_no_simplifiert>();
-  }();
-
-  prop->set_message_handler(get_message_handler());
+  const bool use_simplifier = options.get_bool_option("sat-preprocessor");
+  if(use_simplifier)
+    no_beautification();
+  auto prop = make_satcheck(options, use_simplifier, get_message_handler());
 
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=prop.get();
   info.ui=ui;
+  info.satcheck = parse_satcheck_info(options);
 
   // we allow setting some parameters
   if(options.get_bool_option("max-node-refinement"))
@@ -171,11 +179,11 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
 {
   string_refinementt::infot info;
   info.ns=&ns;
-  auto prop=util_make_unique<satcheck_no_simplifiert>();
-  prop->set_message_handler(get_message_handler());
+  auto prop = make_satcheck(options, false, get_message_handler());
   info.prop=prop.get();
   info.refinement_bound=MAX_NB_REFINEMENT;
   info.ui=ui;
+  info.satcheck = parse_satcheck_info(options);
   if(options.get_bool_option("string-max-length"))
     info.string_max_length=options.get_signed_int_option("string-max-length");
   info.string_non_empty=options.get_bool_option("string-non-empty");
