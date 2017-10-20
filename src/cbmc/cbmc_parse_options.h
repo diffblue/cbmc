@@ -53,8 +53,9 @@ class optionst;
   "(show-claims)(claim):(show-properties)" \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
-  "(hex)" \
-  "(trace-verbosity):" \
+  "(trace-hex)(trace-show-source-code)(trace-hide-assignments)"\
+  "(trace-show-function-calls)(html-trace)(trace-hide-inputs)" \
+  "(trace-hide-outputs)" \
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \
   "(version)" \
@@ -91,6 +92,7 @@ protected:
   void eval_verbosity();
   void register_languages();
   void get_command_line_options(optionst &);
+  void configure_trace_output();
   void preprocessing();
   int get_goto_program(const optionst &);
   bool process_goto_program(const optionst &);

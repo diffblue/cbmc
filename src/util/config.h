@@ -24,6 +24,20 @@ class namespacet;
 class configt
 {
 public:
+  typedef enum { STANDARD, HTML } trace_formatt;
+  typedef enum { HEX, BINARY } numeric_representationt;
+
+  struct trace_configurationt
+  {
+    bool show_function_calls;
+    bool show_source_code;
+    bool show_inputs;
+    bool show_outputs;
+    bool show_value_assignments;
+    numeric_representationt numeric_representation;
+    trace_formatt trace_format;
+  } trace_config;
+
   struct ansi_ct
   {
     // for ANSI-C

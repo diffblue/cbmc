@@ -102,6 +102,47 @@ void cbmc_parse_optionst::eval_verbosity()
   ui_message_handler.set_verbosity(v);
 }
 
+void cbmc_parse_optionst::configure_trace_output()
+{
+
+  if(cmdline.isset("trace-hex"))
+    config.trace_config.numeric_representation =
+        configt::numeric_representationt::HEX;
+  else
+    config.trace_config.numeric_representation =
+        configt::numeric_representationt::BINARY;
+
+  if(cmdline.isset("trace-show-source-code"))
+    config.trace_config.show_source_code=true;
+  else
+    config.trace_config.show_source_code=false;
+
+  if(cmdline.isset("trace-hide-assignments"))
+    config.trace_config.show_value_assignments=false;
+  else
+    config.trace_config.show_value_assignments=true;
+
+  if(cmdline.isset("trace-hide-inputs"))
+    config.trace_config.show_inputs=false;
+  else
+    config.trace_config.show_inputs=true;
+
+  if(cmdline.isset("trace-hide-outputs"))
+    config.trace_config.show_outputs=false;
+  else
+    config.trace_config.show_outputs=true;
+
+  if(cmdline.isset("trace-show-function-calls"))
+    config.trace_config.show_function_calls=true;
+  else
+    config.trace_config.show_function_calls=false;
+
+  if(cmdline.isset("html-trace"))
+    config.trace_config.trace_format = configt::trace_formatt::HTML;
+  else
+    config.trace_config.trace_format = configt::trace_formatt::STANDARD;
+}
+
 void cbmc_parse_optionst::get_command_line_options(optionst &options)
 {
   if(config.set(cmdline))
@@ -156,14 +197,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      cmdline.isset("stop-on-fail"))
   {
     options.set_option("trace", true);
-    if(cmdline.isset("hex"))
-      options.set_option("hex", true);
-
-    if(cmdline.isset("trace-verbosity"))
-      options.set_option("trace-verbosity",
-          cmdline.get_value("trace-verbosity"));
-    else
-      options.set_option("trace-verbosity", 1);
+    configure_trace_output();
   }
 
   if(cmdline.isset("localize-faults"))
@@ -1034,5 +1068,14 @@ void cbmc_parse_optionst::help()
     " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
     " --verbosity #                verbosity level\n"
+    "\n"
+    "Trace formatting options\n"
+    "--trace-show-function-calls  show functions calls and returns in trace (default is to hide)\n" // NOLINT(*)
+    "--trace-hide-assignments     show all assignments in trace (default is to show)\n" // NOLINT(*)
+    "--trace-hide-inputs          show all inputs in trace (default is to show)\n" // NOLINT(*)
+    "--trace-hide-outputs         show all outputs in trace (default is to show)\n" // NOLINT(*)
+    "--trace-show-source-code     show lines of source code (default is to hide)\n" // NOLINT(*)
+    "--trace-hex                  outputs assignments to variables in hex (default is binary)\n" // NOLINT(*)
+    "--html-trace                 outputs trace in html format\n"
     "\n";
 }
