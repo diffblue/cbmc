@@ -201,6 +201,97 @@ std::string gather_full_class_name(const std::string &src)
   std::replace(class_name.begin(), class_name.end(), '/', '.');
   return class_name;
 }
+
+reference_typet
+build_class_name(const std::string src, const std::string &class_name_prefix)
+{
+  PRECONDITION(src[0] == 'L');
+  // ends on ;
+  if(src[src.size() - 1] != ';')
+    throw "invalid string for reference type";
+
+  std::string container_class = gather_full_class_name(src);
+  std::string identifier = "java::" + container_class;
+  symbol_typet symbol_type(identifier);
+  symbol_type.set(ID_C_base_name, container_class);
+
+  // TODO(tkiley): The below code only parses the first generic argument list
+
+  std::size_t f_pos = src.find('<', 1);
+  // get generic type information
+  if(f_pos != std::string::npos)
+  {
+    std::size_t e_pos = find_closing_delimiter(src, f_pos, '<', '>');
+    if(e_pos == std::string::npos)
+      throw unsupported_java_class_signature_exceptiont("recursive generic");
+
+    // What needs to happen is the symbol_typet needs to use all parts
+    // of the name and all generic parts of the child names
+    // For now it might be sufficient to parse the rest of the name
+
+    java_generic_typet result(symbol_type);
+
+#ifdef DEBUG
+    std::cout << "INFO: found generic type "
+              << src.substr(f_pos + 1, e_pos - f_pos - 1) << " in " << src
+              << " with container " << generic_container_class << "\n";
+#endif
+
+    // parse contained types, can be either type variables, starting with T
+    // or instantiated types
+    size_t curr_start = f_pos + 1;
+    size_t curr_end;
+    do
+    {
+      // find next end of type name
+      curr_end = src.find(';', curr_start);
+      INVARIANT(
+        curr_end != std::string::npos, "Type not terminated with \';\'");
+      const size_t end = curr_end - curr_start + 1;
+      const typet &t =
+        java_type_from_string(src.substr(curr_start, end), class_name_prefix);
+#ifdef DEBUG
+      std::cout << "INFO: getting type " << src.substr(curr_start, end) << "\n"
+                << "INFO: type id " << id2string(t.id()) << "\n"
+                << "curr_start " << curr_start << " curr_end " << curr_end
+                << " e_pos " << e_pos << " src " << src << "\n";
+#endif
+      // is an uninstantiated (pure) generic type
+      if(is_java_generic_parameter(t))
+      {
+        const java_generic_parametert &gen_type = to_java_generic_parameter(t);
+#ifdef DEBUG
+        std::cout << " generic type var " << gen_type.id() << " bound "
+                  << to_symbol_type(gen_type.subtype()).get_identifier()
+                  << "\n";
+#endif
+        result.generic_type_variables().push_back(gen_type);
+      }
+
+      /// TODO(mgudemann): implement / test the case of iterated generic
+      /// types
+
+      // is a concrete type, i.e., instantiation of a generic type of the
+      // current type
+      else
+      {
+        java_generic_inst_parametert inst_type(to_symbol_type(t.subtype()));
+#ifdef DEBUG
+        std::cout << " instantiation of generic type var "
+                  << to_symbol_type(t.subtype()).get_identifier() << "\n";
+#endif
+        result.generic_type_variables().push_back(inst_type);
+      }
+
+      curr_start = curr_end + 1;
+    } while(curr_start < e_pos);
+
+    return result;
+  }
+
+  return java_reference_type(symbol_type);
+}
+
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
@@ -361,108 +452,7 @@ typet java_type_from_string(
   }
   case 'L':
     {
-      // ends on ;
-      if(src[src.size()-1]!=';')
-        return nil_typet();
-
-      std::size_t f_pos=src.find('<', 1);
-      // get generic type information
-      if(f_pos!=std::string::npos)
-      {
-        std::size_t e_pos=find_closing_delimiter(src, f_pos, '<', '>');
-        if(e_pos==std::string::npos)
-          throw unsupported_java_class_signature_exceptiont(
-            "recursive generic");
-
-        // construct container type
-        std::string generic_container_class=src.substr(1, f_pos-1);
-
-        for(unsigned i=0; i<generic_container_class.size(); i++)
-        {
-          if(generic_container_class[i]=='/')
-            generic_container_class[i]='.';
-        }
-
-        java_generic_typet result(
-          symbol_typet("java::"+generic_container_class));
-
-#ifdef DEBUG
-        std::cout << "INFO: found generic type "
-                  << src.substr(f_pos+1, e_pos-f_pos-1)
-                  << " in " << src
-                  << " with container " << generic_container_class << "\n";
-#endif
-
-        // parse contained types, can be either type variables, starting with T
-        // or instantiated types
-        size_t curr_start=f_pos+1;
-        size_t curr_end;
-        do
-        {
-          // find next end of type name
-          curr_end=src.find(';', curr_start);
-          INVARIANT(
-            curr_end!=std::string::npos,
-            "Type not terminated with \';\'");
-          const size_t end=curr_end-curr_start+1;
-          const typet &t=
-            java_type_from_string(src.substr(curr_start, end),
-                                  class_name_prefix);
-#ifdef DEBUG
-          std::cout << "INFO: getting type "
-                    << src.substr(curr_start, end) << "\n"
-                    << "INFO: type id " << id2string(t.id()) << "\n"
-                    << "curr_start " << curr_start
-                    << " curr_end " << curr_end
-                    << " e_pos " << e_pos
-                    << " src " << src << "\n";
-#endif
-          // is an uninstantiated (pure) generic type
-          if(is_java_generic_parameter(t))
-          {
-            const java_generic_parametert &gen_type=
-              to_java_generic_parameter(t);
-#ifdef DEBUG
-            std::cout << " generic type var " << gen_type.id() << " bound "
-                      << to_symbol_type(gen_type.subtype()).get_identifier()
-                      << "\n";
-#endif
-            result.generic_type_variables().push_back(gen_type);
-          }
-
-          /// TODO(mgudemann): implement / test the case of iterated generic
-          /// types
-
-          // is a concrete type, i.e., instantiation of a generic type of the
-          // current type
-          else
-          {
-            java_generic_inst_parametert inst_type(
-              to_symbol_type(t.subtype()));
-#ifdef DEBUG
-            std::cout << " instantiation of generic type var "
-                      << to_symbol_type(t.subtype()).get_identifier() << "\n";
-#endif
-            result.generic_type_variables().push_back(inst_type);
-          }
-
-          curr_start=curr_end+1;
-        }
-        while(curr_start<e_pos);
-
-
-        return result;
-      }
-      std::string class_name=src.substr(1, src.size()-2);
-      for(auto &letter : class_name)
-        if(letter=='/')
-          letter='.';
-
-      std::string identifier="java::"+class_name;
-      symbol_typet symbol_type(identifier);
-      symbol_type.set(ID_C_base_name, class_name);
-
-      return java_reference_type(symbol_type);
+      return build_class_name(src, class_name_prefix);
     }
   case '*':
   case '+':
