@@ -17,6 +17,7 @@ Author: elizabeth.polgreen@cs.ox.ac.uk
 #include <ostream>
 
 #include <util/arith_tools.h>
+#include <util/config.h>
 #include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
@@ -61,22 +62,25 @@ void output_html_footer(std::ostream &out)
 
 
 void show_html_state_header(
-  std::ostream &out,
-  const goto_trace_stept &state,
-  const source_locationt &source_location,
-  unsigned step_nr)
+    std::ostream &out,
+    const namespacet &ns,
+    const goto_trace_stept &state)
 {
   out << "\n<hr />\n";
   out << "<p><strong><span style=\"color: Indigo;\">";
 
-  if(step_nr==0)
+  if(state.step_nr==0)
     out << "Initial State";
   else
-    out << "State " << step_nr << "</span>";
+    out << "State " << state.step_nr << "</span>";
 
-  out << " " << source_location
+  out << " " << state.pc->source_location
       << " thread " << state.thread_nr
       << "</strong>></p>\n";
+
+  if(config.trace_config.show_source_code)
+    out << "<p><span style=\"color: DarkGray;\">Code:<em> "
+        << as_string(ns, *state.pc) << "</em></span></p>\n";
 }
 
 
@@ -88,7 +92,6 @@ void show_html_goto_trace(
   unsigned prev_step_nr=0;
   bool first_step=true;
   bool use_panel1=true;
-  bool use_hex=true; // at some point this will become a cmd line argument
   output_html_header(out);
 
   for(const auto &step : goto_trace.steps)
@@ -110,8 +113,8 @@ void show_html_goto_trace(
         out << "<p>  " << step.comment << "</p>\n";
 
         if(step.pc->is_assert())
-          out << "<p>  " << from_expr(ns, "", step.pc->guard) << "\n";
-        out<<"</p></div>\n";
+          out << "<p>  " << from_expr(ns, "", step.pc->guard) << '\n';
+        out << "</p></div>\n";
       }
       break;
 
@@ -137,125 +140,120 @@ void show_html_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
+      if(config.trace_config.show_value_assignments)
       {
-        if(prev_step_nr!=step.step_nr || first_step)
+        if(step.pc->is_assign() || step.pc->is_return()
+            || // returns have a lhs!
+            step.pc->is_function_call()
+            || (step.pc->is_other() && step.lhs_object.is_not_nil()))
         {
-          first_step=false;
-          prev_step_nr=step.step_nr;
-          show_html_state_header(
-              out, step, step.pc->source_location, step.step_nr);
-          out << "<p><span style=\"color: DarkGray;\">Code:<em> "
-              << as_string(ns, *step.pc) << "</em></p>\n";
+          if(prev_step_nr != step.step_nr || first_step)
+          {
+            first_step = false;
+            prev_step_nr = step.step_nr;
+            show_html_state_header(out, ns, step);
+          }
+
+          trace_value(out, ns, step);
+          out << "</p>\n";
         }
-
-        // see if the full lhs is something clean
-        if(is_index_member_symbol(step.full_lhs))
-          trace_value(
-            out, ns, step.lhs_object, step.full_lhs,
-            step.full_lhs_value, use_hex);
-        else
-          trace_value(
-            out, ns, step.lhs_object, step.lhs_object,
-            step.lhs_object_value, use_hex);
-      out<<"</span></p>\n";
       }
-
       break;
 
     case goto_trace_stept::typet::DECL:
-      if(prev_step_nr!=step.step_nr || first_step)
+      if(config.trace_config.show_value_assignments)
       {
-        first_step=false;
-        prev_step_nr=step.step_nr;
-        show_html_state_header(
-            out, step, step.pc->source_location, step.step_nr);
-        out << "<p><span style=\"color: DarkGray;\">Code:<em> "
-            << as_string(ns, *step.pc) << "</em></p>\n";
-      }
+        if(prev_step_nr != step.step_nr || first_step)
+        {
+          first_step = false;
+          prev_step_nr = step.step_nr;
+          show_html_state_header(out, ns, step);
+        }
 
-      trace_value(
-          out, ns, step.lhs_object, step.full_lhs,
-          step.full_lhs_value, use_hex);
-      out<<"</span></p>\n";
+        trace_value(out, ns, step);
+        out << "</span></p>\n";
+      }
       break;
 
     case goto_trace_stept::typet::OUTPUT:
-      if(step.formatted)
+      if(config.trace_config.show_outputs)
       {
-        printf_formattert printf_formatter(ns);
-        printf_formatter(id2string(step.format_string), step.io_args);
-        printf_formatter.print(out);
-      }
-      else
-      {
-        show_html_state_header(
-            out, step, step.pc->source_location, step.step_nr);
-        out << "<p><span style=\"color: DarkGray;\">Code:<em> "
-            << as_string(ns, *step.pc) << "</em></p>\n";
-
-        out << "<p>  OUTPUT " << step.io_id << ":";
-
-        for(std::list<exprt>::const_iterator
-            l_it=step.io_args.begin();
-            l_it!=step.io_args.end();
-            l_it++)
+        if(step.formatted)
         {
-          if(l_it!=step.io_args.begin())
-            out << ";";
-          out << " " << from_expr(ns, "", *l_it);
+          printf_formattert printf_formatter(ns);
+          printf_formatter(id2string(step.format_string), step.io_args);
+          printf_formatter.print(out);
+        }
+        else
+        {
+          show_html_state_header(out, ns, step);
+          out << "<p>  OUTPUT " << step.io_id << ":";
 
-          // the hex representation
-          out << " (" << trace_value_hex(*l_it, ns) << ")";
+          bool first_output = true;
+          for(const auto &arg : step.io_args)
+          {
+            if(!first_output)
+              out << ";";
+            out << " " << from_expr(ns, "", arg);
+
+            if(config.trace_config.numeric_representation ==
+                configt::numeric_representationt::HEX)
+              out << " (" << trace_value_hex(arg, ns) << ")</p>\n";
+            else
+              out << " (" << trace_value_binary(arg, ns) << ")</p>\n";
+            first_output = false;
+          }
         }
       }
-      out<<"</span></p>\n";
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_html_state_header(out, step, step.pc->source_location, step.step_nr);
-      out << "<p><span style=\"color: DarkGray;\">Code:<em> "
-          << as_string(ns, *step.pc) << "</em></p>\n";
-      out << " <p> INPUT " << step.io_id << ":";
-
-      for(std::list<exprt>::const_iterator
-          l_it=step.io_args.begin();
-          l_it!=step.io_args.end();
-          l_it++)
+      if(!config.trace_config.show_inputs)
       {
-        if(l_it!=step.io_args.begin())
-          out << ";";
-        out << " " << from_expr(ns, "", *l_it);
+        show_html_state_header(out, ns, step);
+        out << " <p> INPUT " << step.io_id << ":";
 
-        // the binary representation
-        out << " (" << trace_value_hex(*l_it, ns) << ")";
+        bool first_input = true;
+        for(const auto &arg : step.io_args)
+        {
+          if(!first_input)
+            out << ";";
+          out << " " << from_expr(ns, "", arg);
+
+          if(config.trace_config.numeric_representation ==
+              configt::numeric_representationt::HEX)
+            out << " (" << trace_value_hex(arg, ns) << ")";
+          else
+            out << " (" << trace_value_binary(arg, ns) << ")";
+          first_input = false;
+        }
+
+        out << "</span></p>\n";
       }
-
-      out<<"</span></p>\n";
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
-      out << "\n";
-      out << "<button class=\"function_call\">";
-      out << "<strong>FUNCTION CALL: </strong>" << as_string(ns, *step.pc);
-      if(use_panel1)
+      if(config.trace_config.show_function_calls)
       {
-        out <<"</button>\n<div class=\"panel1\">\n";
-        use_panel1=false;
+        out << '\n';
+        out << "<button class=\"function_call\">";
+        out << "<strong>FUNCTION CALL: </strong>" << as_string(ns, *step.pc);
+        if(use_panel1)
+        {
+          out << "</button>\n<div class=\"panel1\">\n";
+          use_panel1 = false;
+        }
+        else
+        {
+          out << "</button>\n<div class=\"panel2\">\n";
+          use_panel1 = true;
+        }
       }
-      else
-      {
-        out <<"</button>\n<div class=\"panel2\">\n";
-        use_panel1=true;
-      }
-
       break;
 
     case goto_trace_stept::typet::FUNCTION_RETURN:
-      out<<"</div>\n";
+      if(config.trace_config.show_function_calls)
+        out << "</div>\n";
       break;
 
     case goto_trace_stept::typet::SPAWN:

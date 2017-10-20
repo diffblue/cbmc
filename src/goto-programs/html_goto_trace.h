@@ -14,7 +14,6 @@ Author: elizabeth.polgreen@cs.ox.ac.uk
 #ifndef CPROVER_GOTO_PROGRAMS_HTML_GOTO_TRACE_H_
 #define CPROVER_GOTO_PROGRAMS_HTML_GOTO_TRACE_H_
 
-#include <util/config.h>
 
 void show_html_goto_trace(
   std::ostream &,
