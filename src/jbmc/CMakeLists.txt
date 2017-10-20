@@ -34,3 +34,5 @@ add_if_library(jbmc-lib jsil)
 # Executable
 add_executable(jbmc jbmc_main.cpp)
 target_link_libraries(jbmc jbmc-lib)
+
+install(TARGETS jbmc DESTINATION bin)

@@ -33,3 +33,5 @@ add_if_library(cbmc-lib jsil)
 # Executable
 add_executable(cbmc cbmc_main.cpp)
 target_link_libraries(cbmc cbmc-lib)
+
+install(TARGETS cbmc DESTINATION bin)
