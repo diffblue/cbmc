@@ -124,8 +124,7 @@ int clobber_parse_optionst::doit()
 
   try
   {
-    if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
-      return 6;
+    goto_model=initialize_goto_model(cmdline, get_message_handler());
 
     label_properties(goto_model);
 

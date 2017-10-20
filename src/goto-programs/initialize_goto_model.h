@@ -17,8 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_model.h"
 
-bool initialize_goto_model(
-  goto_modelt &goto_model,
+goto_modelt initialize_goto_model(
   const cmdlinet &cmdline,
   message_handlert &message_handler);
 

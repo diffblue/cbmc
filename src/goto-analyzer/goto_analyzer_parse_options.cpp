@@ -160,8 +160,27 @@ int goto_analyzer_parse_optionst::doit()
 
   register_languages();
 
-  if(initialize_goto_model(goto_model, cmdline, get_message_handler()))
-    return 6;
+  try
+  {
+    goto_model=initialize_goto_model(cmdline, get_message_handler());
+  }
+
+  catch(const char *e)
+  {
+    error() << e << eom;
+    return true;
+  }
+
+  catch(const std::string e)
+  {
+    error() << e << eom;
+    return true;
+  }
+
+  catch(int)
+  {
+    return true;
+  }
 
   if(process_goto_program(options))
     return 6;
