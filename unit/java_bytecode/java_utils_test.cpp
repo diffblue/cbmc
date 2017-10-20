@@ -13,6 +13,7 @@
 
 #include <testing-utils/catch.hpp>
 
+#include <java_bytecode/java_types.cpp>
 #include <java_bytecode/java_utils.h>
 
 SCENARIO("Test that the generic signature delimiter lookup works reliably",
@@ -60,6 +61,163 @@ SCENARIO("Test that the generic signature delimiter lookup works reliably",
       REQUIRE(find_closing_delimiter(generic_sigs[6], 4, '<', '>')
               ==std::string::npos);
       REQUIRE(find_closing_delimiter(generic_sigs[6], 9, '<', '>')==17);
+    }
+  }
+}
+
+SCENARIO("gather_full_class_name")
+{
+  GIVEN("Descriptor: class")
+  {
+    std::string descriptor = "LClassName;";
+    THEN("Should get ClassName back")
+    {
+      const std::string &class_name = gather_full_class_name(descriptor);
+      REQUIRE(class_name == "ClassName");
+    }
+  }
+  GIVEN("Descriptor: A packaged class")
+  {
+    std::string descriptor = "Ljava/lang/Object;";
+    THEN("Should get java.lang.Object back")
+    {
+      const std::string &class_name = gather_full_class_name(descriptor);
+      REQUIRE(class_name == "java.lang.Object");
+    }
+  }
+  GIVEN("Descriptor: A inner class")
+  {
+    std::string descriptor = "LOuter$Inner;";
+    THEN("Should get Outer$Inner")
+    {
+      const std::string &class_name = gather_full_class_name(descriptor);
+      REQUIRE(class_name == "Outer$Inner");
+    }
+  }
+  GIVEN("Descriptor: a doubly nested inner class")
+  {
+    std::string descriptor = "LOuter$Inner$Inner2;";
+    THEN("Should get Outer$Inner$Inner2")
+    {
+      const std::string &class_name = gather_full_class_name(descriptor);
+      REQUIRE(class_name == "Outer$Inner$Inner2");
+    }
+  }
+
+  GIVEN("Signature: An generic class")
+  {
+    std::string signature = "LClassName<TT;>;";
+    THEN("Should get ClassName back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName");
+    }
+  }
+  GIVEN("Signature: An inner class in a generic class")
+  {
+    std::string signature = "LClassName<TT;>.Inner;";
+    THEN("Should get ClassName$Inner back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner");
+    }
+  }
+  GIVEN("Signature: An generic inner class in a generic class")
+  {
+    std::string signature = "LClassName<TT;>.Inner<TV;>;";
+    THEN("Should get ClassName$Inner back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner");
+    }
+  }
+  GIVEN("Signature: A generic inner class in a non generic class")
+  {
+    std::string signature = "LClassName.Inner<TV;>;";
+    THEN("Should get ClassName$Inner back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner");
+    }
+  }
+  GIVEN(
+    "Signature: A generic inner class in a non generic class in a non "
+    "generic "
+    "class")
+  {
+    std::string signature = "LClassName.Inner.Inner2<TT;>;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A generic inner class in a generic class in a non generic "
+    "class")
+  {
+    std::string signature = "LClassName.Inner<UU;>.Inner2<TT;>;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A generic inner class in a generic class in a generic "
+    "class")
+  {
+    std::string signature = "LClassName<TV;>.Inner<UU;>.Inner2<TT;>;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A non-generic inner class in a generic class in a non "
+    "generic "
+    "class")
+  {
+    std::string signature = "LClassName.Inner<UU;>.Inner2;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A non-generic inner class in a generic class in a generic "
+    "class")
+  {
+    std::string signature = "LClassName<TV;>.Inner<UU;>.Inner2;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A non-generic inner class in a non-generic class in a "
+    "generic "
+    "class")
+  {
+    std::string signature = "LClassName<TV;>.Inner.Inner2;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
+    }
+  }
+  GIVEN(
+    "Signature: A generic inner class in a non-generic class in a generic "
+    "class")
+  {
+    std::string signature = "LClassName<TV;>.Inner.Inner2<TT;>;";
+    THEN("Should get ClassName$Inner$Inner2 back")
+    {
+      const std::string &class_name = gather_full_class_name(signature);
+      REQUIRE(class_name == "ClassName$Inner$Inner2");
     }
   }
 }

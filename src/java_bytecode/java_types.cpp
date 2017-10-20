@@ -167,6 +167,40 @@ exprt java_bytecode_promotion(const exprt &expr)
     return typecast_exprt(expr, new_type);
 }
 
+/// Returns the full class name, skipping over the generics
+/// \param src: a type descriptor or signature like LOuterClass<TT;>.Inner;
+/// \return The full name of the class like OuterClass.Inner
+std::string gather_full_class_name(const std::string &src)
+{
+  PRECONDITION(src[0] == 'L');
+  PRECONDITION(src[src.size() - 1] == ';');
+
+  std::string class_name = src.substr(1, src.size() - 2);
+
+  std::size_t f_pos = class_name.find('<', 1);
+
+  while(f_pos != std::string::npos)
+  {
+    std::size_t e_pos = find_closing_delimiter(class_name, f_pos, '<', '>');
+    if(e_pos == std::string::npos)
+    {
+      throw unsupported_java_class_signature_exceptiont(
+        "Failed to find generic signature closing delimiter (or recursive "
+        "generic): " +
+        src);
+    }
+
+    // erase generic information between brackets
+    class_name.erase(f_pos, e_pos - f_pos + 1);
+
+    // Search the remainder of the string for generic signature
+    f_pos = class_name.find('<', e_pos + 1);
+  }
+
+  std::replace(class_name.begin(), class_name.end(), '.', '$');
+  std::replace(class_name.begin(), class_name.end(), '/', '.');
+  return class_name;
+}
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
