@@ -29,6 +29,7 @@ Date: July 2005
 
 #include <goto-programs/goto_program.h>
 
+//
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
 */
@@ -194,32 +195,19 @@ public:
   }
 };
 
+/// \brief print the goto trace
+/// \param ostream, namespace, goto_trace
+/// trace_configuration.
 void show_goto_trace(
   std::ostream &out,
   const namespacet &,
   const goto_tracet &);
 
-void show_goto_trace(
-  std::ostream &out,
-  const namespacet &,
-  const goto_tracet &,
-  int verbosity,
-  bool print_hex);
-
 void trace_value(
-  std::ostream &out,
+  std::ostream &,
   const namespacet &,
-  const ssa_exprt &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value);
+  const goto_trace_stept &);
 
-void trace_value(
-  std::ostream &out,
-  const namespacet &,
-  const ssa_exprt &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value,
-  bool use_hex);
 
 std::string trace_value_binary(
   const exprt &,
@@ -228,7 +216,5 @@ std::string trace_value_binary(
 std::string trace_value_hex(
   const exprt &,
   const namespacet &);
-
-bool is_index_member_symbol(const exprt &);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H

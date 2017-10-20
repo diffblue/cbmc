@@ -17,6 +17,7 @@ Author: Daniel Kroening
 #include <ostream>
 
 #include <util/arith_tools.h>
+#include <util/config.h>
 #include <util/symbol.h>
 
 #include <ansi-c/printf_formatter.h>
@@ -58,7 +59,7 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::FUNCTION_RETURN:
     out << "FUNCTION RETURN"; break;
   default:
-    out << "unknown type: " << static_cast<int>(type) << "\n";
+    out << "unknown type: " << static_cast<int>(type) << '\n';
     UNREACHABLE;
   }
 
@@ -68,10 +69,10 @@ void goto_trace_stept::output(
   if(hidden)
     out << " hidden";
 
-  out << "\n";
+  out << '\n';
 
   if(!pc->source_location.is_nil())
-    out << pc->source_location << "\n";
+    out << pc->source_location << '\n';
 
   if(pc->is_goto())
     out << "GOTO   ";
@@ -92,31 +93,31 @@ void goto_trace_stept::output(
   else
     out << "(?)    ";
 
-  out << "\n";
+  out << '\n';
 
   if((pc->is_other() && lhs_object.is_not_nil()) || pc->is_assign())
   {
     irep_idt identifier=lhs_object.get_object_name();
     out << "  " << from_expr(ns, identifier, lhs_object.get_original_expr())
         << " = " << from_expr(ns, identifier, lhs_object_value)
-        << "\n";
+        << '\n';
   }
   else if(pc->is_assert())
   {
     if(!cond_value)
     {
-      out << "Violated property:" << "\n";
+      out << "Violated property:" << '\n';
       if(pc->source_location.is_nil())
-        out << "  " << pc->source_location << "\n";
+        out << "  " << pc->source_location << '\n';
 
       if(comment!="")
-        out << "  " << comment << "\n";
-      out << "  " << from_expr(ns, "", pc->guard) << "\n";
-      out << "\n";
+        out << "  " << comment << '\n';
+      out << "  " << from_expr(ns, "", pc->guard) << '\n';
+      out << '\n';
     }
   }
 
-  out << "\n";
+  out << '\n';
 }
 
 static std::string expr_to_hex(const exprt & expr)
@@ -254,70 +255,7 @@ std::string trace_value_binary(
   return "?";
 }
 
-void trace_value(
-  std::ostream &out,
-  const namespacet &ns,
-  const ssa_exprt &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value,
-  bool hex)
-{
-  irep_idt identifier;
-
-  if(lhs_object.is_not_nil())
-    identifier=lhs_object.get_object_name();
-
-  std::string value_string;
-
-  if(value.is_nil())
-    value_string="(assignment removed)";
-  else
-  {
-    value_string=from_expr(ns, identifier, value);
-
-    // the binary representation
-    if(hex)
-      value_string += " (" + trace_value_hex(value, ns) + ")";
-    else
-      value_string += " (" + trace_value_binary(value, ns) + ")";
-  }
-
-  out << "  "
-      << from_expr(ns, identifier, full_lhs)
-      << "=" << value_string
-      << "\n";
-}
-
-void trace_value(
-  std::ostream &out,
-  const namespacet &ns,
-  const ssa_exprt &lhs_object,
-  const exprt &full_lhs,
-  const exprt &value)
-{
-  // default use binary representation
-  trace_value(out, ns, lhs_object, full_lhs, value, false);
-}
-
-void show_state_header(
-  std::ostream &out,
-  const goto_trace_stept &state,
-  const source_locationt &source_location,
-  unsigned step_nr)
-{
-  out << "\n";
-
-  if(step_nr==0)
-    out << "Initial State";
-  else
-    out << "State " << step_nr;
-
-  out << " " << source_location
-      << " thread " << state.thread_nr << "\n";
-  out << "----------------------------------------------------" << "\n";
-}
-
-bool is_index_member_symbol(const exprt &src)
+static bool is_index_member_symbol(const exprt &src)
 {
   if(src.id()==ID_index)
     return is_index_member_symbol(src.op0());
@@ -329,25 +267,67 @@ bool is_index_member_symbol(const exprt &src)
     return false;
 }
 
-void show_goto_trace(
-    std::ostream &out,
-    const namespacet &ns,
-    const goto_tracet &goto_trace)
-{
-  show_goto_trace(out, ns, goto_trace, 1, false);
-}
-
-void show_goto_trace(
+void trace_value(
   std::ostream &out,
   const namespacet &ns,
-  const goto_tracet &goto_trace,
-  int verbosity,
-  bool print_hex)
+  const goto_trace_stept &step)
 {
-  if(verbosity==10)
-    show_html_goto_trace(out, ns, goto_trace);
+  bool member_symbol = is_index_member_symbol(step.full_lhs);
+  exprt value = member_symbol ? step.full_lhs_value : step.lhs_object_value;
+
+  irep_idt identifier;
+
+  if(step.lhs_object.is_not_nil())
+    identifier=step.lhs_object.get_object_name();
+
+  std::string value_string;
+
+
+  if(value.is_nil())
+    value_string="(assignment removed)";
   else
   {
+    value_string=from_expr(ns, identifier, value);
+
+    if(config.trace_config.numeric_representation ==
+        configt::numeric_representationt::HEX)
+      value_string += " (" + trace_value_hex(value, ns) + ")";
+    else
+      value_string += " (" + trace_value_binary(value, ns) + ")";
+  }
+
+  out << "  "
+      << from_expr(ns, identifier,
+          (member_symbol ? step.full_lhs : step.lhs_object))
+      << "=" << value_string << '\n';
+}
+
+
+static void show_state_header(
+  std::ostream &out,
+  const namespacet &ns,
+  const goto_trace_stept &state)
+{
+  out << '\n';
+
+  if(state.step_nr==0)
+    out << "Initial State";
+  else
+    out << "State " << state.step_nr;
+
+  out << " " << state.pc->source_location
+      << " thread " << state.thread_nr << '\n';
+  out << "----------------------------------------------------" << '\n';
+
+  if(config.trace_config.show_source_code)
+    out << "Code:  " << as_string(ns, *state.pc) << '\n';
+}
+
+static void show_standard_goto_trace(
+  std::ostream &out,
+  const namespacet &ns,
+  const goto_tracet &goto_trace)
+{
   unsigned prev_step_nr=0;
   bool first_step=true;
 
@@ -362,31 +342,31 @@ void show_goto_trace(
     case goto_trace_stept::typet::ASSERT:
       if(!step.cond_value)
       {
-        out << "\n";
-        out << "Violated property:" << "\n";
+        out << '\n';
+        out << "Violated property:" << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-        out << "  " << step.comment << "\n";
+          out << "  " << step.pc->source_location << '\n';
+        out << "  " << step.comment << '\n';
 
         if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+          out << "  " << from_expr(ns, "", step.pc->guard) << '\n';
 
-        out << "\n";
+        out << '\n';
       }
       break;
 
     case goto_trace_stept::typet::ASSUME:
       if(!step.cond_value)
       {
-        out << "\n";
-        out << "Assumption:" << "\n";
+        out << '\n';
+        out << "Assumption:" << '\n';
         if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
+          out << "  " << step.pc->source_location << '\n';
 
         if(step.pc->is_assume())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
+          out << "  " << from_expr(ns, "", step.pc->guard) << '\n';
 
-        out << "\n";
+        out << '\n';
       }
       break;
 
@@ -397,111 +377,105 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
+      if(config.trace_config.show_value_assignments)
       {
-        if(prev_step_nr!=step.step_nr || first_step)
+        if(step.pc->is_assign() || step.pc->is_return()
+            || // returns have a lhs!
+            step.pc->is_function_call()
+            || (step.pc->is_other() && step.lhs_object.is_not_nil()))
         {
-          first_step=false;
-          prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
-          if(verbosity>1)
-            out << "Code:  " << as_string(ns, *step.pc) << "\n";
+          if(prev_step_nr != step.step_nr || first_step)
+          {
+            first_step = false;
+            prev_step_nr = step.step_nr;
+            show_state_header(out, ns, step);
+          }
+          trace_value(out, ns, step);
         }
-
-        // see if the full lhs is something clean
-        if(is_index_member_symbol(step.full_lhs))
-          trace_value(
-            out, ns, step.lhs_object, step.full_lhs,
-            step.full_lhs_value, print_hex);
-        else
-          trace_value(
-            out, ns, step.lhs_object, step.lhs_object,
-            step.lhs_object_value, print_hex);
       }
       break;
 
     case goto_trace_stept::typet::DECL:
-      if(prev_step_nr!=step.step_nr || first_step)
+      if(config.trace_config.show_value_assignments)
       {
-        first_step=false;
-        prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
-        if(verbosity>1)
-          out << "Code:  " << as_string(ns, *step.pc) << "\n";
-      }
-
-      trace_value(out, ns, step.lhs_object, step.full_lhs,
-          step.full_lhs_value, print_hex);
-      break;
-
-    case goto_trace_stept::typet::OUTPUT:
-      if(step.formatted)
-      {
-        printf_formattert printf_formatter(ns);
-        printf_formatter(id2string(step.format_string), step.io_args);
-        printf_formatter.print(out);
-        out << "\n";
-      }
-      else
-      {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
-        if(verbosity>1)
-          out << "Code:  " << as_string(ns, *step.pc) << "\n";
-        out << "  OUTPUT " << step.io_id << ":";
-
-        for(std::list<exprt>::const_iterator
-            l_it=step.io_args.begin();
-            l_it!=step.io_args.end();
-            l_it++)
+        if(prev_step_nr != step.step_nr || first_step)
         {
-          if(l_it != step.io_args.begin())
-            out << ";";
-          out << " " << from_expr(ns, "", *l_it);
-
-          if(print_hex)
-            out << " (" << trace_value_hex(*l_it, ns) << ")";
-          else
-            out << " (" << trace_value_binary(*l_it, ns) << ")";
+          first_step = false;
+          prev_step_nr = step.step_nr;
+          show_state_header(out, ns, step);
         }
 
-        out << "\n";
+        trace_value(out, ns, step);
+      }
+    break;
+
+    case goto_trace_stept::typet::OUTPUT:
+      if(config.trace_config.show_outputs)
+      {
+        if(step.formatted)
+        {
+          printf_formattert printf_formatter(ns);
+          printf_formatter(id2string(step.format_string), step.io_args);
+          printf_formatter.print(out);
+          out << '\n';
+        }
+        else
+        {
+          show_state_header(out, ns, step);
+          out << "  OUTPUT " << step.io_id << ":";
+
+          bool first_output = true;
+          for(const auto &arg : step.io_args)
+          {
+            if(!first_output)
+              out << ";";
+            out << " " << from_expr(ns, "", arg);
+
+            if(config.trace_config.numeric_representation ==
+                configt::numeric_representationt::HEX)
+              out << " (" << trace_value_hex(arg, ns) << ")";
+            else
+              out << " (" << trace_value_binary(arg, ns) << ")";
+            first_output = false;
+          }
+
+          out << '\n';
+        }
       }
       break;
 
     case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
-      if(verbosity>1)
-         out << "Code:  " << as_string(ns, *step.pc) << "\n";
-      out << "  INPUT " << step.io_id << ":";
-
-      for(std::list<exprt>::const_iterator
-          l_it=step.io_args.begin();
-          l_it!=step.io_args.end();
-          l_it++)
+      if(config.trace_config.show_inputs)
       {
-        if(l_it!=step.io_args.begin())
-          out << ";";
-        out << " " << from_expr(ns, "", *l_it);
+        show_state_header(out, ns, step);
+        out << "  INPUT " << step.io_id << ":";
 
-        if(print_hex)
-          out << " (" << trace_value_hex(*l_it, ns) << ")";
-        else
-          out << " (" << trace_value_binary(*l_it, ns) << ")";
+        bool first_input = true;
+        for(const auto &arg : step.io_args)
+        {
+          if(!first_input)
+            out << ";";
+          out << " " << from_expr(ns, "", arg);
+
+          if(config.trace_config.numeric_representation ==
+              configt::numeric_representationt::HEX)
+            out << " (" << trace_value_hex(arg, ns) << ")";
+          else
+            out << " (" << trace_value_binary(arg, ns) << ")";
+          first_input = false;
+        }
+
+        out << '\n';
       }
-
-      out << "\n";
       break;
 
     case goto_trace_stept::typet::FUNCTION_CALL:
-      if(verbosity > 2)
-        out<< "Function call: " << as_string(ns, *step.pc) << "\n";
+      if(config.trace_config.show_function_calls)
+        out << "Function call: " << as_string(ns, *step.pc) << '\n';
       break;
     case goto_trace_stept::typet::FUNCTION_RETURN:
-      if(verbosity > 2)
-        out<< "Function return from: " << as_string(ns, *step.pc) << "\n";
+      if(config.trace_config.show_function_calls)
+        out << "Function return from: " << as_string(ns, *step.pc) << '\n';
       break;
 
     case goto_trace_stept::typet::SPAWN:
@@ -518,5 +492,16 @@ void show_goto_trace(
       UNREACHABLE;
     }
   }
-  }
 }
+
+void show_goto_trace(
+    std::ostream &out,
+    const namespacet &ns,
+    const goto_tracet &goto_trace)
+{
+  if(config.trace_config.trace_format == configt::trace_formatt::HTML)
+    show_html_goto_trace(out, ns, goto_trace);
+  else
+    show_standard_goto_trace(out, ns, goto_trace);
+}
+
