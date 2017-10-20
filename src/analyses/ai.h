@@ -80,6 +80,10 @@ public:
   // a reasonable entry-point state
   virtual void make_entry()=0;
 
+  virtual bool is_bottom() const=0;
+
+  virtual bool is_top() const=0;
+
   // also add
   //
   //   bool merge(const T &b, locationt from, locationt to);
@@ -156,6 +160,17 @@ public:
     initialize(goto_function);
     entry_state(goto_function.body);
     fixedpoint(goto_function.body, goto_functions, ns);
+  }
+
+  /// Returns the abstract state before the given instruction
+  virtual const ai_domain_baset & abstract_state_before(
+    goto_programt::const_targett t) const = 0;
+
+  /// Returns the abstract state after the given instruction
+  virtual const ai_domain_baset & abstract_state_after(
+    goto_programt::const_targett t) const
+  {
+    return abstract_state_before(std::next(t));
   }
 
   virtual void clear()
@@ -307,9 +322,6 @@ protected:
     const goto_functionst &goto_functions,
     const namespacet &ns);
 
-  typedef std::set<irep_idt> recursion_sett;
-  recursion_sett recursion_set;
-
   // function calls
   bool do_function_call_rec(
     locationt l_call, locationt l_return,
@@ -367,6 +379,12 @@ public:
       throw "failed to find state";
 
     return it->second;
+  }
+
+  const ai_domain_baset & abstract_state_before(
+    goto_programt::const_targett t) const override
+  {
+    return (*this)[t];
   }
 
   void clear() override
