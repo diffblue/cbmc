@@ -63,11 +63,13 @@ clean: $(patsubst %, %_clean, $(DIRS))
 $(patsubst %, %_clean, $(DIRS)):
 	$(MAKE) $(MAKEARGS) -C $(patsubst %_clean, %, $@) clean ; \
 
-# minisat 2 download, for your convenience
+# minisat2 and glucose download, for your convenience
+
+DOWNLOADER = lwp-download
 
 minisat2-download:
 	@echo "Downloading Minisat 2.2.1"
-	@lwp-download http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+	@$(DOWNLOADER) http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
 	@tar xfz minisat2_2.2.1.orig.tar.gz
 	@rm -Rf ../minisat-2.2.1
 	@mv minisat2-2.2.1 ../minisat-2.2.1
@@ -76,7 +78,7 @@ minisat2-download:
 
 glucose-download:
 	@echo "Downloading glucose-syrup"
-	@lwp-download http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
+	@$(DOWNLOADER) http://www.labri.fr/perso/lsimon/downloads/softwares/glucose-syrup.tgz
 	@tar xfz glucose-syrup.tgz
 	@rm -Rf ../glucose-syrup
 	@mv glucose-syrup ../
