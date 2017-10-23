@@ -544,16 +544,16 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   exprt nondet_array_expr =
     make_nondet_infinite_char_array(symbol_table, loc, code);
 
-  address_of_exprt first_index(
+  address_of_exprt array_pointer(
     index_exprt(nondet_array_expr, from_integer(0, java_int_type())));
 
   add_pointer_to_array_association(
-    first_index, nondet_array_expr, symbol_table, loc, code);
+    array_pointer, nondet_array_expr, symbol_table, loc, code);
 
   add_array_to_length_association(
     nondet_array_expr, str.length(), symbol_table, loc, code);
 
-  code.add(code_assignt(str.content(), first_index));
+  code.add(code_assignt(str.content(), array_pointer));
 
   return refined_string_exprt(str.length(), str.content());
 }

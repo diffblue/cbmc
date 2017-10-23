@@ -596,12 +596,12 @@ codet initialize_nondet_string_struct(
 
     struct_expr.copy_to_operands(length_expr);
 
-    const address_of_exprt first_index(
+    const address_of_exprt array_pointer(
       index_exprt(data_expr, from_integer(0, java_int_type())));
-    struct_expr.copy_to_operands(first_index);
+    struct_expr.copy_to_operands(array_pointer);
 
     add_pointer_to_array_association(
-      first_index, data_expr, symbol_table, loc, code);
+      array_pointer, data_expr, symbol_table, loc, code);
 
     add_array_to_length_association(
       data_expr, length_expr, symbol_table, loc, code);
