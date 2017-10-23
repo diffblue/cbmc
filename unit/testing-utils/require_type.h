@@ -27,6 +27,10 @@ require_pointer(const typet &type, const optionalt<typet> &subtype);
 struct_typet::componentt require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name);
+
+code_typet require_code(const typet &type);
+code_typet::parametert
+require_parameter(const code_typet &function_type, const irep_idt &param_name);
 }
 
 #endif

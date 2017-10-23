@@ -49,3 +49,32 @@ struct_union_typet::componentt require_type::require_component(
   REQUIRE(componet != struct_type.components().end());
   return *componet;
 }
+
+/// Checks a type is a code_type (i.e. a function)
+/// \param type: The type to check
+/// \return The cast version of the type code_type
+code_typet require_type::require_code(const typet &type)
+{
+  REQUIRE(type.id() == ID_code);
+  return to_code_type(type);
+}
+
+/// Verify that a function has a parameter of a specific name.
+/// \param function_type: The type of the function
+/// \param param_name: The name of the parameter
+/// \return: A reference to the parameter structure corresponding to this
+///   parameter name.
+code_typet::parametert require_type::require_parameter(
+  const code_typet &function_type,
+  const irep_idt &param_name)
+{
+  const auto param = std::find_if(
+    function_type.parameters().begin(),
+    function_type.parameters().end(),
+    [&param_name](const code_typet::parametert param) {
+      return param.get_base_name() == param_name;
+    });
+
+  REQUIRE(param != function_type.parameters().end());
+  return *param;
+}
