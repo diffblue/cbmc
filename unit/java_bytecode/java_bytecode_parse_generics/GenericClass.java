@@ -30,4 +30,40 @@ public class GenericClass<T>
 
   GenericInnerClass<T> field4;
   SameGenericParamInnerClass<T> field5;
+
+  void method(InnerClass input)
+  {
+
+  }
+
+  void method2(InnerClass input, InnerClass input2)
+  {
+
+  }
+
+
+  void method3(GenericInnerClass<Foo> input)
+  {
+
+  }
+
+  void method4(GenericInnerClass<T> input)
+  {
+
+  }
+
+  InnerClass method5()
+  {
+    return null;
+  }
+
+  GenericInnerClass<Foo> method6()
+  {
+    return null;
+  }
+
+  GenericInnerClass<T> method7()
+  {
+    return null;
+  }
 }
