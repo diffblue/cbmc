@@ -221,3 +221,88 @@ SCENARIO("gather_full_class_name")
     }
   }
 }
+
+SCENARIO("find_closing_semi_colon_for_reference_type", "[core][java_util_test]")
+{
+  GIVEN("A simple reference type")
+  {
+    std::string descriptor = "LA;";
+    //                        |
+    //                      012
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 2);
+  }
+  GIVEN("A generic reference type")
+  {
+    std::string descriptor = "LA<TT;>;";
+    //                             |
+    //                      01234567
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 7);
+  }
+  GIVEN("A generic reference type with multiple generic params")
+  {
+    std::string descriptor = "LA<TT;TU;>;";
+    //                                |
+    //                      01234567890
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 10);
+  }
+  GIVEN("A descriptor with multiple reference type")
+  {
+    std::string descriptor = "LA;LB;";
+    //                        |
+    //                      012
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 2);
+  }
+  GIVEN("A descriptor with multiple reference types parsing the second")
+  {
+    std::string descriptor = "LA;LB;";
+    //                         | |
+    //                      012345
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 3) == 5);
+  }
+  GIVEN("A descriptor inner class")
+  {
+    std::string descriptor = "LA$B;";
+    //                          |
+    //                      01234
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 4);
+  }
+  GIVEN("A signature inner class")
+  {
+    std::string descriptor = "LA.B;";
+    //                          |
+    //                      01234
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 4);
+  }
+  GIVEN("A inner class of a generic class")
+  {
+    std::string descriptor = "LA<TT;>.B;";
+    //                               |
+    //                      0123456789
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 9);
+  }
+  GIVEN("A inner class of a instantiated generic class")
+  {
+    std::string descriptor = "LA<LFoo;>.B;";
+    //                                 |
+    //                      012345678901
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 11);
+  }
+  GIVEN(
+    "A signature with multiple references and an inner class of a generic "
+    "class")
+  {
+    std::string descriptor = "LA<TT;>.B;LA<TT;>.B;";
+    //                               |
+    //                      0123456789
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 0) == 9);
+  }
+  GIVEN(
+    "A signature with multiple references and an inner class of a generic "
+    "class")
+  {
+    std::string descriptor = "LA<TT;>.B;LA<TT;>.B;";
+    //                                |        |
+    //                      01234567890123456789
+    REQUIRE(find_closing_semi_colon_for_reference_type(descriptor, 10) == 19);
+  }
+}

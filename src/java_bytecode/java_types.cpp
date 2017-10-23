@@ -320,6 +320,39 @@ build_class_name(const std::string src, const std::string &class_name_prefix)
   return java_reference_type(symbol_type);
 }
 
+/// Finds the closing semi-colon ending a ClassTypeSignature that starts at
+/// \p starting_point.
+/// \param src: The input string to work on.
+/// \param starting_point: The string position where the opening 'L' we want to
+///   find the closing ';' for.
+/// \return The string position corresponding to the matching ';'. For example:
+/// LA;, we would return 2. For LA<TT;>; we would return 7.
+/// See unit/java_bytecode/java_util_tests.cpp for more examples.
+size_t find_closing_semi_colon_for_reference_type(
+  const std::string src,
+  size_t starting_point = 0)
+{
+  PRECONDITION(src[starting_point] == 'L');
+  size_t next_semi_colon = src.find(';', starting_point);
+  INVARIANT(
+    next_semi_colon != std::string::npos,
+    "There must be a semi-colon somewhere in the input");
+  size_t next_angle_bracket = src.find('<', starting_point);
+
+  while(next_angle_bracket < next_semi_colon)
+  {
+    size_t end_bracket =
+      find_closing_delimiter(src, next_angle_bracket, '<', '>');
+    INVARIANT(
+      end_bracket != std::string::npos, "Must find matching angle bracket");
+
+    next_semi_colon = src.find(';', end_bracket + 1);
+    next_angle_bracket = src.find('<', end_bracket + 1);
+  }
+
+  return next_semi_colon;
+}
+
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
