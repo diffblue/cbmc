@@ -91,7 +91,7 @@ void show_html_goto_trace(
 {
   unsigned prev_step_nr=0;
   bool first_step=true;
-  bool use_panel1=true;
+  std::size_t function_depth=0;
   output_html_header(out);
 
   for(const auto &step : goto_trace.steps)
@@ -235,25 +235,21 @@ void show_html_goto_trace(
     case goto_trace_stept::typet::FUNCTION_CALL:
       if(config.trace_config.show_function_calls)
       {
+        function_depth++;
         out << '\n';
         out << "<button class=\"function_call\">";
         out << "<strong>FUNCTION CALL: </strong>" << as_string(ns, *step.pc);
-        if(use_panel1)
-        {
+        if(function_depth%2 == 0)
           out << "</button>\n<div class=\"panel1\">\n";
-          use_panel1 = false;
-        }
         else
-        {
           out << "</button>\n<div class=\"panel2\">\n";
-          use_panel1 = true;
-        }
       }
       break;
 
     case goto_trace_stept::typet::FUNCTION_RETURN:
       if(config.trace_config.show_function_calls)
         out << "</div>\n";
+      function_depth--;
       break;
 
     case goto_trace_stept::typet::SPAWN:
