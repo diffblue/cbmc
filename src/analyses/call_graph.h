@@ -23,9 +23,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/numbering.h>
 
 
-/// Function call graph inherits from grapht to allow forward and
+/// \brief Function call graph: each node represents a function
+/// in the GOTO model, a directed edge from A to B indicates
+/// that function A calls function B.
+/// Inherits from grapht to allow forward and
 /// backward traversal of the function call graph
-
 struct call_graph_nodet: public graph_nodet<empty_edget>
 {
   typedef graph_nodet<empty_edget>::edget edget;
@@ -43,11 +45,28 @@ public:
 
   void add(const irep_idt &caller, const irep_idt &callee);
   void output_xml(std::ostream &out) const;
+
+  /// \return the inverted call graph
   call_grapht get_inverted() const;
+
+  /// \brief get the names of all functions reachable from a start function
+  /// \param start  name of initial function
+  /// \return set of all names of the reachable functions
   std::unordered_set<irep_idt, irep_id_hash>
       reachable_functions(irep_idt start);
+
+  /// \brief Function returns the shortest path on the function call graph
+  /// between a source and a destination function
+  /// \param src  name of the starting function
+  /// \param dest name of the destination function
+  /// \return list of function names on the shortest path between src and dest
   std::list<irep_idt>shortest_function_path(irep_idt src, irep_idt dest);
 
+  /// get the index of the node that corresponds to a function name
+  /// \param[in] function_name function_name passed by reference
+  /// \param[out] n variable for the node index to be written to
+  /// \return true if a node with the given function name exists,
+  /// false if it does not exist
   bool get_node_index(const irep_idt& function_name, node_indext &n) const
   {
     for(node_indext idx = 0; idx < nodes.size(); idx++)
@@ -61,6 +80,9 @@ public:
     return false;
   }
 
+  /// \brief get a list of functions called by a function
+  /// \param function_name   the irep_idt of the function
+  /// \return an unordered set of all functions called by function_name
   std::unordered_set<irep_idt, irep_id_hash> get_successors(
       const irep_idt& function_name) const
   {
