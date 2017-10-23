@@ -167,16 +167,19 @@ exprt java_bytecode_promotion(const exprt &expr)
     return typecast_exprt(expr, new_type);
 }
 
-/// Returns the full class name, skipping over the generics
-/// \param src: a type descriptor or signature like LOuterClass<TT;>.Inner;
-/// \return The full name of the class like OuterClass.Inner
-std::string gather_full_class_name(const std::string &src)
+void add_generic_type_information(
+  java_generic_typet &generic_type,
+  const std::string &parameters)
 {
-  PRECONDITION(src[0] == 'L');
-  PRECONDITION(src[src.size() - 1] == ';');
+}
 
-  std::string class_name = src.substr(1, src.size() - 2);
-
+/// Take a signature string and remove everything in angle brackets allowing
+/// for the type to be parsed normally.
+/// \param src: The input string
+/// \return The input string with everything between angle brackets removed
+std::string erase_type_arguments(const std::string &src)
+{
+  std::string class_name = src;
   std::size_t f_pos = class_name.find('<', 1);
 
   while(f_pos != std::string::npos)
@@ -196,6 +199,24 @@ std::string gather_full_class_name(const std::string &src)
     // Search the remainder of the string for generic signature
     f_pos = class_name.find('<', e_pos + 1);
   }
+  return class_name;
+}
+
+/// Returns the full class name, skipping over the generics.
+/// \param src: a type descriptor or signature
+///   1. Signature: Lcom/package/OuterClass<TT;>.Inner;
+///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
+/// \return The full name of the class like com.package.OuterClass.Inner (for
+///   both examples).
+std::string gather_full_class_name(const std::string &src)
+{
+  PRECONDITION(src.size() >= 2);
+  PRECONDITION(src[0] == 'L');
+  PRECONDITION(src[src.size() - 1] == ';');
+
+  std::string class_name = src.substr(1, src.size() - 2);
+
+  class_name = erase_type_arguments(class_name);
 
   std::replace(class_name.begin(), class_name.end(), '.', '$');
   std::replace(class_name.begin(), class_name.end(), '/', '.');
