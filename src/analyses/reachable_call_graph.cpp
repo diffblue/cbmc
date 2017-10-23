@@ -8,12 +8,8 @@ Author:
 
 /// \file
 /// Reachable Call Graph
-/// Constructs a call graph only from the functions reachable from a given
-/// entry point, or the goto_functions.entry_point if none is given.
-
 #include "reachable_call_graph.h"
 #include <util/message.h>
-
 
 reachable_call_grapht::reachable_call_grapht
 (const goto_modelt & _goto_model)
@@ -70,7 +66,6 @@ void reachable_call_grapht::build(
     }
   }
 }
-
 
 std::unordered_set<irep_idt, irep_id_hash>
 reachable_call_grapht::backward_slice(irep_idt destination_function)
