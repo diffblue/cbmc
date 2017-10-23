@@ -437,14 +437,7 @@ typet java_type_from_string(
           // parameter is an object type or instantiated generic type
           if(src[i]=='L')
           {
-            size_t generic_open=src.find('<', i);
-            size_t end_pos=src.find(';', i);
-            // generic signature
-            if(generic_open!=std::string::npos && generic_open<end_pos)
-              // point to ';' immediately after the closing '>'
-              i=find_closing_delimiter(src, generic_open, '<', '>')+1;
-            else
-              i=src.find(';', i); // ends on ;
+            i = find_closing_semi_colon_for_reference_type(src, i);
             break;
           }
 
