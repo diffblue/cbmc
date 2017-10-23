@@ -223,13 +223,20 @@ std::string gather_full_class_name(const std::string &src)
   return class_name;
 }
 
-reference_typet
+/// For parsing a class type reference
+/// \param src: The input string
+///   Either a signature: "Lpackage/class<TT;>.innerclass<Ljava/lang/Foo;>;
+///   Or a descriptor: "Lpackage.class$inner;
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+/// \return The reference type if parsed correctly, no value if parsing fails.
+optionalt<reference_typet>
 build_class_name(const std::string src, const std::string &class_name_prefix)
 {
   PRECONDITION(src[0] == 'L');
   // ends on ;
   if(src[src.size() - 1] != ';')
-    throw "invalid string for reference type";
+    return optionalt<reference_typet>();
 
   std::string container_class = gather_full_class_name(src);
   std::string identifier = "java::" + container_class;
@@ -473,7 +480,12 @@ typet java_type_from_string(
   }
   case 'L':
     {
-      return build_class_name(src, class_name_prefix);
+      const optionalt<reference_typet> &class_type =
+        build_class_name(src, class_name_prefix);
+      if(class_type)
+        return class_type.value();
+      else
+        return nil_typet();
     }
   case '*':
   case '+':
