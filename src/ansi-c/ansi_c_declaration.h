@@ -195,6 +195,16 @@ public:
     set(ID_is_weak, is_weak);
   }
 
+  bool get_is_always_inline() const
+  {
+    return get_bool(ID_is_always_inline);
+  }
+
+  void set_is_always_inline(bool is_always_inline)
+  {
+    set(ID_is_always_inline, is_always_inline);
+  }
+
   void to_symbol(
     const ansi_c_declaratort &,
     symbolt &symbol) const;
