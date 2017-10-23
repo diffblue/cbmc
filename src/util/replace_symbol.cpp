@@ -100,6 +100,10 @@ bool replace_symbolt::replace(
   if(c_sizeof_type.is_not_nil() && have_to_replace(c_sizeof_type))
     result &= replace(static_cast<typet&>(dest.add(ID_C_c_sizeof_type)));
 
+  const typet &type_arg = static_cast<const typet &>(dest.find(ID_type_arg));
+  if(type_arg.is_not_nil() && have_to_replace(type_arg))
+    result &= replace(static_cast<typet &>(dest.add(ID_type_arg)));
+
   const typet &va_arg_type =
     static_cast<const typet&>(dest.find(ID_C_va_arg_type));
   if(va_arg_type.is_not_nil() && have_to_replace(va_arg_type))
@@ -134,6 +138,12 @@ bool replace_symbolt::have_to_replace(const exprt &dest) const
 
   if(c_sizeof_type.is_not_nil())
     if(have_to_replace(static_cast<const typet &>(c_sizeof_type)))
+      return true;
+
+  const irept &type_arg = dest.find(ID_type_arg);
+
+  if(type_arg.is_not_nil())
+    if(have_to_replace(static_cast<const typet &>(type_arg)))
       return true;
 
   const irept &va_arg_type=dest.find(ID_C_va_arg_type);
