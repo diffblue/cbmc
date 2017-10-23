@@ -662,8 +662,18 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
       reachable_call_grapht reach_graph(goto_model);
-      if(cmdline.isset("xml"))
-        reach_graph.output_xml(std::cout);
+      if(cmdline.isset("property"))
+      {
+        std::list<std::string> function_names = cmdline.get_values("property");
+        if(function_names.size() > 1)
+          status() << "Only one destination allowed, "
+              "using only first function name given\n";
+        cmdline.get_value("property");
+        std::cout << "list of reachable functions: \n";
+        for(const auto f :
+            reach_graph.backward_slice(function_names.front()))
+          std::cout << f << "\n";
+      }
       else
         reach_graph.output_dot(std::cout);
     return 0;
@@ -1425,6 +1435,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal();
 
+    status() << "Slicing away initializations of unused global variables"
+             << eom;
+    slice_global_inits(goto_model);
+
     status() << "Performing an aggressive slice" << eom;
     aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
 
@@ -1444,6 +1458,12 @@ void goto_instrument_parse_optionst::instrument_goto_program()
           "preserve-functions-containing");
 
     aggressive_slicer.doit();
+
+    status() << "Performing a reachability slice" << eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_model);
   }
 
   // recalculate numbers, etc.
