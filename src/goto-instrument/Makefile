@@ -34,6 +34,7 @@ SRC = accelerate/accelerate.cpp \
       interrupt.cpp \
       k_induction.cpp \
       loop_utils.cpp \
+      make_function_assume_false.cpp \
       mmio.cpp \
       model_argc_argv.cpp \
       nondet_static.cpp \
