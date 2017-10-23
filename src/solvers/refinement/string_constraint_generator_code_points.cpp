@@ -205,15 +205,13 @@ exprt string_constraint_generatort::add_axioms_for_offset_by_code_point(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
-  const array_string_exprt str = get_string_expr(f.arguments()[0]);
   const exprt &index = f.arguments()[1];
   const exprt &offset = f.arguments()[2];
   const typet &return_type=f.type();
   const symbol_exprt result = fresh_symbol("offset_by_code_point", return_type);
 
   const exprt minimum = plus_exprt_with_overflow_check(index, offset);
-  const exprt maximum = plus_exprt_with_overflow_check(
-    index, plus_exprt_with_overflow_check(offset, offset));
+  const exprt maximum = plus_exprt_with_overflow_check(minimum, offset);
   m_axioms.push_back(binary_relation_exprt(result, ID_le, maximum));
   m_axioms.push_back(binary_relation_exprt(result, ID_ge, minimum));
 
