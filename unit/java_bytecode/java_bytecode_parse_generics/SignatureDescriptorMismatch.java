@@ -1,4 +1,4 @@
-public class Outer<T>
+public class SignatureDescriptorMismatch<T>
 {
   private class Inner
   {

@@ -21,12 +21,11 @@ SCENARIO(
   "java_bytecode_parse_signature_descriptor_mismatch",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
-  const symbol_tablet &new_symbol_table=
-    load_java_class(
-      "Outer",
-      "./java_bytecode/java_bytecode_parse_generics");
+  const symbol_tablet &new_symbol_table = load_java_class(
+    "SignatureDescriptorMismatch",
+    "./java_bytecode/java_bytecode_parse_generics");
 
-  const std::string class_prefix="java::Outer";
+  const std::string class_prefix = "java::SignatureDescriptorMismatch";
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
   const std::string inner_prefix=class_prefix+"$Inner";
@@ -39,11 +38,13 @@ SCENARIO(
       require_symbol::require_complete_class(inner_symbol);
   }
 
-  THEN("There is a symbol for the constructor of the inner class with correct"
-         " descriptor")
+  THEN(
+    "There is a symbol for the constructor of the class Inner with "
+    "the correct number of parameters")
   {
     const std::string func_name=".<init>";
-    const std::string func_descriptor = ":(LOuter;LAbstractGeneric;)V";
+    const std::string func_descriptor =
+      ":(LSignatureDescriptorMismatch;LAbstractGeneric;)V";
     const std::string process_func_name=
       inner_prefix+func_name+func_descriptor;
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
@@ -64,8 +65,9 @@ SCENARIO(
       require_symbol::require_complete_class(inner_enum_symbol);
   }
 
-  THEN("There is a symbol for the constructor of the inner enum with correct"
-         " number of parameters")
+  THEN(
+    "There is a symbol for the constructor of the inner enum with the "
+    "correct number of parameters")
   {
     const std::string func_name=".<init>";
     const std::string func_descriptor=":(Ljava/lang/String;I)V";
