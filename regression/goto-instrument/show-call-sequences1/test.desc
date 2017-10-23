@@ -1,0 +1,11 @@
+CORE
+main.c
+--show-call-sequences
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+main -> foo
+--
+foo -> foo
+main -> main
+foo -> main
