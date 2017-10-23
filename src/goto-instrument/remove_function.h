@@ -21,6 +21,7 @@ Date: April 2017
 #include <util/irep.h>
 
 #include <analyses/call_graph.h>
+#include <analyses/reachable_call_graph.h>
 
 class goto_modelt;
 class message_handlert;
@@ -47,13 +48,15 @@ public:
   aggressive_slicert(
       goto_modelt & _goto_model,
       message_handlert &_msg) :
+      preserve_all_direct_paths(false),
+      call_depth(0),
+      start_function(_goto_model.goto_functions.entry_point()),
       goto_model(_goto_model),
       message_handler(_msg),
-      call_graph(_goto_model)
-  {
-    start_function = goto_model.goto_functions.entry_point();
-    call_depth=0;
-  }
+      call_graph(_goto_model),
+      reach_graph()
+      {
+      }
 
   ///  \brief Removes the body of all functions except those on the
   /// shortest path or functions
@@ -71,6 +74,11 @@ public:
       functions_to_keep.insert(f);
   };
 
+  /// \brief When set to true we preserve all functions on direct paths between
+  /// the start function
+  /// and any given properties. We do not allow this option to be used without
+  /// specifying a property, as that would effectively be doing a full-slice
+  bool preserve_all_direct_paths;
   std::list<std::string> properties;
   std::size_t call_depth;
   std::list<std::string> name_snippets;
@@ -81,6 +89,7 @@ private:
   message_handlert & message_handler;
   std::unordered_set<irep_idt, irep_id_hash> functions_to_keep;
   call_grapht call_graph;
+  reachable_call_grapht reach_graph;
 
   /// \brief Finds all functions whose name contains a name snippet
   /// and adds them to the std::unordered_set of irep_idts of functions

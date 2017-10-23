@@ -71,13 +71,25 @@ void aggressive_slicert::doit()
   if(!name_snippets.empty())
     find_functions_that_contain_name_snippet();
 
+  if(preserve_all_direct_paths)
+    reach_graph.initialize(goto_model);
+
   for(const auto &p : properties)
   {
     source_locationt property_loc = find_property(p, goto_model.goto_functions);
     irep_idt dest = property_loc.get_function();
-    for(const auto &func : call_graph.shortest_function_path(
-        start_function, dest))
-      functions_to_keep.insert(func);
+
+    if(preserve_all_direct_paths)
+    {
+      for(const auto & func : reach_graph.backward_slice(dest))
+        functions_to_keep.insert(func);
+    }
+    else
+    {
+      for(const auto &func : call_graph.shortest_function_path(start_function,
+          dest))
+        functions_to_keep.insert(func);
+    }
   }
 
   // Add functions within distance of shortest path functions

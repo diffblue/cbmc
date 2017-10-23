@@ -20,6 +20,7 @@ class reachable_call_grapht: public call_grapht
 {
 public:
   explicit reachable_call_grapht(const goto_modelt &);
+  reachable_call_grapht() = default;
 
   /// \brief performs a backwards slice on a reachable call graph
   /// and returns an unordered set of all functions between the initial
@@ -28,6 +29,10 @@ public:
   /// \return unordered set of function names
   std::unordered_set<irep_idt, irep_id_hash>
   backward_slice(irep_idt destination_function);
+  /// \brief used to initialise reachable_call_graph if we have used the
+  /// empty constructor. Necessary for aggressive slicer, to avoid constructing
+  /// reachable call graph unless we need it.
+  void initialize(const goto_modelt &);
 protected:
   void build(const goto_functionst &);
   void build(const goto_functionst &, irep_idt start_function);

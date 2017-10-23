@@ -85,6 +85,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(harness-generator):" \
   "(preserve-function):" \
   "(preserve-functions-containing):" \
+  "(preserve-all-direct-paths)" \
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,

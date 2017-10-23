@@ -1442,6 +1442,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     status() << "Performing an aggressive slice" << eom;
     aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
 
+    if(cmdline.isset("preserve-all-direct-paths"))
+    {
+      if(!cmdline.isset("property"))
+      {
+        error() << "Property must be specified"
+                << " with the sound aggressive slicer"
+                << eom;
+        throw 0;
+      }
+      aggressive_slicer.preserve_all_direct_paths=true;
+    }
+
     if(cmdline.isset("call-depth"))
       aggressive_slicer.call_depth = safe_string2unsigned(
           cmdline.get_value("call-depth"));
@@ -1572,6 +1584,8 @@ void goto_instrument_parse_optionst::help()
     " --preserve-function <f>      force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
     " --preserve-function containing <f>\n"
     "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
+    " --preserve-all-direct-paths  force the aggressive slicer to preserve all functions on direct paths to the property\n" // NOLINT(*)
+    "                              Must be used with a specified property\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)

@@ -17,6 +17,11 @@ reachable_call_grapht::reachable_call_grapht
   build(_goto_model.goto_functions);
 }
 
+void reachable_call_grapht::initialize(const goto_modelt & _goto_model)
+{
+  build(_goto_model.goto_functions);
+}
+
 void reachable_call_grapht::build(const goto_functionst & goto_functions)
 {
   irep_idt start_function_name = goto_functions.entry_point();
