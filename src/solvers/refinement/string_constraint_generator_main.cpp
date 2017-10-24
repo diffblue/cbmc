@@ -324,9 +324,6 @@ void string_constraint_generatort::add_default_axioms(
 
   if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_length_le(max_string_length));
-
-  if(force_printable_characters)
-    add_constraint_on_characters(s, index_zero, s.length(), " -~");
 }
 
 /// Add constraint on characters of a string.
