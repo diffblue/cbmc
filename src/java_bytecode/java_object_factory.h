@@ -157,6 +157,6 @@ codet initialize_nondet_string_struct(
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
   symbol_tablet &symbol_table,
-  bool printable = false);
+  bool printable);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

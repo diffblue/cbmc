@@ -75,6 +75,9 @@ struct object_factory_parameterst final
   /// dereference a pointer using a 'depth counter'. We set a pointer to null if
   /// such depth becomes >= than this maximum value.
   size_t max_nondet_tree_depth=MAX_NONDET_TREE_DEPTH;
+
+  /// Force string content to be ASCII printable characters when set to true.
+  bool string_printable = false;
 };
 
 typedef std::pair<
