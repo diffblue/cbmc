@@ -542,7 +542,8 @@ codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  bool printable)
 {
   PRECONDITION(
     java_string_library_preprocesst::implements_java_char_sequence(obj.type()));
@@ -605,6 +606,13 @@ codet initialize_nondet_string_struct(
 
     add_array_to_length_association(
       data_expr, length_expr, symbol_table, loc, code);
+
+    // Printable ASCII characters are between ' ' and '~'.
+    if(printable)
+    {
+      add_character_set_constraint(
+        array_pointer, length_expr, " -~", symbol_table, loc, code);
+    }
   }
 
   // tmp_object = struct_expr;
