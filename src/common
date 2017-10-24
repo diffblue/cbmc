@@ -101,17 +101,19 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
   CP_CXXFLAGS += -MMD -MP -std=c++11 -U__STRICT_ANSI__
+  # Cygwin-g++ has problems with statically linking exception code.
+  # If linking fails, remove -static.
   LINKFLAGS = -static -std=c++11
   LINKLIB = ar rcT $@ $^
-  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS) -static
+  LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
   LINKNATIVE = $(HOSTCXX) -std=c++11 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
-  CC = i686-w64-mingw32-gcc
+  CC = x86_64-w64-mingw32-gcc
 endif
 ifeq ($(origin CXX),default)
   #CXX    = g++
-  CXX = i686-w64-mingw32-g++
+  CXX = x86_64-w64-mingw32-g++
 endif
 ifeq ($(origin YACC),default)
   YACC   = bison -y
