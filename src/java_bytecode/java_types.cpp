@@ -22,6 +22,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+std::vector<typet> parse_list_types(
+  const std::string src,
+  const std::string class_name_prefix,
+  const char opening_bracket,
+  const char closing_bracket);
+
 size_t find_closing_semi_colon_for_reference_type(
   const std::string src,
   size_t starting_point = 0);
@@ -171,10 +177,50 @@ exprt java_bytecode_promotion(const exprt &expr)
     return typecast_exprt(expr, new_type);
 }
 
+/// Take a list of generic arguments and parse them into the generic type.
+/// \param generic_type [out]: The existing generic type to add the information
+///   to
+/// \param parameters: The string representing the generic arguments for a
+///   signature. For example <TT;Ljava/lang/Foo;> (including wrapping angle
+///   brackets).
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
 void add_generic_type_information(
   java_generic_typet &generic_type,
-  const std::string &parameters)
+  const std::string &parameters,
+  const std::string &class_name_prefix)
 {
+  PRECONDITION(parameters.size() >= 2);
+  PRECONDITION(parameters[0] == '<');
+  PRECONDITION(parameters[parameters.size() - 1] == '>');
+
+  // parse contained types, can be either type variables, starting with T
+  // or instantiated types
+  std::vector<typet> params =
+    parse_list_types(parameters, class_name_prefix, '<', '>');
+
+  CHECK_RETURN(!params.empty()); // We should have at least one generic param
+
+  // take these types - they should either be java_generic_parameters, in which
+  // case they can be directly added to the generic_type
+  // otherwise they should be wrapped in a java_generic_inst_parametert
+
+  std::transform(
+    params.begin(),
+    params.end(),
+    std::back_inserter(generic_type.generic_type_variables()),
+    [](const typet &type) -> java_generic_parametert {
+      if(is_java_generic_parameter(type))
+      {
+        return to_java_generic_parameter(type);
+      }
+      else
+      {
+        INVARIANT(
+          is_reference(type), "All generic parameters should be references");
+        return java_generic_inst_parametert(to_symbol_type(type.subtype()));
+      }
+    });
 }
 
 /// Take a signature string and remove everything in angle brackets allowing
@@ -308,77 +354,23 @@ build_class_name(const std::string src, const std::string &class_name_prefix)
   symbol_typet symbol_type(identifier);
   symbol_type.set(ID_C_base_name, container_class);
 
-  // TODO(tkiley): The below code only parses the first generic argument list
-
   std::size_t f_pos = src.find('<', 1);
-  // get generic type information
   if(f_pos != std::string::npos)
   {
-    std::size_t e_pos = find_closing_delimiter(src, f_pos, '<', '>');
-    if(e_pos == std::string::npos)
-      throw unsupported_java_class_signature_exceptiont("recursive generic");
-
-    // What needs to happen is the symbol_typet needs to use all parts
-    // of the name and all generic parts of the child names
-    // For now it might be sufficient to parse the rest of the name
-
     java_generic_typet result(symbol_type);
-
-#ifdef DEBUG
-    std::cout << "INFO: found generic type "
-              << src.substr(f_pos + 1, e_pos - f_pos - 1) << " in " << src
-              << " with container " << generic_container_class << "\n";
-#endif
-
-    // parse contained types, can be either type variables, starting with T
-    // or instantiated types
-    size_t curr_start = f_pos + 1;
-    size_t curr_end;
+    // get generic type information
     do
     {
-      // find next end of type name
-      curr_end = src.find(';', curr_start);
-      INVARIANT(
-        curr_end != std::string::npos, "Type not terminated with \';\'");
-      const size_t end = curr_end - curr_start + 1;
-      const typet &t =
-        java_type_from_string(src.substr(curr_start, end), class_name_prefix);
-#ifdef DEBUG
-      std::cout << "INFO: getting type " << src.substr(curr_start, end) << "\n"
-                << "INFO: type id " << id2string(t.id()) << "\n"
-                << "curr_start " << curr_start << " curr_end " << curr_end
-                << " e_pos " << e_pos << " src " << src << "\n";
-#endif
-      // is an uninstantiated (pure) generic type
-      if(is_java_generic_parameter(t))
-      {
-        const java_generic_parametert &gen_type = to_java_generic_parameter(t);
-#ifdef DEBUG
-        std::cout << " generic type var " << gen_type.id() << " bound "
-                  << to_symbol_type(gen_type.subtype()).get_identifier()
-                  << "\n";
-#endif
-        result.generic_type_variables().push_back(gen_type);
-      }
+      std::size_t e_pos = find_closing_delimiter(src, f_pos, '<', '>');
+      if(e_pos == std::string::npos)
+        throw unsupported_java_class_signature_exceptiont("recursive generic");
 
-      /// TODO(mgudemann): implement / test the case of iterated generic
-      /// types
+      add_generic_type_information(
+        result, src.substr(f_pos, e_pos - f_pos + 1), class_name_prefix);
 
-      // is a concrete type, i.e., instantiation of a generic type of the
-      // current type
-      else
-      {
-        java_generic_inst_parametert inst_type(to_symbol_type(t.subtype()));
-#ifdef DEBUG
-        std::cout << " instantiation of generic type var "
-                  << to_symbol_type(t.subtype()).get_identifier() << "\n";
-#endif
-        result.generic_type_variables().push_back(inst_type);
-      }
-
-      curr_start = curr_end + 1;
-    } while(curr_start < e_pos);
-
+      // Look for the next generic type info (if it exists)
+      f_pos = src.find('<', e_pos + 1);
+    } while(f_pos != std::string::npos);
     return result;
   }
 

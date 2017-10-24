@@ -219,12 +219,21 @@ SCENARIO(
       REQUIRE(is_java_generic_type(param_type.type()));
       const auto &generic_variables =
         to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(is_java_generic_inst_parameter(generic_param));
-      REQUIRE(
-        generic_param.type_variable() ==
-        java_reference_type(symbol_typet("java::Foo")));
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
     }
   }
   THEN("Method 4 should take a pointer to GenericClass$GenericInnerClass")
