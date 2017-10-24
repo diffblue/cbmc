@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iomanip>
 
-#include <util/std_expr.h>
-#include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/unicode.h>
 
