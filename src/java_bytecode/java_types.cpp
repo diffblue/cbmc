@@ -341,13 +341,13 @@ std::vector<typet> parse_list_types(
 /// \param class_name_prefix: The name of the class to use to prefix any found
 ///   generic types
 /// \return The reference type if parsed correctly, no value if parsing fails.
-optionalt<reference_typet>
-build_class_name(const std::string src, const std::string &class_name_prefix)
+reference_typet
+build_class_name(const std::string &src, const std::string &class_name_prefix)
 {
   PRECONDITION(src[0] == 'L');
-  // ends on ;
-  if(src[src.size() - 1] != ';')
-    return optionalt<reference_typet>();
+
+  // All reference types must end on a ;
+  PRECONDITION(src[src.size() - 1] == ';');
 
   std::string container_class = gather_full_class_name(src);
   std::string identifier = "java::" + container_class;
@@ -536,12 +536,7 @@ typet java_type_from_string(
   }
   case 'L':
     {
-      const optionalt<reference_typet> &class_type =
-        build_class_name(src, class_name_prefix);
-      if(class_type)
-        return class_type.value();
-      else
-        return nil_typet();
+      return build_class_name(src, class_name_prefix);
     }
   case '*':
   case '+':
