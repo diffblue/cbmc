@@ -349,4 +349,12 @@ void add_array_to_length_association(
   const source_locationt &loc,
   code_blockt &code);
 
+void add_character_set_constraint(
+  const exprt &pointer,
+  const exprt &length,
+  const irep_idt &char_set,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_STRING_LIBRARY_PREPROCESS_H

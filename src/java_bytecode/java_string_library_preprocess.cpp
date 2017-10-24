@@ -704,6 +704,38 @@ void add_array_to_length_association(
       symbol_table));
 }
 
+/// Add a call to a primitive of the string solver which ensures all characters
+/// belong to the character set.
+/// \param pointer: a character pointer expression
+/// \param length: length of the character sequence pointed by `pointer`
+/// \param char_set: character set given by a range expression consisting of
+///                  two characters separated by an hyphen.
+///                  For instance "a-z" denotes all lower case ascii letters.
+/// \param symbol_table: the symbol table
+/// \param loc: source location
+/// \param code [out] : code block to which declaration and calls get added
+void add_character_set_constraint(
+  const exprt &pointer,
+  const exprt &length,
+  const irep_idt &char_set,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code)
+{
+  PRECONDITION(pointer.type().id() == ID_pointer);
+  symbolt &return_sym = get_fresh_aux_symbol(
+    java_int_type(), "cnstr_added", "cnstr_added", loc, ID_java, symbol_table);
+  const exprt return_expr = return_sym.symbol_expr();
+  code.add(code_declt(return_expr));
+  const constant_exprt char_set_expr(char_set, string_typet());
+  code.add(
+    code_assign_function_application(
+      return_expr,
+      ID_cprover_string_constrain_characters_func,
+      {length, pointer, char_set_expr},
+      symbol_table));
+}
+
 /// Create a refined_string_exprt `str` whose content and length are fresh
 /// symbols, calls the string primitive with name `function_name`.
 /// In the arguments of the primitive `str` takes the place of the result and
