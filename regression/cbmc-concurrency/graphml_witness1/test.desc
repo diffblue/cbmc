@@ -1,0 +1,10 @@
+CORE
+main.c
+--graphml-witness -
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+</graphml>
+--
+^warning: ignoring
