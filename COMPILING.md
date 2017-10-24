@@ -7,10 +7,8 @@ environments:
 - MacOS X
 - Solaris 11
 - FreeBSD 11
-- Cygwin (We recommend the i686-pc-mingw32-g++ cross compiler, version 5.4 or
-  above.)
-- Microsoft's Visual Studio version 12 (2013), version 14 (2015), or version 15
-  (older versions won't work)
+- Cygwin
+- Microsoft Visual Studio
 
 The rest of this document is split up into three parts: compilation on Linux,
 MacOS, Windows.  Please read the section appropriate for your machine.
@@ -119,42 +117,37 @@ Follow these instructions:
 
 # COMPILATION ON WINDOWS
 
-There are two options: compilation using g++ from Cygwin, or using Visual
-Studio's compiler. As Cygwin has significant overhead during process creation,
-we advise you use Visual Studio.
+There are two options: the Visual Studio compiler with version 12 (2013) or
+later, or the MinGW cross compiler with version 5.4 or later.
+We recommend Visual Studio.
 
 Follow these instructions:
 
-1. You need a C/C++ compiler, Flex and Bison, GNU tar, gzip2, GNU make, and
-   patch. The GNU Make needs to be version 3.81 or higher.  If you don't
-   already have the above, we recommend you install Cygwin.
-2. You need a SAT solver (in source). We recommend MiniSat2. Using a
-   browser, download from
+1. First install Cygwin, then from the Cygwin setup facility install the
+   following packages: `flex, bison, tar, gzip, git, make, wget, patch`.
+2. Get the CBMC source via
    ```
-   http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
+   git clone https://github.com/diffblue/cbmc cbmc-git
    ```
-   and then unpack with
-   ```
-   tar xfz minisat-2.2.1.tar.gz
-   mv minisat minisat-2.2.1
-   cd minisat-2.2.1
-   patch -p1 < ../scripts/minisat-2.2.1-patch
-   ```
-   The patch removes the dependency on zlib and prevents a problem with a
-   header file that is often unavailable on Windows.
-   1. To compile with Cygwin, install the mingw compilers, and adjust
-      the second line of config.inc to say
-      ```
-      BUILD_ENV = MinGW
-      ```
-   2. To compile with Visual Studio, make sure you have at least Visual
-      Studio version 12 (2013), and adjust the second line of config.inc to say
+3. Depending on your choice of compiler:
+   1. To compile with Visual Studio, change the second line of config.inc to
       ```
       BUILD_ENV = MSVC
       ```
-      Open the Visual Studio Command prompt, and then bash.exe -login from
-      Cygwin from in there.
-3. Type cd src; make - that should do it.
+      Open the Developer Command Prompt for Visual Studio, then start the
+	    Cygwin shell with
+	    ```
+	    bash.exe -login
+	    ```
+   2. To compile with MinGW, use Cygwin setup to install a mingw g++ compiler
+      package, i.e. one of `mingw{32,64}-{x86_64,i686}-gcc-g++`. Then start
+      the Cygwin shell.
+4. In the Cygwin shell, type
+   ```
+   cd cbmc-git/src
+   make DOWNLOADER=wget minisat2-download
+   make
+   ```
 
 (Optional) A Visual Studio project file can be generated with the script
 "generate_vcxproj" that is in the subdirectory "scripts".  The project file is
