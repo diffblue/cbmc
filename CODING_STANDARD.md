@@ -1,6 +1,10 @@
 Here a few minimalistic coding rules for the CPROVER source tree.
 
 # Whitespaces
+
+Formatting is enforced using clang-format. For more information about this, see
+`COMPILING.md`. A brief summary of the formatting rules is given below:
+
 - Use 2 spaces indent, no tabs.
 - No lines wider than 80 chars.
   - When line is wider, do the following:
@@ -16,8 +20,7 @@ Here a few minimalistic coding rules for the CPROVER source tree.
         even if the outer function call does.
 - If a method is bigger than 50 lines, break it into parts.
 - Put matching `{ }` into the same column.
-- No spaces around operators (`=`, `+`, `==` ...) Exceptions: Spaces around
-  `&&`, `||` and `<<`
+- Spaces around binary operators (`=`, `+`, `==` ...)
 - Space after comma (parameter lists, argument lists, ...)
 - Space after colon inside `for`
 - For pointers and references, the `*`/`&` should be attached to the variable
@@ -27,10 +30,10 @@ Here a few minimalistic coding rules for the CPROVER source tree.
 - No whitespaces in blank lines
 - Put argument lists on next line (and indent 2 spaces) if too long
 - Put parameters on separate lines (and indent 2 spaces) if too long
-- No whitespaces around colon for inheritance, put inherited into separate
-  lines in case of multiple inheritance
-- The initializer list follows the constructor without a whitespace around the
-  colon. Break line after the colon if required and indent members.
+- Spaces around colon for inheritance, put inherited into separate lines in
+  case of multiple inheritance
+- The initializer list follows the constructor with a whitespace around the
+  colon.
 - `if(...)`, `else`, `for(...)`, `do`, and `while(...)` are always in a
   separate line
 - Break expressions in `if`, `for`, `while` if necessary and align them with
