@@ -363,6 +363,32 @@ void string_constraint_generatort::add_constraint_on_characters(
   axioms.push_back(sc);
 }
 
+/// Add axioms to ensure all characters of a string belong to a given set.
+///
+/// The axiom is: \f$\forall i \in [start, end).\ s[i] \in char_set \f$, where
+/// `char_set` is given by the string `char_set_string` composed of three
+/// characters `low_char`, `-` and `high_char`. Character `c` belongs to
+/// `char_set` if \f$low_char \le c \le high_char\f$.
+/// \param f: a function application with arguments: integer `|s|`, character
+///           pointer `&s[0]`, string `char_set_string`,
+///           optional integers `start` and `end`
+/// \return integer expression whose value is zero
+exprt string_constraint_generatort::add_axioms_for_constrain_characters(
+  const function_application_exprt &f)
+{
+  const auto &args = f.arguments();
+  PRECONDITION(3 <= args.size() && args.size() <= 5);
+  PRECONDITION(args[2].type().id() == ID_string);
+  PRECONDITION(args[2].id() == ID_constant);
+  const array_string_exprt s = char_array_of_pointer(args[1], args[0]);
+  const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
+  const exprt &start =
+    args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
+  const exprt &end = args.size() >= 5 ? args[4] : s.length();
+  add_constraint_on_characters(s, start, end, char_set_string.c_str());
+  return from_integer(0, get_return_code_type());
+}
+
 /// Adds creates a new array if it does not already exists
 /// TODO: This should be replaced by associate_char_array_to_char_pointer
 array_string_exprt string_constraint_generatort::char_array_of_pointer(
@@ -499,6 +525,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res = associate_array_to_pointer(expr);
   else if(id == ID_cprover_associate_length_to_array_func)
     res = associate_length_to_array(expr);
+  else if(id == ID_cprover_string_constrain_characters_func)
+    res = add_axioms_for_constrain_characters(expr);
   else
   {
     std::string msg(

@@ -109,11 +109,14 @@ private:
 
   void add_default_axioms(const array_string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
+
   void add_constraint_on_characters(
     const array_string_exprt &s,
     const exprt &start,
     const exprt &end,
     const std::string &char_set);
+  exprt
+  add_axioms_for_constrain_characters(const function_application_exprt &f);
 
   // The following functions add axioms for the returned value
   // to be equal to the result of the function given as argument.
