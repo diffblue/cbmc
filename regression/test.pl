@@ -42,8 +42,10 @@ sub run($$$$$) {
     }
   }
 
-  system "echo EXIT=$exit_value >>'$name/$output'";
-  system "echo SIGNAL=$signal_num >>'$name/$output'";
+  open my $FH, ">>$name/$output";
+  print $FH "EXIT=$exit_value\n";
+  print $FH "SIGNAL=$signal_num\n";
+  close $FH;
 
   if($signal_num == 2) {
     print "\nProgram under test interrupted; stopping\n";
