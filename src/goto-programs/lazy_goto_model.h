@@ -71,6 +71,11 @@ public:
   /// Eagerly loads all functions from the symbol table.
   void load_all_functions() const;
 
+  language_filet &add_language_file(const std::string &filename)
+  {
+    return language_files.add_file(filename);
+  }
+
   /// The model returned here has access to the functions we've already
   /// loaded but is frozen in the sense that, with regard to the facility to
   /// load new functions, it has let it go.
