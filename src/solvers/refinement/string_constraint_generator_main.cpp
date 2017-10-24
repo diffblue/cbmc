@@ -324,16 +324,43 @@ void string_constraint_generatort::add_default_axioms(
   if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_length_le(max_string_length));
 
+  const exprt index_zero = from_integer(0, s.length().type());
   if(force_printable_characters)
-  {
-    symbol_exprt qvar=fresh_univ_index("printable", s.length().type());
-    exprt chr=s[qvar];
-    and_exprt printable(
-      binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
-      binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
-    string_constraintt sc(qvar, s.length(), printable);
-    axioms.push_back(sc);
-  }
+    add_constraint_on_characters(s, index_zero, s.length(), " -~");
+}
+
+/// Add constraint on characters of a string.
+///
+/// This constraint is
+/// \f$ \forall i \in [start, end), low\_char \le s[i] \le high\_char \f$
+/// \param s: a string expression
+/// \param start: index of the first character to constrain
+/// \param end: index at which we stop adding constraints
+/// \param char_set: a string of the form "<low_char>-<high_char>" where
+///        `<low_char>` and `<high_char>` are two characters, which represents
+///        the set of characters that are between `low_char` and `high_char`.
+/// \return a string expression that is linked to the argument through axioms
+///   that are added to the list
+void string_constraint_generatort::add_constraint_on_characters(
+  const array_string_exprt &s,
+  const exprt &start,
+  const exprt &end,
+  const std::string &char_set)
+{
+  // Parse char_set
+  PRECONDITION(char_set.length() == 3);
+  PRECONDITION(char_set[1] == '-');
+  const char &low_char = char_set[0];
+  const char &high_char = char_set[2];
+
+  // Add constraint
+  const symbol_exprt qvar = fresh_univ_index("char_constr", s.length().type());
+  const exprt chr = s[qvar];
+  const and_exprt char_in_set(
+    binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
+    binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
+  const string_constraintt sc(qvar, start, end, true_exprt(), char_in_set);
+  axioms.push_back(sc);
 }
 
 /// Adds creates a new array if it does not already exists
