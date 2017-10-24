@@ -3,20 +3,24 @@ generic_flex(ansi_c)
 
 add_executable(converter library/converter.cpp)
 
+file(GLOB ansi_c_library_sources "library/*.c")
+
 add_custom_command(OUTPUT converter_input.txt
-    COMMAND cat ${CMAKE_CURRENT_SOURCE_DIR}/library/*.c > converter_input.txt
+    COMMAND cat ${ansi_c_library_sources} > converter_input.txt
+    DEPENDS ${ansi_c_library_sources}
 )
 
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
-    COMMAND converter < converter_input.txt > ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
-    DEPENDS converter_input.txt
+add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+    COMMAND converter < "converter_input.txt" > "${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc"
+    DEPENDS "converter_input.txt" converter
 )
 
 add_executable(file_converter file_converter.cpp)
 
 function(make_inc name)
-    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${name}.inc
-        COMMAND file_converter < ${CMAKE_CURRENT_SOURCE_DIR}/${name}.h > ${CMAKE_CURRENT_BINARY_DIR}/${name}.inc
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
+        COMMAND file_converter < "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" > "${CMAKE_CURRENT_BINARY_DIR}/${name}.inc"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h" file_converter
     )
 endfunction(make_inc)
 
@@ -70,13 +74,7 @@ make_inc(gcc_builtin_headers_power)
 make_inc(gcc_builtin_headers_tm)
 make_inc(gcc_builtin_headers_ubsan)
 
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
-add_library(ansi-c
-    ${sources}
-    ${headers}
-    ${BISON_parser_OUTPUTS}
-    ${FLEX_scanner_OUTPUTS}
+set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/arm_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/clang_builtin_headers.inc
     ${CMAKE_CURRENT_BINARY_DIR}/cprover_library.inc
@@ -96,6 +94,27 @@ add_library(ansi-c
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_tm.inc
     ${CMAKE_CURRENT_BINARY_DIR}/gcc_builtin_headers_ubsan.inc
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
+)
+
+file(GLOB_RECURSE sources "*.cpp")
+file(GLOB_RECURSE headers "*.h")
+
+list(REMOVE_ITEM sources
+    "${CMAKE_CURRENT_SOURCE_DIR}/library/converter.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/file_converter.cpp"
+)
+
+add_library(ansi-c
+    ${sources}
+    ${headers}
+    ${BISON_parser_OUTPUTS}
+    ${FLEX_scanner_OUTPUTS}
+)
+
+set_source_files_properties(
+    ${sources}
+    PROPERTIES
+    OBJECT_DEPENDS "${extra_dependencies}"
 )
 
 generic_includes(ansi-c)
