@@ -45,7 +45,17 @@ SCENARIO(
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericClass$InnerClass"));
 
-      // TODO: then the generic type should be correctly stored
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 1);
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
     }
 
     THEN("The field component should be a pointer to GenericClass$InnerClass")
@@ -57,7 +67,27 @@ SCENARIO(
         field_component.type(),
         symbol_typet("java::GenericClass$GenericInnerClass"));
 
-      // TODO: then the generic type should be correctly stored
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 2);
+        {
+          const java_generic_parametert &generic_param = generic_variables[0];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[1];
+          REQUIRE(is_java_generic_inst_parameter(generic_param));
+          REQUIRE(
+            generic_param ==
+            java_generic_inst_parametert(symbol_typet("java::Foo")));
+        }
+      }
     }
 
     THEN("The field component should be a pointer to GenericClass$InnerClass")
@@ -67,38 +97,33 @@ SCENARIO(
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet("java::GenericClass$SameGenericParamInnerClass"));
-
-      // TODO: then the generic type should be correctly stored
-    }
-
-    THEN("The field component should be a pointer to GenericClass$InnerClass")
-    {
-      const struct_typet::componentt &field_component =
-        require_type::require_component(class_type, "field4");
-
-      require_type::require_pointer(
-        field_component.type(),
         symbol_typet("java::GenericClass$GenericInnerClass"));
 
-      // TODO: then the generic type should be correctly stored
-    }
-    THEN("The field component should be a pointer to GenericClass$InnerClass")
-    {
-      const struct_typet::componentt &field_component =
-        require_type::require_component(class_type, "field5");
-
-      require_type::require_pointer(
-        field_component.type(),
-        symbol_typet("java::GenericClass$SameGenericParamInnerClass"));
-
-      // TODO: then the generic type should be correctly stored
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 2);
+        {
+          const java_generic_parametert &generic_param = generic_variables[0];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[1];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+      }
     }
   }
 
-  THEN("There should be a symbol for the generic inner class")
-  {
-  }
+  // TODO: add fields of doubly nested generic classes
 }
 
 SCENARIO(
@@ -254,6 +279,28 @@ SCENARIO(
       require_type::require_parameter(function_call, "input");
     require_type::require_pointer(
       param_type.type(), symbol_typet("java::GenericClass$GenericInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(param_type.type()));
+      const auto &generic_variables =
+        to_java_generic_type(param_type.type()).generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
   }
   THEN("Method 5 should return a GenericClass$InnerClass")
   {
@@ -272,8 +319,20 @@ SCENARIO(
     require_type::require_pointer(
       function_call.return_type(),
       symbol_typet("java::GenericClass$InnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 1);
+      const java_generic_parametert &generic_param = generic_variables[0];
+      REQUIRE(
+        generic_param.type_variable() == symbol_typet("java::GenericClass::T"));
+    }
   }
-  THEN("Method 6 should return a GenericClass$InnerClass")
+  THEN("Method 6 should return a GenericClass$GenericInnerClass")
   {
     const std::string func_name = ".method6";
     const std::string func_descriptor = ":()LGenericClass$GenericInnerClass;";
@@ -290,8 +349,31 @@ SCENARIO(
     require_type::require_pointer(
       function_call.return_type(),
       symbol_typet("java::GenericClass$GenericInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+    }
   }
-  THEN("Method 7 should return a GenericClass$InnerClass")
+  THEN("Method 7 should return a GenericClass$GenericInnerClass")
   {
     const std::string func_name = ".method7";
     const std::string func_descriptor = ":()LGenericClass$GenericInnerClass;";
@@ -308,5 +390,28 @@ SCENARIO(
     require_type::require_pointer(
       function_call.return_type(),
       symbol_typet("java::GenericClass$GenericInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
   }
 }

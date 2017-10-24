@@ -26,10 +26,7 @@ public class GenericClass<T>
 
   InnerClass field;
   GenericInnerClass<Foo> field2;
-  SameGenericParamInnerClass<Foo> field3;
-
-  GenericInnerClass<T> field4;
-  SameGenericParamInnerClass<T> field5;
+  GenericInnerClass<T> field3;
 
   void method(InnerClass input)
   {
