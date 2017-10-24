@@ -107,8 +107,8 @@ call_grapht call_grapht::get_inverted() const
   return result;
 }
 
-std::list<irep_idt>call_grapht::shortest_function_path
-(irep_idt src, irep_idt dest)
+std::list<irep_idt> call_grapht::shortest_function_path(
+    irep_idt src, irep_idt dest)
 {
   std::list<irep_idt> result;
   node_indext src_idx, dest_idx;
