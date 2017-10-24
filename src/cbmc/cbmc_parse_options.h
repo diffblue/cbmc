@@ -54,7 +54,7 @@ class optionst;
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
   "(trace-hex)(trace-show-source-code)(trace-hide-assignments)"\
-  "(trace-show-function-calls)(html-trace)(trace-hide-inputs)" \
+  "(trace-show-function-calls)(trace-html)(trace-hide-inputs)" \
   "(trace-hide-outputs)" \
   "(error-label):(verbosity):(no-library)" \
   "(nondet-static)" \

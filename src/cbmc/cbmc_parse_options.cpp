@@ -126,7 +126,7 @@ void cbmc_parse_optionst::configure_trace_output()
   config.trace_config.show_function_calls =
       cmdline.isset("trace-show-function-calls");
 
-  if(cmdline.isset("html-trace"))
+  if(cmdline.isset("trace-html"))
     config.trace_config.trace_format = configt::trace_formatt::HTML;
   else
     config.trace_config.trace_format = configt::trace_formatt::STANDARD;
@@ -1065,6 +1065,6 @@ void cbmc_parse_optionst::help()
     "--trace-hide-outputs         hide all outputs in trace (default is to show)\n" // NOLINT(*)
     "--trace-show-source-code     show lines of source code (default is to hide)\n" // NOLINT(*)
     "--trace-hex                  outputs assignments to variables in hex (default is binary)\n" // NOLINT(*)
-    "--html-trace                 outputs trace in html format\n"
+    "--trace-html                 outputs trace in html format\n"
     "\n";
 }
