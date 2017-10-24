@@ -172,7 +172,9 @@ bool ci_lazy_methodst::operator()(
   while(any_new_methods);
 
   // Remove symbols for methods that were declared but never used:
-  symbol_tablet keep_symbols;
+  std::unordered_set<irep_idt, irep_id_hash> unreachable_symbols;
+  for(const auto &sym : symbol_table.symbols)
+    unreachable_symbols.insert(sym.first);
 
   for(const auto &sym : symbol_table.symbols)
   {
@@ -184,16 +186,19 @@ bool ci_lazy_methodst::operator()(
       continue;
     }
     if(sym.second.type.id()==ID_code)
-      gather_needed_globals(sym.second.value, symbol_table, keep_symbols);
-    keep_symbols.add(sym.second);
+    {
+      gather_needed_globals(
+        sym.second.value, symbol_table, unreachable_symbols);
+    }
+    unreachable_symbols.erase(sym.first);
   }
 
-  debug() << "CI lazy methods: removed "
-          << symbol_table.symbols.size() - keep_symbols.symbols.size()
-          << " unreaclass_hierarchyable methods and globals"
-          << eom;
+  debug()
+    << "CI lazy methods: removed " << unreachable_symbols.size()
+    << " unreachable methods and globals" << eom;
 
-  symbol_table.swap(keep_symbols);
+  for(const irep_idt &symbol_name : unreachable_symbols)
+    symbol_table.remove(symbol_name);
 
   return false;
 }
@@ -425,7 +430,7 @@ void ci_lazy_methodst::get_virtual_method_targets(
 void ci_lazy_methodst::gather_needed_globals(
   const exprt &e,
   const symbol_tablet &symbol_table,
-  symbol_tablet &needed)
+  std::unordered_set<irep_idt, irep_id_hash> &unreachable)
 {
   if(e.id()==ID_symbol)
   {
@@ -438,12 +443,12 @@ void ci_lazy_methodst::gather_needed_globals(
     if(findit!=symbol_table.symbols.end() &&
        findit->second.is_static_lifetime)
     {
-      needed.add(findit->second);
+      unreachable.erase(findit->first);
     }
   }
   else
     forall_operands(opit, e)
-      gather_needed_globals(*opit, symbol_table, needed);
+      gather_needed_globals(*opit, symbol_table, unreachable);
 }
 
 /// See param lazy_methods

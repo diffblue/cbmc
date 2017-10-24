@@ -14,49 +14,10 @@ bool symbol_tablet::add(const symbolt &symbol)
   return !insert(symbol).second;
 }
 
-/// Move or copy a new symbol to the symbol table
-/// \remark: This is a nicer interface than move and achieves the same
-/// result as both move and add
-/// \param symbol: The symbol to be added to the symbol table - can be
-/// moved or copied in
-/// \return Returns a reference to the newly inserted symbol or to the
-/// existing symbol if a symbol with the same name already exists in the
-/// symbol table, along with a bool that is true if a new symbol was inserted.
-std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
-{
-  // Add the symbol to the table or retrieve existing symbol with the same name
-  std::pair<symbolst::iterator, bool> result=
-    internal_symbols.emplace(symbol.name, std::move(symbol));
-  symbolt &new_symbol=result.first->second;
-  if(result.second)
-  {
-    try
-    {
-      symbol_base_mapt::iterator base_result=
-        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
-      try
-      {
-        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
-      }
-      catch(...)
-      {
-        internal_symbol_base_map.erase(base_result);
-        throw;
-      }
-    }
-    catch(...)
-    {
-      internal_symbols.erase(result.first);
-      throw;
-    }
-  }
-  return std::make_pair(std::ref(new_symbol), result.second);
-}
-
 /// Move a symbol into the symbol table. If there is already a symbol with the
 /// same name then symbol is unchanged, new_symbol points to the symbol with the
 /// same name and true is returned. Otherwise, the symbol is moved into the
-/// symbol table, symbol is set to be empty, new_symbol points to its new
+/// symbol table, symbol is destroyed, new_symbol points to its new
 /// location in the symbol table and false is returned
 /// \param symbol: The symbol to be added to the symbol table
 /// \param new_symbol: Pointer which the function will set to either point to
@@ -102,9 +63,67 @@ bool symbol_tablet::remove(const irep_idt &name)
   return false;
 }
 
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+void symbol_tablet::show(std::ostream &out) const
+{
+  out << "\n" << "Symbols:" << "\n";
+
+  forall_symbols(it, symbols)
+    out << it->second;
+}
+
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+/// \param symbol_table: The symbol table to print out
+std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
+{
+  symbol_table.show(out);
+  return out;
+}
+
+/// Move or copy a new symbol to the symbol table
+/// \remark: This is a nicer interface than move and achieves the same
+/// result as both move and add
+/// \param symbol: The symbol to be added to the symbol table - can be
+/// moved or copied in
+/// \return Returns a reference to the newly inserted symbol or to the
+/// existing symbol if a symbol with the same name already exists in the
+/// symbol table, along with a bool that is true if a new symbol was inserted.
+std::pair<symbolt &, bool> concrete_symbol_tablet::insert(symbolt symbol)
+{
+  // Add the symbol to the table or retrieve existing symbol with the same name
+  std::pair<symbolst::iterator, bool> result=
+    internal_symbols.emplace(symbol.name, std::move(symbol));
+  symbolt &new_symbol=result.first->second;
+  if(result.second)
+  {
+    try
+    {
+      symbol_base_mapt::iterator base_result=
+        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
+      try
+      {
+        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
+      }
+      catch(...)
+      {
+        internal_symbol_base_map.erase(base_result);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      internal_symbols.erase(result.first);
+      throw;
+    }
+  }
+  return std::make_pair(std::ref(new_symbol), result.second);
+}
+
 /// Remove a symbol from the symbol table
 /// \param entry: an iterator pointing at the symbol to remove
-void symbol_tablet::erase(const symbolst::const_iterator &entry)
+void concrete_symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
 
@@ -136,23 +155,4 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
   internal_symbol_module_map.erase(module_it);
 
   internal_symbols.erase(entry);
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-void symbol_tablet::show(std::ostream &out) const
-{
-  out << "\n" << "Symbols:" << "\n";
-
-  forall_symbols(it, symbols)
-    out << it->second;
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-/// \param symbol_table: The symbol table to print out
-std::ostream &operator << (std::ostream &out, const symbol_tablet &symbol_table)
-{
-  symbol_table.show(out);
-  return out;
 }

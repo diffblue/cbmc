@@ -269,6 +269,6 @@ std::string type2name(const typet &type, const namespacet &ns)
 
 std::string type2name(const typet &type)
 {
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   return type2name(type, namespacet(symbol_table));
 }

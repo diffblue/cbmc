@@ -495,7 +495,7 @@ public:
   /// Output goto-program to given stream
   std::ostream &output(std::ostream &out) const
   {
-    return output(namespacet(symbol_tablet()), "", out);
+    return output(namespacet(concrete_symbol_tablet()), "", out);
   }
 
   /// Output a single instruction

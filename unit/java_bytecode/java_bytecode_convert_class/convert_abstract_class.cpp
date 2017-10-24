@@ -24,7 +24,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
   {
     WHEN("Parsing an interface")
     {
-      const symbol_tablet &new_symbol_table=
+      const concrete_symbol_tablet new_symbol_table=
         load_java_class("I", "./java_bytecode/java_bytecode_convert_class");
 
       THEN("The symbol type should be abstract")
@@ -40,7 +40,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     }
     WHEN("Parsing an abstract class")
     {
-      const symbol_tablet &new_symbol_table=
+      const concrete_symbol_tablet new_symbol_table=
         load_java_class("A", "./java_bytecode/java_bytecode_convert_class");
       THEN("The symbol type should be abstract")
       {
@@ -55,7 +55,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     }
     WHEN("Passing a concrete class")
     {
-      const symbol_tablet &new_symbol_table=
+      const concrete_symbol_tablet new_symbol_table=
         load_java_class("C", "./java_bytecode/java_bytecode_convert_class");
       THEN("The symbol type should not be abstract")
       {
@@ -70,7 +70,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     }
     WHEN("Passing a concrete class that implements an interface")
     {
-      const symbol_tablet &new_symbol_table=
+      const concrete_symbol_tablet new_symbol_table=
         load_java_class(
           "Implementor",
           "./java_bytecode/java_bytecode_convert_class");
@@ -88,7 +88,7 @@ SCENARIO("java_bytecode_convert_abstract_class",
     }
     WHEN("Passing a concrete class that extends an abstract class")
     {
-      const symbol_tablet &new_symbol_table=
+      const concrete_symbol_tablet new_symbol_table=
         load_java_class(
           "Extender",
           "./java_bytecode/java_bytecode_convert_class");

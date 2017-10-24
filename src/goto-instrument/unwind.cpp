@@ -325,7 +325,7 @@ void goto_unwindt::unwind(
       i_it!=goto_program.instructions.end();)
   {
 #ifdef DEBUG
-    symbol_tablet st;
+    concrete_symbol_tablet st;
     namespacet ns(st);
     std::cout << "Instruction:\n";
     goto_program.output_instruction(ns, "", std::cout, *i_it);

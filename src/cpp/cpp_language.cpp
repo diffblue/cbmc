@@ -125,7 +125,7 @@ bool cpp_languaget::typecheck(
   if(module=="")
     return false;
 
-  symbol_tablet new_symbol_table;
+  concrete_symbol_tablet new_symbol_table;
 
   if(cpp_typecheck(
       cpp_parse_tree, new_symbol_table, module, get_message_handler()))

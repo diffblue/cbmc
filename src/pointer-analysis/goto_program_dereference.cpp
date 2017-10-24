@@ -436,7 +436,7 @@ void dereference(
   value_setst &value_sets)
 {
   optionst options;
-  symbol_tablet new_symbol_table;
+  concrete_symbol_tablet new_symbol_table;
   goto_program_dereferencet
     goto_program_dereference(ns, new_symbol_table, options, value_sets);
   goto_program_dereference.dereference_expression(target, expr);

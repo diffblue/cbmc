@@ -98,7 +98,7 @@ public:
 void is_threadedt::compute(const goto_functionst &goto_functions)
 {
   // the analysis doesn't actually use the namespace, fake one
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   const namespacet ns(symbol_table);
 
   ait<is_threaded_domaint> is_threaded_analysis;

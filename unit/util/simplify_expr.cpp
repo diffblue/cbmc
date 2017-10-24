@@ -22,7 +22,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)")
 {
   config.set_arch("none");
 
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   array_typet array_type(char_type(), from_integer(2, size_type()));
@@ -44,7 +44,7 @@ TEST_CASE("Simplify const pointer offset")
 {
   config.set_arch("none");
 
-  symbol_tablet symbol_table;
+  concrete_symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   // build a numeric constant of some pointer type
@@ -74,7 +74,7 @@ void test_unnecessary_cast(const typet &type)
       typecast_exprt(
         typecast_exprt(symbol_exprt("foo", type), java_int_type()),
         type),
-      namespacet(symbol_tablet()));
+      namespacet(concrete_symbol_tablet()));
 
     REQUIRE(simplified.id()==ID_symbol);
     REQUIRE(simplified.type()==type);
@@ -87,7 +87,7 @@ void test_unnecessary_cast(const typet &type)
     {
       const exprt simplified=simplify_expr(
         typecast_exprt(symbol_exprt("foo", type), java_int_type()),
-        namespacet(symbol_tablet()));
+        namespacet(concrete_symbol_tablet()));
 
       REQUIRE(simplified.id()==ID_typecast);
       REQUIRE(simplified.type()==java_int_type());
@@ -96,7 +96,7 @@ void test_unnecessary_cast(const typet &type)
     {
       const exprt simplified=simplify_expr(
         typecast_exprt(symbol_exprt("foo", java_int_type()), type),
-        namespacet(symbol_tablet()));
+        namespacet(concrete_symbol_tablet()));
 
       REQUIRE(simplified.id()==ID_typecast);
       REQUIRE(simplified.type()==type);
@@ -116,7 +116,7 @@ void test_unnecessary_cast(const typet &type)
               java_int_type()),
             type),
           java_int_type()),
-        namespacet(symbol_tablet()));
+        namespacet(concrete_symbol_tablet()));
 
       REQUIRE(
         simplified==typecast_exprt(symbol_exprt("foo", type), java_int_type()));
