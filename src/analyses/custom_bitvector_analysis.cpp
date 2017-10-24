@@ -84,6 +84,19 @@ irep_idt custom_bitvector_domaint::object2id(const exprt &src)
         return '*'+id2string(op_id);
     }
   }
+  else if(src.id()==ID_member)
+  {
+    const auto &m=to_member_expr(src);
+    const exprt &op=m.compound();
+
+    irep_idt op_id=object2id(op);
+
+    if(op_id.empty())
+      return irep_idt();
+    else
+      return id2string(op_id)+'.'+
+             id2string(m.get_component_name());
+  }
   else if(src.id()==ID_typecast)
     return object2id(to_typecast_expr(src).op());
   else
@@ -209,6 +222,49 @@ std::set<exprt> custom_bitvector_analysist::aliases(
     return std::set<exprt>();
 }
 
+void custom_bitvector_domaint::assign_struct_rec(
+  locationt from,
+  const exprt &lhs,
+  const exprt &rhs,
+  custom_bitvector_analysist &cba,
+  const namespacet &ns)
+{
+  if(ns.follow(lhs.type()).id()==ID_struct)
+  {
+    const struct_typet &struct_type=
+      to_struct_type(ns.follow(lhs.type()));
+
+    // assign member-by-member
+    for(const auto &c : struct_type.components())
+    {
+      member_exprt lhs_member(lhs, c),
+                   rhs_member(rhs, c);
+      assign_struct_rec(from, lhs_member, rhs_member, cba, ns);
+    }
+  }
+  else
+  {
+    // may alias other stuff
+    std::set<exprt> lhs_set=cba.aliases(lhs, from);
+
+    vectorst rhs_vectors=get_rhs(rhs);
+
+    for(const auto &lhs_alias : lhs_set)
+    {
+      assign_lhs(lhs_alias, rhs_vectors);
+    }
+
+    // is it a pointer?
+    if(lhs.type().id()==ID_pointer)
+    {
+      dereference_exprt lhs_deref(lhs);
+      dereference_exprt rhs_deref(rhs);
+      vectorst rhs_vectors=get_rhs(rhs_deref);
+      assign_lhs(lhs_deref, rhs_vectors);
+    }
+  }
+}
+
 void custom_bitvector_domaint::transform(
   locationt from,
   locationt to,
@@ -226,25 +282,7 @@ void custom_bitvector_domaint::transform(
   case ASSIGN:
     {
       const code_assignt &code_assign=to_code_assign(instruction.code);
-
-      // may alias other stuff
-      std::set<exprt> lhs_set=cba.aliases(code_assign.lhs(), from);
-
-      vectorst rhs_vectors=get_rhs(code_assign.rhs());
-
-      for(const auto &lhs : lhs_set)
-      {
-        assign_lhs(lhs, rhs_vectors);
-      }
-
-      // is it a pointer?
-      if(code_assign.lhs().type().id()==ID_pointer)
-      {
-        dereference_exprt lhs_deref(code_assign.lhs());
-        dereference_exprt rhs_deref(code_assign.rhs());
-        vectorst rhs_vectors=get_rhs(rhs_deref);
-        assign_lhs(lhs_deref, rhs_vectors);
-      }
+      assign_struct_rec(from, code_assign.lhs(), code_assign.rhs(), cba, ns);
     }
     break;
 
