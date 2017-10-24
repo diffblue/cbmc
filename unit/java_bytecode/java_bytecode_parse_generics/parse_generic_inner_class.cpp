@@ -90,14 +90,52 @@ SCENARIO(
       }
     }
 
-    THEN("The field component should be a pointer to GenericClass$InnerClass")
+    THEN(
+      "The field component should be a pointer to "
+      "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
     {
       const struct_typet::componentt &field_component =
-        require_type::require_component(class_type, "field3");
+        require_type::require_component(class_type, "field4");
 
       require_type::require_pointer(
         field_component.type(),
-        symbol_typet("java::GenericClass$GenericInnerClass"));
+        symbol_typet(
+          "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
+
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 2);
+        {
+          const java_generic_parametert &generic_param = generic_variables[0];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[1];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param ==
+            java_generic_inst_parametert(symbol_typet("java::Foo")));
+        }
+      }
+    }
+
+    THEN(
+      "The field component should be a pointer to "
+      "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
+    {
+      const struct_typet::componentt &field_component =
+        require_type::require_component(class_type, "field5");
+
+      require_type::require_pointer(
+        field_component.type(),
+        symbol_typet(
+          "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
 
       THEN("The pointer should be generic")
       {
@@ -121,9 +159,93 @@ SCENARIO(
         }
       }
     }
-  }
 
-  // TODO: add fields of doubly nested generic classes
+    THEN(
+      "The field component should be a pointer to "
+      "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+    {
+      const struct_typet::componentt &field_component =
+        require_type::require_component(class_type, "field6");
+
+      require_type::require_pointer(
+        field_component.type(),
+        symbol_typet(
+          "java::GenericClass$GenericInnerClass$"
+          "DoublyNestedInnerGenericClass"));
+
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 3);
+        {
+          const java_generic_parametert &generic_param = generic_variables[0];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[1];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param ==
+            java_generic_inst_parametert(symbol_typet("java::Foo")));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[2];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param ==
+            java_generic_inst_parametert(symbol_typet("java::Foo")));
+        }
+      }
+    }
+
+    THEN(
+      "The field component should be a pointer to "
+      "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+    {
+      const struct_typet::componentt &field_component =
+        require_type::require_component(class_type, "field7");
+
+      require_type::require_pointer(
+        field_component.type(),
+        symbol_typet(
+          "java::GenericClass$GenericInnerClass$"
+          "DoublyNestedInnerGenericClass"));
+
+      THEN("The pointer should be generic")
+      {
+        REQUIRE(is_java_generic_type(field_component.type()));
+        const auto &generic_variables =
+          to_java_generic_type(field_component.type()).generic_type_variables();
+        REQUIRE(generic_variables.size() == 3);
+        {
+          const java_generic_parametert &generic_param = generic_variables[0];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[1];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+        {
+          const java_generic_parametert &generic_param = generic_variables[2];
+          REQUIRE(is_java_generic_parameter(generic_param));
+          REQUIRE(
+            generic_param.type_variable() ==
+            symbol_typet("java::GenericClass::T"));
+        }
+      }
+    }
+  }
 }
 
 SCENARIO(
@@ -302,6 +424,206 @@ SCENARIO(
       }
     }
   }
+  THEN(
+    "Method 5 should take a pointer to "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
+  {
+    const std::string func_name = ".method5";
+    const std::string func_descriptor =
+      ":(LGenericClass$GenericInnerClass$DoublyNestedInnerClass;)V";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    const auto param_type =
+      require_type::require_parameter(function_call, "input");
+    require_type::require_pointer(
+      param_type.type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(param_type.type()));
+      const auto &generic_variables =
+        to_java_generic_type(param_type.type()).generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+    }
+  }
+  THEN(
+    "Method 6 should take a pointer to "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
+  {
+    const std::string func_name = ".method6";
+    const std::string func_descriptor =
+      ":(LGenericClass$GenericInnerClass$DoublyNestedInnerClass;)V";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    const auto param_type =
+      require_type::require_parameter(function_call, "input");
+    require_type::require_pointer(
+      param_type.type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(param_type.type()));
+      const auto &generic_variables =
+        to_java_generic_type(param_type.type()).generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
+  }
+  THEN(
+    "Method 7 should take a pointer to "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+  {
+    const std::string func_name = ".method7";
+    const std::string func_descriptor =
+      ":(LGenericClass$GenericInnerClass$DoublyNestedInnerGenericClass;)V";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    const auto param_type =
+      require_type::require_parameter(function_call, "input");
+    require_type::require_pointer(
+      param_type.type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$"
+        "DoublyNestedInnerGenericClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(param_type.type()));
+      const auto &generic_variables =
+        to_java_generic_type(param_type.type()).generic_type_variables();
+      REQUIRE(generic_variables.size() == 3);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[2];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+    }
+  }
+  THEN(
+    "Method 8 should take a pointer to "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+  {
+    const std::string func_name = ".method8";
+    const std::string func_descriptor =
+      ":(LGenericClass$GenericInnerClass$DoublyNestedInnerGenericClass;)V";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    const auto param_type =
+      require_type::require_parameter(function_call, "input");
+    require_type::require_pointer(
+      param_type.type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$"
+        "DoublyNestedInnerGenericClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(param_type.type()));
+      const auto &generic_variables =
+        to_java_generic_type(param_type.type()).generic_type_variables();
+      REQUIRE(generic_variables.size() == 3);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[2];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
+  }
   THEN("Ret Method 1 should return a GenericClass$InnerClass")
   {
     const std::string func_name = ".ret_method1";
@@ -407,6 +729,202 @@ SCENARIO(
       }
       {
         const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
+  }
+  THEN(
+    "Ret method 4 should return a "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
+  {
+    const std::string func_name = ".ret_method4";
+    const std::string func_descriptor =
+      ":()LGenericClass$GenericInnerClass$DoublyNestedInnerClass;";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    require_type::require_pointer(
+      function_call.return_type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+    }
+  }
+  THEN(
+    "Ret method 5 should return a "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerClass")
+  {
+    const std::string func_name = ".ret_method5";
+    const std::string func_descriptor =
+      ":()LGenericClass$GenericInnerClass$DoublyNestedInnerClass;";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    require_type::require_pointer(
+      function_call.return_type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$DoublyNestedInnerClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 2);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+    }
+  }
+  THEN(
+    "Ret method 6 should return a "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+  {
+    const std::string func_name = ".ret_method6";
+    const std::string func_descriptor =
+      ":()LGenericClass$GenericInnerClass$DoublyNestedInnerGenericClass;";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    require_type::require_pointer(
+      function_call.return_type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$"
+        "DoublyNestedInnerGenericClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 3);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[2];
+        REQUIRE(is_java_generic_inst_parameter(generic_param));
+        REQUIRE(
+          generic_param ==
+          java_generic_inst_parametert(symbol_typet("java::Foo")));
+      }
+    }
+  }
+  THEN(
+    "Ret method 7 should return a "
+    "GenericClass$GenericInnerClass$DoublyNestedInnerGenericClass")
+  {
+    const std::string func_name = ".ret_method7";
+    const std::string func_descriptor =
+      ":()LGenericClass$GenericInnerClass$DoublyNestedInnerGenericClass;";
+    const std::string process_func_name =
+      class_prefix + func_name + func_descriptor;
+
+    REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    const symbolt &function_symbol =
+      new_symbol_table.lookup_ref(process_func_name);
+
+    const code_typet &function_call =
+      require_type::require_code(function_symbol.type);
+
+    require_type::require_pointer(
+      function_call.return_type(),
+      symbol_typet(
+        "java::GenericClass$GenericInnerClass$"
+        "DoublyNestedInnerGenericClass"));
+
+    THEN("The pointer should be generic")
+    {
+      REQUIRE(is_java_generic_type(function_call.return_type()));
+      const auto &generic_variables =
+        to_java_generic_type(function_call.return_type())
+          .generic_type_variables();
+      REQUIRE(generic_variables.size() == 3);
+      {
+        const java_generic_parametert &generic_param = generic_variables[0];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[1];
+        REQUIRE(is_java_generic_parameter(generic_param));
+        REQUIRE(
+          generic_param.type_variable() ==
+          symbol_typet("java::GenericClass::T"));
+      }
+      {
+        const java_generic_parametert &generic_param = generic_variables[2];
         REQUIRE(is_java_generic_parameter(generic_param));
         REQUIRE(
           generic_param.type_variable() ==
