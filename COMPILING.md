@@ -130,7 +130,8 @@ Follow these instructions:
    git clone https://github.com/diffblue/cbmc cbmc-git
    ```
 3. Depending on your choice of compiler:
-   1. To compile with Visual Studio, change the second line of config.inc to
+   1. To compile with Visual Studio, change the second line of `src/config.inc`
+      to
       ```
       BUILD_ENV = MSVC
       ```
@@ -140,8 +141,10 @@ Follow these instructions:
 	    bash.exe -login
 	    ```
    2. To compile with MinGW, use Cygwin setup to install a mingw g++ compiler
-      package, i.e. one of `mingw{32,64}-{x86_64,i686}-gcc-g++`. Then start
-      the Cygwin shell.
+      package, i.e. one of `mingw{32,64}-{x86_64,i686}-gcc-g++`. You may also
+      have to adjust the section in `src/common` that defines `CC` and `CXX`
+      for BUILD_ENV = Cygwin.
+      Then start the Cygwin shell.
 4. In the Cygwin shell, type
    ```
    cd cbmc-git/src
