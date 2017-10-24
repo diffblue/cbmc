@@ -824,7 +824,7 @@ int goto_instrument_parse_optionst::doit()
     return 11;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return 11;

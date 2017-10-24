@@ -248,7 +248,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   {
     path_is_monotone=utils.do_assumptions(polynomials, path, guard);
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     // Couldn't do WP.
     std::cout << "Assumptions error: " << s << '\n';
@@ -389,7 +389,7 @@ bool disjunctive_polynomial_accelerationt::find_path(patht &path)
       return true;
     }
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }
@@ -637,7 +637,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
       return true;
     }
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }

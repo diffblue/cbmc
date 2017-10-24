@@ -75,7 +75,7 @@ int main(int argc, const char **argv)
     }
   }
 
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cerr << s << std::endl;
   }

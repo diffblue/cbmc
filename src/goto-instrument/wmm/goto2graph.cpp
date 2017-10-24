@@ -76,7 +76,7 @@ bool inline instrumentert::local(const irep_idt &id)
 
     return false;
   }
-  catch(std::string exception)
+  catch(const std::string &exception)
   {
     message.debug()<<"Exception: "<<exception << messaget::eom;
     return false;
@@ -714,7 +714,7 @@ void instrumentert::cfg_visitort::visit_cfg_function_call(
     cur_fun=stack_fun.pop();
     #endif
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     instrumenter.message.warning() << "sorry, doesn't handle recursion "
                                    << "(function " << fun_id << "; .cpp) "

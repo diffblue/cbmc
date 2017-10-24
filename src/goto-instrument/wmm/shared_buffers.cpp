@@ -177,7 +177,7 @@ void shared_bufferst::assignment(
 
     t++;
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     message.warning() << s << messaget::eom;
   }
@@ -929,7 +929,7 @@ void shared_bufferst::nondet_flush(
                 buff1_thd_3_expr))))));
   }
   }
-  catch (std::string s)
+  catch(const std::string &s)
   {
     message.warning() << s << messaget::eom;
   }
