@@ -319,12 +319,12 @@ void string_constraint_generatort::add_default_axioms(
   if(!created_strings.insert(s).second)
     return;
 
-  axioms.push_back(
-    s.axiom_for_length_ge(from_integer(0, s.length().type())));
+  const exprt index_zero = from_integer(0, s.length().type());
+  axioms.push_back(s.axiom_for_length_ge(index_zero));
+
   if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_length_le(max_string_length));
 
-  const exprt index_zero = from_integer(0, s.length().type());
   if(force_printable_characters)
     add_constraint_on_characters(s, index_zero, s.length(), " -~");
 }
