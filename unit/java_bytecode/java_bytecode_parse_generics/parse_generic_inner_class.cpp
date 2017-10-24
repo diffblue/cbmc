@@ -302,9 +302,9 @@ SCENARIO(
       }
     }
   }
-  THEN("Method 5 should return a GenericClass$InnerClass")
+  THEN("Ret Method 1 should return a GenericClass$InnerClass")
   {
-    const std::string func_name = ".method5";
+    const std::string func_name = ".ret_method1";
     const std::string func_descriptor = ":()LGenericClass$InnerClass;";
     const std::string process_func_name =
       class_prefix + func_name + func_descriptor;
@@ -332,9 +332,9 @@ SCENARIO(
         generic_param.type_variable() == symbol_typet("java::GenericClass::T"));
     }
   }
-  THEN("Method 6 should return a GenericClass$GenericInnerClass")
+  THEN("Ret method 2 should return a GenericClass$GenericInnerClass")
   {
-    const std::string func_name = ".method6";
+    const std::string func_name = ".ret_method2";
     const std::string func_descriptor = ":()LGenericClass$GenericInnerClass;";
     const std::string process_func_name =
       class_prefix + func_name + func_descriptor;
@@ -373,9 +373,9 @@ SCENARIO(
       }
     }
   }
-  THEN("Method 7 should return a GenericClass$GenericInnerClass")
+  THEN("Ret method 3 should return a GenericClass$GenericInnerClass")
   {
-    const std::string func_name = ".method7";
+    const std::string func_name = ".ret_method3";
     const std::string func_descriptor = ":()LGenericClass$GenericInnerClass;";
     const std::string process_func_name =
       class_prefix + func_name + func_descriptor;

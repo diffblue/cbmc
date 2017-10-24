@@ -49,17 +49,17 @@ public class GenericClass<T>
 
   }
 
-  InnerClass method5()
+  InnerClass ret_method1()
   {
     return null;
   }
 
-  GenericInnerClass<Foo> method6()
+  GenericInnerClass<Foo> ret_method2()
   {
     return null;
   }
 
-  GenericInnerClass<T> method7()
+  GenericInnerClass<T> ret_method3()
   {
     return null;
   }
