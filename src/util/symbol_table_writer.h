@@ -54,8 +54,13 @@ private:
 
 public:
   journalling_symbol_table_writert(
-    const journalling_symbol_table_writert &other):
-    base_symbol_table(other.base_symbol_table)
+    const journalling_symbol_table_writert &other)=delete;
+
+  journalling_symbol_table_writert(journalling_symbol_table_writert &&other)
+  : base_symbol_table(other.base_symbol_table),
+    inserted(std::move(other.inserted)),
+    updated(std::move(other.updated)),
+    removed(std::move(other.removed))
   {
   }
 
