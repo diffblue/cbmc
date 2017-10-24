@@ -22,6 +22,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+size_t find_closing_semi_colon_for_reference_type(
+  const std::string src,
+  size_t starting_point = 0);
+
 typet java_int_type()
 {
   return signedbv_typet(32);
@@ -223,6 +227,67 @@ std::string gather_full_class_name(const std::string &src)
   return class_name;
 }
 
+/// Given a substring of a descriptor or signature that contains one or more
+/// types parse out the individual types. This is used for parsing the
+/// parameters of a function or the generic arguments contained within angle
+/// brackets.
+/// \param src: The input string that is wrapped in either ( ) or < >
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+/// \param opening_bracket: For checking string is passed in as expected, the
+///   opening bracket (i.e. '(' or '<').
+/// \param closing_bracket: For checking string is passed in as expected, the
+///   closing bracket (i.e. ')' or '>').
+/// \return A vector of types that the string represents
+std::vector<typet> parse_list_types(
+  const std::string src,
+  const std::string class_name_prefix,
+  const char opening_bracket,
+  const char closing_bracket)
+{
+  PRECONDITION(src.size() >= 2);
+  PRECONDITION(src[0] == opening_bracket);
+  PRECONDITION(src[src.size() - 1] == closing_bracket);
+
+  // Loop over the types in the given string, parsing each one in turn
+  // and adding to the type_list
+  std::vector<typet> type_list;
+  for(std::size_t i = 1; i < src.size() - 1; i++)
+  {
+    size_t start = i;
+    while(i < src.size())
+    {
+      // parameter is an object type or instantiated generic type
+      if(src[i] == 'L')
+      {
+        i = find_closing_semi_colon_for_reference_type(src, i);
+        break;
+      }
+
+      // parameter is an array
+      else if(src[i] == '[')
+        i++;
+
+      // parameter is a type variable
+      else if(src[i] == 'T')
+        i = src.find(';', i); // ends on ;
+
+      // type is an atomic type (just one character)
+      else
+      {
+        break;
+      }
+    }
+
+    std::string sub_str = src.substr(start, i - start + 1);
+    const typet &new_type = java_type_from_string(sub_str, class_name_prefix);
+    INVARIANT(new_type != nil_typet(), "Failed to parse type");
+
+    type_list.push_back(new_type);
+  }
+  return type_list;
+}
+
 /// For parsing a class type reference
 /// \param src: The input string
 ///   Either a signature: "Lpackage/class<TT;>.innerclass<Ljava/lang/Foo;>;
@@ -330,7 +395,7 @@ build_class_name(const std::string src, const std::string &class_name_prefix)
 /// See unit/java_bytecode/java_util_tests.cpp for more examples.
 size_t find_closing_semi_colon_for_reference_type(
   const std::string src,
-  size_t starting_point = 0)
+  size_t starting_point)
 {
   PRECONDITION(src[starting_point] == 'L');
   size_t next_semi_colon = src.find(';', starting_point);
@@ -426,42 +491,15 @@ typet java_type_from_string(
           std::string(src, e_pos+1, std::string::npos),
           class_name_prefix);
 
-      for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
-      {
-        code_typet::parametert param;
+      std::vector<typet> param_types =
+        parse_list_types(src.substr(0, e_pos + 1), class_name_prefix, '(', ')');
 
-        size_t start=i;
-
-        while(i<src.size())
-        {
-          // parameter is an object type or instantiated generic type
-          if(src[i]=='L')
-          {
-            i = find_closing_semi_colon_for_reference_type(src, i);
-            break;
-          }
-
-          // parameter is an array
-          else if(src[i]=='[')
-            i++;
-
-          // parameter is a type variable
-          else if(src[i]=='T')
-            i=src.find(';', i); // ends on ;
-
-          // type is an atomic type (just one character)
-          else
-            break;
-        }
-
-        std::string sub_str=src.substr(start, i-start+1);
-        param.type()=java_type_from_string(sub_str, class_name_prefix);
-
-        if(param.type().id()==ID_symbol)
-          param.type()=java_reference_type(param.type());
-
-        result.parameters().push_back(param);
-      }
+      // create parameters for each type
+      std::transform(
+        param_types.begin(),
+        param_types.end(),
+        std::back_inserter(result.parameters()),
+        [](const typet &type) { return code_typet::parametert(type); });
 
       return result;
     }
