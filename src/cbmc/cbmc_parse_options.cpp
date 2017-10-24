@@ -104,7 +104,6 @@ void cbmc_parse_optionst::eval_verbosity()
 
 void cbmc_parse_optionst::configure_trace_output()
 {
-
   if(cmdline.isset("trace-hex"))
     config.trace_config.numeric_representation =
         configt::numeric_representationt::HEX;
@@ -112,30 +111,20 @@ void cbmc_parse_optionst::configure_trace_output()
     config.trace_config.numeric_representation =
         configt::numeric_representationt::BINARY;
 
-  if(cmdline.isset("trace-show-source-code"))
-    config.trace_config.show_source_code=true;
-  else
-    config.trace_config.show_source_code=false;
+  config.trace_config.show_source_code =
+      cmdline.isset("trace-show-source-code");
 
-  if(cmdline.isset("trace-hide-assignments"))
-    config.trace_config.show_value_assignments=false;
-  else
-    config.trace_config.show_value_assignments=true;
+  config.trace_config.show_value_assignments =
+      !cmdline.isset("trace-hide-assignments");
 
-  if(cmdline.isset("trace-hide-inputs"))
-    config.trace_config.show_inputs=false;
-  else
-    config.trace_config.show_inputs=true;
+  config.trace_config.show_inputs =
+      !cmdline.isset("trace-hide-inputs");
 
-  if(cmdline.isset("trace-hide-outputs"))
-    config.trace_config.show_outputs=false;
-  else
-    config.trace_config.show_outputs=true;
+  config.trace_config.show_outputs =
+      !cmdline.isset("trace-hide-ouputs");
 
-  if(cmdline.isset("trace-show-function-calls"))
-    config.trace_config.show_function_calls=true;
-  else
-    config.trace_config.show_function_calls=false;
+  config.trace_config.show_function_calls =
+      cmdline.isset("trace-show-function-calls");
 
   if(cmdline.isset("html-trace"))
     config.trace_config.trace_format = configt::trace_formatt::HTML;
@@ -1071,9 +1060,9 @@ void cbmc_parse_optionst::help()
     "\n"
     "Trace formatting options\n"
     "--trace-show-function-calls  show functions calls and returns in trace (default is to hide)\n" // NOLINT(*)
-    "--trace-hide-assignments     show all assignments in trace (default is to show)\n" // NOLINT(*)
-    "--trace-hide-inputs          show all inputs in trace (default is to show)\n" // NOLINT(*)
-    "--trace-hide-outputs         show all outputs in trace (default is to show)\n" // NOLINT(*)
+    "--trace-hide-assignments     hide all assignments in trace (default is to show)\n" // NOLINT(*)
+    "--trace-hide-inputs          hide all inputs in trace (default is to show)\n" // NOLINT(*)
+    "--trace-hide-outputs         hide all outputs in trace (default is to show)\n" // NOLINT(*)
     "--trace-show-source-code     show lines of source code (default is to hide)\n" // NOLINT(*)
     "--trace-hex                  outputs assignments to variables in hex (default is binary)\n" // NOLINT(*)
     "--html-trace                 outputs trace in html format\n"
