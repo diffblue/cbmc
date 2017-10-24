@@ -363,7 +363,8 @@ build_class_name(const std::string &src, const std::string &class_name_prefix)
     {
       std::size_t e_pos = find_closing_delimiter(src, f_pos, '<', '>');
       if(e_pos == std::string::npos)
-        throw unsupported_java_class_signature_exceptiont("recursive generic");
+        throw unsupported_java_class_signature_exceptiont(
+          "Parsing type with unmatched generic bracket: " + src);
 
       add_generic_type_information(
         result, src.substr(f_pos, e_pos - f_pos + 1), class_name_prefix);
