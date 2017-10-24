@@ -1093,11 +1093,14 @@ void value_sett::assign(
   bool is_simplified,
   bool add_to_sets)
 {
-  #if 0
-  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << '\n';
-  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << '\n';
+#if 0
+  std::cout << "ASSIGN LHS: " << from_expr(ns, "", lhs) << " : "
+            << from_type(ns, "", lhs.type()) << '\n';
+  std::cout << "ASSIGN RHS: " << from_expr(ns, "", rhs) << " : "
+            << from_type(ns, "", rhs.type()) << '\n';
+  std::cout << "--------------------------------------------\n";
   output(ns, std::cout);
-  #endif
+#endif
 
   const typet &type=ns.follow(lhs.type());
 
