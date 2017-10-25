@@ -1,6 +1,6 @@
 CORE
 main.c
-"--function fun --show-goto-functions"
+'--function fun --show-goto-functions'
 ^\s*fun\(x\);$
 ^EXIT=6$
 ^SIGNAL=0$

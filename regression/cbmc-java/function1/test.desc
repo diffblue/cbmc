@@ -1,6 +1,6 @@
 CORE
 Main.class
---function "Other.fail:()V"
+--function 'Other.fail:()V'
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

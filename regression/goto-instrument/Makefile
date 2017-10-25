@@ -5,10 +5,10 @@ include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
 	exe=../../../src/goto-cc/goto-cl
-	is_windows="true"
+	is_windows=true
 else
 	exe=../../../src/goto-cc/goto-cc
-	is_windows="false"
+	is_windows=false
 endif
 
 test:

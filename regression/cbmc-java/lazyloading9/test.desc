@@ -1,6 +1,6 @@
 CORE
 test.class
---lazy-methods --verbosity 10 --function test.f --lazy-methods-extra-entry-point "test.*"
+--lazy-methods --verbosity 10 --function test.f --lazy-methods-extra-entry-point 'test.*'
 ^EXIT=0$
 ^SIGNAL=0$
 VERIFICATION SUCCESSFUL
