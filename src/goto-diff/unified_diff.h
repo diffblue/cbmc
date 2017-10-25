@@ -85,10 +85,10 @@ public:
     const differencest &differences,
     std::ostream &os) const;
 
-  bool instructions_equal(
+  static bool instructions_equal(
     const goto_programt::instructiont &ins1,
     const goto_programt::instructiont &ins2,
-    bool recurse=true) const;
+    bool recurse=true);
 
   const differences_mapt &differences_map() const;
 
