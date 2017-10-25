@@ -449,7 +449,7 @@ bool goto_diff_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;

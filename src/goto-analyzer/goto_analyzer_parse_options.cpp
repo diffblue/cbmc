@@ -321,7 +321,7 @@ bool goto_analyzer_parse_optionst::set_properties()
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -403,7 +403,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;

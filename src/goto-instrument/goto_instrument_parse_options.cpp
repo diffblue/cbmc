@@ -813,7 +813,7 @@ int goto_instrument_parse_optionst::doit()
     return 11;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return 11;

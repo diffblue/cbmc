@@ -154,7 +154,7 @@ int clobber_parse_optionst::doit()
     return 0;
   }
 
-  catch(const std::string error_msg)
+  catch(const std::string &error_msg)
   {
     error() << error_msg << messaget::eom;
     return 8;

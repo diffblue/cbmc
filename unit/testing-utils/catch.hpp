@@ -7326,7 +7326,7 @@ namespace Catch {
             catch( std::exception& ex ) {
                 return ex.what();
             }
-            catch( std::string& msg ) {
+            catch(const std::string &msg) {
                 return msg;
             }
             catch( const char* msg ) {

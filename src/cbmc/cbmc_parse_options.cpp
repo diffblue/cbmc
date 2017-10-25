@@ -434,7 +434,7 @@ int cbmc_parse_optionst::doit()
     return 6; // should contemplate EX_SOFTWARE from sysexits.h
   }
 
-  catch(const std::string error_msg)
+  catch(const std::string &error_msg)
   {
     error() << error_msg << eom;
     return 6; // should contemplate EX_SOFTWARE from sysexits.h
@@ -586,7 +586,7 @@ bool cbmc_parse_optionst::set_properties()
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -648,7 +648,7 @@ int cbmc_parse_optionst::get_goto_program(
     return 6;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return 6;
@@ -708,7 +708,7 @@ void cbmc_parse_optionst::preprocessing()
     error() << e << eom;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
   }
@@ -840,7 +840,7 @@ bool cbmc_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;

@@ -184,7 +184,7 @@ bool initialize_goto_model(
     msg.error() << e << messaget::eom;
     return true;
   }
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     msg.error() << e << messaget::eom;
     return true;
