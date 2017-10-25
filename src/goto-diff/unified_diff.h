@@ -53,7 +53,6 @@ public:
     const irep_idt &function,
     goto_program_difft &dest) const;
 
-protected:
   const goto_functionst &old_goto_functions;
   const namespacet ns_old;
   const goto_functionst &new_goto_functions;
@@ -61,8 +60,6 @@ protected:
 
   typedef std::vector<differencet> differencest;
   typedef std::map<irep_idt, differencest> differences_mapt;
-
-  differences_mapt differences_map_;
 
   void unified_diff(
     const irep_idt &identifier,
@@ -105,6 +102,9 @@ protected:
          *ins2.get_target(),
          false));
   }
+
+private:
+  differences_mapt differences_map_;
 };
 
 #endif // CPROVER_GOTO_DIFF_UNIFIED_DIFF_H
