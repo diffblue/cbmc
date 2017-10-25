@@ -155,8 +155,6 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     c_storage_spec.is_register=true;
   else if(type.id()==ID_weak)
     c_storage_spec.is_weak=true;
-  else if(type.id()==ID_always_inline)
-    c_storage_spec.is_always_inline=true;
   else if(type.id()==ID_auto)
   {
     // ignore
