@@ -46,7 +46,7 @@ void dump_ct::operator()(std::ostream &os)
 
   // add copies of struct types when ID_C_transparent_union is only
   // annotated to parameter
-  concrete_symbol_tablet symbols_transparent;
+  symbol_tablet symbols_transparent;
   for(const auto &named_symbol : copied_symbol_table.symbols)
   {
     const symbolt &symbol=named_symbol.second;

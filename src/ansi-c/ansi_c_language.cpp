@@ -106,7 +106,7 @@ bool ansi_c_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
 {
-  concrete_symbol_tablet new_symbol_table;
+  symbol_tablet new_symbol_table;
 
   if(ansi_c_typecheck(
     parse_tree,

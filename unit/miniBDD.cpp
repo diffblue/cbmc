@@ -78,7 +78,7 @@ void test4()
 
   or_exprt o(and_exprt(a, b), not_exprt(a));
 
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   namespacet ns(symbol_table);
 
   std::cout << from_expr(ns, "", o) << std::endl;

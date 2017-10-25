@@ -23,7 +23,7 @@
 SCENARIO("does_type_preserve_const_correctness",
   "[core][analyses][does_remove_const][does_type_preserve_const_correctness]")
 {
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   goto_programt program;
   does_remove_constt does_remove_const(program, ns);

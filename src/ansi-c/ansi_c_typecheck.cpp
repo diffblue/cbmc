@@ -42,7 +42,7 @@ bool ansi_c_typecheck(
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   ansi_c_parse_treet ansi_c_parse_tree;
 
   ansi_c_typecheckt ansi_c_typecheck(

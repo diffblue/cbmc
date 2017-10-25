@@ -53,7 +53,7 @@ int linker_script_merget::add_linker_script_definitions()
     return fail;
   }
 
-  concrete_symbol_tablet original_st;
+  symbol_tablet original_st;
   goto_functionst original_gf;
   fail=read_goto_binary(goto_file, original_st, original_gf,
       get_message_handler());
