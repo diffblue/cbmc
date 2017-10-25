@@ -63,6 +63,41 @@ SCENARIO("Test that the generic signature delimiter lookup works reliably",
       REQUIRE(find_closing_delimiter(generic_sigs[6], 9, '<', '>')==17);
     }
   }
+  GIVEN("Some bracketed functions")
+  {
+    std::vector<std::string> bracket_sigs{
+      // Valid inputs
+      "(Entry)",
+      "Something(Else)",
+      "(Nested(Bracket))",
+      // Invalid inputs
+      "(",
+      "(Integer>",
+    };
+    WHEN("We check if the closing tag is recognised correctly")
+    {
+      // TEST VALID CASES
+
+      // (Entry)
+      REQUIRE(find_closing_delimiter(bracket_sigs[0], 0, '(', ')') == 6);
+      // Something(Else)
+      REQUIRE(find_closing_delimiter(bracket_sigs[1], 9, '(', ')') == 14);
+      // (Nested(Bracket))
+      REQUIRE(find_closing_delimiter(bracket_sigs[2], 0, '(', ')') == 16);
+      REQUIRE(find_closing_delimiter(bracket_sigs[2], 7, '(', ')') == 15);
+
+      // TEST INVALID CASES
+
+      // (
+      REQUIRE(
+        find_closing_delimiter(bracket_sigs[3], 0, '(', ')') ==
+        std::string::npos);
+      // (Integer>
+      REQUIRE(
+        find_closing_delimiter(bracket_sigs[4], 0, '(', ')') ==
+        std::string::npos);
+    }
+  }
 }
 
 SCENARIO("gather_full_class_name")
