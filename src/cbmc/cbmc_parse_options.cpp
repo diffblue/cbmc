@@ -557,7 +557,7 @@ int cbmc_parse_optionst::doit()
   catch(const char *error_msg)
   {
     error() << error_msg << eom;
-    return CPROVER_EXIT_USAGE_ERROR; // should contemplate EX_SOFTWARE from sysexits.h
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
@@ -595,8 +595,9 @@ bool cbmc_parse_optionst::set_properties()
     return true;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return true;
   }
 
@@ -654,8 +655,9 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return CPROVER_EXIT_EXCEPTION;
   }
 
@@ -713,13 +715,15 @@ void cbmc_parse_optionst::preprocessing()
     error() << e << eom;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
+    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
   }
 }
 
@@ -846,14 +850,16 @@ bool cbmc_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return true;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
+    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
     return true;
   }
 
