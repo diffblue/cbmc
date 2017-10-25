@@ -38,11 +38,10 @@ symbolt &get_fresh_aux_symbol(
   const irep_idt &symbol_mode,
   symbol_tablet &symbol_table)
 {
-  auxiliary_symbolt new_symbol;
-
   // Loop until find a name that doesn't clash with a non-auxilliary symbol
   while(true)
   {
+    auxiliary_symbolt new_symbol;
     // Distinguish local variables with the same name
     new_symbol.base_name=
       basename_prefix+"$"+std::to_string(++temporary_counter);
