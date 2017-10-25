@@ -400,8 +400,7 @@ void unified_difft::output(std::ostream &os) const
 
 bool unified_difft::instructions_equal(
   const goto_programt::instructiont &ins1,
-  const goto_programt::instructiont &ins2,
-  bool recurse)
+  const goto_programt::instructiont &ins2)
 {
   return
     ins1.code==ins2.code &&
@@ -412,8 +411,7 @@ bool unified_difft::instructions_equal(
     (ins1.targets.empty() ||
      instructions_equal(
        *ins1.get_target(),
-       *ins2.get_target(),
-       false));
+       *ins2.get_target()));
 }
 
 const unified_difft::differences_mapt &unified_difft::differences_map() const

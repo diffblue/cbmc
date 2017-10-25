@@ -87,8 +87,7 @@ public:
 
   static bool instructions_equal(
     const goto_programt::instructiont &ins1,
-    const goto_programt::instructiont &ins2,
-    bool recurse=true);
+    const goto_programt::instructiont &ins2);
 
   const differences_mapt &differences_map() const;
 
