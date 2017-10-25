@@ -422,17 +422,16 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
     }
   }
 
-  #if 0
+  #if 1
   // (T)(a?b:c) --> a?(T)b:(T)c
   if(expr.op0().id()==ID_if &&
      expr.op0().operands().size()==3)
   {
-    exprt tmp_op1=typecast_exprt(expr.op0().op1(), expr_type);
-    exprt tmp_op2=typecast_exprt(expr.op0().op2(), expr_type);
-    simplify_typecast(tmp_op1);
-    simplify_typecast(tmp_op2);
-    expr=if_exprt(expr.op0().op0(), tmp_op1, tmp_op2, expr_type);
-    simplify_if(to_if_expr(expr));
+    if_exprt if_expr=lift_if(expr, 0);
+    simplify_typecast(if_expr.true_case());
+    simplify_typecast(if_expr.false_case());
+    simplify_if(if_expr);
+    expr.swap(if_expr);
     return false;
   }
   #endif

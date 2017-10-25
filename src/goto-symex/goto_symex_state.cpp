@@ -172,6 +172,16 @@ bool goto_symex_statet::constant_propagation(const exprt &expr) const
 
     return true;
   }
+  // consider ?: constant if both branches are constants, irrespective
+  // of the condition
+  else if(expr.id()==ID_if)
+  {
+    const if_exprt &if_expr=to_if_expr(expr);
+
+    return
+      constant_propagation(if_expr.true_case()) &&
+      constant_propagation(if_expr.false_case());
+  }
 
   return false;
 }

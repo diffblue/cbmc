@@ -387,6 +387,23 @@ bool simplify_exprt::simplify_plus(exprt &expr)
       return false;
     }
 
+    std::size_t op_if=0;
+    Forall_operands(it, expr)
+    {
+      if(it->id()==ID_if)
+      {
+        if_exprt if_expr=lift_if(expr, op_if);
+        simplify_plus(if_expr.true_case());
+        simplify_plus(if_expr.false_case());
+        simplify_if(if_expr);
+        expr.swap(if_expr);
+
+        return false;
+      }
+
+      ++op_if;
+    }
+
     // count the constants
     size_t count=0;
     forall_operands(it, expr)
