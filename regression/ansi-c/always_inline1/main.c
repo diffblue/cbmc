@@ -20,6 +20,12 @@ void unused(unsigned long offset)
 {
   ((void)sizeof(char[1 - 2*!!(!__builtin_constant_p(offset))]));
 }
+
+// unused, but no 'static'
+inline __attribute__ ((__always_inline__)) int also_unused(int _c)
+{
+  return _c;
+}
 #endif
 
 int main()
