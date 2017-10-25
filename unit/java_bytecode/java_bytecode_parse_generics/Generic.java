@@ -1,6 +1,7 @@
 class Generic<T>
 {
   public T t;
+  public Generic<Integer> g;
 
   public static <T> Generic<T> makeGeneric(T value)
   {
