@@ -35,14 +35,13 @@ public:
     is_register=false;
     is_inline=false;
     is_weak=false;
-    is_always_inline=false;
     alias.clear();
     asm_label.clear();
     section.clear();
   }
 
   bool is_typedef, is_extern, is_static, is_register,
-       is_inline, is_thread_local, is_weak, is_always_inline;
+       is_inline, is_thread_local, is_weak;
 
   // __attribute__((alias("foo")))
   irep_idt alias;
@@ -60,7 +59,6 @@ public:
            is_thread_local==other.is_thread_local &&
            is_inline==other.is_inline &&
            is_weak==other.is_weak &&
-           is_always_inline==other.is_always_inline &&
            alias==other.alias &&
            asm_label==other.asm_label &&
            section==other.section;
@@ -80,7 +78,6 @@ public:
     is_inline       |=other.is_inline;
     is_thread_local |=other.is_thread_local;
     is_weak         |=other.is_weak;
-    is_always_inline|=other.is_always_inline;
     if(alias.empty())
       alias=other.alias;
     if(asm_label.empty())
