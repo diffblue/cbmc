@@ -9,7 +9,7 @@
 
 #include <testing-utils/catch.hpp>
 #include <util/c_types.h>
-#include <util/expr.h>
+#include <util/fresh_symbol.h>
 #include <util/std_code.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 #include <langapi/language_util.h>
@@ -32,6 +32,8 @@ TEST_CASE("Convert exprt to string exprt")
 {
   GIVEN("A location, a string expression, and a symbol table")
   {
+    reset_temporary_counter();
+
     source_locationt loc;
     symbol_tablet symbol_table;
     namespacet ns(symbol_table);
