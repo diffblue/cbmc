@@ -30,9 +30,7 @@ class goto_programt;
 class unified_difft
 {
 public:
-  unified_difft(
-    const goto_modelt &model_old,
-    const goto_modelt &model_new);
+  unified_difft(const goto_modelt &model_old, const goto_modelt &model_new);
 
   bool operator()();
 
@@ -45,13 +43,10 @@ public:
     NEW
   };
 
-  typedef std::list<std::pair<goto_programt::const_targett,
-                              differencet> >
+  typedef std::list<std::pair<goto_programt::const_targett, differencet>>
     goto_program_difft;
 
-  void get_diff(
-    const irep_idt &function,
-    goto_program_difft &dest) const;
+  void get_diff(const irep_idt &function, goto_program_difft &dest) const;
 
   const goto_functionst &old_goto_functions;
   const namespacet ns_old;
