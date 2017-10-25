@@ -33,8 +33,8 @@ void unified_difft::get_diff(
   dest.clear();
 
   differences_mapt::const_iterator entry=
-    differences_map.find(function);
-  if(entry==differences_map.end())
+    differences_map_.find(function);
+  if(entry==differences_map_.end())
     return;
 
   goto_functionst::function_mapt::const_iterator old_fit=
@@ -304,7 +304,7 @@ void unified_difft::unified_diff(
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program)
 {
-  differencest &differences=differences_map[identifier];
+  differencest &differences=differences_map_[identifier];
   differences.clear();
 
   if(old_goto_program.instructions.empty() ||
@@ -363,14 +363,14 @@ bool unified_difft::operator()()
   for( ; ito!=old_funcs.end(); ++ito)
     unified_diff(ito->first, ito->second->second.body, empty);
 
-  return !differences_map.empty();
+  return !differences_map_.empty();
 }
 
 void unified_difft::output(std::ostream &os) const
 {
   goto_programt empty;
 
-  for(const std::pair<irep_idt, differencest> &p : differences_map)
+  for(const std::pair<irep_idt, differencest> &p : differences_map_)
   {
     const irep_idt &function=p.first;
 

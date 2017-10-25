@@ -62,7 +62,7 @@ protected:
   typedef std::vector<differencet> differencest;
   typedef std::map<irep_idt, differencest> differences_mapt;
 
-  differences_mapt differences_map;
+  differences_mapt differences_map_;
 
   void unified_diff(
     const irep_idt &identifier,
