@@ -21,8 +21,14 @@ Date: April 2016
 void remove_virtual_functions(
   goto_modelt &goto_model);
 
+// record removed virtual function ids
+void remove_virtual_functions(
+  goto_modelt &goto_model,
+  std::vector<irep_idt> &virtual_functions);
+
 void remove_virtual_functions(
   const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions);
+  goto_functionst &goto_functions,
+  std::vector<irep_idt> &virtual_functions);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_VIRTUAL_FUNCTIONS_H
