@@ -164,16 +164,35 @@ There is an experimental build based on CMake instead of hand-written
 makefiles. It should work on a wider variety of systems than the standard
 makefile build, and can integrate better with IDEs and static-analysis tools.
 
-1. Run `cmake --version`. If you get a command-not-found error, or the
-   installed version is lower than 3.2, go and install a new version. Most
-   Linux distributions have a package for CMake, and Mac users can get it
-   through Homebrew.  Windows users should download it manually from cmake.org.
-2. Create a directory to store your build:
-   ```
-   mkdir build
-   ```
-   Run this from the *top level* folder of the project. This is different from
-   the other builds, which require you to `cd src` first.
+1. Ensure you have all the build dependencies installed. Build dependencies are
+   the same as for the makefile build, but with the addition of CMake version
+   3.2 or higher. The installed CMake version can be queried with `cmake
+   --version`. To install all build dependencies:
+   - On Debian-like distributions, do
+     ```
+     apt-get install cmake g++ gcc flex bison make git libwww-perl patch
+     ```
+   - On Red Hat/Fedora or derivates, do
+     ```
+     yum install cmake gcc gcc-c++ flex bison perl-libwww-perl patch devtoolset-6
+     ```
+   - On macOS, do
+     ```
+     xcode-select --install
+     ```
+     You shoud also install [Homebrew](https://brew.sh), after which you can
+     run `brew install cmake` to install CMake.
+   - On Windows, install Cygwin, then from the Cygwin setup facility install
+     `cmake`, `flex`, `bison`, `tar`, `gzip`, `git`, `make`, `wget`, and
+     `patch`.
+   - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
+     be possible to install CMake from the system package manager or the
+     [official download page](https://cmake.org/download) on those systems.
+     The dependencies (as listed in the relevant sections above) will also be
+     required, and should be installed using the suggested methods.
+2. Navigate to the *top level* folder of the project. This is different from
+   the Makefile build, which requires you to navigate to the `src` directory
+   first.
 3. Generate build files with CMake:
    ```
    cmake -H. -Bbuild
