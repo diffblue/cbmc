@@ -127,7 +127,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   default:
-    assert(false);
+    UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   }
