@@ -103,6 +103,8 @@ public:
          false));
   }
 
+  const differences_mapt &differences_map() const;
+
 private:
   differences_mapt differences_map_;
 };

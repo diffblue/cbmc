@@ -396,3 +396,8 @@ void unified_difft::output(std::ostream &os) const
       os);
   }
 }
+
+const unified_difft::differences_mapt &unified_difft::differences_map() const
+{
+  return differences_map_;
+}
