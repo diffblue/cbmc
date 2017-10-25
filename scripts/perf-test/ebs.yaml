@@ -1,0 +1,53 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+    Ami:
+        Type: String
+
+    AvailabilityZone:
+        Type: String
+
+Resources:
+    EC2Instance:
+        Type: "AWS::EC2::Instance"
+        Properties:
+            InstanceType: t2.micro
+            ImageId: !Ref Ami
+            AvailabilityZone: !Ref AvailabilityZone
+            Volumes:
+                - Device: "/dev/sdf"
+                  VolumeId: !Ref BaseVolume
+            UserData: !Base64 |
+                #!/bin/bash
+                set -e
+                # wait to make sure volume is available
+                sleep 10
+                mkfs.ext4 /dev/xvdf
+                mount /dev/xvdf /mnt
+                apt-get -y update
+                apt-get install git
+                cd /mnt
+                git clone --depth 1 --branch svcomp17 \
+                        https://github.com/sosy-lab/sv-benchmarks.git
+                git clone --depth 1 \
+                        https://github.com/sosy-lab/benchexec.git
+                git clone --depth 1 --branch trunk \
+                        https://github.com/sosy-lab/cpachecker.git
+                git clone --depth 1 \
+                        https://github.com/diffblue/cprover-sv-comp.git
+                halt
+
+    BaseVolume:
+        Type: "AWS::EC2::Volume"
+        DeletionPolicy: Snapshot
+        Properties:
+            AvailabilityZone: !Ref AvailabilityZone
+            Size: 8
+            Tags:
+                - Key: Name
+                  Value: perf-test-base
+
+Outputs:
+    InstanceId:
+       Value: !Ref EC2Instance
