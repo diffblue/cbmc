@@ -125,7 +125,7 @@ int goto_instrument_parse_optionst::doit()
   if(cmdline.args.size()!=1 && cmdline.args.size()!=2)
   {
     help();
-    return CPROVER_EXIT_SUCCESS;
+    return CPROVER_EXIT_USAGE_ERROR;
   }
 
   eval_verbosity();
@@ -716,7 +716,7 @@ int goto_instrument_parse_optionst::doit()
         {
           error() << "Failed to open output file "
                   << cmdline.args[1] << eom;
-          return CPROVER_EXIT_USAGE_ERROR;
+          return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
         horn_encoding(goto_model, out);
@@ -748,13 +748,13 @@ int goto_instrument_parse_optionst::doit()
 
       if(write_goto_binary(
         cmdline.args[1], goto_model, get_message_handler()))
-        return CPROVER_EXIT_USAGE_ERROR;
+        return CPROVER_EXIT_CONVERSION_FAILED;
       else
         return CPROVER_EXIT_SUCCESS;
     }
 
     help();
-    return CPROVER_EXIT_SUCCESS;
+    return CPROVER_EXIT_USAGE_ERROR;
   }
 
   catch(const char *e)
@@ -769,8 +769,9 @@ int goto_instrument_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
