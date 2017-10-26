@@ -1418,6 +1418,9 @@ void goto_checkt::check_rec(
   else if(expr.id()==ID_shl || expr.id()==ID_ashr || expr.id()==ID_lshr)
   {
     undefined_shift_check(to_shift_expr(expr), guard);
+
+    if(expr.id()==ID_shl && expr.type().id()==ID_signedbv)
+      integer_overflow_check(expr, guard);
   }
   else if(expr.id()==ID_mod)
   {
