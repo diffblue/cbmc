@@ -286,6 +286,30 @@ void goto_checkt::undefined_shift_check(
       expr.find_source_location(),
       expr,
       guard);
+
+    if(op_type.id()==ID_signedbv && expr.id()==ID_shl)
+    {
+      binary_relation_exprt inequality(
+        expr.op(), ID_ge, from_integer(0, op_type));
+
+      add_guarded_claim(
+        inequality,
+        "shift operand is negative",
+        "undefined-shift",
+        expr.find_source_location(),
+        expr,
+        guard);
+    }
+  }
+  else
+  {
+    add_guarded_claim(
+      false_exprt(),
+      "shift of non-integer type",
+      "undefined-shift",
+      expr.find_source_location(),
+      expr,
+      guard);
   }
 }
 
