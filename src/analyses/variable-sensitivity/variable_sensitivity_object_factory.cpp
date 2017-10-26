@@ -32,7 +32,8 @@ variable_sensitivity_object_factoryt::ABSTRACT_OBJECT_TYPET
 
   if(type.id()==ID_signedbv || type.id()==ID_unsignedbv ||
     type.id()==ID_floatbv || type.id()==ID_fixedbv ||
-    type.id()==ID_c_bool || type.id()==ID_bool || type.id()==ID_integer)
+    type.id()==ID_c_bool || type.id()==ID_bool ||
+    type.id()==ID_integer || type.id()==ID_c_bit_field)
   {
     abstract_object_type=CONSTANT;
   }
@@ -126,7 +127,7 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   default:
-    assert(false);
+    UNREACHABLE;
     return initialize_abstract_object<abstract_objectt>(
       followed_type, top, bottom, e, environment, ns);
   }
