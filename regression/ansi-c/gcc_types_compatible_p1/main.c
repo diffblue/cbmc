@@ -67,6 +67,13 @@ STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot) *, int *));
 STATIC_ASSERT(__builtin_types_compatible_p(typeof (hot), typeof (janette)));
 STATIC_ASSERT(__builtin_types_compatible_p(__int128, signed __int128));
 
+#ifndef __clang__
+// clang doesn't have these
+#if defined(__x86_64__) || defined(__i386__)
+STATIC_ASSERT(__builtin_types_compatible_p(__float128, _Float128));
+#endif
+#endif
+
 /* Incompatible types */
 
 STATIC_ASSERT(!__builtin_types_compatible_p(char, _Bool));
