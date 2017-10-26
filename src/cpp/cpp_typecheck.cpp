@@ -102,7 +102,7 @@ bool cpp_typecheck(
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   cpp_parse_treet cpp_parse_tree;
 
   cpp_typecheckt cpp_typecheck(cpp_parse_tree, symbol_table,

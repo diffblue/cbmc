@@ -143,7 +143,7 @@ SCENARIO("instantiate_not_contains",
 {
   // For printing expression
   register_language(new_java_bytecode_language);
-  concrete_symbol_tablet symtbl;
+  symbol_tablet symtbl;
   const namespacet ns(symtbl);
 
   GIVEN("The not_contains axioms of String.lastIndexOf(String, Int)")
@@ -159,7 +159,7 @@ SCENARIO("instantiate_not_contains",
     func.arguments()=args;
 
     // Generating the corresponding axioms and simplifying, recording info
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
@@ -246,7 +246,7 @@ SCENARIO("instantiate_not_contains",
       a);
 
     // Create witness for axiom
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
@@ -304,7 +304,7 @@ SCENARIO("instantiate_not_contains",
       b);
 
     // Create witness for axiom
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
@@ -363,7 +363,7 @@ SCENARIO("instantiate_not_contains",
       empty);
 
     // Create witness for axiom
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);
@@ -423,7 +423,7 @@ SCENARIO("instantiate_not_contains",
       ab);
 
     // Create witness for axiom
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet empty_ns(symtab);
 
     string_constraint_generatort::infot info;
@@ -483,7 +483,7 @@ SCENARIO("instantiate_not_contains",
       cd);
 
     // Create witness for axiom
-    concrete_symbol_tablet symtab;
+    symbol_tablet symtab;
     const namespacet empty_ns(symtab);
     string_constraint_generatort::infot info;
     string_constraint_generatort generator(info, ns);

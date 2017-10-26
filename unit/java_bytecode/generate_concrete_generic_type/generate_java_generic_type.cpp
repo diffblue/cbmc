@@ -25,7 +25,7 @@ SCENARIO(
   GIVEN("A generic java type with two generic fields and a concrete "
           "substitution")
   {
-    concrete_symbol_tablet new_symbol_table=
+    symbol_tablet new_symbol_table=
       load_java_class("generic_two_fields",
                       "./java_bytecode/generate_concrete_generic_type");
 
@@ -72,7 +72,7 @@ SCENARIO(
 
   GIVEN("A generic java type with two generic parameters, like a Hashtable")
   {
-    concrete_symbol_tablet new_symbol_table=
+    symbol_tablet new_symbol_table=
       load_java_class("generic_two_parameters",
                       "./java_bytecode/generate_concrete_generic_type");
 
@@ -107,7 +107,7 @@ SCENARIO(
   GIVEN("A generic java type with a field that refers to another generic with"
           " an uninstantiated parameter.")
   {
-    concrete_symbol_tablet new_symbol_table=
+    symbol_tablet new_symbol_table=
       load_java_class("generic_unknown_field",
                       "./java_bytecode/generate_concrete_generic_type");
 
@@ -135,7 +135,7 @@ SCENARIO(
   GIVEN("A generic java type with a field that refers to another generic with"
           " an uninstantiated parameter.")
   {
-    concrete_symbol_tablet new_symbol_table=
+    symbol_tablet new_symbol_table=
       load_java_class("generic_two_instances",
                       "./java_bytecode/generate_concrete_generic_type");
 

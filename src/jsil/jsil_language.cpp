@@ -152,7 +152,7 @@ bool jsil_languaget::to_expr(
     result=true;
   else
   {
-    concrete_symbol_tablet symbol_table;
+    symbol_tablet symbol_table;
     result=
       jsil_convert(parse_tree, symbol_table, get_message_handler());
 

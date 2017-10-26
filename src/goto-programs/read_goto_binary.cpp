@@ -251,7 +251,7 @@ bool read_object_and_link(
 /// \return true on error, false otherwise
 bool read_object_and_link(
   const std::string &file_name,
-  concrete_symbol_tablet &dest_symbol_table,
+  symbol_tablet &dest_symbol_table,
   goto_functionst &dest_functions,
   message_handlert &message_handler)
 {

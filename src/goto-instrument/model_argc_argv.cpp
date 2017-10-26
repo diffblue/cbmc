@@ -106,7 +106,7 @@ bool model_argc_argv(
   ansi_c_language.parse(iss, "");
   config.ansi_c.preprocessor=pp;
 
-  concrete_symbol_tablet tmp_symbol_table;
+  symbol_tablet tmp_symbol_table;
   ansi_c_language.typecheck(tmp_symbol_table, "<built-in-library>");
 
   goto_programt init_instructions;

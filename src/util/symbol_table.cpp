@@ -16,6 +16,37 @@ bool symbol_tablet::add(const symbolt &symbol)
   return !insert(symbol).second;
 }
 
+std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
+{
+  // Add the symbol to the table or retrieve existing symbol with the same name
+  std::pair<symbolst::iterator, bool> result=
+    internal_symbols.emplace(symbol.name, std::move(symbol));
+  symbolt &new_symbol=result.first->second;
+  if(result.second)
+  {
+    try
+    {
+      symbol_base_mapt::iterator base_result=
+        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
+      try
+      {
+        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
+      }
+      catch(...)
+      {
+        internal_symbol_base_map.erase(base_result);
+        throw;
+      }
+    }
+    catch(...)
+    {
+      internal_symbols.erase(result.first);
+      throw;
+    }
+  }
+  return std::make_pair(std::ref(new_symbol), result.second);
+}
+
 /// Move a symbol into the symbol table. If there is already a symbol with the
 /// same name then symbol is unchanged, new_symbol points to the symbol with the
 /// same name and true is returned. Otherwise, the symbol is moved into the
@@ -65,74 +96,7 @@ bool symbol_tablet::remove(const irep_idt &name)
   return false;
 }
 
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-void symbol_tablet::show(std::ostream &out) const
-{
-  std::vector<irep_idt> sorted_names;
-  sorted_names.reserve(symbols.size());
-  for(const auto &elem : symbols)
-    sorted_names.push_back(elem.first);
-  std::sort(
-    sorted_names.begin(),
-    sorted_names.end(),
-    [](const irep_idt &a, const irep_idt &b)
-    { return as_string(a)<as_string(b); });
-  out << "\n" << "Symbols:" << "\n";
-  for(const auto &name : sorted_names)
-    out << symbols.at(name);
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-/// \param symbol_table: The symbol table to print out
-std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
-{
-  symbol_table.show(out);
-  return out;
-}
-
-
-symbolt *concrete_symbol_tablet::get_writeable(const irep_idt &identifier)
-{
-  symbolst::iterator it=internal_symbols.find(identifier);
-  if(it==symbols.end())
-    return nullptr;
-  return &it->second;
-}
-
-std::pair<symbolt &, bool> concrete_symbol_tablet::insert(symbolt symbol)
-{
-  // Add the symbol to the table or retrieve existing symbol with the same name
-  std::pair<symbolst::iterator, bool> result=
-    internal_symbols.emplace(symbol.name, std::move(symbol));
-  symbolt &new_symbol=result.first->second;
-  if(result.second)
-  {
-    try
-    {
-      symbol_base_mapt::iterator base_result=
-        internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
-      try
-      {
-        internal_symbol_module_map.emplace(new_symbol.module, new_symbol.name);
-      }
-      catch(...)
-      {
-        internal_symbol_base_map.erase(base_result);
-        throw;
-      }
-    }
-    catch(...)
-    {
-      internal_symbols.erase(result.first);
-      throw;
-    }
-  }
-  return std::make_pair(std::ref(new_symbol), result.second);
-}
-
-void concrete_symbol_tablet::erase(const symbolst::const_iterator &entry)
+void symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
 
@@ -164,4 +128,31 @@ void concrete_symbol_tablet::erase(const symbolst::const_iterator &entry)
   internal_symbol_module_map.erase(module_it);
 
   internal_symbols.erase(entry);
+}
+
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+void symbol_tablet::show(std::ostream &out) const
+{
+  std::vector<irep_idt> sorted_names;
+  sorted_names.reserve(symbols.size());
+  for(const auto &elem : symbols)
+    sorted_names.push_back(elem.first);
+  std::sort(
+    sorted_names.begin(),
+    sorted_names.end(),
+    [](const irep_idt &a, const irep_idt &b)
+    { return as_string(a)<as_string(b); });
+  out << "\n" << "Symbols:" << "\n";
+  for(const auto &name : sorted_names)
+    out << symbols.at(name);
+}
+
+/// Print the contents of the symbol table
+/// \param out: The ostream to direct output to
+/// \param symbol_table: The symbol table to print out
+std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
+{
+  symbol_table.show(out);
+  return out;
 }

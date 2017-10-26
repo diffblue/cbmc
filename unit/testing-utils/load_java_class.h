@@ -15,7 +15,7 @@
 
 #include <util/symbol_table.h>
 
-concrete_symbol_tablet load_java_class(
+symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path);
 

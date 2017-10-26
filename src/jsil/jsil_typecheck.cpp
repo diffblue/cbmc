@@ -925,7 +925,7 @@ bool jsil_typecheck(
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
 
   jsil_typecheckt jsil_typecheck(
     symbol_table,

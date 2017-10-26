@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_modelt
 {
 public:
-  concrete_symbol_tablet symbol_table;
+  symbol_tablet symbol_table;
   goto_functionst goto_functions;
 
   void clear()
