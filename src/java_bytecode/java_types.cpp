@@ -22,6 +22,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iostream>
 #endif
 
+std::vector<typet> parse_list_types(
+  const std::string src,
+  const std::string class_name_prefix,
+  const char opening_bracket,
+  const char closing_bracket);
+
+size_t find_closing_semi_colon_for_reference_type(
+  const std::string src,
+  size_t starting_point = 0);
+
 typet java_int_type()
 {
   return signedbv_typet(32);
@@ -167,6 +177,240 @@ exprt java_bytecode_promotion(const exprt &expr)
     return typecast_exprt(expr, new_type);
 }
 
+/// Take a list of generic arguments and parse them into the generic type.
+/// \param generic_type [out]: The existing generic type to add the information
+///   to
+/// \param parameters: The string representing the generic arguments for a
+///   signature. For example <TT;Ljava/lang/Foo;> (including wrapping angle
+///   brackets).
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+void add_generic_type_information(
+  java_generic_typet &generic_type,
+  const std::string &parameters,
+  const std::string &class_name_prefix)
+{
+  PRECONDITION(parameters.size() >= 2);
+  PRECONDITION(parameters[0] == '<');
+  PRECONDITION(parameters[parameters.size() - 1] == '>');
+
+  // parse contained types, can be either type variables, starting with T
+  // or instantiated types
+  std::vector<typet> params =
+    parse_list_types(parameters, class_name_prefix, '<', '>');
+
+  CHECK_RETURN(!params.empty()); // We should have at least one generic param
+
+  // take these types - they should either be java_generic_parameters, in which
+  // case they can be directly added to the generic_type
+  // otherwise they should be wrapped in a java_generic_inst_parametert
+
+  std::transform(
+    params.begin(),
+    params.end(),
+    std::back_inserter(generic_type.generic_type_variables()),
+    [](const typet &type) -> java_generic_parametert {
+      if(is_java_generic_parameter(type))
+      {
+        return to_java_generic_parameter(type);
+      }
+      else
+      {
+        INVARIANT(
+          is_reference(type), "All generic parameters should be references");
+        return java_generic_inst_parametert(to_symbol_type(type.subtype()));
+      }
+    });
+}
+
+/// Take a signature string and remove everything in angle brackets allowing
+/// for the type to be parsed normally.
+/// \param src: The input string
+/// \return The input string with everything between angle brackets removed
+std::string erase_type_arguments(const std::string &src)
+{
+  std::string class_name = src;
+  std::size_t f_pos = class_name.find('<', 1);
+
+  while(f_pos != std::string::npos)
+  {
+    std::size_t e_pos = find_closing_delimiter(class_name, f_pos, '<', '>');
+    if(e_pos == std::string::npos)
+    {
+      throw unsupported_java_class_signature_exceptiont(
+        "Failed to find generic signature closing delimiter (or recursive "
+        "generic): " +
+        src);
+    }
+
+    // erase generic information between brackets
+    class_name.erase(f_pos, e_pos - f_pos + 1);
+
+    // Search the remainder of the string for generic signature
+    f_pos = class_name.find('<', e_pos + 1);
+  }
+  return class_name;
+}
+
+/// Returns the full class name, skipping over the generics.
+/// \param src: a type descriptor or signature
+///   1. Signature: Lcom/package/OuterClass<TT;>.Inner;
+///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
+/// \return The full name of the class like com.package.OuterClass.Inner (for
+///   both examples).
+std::string gather_full_class_name(const std::string &src)
+{
+  PRECONDITION(src.size() >= 2);
+  PRECONDITION(src[0] == 'L');
+  PRECONDITION(src[src.size() - 1] == ';');
+
+  std::string class_name = src.substr(1, src.size() - 2);
+
+  class_name = erase_type_arguments(class_name);
+
+  std::replace(class_name.begin(), class_name.end(), '.', '$');
+  std::replace(class_name.begin(), class_name.end(), '/', '.');
+  return class_name;
+}
+
+/// Given a substring of a descriptor or signature that contains one or more
+/// types parse out the individual types. This is used for parsing the
+/// parameters of a function or the generic arguments contained within angle
+/// brackets.
+/// \param src: The input string that is wrapped in either ( ) or < >
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+/// \param opening_bracket: For checking string is passed in as expected, the
+///   opening bracket (i.e. '(' or '<').
+/// \param closing_bracket: For checking string is passed in as expected, the
+///   closing bracket (i.e. ')' or '>').
+/// \return A vector of types that the string represents
+std::vector<typet> parse_list_types(
+  const std::string src,
+  const std::string class_name_prefix,
+  const char opening_bracket,
+  const char closing_bracket)
+{
+  PRECONDITION(src.size() >= 2);
+  PRECONDITION(src[0] == opening_bracket);
+  PRECONDITION(src[src.size() - 1] == closing_bracket);
+
+  // Loop over the types in the given string, parsing each one in turn
+  // and adding to the type_list
+  std::vector<typet> type_list;
+  for(std::size_t i = 1; i < src.size() - 1; i++)
+  {
+    size_t start = i;
+    while(i < src.size())
+    {
+      // parameter is an object type or instantiated generic type
+      if(src[i] == 'L')
+      {
+        i = find_closing_semi_colon_for_reference_type(src, i);
+        break;
+      }
+
+      // parameter is an array
+      else if(src[i] == '[')
+        i++;
+
+      // parameter is a type variable
+      else if(src[i] == 'T')
+        i = src.find(';', i); // ends on ;
+
+      // type is an atomic type (just one character)
+      else
+      {
+        break;
+      }
+    }
+
+    std::string sub_str = src.substr(start, i - start + 1);
+    const typet &new_type = java_type_from_string(sub_str, class_name_prefix);
+    INVARIANT(new_type != nil_typet(), "Failed to parse type");
+
+    type_list.push_back(new_type);
+  }
+  return type_list;
+}
+
+/// For parsing a class type reference
+/// \param src: The input string
+///   Either a signature: "Lpackage/class<TT;>.innerclass<Ljava/lang/Foo;>;
+///   Or a descriptor: "Lpackage.class$inner;
+/// \param class_name_prefix: The name of the class to use to prefix any found
+///   generic types
+/// \return The reference type if parsed correctly, no value if parsing fails.
+reference_typet
+build_class_name(const std::string &src, const std::string &class_name_prefix)
+{
+  PRECONDITION(src[0] == 'L');
+
+  // All reference types must end on a ;
+  PRECONDITION(src[src.size() - 1] == ';');
+
+  std::string container_class = gather_full_class_name(src);
+  std::string identifier = "java::" + container_class;
+  symbol_typet symbol_type(identifier);
+  symbol_type.set(ID_C_base_name, container_class);
+
+  std::size_t f_pos = src.find('<', 1);
+  if(f_pos != std::string::npos)
+  {
+    java_generic_typet result(symbol_type);
+    // get generic type information
+    do
+    {
+      std::size_t e_pos = find_closing_delimiter(src, f_pos, '<', '>');
+      if(e_pos == std::string::npos)
+        throw unsupported_java_class_signature_exceptiont(
+          "Parsing type with unmatched generic bracket: " + src);
+
+      add_generic_type_information(
+        result, src.substr(f_pos, e_pos - f_pos + 1), class_name_prefix);
+
+      // Look for the next generic type info (if it exists)
+      f_pos = src.find('<', e_pos + 1);
+    } while(f_pos != std::string::npos);
+    return result;
+  }
+
+  return java_reference_type(symbol_type);
+}
+
+/// Finds the closing semi-colon ending a ClassTypeSignature that starts at
+/// \p starting_point.
+/// \param src: The input string to work on.
+/// \param starting_point: The string position where the opening 'L' we want to
+///   find the closing ';' for.
+/// \return The string position corresponding to the matching ';'. For example:
+/// LA;, we would return 2. For LA<TT;>; we would return 7.
+/// See unit/java_bytecode/java_util_tests.cpp for more examples.
+size_t find_closing_semi_colon_for_reference_type(
+  const std::string src,
+  size_t starting_point)
+{
+  PRECONDITION(src[starting_point] == 'L');
+  size_t next_semi_colon = src.find(';', starting_point);
+  INVARIANT(
+    next_semi_colon != std::string::npos,
+    "There must be a semi-colon somewhere in the input");
+  size_t next_angle_bracket = src.find('<', starting_point);
+
+  while(next_angle_bracket < next_semi_colon)
+  {
+    size_t end_bracket =
+      find_closing_delimiter(src, next_angle_bracket, '<', '>');
+    INVARIANT(
+      end_bracket != std::string::npos, "Must find matching angle bracket");
+
+    next_semi_colon = src.find(';', end_bracket + 1);
+    next_angle_bracket = src.find('<', end_bracket + 1);
+  }
+
+  return next_semi_colon;
+}
+
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
@@ -240,49 +484,15 @@ typet java_type_from_string(
           std::string(src, e_pos+1, std::string::npos),
           class_name_prefix);
 
-      for(std::size_t i=1; i<src.size() && src[i]!=')'; i++)
-      {
-        code_typet::parametert param;
+      std::vector<typet> param_types =
+        parse_list_types(src.substr(0, e_pos + 1), class_name_prefix, '(', ')');
 
-        size_t start=i;
-
-        while(i<src.size())
-        {
-          // parameter is an object type or instantiated generic type
-          if(src[i]=='L')
-          {
-            size_t generic_open=src.find('<', i);
-            size_t end_pos=src.find(';', i);
-            // generic signature
-            if(generic_open!=std::string::npos && generic_open<end_pos)
-              // point to ';' immediately after the closing '>'
-              i=find_closing_delimiter(src, generic_open, '<', '>')+1;
-            else
-              i=src.find(';', i); // ends on ;
-            break;
-          }
-
-          // parameter is an array
-          else if(src[i]=='[')
-            i++;
-
-          // parameter is a type variable
-          else if(src[i]=='T')
-            i=src.find(';', i); // ends on ;
-
-          // type is an atomic type (just one character)
-          else
-            break;
-        }
-
-        std::string sub_str=src.substr(start, i-start+1);
-        param.type()=java_type_from_string(sub_str, class_name_prefix);
-
-        if(param.type().id()==ID_symbol)
-          param.type()=java_reference_type(param.type());
-
-        result.parameters().push_back(param);
-      }
+      // create parameters for each type
+      std::transform(
+        param_types.begin(),
+        param_types.end(),
+        std::back_inserter(result.parameters()),
+        [](const typet &type) { return code_typet::parametert(type); });
 
       return result;
     }
@@ -327,108 +537,7 @@ typet java_type_from_string(
   }
   case 'L':
     {
-      // ends on ;
-      if(src[src.size()-1]!=';')
-        return nil_typet();
-
-      std::size_t f_pos=src.find('<', 1);
-      // get generic type information
-      if(f_pos!=std::string::npos)
-      {
-        std::size_t e_pos=find_closing_delimiter(src, f_pos, '<', '>');
-        if(e_pos==std::string::npos)
-          throw unsupported_java_class_signature_exceptiont(
-            "recursive generic");
-
-        // construct container type
-        std::string generic_container_class=src.substr(1, f_pos-1);
-
-        for(unsigned i=0; i<generic_container_class.size(); i++)
-        {
-          if(generic_container_class[i]=='/')
-            generic_container_class[i]='.';
-        }
-
-        java_generic_typet result(
-          symbol_typet("java::"+generic_container_class));
-
-#ifdef DEBUG
-        std::cout << "INFO: found generic type "
-                  << src.substr(f_pos+1, e_pos-f_pos-1)
-                  << " in " << src
-                  << " with container " << generic_container_class << "\n";
-#endif
-
-        // parse contained types, can be either type variables, starting with T
-        // or instantiated types
-        size_t curr_start=f_pos+1;
-        size_t curr_end;
-        do
-        {
-          // find next end of type name
-          curr_end=src.find(';', curr_start);
-          INVARIANT(
-            curr_end!=std::string::npos,
-            "Type not terminated with \';\'");
-          const size_t end=curr_end-curr_start+1;
-          const typet &t=
-            java_type_from_string(src.substr(curr_start, end),
-                                  class_name_prefix);
-#ifdef DEBUG
-          std::cout << "INFO: getting type "
-                    << src.substr(curr_start, end) << "\n"
-                    << "INFO: type id " << id2string(t.id()) << "\n"
-                    << "curr_start " << curr_start
-                    << " curr_end " << curr_end
-                    << " e_pos " << e_pos
-                    << " src " << src << "\n";
-#endif
-          // is an uninstantiated (pure) generic type
-          if(is_java_generic_parameter(t))
-          {
-            const java_generic_parametert &gen_type=
-              to_java_generic_parameter(t);
-#ifdef DEBUG
-            std::cout << " generic type var " << gen_type.id() << " bound "
-                      << to_symbol_type(gen_type.subtype()).get_identifier()
-                      << "\n";
-#endif
-            result.generic_type_variables().push_back(gen_type);
-          }
-
-          /// TODO(mgudemann): implement / test the case of iterated generic
-          /// types
-
-          // is a concrete type, i.e., instantiation of a generic type of the
-          // current type
-          else
-          {
-            java_generic_inst_parametert inst_type(
-              to_symbol_type(t.subtype()));
-#ifdef DEBUG
-            std::cout << " instantiation of generic type var "
-                      << to_symbol_type(t.subtype()).get_identifier() << "\n";
-#endif
-            result.generic_type_variables().push_back(inst_type);
-          }
-
-          curr_start=curr_end+1;
-        }
-        while(curr_start<e_pos);
-
-
-        return result;
-      }
-      std::string class_name=src.substr(1, src.size()-2);
-      for(auto &letter : class_name)
-        if(letter=='/')
-          letter='.';
-
-      std::string identifier="java::"+class_name;
-      symbol_typet symbol_type(identifier);
-      symbol_type.set(ID_C_base_name, class_name);
-
-      return java_reference_type(symbol_type);
+      return build_class_name(src, class_name_prefix);
     }
   case '*':
   case '+':

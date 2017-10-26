@@ -90,7 +90,6 @@ class java_generic_parametert:public reference_typet
 {
 public:
   typedef symbol_typet type_variablet;
-  typedef std::vector<type_variablet> type_variablest;
 
   java_generic_parametert(
     const irep_idt &_type_var_name,
@@ -108,6 +107,8 @@ public:
     return type_variables().front();
   }
 
+private:
+  typedef std::vector<type_variablet> type_variablest;
   const type_variablest &type_variables() const
   {
     return (const type_variablest &)(find(ID_type_variables).get_sub());

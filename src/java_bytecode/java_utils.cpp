@@ -214,9 +214,9 @@ size_t find_closing_delimiter(
 
   while(c_pos<=end_pos)
   {
-    if(src[c_pos]=='<')
+    if(src[c_pos] == open_char)
       depth++;
-    else if(src[c_pos]=='>')
+    else if(src[c_pos] == close_char)
     {
       if(depth==0)
         return c_pos;

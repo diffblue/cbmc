@@ -2,6 +2,7 @@ SRC = \
   c_to_expr.cpp \
   load_java_class.cpp \
   require_expr.cpp \
+  require_type.cpp \
   # Empty last line (please keep above list sorted!)
 
 INCLUDES = -I .. -I . -I ../../src
