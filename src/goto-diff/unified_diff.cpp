@@ -27,14 +27,12 @@ unified_difft::unified_difft(
 {
 }
 
-void unified_difft::get_diff(const irep_idt &function, goto_program_difft &dest)
-  const
+unified_difft::goto_program_difft
+unified_difft::get_diff(const irep_idt &function) const
 {
-  dest.clear();
-
   differences_mapt::const_iterator entry = differences_map_.find(function);
   if(entry == differences_map_.end())
-    return;
+    return {};
 
   goto_functionst::function_mapt::const_iterator old_fit =
     old_goto_functions.function_map.find(function);
@@ -50,19 +48,20 @@ void unified_difft::get_diff(const irep_idt &function, goto_program_difft &dest)
     new_fit == new_goto_functions.function_map.end() ? empty
                                                      : new_fit->second.body;
 
-  get_diff(old_goto_program, new_goto_program, entry->second, dest);
+  return get_diff(old_goto_program, new_goto_program, entry->second);
 }
 
-void unified_difft::get_diff(
+unified_difft::goto_program_difft unified_difft::get_diff(
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
-  const differencest &differences,
-  goto_program_difft &dest) const
+  const differencest &differences) const
 {
   goto_programt::instructionst::const_iterator old_it =
     old_goto_program.instructions.begin();
   goto_programt::instructionst::const_iterator new_it =
     new_goto_program.instructions.begin();
+
+  goto_program_difft dest;
 
   for(differencest::const_reverse_iterator rit = differences.rbegin();
       rit != differences.rend();
@@ -89,6 +88,8 @@ void unified_difft::get_diff(
       break;
     }
   }
+
+  return dest;
 }
 
 void unified_difft::output_diff(
@@ -98,8 +99,8 @@ void unified_difft::output_diff(
   const differencest &differences,
   std::ostream &os) const
 {
-  goto_program_difft diff;
-  get_diff(old_goto_program, new_goto_program, differences, diff);
+  goto_program_difft diff =
+    get_diff(old_goto_program, new_goto_program, differences);
 
   bool has_diff = false;
   for(const auto &d : diff)

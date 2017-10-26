@@ -46,7 +46,7 @@ public:
   typedef std::list<std::pair<goto_programt::const_targett, differencet>>
     goto_program_difft;
 
-  void get_diff(const irep_idt &function, goto_program_difft &dest) const;
+  goto_program_difft get_diff(const irep_idt &function) const;
 
   const goto_functionst &old_goto_functions;
   const namespacet ns_old;
@@ -67,11 +67,10 @@ public:
     const goto_programt &new_goto_program,
     differencest &differences) const;
 
-  void get_diff(
+  goto_program_difft get_diff(
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
-    const differencest &differences,
-    goto_program_difft &dest) const;
+    const differencest &differences) const;
 
   void output_diff(
     const irep_idt &identifier,
