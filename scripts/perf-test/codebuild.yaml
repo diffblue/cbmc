@@ -1,0 +1,127 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+    S3Bucket:
+        Type: String
+
+    PerfTestId:
+        Type: String
+
+    RepoType:
+        Type: String
+
+    Repository:
+        Type: String
+
+Resources:
+    CodeBuildRole:
+        Type: "AWS::IAM::Role"
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    Effect: Allow
+                    Principal:
+                        Service: codebuild.amazonaws.com
+                    Action: "sts:AssumeRole"
+            RoleName: !Sub "CR-${PerfTestId}"
+            Policies:
+                - PolicyName: !Sub "CP-${PerfTestId}"
+                  PolicyDocument:
+                    Version: 2012-10-17
+                    Statement:
+                        - Action:
+                            - "s3:PutObject"
+                          Effect: Allow
+                          Resource: !Join ["/", [!Sub "arn:aws:s3:::${S3Bucket}", "*"]]
+                        - Action:
+                            - "logs:CreateLogGroup"
+                            - "logs:CreateLogStream"
+                            - "logs:PutLogEvents"
+                          Effect: Allow
+                          Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*'
+
+    ReleaseBuild:
+        Type: "AWS::CodeBuild::Project"
+        Properties:
+            Artifacts:
+                Type: S3
+                Location: !Ref S3Bucket
+                Path: !Ref PerfTestId
+                Name: release
+            Environment:
+                ComputeType: BUILD_GENERAL1_LARGE
+                Image: aws/codebuild/ubuntu-base:14.04
+                Type: LINUX_CONTAINER
+            Name: !Sub "perf-test-release-build-${PerfTestId}"
+            ServiceRole: !Ref CodeBuildRole
+            Source:
+                BuildSpec: !Sub |
+                    version: 0.2
+                    phases:
+                        install:
+                            commands:
+                                - apt-get update -y
+                                - apt-get install -y software-properties-common
+                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - apt-get update -y
+                                - apt-get install -y libwww-perl g++-5 flex bison git
+                                - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
+                                - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                        build:
+                            commands:
+                                - echo ${Repository} > COMMIT_INFO
+                                - git rev-parse --short HEAD >> COMMIT_INFO
+                                - git log HEAD^..HEAD >> COMMIT_INFO
+                                - make -C src minisat2-download glucose-download
+                                - make -C src -j8
+                    artifacts:
+                        files:
+                            - src/cbmc/cbmc
+                            - COMMIT_INFO
+                        discard-paths: yes
+                Type: !Ref RepoType
+                Location: !Ref Repository
+
+    ProfilingBuild:
+        Type: "AWS::CodeBuild::Project"
+        Properties:
+            Artifacts:
+                Type: S3
+                Location: !Ref S3Bucket
+                Path: !Ref PerfTestId
+                Name: profiling
+            Environment:
+                ComputeType: BUILD_GENERAL1_LARGE
+                Image: aws/codebuild/ubuntu-base:14.04
+                Type: LINUX_CONTAINER
+            Name: !Sub "perf-test-profiling-build-${PerfTestId}"
+            ServiceRole: !Ref CodeBuildRole
+            Source:
+                BuildSpec: !Sub |
+                    version: 0.2
+                    phases:
+                        install:
+                            commands:
+                                - apt-get update -y
+                                - apt-get install -y software-properties-common
+                                - add-apt-repository ppa:ubuntu-toolchain-r/test
+                                - apt-get update -y
+                                - apt-get install -y libwww-perl g++-5 flex bison git
+                                - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 1
+                                - update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 1
+                        build:
+                            commands:
+                                - echo ${Repository} > COMMIT_INFO
+                                - git rev-parse --short HEAD >> COMMIT_INFO
+                                - git log HEAD^..HEAD >> COMMIT_INFO
+                                - make -C src minisat2-download glucose-download
+                                - make -C src -j8 CXXFLAGS="-O2 -pg -g -finline-limit=4" LINKFLAGS="-pg"
+                    artifacts:
+                        files:
+                            - src/cbmc/cbmc
+                            - COMMIT_INFO
+                        discard-paths: yes
+                Type: !Ref RepoType
+                Location: !Ref Repository

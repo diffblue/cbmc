@@ -37,7 +37,7 @@ xmlt ai_domain_baset::output_xml(
 {
   std::ostringstream out;
   output(out, ai, ns);
-  xmlt xml("domain");
+  xmlt xml("abstract_state");
   xml.data=out.str();
   return xml;
 }
@@ -170,7 +170,7 @@ jsont ai_baset::output_json(
       json_numbert(std::to_string(i_it->location_number));
     location["sourceLocation"]=
       json_stringt(i_it->source_location.as_string());
-    location["domain"]=find_state(i_it).output_json(*this, ns);
+    location["abstractState"]=find_state(i_it).output_json(*this, ns);
 
     // Ideally we need output_instruction_json
     std::ostringstream out;
@@ -431,7 +431,12 @@ bool ai_baset::do_function_call(
     assert(l_end->is_end_function());
 
     // do edge from end of function to instruction after call
-    std::unique_ptr<statet> tmp_state(make_temporary_state(get_state(l_end)));
+    const statet &end_state=get_state(l_end);
+
+    if(end_state.is_bottom())
+      return false; // function exit point not reachable
+
+    std::unique_ptr<statet> tmp_state(make_temporary_state(end_state));
     tmp_state->transform(l_end, l_return, *this, ns);
 
     // Propagate those
@@ -454,14 +459,6 @@ bool ai_baset::do_function_call_rec(
   {
     const irep_idt &identifier=function.get(ID_identifier);
 
-    if(recursion_set.find(identifier)!=recursion_set.end())
-    {
-      // recursion detected!
-      return new_data;
-    }
-    else
-      recursion_set.insert(identifier);
-
     goto_functionst::function_mapt::const_iterator it=
       goto_functions.function_map.find(identifier);
 
@@ -474,8 +471,6 @@ bool ai_baset::do_function_call_rec(
       it,
       arguments,
       ns);
-
-    recursion_set.erase(identifier);
   }
   else if(function.id()==ID_if)
   {

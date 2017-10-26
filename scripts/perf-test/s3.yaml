@@ -1,0 +1,38 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+    SnsTopicArn:
+        Type: String
+
+    S3BucketName:
+        Type: String
+
+Resources:
+    SnsTopic:
+        Type: "AWS::SNS::TopicPolicy"
+        Properties:
+            Topics:
+                - !Ref SnsTopicArn
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Action:
+                        - sns:Publish
+                      Principal:
+                        AWS: "*"
+                      Resource: !Ref SnsTopicArn
+                      Condition:
+                        ArnLike:
+                            AWS:SourceArn: !Sub "arn:aws:s3:::${S3BucketName}"
+
+    S3Bucket:
+        DependsOn: SnsTopic
+        Type: "AWS::S3::Bucket"
+        Properties:
+            BucketName: !Ref S3BucketName
+            NotificationConfiguration:
+                TopicConfigurations:
+                    - Event: s3:ObjectCreated:*
+                      Topic: !Ref SnsTopicArn

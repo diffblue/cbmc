@@ -3,6 +3,33 @@ language: cpp
 jobs:
   include:
 
+    - &formatting-stage
+      stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
+      env: NAME="clang-format"
+      addons:
+        apt:
+          packages:
+            - clang-format-3.8
+      install:
+      script: |
+        # Apparently update-alternatives doesn't work in Travis containers
+        mkdir -p priority-symlinks
+        ln -s /usr/bin/clang-format-3.8 priority-symlinks/clang-format
+        export PATH=${PWD}/priority-symlinks:${PATH}
+
+        # Now we can do the formatting pass
+        clang-format --version
+        git-clang-format-3.8 "${TRAVIS_BRANCH}"
+        git diff --color > formatted.diff
+        if [[ -s formatted.diff ]] ; then
+          echo 'Formatting error! Apply the following diff and resubmit:'
+          cat formatted.diff
+          exit 1
+        fi
+        echo 'No formatting errors found'
+        exit 0
+      before_cache:
+
     - &linter-stage
       stage: Linter + Doxygen + non-debug Ubuntu/gcc-5 test
       env: NAME="CPP-LINT"
@@ -38,6 +65,32 @@ jobs:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
       env: COMPILER="ccache g++-5"
+
+    # OS X using g++
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      sudo: false
+      compiler: gcc
+      cache: ccache
+      before_install:
+          #we create symlink to non-ccache gcc, to be used in tests
+        - mkdir bin ; ln -s /usr/bin/gcc bin/gcc
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+      env: COMPILER="ccache g++"
+
+    # OS X using clang++
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      sudo: false
+      compiler: clang
+      cache: ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
+      env:
+        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
+        - CCACHE_CPP2=yes
 
     # Ubuntu Linux with glibc using g++-5, debug mode
     - stage: Test different OS/CXX/Flags
@@ -127,6 +180,18 @@ jobs:
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
 
+    - stage: Test different OS/CXX/Flags
+      os: osx
+      cache: ccache
+      env:
+        - BUILD_SYSTEM=cmake
+        - CCACHE_CPP2=yes
+      install:
+        - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
+        - cmake --build build -- -j4
+      script: (cd build; ctest -V -L CORE)
+
+
     # Run Coverity
     - stage: Test different OS/CXX/Flags
       os: linux
@@ -165,6 +230,7 @@ jobs:
       script: echo "This is coverity build. No need for tests."
 
   allow_failures:
+    - <<: *formatting-stage
     - <<: *linter-stage
 
 install:

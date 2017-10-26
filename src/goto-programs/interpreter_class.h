@@ -104,13 +104,13 @@ protected:
 
   const goto_functionst &goto_functions;
 
-  typedef std::unordered_map<irep_idt, std::size_t, irep_id_hash> memory_mapt;
-  typedef std::map<std::size_t, irep_idt> inverse_memory_mapt;
+  typedef std::unordered_map<irep_idt, mp_integer, irep_id_hash> memory_mapt;
+  typedef std::map<mp_integer, irep_idt> inverse_memory_mapt;
   memory_mapt memory_map;
   inverse_memory_mapt inverse_memory_map;
 
   const inverse_memory_mapt::value_type &address_to_object_record(
-    std::size_t address) const
+    const mp_integer &address) const
   {
     auto lower_bound=inverse_memory_map.lower_bound(address);
     if(lower_bound->first!=address)
@@ -121,34 +121,34 @@ protected:
     return *lower_bound;
   }
 
-  irep_idt address_to_identifier(std::size_t address) const
+  irep_idt address_to_identifier(const mp_integer &address) const
   {
     return address_to_object_record(address).second;
   }
 
-  std::size_t address_to_offset(std::size_t address) const
+  mp_integer address_to_offset(const mp_integer &address) const
   {
     return address-(address_to_object_record(address).first);
   }
 
-  std::size_t base_address_to_alloc_size(std::size_t address) const
+  mp_integer base_address_to_alloc_size(const mp_integer &address) const
   {
     PRECONDITION(address_to_offset(address)==0);
     auto upper_bound=inverse_memory_map.upper_bound(address);
-    std::size_t next_alloc_address=
+    mp_integer next_alloc_address=
       upper_bound==inverse_memory_map.end() ?
       memory.size() :
       upper_bound->first;
     return next_alloc_address-address;
   }
 
-  std::size_t base_address_to_actual_size(std::size_t address) const
+  mp_integer base_address_to_actual_size(const mp_integer &address) const
   {
-    auto memory_iter=memory.find(address);
+    auto memory_iter=memory.find(integer2ulong(address));
     if(memory_iter==memory.end())
       return 0;
-    std::size_t ret=0;
-    std::size_t alloc_size=base_address_to_alloc_size(address);
+    mp_integer ret=0;
+    mp_integer alloc_size=base_address_to_alloc_size(address);
     while(memory_iter!=memory.end() && memory_iter->first<(address+alloc_size))
     {
       ++ret;
@@ -187,25 +187,31 @@ protected:
   //  properties need to be mutable to avoid making all calls nonconst
   mutable memoryt memory;
 
-  std::size_t stack_pointer;
+  mp_integer stack_pointer;
 
   void build_memory_map();
   void build_memory_map(const symbolt &symbol);
   mp_integer build_memory_map(const irep_idt &id, const typet &type);
   typet concretize_type(const typet &type);
   bool unbounded_size(const typet &);
-  size_t get_size(const typet &type);
+  mp_integer get_size(const typet &type);
 
   struct_typet::componentt get_component(
     const irep_idt &object,
-    unsigned offset);
+    const mp_integer &offset);
 
   typet get_type(const irep_idt &id) const;
+
   exprt get_value(
     const typet &type,
-    std::size_t offset=0,
+    const mp_integer &offset=0,
     bool use_non_det=false);
-  exprt get_value(const typet &type, mp_vectort &rhs, std::size_t offset=0);
+
+  exprt get_value(
+    const typet &type,
+    mp_vectort &rhs,
+    const mp_integer &offset=0);
+
   exprt get_value(const irep_idt &id);
 
   void step();
@@ -221,7 +227,7 @@ protected:
 
   void allocate(
     const mp_integer &address,
-    size_t size);
+    const mp_integer &size);
 
   void assign(
     const mp_integer &address,
@@ -244,7 +250,7 @@ protected:
     goto_functionst::function_mapt::const_iterator return_function;
     mp_integer return_value_address;
     memory_mapt local_map;
-    unsigned old_stack_pointer;
+    mp_integer old_stack_pointer;
   };
 
   typedef std::stack<stack_framet> call_stackt;
@@ -265,7 +271,7 @@ protected:
 
   dynamic_typest dynamic_types;
   int num_dynamic_objects;
-  size_t stack_depth;
+  mp_integer stack_depth;
   int thread_id;
 
   bool evaluate_boolean(const exprt &expr)

@@ -1,0 +1,10 @@
+CORE
+main.c
+--show-call-sequences
+^SIGNAL=0$
+^EXIT=0$
+recurse -> recurse
+recurse -> foo
+--
+foo -> foo
+foo -> recurse

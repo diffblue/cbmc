@@ -13,8 +13,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <iomanip>
 
-#include <util/std_expr.h>
-#include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/unicode.h>
 
@@ -23,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_pointer_casts.h"
 #include "java_types.h"
 #include "java_utils.h"
+#include "java_root_class.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -58,7 +57,7 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 
 void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 {
-  assert(expr.operands().empty());
+  PRECONDITION(expr.operands().empty());
   typet &type=expr.type();
   typecheck_type(type);
 }
@@ -66,7 +65,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_new(side_effect_exprt &expr)
 void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   side_effect_exprt &expr)
 {
-  assert(expr.operands().size()>=1); // one per dimension
+  PRECONDITION(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
   typecheck_type(type);
 }
@@ -134,15 +133,7 @@ void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
   const auto &jlo_struct=to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
   const auto &jls_struct=to_struct_type(ns.follow(string_type));
-
-  jlo_init.copy_to_operands(
-    constant_exprt(
-      "java::java.lang.String",
-      jlo_struct.components()[0].type()));
-  jlo_init.copy_to_operands(
-    from_integer(
-      0,
-      jlo_struct.components()[1].type()));
+  java_root_class_init(jlo_init, jlo_struct, false, "java::java.lang.String");
 
   // If string refinement *is* around, populate the actual
   // contents as well:
@@ -225,7 +216,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
 
   if(s_it==symbol_table.symbols.end())
   {
-    assert(has_prefix(id2string(identifier), "java::"));
+    PRECONDITION(has_prefix(id2string(identifier), "java::"));
 
     // no, create the symbol
     symbolt new_symbol;
@@ -254,7 +245,7 @@ void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)
   else
   {
     // yes!
-    assert(!s_it->second.is_type);
+    INVARIANT(!s_it->second.is_type, "symbol identifier should not be a type");
 
     const symbolt &symbol=s_it->second;
 

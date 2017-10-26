@@ -1,0 +1,27 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+    PerfTestId:
+        Type: String
+
+Resources:
+    Queue:
+        Type: "AWS::SQS::Queue"
+        Properties:
+            QueueName: !Sub "perf-test-${PerfTestId}"
+
+    QueueDone:
+        Type: "AWS::SQS::Queue"
+        Properties:
+            QueueName: !Sub "perf-test-${PerfTestId}-run"
+
+Outputs:
+    QueueName:
+        Value: !GetAtt Queue.QueueName
+
+    QueueUrl:
+        Value: !Ref Queue
+
+    QueueArn:
+        Value: !GetAtt Queue.Arn

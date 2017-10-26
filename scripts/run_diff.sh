@@ -37,7 +37,7 @@ then
     echo "Ensure cpplint.py is inside the $script_folder directory then run again"
     exit 1
   else
-    cmd='${script_folder}/cpplint.py $file 2>&1 >/dev/null'
+    cmd='${script_folder}/cpplint.py --filter=-whitespace/operators,-readability/identifier_spacing $file 2>&1 >/dev/null'
   fi
 elif [[ "$mode" == "DOXYGEN" ]]
 then
@@ -109,7 +109,7 @@ for file in $diff_files; do
 
   # Run the linting script and filter:
   # The errors from the linter go to STDERR so must be redirected to STDOUT
-  result=$(eval $cmd | "${script_folder}/filter_by_lines.py" "$file" "$added_lines_file" "$absolute_repository_root")
+  result=$(eval "${cmd}" | "${script_folder}/filter_by_lines.py" "$file" "$added_lines_file" "$absolute_repository_root")
 
   # Providing some errors were relevant we print them out
   if [ "$result" ]
