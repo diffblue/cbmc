@@ -20,9 +20,10 @@ jobs:
         # Now we can do the formatting pass
         clang-format --version
         git-clang-format-3.8 "${TRAVIS_BRANCH}"
-        git diff --color > formatted.diff
+        git diff > formatted.diff
         if [[ -s formatted.diff ]] ; then
-          echo 'Formatting error! Apply the following diff and resubmit:'
+          echo 'Formatting error! The following diff shows the required changes'
+          echo 'Use the raw log to get a version of the diff that preserves spacing'
           cat formatted.diff
           exit 1
         fi
