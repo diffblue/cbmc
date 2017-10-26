@@ -129,8 +129,9 @@ public:
 
   void erase(const symbol_tablet::symbolst::const_iterator &entry)
   {
+    const irep_idt entry_name=entry->first;
     base_symbol_table.erase(entry);
-    on_remove(entry->first);
+    on_remove(entry_name);
   }
 
   void clear()
