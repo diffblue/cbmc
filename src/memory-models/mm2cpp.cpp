@@ -8,6 +8,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "mm2cpp.h"
 
+#include <map>
 #include <ostream>
 
 #include <util/std_code.h>
