@@ -41,11 +41,11 @@ exprt string_constraint_generatort::add_axioms_for_equals(
   //       || (0<=witness<s1.length &&s1[witness]!=s2[witness])
 
   implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
-  m_axioms.push_back(a1);
+  axioms.push_back(a1);
 
   symbol_exprt qvar=fresh_univ_index("QA_equal", index_type);
   string_constraintt a2(qvar, s1.length(), eq, equal_exprt(s1[qvar], s2[qvar]));
-  m_axioms.push_back(a2);
+  axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_unequal", index_type);
   exprt zero=from_integer(0, index_type);
@@ -57,7 +57,7 @@ exprt string_constraint_generatort::add_axioms_for_equals(
     notequal_exprt(s1.length(), s2.length()),
     equal_exprt(witness, from_integer(-1, index_type)));
   implies_exprt a3(not_exprt(eq), or_exprt(diff_length, witnessing));
-  m_axioms.push_back(a3);
+  axioms.push_back(a3);
 
   return tc_eq;
 }
@@ -118,14 +118,14 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
   // a3 : !eq => |s1|!=s2 || (0 <=witness<|s1| &&!char_equal_ignore_case)
 
   const implies_exprt a1(eq, equal_exprt(s1.length(), s2.length()));
-  m_axioms.push_back(a1);
+  axioms.push_back(a1);
 
   const symbol_exprt qvar =
     fresh_univ_index("QA_equal_ignore_case", index_type);
   const exprt constr2 =
     character_equals_ignore_case(s1[qvar], s2[qvar], char_a, char_A, char_Z);
   const string_constraintt a2(qvar, s1.length(), eq, constr2);
-  m_axioms.push_back(a2);
+  axioms.push_back(a2);
 
   const symbol_exprt witness =
     fresh_exist_index("witness_unequal_ignore_case", index_type);
@@ -141,7 +141,7 @@ exprt string_constraint_generatort::add_axioms_for_equals_ignore_case(
     or_exprt(
       notequal_exprt(s1.length(), s2.length()),
       and_exprt(bound_witness, witness_diff)));
-  m_axioms.push_back(a3);
+  axioms.push_back(a3);
 
   return typecast_exprt(eq, f.type());
 }
@@ -158,7 +158,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   const typet &return_type = f.type();
   const typet &index_type = str.length().type();
 
-  auto pair=m_hash_code_of_string.insert(
+  auto pair=hash_code_of_string.insert(
     std::make_pair(str, fresh_symbol("hash", return_type)));
   const exprt hash = pair.first->second;
 
@@ -168,7 +168,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
   //   c3: (|str|==|s| && exists i<|s|. s[i]!=str[i])
 
   // WARNING: the specification may be incomplete
-  for(auto it : m_hash_code_of_string)
+  for(auto it : hash_code_of_string)
   {
     const symbol_exprt i = fresh_exist_index("index_hash", index_type);
     const equal_exprt c1(it.second, hash);
@@ -178,7 +178,7 @@ exprt string_constraint_generatort::add_axioms_for_hash_code(
       and_exprt(
         notequal_exprt(str[i], it.first[i]),
         and_exprt(str.axiom_for_length_gt(i), axiom_for_is_positive_index(i))));
-    m_axioms.push_back(or_exprt(c1, or_exprt(c2, c3)));
+    axioms.push_back(or_exprt(c1, or_exprt(c2, c3)));
   }
   return hash;
 }
@@ -212,12 +212,12 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
 
   const equal_exprt res_null(res, from_integer(0, return_type));
   const implies_exprt a1(res_null, equal_exprt(s1.length(), s2.length()));
-  m_axioms.push_back(a1);
+  axioms.push_back(a1);
 
   const symbol_exprt i = fresh_univ_index("QA_compare_to", index_type);
   const string_constraintt a2(
     i, s1.length(), res_null, equal_exprt(s1[i], s2[i]));
-  m_axioms.push_back(a2);
+  axioms.push_back(a2);
 
   const symbol_exprt x = fresh_exist_index("index_compare_to", index_type);
   const equal_exprt ret_char_diff(
@@ -243,12 +243,12 @@ exprt string_constraint_generatort::add_axioms_for_compare_to(
     and_exprt(
       binary_relation_exprt(x, ID_ge, from_integer(0, return_type)),
       or_exprt(cond1, cond2)));
-  m_axioms.push_back(a3);
+  axioms.push_back(a3);
 
   const symbol_exprt i2 = fresh_univ_index("QA_compare_to", index_type);
   const string_constraintt a4(
     i2, x, not_exprt(res_null), equal_exprt(s1[i2], s2[i2]));
-  m_axioms.push_back(a4);
+  axioms.push_back(a4);
 
   return res;
 }
@@ -266,7 +266,7 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   const typet &return_type=f.type();
   const typet index_type = str.length().type();
 
-  auto pair=m_intern_of_string.insert(
+  auto pair=intern_of_string.insert(
     std::make_pair(str, fresh_symbol("pool", return_type)));
   const symbol_exprt intern = pair.first->second;
 
@@ -276,16 +276,16 @@ symbol_exprt string_constraint_generatort::add_axioms_for_intern(
   //    || (|str|==|s| &&exists i<|s|. s[i]!=str[i])
 
   exprt::operandst disj;
-  for(auto it : m_intern_of_string)
+  for(auto it : intern_of_string)
     disj.push_back(equal_exprt(intern, it.second));
-  m_axioms.push_back(disjunction(disj));
+  axioms.push_back(disjunction(disj));
 
   // WARNING: the specification may be incomplete or incorrect
-  for(auto it : m_intern_of_string)
+  for(auto it : intern_of_string)
     if(it.second!=str)
     {
       symbol_exprt i=fresh_exist_index("index_intern", index_type);
-      m_axioms.push_back(
+      axioms.push_back(
         or_exprt(
           equal_exprt(it.second, intern),
           or_exprt(

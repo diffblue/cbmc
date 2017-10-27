@@ -336,21 +336,21 @@ public:
   // Used to store information about witnesses for not_contains constraints
   std::map<string_not_contains_constraintt, symbol_exprt> witness;
 private:
-  std::set<array_string_exprt> m_created_strings;
-  unsigned m_symbol_count=0;
-  const messaget m_message;
-  const bool m_force_printable_characters;
+  std::set<array_string_exprt> created_strings;
+  unsigned symbol_count=0;
+  const messaget message;
+  const bool force_printable_characters;
 
-  std::vector<exprt> m_axioms;
-  std::vector<symbol_exprt> m_boolean_symbols;
-  std::vector<symbol_exprt> m_index_symbols;
-  const namespacet m_ns;
+  std::vector<exprt> axioms;
+  std::vector<symbol_exprt> boolean_symbols;
+  std::vector<symbol_exprt> index_symbols;
+  const namespacet ns;
   // To each string on which hash_code was called we associate a symbol
   // representing the return value of the hash_code function.
-  std::map<array_string_exprt, exprt> m_hash_code_of_string;
+  std::map<array_string_exprt, exprt> hash_code_of_string;
 
   // Pool used for the intern method
-  std::map<array_string_exprt, symbol_exprt> m_intern_of_string;
+  std::map<array_string_exprt, symbol_exprt> intern_of_string;
 
   // associate arrays to char pointers
   std::map<exprt, array_string_exprt> arrays_of_pointers_;

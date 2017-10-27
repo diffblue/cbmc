@@ -31,32 +31,32 @@ string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot &info,
   const namespacet &ns)
   : max_string_length(info.string_max_length),
-    m_force_printable_characters(info.string_printable),
-    m_ns(ns)
+    force_printable_characters(info.string_printable),
+    ns(ns)
 {
 }
 
 const std::vector<exprt> &string_constraint_generatort::get_axioms() const
 {
-  return m_axioms;
+  return axioms;
 }
 
 const std::vector<symbol_exprt> &
 string_constraint_generatort::get_index_symbols() const
 {
-  return m_index_symbols;
+  return index_symbols;
 }
 
 const std::vector<symbol_exprt> &
 string_constraint_generatort::get_boolean_symbols() const
 {
-  return m_boolean_symbols;
+  return boolean_symbols;
 }
 
 const std::set<array_string_exprt> &
 string_constraint_generatort::get_created_strings() const
 {
-  return m_created_strings;
+  return created_strings;
 }
 
 /// generate constant character expression with character type.
@@ -79,7 +79,7 @@ symbol_exprt string_constraint_generatort::fresh_symbol(
   const irep_idt &prefix, const typet &type)
 {
   std::ostringstream buf;
-  buf << "string_refinement#" << prefix << "#" << ++m_symbol_count;
+  buf << "string_refinement#" << prefix << "#" << ++symbol_count;
   irep_idt name(buf.str());
   return symbol_exprt(name, type);
 }
@@ -100,7 +100,7 @@ symbol_exprt string_constraint_generatort::fresh_exist_index(
   const irep_idt &prefix, const typet &type)
 {
   symbol_exprt s=fresh_symbol(prefix, type);
-  m_index_symbols.push_back(s);
+  index_symbols.push_back(s);
   return s;
 }
 
@@ -111,7 +111,7 @@ symbol_exprt string_constraint_generatort::fresh_boolean(
   const irep_idt &prefix)
 {
   symbol_exprt b=fresh_symbol(prefix, bool_typet());
-  m_boolean_symbols.push_back(b);
+  boolean_symbols.push_back(b);
   return b;
 }
 
@@ -137,7 +137,7 @@ plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
   implies_exprt no_overflow(equal_exprt(neg1, neg2),
                             equal_exprt(neg1, neg_sum));
 
-  m_axioms.push_back(no_overflow);
+  axioms.push_back(no_overflow);
 
   return sum;
 }
@@ -168,7 +168,7 @@ array_string_exprt string_constraint_generatort::fresh_string(
   array_typet array_type(char_type, length);
   symbol_exprt content = fresh_symbol("string_content", array_type);
   array_string_exprt str = to_array_string_expr(content);
-  m_created_strings.insert(str);
+  created_strings.insert(str);
   add_default_axioms(str);
   return str;
 }
@@ -289,7 +289,7 @@ exprt string_constraint_generatort::associate_length_to_array(
   const exprt &new_length = f.arguments()[1];
 
   const auto &length = get_length_of_string_array(array_expr);
-  m_axioms.push_back(equal_exprt(length, new_length));
+  axioms.push_back(equal_exprt(length, new_length));
   return from_integer(0, f.type());
 }
 
@@ -316,15 +316,15 @@ void string_constraint_generatort::add_default_axioms(
   const array_string_exprt &s)
 {
   // If `s` was already added we do nothing.
-  if(!m_created_strings.insert(s).second)
+  if(!created_strings.insert(s).second)
     return;
 
-  m_axioms.push_back(
+  axioms.push_back(
     s.axiom_for_length_ge(from_integer(0, s.length().type())));
   if(max_string_length!=std::numeric_limits<size_t>::max())
-    m_axioms.push_back(s.axiom_for_length_le(max_string_length));
+    axioms.push_back(s.axiom_for_length_le(max_string_length));
 
-  if(m_force_printable_characters)
+  if(force_printable_characters)
   {
     symbol_exprt qvar=fresh_univ_index("printable", s.length().type());
     exprt chr=s[qvar];
@@ -332,7 +332,7 @@ void string_constraint_generatort::add_default_axioms(
       binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
       binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
     string_constraintt sc(qvar, s.length(), printable);
-    m_axioms.push_back(sc);
+    axioms.push_back(sc);
   }
 }
 
@@ -562,6 +562,6 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  m_axioms.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
+  axioms.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
   return char_sym;
 }
