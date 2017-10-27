@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/unicode.h>
 #include <util/json.h>
+#include <util/exit_codes.h>
 
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/remove_function_pointers.h>
@@ -118,13 +119,13 @@ int goto_instrument_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(cmdline.args.size()!=1 && cmdline.args.size()!=2)
   {
     help();
-    return 0;
+    return CPROVER_EXIT_USAGE_ERROR;
   }
 
   eval_verbosity();
@@ -269,7 +270,7 @@ int goto_instrument_parse_optionst::doit()
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model.goto_functions);
       show_value_sets(get_ui(), goto_model, value_set_analysis);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-global-may-alias"))
@@ -285,7 +286,7 @@ int goto_instrument_parse_optionst::doit()
       global_may_alias_analysis(goto_model);
       global_may_alias_analysis.output(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-local-bitvector-analysis"))
@@ -308,7 +309,7 @@ int goto_instrument_parse_optionst::doit()
         std::cout << '\n';
       }
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-custom-bitvector-analysis"))
@@ -332,7 +333,7 @@ int goto_instrument_parse_optionst::doit()
       custom_bitvector_analysis(goto_model);
       custom_bitvector_analysis.output(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-escape-analysis"))
@@ -348,7 +349,7 @@ int goto_instrument_parse_optionst::doit()
       escape_analysis(goto_model);
       escape_analysis.output(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("custom-bitvector-analysis"))
@@ -377,7 +378,7 @@ int goto_instrument_parse_optionst::doit()
         cmdline.isset("xml-ui"),
         std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-points-to"))
@@ -393,7 +394,7 @@ int goto_instrument_parse_optionst::doit()
       points_tot points_to;
       points_to(goto_model);
       points_to.output(std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-intervals"))
@@ -408,21 +409,21 @@ int goto_instrument_parse_optionst::doit()
       ait<interval_domaint> interval_analysis;
       interval_analysis(goto_model);
       interval_analysis.output(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-call-sequences"))
     {
       do_indirect_call_and_rtti_removal();
       show_call_sequences(goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("check-call-sequence"))
     {
       do_remove_returns();
       check_call_sequence(goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("list-calls-args"))
@@ -431,7 +432,7 @@ int goto_instrument_parse_optionst::doit()
 
       list_calls_and_arguments(goto_model);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-rw-set"))
@@ -455,13 +456,13 @@ int goto_instrument_parse_optionst::doit()
 
       std::cout <<
         rw_set_functiont(value_set_analysis, goto_model, main);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-symbol-table"))
     {
       ::show_symbol_table(goto_model, get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-reaching-definitions"))
@@ -473,7 +474,7 @@ int goto_instrument_parse_optionst::doit()
       rd_analysis(goto_model);
       rd_analysis.output(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-dependence-graph"))
@@ -486,44 +487,44 @@ int goto_instrument_parse_optionst::doit()
       dependence_graph.output(goto_model, std::cout);
       dependence_graph.output_dot(std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("count-eloc"))
     {
       count_eloc(goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("list-eloc"))
     {
       list_eloc(goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("print-path-lengths"))
     {
       print_path_lengths(goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("list-symbols"))
     {
       show_symbol_table_brief(goto_model, get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-uninitialized"))
     {
       show_uninitialized(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("interpreter"))
     {
       status() << "Starting interpreter" << eom;
       interpreter(goto_model, get_message_handler());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-claims") ||
@@ -531,33 +532,33 @@ int goto_instrument_parse_optionst::doit()
     {
       const namespacet ns(goto_model.symbol_table);
       show_properties(goto_model, get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("document-claims-html") ||
        cmdline.isset("document-properties-html"))
     {
       document_properties_html(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("document-claims-latex") ||
        cmdline.isset("document-properties-latex"))
     {
       document_properties_latex(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-loops"))
     {
       show_loop_ids(get_ui(), goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-natural-loops"))
     {
       show_natural_loops(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("print-internal-representation"))
@@ -570,33 +571,33 @@ int goto_instrument_parse_optionst::doit()
           if(ins.guard.is_not_nil())
             status() << "[guard] " << ins.guard.pretty() << eom;
         }
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-goto-functions"))
     {
       namespacet ns(goto_model.symbol_table);
       show_goto_functions(goto_model, get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("list-undefined-functions"))
     {
       list_undefined_functions(goto_model, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     // experimental: print structs
     if(cmdline.isset("show-struct-alignment"))
     {
       print_struct_alignment_problems(goto_model.symbol_table, std::cout);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("show-locations"))
     {
       show_locations(get_ui(), goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("dump-c") || cmdline.isset("dump-cpp"))
@@ -621,7 +622,7 @@ int goto_instrument_parse_optionst::doit()
         if(!out)
         {
           error() << "failed to write to `" << cmdline.args[1] << "'";
-          return 10;
+          return CPROVER_EXIT_CONVERSION_FAILED;
         }
         (is_cpp ? dump_cpp : dump_c)(
           goto_model.goto_functions,
@@ -640,7 +641,7 @@ int goto_instrument_parse_optionst::doit()
           ns,
           std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("call-graph"))
@@ -655,7 +656,7 @@ int goto_instrument_parse_optionst::doit()
       else
         call_graph.output(std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("dot"))
@@ -672,7 +673,7 @@ int goto_instrument_parse_optionst::doit()
         if(!out)
         {
           error() << "failed to write to " << cmdline.args[1] << "'";
-          return 10;
+          return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
         dot(goto_model, out);
@@ -680,7 +681,7 @@ int goto_instrument_parse_optionst::doit()
       else
         dot(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("accelerate"))
@@ -715,7 +716,7 @@ int goto_instrument_parse_optionst::doit()
         {
           error() << "Failed to open output file "
                   << cmdline.args[1] << eom;
-          return 1;
+          return CPROVER_EXIT_CONVERSION_FAILED;
         }
 
         horn_encoding(goto_model, out);
@@ -723,7 +724,7 @@ int goto_instrument_parse_optionst::doit()
       else
         horn_encoding(goto_model, std::cout);
 
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(cmdline.isset("drop-unused-functions"))
@@ -747,36 +748,37 @@ int goto_instrument_parse_optionst::doit()
 
       if(write_goto_binary(
         cmdline.args[1], goto_model, get_message_handler()))
-        return 1;
+        return CPROVER_EXIT_CONVERSION_FAILED;
       else
-        return 0;
+        return CPROVER_EXIT_SUCCESS;
     }
 
     help();
-    return 0;
+    return CPROVER_EXIT_USAGE_ERROR;
   }
 
   catch(const char *e)
   {
     error() << e << eom;
-    return 11;
+    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
   catch(const std::string e)
   {
     error() << e << eom;
-    return 11;
+    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
-  catch(int)
+  catch(int e)
   {
-    return 11;
+    error() << "Numeric exception : " << e << eom;
+    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return 11;
+    return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 // NOLINTNEXTLINE(readability/fn_size)
 }

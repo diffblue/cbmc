@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/memory_info.h>
 #include <util/invariant.h>
+#include <util/exit_codes.h>
 
 #include <ansi-c/c_preprocess.h>
 
@@ -106,7 +107,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1); // should contemplate EX_USAGE from sysexits.h
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   if(cmdline.isset("program-only"))
@@ -224,7 +225,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   {
     error() << "--partial-loops and --unwinding-assertions "
             << "must not be given together" << eom;
-    exit(1); // should contemplate EX_USAGE from sysexits.h
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   // remove unused equations
@@ -415,7 +416,7 @@ int cbmc_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0; // should contemplate EX_OK from sysexits.h
+    return CPROVER_EXIT_SUCCESS;
   }
 
   //
@@ -431,13 +432,13 @@ int cbmc_parse_optionst::doit()
   catch(const char *error_msg)
   {
     error() << error_msg << eom;
-    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::string error_msg)
   {
     error() << error_msg << eom;
-    return 6; // should contemplate EX_SOFTWARE from sysexits.h
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   eval_verbosity();
@@ -459,18 +460,20 @@ int cbmc_parse_optionst::doit()
   {
     error() << "This version of CBMC has no support for "
                " hardware modules. Please use hw-cbmc." << eom;
-    return 1; // should contemplate EX_USAGE from sysexits.h
+    return CPROVER_EXIT_USAGE_ERROR;
   }
 
   register_languages();
 
   if(cmdline.isset("test-preprocessor"))
-    return test_c_preprocessor(get_message_handler())?8:0;
+    return test_c_preprocessor(get_message_handler())
+             ? CPROVER_EXIT_PREPROCESSOR_TEST_FAILED
+             : CPROVER_EXIT_SUCCESS;
 
   if(cmdline.isset("preprocess"))
   {
     preprocessing();
-    return 0; // should contemplate EX_OK from sysexits.h
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(cmdline.isset("show-parse-tree"))
@@ -479,7 +482,7 @@ int cbmc_parse_optionst::doit()
        is_goto_binary(cmdline.args[0]))
     {
       error() << "Please give exactly one source file" << eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     std::string filename=cmdline.args[0];
@@ -494,7 +497,7 @@ int cbmc_parse_optionst::doit()
     {
       error() << "failed to open input file `"
               << filename << "'" << eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     std::unique_ptr<languaget> language=
@@ -504,7 +507,7 @@ int cbmc_parse_optionst::doit()
     {
       error() << "failed to figure out type of file `"
               <<  filename << "'" << eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     language->get_language_options(cmdline);
@@ -515,11 +518,11 @@ int cbmc_parse_optionst::doit()
     if(language->parse(infile, filename))
     {
       error() << "PARSING ERROR" << eom;
-      return 6;
+      return CPROVER_EXIT_INCORRECT_TASK;
     }
 
     language->show_parse(std::cout);
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   int get_goto_program_ret=get_goto_program(options);
@@ -531,11 +534,11 @@ int cbmc_parse_optionst::doit()
      cmdline.isset("show-properties")) // use this one
   {
     show_properties(goto_model, ui_message_handler.get_ui());
-    return 0; // should contemplate EX_OK from sysexits.h
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(set_properties())
-    return 7; // should contemplate EX_USAGE from sysexits.h
+    return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
   // get solver
   cbmc_solverst cbmc_solvers(
@@ -554,7 +557,7 @@ int cbmc_parse_optionst::doit()
   catch(const char *error_msg)
   {
     error() << error_msg << eom;
-    return 1; // should contemplate EX_SOFTWARE from sysexits.h
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   prop_convt &prop_conv=cbmc_solver->prop_conv();
@@ -592,8 +595,9 @@ bool cbmc_parse_optionst::set_properties()
     return true;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return true;
   }
 
@@ -606,7 +610,7 @@ int cbmc_parse_optionst::get_goto_program(
   if(cmdline.args.empty())
   {
     error() << "Please provide a program to verify" << eom;
-    return 6;
+    return CPROVER_EXIT_INCORRECT_TASK;
   }
 
   try
@@ -616,24 +620,24 @@ int cbmc_parse_optionst::get_goto_program(
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table(goto_model, ui_message_handler.get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     if(process_goto_program(options))
-      return 6;
+      return CPROVER_EXIT_INTERNAL_ERROR;
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
       show_loop_ids(ui_message_handler.get_ui(), goto_model);
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
       show_goto_functions(goto_model, ui_message_handler.get_ui());
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
 
     status() << config.object_bits_info() << eom;
@@ -642,24 +646,25 @@ int cbmc_parse_optionst::get_goto_program(
   catch(const char *e)
   {
     error() << e << eom;
-    return 6;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::string e)
   {
     error() << e << eom;
-    return 6;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(int)
+  catch(int e)
   {
-    return 6;
+    error() << "Numeric exception : " << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
-    return 6;
+    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
   }
 
   return -1; // no error, continue
@@ -710,13 +715,15 @@ void cbmc_parse_optionst::preprocessing()
     error() << e << eom;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
+    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
   }
 }
 
@@ -843,14 +850,16 @@ bool cbmc_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(int)
+  catch(int e)
   {
+    error() << "Numeric exception : " << e << eom;
     return true;
   }
 
   catch(std::bad_alloc)
   {
     error() << "Out of memory" << eom;
+    exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
     return true;
   }
 
@@ -862,19 +871,19 @@ int cbmc_parse_optionst::do_bmc(bmct &bmc)
 {
   bmc.set_ui(ui_message_handler.get_ui());
 
-  int result=6;
+  int result = CPROVER_EXIT_INTERNAL_ERROR;
 
   // do actual BMC
   switch(bmc.run(goto_model.goto_functions))
   {
     case safety_checkert::resultt::SAFE:
-      result=0;
+      result = CPROVER_EXIT_VERIFICATION_SAFE;
       break;
     case safety_checkert::resultt::UNSAFE:
-      result=10;
+      result = CPROVER_EXIT_VERIFICATION_UNSAFE;
       break;
     case safety_checkert::resultt::ERROR:
-      result=6;
+      result = CPROVER_EXIT_INTERNAL_ERROR;
       break;
   }
 
