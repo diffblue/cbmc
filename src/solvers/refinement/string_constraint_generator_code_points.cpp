@@ -63,7 +63,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point(
     equal_exprt(res[1], typecast_exprt(second_char, char_type)));
   m_axioms.push_back(a5);
 
-  return res;
+  return from_integer(0, get_return_code_type());
 }
 
 /// the output is true when the character is a high surrogate for UTF-16

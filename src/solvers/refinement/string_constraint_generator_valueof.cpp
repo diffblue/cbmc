@@ -244,7 +244,7 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
       m_axioms.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
-  return res;
+  return from_integer(0, get_return_code_type());
 }
 
 /// add axioms corresponding to the Integer.toHexString(I) java function
@@ -282,7 +282,7 @@ exprt string_constraint_generatort::add_axioms_from_char(
 {
   and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
   m_axioms.push_back(lemma);
-  return from_integer(0, signedbv_typet(32));
+  return from_integer(0, get_return_code_type());
 }
 
 /// Add axioms making the return value true if the given string is a correct

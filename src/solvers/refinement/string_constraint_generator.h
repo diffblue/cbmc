@@ -93,6 +93,12 @@ public:
 
   exprt get_length_of_string_array(const array_string_exprt &s) const;
 
+  // Type used by primitives to signal errors
+  const signedbv_typet get_return_code_type()
+  {
+    return signedbv_typet(32);
+  }
+
 private:
   symbol_exprt fresh_boolean(const irep_idt &prefix);
   array_string_exprt

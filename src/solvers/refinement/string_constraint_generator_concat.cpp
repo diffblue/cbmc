@@ -93,7 +93,7 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   m_axioms.push_back(a3);
 
   // We should have a enum type for the possible error codes
-  return from_integer(0, return_code_type);
+  return from_integer(0, get_return_code_type());
 }
 
 /// Add axioms to say that `res` is equal to the concatenation of `s1` and `s2`.

@@ -48,7 +48,7 @@ exprt string_constraint_generatort::add_axioms_for_constant(
   const exprt s_length = from_integer(str.size(), index_type);
 
   m_axioms.push_back(res.axiom_for_has_length(s_length));
-  return from_integer(0, signedbv_typet(32));
+  return from_integer(0, get_return_code_type());
 }
 
 /// add axioms to say that the returned string expression is empty
@@ -60,7 +60,7 @@ exprt string_constraint_generatort::add_axioms_for_empty_string(
   PRECONDITION(f.arguments().size() == 2);
   exprt length = f.arguments()[0];
   m_axioms.push_back(equal_exprt(length, from_integer(0, length.type())));
-  return from_integer(0, length.type());
+  return from_integer(0, get_return_code_type());
 }
 
 /// add axioms to say that the returned string expression is equal to the string
