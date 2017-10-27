@@ -1,4 +1,4 @@
-public class GenericInnerClasses
+public class BoundedGenericInnerClasses
 {
   class Inner<E>
   {

@@ -20,13 +20,14 @@
 #include <java_bytecode/java_bytecode_language.h>
 
 SCENARIO(
-  "java_bytecode_parse_generic_inner_classes",
+  "java_bytecode_parse_bounded_generic_inner_classes",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(
-    "GenericInnerClasses", "./java_bytecode/java_bytecode_parse_generics");
+    "BoundedGenericInnerClasses",
+    "./java_bytecode/java_bytecode_parse_generics");
 
-  std::string class_prefix = "java::GenericInnerClasses";
+  std::string class_prefix = "java::BoundedGenericInnerClasses";
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
   WHEN("Parsing an inner class with type variable")
@@ -106,7 +107,7 @@ SCENARIO(
     }
   }
 
-  THEN("The generic fields should be annotated with concrete types")
+  WHEN("There is a generic field with a concrete type")
   {
     const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
     class_typet class_type =
@@ -153,7 +154,7 @@ SCENARIO(
       REQUIRE_FALSE(is_java_generics_class_type(java_class_type));
 
 // TODO (tkiley): Extend this unit test when bounds are correctly
-// parsed.
+// parsed - issue TG-1286
 #if 0
       java_generics_class_typet java_generics_class_type=
         to_java_generics_class_type(java_class_type);
@@ -192,12 +193,10 @@ SCENARIO(
 
       REQUIRE(java_generics_class_type.generic_types().size() == 2);
 
-      auto generic_param_iterator =
-        java_generics_class_type.generic_types().cbegin();
-
       // The first parameter should be called K
       {
-        const typet &first_param = *generic_param_iterator;
+        const typet first_param =
+          java_generics_class_type.generic_types().at(0);
         REQUIRE(is_java_generic_parameter(first_param));
         java_generic_parametert generic_type_var =
           to_java_generic_parameter(first_param);
@@ -210,11 +209,10 @@ SCENARIO(
           twoelementinner_name + "::K");
       }
 
-      ++generic_param_iterator;
-
       // The second parameter should be called V
       {
-        const typet &second_param = *generic_param_iterator;
+        const typet &second_param =
+          java_generics_class_type.generic_types().at(1);
         REQUIRE(is_java_generic_parameter(second_param));
         java_generic_parametert generic_type_var =
           to_java_generic_parameter(second_param);
