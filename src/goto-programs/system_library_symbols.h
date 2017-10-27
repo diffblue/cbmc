@@ -14,6 +14,7 @@ Author: Thomas Kiley
 
 #include <list>
 #include <set>
+#include <map>
 #include <string>
 #include <util/irep.h>
 #include <util/type.h>
