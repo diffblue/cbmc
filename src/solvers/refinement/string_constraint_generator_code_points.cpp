@@ -14,7 +14,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// add axioms for the conversion of an integer representing a java
 /// code point to a utf-16 string
-/// \param code_point an expression representing a java code point
+/// \param res: array of characters corresponding to the result fo the function
+/// \param code_point: an expression representing a java code point
 /// \return an expression
 exprt string_constraint_generatort::add_axioms_for_code_point(
   const array_string_exprt &res,
@@ -69,7 +70,7 @@ exprt string_constraint_generatort::add_axioms_for_code_point(
 /// encoding, see https://en.wikipedia.org/wiki/UTF-16 for more explenation
 /// about the encoding; this is true when the character is in the range
 /// 0xD800..0xDBFF
-/// \par parameters: a character expression
+/// \param chr: a character expression
 /// \return a Boolean expression
 exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 {
@@ -82,7 +83,7 @@ exprt string_constraint_generatort::is_high_surrogate(const exprt &chr)
 /// encoding, see https://en.wikipedia.org/wiki/UTF-16 for more explenation
 /// about the encoding; this is true when the character is in the range
 /// 0xDC00..0xDFFF
-/// \par parameters: a character expression
+/// \param chr: a character expression
 /// \return a Boolean expression
 exprt string_constraint_generatort::is_low_surrogate(const exprt &chr)
 {
@@ -96,8 +97,9 @@ exprt string_constraint_generatort::is_low_surrogate(const exprt &chr)
 /// https://en.wikipedia.org/wiki/UTF-16 for more explenation about the
 /// encoding; the operation we perform is:
 /// pair_value=0x10000+(((char1%0x0800)*0x0400)+char2%0x0400)
-/// \par parameters: two character expressions and a return type
-/// char1 and char2 should be of type return_type
+/// \param char1: a character expression
+/// \param char2: a character expression
+/// \param return_type: type of the expression to return
 /// \return an integer expression of type return_type
 exprt pair_value(exprt char1, exprt char2, typet return_type)
 {

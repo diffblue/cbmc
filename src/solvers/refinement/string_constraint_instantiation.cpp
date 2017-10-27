@@ -15,8 +15,7 @@ Author: Jesse Sigal, jesse.sigal@diffblue.com
 /// substituting the quantifiers and generating axioms.
 /// \related string_refinementt
 /// \param [in] axiom: the axiom to instantiate
-/// \param [in] index_set0: the index set for `axiom.s0()`
-/// \param [in] index_set1: the index set for `axiom.s1()`
+/// \param [in] index_pairs: pair of indexes for `axiom.s0()`and `axiom.s1()`
 /// \param [in] generator: generator to be used to get `axiom`'s witness
 /// \return the lemmas produced through instantiation
 std::vector<exprt> instantiate_not_contains(

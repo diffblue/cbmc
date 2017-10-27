@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// Add axioms enforcing that `s0` is the concatenation of `s1` with
+/// Add axioms enforcing that `res` is the concatenation of `s1` with
 /// the substring of `s2` starting at index `start_index` and ending
 /// at index `end_index`.
 ///
@@ -64,6 +64,12 @@ exprt string_constraint_generatort::add_axioms_for_concat_substr(
   return from_integer(0, res.length().type());
 }
 
+/// Add axioms enforcing that `res` is the concatenation of `s1` with
+/// character `c`.
+/// \param res: string expression
+/// \param s1: string expression
+/// \param c: character expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_for_concat_char(
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -87,15 +93,14 @@ exprt string_constraint_generatort::add_axioms_for_concat_char(
   m_axioms.push_back(a3);
 
   // We should have a enum type for the possible error codes
-  return from_integer(0, res.length().type());
+  return from_integer(0, return_code_type);
 }
 
-/// Add axioms to say that `s0` is equal to the concatenation of `s1` and `s2`.
-/// \param s0: string_expression corresponding to the result
+/// Add axioms to say that `res` is equal to the concatenation of `s1` and `s2`.
+/// \param res: string_expression corresponding to the result
 /// \param s1: the string expression to append to
 /// \param s2: the string expression to append to the first one
 /// \return an integer expression
-
 exprt string_constraint_generatort::add_axioms_for_concat(
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -129,6 +134,12 @@ exprt string_constraint_generatort::add_axioms_for_concat(
     return add_axioms_for_concat(res, s1, s2);
 }
 
+/// Add axioms enforcing that the string represented by the two first
+/// expressions is equal to the concatenation of the string argument and
+/// the character argument of the function application.
+/// \param f: function application with a length, pointer, string and character
+///           argument.
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_for_concat_char(
   const function_application_exprt &f)
 {

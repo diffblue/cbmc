@@ -712,17 +712,18 @@ void add_array_to_length_association(
       symbol_table));
 }
 
-/// \param string_expr: a string expression
 /// \param function_name: the name of the function
 /// \param arguments: arguments of the function
+/// \param loc: source location
 /// \param symbol_table: symbol table
-/// \return return the following code:
+/// \param [out] code: gets added the following code:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// int return_code;
 /// int str.length;
 /// char str.data[str.length]
 /// return_code = <function_name>_data(str.length, str.data, arguments)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \return a new string expression
 refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
@@ -845,14 +846,15 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
 }
 
 /// Create a string expression whose value is given by a literal
-/// \param lhs: an expression representing a java string
 /// \param s: the literal to be assigned
+/// \param loc: location in the source
 /// \param symbol_table: symbol table
-/// \param code: gets added the following:
+/// \param [out] code: gets added the following:
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /// tmp_string = "<s>"
 /// lhs = cprover_string_literal_func(tmp_string)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \return a new refined string
 refined_string_exprt
 java_string_library_preprocesst::string_literal_to_string_expr(
   const std::string &s,

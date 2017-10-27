@@ -317,7 +317,7 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 }
 
 /// add axioms corresponding to the String.toUpperCase java function
-/// \param expr: function application with one string argument
+/// \param f: function application with one string argument
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_to_upper_case(
   const function_application_exprt &f)
@@ -332,9 +332,8 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 /// add axioms corresponding stating that the result is similar to that of the
 /// StringBuilder.setCharAt java function Warning: this may be underspecified in
 /// the case wher the index exceed the length of the string
-/// \par parameters: function application with three arguments, the first is a
-///   string
-/// the second an index and the third a character
+/// \param f: function application with three arguments, the first is a
+///           string, the second an index and the third a character
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_char_set(
   const function_application_exprt &f)

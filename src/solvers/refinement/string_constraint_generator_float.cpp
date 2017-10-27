@@ -71,6 +71,7 @@ exprt get_significand(
 
 /// Create an expression to represent a float or double value.
 /// \param f: a floating point value in double precision
+/// \param float_spec: a specification for floats
 /// \return an expression representing this floating point
 exprt constant_float(const double f, const ieee_float_spect &float_spec)
 {
@@ -97,7 +98,6 @@ exprt round_expr_to_zero(const exprt &f)
 /// Note that the rounding mode is set to ROUND_TO_EVEN.
 /// \param f: a floating point expression
 /// \param g: a floating point expression
-/// \param rounding: rounding mode
 /// \return An expression representing floating point multiplication.
 exprt floatbv_mult(const exprt &f, const exprt &g)
 {
@@ -124,8 +124,8 @@ exprt floatbv_of_int_expr(const exprt &i, const ieee_float_spect &spec)
 
 /// Estimate the decimal exponent that should be used to represent a given
 /// floating point value in decimal.
-/// We are looking for d such that n * 10^d = m * 2^e, so:
-/// d = log_10(m) + log_10(2) * e - log_10(n)
+/// We are looking for \f$d\f$ such that \f$n * 10^d = m * 2^e\f$, so:
+/// \f$d = log_10(m) + log_10(2) * e - log_10(n)\f$
 /// m -- the fraction -- should be between 1 and 2 so log_10(m)
 /// in [0,log_10(2)].
 /// n -- the fraction in base 10 -- should be between 1 and 10 so
@@ -169,10 +169,10 @@ exprt string_constraint_generatort::add_axioms_from_double(
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
-/// leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal
-/// digits representing the fractional part of m. This specification is correct
-/// for inputs that do not exceed 100000 and the function is unspecified for
-/// other values.
+/// leading zeroes, followed by `'.'` (`'\\u002E'`), followed by one or more
+/// decimal digits representing the fractional part of m. This specification is
+/// correct for inputs that do not exceed 100000 and the function is unspecified
+/// for other values.
 ///
 /// TODO: this specification is not correct for negative numbers and
 /// double precision
@@ -219,11 +219,11 @@ exprt string_constraint_generatort::add_axioms_for_string_of_float(
 
 /// Add axioms for representing the fractional part of a floating point starting
 /// with a dot
+/// \param res: string expression for the result
 /// \param int_expr: an integer expression
 /// \param max_size: a maximal size for the string, this includes the
 ///   potential minus sign and therefore should be greater than 2
-/// \param ref_type: a type for refined strings
-/// \return a string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_for_fractional_part(
   const array_string_exprt &res,
   const exprt &int_expr,
@@ -297,20 +297,18 @@ exprt string_constraint_generatort::add_axioms_for_fractional_part(
 
 /// Add axioms to write the float in scientific notation.
 ///
-/// A float is represented as $f = m * 2^e$ where $0 <= m < 2$ is the
-/// significand and $-126 <= e <= 127$ is the exponent.
-/// We want an alternate representation by finding $n$ and
-/// $d$ such that $f=n*10^d$. We can estimate $d$ the following way:
-/// $d ~= log_10(f/n) ~= log_10(m) + log_10(2) * e - log_10(n)$
-/// $d = floor(log_10(2) * e)$
-/// Then $n$ can be expressed by the equation:
-/// $log_10(n) = log_10(m) + log_10(2) * e - d$
-/// $n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))$
+/// A float is represented as \f$f = m * 2^e\f$ where \f$0 <= m < 2\f$ is the
+/// significand and \f$-126 <= e <= 127\f$ is the exponent.
+/// We want an alternate representation by finding \f$n\f$ and
+/// \f$d\f$ such that \f$f=n*10^d\f$. We can estimate \f$d\f$ the following way:
+/// \f$d ~= log_10(f/n) ~= log_10(m) + log_10(2) * e - log_10(n)\f$
+/// \f$d = floor(log_10(2) * e)\f$
+/// Then \f$n\f$ can be expressed by the equation:
+/// \f$log_10(n) = log_10(m) + log_10(2) * e - d\f$
+/// \f$n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))\f$
 /// TODO: For now we only consider single precision.
 /// \param res: string expression representing the float in scientific notation
 /// \param f: a float expression, which is positive
-/// \param max_size: a maximal size for the string
-/// \param ref_type: a type for refined strings
 /// \return a integer expression different from 0 to signal an exception
 exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const array_string_exprt &res,
@@ -476,7 +474,7 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
 /// Add axioms corresponding to the scientific representation of floating point
 /// values
 /// \param f: a function application expression
-/// \return a new string expression
+/// \return code 0 on succes
 exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   const function_application_exprt &f)
 {

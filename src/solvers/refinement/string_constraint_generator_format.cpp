@@ -253,7 +253,8 @@ static exprt get_component_in_struct(
 /// specifier.
 /// \param fs: a format specifier
 /// \param arg: a struct containing the possible value of the argument to format
-/// \param ref_type: a type  for refined string type
+/// \param index_type: type for indexes in strings
+/// \param char_type: type of characters
 /// \return String expression representing the output of String.format.
 array_string_exprt
 string_constraint_generatort::add_axioms_for_format_specifier(
@@ -341,10 +342,10 @@ string_constraint_generatort::add_axioms_for_format_specifier(
 
 /// Parse `s` and add axioms ensuring the output corresponds to the output of
 /// String.format.
+/// \param res: string expression for the result of the format function
 /// \param s: a format string
 /// \param args: a vector of arguments
-/// \param ref_type: a type  for refined string type
-/// \return String expression representing the output of String.format.
+/// \return code, 0 on success
 exprt string_constraint_generatort::add_axioms_for_format(
   const array_string_exprt &res,
   const std::string &s,

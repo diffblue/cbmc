@@ -19,7 +19,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/floatbv/float_bv.h>
 
 /// Add axioms corresponding to the String.valueOf(I) java function.
-/// \param expr: function application with one integer argument
+/// \param f: function application with one integer argument
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_from_int(
   const function_application_exprt &f)
@@ -35,7 +35,7 @@ exprt string_constraint_generatort::add_axioms_from_int(
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
-/// \param expr: function application with one long argument
+/// \param f: function application with one long argument
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_from_long(
   const function_application_exprt &f)
@@ -64,9 +64,9 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
+/// \param res: string expression for the result
 /// \param b: Boolean expression
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_bool(
   const array_string_exprt &res,
   const exprt &b)
@@ -110,11 +110,11 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
-/// \param x: a signed integer expression
-/// \param ref_type: type for refined strings
+/// \param res: string expression for the result
+/// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \return a string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_int(
   const array_string_exprt &res,
   const exprt &input_int,
@@ -127,12 +127,12 @@ exprt string_constraint_generatort::add_axioms_from_int(
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
+/// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param radix: the radix to use
-/// \param ref_type: type for refined strings
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \return a string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_int_with_radix(
   const array_string_exprt &res,
   const exprt &input_int,
@@ -189,11 +189,11 @@ exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
     minus_exprt(chr, zero_char));
 }
 
-/// Add axioms stating that the returned string corresponds to the integer
+/// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
+/// \param res: string expression for the result
 /// \param i: an integer argument
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_int_hex(
   const array_string_exprt &res,
   const exprt &i)
@@ -249,7 +249,7 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
 
 /// add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
-/// \return a new string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_int_hex(
   const function_application_exprt &f)
 {
@@ -261,7 +261,7 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
 
 /// Add axioms corresponding to the String.valueOf(C) java function.
 /// \param f: function application one char argument
-/// \return a new string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_char(
   const function_application_exprt &f)
 {
@@ -273,9 +273,9 @@ exprt string_constraint_generatort::add_axioms_from_char(
 
 /// Add axioms stating that the returned string has length 1 and the character
 /// it contains corresponds to the input expression.
+/// \param res: string expression for the result
 /// \param c: one expression of type char
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
+/// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_char(
   const array_string_exprt &res,
   const exprt &c)
@@ -375,13 +375,13 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 /// in terms of the characters in str.
 /// \param input_int: the integer represented by str
 /// \param type: the type for input_int
+/// \param strict_formatting: if true, don't allow a leading plus, redundant
+///                           zeros or upper case letters
 /// \param str: input string
 /// \param max_string_length: the maximum length str can have
 /// \param radix: the radix, with the same type as input_int
 /// \param radix_ul: the radix as an unsigned long, or 0 if that can't be
 ///   determined
-/// \param strict_formatting: if true, don't allow a leading plus, redundant
-///   zeros or upper case letters
 void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const exprt &input_int,
   const typet &type,

@@ -1751,9 +1751,9 @@ static exprt find_index(
 /// variable `str`, and an index expression `val`.
 /// \return substitute `qvar` the universally quantified variable of `axiom`, by
 ///   an index `val`, in `axiom`, so that the index used for `str` equals `val`.
-///   For instance, if `axiom` corresponds to $\forall q. s[q+x]='a' &&
-///   t[q]='b'$, `instantiate(axiom,s,v)` would return an expression for
-///   $s[v]='a' && t[v-x]='b'$.
+///   For instance, if `axiom` corresponds to \f$\forall q. s[q+x]='a' &&
+///   t[q]='b'\f$, `instantiate(axiom,s,v)` would return an expression for
+///   \f$s[v]='a' && t[v-x]='b'\f$.
 static exprt instantiate(
   messaget::mstreamt &stream,
   const string_constraintt &axiom,
@@ -1778,7 +1778,12 @@ static exprt instantiate(
 
 /// Instantiates a quantified formula representing `not_contains` by
 /// substituting the quantifiers and generating axioms.
+/// \param stream: a message stream
+/// \param ns: namespace
 /// \param [in] axiom: the axiom to instantiate
+/// \param index_set: set of indexes
+/// \param current_index_set: set of indexes that have been newly added
+/// \param generator: constraint generator object
 /// \return the lemmas produced through instantiation
 static std::vector<exprt> instantiate(
   const string_not_contains_constraintt &axiom,
@@ -1903,6 +1908,8 @@ exprt string_refinementt::get(const exprt &expr) const
 /// Creates a solver with `axiom` as the only formula added and runs it. If it
 /// is SAT, then true is returned and the given evaluation of `var` is stored
 /// in `witness`. If UNSAT, then what witness is is undefined.
+/// \param ns: namespace
+/// \param ui: message handler
 /// \param [in] axiom: the axiom to be checked
 /// \param [in] var: the variable whose evaluation will be stored in witness
 /// \return: the witness of the satisfying assignment if one
@@ -2029,8 +2036,10 @@ static bool universal_only_in_index(const string_constraintt &expr)
   return true;
 }
 
-/// Checks the data invariant for \link string_constraintt
+/// Checks the data invariant for \link string_constraintt \endlink
 /// \related string_constraintt
+/// \param stream: message stream
+/// \param ns: namespace
 /// \param [in] expr: the string constraint to check
 /// \return whether the constraint satisfies the invariant
 static bool is_valid_string_constraint(
