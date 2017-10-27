@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/cprover_prefix.h>
 #include <util/options.h>
+#include <util/invariant.h>
 
 #include "local_bitvector_analysis.h"
 
@@ -1658,7 +1659,7 @@ void goto_checkt::goto_check(
     {
       if(enable_pointer_check)
       {
-        assert(i.code.operands().size()==1);
+        INVARIANT(i.code.operands().size() == 1, "The num-operands must be 1.");
         const symbol_exprt &variable=to_symbol_expr(i.code.op0());
 
         // is it dirty?
@@ -1666,16 +1667,15 @@ void goto_checkt::goto_check(
         {
           // need to mark the dead variable as dead
           goto_programt::targett t=new_code.add_instruction(ASSIGN);
-          exprt address_of_expr=address_of_exprt(variable);
+          exprt address_of_expr = address_of_exprt(variable);
           exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
             address_of_expr.make_typecast(lhs.type());
-          exprt rhs=
-            if_exprt(
-              side_effect_expr_nondett(bool_typet()),
-              address_of_expr,
-              lhs,
-              lhs.type());
+          exprt rhs = if_exprt(
+            side_effect_expr_nondett(bool_typet()),
+            address_of_expr,
+            lhs,
+            lhs.type());
           t->source_location=i.source_location;
           t->code=code_assignt(lhs, rhs);
           t->code.add_source_location()=i.source_location;
@@ -1686,27 +1686,26 @@ void goto_checkt::goto_check(
     {
       if(enable_pointer_check)
       {
-        assert(i.code.operands().size()==1);
-        const symbol_exprt &variable=to_symbol_expr(i.code.op0());
+        INVARIANT(i.code.operands().size() == 1, "There must be 1 operand.");
+        const symbol_exprt &variable = to_symbol_expr(i.code.op0());
 
         // is it dirty?
         if(local_bitvector_analysis->dirty(variable))
         {
           // reset the dead marker
-          goto_programt::targett t=new_code.add_instruction(ASSIGN);
-          exprt address_of_expr=address_of_exprt(variable);
-          exprt lhs=ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
+          goto_programt::targett t = new_code.add_instruction(ASSIGN);
+          exprt address_of_expr = address_of_exprt(variable);
+          exprt lhs = ns.lookup(CPROVER_PREFIX "dead_object").symbol_expr();
           if(!base_type_eq(lhs.type(), address_of_expr.type(), ns))
             address_of_expr.make_typecast(lhs.type());
-          exprt rhs=
-            if_exprt(
-              equal_exprt(lhs, address_of_expr),
-              null_pointer_exprt(to_pointer_type(address_of_expr.type())),
-              lhs,
-              lhs.type());
-          t->source_location=i.source_location;
-          t->code=code_assignt(lhs, rhs);
-          t->code.add_source_location()=i.source_location;
+          exprt rhs = if_exprt(
+            equal_exprt(lhs, address_of_expr),
+            null_pointer_exprt(to_pointer_type(address_of_expr.type())),
+            lhs,
+            lhs.type());
+          t->source_location = i.source_location;
+          t->code = code_assignt(lhs, rhs);
+          t->code.add_source_location() = i.source_location;
         }
       }
     }

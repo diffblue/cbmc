@@ -72,32 +72,32 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       return false;
     }
   }
-  else if(expr.id()==ID_xor)
+  else if(expr.id() == ID_xor)
   {
     bool result=true;
 
     bool negate=false;
 
-    for(exprt::operandst::const_iterator it=operands.begin();
-        it!=operands.end();)
+    for(exprt::operandst::const_iterator it = operands.begin();
+        it != operands.end();)
     {
-      if(it->type().id()!=ID_bool)
+      if(it->type().id() != ID_bool)
         return true;
 
       bool erase;
 
       if(it->is_true())
       {
-        erase=true;
-        negate=!negate;
+        erase = true;
+        negate = !negate;
       }
       else
-        erase=it->is_false();
+        erase = it->is_false();
 
       if(erase)
       {
-        it=operands.erase(it);
-        result=false;
+        it = operands.erase(it);
+        result = false;
       }
       else
         it++;
@@ -108,7 +108,7 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       expr.make_bool(negate);
       return false;
     }
-    else if(operands.size()==1)
+    else if(operands.size() == 1)
     {
       exprt tmp(operands.front());
       if(negate)
@@ -119,14 +119,14 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
     return result;
   }
-  else if(expr.id()==ID_and || expr.id()==ID_or)
+  else if(expr.id() == ID_and || expr.id() == ID_or)
   {
     std::unordered_set<exprt, irep_hash> expr_set;
 
-    bool result=true;
+    bool result = true;
 
-    for(exprt::operandst::const_iterator it=operands.begin();
-        it!=operands.end();)
+    for(exprt::operandst::const_iterator it = operands.begin();
+        it != operands.end();)
     {
       if(it->type().id()!=ID_bool)
         return true;
@@ -145,9 +145,8 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
         return false;
       }
 
-      bool erase=
-        (expr.id()==ID_and ? is_true : is_false) ||
-        !expr_set.insert(*it).second;
+      bool erase = (expr.id() == ID_and ? is_true : is_false) ||
+                   !expr_set.insert(*it).second;
 
       if(erase)
       {
@@ -160,18 +159,17 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
 
     // search for a and !a
     for(const exprt &op : operands)
-      if(op.id()==ID_not &&
-         op.operands().size()==1 &&
-         op.type().id()==ID_bool &&
-         expr_set.find(op.op0())!=expr_set.end())
+      if(
+        op.id() == ID_not && op.operands().size() == 1 &&
+        op.type().id() == ID_bool && expr_set.find(op.op0()) != expr_set.end())
       {
-        expr.make_bool(expr.id()==ID_or);
+        expr.make_bool(expr.id() == ID_or);
         return false;
       }
 
     if(operands.empty())
     {
-      expr.make_bool(expr.id()==ID_and);
+      expr.make_bool(expr.id() == ID_and);
       return false;
     }
     else if(operands.size()==1)

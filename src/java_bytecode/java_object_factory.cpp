@@ -195,7 +195,7 @@ exprt allocate_dynamic_object(
   {
     INVARIANT(!object_size.is_nil(), "Size of Java objects should be known");
     // malloc expression
-    exprt malloc_expr=side_effect_exprt(ID_allocate);
+    exprt malloc_expr = side_effect_exprt(ID_allocate);
     malloc_expr.copy_to_operands(object_size);
     malloc_expr.copy_to_operands(false_exprt());
     typet result_type=pointer_type(allocate_type);

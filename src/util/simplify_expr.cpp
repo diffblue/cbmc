@@ -316,16 +316,16 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
 
   // mildly more elaborate version of the above:
   // (int)((T*)0 + int) -> (int)(sizeof(T)*(size_t)int) if NULL is zero
-  if(config.ansi_c.NULL_is_zero &&
-     (expr_type.id()==ID_signedbv || expr_type.id()==ID_unsignedbv) &&
-     op_type.id()==ID_pointer &&
-     expr.op0().id()==ID_plus &&
-     expr.op0().operands().size()==2 &&
-     ((expr.op0().op0().id()==ID_typecast &&
-     expr.op0().op0().operands().size()==1 &&
-       expr.op0().op0().op0().is_zero()) ||
-      (expr.op0().op0().is_constant() &&
-       to_constant_expr(expr.op0().op0()).get_value()==ID_NULL)))
+  if(
+    config.ansi_c.NULL_is_zero &&
+    (expr_type.id() == ID_signedbv || expr_type.id() == ID_unsignedbv) &&
+    op_type.id() == ID_pointer && expr.op0().id() == ID_plus &&
+    expr.op0().operands().size() == 2 &&
+    ((expr.op0().op0().id() == ID_typecast &&
+      expr.op0().op0().operands().size() == 1 &&
+      expr.op0().op0().op0().is_zero()) ||
+     (expr.op0().op0().is_constant() &&
+      to_constant_expr(expr.op0().op0()).get_value() == ID_NULL)))
   {
     mp_integer sub_size=pointer_offset_size(op_type.subtype(), ns);
     if(sub_size!=-1)
@@ -729,15 +729,16 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
       return false;
     }
   }
-  else if(operand.id()==ID_address_of)
+  else if(operand.id() == ID_address_of)
   {
-    const exprt &o=to_address_of_expr(operand).object();
+    const exprt &o = to_address_of_expr(operand).object();
 
     // turn &array into &array[0] when casting to pointer-to-element-type
-    if(o.type().id()==ID_array &&
-       base_type_eq(expr_type, pointer_type(o.type().subtype()), ns))
+    if(
+      o.type().id() == ID_array &&
+      base_type_eq(expr_type, pointer_type(o.type().subtype()), ns))
     {
-      expr=address_of_exprt(index_exprt(o, from_integer(0, size_type())));
+      expr = address_of_exprt(index_exprt(o, from_integer(0, size_type())));
 
       simplify_rec(expr);
       return false;

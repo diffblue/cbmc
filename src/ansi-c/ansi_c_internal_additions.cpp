@@ -105,15 +105,17 @@ static std::string architecture_string(int value, const char *s)
 
 void ansi_c_internal_additions(std::string &code)
 {
-  code+=
+  code +=
     "# 1 \"<built-in-additions>\"\n"
     "typedef __typeof__(sizeof(int)) __CPROVER_size_t;\n"
     "void __CPROVER_assume(__CPROVER_bool assumption);\n"
     "void __VERIFIER_assume(__CPROVER_bool assumption);\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_assert(__CPROVER_bool assertion, const char *description);\n"
+    "void __CPROVER_assert(__CPROVER_bool assertion, const char "
+    "*description);\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_precondition(__CPROVER_bool precondition, const char *description);\n"
+    "void __CPROVER_precondition(__CPROVER_bool precondition, const char "
+    "*description);\n"
     "void __CPROVER_havoc_object(void *);\n"
     "__CPROVER_bool __CPROVER_equal();\n"
     "__CPROVER_bool __CPROVER_same_object(const void *, const void *);\n"
@@ -145,7 +147,8 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_fence(const char *kind, ...);\n"
     "__CPROVER_thread_local unsigned long __CPROVER_thread_id=0;\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
+    "__CPROVER_bool "
+    "__CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
     "unsigned long __CPROVER_next_thread_id=0;\n"
 
     // traces
@@ -157,7 +160,8 @@ void ansi_c_internal_additions(std::string &code)
     "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "void __CPROVER_allocated_memory(__CPROVER_size_t address, __CPROVER_size_t extent);\n"
+    "void __CPROVER_allocated_memory(__CPROVER_size_t address, "
+    "__CPROVER_size_t extent);\n"
 
     // malloc
     "void *__CPROVER_allocate(__CPROVER_size_t size, __CPROVER_bool zero);\n"
@@ -170,13 +174,16 @@ void ansi_c_internal_additions(std::string &code)
 
     // this is ANSI-C
     // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __func__[__CPROVER_constant_infinity_uint];\n"
+    "extern __CPROVER_thread_local const char "
+    "__func__[__CPROVER_constant_infinity_uint];\n"
 
     // this is GCC
     // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __FUNCTION__[__CPROVER_constant_infinity_uint];\n"
+    "extern __CPROVER_thread_local const char "
+    "__FUNCTION__[__CPROVER_constant_infinity_uint];\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "extern __CPROVER_thread_local const char __PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
+    "extern __CPROVER_thread_local const char "
+    "__PRETTY_FUNCTION__[__CPROVER_constant_infinity_uint];\n"
 
     // float stuff
     "__CPROVER_bool __CPROVER_isnanf(float f);\n"
@@ -197,8 +204,9 @@ void ansi_c_internal_additions(std::string &code)
     "double __CPROVER_inf(void);\n"
     "float __CPROVER_inff(void);\n"
     "long double __CPROVER_infl(void);\n"
-    "int __CPROVER_thread_local __CPROVER_rounding_mode="+
-      std::to_string(config.ansi_c.rounding_mode)+";\n"
+    "int __CPROVER_thread_local __CPROVER_rounding_mode=" +
+    std::to_string(config.ansi_c.rounding_mode) +
+    ";\n"
     "int __CPROVER_isgreaterf(float f, float g);\n"
     "int __CPROVER_isgreaterd(double f, double g);\n"
     "int __CPROVER_isgreaterequalf(float f, float g);\n"
@@ -222,7 +230,8 @@ void ansi_c_internal_additions(std::string &code)
 
     // arrays
     // NOLINTNEXTLINE(whitespace/line_length)
-    "__CPROVER_bool __CPROVER_array_equal(const void *array1, const void *array2);\n"
+    "__CPROVER_bool __CPROVER_array_equal(const void *array1, "
+    "const void *array2);\n"
     // overwrite all of *dest (possibly using nondet values), even
     // if *src is smaller
     "void __CPROVER_array_copy(const void *dest, const void *src);\n"
@@ -232,7 +241,7 @@ void ansi_c_internal_additions(std::string &code)
 
     // k-induction
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
-      "unsigned step, unsigned loop_free);\n"
+    "unsigned step, unsigned loop_free);\n"
 
     // format string-related
     "int __CPROVER_scanf(const char *, ...);\n"
@@ -245,7 +254,8 @@ void ansi_c_internal_additions(std::string &code)
     "  short next_unread;\n"
     "};\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    "extern struct __CPROVER_pipet __CPROVER_pipes[__CPROVER_constant_infinity_uint];\n"
+    "extern struct __CPROVER_pipet "
+    "__CPROVER_pipes[__CPROVER_constant_infinity_uint];\n"
     // offset to make sure we don't collide with other fds
     "extern const int __CPROVER_pipe_offset;\n"
     "unsigned __CPROVER_pipe_count=0;\n"

@@ -58,7 +58,7 @@ void goto_symext::symex_allocate(
   const exprt &lhs,
   const side_effect_exprt &code)
 {
-  if(code.operands().size()!=2)
+  if(code.operands().size() != 2)
     throw "allocate expected to have two operands";
 
   if(lhs.is_nil())
@@ -167,7 +167,7 @@ void goto_symext::symex_allocate(
 
   new_symbol_table.add(value_symbol);
 
-  exprt zero_init=code.op1();
+  exprt zero_init = code.op1();
   state.rename(zero_init, ns); // to allow constant propagation
   simplify(zero_init, ns);
 
@@ -177,12 +177,8 @@ void goto_symext::symex_allocate(
   if(!zero_init.is_zero() && !zero_init.is_false())
   {
     null_message_handlert null_message;
-    exprt zero_value=
-      zero_initializer(
-        object_type,
-        code.source_location(),
-        ns,
-        null_message);
+    exprt zero_value =
+      zero_initializer(object_type, code.source_location(), ns, null_message);
 
     if(zero_value.is_not_nil())
     {

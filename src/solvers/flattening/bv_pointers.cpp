@@ -31,12 +31,12 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
        operands[0].type().id()==ID_pointer)
     {
       // we postpone
-      literalt l=prop.new_variable();
+      literalt l = prop.new_variable();
 
       postponed_list.push_back(postponedt());
-      postponed_list.back().op=convert_bv(operands[0]);
+      postponed_list.back().op = convert_bv(operands[0]);
       postponed_list.back().bv.push_back(l);
-      postponed_list.back().expr=expr;
+      postponed_list.back().expr = expr;
 
       return l;
     }
@@ -121,7 +121,7 @@ bool bv_pointerst::convert_address_of_rec(
     {
       // this should be gone
       bv=convert_pointer_type(array);
-      POSTCONDITION(bv.size()==bits);
+      POSTCONDITION(bv.size() == bits);
     }
     else if(array_type.id()==ID_array ||
             array_type.id()==ID_incomplete_array ||
@@ -129,7 +129,7 @@ bool bv_pointerst::convert_address_of_rec(
     {
       if(convert_address_of_rec(array, bv))
         return true;
-      POSTCONDITION(bv.size()==bits);
+      POSTCONDITION(bv.size() == bits);
     }
     else
       UNREACHABLE;
@@ -137,10 +137,10 @@ bool bv_pointerst::convert_address_of_rec(
     // get size
     mp_integer size=
       pointer_offset_size(array_type.subtype(), ns);
-    DATA_INVARIANT(size>0, "array subtype expected to have non-zero size");
+    DATA_INVARIANT(size > 0, "array subtype expected to have non-zero size");
 
     offset_arithmetic(bv, size, index);
-    POSTCONDITION(bv.size()==bits);
+    POSTCONDITION(bv.size() == bits);
     return false;
   }
   else if(expr.id()==ID_member)
@@ -158,7 +158,7 @@ bool bv_pointerst::convert_address_of_rec(
       mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
         member_expr.get_component_name(), ns);
-      DATA_INVARIANT(offset>=0, "member offset expected to be positive");
+      DATA_INVARIANT(offset >= 0, "member offset expected to be positive");
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -281,7 +281,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       return bv;
     }
 
-    POSTCONDITION(bv.size()==bits);
+    POSTCONDITION(bv.size() == bits);
     return bv;
   }
   else if(expr.id()==ID_constant)
@@ -319,13 +319,13 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       {
         count++;
         bv=convert_bv(*it);
-        POSTCONDITION(bv.size()==bits);
+        POSTCONDITION(bv.size() == bits);
 
         typet pointer_sub_type=it->type().subtype();
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
         size=pointer_offset_size(pointer_sub_type, ns);
-        POSTCONDITION(size>0);
+        POSTCONDITION(size > 0);
       }
     }
 
@@ -399,7 +399,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
+    DATA_INVARIANT(element_size > 0, "object size expected to be non-zero");
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -425,9 +425,12 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   {
     return SUB::convert_byte_extract(to_byte_extract_expr(expr));
   }
-  else if(expr.id()==ID_byte_update_little_endian ||
-          expr.id()==ID_byte_update_big_endian)
-    throw "Byte-wise updates of pointers are unsupported";
+  else if(
+    expr.id() == ID_byte_update_little_endian ||
+    expr.id() == ID_byte_update_big_endian)
+  {
+    throw "byte-wise updates of pointers are unsupported";
+  }
 
   return conversion_failed(expr);
 }
@@ -459,7 +462,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
+    DATA_INVARIANT(element_size > 0, "object size expected to be non-zero");
 
     if(element_size!=1)
     {
@@ -559,7 +562,7 @@ exprt bv_pointerst::bv_get_rec(
 
   for(std::size_t i=0; i<bits; i++)
   {
-    char ch=0;
+    char ch = 0;
     std::size_t bit_nr=i+offset;
 
     if(unknown[bit_nr])
@@ -709,8 +712,8 @@ void bv_pointerst::do_postponed(
       bvt saved_bv=postponed.op;
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
 
-      POSTCONDITION(bv.size()==saved_bv.size());
-      PRECONDITION(postponed.bv.size()==1);
+      POSTCONDITION(bv.size() == saved_bv.size());
+      PRECONDITION(postponed.bv.size() == 1);
 
       literalt l1=bv_utils.equal(bv, saved_bv);
       literalt l2=postponed.bv.front();
@@ -762,8 +765,8 @@ void bv_pointerst::do_postponed(
       bvt saved_bv=postponed.op;
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
 
-      POSTCONDITION(bv.size()==saved_bv.size());
-      PRECONDITION(postponed.bv.size()>=1);
+      POSTCONDITION(bv.size() == saved_bv.size());
+      PRECONDITION(postponed.bv.size() >= 1);
 
       literalt l1=bv_utils.equal(bv, saved_bv);
 
@@ -773,60 +776,57 @@ void bv_pointerst::do_postponed(
       prop.l_set_to(prop.limplies(l1, l2), true);
     }
   }
-  else if(postponed.expr.id()==ID_invalid_pointer)
+  else if(postponed.expr.id() == ID_invalid_pointer)
   {
-    const pointer_logict::objectst &objects=pointer_logic.objects;
+    const pointer_logict::objectst &objects = pointer_logic.objects;
 
     bvt disj;
     disj.reserve(objects.size());
 
-    bvt saved_bv=postponed.op;
-    saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
+    bvt saved_bv = postponed.op;
+    saved_bv.erase(saved_bv.begin(), saved_bv.begin() + offset_bits);
 
     bvt invalid_bv, null_bv;
     encode(pointer_logic.get_invalid_object(), invalid_bv);
-    invalid_bv.erase(invalid_bv.begin(), invalid_bv.begin()+offset_bits);
-    encode(pointer_logic.get_null_object(),    null_bv);
-    null_bv.erase(null_bv.begin(), null_bv.begin()+offset_bits);
+    invalid_bv.erase(invalid_bv.begin(), invalid_bv.begin() + offset_bits);
+    encode(pointer_logic.get_null_object(), null_bv);
+    null_bv.erase(null_bv.begin(), null_bv.begin() + offset_bits);
 
     disj.push_back(bv_utils.equal(saved_bv, invalid_bv));
     disj.push_back(bv_utils.equal(saved_bv, null_bv));
 
     // compare object part to non-allocated dynamic objects
-    std::size_t number=0;
+    std::size_t number = 0;
 
-    for(pointer_logict::objectst::const_iterator
-        it=objects.begin();
-        it!=objects.end();
+    for(pointer_logict::objectst::const_iterator it = objects.begin();
+        it != objects.end();
         it++, number++)
     {
-      const exprt &expr=*it;
+      const exprt &expr = *it;
 
-      if(!pointer_logic.is_dynamic_object(expr) ||
-         !is_ssa_expr(expr))
+      if(!pointer_logic.is_dynamic_object(expr) || !is_ssa_expr(expr))
         continue;
 
       // only compare object part
       bvt bv;
       encode(number, bv);
 
-      bv.erase(bv.begin(), bv.begin()+offset_bits);
-      assert(bv.size()==saved_bv.size());
+      bv.erase(bv.begin(), bv.begin() + offset_bits);
+      INVARIANT(bv.size() == saved_bv.size(), "Must be of the same size.");
 
-      literalt l1=bv_utils.equal(bv, saved_bv);
+      literalt l1 = bv_utils.equal(bv, saved_bv);
 
-      const ssa_exprt &ssa=to_ssa_expr(expr);
+      const ssa_exprt &ssa = to_ssa_expr(expr);
 
-      const exprt &guard=
-        static_cast<const exprt&>(
-          ssa.get_original_expr().find("#dynamic_guard"));
+      const exprt &guard = static_cast<const exprt &>(
+        ssa.get_original_expr().find("#dynamic_guard"));
 
       if(guard.is_nil())
         continue;
 
-      const bvt &guard_bv=convert_bv(guard);
-      assert(guard_bv.size()==1);
-      literalt l_guard=guard_bv[0];
+      const bvt &guard_bv = convert_bv(guard);
+      INVARIANT(guard_bv.size() == 1, "Size must be 1.");
+      literalt l_guard = guard_bv[0];
 
       disj.push_back(prop.land(!l_guard, l1));
     }
@@ -835,14 +835,14 @@ void bv_pointerst::do_postponed(
     bvt bv;
     encode(number, bv);
 
-    bv.erase(bv.begin(), bv.begin()+offset_bits);
-    assert(bv.size()==saved_bv.size());
+    bv.erase(bv.begin(), bv.begin() + offset_bits);
+    INVARIANT(bv.size() == saved_bv.size(), "Must be of the same size.");
 
     disj.push_back(
       bv_utils.rel(saved_bv, ID_ge, bv, bv_utilst::representationt::UNSIGNED));
 
-    assert(postponed.bv.size()==1);
-    literalt l=postponed.bv.front();
+    INVARIANT(postponed.bv.size() == 1, "Must be of the size 1.");
+    literalt l = postponed.bv.front();
     prop.l_set_to(prop.lequal(prop.lor(disj), l), true);
   }
   else
