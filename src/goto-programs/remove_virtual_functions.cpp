@@ -30,6 +30,12 @@ public:
 
   bool remove_virtual_functions(goto_programt &goto_program);
 
+  void remove_virtual_function(
+    goto_programt &goto_program,
+    goto_programt::targett target,
+    const dispatch_table_entriest &functions,
+    virtual_dispatch_fallback_actiont fallback_action);
+
 protected:
   const namespacet ns;
   const symbol_tablet &symbol_table;
@@ -40,25 +46,12 @@ protected:
     goto_programt &goto_program,
     goto_programt::targett target);
 
-  class functiont
-  {
-  public:
-    functiont() {}
-    explicit functiont(const irep_idt &_class_id) :
-      class_id(_class_id)
-    {}
-
-    symbol_exprt symbol_expr;
-    irep_idt class_id;
-  };
-
-  typedef std::vector<functiont> functionst;
-  void get_functions(const exprt &, functionst &);
+  void get_functions(const exprt &, dispatch_table_entriest &);
   void get_child_functions_rec(
     const irep_idt &,
     const symbol_exprt &,
     const irep_idt &,
-    functionst &,
+    dispatch_table_entriest &,
     std::set<irep_idt> &visited) const;
   exprt get_method(
     const irep_idt &class_id,
@@ -81,14 +74,35 @@ void remove_virtual_functionst::remove_virtual_function(
   const code_function_callt &code=
     to_code_function_call(target->code);
 
-  const auto &vcall_source_loc=target->source_location;
-
   const exprt &function=code.function();
-  assert(function.id()==ID_virtual_function);
-  assert(!code.arguments().empty());
+  INVARIANT(
+    function.id()==ID_virtual_function,
+    "remove_virtual_function must take a virtual function call instruction");
+  INVARIANT(
+    !code.arguments().empty(),
+    "virtual function calls must have at least a this-argument");
 
-  functionst functions;
+  dispatch_table_entriest functions;
   get_functions(function, functions);
+
+  remove_virtual_function(
+    goto_program,
+    target,
+    functions,
+    virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION);
+}
+
+void remove_virtual_functionst::remove_virtual_function(
+  goto_programt &goto_program,
+  goto_programt::targett target,
+  const dispatch_table_entriest &functions,
+  virtual_dispatch_fallback_actiont fallback_action)
+{
+  INVARIANT(
+    target->is_function_call(),
+    "remove_virtual_function must target a FUNCTION_CALL instruction");
+  const code_function_callt &code=
+    to_code_function_call(target->code);
 
   if(functions.empty())
   {
@@ -97,9 +111,9 @@ void remove_virtual_functionst::remove_virtual_function(
   }
 
   // only one option?
-  if(functions.size()==1)
+  if(functions.size()==1 &&
+     fallback_action==virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION)
   {
-    assert(target->is_function_call());
     if(functions.begin()->symbol_expr==symbol_exprt())
       target->make_skip();
     else
@@ -107,6 +121,8 @@ void remove_virtual_functionst::remove_virtual_function(
         functions.begin()->symbol_expr;
     return;
   }
+
+  const auto &vcall_source_loc=target->source_location;
 
   // the final target is a skip
   goto_programt final_skip;
@@ -122,16 +138,29 @@ void remove_virtual_functionst::remove_virtual_function(
   goto_programt new_code_gotos;
 
   exprt this_expr=code.arguments()[0];
-  // If necessary, cast to the last candidate function to
-  // get the object's clsid. By the structure of get_functions,
-  // this is the parent of all other classes under consideration.
-  const auto &base_classid=functions.back().class_id;
-  const auto &base_function_symbol=functions.back().symbol_expr;
-  symbol_typet suggested_type(base_classid);
-  exprt c_id2=get_class_identifier_field(this_expr, suggested_type, ns);
+  const auto &last_function_symbol=functions.back().symbol_expr;
+
+  const typet &this_type=this_expr.type();
+  INVARIANT(this_type.id() == ID_pointer, "this parameter must be a pointer");
+  INVARIANT(
+    this_type.subtype() != empty_typet(),
+    "this parameter must not be a void pointer");
+
+  // So long as `this` is already not `void*` typed, the second parameter
+  // is ignored:
+  exprt c_id2=get_class_identifier_field(this_expr, symbol_typet(), ns);
+
+  // If instructed, add an ASSUME(FALSE) to handle the case where we don't
+  // match any expected type:
+  if(fallback_action==virtual_dispatch_fallback_actiont::ASSUME_FALSE)
+  {
+    auto newinst=new_code_calls.add_instruction(ASSUME);
+    newinst->guard=false_exprt();
+    newinst->source_location=vcall_source_loc;
+  }
 
   std::map<irep_idt, goto_programt::targett> calls;
-  // Note backwards iteration, to get the least-derived candidate first.
+  // Note backwards iteration, to get the fallback candidate first.
   for(auto it=functions.crbegin(), itend=functions.crend(); it!=itend; ++it)
   {
     const auto &fun=*it;
@@ -149,8 +178,13 @@ void remove_virtual_functionst::remove_virtual_function(
         t1->make_function_call(code);
         auto &newcall=to_code_function_call(t1->code);
         newcall.function()=fun.symbol_expr;
-        typet need_type=
-          pointer_type(symbol_typet(fun.symbol_expr.get(ID_C_class)));
+        // Cast the `this` pointer to the correct type for the new callee:
+        const auto &callee_type=
+          to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
+        INVARIANT(
+          callee_type.has_this(),
+          "Virtual function callees must have a `this` argument");
+        typet need_type=callee_type.parameters()[0].type();
         if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
           newcall.arguments()[0].make_typecast(need_type);
       }
@@ -166,9 +200,10 @@ void remove_virtual_functionst::remove_virtual_function(
       t3->make_goto(t_final, true_exprt());
     }
 
-    // If this calls the base function we just fall through.
+    // If this calls the fallback function we just fall through.
     // Otherwise branch to the right call:
-    if(fun.symbol_expr!=base_function_symbol)
+    if(fallback_action!=virtual_dispatch_fallback_actiont::CALL_LAST_FUNCTION ||
+       fun.symbol_expr!=last_function_symbol)
     {
       exprt c_id1=constant_exprt(fun.class_id, string_typet());
       goto_programt::targett t4=new_code_gotos.add_instruction();
@@ -221,7 +256,7 @@ void remove_virtual_functionst::get_child_functions_rec(
   const irep_idt &this_id,
   const symbol_exprt &last_method_defn,
   const irep_idt &component_name,
-  functionst &functions,
+  dispatch_table_entriest &functions,
   std::set<irep_idt> &visited) const
 {
   auto findit=class_hierarchy.class_map.find(this_id);
@@ -233,7 +268,7 @@ void remove_virtual_functionst::get_child_functions_rec(
     if(!visited.insert(child).second)
       continue;
     exprt method=get_method(child, component_name);
-    functiont function(child);
+    dispatch_table_entryt function(child);
     if(method.is_not_nil())
     {
       function.symbol_expr=to_symbol_expr(method);
@@ -256,7 +291,7 @@ void remove_virtual_functionst::get_child_functions_rec(
 
 void remove_virtual_functionst::get_functions(
   const exprt &function,
-  functionst &functions)
+  dispatch_table_entriest &functions)
 {
   const irep_idt class_id=function.get(ID_C_class);
   const irep_idt component_name=function.get(ID_component_name);
@@ -266,7 +301,7 @@ void remove_virtual_functionst::get_functions(
     symbol_table, class_hierarchy);
   const resolve_concrete_function_callt::concrete_function_callt &
     resolved_call=get_virtual_call_target(class_id, component_name);
-  functiont root_function;
+  dispatch_table_entryt root_function;
 
   if(resolved_call.is_valid())
   {
@@ -372,4 +407,18 @@ void remove_virtual_functions(goto_modelt &goto_model)
 {
   remove_virtual_functions(
     goto_model.symbol_table, goto_model.goto_functions);
+}
+
+void remove_virtual_function(
+  goto_modelt &goto_model,
+  goto_programt &goto_program,
+  goto_programt::targett instruction,
+  const dispatch_table_entriest &dispatch_table,
+  virtual_dispatch_fallback_actiont fallback_action)
+{
+  remove_virtual_functionst
+    rvf(goto_model.symbol_table, goto_model.goto_functions);
+
+  rvf.remove_virtual_function(
+    goto_program, instruction, dispatch_table, fallback_action);
 }
