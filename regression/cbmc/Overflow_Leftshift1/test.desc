@@ -1,0 +1,9 @@
+CORE
+main.c
+--signed-overflow-check
+^SIGNAL=0$
+^\[.*\] arithmetic overflow on signed shl in .*: FAILURE$
+^\*\* 2 of 4 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
