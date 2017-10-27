@@ -599,6 +599,8 @@ char java_char_from_type(const typet &type)
 /// Converts the content of a generic class type into a vector of Java types,
 /// that is each type variable of the class has one entry in the returned
 /// vector.
+/// This also supports parsing of bounds in the form of `<T:CBound>` for classes
+/// or `<T::IBound>` for interfaces.
 ///
 /// For example for `HashMap<K, V>` a vector with two elements would be returned
 ///
@@ -607,8 +609,9 @@ std::vector<typet> java_generic_type_from_string(
   const std::string &class_name,
   const std::string &src)
 {
-  /// the class signature is of the form <TX:Bound_X;:BoundZ;TY:Bound_Y;>
-  size_t signature_end=find_closing_delimiter(src, 0, '<', '>');
+  /// the class signature is of the form <TX:Bound_X;:BoundZ;TY:Bound_Y;> or of
+  /// the form <TX::Bound_X;:BoundZ;TY:Bound_Y;> if Bound_X is an interface
+  size_t signature_end = find_closing_delimiter(src, 0, '<', '>');
   INVARIANT(
     src[0]=='<' && signature_end!=std::string::npos,
     "Class signature has unexpected format");
@@ -625,6 +628,16 @@ std::vector<typet> java_generic_type_from_string(
   {
     size_t bound_sep=signature.find(':');
     INVARIANT(bound_sep!=std::string::npos, "No bound for type variable.");
+
+    // is bound an interface?
+    // in this case the separator is '::'
+    if(signature[bound_sep + 1] == ':')
+    {
+      INVARIANT(
+        signature[bound_sep + 2] != ':', "Unknown bound for type variable.");
+      bound_sep++;
+    }
+
     std::string type_var_name(
       "java::"+class_name+"::"+signature.substr(0, bound_sep));
     std::string bound_type(signature.substr(bound_sep+1, var_sep-bound_sep));

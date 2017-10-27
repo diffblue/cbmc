@@ -1,0 +1,11 @@
+CORE
+Gn.class
+--cover location
+^EXIT=0$
+^SIGNAL=0$
+.*file Gn.java line 6 function java::Gn.\<init\>:\(\)V bytecode-index 1 block 1: FAILED
+.*file Gn.java line 9 function java::Gn.foo1:\(LGn;\)V bytecode-index 1 block 1: FAILED
+.*file Gn.java line 10 function java::Gn.foo1:\(LGn;\)V bytecode-index 4 block 2: FAILED
+.*file Gn.java line 11 function java::Gn.foo1:\(LGn;\)V bytecode-index 5 block 3: FAILED
+.*file Gn.java line 13 function java::Gn.main:\(\[Ljava/lang/String;\)V bytecode-index 2 block 1: SATISFIED
+--
