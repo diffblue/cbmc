@@ -17,7 +17,9 @@ SRC = all_properties.cpp \
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
       ../cpp/cpp$(LIBEXT) \
-      ../java_bytecode/java_bytecode$(LIBEXT) \
+      ../java_bytecode/java_types$(OBJEXT) \
+      ../java_bytecode/java_utils$(OBJEXT) \
+      ../java_bytecode/java_root_class$(OBJEXT) \
       ../linking/linking$(LIBEXT) \
       ../big-int/big-int$(LIBEXT) \
       ../goto-programs/goto-programs$(LIBEXT) \
