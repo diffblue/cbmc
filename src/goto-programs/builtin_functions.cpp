@@ -31,7 +31,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/c_types.h>
 #include <ansi-c/string_constant.h>
-#include <java_bytecode/java_types.h>
 
 #include "format_strings.h"
 
@@ -628,7 +627,11 @@ void goto_convertt::do_java_new_array(
   t_n->source_location=location;
 
   const struct_typet &struct_type=to_struct_type(ns.follow(object_type));
-  PRECONDITION(is_valid_java_array(struct_type));
+
+  // Ideally we would have a check for `is_valid_java_array(struct_type)` but
+  // `is_valid_java_array is part of the java_bytecode module and we cannot
+  // introduce such dependencies. We do this simple check instead:
+  PRECONDITION(struct_type.components().size()==3);
 
   // Init base class:
   dereference_exprt deref(lhs, object_type);
