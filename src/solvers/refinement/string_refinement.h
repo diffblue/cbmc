@@ -23,11 +23,13 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <limits>
 #include <util/string_expr.h>
 #include <util/replace_expr.h>
+#include <util/union_find_replace.h>
 #include <solvers/refinement/string_constraint.h>
 #include <solvers/refinement/string_constraint_generator.h>
 #include <solvers/refinement/string_refinement_invariant.h>
 
 #define MAX_NB_REFINEMENT 100
+#define CHARACTER_FOR_UNKNOWN '?'
 
 struct index_set_pairt
 {
@@ -73,9 +75,6 @@ private:
   // Base class
   typedef bv_refinementt supert;
 
-  typedef std::set<exprt> expr_sett;
-  typedef std::list<exprt> exprt_listt;
-
   string_refinementt(const infot &, bool);
 
   const configt config_;
@@ -94,19 +93,23 @@ private:
   // Warning: this is indexed by array_expressions and not string expressions
 
   index_set_pairt index_sets;
-  replace_mapt symbol_resolve;
-  std::map<exprt, exprt_listt> reverse_symbol_resolve;
+  union_find_replacet symbol_resolve;
+
+  std::vector<equal_exprt> equations;
   std::list<std::pair<exprt, bool>> non_string_axioms;
 
-  // Length of char arrays found during concretization
-  std::map<exprt, exprt> found_length;
-  // Content of char arrays found during concretization
-  std::map<exprt, array_exprt> found_content;
+  // Map pointers to array symbols
+  std::map<exprt, symbol_exprt> pointer_map;
 
-  void add_lemma(const exprt &lemma, bool simplify=true);
+  void add_lemma(const exprt &lemma, const bool simplify_lemma = true);
 };
 
 exprt substitute_array_lists(exprt expr, std::size_t string_max_length);
 exprt concretize_arrays_in_expression(
-  exprt expr, std::size_t string_max_length);
+  exprt expr,
+  std::size_t string_max_length,
+  const namespacet &ns);
+
+bool is_char_array_type(const typet &type, const namespacet &ns);
+
 #endif

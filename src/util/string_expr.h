@@ -14,37 +14,38 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/std_expr.h>
 #include <util/arith_tools.h>
+#include <util/refined_string_type.h>
 
-class string_exprt: public struct_exprt
+// Given an representation of strings as exprt that implements `length` and
+// `content` this provides additional useful methods.
+template <typename child_t>
+class string_exprt
 {
+private:
+  exprt &length()
+  {
+    return static_cast<child_t *>(this)->length();
+  }
+  const exprt &length() const
+  {
+    return static_cast<const child_t *>(this)->length();
+  }
+  exprt &content()
+  {
+    return static_cast<child_t *>(this)->content();
+  }
+  const exprt &content() const
+  {
+    return static_cast<const child_t *>(this)->content();
+  }
+
+protected:
+  string_exprt() = default;
+
 public:
-  string_exprt(): struct_exprt() {}
-
-  explicit string_exprt(typet type): struct_exprt(type)
+  exprt operator[](const exprt &i) const
   {
-    operands().resize(2);
-  }
-
-  string_exprt(const exprt &_length, const exprt &_content, typet type):
-    struct_exprt(type)
-  {
-    copy_to_operands(_length, _content);
-  }
-
-  // Expression corresponding to the length of the string
-  const exprt &length() const { return op0(); }
-  exprt &length() { return op0(); }
-
-  // Expression corresponding to the content (array of characters) of the string
-  const exprt &content() const { return op1(); }
-  exprt &content() { return op1(); }
-
-  static exprt within_bounds(const exprt &idx, const exprt &bound);
-
-  // Expression of the character at position idx in the string
-  index_exprt operator[] (const exprt &idx) const
-  {
-    return index_exprt(content(), idx);
+    return index_exprt(content(), i);
   }
 
   index_exprt operator[] (int i) const
@@ -131,22 +132,110 @@ public:
   {
     return axiom_for_has_length(from_integer(i, length().type()));
   }
-
-  friend inline string_exprt &to_string_expr(exprt &expr);
 };
 
-inline string_exprt &to_string_expr(exprt &expr)
+// Representation of strings as arrays
+class array_string_exprt : public string_exprt<array_string_exprt>, public exprt
 {
-  PRECONDITION(expr.id()==ID_struct);
-  PRECONDITION(expr.operands().size()==2);
-  return static_cast<string_exprt &>(expr);
+public:
+  exprt &length()
+  {
+    return to_array_type(type()).size();
+  }
+
+  const exprt &length() const
+  {
+    return to_array_type(type()).size();
+  }
+
+  exprt &content()
+  {
+    return *this;
+  }
+
+  const exprt &content() const
+  {
+    return *this;
+  }
+};
+
+inline array_string_exprt &to_array_string_expr(exprt &expr)
+{
+  PRECONDITION(expr.type().id() == ID_array);
+  return static_cast<array_string_exprt &>(expr);
 }
 
-inline const string_exprt &to_string_expr(const exprt &expr)
+inline const array_string_exprt &to_array_string_expr(const exprt &expr)
+{
+  PRECONDITION(expr.type().id() == ID_array);
+  return static_cast<const array_string_exprt &>(expr);
+}
+
+// Represent strings as a sturct with a length field and a content field
+class refined_string_exprt : public struct_exprt,
+                             public string_exprt<refined_string_exprt>
+{
+public:
+  refined_string_exprt() : struct_exprt()
+  {
+  }
+
+  explicit refined_string_exprt(typet type) : struct_exprt(type)
+  {
+    operands().resize(2);
+  }
+
+  refined_string_exprt(const exprt &_length, const exprt &_content, typet type)
+    : struct_exprt(type)
+  {
+    copy_to_operands(_length, _content);
+  }
+
+  refined_string_exprt(const exprt &_length, const exprt &_content)
+    : refined_string_exprt(
+        _length,
+        _content,
+        refined_string_typet(_length.type(), _content.type()))
+  {
+  }
+
+  // Expression corresponding to the length of the string
+  const exprt &length() const
+  {
+    return op0();
+  }
+  exprt &length()
+  {
+    return op0();
+  }
+
+  // Expression corresponding to the content (array of characters) of the string
+  const exprt &content() const
+  {
+    return op1();
+  }
+  exprt &content()
+  {
+    return op1();
+  }
+
+  static exprt within_bounds(const exprt &idx, const exprt &bound);
+
+  friend inline refined_string_exprt &to_string_expr(exprt &expr);
+};
+
+inline refined_string_exprt &to_string_expr(exprt &expr)
 {
   PRECONDITION(expr.id()==ID_struct);
   PRECONDITION(expr.operands().size()==2);
-  return static_cast<const string_exprt &>(expr);
+  return static_cast<refined_string_exprt &>(expr);
+}
+
+inline const refined_string_exprt &to_string_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_struct);
+  PRECONDITION(expr.operands().size()==2);
+  return static_cast<const refined_string_exprt &>(expr);
 }
 
 #endif

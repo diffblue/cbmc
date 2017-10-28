@@ -1,7 +1,7 @@
 /*******************************************************************\
 
-Module: Defines string constraints. These are formulas talking about strings. 
-        We implemented two forms of constraints: `string_constraintt` 
+Module: Defines string constraints. These are formulas talking about strings.
+        We implemented two forms of constraints: `string_constraintt`
         are formulas of the form $\forall univ_var \in [lb,ub[. prem => body$,
         and not_contains_constraintt of the form:
         $\forall x in [lb,ub[. p(x) => \exists y in [lb,ub[. s1[x+y] != s2[y]$.
@@ -167,9 +167,9 @@ public:
     exprt premise,
     exprt exists_bound_inf,
     exprt exists_bound_sup,
-    const string_exprt &s0,
-    const string_exprt &s1):
-  exprt(ID_string_not_contains_constraint)
+    const array_string_exprt &s0,
+    const array_string_exprt &s1)
+    : exprt(ID_string_not_contains_constraint)
   {
     copy_to_operands(univ_lower_bound, univ_bound_sup, premise);
     copy_to_operands(exists_bound_inf, exists_bound_sup, s0);
@@ -201,14 +201,14 @@ public:
     return operands()[4];
   }
 
-  const string_exprt &s0() const
+  const array_string_exprt &s0() const
   {
-    return to_string_expr(operands()[5]);
+    return to_array_string_expr(operands()[5]);
   }
 
-  const string_exprt &s1() const
+  const array_string_exprt &s1() const
   {
-    return to_string_expr(operands()[6]);
+    return to_array_string_expr(operands()[6]);
   }
 };
 

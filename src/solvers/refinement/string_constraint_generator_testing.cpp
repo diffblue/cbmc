@@ -18,7 +18,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// \par parameters: a prefix string, a string and an integer offset
 /// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_prefix(
-  const string_exprt &prefix, const string_exprt &str, const exprt &offset)
+  const array_string_exprt &prefix,
+  const array_string_exprt &str,
+  const exprt &offset)
 {
   symbol_exprt isprefix=fresh_boolean("isprefix");
   const typet &index_type=str.length().type();
@@ -41,8 +43,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     qvar,
     prefix.length(),
     isprefix,
-    equal_exprt(str[plus_exprt_with_overflow_check(qvar, offset)],
-                prefix[qvar]));
+    equal_exprt(str[plus_exprt(qvar, offset)], prefix[qvar]));
   m_axioms.push_back(a2);
 
   symbol_exprt witness=fresh_exist_index("witness_not_isprefix", index_type);
@@ -50,12 +51,9 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
     axiom_for_is_positive_index(witness),
     and_exprt(
       prefix.axiom_for_length_gt(witness),
-      notequal_exprt(str[plus_exprt_with_overflow_check(witness, offset)],
-                     prefix[witness])));
+      notequal_exprt(str[plus_exprt(witness, offset)], prefix[witness])));
   or_exprt s0_notpref_s1(
-    not_exprt(
-      str.axiom_for_length_ge(
-        plus_exprt_with_overflow_check(prefix.length(), offset))),
+    not_exprt(str.axiom_for_length_ge(plus_exprt(prefix.length(), offset))),
     witness_diff);
 
   implies_exprt a3(not_exprt(isprefix), s0_notpref_s1);
@@ -75,8 +73,8 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt::argumentst &args=f.arguments();
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
   PRECONDITION(args.size() == 2 || args.size() == 3);
-  const string_exprt s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
-  const string_exprt s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
+  const array_string_exprt s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
+  const array_string_exprt s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
   const exprt offset =
     args.size() == 2 ? from_integer(0, s0.length().type()) : args[2];
   return typecast_exprt(add_axioms_for_is_prefix(s0, s1, offset), f.type());
@@ -117,8 +115,8 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
 
   symbol_exprt issuffix=fresh_boolean("issuffix");
   typecast_exprt tc_issuffix(issuffix, f.type());
-  string_exprt s0=get_string_expr(args[swap_arguments?1:0]);
-  string_exprt s1=get_string_expr(args[swap_arguments?0:1]);
+  const array_string_exprt &s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
+  const array_string_exprt &s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
   const typet &index_type=s0.length().type();
 
   // We add axioms:
@@ -161,7 +159,7 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
 /// \param expr: a string expression
 /// \return a Boolean
 bool string_constraint_generatort::is_constant_string(
-  const string_exprt &expr)
+  const array_string_exprt &expr)
 {
   if(expr.id()!=ID_struct ||
      expr.operands().size()!=2 ||
@@ -182,13 +180,14 @@ bool string_constraint_generatort::is_constant_string(
 exprt string_constraint_generatort::add_axioms_for_contains(
   const function_application_exprt &f)
 {
+  PRECONDITION(f.arguments().size() == 2);
   PRECONDITION(f.type()==bool_typet() || f.type().id()==ID_c_bool);
-  string_exprt s0=get_string_expr(args(f, 2)[0]);
-  string_exprt s1=get_string_expr(args(f, 2)[1]);
-
-  symbol_exprt contains=fresh_boolean("contains");
-  const refined_string_typet ref_type=to_refined_string_type(s0.type());
-  const typet &index_type=ref_type.get_index_type();
+  const array_string_exprt s0 = get_string_expr(f.arguments()[0]);
+  const array_string_exprt s1 = get_string_expr(f.arguments()[1]);
+  const typet &index_type = s0.length().type();
+  const symbol_exprt contains = fresh_boolean("contains");
+  const symbol_exprt startpos =
+    fresh_exist_index("startpos_contains", index_type);
 
   // We add axioms:
   // a1 : contains ==> |s0| >= |s1|
@@ -202,7 +201,6 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   implies_exprt a1(contains, s0.axiom_for_length_ge(s1));
   m_axioms.push_back(a1);
 
-  symbol_exprt startpos=fresh_exist_index("startpos_contains", index_type);
   minus_exprt length_diff(s0.length(), s1.length());
   and_exprt bounds(
     axiom_for_is_positive_index(startpos),

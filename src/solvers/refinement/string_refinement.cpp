@@ -31,6 +31,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
+static exprt instantiate(
+  messaget::mstreamt &stream,
+  const string_constraintt &axiom,
+  const exprt &str,
+  const exprt &val);
 static bool is_char_array(const namespacet &ns, const typet &type);
 
 static bool is_valid_string_constraint(

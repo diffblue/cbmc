@@ -53,7 +53,7 @@ constant_exprt from_integer(const mp_integer &i)
 /// Creates a `string_exprt` of the proper string type.
 /// \param [in] str: string to convert
 /// \return corresponding `string_exprt`
-string_exprt make_string_exprt(const std::string &str)
+array_string_exprt make_string_exprt(const std::string &str)
 {
   const constant_exprt length=from_integer(str.length(), t.length_type());
   array_exprt content(t.array_type());
@@ -61,13 +61,13 @@ string_exprt make_string_exprt(const std::string &str)
   for(const char c : str)
     content.copy_to_operands(from_integer(c, t.char_type()));
 
-  return string_exprt(length, content, t.string_type());
+  return array_string_exprt(length, content, t.string_type());
 }
 
 /// For a constant `string_exprt`, creates a full index set.
 /// \param [in] s: `string_exprt` to create index set for
 /// \return the corresponding index set
-std::set<exprt> full_index_set(const string_exprt &s)
+std::set<exprt> full_index_set(const array_string_exprt &s)
 {
   PRECONDITION(s.length().is_constant());
   mp_integer n;
