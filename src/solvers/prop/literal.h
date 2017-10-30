@@ -193,6 +193,9 @@ inline literalt neg(literalt a) { return !a; }
 inline literalt pos(literalt a) { return a; }
 
 
+inline bool is_false (const literalt &l) { return (l.is_false()); }
+inline bool is_true (const literalt &l) { return (l.is_true()); }
+
 // bit-vectors
 typedef std::vector<literalt> bvt;
 

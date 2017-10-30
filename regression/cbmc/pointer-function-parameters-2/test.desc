@@ -2,7 +2,6 @@ CORE
 main.c
 --function fun --cover branch
 ^\*\* 7 of 7 covered \(100.0%\)$
-^\*\* Used 4 iterations$
 ^Test suite:$
 ^a=\(\(signed int \*\*\)NULL\), tmp\$\d+=[^,]*, tmp\$\d+=[^,]*$
 ^a=&tmp\$\d+!0, tmp\$\d+=\(\(signed int \*\)NULL\), tmp\$\d+=[^,]*$
