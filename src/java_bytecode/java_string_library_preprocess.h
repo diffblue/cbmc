@@ -330,12 +330,6 @@ private:
     symbol_tablet &symbol_table);
 };
 
-exprt make_function_application(
-  const irep_idt &function_name,
-  const exprt::operandst &arguments,
-  const typet &type,
-  symbol_tablet &symbol_table);
-
 exprt make_nondet_infinite_char_array(
   symbol_tablet &symbol_table,
   const source_locationt &loc,

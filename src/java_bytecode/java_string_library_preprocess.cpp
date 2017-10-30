@@ -248,25 +248,6 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
   return array_symbol.symbol_expr();
 }
 
-/// declare a function with the given name and type
-/// \param function_name: a name
-/// \param type: a type
-/// \param symbol_table: symbol table
-static void declare_function(
-  irep_idt function_name,
-  const typet &type,
-  symbol_tablet &symbol_table)
-{
-  auxiliary_symbolt func_symbol;
-  func_symbol.base_name=function_name;
-  func_symbol.pretty_name=function_name;
-  func_symbol.is_static_lifetime=false;
-  func_symbol.mode=ID_java;
-  func_symbol.name=function_name;
-  func_symbol.type=type;
-  symbol_table.add(func_symbol);
-}
-
 /// calls string_refine_preprocesst::process_operands with a list of parameters.
 /// \param params: a list of function parameters
 /// \param loc: location in the source
@@ -591,29 +572,6 @@ exprt java_string_library_preprocesst::allocate_fresh_array(
   code.add(code_declt(array));
   allocate_dynamic_object_with_decl(array, symbol_table, loc, code);
   return array;
-}
-
-/// \param function_name: the name of the function
-/// \param arguments: a list of arguments
-/// \param type: return type of the function
-/// \param symbol_table: a symbol table
-/// \return a function application representing: `function_name(arguments)`
-exprt make_function_application(
-  const irep_idt &function_name,
-  const exprt::operandst &arguments,
-  const typet &type,
-  symbol_tablet &symbol_table)
-{
-  // Names of function to call
-  std::string fun_name=id2string(function_name);
-
-  // Declaring the function
-  declare_function(fun_name, type, symbol_table);
-
-  // Function application
-  function_application_exprt call(symbol_exprt(fun_name), type);
-  call.arguments()=arguments;
-  return call;
 }
 
 /// assign the result of a function call
