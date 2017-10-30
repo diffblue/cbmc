@@ -1924,7 +1924,7 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get = [this](const exprt &expr) {
+  const auto super_get = [this](const exprt &expr) { // NOLINT
     return supert::get(expr);
   };
   exprt ecopy(expr);

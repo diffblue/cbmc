@@ -404,7 +404,7 @@ exprt string_constraint_generatort::add_axioms_for_replace(
     char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
   if(
     const auto maybe_chars =
-      to_char_pair(f.arguments()[3], f.arguments()[4], [this](const exprt &e) {
+      to_char_pair(f.arguments()[3], f.arguments()[4], [this](const exprt &e) { // NOLINT
         return get_string_expr(e);
       }))
   {

@@ -65,7 +65,7 @@ SCENARIO(
               std::regex_replace(line, spaces, " "), numbers, ""));
         }
 
-        const std::vector<std::string> reference_code = {
+        const std::vector<std::string> reference_code = { // NOLINT
           "int tmp_object_factory;",
           "tmp_object_factory = NONDET(int);",
           "__CPROVER_assume(tmp_object_factory >= 0);",
