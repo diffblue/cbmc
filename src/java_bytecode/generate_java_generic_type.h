@@ -31,8 +31,4 @@ private:
   message_handlert &message_handler;
 };
 
-void instantiate_generics(
-  message_handlert &message_handler,
-  symbol_tablet &symbol_table);
-
 #endif // CPROVER_JAVA_BYTECODE_GENERATE_JAVA_GENERIC_TYPE_H

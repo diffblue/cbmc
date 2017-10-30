@@ -240,21 +240,8 @@ bool java_bytecode_languaget::typecheck(
     get_message_handler());
 
   // now typecheck all
-  bool res=java_bytecode_typecheck(
+  return java_bytecode_typecheck(
     symbol_table, get_message_handler(), string_refinement_enabled);
-  // NOTE (FOTIS): There is some unintuitive logic here, where
-  // java_bytecode_check will return TRUE if typechecking failed, and FALSE
-  // if everything went well...
-  if(res)
-  {
-    // there is no point in continuing to concretise
-    // the generic types if typechecking failed.
-    return res;
-  }
-
-  instantiate_generics(get_message_handler(), symbol_table);
-
-  return res;
 }
 
 bool java_bytecode_languaget::generate_support_functions(
