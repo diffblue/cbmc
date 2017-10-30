@@ -984,13 +984,33 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
   if(!class_needs_clinit(classname))
     return static_cast<const exprt &>(get_nil_irep());
 
+  // if the symbol table already contains the clinit_wrapper() function, return
+  // it
   const irep_idt &clinit_wrapper_name=
     id2string(classname)+"::clinit_wrapper";
   auto findit=symbol_table.symbols.find(clinit_wrapper_name);
   if(findit!=symbol_table.symbols.end())
     return findit->second.symbol_expr();
 
-  // Create the wrapper now:
+  // Otherwise, assume that class C extends class C' and implements interfaces
+  // I1, ..., In. We now create the following function (possibly recursively
+  // creating the clinit_wrapper functions for C' and I1, ..., In):
+  //
+  // java::C::clinit_wrapper()
+  // {
+  //   if (java::C::clinit_already_run == false)
+  //   {
+  //     java::C::clinit_already_run = true; // before recursive calls!
+  //
+  //     java::C'::clinit_wrapper();
+  //     java::I1::clinit_wrapper();
+  //     java::I2::clinit_wrapper();
+  //     // ...
+  //     java::In::clinit_wrapper();
+  //
+  //     java::C::<clinit>();
+  //   }
+  // }
   const irep_idt &already_run_name=
     id2string(classname)+"::clinit_already_run";
   symbolt already_run_symbol;
@@ -1009,24 +1029,20 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
     already_run_symbol.symbol_expr(),
     false_exprt());
 
+  // the entire body of the function is an if-then-else
   code_ifthenelset wrapper_body;
+
+  // add the condition to the if
   wrapper_body.cond()=check_already_run;
+
+  // add the "already-run = false" statement
   code_blockt init_body;
-  // Note already-run is set *before* calling clinit, in order to prevent
-  // recursion in clinit methods.
   code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
   init_body.move_to_operands(set_already_run);
-  const irep_idt &real_clinit_name=id2string(classname)+".<clinit>:()V";
+
+  // iterate through the base types and add recursive calls to the
+  // clinit_wrapper()
   const symbolt &class_symbol=*symbol_table.lookup(classname);
-
-  auto findsymit=symbol_table.symbols.find(real_clinit_name);
-  if(findsymit!=symbol_table.symbols.end())
-  {
-    code_function_callt call_real_init;
-    call_real_init.function()=findsymit->second.symbol_expr();
-    init_body.move_to_operands(call_real_init);
-  }
-
   for(const auto &base : to_class_type(class_symbol.type).bases())
   {
     const auto base_name=to_symbol_type(base.type()).get_identifier();
@@ -1038,8 +1054,18 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
     init_body.move_to_operands(call_base);
   }
 
+  // call java::C::<clinit>(), if the class has one static initializer
+  const irep_idt &real_clinit_name=id2string(classname)+".<clinit>:()V";
+  auto find_sym_it=symbol_table.symbols.find(real_clinit_name);
+  if(find_sym_it!=symbol_table.symbols.end())
+  {
+    code_function_callt call_real_init;
+    call_real_init.function()=find_sym_it->second.symbol_expr();
+    init_body.move_to_operands(call_real_init);
+  }
   wrapper_body.then_case()=init_body;
 
+  // insert symbol in the symbol table
   symbolt wrapper_method_symbol;
   code_typet wrapper_method_type;
   wrapper_method_type.return_type()=void_typet();

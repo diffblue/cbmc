@@ -1,0 +1,8 @@
+CORE
+static_init_order.class
+--function static_init_order.test1 --trace
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
