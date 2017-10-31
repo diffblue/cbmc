@@ -142,8 +142,7 @@ void cpp_scopet::lookup(
     other_scope.lookup(base_name, QUALIFIED, id_class, id_set);
   }
 
-  if(!id_set.empty() &&
-     id_class!=id_classt::TEMPLATE)
+  if(!id_set.empty() && id_class != id_classt::TEMPLATE)
     return; // done, upwards scopes are hidden
 
   // secondary scopes
