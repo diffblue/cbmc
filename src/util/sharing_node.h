@@ -19,7 +19,7 @@ Author: Daniel Poetzl
 
 #include "invariant.h"
 
-#define _sn_assert(b) assert(b)
+#define _sn_assert(b) INVARIANT(b, "Sharing-node internal invariant")
 //#define _sn_assert(b)
 
 template <class T>
