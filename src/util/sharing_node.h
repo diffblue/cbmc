@@ -178,7 +178,7 @@ public:
     subt &s=get_sub();
     size_t r=s.erase(n);
 
-    _sn_assert(r==1);
+    CHECK_RETURN(r==1);
   }
 
   // container nodes

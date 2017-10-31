@@ -290,8 +290,8 @@ bool remove_returnst::restore_returns(
 
       if(i_it->is_goto())
       {
-        goto_programt::const_targett target=i_it->get_target();
-        assert(target->is_end_function());
+        DATA_INVARIANT(i_it->get_target()->is_end_function(),
+          "goto after return value assignment is to end of function");
       }
       else
       {
