@@ -1,6 +1,6 @@
 public class test_append_char
 {
-   public static void main(/*String[] args*/)
+  public static void main(boolean b)
    {
       char[] diff = {'d', 'i', 'f', 'f'};
       char[] blue = {'b', 'l', 'u', 'e'};
@@ -12,6 +12,9 @@ public class test_append_char
 
       String tmp=buffer.toString();
       System.out.println(tmp);
-      assert(!tmp.equals("diffblue"));
+      if(b)
+	assert(tmp.equals("diffblue"));
+      else
+	assert(!tmp.equals("diffblue"));
    }
 }

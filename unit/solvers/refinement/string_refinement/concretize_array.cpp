@@ -12,6 +12,7 @@
 #include <util/arith_tools.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
+#include <util/symbol_table.h>
 #include <solvers/refinement/string_refinement.h>
 
 SCENARIO("concretize_array_expression",
@@ -46,7 +47,9 @@ SCENARIO("concretize_array_expression",
       index2));
 
   // String max length is 50, so index 100 should get ignored.
-  const exprt concrete=concretize_arrays_in_expression(input_expr, 50);
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  const exprt concrete = concretize_arrays_in_expression(input_expr, 50, ns);
 
   // The expected result is `'0' + { 'x', 'x', 'y', 'y', 'y' }`
   array_exprt array(array_type);

@@ -31,6 +31,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_types.h"
 #include "java_utils.h"
+#include "java_string_library_preprocess.h"
+#include "java_root_class.h"
 
 static symbolt &new_tmp_symbol(
   symbol_tablet &symbol_table,
@@ -460,8 +462,9 @@ public:
   /// Initialize a recursion-set entry owner operating on a given set.
   /// Initially it does not own any set entry.
   /// \param _recursion_set: set to operate on.
-  recursion_set_entryt(std::unordered_set<irep_idt, irep_id_hash> &_recursion_set):
-    recursion_set(_recursion_set)
+  explicit recursion_set_entryt(
+    std::unordered_set<irep_idt, irep_id_hash> &_recursion_set)
+    : recursion_set(_recursion_set)
   { }
 
   /// Removes erase_entry (if set) from the controlled set.
@@ -493,6 +496,157 @@ public:
     return ret;
   }
 };
+
+/// Get max value for an integer type
+/// \param type:
+///   Type to find maximum value for
+/// \return Maximum integer value
+static mp_integer max_value(const typet &type)
+{
+  if(type.id() == ID_signedbv)
+    return to_signedbv_type(type).largest();
+  else if(type.id() == ID_unsignedbv)
+    return to_unsignedbv_type(type).largest();
+  UNREACHABLE;
+}
+
+/// Initialize a nondeterministic String structure
+/// \param obj: struct to initialize, must have been declared using
+///   code of the form:
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// struct java.lang.String { struct \@java.lang.Object;
+///   int length; char *data; } tmp_object_factory$1;
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// \param max_nondet_string_length: maximum length of strings to initialize
+/// \param loc: location in the source
+/// \param symbol_table: the symbol table
+/// \return code for initialization of the strings
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// int tmp_object_factory$1;
+/// tmp_object_factory$1 = NONDET(int);
+/// __CPROVER_assume(tmp_object_factory$1 >= 0);
+/// __CPROVER_assume(tmp_object_factory$1 <= max_nondet_string_length);
+/// char nondet_infinite_array$2[INFINITY()];
+/// nondet_infinite_array$2 = NONDET(char [INFINITY()]);
+/// cprover_associate_array_to_pointer_func
+///   (nondet_infinite_array$2, &nondet_infinite_array$2[0]);
+/// prover_associate_length_to_array_func
+///   (nondet_infinite_array$2, tmp_object_factory$1);
+/// arg = { .\@java.lang.Object={ .\@class_identifier="java.lang.String",
+///   .\@lock=false }, .length=tmp_object_factory$1,
+///   .data=nondet_infinite_array$2 };
+/// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/// Unit tests in `unit/java_bytecode/java_object_factory/` ensure
+/// it is the case.
+codet initialize_nondet_string_struct(
+  const exprt &obj,
+  const std::size_t &max_nondet_string_length,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table)
+{
+  PRECONDITION(
+    java_string_library_preprocesst::implements_java_char_sequence(obj.type()));
+
+  const namespacet ns(symbol_table);
+  code_blockt code;
+
+  // `obj` is `*expr`
+  const struct_typet &struct_type = to_struct_type(ns.follow(obj.type()));
+  const irep_idt &class_id = struct_type.get_tag();
+
+  // @clsid = String and @lock = false:
+  const symbol_typet jlo_symbol("java::java.lang.Object");
+  const struct_typet &jlo_type = to_struct_type(ns.follow(jlo_symbol));
+  struct_exprt jlo_init(jlo_symbol);
+  java_root_class_init(jlo_init, jlo_type, false, class_id);
+
+  struct_exprt struct_expr(obj.type());
+  struct_expr.copy_to_operands(jlo_init);
+
+  // In case the type for string was not added to the symbol table,
+  // (typically when string refinement is not activated), `struct_type`
+  // just contains the standard Object field and no length and data fields.
+  if(struct_type.has_component("length"))
+  {
+    // length_expr = nondet(int);
+    const symbolt length_sym =
+      new_tmp_symbol(symbol_table, loc, java_int_type());
+    const symbol_exprt length_expr = length_sym.symbol_expr();
+    const side_effect_expr_nondett nondet_length(length_expr.type());
+    code.add(code_declt(length_expr));
+    code.add(code_assignt(length_expr, nondet_length));
+
+    // assume (length_expr >= 0);
+    code.add(
+      code_assumet(
+        binary_relation_exprt(
+          length_expr, ID_ge, from_integer(0, java_int_type()))));
+
+    // assume (length_expr <= max_input_length)
+    if(max_nondet_string_length <= max_value(length_expr.type()))
+    {
+      exprt max_length =
+        from_integer(max_nondet_string_length, length_expr.type());
+      code.add(
+        code_assumet(binary_relation_exprt(length_expr, ID_le, max_length)));
+    }
+
+    // data_expr = nondet(char[INFINITY]) // we use infinity for variable size
+    exprt data_expr = make_nondet_infinite_char_array(symbol_table, loc, code);
+
+    struct_expr.copy_to_operands(length_expr);
+
+    const address_of_exprt array_pointer(
+      index_exprt(data_expr, from_integer(0, java_int_type())));
+    struct_expr.copy_to_operands(array_pointer);
+
+    add_pointer_to_array_association(
+      array_pointer, data_expr, symbol_table, loc, code);
+
+    add_array_to_length_association(
+      data_expr, length_expr, symbol_table, loc, code);
+  }
+
+  // tmp_object = struct_expr;
+  code.add(code_assignt(obj, struct_expr));
+  return code;
+}
+
+/// Add code for the initialization of a string using a nondeterministic
+/// content and association of its address to the pointer `expr`.
+/// \param expr: pointer to be affected
+/// \param max_nondet_string_length: maximum length of strings to initialize
+/// \param symbol_table: the symbol table
+/// \param loc: location in the source
+/// \param [out] code: code block in which initialization code is added
+/// \return false if code was added, true to signal an error when the given
+///         object does not implement CharSequence or does not have data and
+///         length fields, in which case it should be initialized another way.
+static bool add_nondet_string_pointer_initialization(
+  const exprt &expr,
+  const std::size_t &max_nondet_string_length,
+  symbol_tablet &symbol_table,
+  const source_locationt &loc,
+  code_blockt &code)
+{
+  const namespacet ns(symbol_table);
+  const dereference_exprt obj(expr, expr.type().subtype());
+  const struct_typet &struct_type =
+    to_struct_type(ns.follow(to_symbol_type(obj.type())));
+
+  if(!struct_type.has_component("data") || !struct_type.has_component("length"))
+    return true;
+
+  allocate_dynamic_object_with_decl(expr, symbol_table, loc, code);
+
+  code.add(
+    initialize_nondet_string_struct(
+      dereference_exprt(expr, struct_type),
+      max_nondet_string_length,
+      loc,
+      symbol_table));
+  return false;
+}
 
 /// Initializes a pointer \p expr of type \p pointer_type to a primitive-typed
 /// value or an object tree.  It allocates child objects as necessary and
@@ -534,7 +688,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const update_in_placet &update_in_place)
 {
   PRECONDITION(expr.type().id()==ID_pointer);
-
   const pointer_typet &replacement_pointer_type=
     pointer_type_selector.convert_pointer_type(pointer_type, ns);
 
@@ -623,27 +776,34 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // vector of assignments that create a new object (recursively initializes it)
   // and asign to `expr` the address of such object
   code_blockt non_null_inst;
-  gen_pointer_target_init(
-    non_null_inst,
-    expr,
-    subtype,
-    alloc_type,
-    depth,
-    update_in_placet::NO_UPDATE_IN_PLACE);
+
+  if(
+    java_string_library_preprocesst::implements_java_char_sequence_pointer(
+      expr.type()))
+  {
+    add_nondet_string_pointer_initialization(
+      expr,
+      object_factory_parameters.max_nondet_string_length,
+      symbol_table,
+      loc,
+      assignments);
+  }
+  else
+  {
+    gen_pointer_target_init(
+      non_null_inst,
+      expr,
+      subtype,
+      alloc_type,
+      depth,
+      update_in_placet::NO_UPDATE_IN_PLACE);
+  }
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
 
-  // Determine whether the pointer can be null. In particular:
-  // - the 'data' of a String should not be null.
-  // - the pointers inside the java.lang.Class class shall not be null
-  bool not_null=
-    !allow_null ||
-    ((class_identifier=="java.lang.String" ||
-      class_identifier=="java.lang.StringBuilder" ||
-      class_identifier=="java.lang.StringBuffer" ||
-      class_identifier=="java.lang.CharSequence") &&
-     subtype.id()==ID_array) ||
-    class_identifier=="java.lang.Class";
+  // Determine whether the pointer can be null. In particular the pointers
+  // inside the java.lang.Class class shall not be null
+  const bool not_null = !allow_null || class_identifier == "java.lang.Class";
 
   // Alternatively, if this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
@@ -750,19 +910,6 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
   return new_symbol.symbol_expr();
 }
 
-/// Get max value for an integral type
-/// \param type:
-///   Type to find maximum value for
-/// \return Maximum integral valu
-static size_t max_value(const typet& type)
-{
-  if(type.id()==ID_signedbv)
-    return std::numeric_limits<int32_t>::max();
-  else if(type.id()==ID_unsignedbv)
-    return std::numeric_limits<uint32_t>::max();
-  UNREACHABLE;
-}
-
 /// Initializes an object tree rooted at `expr`, allocating child objects as
 /// necessary and nondet-initializes their members, or if MUST_UPDATE_IN_PLACE
 /// is set, re-initializes already-allocated objects.
@@ -866,23 +1013,6 @@ void java_object_factoryt::gen_nondet_struct_init(
         true,    // allow_null always true for sub-objects
         depth,
         substruct_in_place);
-
-      if(name=="length")
-      {
-        if(class_identifier=="java.lang.String" ||
-           class_identifier=="java.lang.StringBuffer" ||
-           class_identifier=="java.lang.StringBuilder")
-        {
-          if(object_factory_parameters.max_nondet_string_length <=
-             max_value(me.type()))
-          {
-            exprt max_length=from_integer(
-              object_factory_parameters.max_nondet_string_length, me.type());
-            assignments.add(code_assumet(
-              binary_relation_exprt(me, ID_le, max_length)));
-          }
-        }
-      }
     }
   }
 }

@@ -71,6 +71,7 @@ exprt get_significand(
 
 /// Create an expression to represent a float or double value.
 /// \param f: a floating point value in double precision
+/// \param float_spec: a specification for floats
 /// \return an expression representing this floating point
 exprt constant_float(const double f, const ieee_float_spect &float_spec)
 {
@@ -97,7 +98,6 @@ exprt round_expr_to_zero(const exprt &f)
 /// Note that the rounding mode is set to ROUND_TO_EVEN.
 /// \param f: a floating point expression
 /// \param g: a floating point expression
-/// \param rounding: rounding mode
 /// \return An expression representing floating point multiplication.
 exprt floatbv_mult(const exprt &f, const exprt &g)
 {
@@ -124,8 +124,8 @@ exprt floatbv_of_int_expr(const exprt &i, const ieee_float_spect &spec)
 
 /// Estimate the decimal exponent that should be used to represent a given
 /// floating point value in decimal.
-/// We are looking for d such that n * 10^d = m * 2^e, so:
-/// d = log_10(m) + log_10(2) * e - log_10(n)
+/// We are looking for \f$d\f$ such that \f$n * 10^d = m * 2^e\f$, so:
+/// \f$d = log_10(m) + log_10(2) * e - log_10(n)\f$
 /// m -- the fraction -- should be between 1 and 2 so log_10(m)
 /// in [0,log_10(2)].
 /// n -- the fraction in base 10 -- should be between 1 and 10 so
@@ -149,83 +149,95 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
 
 /// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_for_string_of_float(
+/// \return an integer expression
+exprt string_constraint_generatort::add_axioms_for_string_of_float(
   const function_application_exprt &f)
 {
-  return add_axioms_for_string_of_float(
-    args(f, 1)[0], to_refined_string_type(f.type()));
+  PRECONDITION(f.arguments().size() == 3);
+  array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  return add_axioms_for_string_of_float(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(D) java function
 /// \param f: function application with one double argument
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_double(
+/// \return an integer expression
+exprt string_constraint_generatort::add_axioms_from_double(
   const function_application_exprt &f)
 {
-  return add_axioms_for_string_of_float(
-    args(f, 1)[0], to_refined_string_type(f.type()));
+  return add_axioms_for_string_of_float(f);
 }
 
 /// Add axioms corresponding to the integer part of m, in decimal form with no
-/// leading zeroes, followed by '.' ('\u002E'), followed by one or more decimal
-/// digits representing the fractional part of m. This specification is correct
-/// for inputs that do not exceed 100000 and the function is unspecified for
-/// other values.
+/// leading zeroes, followed by &apos;.&apos;, followed by
+/// one or more decimal digits representing the fractional part of m.
+/// This specification is correct for inputs that do not exceed 100000 and the
+/// function is unspecified for other values.
 ///
-/// TODO: this specification is not correct for negative numbers and
+/// \todo: this specification is not correct for negative numbers and
 /// double precision
+/// \param res: string expression corresponding to the result
 /// \param f: expression representing a float
-/// \param ref_type: refined type for strings
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_for_string_of_float(
-  const exprt &f, const refined_string_typet &ref_type)
+/// \return an integer expression, different from zero if an error should be
+///   raised
+exprt string_constraint_generatort::add_axioms_for_string_of_float(
+  const array_string_exprt &res,
+  const exprt &f)
 {
   const floatbv_typet &type=to_floatbv_type(f.type());
-  ieee_float_spect float_spec(type);
+  const ieee_float_spect float_spec(type);
+  const typet &char_type = res.content().type().subtype();
+  const typet &index_type = res.length().type();
 
   // We will look at the first 5 digits of the fractional part.
   // shifted is floor(f * 1e5)
-  exprt shifting=constant_float(1e5, float_spec);
-  exprt shifted=round_expr_to_zero(floatbv_mult(f, shifting));
+  const exprt shifting = constant_float(1e5, float_spec);
+  const exprt shifted = round_expr_to_zero(floatbv_mult(f, shifting));
   // Numbers with greater or equal value to the following, should use
   // the exponent notation.
-  exprt max_non_exponent_notation=from_integer(100000, shifted.type());
+  const exprt max_non_exponent_notation = from_integer(100000, shifted.type());
   // fractional_part is floor(f * 100000) % 100000
-  mod_exprt fractional_part(shifted, max_non_exponent_notation);
-  string_exprt fractional_part_str=
-    add_axioms_for_fractional_part(fractional_part, 6, ref_type);
+  const mod_exprt fractional_part(shifted, max_non_exponent_notation);
+  const array_string_exprt fractional_part_str =
+    fresh_string(index_type, char_type);
+  const exprt return_code1 =
+    add_axioms_for_fractional_part(fractional_part_str, fractional_part, 6);
 
   // The axiom added to convert to integer should always be satisfiable even
   // when the preconditions are not satisfied.
-  mod_exprt integer_part(round_expr_to_zero(f), max_non_exponent_notation);
+  const mod_exprt integer_part(
+    round_expr_to_zero(f), max_non_exponent_notation);
   // We should not need more than 8 characters to represent the integer
   // part of the float.
-  string_exprt integer_part_str=add_axioms_from_int(integer_part, ref_type, 8);
+  const array_string_exprt integer_part_str =
+    fresh_string(index_type, char_type);
+  const exprt return_code2 =
+    add_axioms_from_int(integer_part_str, integer_part, 8);
 
-  return add_axioms_for_concat(integer_part_str, fractional_part_str);
+  return add_axioms_for_concat(res, integer_part_str, fractional_part_str);
 }
 
 /// Add axioms for representing the fractional part of a floating point starting
 /// with a dot
+/// \param res: string expression for the result
 /// \param int_expr: an integer expression
 /// \param max_size: a maximal size for the string, this includes the
 ///   potential minus sign and therefore should be greater than 2
-/// \param ref_type: a type for refined strings
-/// \return a string expression
-string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
-  const exprt &int_expr, size_t max_size, const refined_string_typet &ref_type)
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_for_fractional_part(
+  const array_string_exprt &res,
+  const exprt &int_expr,
+  size_t max_size)
 {
   PRECONDITION(int_expr.type().id()==ID_signedbv);
   PRECONDITION(max_size>=2);
   const typet &type=int_expr.type();
-  string_exprt res=fresh_string(ref_type);
-  exprt ten=from_integer(10, type);
-  const typet &char_type=ref_type.get_char_type();
-  const typet &index_type=ref_type.get_index_type();
-  exprt zero_char=constant_char('0', char_type);
-  exprt nine_char=constant_char('9', char_type);
-  exprt max=from_integer(max_size, index_type);
+  const typet &char_type = res.content().type().subtype();
+  const typet &index_type = res.length().type();
+  const exprt ten = from_integer(10, type);
+  const exprt zero_char = constant_char('0', char_type);
+  const exprt nine_char = constant_char('9', char_type);
+  const exprt max = from_integer(max_size, index_type);
 
   // We add axioms:
   // a1 : 2 <= |res| <= max_size
@@ -237,7 +249,7 @@ string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
 
   and_exprt a1(res.axiom_for_length_gt(1),
                res.axiom_for_length_le(max));
-  m_axioms.push_back(a1);
+  axioms.push_back(a1);
 
   equal_exprt starts_with_dot(res[0], from_integer('.', char_type));
 
@@ -275,37 +287,38 @@ string_exprt string_constraint_generatort::add_axioms_for_fractional_part(
   }
 
   exprt a2=conjunction(digit_constraints);
-  m_axioms.push_back(a2);
+  axioms.push_back(a2);
 
   equal_exprt a3(int_expr, sum);
-  m_axioms.push_back(a3);
+  axioms.push_back(a3);
 
-  return res;
+  return from_integer(0, signedbv_typet(32));
 }
 
 /// Add axioms to write the float in scientific notation.
 ///
-/// A float is represented as $f = m * 2^e$ where $0 <= m < 2$ is the
-/// significand and $-126 <= e <= 127$ is the exponent.
-/// We want an alternate representation by finding $n$ and
-/// $d$ such that $f=n*10^d$. We can estimate $d$ the following way:
-/// $d ~= log_10(f/n) ~= log_10(m) + log_10(2) * e - log_10(n)$
-/// $d = floor(log_10(2) * e)$
-/// Then $n$ can be expressed by the equation:
-/// $log_10(n) = log_10(m) + log_10(2) * e - d$
-/// $n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))$
+/// A float is represented as \f$f = m * 2^e\f$ where \f$0 <= m < 2\f$ is the
+/// significand and \f$-126 <= e <= 127\f$ is the exponent.
+/// We want an alternate representation by finding \f$n\f$ and
+/// \f$d\f$ such that \f$f=n*10^d\f$. We can estimate \f$d\f$ the following way:
+/// \f$d ~= log_10(f/n) ~= log_10(m) + log_10(2) * e - log_10(n)\f$
+/// \f$d = floor(log_10(2) * e)\f$
+/// Then \f$n\f$ can be expressed by the equation:
+/// \f$log_10(n) = log_10(m) + log_10(2) * e - d\f$
+/// \f$n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))\f$
 /// TODO: For now we only consider single precision.
+/// \param res: string expression representing the float in scientific notation
 /// \param f: a float expression, which is positive
-/// \param max_size: a maximal size for the string
-/// \param ref_type: a type for refined strings
-/// \return a string expression representing the float in scientific notation
-string_exprt string_constraint_generatort::
-  add_axioms_from_float_scientific_notation(
-    const exprt &f, const refined_string_typet &ref_type)
+/// \return a integer expression different from 0 to signal an exception
+exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
+  const array_string_exprt &res,
+  const exprt &f)
 {
-  ieee_float_spect float_spec=ieee_float_spect::single_precision();
-  typet float_type=float_spec.to_type();
-  signedbv_typet int_type(32);
+  const ieee_float_spect float_spec = ieee_float_spect::single_precision();
+  const typet float_type = float_spec.to_type();
+  const signedbv_typet int_type(32);
+  const typet &index_type = res.length().type();
+  const typet &char_type = res.content().type().subtype();
 
   // This is used for rounding float to integers.
   exprt round_to_zero_expr=from_integer(ieee_floatt::ROUND_TO_ZERO, int_type);
@@ -406,8 +419,10 @@ string_exprt string_constraint_generatort::
     dec_significand);
   dec_significand_int=round_expr_to_zero(dec_significand);
 
-  string_exprt string_expr_integer_part=
-    add_axioms_from_int(dec_significand_int, ref_type, 3);
+  array_string_exprt string_expr_integer_part =
+    fresh_string(index_type, char_type);
+  exprt return_code1 =
+    add_axioms_from_int(string_expr_integer_part, dec_significand_int, 3);
   minus_exprt fractional_part(
     dec_significand, floatbv_of_int_expr(dec_significand_int, float_spec));
 
@@ -421,37 +436,51 @@ string_exprt string_constraint_generatort::
   exprt max_non_exponent_notation=from_integer(100000, shifted_float.type());
 
   // fractional_part_shifted is floor(f * 100000) % 100000
-  mod_exprt fractional_part_shifted(shifted_float, max_non_exponent_notation);
+  const mod_exprt fractional_part_shifted(
+    shifted_float, max_non_exponent_notation);
 
-  string_exprt string_fractional_part=add_axioms_for_fractional_part(
-    fractional_part_shifted, 6, ref_type);
+  array_string_exprt string_fractional_part =
+    fresh_string(index_type, char_type);
+  const exprt return_code2 = add_axioms_for_fractional_part(
+    string_fractional_part, fractional_part_shifted, 6);
 
   // string_expr_with_fractional_part =
   //   concat(string_with_do, string_fractional_part)
-  string_exprt string_expr_with_fractional_part=add_axioms_for_concat(
-    string_expr_integer_part, string_fractional_part);
+  const array_string_exprt string_expr_with_fractional_part =
+    fresh_string(index_type, char_type);
+  const exprt return_code3 = add_axioms_for_concat(
+    string_expr_with_fractional_part,
+    string_expr_integer_part,
+    string_fractional_part);
 
   // string_expr_with_E = concat(string_fraction, string_lit_E)
-  string_exprt string_expr_with_E=add_axioms_for_concat_char(
-    string_expr_with_fractional_part,
-    from_integer('E', ref_type.get_char_type()));
+  const array_string_exprt stringE = fresh_string(index_type, char_type);
+  const exprt return_code4 = add_axioms_for_constant(stringE, "E");
+  const array_string_exprt string_expr_with_E =
+    fresh_string(index_type, char_type);
+  const exprt return_code5 = add_axioms_for_concat(
+    string_expr_with_E, string_expr_with_fractional_part, stringE);
 
   // exponent_string = string_of_int(decimal_exponent)
-  string_exprt exponent_string=
-    add_axioms_from_int(decimal_exponent, ref_type, 3);
+  const array_string_exprt exponent_string =
+    fresh_string(index_type, char_type);
+  const exprt return_code6 =
+    add_axioms_from_int(exponent_string, decimal_exponent, 3);
 
   // string_expr = concat(string_expr_with_E, exponent_string)
-  return add_axioms_for_concat(string_expr_with_E, exponent_string);
+  return add_axioms_for_concat(res, string_expr_with_E, exponent_string);
 }
 
 /// Add axioms corresponding to the scientific representation of floating point
 /// values
 /// \param f: a function application expression
-/// \return a new string expression
-string_exprt string_constraint_generatort::
-  add_axioms_from_float_scientific_notation(
-    const function_application_exprt &f)
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
+  const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_float_scientific_notation(args(f, 1)[0], ref_type);
+  PRECONDITION(f.arguments().size() == 3);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  const exprt &arg = f.arguments()[2];
+  return add_axioms_from_float_scientific_notation(res, arg);
 }

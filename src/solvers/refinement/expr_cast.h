@@ -45,10 +45,10 @@ struct expr_cast_implt<std::size_t> final
   }
 };
 
-template<>
-struct expr_cast_implt<string_exprt> final
+template <>
+struct expr_cast_implt<refined_string_exprt> final
 {
-  optionalt<string_exprt> operator()(const exprt &expr) const
+  optionalt<refined_string_exprt> operator()(const exprt &expr) const
   {
     if(is_refined_string_type(expr.type()))
       return to_string_expr(expr);

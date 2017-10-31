@@ -81,4 +81,15 @@ size_t find_closing_delimiter(
   char open_char,
   char close_char);
 
+void declare_function(
+  irep_idt function_name,
+  const typet &type,
+  symbol_tablet &symbol_table);
+
+exprt make_function_application(
+  const irep_idt &function_name,
+  const exprt::operandst &arguments,
+  const typet &type,
+  symbol_tablet &symbol_table);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

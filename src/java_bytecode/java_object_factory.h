@@ -152,4 +152,10 @@ void allocate_dynamic_object_with_decl(
   const source_locationt &loc,
   code_blockt &output_code);
 
+codet initialize_nondet_string_struct(
+  const exprt &obj,
+  const std::size_t &max_nondet_string_length,
+  const source_locationt &loc,
+  symbol_tablet &symbol_table);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

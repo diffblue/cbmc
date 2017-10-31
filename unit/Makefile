@@ -18,6 +18,7 @@ SRC += unit_tests.cpp \
        analyses/does_remove_const/is_type_at_least_as_const_as.cpp \
        java_bytecode/java_bytecode_convert_class/convert_abstract_class.cpp \
        java_bytecode/java_bytecode_parse_generics/parse_generic_class.cpp \
+       java_bytecode/java_object_factory/gen_nondet_string_init.cpp \
        miniBDD_new.cpp \
        java_bytecode/java_string_library_preprocess/convert_exprt_to_string_exprt.cpp \
        java_bytecode/java_utils_test.cpp \
@@ -27,6 +28,7 @@ SRC += unit_tests.cpp \
        solvers/refinement/string_constraint_instantiation/instantiate_not_contains.cpp \
        solvers/refinement/string_refinement/concretize_array.cpp \
        solvers/refinement/string_refinement/substitute_array_list.cpp \
+       solvers/refinement/string_refinement/union_find_replace.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_iterator.cpp \
        util/message.cpp \
