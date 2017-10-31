@@ -73,7 +73,7 @@ public:
 
   T &write()
   {
-    detatch();
+    detach();
     return *d;
   }
 
@@ -92,7 +92,7 @@ protected:
 
   void remove_ref(dt *old_d);
 
-  void detatch();
+  void detach();
 
   void copy_from(const reference_counting &other)
   {
@@ -145,10 +145,10 @@ void reference_counting<T>::remove_ref(dt *old_d)
 }
 
 template<class T>
-void reference_counting<T>::detatch()
+void reference_counting<T>::detach()
 {
   #ifdef REFERENCE_COUNTING_DEBUG
-  std::cout << "DETATCH1: " << d << '\n';
+  std::cout << "DETACH1: " << d << '\n';
   #endif
 
   if(d==nullptr)
@@ -175,7 +175,7 @@ void reference_counting<T>::detatch()
   assert(d->ref_count==1);
 
   #ifdef REFERENCE_COUNTING_DEBUG
-  std::cout << "DETATCH2: " << d << '\n'
+  std::cout << "DETACH2: " << d << '\n'
   #endif
 }
 
