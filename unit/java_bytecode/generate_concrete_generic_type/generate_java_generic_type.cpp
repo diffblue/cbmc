@@ -13,7 +13,8 @@
 #include <util/symbol_table.h>
 
 #include <java_bytecode/generate_java_generic_type.h>
-
+#include <testing-utils/require_type.h>
+#include <util/ui_message.h>
 
 SCENARIO(
   "generate_java_generic_type_from_file",
@@ -158,5 +159,66 @@ SCENARIO(
     REQUIRE(second_symbol_type.subtype().id()==ID_symbol);
     REQUIRE(to_symbol_type(second_symbol_type.subtype()).get_identifier()==
             "java::java.lang.Integer");
+  }
+}
+
+SCENARIO(
+  "generate_java_generic_type_with_array_concrete_type",
+  "[core][java_bytecode][generate_java_generic_type]")
+{
+  // We have a 'harness' class who's only purpose is to contain a reference
+  // to the generic class so that we can test the specialization of that generic
+  // class
+  const irep_idt harness_class=
+    "java::generic_field_array_instantiation";
+
+  // We want to test that the specialized/instantiated class has it's field
+  // type updated, so find the specialized class, not the generic class.
+  const irep_idt test_class=
+    "java::generic_field_array_instantiation$generic<java::array[reference]>";
+
+  GIVEN("A generic type instantiated with an array type")
+  {
+    symbol_tablet new_symbol_table=
+      load_java_class(
+        "generic_field_array_instantiation",
+        "./java_bytecode/generate_concrete_generic_type");
+
+    // Ensure the class has been specialized
+    REQUIRE(new_symbol_table.has_symbol(harness_class));
+    const symbolt &harness_symbol=
+      new_symbol_table.lookup_ref(harness_class);
+
+    const struct_typet::componentt &harness_component=
+      require_type::require_component(
+        to_struct_type(harness_symbol.type),
+        "f");
+
+    ui_message_handlert message_handler;
+    generate_java_generic_typet instantiate_generic_type(message_handler);
+    instantiate_generic_type(
+      to_java_generic_type(harness_component.type()), new_symbol_table);
+
+    // Test the specialized class
+    REQUIRE(new_symbol_table.has_symbol(test_class));
+    const symbolt test_class_symbol=
+      new_symbol_table.lookup_ref(test_class);
+
+    REQUIRE(test_class_symbol.type.id()==ID_struct);
+    const struct_typet::componentt &field_component=
+      require_type::require_component(
+        to_struct_type(test_class_symbol.type),
+        "gf");
+    const typet &test_field_type=field_component.type();
+
+    REQUIRE(test_field_type.id()==ID_pointer);
+    REQUIRE(test_field_type.subtype().id()==ID_symbol);
+    const symbol_typet test_field_array=
+      to_symbol_type(test_field_type.subtype());
+    REQUIRE(test_field_array.get_identifier()=="java::array[reference]");
+    const pointer_typet &element_type=
+      require_type::require_pointer(
+        java_array_element_type(test_field_array),
+        symbol_typet("java::java.lang.Float"));
   }
 }
