@@ -7,19 +7,17 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-
-#include <util/config.h>
-#include <util/cmdline.h>
-#include <util/language.h>
-#include <util/prefix.h>
-
-#include <java_bytecode/java_bytecode_language.h>
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_type.h>
 #include <testing-utils/require_symbol.h>
 
+
+#include <util/config.h>
+#include <util/language.h>
+#include <java_bytecode/java_bytecode_language.h>
+
 SCENARIO(
-  "java_bytecode_parse_generic_array_class",
+  "parse_generic_array_class",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(

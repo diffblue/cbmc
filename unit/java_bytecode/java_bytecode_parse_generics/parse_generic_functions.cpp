@@ -15,12 +15,11 @@
 
 #include <java_bytecode/java_bytecode_language.h>
 
-#include <iostream>
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_type.h>
 
 SCENARIO(
-  "java_bytecode_parse_generic_functions",
+  "parse_generic_functions",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(

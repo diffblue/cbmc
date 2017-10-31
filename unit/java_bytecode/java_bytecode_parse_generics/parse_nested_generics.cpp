@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/load_java_class.h>
 #include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
 
@@ -17,9 +18,6 @@
 #include <util/std_types.h>
 
 #include <java_bytecode/java_bytecode_language.h>
-
-#include <iostream>
-#include <testing-utils/load_java_class.h>
 
 SCENARIO(
   "parse_nested_generics_fields",
@@ -58,7 +56,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -83,7 +82,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -108,7 +108,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -133,7 +134,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -158,7 +160,8 @@ SCENARIO(
             generic_param == java_generic_inst_parametert(
                                symbol_typet("java::GenericTwoParam")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -183,7 +186,8 @@ SCENARIO(
             generic_param == java_generic_inst_parametert(
                                symbol_typet("java::GenericTwoParam")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -208,7 +212,8 @@ SCENARIO(
             generic_param == java_generic_inst_parametert(
                                symbol_typet("java::GenericTwoParam")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -240,7 +245,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -272,7 +278,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -304,7 +311,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -336,7 +344,8 @@ SCENARIO(
             generic_param == java_generic_inst_parametert(
                                symbol_typet("java::Interface_Implementation")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -368,7 +377,8 @@ SCENARIO(
             generic_param == java_generic_inst_parametert(
                                symbol_typet("java::Interface_Implementation")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
 
@@ -400,7 +410,8 @@ SCENARIO(
             generic_param ==
             java_generic_inst_parametert(symbol_typet("java::Generic")));
         }
-        // TODO: extend tests when nested generics are parsed correctly
+        // TODO: extend tests when nested generics are parsed correctly -
+        // issue TG-1301
       }
     }
   }
@@ -444,7 +455,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -477,7 +489,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -510,7 +523,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -543,7 +557,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -576,7 +591,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -609,7 +625,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -642,7 +659,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -683,7 +701,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -724,7 +743,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -765,7 +785,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -806,7 +827,8 @@ SCENARIO(
           generic_param == java_generic_inst_parametert(
                              symbol_typet("java::Interface_Implementation")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -847,7 +869,8 @@ SCENARIO(
           generic_param == java_generic_inst_parametert(
                              symbol_typet("java::Interface_Implementation")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -888,7 +911,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -920,7 +944,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -952,7 +977,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -984,7 +1010,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1016,7 +1043,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1048,7 +1076,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1080,7 +1109,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1112,7 +1142,8 @@ SCENARIO(
       REQUIRE(
         generic_param ==
         java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1152,7 +1183,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1192,7 +1224,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1232,7 +1265,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1272,7 +1306,8 @@ SCENARIO(
           generic_param == java_generic_inst_parametert(
                              symbol_typet("java::Interface_Implementation")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1312,7 +1347,8 @@ SCENARIO(
           generic_param == java_generic_inst_parametert(
                              symbol_typet("java::Interface_Implementation")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 
@@ -1352,7 +1388,8 @@ SCENARIO(
           generic_param ==
           java_generic_inst_parametert(symbol_typet("java::Generic")));
       }
-      // TODO: extend tests when nested generics are parsed correctly
+      // TODO: extend tests when nested generics are parsed correctly - issue
+      // TG-1301
     }
   }
 }

@@ -7,20 +7,17 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/load_java_class.h>
+#include <testing-utils/require_symbol.h>
 
-#include <istream>
 #include <memory>
 
 #include <util/config.h>
 #include <util/language.h>
-#include <util/message.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <iostream>
-#include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
 
 SCENARIO(
-  "java_bytecode_parse_derived_generic_class",
+  "parse_derived_generic_class",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(
@@ -36,6 +33,6 @@ SCENARIO(
       require_symbol::require_complete_class(derived_symbol);
 
     // TODO(tkiley): Currently we do not support extracting information
-    // about the base classes generic information.
+    // about the base classes generic information - issue TG-1287
   }
 }

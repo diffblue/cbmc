@@ -7,18 +7,17 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/load_java_class.h>
+#include <testing-utils/require_symbol.h>
 
 #include <memory>
 
 #include <util/config.h>
 #include <util/language.h>
 #include <java_bytecode/java_bytecode_language.h>
-#include <iostream>
-#include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
 
 SCENARIO(
-  "java_bytecode_parse_signature_descriptor_mismatch",
+  "parse_signature_descriptor_mismatch",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(
@@ -54,7 +53,7 @@ SCENARIO(
     REQUIRE(func_code.parameters().size()==3);
 
     // TODO: for now, the parameters are not generic because we fall back to
-    // descriptor due to mismatch; enable tests when fixed
+    // descriptor due to mismatch; enable tests when fixed - issue TG-1309
     // code_typet::parametert param_parent=
     //  require_type::require_parameter(func_code,"arg1a");
     // REQUIRE(is_java_generic_type(param_parent.type()));
@@ -89,7 +88,7 @@ SCENARIO(
     REQUIRE(func_code.parameters().size()==3);
 
     // TODO: for now, the parameters are not generic because we fall back to
-    // descriptor due to mismatch; enable tests when fixed
+    // descriptor due to mismatch; enable tests when fixed - issue TG-1309
     // code_typet::parametert param_parent=
     //  require_type::require_parameter(func_code,"arg1a");
     // REQUIRE(is_java_generic_type(param_parent.type()));

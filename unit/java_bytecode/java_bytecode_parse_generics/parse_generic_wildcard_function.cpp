@@ -7,19 +7,15 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
+#include <testing-utils/load_java_class.h>
 
 #include <util/config.h>
-#include <util/cmdline.h>
 #include <util/language.h>
-#include <util/prefix.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
-#include <iostream>
-#include <testing-utils/load_java_class.h>
-
 SCENARIO(
-  "java_bytecode_parse_generic_wildcard",
+  "parse_generic_wildcard",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table=

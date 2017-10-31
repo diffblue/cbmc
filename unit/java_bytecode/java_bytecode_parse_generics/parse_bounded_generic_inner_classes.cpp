@@ -11,16 +11,14 @@
 #include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
 
-#include <istream>
 #include <memory>
 
 #include <util/config.h>
 #include <util/language.h>
-#include <util/message.h>
 #include <java_bytecode/java_bytecode_language.h>
 
 SCENARIO(
-  "java_bytecode_parse_bounded_generic_inner_classes",
+  "parse_bounded_generic_inner_classes",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
   const symbol_tablet &new_symbol_table = load_java_class(

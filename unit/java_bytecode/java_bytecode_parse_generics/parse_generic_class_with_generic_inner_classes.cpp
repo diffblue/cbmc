@@ -10,11 +10,8 @@
 #include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
 
-#include <util/cmdline.h>
 #include <util/config.h>
 #include <util/language.h>
-#include <util/prefix.h>
-#include <util/std_types.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
