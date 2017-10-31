@@ -123,6 +123,17 @@ reference_typet java_array_type(const char subtype)
   return java_reference_type(symbol_type);
 }
 
+/// Return the type of the elements of a given java array type
+/// \param array_type The java array type
+/// \return The type of the elements of the array
+typet java_array_element_type(const symbol_typet &array_type)
+{
+  INVARIANT(
+    is_java_array_tag(array_type.get_identifier()),
+    "Symbol should have array tag");
+  return array_type.find_type(ID_C_element_type);
+}
+
 /// See above
 /// \par parameters: Struct tag 'tag'
 /// \return True if the given struct is a Java array

@@ -56,6 +56,7 @@ reference_typet java_lang_object_type();
 symbol_typet java_classname(const std::string &);
 
 reference_typet java_array_type(const char subtype);
+typet java_array_element_type(const symbol_typet &array_type);
 
 bool is_reference_type(char t);
 
