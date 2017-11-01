@@ -66,7 +66,7 @@ def parse_args():
     parser.add_argument('-T', '--tasks', type=str,
                         default='quick',
                         help='Subset of tasks to run (quick, full; ' +
-                             'default: quick; or name of SV-COMP task)')
+                             'default: quick; or regex of SV-COMP task(s))')
 
     args = parser.parse_args()
     assert(args.repository.startswith('https://github.com/') or
@@ -479,10 +479,8 @@ def seed_queue(session, region, queue, task_set):
     elif task_set == 'quick':
         tasks = ['ReachSafety-Loops', 'ReachSafety-BitVectors']
     else:
-        tasks = [task_set]
-
-    for t in tasks:
-        assert(t in set(all_tasks))
+        tasks = [t for t in all_tasks if re.match('^' + task_set + '$', t)]
+        assert(tasks)
 
     for t in tasks:
         response = queue.send_messages(
@@ -491,6 +489,9 @@ def seed_queue(session, region, queue, task_set):
                     {'Id': '2', 'MessageBody': 'profiling-' + t}
                 ])
         assert(not response.get('Failed'))
+
+    logger.info(region + ': SQS queue seeded with {} jobs'.format(
+        len(tasks) * 2))
 
 
 def run_perf_test(
