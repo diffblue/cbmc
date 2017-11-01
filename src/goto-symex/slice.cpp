@@ -54,87 +54,96 @@ void symex_slicet::slice(symex_target_equationt &equation)
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
   get_symbols(SSA_step.guard);
-
-  switch(SSA_step.type())
-  {
-  case goto_trace_stept::typet::ASSERT:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::ASSUME:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::GOTO:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::LOCATION:
-    // ignore
-    break;
-
-  case goto_trace_stept::typet::ASSIGNMENT:
-    slice_assignment(SSA_step);
-    break;
-
-  case goto_trace_stept::typet::DECL:
-    slice_decl(SSA_step);
-    break;
-
-  case goto_trace_stept::typet::OUTPUT:
-  case goto_trace_stept::typet::INPUT:
-    break;
-
-  case goto_trace_stept::typet::DEAD:
-    // ignore for now
-    break;
-
-  case goto_trace_stept::typet::CONSTRAINT:
-  case goto_trace_stept::typet::SHARED_READ:
-  case goto_trace_stept::typet::SHARED_WRITE:
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-  case goto_trace_stept::typet::ATOMIC_END:
-  case goto_trace_stept::typet::SPAWN:
-  case goto_trace_stept::typet::MEMORY_BARRIER:
-    // ignore for now
-    break;
-
-  case goto_trace_stept::typet::FUNCTION_CALL:
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    // ignore for now
-    break;
-
-  default:
-    UNREACHABLE;
-  }
+  SSA_step.accept(*this);
 }
 
-void symex_slicet::slice_assignment(
-  symex_target_equationt::SSA_stept &SSA_step)
+void symex_slicet::visit(SSA_assertt &x)
 {
-  assert(SSA_step.ssa_lhs.id()==ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+  get_symbols(x.cond_expr);
+}
+
+void symex_slicet::visit(SSA_assumet &x)
+{
+  get_symbols(x.cond_expr);
+}
+
+void symex_slicet::visit(SSA_assignmentt &x)
+{
+  assert(x.ssa_lhs.id() == ID_symbol);
+  const irep_idt &id = x.ssa_lhs.get_identifier();
 
   if(depends.find(id)==depends.end())
   {
     // we don't really need it
-    SSA_step.ignore=true;
+    x.ignore = true;
   }
   else
-    get_symbols(SSA_step.ssa_rhs);
+    get_symbols(x.ssa_rhs);
 }
 
-void symex_slicet::slice_decl(
-  symex_target_equationt::SSA_stept &SSA_step)
+void symex_slicet::visit(SSA_gotot &x)
 {
-  assert(SSA_step.ssa_lhs.id()==ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
+  get_symbols(x.cond_expr);
+}
+
+void symex_slicet::visit(SSA_constraintt &x)
+{
+}
+
+void symex_slicet::visit(SSA_locationt &x)
+{
+}
+
+void symex_slicet::visit(SSA_outputt &x)
+{
+}
+
+void symex_slicet::visit(SSA_declt &x)
+{
+  assert(x.ssa_lhs.id() == ID_symbol);
+  const irep_idt &id=x.ssa_lhs.get_identifier();
 
   if(depends.find(id)==depends.end())
   {
     // we don't really need it
-    SSA_step.ignore=true;
+    x.ignore = true;
   }
+}
+
+void symex_slicet::visit(SSA_function_callt &x)
+{
+}
+
+void symex_slicet::visit(SSA_function_returnt &x)
+{
+}
+
+void symex_slicet::visit(SSA_shared_readt &x)
+{
+}
+
+void symex_slicet::visit(SSA_shared_writet &x)
+{
+}
+
+void symex_slicet::visit(SSA_spawnt &x)
+{
+}
+
+void symex_slicet::visit(SSA_memory_barriert &x)
+{
+}
+
+void symex_slicet::visit(SSA_atomic_begint &x)
+{
+}
+
+void symex_slicet::visit(SSA_atomic_endt &x)
+{
+}
+
+void symex_slicet::visit(SSA_inputt &x)
+{
 }
 
 /// Collect the open variables, i.e., variables that are used in RHS but never
