@@ -203,9 +203,14 @@ Resources:
                     update-rc.d ec2-terminate defaults
                     systemctl start ec2-terminate
 
+                    # update benchexec
+                    cd /mnt/benchexec
+                    git pull
+
                     # prepare for tool packaging
                     cd /mnt
                     cd cprover-sv-comp
+                    git pull
                     mkdir -p src/cbmc/
                     touch LICENSE
                     cd ..
