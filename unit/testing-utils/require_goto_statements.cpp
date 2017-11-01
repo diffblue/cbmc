@@ -6,7 +6,7 @@
 
 \*******************************************************************/
 
-#include "java_testing_utils.h"
+#include "require_goto_statements.h"
 
 #include <algorithm>
 #include <util/expr_iterator.h>
