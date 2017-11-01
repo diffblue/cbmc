@@ -56,6 +56,17 @@ public:
     bool offset_is_set;
     bool offset_is_zero() const
     { return offset_is_set && offset.is_zero(); }
+
+    bool operator==(const objectt &other) const
+    {
+      return
+        offset_is_set==other.offset_is_set &&
+        (!offset_is_set || offset==other.offset);
+    }
+    bool operator!=(const objectt &other) const
+    {
+      return !(*this==other);
+    }
   };
 
   class object_map_dt
@@ -100,6 +111,15 @@ public:
     static const object_map_dt blank;
 
     object_map_dt()=default;
+
+    bool operator==(const object_map_dt &other) const
+    {
+      return data==other.data;
+    }
+    bool operator!=(const object_map_dt &other) const
+    {
+      return !(*this==other);
+    }
 
   protected:
     ~object_map_dt()=default;
@@ -156,6 +176,18 @@ public:
       identifier(_identifier),
       suffix(_suffix)
     {
+    }
+
+    bool operator==(const entryt &other) const
+    {
+      return
+        identifier==other.identifier &&
+        suffix==other.suffix &&
+        object_map==other.object_map;
+    }
+    bool operator!=(const entryt &other) const
+    {
+      return !(*this==other);
     }
   };
 
