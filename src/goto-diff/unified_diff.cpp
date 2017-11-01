@@ -71,19 +71,27 @@ unified_difft::goto_program_difft unified_difft::get_diff(
     {
     case differencet::SAME:
       dest.push_back(std::make_pair(new_it, differencet::SAME));
-      assert(old_it != old_goto_program.instructions.end());
+      INVARIANT(
+        old_it != old_goto_program.instructions.end(),
+        "Old iterator reached the final goto instruction");
       ++old_it;
-      assert(new_it != new_goto_program.instructions.end());
+      INVARIANT(
+        new_it != new_goto_program.instructions.end(),
+        "New iterator reached the final goto instruction");
       ++new_it;
       break;
     case differencet::DELETED:
       dest.push_back(std::make_pair(old_it, differencet::DELETED));
-      assert(old_it != old_goto_program.instructions.end());
+      INVARIANT(
+        old_it != old_goto_program.instructions.end(),
+        "Old iterator reached the final goto instruction");
       ++old_it;
       break;
     case differencet::NEW:
       dest.push_back(std::make_pair(new_it, differencet::NEW));
-      assert(new_it != new_goto_program.instructions.end());
+      INVARIANT(
+        new_it != new_goto_program.instructions.end(),
+        "New iterator reached the final goto instruction");
       ++new_it;
       break;
     }
@@ -336,7 +344,8 @@ bool unified_difft::operator()()
       unified_diff(itn->first, empty, itn->second->second.body);
     else
     {
-      assert(ito->first == itn->first);
+      INVARIANT(
+        ito->first == itn->first, "Old and new function names do not match");
       unified_diff(
         itn->first, ito->second->second.body, itn->second->second.body);
       ++ito;
