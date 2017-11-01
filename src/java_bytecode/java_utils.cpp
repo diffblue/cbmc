@@ -214,9 +214,9 @@ size_t find_closing_delimiter(
 
   while(c_pos<=end_pos)
   {
-    if(src[c_pos]=='<')
+    if(src[c_pos] == open_char)
       depth++;
-    else if(src[c_pos]=='>')
+    else if(src[c_pos] == close_char)
     {
       if(depth==0)
         return c_pos;
@@ -250,4 +250,48 @@ void java_add_components_to_class(
   {
     components.push_back(component);
   }
+}
+
+/// Declare a function with the given name and type.
+/// \param function_name: a name
+/// \param type: a type
+/// \param symbol_table: symbol table
+void declare_function(
+  irep_idt function_name,
+  const typet &type,
+  symbol_tablet &symbol_table)
+{
+  auxiliary_symbolt func_symbol;
+  func_symbol.base_name=function_name;
+  func_symbol.pretty_name=function_name;
+  func_symbol.is_static_lifetime=false;
+  func_symbol.mode=ID_java;
+  func_symbol.name=function_name;
+  func_symbol.type=type;
+  symbol_table.add(func_symbol);
+}
+
+/// Create a function application expression.
+/// \param function_name: the name of the function
+/// \param arguments: a list of arguments
+/// \param type: return type of the function
+/// \param symbol_table: a symbol table
+/// \return a function application expression representing:
+///         `function_name(arguments)`
+exprt make_function_application(
+  const irep_idt &function_name,
+  const exprt::operandst &arguments,
+  const typet &type,
+  symbol_tablet &symbol_table)
+{
+  // Names of function to call
+  std::string fun_name=id2string(function_name);
+
+  // Declaring the function
+  declare_function(fun_name, type, symbol_table);
+
+  // Function application
+  function_application_exprt call(symbol_exprt(fun_name), type);
+  call.arguments()=arguments;
+  return call;
 }

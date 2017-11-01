@@ -62,7 +62,7 @@ public:
 
   class object_map_dt
   {
-    typedef std::map<unsigned, objectt> data_typet;
+    typedef std::map<object_numberingt::number_type, objectt> data_typet;
     data_typet data;
 
   public:
@@ -134,7 +134,10 @@ public:
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
 
-  bool insert(object_mapt &dest, unsigned n, const objectt &object) const;
+  bool insert(
+    object_mapt &dest,
+    object_numberingt::number_type n,
+    const objectt &object) const;
 
   bool insert(object_mapt &dest, const exprt &expr, const objectt &object) const
   {

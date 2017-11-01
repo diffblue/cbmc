@@ -30,9 +30,14 @@ endif
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-MINISAT2 = ../../minisat-2.2.1
+#MINISAT2 = ../../minisat-2.2.1
+#IPASIR = ../../ipasir
 #GLUCOSE = ../../glucose-syrup
 #SMVSAT =
+
+# Extra library for SAT solver. This should link to the archive file to be used
+# when linking against an IPASIR solver.
+LIBSOLVER =
 
 ifneq ($(PRECOSAT),)
   CP_CXXFLAGS += -DSATCHECK_PRECOSAT

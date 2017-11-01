@@ -70,7 +70,7 @@ value_sett::entryt &value_sett::get_entry(
 
 bool value_sett::insert(
   object_mapt &dest,
-  unsigned n,
+  object_numberingt::number_type n,
   const objectt &object) const
 {
   auto entry=dest.read().find(n);

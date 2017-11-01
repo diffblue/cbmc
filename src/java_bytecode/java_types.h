@@ -56,6 +56,7 @@ reference_typet java_lang_object_type();
 symbol_typet java_classname(const std::string &);
 
 reference_typet java_array_type(const char subtype);
+typet java_array_element_type(const symbol_typet &array_type);
 
 bool is_reference_type(char t);
 
@@ -90,7 +91,6 @@ class java_generic_parametert:public reference_typet
 {
 public:
   typedef symbol_typet type_variablet;
-  typedef std::vector<type_variablet> type_variablest;
 
   java_generic_parametert(
     const irep_idt &_type_var_name,
@@ -108,6 +108,8 @@ public:
     return type_variables().front();
   }
 
+private:
+  typedef std::vector<type_variablet> type_variablest;
   const type_variablest &type_variables() const
   {
     return (const type_variablest &)(find(ID_type_variables).get_sub());

@@ -10,6 +10,5 @@ main.c
 ^\[main.coverage.5\] file main.c line 14 function main MC/DC independence condition `C && D && E && !A && B.*: SATISFIED$
 ^\[main.coverage.6\] file main.c line 14 function main MC/DC independence condition `C && D && E && !A && !B.*: SATISFIED$
 ^\*\* .* of .* covered \(100.0%\)$
-^\*\* Used 10 iterations$
 --
 ^warning: ignoring

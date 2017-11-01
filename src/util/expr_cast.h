@@ -74,7 +74,7 @@ auto expr_try_dynamic_cast(TExpr &base)
     typename detail::expr_try_dynamic_cast_return_typet<T, TExpr>::type
     returnt;
   static_assert(
-    std::is_same<typename std::decay<TExpr>::type, exprt>::value,
+    std::is_base_of<exprt, typename std::decay<TExpr>::type>::value,
     "Tried to expr_try_dynamic_cast from something that wasn't an exprt");
   static_assert(
     std::is_base_of<exprt, T>::value,

@@ -10,7 +10,6 @@ list(REMOVE_ITEM sources
     # Used in executables
     ${CMAKE_CURRENT_SOURCE_DIR}/miniBDD.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/string_utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sharing_node.cpp
 
     # Don't build
     ${CMAKE_CURRENT_SOURCE_DIR}/sharing_map.cpp
@@ -70,14 +69,3 @@ target_include_directories(string_utils
 target_link_libraries(string_utils solvers ansi-c)
 add_test(NAME string_utils COMMAND $<TARGET_FILE:string_utils>)
 set_tests_properties(string_utils PROPERTIES LABELS "CORE;CBMC")
-
-add_executable(sharing_node sharing_node.cpp)
-target_include_directories(sharing_node
-    PUBLIC
-    ${CBMC_BINARY_DIR}
-    ${CBMC_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-target_link_libraries(sharing_node util)
-add_test(NAME sharing_node COMMAND $<TARGET_FILE:sharing_node>)
-set_tests_properties(sharing_node PROPERTIES LABELS "CORE;CBMC")

@@ -18,70 +18,60 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
 
-
 /// Add axioms corresponding to the String.valueOf(I) java function.
-/// \param expr: function application with one integer argument
+/// \param f: function application with one integer argument
 /// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_int(
-  const function_application_exprt &expr)
+exprt string_constraint_generatort::add_axioms_from_int(
+  const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(expr.type());
-  PRECONDITION(expr.arguments().size()>=1);
-  if(expr.arguments().size()==1)
-  {
-    return add_axioms_from_int(expr.arguments()[0], ref_type);
-  }
-  else
-  {
+  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  if(f.arguments().size() == 4)
     return add_axioms_from_int_with_radix(
-      expr.arguments()[0],
-      expr.arguments()[1],
-      ref_type);
-  }
+      res, f.arguments()[2], f.arguments()[3]);
+  else // f.arguments.size()==3
+    return add_axioms_from_int(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
-/// \param expr: function application with one long argument
+/// \param f: function application with one long argument
 /// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_long(
-  const function_application_exprt &expr)
+exprt string_constraint_generatort::add_axioms_from_long(
+  const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(expr.type());
-  PRECONDITION(expr.arguments().size()>=1);
-  if(expr.arguments().size()==1)
-  {
-    return add_axioms_from_int(expr.arguments()[0], ref_type);
-  }
-  else
-  {
+  PRECONDITION(f.arguments().size() == 3 || f.arguments().size() == 4);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  if(f.arguments().size() == 4)
     return add_axioms_from_int_with_radix(
-      expr.arguments()[0],
-      expr.arguments()[1],
-      ref_type);
-  }
+      res, f.arguments()[2], f.arguments()[3]);
+  else
+    return add_axioms_from_int(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
 /// \param f: function application with a Boolean argument
 /// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_bool(
+exprt string_constraint_generatort::add_axioms_from_bool(
   const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_bool(args(f, 1)[0], ref_type);
+  PRECONDITION(f.arguments().size() == 3);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_bool(res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
+/// \param res: string expression for the result
 /// \param b: Boolean expression
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_bool(
-  const exprt &b, const refined_string_typet &ref_type)
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_bool(
+  const array_string_exprt &res,
+  const exprt &b)
 {
-  string_exprt res=fresh_string(ref_type);
-  const typet &char_type=ref_type.get_char_type();
-
+  const typet &char_type = res.content().type().subtype();
   PRECONDITION(b.type()==bool_typet() || b.type().id()==ID_c_bool);
 
   typecast_exprt eq(b, bool_typet());
@@ -94,62 +84,62 @@ string_exprt string_constraint_generatort::add_axioms_from_bool(
 
   std::string str_true="true";
   implies_exprt a1(eq, res.axiom_for_has_length(str_true.length()));
-  m_axioms.push_back(a1);
+  axioms.push_back(a1);
 
   for(std::size_t i=0; i<str_true.length(); i++)
   {
     exprt chr=from_integer(str_true[i], char_type);
     implies_exprt a2(eq, equal_exprt(res[i], chr));
-    m_axioms.push_back(a2);
+    axioms.push_back(a2);
   }
 
   std::string str_false="false";
   implies_exprt a3(not_exprt(eq), res.axiom_for_has_length(str_false.length()));
-  m_axioms.push_back(a3);
+  axioms.push_back(a3);
 
   for(std::size_t i=0; i<str_false.length(); i++)
   {
     exprt chr=from_integer(str_false[i], char_type);
     implies_exprt a4(not_exprt(eq), equal_exprt(res[i], chr));
-    m_axioms.push_back(a4);
+    axioms.push_back(a4);
   }
 
-  return res;
+  return from_integer(0, signedbv_typet(32));
 }
 
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(I) or String.valueOf(J) Java functions applied
 /// on the integer expression.
-/// \param x: a signed integer expression
-/// \param ref_type: type for refined strings
+/// \param res: string expression for the result
+/// \param input_int: a signed integer expression
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \return a string expression
-string_exprt string_constraint_generatort::add_axioms_from_int(
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_int(
+  const array_string_exprt &res,
   const exprt &input_int,
-  const refined_string_typet &ref_type,
   size_t max_size)
 {
   const constant_exprt radix=from_integer(10, input_int.type());
-  return add_axioms_from_int_with_radix(input_int, radix, ref_type, max_size);
+  return add_axioms_from_int_with_radix(res, input_int, radix, max_size);
 }
 
 /// Add axioms enforcing that the string corresponds to the result
 /// of String.valueOf(II) or String.valueOf(JI) Java functions applied
 /// on the integer expression.
+/// \param res: string expression for the result
 /// \param input_int: a signed integer expression
 /// \param radix: the radix to use
-/// \param ref_type: type for refined strings
 /// \param max_size: a maximal size for the string representation (default 0,
 ///   which is interpreted to mean "as large as is needed for this type")
-/// \return a string expression
-string_exprt string_constraint_generatort::add_axioms_from_int_with_radix(
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_int_with_radix(
+  const array_string_exprt &res,
   const exprt &input_int,
   const exprt &radix,
-  const refined_string_typet &ref_type,
   size_t max_size)
 {
-  PRECONDITION(max_size==0 || max_size<std::numeric_limits<size_t>::max());
+  PRECONDITION(max_size < std::numeric_limits<size_t>::max());
   const typet &type=input_int.type();
   PRECONDITION(type.id()==ID_signedbv);
 
@@ -164,25 +154,24 @@ string_exprt string_constraint_generatort::add_axioms_from_int_with_radix(
     CHECK_RETURN(max_size<std::numeric_limits<size_t>::max());
   }
 
-  string_exprt str=fresh_string(ref_type);
-  const typet &char_type=ref_type.get_char_type();
+  const typet &char_type = res.content().type().subtype();
   exprt radix_as_char=typecast_exprt(radix, char_type);
   exprt radix_input_type=typecast_exprt(radix, type);
   const bool strict_formatting=true;
 
   add_axioms_for_correct_number_format(
-    input_int, str, radix_as_char, radix_ul, max_size, strict_formatting);
+    input_int, res, radix_as_char, radix_ul, max_size, strict_formatting);
 
   add_axioms_for_characters_in_integer_string(
     input_int,
     type,
     strict_formatting,
-    str,
+    res,
     max_size,
     radix_input_type,
     radix_ul);
 
-  return str;
+  return from_integer(0, signedbv_typet(32));
 }
 
 /// Returns the integer value represented by the character.
@@ -200,19 +189,19 @@ exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
     minus_exprt(chr, zero_char));
 }
 
-/// Add axioms stating that the returned string corresponds to the integer
+/// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
+/// \param res: string expression for the result
 /// \param i: an integer argument
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_int_hex(
-  const exprt &i, const refined_string_typet &ref_type)
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_int_hex(
+  const array_string_exprt &res,
+  const exprt &i)
 {
-  string_exprt res=fresh_string(ref_type);
   const typet &type=i.type();
   PRECONDITION(type.id()==ID_signedbv);
-  const typet &index_type=ref_type.get_index_type();
-  const typet &char_type=ref_type.get_char_type();
+  const typet &index_type = res.length().type();
+  const typet &char_type = res.content().type().subtype();
   exprt sixteen=from_integer(16, index_type);
   exprt minus_char=constant_char('-', char_type);
   exprt zero_char=constant_char('0', char_type);
@@ -221,7 +210,7 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
   exprt f_char=constant_char('f', char_type);
 
   size_t max_size=8;
-  m_axioms.push_back(
+  axioms.push_back(
     and_exprt(res.axiom_for_length_gt(0),
               res.axiom_for_length_le(max_size)));
 
@@ -234,8 +223,8 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
     for(size_t j=0; j<size; j++)
     {
       chr=res[j];
-      exprt i=int_of_hex_char(chr);
-      sum=plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(i, type));
+      exprt chr_int = int_of_hex_char(chr);
+      sum = plus_exprt(mult_exprt(sum, sixteen), typecast_exprt(chr_int, type));
       or_exprt is_number(
         and_exprt(
           binary_relation_exprt(chr, ID_ge, zero_char),
@@ -247,49 +236,53 @@ string_exprt string_constraint_generatort::add_axioms_from_int_hex(
     }
 
     equal_exprt premise(res.axiom_for_has_length(size));
-    m_axioms.push_back(
+    axioms.push_back(
       implies_exprt(premise, and_exprt(equal_exprt(i, sum), all_numbers)));
 
     // disallow 0s at the beginning
     if(size>1)
-      m_axioms.push_back(
+      axioms.push_back(
         implies_exprt(premise, not_exprt(equal_exprt(res[0], zero_char))));
   }
-  return res;
+  return from_integer(0, get_return_code_type());
 }
 
 /// add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_int_hex(
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_int_hex(
   const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_int_hex(args(f, 1)[0], ref_type);
+  PRECONDITION(f.arguments().size() == 3);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_int_hex(res, f.arguments()[2]);
 }
 
 /// Add axioms corresponding to the String.valueOf(C) java function.
 /// \param f: function application one char argument
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_char(
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_char(
   const function_application_exprt &f)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(f.type());
-  return add_axioms_from_char(args(f, 1)[0], ref_type);
+  PRECONDITION(f.arguments().size() == 3);
+  const array_string_exprt res =
+    char_array_of_pointer(f.arguments()[1], f.arguments()[0]);
+  return add_axioms_from_char(res, f.arguments()[2]);
 }
 
 /// Add axioms stating that the returned string has length 1 and the character
 /// it contains corresponds to the input expression.
+/// \param res: string expression for the result
 /// \param c: one expression of type char
-/// \param ref_type: type of refined string expressions
-/// \return a new string expression
-string_exprt string_constraint_generatort::add_axioms_from_char(
-  const exprt &c, const refined_string_typet &ref_type)
+/// \return code 0 on success
+exprt string_constraint_generatort::add_axioms_from_char(
+  const array_string_exprt &res,
+  const exprt &c)
 {
-  string_exprt res=fresh_string(ref_type);
   and_exprt lemma(equal_exprt(res[0], c), res.axiom_for_has_length(1));
-  m_axioms.push_back(lemma);
-  return res;
+  axioms.push_back(lemma);
+  return from_integer(0, get_return_code_type());
 }
 
 /// Add axioms making the return value true if the given string is a correct
@@ -305,15 +298,14 @@ string_exprt string_constraint_generatort::add_axioms_from_char(
 ///   zeros or upper case letters
 void string_constraint_generatort::add_axioms_for_correct_number_format(
   const exprt &input_int,
-  const string_exprt &str,
+  const array_string_exprt &str,
   const exprt &radix_as_char,
   const unsigned long radix_ul,
   const std::size_t max_size,
   const bool strict_formatting)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
-  const typet &index_type=ref_type.get_index_type();
+  const typet &char_type = str.content().type().subtype();
+  const typet &index_type = str.length().type();
 
   const exprt &chr=str[0];
   const equal_exprt starts_with_minus(chr, constant_char('-', char_type));
@@ -323,30 +315,30 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 
   // |str| > 0
   const exprt non_empty=str.axiom_for_length_ge(from_integer(1, index_type));
-  m_axioms.push_back(non_empty);
+  axioms.push_back(non_empty);
 
   if(strict_formatting)
   {
     // str[0] = '-' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(starts_with_minus, starts_with_digit);
-    m_axioms.push_back(correct_first);
+    axioms.push_back(correct_first);
   }
   else
   {
     // str[0] = '-' || str[0] = '+' || is_digit_with_radix(str[0], radix)
     const or_exprt correct_first(
       starts_with_minus, starts_with_digit, starts_with_plus);
-    m_axioms.push_back(correct_first);
+    axioms.push_back(correct_first);
   }
 
   // str[0]='+' or '-' ==> |str| > 1
   const implies_exprt contains_digit(
     or_exprt(starts_with_minus, starts_with_plus),
     str.axiom_for_length_ge(from_integer(2, index_type)));
-  m_axioms.push_back(contains_digit);
+  axioms.push_back(contains_digit);
 
   // |str| <= max_size
-  m_axioms.push_back(str.axiom_for_length_le(max_size));
+  axioms.push_back(str.axiom_for_length_le(max_size));
 
   // forall 1 <= i < |str| . is_digit_with_radix(str[i], radix)
   // We unfold the above because we know that it will be used for all i up to
@@ -358,7 +350,7 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
       str.axiom_for_length_ge(from_integer(index+1, index_type)),
       is_digit_with_radix(
         str[index], strict_formatting, radix_as_char, radix_ul));
-    m_axioms.push_back(character_at_index_is_digit);
+    axioms.push_back(character_at_index_is_digit);
   }
 
   if(strict_formatting)
@@ -369,12 +361,12 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
     const implies_exprt no_leading_zero(
       equal_exprt(chr, zero_char),
       str.axiom_for_has_length(from_integer(1, index_type)));
-    m_axioms.push_back(no_leading_zero);
+    axioms.push_back(no_leading_zero);
 
     // no_leading_zero_after_minus : str[0]='-' => str[1]!='0'
     implies_exprt no_leading_zero_after_minus(
       starts_with_minus, not_exprt(equal_exprt(str[1], zero_char)));
-    m_axioms.push_back(no_leading_zero_after_minus);
+    axioms.push_back(no_leading_zero_after_minus);
   }
 }
 
@@ -383,24 +375,23 @@ void string_constraint_generatort::add_axioms_for_correct_number_format(
 /// in terms of the characters in str.
 /// \param input_int: the integer represented by str
 /// \param type: the type for input_int
+/// \param strict_formatting: if true, don't allow a leading plus, redundant
+///                           zeros or upper case letters
 /// \param str: input string
 /// \param max_string_length: the maximum length str can have
 /// \param radix: the radix, with the same type as input_int
 /// \param radix_ul: the radix as an unsigned long, or 0 if that can't be
 ///   determined
-/// \param strict_formatting: if true, don't allow a leading plus, redundant
-///   zeros or upper case letters
 void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   const exprt &input_int,
   const typet &type,
   const bool strict_formatting,
-  const string_exprt &str,
+  const array_string_exprt &str,
   const std::size_t max_string_length,
   const exprt &radix,
   const unsigned long radix_ul)
 {
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
+  const typet &char_type = str.content().type().subtype();
 
   const equal_exprt starts_with_minus(str[0], constant_char('-', char_type));
   const constant_exprt zero_expr=from_integer(0, type);
@@ -412,7 +403,7 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   /// Deal with size==1 case separately. There are axioms from
   /// add_axioms_for_correct_number_format which say that the string must
   /// contain at least one digit, so we don't have to worry about "+" or "-".
-  m_axioms.push_back(
+  axioms.push_back(
     implies_exprt(str.axiom_for_has_length(1), equal_exprt(input_int, sum)));
 
   for(size_t size=2; size<=max_string_length; size++)
@@ -456,18 +447,18 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
     if(!digit_constraints.empty())
     {
       const implies_exprt a5(premise, conjunction(digit_constraints));
-      m_axioms.push_back(a5);
+      axioms.push_back(a5);
     }
 
     const implies_exprt a6(
       and_exprt(premise, not_exprt(starts_with_minus)),
       equal_exprt(input_int, sum));
-    m_axioms.push_back(a6);
+    axioms.push_back(a6);
 
     const implies_exprt a7(
       and_exprt(premise, starts_with_minus),
       equal_exprt(input_int, unary_minus_exprt(sum)));
-    m_axioms.push_back(a7);
+    axioms.push_back(a7);
   }
 }
 
@@ -479,7 +470,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size()==1 || f.arguments().size()==2);
-  const string_exprt str=get_string_expr(f.arguments()[0]);
+  const array_string_exprt str = get_string_expr(f.arguments()[0]);
   const typet &type=f.type();
   PRECONDITION(type.id()==ID_signedbv);
   const exprt radix=f.arguments().size()==1?
@@ -491,8 +482,7 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
   const symbol_exprt input_int=fresh_symbol("parsed_int", type);
-  const refined_string_typet &ref_type=to_refined_string_type(str.type());
-  const typet &char_type=ref_type.get_char_type();
+  const typet &char_type = str.content().type().subtype();
   const typecast_exprt radix_as_char(radix, char_type);
   const bool strict_formatting=false;
 
@@ -530,7 +520,7 @@ unsigned long string_constraint_generatort::to_integer_or_default(
   const exprt &expr, unsigned long def)
 {
   mp_integer mp_radix;
-  bool to_integer_failed=to_integer(simplify_expr(expr, m_ns), mp_radix);
+  bool to_integer_failed=to_integer(simplify_expr(expr, ns), mp_radix);
   return to_integer_failed?def:integer2ulong(mp_radix);
 }
 

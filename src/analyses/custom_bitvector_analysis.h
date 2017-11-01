@@ -96,6 +96,13 @@ public:
 
   bitst may_bits, must_bits;
 
+  void assign_struct_rec(
+    locationt from,
+    const exprt &lhs,
+    const exprt &rhs,
+    custom_bitvector_analysist &,
+    const namespacet &);
+
   void assign_lhs(const exprt &, const vectorst &);
   void assign_lhs(const irep_idt &, const vectorst &);
   vectorst get_rhs(const exprt &) const;

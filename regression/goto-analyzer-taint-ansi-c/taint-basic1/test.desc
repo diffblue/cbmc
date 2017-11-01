@@ -1,0 +1,10 @@
+CORE
+main.o
+--taint taint.json
+^EXIT=0$
+^SIGNAL=0$
+^file main.c line 12( function .*)?: There is a T1 flow \(taint rule my_h1\)$
+^file main.c line 15( function .*)?: There is a T2 flow \(taint rule my_h2\)$
+--
+^file main.c line 12( function .*)?: There is a T2 flow \(.*\)$
+^file main.c line 15( function .*)?: There is a T1 flow \(.*\)$
