@@ -7,6 +7,7 @@
 \*******************************************************************/
 
 #include "require_goto_statements.h"
+#include "catch.hpp"
 
 #include <algorithm>
 #include <util/expr_iterator.h>
@@ -120,7 +121,7 @@ require_goto_statements::find_pointer_assignments(
 /// \param variable_name: The name of the variable.
 /// \param entry_point_instructions: The statements to look through
 /// \return The declaration statement corresponding to that variable
-const code_declt &require_goto_statements::find_declaration_by_name(
+const code_declt &require_goto_statements::require_declaration_of_name(
   const irep_idt &variable_name,
   const std::vector<codet> &entry_point_instructions)
 {
