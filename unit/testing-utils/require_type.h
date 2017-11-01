@@ -39,21 +39,29 @@ code_typet require_code(
   const typet &type,
   const size_t num_params);
 
-const java_generic_typet &require_java_generic_type_variables(
-  const typet &type,
-  const optionalt<std::initializer_list<irep_idt>> &type_variables);
+// A mini DSL for describing an expected set of type parameters for a
+// java_generic_typet
+enum class type_parameter_kindt { Inst, Var };
+struct expected_type_parametert
+{
+  type_parameter_kindt kind;
+  irep_idt description;
+};
+typedef std::initializer_list<expected_type_parametert>
+  expected_type_parameterst;
 
-const java_generic_typet &require_java_generic_type_instantiations(
+java_generic_typet require_java_generic_type(
   const typet &type,
-  const optionalt<std::initializer_list<irep_idt>> &type_instantiations);
+  const optionalt<require_type::expected_type_parameterst> &type_expectations);
 
-const java_generic_parametert &require_java_generic_parameter_variables(
+
+java_generic_parametert require_java_generic_parameter(
   const typet &type,
-  const optionalt<irep_idt> &type_variables);
+  const optionalt<require_type::expected_type_parametert> &type_expectation);
 
 const typet &require_java_non_generic_type(
   const typet &type,
-  const optionalt<irep_idt> &expect_type);
+  const optionalt<symbol_typet> &expect_subtype);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
