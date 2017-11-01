@@ -11,38 +11,45 @@
 #include <algorithm>
 #include <util/expr_iterator.h>
 
-std::vector<codet> get_all_statements(const exprt::operandst &instructions)
+/// Expand value of a function to include all child codets
+/// \param instructions: The value of the function (e.g. got by looking up
+///  the function in the symbol table and getting the value)
+/// \return: All ID_code statements in the tree rooted at \p function_value
+std::vector<codet>
+require_goto_statements::get_all_statements(const exprt &function_value)
 {
   std::vector<codet> statements;
-  for(const exprt &instruction : instructions)
-  {
-    // Add the statement
-    statements.push_back(to_code(instruction));
 
-    // Add any child statements (e.g. if this is a code_block
-    // TODO(tkiley): It should be possible to have a custom version of
-    // TODO(tkiley): back_inserter that also transforms to codet, but I don't
-    // TODO(tkiley): know how to do this
-    std::vector<exprt> sub_expr;
-    std::copy_if(
-      instruction.depth_begin(),
-      instruction.depth_end(),
-      std::back_inserter(sub_expr),
-      [](const exprt &sub_statement) {
-        // Get all codet
-        return sub_statement.id() == ID_code;
-      });
+  // Add any child statements (e.g. if this is a code_block
+  // TODO(tkiley): It should be possible to have a custom version of
+  // TODO(tkiley): back_inserter that also transforms to codet, but I don't
+  // TODO(tkiley): know how to do this
+  std::vector<exprt> sub_expr;
+  std::copy_if(
+    function_value.depth_begin(),
+    function_value.depth_end(),
+    std::back_inserter(sub_expr),
+    [](const exprt &sub_statement) {
+      // Get all codet
+      return sub_statement.id() == ID_code;
+    });
 
-    std::transform(
-      sub_expr.begin(),
-      sub_expr.end(),
-      std::back_inserter(statements),
-      [](const exprt &sub_expr) { return to_code(sub_expr); });
-  }
+  std::transform(
+    sub_expr.begin(),
+    sub_expr.end(),
+    std::back_inserter(statements),
+    [](const exprt &sub_expr) { return to_code(sub_expr); });
+
   return statements;
 }
 
-std::vector<code_assignt> find_struct_component_assignments(
+/// Find assignment statements of the form \p structure_name.\component_name =
+/// \param statements: The statements to look through
+/// \param structure_name: The name of variable of type struct
+/// \param component_name: The name of the component that should be assigned
+/// \return: All the assignments to that component.
+std::vector<code_assignt>
+require_goto_statements::find_struct_component_assignments(
   const std::vector<codet> &statements,
   const irep_idt &structure_name,
   const irep_idt &component_name)
@@ -77,7 +84,8 @@ std::vector<code_assignt> find_struct_component_assignments(
 /// \param instructions: The instructions to look through
 /// \return: A structure that contains the null assignment if found, and a
 /// vector of all other assignments
-pointer_assignment_locationt find_pointer_assignments(
+require_goto_statements::pointer_assignment_locationt
+require_goto_statements::find_pointer_assignments(
   const irep_idt &pointer_name,
   const std::vector<codet> &instructions)
 {
@@ -108,7 +116,11 @@ pointer_assignment_locationt find_pointer_assignments(
   return locations;
 }
 
-const exprt &find_declaration_by_name(
+/// Find the declaration of the specific variable.
+/// \param variable_name: The name of the variable.
+/// \param entry_point_instructions: The statements to look through
+/// \return The declaration statement corresponding to that variable
+const code_declt &require_goto_statements::find_declaration_by_name(
   const irep_idt &variable_name,
   const std::vector<codet> &entry_point_instructions)
 {
@@ -120,7 +132,7 @@ const exprt &find_declaration_by_name(
 
       if(decl_statement.get_identifier() == variable_name)
       {
-        return statement;
+        return decl_statement;
       }
     }
   }
