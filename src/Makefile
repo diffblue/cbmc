@@ -93,6 +93,19 @@ cprover-jar-build:
 	cd target; jar cf org.cprover.jar `find . -name "*.class"`; \
 	mv org.cprover.jar ../../../)
 
+ipasir-download:
+	# get the 2016 version of the ipasir package, which contains a few solvers
+	@echo "Download ipasir 2016 package"
+	@(lwp-download http://baldur.iti.kit.edu/sat-competition-2016/downloads/ipasir.zip ../ipasir.zip)
+	@(cd ..; unzip -u ipasir.zip)
+
+ipasir-build: ipasir-download
+	# build libpicosat, and create a libipasir.a in ipasir directory
+	# make sure that the ipasir.h file is located there as well (ships with 2016 package)
+	@echo "Build Picosat 961 from ipasir 2016 package"
+	$(MAKE) -C ../ipasir/sat/picosat961 libipasirpicosat961.a
+	@(cd ../ipasir; ln -sf sat/picosat961/libipasirpicosat961.a libipasir.a)
+
 boost-download:
 	@echo "Downloading boost headers"
 	@lwp-download "http://storage.googleapis.com/diffblue-mirror/boost/boost_1.63_headers.tar.bz2?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1542631994&Signature=X2GwPSm1dR8IPGP0D5JoyDmOnL%2Br4F7AI7NUA7SbmOAowMC0JS7Q5A6%2BkQziUzQa88zpddr5gSRbDOLqdoGzwLrYgPNtURS5dJ7l1q6xfJWSS%2FYf8be%2FSbdfLVN8qcXKCsfDe05Hqf%2Bz2cksqjQ1H6L0syj43rftbW4%2F7tp355%2BkinCeE466ulJeyru3CK%2F3RGX2Ul6ZQV6lNxkit1m6QM5BRtLbUQ1GOW0GCK9fWH2fry2n7kRVBCM3oz8fX62kLdKYlaXCf%2BvvXs9hOOmcQurL%2Fa4DCJYoClX%2BpznqXVmjUY%2FI3pD4HlRKbCeiPnoC6de2i1uxFNSVTBpG3w%2BtfA%3D%3D"
@@ -102,4 +115,4 @@ boost-download:
 	@mv boost ../boost-include/boost
 	@rm boost_1.63_headers.tar.bz2
 
-.PHONY: minisat2-download glucose-download cprover-jar-build
+.PHONY: ipasir-build minisat2-download glucose-download cprover-jar-build

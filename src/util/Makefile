@@ -94,6 +94,7 @@ SRC = arith_tools.cpp \
       ui_message.cpp \
       unicode.cpp \
       union_find.cpp \
+      union_find_replace.cpp \
       xml.cpp \
       xml_expr.cpp \
       xml_irep.cpp \

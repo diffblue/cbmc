@@ -253,7 +253,7 @@ public:
     std::vector<node_indext> &subgraph_nr);
 
   // return value: number of SCCs
-  std::size_t SCCs(std::vector<node_indext> &subgraph_nr);
+  std::size_t SCCs(std::vector<node_indext> &subgraph_nr) const;
 
   bool is_dag() const
   {
@@ -290,7 +290,7 @@ protected:
     }
   };
 
-  void tarjan(class tarjant &t, node_indext v);
+  void tarjan(class tarjant &t, node_indext v) const;
 
   void shortest_path(
     node_indext src,
@@ -515,7 +515,7 @@ std::size_t grapht<N>::connected_subgraphs(
 }
 
 template<class N>
-void grapht<N>::tarjan(tarjant &t, node_indext v)
+void grapht<N>::tarjan(tarjant &t, node_indext v) const
 {
   t.scc_stack.push(v);
   t.in_scc[v]=true;
@@ -559,7 +559,7 @@ void grapht<N>::tarjan(tarjant &t, node_indext v)
 }
 
 template<class N>
-std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr)
+std::size_t grapht<N>::SCCs(std::vector<node_indext> &subgraph_nr) const
 {
   tarjant t(nodes.size(), subgraph_nr);
 

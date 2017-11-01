@@ -1,7 +1,8 @@
 CORE
 test_insert_char_array.class
 --refine-strings --string-max-length 1000
-^EXIT=0$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
+assertion.* file test_insert_char_array.java line 20 .* SUCCESS$
+assertion.* file test_insert_char_array.java line 22 .* FAILURE$
 --

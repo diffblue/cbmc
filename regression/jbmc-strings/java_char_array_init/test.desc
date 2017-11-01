@@ -3,5 +3,8 @@ test_init.class
 --refine-strings --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
-^\[.*assertion.1\].* line 14.* FAILURE$
+assertion.* file test_init.java line 31 .* SUCCESS$
+assertion.* file test_init.java line 33 .* SUCCESS$
+assertion.* file test_init.java line 35 .* FAILURE$
+assertion.* file test_init.java line 37 .* FAILURE$
 --

@@ -88,7 +88,9 @@ void remove_returnst::replace_returns(
   {
     if(i_it->is_return())
     {
-      assert(i_it->code.operands().size()==1);
+      INVARIANT(
+        i_it->code.operands().size()==1,
+        "return instructions should have one operand");
 
       // replace "return x;" by "fkt#return_value=x;"
       symbol_exprt lhs_expr;
@@ -122,7 +124,10 @@ void remove_returnst::do_function_calls(
       {
         // replace "lhs=f(...)" by
         // "f(...); lhs=f#return_value; DEAD f#return_value;"
-        assert(function_call.function().id()==ID_symbol);
+        INVARIANT(
+          function_call.function().id()==ID_symbol,
+          "indirect function calls should have been removed prior to running "
+          "remove-returns");
 
         const irep_idt function_id=
           to_symbol_expr(function_call.function()).get_identifier();
@@ -221,12 +226,9 @@ code_typet original_return_type(
   if(rv_it!=symbol_table.symbols.end())
   {
     // look up the function symbol
-    symbol_tablet::symbolst::const_iterator s_it=
-      symbol_table.symbols.find(function_id);
+    const symbolt &function_symbol=symbol_table.lookup_ref(function_id);
 
-    assert(s_it!=symbol_table.symbols.end());
-
-    type=to_code_type(s_it->second.type);
+    type=to_code_type(function_symbol.type);
     type.return_type()=rv_it->second.type;
   }
 
@@ -279,18 +281,25 @@ bool remove_returnst::restore_returns(
 
       while(!i_it->is_goto() && !i_it->is_end_function())
       {
-        assert(i_it->is_dead());
+        INVARIANT(
+          i_it->is_dead(),
+          "only dead statements should appear between "
+          "a return and the next goto or function end");
         i_it++;
       }
 
       if(i_it->is_goto())
       {
-        goto_programt::const_targett target=i_it->get_target();
-        assert(target->is_end_function());
+        INVARIANT(
+          i_it->get_target()->is_end_function(),
+          "GOTO following return should target end of function");
       }
       else
       {
-        assert(i_it->is_end_function());
+        INVARIANT(
+          i_it->is_end_function(),
+          "control-flow after assigning return value should lead directly "
+          "to end of function");
         i_it=goto_program.instructions.insert(i_it, *i_it);
       }
 
@@ -302,7 +311,7 @@ bool remove_returnst::restore_returns(
   return false;
 }
 
-/// turns f(...); lhs=f#return_value; into x=f(...)
+/// turns f(...); lhs=f#return_value; into lhs=f(...)
 void remove_returnst::undo_function_calls(
   goto_functionst &goto_functions,
   goto_programt &goto_program)
@@ -332,7 +341,9 @@ void remove_returnst::undo_function_calls(
       // and revert to "lhs=f(...);"
       goto_programt::instructionst::iterator next=i_it;
       ++next;
-      assert(next!=goto_program.instructions.end());
+      INVARIANT(
+        next!=goto_program.instructions.end(),
+        "non-void function call must be followed by #return_value read");
 
       if(!next->is_assign())
         continue;
@@ -353,8 +364,9 @@ void remove_returnst::undo_function_calls(
       // remove the assignment and subsequent dead
       // i_it remains valid
       next=goto_program.instructions.erase(next);
-      assert(next!=goto_program.instructions.end());
-      assert(next->is_dead());
+      INVARIANT(
+        next!=goto_program.instructions.end() && next->is_dead(),
+        "read from #return_value should be followed by DEAD #return_value");
       // i_it remains valid
       goto_program.instructions.erase(next);
     }

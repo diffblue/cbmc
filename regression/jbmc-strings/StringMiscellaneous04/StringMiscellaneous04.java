@@ -1,40 +1,52 @@
 public class StringMiscellaneous04
 {
-   public static void main(String[] args)
-   {
-      String s1 = "diffblue";
-      String s2 = "TESTGENERATION";
-      String s3 = "   automated   ";
+    // This is a model of the String.toCharArray method
+    public static char[] toCharArray(String s)
+    {
+        int length=s.length();
+        assert(length<10);
+        char arr[]=new char[s.length()];
+        // We limit arbitrarly the loop unfolding to 10
+        for(int i=0; i<length && i<10; i++)
+            arr[i]=s.charAt(i);
+        return arr;
+    }
 
-      assert s1.equals("diffblue");
-      assert s2.equals("TESTGENERATION");
-      assert s3.equals("   automated   ");
+    public static void main(String[] args)
+    {
+        String s1 = "diffblue";
+        String s2 = "TESTGENERATION";
+        String s3 = "	automated   ";
 
-      System.out.printf(
-         "Replace 'f' with 'F' in s1: %s\n\n", s1.replace('f', 'F'));
-      String tmp=s1.replace('f', 'F');
-      assert tmp.equals("diFFblue");
+        assert s1.equals("diffblue");
+        assert s2.equals("TESTGENERATION");
+        assert s3.equals("   automated	 ");
 
-      tmp=s1.toUpperCase();
-      assert tmp.equals("DIFFBLUE");
+        System.out.printf(
+          "Replace 'f' with 'F' in s1: %s\n\n", s1.replace('f', 'F'));
+        String tmp=s1.replace('f', 'F');
+        assert tmp.equals("diFFblue");
 
-      tmp=s2.toLowerCase();
-      assert tmp.equals("testgeneration");
+        tmp=s1.toUpperCase();
+        assert tmp.equals("DIFFBLUE");
 
-      tmp=s3.trim();
-      assert tmp.equals("automated");
+        tmp=s2.toLowerCase();
+        assert tmp.equals("testgeneration");
 
-      // test toCharArray method
-      char[] charArray = s1.toCharArray();
-      System.out.print("s1 as a character array = ");
+        tmp=s3.trim();
+        assert tmp.equals("automated");
 
-      int i=0;
-      for (char character : charArray)
-      {
-         assert character=="diffblue".charAt(i);
-         ++i;
-      }
+        // test toCharArray method
+        char[] charArray = toCharArray(s1);
+        System.out.print("s1 as a character array = ");
 
-      System.out.println();
-   }
+        int i=0;
+        for (char character : charArray)
+        {
+            assert character=="diffblue".charAt(i);
+            ++i;
+        }
+
+        System.out.println();
+    }
 }

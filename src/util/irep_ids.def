@@ -755,6 +755,8 @@ IREP_ID_ONE(exception_landingpad)
 IREP_ID_ONE(length_upper_bound)
 IREP_ID_ONE(string_constraint)
 IREP_ID_ONE(string_not_contains_constraint)
+IREP_ID_ONE(cprover_associate_array_to_pointer_func)
+IREP_ID_ONE(cprover_associate_length_to_array_func)
 IREP_ID_ONE(cprover_char_literal_func)
 IREP_ID_ONE(cprover_string_literal_func)
 IREP_ID_ONE(cprover_string_array_of_char_pointer_func)
@@ -839,6 +841,7 @@ IREP_ID_TWO(C_java_generics_class_type, #java_generics_class_type)
 IREP_ID_TWO(generic_types, #generic_types)
 IREP_ID_TWO(type_variables, #type_variables)
 IREP_ID_ONE(havoc_object)
+IREP_ID_TWO(overflow_shl, overflow-shl)
 
 #undef IREP_ID_ONE
 #undef IREP_ID_TWO

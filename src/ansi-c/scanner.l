@@ -466,7 +466,8 @@ void ansi_c_scanner_init()
                     return make_identifier();
                 }
 
-"__float128"    { // clang doesn't have it
+"__float128" |
+"_Float128"     { // clang doesn't have it
                   if(PARSER.mode==configt::ansi_ct::flavourt::GCC)
                   { loc(); return TOK_GCC_FLOAT128; }
                   else
