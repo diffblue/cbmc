@@ -15,10 +15,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+#include <goto-symex/symex_slice_class.h>
 #include <langapi/language_util.h>
-#include <solvers/prop/prop_conv.h>
-#include <solvers/prop/prop.h>
 #include <solvers/prop/literal_expr.h>
+#include <solvers/prop/prop.h>
+#include <solvers/prop/prop_conv.h>
 
 #include "goto_symex_state.h"
 

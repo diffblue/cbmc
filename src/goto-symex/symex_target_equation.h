@@ -28,12 +28,141 @@ class decision_proceduret;
 class namespacet;
 class prop_convt;
 
+class SSA_assertt;
+class SSA_assumet;
+class SSA_assignmentt;
+class SSA_gotot;
+class SSA_constraintt;
+class SSA_locationt;
+class SSA_outputt;
+class SSA_declt;
+class SSA_function_callt;
+class SSA_function_returnt;
+class SSA_shared_readt;
+class SSA_shared_writet;
+class SSA_spawnt;
+class SSA_memory_barriert;
+class SSA_atomic_begint;
+class SSA_atomic_endt;
+class SSA_inputt;
+
+template <typename... Ts>
+struct visitor_generatort;
+
+template <typename T, typename... Ts>
+struct visitor_generatort<T, Ts...> : visitor_generatort<Ts...>
+{
+  virtual void visit(T) = 0;
+  using visitor_generatort<Ts...>::visit;
+};
+
+template <typename T>
+struct visitor_generatort<T>
+{
+  virtual ~visitor_generatort() = default;
+  virtual void visit(T) = 0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+template <typename... Ts>
+struct const_visitor_generatort;
+
+template <typename T, typename... Ts>
+struct const_visitor_generatort<T, Ts...> : const_visitor_generatort<Ts...>
+{
+  virtual void visit(T) const = 0;
+  using const_visitor_generatort<Ts...>::visit;
+};
+
+template <typename T>
+struct const_visitor_generatort<T>
+{
+  virtual ~const_visitor_generatort() = default;
+  virtual void visit(T) const = 0;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+using SSA_visitor_const_args = visitor_generatort<const SSA_assertt &,
+                                                  const SSA_assumet &,
+                                                  const SSA_assignmentt &,
+                                                  const SSA_gotot &,
+                                                  const SSA_constraintt &,
+                                                  const SSA_locationt &,
+                                                  const SSA_outputt &,
+                                                  const SSA_declt &,
+                                                  const SSA_function_callt &,
+                                                  const SSA_function_returnt &,
+                                                  const SSA_shared_readt &,
+                                                  const SSA_shared_writet &,
+                                                  const SSA_spawnt &,
+                                                  const SSA_memory_barriert &,
+                                                  const SSA_atomic_begint &,
+                                                  const SSA_atomic_endt &,
+                                                  const SSA_inputt &>;
+
+using SSA_const_visitor_const_args =
+  const_visitor_generatort<const SSA_assertt &,
+                           const SSA_assumet &,
+                           const SSA_assignmentt &,
+                           const SSA_gotot &,
+                           const SSA_constraintt &,
+                           const SSA_locationt &,
+                           const SSA_outputt &,
+                           const SSA_declt &,
+                           const SSA_function_callt &,
+                           const SSA_function_returnt &,
+                           const SSA_shared_readt &,
+                           const SSA_shared_writet &,
+                           const SSA_spawnt &,
+                           const SSA_memory_barriert &,
+                           const SSA_atomic_begint &,
+                           const SSA_atomic_endt &,
+                           const SSA_inputt &>;
+
+using SSA_visitor = visitor_generatort<SSA_assertt &,
+                                       SSA_assumet &,
+                                       SSA_assignmentt &,
+                                       SSA_gotot &,
+                                       SSA_constraintt &,
+                                       SSA_locationt &,
+                                       SSA_outputt &,
+                                       SSA_declt &,
+                                       SSA_function_callt &,
+                                       SSA_function_returnt &,
+                                       SSA_shared_readt &,
+                                       SSA_shared_writet &,
+                                       SSA_spawnt &,
+                                       SSA_memory_barriert &,
+                                       SSA_atomic_begint &,
+                                       SSA_atomic_endt &,
+                                       SSA_inputt &>;
+
+using SSA_const_visitor = const_visitor_generatort<SSA_assertt &,
+                                                   SSA_assumet &,
+                                                   SSA_assignmentt &,
+                                                   SSA_gotot &,
+                                                   SSA_constraintt &,
+                                                   SSA_locationt &,
+                                                   SSA_outputt &,
+                                                   SSA_declt &,
+                                                   SSA_function_callt &,
+                                                   SSA_function_returnt &,
+                                                   SSA_shared_readt &,
+                                                   SSA_shared_writet &,
+                                                   SSA_spawnt &,
+                                                   SSA_memory_barriert &,
+                                                   SSA_atomic_begint &,
+                                                   SSA_atomic_endt &,
+                                                   SSA_inputt &>;
+
 class SSA_stept
 {
 public:
   virtual ~SSA_stept()=default;
   symex_targett::sourcet source;
-public:
+
   virtual goto_trace_stept::typet type() const = 0;
 
   // NOLINTNEXTLINE(whitespace/line_length)
@@ -105,6 +234,12 @@ public:
   void output(
     const namespacet &ns,
     std::ostream &out) const;
+
+  virtual void accept(SSA_visitor_const_args &) const = 0;
+  virtual void accept(const SSA_const_visitor_const_args &) const = 0;
+  virtual void accept(SSA_visitor &) = 0;
+  virtual void accept(const SSA_const_visitor &) = 0;
+
 protected:
   SSA_stept():
     hidden(false),
@@ -124,103 +259,152 @@ protected:
   }
 };
 
-class SSA_assertt : public SSA_stept {
+template <typename T>
+class SSA_acceptor_mixint : public SSA_stept
+{
+  void accept(SSA_visitor_const_args &v) const
+  {
+    v.visit(get_base());
+  }
+  void accept(const SSA_const_visitor_const_args &v) const
+  {
+    v.visit(get_base());
+  }
+  void accept(SSA_visitor &v)
+  {
+    v.visit(get_base());
+  }
+  void accept(const SSA_const_visitor &v)
+  {
+    v.visit(get_base());
+  }
+
+private:
+  T &get_base()
+  {
+    return static_cast<T &>(*this);
+  }
+
+  const T &get_base() const
+  {
+    return static_cast<const T &>(*this);
+  }
+};
+
+class SSA_assertt : public SSA_acceptor_mixint<SSA_assertt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSERT; }
 };
 
-class SSA_assumet : public SSA_stept {
+class SSA_assumet : public SSA_acceptor_mixint<SSA_assumet>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSUME; }
 };
 
-class SSA_assignmentt : public SSA_stept {
+class SSA_assignmentt : public SSA_acceptor_mixint<SSA_assignmentt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSIGNMENT; }
 };
 
-class SSA_gotot : public SSA_stept {
+class SSA_gotot : public SSA_acceptor_mixint<SSA_gotot>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::GOTO; }
 };
 
-class SSA_constraintt : public SSA_stept {
+class SSA_constraintt : public SSA_acceptor_mixint<SSA_constraintt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::CONSTRAINT; }
 };
 
-class SSA_locationt : public SSA_stept {
+class SSA_locationt : public SSA_acceptor_mixint<SSA_locationt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::LOCATION; }
 };
 
-class SSA_outputt : public SSA_stept {
+class SSA_outputt : public SSA_acceptor_mixint<SSA_outputt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::OUTPUT; }
 };
 
-class SSA_declt : public SSA_stept {
+class SSA_declt : public SSA_acceptor_mixint<SSA_declt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::DECL; }
 };
 
-class SSA_function_callt : public SSA_stept {
+class SSA_function_callt : public SSA_acceptor_mixint<SSA_function_callt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::FUNCTION_CALL; }
 };
 
-class SSA_function_returnt : public SSA_stept {
+class SSA_function_returnt : public SSA_acceptor_mixint<SSA_function_returnt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::FUNCTION_RETURN; }
 };
 
-class SSA_shared_readt : public SSA_stept {
+class SSA_shared_readt : public SSA_acceptor_mixint<SSA_shared_readt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SHARED_READ; }
 };
 
-class SSA_shared_writet : public SSA_stept {
+class SSA_shared_writet : public SSA_acceptor_mixint<SSA_shared_writet>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SHARED_WRITE; }
 };
 
-class SSA_spawnt : public SSA_stept {
+class SSA_spawnt : public SSA_acceptor_mixint<SSA_spawnt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SPAWN; }
 };
 
-class SSA_memory_barriert : public SSA_stept {
+class SSA_memory_barriert : public SSA_acceptor_mixint<SSA_memory_barriert>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::MEMORY_BARRIER; }
 };
 
-class SSA_atomic_begint : public SSA_stept {
+class SSA_atomic_begint : public SSA_acceptor_mixint<SSA_atomic_begint>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ATOMIC_BEGIN; }
 };
 
-class SSA_atomic_endt : public SSA_stept {
+class SSA_atomic_endt : public SSA_acceptor_mixint<SSA_atomic_endt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ATOMIC_END; }
 };
 
-class SSA_inputt : public SSA_stept {
+class SSA_inputt : public SSA_acceptor_mixint<SSA_inputt>
+{
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::INPUT; }
