@@ -382,16 +382,18 @@ if($opt_p && $failures != 0) {
   my $output_file = "";
   my $descriptor_file = "";
 
-  while (<LOG>) {
-    chomp;
-    if (/^Test '(.+)'/) {
+  while (my $line = <LOG>) {
+    chomp $line;
+    if ($line =~ /^Test '(.+)'/) {
       $current_test = $1;
       $printed_this_test = 0;
-    } elsif (/Descriptor:\s+([^\s]+)/) {
+    } elsif ($line =~ /Descriptor:\s+([^\s]+)/) {
       $descriptor_file = $1;
-    } elsif (/Output:\s+([^\s]+)/) {
+    } elsif ($line =~ /Output:\s+([^\s]+)/) {
       $output_file = $1;
-    } elsif (/\[FAILED\]\s*$/) {
+    } elsif ($line =~ /\[FAILED\]\s*$/) {
+      # print a descriptive header before dumping the test.desc lines that
+      # actually weren't matched (and print this header just once)
       if(0 == $printed_this_test) {
         $printed_this_test = 1;
         print "\n\n";
@@ -403,7 +405,8 @@ if($opt_p && $failures != 0) {
         close FH;
         print "\n\nFailed $descriptor_file lines:\n";
       }
-      print "$_\n";
+
+      print "$line\n";
     }
   }
 }
