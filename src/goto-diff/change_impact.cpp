@@ -315,8 +315,7 @@ change_impactt::change_impactt(
 
 void change_impactt::change_impact(const irep_idt &function)
 {
-  unified_difft::goto_program_difft diff;
-  unified_diff.get_diff(function, diff);
+  unified_difft::goto_program_difft diff = unified_diff.get_diff(function);
 
   if(diff.empty())
     return;
