@@ -50,7 +50,7 @@ SCENARIO(
 
       THEN("The elements have the parametric type T")
       {
-        const typet &element = field_t_subtype.find_type(ID_C_element_type);
+        const typet &element = java_array_element_type(field_t_subtype);
         REQUIRE(is_java_generic_parameter(element));
         java_generic_parametert element_parameter =
           to_java_generic_parameter(element);
@@ -80,7 +80,7 @@ SCENARIO(
 
       THEN("The elements have type Generic<T>")
       {
-        const typet &element = field_t2_subtype.find_type(ID_C_element_type);
+        const typet &element = java_array_element_type(field_t2_subtype);
         REQUIRE(is_java_generic_type(element));
         const java_generic_typet generic_element =
           to_java_generic_type(element);
@@ -118,7 +118,7 @@ SCENARIO(
 
       THEN("The elements have type Generic<Integer>")
       {
-        const typet &element = field_t3_subtype.find_type(ID_C_element_type);
+        const typet &element = java_array_element_type(field_t3_subtype);
         REQUIRE(is_java_generic_type(element));
         const java_generic_typet generic_element =
           to_java_generic_type(element);
