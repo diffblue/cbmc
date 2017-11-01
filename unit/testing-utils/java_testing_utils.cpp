@@ -6,39 +6,51 @@
 
 \*******************************************************************/
 
-#include <goto-programs/goto_program.h>
 #include "java_testing_utils.h"
 
-struct_component_assignment_locationt combine_locations(
-  const struct_component_assignment_locationt &a,
-  const struct_component_assignment_locationt &b)
+#include <algorithm>
+#include <util/expr_iterator.h>
+
+std::vector<codet> get_all_statements(const exprt::operandst &instructions)
 {
-  struct_component_assignment_locationt new_locations;
+  std::vector<codet> statements;
+  for(const exprt &instruction : instructions)
+  {
+    // Add the statement
+    statements.push_back(to_code(instruction));
 
-  new_locations.assignment_locations.insert(
-    new_locations.assignment_locations.end(),
-    a.assignment_locations.begin(),
-    a.assignment_locations.end());
+    // Add any child statements (e.g. if this is a code_block
+    // TODO(tkiley): It should be possible to have a custom version of
+    // TODO(tkiley): back_inserter that also transforms to codet, but I don't
+    // TODO(tkiley): know how to do this
+    std::vector<exprt> sub_expr;
+    std::copy_if(
+      instruction.depth_begin(),
+      instruction.depth_end(),
+      std::back_inserter(sub_expr),
+      [](const exprt &sub_statement) {
+        // Get all codet
+        return sub_statement.id() == ID_code;
+      });
 
-  new_locations.assignment_locations.insert(
-    new_locations.assignment_locations.end(),
-    b.assignment_locations.begin(),
-    b.assignment_locations.end());
-
-  return new_locations;
+    std::transform(
+      sub_expr.begin(),
+      sub_expr.end(),
+      std::back_inserter(statements),
+      [](const exprt &sub_expr) { return to_code(sub_expr); });
+  }
+  return statements;
 }
 
-struct_component_assignment_locationt find_struct_component_assignments(
-  const exprt::operandst &entry_point_instructions,
+std::vector<code_assignt> find_struct_component_assignments(
+  const std::vector<codet> &statements,
   const irep_idt &structure_name,
   const irep_idt &component_name)
 {
-  struct_component_assignment_locationt component_assignments;
+  std::vector<code_assignt> component_assignments;
 
-  for(const auto &instruction : entry_point_instructions)
+  for(const auto &assignment : statements)
   {
-    const codet &assignment = to_code(instruction);
-    INVARIANT(instruction.id() == ID_code, "All instructions must be code");
     if(assignment.get_statement() == ID_assign)
     {
       const code_assignt &code_assign = to_code_assign(assignment);
@@ -52,86 +64,12 @@ struct_component_assignment_locationt find_struct_component_assignments(
           symbol.get_identifier() == structure_name &&
           member_expr.get_component_name() == component_name)
         {
-          component_assignments.assignment_locations.push_back(code_assign);
+          component_assignments.push_back(code_assign);
         }
       }
     }
-    else if(assignment.get_statement() == ID_block)
-    {
-      const auto &assignments_in_block = find_struct_component_assignments(
-        assignment.operands(), structure_name, component_name);
-      component_assignments =
-        combine_locations(component_assignments, assignments_in_block);
-    }
-    else if(assignment.get_statement() == ID_ifthenelse)
-    {
-      const code_ifthenelset &if_else_block =
-        to_code_ifthenelse(to_code(assignment));
-      const auto &assignments_in_block = find_struct_component_assignments(
-        exprt::operandst{if_else_block.then_case()},
-        structure_name,
-        component_name);
-      component_assignments =
-        combine_locations(component_assignments, assignments_in_block);
-
-      if(if_else_block.has_else_case())
-      {
-        const auto &assignments_in_else = find_struct_component_assignments(
-          exprt::operandst{if_else_block.else_case()},
-          structure_name,
-          component_name);
-        component_assignments =
-          combine_locations(component_assignments, assignments_in_else);
-      }
-    }
-    else if(assignment.get_statement() == ID_label)
-    {
-      const code_labelt &label_statement = to_code_label(assignment);
-      const auto &assignments_in_label = find_struct_component_assignments(
-        exprt::operandst{label_statement.code()},
-        structure_name,
-        component_name);
-      component_assignments =
-        combine_locations(component_assignments, assignments_in_label);
-    }
   }
   return component_assignments;
-}
-
-/// Combine two pointer locations. Takes the null assignment if present in
-/// either (fails if present in both) and appends the non-null assignments
-/// \param a: The first set of assignments
-/// \param b: The second set of assignments
-/// \return The resulting assignment
-pointer_assignment_locationt combine_locations(
-  const pointer_assignment_locationt &a,
-  const pointer_assignment_locationt &b)
-{
-  pointer_assignment_locationt new_locations;
-  if(a.null_assignment.has_value())
-  {
-    INVARIANT(
-      !b.null_assignment.has_value(), "Only expected one assignment to null");
-    new_locations.null_assignment = a.null_assignment;
-  }
-  else if(b.null_assignment.has_value())
-  {
-    INVARIANT(
-      !a.null_assignment.has_value(), "Only expected one assignment to null");
-    new_locations.null_assignment = b.null_assignment;
-  }
-
-  new_locations.non_null_assignments.insert(
-    new_locations.non_null_assignments.end(),
-    a.non_null_assignments.begin(),
-    a.non_null_assignments.end());
-
-  new_locations.non_null_assignments.insert(
-    new_locations.non_null_assignments.end(),
-    b.non_null_assignments.begin(),
-    b.non_null_assignments.end());
-
-  return new_locations;
 }
 
 /// For a given variable name, gets the assignments to it in the functions
@@ -141,16 +79,14 @@ pointer_assignment_locationt combine_locations(
 /// vector of all other assignments
 pointer_assignment_locationt find_pointer_assignments(
   const irep_idt &pointer_name,
-  const exprt::operandst &instructions)
+  const std::vector<codet> &instructions)
 {
   pointer_assignment_locationt locations;
-  for(const exprt &assignment : instructions)
+  for(const codet &statement : instructions)
   {
-    const codet &statement = to_code(assignment);
-    INVARIANT(assignment.id() == ID_code, "All instructions must be code");
     if(statement.get_statement() == ID_assign)
     {
-      const code_assignt &code_assign = to_code_assign(to_code(assignment));
+      const code_assignt &code_assign = to_code_assign(statement);
       if(
         code_assign.lhs().id() == ID_symbol &&
         to_symbol_expr(code_assign.lhs()).get_identifier() == pointer_name)
@@ -167,34 +103,6 @@ pointer_assignment_locationt find_pointer_assignments(
         }
       }
     }
-    else if(statement.get_statement() == ID_block)
-    {
-      const auto &assignments_in_block =
-        find_pointer_assignments(pointer_name, assignment.operands());
-      locations = combine_locations(locations, assignments_in_block);
-    }
-    else if(statement.get_statement() == ID_ifthenelse)
-    {
-      const code_ifthenelset &if_else_block =
-        to_code_ifthenelse(to_code(assignment));
-      const auto &assignments_in_block = find_pointer_assignments(
-        pointer_name, exprt::operandst{if_else_block.then_case()});
-      locations = combine_locations(locations, assignments_in_block);
-
-      if(if_else_block.has_else_case())
-      {
-        const auto &assignments_in_else = find_pointer_assignments(
-          pointer_name, exprt::operandst{if_else_block.else_case()});
-        locations = combine_locations(locations, assignments_in_else);
-      }
-    }
-    else if(statement.get_statement() == ID_label)
-    {
-      const code_labelt &label_statement = to_code_label(statement);
-      const auto &assignments_in_label = find_pointer_assignments(
-        pointer_name, exprt::operandst{label_statement.code()});
-      locations = combine_locations(locations, assignments_in_label);
-    }
   }
 
   return locations;
@@ -202,19 +110,17 @@ pointer_assignment_locationt find_pointer_assignments(
 
 const exprt &find_declaration_by_name(
   const irep_idt &variable_name,
-  const exprt::operandst &entry_point_instructions)
+  const std::vector<codet> &entry_point_instructions)
 {
-  for(const auto &instruction : entry_point_instructions)
+  for(const auto &statement : entry_point_instructions)
   {
-    const codet &statement = to_code(instruction);
-    INVARIANT(instruction.id() == ID_code, "All instructions must be code");
     if(statement.get_statement() == ID_decl)
     {
       const auto &decl_statement = to_code_decl(statement);
 
       if(decl_statement.get_identifier() == variable_name)
       {
-        return instruction;
+        return statement;
       }
     }
   }

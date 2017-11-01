@@ -38,13 +38,8 @@ private:
   std::string _varname;
 };
 
-struct struct_component_assignment_locationt
-{
-  std::vector<code_assignt> assignment_locations;
-};
-
-struct_component_assignment_locationt find_struct_component_assignments(
-  const exprt::operandst &entry_point_instructions,
+std::vector<code_assignt> find_struct_component_assignments(
+  const std::vector<codet> &statements,
   const irep_idt &structure_name,
   const irep_idt &component_name);
 
@@ -54,12 +49,14 @@ struct pointer_assignment_locationt
   std::vector<code_assignt> non_null_assignments;
 };
 
+std::vector<codet> get_all_statements(const exprt::operandst &instructions);
+
 pointer_assignment_locationt find_pointer_assignments(
   const irep_idt &pointer_name,
-  const exprt::operandst &instructions);
+  const std::vector<codet> &instructions);
 
 const exprt &find_declaration_by_name(
   const irep_idt &variable_name,
-  const exprt::operandst &entry_point_instructions);
+  const std::vector<codet> &entry_point_instructions);
 
 #endif //TEST_GEN_SUPERBUILD_JAVA_TESTING_UTILS_H
