@@ -354,8 +354,10 @@ exprt string_constraint_generatort::add_axioms_for_char_set(
   axioms.push_back(equal_exprt(res.length(), str.length()));
   axioms.push_back(equal_exprt(res[position], character));
   const symbol_exprt q = fresh_univ_index("QA_char_set", position.type());
-  or_exprt a3_body(equal_exprt(q, position), equal_exprt(res[q], str[q]));
-  axioms.push_back(string_constraintt(q, res.length(), a3_body));
+  equal_exprt a3_body(res[q], str[q]);
+  notequal_exprt a3_guard(q, position);
+  axioms.push_back(string_constraintt(
+    q, from_integer(0, q.type()), res.length(), a3_guard, a3_body));
   return if_exprt(
     out_of_bounds, from_integer(1, f.type()), from_integer(0, f.type()));
 }

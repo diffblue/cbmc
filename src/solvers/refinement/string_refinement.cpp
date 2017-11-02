@@ -1924,9 +1924,13 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get = [this](const exprt &expr) { // NOLINT
+  // clang-format off
+  const auto super_get = [this](const exprt &expr)
+  {
     return supert::get(expr);
   };
+  // clang-format on
+
   exprt ecopy(expr);
   (void)symbol_resolve.replace_expr(ecopy);
 
@@ -2003,31 +2007,21 @@ static optionalt<exprt> find_counter_example(
 typedef std::map<exprt, std::vector<exprt>> array_index_mapt;
 
 /// \related string_constraintt
-class gather_indices_visitort: public const_expr_visitort
-{
-public:
-  array_index_mapt indices;
-
-  gather_indices_visitort(): indices() {}
-
-  void operator()(const exprt &expr) override
-  {
-    if(expr.id()==ID_index)
-    {
-      const index_exprt &index=to_index_expr(expr);
-      const exprt &s(index.array());
-      const exprt &i(index.index());
-      indices[s].push_back(i);
-    }
-  }
-};
-
-/// \related string_constraintt
 static array_index_mapt gather_indices(const exprt &expr)
 {
-  gather_indices_visitort v;
-  expr.visit(v);
-  return v.indices;
+  array_index_mapt indices;
+  // clang-format off
+  std::for_each(
+    expr.depth_begin(),
+    expr.depth_end(),
+    [&](const exprt &expr)
+    {
+      const auto index_expr = expr_try_dynamic_cast<const index_exprt>(expr);
+      if(index_expr)
+        indices[index_expr->array()].push_back(index_expr->index());
+    });
+  // clang-format on
+  return indices;
 }
 
 /// \param expr: an expression
@@ -2064,33 +2058,14 @@ is_linear_arithmetic_expr(const exprt &expr, const symbol_exprt &var)
 ///   false otherwise.
 static bool universal_only_in_index(const string_constraintt &expr)
 {
-  // For efficiency, we do a depth-first search of the
-  // body. The exprt visitors do a BFS and hide the stack/queue, so we would
-  // need to store a map from child to parent.
-
-  // The unsigned int represents index depth we are. For example, if we are
-  // considering the fragment `a[b[x]]` (not inside an index expression), then
-  // the stack would look something like `[..., (a, 0), (b, 1), (x, 2)]`.
-  typedef std::pair<exprt, unsigned> valuet;
-  std::stack<valuet> stack;
-  // We start at 0 since expr is not an index expression, so expr.body() is not
-  // in an index expression.
-  stack.push(valuet(expr.body(), 0));
-  while(!stack.empty())
+  for(auto it = expr.body().depth_begin(); it != expr.body().depth_end();)
   {
-    // Inspect current value
-    const valuet cur=stack.top();
-    stack.pop();
-    const exprt e=cur.first;
-    const unsigned index_depth=cur.second;
-    const unsigned child_index_depth=index_depth+(e.id()==ID_index?0:1);
-
-    // If we found the universal variable not in an index_exprt, fail
-    if(e==expr.univ_var() && index_depth==0)
+    if(*it == expr.univ_var())
       return false;
+    if(it->id() == ID_index)
+      it.next_sibling_or_parent();
     else
-      forall_operands(it, e)
-        stack.push(valuet(*it, child_index_depth));
+      ++it;
   }
   return true;
 }
