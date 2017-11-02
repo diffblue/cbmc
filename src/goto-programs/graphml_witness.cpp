@@ -171,6 +171,124 @@ static bool filter_out(
   return false;
 }
 
+namespace
+{
+class graphml_witness_operator_visitort
+  : public const_defaulted_visitor_generatort<const SSA_stept &,
+                                              SSA_step_const_ref_typest>
+{
+public:
+  explicit graphml_witness_operator_visitort(
+    const namespacet &ns,
+    graphmlt &graphml,
+    size_t from,
+    size_t to)
+    : ns_{ns}, graphml_{graphml}, from_{from}, to_{to}
+  {
+  }
+
+  void visit(const SSA_stept &base) const override
+  {
+    // Ignore
+  }
+
+  void visit(const SSA_assignmentt &x) const override
+  {
+    write_edge(x, [this, &x](xmlt &edge) {
+      if(x.lhs_object_value.is_not_nil() && x.full_lhs.is_not_nil())
+      {
+        if(
+          !x.lhs_object_value.is_constant() ||
+          !x.lhs_object_value.has_operands() ||
+          !has_prefix(
+            id2string(x.lhs_object_value.op0().get(ID_value)), "INVALID-"))
+        {
+          xmlt &val = edge.new_element("data");
+          val.set_attribute("key", "assumption");
+          code_assignt assign(x.lhs_object, x.lhs_object_value);
+          irep_idt identifier = x.lhs_object.get_identifier();
+          val.data = convert_assign_rec(ns_, identifier, assign);
+
+          xmlt &val_s = edge.new_element("data");
+          val_s.set_attribute("key", "assumption.scope");
+          val_s.data = id2string(x.pc->source_location.get_function());
+        }
+      }
+    });
+  }
+
+  void visit(const SSA_assertt &x) const override
+  {
+    write_edge(x, [this, &x](xmlt &edge) {});
+  }
+
+  void visit(const SSA_gotot &x) const override
+  {
+    write_edge(x, [this, &x](xmlt &edge) {
+      if(x.pc->is_goto())
+      {
+        xmlt &val = edge.new_element("data");
+        val.set_attribute("key", "sourcecode");
+        const std::string cond = from_expr(ns_, "", x.cond_expr);
+        const std::string neg_cond = from_expr(ns_, "", not_exprt(x.cond_expr));
+        val.data = "[" + (x.cond_value ? cond : neg_cond) + "]";
+
+#if 0
+          xmlt edge2("edge");
+          edge2.set_attribute("source", graphml[from].node_name);
+          edge2.set_attribute("target", graphml[sink].node_name);
+
+          xmlt &data_f2=edge2.new_element("data");
+          data_f2.set_attribute("key", "originfile");
+          data_f2.data=id2string(graphml[from].file);
+
+          xmlt &data_l2=edge2.new_element("data");
+          data_l2.set_attribute("key", "startline");
+          data_l2.data=id2string(graphml[from].line);
+
+          xmlt &val2=edge2.new_element("data");
+          val2.set_attribute("key", "sourcecode");
+          val2.data="["+((*it)->cond_value ? neg_cond : cond)+"]";
+
+          graphml[sink].in[from].xml_node=edge2;
+          graphml[from].out[sink].xml_node=edge2;
+#endif
+      }
+    });
+  }
+
+private:
+  template <typename Step, typename Fn>
+  void write_edge(Step &step, Fn fn) const
+  {
+    xmlt edge("edge");
+    edge.set_attribute("source", graphml_[from_].node_name);
+    edge.set_attribute("target", graphml_[to_].node_name);
+
+    {
+      xmlt &data_f = edge.new_element("data");
+      data_f.set_attribute("key", "originfile");
+      data_f.data = id2string(graphml_[from_].file);
+
+      xmlt &data_l = edge.new_element("data");
+      data_l.set_attribute("key", "startline");
+      data_l.data = id2string(graphml_[from_].line);
+    }
+
+    fn(edge);
+
+    graphml_[to_].in[from_].xml_node = edge;
+    graphml_[from_].out[to_].xml_node = edge;
+  }
+
+  const namespacet &ns_;
+  graphmlt &graphml_;
+  size_t from_;
+  size_t to_;
+};
+
+} // namespace
+
 /// counterexample witness
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
@@ -356,7 +474,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 namespace
 {
 class graphml_witness_visitort
-  : public const_defaulted_visitor_generatort<SSA_stept &, SSA_step_ref_typest>
+  : public const_defaulted_visitor_generatort<const SSA_stept &,
+                                              SSA_step_const_ref_typest>
 {
 public:
   explicit graphml_witness_visitort(
@@ -368,12 +487,12 @@ public:
   {
   }
 
-  void visit(SSA_stept &base) const override
+  void visit(const SSA_stept &base) const override
   {
     // Ignore
   }
 
-  void visit(SSA_assignmentt &x) const override
+  void visit(const SSA_assignmentt &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {
       if(x.ssa_rhs.is_not_nil() && x.ssa_full_lhs.is_not_nil())
@@ -389,7 +508,7 @@ public:
     });
   }
 
-  void visit(SSA_assertt &x) const override
+  void visit(const SSA_assertt &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {
       if(x.is_goto() && x.source.pc->is_goto())
@@ -403,7 +522,7 @@ public:
     });
   }
 
-  void visit(SSA_gotot &x) const override
+  void visit(const SSA_gotot &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {
       if(x.ssa_rhs.is_not_nil() && x.ssa_full_lhs.is_not_nil())
