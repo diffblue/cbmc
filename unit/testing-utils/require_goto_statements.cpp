@@ -20,26 +20,15 @@ std::vector<codet>
 require_goto_statements::get_all_statements(const exprt &function_value)
 {
   std::vector<codet> statements;
-
-  // Add any child statements (e.g. if this is a code_block
-  // TODO(tkiley): It should be possible to have a custom version of
-  // TODO(tkiley): back_inserter that also transforms to codet, but I don't
-  // TODO(tkiley): know how to do this
-  std::vector<exprt> sub_expr;
-  std::copy_if(
-    function_value.depth_begin(),
-    function_value.depth_end(),
-    std::back_inserter(sub_expr),
-    [](const exprt &sub_statement) {
-      // Get all codet
-      return sub_statement.id() == ID_code;
-    });
-
-  std::transform(
-    sub_expr.begin(),
-    sub_expr.end(),
-    std::back_inserter(statements),
-    [](const exprt &sub_expr) { return to_code(sub_expr); });
+  for(auto sub_expression_it = function_value.depth_begin();
+      sub_expression_it != function_value.depth_end();
+      ++sub_expression_it)
+  {
+    if(sub_expression_it->id() == ID_code)
+    {
+      statements.push_back(to_code(*sub_expression_it));
+    }
+  }
 
   return statements;
 }
