@@ -47,6 +47,8 @@ class SSA_atomic_begint;
 class SSA_atomic_endt;
 class SSA_inputt;
 
+namespace detail
+{
 using SSA_step_ref_typest = typelistt<SSA_assertt &,
                                       SSA_assumet &,
                                       SSA_assignmentt &,
@@ -83,13 +85,15 @@ using SSA_step_const_ref_typest = typelistt<const SSA_assertt &,
                                             const SSA_atomic_endt &,
                                             const SSA_inputt &>;
 
-////////////////////////////////////////////////////////////////////////////////
+} // namespace detail
 
-using SSA_visitor_const_argst = visitor_generatort<SSA_step_const_ref_typest>;
+using SSA_visitor_const_argst =
+  visitor_generatort<detail::SSA_step_const_ref_typest>;
 using SSA_const_visitor_const_argst =
-  const_visitor_generatort<SSA_step_const_ref_typest>;
-using SSA_visitort = visitor_generatort<SSA_step_ref_typest>;
-using SSA_const_visitort = const_visitor_generatort<SSA_step_ref_typest>;
+  const_visitor_generatort<detail::SSA_step_const_ref_typest>;
+using SSA_visitort = visitor_generatort<detail::SSA_step_ref_typest>;
+using SSA_const_visitort =
+  const_visitor_generatort<detail::SSA_step_ref_typest>;
 
 class SSA_stept
 {
@@ -196,19 +200,19 @@ protected:
 template <typename T>
 class SSA_acceptor_mixint : public SSA_stept
 {
-  void accept(SSA_visitor_const_argst &v) const
+  void accept(SSA_visitor_const_argst &v) const override
   {
     v.visit(get_base());
   }
-  void accept(const SSA_const_visitor_const_argst &v) const
+  void accept(const SSA_const_visitor_const_argst &v) const override
   {
     v.visit(get_base());
   }
-  void accept(SSA_visitort &v)
+  void accept(SSA_visitort &v) override
   {
     v.visit(get_base());
   }
-  void accept(const SSA_const_visitort &v)
+  void accept(const SSA_const_visitort &v) override
   {
     v.visit(get_base());
   }

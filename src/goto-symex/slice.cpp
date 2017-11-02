@@ -34,7 +34,8 @@ static void get_symbols(const exprt &expr, symbol_sett &depends)
 namespace
 {
 class slicing_visitort
-  : public const_defaulted_visitor_generatort<SSA_stept &, SSA_step_ref_typest>
+  : public const_defaulted_visitor_generatort<SSA_stept &,
+                                              detail::SSA_step_ref_typest>
 {
 public:
   explicit slicing_visitort(symbol_sett &depends) : depends_{depends}
@@ -93,7 +94,7 @@ private:
 
 class collecting_visitort
   : public const_defaulted_visitor_generatort<const SSA_stept &,
-                                              SSA_step_const_ref_typest>
+                                              detail::SSA_step_const_ref_typest>
 {
 public:
   explicit collecting_visitort(symbol_sett &depends, symbol_sett &lhs)

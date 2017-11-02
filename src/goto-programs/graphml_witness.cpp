@@ -174,8 +174,9 @@ static bool filter_out(
 namespace
 {
 class graphml_witness_operator_visitort
-  : public const_defaulted_visitor_generatort<const SSA_stept &,
-                                              SSA_step_const_ref_typest>
+  : public const_defaulted_visitor_generatort<
+      const goto_trace_stept &,
+      detail::trace_step_const_ref_typest>
 {
 public:
   explicit graphml_witness_operator_visitort(
@@ -187,12 +188,12 @@ public:
   {
   }
 
-  void visit(const SSA_stept &base) const override
+  void visit(const goto_trace_stept &base) const override
   {
     // Ignore
   }
 
-  void visit(const SSA_assignmentt &x) const override
+  void visit(const trace_assignmentt &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {
       if(x.lhs_object_value.is_not_nil() && x.full_lhs.is_not_nil())
@@ -217,12 +218,12 @@ public:
     });
   }
 
-  void visit(const SSA_assertt &x) const override
+  void visit(const trace_assertt &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {});
   }
 
-  void visit(const SSA_gotot &x) const override
+  void visit(const trace_gotot &x) const override
   {
     write_edge(x, [this, &x](xmlt &edge) {
       if(x.pc->is_goto())
@@ -371,101 +372,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       next==goto_trace.steps.end()?
       sink:step_to_node[(*next)->step_nr];
 
-    switch((*it)->type())
-    {
-    case goto_trace_stept::typet::ASSIGNMENT:
-    case goto_trace_stept::typet::ASSERT:
-    case goto_trace_stept::typet::GOTO:
-      {
-        xmlt edge("edge");
-        edge.set_attribute("source", graphml[from].node_name);
-        edge.set_attribute("target", graphml[to].node_name);
-
-        {
-          xmlt &data_f=edge.new_element("data");
-          data_f.set_attribute("key", "originfile");
-          data_f.data=id2string(graphml[from].file);
-
-          xmlt &data_l=edge.new_element("data");
-          data_l.set_attribute("key", "startline");
-          data_l.data=id2string(graphml[from].line);
-        }
-
-        if(
-          (*it)->is_assignment() && (*it)->lhs_object_value.is_not_nil() &&
-          (*it)->full_lhs.is_not_nil())
-        {
-          if(!(*it)->lhs_object_value.is_constant() ||
-             !(*it)->lhs_object_value.has_operands() ||
-             !has_prefix(id2string((*it)->lhs_object_value.op0().get(ID_value)),
-                         "INVALID-"))
-          {
-            xmlt &val=edge.new_element("data");
-            val.set_attribute("key", "assumption");
-            code_assignt assign((*it)->lhs_object, (*it)->lhs_object_value);
-            irep_idt identifier=(*it)->lhs_object.get_identifier();
-            val.data=convert_assign_rec(ns, identifier, assign);
-
-            xmlt &val_s=edge.new_element("data");
-            val_s.set_attribute("key", "assumption.scope");
-            val_s.data=id2string((*it)->pc->source_location.get_function());
-          }
-        }
-        else if((*it)->is_goto() && (*it)->pc->is_goto())
-        {
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "sourcecode");
-          const std::string cond=from_expr(ns, "", (*it)->cond_expr);
-          const std::string neg_cond=
-            from_expr(ns, "", not_exprt((*it)->cond_expr));
-          val.data="["+((*it)->cond_value ? cond : neg_cond)+"]";
-
-          #if 0
-          xmlt edge2("edge");
-          edge2.set_attribute("source", graphml[from].node_name);
-          edge2.set_attribute("target", graphml[sink].node_name);
-
-          xmlt &data_f2=edge2.new_element("data");
-          data_f2.set_attribute("key", "originfile");
-          data_f2.data=id2string(graphml[from].file);
-
-          xmlt &data_l2=edge2.new_element("data");
-          data_l2.set_attribute("key", "startline");
-          data_l2.data=id2string(graphml[from].line);
-
-          xmlt &val2=edge2.new_element("data");
-          val2.set_attribute("key", "sourcecode");
-          val2.data="["+((*it)->cond_value ? neg_cond : cond)+"]";
-
-          graphml[sink].in[from].xml_node=edge2;
-          graphml[from].out[sink].xml_node=edge2;
-          #endif
-        }
-
-        graphml[to].in[from].xml_node=edge;
-        graphml[from].out[to].xml_node=edge;
-      }
-      break;
-
-    case goto_trace_stept::typet::DECL:
-    case goto_trace_stept::typet::FUNCTION_CALL:
-    case goto_trace_stept::typet::FUNCTION_RETURN:
-    case goto_trace_stept::typet::LOCATION:
-    case goto_trace_stept::typet::ASSUME:
-    case goto_trace_stept::typet::INPUT:
-    case goto_trace_stept::typet::OUTPUT:
-    case goto_trace_stept::typet::SHARED_READ:
-    case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::SPAWN:
-    case goto_trace_stept::typet::MEMORY_BARRIER:
-    case goto_trace_stept::typet::ATOMIC_BEGIN:
-    case goto_trace_stept::typet::ATOMIC_END:
-    case goto_trace_stept::typet::DEAD:
-    case goto_trace_stept::typet::CONSTRAINT:
-    case goto_trace_stept::typet::NONE:
-      // ignore
-      break;
-    }
+    (*it)->accept(graphml_witness_operator_visitort{ns, graphml, from, to});
 
     it=next;
   }
@@ -475,7 +382,7 @@ namespace
 {
 class graphml_witness_visitort
   : public const_defaulted_visitor_generatort<const SSA_stept &,
-                                              SSA_step_const_ref_typest>
+                                              detail::SSA_step_const_ref_typest>
 {
 public:
   explicit graphml_witness_visitort(

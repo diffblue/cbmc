@@ -26,9 +26,79 @@ Date: July 2005
 
 #include <util/namespace.h>
 #include <util/ssa_expr.h>
+#include <util/visitor_generator.h>
 
 #include <goto-programs/goto_program.h>
 #include <util/make_unique.h>
+
+class trace_assignmentt;
+class trace_assumet;
+class trace_assertt;
+class trace_gotot;
+class trace_locationt;
+class trace_inputt;
+class trace_outputt;
+class trace_declt;
+class trace_deadt;
+class trace_function_callt;
+class trace_function_returnt;
+class trace_constraintt;
+class trace_shared_readt;
+class trace_shared_writet;
+class trace_spawnt;
+class trace_memory_barriert;
+class trace_atomic_begint;
+class trace_atomic_endt;
+
+namespace detail
+{
+using trace_step_ref_typest = typelistt<trace_assignmentt &,
+                                        trace_assumet &,
+                                        trace_assertt &,
+                                        trace_gotot &,
+                                        trace_locationt &,
+                                        trace_inputt &,
+                                        trace_outputt &,
+                                        trace_declt &,
+                                        trace_deadt &,
+                                        trace_function_callt &,
+                                        trace_function_returnt &,
+                                        trace_constraintt &,
+                                        trace_shared_readt &,
+                                        trace_shared_writet &,
+                                        trace_spawnt &,
+                                        trace_memory_barriert &,
+                                        trace_atomic_begint &,
+                                        trace_atomic_endt &>;
+
+using trace_step_const_ref_typest = typelistt<const trace_assignmentt &,
+                                              const trace_assumet &,
+                                              const trace_assertt &,
+                                              const trace_gotot &,
+                                              const trace_locationt &,
+                                              const trace_inputt &,
+                                              const trace_outputt &,
+                                              const trace_declt &,
+                                              const trace_deadt &,
+                                              const trace_function_callt &,
+                                              const trace_function_returnt &,
+                                              const trace_constraintt &,
+                                              const trace_shared_readt &,
+                                              const trace_shared_writet &,
+                                              const trace_spawnt &,
+                                              const trace_memory_barriert &,
+                                              const trace_atomic_begint &,
+                                              const trace_atomic_endt &>;
+
+} // namespace detail
+
+using trace_visitor_const_argst =
+  visitor_generatort<detail::trace_step_const_ref_typest>;
+using trace_const_visitor_const_argst =
+  const_visitor_generatort<detail::trace_step_const_ref_typest>;
+using trace_visitor = visitor_generatort<detail::trace_step_ref_typest>;
+using trace_const_visitor =
+  const_visitor_generatort<detail::trace_step_ref_typest>;
 
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
@@ -128,6 +198,11 @@ public:
 
   virtual typet type() const = 0;
 
+  virtual void accept(trace_visitor_const_argst &v) const = 0;
+  virtual void accept(const trace_const_visitor_const_argst &v) const = 0;
+  virtual void accept(trace_visitor &v) = 0;
+  virtual void accept(const trace_const_visitor &v) = 0;
+
 protected:
   goto_trace_stept():
     step_nr(0),
@@ -146,109 +221,163 @@ protected:
   }
 };
 
-class trace_assignmentt : public goto_trace_stept {
+template <typename T>
+class goto_trace_accept_mixint : public goto_trace_stept {
+public:
+  void accept(trace_visitor_const_argst &v) const override
+  {
+    v.visit(get_base());
+  }
+  void accept(const trace_const_visitor_const_argst &v) const override
+  {
+    v.visit(get_base());
+  }
+  void accept(trace_visitor &v) override
+  {
+    v.visit(get_base());
+  }
+  void accept(const trace_const_visitor &v) override
+  {
+    v.visit(get_base());
+  }
+
+private:
+  T &get_base()
+  {
+    return static_cast<T &>(*this);
+  }
+
+  const T &get_base() const
+  {
+    return static_cast<const T &>(*this);
+  }
+
+};
+
+class trace_assignmentt : public goto_trace_accept_mixint<trace_assignmentt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::ASSIGNMENT; }
 };
 
-class trace_assumet : public goto_trace_stept {
+class trace_assumet : public goto_trace_accept_mixint<trace_assumet>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::ASSUME; }
 };
 
-class trace_assertt : public goto_trace_stept {
+class trace_assertt : public goto_trace_accept_mixint<trace_assertt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::ASSERT; }
 };
 
-class trace_gotot : public goto_trace_stept {
+class trace_gotot : public goto_trace_accept_mixint<trace_gotot>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::GOTO; }
 };
 
-class trace_locationt : public goto_trace_stept {
+class trace_locationt : public goto_trace_accept_mixint<trace_locationt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::LOCATION; }
 };
 
-class trace_inputt : public goto_trace_stept {
+class trace_inputt : public goto_trace_accept_mixint<trace_inputt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::INPUT; }
 };
 
-class trace_outputt : public goto_trace_stept {
+class trace_outputt : public goto_trace_accept_mixint<trace_outputt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::OUTPUT; }
 };
 
-class trace_declt : public goto_trace_stept {
+class trace_declt : public goto_trace_accept_mixint<trace_declt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::DECL; }
 };
 
-class trace_deadt : public goto_trace_stept {
+class trace_deadt : public goto_trace_accept_mixint<trace_deadt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::DEAD; }
 };
 
-class trace_function_callt : public goto_trace_stept {
+class trace_function_callt
+  : public goto_trace_accept_mixint<trace_function_callt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::FUNCTION_CALL; }
 };
 
-class trace_function_returnt : public goto_trace_stept {
+class trace_function_returnt
+  : public goto_trace_accept_mixint<trace_function_returnt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::FUNCTION_RETURN; }
 };
 
-class trace_constraintt : public goto_trace_stept {
+class trace_constraintt : public goto_trace_accept_mixint<trace_constraintt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::CONSTRAINT; }
 };
 
-class trace_shared_readt : public goto_trace_stept {
+class trace_shared_readt : public goto_trace_accept_mixint<trace_shared_readt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::SHARED_READ; }
 };
 
-class trace_shared_writet : public goto_trace_stept {
+class trace_shared_writet : public goto_trace_accept_mixint<trace_shared_writet>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::SHARED_WRITE; }
 };
 
-class trace_spawnt : public goto_trace_stept {
+class trace_spawnt : public goto_trace_accept_mixint<trace_spawnt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::SPAWN; }
 };
 
-class trace_memory_barriert : public goto_trace_stept {
+class trace_memory_barriert
+  : public goto_trace_accept_mixint<trace_memory_barriert>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::MEMORY_BARRIER; }
 };
 
-class trace_atomic_begint : public goto_trace_stept {
+class trace_atomic_begint : public goto_trace_accept_mixint<trace_atomic_begint>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::ATOMIC_BEGIN; }
 };
 
-class trace_atomic_endt : public goto_trace_stept {
+class trace_atomic_endt : public goto_trace_accept_mixint<trace_atomic_endt>
+{
 public:
   typet type() const override
   { return goto_trace_stept::typet::ATOMIC_END; }
