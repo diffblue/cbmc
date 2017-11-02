@@ -16,9 +16,10 @@
 #include <util/std_types.h>
 #include <goto-programs/goto_program.h>
 
-#ifndef CPROVER_TESTING_UTILS_CHECK_GOTO_FUNCTIONS_H
-#define CPROVER_TESTING_UTILS_CHECK_GOTO_FUNCTIONS_H
+#ifndef CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
+#define CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
 
+// NOLINTNEXTLINE(readability/namespace)
 namespace require_goto_statements
 {
 struct pointer_assignment_locationt
@@ -27,11 +28,11 @@ struct pointer_assignment_locationt
   std::vector<code_assignt> non_null_assignments;
 };
 
-class no_decl_found_exception : public std::exception
+class no_decl_found_exceptiont : public std::exception
 {
 public:
-  explicit no_decl_found_exception(const std::string &varname)
-    : _varname(varname)
+  explicit no_decl_found_exceptiont(const std::string &var_name)
+    : _varname(var_name)
   {
   }
 
@@ -62,4 +63,4 @@ const code_declt &require_declaration_of_name(
   const std::vector<codet> &entry_point_instructions);
 }
 
-#endif //TEST_GEN_SUPERBUILD_JAVA_TESTING_UTILS_H
+#endif // CPROVER_TESTING_UTILS_REQUIRE_GOTO_STATEMENTS_H
