@@ -13,7 +13,7 @@
 #include <util/expr_iterator.h>
 
 /// Expand value of a function to include all child codets
-/// \param instructions: The value of the function (e.g. got by looking up
+/// \param function_value: The value of the function (e.g. got by looking up
 ///  the function in the symbol table and getting the value)
 /// \return: All ID_code statements in the tree rooted at \p function_value
 std::vector<codet>
@@ -69,7 +69,8 @@ require_goto_statements::find_struct_component_assignments(
   return component_assignments;
 }
 
-/// For a given variable name, gets the assignments to it in the functions
+/// For a given variable name, gets the assignments to it in the provided
+/// instructions.
 /// \param pointer_name: The name of the variable
 /// \param instructions: The instructions to look through
 /// \return: A structure that contains the null assignment if found, and a
@@ -110,6 +111,8 @@ require_goto_statements::find_pointer_assignments(
 /// \param variable_name: The name of the variable.
 /// \param entry_point_instructions: The statements to look through
 /// \return The declaration statement corresponding to that variable
+/// \throws no_decl_found_exceptiont if no declaration of the specific
+/// variable is found
 const code_declt &require_goto_statements::require_declaration_of_name(
   const irep_idt &variable_name,
   const std::vector<codet> &entry_point_instructions)
