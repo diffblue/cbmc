@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 
 #include <util/merge_irep.h>
+#include <util/visitor_generator.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
@@ -46,116 +47,49 @@ class SSA_atomic_begint;
 class SSA_atomic_endt;
 class SSA_inputt;
 
-template <typename... Ts>
-struct visitor_generatort;
+using SSA_step_ref_typest = typelistt<SSA_assertt &,
+                                      SSA_assumet &,
+                                      SSA_assignmentt &,
+                                      SSA_gotot &,
+                                      SSA_constraintt &,
+                                      SSA_locationt &,
+                                      SSA_outputt &,
+                                      SSA_declt &,
+                                      SSA_function_callt &,
+                                      SSA_function_returnt &,
+                                      SSA_shared_readt &,
+                                      SSA_shared_writet &,
+                                      SSA_spawnt &,
+                                      SSA_memory_barriert &,
+                                      SSA_atomic_begint &,
+                                      SSA_atomic_endt &,
+                                      SSA_inputt &>;
 
-template <typename T, typename... Ts>
-struct visitor_generatort<T, Ts...> : visitor_generatort<Ts...>
-{
-  virtual void visit(T) = 0;
-  using visitor_generatort<Ts...>::visit;
-};
-
-template <typename T>
-struct visitor_generatort<T>
-{
-  virtual ~visitor_generatort() = default;
-  virtual void visit(T) = 0;
-};
+using SSA_step_const_ref_typest = typelistt<const SSA_assertt &,
+                                            const SSA_assumet &,
+                                            const SSA_assignmentt &,
+                                            const SSA_gotot &,
+                                            const SSA_constraintt &,
+                                            const SSA_locationt &,
+                                            const SSA_outputt &,
+                                            const SSA_declt &,
+                                            const SSA_function_callt &,
+                                            const SSA_function_returnt &,
+                                            const SSA_shared_readt &,
+                                            const SSA_shared_writet &,
+                                            const SSA_spawnt &,
+                                            const SSA_memory_barriert &,
+                                            const SSA_atomic_begint &,
+                                            const SSA_atomic_endt &,
+                                            const SSA_inputt &>;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-template <typename... Ts>
-struct const_visitor_generatort;
-
-template <typename T, typename... Ts>
-struct const_visitor_generatort<T, Ts...> : const_visitor_generatort<Ts...>
-{
-  virtual void visit(T) const = 0;
-  using const_visitor_generatort<Ts...>::visit;
-};
-
-template <typename T>
-struct const_visitor_generatort<T>
-{
-  virtual ~const_visitor_generatort() = default;
-  virtual void visit(T) const = 0;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-
-using SSA_visitor_const_args = visitor_generatort<const SSA_assertt &,
-                                                  const SSA_assumet &,
-                                                  const SSA_assignmentt &,
-                                                  const SSA_gotot &,
-                                                  const SSA_constraintt &,
-                                                  const SSA_locationt &,
-                                                  const SSA_outputt &,
-                                                  const SSA_declt &,
-                                                  const SSA_function_callt &,
-                                                  const SSA_function_returnt &,
-                                                  const SSA_shared_readt &,
-                                                  const SSA_shared_writet &,
-                                                  const SSA_spawnt &,
-                                                  const SSA_memory_barriert &,
-                                                  const SSA_atomic_begint &,
-                                                  const SSA_atomic_endt &,
-                                                  const SSA_inputt &>;
-
-using SSA_const_visitor_const_args =
-  const_visitor_generatort<const SSA_assertt &,
-                           const SSA_assumet &,
-                           const SSA_assignmentt &,
-                           const SSA_gotot &,
-                           const SSA_constraintt &,
-                           const SSA_locationt &,
-                           const SSA_outputt &,
-                           const SSA_declt &,
-                           const SSA_function_callt &,
-                           const SSA_function_returnt &,
-                           const SSA_shared_readt &,
-                           const SSA_shared_writet &,
-                           const SSA_spawnt &,
-                           const SSA_memory_barriert &,
-                           const SSA_atomic_begint &,
-                           const SSA_atomic_endt &,
-                           const SSA_inputt &>;
-
-using SSA_visitor = visitor_generatort<SSA_assertt &,
-                                       SSA_assumet &,
-                                       SSA_assignmentt &,
-                                       SSA_gotot &,
-                                       SSA_constraintt &,
-                                       SSA_locationt &,
-                                       SSA_outputt &,
-                                       SSA_declt &,
-                                       SSA_function_callt &,
-                                       SSA_function_returnt &,
-                                       SSA_shared_readt &,
-                                       SSA_shared_writet &,
-                                       SSA_spawnt &,
-                                       SSA_memory_barriert &,
-                                       SSA_atomic_begint &,
-                                       SSA_atomic_endt &,
-                                       SSA_inputt &>;
-
-using SSA_const_visitor = const_visitor_generatort<SSA_assertt &,
-                                                   SSA_assumet &,
-                                                   SSA_assignmentt &,
-                                                   SSA_gotot &,
-                                                   SSA_constraintt &,
-                                                   SSA_locationt &,
-                                                   SSA_outputt &,
-                                                   SSA_declt &,
-                                                   SSA_function_callt &,
-                                                   SSA_function_returnt &,
-                                                   SSA_shared_readt &,
-                                                   SSA_shared_writet &,
-                                                   SSA_spawnt &,
-                                                   SSA_memory_barriert &,
-                                                   SSA_atomic_begint &,
-                                                   SSA_atomic_endt &,
-                                                   SSA_inputt &>;
+using SSA_visitor_const_argst = visitor_generatort<SSA_step_const_ref_typest>;
+using SSA_const_visitor_const_argst =
+  const_visitor_generatort<SSA_step_const_ref_typest>;
+using SSA_visitort = visitor_generatort<SSA_step_ref_typest>;
+using SSA_const_visitort = const_visitor_generatort<SSA_step_ref_typest>;
 
 class SSA_stept
 {
@@ -235,10 +169,10 @@ public:
     const namespacet &ns,
     std::ostream &out) const;
 
-  virtual void accept(SSA_visitor_const_args &) const = 0;
-  virtual void accept(const SSA_const_visitor_const_args &) const = 0;
-  virtual void accept(SSA_visitor &) = 0;
-  virtual void accept(const SSA_const_visitor &) = 0;
+  virtual void accept(SSA_visitor_const_argst &) const = 0;
+  virtual void accept(const SSA_const_visitor_const_argst &) const = 0;
+  virtual void accept(SSA_visitort &) = 0;
+  virtual void accept(const SSA_const_visitort &) = 0;
 
 protected:
   SSA_stept():
@@ -262,19 +196,19 @@ protected:
 template <typename T>
 class SSA_acceptor_mixint : public SSA_stept
 {
-  void accept(SSA_visitor_const_args &v) const
+  void accept(SSA_visitor_const_argst &v) const
   {
     v.visit(get_base());
   }
-  void accept(const SSA_const_visitor_const_args &v) const
+  void accept(const SSA_const_visitor_const_argst &v) const
   {
     v.visit(get_base());
   }
-  void accept(SSA_visitor &v)
+  void accept(SSA_visitort &v)
   {
     v.visit(get_base());
   }
-  void accept(const SSA_const_visitor &v)
+  void accept(const SSA_const_visitort &v)
   {
     v.visit(get_base());
   }

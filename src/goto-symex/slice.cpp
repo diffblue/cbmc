@@ -33,25 +33,30 @@ static void get_symbols(const exprt &expr, symbol_sett &depends)
 
 namespace
 {
-
-class slicing_visitort : public SSA_const_visitor
+class slicing_visitort
+  : public const_defaulted_visitor_generatort<SSA_stept &, SSA_step_ref_typest>
 {
 public:
   explicit slicing_visitort(symbol_sett &depends) : depends_{depends}
   {
   }
 
-  void visit(SSA_assertt &x) const
+  void visit(SSA_stept &base) const override
+  {
+    // Ignore
+  }
+
+  void visit(SSA_assertt &x) const override
   {
     get_symbols(x.cond_expr, depends_);
   }
 
-  void visit(SSA_assumet &x) const
+  void visit(SSA_assumet &x) const override
   {
     get_symbols(x.cond_expr, depends_);
   }
 
-  void visit(SSA_assignmentt &x) const
+  void visit(SSA_assignmentt &x) const override
   {
     assert(x.ssa_lhs.id() == ID_symbol);
     const irep_idt &id = x.ssa_lhs.get_identifier();
@@ -65,24 +70,12 @@ public:
       get_symbols(x.ssa_rhs, depends_);
   }
 
-  void visit(SSA_gotot &x) const
+  void visit(SSA_gotot &x) const override
   {
     get_symbols(x.cond_expr, depends_);
   }
 
-  void visit(SSA_constraintt &x) const
-  {
-  }
-
-  void visit(SSA_locationt &x) const
-  {
-  }
-
-  void visit(SSA_outputt &x) const
-  {
-  }
-
-  void visit(SSA_declt &x) const
+  void visit(SSA_declt &x) const override
   {
     assert(x.ssa_lhs.id() == ID_symbol);
     const irep_idt &id = x.ssa_lhs.get_identifier();
@@ -94,47 +87,13 @@ public:
     }
   }
 
-  void visit(SSA_function_callt &x) const
-  {
-  }
-
-  void visit(SSA_function_returnt &x) const
-  {
-  }
-
-  void visit(SSA_shared_readt &x) const
-  {
-  }
-
-  void visit(SSA_shared_writet &x) const
-  {
-  }
-
-  void visit(SSA_spawnt &x) const
-  {
-  }
-
-  void visit(SSA_memory_barriert &x) const
-  {
-  }
-
-  void visit(SSA_atomic_begint &x) const
-  {
-  }
-
-  void visit(SSA_atomic_endt &x) const
-  {
-  }
-
-  void visit(SSA_inputt &x) const
-  {
-  }
-
 private:
   symbol_sett &depends_;
 };
 
-class collecting_visitort : public SSA_const_visitor_const_args
+class collecting_visitort
+  : public const_defaulted_visitor_generatort<const SSA_stept &,
+                                              SSA_step_const_ref_typest>
 {
 public:
   explicit collecting_visitort(symbol_sett &depends, symbol_sett &lhs)
@@ -142,76 +101,25 @@ public:
   {
   }
 
-  void visit(const SSA_assertt &x) const
+  void visit(const SSA_stept &base) const override
+  {
+    // Ignore
+  }
+
+  void visit(const SSA_assertt &x) const override
   {
     get_symbols(x.cond_expr, depends_);
   }
 
-  void visit(const SSA_assumet &x) const
+  void visit(const SSA_assumet &x) const override
   {
     get_symbols(x.cond_expr, depends_);
   }
 
-  void visit(const SSA_assignmentt &x) const
+  void visit(const SSA_assignmentt &x) const override
   {
     get_symbols(x.ssa_rhs, depends_);
     lhs_.insert(x.ssa_lhs.get_identifier());
-  }
-
-  void visit(const SSA_gotot &x) const
-  {
-  }
-
-  void visit(const SSA_constraintt &x) const
-  {
-  }
-
-  void visit(const SSA_locationt &x) const
-  {
-  }
-
-  void visit(const SSA_outputt &x) const
-  {
-  }
-
-  void visit(const SSA_declt &x) const
-  {
-  }
-
-  void visit(const SSA_function_callt &x) const
-  {
-  }
-
-  void visit(const SSA_function_returnt &x) const
-  {
-  }
-
-  void visit(const SSA_shared_readt &x) const
-  {
-  }
-
-  void visit(const SSA_shared_writet &x) const
-  {
-  }
-
-  void visit(const SSA_spawnt &x) const
-  {
-  }
-
-  void visit(const SSA_memory_barriert &x) const
-  {
-  }
-
-  void visit(const SSA_atomic_begint &x) const
-  {
-  }
-
-  void visit(const SSA_atomic_endt &x) const
-  {
-  }
-
-  void visit(const SSA_inputt &x) const
-  {
   }
 
 private:
