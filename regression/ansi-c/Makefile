@@ -10,16 +10,10 @@ else
 endif
 
 test:
-	@if ! ../test.pl -c $(exe) ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c $(exe)
 
 tests.log: ../test.pl
-	@if ! ../test.pl -c $(exe) ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c $(exe)
 
 show:
 	@for dir in *; do \

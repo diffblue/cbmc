@@ -42,8 +42,10 @@ sub run($$$$$) {
     }
   }
 
-  system "echo EXIT=$exit_value >>'$name/$output'";
-  system "echo SIGNAL=$signal_num >>'$name/$output'";
+  open my $FH, ">>$name/$output";
+  print $FH "EXIT=$exit_value\n";
+  print $FH "SIGNAL=$signal_num\n";
+  close $FH;
 
   if($signal_num == 2) {
     print "\nProgram under test interrupted; stopping\n";
@@ -234,6 +236,7 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   -i <regex> options in test.desc matching the specified perl regex are ignored
   -j <num>   run <num> tests in parallel (requires Thread::Pool::Simple)
   -n         dry-run: print the tests that would be run, but don't actually run them
+  -p         print logs of each failed test (if any)
   -h         show this help and exit
   -C         core: run all essential tests (default if none of C/T/F/K are given)
   -T         thorough: run expensive tests
@@ -275,10 +278,10 @@ use Getopt::Std;
 use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, %defines); # the variables for getopt
+our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, %defines); # the variables for getopt
 $opt_j = 0;
 GetOptions("D=s", \%defines);
-getopts('c:i:j:nhCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
+getopts('c:i:j:nphCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 (!$opt_j || $has_thread_pool) or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_h and &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
@@ -370,5 +373,42 @@ print "\n";
 
 
 close LOG;
+
+if($opt_p && $failures != 0) {
+  open LOG,"<tests.log" or die "Failed to open tests.log\n";
+
+  my $printed_this_test = 1;
+  my $current_test = "";
+  my $output_file = "";
+  my $descriptor_file = "";
+
+  while (my $line = <LOG>) {
+    chomp $line;
+    if ($line =~ /^Test '(.+)'/) {
+      $current_test = $1;
+      $printed_this_test = 0;
+    } elsif ($line =~ /Descriptor:\s+([^\s]+)/) {
+      $descriptor_file = $1;
+    } elsif ($line =~ /Output:\s+([^\s]+)/) {
+      $output_file = $1;
+    } elsif ($line =~ /\[FAILED\]\s*$/) {
+      # print a descriptive header before dumping the test.desc lines that
+      # actually weren't matched (and print this header just once)
+      if(0 == $printed_this_test) {
+        $printed_this_test = 1;
+        print "\n\n";
+        print "Failed test: $current_test\n";
+        open FH, "<$current_test/$output_file";
+        while (my $f = <FH>) {
+          print $f;
+        }
+        close FH;
+        print "\n\nFailed $descriptor_file lines:\n";
+      }
+
+      print "$line\n";
+    }
+  }
+}
 
 exit $failures;

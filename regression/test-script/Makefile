@@ -2,31 +2,19 @@
 default: tests.log
 
 test:
-	@if ! ../test.pl -c ../program_runner.sh ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c ../program_runner.sh
 
 	@echo "Testing KNOWNBUG fail"
 
-	@if ! ../test.pl -c ../program_runner.sh -K ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c ../program_runner.sh -K
 
 tests.log:
 	pwd
-	@if ! ../test.pl -c ../program_runner.sh ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c ../program_runner.sh
 
 	@echo "Testing KNOWNBUG fail"
 
-	@if ! ../test.pl -c ../program_runner.sh -K ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c ../program_runner.sh -K
 
 show:
 	@for dir in *; do \

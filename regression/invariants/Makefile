@@ -11,16 +11,10 @@ include ../../src/config.inc
 include ../../src/common
 
 test: driver$(EXEEXT)
-	@if ! ../test.pl -c ../driver ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../driver
 
 tests.log: ../test.pl driver$(EXEEXT)
-	@if ! ../test.pl -c ../driver ; then \
-		../failed-tests-printer.pl ; \
-		exit 1 ; \
-	fi
+	@../test.pl -p -c ../driver
 
 show:
 	@for dir in *; do \

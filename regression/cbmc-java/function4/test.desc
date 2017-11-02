@@ -1,6 +1,6 @@
 KNOWNBUG
 Main.class
---function "Other.fail"
+--function 'Other.fail'
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$

@@ -1,6 +1,6 @@
 CORE
 static_method1.class
---function "static_method1.f" --div-by-zero-check
+--function 'static_method1.f' --div-by-zero-check
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

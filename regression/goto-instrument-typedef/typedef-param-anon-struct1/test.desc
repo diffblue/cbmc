@@ -1,6 +1,6 @@
 CORE
 main.c
-"--show-symbol-table"
+--show-symbol-table
 // Enable multi-line checking
 activate-multi-line-match
 EXIT=0

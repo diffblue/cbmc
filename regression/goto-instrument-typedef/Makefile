@@ -5,23 +5,17 @@ include ../../src/common
 
 ifeq ($(BUILD_ENV_),MSVC)
 	exe=../../../src/goto-cc/goto-cl
-	is_windows="true"
+	is_windows=true
 else
 	exe=../../../src/goto-cc/goto-cc
-	is_windows="false"
+	is_windows=false
 endif
 
 test:
-	@if ! ../test.pl -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument $(is_windows)' ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument $(is_windows)'
 
 tests.log:
-	@if ! ../test.pl -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument $(is_windows)' ; then \
-		../failed-tests-printer.pl ; \
-		exit 1; \
-	fi
+	@../test.pl -p -c '../chain.sh $(exe) ../../../src/goto-instrument/goto-instrument $(is_windows)'
 
 show:
 	@for dir in *; do \
