@@ -17,6 +17,8 @@
 
 #include <util/optional.h>
 #include <util/std_types.h>
+#include <java_bytecode/java_types.h>
+
 
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_type
@@ -29,8 +31,37 @@ struct_typet::componentt require_component(
   const irep_idt &component_name);
 
 code_typet require_code(const typet &type);
+
 code_typet::parametert
 require_parameter(const code_typet &function_type, const irep_idt &param_name);
+
+code_typet require_code(
+  const typet &type,
+  const size_t num_params);
+
+// A mini DSL for describing an expected set of type parameters for a
+// java_generic_typet
+enum class type_parameter_kindt { Inst, Var };
+struct expected_type_parametert
+{
+  type_parameter_kindt kind;
+  irep_idt description;
+};
+typedef std::initializer_list<expected_type_parametert>
+  expected_type_parameterst;
+
+java_generic_typet require_java_generic_type(
+  const typet &type,
+  const optionalt<require_type::expected_type_parameterst> &type_expectations);
+
+
+java_generic_parametert require_java_generic_parameter(
+  const typet &type,
+  const optionalt<require_type::expected_type_parametert> &type_expectation);
+
+const typet &require_java_non_generic_type(
+  const typet &type,
+  const optionalt<symbol_typet> &expect_subtype);
 }
 
-#endif
+#endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
