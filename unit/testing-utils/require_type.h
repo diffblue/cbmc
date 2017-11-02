@@ -62,6 +62,9 @@ java_generic_parametert require_java_generic_parameter(
 const typet &require_java_non_generic_type(
   const typet &type,
   const optionalt<symbol_typet> &expect_subtype);
+
+java_generics_class_typet &
+require_java_generic_class(const class_typet &class_type);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H

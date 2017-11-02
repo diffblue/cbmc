@@ -201,3 +201,15 @@ const typet &require_type::require_java_non_generic_type(
     REQUIRE(type.subtype()==expect_subtype.value());
   return type;
 }
+
+/// Verify that a class is a valid java generic class
+/// \param class_type: the class
+/// \return: A reference to the java generic class type.
+java_generics_class_typet &
+require_type::require_java_generic_class(const class_typet &class_type)
+{
+  java_class_typet java_class_type = to_java_class_type(class_type);
+
+  REQUIRE(is_java_generics_class_type(java_class_type));
+  return to_java_generics_class_type(java_class_type);
+}
