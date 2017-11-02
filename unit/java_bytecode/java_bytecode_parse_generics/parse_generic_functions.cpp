@@ -7,14 +7,6 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-
-#include <util/config.h>
-#include <util/cmdline.h>
-#include <util/language.h>
-#include <util/prefix.h>
-
-#include <java_bytecode/java_bytecode_language.h>
-
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_type.h>
 
@@ -40,25 +32,20 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -76,25 +63,20 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -118,25 +100,20 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -160,25 +137,20 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -202,25 +174,20 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -244,46 +211,35 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 2);
 
       THEN("It contains parameter t pointing to Generic")
       {
-        code_typet::parametert param_t =
+        const code_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
 
         THEN("t is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_t.type()));
-
-          const java_generic_typet generic_t =
-            to_java_generic_type(param_t.type());
-          const java_generic_parametert generic_param_t =
-            generic_t.generic_type_variables().front();
-          REQUIRE(
-            generic_param_t.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_t.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
       THEN("It contains parameter u pointing to Generic")
       {
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
-
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
         }
       }
     }
@@ -301,26 +257,22 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 2);
 
       THEN("It contains parameter t pointing to Generic")
       {
-        code_typet::parametert param_t =
+        const code_typet::parametert &param_t =
           require_type::require_parameter(func_code, "t");
         require_type::require_pointer(
           param_t.type(), symbol_typet("java::Generic"));
 
         THEN("t is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_t.type()));
+          require_type::require_java_generic_type(
+            param_t.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
-          const java_generic_typet generic_t =
-            to_java_generic_type(param_t.type());
-          const java_generic_parametert generic_param_t =
-            generic_t.generic_type_variables().front();
-          REQUIRE(
-            generic_param_t.type_variable().get_identifier() ==
-            class_prefix + "::T");
           THEN("The bounds are set correctly")
           {
             // TODO: the bounds are not parsed yet; extend the tests when
@@ -330,22 +282,17 @@ SCENARIO(
       }
       THEN("It contains parameter u pointing to Generic")
       {
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
 
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
           THEN("The bounds are set correctly")
           {
             // TODO: the bounds are not parsed yet; extend the tests when
@@ -369,24 +316,18 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -405,24 +346,20 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 0);
       // TODO: should point to something else than Object?? - possibly
-      // connecte dto bounds - issue TG-1286
+      // connected to bounds - issue TG-1286
       THEN("It has return type pointing to java.lang.Object")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::java.lang.Object"));
+          func_code.return_type(), symbol_typet("java::java.lang.Object"));
 
         THEN("It is the generic parameter T")
         {
-          REQUIRE(is_java_generic_parameter(return_type));
-
-          const java_generic_parametert generic_return_param =
-            to_java_generic_parameter(return_type);
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_parameter(
+            func_code.return_type(),
+            {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
         }
       }
     }
@@ -440,24 +377,17 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code = to_code_type(func_symbol.type);
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -481,24 +411,18 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -522,24 +446,18 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -563,24 +481,18 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 0);
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -605,47 +517,34 @@ SCENARIO(
 
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -663,26 +562,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -694,22 +588,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -733,26 +619,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -764,22 +645,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -803,26 +676,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -834,22 +702,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -874,26 +734,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter x pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_x =
+        const code_typet::parametert &param_x =
           require_type::require_parameter(func_code, "x");
         require_type::require_pointer(
           param_x.type(), symbol_typet("java::Generic"));
 
         THEN("x is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(param_x.type()));
-
-          const java_generic_typet generic_x =
-            to_java_generic_type(param_x.type());
-          const java_generic_parametert generic_param_x =
-            generic_x.generic_type_variables().front();
-          REQUIRE(
-            generic_param_x.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            param_x.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -905,22 +760,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -944,48 +791,34 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
-
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
         }
       }
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -1003,27 +836,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 1);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
-
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
 
           THEN("The bounds are set correctly")
           {
@@ -1035,22 +862,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -1074,68 +893,49 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 2);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
-
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
         }
       }
 
       THEN("It contains parameter v pointing to Generic")
       {
-        code_typet::parametert param_v =
+        const code_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));
 
         THEN("v is generic with type variable V")
         {
-          REQUIRE(is_java_generic_type(param_v.type()));
-
-          const java_generic_typet generic_v =
-            to_java_generic_type(param_v.type());
-          const java_generic_parametert generic_param_v =
-            generic_v.generic_type_variables().front();
-          REQUIRE(
-            generic_param_v.type_variable().get_identifier() ==
-            class_prefix + "::V");
+          require_type::require_java_generic_type(
+            param_v.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::V"}});
         }
       }
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -1153,26 +953,21 @@ SCENARIO(
       REQUIRE(new_symbol_table.has_symbol(process_func_name));
       const symbolt func_symbol =
         new_symbol_table.lookup_ref(process_func_name);
-      const code_typet func_code = to_code_type(func_symbol.type);
+      const code_typet func_code =
+        require_type::require_code(func_symbol.type, 2);
 
       THEN("It contains parameter u pointing to Generic")
       {
-        code_typet::parametert param_u =
+        const code_typet::parametert &param_u =
           require_type::require_parameter(func_code, "u");
         require_type::require_pointer(
           param_u.type(), symbol_typet("java::Generic"));
 
         THEN("u is generic with type variable U")
         {
-          REQUIRE(is_java_generic_type(param_u.type()));
-
-          const java_generic_typet generic_u =
-            to_java_generic_type(param_u.type());
-          const java_generic_parametert generic_param_u =
-            generic_u.generic_type_variables().front();
-          REQUIRE(
-            generic_param_u.type_variable().get_identifier() ==
-            class_prefix + "::U");
+          require_type::require_java_generic_type(
+            param_u.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
 
           THEN("The bounds are set correctly")
           {
@@ -1184,22 +979,16 @@ SCENARIO(
 
       THEN("It contains parameter v pointing to Generic")
       {
-        code_typet::parametert param_v =
+        const code_typet::parametert &param_v =
           require_type::require_parameter(func_code, "v");
         require_type::require_pointer(
           param_v.type(), symbol_typet("java::Generic"));
 
         THEN("v is generic with type variable V")
         {
-          REQUIRE(is_java_generic_type(param_v.type()));
-
-          const java_generic_typet generic_v =
-            to_java_generic_type(param_v.type());
-          const java_generic_parametert generic_param_v =
-            generic_v.generic_type_variables().front();
-          REQUIRE(
-            generic_param_v.type_variable().get_identifier() ==
-            class_prefix + "::V");
+          require_type::require_java_generic_type(
+            param_v.type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::V"}});
 
           THEN("The bounds are set correctly")
           {
@@ -1211,22 +1000,14 @@ SCENARIO(
 
       THEN("It has return type pointing to Generic")
       {
-        const code_typet func_code = to_code_type(func_symbol.type);
-        const typet return_type = func_code.return_type();
         require_type::require_pointer(
-          return_type, symbol_typet("java::Generic"));
+          func_code.return_type(), symbol_typet("java::Generic"));
 
         THEN("It is generic with type variable T")
         {
-          REQUIRE(is_java_generic_type(return_type));
-
-          const java_generic_typet generic_return_type =
-            to_java_generic_type(return_type);
-          const java_generic_parametert generic_return_param =
-            generic_return_type.generic_type_variables().front();
-          REQUIRE(
-            generic_return_param.type_variable().get_identifier() ==
-            class_prefix + "::T");
+          require_type::require_java_generic_type(
+            func_code.return_type(),
+            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {

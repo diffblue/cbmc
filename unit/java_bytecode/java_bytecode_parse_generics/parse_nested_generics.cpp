@@ -8,16 +8,7 @@
 
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
-
-#include <util/cmdline.h>
-#include <util/config.h>
-#include <util/language.h>
-#include <util/prefix.h>
-#include <util/std_types.h>
-
-#include <java_bytecode/java_bytecode_language.h>
 
 SCENARIO(
   "parse_nested_generics_fields",
@@ -33,29 +24,21 @@ SCENARIO(
     const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
 
     const class_typet &class_type =
-      require_symbol::require_complete_class(class_symbol);
+      require_type::require_java_non_generic_class(class_symbol.type);
 
     THEN("The field component should be a pointer to java::Generic")
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -65,23 +48,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field2");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -91,23 +66,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field3");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -117,23 +84,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field4");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -143,23 +102,16 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field5");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::GenericTwoParam")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -169,23 +121,16 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field6");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::GenericTwoParam")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -195,23 +140,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field7");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::Generic"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 1);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::GenericTwoParam")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -221,30 +158,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field8");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -254,30 +176,15 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field9");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -287,30 +194,16 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field10");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -320,30 +213,18 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field11");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::Interface_Implementation")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -353,30 +234,18 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field12");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::Interface_Implementation")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -386,30 +255,16 @@ SCENARIO(
     {
       const struct_typet::componentt &field_component =
         require_type::require_component(class_type, "field13");
-
       require_type::require_pointer(
         field_component.type(), symbol_typet("java::GenericTwoParam"));
 
       THEN("The pointer should be generic")
       {
-        REQUIRE(is_java_generic_type(field_component.type()));
-        const auto &generic_variables =
-          to_java_generic_type(field_component.type()).generic_type_variables();
-        REQUIRE(generic_variables.size() == 2);
-        {
-          const java_generic_parametert &generic_param = generic_variables[0];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param == java_generic_inst_parametert(
-                               symbol_typet("java::GenericTwoParam")));
-        }
-        {
-          const java_generic_parametert &generic_param = generic_variables[1];
-          REQUIRE(is_java_generic_parameter(generic_param));
-          REQUIRE(
-            generic_param ==
-            java_generic_inst_parametert(symbol_typet("java::Generic")));
-        }
+        require_type::require_java_generic_type(
+          field_component.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -438,25 +293,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs are of correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -472,25 +325,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs are of oorrect type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -506,25 +357,24 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs are of correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -540,25 +390,24 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs are of correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -574,25 +423,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs are of correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -608,25 +457,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -642,25 +491,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -676,33 +525,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -718,33 +559,24 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -760,33 +592,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -802,33 +626,27 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param == java_generic_inst_parametert(
-                             symbol_typet("java::Interface_Implementation")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -844,33 +662,27 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param == java_generic_inst_parametert(
-                             symbol_typet("java::Interface_Implementation")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -886,33 +698,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 2);
 
-    const auto param_type =
-      require_type::require_parameter(function_call, "input");
-    require_type::require_pointer(
-      param_type.type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The inputs have correct type")
     {
-      REQUIRE(is_java_generic_type(param_type.type()));
-      const auto &generic_variables =
-        to_java_generic_type(param_type.type()).generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      const auto &param_type =
+        require_type::require_parameter(function_call, "input");
+      require_type::require_pointer(
+        param_type.type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
+        require_type::require_java_generic_type(
+          param_type.type(),
+          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -928,24 +732,22 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -961,24 +763,22 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -994,24 +794,22 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -1027,24 +825,22 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::Generic")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -1060,24 +856,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -1093,24 +888,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -1126,24 +920,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::Generic"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 1);
-      const java_generic_parametert &generic_param = generic_variables[0];
-      REQUIRE(
-        generic_param ==
-        java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::Generic"));
+
+      THEN("The pointer should be generic")
+      {
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst,
+            "java::GenericTwoParam"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
+      }
     }
   }
 
@@ -1159,32 +952,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -1200,32 +984,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -1241,32 +1016,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -1282,32 +1048,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param == java_generic_inst_parametert(
-                             symbol_typet("java::Interface_Implementation")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -1323,32 +1082,25 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst,
+             "java::Generic"},
+           {require_type::type_parameter_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param == java_generic_inst_parametert(
-                             symbol_typet("java::Interface_Implementation")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 
@@ -1364,32 +1116,23 @@ SCENARIO(
       new_symbol_table.lookup_ref(process_func_name);
 
     const code_typet &function_call =
-      require_type::require_code(function_symbol.type);
+      require_type::require_code(function_symbol.type, 1);
 
-    require_type::require_pointer(
-      function_call.return_type(), symbol_typet("java::GenericTwoParam"));
-
-    THEN("The pointer should be generic")
+    THEN("The return type is correct")
     {
-      REQUIRE(is_java_generic_type(function_call.return_type()));
-      const auto &generic_variables =
-        to_java_generic_type(function_call.return_type())
-          .generic_type_variables();
-      REQUIRE(generic_variables.size() == 2);
+      require_type::require_pointer(
+        function_call.return_type(), symbol_typet("java::GenericTwoParam"));
+
+      THEN("The pointer should be generic")
       {
-        const java_generic_parametert &generic_param = generic_variables[0];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::GenericTwoParam")));
+        require_type::require_java_generic_type(
+          function_call.return_type(),
+          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+
+        // TODO: extend tests when nested generics are parsed correctly - issue
+        // TG-1301
       }
-      {
-        const java_generic_parametert &generic_param = generic_variables[1];
-        REQUIRE(
-          generic_param ==
-          java_generic_inst_parametert(symbol_typet("java::Generic")));
-      }
-      // TODO: extend tests when nested generics are parsed correctly - issue
-      // TG-1301
     }
   }
 }

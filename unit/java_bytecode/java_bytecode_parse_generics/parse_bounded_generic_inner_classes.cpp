@@ -8,10 +8,7 @@
 
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
-
-#include <memory>
 
 #include <util/config.h>
 #include <util/language.h>
@@ -28,6 +25,10 @@ SCENARIO(
   std::string class_prefix = "java::BoundedGenericInnerClasses";
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
+  const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
+  const java_class_typet &java_class_type =
+    require_type::require_java_non_generic_class(class_symbol.type);
+
   WHEN("Parsing an inner class with type variable")
   {
     std::string inner_name = class_prefix + "$Inner";
@@ -35,29 +36,18 @@ SCENARIO(
     THEN("The symbol type should be generic")
     {
       const symbolt &class_symbol = new_symbol_table.lookup_ref(inner_name);
-      class_typet class_type =
-        require_symbol::require_complete_class(class_symbol);
-      java_generics_class_typet java_generics_class_type =
-        require_type::require_java_generic_class(class_type);
+      const java_generics_class_typet &java_generics_class_type =
+        require_type::require_java_generic_class(
+          class_symbol.type, {inner_name + "::E"});
 
-      const typet &elem_type =
-        to_java_class_type(class_type).component_type("elem");
-      REQUIRE(is_java_generic_parameter(elem_type));
-
-      REQUIRE(java_generics_class_type.generic_types().size() == 1);
-      THEN("Type variable is named 'E'")
+      THEN("The fields are of correct types")
       {
-        typet &type_var = java_generics_class_type.generic_types().front();
-        REQUIRE(is_java_generic_parameter(type_var));
-        java_generic_parametert generic_type_var =
-          to_java_generic_parameter(type_var);
-        REQUIRE(
-          generic_type_var.type_variable().get_identifier() ==
-          inner_name + "::E");
-        typet &sub_type = generic_type_var.subtype();
-        REQUIRE(sub_type.id() == ID_symbol);
-        symbol_typet &bound_type = to_symbol_type(sub_type);
-        REQUIRE(bound_type.get_identifier() == "java::java.lang.Object");
+        const struct_union_typet::componentt &elem =
+          require_type::require_component(
+            to_struct_type(class_symbol.type), "elem");
+        require_type::require_java_generic_parameter(
+          elem.type(),
+          {require_type::type_parameter_kindt::Var, inner_name + "::E"});
       }
     }
   }
@@ -70,109 +60,63 @@ SCENARIO(
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(boundedinner_name);
-      class_typet class_type =
-        require_symbol::require_complete_class(class_symbol);
-      java_generics_class_typet java_generics_class_type =
-        require_type::require_java_generic_class(class_type);
+      const java_generics_class_typet &java_generics_class_type =
+        require_type::require_java_generic_class(
+          class_symbol.type, {boundedinner_name + "::NUM"});
 
-      REQUIRE(java_generics_class_type.generic_types().size() == 1);
-      typet &type_var = java_generics_class_type.generic_types().front();
-      REQUIRE(is_java_generic_parameter(type_var));
-      java_generic_parametert generic_type_var =
-        to_java_generic_parameter(type_var);
+      //TODO extend when bounds are parsed correctly - TG-1286
 
-      REQUIRE(
-        generic_type_var.type_variable().get_identifier() ==
-        boundedinner_name + "::NUM");
-      REQUIRE(
-        java_generics_class_type_var(0, java_generics_class_type) ==
-        boundedinner_name + "::NUM");
-      THEN("Bound must be Number")
+      THEN("The fields are of correct types")
       {
-        typet &sub_type = generic_type_var.subtype();
-        REQUIRE(sub_type.id() == ID_symbol);
-        symbol_typet &bound_type = to_symbol_type(sub_type);
-        REQUIRE(bound_type.get_identifier() == "java::java.lang.Number");
-        REQUIRE(
-          to_symbol_type(
-            java_generics_class_type_bound(0, java_generics_class_type))
-            .get_identifier() == "java::java.lang.Number");
+        const struct_union_typet::componentt &elem =
+          require_type::require_component(
+            to_struct_type(class_symbol.type), "elem");
+        require_type::require_java_generic_parameter(
+          elem.type(),
+          {require_type::type_parameter_kindt::Var,
+           boundedinner_name + "::NUM"});
       }
-
-      const typet &elem_type =
-        to_java_class_type(class_type).component_type("elem");
-      REQUIRE(is_java_generic_parameter(elem_type));
     }
   }
 
   WHEN("There is a generic field with a concrete type")
   {
-    const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
-    class_typet class_type =
-      require_symbol::require_complete_class(class_symbol);
-
-    java_class_typet java_class_type = to_java_class_type(class_type);
-    REQUIRE(!is_java_generics_class_type(java_class_type));
-
-    const typet &belem_type = java_class_type.component_type("belem");
-
-    REQUIRE(belem_type != nil_typet());
-    REQUIRE(is_java_generic_type(belem_type));
-    THEN("Field has instantiated type variable")
-    {
-      const java_generic_typet &container = to_java_generic_type(belem_type);
-
-      const std::vector<java_generic_parametert> &generic_types =
-        container.generic_type_variables();
-      REQUIRE(generic_types.size() == 1);
-
-      const typet &inst_type = java_generic_get_inst_type(0, container);
-
-      REQUIRE(inst_type.id() == ID_pointer);
-      const typet &inst_type_symbol = inst_type.subtype();
-      REQUIRE(inst_type_symbol.id() == ID_symbol);
-      REQUIRE(
-        to_symbol_type(inst_type_symbol).get_identifier() ==
-        "java::java.lang.Integer");
-    }
+    const struct_union_typet::componentt &belem_type =
+      require_type::require_component(
+        to_struct_type(class_symbol.type), "belem");
+    require_type::require_pointer(
+      belem_type.type(), symbol_typet(class_prefix + "$BoundedInner"));
+    require_type::require_java_generic_type(
+      belem_type.type(),
+      {{require_type::type_parameter_kindt::Inst, "java::java.lang.Integer"}});
   }
 
   WHEN("Parsing an inner class with double bounded type variable")
   {
     std::string doubleboundedinner_name = class_prefix + "$DoubleBoundedInner";
     REQUIRE(new_symbol_table.has_symbol(doubleboundedinner_name));
-    THEN("The bounds should be encoded")
+    THEN("The symbol type should be generic")
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(doubleboundedinner_name);
-      class_typet class_type =
-        require_symbol::require_complete_class(class_symbol);
+      const java_generics_class_typet &java_generics_class_type =
+        require_type::require_java_generic_class(
+          class_symbol.type, {doubleboundedinner_name + "::T"});
 
-      java_class_typet java_class_type = to_java_class_type(class_type);
-      REQUIRE_FALSE(is_java_generics_class_type(java_class_type));
+      //TODO extend when bounds are parsed correctly - TG-1286
 
-// TODO (tkiley): Extend this unit test when bounds are correctly
-// parsed - issue TG-1286
-#if 0
-      java_generics_class_typet java_generics_class_type=
-        to_java_generics_class_type(java_class_type);
-      REQUIRE(java_generics_class_type.generic_types().size()==1);
-      typet &type_var=java_generics_class_type.generic_types().front();
-      REQUIRE(is_java_generic_parameter(type_var));
-      java_generic_parametert generic_type_var=
-        to_java_generic_parameter(type_var);
-
-      REQUIRE(
-        generic_type_var.type_variable().get_identifier()==
-        doubleboundedinner_name+"::T");
-      REQUIRE(
-        java_generics_class_type_var(0, java_generics_class_type)==
-        doubleboundedinner_name+"::T");
-      THEN("Bound must be Number and Interface")
+      THEN("The fields are of correct types")
       {
+        const struct_union_typet::componentt &elem =
+          require_type::require_component(
+            to_struct_type(class_symbol.type), "elem");
+        require_type::require_java_generic_parameter(
+          elem.type(),
+          {require_type::type_parameter_kindt::Var,
+           doubleboundedinner_name + "::T"});
 
+        // TODO extend when bounds are parsed correctly - TG-1286
       }
-#endif
     }
   }
 
@@ -180,47 +124,34 @@ SCENARIO(
   {
     std::string twoelementinner_name = class_prefix + "$TwoElementInner";
     REQUIRE(new_symbol_table.has_symbol(twoelementinner_name));
-    THEN("Both generic parameters should be encoded")
+    THEN("The symbol type should be generic with two type variables")
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(twoelementinner_name);
-      class_typet class_type =
-        require_symbol::require_complete_class(class_symbol);
-      java_generics_class_typet java_generics_class_type =
-        require_type::require_java_generic_class(class_type);
+      const java_generics_class_typet &java_generics_class_type =
+        require_type::require_java_generic_class(
+          class_symbol.type,
+          {twoelementinner_name + "::K", twoelementinner_name + "::V"});
 
-      REQUIRE(java_generics_class_type.generic_types().size() == 2);
+      //TODO extend when bounds are parsed correctly - TG-1286
 
-      // The first parameter should be called K
+      THEN("The fields are of correct types")
       {
-        const typet first_param =
-          java_generics_class_type.generic_types().at(0);
-        REQUIRE(is_java_generic_parameter(first_param));
-        java_generic_parametert generic_type_var =
-          to_java_generic_parameter(first_param);
+        const struct_union_typet::componentt &elemk =
+          require_type::require_component(
+            to_struct_type(class_symbol.type), "k");
+        require_type::require_java_generic_parameter(
+          elemk.type(),
+          {require_type::type_parameter_kindt::Var,
+           twoelementinner_name + "::K"});
 
-        REQUIRE(
-          generic_type_var.type_variable().get_identifier() ==
-          twoelementinner_name + "::K");
-        REQUIRE(
-          java_generics_class_type_var(0, java_generics_class_type) ==
-          twoelementinner_name + "::K");
-      }
-
-      // The second parameter should be called V
-      {
-        const typet &second_param =
-          java_generics_class_type.generic_types().at(1);
-        REQUIRE(is_java_generic_parameter(second_param));
-        java_generic_parametert generic_type_var =
-          to_java_generic_parameter(second_param);
-
-        REQUIRE(
-          generic_type_var.type_variable().get_identifier() ==
-          twoelementinner_name + "::V");
-        REQUIRE(
-          java_generics_class_type_var(1, java_generics_class_type) ==
-          twoelementinner_name + "::V");
+        const struct_union_typet::componentt &elemv =
+          require_type::require_component(
+            to_struct_type(class_symbol.type), "v");
+        require_type::require_java_generic_parameter(
+          elemv.type(),
+          {require_type::type_parameter_kindt::Var,
+           twoelementinner_name + "::V"});
       }
     }
   }

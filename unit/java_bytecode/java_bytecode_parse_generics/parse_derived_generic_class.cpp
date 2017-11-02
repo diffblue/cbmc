@@ -8,13 +8,11 @@
 
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
-
-#include <memory>
 
 #include <util/config.h>
 #include <util/language.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <iostream>
 
 SCENARIO(
   "parse_derived_generic_class",
@@ -29,6 +27,7 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
+    derived_symbol.show(std::cout);
     const class_typet &derived_class_type =
       require_symbol::require_complete_class(derived_symbol);
 
