@@ -1924,9 +1924,13 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
 /// \return an expression
 exprt string_refinementt::get(const exprt &expr) const
 {
-  const auto super_get = [this](const exprt &expr) { // NOLINT
+  // clang-format off
+  const auto super_get = [this](const exprt &expr)
+  {
     return supert::get(expr);
   };
+  // clang-format on
+
   exprt ecopy(expr);
   (void)symbol_resolve.replace_expr(ecopy);
 
