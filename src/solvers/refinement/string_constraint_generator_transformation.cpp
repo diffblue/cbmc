@@ -76,6 +76,7 @@ exprt string_constraint_generatort::add_axioms_for_set_length(
 ///   const array_string_exprt &str,
 ///   const exprt &start,
 ///   const exprt &end)
+// NOLINTNEXTLINE
 /// \link string_constraint_generatort::add_axioms_for_substring(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
 ///   (More...) \endlink
 /// \warning The specification may not be correct for the case where the string
@@ -367,8 +368,9 @@ exprt string_constraint_generatort::add_axioms_for_to_upper_case(
 
 /// Conversion of a string to upper case
 ///
-/// \copybrief string_constraint_generatort::add_axioms_for_to_upper_case(
-/// const array_string_exprt &res, const array_string_exprt &str)
+// NOLINTNEXTLINE
+/// \copybrief string_constraint_generatort::add_axioms_for_to_upper_case(const array_string_exprt&, const array_string_exprt&)
+// NOLINTNEXTLINE
 /// \link string_constraint_generatort::add_axioms_for_to_upper_case(const array_string_exprt &res, const array_string_exprt &str)
 ///   (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character
@@ -551,7 +553,9 @@ exprt string_constraint_generatort::add_axioms_for_delete(
 
 /// Remove a portion of a string
 ///
+// NOLINTNEXTLINE
 /// \copybrief string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
+// NOLINTNEXTLINE
 /// \link string_constraint_generatort::add_axioms_for_delete(const array_string_exprt &res, const array_string_exprt &str, const exprt &start, const exprt &end)
 ///   (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character

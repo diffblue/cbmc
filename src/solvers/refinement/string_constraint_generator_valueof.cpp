@@ -269,6 +269,7 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
 ///
 /// \copybrief  string_constraint_generatort::add_axioms_from_char(
 ///   const array_string_exprt &res, const exprt &c)
+// NOLINTNEXTLINE
 /// \link string_constraint_generatort::add_axioms_from_char(const array_string_exprt &res, const exprt &c)
 ///    (More...) \endlink
 /// \param f: function application with arguments integer `|res|`, character

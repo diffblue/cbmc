@@ -70,6 +70,7 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 /// Add axioms ensuring the return value is true when the string starts with the
 /// given target.
 /// These axioms are detailed here:
+// NOLINTNEXTLINE
 /// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset)
 /// \todo The primitive should be renamed to `starts_with`.
 /// \todo Get rid of the boolean flag.

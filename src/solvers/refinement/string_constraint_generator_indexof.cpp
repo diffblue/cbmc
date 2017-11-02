@@ -244,6 +244,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
 /// Index of the first occurence of a target inside the string
 ///
 /// If the target is a character:
+// NOLINTNEXTLINE
 /// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
 /// \link
 /// add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
@@ -357,9 +358,10 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 /// Index of the last occurence of a target inside the string
 ///
 /// If the target is a character:
+// NOLINTNEXTLINE
 /// \copybrief add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
-/// \link
-/// add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If the target is a refined_string:

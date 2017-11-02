@@ -56,8 +56,8 @@ exprt string_constraint_generatort::add_axioms_for_insert(
 /// \copybrief string_constraint_generatort::add_axioms_for_insert(
 /// const array_string_exprt &, const array_string_exprt &,
 /// const array_string_exprt &, const exprt &)
-/// \link
-/// add_axioms_for_insert(const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_insert(const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
 ///   (More...) \endlink
 ///
 /// If `start` and `end` arguments are given then `substring(s2, start, end)`

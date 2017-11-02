@@ -215,6 +215,7 @@ static void display_index_set(
 ///     the index set of `str` we find `y` such that `f(y)=val` and
 ///     add lemma `P(y)`.
 ///     (See
+// NOLINTNEXTLINE
 ///     `instantiate(messaget::mstreamt&,const string_constraintt&,const exprt &,const exprt&)`
 ///      for details)
 ///   * For formulas of the form
@@ -467,12 +468,15 @@ void output_equations(
 /// Pointer symbols which are set to be equal by constraints, are replaced by
 /// an single symbol in the solver. The `symbol_solvert` object used for this
 /// substitution is constructed by
+// NOLINTNEXTLINE
 /// `generate_symbol_resolution_from_equations(const std::vector<equal_exprt>&,const namespacet&,messaget::mstreamt&)`.
 /// All these symbols are then replaced using
+// NOLINTNEXTLINE
 /// `replace_symbols_in_equations(const union_find_replacet &, std::vector<equal_exprt> &)`.
 ///
 /// ## Conversion to first order formulas:
 /// Each string primitive is converted to a list of first order formulas by the
+// NOLINTNEXTLINE
 /// function `substitute_function_applications_in_equations(std::vector<equal_exprt>&,string_constraint_generatort&)`.
 /// These formulas should be unquantified or be either a `string_constraintt`
 /// or a `string_not_contains_constraintt`.
