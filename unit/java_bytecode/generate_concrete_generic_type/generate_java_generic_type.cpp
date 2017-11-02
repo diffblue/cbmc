@@ -126,27 +126,6 @@ SCENARIO(
   }
 }
 
-
-SCENARIO(
-  "generate_java_generic_type_from_file_uninstantiated_param",
-  "[core][java_bytecode][generate_java_generic_type]")
-{
-  GIVEN("A generic java type with a field that refers to another generic with"
-          " an uninstantiated parameter.")
-  {
-    symbol_tablet new_symbol_table=
-      load_java_class("generic_unknown_field",
-                      "./java_bytecode/generate_concrete_generic_type");
-
-    // It's illegal to create an instantiation of a field that refers
-    // to a (still) uninstantiated generic class, so this is checking that
-    // this hasn't happened.
-    REQUIRE_FALSE(new_symbol_table.has_symbol
-      ("java::generic_unknown_field$element<T>"));
-  }
-}
-
-
 SCENARIO(
   "generate_java_generic_type_from_file_two_instances",
   "[core][java_bytecode][generate_java_generic_type]")
