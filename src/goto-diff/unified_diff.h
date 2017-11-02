@@ -61,16 +61,16 @@ public:
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program);
 
-  void lcss(
+  static void lcss(
     const irep_idt &identifier,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
-    differencest &differences) const;
+    differencest &differences);
 
-  goto_program_difft get_diff(
+  static goto_program_difft get_diff(
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
-    const differencest &differences) const;
+    const differencest &differences);
 
   void output_diff(
     const irep_idt &identifier,

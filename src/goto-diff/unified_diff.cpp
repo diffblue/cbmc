@@ -54,7 +54,7 @@ unified_difft::get_diff(const irep_idt &function) const
 unified_difft::goto_program_difft unified_difft::get_diff(
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
-  const differencest &differences) const
+  const differencest &differences)
 {
   goto_programt::instructionst::const_iterator old_it =
     old_goto_program.instructions.begin();
@@ -148,7 +148,7 @@ void unified_difft::lcss(
   const irep_idt &identifier,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
-  differencest &differences) const
+  differencest &differences)
 {
   std::size_t old_count = old_goto_program.instructions.size();
   std::size_t new_count = new_goto_program.instructions.size();
