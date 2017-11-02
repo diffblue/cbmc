@@ -63,7 +63,7 @@ public:
   symbol_tablet(const symbol_tablet &other)
     : internal_symbols(other.internal_symbols),
       internal_symbol_base_map(other.internal_symbol_base_map),
-      internal_symbol_module_map(other.symbol_module_map),
+      internal_symbol_module_map(other.internal_symbol_module_map),
       symbols(internal_symbols),
       symbol_base_map(internal_symbol_base_map),
       symbol_module_map(internal_symbol_module_map)
@@ -79,7 +79,7 @@ public:
   symbol_tablet(symbol_tablet &&other)
     : internal_symbols(std::move(other.internal_symbols)),
       internal_symbol_base_map(std::move(other.internal_symbol_base_map)),
-      internal_symbol_module_map(std::move(other.symbol_module_map)),
+      internal_symbol_module_map(std::move(other.internal_symbol_module_map)),
       symbols(internal_symbols),
       symbol_base_map(internal_symbol_base_map),
       symbol_module_map(internal_symbol_module_map)
@@ -88,9 +88,9 @@ public:
 
   symbol_tablet &operator=(symbol_tablet &&other)
   {
-    internal_symbols=std::move(other.internal_symbols);
-    internal_symbol_base_map=std::move(other.internal_symbol_base_map);
-    internal_symbol_module_map=std::move(other.symbol_module_map);
+    internal_symbols = std::move(other.internal_symbols);
+    internal_symbol_base_map = std::move(other.internal_symbol_base_map);
+    internal_symbol_module_map = std::move(other.internal_symbol_module_map);
     return *this;
   }
 
