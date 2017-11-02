@@ -26,29 +26,32 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/string_expr.h>
 #include <langapi/language_util.h>
 
-/*! \brief Universally quantified string constraint
-
-    This represents a universally quantified string constraint as laid out in
-    DOI: 10.1007/978-3-319-03077-7. The paper seems to specify a universal
-    constraint as follows.
-
-    A universal constraint is of the form \f$\forall n. L(n) \rightarrow
-    P(n, s_0,\ldots, s_k)\f$ where
-
-    1. \f$L(n)\f$ does not contain string indices [possibly not required, but
-       implied by examples]
-    2. \f$\forall n. L(n) \rightarrow P'\left(s_0[f_0(n)],\ldots, s_k[f_k(n)]
-       \right)\f$, i.e. when focusing on one specific string, all indices are
-       the same [stated in a roundabout manner]
-    3. Each \f$f\f$ is linear and therefore has an inverse [explicitly stated]
-    4. \f$L(n)\f$ and \f$P(n, s_0,\ldots, s_k)\f$ may contain other (free)
-       variables, but in \f$P\f$, \f$n\f$ can only occur as an argument to an
-       \f$f\f$ [explicitly stated, implied]
-
-    We extend this slightly by restricting n to be in a specific range, but this
-    is another implication which can be pushed in to \f$L(n)\f$.
-*/
-
+///  ### Universally quantified string constraint
+///
+///  This represents a universally quantified string constraint as laid out in
+///  DOI: 10.1007/978-3-319-03077-7. The paper seems to specify a universal
+///  constraint as follows.
+///
+///  A universal constraint is of the form
+///  \f$ \forall i.\ PI(i) \Rightarrow  PV(i)\f$
+///  where \f$PI\f$ and \f$PV\f$ satisfies the following conditions:
+///
+///    * The predicate `PI` , called the index guard, must follow the grammar
+///      * \f$iguard : iguard \land iguard \mid iguard \lor iguard \mid
+///        iterm \le iterm \mid  iterm = iterm \f$
+///      * \f$iterm : integer\_constant1 \times i + integer\_constant2 \f$
+///
+///    * The predicate `PV` is called the value constraint.
+///      The index variable `i` can only be used in array read expressions of
+///      the form `a[i]`.
+///      ie. `PV` is of the form \f$P'(s_0[f_0(i)],\ldots, s_k[f_k(i)]
+///      )\f$, moreover when focusing on one specific string, all indices are
+///      the same [stated in a roundabout manner].
+///      \f$L(n)\f$ and \f$P(n, s_0,\ldots, s_k)\f$ may contain other (free)
+///      variables, but in \f$P\f$, \f$n\f$ can only occur as an argument to an
+///      \f$f\f$ [explicitly stated, implied].
+///
+/// \todo The fact that we follow this grammar is not enforced at the moment.
 class string_constraintt: public exprt
 {
 public:
@@ -155,6 +158,7 @@ inline std::string from_expr(
     from_expr(ns, identifier, expr.body());
 }
 
+/// Constraints to encode non containement of strings.
 class string_not_contains_constraintt: public exprt
 {
 public:

@@ -15,8 +15,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/prefix.h>
 #include <util/unicode.h>
 
-/// add axioms saying the returned string expression should be equal to the
-/// string constant
+/// Add axioms ensuring that the provided string expression and constant are
+/// equal.
 /// \param res: array of characters for the result
 /// \param sval: a string constant
 /// \return integer expression equal to zero
@@ -29,8 +29,8 @@ exprt string_constraint_generatort::add_axioms_for_constant(
   std::string c_str=id2string(sval);
   std::wstring str;
 
-  // TODO: we should have a special treatment for java strings when the
-  // conversion function is available:
+/// \todo We should have a special treatment for java strings when the
+/// conversion function is available:
 #if 0
   if(mode==ID_java)
     str=utf8_to_utf16_little_endian(c_str);
@@ -52,7 +52,7 @@ exprt string_constraint_generatort::add_axioms_for_constant(
   return from_integer(0, get_return_code_type());
 }
 
-/// add axioms to say that the returned string expression is empty
+/// Add axioms to say that the returned string expression is empty
 /// \param f: function application with arguments integer `length` and character
 ///           pointer `ptr`.
 /// \return integer expression equal to zero
@@ -65,8 +65,11 @@ exprt string_constraint_generatort::add_axioms_for_empty_string(
   return from_integer(0, get_return_code_type());
 }
 
-/// add axioms to say that the returned string expression is equal to the string
-/// literal
+/// String corresponding to an internal cprover string
+///
+/// Add axioms ensuring that the returned string expression is equal to the
+/// string literal.
+/// \todo The name of the function should be changed to reflect what it does.
 /// \param f: function application with an argument which is a string literal
 /// that is a constant with a string value.
 /// \return string expression

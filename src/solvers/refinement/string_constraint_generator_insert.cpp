@@ -12,11 +12,16 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms stating that the result correspond to the first string where we
-/// inserted the second one at position offset
-/// \par parameters: two string expression and an integer offset
-/// \return an expression whose value would be different from zero if there is
-///   an exception to signal
+/// Add axioms ensuring the result `res` corresponds to `s1` where we
+/// inserted `s2` at position `offset`.
+/// This is equivalent to
+/// `res=concat(substring(s1, 0, offset), concat(s2, substring(s1, offset)))`.
+/// \param res: array of characters expression
+/// \param s1: array of characters expression
+/// \param s2: array of characters expression
+/// \param offset: integer expression
+/// \return an expression expression which is different from zero if there is
+///         an exception to signal
 exprt string_constraint_generatort::add_axioms_for_insert(
   const array_string_exprt &res,
   const array_string_exprt &s1,
@@ -46,12 +51,23 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     return_code1);
 }
 
-/// add axioms corresponding to the StringBuilder.insert(int, CharSequence) and
-/// StringBuilder.insert(int, CharSequence, int, int) java functions
-/// \param f: function application with arguments integer `|res|`, char pointer
-///           `&res[0]`, refined string `s1`, refined string `s2`,
-///           integer `offset`
-/// \return a new string expression
+/// Insertion of a string in another at a specific index
+///
+/// \copybrief string_constraint_generatort::add_axioms_for_insert(
+/// const array_string_exprt &, const array_string_exprt &,
+/// const array_string_exprt &, const exprt &)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_insert(const array_string_exprt&,const array_string_exprt&,const array_string_exprt&,const exprt&)
+///   (More...) \endlink
+///
+/// If `start` and `end` arguments are given then `substring(s2, start, end)`
+/// is considered instead of `s2`.
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]`, refined_string `s1`, refined_string`s2`,
+///           integer `offset`, optional integer `start` and optional integer
+///           `end`
+/// \return an integer expression which is different from zero if there is
+///         an exception to signal
 exprt string_constraint_generatort::add_axioms_for_insert(
   const function_application_exprt &f)
 {
@@ -80,7 +96,9 @@ exprt string_constraint_generatort::add_axioms_for_insert(
     return add_axioms_for_insert(res, s1, s2, offset);
   }
 }
+
 /// add axioms corresponding to the StringBuilder.insert(I) java function
+/// \deprecated
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and an integer
 /// \return an expression
@@ -100,6 +118,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_int(
 }
 
 /// add axioms corresponding to the StringBuilder.insert(Z) java function
+/// \deprecated should convert the value to string and call insert
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a Boolean
 /// \return a new string expression
@@ -118,7 +137,8 @@ exprt string_constraint_generatort::add_axioms_for_insert_bool(
   return add_axioms_for_insert(res, s1, s2, offset);
 }
 
-/// add axioms corresponding to the StringBuilder.insert(C) java function
+/// Add axioms corresponding to the StringBuilder.insert(C) java function
+/// \todo This should be merged with add_axioms_for_insert.
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a character
 /// \return an expression
@@ -138,6 +158,7 @@ exprt string_constraint_generatort::add_axioms_for_insert_char(
 }
 
 /// add axioms corresponding to the StringBuilder.insert(D) java function
+/// \deprecated should convert the value to string and call insert
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a double
 /// \return a string expression
@@ -157,7 +178,8 @@ exprt string_constraint_generatort::add_axioms_for_insert_double(
   return add_axioms_for_insert(res, s1, s2, offset);
 }
 
-/// add axioms corresponding to the StringBuilder.insert(F) java function
+/// Add axioms corresponding to the StringBuilder.insert(F) java function
+/// \deprecated should convert the value to string and call insert
 /// \param f: function application with three arguments: a string, an
 ///   integer offset, and a float
 /// \return a new string expression

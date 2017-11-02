@@ -222,7 +222,7 @@ string_constraint_generatort::associate_char_array_to_char_pointer(
     char_pointer.id() == ID_constant &&
     to_constant_expr(char_pointer).get_value() == ID_NULL)
   {
-    // TODO: is this useful?
+    /// \todo Check if the case char_array_null occurs.
     array_typet array_type(
       char_array_type.subtype(),
       from_integer(0, to_array_type(char_array_type).size().type()));
@@ -269,9 +269,9 @@ exprt string_constraint_generatort::associate_array_to_pointer(
     array_expr.length() = pair.first->second;
   }
 
-  // TODO should use a function for that
+  /// \todo We should use a function for inserting the correspondance
+  /// between array and pointers.
   arrays_of_pointers_.insert(std::make_pair(pointer_expr, array_expr));
-  // TODO should go inside function
   add_default_axioms(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }
@@ -337,7 +337,7 @@ void string_constraint_generatort::add_default_axioms(
 }
 
 /// Adds creates a new array if it does not already exists
-/// TODO: This should be replaced by associate_char_array_to_char_pointer
+/// \todo This should be replaced by associate_char_array_to_char_pointer
 array_string_exprt string_constraint_generatort::char_array_of_pointer(
   const exprt &pointer,
   const exprt &length)
@@ -484,7 +484,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
 
 /// add axioms to say that the returned string expression is equal to the
 /// argument of the function application
-/// \par parameters: function application with one argument, which is a string,
+/// \deprecated should use substring instead
+/// \param f: function application with one argument, which is a string,
 /// or three arguments: string, integer offset and count
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_for_copy(
@@ -500,10 +501,11 @@ exprt string_constraint_generatort::add_axioms_for_copy(
   return add_axioms_for_substring(res, str, offset, plus_exprt(offset, count));
 }
 
-
-/// add axioms corresponding to the String.length java function
-/// \par parameters: function application with one string argument
-/// \return a string expression of index type
+/// Length of a string
+///
+/// Returns the length of the string argument of the given function application
+/// \param f: function application with argument string `str`
+/// \return expression `|str|`
 exprt string_constraint_generatort::add_axioms_for_length(
   const function_application_exprt &f)
 {
@@ -513,7 +515,7 @@ exprt string_constraint_generatort::add_axioms_for_length(
 }
 
 /// expression true exactly when the index is positive
-/// \par parameters: an index expression
+/// \param x: an index expression
 /// \return a Boolean expression
 exprt string_constraint_generatort::axiom_for_is_positive_index(const exprt &x)
 {
@@ -521,7 +523,7 @@ exprt string_constraint_generatort::axiom_for_is_positive_index(const exprt &x)
 }
 
 /// add axioms stating that the returned value is equal to the argument
-/// \par parameters: function application with one character argument
+/// \param f: function application with one character argument
 /// \return a new character expression
 exprt string_constraint_generatort::add_axioms_for_char_literal(
   const function_application_exprt &f)
@@ -551,11 +553,13 @@ exprt string_constraint_generatort::add_axioms_for_char_literal(
   }
 }
 
-/// add axioms stating that the character of the string at the given position is
-/// equal to the returned value
-/// \par parameters: function application with two arguments: a string and an
-///   integer
-/// \return a character expression
+/// Character at a given position
+///
+/// Add axioms stating that the character of the string at position given by
+/// second argument is equal to the returned value.
+/// This axiom is \f$ char = str[i] \f$.
+/// \param f: function application with arguments string `str` and integer `i`
+/// \return character expression `char`
 exprt string_constraint_generatort::add_axioms_for_char_at(
   const function_application_exprt &f)
 {

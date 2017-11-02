@@ -211,36 +211,27 @@ private:
     const array_string_exprt &str,
     const exprt &c,
     const exprt &from_index);
-
-  // Add axioms corresponding to the String.indexOf:(String;I) java function
   exprt add_axioms_for_index_of_string(
     const array_string_exprt &haystack,
     const array_string_exprt &needle,
     const exprt &from_index);
-
-  // Add axioms corresponding to the String.indexOf java functions
   exprt add_axioms_for_index_of(const function_application_exprt &f);
-
-  // Add axioms corresponding to the String.lastIndexOf:(String;I) java function
   exprt add_axioms_for_last_index_of_string(
     const array_string_exprt &haystack,
     const array_string_exprt &needle,
     const exprt &from_index);
-
-  // Add axioms corresponding to the String.lastIndexOf:(CI) java function
   exprt add_axioms_for_last_index_of(
     const array_string_exprt &str,
     const exprt &c,
     const exprt &from_index);
 
-  // Add axioms corresponding to the String.lastIndexOf java functions
   exprt add_axioms_for_last_index_of(const function_application_exprt &f);
 
-  // TODO: the specifications of these functions is only partial
-  // We currently only specify that the string for NaN is "NaN", for infinity
-  // and minus infinity the string are "Infinity" and "-Infinity respectively
-  // otherwise the string contains only characters in [0123456789.] and '-' at
-  // the start for negative number
+  /// \todo The specifications of these functions is only partial.
+  /// We currently only specify that the string for NaN is "NaN", for infinity
+  /// and minus infinity the string are "Infinity" and "-Infinity respectively
+  /// otherwise the string contains only characters in [0123456789.] and '-' at
+  /// the start for negative number
   exprt add_axioms_for_string_of_float(const function_application_exprt &f);
   exprt
   add_axioms_for_string_of_float(const array_string_exprt &res, const exprt &f);
@@ -254,16 +245,16 @@ private:
   exprt add_axioms_from_float_scientific_notation(
     const function_application_exprt &f);
 
-  // Add axioms corresponding to the String.valueOf(D) java function
-  // TODO: the specifications is only partial
+  /// Add axioms corresponding to the String.valueOf(D) java function
+  /// \todo The specifications is only partial.
   exprt add_axioms_from_double(const function_application_exprt &f);
 
   exprt add_axioms_for_replace(const function_application_exprt &f);
   exprt add_axioms_for_set_length(const function_application_exprt &f);
 
-  // TODO: the specification may not be correct for the case where the
-  // string is shorter than end. An actual java program should throw an
-  // exception in that case
+  /// \todo The specification may not be correct for the case where the
+  /// string is shorter than end. An actual java program should throw an
+  /// exception in that case.
   exprt add_axioms_for_substring(
     const array_string_exprt &res,
     const array_string_exprt &str,
@@ -282,16 +273,18 @@ private:
     const exprt &code_point);
   exprt add_axioms_for_char_literal(const function_application_exprt &f);
 
-  // Add axioms corresponding the String.codePointCount java function
-  // TODO: this function is underspecified, we do not compute the exact value
-  // but over approximate it.
+  /// Add axioms corresponding the String.codePointCount java function
+  /// \todo This function is underspecified, we do not compute the exact value
+  /// but over approximate it.
+  /// \deprecated This is Java specific and should be implemented in Java.
   exprt add_axioms_for_code_point_count(const function_application_exprt &f);
 
-  // Add axioms corresponding the String.offsetByCodePointCount java function
-  // TODO: this function is underspecified, it should return the index within
-  // this String that is offset from the given first argument by second argument
-  // code points and we approximate this by saying the result is
-  // between index + offset and index + 2 * offset
+  /// Add axioms corresponding the String.offsetByCodePointCount java function
+  /// \todo This function is underspecified, it should return the index within
+  /// this String that is offset from the given first argument by second
+  /// argument code points and we approximate this by saying the result is
+  /// between index + offset and index + 2 * offset.
+  /// \deprecated This is Java specific and should be implemented in Java.
   exprt add_axioms_for_offset_by_code_point(
     const function_application_exprt &f);
 
@@ -313,9 +306,10 @@ private:
   exprt add_axioms_for_parse_int(const function_application_exprt &f);
   exprt add_axioms_for_compare_to(const function_application_exprt &f);
 
-  // Add axioms corresponding to the String.intern java function
-  // TODO: this does not work at the moment because of the way we treat
-  // string pointers
+  /// Add axioms corresponding to the String.intern java function
+  /// \todo This does not work at the moment because of the way we treat
+  /// string pointers.
+  /// \deprecated Not tested.
   symbol_exprt add_axioms_for_intern(const function_application_exprt &f);
 
   exprt associate_array_to_pointer(const function_application_exprt &f);

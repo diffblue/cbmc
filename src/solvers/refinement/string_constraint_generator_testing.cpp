@@ -13,10 +13,21 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// add axioms stating that the returned expression is true exactly when the
-/// first string is a prefix of the second one, starting at position offset
-/// \par parameters: a prefix string, a string and an integer offset
-/// \return a Boolean expression
+/// Add axioms stating that the returned expression is true exactly when the
+/// first string is a prefix of the second one, starting at position offset.
+///
+/// These axioms are:
+///   1. \f$ {\tt isprefix} \Rightarrow |str| \ge |{\tt prefix}|+offset \f$
+///   2. \f$ \forall 0 \le qvar<|{\tt prefix}|.\ {\tt isprefix}
+///          \Rightarrow s0[witness+{\tt offset}]=s2[witness] \f$
+///   3. \f$ !{\tt isprefix} \Rightarrow |{\tt str}|<|{\tt prefix}|+{\tt offset}
+///          \lor (0 \le witness<|{\tt prefix}|
+///        \land {\tt str}[witness+{\tt offset}] \ne {\tt prefix}[witness])\f$
+///
+/// \param prefix: an array of characters
+/// \param str: an array of characters
+/// \param offset: an integer
+/// \return Boolean expression `isprefix`
 exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const array_string_exprt &prefix,
   const array_string_exprt &str,
@@ -24,13 +35,6 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
 {
   symbol_exprt isprefix=fresh_boolean("isprefix");
   const typet &index_type=str.length().type();
-
-  // We add axioms:
-  // a1 : isprefix => |str| >= |prefix|+offset
-  // a2 : forall 0<=qvar<|prefix|. isprefix => s0[witness+offset]=s2[witness]
-  // a3 : !isprefix =>
-  //        |str|<|prefix|+offset ||
-  //        (0<=witness<|prefix| && str[witness+offset]!=prefix[witness])
 
   implies_exprt a1(
     isprefix,
@@ -61,12 +65,21 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   return isprefix;
 }
 
-/// add axioms corresponding to the String.isPrefix java function
-/// \par parameters: a function application with 2 or 3 arguments and a Boolean
-///   telling
-/// whether the prefix is the second argument (when swap_arguments is
-/// true) or the first argument
-/// \return a Boolean expression
+/// Test if the target is a prefix of the string
+///
+/// Add axioms ensuring the return value is true when the string starts with the
+/// given target.
+/// These axioms are detailed here:
+// NOLINTNEXTLINE
+/// string_constraint_generatort::add_axioms_for_is_prefix(const array_string_exprt &prefix, const array_string_exprt &str, const exprt &offset)
+/// \todo The primitive should be renamed to `starts_with`.
+/// \todo Get rid of the boolean flag.
+/// \param f: a function application with arguments refined_string `s0`,
+///           refined string `s1` and optional integer argument `offset`
+///           whose default value is 0
+/// \param swap_arguments: a Boolean telling whether the prefix is the second
+///        argument or the first argument
+/// \return boolean expression `isprefix`
 exprt string_constraint_generatort::add_axioms_for_is_prefix(
   const function_application_exprt &f, bool swap_arguments)
 {
@@ -80,9 +93,10 @@ exprt string_constraint_generatort::add_axioms_for_is_prefix(
   return typecast_exprt(add_axioms_for_is_prefix(s0, s1, offset), f.type());
 }
 
-/// add axioms stating that the returned value is true exactly when the argument
-/// string is empty
-/// \par parameters: function application with a string argument
+/// Add axioms stating that the returned value is true exactly when the argument
+/// string is empty.
+/// \deprecated should use `string_length(s)==0` instead
+/// \param f: function application with a string argument
 /// \return a Boolean expression
 exprt string_constraint_generatort::add_axioms_for_is_empty(
   const function_application_exprt &f)
@@ -100,12 +114,26 @@ exprt string_constraint_generatort::add_axioms_for_is_empty(
   return typecast_exprt(is_empty, f.type());
 }
 
-/// add axioms corresponding to the String.isSuffix java function
-/// \par parameters: a function application with 2 or 3 arguments and a Boolean
-///   telling
-/// whether the suffix is the second argument (when swap_arguments is
-/// true) or the first argument
-/// \return a Boolean expression
+/// Test if the target is a suffix of the string
+///
+/// Add axioms ensuring the return value is true when the first string ends with
+/// the given target.
+/// These axioms are:
+///   1. \f$ \texttt{issuffix} \Rightarrow |s_0| \ge |s_1| \f$
+///   2. \f$ \forall i <|s_1|.\ {\tt issuffix}
+///          \Rightarrow s_1[i] = s_0[i + |s_0| - |s_1|]
+///      \f$
+///   3. \f$ \lnot {\tt issuffix} \Rightarrow
+///     (|s_1| > |s_0| \land {\tt witness}=-1)
+///     \lor (|s_1| > {witness} \ge 0
+///       \land s_1[{witness}] \ne s_0[{witness} + |s_0| - |s_1|] \f$
+///
+/// \todo The primitive should be renamed `ends_with`.
+/// \param f: a function application with arguments refined_string `s0`
+///           and refined_string  `s1`
+/// \param swap_arguments: boolean flag telling whether the suffix is the second
+///        argument or the first argument
+/// \return Boolean expression `issuffix`
 exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const function_application_exprt &f, bool swap_arguments)
 {
@@ -118,15 +146,6 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   const array_string_exprt &s0 = get_string_expr(args[swap_arguments ? 1 : 0]);
   const array_string_exprt &s1 = get_string_expr(args[swap_arguments ? 0 : 1]);
   const typet &index_type=s0.length().type();
-
-  // We add axioms:
-  // a1 : issufix => s0.length >= s1.length
-  // a2 : forall witness<s1.length.
-  //     issufix => s1[witness]=s0[witness + s0.length-s1.length]
-  // a3 : !issuffix =>
-  //   (s1.length > s0.length && witness=-1)
-  //     || (s1.length > witness>=0
-  //       &&s1[witness]!=s0[witness + s0.length-s1.length]
 
   implies_exprt a1(issuffix, s1.axiom_for_length_ge(s0.length()));
   axioms.push_back(a1);
@@ -156,9 +175,24 @@ exprt string_constraint_generatort::add_axioms_for_is_suffix(
   return tc_issuffix;
 }
 
-/// add axioms corresponding to the String.contains java function
-/// \par parameters: function application with two string arguments
-/// \return a Boolean expression
+/// Test whether a string contains another
+///
+/// Add axioms ensuring the returned value is true when the first string
+/// contains the second.
+/// These axioms are:
+///   1. \f$ contains \Rightarrow |s_0| \ge |s_1| \f$
+///   2. \f$ contains \Rightarrow 0 \le startpos \le |s_0|-|s_1| \f$
+///   3. \f$ !contains \Rightarrow startpos = -1 \f$
+///   4. \f$ \forall qvar < |s_1|.\ contains
+///          \Rightarrow s_1[qvar] = s_0[startpos + qvar] \f$
+///   5. \f$ \forall startpos \le |s_0|-|s_1|.
+///          \ (!contains \land |s_0| \ge |s_1|)
+///          \Rightarrow \exists witness < |s_1|.
+///          \ s_1[witness] \ne s_0[startpos+witness] \f$
+/// \warning slow for target longer than one character
+/// \param f: function application with arguments refined_string `s0`
+///           refined_string `s1`
+/// \return Boolean expression `contains`
 exprt string_constraint_generatort::add_axioms_for_contains(
   const function_application_exprt &f)
 {
@@ -170,15 +204,6 @@ exprt string_constraint_generatort::add_axioms_for_contains(
   const symbol_exprt contains = fresh_boolean("contains");
   const symbol_exprt startpos =
     fresh_exist_index("startpos_contains", index_type);
-
-  // We add axioms:
-  // a1 : contains ==> |s0| >= |s1|
-  // a2 : contains ==> 0 <= startpos <= |s0|-|s1|
-  // a3 : !contains ==> startpos = -1
-  // a4 : forall qvar < |s1|. contains ==> s1[qvar] = s0[startpos + qvar]
-  // a5 : !contains ==> |s1| > |s0| ||
-  //      (forall startpos <= |s0| - |s1|.
-  //         exists witness < |s1|. s1[witness] != s0[witness + startpos])
 
   const implies_exprt a1(contains, s0.axiom_for_length_ge(s1.length()));
   axioms.push_back(a1);
@@ -201,9 +226,6 @@ exprt string_constraint_generatort::add_axioms_for_contains(
     qvar, s1.length(), contains, equal_exprt(s1[qvar], s0[qvar_shifted]));
   axioms.push_back(a4);
 
-  // We rewrite axiom a4 as:
-  // forall startpos <= |s0|-|s1|.  (!contains && |s0| >= |s1|)
-  //     ==> exists witness < |s1|. s1[witness] != s0[startpos+witness]
   string_not_contains_constraintt a5(
     from_integer(0, index_type),
     plus_exprt(from_integer(1, index_type), length_diff),

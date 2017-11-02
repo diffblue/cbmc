@@ -18,7 +18,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 /// Gets the unbiased exponent in a floating-point bit-vector
 ///
-/// TODO: factorize with float_bv.cpp float_utils.h
+/// \todo Refactor with float_bv.cpp float_utils.h
 /// \param src: a floating point expression
 /// \param spec: specification for floating points
 /// \return A new 32 bit integer expression representing the exponent.
@@ -147,6 +147,8 @@ exprt estimate_decimal_exponent(const exprt &f, const ieee_float_spect &spec)
   return round_expr_to_zero(adjust_for_neg);
 }
 
+/// String representation of a float value
+///
 /// Add axioms corresponding to the String.valueOf(F) java function
 /// \param f: function application with one float argument
 /// \return an integer expression
@@ -174,8 +176,8 @@ exprt string_constraint_generatort::add_axioms_from_double(
 /// This specification is correct for inputs that do not exceed 100000 and the
 /// function is unspecified for other values.
 ///
-/// \todo: this specification is not correct for negative numbers and
-/// double precision
+/// \todo This specification is not correct for negative numbers and
+/// double precision.
 /// \param res: string expression corresponding to the result
 /// \param f: expression representing a float
 /// \return an integer expression, different from zero if an error should be
@@ -306,7 +308,7 @@ exprt string_constraint_generatort::add_axioms_for_fractional_part(
 /// Then \f$n\f$ can be expressed by the equation:
 /// \f$log_10(n) = log_10(m) + log_10(2) * e - d\f$
 /// \f$n = f / 10^d = m * 2^e / 10^d = m * 2^e / 10^(floor(log_10(2) * e))\f$
-/// TODO: For now we only consider single precision.
+/// \todo For now we only consider single precision.
 /// \param res: string expression representing the float in scientific notation
 /// \param f: a float expression, which is positive
 /// \return a integer expression different from 0 to signal an exception
@@ -471,6 +473,8 @@ exprt string_constraint_generatort::add_axioms_from_float_scientific_notation(
   return add_axioms_for_concat(res, string_expr_with_E, exponent_string);
 }
 
+/// Representation of a float value in scientific notation
+///
 /// Add axioms corresponding to the scientific representation of floating point
 /// values
 /// \param f: a function application expression

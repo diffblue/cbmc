@@ -18,6 +18,8 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <cmath>
 #include <solvers/floatbv/float_bv.h>
 
+/// Convert an integer to a string
+///
 /// Add axioms corresponding to the String.valueOf(I) java function.
 /// \param f: function application with one integer argument
 /// \return a new string expression
@@ -35,6 +37,7 @@ exprt string_constraint_generatort::add_axioms_from_int(
 }
 
 /// Add axioms corresponding to the String.valueOf(J) java function.
+/// \deprecated should use add_axioms_from_int instead
 /// \param f: function application with one long argument
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_from_long(
@@ -51,6 +54,7 @@ exprt string_constraint_generatort::add_axioms_from_long(
 }
 
 /// Add axioms corresponding to the String.valueOf(Z) java function.
+/// \deprecated this is specific to Java
 /// \param f: function application with a Boolean argument
 /// \return a new string expression
 exprt string_constraint_generatort::add_axioms_from_bool(
@@ -64,6 +68,7 @@ exprt string_constraint_generatort::add_axioms_from_bool(
 
 /// Add axioms stating that the returned string equals "true" when the Boolean
 /// expression is true and "false" when it is false.
+/// \deprecated This is language dependent
 /// \param res: string expression for the result
 /// \param b: Boolean expression
 /// \return code 0 on success
@@ -191,6 +196,7 @@ exprt string_constraint_generatort::int_of_hex_char(const exprt &chr)
 
 /// Add axioms stating that the string `res` corresponds to the integer
 /// argument written in hexadecimal.
+/// \deprecated use add_axioms_from_int which takes a radix argument instead
 /// \param res: string expression for the result
 /// \param i: an integer argument
 /// \return code 0 on success
@@ -247,7 +253,7 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
   return from_integer(0, get_return_code_type());
 }
 
-/// add axioms corresponding to the Integer.toHexString(I) java function
+/// Add axioms corresponding to the Integer.toHexString(I) java function
 /// \param f: function application with an integer argument
 /// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_int_hex(
@@ -259,8 +265,15 @@ exprt string_constraint_generatort::add_axioms_from_int_hex(
   return add_axioms_from_int_hex(res, f.arguments()[2]);
 }
 
-/// Add axioms corresponding to the String.valueOf(C) java function.
-/// \param f: function application one char argument
+/// Conversion from char to string
+///
+/// \copybrief  string_constraint_generatort::add_axioms_from_char(
+///   const array_string_exprt &res, const exprt &c)
+// NOLINTNEXTLINE
+/// \link string_constraint_generatort::add_axioms_from_char(const array_string_exprt &res, const exprt &c)
+///    (More...) \endlink
+/// \param f: function application with arguments integer `|res|`, character
+///           pointer `&res[0]` and character `c`
 /// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_char(
   const function_application_exprt &f)
@@ -271,10 +284,12 @@ exprt string_constraint_generatort::add_axioms_from_char(
   return add_axioms_from_char(res, f.arguments()[2]);
 }
 
-/// Add axioms stating that the returned string has length 1 and the character
-/// it contains corresponds to the input expression.
-/// \param res: string expression for the result
-/// \param c: one expression of type char
+/// Add axiom stating that string `res` has length 1 and the character
+/// it contains equals `c`.
+///
+/// This axiom is: \f$ |{\tt res}| = 1 \land {\tt res}[0] = {\tt c} \f$.
+/// \param res: array of characters expression
+/// \param c: character expression
 /// \return code 0 on success
 exprt string_constraint_generatort::add_axioms_from_char(
   const array_string_exprt &res,
@@ -462,10 +477,13 @@ void string_constraint_generatort::add_axioms_for_characters_in_integer_string(
   }
 }
 
-/// add axioms corresponding to the Integer.parseInt java function
-/// \param f: a function application with either one string expression or one
-///   string expression and an integer expression for the radix
-/// \return an integer expression
+/// Integer value represented by a string
+///
+/// Add axioms ensuring the value of the returned integer corresponds
+/// to the value represented by `str`
+/// \param f: a function application with arguments refined_string `str` and
+///          an optional integer for the radix
+/// \return integer expression equal to the value represented by `str`
 exprt string_constraint_generatort::add_axioms_for_parse_int(
   const function_application_exprt &f)
 {
@@ -476,8 +494,8 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
   const exprt radix=f.arguments().size()==1?
     static_cast<exprt>(from_integer(10, type)):
     static_cast<exprt>(typecast_exprt(f.arguments()[1], type));
-  /// Most of the time we can evaluate radix as an integer. The value 0 is used
-  /// to indicate when we can't tell what the radix is.
+  // Most of the time we can evaluate radix as an integer. The value 0 is used
+  // to indicate when we can't tell what the radix is.
   const unsigned long radix_ul=to_integer_or_default(radix, 0);
   PRECONDITION((radix_ul>=2 && radix_ul<=36) || radix_ul==0);
 
@@ -488,8 +506,9 @@ exprt string_constraint_generatort::add_axioms_for_parse_int(
 
   const std::size_t max_string_length=max_printed_string_length(type, radix_ul);
 
-  /// TODO: we should throw an exception when this does not hold:
-  /// Note that the only thing stopping us from taking longer strings with many
+  /// \todo We should throw an exception when constraints added in
+  /// add_axioms_for_correct_number_format do not hold.
+  /// \note the only thing stopping us from taking longer strings with many
   /// leading zeros is the axioms for correct number format
   add_axioms_for_correct_number_format(
     input_int,

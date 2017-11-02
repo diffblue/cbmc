@@ -14,13 +14,26 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
 
-/// Add axioms stating that the returned value is the index within str of the
-/// first occurrence of c starting the search at from_index, or -1 if no such
-/// character occurs at or after position from_index.
-/// \param str: a string expression
-/// \param c: an expression representing a character
-/// \param from_index: an expression representing an index in the string
-/// \return a integer expression
+/// Add axioms stating that the returned value is the index within `haystack`
+/// (`str`) of the first occurrence of `needle` (`c`) starting the search at
+/// `from_index`, or is `-1` if no such character occurs at or after position
+/// `from_index`.
+/// \todo Make argument names match whose of add_axioms_for_index_of_string
+///
+/// These axioms are:
+///   1. \f$-1 \le {\tt index} < |{\tt haystack}| \f$
+///   2. \f$ \lnot contains \Leftrightarrow {\tt index} = -1 \f$
+///   3. \f$ contains \Rightarrow {\tt from\_index} \le {\tt index}
+///          \land {\tt haystack}[{\tt index}] = {\tt needle} \f$
+///   4. \f$ \forall i \in [{\tt from\_index}, {\tt index}).\ contains
+///          \Rightarrow {\tt haystack}[i] \ne {\tt needle} \f$
+///   5. \f$ \forall m, n \in [{\tt from\_index}, |{\tt haystack}|)
+///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}
+///      \f$
+/// \param str: an array of characters expression
+/// \param c: a character expression
+/// \param from_index: an integer expression
+/// \return integer expression `index`
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const array_string_exprt &str,
   const exprt &c,
@@ -29,13 +42,6 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   const typet &index_type=str.length().type();
   symbol_exprt index=fresh_exist_index("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_in_index_of");
-
-  // We add axioms:
-  // a1 : -1 <= index < |str|
-  // a2 : !contains <=> index=-1
-  // a3 : contains ==> from_index <= index && str[index] = c
-  // a4 : forall n, n:[from_index,index[. contains ==> str[n] != c
-  // a5 : forall m, n:[from_index,|str|[. !contains ==> str[m] != c
 
   exprt minus1=from_integer(-1, index_type);
   and_exprt a1(
@@ -70,14 +76,28 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   return index;
 }
 
-/// Add axioms stating that the returned value is the index within haystack of
-/// the first occurrence of needle starting the search at from_index, or -1 if
-/// needle does not occur at or after position from_index.
-/// \param haystack: a string expression
-/// \param needle: a string expression
-/// \param from_index: an expression representing an index in strings
-/// \return an integer expression representing the first index of needle in
-///   haystack after from_index, or -1 if there is none
+/// Add axioms stating that the returned value `index` is the index within
+/// `haystack` of the first occurrence of `needle` starting the search at
+/// `from_index`, or `-1` if needle does not occur at or after position
+/// `from_index`.
+///
+/// These axioms are:
+///   1. \f$ contains \Rightarrow {\tt from\_index} \le \tt{index}
+///          \le |{\tt haystack}|-|{\tt needle} | \f$
+///   2. \f$ \lnot contains \Leftrightarrow {\tt index} = -1 \f$
+///   3. \f$ \forall n \in [0,|{\tt needle}|).\ contains
+///          \Rightarrow {\tt haystack}[n + {\tt index}] = {\tt needle}[n] \f$
+///   4. \f$ \forall n \in [{\tt from\_index}, {\tt index}).\ contains
+///          \Rightarrow (\exists m \in [0,|{\tt needle}|).\ {\tt haystack}[m+n]
+///          \ne {\tt needle}[m]]) \f$
+///   5. \f$ \forall n \in [{\tt from\_index},|{\tt haystack}|-|{\tt needle}|]
+///          .\ \lnot contains \Rightarrow (\exists m \in [0,|{\tt needle}|)
+///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+/// \param haystack: an array of character expression
+/// \param needle: an array of character expression
+/// \param from_index: an integer expression
+/// \return integer expression `index` representing the first index of `needle`
+///   in `haystack`
 exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
@@ -86,16 +106,6 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
   const typet &index_type=haystack.length().type();
   symbol_exprt offset=fresh_exist_index("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_substring");
-
-  // We add axioms:
-  // a1 : contains ==> from_index <= offset <= |haystack|-|needle|
-  // a2 : !contains <=> offset=-1
-  // a3 : forall n:[0,|needle|[.
-  //        contains ==> haystack[n+offset]=needle[n]
-  // a4 : forall n:[from_index,offset[.
-  //        contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
-  // a5:  forall n:[from_index,|haystack|-|needle|].
-  //        !contains ==> (exists m:[0,|needle|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
     contains,
@@ -149,11 +159,30 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 /// the last occurrence of needle starting the search backward at from_index (ie
 /// the index is smaller or equal to from_index), or -1 if needle does not occur
 /// before from_index.
-/// \param haystack: a string expression
-/// \param needle: a string expression
-/// \param from_index: an expression representing an index in strings
-/// \return an integer expression representing the last index of needle in
-///   haystack before or at from_index, or -1 if there is none
+///
+/// These axioms are:
+///   1. \f$ contains \Rightarrow -1 \le {\tt index}
+///          \land {\tt index} \le {\tt from\_index}
+///          \land {\tt index} \le |{\tt haystack}| - |{\tt needle}| \f$
+///   2. \f$ \lnot contains \Leftrightarrow {\tt index}= -1 \f$
+///   3. \f$ \forall n \in [0, |{\tt needle}|).\ contains
+///          \Rightarrow {\tt haystack}[n+{\tt index}] = {\tt needle}[n] \f$
+///   4. \f$ \forall n \in [{\tt index}+1,
+///                         min({\tt from\_index},
+///                             |{\tt haystack}| - |{\tt needle}|)]
+///          .\ contains \Rightarrow
+///          (\exists m \in [0,|{\tt needle}|)
+///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]]) \f$
+///   5. \f$ \forall n \in
+///          [0, min({\tt from\_index}, |{\tt haystack}| - |{\tt needle}|)]
+///          .\ \lnot contains \Rightarrow
+///          (\exists m \in [0,|{\tt needle}|)
+///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+/// \param haystack: an array of characters expression
+/// \param needle: an array of characters expression
+/// \param from_index: integer expression
+/// \return integer expression `index` representing the last index of `needle`
+///         in `haystack` before or at `from_index`, or -1 if there is none
 exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const array_string_exprt &haystack,
   const array_string_exprt &needle,
@@ -162,19 +191,6 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   const typet &index_type=haystack.length().type();
   symbol_exprt offset=fresh_exist_index("index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_substring");
-
-  // We add axioms:
-  // a1 : contains ==> -1 <= offset && offset <= from_index
-  //                   && offset <= |haystack| - |needle|
-  // a2 : !contains <=> offset = -1
-  // a3 : forall n:[0, |needle|[,
-  //        contains ==> haystack[n+offset] = needle[n]
-  // a4 : forall n:[offset+1, min(from_index, |haystack| - |needle|)].
-  //        contains ==>
-  //          (exists m:[0,|needle|[. haystack[m+n] != needle[m]])
-  // a5:  forall n:[0, min(from_index, |haystack| - |needle|)].
-  //        !contains ==>
-  //          (exists m:[0,|needle|[. haystack[m+n] != needle[m])
 
   implies_exprt a1(
     contains,
@@ -225,10 +241,24 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
   return offset;
 }
 
-/// add axioms corresponding to the String.indexOf:(C), String.indexOf:(CI),
-/// String.indexOf:(String), and String.indexOf:(String,I) java functions
-/// \par parameters: function application with 2 or 3 arguments
-/// \return a integer expression
+/// Index of the first occurence of a target inside the string
+///
+/// If the target is a character:
+// NOLINTNEXTLINE
+/// \copybrief add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// \link
+/// add_axioms_for_index_of(const array_string_exprt&,const exprt&,const exprt&)
+/// (More...) \endlink
+///
+/// If the target is a refined_string:
+/// \copybrief string_constraint_generatort::add_axioms_for_index_of_string
+/// \link string_constraint_generatort::add_axioms_for_index_of_string (More...)
+/// \endlink
+/// \warning slow for string targets
+/// \param f: function application with arguments refined_string `haystack`,
+///           refined_string or character `needle`, and optional integer
+///           `from_index` with default value `0`
+/// \return integer expression
 exprt string_constraint_generatort::add_axioms_for_index_of(
   const function_application_exprt &f)
 {
@@ -258,14 +288,26 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
   }
 }
 
-/// Add axioms stating that the returned value is the index within str of the
-/// last occurrence of c starting the search backward at from_index, or -1 if no
-/// such character occurs at or before position from_index.
-/// \param str: a string expression
-/// \param c: an expression representing a character
-/// \param from_index: an expression representing an index in the string
-/// \return an integer expression representing the last index of c in str before
-///   or at from_index, or -1 if there is none
+/// Add axioms stating that the returned value is the index within `haystack`
+/// (`str`) of the last occurrence of `needle` (`c`) starting the search
+/// backward at `from_index`, or `-1` if no such character occurs at or before
+/// position `from_index`.
+/// \todo Change argument names to match add_axioms_for_last_index_of_string
+///
+/// These axioms are :
+///   1. \f$ -1 \le {\tt index} \le {\tt from\_index} \f$
+///   2. \f$ {\tt index} = -1 \Leftrightarrow \lnot contains\f$
+///   3. \f$ contains \Rightarrow ({\tt index} \le {\tt from\_index} \land
+///          {\tt haystack}[i] = {\tt needle} )\f$
+///   4. \f$ \forall n \in [{\tt index} +1, {\tt from\_index}+1)
+///          .\ contains \Rightarrow {\tt haystack}[n] \ne {\tt needle} \f$
+///   5. \f$ \forall m \in [0, {\tt from\_index}+1)
+///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}\f$
+/// \param str: an array of characters expression
+/// \param c: a character expression
+/// \param from_index: an integer expression
+/// \return integer expression `index` representing the last index of `needle`
+///         in `haystack` before or at `from_index`, or `-1` if there is none
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const array_string_exprt &str,
   const exprt &c,
@@ -274,13 +316,6 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const typet &index_type = str.length().type();
   symbol_exprt index=fresh_exist_index("last_index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_in_last_index_of");
-
-  // We add axioms:
-  // a1 : -1 <= i <= from_index
-  // a2 : i = -1 <=> !contains
-  // a3 : contains ==> (i <= from_index && s[i] = c)
-  // a4 : forall n:[i+1, from_index+1[ && contains ==> s[n] != c
-  // a5 : forall m:[0, from_index+1[ && !contains ==> s[m] != c
 
   exprt index1=from_integer(1, index_type);
   exprt minus1=from_integer(-1, index_type);
@@ -320,11 +355,24 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   return index;
 }
 
-/// add axioms corresponding to the String.lastIndexOf:(C),
-/// String.lastIndexOf:(CI), String.lastIndexOf:(String), and
-/// String.lastIndexOf:(String,I) java functions
-/// \par parameters: function application with 2 or 3 arguments
-/// \return a integer expression
+/// Index of the last occurence of a target inside the string
+///
+/// If the target is a character:
+// NOLINTNEXTLINE
+/// \copybrief add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
+// NOLINTNEXTLINE
+/// \link add_axioms_for_last_index_of(const array_string_exprt&,const exprt&,const exprt&)
+///   (More...) \endlink
+///
+/// If the target is a refined_string:
+/// \copybrief string_constraint_generatort::add_axioms_for_last_index_of_string
+/// \link string_constraint_generatort::add_axioms_for_last_index_of_string
+///   (More...) \endlink
+/// \warning slow for string targets
+/// \param f: function application with arguments refined_string `haystack`,
+///           refined_string or character `needle`, and optional integer
+///           `from_index` with default value `|haystack|-1`
+/// \return an integer expression
 exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const function_application_exprt &f)
 {
