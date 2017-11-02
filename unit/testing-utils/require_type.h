@@ -19,7 +19,6 @@
 #include <util/std_types.h>
 #include <java_bytecode/java_types.h>
 
-
 // NOLINTNEXTLINE(readability/namespace)
 namespace require_type
 {
@@ -63,8 +62,11 @@ const typet &require_java_non_generic_type(
   const typet &type,
   const optionalt<symbol_typet> &expect_subtype);
 
-java_generics_class_typet &
-require_java_generic_class(const class_typet &class_type);
+java_generics_class_typet require_java_generic_class(
+  const typet &class_type,
+  const optionalt<std::initializer_list<irep_idt>> &type_variables);
+
+java_class_typet require_java_non_generic_class(const typet &class_type);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
