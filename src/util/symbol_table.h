@@ -112,7 +112,8 @@ public:
   /// \return a pointer to the found symbol if it exists, nullptr otherwise.
   const symbolt *lookup(const irep_idt &name) const
   {
-    return lookup_impl(name);
+    symbolst::const_iterator it = symbols.find(name);
+    return it != symbols.end() ? &it->second : nullptr;
   }
 
   /// Find a symbol in the symbol table for read-only access.
@@ -129,7 +130,8 @@ public:
   /// \return a pointer to the found symbol if it exists, nullptr otherwise.
   symbolt *get_writeable(const irep_idt &name)
   {
-    return lookup_impl(name);
+    symbolst::iterator it = internal_symbols.find(name);
+    return it != internal_symbols.end() ? &it->second : nullptr;
   }
 
   /// Find a symbol in the symbol table for read-write access.
@@ -138,7 +140,10 @@ public:
   /// \throw `std::out_of_range` if no such symbol exists
   symbolt &get_writeable_ref(const irep_idt &name)
   {
-    return internal_symbols.at(name);
+    symbolt *symbol = get_writeable(name);
+    if(symbol == nullptr)
+      throw std::out_of_range("name not found in symbol_table");
+    return *symbol;
   }
 
   bool add(const symbolt &symbol);
@@ -155,25 +160,6 @@ public:
   }
 
   void show(std::ostream &out) const;
-
-private:
-  const symbolt *lookup_impl(const irep_idt &name) const
-  {
-    return lookup_impl(*this, name);
-  }
-
-  symbolt *lookup_impl(const irep_idt &name)
-  {
-    return lookup_impl(*this, name);
-  }
-
-  template <typename T>
-  static auto lookup_impl(T &t, const irep_idt &name)
-    -> decltype(std::declval<T>().lookup_impl(name))
-  {
-    const auto it = t.internal_symbols.find(name);
-    return it==t.internal_symbols.end()?nullptr:&it->second;
-  }
 };
 
 std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table);
