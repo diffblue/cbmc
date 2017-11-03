@@ -64,7 +64,7 @@ SCENARIO(
         require_type::require_java_generic_class(
           class_symbol.type, {boundedinner_name + "::NUM"});
 
-      //TODO extend when bounds are parsed correctly - TG-1286
+      // TODO extend when bounds are parsed correctly - TG-1286
 
       THEN("The fields are of correct types")
       {
@@ -103,7 +103,7 @@ SCENARIO(
         require_type::require_java_generic_class(
           class_symbol.type, {doubleboundedinner_name + "::T"});
 
-      //TODO extend when bounds are parsed correctly - TG-1286
+      // TODO extend when bounds are parsed correctly - TG-1286
 
       THEN("The fields are of correct types")
       {
@@ -133,7 +133,7 @@ SCENARIO(
           class_symbol.type,
           {twoelementinner_name + "::K", twoelementinner_name + "::V"});
 
-      //TODO extend when bounds are parsed correctly - TG-1286
+      // TODO extend when bounds are parsed correctly - TG-1286
 
       THEN("The fields are of correct types")
       {

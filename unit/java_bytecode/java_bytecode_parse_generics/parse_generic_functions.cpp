@@ -348,8 +348,6 @@ SCENARIO(
         new_symbol_table.lookup_ref(process_func_name);
       const code_typet func_code =
         require_type::require_code(func_symbol.type, 0);
-      // TODO: should point to something else than Object?? - possibly
-      // connected to bounds - issue TG-1286
       THEN("It has return type pointing to java.lang.Object")
       {
         require_type::require_pointer(

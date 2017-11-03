@@ -9,11 +9,6 @@
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
 
-#include <util/config.h>
-#include <util/language.h>
-
-#include <java_bytecode/java_bytecode_language.h>
-
 SCENARIO(
   "parse_generic_wildcard",
   "[core][java_bytecode][java_bytecode_parse_generics]")
@@ -31,6 +26,7 @@ SCENARIO(
       class_prefix + func_name + func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    // TODO extend tests when wildcards are parsed correctly - TG-675
   }
 
   THEN("There should be a symbol for processUpperBoundInterfaceGeneric")
@@ -41,6 +37,7 @@ SCENARIO(
       class_prefix + func_name + func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    // TODO extend tests when wildcards are parsed correctly - TG-675
   }
 
   THEN("There should be a symbol for processUpperBoundClassGeneric")
@@ -51,6 +48,7 @@ SCENARIO(
       class_prefix + func_name + func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    // TODO extend tests when wildcards are parsed correctly - TG-675
   }
 
   THEN("There should be a symbol for processLowerBoundGeneric")
@@ -62,5 +60,6 @@ SCENARIO(
       class_prefix + func_name + func_descriptor;
 
     REQUIRE(new_symbol_table.has_symbol(process_func_name));
+    // TODO extend tests when wildcards are parsed correctly - TG-675
   }
 }
