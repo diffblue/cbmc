@@ -55,6 +55,9 @@ public:
   }
   virtual const symbol_tablet &get_symbol_table() const = 0;
 
+  /// Check whether a symbol exists in the symbol table
+  /// \param name: The name of the symbol to look for
+  /// \return true if the symbol exists
   bool has_symbol(const irep_idt &name) const
   {
     return symbols.find(name) != symbols.end();
