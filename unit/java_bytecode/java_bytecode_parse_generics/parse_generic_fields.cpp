@@ -8,14 +8,7 @@
 
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
-#include <testing-utils/require_symbol.h>
 #include <testing-utils/require_type.h>
-
-#include <memory>
-
-#include <util/config.h>
-#include <util/language.h>
-#include <java_bytecode/java_bytecode_language.h>
 
 SCENARIO(
   "parse_generic_fields",
@@ -73,8 +66,7 @@ SCENARIO(
           require_type::require_java_generic_type(
             field.type(),
             {{require_type::type_parameter_kindt::Inst,
-              "java::java"
-              ".lang.Integer"}});
+              "java::java.lang.Integer"}});
         }
       }
 
@@ -89,8 +81,7 @@ SCENARIO(
           require_type::require_java_generic_type(
             field.type(),
             {{require_type::type_parameter_kindt::Inst,
-              "java::java"
-              ".lang.Integer"}});
+              "java::java.lang.Integer"}});
         }
       }
 
@@ -165,8 +156,9 @@ SCENARIO(
           require_type::require_java_generic_type(
             field.type(),
             {{require_type::type_parameter_kindt::Inst,
-              "java::java.lang.Integer"},
-             {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+               "java::java.lang.Integer"},
+             {require_type::type_parameter_kindt::Var,
+               class_prefix + "::T"}});
         }
       }
 
@@ -180,10 +172,10 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
+            {{require_type::type_parameter_kindt::Var,
+               class_prefix + "::T"},
              {require_type::type_parameter_kindt::Inst,
-              "java::java.lang"
-              ".Integer"}});
+              "java::java.lang.Integer"}});
         }
       }
 
@@ -214,9 +206,10 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Inst, "java::Generic"},
+            {{require_type::type_parameter_kindt::Inst,
+               "java::Generic"},
              {require_type::type_parameter_kindt::Inst,
-              "java::GenericTwoParam"}});
+               "java::GenericTwoParam"}});
           // TODO extend when nested generics are parsed correctly - TG-1301
         }
       }
