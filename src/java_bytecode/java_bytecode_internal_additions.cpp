@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/c_types.h>
 
-void java_internal_additions(symbol_tablet &dest)
+void java_internal_additions(symbol_table_baset &dest)
 {
   // add __CPROVER_rounding_mode
 

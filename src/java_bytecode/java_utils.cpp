@@ -64,7 +64,7 @@ const std::string java_class_to_package(const std::string &canonical_classname)
 
 void generate_class_stub(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst)
 {
@@ -119,7 +119,7 @@ bool is_java_string_literal_id(const irep_idt &id)
 
 irep_idt resolve_friendly_method_name(
   const std::string &friendly_name,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::string &error)
 {
   std::string qualified_name="java::"+friendly_name;
@@ -257,7 +257,7 @@ void java_add_components_to_class(
 void declare_function(
   irep_idt function_name,
   const typet &type,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   auxiliary_symbolt func_symbol;
   func_symbol.base_name=function_name;
@@ -280,7 +280,7 @@ exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
   const typet &type,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Names of function to call
   std::string fun_name=id2string(function_name);

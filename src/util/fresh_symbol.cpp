@@ -36,7 +36,7 @@ symbolt &get_fresh_aux_symbol(
   const std::string &basename_prefix,
   const source_locationt &source_location,
   const irep_idt &symbol_mode,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Loop until find a name that doesn't clash with a non-auxilliary symbol
   while(true)

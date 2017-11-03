@@ -108,10 +108,9 @@ public:
     symbol_tablet &context,
     const std::string &module) override;
 
-  void replace_string_methods(symbol_tablet &context);
+  void replace_string_methods(symbol_table_baset &context);
 
-  virtual bool final(
-    symbol_tablet &context) override;
+  virtual bool final(symbol_table_baset &context) override;
 
   void show_parse(std::ostream &out) override;
 
