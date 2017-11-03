@@ -763,7 +763,7 @@ int goto_instrument_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
@@ -775,7 +775,7 @@ int goto_instrument_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return CPROVER_EXIT_EXCEPTION_GOTO_INSTRUMENT;

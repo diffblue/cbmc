@@ -171,7 +171,7 @@ int goto_analyzer_parse_optionst::doit()
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -340,7 +340,7 @@ bool goto_analyzer_parse_optionst::set_properties()
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -422,7 +422,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -433,7 +433,7 @@ bool goto_analyzer_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return true;

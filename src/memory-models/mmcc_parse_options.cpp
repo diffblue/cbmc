@@ -64,7 +64,7 @@ int mmcc_parse_optionst::doit()
     std::cerr << error << '\n';
     return 10;
   }
-  catch(const std::string error)
+  catch(const std::string &error)
   {
     std::cerr << error << '\n';
     return 10;

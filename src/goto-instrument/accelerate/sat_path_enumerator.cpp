@@ -95,7 +95,7 @@ bool sat_path_enumeratort::next(patht &path)
       return true;
     }
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cout << "Error in fitting polynomial SAT check: " << s << '\n';
   }

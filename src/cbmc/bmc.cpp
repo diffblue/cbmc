@@ -371,7 +371,7 @@ safety_checkert::resultt bmct::run(
     return safety_checkert::resultt::ERROR;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return safety_checkert::resultt::ERROR;
@@ -471,7 +471,7 @@ safety_checkert::resultt bmct::run(
     return decide(goto_functions, prop_conv);
   }
 
-  catch(std::string &error_str)
+  catch(const std::string &error_str)
   {
     error() << error_str << eom;
     return safety_checkert::resultt::ERROR;
@@ -483,7 +483,7 @@ safety_checkert::resultt bmct::run(
     return safety_checkert::resultt::ERROR;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return safety_checkert::resultt::ERROR;

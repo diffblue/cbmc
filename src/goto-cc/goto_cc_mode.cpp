@@ -88,7 +88,7 @@ int goto_cc_modet::main(int argc, const char **argv)
     return EX_SOFTWARE;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return EX_SOFTWARE;
@@ -99,7 +99,7 @@ int goto_cc_modet::main(int argc, const char **argv)
     return EX_SOFTWARE;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return EX_SOFTWARE;
