@@ -760,8 +760,10 @@ void goto_convertt::convert_assign(
 
     do_java_new_array(lhs, to_side_effect_expr(rhs), dest);
   }
-  else if(rhs.id()==ID_side_effect &&
-          rhs.get(ID_statement)==ID_malloc)
+  else if(
+    rhs.id() == ID_side_effect &&
+    (rhs.get(ID_statement) == ID_malloc ||
+     rhs.get(ID_statement) == ID_java_new_array_data))
   {
     // just preserve
     Forall_operands(it, rhs)

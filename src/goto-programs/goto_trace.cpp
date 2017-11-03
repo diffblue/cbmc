@@ -47,7 +47,9 @@ void goto_trace_stept::output(
   case goto_trace_stept::typet::DEAD: out << "DEAD"; break;
   case goto_trace_stept::typet::OUTPUT: out << "OUTPUT"; break;
   case goto_trace_stept::typet::INPUT: out << "INPUT"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN: out << "ATOMC_BEGIN"; break;
+  case goto_trace_stept::typet::ATOMIC_BEGIN:
+    out << "ATOMIC_BEGIN";
+    break;
   case goto_trace_stept::typet::ATOMIC_END: out << "ATOMIC_END"; break;
   case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
   case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
@@ -91,7 +93,7 @@ void goto_trace_stept::output(
 
   out << "\n";
 
-  if(pc->is_other() || pc->is_assign())
+  if((pc->is_other() && lhs_object.is_not_nil()) || pc->is_assign())
   {
     irep_idt identifier=lhs_object.get_object_name();
     out << "  " << from_expr(ns, identifier, lhs_object.get_original_expr())
@@ -386,14 +388,8 @@ void show_goto_trace(
       break;
 
     case goto_trace_stept::typet::CONSTRAINT:
-      UNREACHABLE;
-      break;
-
     case goto_trace_stept::typet::SHARED_READ:
     case goto_trace_stept::typet::SHARED_WRITE:
-      UNREACHABLE;
-      break;
-
     default:
       UNREACHABLE;
     }
