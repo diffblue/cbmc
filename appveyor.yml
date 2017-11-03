@@ -83,6 +83,7 @@ test_script:
     rmdir /s /q cbmc\byte_update7
     rmdir /s /q cbmc\pipe1
     rmdir /s /q cbmc\unsigned___int128
+    rmdir /s /q cbmc-cpp
     rmdir /s /q cpp\Decltype1
     rmdir /s /q cpp\Decltype2
     rmdir /s /q cpp\Function_Overloading1
