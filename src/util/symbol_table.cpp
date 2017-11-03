@@ -3,6 +3,7 @@
 #include "symbol_table.h"
 
 #include <ostream>
+#include <algorithm>
 #include <util/invariant.h>
 
 /// Add a new symbol to the symbol table
@@ -142,10 +143,20 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
 /// \param out: The ostream to direct output to
 void symbol_tablet::show(std::ostream &out) const
 {
+  std::vector<irep_idt> sorted_names;
+  sorted_names.reserve(symbols.size());
+  for(const auto &elem : symbols)
+    sorted_names.push_back(elem.first);
+  std::sort(
+    sorted_names.begin(),
+    sorted_names.end(),
+    [](const irep_idt &a, const irep_idt &b)
+    {
+      return as_string(a) < as_string(b);
+    });
   out << "\n" << "Symbols:" << "\n";
-
-  forall_symbols(it, symbols)
-    out << it->second;
+  for(const auto &name : sorted_names)
+    out << symbols.at(name);
 }
 
 /// Print the contents of the symbol table
