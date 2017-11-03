@@ -1,3 +1,5 @@
+// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+
 #include <iostream>
 
 #include <util/cout_message.h>
