@@ -1,4 +1,4 @@
-// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
 
 /// \file
 /// Symbol table
@@ -52,6 +52,7 @@ public:
   const symbol_base_mapt &symbol_base_map;
   const symbol_module_mapt &symbol_module_map;
 
+public:
   symbol_tablet()
     : symbols(internal_symbols),
       symbol_base_map(internal_symbol_base_map),
@@ -93,54 +94,6 @@ public:
     return *this;
   }
 
-  bool has_symbol(const irep_idt &name) const
-  {
-    return symbols.find(name)!=symbols.end();
-  }
-
-  /// Find a symbol in the symbol table for read-only access.
-  /// \param id: The name of the symbol to look for
-  /// \return an optional reference, set if found, nullptr otherwise.
-  const symbolt *lookup(const irep_idt &id) const { return lookup_impl(id); }
-
-  /// Find a symbol in the symbol table for read-write access.
-  /// \param id: The name of the symbol to look for
-  /// \return an optional reference, set if found, unset otherwise.
-  symbolt *get_writeable(const irep_idt &id) { return lookup_impl(id); }
-
-  /// Find a symbol in the symbol table for read-only access.
-  /// \param id: The name of the symbol to look for
-  /// \return A reference to the symbol
-  /// \throw `std::out_of_range` if no such symbol exists
-  const symbolt &lookup_ref(const irep_idt &id) const
-    { return internal_symbols.at(id); }
-
-  /// Find a symbol in the symbol table for read-write access.
-  /// \param id: The name of the symbol to look for
-  /// \return A reference to the symbol
-  /// \throw `std::out_of_range` if no such symbol exists
-  symbolt &get_writeable_ref(const irep_idt &id)
-    { return internal_symbols.at(id); }
-
-  bool add(const symbolt &symbol);
-
-  std::pair<symbolt &, bool> insert(symbolt symbol);
-
-  bool move(symbolt &symbol, symbolt *&new_symbol);
-
-  void clear()
-  {
-    internal_symbols.clear();
-    internal_symbol_base_map.clear();
-    internal_symbol_module_map.clear();
-  }
-
-  bool remove(const irep_idt &name);
-
-  void erase(const symbolst::const_iterator &entry);
-
-  void show(std::ostream &out) const;
-
   void swap(symbol_tablet &other)
   {
     internal_symbols.swap(other.internal_symbols);
@@ -148,24 +101,81 @@ public:
     internal_symbol_module_map.swap(other.internal_symbol_module_map);
   }
 
-private:
-  const symbolt *lookup_impl(const irep_idt &id) const
-    { return lookup_impl(*this, id); }
-
-  symbolt *lookup_impl(const irep_idt &id)
-    { return lookup_impl(*this, id); }
-
-  template<typename T>
-  static auto lookup_impl(T &t, const irep_idt &id)
-    -> decltype(std::declval<T>().lookup_impl(id))
+public:
+  bool has_symbol(const irep_idt &name) const
   {
-    const auto it=t.internal_symbols.find(id);
+    return symbols.find(name)!=symbols.end();
+  }
+
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param name: The name of the symbol to look for
+  /// \return a pointer to the found symbol if it exists, nullptr otherwise.
+  const symbolt *lookup(const irep_idt &name) const
+  {
+    return lookup_impl(name);
+  }
+
+  /// Find a symbol in the symbol table for read-only access.
+  /// \param name: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  const symbolt &lookup_ref(const irep_idt &name) const
+  {
+    return symbols.at(name);
+  }
+
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param name: The name of the symbol to look for
+  /// \return a pointer to the found symbol if it exists, nullptr otherwise.
+  symbolt *get_writeable(const irep_idt &name)
+  {
+    return lookup_impl(name);
+  }
+
+  /// Find a symbol in the symbol table for read-write access.
+  /// \param name: The name of the symbol to look for
+  /// \return A reference to the symbol
+  /// \throw `std::out_of_range` if no such symbol exists
+  symbolt &get_writeable_ref(const irep_idt &name)
+  {
+    return internal_symbols.at(name);
+  }
+
+  bool add(const symbolt &symbol);
+  std::pair<symbolt &, bool> insert(symbolt symbol);
+  bool move(symbolt &symbol, symbolt *&new_symbol);
+
+  bool remove(const irep_idt &name);
+  void erase(const symbolst::const_iterator &entry);
+  void clear()
+  {
+    internal_symbols.clear();
+    internal_symbol_base_map.clear();
+    internal_symbol_module_map.clear();
+  }
+
+  void show(std::ostream &out) const;
+
+private:
+  const symbolt *lookup_impl(const irep_idt &name) const
+  {
+    return lookup_impl(*this, name);
+  }
+
+  symbolt *lookup_impl(const irep_idt &name)
+  {
+    return lookup_impl(*this, name);
+  }
+
+  template <typename T>
+  static auto lookup_impl(T &t, const irep_idt &name)
+    -> decltype(std::declval<T>().lookup_impl(name))
+  {
+    const auto it = t.internal_symbols.find(name);
     return it==t.internal_symbols.end()?nullptr:&it->second;
   }
 };
 
-std::ostream &operator << (
-  std::ostream &out,
-  const symbol_tablet &symbol_table);
+std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table);
 
 #endif // CPROVER_UTIL_SYMBOL_TABLE_H

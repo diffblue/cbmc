@@ -1,4 +1,4 @@
-// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
 
 #include "symbol_table.h"
 
@@ -56,7 +56,7 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
 /// Move a symbol into the symbol table. If there is already a symbol with the
 /// same name then symbol is unchanged, new_symbol points to the symbol with the
 /// same name and true is returned. Otherwise, the symbol is moved into the
-/// symbol table, symbol is set to be empty, new_symbol points to its new
+/// symbol table, symbol is destroyed, new_symbol points to its new
 /// location in the symbol table and false is returned
 /// \param symbol: The symbol to be added to the symbol table
 /// \param new_symbol: Pointer which the function will set to either point to
@@ -151,7 +151,7 @@ void symbol_tablet::show(std::ostream &out) const
 /// Print the contents of the symbol table
 /// \param out: The ostream to direct output to
 /// \param symbol_table: The symbol table to print out
-std::ostream &operator << (std::ostream &out, const symbol_tablet &symbol_table)
+std::ostream &operator<<(std::ostream &out, const symbol_tablet &symbol_table)
 {
   symbol_table.show(out);
   return out;
