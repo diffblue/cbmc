@@ -24,7 +24,8 @@ class remove_virtual_functionst
 public:
   remove_virtual_functionst(
     const symbol_tablet &_symbol_table,
-    const goto_functionst &goto_functions);
+    const goto_functionst &goto_functions,
+    std::vector<irep_idt> &_virtual_functions);
 
   void operator()(goto_functionst &goto_functions);
 
@@ -33,6 +34,7 @@ public:
 protected:
   const namespacet ns;
   const symbol_tablet &symbol_table;
+  std::vector<irep_idt> &virtual_functions;
 
   class_hierarchyt class_hierarchy;
 
@@ -67,9 +69,11 @@ protected:
 
 remove_virtual_functionst::remove_virtual_functionst(
   const symbol_tablet &_symbol_table,
-  const goto_functionst &goto_functions):
+  const goto_functionst &goto_functions,
+  std::vector<irep_idt> &_virtual_functions):
   ns(_symbol_table),
-  symbol_table(_symbol_table)
+  symbol_table(_symbol_table),
+  virtual_functions(_virtual_functions)
 {
   class_hierarchy(symbol_table);
 }
@@ -82,6 +86,9 @@ void remove_virtual_functionst::remove_virtual_function(
     to_code_function_call(target->code);
 
   const auto &vcall_source_loc=target->source_location;
+
+  // record the virtual functions that are removed
+  virtual_functions.push_back(target->function);
 
   const exprt &function=code.function();
   assert(function.id()==ID_virtual_function);
@@ -360,16 +367,25 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
 
 void remove_virtual_functions(
   const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+  goto_functionst &goto_functions,
+  std::vector<irep_idt> &virtual_functions)
 {
   remove_virtual_functionst
-    rvf(symbol_table, goto_functions);
+    rvf(symbol_table, goto_functions, virtual_functions);
 
   rvf(goto_functions);
 }
 
 void remove_virtual_functions(goto_modelt &goto_model)
 {
+  std::vector<irep_idt> virtual_functions;
+  remove_virtual_functions(goto_model, virtual_functions);
+}
+
+void remove_virtual_functions(
+  goto_modelt &goto_model,
+  std::vector<irep_idt> &virtual_functions)
+{
   remove_virtual_functions(
-    goto_model.symbol_table, goto_model.goto_functions);
+    goto_model.symbol_table, goto_model.goto_functions, virtual_functions);
 }
