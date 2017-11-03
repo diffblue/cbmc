@@ -1124,7 +1124,7 @@ std::string expr2ct::convert_allocate(const exprt &src, unsigned &precedence)
   std::string op0 = convert_with_precedence(src.op0(), p0);
 
   unsigned p1;
-  std::string op1 = convert_with_precedence(src.op1(), p1);
+  const std::string op1 = convert_with_precedence(src.op1(), p1);
 
   std::string dest = "ALLOCATE";
   dest += '(';

@@ -84,17 +84,10 @@ bool simplify_exprt::simplify_boolean(exprt &expr)
       if(it->type().id() != ID_bool)
         return true;
 
-      bool erase;
-
       if(it->is_true())
-      {
-        erase = true;
         negate = !negate;
-      }
-      else
-        erase = it->is_false();
 
-      if(erase)
+      if(it->is_constant())
       {
         it = operands.erase(it);
         result = false;
