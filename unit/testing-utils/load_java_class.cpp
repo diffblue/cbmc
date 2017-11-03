@@ -27,6 +27,15 @@ symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path)
 {
+  return load_java_class(
+    java_class_name, class_path, new_java_bytecode_language());
+}
+
+symbol_tablet load_java_class(
+  const std::string &java_class_name,
+  const std::string &class_path,
+  std::unique_ptr<languaget> java_lang)
+{
   // We don't expect the .class suffix to allow us to check the name of the
   // class
   PRECONDITION(!has_suffix(java_class_name, ".class"));
@@ -38,8 +47,6 @@ symbol_tablet load_java_class(
   config.java.classpath.push_back(class_path);
 
   symbol_tablet new_symbol_table;
-
-  std::unique_ptr<languaget>java_lang(new_java_bytecode_language());
 
   std::istringstream java_code_stream("ignored");
   null_message_handlert message_handler;
