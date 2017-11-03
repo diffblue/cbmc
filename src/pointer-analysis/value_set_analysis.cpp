@@ -18,22 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/language_util.h>
 
-void value_set_analysist::initialize(
-  const goto_programt &goto_program)
-{
-  baset::initialize(goto_program);
-}
-
-void value_set_analysist::initialize(
-  const goto_functionst &goto_functions)
-{
-  baset::initialize(goto_functions);
-}
-
-void value_set_analysist::convert(
+void value_sets_to_xml(
+  std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
   const goto_programt &goto_program,
   const irep_idt &identifier,
-  xmlt &dest) const
+  xmlt &dest)
 {
   source_locationt previous_location;
 
@@ -48,7 +37,7 @@ void value_set_analysist::convert(
       continue;
 
     // find value set
-    const value_sett &value_set=(*this)[i_it].value_set;
+    const value_sett &value_set=get_value_set(i_it);
 
     xmlt &i=dest.new_element("instruction");
     i.new_element()=::xml(location);
@@ -81,6 +70,7 @@ void value_set_analysist::convert(
     }
   }
 }
+
 void convert(
   const goto_functionst &goto_functions,
   const value_set_analysist &value_set_analysis,

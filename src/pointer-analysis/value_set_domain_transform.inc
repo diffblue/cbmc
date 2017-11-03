@@ -9,11 +9,12 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Value Set
 
-#include "value_set_domain.h"
+// The body of value_set_domaint<VST>::transform, included from
+// value_set_domain.h but retained in this out-of-line file to ease
+// git merges:
 
-#include <util/std_code.h>
-
-void value_set_domaint::transform(
+template<class VST>
+void value_set_domain_templatet<VST>::transform(
   const namespacet &ns,
   locationt from_l,
   locationt to_l)
@@ -25,9 +26,13 @@ void value_set_domaint::transform(
     break;
 
   case END_FUNCTION:
-    value_set.do_end_function(static_analysis_baset::get_return_lhs(to_l), ns);
+  {
+    value_set.do_end_function(
+      static_analysis_baset::get_return_lhs(to_l), ns);
     break;
+  }
 
+  // Note intentional fall-through here:
   case RETURN:
   case OTHER:
   case ASSIGN:
@@ -44,7 +49,8 @@ void value_set_domaint::transform(
       const code_function_callt &code=
         to_code_function_call(from_l->code);
 
-      value_set.do_function_call(to_l->function, code.arguments(), ns);
+      value_set.do_function_call(
+        to_l->function, code.arguments(), ns);
     }
     break;
 

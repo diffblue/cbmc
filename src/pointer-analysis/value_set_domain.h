@@ -17,14 +17,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "value_set.h"
 
-class value_set_domaint:public domain_baset
+template<class VST>
+class value_set_domain_templatet:public domain_baset
 {
 public:
-  value_sett value_set;
+  VST value_set;
 
   // overloading
 
-  bool merge(const value_set_domaint &other, locationt to)
+  bool merge(const value_set_domain_templatet<VST> &other, locationt to)
   {
     return value_set.make_union(other.value_set);
   }
@@ -57,5 +58,9 @@ public:
     value_set.get_reference_set(expr, dest, ns);
   }
 };
+
+typedef value_set_domain_templatet<value_sett> value_set_domaint;
+
+#include "value_set_domain_transform.inc"
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_DOMAIN_H
