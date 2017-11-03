@@ -54,7 +54,7 @@ unified_difft::get_diff(const irep_idt &function) const
 unified_difft::goto_program_difft unified_difft::get_diff(
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
-  const differencest &differences) const
+  const differencest &differences)
 {
   goto_programt::instructionst::const_iterator old_it =
     old_goto_program.instructions.begin();
@@ -144,15 +144,15 @@ void unified_difft::output_diff(
   }
 }
 
-void unified_difft::lcss(
+unified_difft::differencest unified_difft::lcss(
   const irep_idt &identifier,
   const goto_programt &old_goto_program,
-  const goto_programt &new_goto_program,
-  differencest &differences) const
+  const goto_programt &new_goto_program)
 {
   std::size_t old_count = old_goto_program.instructions.size();
   std::size_t new_count = new_goto_program.instructions.size();
 
+  differencest differences;
   differences.reserve(old_count + new_count);
 
   // skip common prefix
@@ -200,7 +200,7 @@ void unified_difft::lcss(
   // the common tail
 
   if(old_count == 0 && new_count == 0)
-    return;
+    return differences;
 
   // apply longest common subsequence (LCSS)
   typedef std::vector<std::vector<std::size_t>> lcss_matrixt;
@@ -293,6 +293,8 @@ void unified_difft::lcss(
   // add common prefix (if any)
   for(; old_it != old_goto_program.instructions.begin(); --old_it)
     differences.push_back(differencet::SAME);
+
+  return differences;
 }
 
 void unified_difft::unified_diff(
@@ -315,7 +317,7 @@ void unified_difft::unified_diff(
         new_goto_program.instructions.size(), differencet::NEW);
   }
   else
-    lcss(identifier, old_goto_program, new_goto_program, differences);
+    differences=lcss(identifier, old_goto_program, new_goto_program);
 }
 
 bool unified_difft::operator()()
