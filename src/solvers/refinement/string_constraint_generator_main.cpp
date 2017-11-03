@@ -31,7 +31,6 @@ string_constraint_generatort::string_constraint_generatort(
   const string_constraint_generatort::infot &info,
   const namespacet &ns)
   : max_string_length(info.string_max_length),
-    force_printable_characters(info.string_printable),
     ns(ns)
 {
 }
@@ -319,21 +318,71 @@ void string_constraint_generatort::add_default_axioms(
   if(!created_strings.insert(s).second)
     return;
 
-  axioms.push_back(
-    s.axiom_for_length_ge(from_integer(0, s.length().type())));
+  const exprt index_zero = from_integer(0, s.length().type());
+  axioms.push_back(s.axiom_for_length_ge(index_zero));
+
   if(max_string_length!=std::numeric_limits<size_t>::max())
     axioms.push_back(s.axiom_for_length_le(max_string_length));
+}
 
-  if(force_printable_characters)
-  {
-    symbol_exprt qvar=fresh_univ_index("printable", s.length().type());
-    exprt chr=s[qvar];
-    and_exprt printable(
-      binary_relation_exprt(chr, ID_ge, from_integer(' ', chr.type())),
-      binary_relation_exprt(chr, ID_le, from_integer('~', chr.type())));
-    string_constraintt sc(qvar, s.length(), printable);
-    axioms.push_back(sc);
-  }
+/// Add constraint on characters of a string.
+///
+/// This constraint is
+/// \f$ \forall i \in [start, end), low\_char \le s[i] \le high\_char \f$
+/// \param s: a string expression
+/// \param start: index of the first character to constrain
+/// \param end: index at which we stop adding constraints
+/// \param char_set: a string of the form "<low_char>-<high_char>" where
+///        `<low_char>` and `<high_char>` are two characters, which represents
+///        the set of characters that are between `low_char` and `high_char`.
+/// \return a string expression that is linked to the argument through axioms
+///   that are added to the list
+void string_constraint_generatort::add_constraint_on_characters(
+  const array_string_exprt &s,
+  const exprt &start,
+  const exprt &end,
+  const std::string &char_set)
+{
+  // Parse char_set
+  PRECONDITION(char_set.length() == 3);
+  PRECONDITION(char_set[1] == '-');
+  const char &low_char = char_set[0];
+  const char &high_char = char_set[2];
+
+  // Add constraint
+  const symbol_exprt qvar = fresh_univ_index("char_constr", s.length().type());
+  const exprt chr = s[qvar];
+  const and_exprt char_in_set(
+    binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
+    binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
+  const string_constraintt sc(qvar, start, end, true_exprt(), char_in_set);
+  axioms.push_back(sc);
+}
+
+/// Add axioms to ensure all characters of a string belong to a given set.
+///
+/// The axiom is: \f$\forall i \in [start, end).\ s[i] \in char_set \f$, where
+/// `char_set` is given by the string `char_set_string` composed of three
+/// characters `low_char`, `-` and `high_char`. Character `c` belongs to
+/// `char_set` if \f$low_char \le c \le high_char\f$.
+/// \param f: a function application with arguments: integer `|s|`, character
+///           pointer `&s[0]`, string `char_set_string`,
+///           optional integers `start` and `end`
+/// \return integer expression whose value is zero
+exprt string_constraint_generatort::add_axioms_for_constrain_characters(
+  const function_application_exprt &f)
+{
+  const auto &args = f.arguments();
+  PRECONDITION(3 <= args.size() && args.size() <= 5);
+  PRECONDITION(args[2].type().id() == ID_string);
+  PRECONDITION(args[2].id() == ID_constant);
+  const array_string_exprt s = char_array_of_pointer(args[1], args[0]);
+  const irep_idt &char_set_string = to_constant_expr(args[2]).get_value();
+  const exprt &start =
+    args.size() >= 4 ? args[3] : from_integer(0, s.length().type());
+  const exprt &end = args.size() >= 5 ? args[4] : s.length();
+  add_constraint_on_characters(s, start, end, char_set_string.c_str());
+  return from_integer(0, get_return_code_type());
 }
 
 /// Adds creates a new array if it does not already exists
@@ -472,6 +521,8 @@ exprt string_constraint_generatort::add_axioms_for_function_application(
     res = associate_array_to_pointer(expr);
   else if(id == ID_cprover_associate_length_to_array_func)
     res = associate_length_to_array(expr);
+  else if(id == ID_cprover_string_constrain_characters_func)
+    res = add_axioms_for_constrain_characters(expr);
   else
   {
     std::string msg(

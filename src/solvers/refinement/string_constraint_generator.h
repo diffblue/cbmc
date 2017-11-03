@@ -42,8 +42,6 @@ public:
   {
     /// Max length of non-deterministic strings
     size_t string_max_length=std::numeric_limits<size_t>::max();
-    /// Prefer printable characters in non-deterministic strings
-    bool string_printable=false;
   };
 
   string_constraint_generatort(const infot& info, const namespacet& ns);
@@ -109,6 +107,14 @@ private:
 
   void add_default_axioms(const array_string_exprt &s);
   exprt axiom_for_is_positive_index(const exprt &x);
+
+  void add_constraint_on_characters(
+    const array_string_exprt &s,
+    const exprt &start,
+    const exprt &end,
+    const std::string &char_set);
+  exprt
+  add_axioms_for_constrain_characters(const function_application_exprt &f);
 
   // The following functions add axioms for the returned value
   // to be equal to the result of the function given as argument.
@@ -333,7 +339,6 @@ private:
   std::set<array_string_exprt> created_strings;
   unsigned symbol_count=0;
   const messaget message;
-  const bool force_printable_characters;
 
   std::vector<exprt> axioms;
   std::vector<symbol_exprt> boolean_symbols;

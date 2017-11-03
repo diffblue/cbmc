@@ -542,7 +542,8 @@ codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symbol_table,
+  bool printable)
 {
   PRECONDITION(
     java_string_library_preprocesst::implements_java_char_sequence(obj.type()));
@@ -605,6 +606,13 @@ codet initialize_nondet_string_struct(
 
     add_array_to_length_association(
       data_expr, length_expr, symbol_table, loc, code);
+
+    // Printable ASCII characters are between ' ' and '~'.
+    if(printable)
+    {
+      add_character_set_constraint(
+        array_pointer, length_expr, " -~", symbol_table, loc, code);
+    }
   }
 
   // tmp_object = struct_expr;
@@ -616,6 +624,7 @@ codet initialize_nondet_string_struct(
 /// content and association of its address to the pointer `expr`.
 /// \param expr: pointer to be affected
 /// \param max_nondet_string_length: maximum length of strings to initialize
+/// \param printable: Boolean, true to force content to be printable
 /// \param symbol_table: the symbol table
 /// \param loc: location in the source
 /// \param [out] code: code block in which initialization code is added
@@ -625,6 +634,7 @@ codet initialize_nondet_string_struct(
 static bool add_nondet_string_pointer_initialization(
   const exprt &expr,
   const std::size_t &max_nondet_string_length,
+  bool printable,
   symbol_tablet &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
@@ -644,7 +654,8 @@ static bool add_nondet_string_pointer_initialization(
       dereference_exprt(expr, struct_type),
       max_nondet_string_length,
       loc,
-      symbol_table));
+      symbol_table,
+      printable));
   return false;
 }
 
@@ -784,6 +795,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
     add_nondet_string_pointer_initialization(
       expr,
       object_factory_parameters.max_nondet_string_length,
+      object_factory_parameters.string_printable,
       symbol_table,
       loc,
       assignments);
