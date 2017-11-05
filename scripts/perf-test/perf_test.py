@@ -67,13 +67,18 @@ def parse_args():
                         default='quick',
                         help='Subset of tasks to run (quick, full; ' +
                              'default: quick; or regex of SV-COMP task(s))')
+    parser.add_argument('-B', '--code-build', type=str,
+                        default=same_dir('codebuild.yaml'),
+                        help='Non-default CodeBuild template to use')
 
     args = parser.parse_args()
+
     assert(args.repository.startswith('https://github.com/') or
            args.repository.startswith('https://git-codecommit.'))
     assert(not args.ssh_key or args.ssh_key_name)
     if args.ssh_key:
         assert(os.path.isfile(args.ssh_key))
+    assert(os.path.isfile(args.code_build))
 
     return args
 
@@ -345,7 +350,8 @@ def prepare_ebs(session, region, az, ami):
     return snapshots['Snapshots'][0]['SnapshotId']
 
 
-def build(session, repository, commit_id, bucket_name, perf_test_id):
+def build(session, repository, commit_id, bucket_name, perf_test_id,
+        codebuild_file):
     # build the chosen commit in CodeBuild
     logger = logging.getLogger('perf_test')
 
@@ -356,7 +362,7 @@ def build(session, repository, commit_id, bucket_name, perf_test_id):
 
     cfn = session.resource('cloudformation', region_name='us-east-1')
     stack_name = 'perf-test-codebuild-' + perf_test_id
-    with open(same_dir('codebuild.yaml')) as f:
+    with open(codebuild_file) as f:
         CFN_codebuild = f.read()
     stack = cfn.create_stack(
             StackName=stack_name,
@@ -569,6 +575,7 @@ def run_perf_test(
             ],
             Capabilities=['CAPABILITY_NAMED_IAM'])
 
+    logger.info(region + ': Waiting for completition of ' + stack_name)
     waiter = cfn.meta.client.get_waiter('stack_create_complete')
     waiter.wait(StackName=stack_name)
     asg_name = stack.outputs[0]['OutputValue']
@@ -643,7 +650,7 @@ def main():
         session2 = boto3.session.Session()
         build_future = e.submit(
                 build, session2, args.repository, args.commit_id, bucket_name,
-                perf_test_id)
+                perf_test_id, args.code_build)
         session3 = boto3.session.Session()
         ebs_future = e.submit(prepare_ebs, session3, region, az, ami)
         session4 = boto3.session.Session()
