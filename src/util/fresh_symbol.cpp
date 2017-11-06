@@ -38,19 +38,15 @@ symbolt &get_fresh_aux_symbol(
   const irep_idt &symbol_mode,
   symbol_tablet &symbol_table)
 {
-  auxiliary_symbolt new_symbol;
-
   // Loop until find a name that doesn't clash with a non-auxilliary symbol
   while(true)
   {
-    // Distinguish local variables with the same name
-    new_symbol.base_name=
-      basename_prefix+"$"+std::to_string(++temporary_counter);
-    if(name_prefix.empty())
-      new_symbol.name=new_symbol.base_name;
-    else
+    auxiliary_symbolt new_symbol(
+      // Distinguish local variables with the same name
+      basename_prefix + "$" + std::to_string(++temporary_counter),
+      type);
+    if(!name_prefix.empty())
       new_symbol.name=name_prefix+"::"+id2string(new_symbol.base_name);
-    new_symbol.type=type;
     new_symbol.location=source_location;
     new_symbol.mode=symbol_mode;
     std::pair<symbolt &, bool> res=symbol_table.insert(std::move(new_symbol));
