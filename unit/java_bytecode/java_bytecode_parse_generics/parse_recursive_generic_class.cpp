@@ -7,30 +7,20 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-
-#include <util/config.h>
-#include <util/cmdline.h>
-#include <util/language.h>
-#include <util/prefix.h>
-
-#include <java_bytecode/java_bytecode_language.h>
 #include <testing-utils/load_java_class.h>
 
-#include <iostream>
-#include <util/namespace.h>
-
 SCENARIO(
-  "java_bytecode_parse_recursive_generic_class",
+  "parse_recursive_generic_class",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
-  const symbol_tablet &new_symbol_table=
-    load_java_class("RecursiveGeneric", ""
-      "./java_bytecode/java_bytecode_parse_generics");
+  const symbol_tablet &new_symbol_table = load_java_class(
+    "RecursiveGeneric",
+    "./java_bytecode/java_bytecode_parse_generics");
 
-  std::string class_prefix="java::RecursiveGeneric";
+  std::string class_prefix = "java::RecursiveGeneric";
 
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
   // TODO: Extend this unit test when recursive generic types are correctly
-  // parsed.
+  // parsed - issue TG-1305
 }

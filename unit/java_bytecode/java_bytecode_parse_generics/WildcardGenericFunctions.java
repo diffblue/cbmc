@@ -1,54 +1,48 @@
 public class WildcardGenericFunctions
 {
   // Test a wild card generic type
-  public static void processSimpleGeneric(SimpleGeneric<?> x) {
-    assert(x.t.equals(null));
+  public static void processSimpleGeneric(Generic<?> x)
+  {
+
   }
 
   // Test a wildcard generic bound by an interface
-  public static void processUpperBoundInterfaceGeneric(SimpleGeneric<? extends BasicInterface> x) {
-    assert(x.t.getX() == 4);
+  public static void processUpperBoundInterfaceGeneric(
+    Generic<? extends Interface> x)
+  {
+
   }
 
   // Test a wild card generic bound by a class
-  public static void processUpperBoundClassGeneric(SimpleGeneric<? extends Foo> x) {
-    assert(x.t.getX() == 4);
+  public static void processUpperBoundClassGeneric(
+    Generic<? extends Interface_Implementation> x)
+  {
+
   }
 
-  // It isn't legal to have an wild card with two upper bounds
+  // It isn't legal to have a wild card with two upper bounds
   // Per language spec on intersection types
 
-  public static void processLowerBoundGeneric(SimpleGeneric<? super Foo> x, Foo assign) {
-    x.t = assign;
+  public static void processLowerBoundGeneric(
+    Generic<? super Interface_Implementation> x,
+    Interface_Implementation assign)
+  {
+
   }
 
   // It is not legal Java to specify both an upper and lower bound
-  // public static void processBoundSuperClassGeneric(SimpleGeneric<? extends Object super Foo> x, Foo assign) {
-  //   x.t = assign;
+  // public static void processBoundSuperClassGeneric(
+  //   Generic<? extends Object super Interface_Implementation> x,
+  //   Interface_Implementation assign)
+  // {
+  //
   // }
 
-  // Test a wild card generic bound by a class
-  // public static void processBoundClassGenericDoubleBound(SimpleGeneric<? extends Foo & BasicInterface> x) {
-  //   assert(x.t.getX() == 4);
+  // It is not legal Java to specify two upper bounds
+  // Test a wild card generic bound by a class and an interface
+  // public static void processBoundClassGenericDoubleBound(
+  //   Generic<? extends Interface_Implementation & Interface> x)
+  // {
+  //
   // }
-
-  public static void test()
-  {
-    SimpleGeneric<Foo> myGenericValue = new SimpleGeneric<Foo>();
-    myGenericValue.t = null;
-    processSimpleGeneric(myGenericValue);
-
-    myGenericValue.t = new Foo();
-    myGenericValue.t.x = 4;
-    processUpperBoundInterfaceGeneric(myGenericValue);
-
-    SimpleGeneric<Bar> anotherGenericValue = new SimpleGeneric<Bar>();
-    anotherGenericValue.t = new Bar();
-    anotherGenericValue.t.x = 4;
-    processUpperBoundClassGeneric(anotherGenericValue);
-
-
-    SimpleGeneric<Object> baseGenericValue = new SimpleGeneric<Object>();
-    processLowerBoundGeneric(baseGenericValue, new Foo());
-  }
 }

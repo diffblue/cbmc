@@ -7,58 +7,102 @@
 \*******************************************************************/
 
 #include <testing-utils/catch.hpp>
-
-#include <util/config.h>
-#include <util/cmdline.h>
-#include <util/language.h>
-#include <util/prefix.h>
-
-#include <java_bytecode/java_bytecode_language.h>
 #include <testing-utils/load_java_class.h>
-
-#include <iostream>
-#include <util/namespace.h>
+#include <testing-utils/require_type.h>
 
 SCENARIO(
-  "java_bytecode_parse_generic_array_class",
+  "parse_generic_array_class",
   "[core][java_bytecode][java_bytecode_parse_generics]")
 {
-  const symbol_tablet &new_symbol_table=
-    load_java_class("GenericArray", ""
-      "./java_bytecode/java_bytecode_parse_generics");
+  const symbol_tablet &new_symbol_table = load_java_class(
+    "GenericArray", "./java_bytecode/java_bytecode_parse_generics");
 
-  std::string class_prefix="java::GenericArray";
-
+  std::string class_prefix = "java::GenericArray";
   REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
-  const struct_typet &type=to_struct_type(
-    new_symbol_table.lookup_ref(class_prefix).type);
+  const symbolt &class_symbol = new_symbol_table.lookup_ref(class_prefix);
+  const java_generics_class_typet &java_generic_class =
+    require_type::require_java_generic_class(
+      class_symbol.type, {class_prefix + "::T"});
 
-  THEN("There should be a component with name t")
+  THEN("There should be field t")
   {
-    REQUIRE(type.has_component("t"));
+    const struct_union_typet::componentt &field_t =
+      require_type::require_component(java_generic_class, "t");
+
+    THEN("It is an array")
+    {
+      const pointer_typet &field_t_pointer = require_type::require_pointer(
+        field_t.type(), symbol_typet("java::array[reference]"));
+
+      const symbol_typet &field_t_subtype =
+        to_symbol_type(field_t_pointer.subtype());
+      const struct_typet &subtype_type = to_struct_type(
+        new_symbol_table.lookup_ref(field_t_subtype.get_identifier()).type);
+      REQUIRE(is_valid_java_array(subtype_type));
+
+      THEN("The elements have the parametric type T")
+      {
+        const typet &element = java_array_element_type(field_t_subtype);
+        require_type::require_java_generic_parameter(
+          element,
+          {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+      }
+    }
   }
 
-  const pointer_typet &t_component=to_pointer_type(
-    type.get_component("t")
-      .type());
-  const symbol_typet &subtype=to_symbol_type(t_component.subtype());
-
-  THEN("The t component is a valid java array")
+  THEN("There should be field t2")
   {
-    const struct_typet &subtype_type=to_struct_type(
-      new_symbol_table.lookup_ref(subtype.get_identifier()).type);
-    REQUIRE(is_valid_java_array(subtype_type));
+    const struct_union_typet::componentt &field_t2 =
+      require_type::require_component(java_generic_class, "t2");
+
+    THEN("It is an array")
+    {
+      const pointer_typet &field_t2_pointer = require_type::require_pointer(
+        field_t2.type(), symbol_typet("java::array[reference]"));
+
+      const symbol_typet &field_t2_subtype =
+        to_symbol_type(field_t2_pointer.subtype());
+      const struct_typet &subtype_struct = to_struct_type(
+        new_symbol_table.lookup_ref(field_t2_subtype.get_identifier()).type);
+      REQUIRE(is_valid_java_array(subtype_struct));
+
+      THEN("The elements have type Generic<T>")
+      {
+        const typet &element = java_array_element_type(field_t2_subtype);
+        require_type::require_pointer(element, symbol_typet("java::Generic"));
+        require_type::require_java_generic_type(
+          element,
+          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+      }
+    }
   }
 
-  THEN("The elements of the t component have the parametric type T")
+  THEN("There should be field t3")
   {
-    const typet &element=static_cast<const typet &>(subtype.find(
-      ID_C_element_type));
-    REQUIRE(is_java_generic_parameter(element));
+    const struct_union_typet::componentt &field_t3 =
+      require_type::require_component(java_generic_class, "t3");
 
-    REQUIRE(
-      to_java_generic_parameter(element).type_variable().get_identifier()==
-      "java::GenericArray::T");
+    THEN("It is an array")
+    {
+      const pointer_typet &field_t3_pointer = require_type::require_pointer(
+        field_t3.type(), symbol_typet("java::array[reference]"));
+
+      const symbol_typet &field_t3_subtype =
+        to_symbol_type(field_t3_pointer.subtype());
+      const struct_typet &subtype_struct = to_struct_type(
+        new_symbol_table.lookup_ref(field_t3_subtype.get_identifier()).type);
+      REQUIRE(is_valid_java_array(subtype_struct));
+
+      THEN("The elements have type Generic<Integer>")
+      {
+        const typet &element = java_array_element_type(field_t3_subtype);
+        require_type::require_pointer(element, symbol_typet("java::Generic"));
+        require_type::require_java_generic_type(
+          element,
+          {{require_type::type_parameter_kindt::Inst,
+            "java::java.lang.Integer"}});
+      }
+    }
   }
 }

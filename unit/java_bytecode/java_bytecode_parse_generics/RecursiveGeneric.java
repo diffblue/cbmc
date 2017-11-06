@@ -1,4 +1,4 @@
-class RecursiveGeneric extends SimpleRecursiveGeneric<RecursiveGeneric>
+class RecursiveGeneric<T extends RecursiveGeneric<T>>
 {
-
+  public T t;
 }
