@@ -23,6 +23,147 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex_state.h"
 
+std::string SSA_assertt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'
+      << from_expr(ns, "", cond_expr) << '\n'
+      << comment << '\n';
+  return out.str();
+}
+
+std::string SSA_assumet::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'
+      << from_expr(ns, "", cond_expr) << '\n';
+  return out.str();
+}
+
+std::string SSA_assignmentt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSIGNMENT (";
+  switch(assignment_type)
+  {
+  case assignment_typet::HIDDEN:
+    out << "HIDDEN";
+    break;
+  case assignment_typet::STATE:
+    out << "STATE";
+    break;
+  case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
+    out << "VISIBLE_ACTUAL_PARAMETER";
+    break;
+  case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
+    out << "HIDDEN_ACTUAL_PARAMETER";
+    break;
+  case assignment_typet::PHI:
+    out << "PHI";
+    break;
+  case assignment_typet::GUARD:
+    out << "GUARD";
+    break;
+  default:
+  {
+  }
+  }
+
+  out << ")\n" << from_expr(ns, "", cond_expr) << '\n';
+  return out.str();
+}
+
+std::string SSA_gotot::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n";
+  return out.str();
+}
+
+std::string SSA_constraintt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "CONSTRAINT\n"
+      << from_expr(ns, "", cond_expr) << '\n'
+      << comment << '\n';
+  return out.str();
+}
+
+std::string SSA_locationt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "LOCATION" << '\n';
+  return out.str();
+}
+
+std::string SSA_outputt::custom_output(const namespacet &ns) const
+{
+  return "OUTPUT\n";
+}
+
+std::string SSA_declt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "DECL" << '\n' << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_deadt::custom_output(const namespacet &ns) const
+{
+  return "DEAD\n";
+}
+
+std::string SSA_function_callt::custom_output(const namespacet &ns) const
+{
+  return "FUNCTION_CALL\n";
+}
+
+std::string SSA_function_returnt::custom_output(const namespacet &ns) const
+{
+  return "FUNCTION_RETURN\n";
+}
+
+std::string SSA_shared_readt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "SHARED READ\n" << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_shared_writet::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "SHARED WRITE\n" << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_spawnt::custom_output(const namespacet &ns) const
+{
+  return "SPAWN\n";
+}
+
+std::string SSA_memory_barriert::custom_output(const namespacet &ns) const
+{
+  return "MEMORY_BARRIER\n";
+}
+
+std::string SSA_atomic_begint::custom_output(const namespacet &ns) const
+{
+  return "ATOMIC_BEGIN\n";
+}
+
+std::string SSA_atomic_endt::custom_output(const namespacet &ns) const
+{
+  return "AUTOMIC_END\n";
+}
+
+std::string SSA_inputt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "INPUT" << '\n';
+  return out.str();
+}
+
 symex_target_equationt::symex_target_equationt(
   const namespacet &_ns):ns(_ns)
 {
@@ -579,90 +720,7 @@ void symex_target_equationt::SSA_stept::output(
       out << '\n';
   }
 
-  switch(type())
-  {
-  case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
-  case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
-  case goto_trace_stept::typet::LOCATION:
-    out << "LOCATION" << '\n'; break;
-  case goto_trace_stept::typet::INPUT:
-    out << "INPUT" << '\n'; break;
-  case goto_trace_stept::typet::OUTPUT:
-    out << "OUTPUT" << '\n'; break;
-
-  case goto_trace_stept::typet::DECL:
-    out << "DECL" << '\n';
-    out << from_expr(ns, "", ssa_lhs) << '\n';
-    break;
-
-  case goto_trace_stept::typet::ASSIGNMENT:
-    out << "ASSIGNMENT (";
-    switch(assignment_type)
-    {
-    case assignment_typet::HIDDEN:
-      out << "HIDDEN";
-      break;
-    case assignment_typet::STATE:
-      out << "STATE";
-      break;
-    case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
-      out << "VISIBLE_ACTUAL_PARAMETER";
-      break;
-    case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
-      out << "HIDDEN_ACTUAL_PARAMETER";
-      break;
-    case assignment_typet::PHI:
-      out << "PHI";
-      break;
-    case assignment_typet::GUARD:
-      out << "GUARD";
-      break;
-    default:
-      {
-      }
-    }
-
-    out << ")\n";
-    break;
-
-  case goto_trace_stept::typet::DEAD:
-    out << "DEAD\n"; break;
-  case goto_trace_stept::typet::FUNCTION_CALL:
-    out << "FUNCTION_CALL\n"; break;
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN\n"; break;
-  case goto_trace_stept::typet::CONSTRAINT:
-    out << "CONSTRAINT\n"; break;
-  case goto_trace_stept::typet::SHARED_READ:
-    out << "SHARED READ\n"; break;
-  case goto_trace_stept::typet::SHARED_WRITE:
-    out << "SHARED WRITE\n"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN\n"; break;
-  case goto_trace_stept::typet::ATOMIC_END:
-    out << "AUTOMIC_END\n"; break;
-  case goto_trace_stept::typet::SPAWN:
-    out << "SPAWN\n"; break;
-  case goto_trace_stept::typet::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER\n"; break;
-  case goto_trace_stept::typet::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
-
-  default: UNREACHABLE;
-  }
-
-  if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << '\n';
-
-  if(is_assert() || is_constraint())
-    out << comment << '\n';
-
-  if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << '\n';
-
-  out << "Guard: " << from_expr(ns, "", guard) << '\n';
+  out << custom_output(ns) << "Guard: " << from_expr(ns, "", guard) << '\n';
 }
 
 std::ostream &operator<<(

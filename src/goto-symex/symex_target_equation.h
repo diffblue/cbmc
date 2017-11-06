@@ -30,22 +30,23 @@ class namespacet;
 class prop_convt;
 
 class SSA_assertt;
-class SSA_assumet;
 class SSA_assignmentt;
-class SSA_gotot;
+class SSA_assumet;
+class SSA_atomic_begint;
+class SSA_atomic_endt;
 class SSA_constraintt;
-class SSA_locationt;
-class SSA_outputt;
 class SSA_declt;
+class SSA_deadt;
 class SSA_function_callt;
 class SSA_function_returnt;
+class SSA_gotot;
+class SSA_inputt;
+class SSA_locationt;
+class SSA_memory_barriert;
+class SSA_outputt;
 class SSA_shared_readt;
 class SSA_shared_writet;
 class SSA_spawnt;
-class SSA_memory_barriert;
-class SSA_atomic_begint;
-class SSA_atomic_endt;
-class SSA_inputt;
 
 namespace detail
 {
@@ -57,6 +58,7 @@ using SSA_step_ref_typest = typelistt<SSA_assertt &,
                                       SSA_locationt &,
                                       SSA_outputt &,
                                       SSA_declt &,
+                                      SSA_deadt &,
                                       SSA_function_callt &,
                                       SSA_function_returnt &,
                                       SSA_shared_readt &,
@@ -75,6 +77,7 @@ using SSA_step_const_ref_typest = typelistt<const SSA_assertt &,
                                             const SSA_locationt &,
                                             const SSA_outputt &,
                                             const SSA_declt &,
+                                            const SSA_deadt &,
                                             const SSA_function_callt &,
                                             const SSA_function_returnt &,
                                             const SSA_shared_readt &,
@@ -197,6 +200,9 @@ protected:
     ignore(false)
   {
   }
+
+private:
+  virtual std::string custom_output(const namespacet &ns) const = 0;
 };
 
 template <typename T>
@@ -241,6 +247,9 @@ public:
   {
     return util_make_unique<trace_assertt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_assumet : public SSA_acceptor_mixint<SSA_assumet>
@@ -253,6 +262,9 @@ public:
   {
     return util_make_unique<trace_assumet>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_assignmentt : public SSA_acceptor_mixint<SSA_assignmentt>
@@ -265,6 +277,9 @@ public:
   {
     return util_make_unique<trace_assignmentt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_gotot : public SSA_acceptor_mixint<SSA_gotot>
@@ -277,6 +292,9 @@ public:
   {
     return util_make_unique<trace_gotot>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_constraintt : public SSA_acceptor_mixint<SSA_constraintt>
@@ -289,6 +307,9 @@ public:
   {
     return util_make_unique<trace_constraintt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_locationt : public SSA_acceptor_mixint<SSA_locationt>
@@ -301,6 +322,9 @@ public:
   {
     return util_make_unique<trace_locationt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_outputt : public SSA_acceptor_mixint<SSA_outputt>
@@ -313,6 +337,9 @@ public:
   {
     return util_make_unique<trace_outputt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_declt : public SSA_acceptor_mixint<SSA_declt>
@@ -325,6 +352,24 @@ public:
   {
     return util_make_unique<trace_declt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
+};
+
+class SSA_deadt : public SSA_acceptor_mixint<SSA_deadt>
+{
+public:
+  goto_trace_stept::typet type() const override
+  { return goto_trace_stept::typet::DEAD; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_deadt>();
+  }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_function_callt : public SSA_acceptor_mixint<SSA_function_callt>
@@ -337,6 +382,9 @@ public:
   {
     return util_make_unique<trace_function_callt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_function_returnt : public SSA_acceptor_mixint<SSA_function_returnt>
@@ -349,6 +397,9 @@ public:
   {
     return util_make_unique<trace_function_returnt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_shared_readt : public SSA_acceptor_mixint<SSA_shared_readt>
@@ -361,6 +412,9 @@ public:
   {
     return util_make_unique<trace_shared_readt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_shared_writet : public SSA_acceptor_mixint<SSA_shared_writet>
@@ -373,6 +427,9 @@ public:
   {
     return util_make_unique<trace_shared_writet>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_spawnt : public SSA_acceptor_mixint<SSA_spawnt>
@@ -385,6 +442,9 @@ public:
   {
     return util_make_unique<trace_spawnt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_memory_barriert : public SSA_acceptor_mixint<SSA_memory_barriert>
@@ -397,6 +457,9 @@ public:
   {
     return util_make_unique<trace_memory_barriert>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_atomic_begint : public SSA_acceptor_mixint<SSA_atomic_begint>
@@ -409,6 +472,9 @@ public:
   {
     return util_make_unique<trace_atomic_begint>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_atomic_endt : public SSA_acceptor_mixint<SSA_atomic_endt>
@@ -421,6 +487,9 @@ public:
   {
     return util_make_unique<trace_atomic_endt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class SSA_inputt : public SSA_acceptor_mixint<SSA_inputt>
@@ -433,6 +502,9 @@ public:
   {
     return util_make_unique<trace_inputt>();
   }
+
+private:
+  std::string custom_output(const namespacet &ns) const override;
 };
 
 class symex_target_equationt:public symex_targett
