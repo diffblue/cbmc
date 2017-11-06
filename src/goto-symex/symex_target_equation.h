@@ -104,40 +104,22 @@ public:
   virtual ~SSA_stept()=default;
   symex_targett::sourcet source;
 
-  virtual goto_trace_stept::typet type() const = 0;
-
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_assert() const          { return type()==goto_trace_stept::typet::ASSERT; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_assume() const          { return type()==goto_trace_stept::typet::ASSUME; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_assignment() const      { return type()==goto_trace_stept::typet::ASSIGNMENT; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_goto() const            { return type()==goto_trace_stept::typet::GOTO; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_constraint() const      { return type()==goto_trace_stept::typet::CONSTRAINT; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_location() const        { return type()==goto_trace_stept::typet::LOCATION; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_output() const          { return type()==goto_trace_stept::typet::OUTPUT; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_decl() const            { return type()==goto_trace_stept::typet::DECL; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_function_call() const   { return type()==goto_trace_stept::typet::FUNCTION_CALL; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_function_return() const { return type()==goto_trace_stept::typet::FUNCTION_RETURN; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_shared_read() const     { return type()==goto_trace_stept::typet::SHARED_READ; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_shared_write() const    { return type()==goto_trace_stept::typet::SHARED_WRITE; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_spawn() const           { return type()==goto_trace_stept::typet::SPAWN; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_memory_barrier() const  { return type()==goto_trace_stept::typet::MEMORY_BARRIER; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_atomic_begin() const    { return type()==goto_trace_stept::typet::ATOMIC_BEGIN; }
-  // NOLINTNEXTLINE(whitespace/line_length)
-  bool is_atomic_end() const      { return type()==goto_trace_stept::typet::ATOMIC_END; }
+  virtual bool is_assert() const          { return false; }
+  virtual bool is_assume() const          { return false; }
+  virtual bool is_assignment() const      { return false; }
+  virtual bool is_goto() const            { return false; }
+  virtual bool is_constraint() const      { return false; }
+  virtual bool is_location() const        { return false; }
+  virtual bool is_output() const          { return false; }
+  virtual bool is_decl() const            { return false; }
+  virtual bool is_function_call() const   { return false; }
+  virtual bool is_function_return() const { return false; }
+  virtual bool is_shared_read() const     { return false; }
+  virtual bool is_shared_write() const    { return false; }
+  virtual bool is_spawn() const           { return false; }
+  virtual bool is_memory_barrier() const  { return false; }
+  virtual bool is_atomic_begin() const    { return false; }
+  virtual bool is_atomic_end() const      { return false; }
 
   // we may choose to hide
   bool hidden=false;
@@ -240,14 +222,12 @@ private:
 class SSA_assertt : public SSA_acceptor_mixint<SSA_assertt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::ASSERT; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_assertt>();
   }
 
+  bool is_assert() const          override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -255,14 +235,12 @@ private:
 class SSA_assumet : public SSA_acceptor_mixint<SSA_assumet>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::ASSUME; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_assumet>();
   }
 
+  bool is_assume() const          override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -270,14 +248,12 @@ private:
 class SSA_assignmentt : public SSA_acceptor_mixint<SSA_assignmentt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::ASSIGNMENT; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_assignmentt>();
   }
 
+  bool is_assignment() const      override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -285,14 +261,12 @@ private:
 class SSA_gotot : public SSA_acceptor_mixint<SSA_gotot>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::GOTO; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_gotot>();
   }
 
+  bool is_goto() const            override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -300,14 +274,12 @@ private:
 class SSA_constraintt : public SSA_acceptor_mixint<SSA_constraintt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::CONSTRAINT; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_constraintt>();
   }
 
+  bool is_constraint() const      override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -315,14 +287,12 @@ private:
 class SSA_locationt : public SSA_acceptor_mixint<SSA_locationt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::LOCATION; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_locationt>();
   }
 
+  bool is_location() const        override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -330,14 +300,12 @@ private:
 class SSA_outputt : public SSA_acceptor_mixint<SSA_outputt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::OUTPUT; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_outputt>();
   }
 
+  bool is_output() const          override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -345,14 +313,12 @@ private:
 class SSA_declt : public SSA_acceptor_mixint<SSA_declt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::DECL; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_declt>();
   }
 
+  bool is_decl() const            override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -360,9 +326,6 @@ private:
 class SSA_deadt : public SSA_acceptor_mixint<SSA_deadt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::DEAD; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_deadt>();
@@ -375,14 +338,12 @@ private:
 class SSA_function_callt : public SSA_acceptor_mixint<SSA_function_callt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::FUNCTION_CALL; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_function_callt>();
   }
 
+  bool is_function_call() const   override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -390,14 +351,12 @@ private:
 class SSA_function_returnt : public SSA_acceptor_mixint<SSA_function_returnt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::FUNCTION_RETURN; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_function_returnt>();
   }
 
+  bool is_function_return() const override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -405,14 +364,12 @@ private:
 class SSA_shared_readt : public SSA_acceptor_mixint<SSA_shared_readt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::SHARED_READ; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_shared_readt>();
   }
 
+  bool is_shared_read() const     override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -420,14 +377,12 @@ private:
 class SSA_shared_writet : public SSA_acceptor_mixint<SSA_shared_writet>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::SHARED_WRITE; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_shared_writet>();
   }
 
+  bool is_shared_write() const    override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -435,14 +390,12 @@ private:
 class SSA_spawnt : public SSA_acceptor_mixint<SSA_spawnt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::SPAWN; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_spawnt>();
   }
 
+  bool is_spawn() const           override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -450,14 +403,12 @@ private:
 class SSA_memory_barriert : public SSA_acceptor_mixint<SSA_memory_barriert>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::MEMORY_BARRIER; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_memory_barriert>();
   }
 
+  bool is_memory_barrier() const  override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -465,14 +416,12 @@ private:
 class SSA_atomic_begint : public SSA_acceptor_mixint<SSA_atomic_begint>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::ATOMIC_BEGIN; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_atomic_begint>();
   }
 
+  bool is_atomic_begin() const    override { return true; }
 private:
   std::string custom_output(const namespacet &ns) const override;
 };
@@ -480,13 +429,12 @@ private:
 class SSA_atomic_endt : public SSA_acceptor_mixint<SSA_atomic_endt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::ATOMIC_END; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_atomic_endt>();
   }
+
+  bool is_atomic_end() const      override { return true; }
 
 private:
   std::string custom_output(const namespacet &ns) const override;
@@ -495,9 +443,6 @@ private:
 class SSA_inputt : public SSA_acceptor_mixint<SSA_inputt>
 {
 public:
-  goto_trace_stept::typet type() const override
-  { return goto_trace_stept::typet::INPUT; }
-
   std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
   {
     return util_make_unique<trace_inputt>();
