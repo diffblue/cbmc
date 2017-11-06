@@ -435,7 +435,7 @@ int cbmc_parse_optionst::doit()
     return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(const std::string error_msg)
+  catch(const std::string &error_msg)
   {
     error() << error_msg << eom;
     return CPROVER_EXIT_EXCEPTION;
@@ -589,7 +589,7 @@ bool cbmc_parse_optionst::set_properties()
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -649,7 +649,7 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return CPROVER_EXIT_EXCEPTION;
@@ -661,7 +661,7 @@ int cbmc_parse_optionst::get_goto_program(
     return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
@@ -710,7 +710,7 @@ void cbmc_parse_optionst::preprocessing()
     error() << e << eom;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
   }
@@ -720,7 +720,7 @@ void cbmc_parse_optionst::preprocessing()
     error() << "Numeric exception : " << e << eom;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
@@ -844,7 +844,7 @@ bool cbmc_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(const std::string e)
+  catch(const std::string &e)
   {
     error() << e << eom;
     return true;
@@ -856,7 +856,7 @@ bool cbmc_parse_optionst::process_goto_program(
     return true;
   }
 
-  catch(std::bad_alloc)
+  catch(const std::bad_alloc &)
   {
     error() << "Out of memory" << eom;
     exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);

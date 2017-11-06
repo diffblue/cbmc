@@ -181,7 +181,7 @@ bool acceleration_utilst::check_inductive(
       return true;
     }
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cout << "Error in inductiveness SAT check: " << s << '\n';
     return false;
@@ -458,7 +458,7 @@ bool acceleration_utilst::do_assumptions(
       return false;
     }
   }
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cout << "Error in monotonicity SAT check: " << s << '\n';
      return false;

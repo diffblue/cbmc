@@ -1,3 +1,5 @@
+// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+
 #include <iostream>
 
 #include <util/cout_message.h>
@@ -75,7 +77,7 @@ int main(int argc, const char **argv)
     }
   }
 
-  catch(std::string s)
+  catch(const std::string &s)
   {
     std::cerr << s << std::endl;
   }

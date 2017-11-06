@@ -251,7 +251,7 @@ protected:
           function, empty_in, end_out);
         leave_function(function);
       }
-      catch(std::string s)
+      catch(const std::string &s)
       {
         instrumenter.message.warning() << s << messaget::eom;
       }

@@ -53,7 +53,7 @@ void event_grapht::graph_pensieve_explorert::collect_pairs(namespacet &ns)
           first_event.source_location.get_line(), first_event.variable,
             static_cast<int>(first_event.operation));
       }
-      catch(std::string s)
+      catch(const std::string &s)
       {
         egraph.message.warning() << "failed to find" << s << messaget::eom;
         continue;
