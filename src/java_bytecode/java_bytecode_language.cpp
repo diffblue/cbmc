@@ -264,8 +264,8 @@ bool java_bytecode_languaget::generate_support_functions(
 
   main_function_resultt res=
     get_main_symbol(symbol_table, main_class, get_message_handler());
-  if(res.stop_convert)
-    return res.error_found;
+  if(!res.is_success())
+    return res.is_error();
 
   // generate the test harness in __CPROVER__start and a call the entry point
   return
