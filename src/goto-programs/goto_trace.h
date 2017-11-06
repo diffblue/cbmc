@@ -459,48 +459,6 @@ private:
   std::string name() const override { return "ATOMIC END"; }
 };
 
-inline std::unique_ptr<goto_trace_stept> make_goto_trace_step(
-  goto_trace_stept::typet type)
-{
-  if (type==goto_trace_stept::typet::ASSIGNMENT)
-    return util_make_unique<trace_assignmentt>();
-  if (type==goto_trace_stept::typet::ASSUME)
-    return util_make_unique<trace_assumet>();
-  if (type==goto_trace_stept::typet::ASSERT)
-    return util_make_unique<trace_assertt>();
-  if (type==goto_trace_stept::typet::GOTO)
-    return util_make_unique<trace_gotot>();
-  if (type==goto_trace_stept::typet::LOCATION)
-    return util_make_unique<trace_locationt>();
-  if (type==goto_trace_stept::typet::INPUT)
-    return util_make_unique<trace_inputt>();
-  if (type==goto_trace_stept::typet::OUTPUT)
-    return util_make_unique<trace_outputt>();
-  if (type==goto_trace_stept::typet::DECL)
-    return util_make_unique<trace_declt>();
-  if (type==goto_trace_stept::typet::DEAD)
-    return util_make_unique<trace_deadt>();
-  if (type==goto_trace_stept::typet::FUNCTION_CALL)
-    return util_make_unique<trace_function_callt>();
-  if (type==goto_trace_stept::typet::FUNCTION_RETURN)
-    return util_make_unique<trace_function_returnt>();
-  if (type==goto_trace_stept::typet::CONSTRAINT)
-    return util_make_unique<trace_constraintt>();
-  if (type==goto_trace_stept::typet::SHARED_READ)
-    return util_make_unique<trace_shared_readt>();
-  if (type==goto_trace_stept::typet::SHARED_WRITE)
-    return util_make_unique<trace_shared_writet>();
-  if (type==goto_trace_stept::typet::SPAWN)
-    return util_make_unique<trace_spawnt>();
-  if (type==goto_trace_stept::typet::MEMORY_BARRIER)
-    return util_make_unique<trace_memory_barriert>();
-  if (type==goto_trace_stept::typet::ATOMIC_BEGIN)
-    return util_make_unique<trace_atomic_begint>();
-  if (type==goto_trace_stept::typet::ATOMIC_END)
-    return util_make_unique<trace_atomic_endt>();
-  UNREACHABLE;
-}
-
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
 */

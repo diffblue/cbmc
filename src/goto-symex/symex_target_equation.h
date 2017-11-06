@@ -178,6 +178,8 @@ public:
   virtual void accept(SSA_visitort &) = 0;
   virtual void accept(const SSA_const_visitort &) = 0;
 
+  virtual std::unique_ptr<goto_trace_stept> make_goto_trace_step() const = 0;
+
 protected:
   SSA_stept():
     hidden(false),
@@ -234,6 +236,11 @@ class SSA_assertt : public SSA_acceptor_mixint<SSA_assertt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSERT; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_assertt>();
+  }
 };
 
 class SSA_assumet : public SSA_acceptor_mixint<SSA_assumet>
@@ -241,6 +248,11 @@ class SSA_assumet : public SSA_acceptor_mixint<SSA_assumet>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSUME; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_assumet>();
+  }
 };
 
 class SSA_assignmentt : public SSA_acceptor_mixint<SSA_assignmentt>
@@ -248,6 +260,11 @@ class SSA_assignmentt : public SSA_acceptor_mixint<SSA_assignmentt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ASSIGNMENT; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_assignmentt>();
+  }
 };
 
 class SSA_gotot : public SSA_acceptor_mixint<SSA_gotot>
@@ -255,6 +272,11 @@ class SSA_gotot : public SSA_acceptor_mixint<SSA_gotot>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::GOTO; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_gotot>();
+  }
 };
 
 class SSA_constraintt : public SSA_acceptor_mixint<SSA_constraintt>
@@ -262,6 +284,11 @@ class SSA_constraintt : public SSA_acceptor_mixint<SSA_constraintt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::CONSTRAINT; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_constraintt>();
+  }
 };
 
 class SSA_locationt : public SSA_acceptor_mixint<SSA_locationt>
@@ -269,6 +296,11 @@ class SSA_locationt : public SSA_acceptor_mixint<SSA_locationt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::LOCATION; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_locationt>();
+  }
 };
 
 class SSA_outputt : public SSA_acceptor_mixint<SSA_outputt>
@@ -276,6 +308,11 @@ class SSA_outputt : public SSA_acceptor_mixint<SSA_outputt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::OUTPUT; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_outputt>();
+  }
 };
 
 class SSA_declt : public SSA_acceptor_mixint<SSA_declt>
@@ -283,6 +320,11 @@ class SSA_declt : public SSA_acceptor_mixint<SSA_declt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::DECL; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_declt>();
+  }
 };
 
 class SSA_function_callt : public SSA_acceptor_mixint<SSA_function_callt>
@@ -290,6 +332,11 @@ class SSA_function_callt : public SSA_acceptor_mixint<SSA_function_callt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::FUNCTION_CALL; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_function_callt>();
+  }
 };
 
 class SSA_function_returnt : public SSA_acceptor_mixint<SSA_function_returnt>
@@ -297,6 +344,11 @@ class SSA_function_returnt : public SSA_acceptor_mixint<SSA_function_returnt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::FUNCTION_RETURN; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_function_returnt>();
+  }
 };
 
 class SSA_shared_readt : public SSA_acceptor_mixint<SSA_shared_readt>
@@ -304,6 +356,11 @@ class SSA_shared_readt : public SSA_acceptor_mixint<SSA_shared_readt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SHARED_READ; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_shared_readt>();
+  }
 };
 
 class SSA_shared_writet : public SSA_acceptor_mixint<SSA_shared_writet>
@@ -311,6 +368,11 @@ class SSA_shared_writet : public SSA_acceptor_mixint<SSA_shared_writet>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SHARED_WRITE; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_shared_writet>();
+  }
 };
 
 class SSA_spawnt : public SSA_acceptor_mixint<SSA_spawnt>
@@ -318,6 +380,11 @@ class SSA_spawnt : public SSA_acceptor_mixint<SSA_spawnt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::SPAWN; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_spawnt>();
+  }
 };
 
 class SSA_memory_barriert : public SSA_acceptor_mixint<SSA_memory_barriert>
@@ -325,6 +392,11 @@ class SSA_memory_barriert : public SSA_acceptor_mixint<SSA_memory_barriert>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::MEMORY_BARRIER; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_memory_barriert>();
+  }
 };
 
 class SSA_atomic_begint : public SSA_acceptor_mixint<SSA_atomic_begint>
@@ -332,6 +404,11 @@ class SSA_atomic_begint : public SSA_acceptor_mixint<SSA_atomic_begint>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ATOMIC_BEGIN; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_atomic_begint>();
+  }
 };
 
 class SSA_atomic_endt : public SSA_acceptor_mixint<SSA_atomic_endt>
@@ -339,6 +416,11 @@ class SSA_atomic_endt : public SSA_acceptor_mixint<SSA_atomic_endt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::ATOMIC_END; }
+
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_atomic_endt>();
+  }
 };
 
 class SSA_inputt : public SSA_acceptor_mixint<SSA_inputt>
@@ -346,8 +428,12 @@ class SSA_inputt : public SSA_acceptor_mixint<SSA_inputt>
 public:
   goto_trace_stept::typet type() const override
   { return goto_trace_stept::typet::INPUT; }
-};
 
+  std::unique_ptr<goto_trace_stept> make_goto_trace_step() const override
+  {
+    return util_make_unique<trace_inputt>();
+  }
+};
 
 class symex_target_equationt:public symex_targett
 {

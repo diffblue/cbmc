@@ -258,7 +258,7 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(make_goto_trace_step(SSA_step.type()));
+    steps.push_back(SSA_step.make_goto_trace_step());
     goto_trace_stept &goto_trace_step=*steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
