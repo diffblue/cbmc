@@ -34,40 +34,8 @@ void goto_trace_stept::output(
   const namespacet &ns,
   std::ostream &out) const
 {
-  out << "*** ";
-
-  switch(type())
-  {
-  case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
-  case goto_trace_stept::typet::ASSUME: out << "ASSUME"; break;
-  case goto_trace_stept::typet::LOCATION: out << "LOCATION"; break;
-  case goto_trace_stept::typet::ASSIGNMENT: out << "ASSIGNMENT"; break;
-  case goto_trace_stept::typet::GOTO: out << "GOTO"; break;
-  case goto_trace_stept::typet::DECL: out << "DECL"; break;
-  case goto_trace_stept::typet::DEAD: out << "DEAD"; break;
-  case goto_trace_stept::typet::OUTPUT: out << "OUTPUT"; break;
-  case goto_trace_stept::typet::INPUT: out << "INPUT"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN";
-    break;
-  case goto_trace_stept::typet::ATOMIC_END: out << "ATOMIC_END"; break;
-  case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
-  case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
-  case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION RETURN"; break;
-  default:
-    out << "unknown type: " << static_cast<int>(type()) << std::endl;
-    UNREACHABLE;
-  }
-
-  if(type()==typet::ASSERT || type()==typet::ASSUME || type()==typet::GOTO)
-    out << " (" << cond_value << ")";
-
-  if(hidden)
-    out << " hidden";
-
-  out << "\n";
+  out << "*** " << name() << formatted_cond_value() << (hidden ? " hidden" : "")
+      << '\n';
 
   if(!pc->source_location.is_nil())
     out << pc->source_location << "\n";
