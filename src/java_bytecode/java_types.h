@@ -254,12 +254,12 @@ inline java_generic_typet &to_java_generic_type(typet &type)
 /// vector of java_generic_type variables.
 ///
 /// For example, a class definition `class MyGenericClass<T>`
-class java_generics_class_typet:public java_class_typet
+class java_generic_class_typet : public java_class_typet
 {
  public:
   typedef std::vector<java_generic_parametert> generic_typest;
 
-  java_generics_class_typet()
+  java_generic_class_typet()
   {
     set(ID_C_java_generics_class_type, true);
   }
@@ -277,27 +277,27 @@ class java_generics_class_typet:public java_class_typet
 
 /// \param type: the type to check
 /// \return true if type is a java class type with generics
-inline bool is_java_generics_class_type(const typet &type)
+inline bool is_java_generic_class_type(const typet &type)
 {
   return type.get_bool(ID_C_java_generics_class_type);
 }
 
 /// \param type: the type to check
 /// \return cast of type to java_generics_class_typet
-inline const java_generics_class_typet &to_java_generics_class_type(
-  const java_class_typet &type)
+inline const java_generic_class_typet &
+to_java_generic_class_type(const java_class_typet &type)
 {
-  PRECONDITION(is_java_generics_class_type(type));
-  return static_cast<const java_generics_class_typet &>(type);
+  PRECONDITION(is_java_generic_class_type(type));
+  return static_cast<const java_generic_class_typet &>(type);
 }
 
 /// \param type: source type
 /// \return cast of type into a java class type with generics
-inline java_generics_class_typet &to_java_generics_class_type(
-  java_class_typet &type)
+inline java_generic_class_typet &
+to_java_generic_class_type(java_class_typet &type)
 {
-  PRECONDITION(is_java_generics_class_type(type));
-  return static_cast<java_generics_class_typet &>(type);
+  PRECONDITION(is_java_generic_class_type(type));
+  return static_cast<java_generic_class_typet &>(type);
 }
 
 /// Access information of instantiated type params of java instantiated type.
@@ -318,9 +318,8 @@ inline const typet &java_generic_get_inst_type(
 /// \param index: the index of the type variable
 /// \param type: the type from which to extract the type variable
 /// \return the name of the generic type variable of t at the given index
-inline const irep_idt &java_generics_class_type_var(
-  size_t index,
-  const java_generics_class_typet &type)
+inline const irep_idt &
+java_generic_class_type_var(size_t index, const java_generic_class_typet &type)
 {
   const std::vector<java_generic_parametert> &gen_types=type.generic_types();
 
@@ -334,13 +333,11 @@ inline const irep_idt &java_generics_class_type_var(
 /// \param index: the index of the type variable
 /// \param t: the type from which to extract the type bound
 /// \return the type of the bound of the type variable
-inline const typet &java_generics_class_type_bound(
-  size_t index,
-  const typet &t)
+inline const typet &java_generic_class_type_bound(size_t index, const typet &t)
 {
-  PRECONDITION(is_java_generics_class_type(t));
-  const java_generics_class_typet &type=
-    to_java_generics_class_type(to_java_class_type(t));
+  PRECONDITION(is_java_generic_class_type(t));
+  const java_generic_class_typet &type =
+    to_java_generic_class_type(to_java_class_type(t));
   const std::vector<java_generic_parametert> &gen_types=type.generic_types();
 
   PRECONDITION(index<gen_types.size());
@@ -381,7 +378,7 @@ inline typet java_type_from_string_with_exception(
 /// \param identifier The string identifier of the type of the component.
 /// \return Optional with the size if the identifier was found.
 inline const optionalt<size_t> java_generics_get_index_for_subtype(
-  const java_generics_class_typet &t,
+  const java_generic_class_typet &t,
   const irep_idt &identifier)
 {
   const std::vector<java_generic_parametert> &gen_types=

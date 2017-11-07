@@ -67,9 +67,9 @@ const typet &require_java_non_generic_type(
   const typet &type,
   const optionalt<symbol_typet> &expect_subtype);
 
-java_generics_class_typet require_java_generic_class(const typet &class_type);
+java_generic_class_typet require_java_generic_class(const typet &class_type);
 
-java_generics_class_typet require_java_generic_class(
+java_generic_class_typet require_java_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &type_variables);
 

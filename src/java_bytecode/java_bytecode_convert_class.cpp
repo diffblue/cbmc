@@ -97,7 +97,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
   java_class_typet class_type;
   if(c.signature.has_value() && c.signature.value()[0]=='<')
   {
-    java_generics_class_typet generic_class_type;
+    java_generic_class_typet generic_class_type;
 #ifdef DEBUG
     std::cout << "INFO: found generic class signature "
               << c.signature.value()

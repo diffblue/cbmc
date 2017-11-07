@@ -32,7 +32,7 @@ SCENARIO(
     THEN("The symbol type should be generic")
     {
       const symbolt &class_symbol = new_symbol_table.lookup_ref(inner_name);
-      const java_generics_class_typet &java_generics_class_type =
+      const java_generic_class_typet &java_generic_class_type =
         require_type::require_java_generic_class(
           class_symbol.type, {inner_name + "::E"});
 
@@ -56,7 +56,7 @@ SCENARIO(
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(boundedinner_name);
-      const java_generics_class_typet &java_generics_class_type =
+      const java_generic_class_typet &java_generic_class_type =
         require_type::require_java_generic_class(
           class_symbol.type, {boundedinner_name + "::NUM"});
 
@@ -96,7 +96,7 @@ SCENARIO(
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(doubleboundedinner_name);
       // TODO the symbol should be generic - TG-1349
-      //      const java_generics_class_typet &java_generics_class_type =
+      //      const java_generic_class_typet &java_generic_class_type =
       //        require_type::require_java_generic_class(
       //          class_symbol.type, {doubleboundedinner_name + "::T"});
 
@@ -125,7 +125,7 @@ SCENARIO(
     {
       const symbolt &class_symbol =
         new_symbol_table.lookup_ref(twoelementinner_name);
-      const java_generics_class_typet &java_generics_class_type =
+      const java_generic_class_typet &java_generic_class_type =
         require_type::require_java_generic_class(
           class_symbol.type,
           {twoelementinner_name + "::K", twoelementinner_name + "::V"});

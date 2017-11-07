@@ -234,15 +234,15 @@ class_typet require_complete_class(const typet &class_type)
 /// Verify that a class is a complete, valid java generic class.
 /// \param class_type: the class
 /// \return: A reference to the java generic class type.
-java_generics_class_typet
+java_generic_class_typet
 require_type::require_java_generic_class(const typet &class_type)
 {
   const class_typet &class_class_type = require_complete_class(class_type);
   java_class_typet java_class_type = to_java_class_type(class_class_type);
 
-  REQUIRE(is_java_generics_class_type(java_class_type));
-  java_generics_class_typet java_generic_class_type =
-    to_java_generics_class_type(java_class_type);
+  REQUIRE(is_java_generic_class_type(java_class_type));
+  java_generic_class_typet java_generic_class_type =
+    to_java_generic_class_type(java_class_type);
 
   return java_generic_class_type;
 }
@@ -252,14 +252,14 @@ require_type::require_java_generic_class(const typet &class_type)
 /// \param class_type: the class
 /// \param type_variables: vector of type variables
 /// \return: A reference to the java generic class type.
-java_generics_class_typet require_type::require_java_generic_class(
+java_generic_class_typet require_type::require_java_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &type_variables)
 {
-  const java_generics_class_typet java_generic_class_type =
+  const java_generic_class_typet java_generic_class_type =
     require_type::require_java_generic_class(class_type);
 
-  const java_generics_class_typet::generic_typest &generic_type_vars =
+  const java_generic_class_typet::generic_typest &generic_type_vars =
     java_generic_class_type.generic_types();
   REQUIRE(generic_type_vars.size() == type_variables.size());
   REQUIRE(
@@ -285,7 +285,7 @@ require_type::require_java_non_generic_class(const typet &class_type)
   const class_typet &class_class_type = require_complete_class(class_type);
   java_class_typet java_class_type = to_java_class_type(class_class_type);
 
-  REQUIRE(!is_java_generics_class_type(java_class_type));
+  REQUIRE(!is_java_generic_class_type(java_class_type));
 
   return java_class_type;
 }
