@@ -670,7 +670,7 @@ void goto_convertt::remove_side_effect(
   else if(statement==ID_cpp_delete ||
           statement==ID_cpp_delete_array)
     remove_cpp_delete(expr, dest, result_is_used);
-  else if(statement==ID_malloc)
+  else if(statement==ID_allocate)
     remove_malloc(expr, dest, result_is_used);
   else if(statement==ID_temporary_object)
     remove_temporary_object(expr, dest, result_is_used);

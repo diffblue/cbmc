@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/arith_tools.h>
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
@@ -135,7 +136,7 @@ bool bv_pointerst::convert_address_of_rec(
     {
       // this should be gone
       bv=convert_pointer_type(array);
-      assert(bv.size()==bits);
+      POSTCONDITION(bv.size()==bits);
     }
     else if(array_type.id()==ID_array ||
             array_type.id()==ID_incomplete_array ||
@@ -143,18 +144,18 @@ bool bv_pointerst::convert_address_of_rec(
     {
       if(convert_address_of_rec(array, bv))
         return true;
-      assert(bv.size()==bits);
+      POSTCONDITION(bv.size()==bits);
     }
     else
-      assert(false);
+      UNREACHABLE;
 
     // get size
     mp_integer size=
       pointer_offset_size(array_type.subtype(), ns);
-    assert(size>0);
+    DATA_INVARIANT(size>0, "array subtype expected to have non-zero size");
 
     offset_arithmetic(bv, size, index);
-    assert(bv.size()==bits);
+    POSTCONDITION(bv.size()==bits);
     return false;
   }
   else if(expr.id()==ID_member)
@@ -172,7 +173,7 @@ bool bv_pointerst::convert_address_of_rec(
       mp_integer offset=member_offset(
         to_struct_type(struct_op_type),
         member_expr.get_component_name(), ns);
-      assert(offset>=0);
+      DATA_INVARIANT(offset>=0, "member offset expected to be positive");
 
       // add offset
       offset_arithmetic(bv, offset);
@@ -295,7 +296,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       return bv;
     }
 
-    assert(bv.size()==bits);
+    POSTCONDITION(bv.size()==bits);
     return bv;
   }
   else if(expr.id()==ID_constant)
@@ -333,13 +334,13 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       {
         count++;
         bv=convert_bv(*it);
-        assert(bv.size()==bits);
+        POSTCONDITION(bv.size()==bits);
 
         typet pointer_sub_type=it->type().subtype();
         if(pointer_sub_type.id()==ID_empty)
           pointer_sub_type=char_type();
         size=pointer_offset_size(pointer_sub_type, ns);
-        assert(size>0);
+        POSTCONDITION(size>0);
       }
     }
 
@@ -413,7 +414,7 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
-    assert(element_size>0);
+    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -470,7 +471,7 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     mp_integer element_size=
       pointer_offset_size(expr.op0().type().subtype(), ns);
-    assert(element_size>0);
+    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
 
     if(element_size!=1)
     {
@@ -570,7 +571,7 @@ exprt bv_pointerst::bv_get_rec(
 
   for(std::size_t i=0; i<bits; i++)
   {
-    char ch;
+    char ch=0;
     std::size_t bit_nr=i+offset;
 
     if(unknown[bit_nr])
@@ -720,8 +721,8 @@ void bv_pointerst::do_postponed(
       bvt saved_bv=postponed.op;
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
 
-      assert(bv.size()==saved_bv.size());
-      assert(postponed.bv.size()==1);
+      POSTCONDITION(bv.size()==saved_bv.size());
+      PRECONDITION(postponed.bv.size()==1);
 
       literalt l1=bv_utils.equal(bv, saved_bv);
       literalt l2=postponed.bv.front();
@@ -773,8 +774,8 @@ void bv_pointerst::do_postponed(
       bvt saved_bv=postponed.op;
       saved_bv.erase(saved_bv.begin(), saved_bv.begin()+offset_bits);
 
-      assert(bv.size()==saved_bv.size());
-      assert(postponed.bv.size()>=1);
+      POSTCONDITION(bv.size()==saved_bv.size());
+      PRECONDITION(postponed.bv.size()>=1);
 
       literalt l1=bv_utils.equal(bv, saved_bv);
 
@@ -785,7 +786,7 @@ void bv_pointerst::do_postponed(
     }
   }
   else
-    assert(false);
+    UNREACHABLE;
 }
 
 void bv_pointerst::post_process()

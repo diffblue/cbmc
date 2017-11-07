@@ -277,7 +277,7 @@ bool constant_propagator_domaint::valuest::is_constant(const exprt &expr) const
     return false;
 
   if(expr.id()==ID_side_effect &&
-     to_side_effect_expr(expr).get_statement()==ID_malloc)
+     to_side_effect_expr(expr).get_statement()==ID_allocate)
     return false;
 
   if(expr.id()==ID_symbol)

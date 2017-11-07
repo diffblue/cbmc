@@ -516,7 +516,7 @@ void value_set_fivrnst::get_value_set_rec(
       // these should be gone
       throw "unexpected function_call sideeffect";
     }
-    else if(statement==ID_malloc)
+    else if(statement==ID_allocate)
     {
       if(expr.type().id()!=ID_pointer)
         throw "malloc expected to return pointer type";
