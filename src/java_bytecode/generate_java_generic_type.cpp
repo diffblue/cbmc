@@ -11,7 +11,6 @@
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 
-
 generate_java_generic_typet::generate_java_generic_typet(
   message_handlert &message_handler):
     message_handler(message_handler)
@@ -43,31 +42,14 @@ symbolt generate_java_generic_typet::operator()(
 
   // Small auxiliary function, to perform the inplace
   // modification of the generic fields.
-  auto replace_type_for_generic_field=
-    [&](struct_union_typet::componentt &component)
-    {
-      if(is_java_generic_parameter(component.type()))
-      {
-        auto replacement_type_param=
-          to_java_generic_class_type(replacement_type);
+  auto replace_type_for_generic_field =
+    [&](struct_union_typet::componentt &component) {
 
-        auto component_identifier=
-          to_java_generic_parameter(component.type()).type_variable()
-            .get_identifier();
+      component.type() = substitute_type(
+        component.type(),
+        to_java_generic_class_type(replacement_type),
+        existing_generic_type);
 
-        optionalt<size_t> results=java_generics_get_index_for_subtype(
-          replacement_type_param, component_identifier);
-
-        INVARIANT(
-          results.has_value(),
-          "generic component type not found");
-
-        if(results)
-        {
-          component.type()=
-            existing_generic_type.generic_type_variables()[*results];
-        }
-      }
       return component;
     };
 
@@ -96,6 +78,65 @@ symbolt generate_java_generic_typet::operator()(
   auto symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
+}
+
+/// For a given type, if the type contains a Java generic parameter, we look
+/// that parameter up and return the relevant type. This works recursively on
+/// arrays so that T [] is converted to RelevantType [].
+/// \param parameter_type: The type under consideration
+/// \param generic_class: The generic class that the \p parameter_type
+/// belongs to (e.g. the type of a component of the class). This is used to
+/// look up the mapping from name of generic parameter to its index.
+/// \param generic_reference: The instantiated version of the generic class
+/// used to look up the instantiated type. This is expected to be fully
+/// instantiated.
+/// \return A newly constructed type with generic parameters replaced, or if
+/// there are none to replace, the original type.
+typet generate_java_generic_typet::substitute_type(
+  const typet &parameter_type,
+  const java_generics_class_typet &generic_class,
+  const java_generic_typet &generic_reference) const
+{
+  if(is_java_generic_parameter(parameter_type))
+  {
+    auto component_identifier = to_java_generic_parameter(parameter_type)
+                                  .type_variable()
+                                  .get_identifier();
+
+    optionalt<size_t> results =
+      java_generics_get_index_for_subtype(generic_class, component_identifier);
+
+    INVARIANT(results.has_value(), "generic component type not found");
+
+    if(results)
+    {
+      return generic_reference.generic_type_variables()[*results];
+    }
+    else
+    {
+      return parameter_type;
+    }
+  }
+  else if(
+    parameter_type.id() == ID_pointer &&
+    parameter_type.subtype().id() == ID_symbol)
+  {
+    const symbol_typet &array_subtype =
+      to_symbol_type(parameter_type.subtype());
+    if(is_java_array_tag(array_subtype.get_identifier()))
+    {
+      const typet &array_element_type = java_array_element_type(array_subtype);
+
+      const typet &new_array_type =
+        substitute_type(array_element_type, generic_class, generic_reference);
+
+      typet replacement_array_type = java_array_type('a');
+      replacement_array_type.subtype().set(
+        ID_C_element_type, new_array_type);
+      return replacement_array_type;
+    }
+  }
+  return parameter_type;
 }
 
 /// Build a unique tag for the generic to be instantiated.

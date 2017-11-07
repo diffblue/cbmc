@@ -17,7 +17,6 @@
 #include <testing-utils/require_type.h>
 #include <testing-utils/generic_utils.h>
 #include <util/ui_message.h>
-#include <iostream>
 
 /// Helper function to specalise a generic class from a named component of a
 /// named class
@@ -231,48 +230,55 @@ SCENARIO(
       require_type::require_pointer(
         java_array_element_type(test_field_array),
         symbol_typet("java::java.lang.Float"));
-
-    GIVEN("Specialising a generic class with an array field")
-    {
-      const irep_idt &inner_class = "genericArray";
-
-      specialise_generic_from_component(
-        harness_class, "genericArrayField", new_symbol_table);
-
-      const irep_idt &specialised_class_name = id2string(harness_class) + "$" +
-                                               id2string(inner_class) +
-                                               "<java::java.lang.Float>";
-      REQUIRE(new_symbol_table.has_symbol(specialised_class_name));
-
-      const symbolt test_class_symbol=
-        new_symbol_table.lookup_ref(specialised_class_name);
-
-      REQUIRE(test_class_symbol.type.id()==ID_struct);
-      const struct_typet::componentt &field_component=
-        require_type::require_component(
-          to_struct_type(test_class_symbol.type),
-          "arrayField");
-      const typet &test_field_type=field_component.type();
-
-      std::cout << test_field_type.pretty() << std::endl;
-
-      std::cout << "Hello world" << std::endl;
-    }
-
   }
 }
-//
-//SCENARIO("Specialising a generic class with a generic field ")
-//{
-//  const irep_idt harness_class =
-//    "java::generic_field_array_instantiation";
-//  GIVEN("A generic type with a generic array field")
-//  {
-//    symbol_tablet new_symbol_table=
-//      load_java_class(
-//        "generic_field_array_instantiation",
-//        "./java_bytecode/generate_concrete_generic_type");
-//
-//
-//  }
-//}
+
+SCENARIO("generate_java_generic_type with a generic array field")
+{
+  const irep_idt harness_class = "java::generic_field_array_instantiation";
+  GIVEN("A generic class with a field of type T []")
+  {
+    symbol_tablet new_symbol_table = load_java_class(
+      "generic_field_array_instantiation",
+      "./java_bytecode/generate_concrete_generic_type");
+
+    const irep_idt &inner_class = "genericArray";
+
+    WHEN("We specialise that class from a reference to it")
+    {
+      specialise_generic_from_component(
+        harness_class, "genericArrayField", new_symbol_table);
+      THEN(
+        "There should be a specialised version of the class in the symbol "
+        "table")
+      {
+        const irep_idt &specialised_class_name = id2string(harness_class) +
+                                                 "$" + id2string(inner_class) +
+                                                 "<java::java.lang.Float>";
+        REQUIRE(new_symbol_table.has_symbol(specialised_class_name));
+
+        const symbolt test_class_symbol =
+          new_symbol_table.lookup_ref(specialised_class_name);
+
+        THEN("The array field should be specialised to be an array of floats")
+        {
+          REQUIRE(test_class_symbol.type.id() == ID_struct);
+          const struct_typet::componentt &field_component =
+            require_type::require_component(
+              to_struct_type(test_class_symbol.type), "arrayField");
+
+          const pointer_typet &component_pointer_type =
+            require_type::require_pointer(field_component.type(), {});
+
+          const symbol_typet &pointer_subtype = require_type::require_symbol(
+            component_pointer_type.subtype(), "java::array[reference]");
+
+          const typet &array_type = java_array_element_type(pointer_subtype);
+
+          require_type::require_pointer(
+            array_type, symbol_typet("java::java.lang.Float"));
+        }
+      }
+    }
+  }
+}
