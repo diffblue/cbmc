@@ -1,23 +1,19 @@
-DIRS = ansi-c \
-       cbmc \
-       cbmc-cover \
-       cbmc-cpp \
-       cbmc-java \
-       cbmc-java-inheritance \
-       cpp \
-       goto-analyzer \
-       goto-analyzer-taint \
-       goto-cc-cbmc \
-       goto-cc-goto-analyzer \
-       goto-diff \
-       goto-gcc \
-       goto-instrument \
-       goto-instrument-typedef \
-       invariants \
-       strings \
-       jbmc-strings \
-       strings-smoke-tests \
-       test-script \
+DIRS =  cbmc-java \
+       #cbmc-java-inheritance \
+       #cpp \
+       #goto-analyzer \
+       #goto-analyzer-taint \
+       #goto-cc-cbmc \
+       #goto-cc-goto-analyzer \
+       #goto-diff \
+       #goto-gcc \
+       #goto-instrument \
+       #goto-instrument-typedef \
+       #invariants \
+       #strings \
+       #jbmc-strings \
+       #strings-smoke-tests \
+       #test-script \
        # Empty last line
 
 # Check for the existence of $dir. Tests under goto-gcc cannot be run on

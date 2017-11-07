@@ -435,6 +435,7 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("graphml-witness", cmdline.get_value("graphml-witness"));
     options.set_option("stop-on-fail", true);
     options.set_option("trace", true);
+    configure_trace_output();
   }
 
   if(cmdline.isset("symex-coverage-report"))
