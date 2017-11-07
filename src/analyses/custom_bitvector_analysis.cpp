@@ -380,6 +380,19 @@ void custom_bitvector_domaint::transform(
             }
           }
         }
+        else if(identifier=="memcpy" ||
+                identifier=="memmove")
+        {
+          if(code_function_call.arguments().size()==3)
+          {
+            // we copy all tracked bits from op1 to op0
+            // we do not consider any bits attached to the size op2
+            dereference_exprt lhs_deref(code_function_call.arguments()[0]);
+            dereference_exprt rhs_deref(code_function_call.arguments()[1]);
+
+            assign_struct_rec(from, lhs_deref, rhs_deref, cba, ns);
+          }
+        }
         else
         {
           goto_programt::const_targett next=from;
