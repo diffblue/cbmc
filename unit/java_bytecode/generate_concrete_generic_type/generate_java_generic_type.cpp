@@ -292,9 +292,9 @@ SCENARIO(
         const symbolt test_class_symbol =
           new_symbol_table.lookup_ref(specialised_class_name);
 
+        REQUIRE(test_class_symbol.type.id() == ID_struct);
         THEN("The array field should be specialised to be an array of floats")
         {
-          REQUIRE(test_class_symbol.type.id() == ID_struct);
           const struct_typet::componentt &field_component =
             require_type::require_component(
               to_struct_type(test_class_symbol.type), "arrayField");
@@ -309,6 +309,20 @@ SCENARIO(
 
           require_type::require_pointer(
             array_type, symbol_typet("java::java.lang.Float"));
+        }
+
+        THEN(
+          "The generic class field should be specialised to be a generic "
+          "class with the appropriate type")
+        {
+          const struct_typet::componentt &field_component =
+            require_type::require_component(
+              to_struct_type(test_class_symbol.type), "genericClassField");
+
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_parameter_kindt::Inst,
+              "java::java.lang.Float"}});
         }
       }
     }
