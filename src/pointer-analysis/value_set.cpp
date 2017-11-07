@@ -466,7 +466,9 @@ void value_sett::get_value_set_rec(
           it1!=object_map.end();
           it1++)
       {
-        const exprt &object=object_numbering[it1->first];
+        /// Do not take a reference to object_numbering's storage as we may call
+        /// object_numbering.number(), which may reallocate it.
+        const exprt object=object_numbering[it1->first];
         get_value_set_rec(object, dest, suffix, original_type, ns);
       }
     }
@@ -489,7 +491,9 @@ void value_sett::get_value_set_rec(
           it!=object_map.end();
           it++)
       {
-        const exprt &object=object_numbering[it->first];
+        /// Do not take a reference to object_numbering's storage as we may call
+        /// object_numbering.number(), which may reallocate it.
+        const exprt object=object_numbering[it->first];
         get_value_set_rec(object, dest, suffix, original_type, ns);
       }
     }
@@ -1348,7 +1352,9 @@ void value_sett::assign_rec(
         it!=reference_set.read().end();
         it++)
     {
-      const exprt &object=object_numbering[it->first];
+      /// Do not take a reference to object_numbering's storage as we may call
+      /// object_numbering.number(), which may reallocate it.
+      const exprt object=object_numbering[it->first];
 
       if(object.id()!=ID_unknown)
         assign_rec(object, values_rhs, suffix, ns, add_to_sets);
