@@ -6,6 +6,8 @@ public class generic_field_array_instantiation {
 
     class genericArray<T> {
         T [] arrayField;
+
+        generic<T> genericClassField;
     }
 
     generic<Float []> f;

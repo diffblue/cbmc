@@ -118,22 +118,61 @@ typet generate_java_generic_typet::substitute_type(
     }
   }
   else if(
-    parameter_type.id() == ID_pointer &&
-    parameter_type.subtype().id() == ID_symbol)
+    parameter_type.id() == ID_pointer)
   {
-    const symbol_typet &array_subtype =
-      to_symbol_type(parameter_type.subtype());
-    if(is_java_array_tag(array_subtype.get_identifier()))
+    if(is_java_generic_type(parameter_type))
     {
-      const typet &array_element_type = java_array_element_type(array_subtype);
+      const java_generic_typet &generic_type =
+        to_java_generic_type(parameter_type);
 
-      const typet &new_array_type =
-        substitute_type(array_element_type, generic_class, generic_reference);
+      java_generic_typet::generic_type_variablest replaced_type_variables;
 
-      typet replacement_array_type = java_array_type('a');
-      replacement_array_type.subtype().set(
-        ID_C_element_type, new_array_type);
-      return replacement_array_type;
+      // Swap each parameter
+      std::transform(
+        generic_type.generic_type_variables().begin(),
+        generic_type.generic_type_variables().end(),
+        std::back_inserter(replaced_type_variables),
+        [&](const java_generic_parametert &generic_param)
+          -> java_generic_parametert {
+            const typet &replacement_type =
+              substitute_type(generic_param, generic_class, generic_reference);
+
+            // This code will be simplified when references aren't considered to
+            // be generic parameters
+            if(is_java_generic_parameter(replacement_type))
+            {
+              return to_java_generic_parameter(replacement_type);
+            }
+            else
+            {
+              INVARIANT(
+                is_reference(replacement_type),
+                "All generic parameters should be references");
+              return java_generic_inst_parametert(
+                to_symbol_type(replacement_type.subtype()));
+            }
+          });
+
+      java_generic_typet new_type=generic_type;
+      new_type.generic_type_variables()=replaced_type_variables;
+      return new_type;
+    }
+    else if(parameter_type.subtype().id() == ID_symbol)
+    {
+      const symbol_typet &array_subtype =
+        to_symbol_type(parameter_type.subtype());
+      if(is_java_array_tag(array_subtype.get_identifier()))
+      {
+        const typet &array_element_type = java_array_element_type(array_subtype);
+
+        const typet &new_array_type =
+          substitute_type(array_element_type, generic_class, generic_reference);
+
+        typet replacement_array_type = java_array_type('a');
+        replacement_array_type.subtype().set(
+          ID_C_element_type, new_array_type);
+        return replacement_array_type;
+      }
     }
   }
   return parameter_type;
