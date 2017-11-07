@@ -242,12 +242,12 @@ exprt flatten_byte_extract(
 
         byte_extract_exprt tmp(unpacked);
         tmp.type()=subtype;
-        tmp.offset()=simplify_expr(new_offset, ns);
+        tmp.offset()=new_offset;
 
         array.copy_to_operands(flatten_byte_extract(tmp, ns));
       }
 
-      return array;
+      return simplify_expr(array, ns);
     }
   }
   else if(type.id()==ID_struct)
@@ -277,13 +277,13 @@ exprt flatten_byte_extract(
 
       byte_extract_exprt tmp(unpacked);
       tmp.type()=comp.type();
-      tmp.offset()=simplify_expr(new_offset, ns);
+      tmp.offset()=new_offset;
 
       s.move_to_operands(tmp);
     }
 
     if(!failed)
-      return s;
+      return simplify_expr(s, ns);
   }
 
   const exprt &root=unpacked.op();
@@ -333,7 +333,7 @@ exprt flatten_byte_extract(
   {
     concatenation_exprt concatenation(src.type());
     concatenation.operands().swap(op);
-    return concatenation;
+    return simplify_expr(concatenation, ns);
   }
 }
 
@@ -413,7 +413,7 @@ exprt flatten_byte_update(
           result.swap(with_expr);
         }
 
-        return result;
+        return simplify_expr(result, ns);
       }
       else // sub_size!=1
       {
@@ -512,7 +512,7 @@ exprt flatten_byte_update(
           result=with_expr;
         }
 
-        return result;
+        return simplify_expr(result, ns);
       }
     }
     else
@@ -583,7 +583,7 @@ exprt flatten_byte_update(
     // original_bits |= newvalue
     bitor_exprt bitor_expr(bitand_expr, value_shifted);
 
-    return bitor_expr;
+    return simplify_expr(bitor_expr, ns);
   }
   else
   {

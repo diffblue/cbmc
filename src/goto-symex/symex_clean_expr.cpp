@@ -67,11 +67,13 @@ void goto_symext::process_array_expr_rec(
     expr.swap(tmp);
   }
   else
+  {
     Forall_operands(it, expr)
     {
       typet t=it->type();
       process_array_expr_rec(*it, t);
     }
+  }
 
   if(!base_type_eq(expr.type(), type, ns))
   {
@@ -166,6 +168,28 @@ void goto_symext::replace_array_equal(exprt &expr)
     replace_array_equal(*it);
 }
 
+/// Rewrite index/member expressions in byte_extract to offset
+static void adjust_byte_extract_rec(exprt &expr, const namespacet &ns)
+{
+  Forall_operands(it, expr)
+    adjust_byte_extract_rec(*it, ns);
+
+  if(expr.id()==ID_byte_extract_big_endian ||
+     expr.id()==ID_byte_extract_little_endian)
+  {
+    byte_extract_exprt &be=to_byte_extract_expr(expr);
+    if(be.op().id()==ID_symbol &&
+       to_ssa_expr(be.op()).get_original_expr().get_bool(ID_C_invalid_object))
+      return;
+
+    object_descriptor_exprt ode;
+    ode.build(expr, ns);
+
+    be.op()=ode.root_object();
+    be.offset()=ode.offset();
+  }
+}
+
 void goto_symext::clean_expr(
   exprt &expr,
   statet &state,
@@ -173,5 +197,12 @@ void goto_symext::clean_expr(
 {
   replace_nondet(expr);
   dereference(expr, state, write);
+
+  // make sure all remaining byte extract operations use the root
+  // object to avoid nesting of with/update and byte_update when on
+  // lhs
+  if(write)
+    adjust_byte_extract_rec(expr, ns);
+
   replace_array_equal(expr);
 }
