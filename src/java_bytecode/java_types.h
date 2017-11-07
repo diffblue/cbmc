@@ -284,7 +284,7 @@ inline bool is_java_generics_class_type(const typet &type)
 
 /// \param type: the type to check
 /// \return cast of type to java_generics_class_typet
-inline const java_generics_class_typet &to_java_generics_class_type(
+inline const java_generics_class_typet &to_java_generic_class_type(
   const java_class_typet &type)
 {
   PRECONDITION(is_java_generics_class_type(type));
@@ -340,7 +340,7 @@ inline const typet &java_generics_class_type_bound(
 {
   PRECONDITION(is_java_generics_class_type(t));
   const java_generics_class_typet &type=
-    to_java_generics_class_type(to_java_class_type(t));
+    to_java_generic_class_type(to_java_class_type(t));
   const std::vector<java_generic_parametert> &gen_types=type.generic_types();
 
   PRECONDITION(index<gen_types.size());

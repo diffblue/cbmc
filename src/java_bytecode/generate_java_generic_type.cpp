@@ -49,7 +49,7 @@ symbolt generate_java_generic_typet::operator()(
       if(is_java_generic_parameter(component.type()))
       {
         auto replacement_type_param=
-          to_java_generics_class_type(replacement_type);
+          to_java_generic_class_type(replacement_type);
 
         auto component_identifier=
           to_java_generic_parameter(component.type()).type_variable()
