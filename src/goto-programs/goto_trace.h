@@ -127,29 +127,6 @@ public:
   bool is_atomic_begin() const;
   bool is_atomic_end() const;
 
-  enum class typet
-  {
-    NONE,
-    ASSIGNMENT,
-    ASSUME,
-    ASSERT,
-    GOTO,
-    LOCATION,
-    INPUT,
-    OUTPUT,
-    DECL,
-    DEAD,
-    FUNCTION_CALL,
-    FUNCTION_RETURN,
-    CONSTRAINT,
-    SHARED_READ,
-    SHARED_WRITE,
-    SPAWN,
-    MEMORY_BARRIER,
-    ATOMIC_BEGIN,
-    ATOMIC_END
-  };
-
   // we may choose to hide a step
   bool hidden;
 
