@@ -9,12 +9,12 @@ Author: elizabeth.polgreen@cs.ox.ac.uk
 \*******************************************************************/
 
 /// \file
-/// HTML races of GOTO Programs
+/// HTML traces of GOTO Programs
 
 #ifndef CPROVER_GOTO_PROGRAMS_HTML_GOTO_TRACE_H_
 #define CPROVER_GOTO_PROGRAMS_HTML_GOTO_TRACE_H_
 
-
+/// \brief print the goto_trace in html format
 void show_html_goto_trace(
   std::ostream &,
   const namespacet &,

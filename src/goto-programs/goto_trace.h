@@ -196,8 +196,6 @@ public:
 };
 
 /// \brief print the goto trace
-/// \param ostream, namespace, goto_trace
-/// trace_configuration.
 void show_goto_trace(
   std::ostream &out,
   const namespacet &,
