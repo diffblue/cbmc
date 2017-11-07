@@ -196,8 +196,6 @@ public:
     const class namespacet &ns,
     std::ostream &out) const;
 
-  virtual typet type() const = 0;
-
   virtual void accept(trace_visitor_const_argst &v) const = 0;
   virtual void accept(const trace_const_visitor_const_argst &v) const = 0;
   virtual void accept(trace_visitor &v) = 0;
@@ -260,20 +258,12 @@ private:
 
 class trace_assignmentt : public goto_trace_accept_mixint<trace_assignmentt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::ASSIGNMENT; }
-
 private:
   std::string name() const override { return "ASSIGNMENT"; }
 };
 
 class trace_assumet : public goto_trace_accept_mixint<trace_assumet>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::ASSUME; }
-
 private:
   std::string name() const override { return "ASSUME"; }
   std::string formatted_cond_value() const override
@@ -286,10 +276,6 @@ private:
 
 class trace_assertt : public goto_trace_accept_mixint<trace_assertt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::ASSERT; }
-
 private:
   std::string name() const override { return "ASSERT"; }
   std::string formatted_cond_value() const override
@@ -302,10 +288,6 @@ private:
 
 class trace_gotot : public goto_trace_accept_mixint<trace_gotot>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::GOTO; }
-
 private:
   std::string name() const override { return "GOTO"; }
   std::string formatted_cond_value() const override
@@ -318,50 +300,30 @@ private:
 
 class trace_locationt : public goto_trace_accept_mixint<trace_locationt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::LOCATION; }
-
 private:
   std::string name() const override { return "LOCATION"; }
 };
 
 class trace_inputt : public goto_trace_accept_mixint<trace_inputt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::INPUT; }
-
 private:
   std::string name() const override { return "INPUT"; }
 };
 
 class trace_outputt : public goto_trace_accept_mixint<trace_outputt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::OUTPUT; }
-
 private:
   std::string name() const override { return "OUTPUT"; }
 };
 
 class trace_declt : public goto_trace_accept_mixint<trace_declt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::DECL; }
-
 private:
   std::string name() const override { return "DECL"; }
 };
 
 class trace_deadt : public goto_trace_accept_mixint<trace_deadt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::DEAD; }
-
 private:
   std::string name() const override { return "DEAD"; }
 };
@@ -369,10 +331,6 @@ private:
 class trace_function_callt
   : public goto_trace_accept_mixint<trace_function_callt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::FUNCTION_CALL; }
-
 private:
   std::string name() const override { return "FUNCTION CALL"; }
 };
@@ -380,50 +338,30 @@ private:
 class trace_function_returnt
   : public goto_trace_accept_mixint<trace_function_returnt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::FUNCTION_RETURN; }
-
 private:
   std::string name() const override { return "FUNCTION RETURN"; }
 };
 
 class trace_constraintt : public goto_trace_accept_mixint<trace_constraintt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::CONSTRAINT; }
-
 private:
   std::string name() const override { return "CONSTRAINT"; }
 };
 
 class trace_shared_readt : public goto_trace_accept_mixint<trace_shared_readt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::SHARED_READ; }
-
 private:
   std::string name() const override { return "SHARED READ"; }
 };
 
 class trace_shared_writet : public goto_trace_accept_mixint<trace_shared_writet>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::SHARED_WRITE; }
-
 private:
   std::string name() const override { return "SHARED WRITE"; }
 };
 
 class trace_spawnt : public goto_trace_accept_mixint<trace_spawnt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::SPAWN; }
-
 private:
   std::string name() const override { return "SPAWN"; }
 };
@@ -431,30 +369,18 @@ private:
 class trace_memory_barriert
   : public goto_trace_accept_mixint<trace_memory_barriert>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::MEMORY_BARRIER; }
-
 private:
   std::string name() const override { return "MEMORY BARRIER"; }
 };
 
 class trace_atomic_begint : public goto_trace_accept_mixint<trace_atomic_begint>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::ATOMIC_BEGIN; }
-
 private:
   std::string name() const override { return "ATOMIC BEGIN"; }
 };
 
 class trace_atomic_endt : public goto_trace_accept_mixint<trace_atomic_endt>
 {
-public:
-  typet type() const override
-  { return goto_trace_stept::typet::ATOMIC_END; }
-
 private:
   std::string name() const override { return "ATOMIC END"; }
 };
