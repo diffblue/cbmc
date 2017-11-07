@@ -17,6 +17,7 @@
 #include <testing-utils/require_type.h>
 #include <testing-utils/generic_utils.h>
 #include <util/ui_message.h>
+#include <iostream>
 
 /// Helper function to specalise a generic class from a named component of a
 /// named class
@@ -179,27 +180,27 @@ SCENARIO(
   // We have a 'harness' class who's only purpose is to contain a reference
   // to the generic class so that we can test the specialization of that generic
   // class
-  const irep_idt harness_class=
+  const irep_idt harness_class =
     "java::generic_field_array_instantiation";
 
   // We want to test that the specialized/instantiated class has it's field
   // type updated, so find the specialized class, not the generic class.
-  const irep_idt test_class=
+  const irep_idt test_class =
     "java::generic_field_array_instantiation$generic<java::array[reference]>";
 
   GIVEN("A generic type instantiated with an array type")
   {
-    symbol_tablet new_symbol_table=
+    symbol_tablet new_symbol_table =
       load_java_class(
         "generic_field_array_instantiation",
         "./java_bytecode/generate_concrete_generic_type");
 
     // Ensure the class has been specialized
     REQUIRE(new_symbol_table.has_symbol(harness_class));
-    const symbolt &harness_symbol=
+    const symbolt &harness_symbol =
       new_symbol_table.lookup_ref(harness_class);
 
-    const struct_typet::componentt &harness_component=
+    const struct_typet::componentt &harness_component =
       require_type::require_component(
         to_struct_type(harness_symbol.type),
         "f");
@@ -211,24 +212,67 @@ SCENARIO(
 
     // Test the specialized class
     REQUIRE(new_symbol_table.has_symbol(test_class));
-    const symbolt test_class_symbol=
+    const symbolt test_class_symbol =
       new_symbol_table.lookup_ref(test_class);
 
-    REQUIRE(test_class_symbol.type.id()==ID_struct);
-    const struct_typet::componentt &field_component=
+    REQUIRE(test_class_symbol.type.id() == ID_struct);
+    const struct_typet::componentt &field_component =
       require_type::require_component(
         to_struct_type(test_class_symbol.type),
         "gf");
-    const typet &test_field_type=field_component.type();
+    const typet &test_field_type = field_component.type();
 
-    REQUIRE(test_field_type.id()==ID_pointer);
-    REQUIRE(test_field_type.subtype().id()==ID_symbol);
-    const symbol_typet test_field_array=
+    REQUIRE(test_field_type.id() == ID_pointer);
+    REQUIRE(test_field_type.subtype().id() == ID_symbol);
+    const symbol_typet test_field_array =
       to_symbol_type(test_field_type.subtype());
-    REQUIRE(test_field_array.get_identifier()=="java::array[reference]");
-    const pointer_typet &element_type=
+    REQUIRE(test_field_array.get_identifier() == "java::array[reference]");
+    const pointer_typet &element_type =
       require_type::require_pointer(
         java_array_element_type(test_field_array),
         symbol_typet("java::java.lang.Float"));
+
+    GIVEN("Specialising a generic class with an array field")
+    {
+      const irep_idt &inner_class = "genericArray";
+
+      specialise_generic_from_component(
+        harness_class, "genericArrayField", new_symbol_table);
+
+      const irep_idt &specialised_class_name = id2string(harness_class) + "$" +
+                                               id2string(inner_class) +
+                                               "<java::java.lang.Float>";
+      REQUIRE(new_symbol_table.has_symbol(specialised_class_name));
+
+      const symbolt test_class_symbol=
+        new_symbol_table.lookup_ref(specialised_class_name);
+
+      REQUIRE(test_class_symbol.type.id()==ID_struct);
+      const struct_typet::componentt &field_component=
+        require_type::require_component(
+          to_struct_type(test_class_symbol.type),
+          "arrayField");
+      const typet &test_field_type=field_component.type();
+
+      std::cout << test_field_type.pretty() << std::endl;
+
+      std::cout << "Hello world" << std::endl;
+    }
+
   }
 }
+//
+//SCENARIO("Specialising a generic class with a generic field ")
+//{
+//  const irep_idt harness_class =
+//    "java::generic_field_array_instantiation";
+//  GIVEN("A generic type with a generic array field")
+//  {
+//    symbol_tablet new_symbol_table=
+//      load_java_class(
+//        "generic_field_array_instantiation",
+//        "./java_bytecode/generate_concrete_generic_type");
+//
+//
+//  }
+//}
