@@ -25,6 +25,9 @@ namespace require_type
 pointer_typet
 require_pointer(const typet &type, const optionalt<typet> &subtype);
 
+const symbol_typet &
+require_symbol(const typet &type, const irep_idt &identifier = "");
+
 struct_typet::componentt require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name);

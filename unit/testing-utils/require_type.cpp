@@ -289,3 +289,20 @@ require_type::require_java_non_generic_class(const typet &class_type)
 
   return java_class_type;
 }
+
+/// Verify a given type is a symbol type, optionally with a specific identifier
+/// \param type: The type to check
+/// \param identifier: The identifier the symbol type should have
+/// \return The cast version of the input type
+const symbol_typet &require_type::require_symbol(const typet &type,
+                                           const irep_idt &identifier)
+{
+  REQUIRE(type.id()==ID_symbol);
+  const symbol_typet &result=to_symbol_type(type);
+  if(identifier!="")
+  {
+    REQUIRE(result.get_identifier()==identifier);
+  }
+  return result;
+
+}
