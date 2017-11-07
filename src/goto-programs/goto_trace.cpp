@@ -184,7 +184,7 @@ std::string trace_value_hex(
   }
   else if(expr.id()==ID_union)
   {
-    assert(expr.operands().size()==1);
+    INVARIANT(expr.operands().size()==1, "expr must have 1 operand");
     return trace_value_hex(expr.op0(), ns);
   }
 
