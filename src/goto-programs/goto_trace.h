@@ -108,24 +108,78 @@ class goto_trace_stept
 public:
   std::size_t step_nr;
 
-  bool is_assignment() const;
-  bool is_assume() const;
-  bool is_assert() const;
-  bool is_goto() const;
-  bool is_constraint() const;
-  bool is_function_call() const;
-  bool is_function_return() const;
-  bool is_location() const;
-  bool is_output() const;
-  bool is_input() const;
-  bool is_decl() const;
-  bool is_dead() const;
-  bool is_shared_read() const;
-  bool is_shared_write() const;
-  bool is_spawn() const;
-  bool is_memory_barrier() const;
-  bool is_atomic_begin() const;
-  bool is_atomic_end() const;
+  virtual bool is_assignment() const
+  {
+    return false;
+  }
+  virtual bool is_assume() const
+  {
+    return false;
+  }
+  virtual bool is_assert() const
+  {
+    return false;
+  }
+  virtual bool is_goto() const
+  {
+    return false;
+  }
+  virtual bool is_constraint() const
+  {
+    return false;
+  }
+  virtual bool is_function_call() const
+  {
+    return false;
+  }
+  virtual bool is_function_return() const
+  {
+    return false;
+  }
+  virtual bool is_location() const
+  {
+    return false;
+  }
+  virtual bool is_output() const
+  {
+    return false;
+  }
+  virtual bool is_input() const
+  {
+    return false;
+  }
+  virtual bool is_decl() const
+  {
+    return false;
+  }
+  virtual bool is_dead() const
+  {
+    return false;
+  }
+  virtual bool is_shared_read() const
+  {
+    return false;
+  }
+  virtual bool is_shared_write() const
+  {
+    return false;
+  }
+  virtual bool is_spawn() const
+  {
+    return false;
+  }
+  virtual bool is_memory_barrier() const
+  {
+    return false;
+  }
+  virtual bool is_atomic_begin() const
+  {
+    return false;
+  }
+  virtual bool is_atomic_end() const
+  {
+    return false;
+  }
 
   // we may choose to hide a step
   bool hidden;
@@ -235,14 +289,32 @@ private:
 
 class trace_assignmentt : public goto_trace_accept_mixint<trace_assignmentt>
 {
+public:
+  bool is_assignment() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "ASSIGNMENT"; }
+  std::string name() const override
+  {
+    return "ASSIGNMENT";
+  }
 };
 
 class trace_assumet : public goto_trace_accept_mixint<trace_assumet>
 {
+public:
+  bool is_assume() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "ASSUME"; }
+  std::string name() const override
+  {
+    return "ASSUME";
+  }
   std::string formatted_cond_value() const override
   {
     std::ostringstream ss;
@@ -253,8 +325,17 @@ private:
 
 class trace_assertt : public goto_trace_accept_mixint<trace_assertt>
 {
+public:
+  bool is_assert() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "ASSERT"; }
+  std::string name() const override
+  {
+    return "ASSERT";
+  }
   std::string formatted_cond_value() const override
   {
     std::ostringstream ss;
@@ -265,8 +346,17 @@ private:
 
 class trace_gotot : public goto_trace_accept_mixint<trace_gotot>
 {
+public:
+  bool is_goto() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "GOTO"; }
+  std::string name() const override
+  {
+    return "GOTO";
+  }
   std::string formatted_cond_value() const override
   {
     std::ostringstream ss;
@@ -277,89 +367,215 @@ private:
 
 class trace_locationt : public goto_trace_accept_mixint<trace_locationt>
 {
+public:
+  bool is_location() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "LOCATION"; }
+  std::string name() const override
+  {
+    return "LOCATION";
+  }
 };
 
 class trace_inputt : public goto_trace_accept_mixint<trace_inputt>
 {
+public:
+  bool is_input() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "INPUT"; }
+  std::string name() const override
+  {
+    return "INPUT";
+  }
 };
 
 class trace_outputt : public goto_trace_accept_mixint<trace_outputt>
 {
+public:
+  bool is_output() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "OUTPUT"; }
+  std::string name() const override
+  {
+    return "OUTPUT";
+  }
 };
 
 class trace_declt : public goto_trace_accept_mixint<trace_declt>
 {
+public:
+  bool is_decl() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "DECL"; }
+  std::string name() const override
+  {
+    return "DECL";
+  }
 };
 
 class trace_deadt : public goto_trace_accept_mixint<trace_deadt>
 {
+public:
+  bool is_dead() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "DEAD"; }
+  std::string name() const override
+  {
+    return "DEAD";
+  }
 };
 
 class trace_function_callt
   : public goto_trace_accept_mixint<trace_function_callt>
 {
+public:
+  bool is_function_call() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "FUNCTION CALL"; }
+  std::string name() const override
+  {
+    return "FUNCTION CALL";
+  }
 };
 
 class trace_function_returnt
   : public goto_trace_accept_mixint<trace_function_returnt>
 {
+public:
+  bool is_function_return() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "FUNCTION RETURN"; }
+  std::string name() const override
+  {
+    return "FUNCTION RETURN";
+  }
 };
 
 class trace_constraintt : public goto_trace_accept_mixint<trace_constraintt>
 {
+public:
+  bool is_constraint() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "CONSTRAINT"; }
+  std::string name() const override
+  {
+    return "CONSTRAINT";
+  }
 };
 
 class trace_shared_readt : public goto_trace_accept_mixint<trace_shared_readt>
 {
+public:
+  bool is_shared_read() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "SHARED READ"; }
+  std::string name() const override
+  {
+    return "SHARED READ";
+  }
 };
 
 class trace_shared_writet : public goto_trace_accept_mixint<trace_shared_writet>
 {
+public:
+  bool is_shared_write() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "SHARED WRITE"; }
+  std::string name() const override
+  {
+    return "SHARED WRITE";
+  }
 };
 
 class trace_spawnt : public goto_trace_accept_mixint<trace_spawnt>
 {
+public:
+  bool is_spawn() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "SPAWN"; }
+  std::string name() const override
+  {
+    return "SPAWN";
+  }
 };
 
 class trace_memory_barriert
   : public goto_trace_accept_mixint<trace_memory_barriert>
 {
+public:
+  bool is_memory_barrier() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "MEMORY BARRIER"; }
+  std::string name() const override
+  {
+    return "MEMORY BARRIER";
+  }
 };
 
 class trace_atomic_begint : public goto_trace_accept_mixint<trace_atomic_begint>
 {
+public:
+  bool is_atomic_begin() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "ATOMIC BEGIN"; }
+  std::string name() const override
+  {
+    return "ATOMIC BEGIN";
+  }
 };
 
 class trace_atomic_endt : public goto_trace_accept_mixint<trace_atomic_endt>
 {
+public:
+  bool is_atomic_end() const override
+  {
+    return true;
+  }
+
 private:
-  std::string name() const override { return "ATOMIC END"; }
+  std::string name() const override
+  {
+    return "ATOMIC END";
+  }
 };
 
 /*! \brief TO_BE_DOCUMENTED
