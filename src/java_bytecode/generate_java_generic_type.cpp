@@ -69,12 +69,44 @@ symbolt generate_java_generic_typet::operator()(
     "All components in the original class should be in the new class");
 
   const auto expected_symbol="java::"+id2string(new_tag);
+//
+//  generate_class_stub(
+//    new_tag,
+//    symbol_table,
+//    message_handler,
+//    replacement_components);
 
-  generate_class_stub(
-    new_tag,
-    symbol_table,
-    message_handler,
-    replacement_components);
+  // inlined the generate_class_stub for now
+  {
+    java_class_typet specialised_class;
+    specialised_class.set_tag(replacement_type.get_tag());
+    specialised_class.set(ID_base_name, new_tag);
+
+    // produce class symbol
+    symbolt new_symbol;
+    new_symbol.base_name = new_tag;
+    new_symbol.pretty_name = new_tag;
+    new_symbol.name = "java::" + id2string(new_tag);
+    specialised_class.set(ID_name, new_symbol.name);
+    new_symbol.type = specialised_class;
+    new_symbol.mode = ID_java;
+    new_symbol.is_type = true;
+
+    std::pair<symbolt &, bool> res = symbol_table.insert(std::move(new_symbol));
+
+    if(! res.second)
+    {
+      messaget message(message_handler);
+      message.warning() <<
+                        "stub class symbol " <<
+                        new_symbol.name <<
+                        " already exists" << messaget::eom;
+    }
+    else
+    {
+      java_add_components_to_class(res.first, replacement_components);
+    }
+  }
   auto symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
