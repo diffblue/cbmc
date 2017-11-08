@@ -326,5 +326,72 @@ SCENARIO(
         }
       }
     }
+    WHEN(
+      "We specialise the class with an array we should have appropriate types")
+    {
+      specialise_generic_from_component(
+        harness_class, "genericArrayArrayField", new_symbol_table);
+      THEN(
+        "There should be a specialised version of the class in the symbol "
+        "table")
+      {
+        const std::string specialised_string =
+          "<java::array[reference]of_"
+          "java::java.lang.Float>";
+        const irep_idt specialised_class_name = id2string(harness_class) + "$" +
+                                                id2string(inner_class) +
+                                                specialised_string;
+
+        REQUIRE(new_symbol_table.has_symbol(specialised_class_name));
+
+        const symbolt test_class_symbol =
+          new_symbol_table.lookup_ref(specialised_class_name);
+
+        REQUIRE(test_class_symbol.type.id() == ID_struct);
+        THEN("The array field should be specialised to be an array of floats")
+        {
+          const struct_typet::componentt &field_component =
+            require_type::require_component(
+              to_struct_type(test_class_symbol.type), "arrayField");
+
+          const pointer_typet &component_pointer_type =
+            require_type::require_pointer(field_component.type(), {});
+
+          const symbol_typet &pointer_subtype = require_type::require_symbol(
+            component_pointer_type.subtype(), "java::array[reference]");
+
+          const typet &array_type = java_array_element_type(pointer_subtype);
+
+          require_type::require_pointer(
+            array_type, symbol_typet("java::array[reference]"));
+
+          const typet &array_subtype =
+            java_array_element_type(to_symbol_type(array_type.subtype()));
+
+          require_type::require_pointer(
+            array_subtype, symbol_typet("java::java.lang.Float"));
+        }
+
+        THEN(
+          "The generic class field should be specialised to be a generic "
+          "class with the appropriate type")
+        {
+          const struct_typet::componentt &field_component =
+            require_type::require_component(
+              to_struct_type(test_class_symbol.type), "genericClassField");
+
+          const java_generic_typet &param_type =
+            require_type::require_java_generic_type(
+              field_component.type(),
+              {{require_type::type_parameter_kindt::Inst,
+                "java::array[reference]"}});
+
+          const typet &array_type = java_array_element_type(
+            to_symbol_type(param_type.generic_type_variables()[0].subtype()));
+          require_type::require_pointer(
+            array_type, symbol_typet("java::java.lang.Float"));
+        }
+      }
+    }
   }
 }

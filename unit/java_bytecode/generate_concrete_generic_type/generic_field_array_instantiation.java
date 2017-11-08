@@ -17,4 +17,5 @@ public class generic_field_array_instantiation {
     Float [] af;
 
     genericArray<Float> genericArrayField;
+    genericArray<Float []> genericArrayArrayField;
 }
