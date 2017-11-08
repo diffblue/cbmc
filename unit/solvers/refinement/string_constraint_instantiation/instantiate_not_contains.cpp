@@ -15,6 +15,7 @@
 #include <langapi/mode.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <util/simplify_expr.h>
+#include <util/config.h>
 
 /// \class Types used throughout the test. Currently it is impossible to
 /// statically initialize this value, there is a PR to allow this
@@ -160,6 +161,9 @@ SCENARIO("instantiate_not_contains",
   register_language(new_java_bytecode_language);
   symbol_tablet symtbl;
   const namespacet ns(symtbl);
+
+  // initialize architecture with sensible default values
+  config.set_arch("none");
 
   // Creating strings
   const auto ab_array = make_string_exprt("ab");
