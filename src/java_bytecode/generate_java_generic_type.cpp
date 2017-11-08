@@ -119,7 +119,24 @@ irep_idt generate_java_generic_typet::build_generic_tag(
     INVARIANT(
       is_java_generic_inst_parameter(param),
       "Only create full concretized generic types");
-    new_tag_buffer << param.subtype().get(ID_identifier);
+    const irep_idt &id(id2string(param.subtype().get(ID_identifier)));
+    new_tag_buffer << id2string(id);
+    if(is_java_array_tag(id))
+    {
+      const typet &element_type =
+        java_array_element_type(to_symbol_type(param.subtype()));
+
+      // If this is an array of references then we will specialize its
+      // identifier using the type of the objects in the array. Else, there can
+      // be a problem with the same symbols for different instantiations using
+      // arrays with different types.
+      if(element_type.id() == ID_pointer)
+      {
+        const symbol_typet element_symbol =
+          to_symbol_type(element_type.subtype());
+        new_tag_buffer << "of_" << id2string(element_symbol.get_identifier());
+      }
+    }
   }
 
   new_tag_buffer << ">";
