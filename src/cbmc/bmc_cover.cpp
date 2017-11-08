@@ -117,17 +117,17 @@ public:
     std::string test;
     for(const auto &step : goto_trace.steps)
     {
-      if(step.is_input())
+      if(step->is_input())
       {
         if(first)
           first=false;
         else
           test+=", ";
 
-        test+=id2string(step.io_id)+"=";
+        test+=id2string(step->io_id)+"=";
 
-        if(step.io_args.size()==1)
-          test+=from_expr(bmc.ns, "", step.io_args.front());
+        if(step->io_args.size()==1)
+          test+=from_expr(bmc.ns, "", step->io_args.front());
       }
     }
     return test;
@@ -178,7 +178,7 @@ void bmc_covert::satisfying_assignment()
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
       s_it1++)
-    if(s_it1->is_assume() && !s_it1->cond_value)
+    if((*s_it1)->is_assume() && !(*s_it1)->cond_value)
     {
       goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
       break;
@@ -209,7 +209,7 @@ bool bmc_covert::operator()()
   }
 
   for(auto &step : bmc.equation.SSA_steps)
-    step.cond_literal=literalt(0, 0);
+    (*step).cond_literal=literalt(0, 0);
 
   // Do conversion to next solver layer
 
@@ -221,15 +221,15 @@ bool bmc_covert::operator()()
       it!=bmc.equation.SSA_steps.end();
       it++)
   {
-    if(it->is_assert())
+    if((*it)->is_assert())
     {
-      assert(it->source.pc->is_assert());
+      assert((*it)->source.pc->is_assert());
       exprt c=
         conjunction({ // NOLINT(whitespace/braces)
-          literal_exprt(it->guard_literal),
-          literal_exprt(!it->cond_literal) });
+          literal_exprt((*it)->guard_literal),
+          literal_exprt(!(*it)->cond_literal) });
       literalt l_c=solver.convert(c);
-      goal_map[id(it->source.pc)].add_instance(it, l_c);
+      goal_map[id((*it)->source.pc)].add_instance(it, l_c);
     }
   }
 
@@ -322,13 +322,13 @@ bool bmc_covert::operator()()
 
           for(const auto &step : test.goto_trace.steps)
           {
-            if(step.is_input())
+            if((*step).is_input())
             {
               xmlt &xml_input=xml_test.new_element("input");
-              xml_input.set_attribute("id", id2string(step.io_id));
-              if(step.io_args.size()==1)
+              xml_input.set_attribute("id", id2string((*step).io_id));
+              if((*step).io_args.size()==1)
                 xml_input.new_element("value")=
-                  xml(step.io_args.front(), bmc.ns);
+                  xml((*step).io_args.front(), bmc.ns);
             }
           }
         }
@@ -378,13 +378,13 @@ bool bmc_covert::operator()()
 
           for(const auto &step : test.goto_trace.steps)
           {
-            if(step.is_input())
+            if(step->is_input())
             {
               json_objectt json_input;
-              json_input["id"]=json_stringt(id2string(step.io_id));
-              if(step.io_args.size()==1)
+              json_input["id"]=json_stringt(id2string(step->io_id));
+              if(step->io_args.size()==1)
                 json_input["value"]=
-                  json(step.io_args.front(), bmc.ns, ID_unknown);
+                  json(step->io_args.front(), bmc.ns, ID_unknown);
               json_test.push_back(json_input);
             }
           }

@@ -36,8 +36,8 @@ bool memory_model_sct::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
   partial_order_concurrencyt::event_it e2) const
 {
-  assert(e1->is_shared_read() || e1->is_shared_write());
-  assert(e2->is_shared_read() || e2->is_shared_write());
+  assert((*e1)->is_shared_read() || (*e1)->is_shared_write());
+  assert((*e2)->is_shared_read() || (*e2)->is_shared_write());
 
   return false;
 }
@@ -54,12 +54,12 @@ void memory_model_sct::build_per_thread_map(
       e_it++)
   {
     // concurrency-related?
-    if(!e_it->is_shared_read() &&
-       !e_it->is_shared_write() &&
-       !e_it->is_spawn() &&
-       !e_it->is_memory_barrier()) continue;
+    if(!(*e_it)->is_shared_read() &&
+       !(*e_it)->is_shared_write() &&
+       !(*e_it)->is_spawn() &&
+       !(*e_it)->is_memory_barrier()) continue;
 
-    dest[e_it->source.thread_nr].push_back(e_it);
+    dest[(*e_it)->source.thread_nr].push_back(e_it);
   }
 }
 
@@ -76,7 +76,7 @@ void memory_model_sct::thread_spawn(
       e_it!=equation.SSA_steps.end();
       e_it++)
   {
-    if(e_it->is_spawn())
+    if((*e_it)->is_spawn())
     {
       per_thread_mapt::const_iterator next_thread=
         per_thread_map.find(++next_thread_id);
@@ -90,12 +90,12 @@ void memory_model_sct::thread_spawn(
           n_it!=next_thread->second.end();
           n_it++)
       {
-        if(!(*n_it)->is_memory_barrier())
+        if(!(**n_it)->is_memory_barrier())
           add_constraint(
             equation,
             before(e_it, *n_it),
             "thread-spawn",
-            e_it->source);
+            (*e_it)->source);
       }
     }
   }
@@ -172,7 +172,7 @@ void memory_model_sct::program_order(
         e_it!=events.end();
         e_it++)
     {
-      if((*e_it)->is_memory_barrier())
+      if((**e_it)->is_memory_barrier())
          continue;
 
       if(previous==equation.SSA_steps.end())
@@ -186,7 +186,7 @@ void memory_model_sct::program_order(
         equation,
         before(previous, *e_it),
         "po",
-        (*e_it)->source);
+        (**e_it)->source);
 
       previous=*e_it;
     }
@@ -219,8 +219,8 @@ void memory_model_sct::write_serialization_external(
           ++w_it2)
       {
         // external?
-        if((*w_it1)->source.thread_nr==
-           (*w_it2)->source.thread_nr)
+        if((**w_it1)->source.thread_nr==
+           (**w_it2)->source.thread_nr)
           continue;
 
         // ws is a total order, no two elements have the same rank
@@ -233,13 +233,13 @@ void memory_model_sct::write_serialization_external(
           equation,
           implies_exprt(s, before(*w_it1, *w_it2)),
           "ws-ext",
-          (*w_it1)->source);
+          (**w_it1)->source);
 
         add_constraint(
           equation,
           implies_exprt(not_exprt(s), before(*w_it2, *w_it1)),
           "ws-ext",
-          (*w_it1)->source);
+          (**w_it1)->source);
       }
     }
   }
@@ -309,7 +309,7 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w)->guard, ws1, rf),
+                and_exprt((*r)->guard, (**w)->guard, ws1, rf),
                 fr);
           }
           else if(c_it->first.second==*w && !ws2.is_false())
@@ -321,13 +321,13 @@ void memory_model_sct::from_read(symex_target_equationt &equation)
             // it would even be wrong to add this guard
             cond=
               implies_exprt(
-                and_exprt(r->guard, (*w_prime)->guard, ws2, rf),
+                and_exprt((*r)->guard, (**w_prime)->guard, ws2, rf),
                 fr);
           }
 
           if(cond.is_not_nil())
             add_constraint(equation,
-              cond, "fr", r->source);
+              cond, "fr", (*r)->source);
         }
       }
     }

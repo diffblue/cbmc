@@ -31,11 +31,11 @@ void fault_localizationt::freeze_guards()
 {
   for(const auto &step : bmc.equation.SSA_steps)
   {
-    if(!step.guard_literal.is_constant())
-      bmc.prop_conv.set_frozen(step.guard_literal);
-    if(step.is_assert() &&
-       !step.cond_literal.is_constant())
-      bmc.prop_conv.set_frozen(step.cond_literal);
+    if(!step->guard_literal.is_constant())
+      bmc.prop_conv.set_frozen(step->guard_literal);
+    if(step->is_assert() &&
+       !step->cond_literal.is_constant())
+      bmc.prop_conv.set_frozen(step->cond_literal);
   }
 }
 
@@ -45,14 +45,14 @@ void fault_localizationt::collect_guards(lpointst &lpoints)
       it=bmc.equation.SSA_steps.begin();
       it!=bmc.equation.SSA_steps.end(); it++)
   {
-    if(it->is_assignment() &&
-       it->assignment_type==symex_targett::assignment_typet::STATE &&
-       !it->ignore)
+    if((*it)->is_assignment() &&
+       (*it)->assignment_type==symex_targett::assignment_typet::STATE &&
+       !(*it)->ignore)
     {
-      if(!it->guard_literal.is_constant())
+      if(!(*it)->guard_literal.is_constant())
       {
-        lpoints[it->guard_literal].target=it->source.pc;
-        lpoints[it->guard_literal].score=0;
+        lpoints[(*it)->guard_literal].target=(*it)->source.pc;
+        lpoints[(*it)->guard_literal].score=0;
       }
     }
 
@@ -68,9 +68,9 @@ fault_localizationt::get_failed_property()
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=bmc.equation.SSA_steps.begin();
       it!=bmc.equation.SSA_steps.end(); it++)
-    if(it->is_assert() &&
-       bmc.prop_conv.l_get(it->guard_literal).is_true() &&
-       bmc.prop_conv.l_get(it->cond_literal).is_false())
+    if((*it)->is_assert() &&
+       bmc.prop_conv.l_get((*it)->guard_literal).is_true() &&
+       bmc.prop_conv.l_get((*it)->cond_literal).is_false())
       return it;
 
   UNREACHABLE;
@@ -93,7 +93,7 @@ bool fault_localizationt::check(const lpointst &lpoints,
   }
 
   // lock the failed assertion
-  assumptions.push_back(!failed->cond_literal);
+  assumptions.push_back(!(*failed)->cond_literal);
 
   bmc.prop_conv.set_assumptions(assumptions);
 
@@ -145,7 +145,7 @@ void fault_localizationt::run(irep_idt goal_id)
   assert(failed!=bmc.equation.SSA_steps.end());
 
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id=(*failed)->source.pc->source_location.get_property_id();
   lpointst &lpoints=lpoints_map[goal_id];
 
   // collect lpoints
@@ -168,7 +168,7 @@ void fault_localizationt::run(irep_idt goal_id)
 void fault_localizationt::report(irep_idt goal_id)
 {
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id=(*failed)->source.pc->source_location.get_property_id();
 
   lpointst &lpoints=lpoints_map[goal_id];
 
@@ -200,7 +200,7 @@ xmlt fault_localizationt::report_xml(irep_idt goal_id)
   xml_diagnosis.new_element("method").data="linear fault localization";
 
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id=(*failed)->source.pc->source_location.get_property_id();
 
   xml_diagnosis.set_attribute("property", id2string(goal_id));
 
@@ -331,7 +331,7 @@ void fault_localizationt::goal_covered(
     // check whether failed
     for(auto &inst : goal_pair.second.instances)
     {
-      literalt cond=inst->cond_literal;
+      literalt cond=(*inst)->cond_literal;
 
       if(solver.l_get(cond).is_false())
       {

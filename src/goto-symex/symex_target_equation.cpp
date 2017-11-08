@@ -15,12 +15,154 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/std_expr.h>
 
+#include <goto-symex/symex_slice_class.h>
 #include <langapi/language_util.h>
-#include <solvers/prop/prop_conv.h>
-#include <solvers/prop/prop.h>
 #include <solvers/prop/literal_expr.h>
+#include <solvers/prop/prop.h>
+#include <solvers/prop/prop_conv.h>
 
 #include "goto_symex_state.h"
+
+std::string SSA_assertt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'
+      << from_expr(ns, "", cond_expr) << '\n'
+      << comment << '\n';
+  return out.str();
+}
+
+std::string SSA_assumet::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'
+      << from_expr(ns, "", cond_expr) << '\n';
+  return out.str();
+}
+
+std::string SSA_assignmentt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "ASSIGNMENT (";
+  switch(assignment_type)
+  {
+  case assignment_typet::HIDDEN:
+    out << "HIDDEN";
+    break;
+  case assignment_typet::STATE:
+    out << "STATE";
+    break;
+  case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
+    out << "VISIBLE_ACTUAL_PARAMETER";
+    break;
+  case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
+    out << "HIDDEN_ACTUAL_PARAMETER";
+    break;
+  case assignment_typet::PHI:
+    out << "PHI";
+    break;
+  case assignment_typet::GUARD:
+    out << "GUARD";
+    break;
+  default:
+  {
+  }
+  }
+
+  out << ")\n" << from_expr(ns, "", cond_expr) << '\n';
+  return out.str();
+}
+
+std::string SSA_gotot::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n";
+  return out.str();
+}
+
+std::string SSA_constraintt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "CONSTRAINT\n"
+      << from_expr(ns, "", cond_expr) << '\n'
+      << comment << '\n';
+  return out.str();
+}
+
+std::string SSA_locationt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "LOCATION" << '\n';
+  return out.str();
+}
+
+std::string SSA_outputt::custom_output(const namespacet &ns) const
+{
+  return "OUTPUT\n";
+}
+
+std::string SSA_declt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "DECL" << '\n' << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_deadt::custom_output(const namespacet &ns) const
+{
+  return "DEAD\n";
+}
+
+std::string SSA_function_callt::custom_output(const namespacet &ns) const
+{
+  return "FUNCTION_CALL\n";
+}
+
+std::string SSA_function_returnt::custom_output(const namespacet &ns) const
+{
+  return "FUNCTION_RETURN\n";
+}
+
+std::string SSA_shared_readt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "SHARED READ\n" << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_shared_writet::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "SHARED WRITE\n" << from_expr(ns, "", ssa_lhs) << '\n';
+  return out.str();
+}
+
+std::string SSA_spawnt::custom_output(const namespacet &ns) const
+{
+  return "SPAWN\n";
+}
+
+std::string SSA_memory_barriert::custom_output(const namespacet &ns) const
+{
+  return "MEMORY_BARRIER\n";
+}
+
+std::string SSA_atomic_begint::custom_output(const namespacet &ns) const
+{
+  return "ATOMIC_BEGIN\n";
+}
+
+std::string SSA_atomic_endt::custom_output(const namespacet &ns) const
+{
+  return "AUTOMIC_END\n";
+}
+
+std::string SSA_inputt::custom_output(const namespacet &ns) const
+{
+  std::ostringstream out;
+  out << "INPUT" << '\n';
+  return out.str();
+}
 
 symex_target_equationt::symex_target_equationt(
   const namespacet &_ns):ns(_ns)
@@ -38,16 +180,13 @@ void symex_target_equationt::shared_read(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::typet::SHARED_READ;
-  SSA_step.atomic_section_id=atomic_section_id;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_shared_readt>();
+  SSA_step->guard=guard;
+  SSA_step->ssa_lhs=ssa_object;
+  SSA_step->atomic_section_id=atomic_section_id;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// write to a sharedvariable
@@ -57,16 +196,13 @@ void symex_target_equationt::shared_write(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_object;
-  SSA_step.type=goto_trace_stept::typet::SHARED_WRITE;
-  SSA_step.atomic_section_id=atomic_section_id;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_shared_writet>();
+  SSA_step->guard=guard;
+  SSA_step->ssa_lhs=ssa_object;
+  SSA_step->atomic_section_id=atomic_section_id;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// spawn a new thread
@@ -74,26 +210,22 @@ void symex_target_equationt::spawn(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::SPAWN;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_spawnt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 void symex_target_equationt::memory_barrier(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::MEMORY_BARRIER;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_memory_barriert>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// start an atomic section
@@ -102,14 +234,12 @@ void symex_target_equationt::atomic_begin(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
-  SSA_step.atomic_section_id=atomic_section_id;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_atomic_begint>();
+  SSA_step->guard=guard;
+  SSA_step->atomic_section_id=atomic_section_id;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// end an atomic section
@@ -118,14 +248,12 @@ void symex_target_equationt::atomic_end(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::ATOMIC_END;
-  SSA_step.atomic_section_id=atomic_section_id;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_atomic_endt>();
+  SSA_step->guard=guard;
+  SSA_step->atomic_section_id=atomic_section_id;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// write to a variable
@@ -140,23 +268,22 @@ void symex_target_equationt::assignment(
 {
   assert(ssa_lhs.is_not_nil());
 
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  auto SSA_step=util_make_unique<SSA_assignmentt>();
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_lhs;
-  SSA_step.ssa_full_lhs=ssa_full_lhs;
-  SSA_step.original_full_lhs=original_full_lhs;
-  SSA_step.ssa_rhs=ssa_rhs;
-  SSA_step.assignment_type=assignment_type;
+  SSA_step->guard=guard;
+  SSA_step->ssa_lhs=ssa_lhs;
+  SSA_step->ssa_full_lhs=ssa_full_lhs;
+  SSA_step->original_full_lhs=original_full_lhs;
+  SSA_step->ssa_rhs=ssa_rhs;
+  SSA_step->assignment_type=assignment_type;
 
-  SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-  SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
-  SSA_step.hidden=(assignment_type!=assignment_typet::STATE &&
+  SSA_step->cond_expr=equal_exprt(SSA_step->ssa_lhs, SSA_step->ssa_rhs);
+  SSA_step->hidden=(assignment_type!=assignment_typet::STATE &&
                    assignment_type!=assignment_typet::VISIBLE_ACTUAL_PARAMETER);
-  SSA_step.source=source;
+  SSA_step->source=source;
 
-  merge_ireps(SSA_step);
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// declare a fresh variable
@@ -168,22 +295,21 @@ void symex_target_equationt::decl(
 {
   assert(ssa_lhs.is_not_nil());
 
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  auto SSA_step=util_make_unique<SSA_declt>();
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_lhs;
-  SSA_step.ssa_full_lhs=ssa_lhs;
-  SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
-  SSA_step.type=goto_trace_stept::typet::DECL;
-  SSA_step.source=source;
-  SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
+  SSA_step->guard=guard;
+  SSA_step->ssa_lhs=ssa_lhs;
+  SSA_step->ssa_full_lhs=ssa_lhs;
+  SSA_step->original_full_lhs=ssa_lhs.get_original_expr();
+  SSA_step->source=source;
+  SSA_step->hidden=(assignment_type!=assignment_typet::STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
-  SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
+  SSA_step->cond_expr=equal_exprt(SSA_step->ssa_lhs, SSA_step->ssa_lhs);
 
-  merge_ireps(SSA_step);
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// declare a fresh variable
@@ -200,14 +326,11 @@ void symex_target_equationt::location(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::LOCATION;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_locationt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// just record a location
@@ -216,15 +339,12 @@ void symex_target_equationt::function_call(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
-  SSA_step.source=source;
-  SSA_step.identifier=identifier;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_function_callt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  SSA_step->identifier=identifier;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// just record a location
@@ -233,15 +353,12 @@ void symex_target_equationt::function_return(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
-  SSA_step.source=source;
-  SSA_step.identifier=identifier;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_function_returnt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  SSA_step->identifier=identifier;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// just record output
@@ -251,16 +368,13 @@ void symex_target_equationt::output(
   const irep_idt &output_id,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::OUTPUT;
-  SSA_step.source=source;
-  SSA_step.io_args=args;
-  SSA_step.io_id=output_id;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_outputt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  SSA_step->io_args=args;
+  SSA_step->io_id=output_id;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// just record formatted output
@@ -271,18 +385,15 @@ void symex_target_equationt::output_fmt(
   const irep_idt &fmt,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::OUTPUT;
-  SSA_step.source=source;
-  SSA_step.io_args=args;
-  SSA_step.io_id=output_id;
-  SSA_step.formatted=true;
-  SSA_step.format_string=fmt;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_outputt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  SSA_step->io_args=args;
+  SSA_step->io_id=output_id;
+  SSA_step->formatted=true;
+  SSA_step->format_string=fmt;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// just record input
@@ -292,16 +403,13 @@ void symex_target_equationt::input(
   const irep_idt &input_id,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.type=goto_trace_stept::typet::INPUT;
-  SSA_step.source=source;
-  SSA_step.io_args=args;
-  SSA_step.io_id=input_id;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_inputt>();
+  SSA_step->guard=guard;
+  SSA_step->source=source;
+  SSA_step->io_args=args;
+  SSA_step->io_id=input_id;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// record an assumption
@@ -310,15 +418,12 @@ void symex_target_equationt::assumption(
   const exprt &cond,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::typet::ASSUME;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_assumet>();
+  SSA_step->guard=guard;
+  SSA_step->cond_expr=cond;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// record an assertion
@@ -328,16 +433,13 @@ void symex_target_equationt::assertion(
   const std::string &msg,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::typet::ASSERT;
-  SSA_step.source=source;
-  SSA_step.comment=msg;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_assertt>();
+  SSA_step->guard=guard;
+  SSA_step->cond_expr=cond;
+  SSA_step->source=source;
+  SSA_step->comment=msg;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// record a goto instruction
@@ -346,15 +448,12 @@ void symex_target_equationt::goto_instruction(
   const exprt &cond,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::typet::GOTO;
-  SSA_step.source=source;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_gotot>();
+  SSA_step->guard=guard;
+  SSA_step->cond_expr=cond;
+  SSA_step->source=source;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 /// record a constraint
@@ -364,16 +463,13 @@ void symex_target_equationt::constraint(
   const sourcet &source)
 {
   // like assumption, but with global effect
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
-
-  SSA_step.guard=true_exprt();
-  SSA_step.cond_expr=cond;
-  SSA_step.type=goto_trace_stept::typet::CONSTRAINT;
-  SSA_step.source=source;
-  SSA_step.comment=msg;
-
-  merge_ireps(SSA_step);
+  auto SSA_step=util_make_unique<SSA_constraintt>();
+  SSA_step->guard=true_exprt();
+  SSA_step->cond_expr=cond;
+  SSA_step->source=source;
+  SSA_step->comment=msg;
+  merge_ireps(*SSA_step);
+  SSA_steps.push_back(std::move(SSA_step));
 }
 
 void symex_target_equationt::convert(
@@ -397,8 +493,8 @@ void symex_target_equationt::convert_assignments(
 {
   for(const auto &step : SSA_steps)
   {
-    if(step.is_assignment() && !step.ignore)
-      decision_procedure.set_to_true(step.cond_expr);
+    if(step->is_assignment() && !step->ignore)
+      decision_procedure.set_to_true(step->cond_expr);
   }
 }
 
@@ -409,11 +505,11 @@ void symex_target_equationt::convert_decls(
 {
   for(const auto &step : SSA_steps)
   {
-    if(step.is_decl() && !step.ignore)
+    if(step->is_decl() && !step->ignore)
     {
       // The result is not used, these have no impact on
       // the satisfiability of the formula.
-      prop_conv.convert(step.cond_expr);
+      prop_conv.convert(step->cond_expr);
     }
   }
 }
@@ -425,10 +521,10 @@ void symex_target_equationt::convert_guards(
 {
   for(auto &step : SSA_steps)
   {
-    if(step.ignore)
-      step.guard_literal=const_literal(false);
+    if(step->ignore)
+      step->guard_literal=const_literal(false);
     else
-      step.guard_literal=prop_conv.convert(step.guard);
+      step->guard_literal=prop_conv.convert(step->guard);
   }
 }
 
@@ -439,12 +535,12 @@ void symex_target_equationt::convert_assumptions(
 {
   for(auto &step : SSA_steps)
   {
-    if(step.is_assume())
+    if(step->is_assume())
     {
-      if(step.ignore)
-        step.cond_literal=const_literal(true);
+      if(step->ignore)
+        step->cond_literal=const_literal(true);
       else
-        step.cond_literal=prop_conv.convert(step.cond_expr);
+        step->cond_literal=prop_conv.convert(step->cond_expr);
     }
   }
 }
@@ -456,12 +552,12 @@ void symex_target_equationt::convert_goto_instructions(
 {
   for(auto &step : SSA_steps)
   {
-    if(step.is_goto())
+    if(step->is_goto())
     {
-      if(step.ignore)
-        step.cond_literal=const_literal(true);
+      if(step->ignore)
+        step->cond_literal=const_literal(true);
       else
-        step.cond_literal=prop_conv.convert(step.cond_expr);
+        step->cond_literal=prop_conv.convert(step->cond_expr);
     }
   }
 }
@@ -474,12 +570,12 @@ void symex_target_equationt::convert_constraints(
 {
   for(const auto &step : SSA_steps)
   {
-    if(step.is_constraint())
+    if(step->is_constraint())
     {
-      if(step.ignore)
+      if(step->ignore)
         continue;
 
-      decision_procedure.set_to_true(step.cond_expr);
+      decision_procedure.set_to_true(step->cond_expr);
     }
   }
 }
@@ -501,14 +597,14 @@ void symex_target_equationt::convert_assertions(
   {
     for(auto &step : SSA_steps)
     {
-      if(step.is_assert())
+      if(step->is_assert())
       {
-        prop_conv.set_to_false(step.cond_expr);
-        step.cond_literal=const_literal(false);
+        prop_conv.set_to_false(step->cond_expr);
+        step->cond_literal=const_literal(false);
         return; // prevent further assumptions!
       }
-      else if(step.is_assume())
-        prop_conv.set_to_true(step.cond_expr);
+      else if(step->is_assume())
+        prop_conv.set_to_true(step->cond_expr);
     }
 
     UNREACHABLE; // unreachable
@@ -523,27 +619,27 @@ void symex_target_equationt::convert_assertions(
 
   for(auto &step : SSA_steps)
   {
-    if(step.is_assert())
+    if(step->is_assert())
     {
       implies_exprt implication(
         assumption,
-        step.cond_expr);
+        step->cond_expr);
 
       // do the conversion
-      step.cond_literal=prop_conv.convert(implication);
+      step->cond_literal=prop_conv.convert(implication);
 
       // store disjunct
-      disjuncts.push_back(literal_exprt(!step.cond_literal));
+      disjuncts.push_back(literal_exprt(!step->cond_literal));
     }
-    else if(step.is_assume())
+    else if(step->is_assume())
     {
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
       if(assumption.id()==ID_and)
-        assumption.copy_to_operands(literal_exprt(step.cond_literal));
+        assumption.copy_to_operands(literal_exprt(step->cond_literal));
       else
         assumption=
-          and_exprt(assumption, literal_exprt(step.cond_literal));
+          and_exprt(assumption, literal_exprt(step->cond_literal));
     }
   }
 
@@ -560,13 +656,13 @@ void symex_target_equationt::convert_io(
   std::size_t io_count=0;
 
   for(auto &step : SSA_steps)
-    if(!step.ignore)
+    if(!step->ignore)
     {
-      for(const auto &arg : step.io_args)
+      for(const auto &arg : step->io_args)
       {
         if(arg.is_constant() ||
            arg.id()==ID_string_constant)
-          step.converted_io_args.push_back(arg);
+          step->converted_io_args.push_back(arg);
         else
         {
           symbol_exprt symbol;
@@ -577,7 +673,7 @@ void symex_target_equationt::convert_io(
           merge_irep(eq);
 
           dec_proc.set_to(eq, true);
-          step.converted_io_args.push_back(symbol);
+          step->converted_io_args.push_back(symbol);
         }
       }
     }
@@ -605,7 +701,7 @@ void symex_target_equationt::output(std::ostream &out) const
 {
   for(const auto &step : SSA_steps)
   {
-    step.output(ns, out);
+    step->output(ns, out);
     out << "--------------\n";
   }
 }
@@ -624,90 +720,7 @@ void symex_target_equationt::SSA_stept::output(
       out << '\n';
   }
 
-  switch(type)
-  {
-  case goto_trace_stept::typet::ASSERT:
-    out << "ASSERT " << from_expr(ns, "", cond_expr) << '\n'; break;
-  case goto_trace_stept::typet::ASSUME:
-    out << "ASSUME " << from_expr(ns, "", cond_expr) << '\n'; break;
-  case goto_trace_stept::typet::LOCATION:
-    out << "LOCATION" << '\n'; break;
-  case goto_trace_stept::typet::INPUT:
-    out << "INPUT" << '\n'; break;
-  case goto_trace_stept::typet::OUTPUT:
-    out << "OUTPUT" << '\n'; break;
-
-  case goto_trace_stept::typet::DECL:
-    out << "DECL" << '\n';
-    out << from_expr(ns, "", ssa_lhs) << '\n';
-    break;
-
-  case goto_trace_stept::typet::ASSIGNMENT:
-    out << "ASSIGNMENT (";
-    switch(assignment_type)
-    {
-    case assignment_typet::HIDDEN:
-      out << "HIDDEN";
-      break;
-    case assignment_typet::STATE:
-      out << "STATE";
-      break;
-    case assignment_typet::VISIBLE_ACTUAL_PARAMETER:
-      out << "VISIBLE_ACTUAL_PARAMETER";
-      break;
-    case assignment_typet::HIDDEN_ACTUAL_PARAMETER:
-      out << "HIDDEN_ACTUAL_PARAMETER";
-      break;
-    case assignment_typet::PHI:
-      out << "PHI";
-      break;
-    case assignment_typet::GUARD:
-      out << "GUARD";
-      break;
-    default:
-      {
-      }
-    }
-
-    out << ")\n";
-    break;
-
-  case goto_trace_stept::typet::DEAD:
-    out << "DEAD\n"; break;
-  case goto_trace_stept::typet::FUNCTION_CALL:
-    out << "FUNCTION_CALL\n"; break;
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION_RETURN\n"; break;
-  case goto_trace_stept::typet::CONSTRAINT:
-    out << "CONSTRAINT\n"; break;
-  case goto_trace_stept::typet::SHARED_READ:
-    out << "SHARED READ\n"; break;
-  case goto_trace_stept::typet::SHARED_WRITE:
-    out << "SHARED WRITE\n"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN\n"; break;
-  case goto_trace_stept::typet::ATOMIC_END:
-    out << "AUTOMIC_END\n"; break;
-  case goto_trace_stept::typet::SPAWN:
-    out << "SPAWN\n"; break;
-  case goto_trace_stept::typet::MEMORY_BARRIER:
-    out << "MEMORY_BARRIER\n"; break;
-  case goto_trace_stept::typet::GOTO:
-    out << "IF " << from_expr(ns, "", cond_expr) << " GOTO\n"; break;
-
-  default: UNREACHABLE;
-  }
-
-  if(is_assert() || is_assume() || is_assignment() || is_constraint())
-    out << from_expr(ns, "", cond_expr) << '\n';
-
-  if(is_assert() || is_constraint())
-    out << comment << '\n';
-
-  if(is_shared_read() || is_shared_write())
-    out << from_expr(ns, "", ssa_lhs) << '\n';
-
-  out << "Guard: " << from_expr(ns, "", guard) << '\n';
+  out << custom_output(ns) << "Guard: " << from_expr(ns, "", guard) << '\n';
 }
 
 std::ostream &operator<<(

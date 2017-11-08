@@ -63,13 +63,13 @@ protected:
   // produces the symbol ID for an event
   static inline irep_idt id(event_it event)
   {
-    return event->ssa_lhs.get_identifier();
+    return (*event)->ssa_lhs.get_identifier();
   }
 
   // produces an address ID for an event
   irep_idt address(event_it event) const
   {
-    ssa_exprt tmp=event->ssa_lhs;
+    ssa_exprt tmp=(*event)->ssa_lhs;
     tmp.remove_level_2();
     return tmp.get_identifier();
   }

@@ -34,7 +34,7 @@ symbol_exprt memory_model_baset::nondet_bool_symbol(
 bool memory_model_baset::po(event_it e1, event_it e2)
 {
   // within same thread
-  if(e1->source.thread_nr==e2->source.thread_nr)
+  if((*e1)->source.thread_nr==(*e2)->source.thread_nr)
     return numbering[e1]<numbering[e2];
   else
   {
@@ -79,7 +79,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
           continue; // contradicts po
 
         bool is_rfi=
-          w->source.thread_nr==r->source.thread_nr;
+          (*w)->source.thread_nr==(*r)->source.thread_nr;
 
         symbol_exprt s=nondet_bool_symbol("rf");
 
@@ -90,20 +90,20 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
         // We rely on the fact that there is at least
         // one write event that has guard 'true'.
         implies_exprt read_from(s,
-            and_exprt(w->guard,
-              equal_exprt(r->ssa_lhs, w->ssa_lhs)));
+            and_exprt((*w)->guard,
+              equal_exprt((*r)->ssa_lhs, (*w)->ssa_lhs)));
 
         // Uses only the write's guard as precondition, read's guard
         // follows from rf_some
         add_constraint(equation,
-          read_from, is_rfi?"rfi":"rf", r->source);
+          read_from, is_rfi?"rfi":"rf", (*r)->source);
 
         if(!is_rfi)
         {
           // if r reads from w, then w must have happened before r
           exprt cond=implies_exprt(s, before(w, r));
           add_constraint(equation,
-            cond, "rf-order", r->source);
+            cond, "rf-order", (*r)->source);
         }
 
         rf_some_operands.push_back(s);
@@ -127,7 +127,7 @@ void memory_model_baset::read_from(symex_target_equationt &equation)
       // Add the read's guard, each of the writes' guards is implied
       // by each entry in rf_some
       add_constraint(equation,
-        implies_exprt(r->guard, rf_some), "rf-some", r->source);
+        implies_exprt((*r)->guard, rf_some), "rf-some", (*r)->source);
     }
   }
 }

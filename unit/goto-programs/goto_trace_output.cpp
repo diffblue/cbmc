@@ -19,8 +19,7 @@ SCENARIO(
   namespacet ns(symbol_table);
   goto_programt::instructionst instructions;
   instructions.emplace_back(goto_program_instruction_typet::OTHER);
-  goto_trace_stept step;
+  auto step = trace_atomic_begint{};
   step.pc = instructions.begin();
-  step.type = goto_trace_stept::typet::ATOMIC_BEGIN;
   step.output(ns, std::cout);
 }

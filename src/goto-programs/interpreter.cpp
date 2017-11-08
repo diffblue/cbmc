@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ieee_float.h>
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
+#include <util/make_unique.h>
 #include <util/message.h>
 #include <json/json_parser.h>
 
@@ -247,24 +248,27 @@ void interpretert::step()
   next_pc=pc;
   next_pc++;
 
-  steps.add_step(goto_trace_stept());
-  goto_trace_stept &trace_step=steps.get_last_step();
-  trace_step.thread_nr=thread_id;
-  trace_step.pc=pc;
+  std::unique_ptr<goto_trace_stept> trace_step;
   switch(pc->type)
   {
   case GOTO:
-    trace_step.type=goto_trace_stept::typet::GOTO;
+    trace_step=util_make_unique<trace_gotot>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_goto();
     break;
 
   case ASSUME:
-    trace_step.type=goto_trace_stept::typet::ASSUME;
+    trace_step=util_make_unique<trace_assumet>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assume();
     break;
 
   case ASSERT:
-    trace_step.type=goto_trace_stept::typet::ASSERT;
+    trace_step=util_make_unique<trace_assertt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assert();
     break;
 
@@ -273,20 +277,28 @@ void interpretert::step()
     break;
 
   case DECL:
-    trace_step.type=goto_trace_stept::typet::DECL;
+    trace_step=util_make_unique<trace_declt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_decl();
     break;
 
   case SKIP:
   case LOCATION:
-    trace_step.type=goto_trace_stept::typet::LOCATION;
+    trace_step=util_make_unique<trace_locationt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
   case END_FUNCTION:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
+    trace_step=util_make_unique<trace_function_returnt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
 
   case RETURN:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
+    trace_step=util_make_unique<trace_function_returnt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     if(call_stack.empty())
       throw "RETURN without call"; // NOLINT(readability/throw)
 
@@ -302,17 +314,23 @@ void interpretert::step()
     break;
 
   case ASSIGN:
-    trace_step.type=goto_trace_stept::typet::ASSIGNMENT;
+    trace_step=util_make_unique<trace_assignmentt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_assign();
     break;
 
   case FUNCTION_CALL:
-    trace_step.type=goto_trace_stept::typet::FUNCTION_CALL;
+    trace_step=util_make_unique<trace_function_callt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     execute_function_call();
     break;
 
   case START_THREAD:
-    trace_step.type=goto_trace_stept::typet::SPAWN;
+    trace_step=util_make_unique<trace_spawnt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "START_THREAD not yet implemented"; // NOLINT(readability/throw)
 
   case END_THREAD:
@@ -320,18 +338,26 @@ void interpretert::step()
     break;
 
   case ATOMIC_BEGIN:
-    trace_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
+    trace_step=util_make_unique<trace_atomic_begint>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "ATOMIC_BEGIN not yet implemented"; // NOLINT(readability/throw)
 
   case ATOMIC_END:
-    trace_step.type=goto_trace_stept::typet::ATOMIC_END;
+    trace_step=util_make_unique<trace_atomic_endt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     throw "ATOMIC_END not yet implemented"; // NOLINT(readability/throw)
 
   case DEAD:
-    trace_step.type=goto_trace_stept::typet::DEAD;
+    trace_step=util_make_unique<trace_deadt>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     break;
   case THROW:
-    trace_step.type=goto_trace_stept::typet::GOTO;
+    trace_step=util_make_unique<trace_gotot>();
+    trace_step->thread_nr=thread_id;
+    trace_step->pc=pc;
     while(!done && (pc->type!=CATCH))
     {
       if(pc==function->second.body.instructions.end())
@@ -357,6 +383,7 @@ void interpretert::step()
   default:
     throw "encountered instruction with undefined instruction type";
   }
+  steps.add_step(std::move(trace_step));
   pc=next_pc;
 }
 

@@ -22,6 +22,7 @@ Author: Daniel Kroening
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
 
+
 #include "partial_order_concurrency.h"
 
 exprt build_full_lhs_rec(
@@ -153,8 +154,7 @@ void update_internal_field(
   }
 
   // set internal field to input and output steps
-  if(goto_trace_step.type==goto_trace_stept::typet::OUTPUT ||
-      goto_trace_step.type==goto_trace_stept::typet::INPUT)
+  if(goto_trace_step.is_output() || goto_trace_step.is_input())
   {
     goto_trace_step.internal=true;
   }
@@ -197,15 +197,15 @@ void build_goto_trace(
     if(it==end_step)
       end_step_seen=true;
 
-    const symex_target_equationt::SSA_stept &SSA_step=*it;
+    const symex_target_equationt::SSA_stept &SSA_step=**it;
 
     if(prop_conv.l_get(SSA_step.guard_literal)!=tvt(true))
       continue;
 
-    if(it->is_constraint() ||
-       it->is_spawn())
+    if((*it)->is_constraint() ||
+       (*it)->is_spawn())
       continue;
-    else if(it->is_atomic_begin())
+    else if((*it)->is_atomic_begin())
     {
       // for atomic sections the timing can only be determined once we see
       // a shared read or write (if there is none, the time will be
@@ -214,12 +214,12 @@ void build_goto_trace(
       current_time*=-1;
       continue;
     }
-    else if(it->is_shared_read() || it->is_shared_write() ||
-            it->is_atomic_end())
+    else if((*it)->is_shared_read() || (*it)->is_shared_write() ||
+            (*it)->is_atomic_end())
     {
       mp_integer time_before=current_time;
 
-      if(it->is_shared_read() || it->is_shared_write())
+      if((*it)->is_shared_read() || (*it)->is_shared_write())
       {
         // these are just used to get the time stamp
         exprt clock_value=prop_conv.get(
@@ -227,7 +227,7 @@ void build_goto_trace(
 
         to_integer(clock_value, current_time);
       }
-      else if(it->is_atomic_end() && current_time<0)
+      else if((*it)->is_atomic_end() && current_time<0)
         current_time*=-1;
 
       assert(current_time>=0);
@@ -247,7 +247,7 @@ void build_goto_trace(
     }
 
     // drop PHI and GUARD assignments altogether
-    if(it->is_assignment() &&
+    if((*it)->is_assignment() &&
        (SSA_step.assignment_type==
           symex_target_equationt::assignment_typet::PHI ||
         SSA_step.assignment_type==
@@ -257,8 +257,8 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(goto_trace_stept());
-    goto_trace_stept &goto_trace_step=steps.back();
+    steps.push_back(SSA_step.make_goto_trace_step());
+    goto_trace_stept &goto_trace_step=*steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
 
@@ -270,7 +270,6 @@ void build_goto_trace(
         ssa_exprt(SSA_step.ssa_lhs.get_original_expr());
     else
       goto_trace_step.lhs_object.make_nil();
-    goto_trace_step.type=SSA_step.type;
     goto_trace_step.hidden=SSA_step.hidden;
     goto_trace_step.format_string=SSA_step.format_string;
     goto_trace_step.io_id=SSA_step.io_id;
@@ -281,7 +280,7 @@ void build_goto_trace(
     update_internal_field(SSA_step, goto_trace_step, ns);
 
     goto_trace_step.assignment_type=
-      (it->is_assignment()&&
+      ((*it)->is_assignment()&&
        (SSA_step.assignment_type==
           symex_targett::assignment_typet::VISIBLE_ACTUAL_PARAMETER ||
         SSA_step.assignment_type==
@@ -336,7 +335,7 @@ void build_goto_trace(
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
       ++s_it1)
-    if(end_step_seen && end_ptr==&(*s_it1))
+    if(end_step_seen && end_ptr==s_it1->get())
     {
       goto_trace.trim_after(s_it1);
       break;
@@ -346,7 +345,7 @@ void build_goto_trace(
   unsigned step_nr=0;
 
   for(auto &s_it : goto_trace.steps)
-    s_it.step_nr=++step_nr;
+    s_it->step_nr=++step_nr;
 }
 
 void build_goto_trace(
@@ -363,7 +362,7 @@ void build_goto_trace(
       s_it1=goto_trace.steps.begin();
       s_it1!=goto_trace.steps.end();
       s_it1++)
-    if(s_it1->is_assert() && !s_it1->cond_value)
+    if((*s_it1)->is_assert() && !(*s_it1)->cond_value)
     {
       goto_trace.trim_after(s_it1);
       break;

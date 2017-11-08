@@ -63,7 +63,7 @@ void precondition(
       it!=equation.SSA_steps.rend();
       it++)
   {
-    preconditiont precondition(ns, value_sets, target, *it, s);
+    preconditiont precondition(ns, value_sets, target, **it, s);
     precondition.compute(dest);
     if(dest.is_false())
       return;

@@ -104,14 +104,13 @@ void symex_slice_by_tracet::slice_by_trace(
   guardt t_guard;
   t_guard.make_true();
   symex_targett::sourcet empty_source;
-  equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
-  symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
+  auto SSA_step=util_make_unique<SSA_assumet>();
 
-  SSA_step.guard=t_guard.as_expr();
-  SSA_step.ssa_lhs.make_nil();
-  SSA_step.cond_expr.swap(trace_condition);
-  SSA_step.type=goto_trace_stept::typet::ASSUME;
-  SSA_step.source=empty_source;
+  SSA_step->guard=t_guard.as_expr();
+  SSA_step->ssa_lhs.make_nil();
+  SSA_step->cond_expr.swap(trace_condition);
+  SSA_step->source=empty_source;
+  equation.SSA_steps.push_front(std::move(SSA_step));
 
   assign_merges(equation); // Now add the merge variable assignments to eqn
 
@@ -241,11 +240,11 @@ void symex_slice_by_tracet::compute_ts_back(
       i!=equation.SSA_steps.rend();
       i++)
   {
-    if(i->is_output() &&
-       !i->io_args.empty() &&
-       i->io_args.front().id()=="trace_event")
+    if((*i)->is_output() &&
+       !(*i)->io_args.empty() &&
+       (*i)->io_args.front().id()=="trace_event")
     {
-      irep_idt event=i->io_args.front().get("event");
+      irep_idt event=(*i)->io_args.front().get("event");
 
       if(!alphabet.empty())
       {
@@ -254,7 +253,7 @@ void symex_slice_by_tracet::compute_ts_back(
           continue;
       }
 
-      exprt guard=i->guard;
+      exprt guard=(*i)->guard;
 
 #if 0
       std::cout << "EVENT:  " << event << '\n';
@@ -298,7 +297,7 @@ void symex_slice_by_tracet::compute_ts_back(
           if(!sigma_vals[j].empty())
           {
             std::list<exprt> eq_conds;
-            std::list<exprt>::iterator pvi=i->io_args.begin();
+            std::list<exprt>::iterator pvi=(*i)->io_args.begin();
             for(std::vector<irep_idt>::iterator k=sigma_vals[j].begin();
                  k!=sigma_vals[j].end(); k++)
             {
@@ -396,12 +395,12 @@ void symex_slice_by_tracet::slice_SSA_steps(
       it!=equation.SSA_steps.end();
       it++)
   {
-    if(it->is_output())
+    if((*it)->is_output())
       trace_SSA_steps++;
-    if(it->is_location())
+    if((*it)->is_location())
       location_SSA_steps++;
     bool sliced_SSA_step=false;
-    exprt guard=it->guard;
+    exprt guard=(*it)->guard;
 
     simplify(guard, ns);
 
@@ -417,11 +416,11 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
       if(implications.count(guard)!=0)
       {
-        it->cond_expr=true_exprt();
-        it->ssa_rhs=true_exprt();
-        it->guard=false_exprt();
+        (*it)->cond_expr=true_exprt();
+        (*it)->ssa_rhs=true_exprt();
+        (*it)->guard=false_exprt();
         sliced_SSA_steps++;
-        if(it->is_output() || it->is_location())
+        if((*it)->is_output() || (*it)->is_location())
           trace_loc_sliced++;
         sliced_SSA_step=true;
       }
@@ -436,11 +435,11 @@ void symex_slice_by_tracet::slice_SSA_steps(
 
         if(implications.count(neg_expr)!=0)
         {
-          it->cond_expr=true_exprt();
-          it->ssa_rhs=true_exprt();
-          it->guard=false_exprt();
+          (*it)->cond_expr=true_exprt();
+          (*it)->ssa_rhs=true_exprt();
+          (*it)->guard=false_exprt();
           sliced_SSA_steps++;
-          if(it->is_output() || it->is_location())
+          if((*it)->is_output() || (*it)->is_location())
             trace_loc_sliced++;
           sliced_SSA_step=true;
           break; // Sliced, so no need to consider the rest
@@ -452,21 +451,21 @@ void symex_slice_by_tracet::slice_SSA_steps(
       }
     }
 
-    if(!sliced_SSA_step && it->is_assignment())
+    if(!sliced_SSA_step && (*it)->is_assignment())
     {
-      if(it->ssa_rhs.id()==ID_if)
+      if((*it)->ssa_rhs.id()==ID_if)
       {
         conds_seen++;
-        exprt cond_copy(it->ssa_rhs.op0());
+        exprt cond_copy((*it)->ssa_rhs.op0());
         simplify(cond_copy, ns);
 
         if(implications.count(cond_copy)!=0)
         {
           sliced_conds++;
-          exprt t_copy1(it->ssa_rhs.op1());
-          exprt t_copy2(it->ssa_rhs.op1());
-          it->ssa_rhs=t_copy1;
-          it->cond_expr.op1().swap(t_copy2);
+          exprt t_copy1((*it)->ssa_rhs.op1());
+          exprt t_copy2((*it)->ssa_rhs.op1());
+          (*it)->ssa_rhs=t_copy1;
+          (*it)->cond_expr.op1().swap(t_copy2);
         }
         else
         {
@@ -475,10 +474,10 @@ void symex_slice_by_tracet::slice_SSA_steps(
           if(implications.count(cond_copy)!=0)
           {
             sliced_conds++;
-            exprt f_copy1(it->ssa_rhs.op2());
-            exprt f_copy2(it->ssa_rhs.op2());
-            it->ssa_rhs=f_copy1;
-            it->cond_expr.op1().swap(f_copy2);
+            exprt f_copy1((*it)->ssa_rhs.op2());
+            exprt f_copy2((*it)->ssa_rhs.op2());
+            (*it)->ssa_rhs=f_copy1;
+            (*it)->cond_expr.op1().swap(f_copy2);
           }
         }
       }
@@ -519,17 +518,16 @@ void symex_slice_by_tracet::assign_merges(
 
     exprt merge_copy(*i);
 
-    equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
-    symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
+    auto SSA_step=util_make_unique<SSA_assignmentt>();
 
-    SSA_step.guard=t_guard.as_expr();
-    SSA_step.ssa_lhs=merge_sym;
-    SSA_step.ssa_rhs.swap(merge_copy);
-    SSA_step.assignment_type=symex_targett::assignment_typet::HIDDEN;
+    SSA_step->guard=t_guard.as_expr();
+    SSA_step->ssa_lhs=merge_sym;
+    SSA_step->ssa_rhs.swap(merge_copy);
+    SSA_step->assignment_type=symex_targett::assignment_typet::HIDDEN;
 
-    SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_rhs);
-    SSA_step.type=goto_trace_stept::typet::ASSIGNMENT;
-    SSA_step.source=empty_source;
+    SSA_step->cond_expr=equal_exprt(SSA_step->ssa_lhs, SSA_step->ssa_rhs);
+    SSA_step->source=empty_source;
+    equation.SSA_steps.push_front(std::move(SSA_step));
   }
 }
 

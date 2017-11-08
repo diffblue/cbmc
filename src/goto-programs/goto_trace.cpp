@@ -27,47 +27,15 @@ void goto_tracet::output(
   std::ostream &out) const
 {
   for(const auto &step : steps)
-    step.output(ns, out);
+    step->output(ns, out);
 }
 
 void goto_trace_stept::output(
   const namespacet &ns,
   std::ostream &out) const
 {
-  out << "*** ";
-
-  switch(type)
-  {
-  case goto_trace_stept::typet::ASSERT: out << "ASSERT"; break;
-  case goto_trace_stept::typet::ASSUME: out << "ASSUME"; break;
-  case goto_trace_stept::typet::LOCATION: out << "LOCATION"; break;
-  case goto_trace_stept::typet::ASSIGNMENT: out << "ASSIGNMENT"; break;
-  case goto_trace_stept::typet::GOTO: out << "GOTO"; break;
-  case goto_trace_stept::typet::DECL: out << "DECL"; break;
-  case goto_trace_stept::typet::DEAD: out << "DEAD"; break;
-  case goto_trace_stept::typet::OUTPUT: out << "OUTPUT"; break;
-  case goto_trace_stept::typet::INPUT: out << "INPUT"; break;
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-    out << "ATOMIC_BEGIN";
-    break;
-  case goto_trace_stept::typet::ATOMIC_END: out << "ATOMIC_END"; break;
-  case goto_trace_stept::typet::SHARED_READ: out << "SHARED_READ"; break;
-  case goto_trace_stept::typet::SHARED_WRITE: out << "SHARED WRITE"; break;
-  case goto_trace_stept::typet::FUNCTION_CALL: out << "FUNCTION CALL"; break;
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    out << "FUNCTION RETURN"; break;
-  default:
-    out << "unknown type: " << static_cast<int>(type) << std::endl;
-    UNREACHABLE;
-  }
-
-  if(type==typet::ASSERT || type==typet::ASSUME || type==typet::GOTO)
-    out << " (" << cond_value << ")";
-
-  if(hidden)
-    out << " hidden";
-
-  out << "\n";
+  out << "*** " << name() << formatted_cond_value() << (hidden ? " hidden" : "")
+      << '\n';
 
   if(!pc->source_location.is_nil())
     out << pc->source_location << "\n";
@@ -241,6 +209,195 @@ bool is_index_member_symbol(const exprt &src)
     return false;
 }
 
+namespace
+{
+class show_goto_trace_visitort final : public trace_const_visitor_const_argst
+{
+public:
+  show_goto_trace_visitort(
+    std::ostream &out,
+    const namespacet &ns,
+    unsigned &prev_step_nr,
+    bool &first_step)
+    : out_{out}, ns_{ns}, prev_step_nr_{prev_step_nr}, first_step_{first_step}
+  {
+  }
+
+  void visit(const trace_assignmentt &x) const override
+  {
+    if(
+      x.pc->is_assign() || x.pc->is_return() || // returns have a lhs!
+      x.pc->is_function_call() ||
+      (x.pc->is_other() && x.lhs_object.is_not_nil()))
+    {
+      if(prev_step_nr_ != x.step_nr || first_step_)
+      {
+        first_step_ = false;
+        prev_step_nr_ = x.step_nr;
+        show_state_header(out_, x, x.pc->source_location, x.step_nr);
+      }
+
+      // see if the full lhs is something clean
+      if(is_index_member_symbol(x.full_lhs))
+        trace_value(out_, ns_, x.lhs_object, x.full_lhs, x.full_lhs_value);
+      else
+        trace_value(out_, ns_, x.lhs_object, x.lhs_object, x.lhs_object_value);
+    }
+  }
+
+  void visit(const trace_assumet &x) const override
+  {
+    if(!x.cond_value)
+    {
+      out_ << "\n";
+      out_ << "Violated assumption:"
+           << "\n";
+      if(!x.pc->source_location.is_nil())
+        out_ << "  " << x.pc->source_location << "\n";
+
+      if(x.pc->is_assume())
+        out_ << "  " << from_expr(ns_, "", x.pc->guard) << "\n";
+
+      out_ << "\n";
+    }
+  }
+
+  void visit(const trace_assertt &x) const override
+  {
+    if(!x.cond_value)
+    {
+      out_ << "\n";
+      out_ << "Violated property:"
+          << "\n";
+      if(!x.pc->source_location.is_nil())
+        out_ << "  " << x.pc->source_location << "\n";
+      out_ << "  " << x.comment << "\n";
+
+      if(x.pc->is_assert())
+        out_ << "  " << from_expr(ns_, "", x.pc->guard) << "\n";
+
+      out_ << "\n";
+    }
+  }
+
+  void visit(const trace_gotot &x) const override
+  {
+  }
+
+  void visit(const trace_locationt &x) const override
+  {
+  }
+
+  void visit(const trace_inputt &x) const override
+  {
+    show_state_header(out_, x, x.pc->source_location, x.step_nr);
+    out_ << "  INPUT " << x.io_id << ":";
+
+    for(auto l_it = x.io_args.begin(); l_it != x.io_args.end(); ++l_it)
+    {
+      if(l_it != x.io_args.begin())
+        out_ << ";";
+      out_ << " " << from_expr(ns_, "", *l_it);
+
+      // the binary representation
+      out_ << " (" << trace_value_binary(*l_it, ns_) << ")";
+    }
+
+    out_ << "\n";
+  }
+
+  void visit(const trace_outputt &x) const override
+  {
+    if(x.formatted)
+    {
+      printf_formattert printf_formatter(ns_);
+      printf_formatter(id2string(x.format_string), x.io_args);
+      printf_formatter.print(out_);
+      out_ << "\n";
+    }
+    else
+    {
+      show_state_header(out_, x, x.pc->source_location, x.step_nr);
+      out_ << "  OUTPUT " << x.io_id << ":";
+
+      for(auto l_it = x.io_args.begin(); l_it != x.io_args.end(); ++l_it)
+      {
+        if(l_it != x.io_args.begin())
+          out_ << ";";
+        out_ << " " << from_expr(ns_, "", *l_it);
+
+        // the binary representation
+        out_ << " (" << trace_value_binary(*l_it, ns_) << ")";
+      }
+
+      out_ << '\n';
+    }
+  }
+
+  void visit(const trace_declt &x) const override
+  {
+    if(prev_step_nr_ != x.step_nr || first_step_)
+    {
+      first_step_ = false;
+      prev_step_nr_ = x.step_nr;
+      show_state_header(out_, x, x.pc->source_location, x.step_nr);
+    }
+
+    trace_value(out_, ns_, x.lhs_object, x.full_lhs, x.full_lhs_value);
+  }
+
+  void visit(const trace_deadt &x) const override
+  {
+  }
+
+  void visit(const trace_function_callt &x) const override
+  {
+  }
+
+  void visit(const trace_function_returnt &x) const override
+  {
+  }
+
+  void visit(const trace_constraintt &x) const override
+  {
+    UNREACHABLE;
+  }
+
+  void visit(const trace_shared_readt &x) const override
+  {
+    UNREACHABLE;
+  }
+
+  void visit(const trace_shared_writet &x) const override
+  {
+    UNREACHABLE;
+  }
+
+  void visit(const trace_spawnt &x) const override
+  {
+  }
+
+  void visit(const trace_memory_barriert &x) const override
+  {
+  }
+
+  void visit(const trace_atomic_begint &x) const override
+  {
+  }
+
+  void visit(const trace_atomic_endt &x) const override
+  {
+  }
+
+private:
+  std::ostream &out_;
+  const namespacet &ns_;
+  unsigned &prev_step_nr_;
+  bool &first_step_;
+};
+
+} // namespace
+
 void show_goto_trace(
   std::ostream &out,
   const namespacet &ns,
@@ -252,146 +409,9 @@ void show_goto_trace(
   for(const auto &step : goto_trace.steps)
   {
     // hide the hidden ones
-    if(step.hidden)
+    if(step->hidden)
       continue;
 
-    switch(step.type)
-    {
-    case goto_trace_stept::typet::ASSERT:
-      if(!step.cond_value)
-      {
-        out << "\n";
-        out << "Violated property:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-        out << "  " << step.comment << "\n";
-
-        if(step.pc->is_assert())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
-
-        out << "\n";
-      }
-      break;
-
-    case goto_trace_stept::typet::ASSUME:
-      if(!step.cond_value)
-      {
-        out << "\n";
-        out << "Violated assumption:" << "\n";
-        if(!step.pc->source_location.is_nil())
-          out << "  " << step.pc->source_location << "\n";
-
-        if(step.pc->is_assume())
-          out << "  " << from_expr(ns, "", step.pc->guard) << "\n";
-
-        out << "\n";
-      }
-      break;
-
-    case goto_trace_stept::typet::LOCATION:
-      break;
-
-    case goto_trace_stept::typet::GOTO:
-      break;
-
-    case goto_trace_stept::typet::ASSIGNMENT:
-      if(step.pc->is_assign() ||
-         step.pc->is_return() || // returns have a lhs!
-         step.pc->is_function_call() ||
-         (step.pc->is_other() && step.lhs_object.is_not_nil()))
-      {
-        if(prev_step_nr!=step.step_nr || first_step)
-        {
-          first_step=false;
-          prev_step_nr=step.step_nr;
-          show_state_header(out, step, step.pc->source_location, step.step_nr);
-        }
-
-        // see if the full lhs is something clean
-        if(is_index_member_symbol(step.full_lhs))
-          trace_value(
-            out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
-        else
-          trace_value(
-            out, ns, step.lhs_object, step.lhs_object, step.lhs_object_value);
-      }
-      break;
-
-    case goto_trace_stept::typet::DECL:
-      if(prev_step_nr!=step.step_nr || first_step)
-      {
-        first_step=false;
-        prev_step_nr=step.step_nr;
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
-      }
-
-      trace_value(out, ns, step.lhs_object, step.full_lhs, step.full_lhs_value);
-      break;
-
-    case goto_trace_stept::typet::OUTPUT:
-      if(step.formatted)
-      {
-        printf_formattert printf_formatter(ns);
-        printf_formatter(id2string(step.format_string), step.io_args);
-        printf_formatter.print(out);
-        out << "\n";
-      }
-      else
-      {
-        show_state_header(out, step, step.pc->source_location, step.step_nr);
-        out << "  OUTPUT " << step.io_id << ":";
-
-        for(std::list<exprt>::const_iterator
-            l_it=step.io_args.begin();
-            l_it!=step.io_args.end();
-            l_it++)
-        {
-          if(l_it!=step.io_args.begin())
-            out << ";";
-          out << " " << from_expr(ns, "", *l_it);
-
-          // the binary representation
-          out << " (" << trace_value_binary(*l_it, ns) << ")";
-        }
-
-        out << "\n";
-      }
-      break;
-
-    case goto_trace_stept::typet::INPUT:
-      show_state_header(out, step, step.pc->source_location, step.step_nr);
-      out << "  INPUT " << step.io_id << ":";
-
-      for(std::list<exprt>::const_iterator
-          l_it=step.io_args.begin();
-          l_it!=step.io_args.end();
-          l_it++)
-      {
-        if(l_it!=step.io_args.begin())
-          out << ";";
-        out << " " << from_expr(ns, "", *l_it);
-
-        // the binary representation
-        out << " (" << trace_value_binary(*l_it, ns) << ")";
-      }
-
-      out << "\n";
-      break;
-
-    case goto_trace_stept::typet::FUNCTION_CALL:
-    case goto_trace_stept::typet::FUNCTION_RETURN:
-    case goto_trace_stept::typet::SPAWN:
-    case goto_trace_stept::typet::MEMORY_BARRIER:
-    case goto_trace_stept::typet::ATOMIC_BEGIN:
-    case goto_trace_stept::typet::ATOMIC_END:
-    case goto_trace_stept::typet::DEAD:
-      break;
-
-    case goto_trace_stept::typet::CONSTRAINT:
-    case goto_trace_stept::typet::SHARED_READ:
-    case goto_trace_stept::typet::SHARED_WRITE:
-    default:
-      UNREACHABLE;
-    }
+    step->accept(show_goto_trace_visitort{out, ns, prev_step_nr, first_step});
   }
 }

@@ -30,12 +30,12 @@ void counterexample_beautificationt::get_minimization_list(
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end(); it++)
   {
-    if(it->is_assignment() &&
-       it->assignment_type==symex_targett::assignment_typet::STATE)
+    if((*it)->is_assignment() &&
+       (*it)->assignment_type==symex_targett::assignment_typet::STATE)
     {
-      if(!prop_conv.l_get(it->guard_literal).is_false())
+      if(!prop_conv.l_get((*it)->guard_literal).is_false())
       {
-        const typet &type=it->ssa_lhs.type();
+        const typet &type=(*it)->ssa_lhs.type();
 
         if(type!=bool_typet())
         {
@@ -44,11 +44,11 @@ void counterexample_beautificationt::get_minimization_list(
              type.id()==ID_fixedbv ||
              type.id()==ID_floatbv)
           {
-            abs_exprt abs_expr(it->ssa_lhs);
+            abs_exprt abs_expr((*it)->ssa_lhs);
             minimization_list.insert(abs_expr);
           }
           else
-            minimization_list.insert(it->ssa_lhs);
+            minimization_list.insert((*it)->ssa_lhs);
         }
       }
     }
@@ -69,9 +69,9 @@ counterexample_beautificationt::get_failed_property(
   for(symex_target_equationt::SSA_stepst::const_iterator
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end(); it++)
-    if(it->is_assert() &&
-       prop_conv.l_get(it->guard_literal).is_true() &&
-       prop_conv.l_get(it->cond_literal).is_false())
+    if((*it)->is_assert() &&
+       prop_conv.l_get((*it)->guard_literal).is_true() &&
+       prop_conv.l_get((*it)->cond_literal).is_false())
       return it;
 
   UNREACHABLE;
@@ -88,7 +88,7 @@ void counterexample_beautificationt::operator()(
   failed=get_failed_property(bv_cbmc, equation);
 
   // lock the failed assertion
-  bv_cbmc.set_to(literal_exprt(failed->cond_literal), false);
+  bv_cbmc.set_to(literal_exprt((*failed)->cond_literal), false);
 
   {
     bv_cbmc.status() << "Beautifying counterexample (guards)"
@@ -102,11 +102,11 @@ void counterexample_beautificationt::operator()(
         it=equation.SSA_steps.begin();
         it!=equation.SSA_steps.end(); it++)
     {
-      if(it->is_assignment() &&
-         it->assignment_type!=symex_targett::assignment_typet::HIDDEN)
+      if((*it)->is_assignment() &&
+         (*it)->assignment_type!=symex_targett::assignment_typet::HIDDEN)
       {
-        if(!it->guard_literal.is_constant())
-          guard_count[it->guard_literal]++;
+        if(!(*it)->guard_literal.is_constant())
+          guard_count[(*it)->guard_literal]++;
       }
 
       // reached failed assertion?

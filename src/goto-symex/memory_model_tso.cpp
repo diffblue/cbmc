@@ -39,16 +39,16 @@ bool memory_model_tsot::program_order_is_relaxed(
   partial_order_concurrencyt::event_it e1,
   partial_order_concurrencyt::event_it e2) const
 {
-  assert(e1->is_shared_read() || e1->is_shared_write());
-  assert(e2->is_shared_read() || e2->is_shared_write());
+  assert((*e1)->is_shared_read() || (*e1)->is_shared_write());
+  assert((*e2)->is_shared_read() || (*e2)->is_shared_write());
 
   // no po relaxation within atomic sections
-  if(e1->atomic_section_id!=0 &&
-     e1->atomic_section_id==e2->atomic_section_id)
+  if((*e1)->atomic_section_id!=0 &&
+     (*e1)->atomic_section_id==(*e2)->atomic_section_id)
     return false;
 
   // write to read program order is relaxed
-  return e1->is_shared_write() && e2->is_shared_read();
+  return (*e1)->is_shared_write() && (*e2)->is_shared_read();
 }
 
 void memory_model_tsot::program_order(
@@ -75,7 +75,7 @@ void memory_model_tsot::program_order(
         e_it!=events.end();
         e_it++)
     {
-      if((*e_it)->is_memory_barrier())
+      if((**e_it)->is_memory_barrier())
         continue;
 
       event_listt::const_iterator next=e_it;
@@ -90,41 +90,41 @@ void memory_model_tsot::program_order(
           e_it2!=events.end();
           e_it2++)
       {
-        if(((*e_it)->is_spawn() && !(*e_it2)->is_memory_barrier()) ||
-           (*e_it2)->is_spawn())
+        if(((**e_it)->is_spawn() && !(**e_it2)->is_memory_barrier()) ||
+           (**e_it2)->is_spawn())
         {
           add_constraint(
             equation,
             before(*e_it, *e_it2),
             "po",
-            (*e_it)->source);
+            (**e_it)->source);
 
-          if((*e_it2)->is_spawn())
+          if((**e_it2)->is_spawn())
             break;
           else
             continue;
         }
 
-        if((*e_it2)->is_memory_barrier())
+        if((**e_it2)->is_memory_barrier())
         {
-          const codet &code=to_code((*e_it2)->source.pc->code);
+          const codet &code=to_code((**e_it2)->source.pc->code);
 
-          if((*e_it)->is_shared_read() &&
+          if((**e_it)->is_shared_read() &&
              !code.get_bool(ID_RRfence) &&
              !code.get_bool(ID_RWfence))
             continue;
-          else if((*e_it)->is_shared_write() &&
+          else if((**e_it)->is_shared_write() &&
              !code.get_bool(ID_WRfence) &&
              !code.get_bool(ID_WWfence))
             continue;
 
           if(code.get_bool(ID_RRfence) ||
              code.get_bool(ID_WRfence))
-            mb_guard_r=or_exprt(mb_guard_r, (*e_it2)->guard);
+            mb_guard_r=or_exprt(mb_guard_r, (**e_it2)->guard);
 
           if(code.get_bool(ID_RWfence) ||
              code.get_bool(ID_WWfence))
-            mb_guard_w=or_exprt(mb_guard_w, (*e_it2)->guard);
+            mb_guard_w=or_exprt(mb_guard_w, (**e_it2)->guard);
 
           continue;
         }
@@ -139,7 +139,7 @@ void memory_model_tsot::program_order(
         }
         else if(program_order_is_relaxed(*e_it, *e_it2))
         {
-          if((*e_it2)->is_shared_read())
+          if((**e_it2)->is_shared_read())
             cond=mb_guard_r;
           else
             cond=mb_guard_w;
@@ -157,7 +157,7 @@ void memory_model_tsot::program_order(
             equation,
             implies_exprt(cond, ordering),
             "po",
-            (*e_it)->source);
+            (**e_it)->source);
         }
       }
     }

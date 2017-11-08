@@ -15,21 +15,114 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_slice_class.h"
 
-void symex_slicet::get_symbols(const exprt &expr)
+static void get_symbols(const typet &type, symbol_sett &depends)
 {
-  get_symbols(expr.type());
+  // TODO
+}
+
+static void get_symbols(const exprt &expr, symbol_sett &depends)
+{
+  get_symbols(expr.type(), depends);
 
   forall_operands(it, expr)
-    get_symbols(*it);
+    get_symbols(*it, depends);
 
   if(expr.id()==ID_symbol)
     depends.insert(to_symbol_expr(expr).get_identifier());
 }
 
-void symex_slicet::get_symbols(const typet &type)
+namespace
 {
-  // TODO
-}
+class slicing_visitort : public defaulted_SSA_const_visitort
+{
+public:
+  explicit slicing_visitort(symbol_sett &depends) : depends_{depends}
+  {
+  }
+
+  void default_visit(SSA_stept &base) const override
+  {
+  }
+
+  void visit(SSA_assertt &x) const override
+  {
+    get_symbols(x.cond_expr, depends_);
+  }
+
+  void visit(SSA_assumet &x) const override
+  {
+    get_symbols(x.cond_expr, depends_);
+  }
+
+  void visit(SSA_assignmentt &x) const override
+  {
+    assert(x.ssa_lhs.id() == ID_symbol);
+    const irep_idt &id = x.ssa_lhs.get_identifier();
+
+    if(depends_.find(id) == depends_.end())
+    {
+      // we don't really need it
+      x.ignore = true;
+    }
+    else
+      get_symbols(x.ssa_rhs, depends_);
+  }
+
+  void visit(SSA_gotot &x) const override
+  {
+    get_symbols(x.cond_expr, depends_);
+  }
+
+  void visit(SSA_declt &x) const override
+  {
+    assert(x.ssa_lhs.id() == ID_symbol);
+    const irep_idt &id = x.ssa_lhs.get_identifier();
+
+    if(depends_.find(id) == depends_.end())
+    {
+      // we don't really need it
+      x.ignore = true;
+    }
+  }
+
+private:
+  symbol_sett &depends_;
+};
+
+class collecting_visitort : public defaulted_SSA_const_visitor_const_argst
+{
+public:
+  explicit collecting_visitort(symbol_sett &depends, symbol_sett &lhs)
+    : depends_{depends}, lhs_{lhs}
+  {
+  }
+
+  void default_visit(const SSA_stept &base) const override
+  {
+  }
+
+  void visit(const SSA_assertt &x) const override
+  {
+    get_symbols(x.cond_expr, depends_);
+  }
+
+  void visit(const SSA_assumet &x) const override
+  {
+    get_symbols(x.cond_expr, depends_);
+  }
+
+  void visit(const SSA_assignmentt &x) const override
+  {
+    get_symbols(x.ssa_rhs, depends_);
+    lhs_.insert(x.ssa_lhs.get_identifier());
+  }
+
+private:
+  symbol_sett &depends_;
+  symbol_sett &lhs_;
+};
+
+} // namespace
 
 void symex_slicet::slice(
   symex_target_equationt &equation,
@@ -37,7 +130,7 @@ void symex_slicet::slice(
 {
   // collect dependencies
   forall_expr_list(expr_it, exprs)
-    get_symbols(*expr_it);
+    get_symbols(*expr_it, depends_);
 
   slice(equation);
 }
@@ -48,93 +141,13 @@ void symex_slicet::slice(symex_target_equationt &equation)
       it=equation.SSA_steps.rbegin();
       it!=equation.SSA_steps.rend();
       it++)
-    slice(*it);
+    slice(**it);
 }
 
 void symex_slicet::slice(symex_target_equationt::SSA_stept &SSA_step)
 {
-  get_symbols(SSA_step.guard);
-
-  switch(SSA_step.type)
-  {
-  case goto_trace_stept::typet::ASSERT:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::ASSUME:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::GOTO:
-    get_symbols(SSA_step.cond_expr);
-    break;
-
-  case goto_trace_stept::typet::LOCATION:
-    // ignore
-    break;
-
-  case goto_trace_stept::typet::ASSIGNMENT:
-    slice_assignment(SSA_step);
-    break;
-
-  case goto_trace_stept::typet::DECL:
-    slice_decl(SSA_step);
-    break;
-
-  case goto_trace_stept::typet::OUTPUT:
-  case goto_trace_stept::typet::INPUT:
-    break;
-
-  case goto_trace_stept::typet::DEAD:
-    // ignore for now
-    break;
-
-  case goto_trace_stept::typet::CONSTRAINT:
-  case goto_trace_stept::typet::SHARED_READ:
-  case goto_trace_stept::typet::SHARED_WRITE:
-  case goto_trace_stept::typet::ATOMIC_BEGIN:
-  case goto_trace_stept::typet::ATOMIC_END:
-  case goto_trace_stept::typet::SPAWN:
-  case goto_trace_stept::typet::MEMORY_BARRIER:
-    // ignore for now
-    break;
-
-  case goto_trace_stept::typet::FUNCTION_CALL:
-  case goto_trace_stept::typet::FUNCTION_RETURN:
-    // ignore for now
-    break;
-
-  default:
-    UNREACHABLE;
-  }
-}
-
-void symex_slicet::slice_assignment(
-  symex_target_equationt::SSA_stept &SSA_step)
-{
-  assert(SSA_step.ssa_lhs.id()==ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
-
-  if(depends.find(id)==depends.end())
-  {
-    // we don't really need it
-    SSA_step.ignore=true;
-  }
-  else
-    get_symbols(SSA_step.ssa_rhs);
-}
-
-void symex_slicet::slice_decl(
-  symex_target_equationt::SSA_stept &SSA_step)
-{
-  assert(SSA_step.ssa_lhs.id()==ID_symbol);
-  const irep_idt &id=SSA_step.ssa_lhs.get_identifier();
-
-  if(depends.find(id)==depends.end())
-  {
-    // we don't really need it
-    SSA_step.ignore=true;
-  }
+  get_symbols(SSA_step.guard, depends_);
+  SSA_step.accept(slicing_visitort{depends_});
 }
 
 /// Collect the open variables, i.e., variables that are used in RHS but never
@@ -153,54 +166,13 @@ void symex_slicet::collect_open_variables(
       it!=equation.SSA_steps.end();
       it++)
   {
-    const symex_target_equationt::SSA_stept &SSA_step=*it;
+    const symex_target_equationt::SSA_stept &SSA_step=**it;
 
-    get_symbols(SSA_step.guard);
-
-    switch(SSA_step.type)
-    {
-    case goto_trace_stept::typet::ASSERT:
-      get_symbols(SSA_step.cond_expr);
-      break;
-
-    case goto_trace_stept::typet::ASSUME:
-      get_symbols(SSA_step.cond_expr);
-      break;
-
-    case goto_trace_stept::typet::LOCATION:
-      // ignore
-      break;
-
-    case goto_trace_stept::typet::ASSIGNMENT:
-      get_symbols(SSA_step.ssa_rhs);
-      lhs.insert(SSA_step.ssa_lhs.get_identifier());
-      break;
-
-    case goto_trace_stept::typet::OUTPUT:
-    case goto_trace_stept::typet::INPUT:
-    case goto_trace_stept::typet::DEAD:
-    case goto_trace_stept::typet::NONE:
-      break;
-
-    case goto_trace_stept::typet::DECL:
-    case goto_trace_stept::typet::FUNCTION_CALL:
-    case goto_trace_stept::typet::FUNCTION_RETURN:
-    case goto_trace_stept::typet::CONSTRAINT:
-    case goto_trace_stept::typet::SHARED_READ:
-    case goto_trace_stept::typet::SHARED_WRITE:
-    case goto_trace_stept::typet::ATOMIC_BEGIN:
-    case goto_trace_stept::typet::ATOMIC_END:
-    case goto_trace_stept::typet::SPAWN:
-    case goto_trace_stept::typet::MEMORY_BARRIER:
-      // ignore for now
-      break;
-
-    default:
-      UNREACHABLE;
-    }
+    get_symbols(SSA_step.guard, depends_);
+    SSA_step.accept(collecting_visitort{depends_, lhs});
   }
 
-  open_variables=depends;
+  open_variables=depends_;
 
   // remove the ones that are defined
   open_variables.erase(lhs.begin(), lhs.end());
@@ -246,7 +218,7 @@ void simple_slice(symex_target_equationt &equation)
       it=equation.SSA_steps.begin();
       it!=equation.SSA_steps.end();
       it++)
-    if(it->is_assert())
+    if((*it)->is_assert())
       last_assertion=it;
 
   // slice away anything after it
@@ -259,6 +231,6 @@ void simple_slice(symex_target_equationt &equation)
     for(s_it++;
         s_it!=equation.SSA_steps.end();
         s_it++)
-      s_it->ignore=true;
+      (*s_it)->ignore=true;
   }
 }

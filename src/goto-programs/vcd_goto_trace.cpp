@@ -81,6 +81,68 @@ std::string as_vcd_binary(
   return "";
 }
 
+namespace
+{
+class output_vcd_visitort final
+  : public defaulted_trace_const_visitor_const_argst
+{
+public:
+  output_vcd_visitort(
+    const namespacet &ns,
+    std::ostream &out,
+    numbering<irep_idt> &n,
+    unsigned &timestamp)
+    : ns_{ns}, out_{out}, numbering_{n}, timestamp_{timestamp}
+  {
+  }
+
+  void default_visit(const goto_trace_stept &) const override
+  {
+    // Do nothing
+  }
+
+  void visit(const trace_assignmentt &step) const override
+  {
+    irep_idt identifier = step.lhs_object.get_identifier();
+    const typet &type = step.lhs_object.type();
+
+    out_ << '#' << timestamp_ << "\n";
+    timestamp_++;
+
+    const auto number = numbering_.number(identifier);
+
+    // booleans are special in VCD
+    if(type.id() == ID_bool)
+    {
+      if(step.lhs_object_value.is_true())
+        out_ << "1"
+             << "V" << number << "\n";
+      else if(step.lhs_object_value.is_false())
+        out_ << "0"
+             << "V" << number << "\n";
+      else
+        out_ << "x"
+             << "V" << number << "\n";
+    }
+    else
+    {
+      std::string binary = as_vcd_binary(step.lhs_object_value, ns_);
+
+      if(binary != "")
+        out_ << "b" << binary << " V" << number << " "
+             << "\n";
+    }
+  }
+
+private:
+  const namespacet &ns_;
+  std::ostream &out_;
+  numbering<irep_idt> &numbering_;
+  unsigned &timestamp_;
+};
+
+} // namespace
+
 void output_vcd(
   const namespacet &ns,
   const goto_tracet &goto_trace,
@@ -99,10 +161,10 @@ void output_vcd(
 
   for(const auto &step : goto_trace.steps)
   {
-    if(step.is_assignment())
+    if(step->is_assignment())
     {
-      irep_idt identifier=step.lhs_object.get_identifier();
-      const typet &type=step.lhs_object.type();
+      irep_idt identifier=step->lhs_object.get_identifier();
+      const typet &type=step->lhs_object.type();
 
       const auto number=n.number(identifier);
 
@@ -122,45 +184,10 @@ void output_vcd(
   // end of header
   out << "$enddefinitions $end" << "\n";
 
-  unsigned timestamp=0;
+  unsigned timestamp = 0;
 
   for(const auto &step : goto_trace.steps)
   {
-    switch(step.type)
-    {
-    case goto_trace_stept::typet::ASSIGNMENT:
-      {
-        irep_idt identifier=step.lhs_object.get_identifier();
-        const typet &type=step.lhs_object.type();
-
-        out << '#' << timestamp << "\n";
-        timestamp++;
-
-        const auto number=n.number(identifier);
-
-        // booleans are special in VCD
-        if(type.id()==ID_bool)
-        {
-          if(step.lhs_object_value.is_true())
-            out << "1" << "V" << number << "\n";
-          else if(step.lhs_object_value.is_false())
-            out << "0" << "V" << number << "\n";
-          else
-            out << "x" << "V" << number << "\n";
-        }
-        else
-        {
-          std::string binary=as_vcd_binary(step.lhs_object_value, ns);
-
-          if(binary!="")
-            out << "b" << binary << " V" << number << " " << "\n";
-        }
-      }
-      break;
-
-    default:
-      {
-      }
-    }
+    step->accept(output_vcd_visitort{ns, out, n, timestamp});
   }
 }

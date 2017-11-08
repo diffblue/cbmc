@@ -59,7 +59,7 @@ void postcondition(
       it!=equation.SSA_steps.end();
       it++)
   {
-    postconditiont postcondition(ns, value_set, *it, s);
+    postconditiont postcondition(ns, value_set, **it, s);
     postcondition.compute(dest);
     if(dest.is_false())
       return;
