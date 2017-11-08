@@ -254,6 +254,7 @@ _ERROR_CATEGORIES = [
     'runtime/vlog',
     'whitespace/blank_line',
     'whitespace/braces',
+    'whitespace/braces_newline',
     'whitespace/comma',
     'whitespace/comments',
     'whitespace/empty_conditional_body',
@@ -283,7 +284,11 @@ _LEGACY_ERROR_CATEGORIES = [
 # flag. By default all errors are on, so only add here categories that should be
 # off by default (i.e., categories that must be enabled by the --filter= flags).
 # All entries here should start with a '-' or '+', as in the --filter= flag.
-_DEFAULT_FILTERS = ['-build/include_alpha', '-readability/dowhile']
+_DEFAULT_FILTERS = [
+    '-build/include_alpha',
+    '-readability/dowhile',
+    '-whitespace/braces_newline',
+    ]
 
 # The default list of categories suppressed for C (not C++) files.
 _DEFAULT_C_SUPPRESSED_CATEGORIES = [
@@ -3977,7 +3982,7 @@ def CheckBracesSpacing(filename, clean_lines, linenum, nesting_state, error):
   #   error(filename, linenum, 'whitespace/braces', 5,
   #        'Missing space before else')
   if (Search(r'^.*[^\s].*}$', line) or Search(r'^.*[^\s].*{$', line)) and not(Search(r'{[^}]*}', line)):
-     error(filename, linenum, 'whitespace/braces', 5,
+     error(filename, linenum, 'whitespace/braces_newline', 5,
            'Put braces on a separate next line')
 
   # You shouldn't have a space before a semicolon at the end of the line.
