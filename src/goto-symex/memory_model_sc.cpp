@@ -48,9 +48,8 @@ void memory_model_sct::build_per_thread_map(
 {
   // this orders the events within a thread
 
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  for(auto e_it = make_dereference_iterator(equation.SSA_steps.begin());
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     // concurrency-related?
@@ -71,9 +70,8 @@ void memory_model_sct::thread_spawn(
   // instruction of the new thread in program order
 
   unsigned next_thread_id=0;
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  for(auto e_it = make_dereference_iterator(equation.SSA_steps.begin());
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     if(e_it->is_spawn())
@@ -165,7 +163,7 @@ void memory_model_sct::program_order(
 
     // iterate over relevant events in the thread
 
-    event_it previous=equation.SSA_steps.end();
+    event_it previous = make_dereference_iterator(equation.SSA_steps.end());
 
     for(event_listt::const_iterator
         e_it=events.begin();

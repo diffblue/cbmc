@@ -13,6 +13,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 #define CPROVER_GOTO_SYMEX_PARTIAL_ORDER_CONCURRENCY_H
 
 #include <util/message.h>
+#include <util/dereference_iterator.h>
 
 #include "symex_target_equation.h"
 
@@ -24,7 +25,7 @@ public:
 
   typedef symex_target_equationt::SSA_stept eventt;
   typedef symex_target_equationt::SSA_stepst eventst;
-  typedef eventst::const_iterator event_it;
+  typedef dereference_iteratort<eventst::const_iterator> event_it;
 
   // the name of a clock variable for a shared read/write
   enum axiomt

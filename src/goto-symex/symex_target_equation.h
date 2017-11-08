@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 
 #include <util/merge_irep.h>
+#include <util/dereference_iterator.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
@@ -264,10 +265,8 @@ public:
   std::size_t count_assertions() const
   {
     std::size_t i=0;
-    for(SSA_stepst::const_iterator
-        it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
-      if(it->is_assert())
+    for(const auto &it : make_dereference_facade(SSA_steps))
+      if(it.is_assert())
         i++;
     return i;
   }
@@ -275,15 +274,13 @@ public:
   std::size_t count_ignored_SSA_steps() const
   {
     std::size_t i=0;
-    for(SSA_stepst::const_iterator
-        it=SSA_steps.begin();
-        it!=SSA_steps.end(); it++)
-      if(it->ignore)
+    for(const auto &it : make_dereference_facade(SSA_steps))
+      if(it.ignore)
         i++;
     return i;
   }
 
-  typedef std::list<SSA_stept> SSA_stepst;
+  typedef std::list<std::unique_ptr<SSA_stept>> SSA_stepst;
   SSA_stepst SSA_steps;
 
   SSA_stepst::iterator get_SSA_step(std::size_t s)
@@ -306,10 +303,8 @@ public:
 
   bool has_threads() const
   {
-    for(SSA_stepst::const_iterator it=SSA_steps.begin();
-        it!=SSA_steps.end();
-        it++)
-      if(it->source.thread_nr!=0)
+    for(const auto &it : make_dereference_facade(SSA_steps))
+      if(it.source.thread_nr != 0)
         return true;
 
     return false;

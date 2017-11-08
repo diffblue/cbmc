@@ -208,7 +208,7 @@ bool bmc_covert::operator()()
     }
   }
 
-  for(auto &step : bmc.equation.SSA_steps)
+  for(auto &step : make_dereference_facade(bmc.equation.SSA_steps))
     step.cond_literal=literalt(0, 0);
 
   // Do conversion to next solver layer
@@ -217,8 +217,8 @@ bool bmc_covert::operator()()
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
-  for(auto it = bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(bmc.equation.SSA_steps.begin());
+      it != bmc.equation.SSA_steps.end();
       it++)
   {
     if(it->is_assert())
@@ -229,7 +229,7 @@ bool bmc_covert::operator()()
           literal_exprt(it->guard_literal),
           literal_exprt(!it->cond_literal) });
       literalt l_c=solver.convert(c);
-      goal_map[id(it->source.pc)].add_instance(it, l_c);
+      goal_map[id(it->source.pc)].add_instance(it.base(), l_c);
     }
   }
 

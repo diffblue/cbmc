@@ -35,7 +35,7 @@ void bmc_all_propertiest::goal_covered(const cover_goalst::goalt &)
     // check whether failed
     for(auto &c : g.second.instances)
     {
-      literalt cond=c->cond_literal;
+      literalt cond = (*c)->cond_literal;
 
       if(solver.l_get(cond).is_false())
       {
@@ -70,9 +70,8 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the properties
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(bmc.equation.SSA_steps.begin());
+      it != bmc.equation.SSA_steps.end();
       it++)
   {
     if(it->is_assert())
@@ -92,7 +91,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       else
         continue;
 
-      goal_map[property_id].instances.push_back(it);
+      goal_map[property_id].instances.push_back(it.base());
     }
   }
 

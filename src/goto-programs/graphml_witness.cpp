@@ -367,9 +367,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
   std::vector<std::size_t> step_to_node(equation.SSA_steps.size()+1, 0);
 
   std::size_t step_nr=1;
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++, step_nr++) // we cannot replace this by a ranged for
   {
     const source_locationt &source_location=it->source.pc->source_location;
@@ -387,7 +386,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     }
 
     // skip declarations followed by an immediate assignment
-    symex_target_equationt::SSA_stepst::const_iterator next=it;
+    auto next = it;
     ++next;
     if(next!=equation.SSA_steps.end() &&
        next->is_assignment() &&
@@ -414,10 +413,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
   // build edges
   step_nr=1;
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
-      ) // no ++it
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();) // no ++it
   {
     const std::size_t from=step_to_node[step_nr];
 
@@ -428,7 +425,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       continue;
     }
 
-    symex_target_equationt::SSA_stepst::const_iterator next=it;
+    auto next = it;
     std::size_t next_step_nr=step_nr;
     for(++next, ++next_step_nr;
         next!=equation.SSA_steps.end() &&

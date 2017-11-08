@@ -38,8 +38,8 @@ void symex_target_equationt::shared_read(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
@@ -57,8 +57,8 @@ void symex_target_equationt::shared_write(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_object;
@@ -74,8 +74,8 @@ void symex_target_equationt::spawn(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::SPAWN;
   SSA_step.source=source;
@@ -87,8 +87,8 @@ void symex_target_equationt::memory_barrier(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::MEMORY_BARRIER;
   SSA_step.source=source;
@@ -102,8 +102,8 @@ void symex_target_equationt::atomic_begin(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::ATOMIC_BEGIN;
   SSA_step.atomic_section_id=atomic_section_id;
@@ -118,8 +118,8 @@ void symex_target_equationt::atomic_end(
   unsigned atomic_section_id,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::ATOMIC_END;
   SSA_step.atomic_section_id=atomic_section_id;
@@ -140,8 +140,8 @@ void symex_target_equationt::assignment(
 {
   assert(ssa_lhs.is_not_nil());
 
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
@@ -168,8 +168,8 @@ void symex_target_equationt::decl(
 {
   assert(ssa_lhs.is_not_nil());
 
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.ssa_lhs=ssa_lhs;
@@ -200,8 +200,8 @@ void symex_target_equationt::location(
   const exprt &guard,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::LOCATION;
@@ -216,8 +216,8 @@ void symex_target_equationt::function_call(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::FUNCTION_CALL;
@@ -233,8 +233,8 @@ void symex_target_equationt::function_return(
   const irep_idt &identifier,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::FUNCTION_RETURN;
@@ -251,8 +251,8 @@ void symex_target_equationt::output(
   const irep_idt &output_id,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::OUTPUT;
@@ -271,8 +271,8 @@ void symex_target_equationt::output_fmt(
   const irep_idt &fmt,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::OUTPUT;
@@ -292,8 +292,8 @@ void symex_target_equationt::input(
   const irep_idt &input_id,
   const std::list<exprt> &args)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.type=goto_trace_stept::typet::INPUT;
@@ -310,8 +310,8 @@ void symex_target_equationt::assumption(
   const exprt &cond,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
@@ -328,8 +328,8 @@ void symex_target_equationt::assertion(
   const std::string &msg,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
@@ -346,8 +346,8 @@ void symex_target_equationt::goto_instruction(
   const exprt &cond,
   const sourcet &source)
 {
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=guard;
   SSA_step.cond_expr=cond;
@@ -364,8 +364,8 @@ void symex_target_equationt::constraint(
   const sourcet &source)
 {
   // like assumption, but with global effect
-  SSA_steps.push_back(SSA_stept());
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_steps.push_back(util_make_unique<SSA_stept>());
+  SSA_stept &SSA_step = *SSA_steps.back();
 
   SSA_step.guard=true_exprt();
   SSA_step.cond_expr=cond;
@@ -395,7 +395,7 @@ void symex_target_equationt::convert(
 void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure) const
 {
-  for(const auto &step : SSA_steps)
+  for(const auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_assignment() && !step.ignore)
       decision_procedure.set_to_true(step.cond_expr);
@@ -407,7 +407,7 @@ void symex_target_equationt::convert_assignments(
 void symex_target_equationt::convert_decls(
   prop_convt &prop_conv) const
 {
-  for(const auto &step : SSA_steps)
+  for(const auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_decl() && !step.ignore)
     {
@@ -423,7 +423,7 @@ void symex_target_equationt::convert_decls(
 void symex_target_equationt::convert_guards(
   prop_convt &prop_conv)
 {
-  for(auto &step : SSA_steps)
+  for(auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.ignore)
       step.guard_literal=const_literal(false);
@@ -437,7 +437,7 @@ void symex_target_equationt::convert_guards(
 void symex_target_equationt::convert_assumptions(
   prop_convt &prop_conv)
 {
-  for(auto &step : SSA_steps)
+  for(auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_assume())
     {
@@ -454,7 +454,7 @@ void symex_target_equationt::convert_assumptions(
 void symex_target_equationt::convert_goto_instructions(
   prop_convt &prop_conv)
 {
-  for(auto &step : SSA_steps)
+  for(auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_goto())
     {
@@ -472,7 +472,7 @@ void symex_target_equationt::convert_goto_instructions(
 void symex_target_equationt::convert_constraints(
   decision_proceduret &decision_procedure) const
 {
-  for(const auto &step : SSA_steps)
+  for(const auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_constraint())
     {
@@ -499,7 +499,7 @@ void symex_target_equationt::convert_assertions(
 
   if(number_of_assertions==1)
   {
-    for(auto &step : SSA_steps)
+    for(auto &step : make_dereference_facade(SSA_steps))
     {
       if(step.is_assert())
       {
@@ -521,7 +521,7 @@ void symex_target_equationt::convert_assertions(
 
   exprt assumption=true_exprt();
 
-  for(auto &step : SSA_steps)
+  for(auto &step : make_dereference_facade(SSA_steps))
   {
     if(step.is_assert())
     {
@@ -559,7 +559,7 @@ void symex_target_equationt::convert_io(
 {
   std::size_t io_count=0;
 
-  for(auto &step : SSA_steps)
+  for(auto &step : make_dereference_facade(SSA_steps))
     if(!step.ignore)
     {
       for(const auto &arg : step.io_args)
@@ -603,7 +603,7 @@ void symex_target_equationt::merge_ireps(SSA_stept &SSA_step)
 
 void symex_target_equationt::output(std::ostream &out) const
 {
-  for(const auto &step : SSA_steps)
+  for(const auto &step : make_dereference_facade(SSA_steps))
   {
     step.output(ns, out);
     out << "--------------\n";

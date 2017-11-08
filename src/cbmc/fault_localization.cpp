@@ -29,7 +29,7 @@ Author: Peter Schrammel
 
 void fault_localizationt::freeze_guards()
 {
-  for(const auto &step : bmc.equation.SSA_steps)
+  for(const auto &step : make_dereference_facade(bmc.equation.SSA_steps))
   {
     if(!step.guard_literal.is_constant())
       bmc.prop_conv.set_frozen(step.guard_literal);
@@ -41,9 +41,9 @@ void fault_localizationt::freeze_guards()
 
 void fault_localizationt::collect_guards(lpointst &lpoints)
 {
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end(); it++)
+  for(auto it = make_dereference_iterator(bmc.equation.SSA_steps.begin());
+      it != bmc.equation.SSA_steps.end();
+      it++)
   {
     if(it->is_assignment() &&
        it->assignment_type==symex_targett::assignment_typet::STATE &&
@@ -62,19 +62,19 @@ void fault_localizationt::collect_guards(lpointst &lpoints)
   }
 }
 
-symex_target_equationt::SSA_stepst::const_iterator
+dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
 fault_localizationt::get_failed_property()
 {
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end(); it++)
+  for(auto it = make_dereference_iterator(bmc.equation.SSA_steps.begin());
+      it != bmc.equation.SSA_steps.end();
+      it++)
     if(it->is_assert() &&
        bmc.prop_conv.l_get(it->guard_literal).is_true() &&
        bmc.prop_conv.l_get(it->cond_literal).is_false())
       return it;
 
   UNREACHABLE;
-  return bmc.equation.SSA_steps.end();
+  return make_dereference_iterator(bmc.equation.SSA_steps.end());
 }
 
 bool fault_localizationt::check(const lpointst &lpoints,
@@ -331,12 +331,12 @@ void fault_localizationt::goal_covered(
     // check whether failed
     for(auto &inst : goal_pair.second.instances)
     {
-      literalt cond=inst->cond_literal;
+      literalt cond = (*inst)->cond_literal;
 
       if(solver.l_get(cond).is_false())
       {
         goal_pair.second.status=goalt::statust::FAILURE;
-        symex_target_equationt::SSA_stepst::iterator next=inst;
+        auto next = inst;
         next++; // include the assertion
         build_goto_trace(
           bmc.equation, next, solver, bmc.ns, goal_pair.second.goto_trace);

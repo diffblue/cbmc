@@ -15,6 +15,7 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include <util/arith_tools.h>
 #include <util/simplify_expr.h>
+#include <util/make_unique.h>
 
 partial_order_concurrencyt::partial_order_concurrencyt(
   const namespacet &_ns):ns(_ns)
@@ -33,9 +34,8 @@ void partial_order_concurrencyt::add_init_writes(
 
   symex_target_equationt::SSA_stepst init_steps;
 
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  for(auto e_it = make_dereference_iterator(equation.SSA_steps.begin());
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     if(e_it->is_spawn())
@@ -56,8 +56,9 @@ void partial_order_concurrencyt::add_init_writes(
        e_it->is_shared_read() ||
        !e_it->guard.is_true())
     {
-      init_steps.push_back(symex_target_equationt::SSA_stept());
-      symex_target_equationt::SSA_stept &SSA_step=init_steps.back();
+      init_steps.push_back(
+        util_make_unique<symex_target_equationt::SSA_stept>());
+      symex_target_equationt::SSA_stept &SSA_step = *init_steps.back();
 
       SSA_step.guard=true_exprt();
       // no SSA L2 index, thus nondet value
@@ -82,9 +83,8 @@ void partial_order_concurrencyt::build_event_lists(
   // a per-thread counter
   std::map<unsigned, unsigned> counter;
 
-  for(eventst::const_iterator
-      e_it=equation.SSA_steps.begin();
-      e_it!=equation.SSA_steps.end();
+  for(auto e_it = make_dereference_iterator(equation.SSA_steps.begin());
+      e_it != equation.SSA_steps.end();
       e_it++)
   {
     if(e_it->is_shared_read() ||

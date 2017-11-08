@@ -54,9 +54,8 @@ void postcondition(
   const goto_symex_statet &s,
   exprt &dest)
 {
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++)
   {
     postconditiont postcondition(ns, value_set, *it, s);

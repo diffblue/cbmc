@@ -26,9 +26,8 @@ void bmct::show_vcc_plain(std::ostream &out)
 
   bool has_threads=equation.has_threads();
 
-  for(symex_target_equationt::SSA_stepst::iterator
-      s_it=equation.SSA_steps.begin();
-      s_it!=equation.SSA_steps.end();
+  for(auto s_it = make_dereference_iterator(equation.SSA_steps.begin());
+      s_it != equation.SSA_steps.end();
       s_it++)
   {
     if(!s_it->is_assert())
@@ -40,12 +39,11 @@ void bmct::show_vcc_plain(std::ostream &out)
     if(s_it->comment!="")
       out << s_it->comment << "\n";
 
-    symex_target_equationt::SSA_stepst::const_iterator
-      p_it=equation.SSA_steps.begin();
+    auto p_it = make_dereference_iterator(equation.SSA_steps.begin());
 
     // we show everything in case there are threads
-    symex_target_equationt::SSA_stepst::const_iterator
-      last_it=has_threads?equation.SSA_steps.end():s_it;
+    auto last_it =
+      has_threads ? make_dereference_iterator(equation.SSA_steps.end()) : s_it;
 
     for(std::size_t count=1; p_it!=last_it; p_it++)
       if(p_it->is_assume() || p_it->is_assignment() || p_it->is_constraint())
@@ -84,9 +82,8 @@ void bmct::show_vcc_json(std::ostream &out)
 
   bool has_threads=equation.has_threads();
 
-  for(symex_target_equationt::SSA_stepst::iterator
-      s_it=equation.SSA_steps.begin();
-      s_it!=equation.SSA_steps.end();
+  for(auto s_it = make_dereference_iterator(equation.SSA_steps.begin());
+      s_it != equation.SSA_steps.end();
       s_it++)
   {
     if(!s_it->is_assert())
@@ -104,14 +101,14 @@ void bmct::show_vcc_json(std::ostream &out)
       object["comment"]=json_stringt(s);
 
     // we show everything in case there are threads
-    symex_target_equationt::SSA_stepst::const_iterator
-      last_it=has_threads?equation.SSA_steps.end():s_it;
+    auto last_it =
+      has_threads ? make_dereference_iterator(equation.SSA_steps.end()) : s_it;
 
     json_arrayt &json_constraints=object["constraints"].make_array();
 
-    for(symex_target_equationt::SSA_stepst::const_iterator p_it
-          =equation.SSA_steps.begin();
-        p_it!=last_it; p_it++)
+    for(auto p_it = make_dereference_iterator(equation.SSA_steps.begin());
+        p_it != last_it;
+        p_it++)
     {
       if((p_it->is_assume() ||
          p_it->is_assignment() ||

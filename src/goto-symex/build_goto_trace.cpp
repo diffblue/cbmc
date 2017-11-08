@@ -190,9 +190,8 @@ void build_goto_trace(
   const goto_trace_stept *end_ptr=nullptr;
   bool end_step_seen=false;
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=target.SSA_steps.begin();
-      it!=target.SSA_steps.end();
+  for(auto it = make_dereference_iterator(target.SSA_steps.begin());
+      it != target.SSA_steps.end();
       it++)
   {
     if(it==end_step)

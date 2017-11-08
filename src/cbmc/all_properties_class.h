@@ -75,7 +75,7 @@ public:
     {
       std::vector<exprt> tmp;
       tmp.reserve(instances.size());
-      for(const auto &inst : instances)
+      for(const auto &inst : make_dereference_facade(instances))
         tmp.push_back(literal_exprt(inst->cond_literal));
       return conjunction(tmp);
     }

@@ -220,7 +220,7 @@ void bmct::show_program()
 
   std::cout << "\n" << "Program constraints:" << "\n";
 
-  for(const auto &step : equation.SSA_steps)
+  for(const auto &step : make_dereference_facade(equation.SSA_steps))
   {
     std::cout << "// " << step.source.pc->location_number << " ";
     std::cout << step.source.pc->source_location.as_string() << "\n";
