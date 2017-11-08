@@ -23,9 +23,8 @@ Author: Daniel Kroening
 
 namespace
 {
-class json_conversion_visitort : public const_defaulted_visitor_generatort<
-                                   const goto_trace_stept &,
-                                   detail::trace_step_const_ref_typest>
+class json_conversion_visitort
+  : public defaulted_trace_const_visitor_const_argst
 {
 public:
   json_conversion_visitort(
@@ -42,7 +41,7 @@ public:
   {
   }
 
-  void visit(const goto_trace_stept &step) const override
+  void default_visit(const goto_trace_stept &step) const override
   {
     if(source_location_ != previous_source_location_)
     {

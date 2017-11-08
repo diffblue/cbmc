@@ -83,9 +83,8 @@ std::string as_vcd_binary(
 
 namespace
 {
-class output_vcd_visitort final : public const_defaulted_visitor_generatort<
-                                    const goto_trace_stept &,
-                                    detail::trace_step_const_ref_typest>
+class output_vcd_visitort final
+  : public defaulted_trace_const_visitor_const_argst
 {
 public:
   output_vcd_visitort(
@@ -97,7 +96,7 @@ public:
   {
   }
 
-  void visit(const goto_trace_stept &) const override
+  void default_visit(const goto_trace_stept &) const override
   {
     // Do nothing
   }

@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 
 #include <util/merge_irep.h>
-#include <util/visitor_generator.h>
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_trace.h>
@@ -48,55 +47,105 @@ class SSA_shared_readt;
 class SSA_shared_writet;
 class SSA_spawnt;
 
-namespace detail
+class SSA_visitor_const_argst
 {
-using SSA_step_ref_typest = typelistt<SSA_assertt &,
-                                      SSA_assumet &,
-                                      SSA_assignmentt &,
-                                      SSA_gotot &,
-                                      SSA_constraintt &,
-                                      SSA_locationt &,
-                                      SSA_outputt &,
-                                      SSA_declt &,
-                                      SSA_deadt &,
-                                      SSA_function_callt &,
-                                      SSA_function_returnt &,
-                                      SSA_shared_readt &,
-                                      SSA_shared_writet &,
-                                      SSA_spawnt &,
-                                      SSA_memory_barriert &,
-                                      SSA_atomic_begint &,
-                                      SSA_atomic_endt &,
-                                      SSA_inputt &>;
+public:
+  virtual ~SSA_visitor_const_argst() = default;
 
-using SSA_step_const_ref_typest = typelistt<const SSA_assertt &,
-                                            const SSA_assumet &,
-                                            const SSA_assignmentt &,
-                                            const SSA_gotot &,
-                                            const SSA_constraintt &,
-                                            const SSA_locationt &,
-                                            const SSA_outputt &,
-                                            const SSA_declt &,
-                                            const SSA_deadt &,
-                                            const SSA_function_callt &,
-                                            const SSA_function_returnt &,
-                                            const SSA_shared_readt &,
-                                            const SSA_shared_writet &,
-                                            const SSA_spawnt &,
-                                            const SSA_memory_barriert &,
-                                            const SSA_atomic_begint &,
-                                            const SSA_atomic_endt &,
-                                            const SSA_inputt &>;
+  virtual void visit(const SSA_assertt &) = 0;
+  virtual void visit(const SSA_assumet &) = 0;
+  virtual void visit(const SSA_assignmentt &) = 0;
+  virtual void visit(const SSA_gotot &) = 0;
+  virtual void visit(const SSA_constraintt &) = 0;
+  virtual void visit(const SSA_locationt &) = 0;
+  virtual void visit(const SSA_outputt &) = 0;
+  virtual void visit(const SSA_declt &) = 0;
+  virtual void visit(const SSA_deadt &) = 0;
+  virtual void visit(const SSA_function_callt &) = 0;
+  virtual void visit(const SSA_function_returnt &) = 0;
+  virtual void visit(const SSA_shared_readt &) = 0;
+  virtual void visit(const SSA_shared_writet &) = 0;
+  virtual void visit(const SSA_spawnt &) = 0;
+  virtual void visit(const SSA_memory_barriert &) = 0;
+  virtual void visit(const SSA_atomic_begint &) = 0;
+  virtual void visit(const SSA_atomic_endt &) = 0;
+  virtual void visit(const SSA_inputt &) = 0;
+};
 
-} // namespace detail
+class SSA_const_visitor_const_argst
+{
+public:
+  virtual ~SSA_const_visitor_const_argst() = default;
 
-using SSA_visitor_const_argst =
-  visitor_generatort<detail::SSA_step_const_ref_typest>;
-using SSA_const_visitor_const_argst =
-  const_visitor_generatort<detail::SSA_step_const_ref_typest>;
-using SSA_visitort = visitor_generatort<detail::SSA_step_ref_typest>;
-using SSA_const_visitort =
-  const_visitor_generatort<detail::SSA_step_ref_typest>;
+  virtual void visit(const SSA_assertt &) const = 0;
+  virtual void visit(const SSA_assumet &) const = 0;
+  virtual void visit(const SSA_assignmentt &) const = 0;
+  virtual void visit(const SSA_gotot &) const = 0;
+  virtual void visit(const SSA_constraintt &) const = 0;
+  virtual void visit(const SSA_locationt &) const = 0;
+  virtual void visit(const SSA_outputt &) const = 0;
+  virtual void visit(const SSA_declt &) const = 0;
+  virtual void visit(const SSA_deadt &) const = 0;
+  virtual void visit(const SSA_function_callt &) const = 0;
+  virtual void visit(const SSA_function_returnt &) const = 0;
+  virtual void visit(const SSA_shared_readt &) const = 0;
+  virtual void visit(const SSA_shared_writet &) const = 0;
+  virtual void visit(const SSA_spawnt &) const = 0;
+  virtual void visit(const SSA_memory_barriert &) const = 0;
+  virtual void visit(const SSA_atomic_begint &) const = 0;
+  virtual void visit(const SSA_atomic_endt &) const = 0;
+  virtual void visit(const SSA_inputt &) const = 0;
+};
+
+class SSA_visitort
+{
+public:
+  virtual ~SSA_visitort() = default;
+
+  virtual void visit(SSA_assertt &) = 0;
+  virtual void visit(SSA_assumet &) = 0;
+  virtual void visit(SSA_assignmentt &) = 0;
+  virtual void visit(SSA_gotot &) = 0;
+  virtual void visit(SSA_constraintt &) = 0;
+  virtual void visit(SSA_locationt &) = 0;
+  virtual void visit(SSA_outputt &) = 0;
+  virtual void visit(SSA_declt &) = 0;
+  virtual void visit(SSA_deadt &) = 0;
+  virtual void visit(SSA_function_callt &) = 0;
+  virtual void visit(SSA_function_returnt &) = 0;
+  virtual void visit(SSA_shared_readt &) = 0;
+  virtual void visit(SSA_shared_writet &) = 0;
+  virtual void visit(SSA_spawnt &) = 0;
+  virtual void visit(SSA_memory_barriert &) = 0;
+  virtual void visit(SSA_atomic_begint &) = 0;
+  virtual void visit(SSA_atomic_endt &) = 0;
+  virtual void visit(SSA_inputt &) = 0;
+};
+
+class SSA_const_visitort
+{
+public:
+  virtual ~SSA_const_visitort() = default;
+
+  virtual void visit(SSA_assertt &) const = 0;
+  virtual void visit(SSA_assumet &) const = 0;
+  virtual void visit(SSA_assignmentt &) const = 0;
+  virtual void visit(SSA_gotot &) const = 0;
+  virtual void visit(SSA_constraintt &) const = 0;
+  virtual void visit(SSA_locationt &) const = 0;
+  virtual void visit(SSA_outputt &) const = 0;
+  virtual void visit(SSA_declt &) const = 0;
+  virtual void visit(SSA_deadt &) const = 0;
+  virtual void visit(SSA_function_callt &) const = 0;
+  virtual void visit(SSA_function_returnt &) const = 0;
+  virtual void visit(SSA_shared_readt &) const = 0;
+  virtual void visit(SSA_shared_writet &) const = 0;
+  virtual void visit(SSA_spawnt &) const = 0;
+  virtual void visit(SSA_memory_barriert &) const = 0;
+  virtual void visit(SSA_atomic_begint &) const = 0;
+  virtual void visit(SSA_atomic_endt &) const = 0;
+  virtual void visit(SSA_inputt &) const = 0;
+};
 
 class SSA_stept
 {
@@ -450,6 +499,57 @@ public:
 
 private:
   std::string custom_output(const namespacet &ns) const override;
+};
+
+class defaulted_SSA_const_visitor_const_argst
+  : public SSA_const_visitor_const_argst
+{
+public:
+  virtual void default_visit(const SSA_stept &) const = 0;
+
+  void visit(const SSA_assertt &x) const override { default_visit(x); }
+  void visit(const SSA_assumet &x) const override { default_visit(x); }
+  void visit(const SSA_assignmentt &x) const override { default_visit(x); }
+  void visit(const SSA_gotot &x) const override { default_visit(x); }
+  void visit(const SSA_constraintt &x) const override { default_visit(x); }
+  void visit(const SSA_locationt &x) const override { default_visit(x); }
+  void visit(const SSA_outputt &x) const override { default_visit(x); }
+  void visit(const SSA_declt &x) const override { default_visit(x); }
+  void visit(const SSA_deadt &x) const override { default_visit(x); }
+  void visit(const SSA_function_callt &x) const override { default_visit(x); }
+  void visit(const SSA_function_returnt &x) const override { default_visit(x); }
+  void visit(const SSA_shared_readt &x) const override { default_visit(x); }
+  void visit(const SSA_shared_writet &x) const override { default_visit(x); }
+  void visit(const SSA_spawnt &x) const override { default_visit(x); }
+  void visit(const SSA_memory_barriert &x) const override { default_visit(x); }
+  void visit(const SSA_atomic_begint &x) const override { default_visit(x); }
+  void visit(const SSA_atomic_endt &x) const override { default_visit(x); }
+  void visit(const SSA_inputt &x) const override { default_visit(x); }
+};
+
+class defaulted_SSA_const_visitort : public SSA_const_visitort
+{
+public:
+  virtual void default_visit(SSA_stept &) const = 0;
+
+  void visit(SSA_assertt &x) const override { default_visit(x); }
+  void visit(SSA_assumet &x) const override { default_visit(x); }
+  void visit(SSA_assignmentt &x) const override { default_visit(x); }
+  void visit(SSA_gotot &x) const override { default_visit(x); }
+  void visit(SSA_constraintt &x) const override { default_visit(x); }
+  void visit(SSA_locationt &x) const override { default_visit(x); }
+  void visit(SSA_outputt &x) const override { default_visit(x); }
+  void visit(SSA_declt &x) const override { default_visit(x); }
+  void visit(SSA_deadt &x) const override { default_visit(x); }
+  void visit(SSA_function_callt &x) const override { default_visit(x); }
+  void visit(SSA_function_returnt &x) const override { default_visit(x); }
+  void visit(SSA_shared_readt &x) const override { default_visit(x); }
+  void visit(SSA_shared_writet &x) const override { default_visit(x); }
+  void visit(SSA_spawnt &x) const override { default_visit(x); }
+  void visit(SSA_memory_barriert &x) const override { default_visit(x); }
+  void visit(SSA_atomic_begint &x) const override { default_visit(x); }
+  void visit(SSA_atomic_endt &x) const override { default_visit(x); }
+  void visit(SSA_inputt &x) const override { default_visit(x); }
 };
 
 class symex_target_equationt:public symex_targett

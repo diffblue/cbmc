@@ -23,9 +23,7 @@ Author: Daniel Kroening
 
 namespace
 {
-class convert_visitort final : public const_defaulted_visitor_generatort<
-                                 const goto_trace_stept &,
-                                 detail::trace_step_const_ref_typest>
+class convert_visitort final : public defaulted_trace_const_visitor_const_argst
 {
 public:
   convert_visitort(
@@ -42,7 +40,7 @@ public:
   {
   }
 
-  void visit(const goto_trace_stept &step) const override
+  void default_visit(const goto_trace_stept &step) const override
   {
     if(source_location_ != previous_source_location_)
     {

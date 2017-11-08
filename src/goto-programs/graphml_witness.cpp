@@ -174,9 +174,7 @@ static bool filter_out(
 namespace
 {
 class graphml_witness_operator_visitort
-  : public const_defaulted_visitor_generatort<
-      const goto_trace_stept &,
-      detail::trace_step_const_ref_typest>
+  : public defaulted_trace_const_visitor_const_argst
 {
 public:
   explicit graphml_witness_operator_visitort(
@@ -188,9 +186,8 @@ public:
   {
   }
 
-  void visit(const goto_trace_stept &base) const override
+  void default_visit(const goto_trace_stept &base) const override
   {
-    // Ignore
   }
 
   void visit(const trace_assignmentt &x) const override
@@ -381,8 +378,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 namespace
 {
 class graphml_witness_visitort
-  : public const_defaulted_visitor_generatort<const SSA_stept &,
-                                              detail::SSA_step_const_ref_typest>
+  : public defaulted_SSA_const_visitor_const_argst
 {
 public:
   explicit graphml_witness_visitort(
@@ -394,9 +390,8 @@ public:
   {
   }
 
-  void visit(const SSA_stept &base) const override
+  void default_visit(const SSA_stept &base) const override
   {
-    // Ignore
   }
 
   void visit(const SSA_assignmentt &x) const override

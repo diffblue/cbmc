@@ -26,7 +26,6 @@ Date: July 2005
 
 #include <util/namespace.h>
 #include <util/ssa_expr.h>
-#include <util/visitor_generator.h>
 
 #include <goto-programs/goto_program.h>
 #include <util/make_unique.h>
@@ -50,55 +49,105 @@ class trace_memory_barriert;
 class trace_atomic_begint;
 class trace_atomic_endt;
 
-namespace detail
+class trace_visitor_const_argst
 {
-using trace_step_ref_typest = typelistt<trace_assignmentt &,
-                                        trace_assumet &,
-                                        trace_assertt &,
-                                        trace_gotot &,
-                                        trace_locationt &,
-                                        trace_inputt &,
-                                        trace_outputt &,
-                                        trace_declt &,
-                                        trace_deadt &,
-                                        trace_function_callt &,
-                                        trace_function_returnt &,
-                                        trace_constraintt &,
-                                        trace_shared_readt &,
-                                        trace_shared_writet &,
-                                        trace_spawnt &,
-                                        trace_memory_barriert &,
-                                        trace_atomic_begint &,
-                                        trace_atomic_endt &>;
+public:
+  virtual ~trace_visitor_const_argst() = default;
 
-using trace_step_const_ref_typest = typelistt<const trace_assignmentt &,
-                                              const trace_assumet &,
-                                              const trace_assertt &,
-                                              const trace_gotot &,
-                                              const trace_locationt &,
-                                              const trace_inputt &,
-                                              const trace_outputt &,
-                                              const trace_declt &,
-                                              const trace_deadt &,
-                                              const trace_function_callt &,
-                                              const trace_function_returnt &,
-                                              const trace_constraintt &,
-                                              const trace_shared_readt &,
-                                              const trace_shared_writet &,
-                                              const trace_spawnt &,
-                                              const trace_memory_barriert &,
-                                              const trace_atomic_begint &,
-                                              const trace_atomic_endt &>;
+  virtual void visit(const trace_assignmentt &) = 0;
+  virtual void visit(const trace_assumet &) = 0;
+  virtual void visit(const trace_assertt &) = 0;
+  virtual void visit(const trace_gotot &) = 0;
+  virtual void visit(const trace_locationt &) = 0;
+  virtual void visit(const trace_inputt &) = 0;
+  virtual void visit(const trace_outputt &) = 0;
+  virtual void visit(const trace_declt &) = 0;
+  virtual void visit(const trace_deadt &) = 0;
+  virtual void visit(const trace_function_callt &) = 0;
+  virtual void visit(const trace_function_returnt &) = 0;
+  virtual void visit(const trace_constraintt &) = 0;
+  virtual void visit(const trace_shared_readt &) = 0;
+  virtual void visit(const trace_shared_writet &) = 0;
+  virtual void visit(const trace_spawnt &) = 0;
+  virtual void visit(const trace_memory_barriert &) = 0;
+  virtual void visit(const trace_atomic_begint &) = 0;
+  virtual void visit(const trace_atomic_endt &) = 0;
+};
 
-} // namespace detail
+class trace_const_visitor_const_argst
+{
+public:
+  virtual ~trace_const_visitor_const_argst() = default;
 
-using trace_visitor_const_argst =
-  visitor_generatort<detail::trace_step_const_ref_typest>;
-using trace_const_visitor_const_argst =
-  const_visitor_generatort<detail::trace_step_const_ref_typest>;
-using trace_visitor = visitor_generatort<detail::trace_step_ref_typest>;
-using trace_const_visitor =
-  const_visitor_generatort<detail::trace_step_ref_typest>;
+  virtual void visit(const trace_assignmentt &) const = 0;
+  virtual void visit(const trace_assumet &) const = 0;
+  virtual void visit(const trace_assertt &) const = 0;
+  virtual void visit(const trace_gotot &) const = 0;
+  virtual void visit(const trace_locationt &) const = 0;
+  virtual void visit(const trace_inputt &) const = 0;
+  virtual void visit(const trace_outputt &) const = 0;
+  virtual void visit(const trace_declt &) const = 0;
+  virtual void visit(const trace_deadt &) const = 0;
+  virtual void visit(const trace_function_callt &) const = 0;
+  virtual void visit(const trace_function_returnt &) const = 0;
+  virtual void visit(const trace_constraintt &) const = 0;
+  virtual void visit(const trace_shared_readt &) const = 0;
+  virtual void visit(const trace_shared_writet &) const = 0;
+  virtual void visit(const trace_spawnt &) const = 0;
+  virtual void visit(const trace_memory_barriert &) const = 0;
+  virtual void visit(const trace_atomic_begint &) const = 0;
+  virtual void visit(const trace_atomic_endt &) const = 0;
+};
+
+class trace_visitort
+{
+public:
+  virtual ~trace_visitort() = default;
+
+  virtual void visit(trace_assignmentt &) = 0;
+  virtual void visit(trace_assumet &) = 0;
+  virtual void visit(trace_assertt &) = 0;
+  virtual void visit(trace_gotot &) = 0;
+  virtual void visit(trace_locationt &) = 0;
+  virtual void visit(trace_inputt &) = 0;
+  virtual void visit(trace_outputt &) = 0;
+  virtual void visit(trace_declt &) = 0;
+  virtual void visit(trace_deadt &) = 0;
+  virtual void visit(trace_function_callt &) = 0;
+  virtual void visit(trace_function_returnt &) = 0;
+  virtual void visit(trace_constraintt &) = 0;
+  virtual void visit(trace_shared_readt &) = 0;
+  virtual void visit(trace_shared_writet &) = 0;
+  virtual void visit(trace_spawnt &) = 0;
+  virtual void visit(trace_memory_barriert &) = 0;
+  virtual void visit(trace_atomic_begint &) = 0;
+  virtual void visit(trace_atomic_endt &) = 0;
+};
+
+class trace_const_visitort
+{
+public:
+  virtual ~trace_const_visitort() = default;
+
+  virtual void visit(trace_assignmentt &) const = 0;
+  virtual void visit(trace_assumet &) const = 0;
+  virtual void visit(trace_assertt &) const = 0;
+  virtual void visit(trace_gotot &) const = 0;
+  virtual void visit(trace_locationt &) const = 0;
+  virtual void visit(trace_inputt &) const = 0;
+  virtual void visit(trace_outputt &) const = 0;
+  virtual void visit(trace_declt &) const = 0;
+  virtual void visit(trace_deadt &) const = 0;
+  virtual void visit(trace_function_callt &) const = 0;
+  virtual void visit(trace_function_returnt &) const = 0;
+  virtual void visit(trace_constraintt &) const = 0;
+  virtual void visit(trace_shared_readt &) const = 0;
+  virtual void visit(trace_shared_writet &) const = 0;
+  virtual void visit(trace_spawnt &) const = 0;
+  virtual void visit(trace_memory_barriert &) const = 0;
+  virtual void visit(trace_atomic_begint &) const = 0;
+  virtual void visit(trace_atomic_endt &) const = 0;
+};
 
 /*! \brief TO_BE_DOCUMENTED
  * \ingroup gr_goto_symex
@@ -229,8 +278,8 @@ public:
 
   virtual void accept(trace_visitor_const_argst &v) const = 0;
   virtual void accept(const trace_const_visitor_const_argst &v) const = 0;
-  virtual void accept(trace_visitor &v) = 0;
-  virtual void accept(const trace_const_visitor &v) = 0;
+  virtual void accept(trace_visitort &v) = 0;
+  virtual void accept(const trace_const_visitort &v) = 0;
 
 protected:
   goto_trace_stept():
@@ -265,11 +314,11 @@ public:
   {
     v.visit(get_base());
   }
-  void accept(trace_visitor &v) override
+  void accept(trace_visitort &v) override
   {
     v.visit(get_base());
   }
-  void accept(const trace_const_visitor &v) override
+  void accept(const trace_const_visitort &v) override
   {
     v.visit(get_base());
   }
@@ -576,6 +625,57 @@ private:
   {
     return "ATOMIC END";
   }
+};
+
+class defaulted_trace_const_visitor_const_argst
+  : public trace_const_visitor_const_argst
+{
+public:
+  virtual void default_visit(const goto_trace_stept &) const = 0;
+
+  void visit(const trace_assignmentt &x) const override { default_visit(x); }
+  void visit(const trace_assumet &x) const override { default_visit(x); }
+  void visit(const trace_assertt &x) const override { default_visit(x); }
+  void visit(const trace_gotot &x) const override { default_visit(x); }
+  void visit(const trace_locationt &x) const override { default_visit(x); }
+  void visit(const trace_inputt &x) const override { default_visit(x); }
+  void visit(const trace_outputt &x) const override { default_visit(x); }
+  void visit(const trace_declt &x) const override { default_visit(x); }
+  void visit(const trace_deadt &x) const override { default_visit(x); }
+  void visit(const trace_function_callt &x) const override { default_visit(x); }
+  void visit(const trace_function_returnt &x) const override { default_visit(x); }
+  void visit(const trace_constraintt &x) const override { default_visit(x); }
+  void visit(const trace_shared_readt &x) const override { default_visit(x); }
+  void visit(const trace_shared_writet &x) const override { default_visit(x); }
+  void visit(const trace_spawnt &x) const override { default_visit(x); }
+  void visit(const trace_memory_barriert &x) const override { default_visit(x); }
+  void visit(const trace_atomic_begint &x) const override { default_visit(x); }
+  void visit(const trace_atomic_endt &x) const override { default_visit(x); }
+};
+
+class defaulted_trace_const_visitort : public trace_const_visitort
+{
+public:
+  virtual void default_visit(goto_trace_stept &) const = 0;
+
+  void visit( trace_assignmentt &x) const override { default_visit(x); }
+  void visit( trace_assumet &x) const override { default_visit(x); }
+  void visit( trace_assertt &x) const override { default_visit(x); }
+  void visit( trace_gotot &x) const override { default_visit(x); }
+  void visit( trace_locationt &x) const override { default_visit(x); }
+  void visit( trace_inputt &x) const override { default_visit(x); }
+  void visit( trace_outputt &x) const override { default_visit(x); }
+  void visit( trace_declt &x) const override { default_visit(x); }
+  void visit( trace_deadt &x) const override { default_visit(x); }
+  void visit( trace_function_callt &x) const override { default_visit(x); }
+  void visit( trace_function_returnt &x) const override { default_visit(x); }
+  void visit( trace_constraintt &x) const override { default_visit(x); }
+  void visit( trace_shared_readt &x) const override { default_visit(x); }
+  void visit( trace_shared_writet &x) const override { default_visit(x); }
+  void visit( trace_spawnt &x) const override { default_visit(x); }
+  void visit( trace_memory_barriert &x) const override { default_visit(x); }
+  void visit( trace_atomic_begint &x) const override { default_visit(x); }
+  void visit( trace_atomic_endt &x) const override { default_visit(x); }
 };
 
 /*! \brief TO_BE_DOCUMENTED

@@ -33,18 +33,15 @@ static void get_symbols(const exprt &expr, symbol_sett &depends)
 
 namespace
 {
-class slicing_visitort
-  : public const_defaulted_visitor_generatort<SSA_stept &,
-                                              detail::SSA_step_ref_typest>
+class slicing_visitort : public defaulted_SSA_const_visitort
 {
 public:
   explicit slicing_visitort(symbol_sett &depends) : depends_{depends}
   {
   }
 
-  void visit(SSA_stept &base) const override
+  void default_visit(SSA_stept &base) const override
   {
-    // Ignore
   }
 
   void visit(SSA_assertt &x) const override
@@ -92,9 +89,7 @@ private:
   symbol_sett &depends_;
 };
 
-class collecting_visitort
-  : public const_defaulted_visitor_generatort<const SSA_stept &,
-                                              detail::SSA_step_const_ref_typest>
+class collecting_visitort : public defaulted_SSA_const_visitor_const_argst
 {
 public:
   explicit collecting_visitort(symbol_sett &depends, symbol_sett &lhs)
@@ -102,9 +97,8 @@ public:
   {
   }
 
-  void visit(const SSA_stept &base) const override
+  void default_visit(const SSA_stept &base) const override
   {
-    // Ignore
   }
 
   void visit(const SSA_assertt &x) const override
