@@ -5,7 +5,8 @@ public class generic_field_array_instantiation {
     }
 
     generic<Float []> f;
+    generic<Integer []> g;
+    generic<int []> h;
+    generic<float []> i;
     Float [] af;
 }
-
-

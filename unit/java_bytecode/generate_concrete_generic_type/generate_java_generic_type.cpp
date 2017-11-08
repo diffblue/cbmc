@@ -184,8 +184,9 @@ SCENARIO(
 
   // We want to test that the specialized/instantiated class has it's field
   // type updated, so find the specialized class, not the generic class.
-  const irep_idt test_class=
-    "java::generic_field_array_instantiation$generic<java::array[reference]>";
+  const irep_idt test_class =
+    "java::generic_field_array_instantiation$generic<java::array[reference]"
+    "of_java::java.lang.Float>";
 
   GIVEN("A generic type instantiated with an array type")
   {
@@ -230,5 +231,42 @@ SCENARIO(
       require_type::require_pointer(
         java_array_element_type(test_field_array),
         symbol_typet("java::java.lang.Float"));
+
+    // check for other specialized classes, in particular different symbol ids
+    // for arrays with different element types
+    GIVEN("A generic type instantiated with different array types")
+    {
+      const irep_idt test_class_integer =
+        "java::generic_field_array_instantiation$generic<java::array[reference]"
+        "of_"
+        "java::java.lang.Integer>";
+
+      const irep_idt test_class_int =
+        "java::generic_field_array_instantiation$generic<java::array[int]>";
+
+      const irep_idt test_class_float =
+        "java::generic_field_array_instantiation$generic<java::array[float]>";
+
+      const struct_typet::componentt &component_g =
+        require_type::require_component(
+          to_struct_type(harness_symbol.type), "g");
+      instantiate_generic_type(
+        to_java_generic_type(component_g.type()), new_symbol_table);
+      REQUIRE(new_symbol_table.has_symbol(test_class_integer));
+
+      const struct_typet::componentt &component_h =
+        require_type::require_component(
+          to_struct_type(harness_symbol.type), "h");
+      instantiate_generic_type(
+        to_java_generic_type(component_h.type()), new_symbol_table);
+      REQUIRE(new_symbol_table.has_symbol(test_class_int));
+
+      const struct_typet::componentt &component_i =
+        require_type::require_component(
+          to_struct_type(harness_symbol.type), "i");
+      instantiate_generic_type(
+        to_java_generic_type(component_i.type()), new_symbol_table);
+      REQUIRE(new_symbol_table.has_symbol(test_class_float));
+    }
   }
 }
