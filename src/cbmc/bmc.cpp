@@ -73,7 +73,7 @@ void bmct::error_trace()
       json_objectt json;
       json_arrayt &result_array=json["results"].make_array();
       json_objectt &json_result=result_array.push_back().make_object();
-      const goto_trace_stept &step=goto_trace.steps.back();
+      const goto_trace_stept &step = *goto_trace.steps.back();
       json_result["property"]=
         json_stringt(id2string(step.pc->source_location.get_property_id()));
       json_result["description"]=

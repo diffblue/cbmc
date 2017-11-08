@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/fixedbv.h>
 #include <util/std_expr.h>
 #include <util/message.h>
+#include <util/make_unique.h>
+
 #include <json/json_parser.h>
 
 #include "interpreter_class.h"
@@ -247,8 +249,8 @@ void interpretert::step()
   next_pc=pc;
   next_pc++;
 
-  steps.add_step(goto_trace_stept());
-  goto_trace_stept &trace_step=steps.get_last_step();
+  steps.add_step(util_make_unique<goto_trace_stept>());
+  goto_trace_stept &trace_step = *steps.get_last_step();
   trace_step.thread_nr=thread_id;
   trace_step.pc=pc;
   switch(pc->type)
@@ -671,7 +673,7 @@ void interpretert::execute_assign()
               << eom;
     else
     {
-      goto_trace_stept &trace_step=steps.get_last_step();
+      goto_trace_stept &trace_step = *steps.get_last_step();
       assign(address, rhs);
       trace_step.full_lhs=code_assign.lhs();
 
@@ -764,7 +766,7 @@ void interpretert::execute_function_call()
 
   // Retrieve the empty last trace step struct we pushed for this step
   // of the interpreter run to fill it with the corresponding data
-  goto_trace_stept &trace_step=steps.get_last_step();
+  goto_trace_stept &trace_step = *steps.get_last_step();
 #if 0
   const memory_cellt &cell=memory[address];
 #endif

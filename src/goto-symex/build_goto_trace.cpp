@@ -18,6 +18,7 @@ Author: Daniel Kroening
 #include <util/threeval.h>
 #include <util/simplify_expr.h>
 #include <util/arith_tools.h>
+#include <util/dereference_iterator.h>
 
 #include <solvers/prop/prop_conv.h>
 #include <solvers/prop/prop.h>
@@ -257,8 +258,8 @@ void build_goto_trace(
     }
 
     goto_tracet::stepst &steps=time_map[current_time];
-    steps.push_back(goto_trace_stept());
-    goto_trace_stept &goto_trace_step=steps.back();
+    steps.push_back(util_make_unique<goto_trace_stept>());
+    goto_trace_stept &goto_trace_step = *steps.back();
     if(!end_step_seen)
       end_ptr=&goto_trace_step;
 
@@ -332,20 +333,19 @@ void build_goto_trace(
     goto_trace.steps.splice(goto_trace.steps.end(), t_it.second);
 
   // cut off the trace at the desired end
-  for(goto_tracet::stepst::iterator
-      s_it1=goto_trace.steps.begin();
-      s_it1!=goto_trace.steps.end();
+  for(auto s_it1 = make_dereference_iterator(goto_trace.steps.begin());
+      s_it1 != goto_trace.steps.end();
       ++s_it1)
     if(end_step_seen && end_ptr==&(*s_it1))
     {
-      goto_trace.trim_after(s_it1);
+      goto_trace.trim_after(s_it1.base());
       break;
     }
 
   // produce the step numbers
   unsigned step_nr=0;
 
-  for(auto &s_it : goto_trace.steps)
+  for(auto &s_it : make_dereference_facade(goto_trace.steps))
     s_it.step_nr=++step_nr;
 }
 
@@ -359,13 +359,12 @@ void build_goto_trace(
     target, target.SSA_steps.end(), prop_conv, ns, goto_trace);
 
   // Now delete anything after first failed assertion
-  for(goto_tracet::stepst::iterator
-      s_it1=goto_trace.steps.begin();
-      s_it1!=goto_trace.steps.end();
+  for(auto s_it1 = make_dereference_iterator(goto_trace.steps.begin());
+      s_it1 != goto_trace.steps.end();
       s_it1++)
     if(s_it1->is_assert() && !s_it1->cond_value)
     {
-      goto_trace.trim_after(s_it1);
+      goto_trace.trim_after(s_it1.base());
       break;
     }
 }

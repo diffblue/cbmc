@@ -18,6 +18,7 @@ Author: Daniel Kroening
 
 #include <util/arith_tools.h>
 #include <util/symbol.h>
+#include <util/dereference_iterator.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
@@ -26,7 +27,7 @@ void goto_tracet::output(
   const class namespacet &ns,
   std::ostream &out) const
 {
-  for(const auto &step : steps)
+  for(const auto &step : make_dereference_facade(steps))
     step.output(ns, out);
 }
 
@@ -249,7 +250,7 @@ void show_goto_trace(
   unsigned prev_step_nr=0;
   bool first_step=true;
 
-  for(const auto &step : goto_trace.steps)
+  for(const auto &step : make_dereference_facade(goto_trace.steps))
   {
     // hide the hidden ones
     if(step.hidden)

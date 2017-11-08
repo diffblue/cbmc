@@ -17,6 +17,7 @@ Author: Daniel Kroening
 
 #include <util/xml_expr.h>
 #include <util/symbol.h>
+#include <util/dereference_iterator.h>
 
 #include <ansi-c/printf_formatter.h>
 #include <langapi/language_util.h>
@@ -30,7 +31,7 @@ void convert(
 
   source_locationt previous_source_location;
 
-  for(const auto &step : goto_trace.steps)
+  for(const auto &step : make_dereference_facade(goto_trace.steps))
   {
     const source_locationt &source_location=step.pc->source_location;
 
