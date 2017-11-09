@@ -50,7 +50,8 @@ protected:
   const optionst &options;
 
   // the failed property
-  symex_target_equationt::SSA_stepst::const_iterator failed;
+  dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
+    failed;
 
   // the list of localization points up to the failed property
   struct lpointt
@@ -82,7 +83,8 @@ protected:
   // void localize_TBD(
   //  prop_convt &prop_conv);
 
-  symex_target_equationt::SSA_stepst::const_iterator get_failed_property();
+  dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
+  get_failed_property();
 
   decision_proceduret::resultt
     run_decision_procedure(prop_convt &prop_conv);

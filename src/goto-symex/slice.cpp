@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "slice.h"
 
 #include <util/std_expr.h>
+#include <util/dereference_iterator.h>
 
 #include "symex_slice_class.h"
 
@@ -44,9 +45,8 @@ void symex_slicet::slice(
 
 void symex_slicet::slice(symex_target_equationt &equation)
 {
-  for(symex_target_equationt::SSA_stepst::reverse_iterator
-      it=equation.SSA_steps.rbegin();
-      it!=equation.SSA_steps.rend();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.rbegin());
+      it != equation.SSA_steps.rend();
       it++)
     slice(*it);
 }
@@ -148,9 +148,8 @@ void symex_slicet::collect_open_variables(
 {
   symbol_sett lhs;
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++)
   {
     const symex_target_equationt::SSA_stept &SSA_step=*it;
@@ -239,20 +238,17 @@ void slice(symex_target_equationt &equation,
 void simple_slice(symex_target_equationt &equation)
 {
   // just find the last assertion
-  symex_target_equationt::SSA_stepst::iterator
-    last_assertion=equation.SSA_steps.end();
+  auto last_assertion = make_dereference_iterator(equation.SSA_steps.end());
 
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++)
     if(it->is_assert())
       last_assertion=it;
 
   // slice away anything after it
 
-  symex_target_equationt::SSA_stepst::iterator s_it=
-    last_assertion;
+  auto s_it = last_assertion;
 
   if(s_it!=equation.SSA_steps.end())
   {

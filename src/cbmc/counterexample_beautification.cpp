@@ -26,9 +26,9 @@ void counterexample_beautificationt::get_minimization_list(
 {
   // ignore the ones that are assigned under false guards
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
+      it++)
   {
     if(it->is_assignment() &&
        it->assignment_type==symex_targett::assignment_typet::STATE)
@@ -59,23 +59,23 @@ void counterexample_beautificationt::get_minimization_list(
   }
 }
 
-symex_target_equationt::SSA_stepst::const_iterator
+dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
 counterexample_beautificationt::get_failed_property(
   const prop_convt &prop_conv,
   const symex_target_equationt &equation)
 {
   // find failed property
 
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end(); it++)
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
+      it++)
     if(it->is_assert() &&
        prop_conv.l_get(it->guard_literal).is_true() &&
        prop_conv.l_get(it->cond_literal).is_false())
       return it;
 
   UNREACHABLE;
-  return equation.SSA_steps.end();
+  return make_dereference_iterator(equation.SSA_steps.end());
 }
 
 void counterexample_beautificationt::operator()(
@@ -98,9 +98,9 @@ void counterexample_beautificationt::operator()(
     typedef std::map<literalt, unsigned> guard_countt;
     guard_countt guard_count;
 
-    for(symex_target_equationt::SSA_stepst::const_iterator
-        it=equation.SSA_steps.begin();
-        it!=equation.SSA_steps.end(); it++)
+    for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+        it != equation.SSA_steps.end();
+        it++)
     {
       if(it->is_assignment() &&
          it->assignment_type!=symex_targett::assignment_typet::HIDDEN)

@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/guard.h>
+#include <util/make_unique.h>
+#include <util/dereference_iterator.h>
 
 #include <langapi/language_util.h>
 
@@ -104,8 +106,9 @@ void symex_slice_by_tracet::slice_by_trace(
   guardt t_guard;
   t_guard.make_true();
   symex_targett::sourcet empty_source;
-  equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
-  symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
+  equation.SSA_steps.push_front(
+    util_make_unique<symex_target_equationt::SSA_stept>());
+  symex_target_equationt::SSA_stept &SSA_step = *equation.SSA_steps.front();
 
   SSA_step.guard=t_guard.as_expr();
   SSA_step.ssa_lhs.make_nil();
@@ -236,9 +239,8 @@ void symex_slice_by_tracet::compute_ts_back(
 {
   size_t merge_count=0;
 
-  for(symex_target_equationt::SSA_stepst::reverse_iterator
-      i=equation.SSA_steps.rbegin();
-      i!=equation.SSA_steps.rend();
+  for(auto i = make_dereference_iterator(equation.SSA_steps.rbegin());
+      i != equation.SSA_steps.rend();
       i++)
   {
     if(i->is_output() &&
@@ -391,9 +393,8 @@ void symex_slice_by_tracet::slice_SSA_steps(
   size_t location_SSA_steps=0;
   size_t trace_loc_sliced=0;
 
-  for(symex_target_equationt::SSA_stepst::iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++)
   {
     if(it->is_output())
@@ -519,8 +520,9 @@ void symex_slice_by_tracet::assign_merges(
 
     exprt merge_copy(*i);
 
-    equation.SSA_steps.push_front(symex_target_equationt::SSA_stept());
-    symex_target_equationt::SSA_stept &SSA_step=equation.SSA_steps.front();
+    equation.SSA_steps.push_front(
+      util_make_unique<symex_target_equationt::SSA_stept>());
+    symex_target_equationt::SSA_stept &SSA_step = *equation.SSA_steps.front();
 
     SSA_step.guard=t_guard.as_expr();
     SSA_step.ssa_lhs=merge_sym;

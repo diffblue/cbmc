@@ -58,9 +58,8 @@ void precondition(
   const goto_symex_statet &s,
   exprt &dest)
 {
-  for(symex_target_equationt::SSA_stepst::const_reverse_iterator
-      it=equation.SSA_steps.rbegin();
-      it!=equation.SSA_steps.rend();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.rbegin());
+      it != equation.SSA_steps.rend();
       it++)
   {
     preconditiont precondition(ns, value_sets, target, *it, s);

@@ -20,6 +20,7 @@ Date: June 2011
 #include <util/arith_tools.h>
 #include <util/pointer_offset_size.h>
 #include <util/numbering.h>
+#include <util/dereference_iterator.h>
 
 std::string as_vcd_binary(
   const exprt &expr,
@@ -97,7 +98,7 @@ void output_vcd(
 
   numbering<irep_idt> n;
 
-  for(const auto &step : goto_trace.steps)
+  for(const auto &step : make_dereference_facade(goto_trace.steps))
   {
     if(step.is_assignment())
     {
@@ -124,7 +125,7 @@ void output_vcd(
 
   unsigned timestamp=0;
 
-  for(const auto &step : goto_trace.steps)
+  for(const auto &step : make_dereference_facade(goto_trace.steps))
   {
     switch(step.type)
     {

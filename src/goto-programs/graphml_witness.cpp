@@ -17,6 +17,7 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
+#include <util/dereference_iterator.h>
 
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
@@ -137,8 +138,8 @@ std::string graphml_witnesst::convert_assign_rec(
 
 static bool filter_out(
   const goto_tracet &goto_trace,
-  const goto_tracet::stepst::const_iterator &prev_it,
-  goto_tracet::stepst::const_iterator &it)
+  const dereference_iteratort<goto_tracet::stepst::const_iterator> &prev_it,
+  dereference_iteratort<goto_tracet::stepst::const_iterator> &it)
 {
   if(it->hidden &&
      (!it->pc->is_assign() ||
@@ -184,10 +185,9 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
 
-  goto_tracet::stepst::const_iterator prev_it=goto_trace.steps.end();
-  for(goto_tracet::stepst::const_iterator
-      it=goto_trace.steps.begin();
-      it!=goto_trace.steps.end();
+  auto prev_it = make_dereference_iterator(goto_trace.steps.end());
+  for(auto it = make_dereference_iterator(goto_trace.steps.begin());
+      it != goto_trace.steps.end();
       it++) // we cannot replace this by a ranged for
   {
     if(filter_out(goto_trace, prev_it, it))
@@ -198,7 +198,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     }
 
     // skip declarations followed by an immediate assignment
-    goto_tracet::stepst::const_iterator next=it;
+    auto next = it;
     ++next;
     if(next!=goto_trace.steps.end() &&
        next->type==goto_trace_stept::typet::ASSIGNMENT &&
@@ -228,10 +228,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   }
 
   // build edges
-  for(goto_tracet::stepst::const_iterator
-      it=goto_trace.steps.begin();
-      it!=goto_trace.steps.end();
-      ) // no ++it
+  for(auto it = make_dereference_iterator(goto_trace.steps.begin());
+      it != goto_trace.steps.end();) // no ++it
   {
     const std::size_t from=step_to_node[it->step_nr];
 
@@ -241,7 +239,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       continue;
     }
 
-    goto_tracet::stepst::const_iterator next=it;
+    auto next = it;
     for(++next;
         next!=goto_trace.steps.end() &&
         (step_to_node[next->step_nr]==sink || it->pc==next->pc);
@@ -369,9 +367,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
   std::vector<std::size_t> step_to_node(equation.SSA_steps.size()+1, 0);
 
   std::size_t step_nr=1;
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();
       it++, step_nr++) // we cannot replace this by a ranged for
   {
     const source_locationt &source_location=it->source.pc->source_location;
@@ -389,7 +386,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     }
 
     // skip declarations followed by an immediate assignment
-    symex_target_equationt::SSA_stepst::const_iterator next=it;
+    auto next = it;
     ++next;
     if(next!=equation.SSA_steps.end() &&
        next->is_assignment() &&
@@ -416,10 +413,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
 
   // build edges
   step_nr=1;
-  for(symex_target_equationt::SSA_stepst::const_iterator
-      it=equation.SSA_steps.begin();
-      it!=equation.SSA_steps.end();
-      ) // no ++it
+  for(auto it = make_dereference_iterator(equation.SSA_steps.begin());
+      it != equation.SSA_steps.end();) // no ++it
   {
     const std::size_t from=step_to_node[step_nr];
 
@@ -430,7 +425,7 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       continue;
     }
 
-    symex_target_equationt::SSA_stepst::const_iterator next=it;
+    auto next = it;
     std::size_t next_step_nr=step_nr;
     for(++next, ++next_step_nr;
         next!=equation.SSA_steps.end() &&

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/xml_expr.h>
 #include <util/json.h>
 #include <util/json_expr.h>
+#include <util/dereference_iterator.h>
 
 #include <solvers/prop/cover_goals.h>
 #include <solvers/prop/literal_expr.h>
@@ -115,7 +116,7 @@ public:
   {
     bool first=true;
     std::string test;
-    for(const auto &step : goto_trace.steps)
+    for(const auto &step : make_dereference_facade(goto_trace.steps))
     {
       if(step.is_input())
       {
@@ -174,13 +175,12 @@ void bmc_covert::satisfying_assignment()
   goto_tracet &goto_trace=test.goto_trace;
 
   // Now delete anything after first failed assumption
-  for(goto_tracet::stepst::iterator
-      s_it1=goto_trace.steps.begin();
-      s_it1!=goto_trace.steps.end();
+  for(auto s_it1 = make_dereference_iterator(goto_trace.steps.begin());
+      s_it1 != goto_trace.steps.end();
       s_it1++)
     if(s_it1->is_assume() && !s_it1->cond_value)
     {
-      goto_trace.steps.erase(++s_it1, goto_trace.steps.end());
+      goto_trace.steps.erase(++s_it1.base(), goto_trace.steps.end());
       break;
     }
 }
@@ -208,7 +208,7 @@ bool bmc_covert::operator()()
     }
   }
 
-  for(auto &step : bmc.equation.SSA_steps)
+  for(auto &step : make_dereference_facade(bmc.equation.SSA_steps))
     step.cond_literal=literalt(0, 0);
 
   // Do conversion to next solver layer
@@ -217,8 +217,8 @@ bool bmc_covert::operator()()
 
   // get the conditions for these goals from formula
   // collect all 'instances' of the goals
-  for(auto it = bmc.equation.SSA_steps.begin();
-      it!=bmc.equation.SSA_steps.end();
+  for(auto it = make_dereference_iterator(bmc.equation.SSA_steps.begin());
+      it != bmc.equation.SSA_steps.end();
       it++)
   {
     if(it->is_assert())
@@ -229,7 +229,7 @@ bool bmc_covert::operator()()
           literal_exprt(it->guard_literal),
           literal_exprt(!it->cond_literal) });
       literalt l_c=solver.convert(c);
-      goal_map[id(it->source.pc)].add_instance(it, l_c);
+      goal_map[id(it->source.pc)].add_instance(it.base(), l_c);
     }
   }
 
@@ -320,7 +320,7 @@ bool bmc_covert::operator()()
         {
           xmlt &xml_test=xml_result.new_element("inputs");
 
-          for(const auto &step : test.goto_trace.steps)
+          for(const auto &step : make_dereference_facade(test.goto_trace.steps))
           {
             if(step.is_input())
             {
@@ -376,7 +376,7 @@ bool bmc_covert::operator()()
         {
           json_arrayt &json_test=result["inputs"].make_array();
 
-          for(const auto &step : test.goto_trace.steps)
+          for(const auto &step : make_dereference_facade(test.goto_trace.steps))
           {
             if(step.is_input())
             {

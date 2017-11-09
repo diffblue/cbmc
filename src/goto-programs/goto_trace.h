@@ -151,7 +151,22 @@ public:
 class goto_tracet
 {
 public:
-  typedef std::list<goto_trace_stept> stepst;
+  goto_tracet() = default;
+  goto_tracet(const goto_tracet &) = delete;
+  goto_tracet &operator=(const goto_tracet &) = delete;
+
+  goto_tracet(goto_tracet &&other)
+    : steps(std::move(other.steps)), mode(std::move(other.mode))
+  {
+  }
+
+  goto_tracet &operator=(goto_tracet &&other)
+  {
+    swap(other);
+    return *this;
+  }
+
+  typedef std::list<std::unique_ptr<goto_trace_stept>> stepst;
   stepst steps;
 
   irep_idt mode;
@@ -174,16 +189,17 @@ public:
     other.mode.swap(mode);
   }
 
-  void add_step(const goto_trace_stept &step)
+  void add_step(std::unique_ptr<goto_trace_stept> step)
   {
-    steps.push_back(step);
+    steps.push_back(std::move(step));
   }
 
   // retrieves the final step in the trace for manipulation
   // (used to fill a trace from code, hence non-const)
-  inline goto_trace_stept &get_last_step()
+  // We return a non-owning pointer to help ensure the object is not sliced
+  inline goto_trace_stept *get_last_step()
   {
-    return steps.back();
+    return steps.back().get();
   }
 
   // delete all steps after (not including) s

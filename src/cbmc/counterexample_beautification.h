@@ -42,12 +42,14 @@ protected:
     const exprt &expr,
     class prop_minimizet &prop_minimize);
 
-  symex_target_equationt::SSA_stepst::const_iterator get_failed_property(
+  dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
+  get_failed_property(
     const prop_convt &prop_conv,
     const symex_target_equationt &equation);
 
   // the failed property
-  symex_target_equationt::SSA_stepst::const_iterator failed;
+  dereference_iteratort<symex_target_equationt::SSA_stepst::const_iterator>
+    failed;
 };
 
 #endif // CPROVER_CBMC_COUNTEREXAMPLE_BEAUTIFICATION_H
