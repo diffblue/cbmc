@@ -20,6 +20,7 @@ Author: Daniel Kroening
 #include <util/simplify_expr.h>
 
 #include <langapi/language_util.h>
+#include <util/json_irep.h>
 
 /// Produce a json representation of a trace.
 /// \param ns: a namespace
@@ -121,6 +122,9 @@ void convert(
 
         json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
+        // Not language specific, still mangled, fully-qualified name of lhs:
+        json_assignment["rawLhs"] =
+          json_irept(true).convert_from_irep(simplified);
         json_assignment["hidden"]=jsont::json_boolean(step.hidden);
         json_assignment["internal"]=jsont::json_boolean(step.internal);
         json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));
