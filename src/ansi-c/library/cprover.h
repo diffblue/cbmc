@@ -54,7 +54,7 @@ void CBMC_trace(int lvl, const char *event, ...);
 
 // pointers
 unsigned __CPROVER_POINTER_OBJECT(const void *p);
-signed __CPROVER_POINTER_OFFSET(const void *p);
+signed long int __CPROVER_POINTER_OFFSET(const void *p);
 __CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);
 #if 0
 extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];

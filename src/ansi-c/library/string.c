@@ -14,9 +14,11 @@ inline char *__builtin___strcpy_chk(char *dst, const char *src, __CPROVER_size_t
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcpy src/dst overlap");
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      __CPROVER_POINTER_OFFSET(src) + s <= __CPROVER_POINTER_OFFSET(dst) ||
+      __CPROVER_POINTER_OFFSET(dst) + s <= __CPROVER_POINTER_OFFSET(src),
+      "strcpy src/dst overlap");
   __CPROVER_size_t i=0;
   char ch;
   do
@@ -140,9 +142,16 @@ inline char *strcpy(char *dst, const char *src)
   __CPROVER_is_zero_string(dst)=1;
   __CPROVER_zero_string_length(dst)=__CPROVER_zero_string_length(src);
   #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "strcpy src/dst overlap");
+    {
+    unsigned long n;
+    for(n = 0U; *(src + n) != 0; ++n)
+        ;
+    __CPROVER_precondition(
+      __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      __CPROVER_POINTER_OFFSET(src) + n < __CPROVER_POINTER_OFFSET(dst) ||
+      __CPROVER_POINTER_OFFSET(dst) + n < __CPROVER_POINTER_OFFSET(src),
+      "strcpy src/dst overlap");
+    }
   __CPROVER_size_t i=0;
   char ch;
   do
@@ -578,6 +587,8 @@ inline char *strdup(const char *str)
 void *memcpy(void *dst, const void *src, size_t n)
 {
   __CPROVER_HIDE:
+  if(n==0U)
+    return dst;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
                          "memcpy buffer overflow");
@@ -594,9 +605,11 @@ void *memcpy(void *dst, const void *src, size_t n)
             n <= __CPROVER_zero_string_length(dst)))
     __CPROVER_is_zero_string(dst)=0;
   #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+    __CPROVER_POINTER_OFFSET(src) + n <= __CPROVER_POINTER_OFFSET(dst) ||
+    __CPROVER_POINTER_OFFSET(dst) + n <= __CPROVER_POINTER_OFFSET(src),
+    "memcpy src/dst overlap");
   (void)*(char *)dst; // check that the memory is accessible
   (void)*(const char *)src; // check that the memory is accessible
 
@@ -618,6 +631,8 @@ void *memcpy(void *dst, const void *src, size_t n)
 void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __CPROVER_size_t size)
 {
   __CPROVER_HIDE:
+  if(size==0U)
+    return dst;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(src)>=n,
                          "memcpy buffer overflow");
@@ -636,9 +651,11 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
             n <= __CPROVER_zero_string_length(dst)))
     __CPROVER_is_zero_string(dst)=0;
   #else
-  __CPROVER_precondition(__CPROVER_POINTER_OBJECT(dst)!=
-                         __CPROVER_POINTER_OBJECT(src),
-                         "memcpy src/dst overlap");
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+    __CPROVER_POINTER_OFFSET(src) + n <= __CPROVER_POINTER_OFFSET(dst) ||
+    __CPROVER_POINTER_OFFSET(dst) + n <= __CPROVER_POINTER_OFFSET(src),
+     "__builtin___memcpy_chk src/dst overlap");
   (void)*(char *)dst; // check that the memory is accessible
   (void)*(const char *)src; // check that the memory is accessible
   (void)size;
@@ -668,6 +685,8 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
 void *memset(void *s, int c, size_t n)
 {
   __CPROVER_HIDE:;
+  if(n==0U)
+    return s;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(s)>=n,
                          "memset buffer overflow");
@@ -705,6 +724,8 @@ void *memset(void *s, int c, size_t n)
 void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
 {
   __CPROVER_HIDE:;
+  if(n==0U)
+    return s;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(s)>=n,
                          "memset buffer overflow");
@@ -744,6 +765,8 @@ void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
 void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_t size)
 {
   __CPROVER_HIDE:;
+  if(n==0U)
+    return s;
   #ifdef __CPROVER_STRING_ABSTRACTION
   __CPROVER_precondition(__CPROVER_buffer_size(s)>=n,
                          "memset buffer overflow");

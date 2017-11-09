@@ -84,7 +84,7 @@ void cpp_internal_additions(std::ostream &out)
 
   // pointers
   out << "extern \"C\" unsigned __CPROVER_POINTER_OBJECT(const void *p);\n";
-  out << "extern \"C\" signed __CPROVER_POINTER_OFFSET(const void *p);" << '\n';
+  out << "extern \"C\" signed long int __CPROVER_POINTER_OFFSET(const void *p);" << '\n';
   out << "extern \"C\" bool __CPROVER_DYNAMIC_OBJECT(const void *p);" << '\n';
   // NOLINTNEXTLINE(whitespace/line_length)
   out << "extern \"C\" extern unsigned char __CPROVER_memory[__CPROVER::constant_infinity_uint];" << '\n';

@@ -131,6 +131,15 @@ void ansi_c_internal_additions(std::string &code)
     // NOLINTNEXTLINE(whitespace/line_length)
     "__CPROVER_bool __CPROVER_threads_exited[__CPROVER_constant_infinity_uint];\n"
     "unsigned long __CPROVER_next_thread_id=0;\n"
+
+    // traces
+    "void CBMC_trace(int lvl, const char *event, ...);\n"
+
+    // pointers
+    "unsigned __CPROVER_POINTER_OBJECT(const void *p);\n"
+    "signed long int __CPROVER_POINTER_OFFSET(const void *p);\n"
+    "__CPROVER_bool __CPROVER_DYNAMIC_OBJECT(const void *p);\n"
+    "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     "extern unsigned char __CPROVER_memory[__CPROVER_constant_infinity_uint];\n"
 
