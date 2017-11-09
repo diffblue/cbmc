@@ -35,6 +35,18 @@ public:
   explicit symex_target_equationt(const namespacet &_ns);
   virtual ~symex_target_equationt();
 
+  symex_target_equationt(const symex_target_equationt &) = delete;
+  symex_target_equationt &operator=(const symex_target_equationt &) = delete;
+
+  symex_target_equationt(symex_target_equationt &&other)
+    : SSA_steps(std::move(other.SSA_steps)),
+      ns(std::move(other.ns)),
+      merge_irep(std::move(other.merge_irep))
+  {
+  }
+
+  symex_target_equationt &operator=(symex_target_equationt &&other) = delete;
+
   // read event
   virtual void shared_read(
     const exprt &guard,
