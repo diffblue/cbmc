@@ -109,15 +109,7 @@ typet generate_java_generic_typet::substitute_type(
       java_generics_get_index_for_subtype(generic_class, component_identifier);
 
     INVARIANT(results.has_value(), "generic component type not found");
-
-    if(results)
-    {
-      return generic_reference.generic_type_variables()[*results];
-    }
-    else
-    {
-      return parameter_type;
-    }
+    return generic_reference.generic_type_variables()[*results];
   }
   else if(parameter_type.id() == ID_pointer)
   {
