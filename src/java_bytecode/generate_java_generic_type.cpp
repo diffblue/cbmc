@@ -32,13 +32,17 @@ symbolt generate_java_generic_typet::operator()(
 
   INVARIANT(
     pointer_subtype.id()==ID_struct, "Only pointers to classes in java");
+  INVARIANT(
+    is_java_generic_class_type(pointer_subtype),
+    "Generic references type must be a generic class");
 
-  const java_class_typet &replacement_type=
-    to_java_class_type(pointer_subtype);
-  const irep_idt new_tag=build_generic_tag(
-    existing_generic_type, replacement_type);
-  struct_union_typet::componentst replacement_components=
-    replacement_type.components();
+  const java_generic_class_typet &generic_class_definition =
+    to_java_generic_class_type(to_java_class_type(pointer_subtype));
+
+  const irep_idt new_tag =
+    build_generic_tag(existing_generic_type, generic_class_definition);
+  struct_union_typet::componentst replacement_components =
+    generic_class_definition.components();
 
   // Small auxiliary function, to perform the inplace
   // modification of the generic fields.
@@ -46,9 +50,7 @@ symbolt generate_java_generic_typet::operator()(
     [&](struct_union_typet::componentt &component) {
 
       component.type() = substitute_type(
-        component.type(),
-        to_java_generic_class_type(replacement_type),
-        existing_generic_type);
+        component.type(), generic_class_definition, existing_generic_type);
 
       return component;
     };
@@ -61,8 +63,8 @@ symbolt generate_java_generic_typet::operator()(
     replacement_components.end(),
     replace_type_for_generic_field);
 
-  std::size_t after_modification_size=
-    replacement_type.components().size();
+  std::size_t after_modification_size =
+    generic_class_definition.components().size();
 
   INVARIANT(
     pre_modification_size==after_modification_size,
