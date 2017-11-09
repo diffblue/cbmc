@@ -151,6 +151,21 @@ public:
 class goto_tracet
 {
 public:
+  goto_tracet() = default;
+  goto_tracet(const goto_tracet &) = delete;
+  goto_tracet &operator=(const goto_tracet &) = delete;
+
+  goto_tracet(goto_tracet &&other)
+    : steps(std::move(other.steps)), mode(std::move(other.mode))
+  {
+  }
+
+  goto_tracet &operator=(goto_tracet &&other)
+  {
+    swap(other);
+    return *this;
+  }
+
   typedef std::list<std::unique_ptr<goto_trace_stept>> stepst;
   stepst steps;
 
