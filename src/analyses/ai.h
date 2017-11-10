@@ -133,6 +133,7 @@ public:
     initialize(goto_program);
     entry_state(goto_program);
     fixedpoint(goto_program, goto_functions, ns);
+    finalize();
   }
 
   void operator()(
@@ -142,6 +143,7 @@ public:
     initialize(goto_functions);
     entry_state(goto_functions);
     fixedpoint(goto_functions, ns);
+    finalize();
   }
 
   void operator()(const goto_modelt &goto_model)
@@ -150,6 +152,7 @@ public:
     initialize(goto_model.goto_functions);
     entry_state(goto_model.goto_functions);
     fixedpoint(goto_model.goto_functions, ns);
+    finalize();
   }
 
   void operator()(
@@ -160,6 +163,7 @@ public:
     initialize(goto_function);
     entry_state(goto_function.body);
     fixedpoint(goto_function.body, goto_functions, ns);
+    finalize();
   }
 
   /// Returns the abstract state before the given instruction
@@ -263,6 +267,9 @@ protected:
   virtual void initialize(const goto_programt &);
   virtual void initialize(const goto_functionst::goto_functiont &);
   virtual void initialize(const goto_functionst &);
+
+  // override to add a cleanup step after fixedpoint has run
+  virtual void finalize();
 
   void entry_state(const goto_programt &);
   void entry_state(const goto_functionst &);
