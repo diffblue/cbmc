@@ -1,0 +1,9 @@
+CORE
+DivideByZero.class
+
+^EXIT=10$
+^SIGNAL=0$
+Denominator should be nonzero: FAILURE
+^VERIFICATION FAILED
+--
+^warning: ignoring

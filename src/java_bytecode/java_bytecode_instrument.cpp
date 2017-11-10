@@ -143,7 +143,7 @@ codet java_bytecode_instrumentt::throw_exception(
 /// flag is set.
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ArithmeticException
-/// or is a skip
+/// or asserts a nonzero denominator.
 codet java_bytecode_instrumentt::check_arithmetic_exception(
   const exprt &denominator,
   const source_locationt &original_loc)
@@ -157,7 +157,11 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
       original_loc,
       "java.lang.ArithmeticException");
 
-  return code_skipt();
+  code_assertt ret(binary_relation_exprt(denominator, ID_notequal, zero));
+  ret.add_source_location()=original_loc;
+  ret.add_source_location().set_comment("Denominator should be nonzero");
+  ret.add_source_location().set_property_class("integer-divide-by-zero");
+  return ret;
 }
 
 /// Checks whether the array access array_struct[idx] is out-of-bounds,
