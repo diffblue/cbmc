@@ -153,22 +153,22 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(first_expected_symbol));
     auto first_symbol=new_symbol_table.lookup(first_expected_symbol);
     REQUIRE(first_symbol->type.id()==ID_struct);
-    auto first_symbol_type=
-      to_struct_type(first_symbol->type).components()[3].type();
-    REQUIRE(first_symbol_type.id()==ID_pointer);
-    REQUIRE(first_symbol_type.subtype().id()==ID_symbol);
-    REQUIRE(to_symbol_type(first_symbol_type.subtype()).get_identifier()==
-      "java::java.lang.Boolean");
+    const struct_union_typet::componentt &component =
+      require_type::require_component(
+        to_struct_type(first_symbol->type), "elem");
+    auto first_symbol_type=component.type();
+    require_type::require_pointer(
+      first_symbol_type, symbol_typet("java::java.lang.Boolean"));
 
     REQUIRE(new_symbol_table.has_symbol(second_expected_symbol));
     auto second_symbol=new_symbol_table.lookup(second_expected_symbol);
     REQUIRE(second_symbol->type.id()==ID_struct);
-    auto second_symbol_type=
-      to_struct_type(second_symbol->type).components()[3].type();
-    REQUIRE(second_symbol_type.id()==ID_pointer);
-    REQUIRE(second_symbol_type.subtype().id()==ID_symbol);
-    REQUIRE(to_symbol_type(second_symbol_type.subtype()).get_identifier()==
-            "java::java.lang.Integer");
+    const struct_union_typet::componentt &second_component =
+      require_type::require_component(
+        to_struct_type(second_symbol->type), "elem");
+    auto second_symbol_type=second_component.type();
+    require_type::require_pointer(
+      second_symbol_type, symbol_typet("java::java.lang.Integer"));
   }
 }
 

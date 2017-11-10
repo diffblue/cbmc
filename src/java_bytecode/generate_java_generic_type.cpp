@@ -70,13 +70,20 @@ symbolt generate_java_generic_typet::operator()(
     pre_modification_size==after_modification_size,
     "All components in the original class should be in the new class");
 
-  const auto expected_symbol="java::"+id2string(new_tag);
+  const java_class_typet &new_java_class = construct_specialised_generic_type(
+    generic_class_definition, new_tag, replacement_components);
+  const type_symbolt &class_symbol =
+    build_symbol_from_specialised_class(new_java_class);
 
-  generate_class_stub(
-    new_tag,
-    symbol_table,
-    message_handler,
-    replacement_components);
+  std::pair<symbolt &, bool> res = symbol_table.insert(std::move(class_symbol));
+  if(!res.second)
+  {
+    messaget message(message_handler);
+    message.warning() << "stub class symbol " << class_symbol.name
+                      << " already exists" << messaget::eom;
+  }
+
+  const auto expected_symbol="java::"+id2string(new_tag);
   auto symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
@@ -215,4 +222,39 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   new_tag_buffer << ">";
 
   return new_tag_buffer.str();
+}
+
+/// Build the specalised version of the specific class, with the specified
+/// parameters and name.
+/// \param generic_class_definition: The generic class we are specialising
+/// \param new_tag: The new name for the class (like Generic<java::Float>)
+/// \param new_components: The specialised components
+/// \return The newly constructed class.
+java_class_typet
+generate_java_generic_typet::construct_specialised_generic_type(
+  const java_generic_class_typet &generic_class_definition,
+  const irep_idt &new_tag,
+  const struct_typet::componentst &new_components) const
+{
+  java_class_typet specialised_class = generic_class_definition;
+  // We are specialising the logic - so we don't want to be marked as generic
+  specialised_class.set(ID_C_java_generics_class_type, false);
+  specialised_class.set(ID_name, "java::" + id2string(new_tag));
+  specialised_class.set(ID_base_name, new_tag);
+  specialised_class.components() = new_components;
+  return specialised_class;
+}
+
+/// Construct the symbol to be moved into the symbol table
+/// \param specialised_class: The newly constructed specialised class
+/// \return The symbol to add to the symbol table
+type_symbolt generate_java_generic_typet::build_symbol_from_specialised_class(
+  const java_class_typet &specialised_class) const
+{
+  type_symbolt new_symbol(specialised_class);
+  new_symbol.base_name = specialised_class.get(ID_base_name);
+  new_symbol.pretty_name = specialised_class.get(ID_base_name);
+  new_symbol.name = specialised_class.get(ID_name);
+  new_symbol.mode = ID_java;
+  return new_symbol;
 }
