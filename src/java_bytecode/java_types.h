@@ -403,4 +403,29 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
   return std::distance(gen_types.cbegin(), iter);
 }
 
+class java_specialised_generic_class_typet : public java_class_typet
+{
+  // note the constryctor could take the components and construct it itself
+  // note vector of generic parameter of symbol type
+public:
+  // TODO: to be defined more appropriately.
+  java_specialised_generic_class_typet()
+  {
+    set(ID_C_specialised_generic_java_class, true);
+  }
+};
+
+inline const bool java_is_specialised_generic_class_type(const typet &type)
+{
+  return type.get_bool(ID_C_specialised_generic_java_class);
+}
+
+inline java_specialised_generic_class_typet
+  to_java_specialised_class_typet(const typet &type)
+{
+  INVARIANT(java_is_specialised_generic_class_type(type),
+    "Tried to convert a type that was not a specialised generic java class");
+  return static_cast<const java_specialised_generic_class_typet &>(type);
+}
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

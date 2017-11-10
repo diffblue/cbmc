@@ -78,8 +78,9 @@ symbolt generate_java_generic_typet::operator()(
 
   // inlined the generate_class_stub for now
   {
-    java_class_typet specialised_class;
+    java_specialised_generic_class_typet specialised_class;
     specialised_class.set_tag(replacement_type.get_tag());
+    // NOTE: the tag absolutely has to be BasicGeneric
     specialised_class.set(ID_base_name, new_tag);
 
     // produce class symbol
@@ -94,13 +95,11 @@ symbolt generate_java_generic_typet::operator()(
 
     std::pair<symbolt &, bool> res = symbol_table.insert(std::move(new_symbol));
 
-    if(! res.second)
+    if(!res.second)
     {
       messaget message(message_handler);
-      message.warning() <<
-                        "stub class symbol " <<
-                        new_symbol.name <<
-                        " already exists" << messaget::eom;
+      message.warning() << "stub class symbol " << new_symbol.name
+                        << " already exists" << messaget::eom;
     }
     else
     {
