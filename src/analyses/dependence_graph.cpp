@@ -120,10 +120,6 @@ void dep_graph_domaint::control_dependencies(
 
     it=next;
   }
-
-  // add edges to the graph
-  for(const auto &c_dep : control_deps)
-    dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, to);
 }
 
 static bool may_be_def_use_pair(
@@ -184,15 +180,6 @@ void dep_graph_domaint::data_dependencies(
     }
 
     dep_graph.reaching_definitions()[to].clear_cache(it->first);
-  }
-
-  // add edges to the graph
-  for(const auto &d_dep : data_deps)
-  {
-    // *it might be handled in a future call call to visit only,
-    // depending on the sequence of successors; make sure it exists
-    dep_graph.get_state(d_dep);
-    dep_graph.add_dep(dep_edget::kindt::DATA, d_dep, to);
   }
 }
 
@@ -325,4 +312,14 @@ void dependence_grapht::add_dep(
   // add_edge(n_from, n_to);
   nodes[n_from].out[n_to].add(kind);
   nodes[n_to].in[n_from].add(kind);
+}
+
+void dep_graph_domaint::populate_dep_graph(
+  dependence_grapht &dep_graph, goto_programt::const_targett this_loc) const
+{
+  for(const auto &c_dep : control_deps)
+    dep_graph.add_dep(dep_edget::kindt::CTRL, c_dep, this_loc);
+
+  for(const auto &d_dep : data_deps)
+    dep_graph.add_dep(dep_edget::kindt::DATA, d_dep, this_loc);
 }

@@ -154,6 +154,9 @@ public:
     return node_id;
   }
 
+  void populate_dep_graph(
+    dependence_grapht &, goto_programt::const_targett) const;
+
 private:
   tvt has_values;
   node_indext node_id;
@@ -204,6 +207,14 @@ public:
       const irep_idt id=goto_programt::get_function_id(goto_program);
       cfg_post_dominatorst &pd=post_dominators[id];
       pd(goto_program);
+    }
+  }
+
+  void finalize()
+  {
+    for(const auto &location_state : state_map)
+    {
+      location_state.second.populate_dep_graph(*this, location_state.first);
     }
   }
 
