@@ -25,6 +25,9 @@ namespace require_type
 pointer_typet
 require_pointer(const typet &type, const optionalt<typet> &subtype);
 
+const symbol_typet &
+require_symbol(const typet &type, const irep_idt &identifier = "");
+
 struct_typet::componentt require_component(
   const struct_typet &struct_type,
   const irep_idt &component_name);
@@ -67,9 +70,9 @@ const typet &require_java_non_generic_type(
   const typet &type,
   const optionalt<symbol_typet> &expect_subtype);
 
-java_generics_class_typet require_java_generic_class(const typet &class_type);
+java_generic_class_typet require_java_generic_class(const typet &class_type);
 
-java_generics_class_typet require_java_generic_class(
+java_generic_class_typet require_java_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &type_variables);
 

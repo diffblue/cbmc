@@ -28,6 +28,11 @@ private:
     const java_generic_typet &existing_generic_type,
     const java_class_typet &original_class) const;
 
+  typet substitute_type(
+    const typet &parameter_type,
+    const java_generic_class_typet &replacement_type,
+    const java_generic_typet &generic_reference) const;
+
   message_handlert &message_handler;
 };
 

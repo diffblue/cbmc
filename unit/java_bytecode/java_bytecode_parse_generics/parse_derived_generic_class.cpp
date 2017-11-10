@@ -44,7 +44,7 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(class_prefix));
 
     const symbolt &derived_symbol = new_symbol_table.lookup_ref(class_prefix);
-    const java_generics_class_typet &derived_class_type =
+    const java_generic_class_typet &derived_class_type =
       require_type::require_java_generic_class(
         derived_symbol.type, {class_prefix + "::T"});
 
