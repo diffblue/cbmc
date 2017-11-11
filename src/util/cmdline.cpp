@@ -18,7 +18,6 @@ cmdlinet::cmdlinet()
 
 cmdlinet::~cmdlinet()
 {
-  clear();
 }
 
 void cmdlinet::clear()
