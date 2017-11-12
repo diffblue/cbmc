@@ -164,6 +164,11 @@ private:
   typedef std::set<goto_programt::const_targett> depst;
   depst control_deps, data_deps;
 
+  friend const depst &
+    dependence_graph_test_get_control_deps(const dep_graph_domaint &);
+  friend const depst &
+    dependence_graph_test_get_data_deps(const dep_graph_domaint &);
+
   void control_dependencies(
     goto_programt::const_targett from,
     goto_programt::const_targett to,
