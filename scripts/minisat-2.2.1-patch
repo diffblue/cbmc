@@ -1,5 +1,5 @@
 diff --git a/minisat/core/Solver.cc b/minisat/core/Solver.cc
-index 501393d..b450b73 100644
+index 501393d..c323d7e 100644
 --- a/minisat/core/Solver.cc
 +++ b/minisat/core/Solver.cc
 @@ -210,7 +210,7 @@ void Solver::cancelUntil(int level) {
@@ -11,7 +11,17 @@ index 501393d..b450b73 100644
                  polarity[x] = sign(trail[c]);
              insertVarOrder(x); }
          qhead = trail_lim[level];
-@@ -666,7 +666,7 @@ lbool Solver::search(int nof_conflicts)
+@@ -533,6 +533,9 @@ struct reduceDB_lt {
+ };
+ void Solver::reduceDB()
+ {
++    if (learnts.size() == 0){ // No empty method!
++        return;
++    }
+     int     i, j;
+     double  extra_lim = cla_inc / learnts.size();    // Remove any clause below this activity
+ 
+@@ -666,7 +669,7 @@ lbool Solver::search(int nof_conflicts)
  
          }else{
              // NO CONFLICT
@@ -21,7 +31,7 @@ index 501393d..b450b73 100644
                  progress_estimate = progressEstimate();
                  cancelUntil(0);
 diff --git a/minisat/core/SolverTypes.h b/minisat/core/SolverTypes.h
-index 4757b20..c3fae2b 100644
+index 4757b20..f4a058c 100644
 --- a/minisat/core/SolverTypes.h
 +++ b/minisat/core/SolverTypes.h
 @@ -47,7 +47,7 @@ struct Lit {
