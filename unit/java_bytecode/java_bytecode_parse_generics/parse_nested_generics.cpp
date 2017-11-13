@@ -35,12 +35,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
 
@@ -53,12 +58,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -71,12 +81,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        const java_generic_typet generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
 
@@ -89,12 +111,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        const java_generic_typet generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -107,13 +141,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
 
@@ -126,13 +167,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -145,12 +193,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
+
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          field_component.type(),
+          type_argument_1,
           {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+             "java::java.lang.Integer"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -163,12 +219,25 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        const typet &type_argument_2 =
+          generic_field.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
 
@@ -181,12 +250,25 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+
+        const typet &type_argument_2 =
+          generic_field.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -199,13 +281,25 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
+
+        const typet &type_argument_2 =
+          generic_field.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -218,15 +312,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -239,15 +338,27 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        const java_generic_typet generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
 
@@ -260,13 +371,27 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          field_component.type(),
-          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly -
-        // issue TG-1301
+        const typet &type_argument_1 =
+          generic_field.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
+
+        const typet &type_argument_2 =
+          generic_field.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -304,11 +429,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -336,11 +467,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -368,12 +505,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -401,12 +550,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -434,13 +595,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -468,13 +636,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -502,13 +677,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -536,13 +718,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+        const typet &type_argument_2 =
+          generic_param.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -570,12 +763,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
         require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+        const typet &type_argument_2 =
+          generic_param.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -603,13 +808,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
+        const typet &type_argument_2 =
+          generic_param.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -637,15 +853,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -673,15 +894,26 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -709,13 +941,26 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          param_type.type(),
-          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_param =
+          require_type::require_java_generic_type(
+            param_type.type(),
+            {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_param.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
+        const typet &type_argument_2 =
+          generic_param.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -741,12 +986,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -772,12 +1022,17 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -803,12 +1058,23 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -834,12 +1100,23 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -865,13 +1142,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -897,13 +1181,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -929,13 +1220,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst,
-            "java::GenericTwoParam"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::GenericTwoParam"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -961,13 +1259,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+        const typet &type_argument_2 =
+          generic_return.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
       }
     }
   }
@@ -993,13 +1302,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"}});
+        const typet &type_argument_2 =
+          generic_return.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -1025,13 +1345,24 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::Generic"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::Generic"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
+        const typet &type_argument_2 =
+          generic_return.generic_type_arguments().at(1);
+        require_type::require_java_generic_type(
+          type_argument_2,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -1057,15 +1388,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -1091,15 +1427,26 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst,
-             "java::Generic"},
-           {require_type::type_argument_kindt::Inst,
-             "java::Interface_Implementation"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst,
+               "java::Generic"},
+             {require_type::type_argument_kindt::Inst,
+               "java::Interface_Implementation"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        const java_generic_typet &generic_type_argument_1 =
+          require_type::require_java_generic_type(
+            type_argument_1,
+            {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const typet &type_argument_1_1 =
+          generic_type_argument_1.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
@@ -1125,13 +1472,20 @@ SCENARIO(
 
       THEN("The pointer should be generic")
       {
-        require_type::require_java_generic_type(
-          function_call.return_type(),
-          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_argument_kindt::Inst, "java::Generic"}});
+        const java_generic_typet &generic_return =
+          require_type::require_java_generic_type(
+            function_call.return_type(),
+            {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+             {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
-        // TODO: extend tests when nested generics are parsed correctly - issue
-        // TG-1301
+        const typet &type_argument_1 =
+          generic_return.generic_type_arguments().at(0);
+        require_type::require_java_generic_type(
+          type_argument_1,
+          {{require_type::type_argument_kindt::Inst,
+             "java::Interface_Implementation"},
+           {require_type::type_argument_kindt::Inst,
+             "java::java.lang.Integer"}});
       }
     }
   }
