@@ -254,7 +254,8 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
   {
     const std::size_t from=step_to_node[it->step_nr];
 
-    if(from==sink)
+    // no outgoing edges from sinks or violation nodes
+    if(from==sink || graphml[from].is_violation)
     {
       ++it;
       continue;
