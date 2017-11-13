@@ -37,7 +37,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -55,7 +55,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -73,7 +73,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -91,7 +91,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -109,7 +109,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
@@ -128,7 +128,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
@@ -147,7 +147,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -165,8 +165,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -183,8 +183,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
       }
@@ -201,8 +201,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -220,9 +220,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
@@ -241,9 +241,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
@@ -262,8 +262,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly -
         // issue TG-1301
@@ -306,7 +306,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
       }
@@ -338,7 +338,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
       }
@@ -370,7 +370,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -403,7 +403,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -436,7 +436,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -470,7 +470,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -504,7 +504,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -538,8 +538,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -572,8 +572,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
       }
@@ -605,8 +605,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -639,9 +639,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -675,9 +675,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -711,8 +711,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           param_type.type(),
-          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -743,7 +743,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -774,7 +774,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -805,7 +805,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -836,7 +836,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -867,7 +867,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -899,7 +899,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -931,7 +931,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::GenericTwoParam"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -963,8 +963,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -995,8 +995,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -1027,8 +1027,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::Generic"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::Generic"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301
@@ -1059,9 +1059,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -1093,9 +1093,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
              "java::Generic"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
@@ -1127,8 +1127,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           function_call.return_type(),
-          {{require_type::type_parameter_kindt::Inst, "java::GenericTwoParam"},
-           {require_type::type_parameter_kindt::Inst, "java::Generic"}});
+          {{require_type::type_argument_kindt::Inst, "java::GenericTwoParam"},
+           {require_type::type_argument_kindt::Inst, "java::Generic"}});
 
         // TODO: extend tests when nested generics are parsed correctly - issue
         // TG-1301

@@ -66,7 +66,7 @@ SCENARIO(
 
       REQUIRE(class_type.has_component("first"));
       const auto &first_component=class_type.get_component("first");
-      REQUIRE(is_java_generic_inst_parameter(first_component.type()));
+      REQUIRE(!is_java_generic_parameter(first_component.type()));
       REQUIRE(first_component.type().id()==ID_pointer);
       REQUIRE(first_component.type().subtype().id()==ID_symbol);
       REQUIRE(to_symbol_type(
@@ -74,7 +74,7 @@ SCENARIO(
           "java::java.lang.Integer");
       REQUIRE(class_type.has_component("second"));
       const auto &second_component=class_type.get_component("second");
-      REQUIRE(is_java_generic_inst_parameter(second_component.type()));
+      REQUIRE(!is_java_generic_parameter(second_component.type()));
       REQUIRE(second_component.type().id()==ID_pointer);
       REQUIRE(second_component.type().subtype().id()==ID_symbol);
       REQUIRE(to_symbol_type(
@@ -118,10 +118,10 @@ SCENARIO(
 
       REQUIRE(class_type.has_component("key"));
       const auto &first_component=class_type.get_component("key");
-      REQUIRE(is_java_generic_inst_parameter(first_component.type()));
+      REQUIRE(!is_java_generic_parameter(first_component.type()));
       REQUIRE(class_type.has_component("value"));
       const auto &second_component=class_type.get_component("value");
-      REQUIRE(is_java_generic_inst_parameter(second_component.type()));
+      REQUIRE(!is_java_generic_parameter(second_component.type()));
     }
   }
 }
@@ -321,7 +321,7 @@ SCENARIO(
 
           require_type::require_java_generic_type(
             field_component.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Float"}});
         }
       }
@@ -383,11 +383,11 @@ SCENARIO(
           const java_generic_typet &param_type =
             require_type::require_java_generic_type(
               field_component.type(),
-              {{require_type::type_parameter_kindt::Inst,
+              {{require_type::type_argument_kindt::Inst,
                 "java::array[reference]"}});
 
           const typet &array_type = java_array_element_type(
-            to_symbol_type(param_type.generic_type_variables()[0].subtype()));
+            to_symbol_type(param_type.generic_type_arguments()[0].subtype()));
           require_type::require_pointer(
             array_type, symbol_typet("java::java.lang.Float"));
         }

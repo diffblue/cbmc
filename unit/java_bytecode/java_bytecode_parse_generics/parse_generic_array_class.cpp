@@ -45,8 +45,7 @@ SCENARIO(
       {
         const typet &element = java_array_element_type(field_t_subtype);
         require_type::require_java_generic_parameter(
-          element,
-          {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+          element, class_prefix + "::T");
       }
     }
   }
@@ -73,7 +72,7 @@ SCENARIO(
         require_type::require_pointer(element, symbol_typet("java::Generic"));
         require_type::require_java_generic_type(
           element,
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
   }
@@ -100,7 +99,7 @@ SCENARIO(
         require_type::require_pointer(element, symbol_typet("java::Generic"));
         require_type::require_java_generic_type(
           element,
-          {{require_type::type_parameter_kindt::Inst,
+          {{require_type::type_argument_kindt::Inst,
             "java::java.lang.Integer"}});
       }
     }

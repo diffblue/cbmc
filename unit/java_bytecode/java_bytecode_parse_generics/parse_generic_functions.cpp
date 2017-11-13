@@ -45,7 +45,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -76,7 +76,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -113,7 +113,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -150,7 +150,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -187,7 +187,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -225,7 +225,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_t.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
       THEN("It contains parameter u pointing to Generic")
@@ -239,7 +239,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
         }
       }
     }
@@ -271,7 +271,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_t.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -291,7 +291,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
 
           THEN("The bounds are set correctly")
           {
@@ -327,7 +327,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -356,8 +356,7 @@ SCENARIO(
         THEN("It is the generic parameter T")
         {
           require_type::require_java_generic_parameter(
-            func_code.return_type(),
-            {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+            func_code.return_type(), class_prefix + "::T");
         }
       }
     }
@@ -385,7 +384,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -420,7 +419,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -455,7 +454,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -490,7 +489,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -529,7 +528,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
 
@@ -542,7 +541,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -574,7 +573,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -593,7 +592,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -631,7 +630,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -650,7 +649,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -688,7 +687,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -707,7 +706,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -746,7 +745,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -765,7 +764,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -803,7 +802,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
         }
       }
 
@@ -816,7 +815,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -848,7 +847,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
 
           THEN("The bounds are set correctly")
           {
@@ -867,7 +866,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
@@ -905,7 +904,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
         }
       }
 
@@ -920,7 +919,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_v.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::V"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::V"}});
         }
       }
 
@@ -933,7 +932,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
     }
@@ -965,7 +964,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_u.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::U"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::U"}});
 
           THEN("The bounds are set correctly")
           {
@@ -986,7 +985,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_v.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::V"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::V"}});
 
           THEN("The bounds are set correctly")
           {
@@ -1005,7 +1004,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             func_code.return_type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
           THEN("The bounds are set correctly")
           {
