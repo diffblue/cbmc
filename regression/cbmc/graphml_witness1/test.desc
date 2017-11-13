@@ -13,9 +13,6 @@ main.c
   <key attr.name="isEntryNode" attr.type="boolean" for="node" id="entry">
     <default>false</default>
   </key>
-  <key attr.name="isSinkNode" attr.type="boolean" for="node" id="sink">
-    <default>false</default>
-  </key>
   <key attr.name="enterLoopHead" attr.type="boolean" for="edge" id="enterLoopHead">
     <default>false</default>
   </key>
@@ -38,7 +35,6 @@ main.c
   <key attr.name="witness-type" attr.type="string" for="graph" id="witness-type"/>
   <graph edgedefault="directed">
     <data key="sourcecodelang">C</data>
-    <node id="sink"/>
     <node id="[0-9\.]*">
       <data key="entry">true</data>
     </node>
@@ -61,10 +57,6 @@ main.c
     <node id="[0-9\.]*">
       <data key="violation">true</data>
     </node>
-    <edge source="[0-9\.]*" target="sink">
-      <data key="originfile">main.c</data>
-      <data key="startline">31</data>
-    </edge>
   </graph>
 </graphml>
 --
