@@ -188,49 +188,42 @@ exprt java_bytecode_promotion(const exprt &expr)
     return typecast_exprt(expr, new_type);
 }
 
-/// Take a list of generic arguments and parse them into the generic type.
+/// Take a list of generic type arguments and parse them into the generic type.
 /// \param generic_type [out]: The existing generic type to add the information
 ///   to
-/// \param parameters: The string representing the generic arguments for a
-///   signature. For example <TT;Ljava/lang/Foo;> (including wrapping angle
-///   brackets).
+/// \param type_arguments: The string representing the generic type arguments
+///   for a signature. For example `<TT;Ljava/lang/Foo;LList<LInteger;>;>`
+///   (including the wrapping angle brackets).
 /// \param class_name_prefix: The name of the class to use to prefix any found
 ///   generic types
 void add_generic_type_information(
   java_generic_typet &generic_type,
-  const std::string &parameters,
+  const std::string &type_arguments,
   const std::string &class_name_prefix)
 {
-  PRECONDITION(parameters.size() >= 2);
-  PRECONDITION(parameters[0] == '<');
-  PRECONDITION(parameters[parameters.size() - 1] == '>');
+  PRECONDITION(type_arguments.size() >= 2);
+  PRECONDITION(type_arguments[0] == '<');
+  PRECONDITION(type_arguments[type_arguments.size() - 1] == '>');
 
-  // parse contained types, can be either type variables, starting with T
-  // or instantiated types
-  std::vector<typet> params =
-    parse_list_types(parameters, class_name_prefix, '<', '>');
+  // Parse contained arguments, can be either type parameters (`TT;`)
+  // or instantiated types - either generic types (`LList<LInteger;>;`) or
+  // just references (`Ljava/lang/Foo;`)
+  std::vector<typet> type_arguments_types =
+    parse_list_types(type_arguments, class_name_prefix, '<', '>');
 
-  CHECK_RETURN(!params.empty()); // We should have at least one generic param
+  // We should have at least one generic type argument
+  CHECK_RETURN(!type_arguments_types.empty());
 
-  // take these types - they should either be java_generic_parameters, in which
-  // case they can be directly added to the generic_type
-  // otherwise they should be wrapped in a java_generic_inst_parametert
-
+  // Add the type arguments to the generic type
   std::transform(
-    params.begin(),
-    params.end(),
-    std::back_inserter(generic_type.generic_type_variables()),
-    [](const typet &type) -> java_generic_parametert {
-      if(is_java_generic_parameter(type))
-      {
-        return to_java_generic_parameter(type);
-      }
-      else
-      {
-        INVARIANT(
-          is_reference(type), "All generic parameters should be references");
-        return java_generic_inst_parametert(to_symbol_type(type.subtype()));
-      }
+    type_arguments_types.begin(),
+    type_arguments_types.end(),
+    std::back_inserter(generic_type.generic_type_arguments()),
+    [](const typet &type) -> reference_typet
+    {
+      INVARIANT(
+        is_reference(type), "All generic type arguments should be references");
+      return to_reference_type(type);
     });
 }
 
@@ -286,8 +279,8 @@ std::string gather_full_class_name(const std::string &src)
 
 /// Given a substring of a descriptor or signature that contains one or more
 /// types parse out the individual types. This is used for parsing the
-/// parameters of a function or the generic arguments contained within angle
-/// brackets.
+/// parameters of a function or the generic type variables/parameters or
+/// arguments contained within angle brackets.
 /// \param src: The input string that is wrapped in either ( ) or < >
 /// \param class_name_prefix: The name of the class to use to prefix any found
 ///   generic types
@@ -314,18 +307,18 @@ std::vector<typet> parse_list_types(
     size_t start = i;
     while(i < src.size())
     {
-      // parameter is an object type or instantiated generic type
+      // type is an object type or instantiated generic type
       if(src[i] == 'L')
       {
         i = find_closing_semi_colon_for_reference_type(src, i);
         break;
       }
 
-      // parameter is an array
+      // type is an array
       else if(src[i] == '[')
         i++;
 
-      // parameter is a type variable
+      // type is a type variable/parameter
       else if(src[i] == 'T')
         i = src.find(';', i); // ends on ;
 
@@ -425,12 +418,13 @@ size_t find_closing_semi_colon_for_reference_type(
 /// Transforms a string representation of a Java type into an internal type
 /// representation thereof.
 ///
-/// Example use are object types like "Ljava/lang/Integer;", type variables like
-/// "TE;" which require a non-empty \p class_name or generic types like
-/// "Ljava/util/List<T>;" or "Ljava/util/List<Integer>;"
+/// Example use are object types like "Ljava/lang/Integer;", type
+/// variables/parameters like "TE;" which require a non-empty \p class_name
+/// or generic types like "Ljava/util/List<T>;" or "Ljava/util/List<Integer>;"
 ///
 /// \param src: the string representation as used in the class file
-/// \param class_name_prefix: name of class to append to generic type variables
+/// \param class_name_prefix: name of class to append to generic type
+///   variables/parameters
 /// \returns internal type representation for GOTO programs
 typet java_type_from_string(
   const std::string &src,

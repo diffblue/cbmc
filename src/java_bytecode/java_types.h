@@ -85,8 +85,9 @@ exprt java_bytecode_promotion(const exprt &);
 bool is_java_array_tag(const irep_idt &tag);
 bool is_valid_java_array(const struct_typet &);
 
-/// class to hold a Java generic type
-/// upper bound can specify type requirements
+/// Class to hold a Java generic type parameter (also called type variable),
+/// e.g., `T` in `List<T>`.
+/// The bound can specify type requirements.
 class java_generic_parametert:public reference_typet
 {
 public:
@@ -121,8 +122,10 @@ private:
   }
 };
 
-/// \param type: type the type to check
-/// \return true if type is a generic Java parameter type, e.g., T in List<T>
+/// Checks whether the type is a java generic parameter/variable, e.g., `T` in
+/// `List<T>`.
+/// \param type: the type to check
+/// \return true if type is a generic Java parameter type
 inline bool is_java_generic_parameter(const typet &type)
 {
   return type.get_bool(ID_C_java_generic_parameter);
@@ -145,61 +148,25 @@ inline java_generic_parametert &to_java_generic_parameter(typet &type)
   return static_cast<java_generic_parametert &>(type);
 }
 
-/// class to hold an instantiated type variable bound is exact, for example the
-/// `java.lang.Integer` type in a `List<Integer>`
-class java_generic_inst_parametert:public java_generic_parametert
-{
-public:
-  // uses empty name for base type variable java_generic_parametert as real name
-  // is not known here
-  explicit java_generic_inst_parametert(const symbol_typet &type):
-    java_generic_parametert(irep_idt(), type)
-  {
-    set(ID_C_java_generic_inst_parameter, true);
-  }
-};
-
-/// \param type: the type to check
-/// \return true if type is an instantiated generic Java type, e.g., the Integer
-/// in List<Integer>
-inline bool is_java_generic_inst_parameter(const typet &type)
-{
-  return type.get_bool(ID_C_java_generic_inst_parameter);
-}
-
-/// \param type: source type
-/// \return cast of type into an instantiated java_generic_parameter
-inline const java_generic_inst_parametert &to_java_generic_inst_parameter(
-  const typet &type)
-{
-  PRECONDITION(
-    type.id()==ID_pointer &&
-    is_java_generic_inst_parameter(type));
-  return static_cast<const java_generic_inst_parametert &>(type);
-}
-
-/// \param type: source type
-/// \return cast of type into an instantiated java_generic_inst_parametert
-inline java_generic_inst_parametert &to_java_generic_inst_parameter(typet &type)
-{
-  PRECONDITION(
-    type.id()==ID_pointer &&
-    is_java_generic_inst_parameter(type));
-  return static_cast<java_generic_inst_parametert &>(type);
-}
-
-/// class to hold type with generic type variable, for example `java.util.List`
-/// in either a reference of type List<Integer> or List<T>. The vector holds
-/// the types of the type Variables, that is the vector has the length of the
-/// number of type variables of the generic class. For example in `HashMap<K,
-/// V>` it would contain two elements, each of type `java_generic_parametert`,
-/// in `HashMap<Integer, V>` it would contains two elements, the first of type
-/// `java_generic_inst_parametert` and the second of type
-/// `java_generic_parametert`.
+/// Class to hold type with generic type arguments, for example `java.util.List`
+/// in either a reference of type List<Integer> or List<T> (here T must have
+/// been concretized already to create this object so technically it is an
+/// argument rather than parameter/variable, but in the symbol table this still
+/// shows as the parameter T). The vector holds the types of the type arguments
+/// (all of type or subtype of reference_typet), that is the vector has
+/// the length of the number of type parameters of the generic class.
+/// For example:
+/// - in `HashMap<K, V>` it would contain two elements, each of type
+///   `java_generic_parametert`,
+/// - in `HashMap<Integer, V>` it would contain two elements, the first of type
+///   `reference_typet` and the second of type `java_generic_parametert`,
+/// - in `HashMap<List<T>, V>` it would contain two elements, the first of
+///   type `java_generic_typet` and the second of type
+///   `java_generic_parametert`.
 class java_generic_typet:public reference_typet
 {
 public:
-  typedef std::vector<java_generic_parametert> generic_type_variablest;
+  typedef std::vector<reference_typet> generic_type_argumentst;
 
   explicit java_generic_typet(const typet &_type):
     reference_typet(java_reference_type(_type))
@@ -208,16 +175,16 @@ public:
   }
 
   /// \return vector of type variables
-  const generic_type_variablest &generic_type_variables() const
+  const generic_type_argumentst &generic_type_arguments() const
   {
-    return (const generic_type_variablest &)(
+    return (const generic_type_argumentst &)(
       find(ID_type_variables).get_sub());
   }
 
   /// \return vector of type variables
-  generic_type_variablest &generic_type_variables()
+  generic_type_argumentst &generic_type_arguments()
   {
-    return (generic_type_variablest &)(
+    return (generic_type_argumentst &)(
       add(ID_type_variables).get_sub());
   }
 };
@@ -251,10 +218,9 @@ inline java_generic_typet &to_java_generic_type(typet &type)
 }
 
 /// Class to hold a class with generics, extends the java class type with a
-/// vector of java_generic_type variables.
-///
-/// For example, a class definition `class MyGenericClass<T>`
-class java_generic_class_typet : public java_class_typet
+/// vector of java generic type parameters (also called type variables). For
+/// example, a class definition `class MyGenericClass<T>`.
+class java_generic_class_typet:public java_class_typet
 {
  public:
   typedef std::vector<java_generic_parametert> generic_typest;
@@ -300,18 +266,18 @@ to_java_generic_class_type(java_class_typet &type)
   return static_cast<java_generic_class_typet &>(type);
 }
 
-/// Access information of instantiated type params of java instantiated type.
-/// \param index: the index of the type variable
-/// \param type: the type from which to extract the type variable
+/// Access information of type arguments of java instantiated type.
+/// \param index: the index of the type argument
+/// \param type: the type from which to extract the type argument
 /// \return the type variable of t at the given index
 inline const typet &java_generic_get_inst_type(
   size_t index,
   const java_generic_typet &type)
 {
-  const std::vector<java_generic_parametert> &gen_types=
-    type.generic_type_variables();
-  PRECONDITION(index<gen_types.size());
-  return gen_types[index];
+  const std::vector<reference_typet> &type_arguments =
+    type.generic_type_arguments();
+  PRECONDITION(index<type_arguments.size());
+  return type_arguments[index];
 }
 
 /// Access information of type variables of a generic java class type.

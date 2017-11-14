@@ -25,10 +25,10 @@ void generic_utils::specialise_generic(
 {
   // Should be a fully instantiated generic type
   REQUIRE(
-    std::all_of(
-      example_type.generic_type_variables().begin(),
-      example_type.generic_type_variables().end(),
-      is_java_generic_inst_parameter));
+    std::none_of(
+      example_type.generic_type_arguments().begin(),
+      example_type.generic_type_arguments().end(),
+      is_java_generic_parameter));
 
   namespacet ns(new_symbol_table);
   const typet &class_type = ns.follow(example_type.subtype());

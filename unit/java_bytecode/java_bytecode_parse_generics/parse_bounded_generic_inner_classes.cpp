@@ -42,8 +42,7 @@ SCENARIO(
           require_type::require_component(
             to_struct_type(class_symbol.type), "elem");
         require_type::require_java_generic_parameter(
-          elem.type(),
-          {require_type::type_parameter_kindt::Var, inner_name + "::E"});
+          elem.type(), inner_name + "::E");
       }
     }
   }
@@ -68,9 +67,7 @@ SCENARIO(
           require_type::require_component(
             to_struct_type(class_symbol.type), "elem");
         require_type::require_java_generic_parameter(
-          elem.type(),
-          {require_type::type_parameter_kindt::Var,
-           boundedinner_name + "::NUM"});
+          elem.type(), boundedinner_name + "::NUM");
       }
     }
   }
@@ -84,7 +81,7 @@ SCENARIO(
       belem_type.type(), symbol_typet(class_prefix + "$BoundedInner"));
     require_type::require_java_generic_type(
       belem_type.type(),
-      {{require_type::type_parameter_kindt::Inst, "java::java.lang.Integer"}});
+      {{require_type::type_argument_kindt::Inst, "java::java.lang.Integer"}});
   }
 
   WHEN("Parsing an inner class with double bounded type variable")
@@ -108,9 +105,7 @@ SCENARIO(
           require_type::require_component(
             to_struct_type(class_symbol.type), "elem");
         require_type::require_java_generic_parameter(
-          elem.type(),
-          {require_type::type_parameter_kindt::Var,
-           doubleboundedinner_name + "::T"});
+          elem.type(), doubleboundedinner_name + "::T");
 
         // TODO extend when bounds are parsed correctly - TG-1286
       }
@@ -138,17 +133,13 @@ SCENARIO(
           require_type::require_component(
             to_struct_type(class_symbol.type), "k");
         require_type::require_java_generic_parameter(
-          elemk.type(),
-          {require_type::type_parameter_kindt::Var,
-           twoelementinner_name + "::K"});
+          elemk.type(), twoelementinner_name + "::K");
 
         const struct_union_typet::componentt &elemv =
           require_type::require_component(
             to_struct_type(class_symbol.type), "v");
         require_type::require_java_generic_parameter(
-          elemv.type(),
-          {require_type::type_parameter_kindt::Var,
-           twoelementinner_name + "::V"});
+          elemv.type(), twoelementinner_name + "::V");
       }
     }
   }

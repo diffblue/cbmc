@@ -116,7 +116,7 @@ typet generate_java_generic_typet::substitute_type(
       java_generics_get_index_for_subtype(generic_class, component_identifier);
 
     INVARIANT(results.has_value(), "generic component type not found");
-    return generic_reference.generic_type_variables()[*results];
+    return generic_reference.generic_type_arguments()[*results];
   }
   else if(parameter_type.id() == ID_pointer)
   {
@@ -125,36 +125,35 @@ typet generate_java_generic_typet::substitute_type(
       const java_generic_typet &generic_type =
         to_java_generic_type(parameter_type);
 
-      java_generic_typet::generic_type_variablest replaced_type_variables;
+      java_generic_typet::generic_type_argumentst replaced_type_variables;
 
       // Swap each parameter
       std::transform(
-        generic_type.generic_type_variables().begin(),
-        generic_type.generic_type_variables().end(),
+        generic_type.generic_type_arguments().begin(),
+        generic_type.generic_type_arguments().end(),
         std::back_inserter(replaced_type_variables),
-        [&](const java_generic_parametert &generic_param)
-          -> java_generic_parametert {
-            const typet &replacement_type =
-              substitute_type(generic_param, generic_class, generic_reference);
+        [&](const reference_typet &generic_param) -> reference_typet
+        {
+          const typet &replacement_type =
+            substitute_type(generic_param, generic_class, generic_reference);
 
-            // This code will be simplified when references aren't considered to
-            // be generic parameters
-            if(is_java_generic_parameter(replacement_type))
-            {
-              return to_java_generic_parameter(replacement_type);
-            }
-            else
-            {
-              INVARIANT(
-                is_reference(replacement_type),
-                "All generic parameters should be references");
-              return java_generic_inst_parametert(
-                to_symbol_type(replacement_type.subtype()));
-            }
-          });
+          // This code will be simplified when references aren't considered to
+          // be generic parameters
+          if(is_java_generic_parameter(replacement_type))
+          {
+            return to_java_generic_parameter(replacement_type);
+          }
+          else
+          {
+            INVARIANT(
+              is_reference(replacement_type),
+              "All generic parameters should be references");
+            return to_reference_type(replacement_type);
+          }
+        });
 
       java_generic_typet new_type = generic_type;
-      new_type.generic_type_variables() = replaced_type_variables;
+      new_type.generic_type_arguments() = replaced_type_variables;
       return new_type;
     }
     else if(parameter_type.subtype().id() == ID_symbol)
@@ -190,21 +189,22 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   new_tag_buffer << original_class.get_tag();
   new_tag_buffer << "<";
   bool first=true;
-  for(const typet &param : existing_generic_type.generic_type_variables())
+  for(const typet &type_argument : existing_generic_type
+    .generic_type_arguments())
   {
     if(!first)
       new_tag_buffer << ",";
     first=false;
 
     INVARIANT(
-      is_java_generic_inst_parameter(param),
+      !is_java_generic_parameter(type_argument),
       "Only create full concretized generic types");
-    const irep_idt &id(id2string(param.subtype().get(ID_identifier)));
+    const irep_idt &id(id2string(type_argument.subtype().get(ID_identifier)));
     new_tag_buffer << id2string(id);
     if(is_java_array_tag(id))
     {
       const typet &element_type =
-        java_array_element_type(to_symbol_type(param.subtype()));
+        java_array_element_type(to_symbol_type(type_argument.subtype()));
 
       // If this is an array of references then we will specialize its
       // identifier using the type of the objects in the array. Else, there can

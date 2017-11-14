@@ -37,8 +37,7 @@ SCENARIO(
         const struct_union_typet::componentt &field =
           require_type::require_component(class_struct, "f");
         require_type::require_java_generic_parameter(
-          field.type(),
-          {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+          field.type(), class_prefix + "::T");
       }
 
       THEN("It has field f2 pointing to Generic")
@@ -51,7 +50,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
 
@@ -65,22 +64,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Inst,
-              "java::java.lang.Integer"}});
-        }
-      }
-
-      THEN("It has field f3 pointing to Generic")
-      {
-        const struct_typet::componentt &field =
-          require_type::require_component(class_struct, "f3");
-        require_type::require_pointer(
-          field.type(), symbol_typet("java::Generic"));
-        THEN("The pointer should be generic")
-        {
-          require_type::require_java_generic_type(
-            field.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -93,10 +77,16 @@ SCENARIO(
           field.type(), symbol_typet("java::Generic"));
         THEN("The pointer should be generic")
         {
+          const java_generic_typet &generic_field =
+            require_type::require_java_generic_type(
+              field.type(),
+              {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+          const typet &type_argument_1 =
+            generic_field.generic_type_arguments().at(0);
           require_type::require_java_generic_type(
-            field.type(),
-            {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
-          // TODO extend when nested generics are parsed correctly - TG-1301
+            type_argument_1,
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
 
@@ -108,10 +98,24 @@ SCENARIO(
           field.type(), symbol_typet("java::Generic"));
         THEN("The pointer should be generic")
         {
+          const java_generic_typet &generic_field =
+            require_type::require_java_generic_type(
+              field.type(),
+              {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+          const typet &type_argument_1 =
+            generic_field.generic_type_arguments().at(0);
+          const java_generic_typet &generic_type_argument_1 =
+            require_type::require_java_generic_type(
+              type_argument_1,
+              {{require_type::type_argument_kindt::Inst, "java::Generic"}});
+
+          const typet &type_argument_1_1 =
+            generic_type_argument_1.generic_type_arguments().at(0);
           require_type::require_java_generic_type(
-            field.type(),
-            {{require_type::type_parameter_kindt::Inst, "java::Generic"}});
-          // TODO extend when nested generics are parsed correctly - TG-1301
+            type_argument_1_1,
+            {{require_type::type_argument_kindt::Inst,
+               "java::java.lang.Integer"}});
         }
       }
 
@@ -125,8 +129,8 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-             {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+             {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
         }
       }
 
@@ -140,8 +144,8 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-             {require_type::type_parameter_kindt::Var, class_prefix + "::S"}});
+            {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+             {require_type::type_argument_kindt::Var, class_prefix + "::S"}});
         }
       }
 
@@ -155,9 +159,9 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
                "java::java.lang.Integer"},
-             {require_type::type_parameter_kindt::Var,
+             {require_type::type_argument_kindt::Var,
                class_prefix + "::T"}});
         }
       }
@@ -172,9 +176,9 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Var,
+            {{require_type::type_argument_kindt::Var,
                class_prefix + "::T"},
-             {require_type::type_parameter_kindt::Inst,
+             {require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -189,9 +193,9 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"},
-             {require_type::type_parameter_kindt::Inst,
+             {require_type::type_argument_kindt::Inst,
               "java::java.lang.String"}});
         }
       }
@@ -204,13 +208,29 @@ SCENARIO(
           field.type(), symbol_typet("java::GenericTwoParam"));
         THEN("The pointer should be generic")
         {
+          const java_generic_typet &generic_field =
+            require_type::require_java_generic_type(
+              field.type(),
+              {{require_type::type_argument_kindt::Inst,
+                 "java::Generic"},
+               {require_type::type_argument_kindt::Inst,
+                 "java::GenericTwoParam"}});
+
+          const typet &type_argument_1 =
+            generic_field.generic_type_arguments().at(0);
           require_type::require_java_generic_type(
-            field.type(),
-            {{require_type::type_parameter_kindt::Inst,
-               "java::Generic"},
-             {require_type::type_parameter_kindt::Inst,
-               "java::GenericTwoParam"}});
-          // TODO extend when nested generics are parsed correctly - TG-1301
+            type_argument_1,
+            {{require_type::type_argument_kindt::Var,
+               class_prefix + "::T"}});
+
+          const typet &type_argument_2 =
+            generic_field.generic_type_arguments().at(1);
+          require_type::require_java_generic_type(
+            type_argument_2,
+            {{require_type::type_argument_kindt::Var,
+               class_prefix + "::S"},
+             {require_type::type_argument_kindt::Inst,
+               "java::java.lang.Integer"}});
         }
       }
     }
