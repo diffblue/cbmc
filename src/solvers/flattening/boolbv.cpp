@@ -697,12 +697,10 @@ bool boolbvt::is_unbounded_array(const typet &type) const
 
 void boolbvt::print_assignment(std::ostream &out) const
 {
-  for(boolbv_mapt::mappingt::const_iterator it=map.mapping.begin();
-      it!=map.mapping.end();
-      it++)
+  for(const auto &it : map.mapping)
   {
-    out << it->first << "="
-        << it->second.get_value(prop) << '\n';
+    out << it.first << "="
+        << it.second.get_value(prop) << '\n';
   }
 }
 
