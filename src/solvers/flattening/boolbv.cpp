@@ -697,6 +697,8 @@ bool boolbvt::is_unbounded_array(const typet &type) const
 
 void boolbvt::print_assignment(std::ostream &out) const
 {
+  arrayst::print_assignment(out);
+
   for(const auto &it : map.mapping)
   {
     out << it.first << "="
