@@ -16,6 +16,7 @@ Author: Matt Lewis
 #include <string>
 
 #include <util/make_unique.h>
+#include <util/message.h>
 #include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
@@ -34,16 +35,16 @@ Author: Matt Lewis
 class scratch_programt:public goto_programt
 {
 public:
-  explicit scratch_programt(symbol_tablet &_symbol_table):
-    constant_propagation(true),
-    symbol_table(_symbol_table),
-    ns(symbol_table),
-    equation(ns),
-    symex(ns, symbol_table, equation),
-    satcheck(util_make_unique<satcheckt>()),
-    satchecker(ns, *satcheck),
-    z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
-    checker(&z3) // checker(&satchecker)
+  scratch_programt(symbol_tablet &_symbol_table, message_handlert &mh)
+    : constant_propagation(true),
+      symbol_table(_symbol_table),
+      ns(symbol_table),
+      equation(ns),
+      symex(mh, ns, symbol_table, equation),
+      satcheck(util_make_unique<satcheckt>()),
+      satchecker(ns, *satcheck),
+      z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
+      checker(&z3) // checker(&satchecker)
   {
   }
 

@@ -340,7 +340,6 @@ void bmct::get_memory_model()
 void bmct::setup()
 {
   get_memory_model();
-  symex.set_message_handler(get_message_handler());
   symex.options=options;
 
   {

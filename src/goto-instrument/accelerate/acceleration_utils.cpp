@@ -128,7 +128,7 @@ bool acceleration_utilst::check_inductive(
   // assert (target1==polynomial1);
   // assert (target2==polynomial2);
   // ...
-  scratch_programt program(symbol_table);
+  scratch_programt program(symbol_table, message_handler);
   std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 
@@ -386,7 +386,7 @@ bool acceleration_utilst::do_assumptions(
   // assert(!precondition);
 
   exprt condition=precondition(path);
-  scratch_programt program(symbol_table);
+  scratch_programt program(symbol_table, message_handler);
 
   substitutiont substitution;
   stash_polynomials(program, polynomials, substitution, path);

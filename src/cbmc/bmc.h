@@ -38,14 +38,14 @@ public:
     const optionst &_options,
     const symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
-    prop_convt &_prop_conv):
-    safety_checkert(ns, _message_handler),
-    options(_options),
-    ns(_symbol_table, new_symbol_table),
-    equation(ns),
-    symex(ns, new_symbol_table, equation),
-    prop_conv(_prop_conv),
-    ui(ui_message_handlert::uit::PLAIN)
+    prop_convt &_prop_conv)
+    : safety_checkert(ns, _message_handler),
+      options(_options),
+      ns(_symbol_table, new_symbol_table),
+      equation(ns),
+      symex(_message_handler, ns, new_symbol_table, equation),
+      prop_conv(_prop_conv),
+      ui(ui_message_handlert::uit::PLAIN)
   {
     symex.constant_propagation=options.get_bool_option("propagation");
     symex.record_coverage=

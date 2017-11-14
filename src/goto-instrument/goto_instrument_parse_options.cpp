@@ -694,7 +694,8 @@ int goto_instrument_parse_optionst::doit()
       goto_inline(goto_model, get_message_handler());
 
       status() << "Accelerating" << eom;
-      accelerate_functions(goto_model, cmdline.isset("z3"));
+      accelerate_functions(
+        goto_model, get_message_handler(), cmdline.isset("z3"));
       remove_skip(goto_model);
       goto_model.goto_functions.update();
     }
@@ -1018,7 +1019,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("function-inline"))
   {
     std::string function=cmdline.get_value("function-inline");
-    assert(!function.empty());
+    PRECONDITION(!function.empty());
 
     bool caching=!cmdline.isset("no-caching");
 

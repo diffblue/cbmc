@@ -18,12 +18,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_coverage.h"
 
-class symex_bmct:
-  public goto_symext,
-  public messaget
+class symex_bmct: public goto_symext
 {
 public:
   symex_bmct(
+    message_handlert &mh,
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
     symex_targett &_target);
