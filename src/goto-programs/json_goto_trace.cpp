@@ -95,6 +95,38 @@ void convert(
           step.full_lhs.is_not_nil(),
           "full_lhs in assignment must not be nil");
         exprt simplified=simplify_expr(step.full_lhs, ns);
+
+        class comment_base_name_visitort : public expr_visitort
+        {
+        private:
+          const namespacet &ns;
+
+        public:
+          explicit comment_base_name_visitort(const namespacet &ns) : ns(ns)
+          {
+          }
+
+          void operator()(exprt &expr) override
+          {
+            if(expr.id() == ID_symbol)
+            {
+              const symbolt &symbol = ns.lookup(expr.get(ID_identifier));
+              // Don't break sharing unless need to write to it
+              const irept::named_subt &comments =
+                static_cast<const exprt &>(expr).get_comments();
+              if(comments.count(ID_C_base_name) != 0)
+                INVARIANT(
+                  comments.at(ID_C_base_name).id() == symbol.base_name,
+                  "base_name comment does not match symbol's base_name");
+              else
+                expr.get_comments().emplace(
+                  ID_C_base_name, irept(symbol.base_name));
+            }
+          }
+        };
+        comment_base_name_visitort comment_base_name_visitor(ns);
+        simplified.visit(comment_base_name_visitor);
+
         full_lhs_string=from_expr(ns, identifier, simplified);
 
         const symbolt *symbol;
