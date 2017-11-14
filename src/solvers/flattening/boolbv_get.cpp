@@ -330,13 +330,14 @@ exprt boolbvt::bv_get_unbounded_array(const exprt &expr) const
   valuest values;
 
   {
-    std::size_t number;
-
-    if(arrays.get_number(expr, number))
+    const auto opt_num = arrays.get_number(expr);
+    if(!opt_num)
+    {
       return nil_exprt();
+    }
 
     // get root
-    number=arrays.find_number(number);
+    const auto number = arrays.find_number(*opt_num);
 
     assert(number<index_map.size());
     index_mapt::const_iterator it=index_map.find(number);

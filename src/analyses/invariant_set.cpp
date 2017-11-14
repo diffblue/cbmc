@@ -52,7 +52,12 @@ bool inv_object_storet::get(const exprt &expr, unsigned &n)
     return false;
   }
 
-  return map.get_number(s, n);
+  if(const auto number = map.get_number(s))
+  {
+    n = *number;
+    return false;
+  }
+  return true;
 }
 
 unsigned inv_object_storet::add(const exprt &expr)

@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 #include <util/invariant.h>
+#include <util/optional.h>
 
 template <typename T>
 // NOLINTNEXTLINE(readability/identifiers)
@@ -60,15 +61,14 @@ public:
     return number(a);
   }
 
-  bool get_number(const T &a, number_type &n) const
+  optionalt<number_type> get_number(const T &a) const
   {
-    typename numberst::const_iterator it=numbers.find(a);
-
-    if(it==numbers.end())
-      return true;
-
-    n=it->second;
-    return false;
+    const auto it = numbers.find(a);
+    if(it == numbers.end())
+    {
+      return {};
+    }
+    return it->second;
   }
 
   void clear()
@@ -129,15 +129,15 @@ public:
     return (result.first)->second;
   }
 
-  bool get_number(const T &a, number_type &n) const
+  optionalt<number_type> get_number(const T &a) const
   {
-    typename numberst::const_iterator it=numbers.find(a);
+    const auto it = numbers.find(a);
 
-    if(it==numbers.end())
-      return true;
-
-    n=it->second;
-    return false;
+    if(it == numbers.end())
+    {
+      return {};
+    }
+    return it->second;
   }
 
   void clear()

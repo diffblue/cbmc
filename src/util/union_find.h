@@ -168,16 +168,14 @@ public:
   // are 'a' and 'b' in the same set?
   bool same_set(const T &a, const T &b) const
   {
-    number_type na, nb;
-    bool have_na=!numbers.get_number(a, na),
-         have_nb=!numbers.get_number(b, nb);
+    const optionalt<number_type> na = numbers.get_number(a);
+    const optionalt<number_type> nb = numbers.get_number(a);
 
-    if(have_na && have_nb)
-      return uuf.same_set(na, nb);
-    else if(!have_na && !have_nb)
+    if(na && nb)
+      return uuf.same_set(*na, *nb);
+    if(!na && !nb)
       return a==b;
-    else
-      return false;
+    return false;
   }
 
   // are 'a' and 'b' in the same set?
@@ -259,9 +257,9 @@ public:
     uuf.isolate(number(a));
   }
 
-  bool get_number(const T &a, number_type &n) const
+  optionalt<number_type> get_number(const T &a) const
   {
-    return numbers.get_number(a, n);
+    return numbers.get_number(a);
   }
 
   size_t size() const { return numbers.size(); }
