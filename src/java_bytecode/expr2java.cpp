@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_types.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
+#include <util/unicode.h>
 #include <util/arith_tools.h>
 #include <util/ieee_float.h>
 
@@ -191,20 +192,7 @@ std::string expr2javat::convert_constant(
     if(to_integer(src, int_value))
       UNREACHABLE;
 
-    dest+="(char)'";
-
-    if(int_value>=' ' && int_value<127)
-      dest+=static_cast<char>(int_value.to_long());
-    else
-    {
-      std::string hex=integer2string(int_value, 16);
-      while(hex.size()<4) hex='0'+hex;
-      dest+='\\';
-      dest+='u';
-      dest+=hex;
-    }
-
-    dest+='\'';
+    dest += "(char)'" + utf16_little_endian_to_java(int_value.to_long()) + '\'';
     return dest;
   }
   else if(src.type()==java_byte_type())
