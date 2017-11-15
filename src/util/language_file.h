@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 
 class symbol_tablet;
+class symbol_table_baset;
 class language_filet;
 class languaget;
 
@@ -87,7 +88,7 @@ public:
 
   bool typecheck(symbol_tablet &symbol_table);
 
-  bool final(symbol_tablet &symbol_table);
+  bool final(symbol_table_baset &symbol_table);
 
   bool interfaces(symbol_tablet &symbol_table);
 

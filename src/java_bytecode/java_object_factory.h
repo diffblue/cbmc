@@ -91,7 +91,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const object_factory_parameterst &parameters,
   allocation_typet alloc_type,
   const source_locationt &location,
@@ -117,7 +117,7 @@ enum class update_in_placet
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
@@ -129,7 +129,7 @@ void gen_nondet_init(
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
@@ -140,15 +140,15 @@ void gen_nondet_init(
 exprt allocate_dynamic_object(
   const exprt &target_expr,
   const typet &allocate_type,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &output_code,
   std::vector<const symbolt *> &symbols_created,
-  bool cast_needed=false);
+  bool cast_needed = false);
 
 void allocate_dynamic_object_with_decl(
   const exprt &target_expr,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &output_code);
 
@@ -156,7 +156,7 @@ codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool printable);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_OBJECT_FACTORY_H

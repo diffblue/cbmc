@@ -174,8 +174,7 @@ bool language_filest::generate_support_functions(
   return false;
 }
 
-bool language_filest::final(
-  symbol_tablet &symbol_table)
+bool language_filest::final(symbol_table_baset &symbol_table)
 {
   std::set<std::string> languages;
 

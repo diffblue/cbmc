@@ -43,7 +43,7 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
 
@@ -62,9 +62,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var,
+          {{require_type::type_argument_kindt::Var,
              class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
       }
     }
@@ -84,8 +84,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
 
@@ -105,9 +105,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var,
+          {{require_type::type_argument_kindt::Var,
              class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
       }
     }
@@ -128,8 +128,8 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
 
@@ -149,11 +149,11 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var,
+          {{require_type::type_argument_kindt::Var,
              class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
       }
     }
@@ -174,9 +174,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
 
@@ -195,11 +195,11 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var,
+          {{require_type::type_argument_kindt::Var,
              class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"}});
       }
     }
@@ -219,11 +219,11 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var,
+          {{require_type::type_argument_kindt::Var,
              class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Inst,
+           {require_type::type_argument_kindt::Inst,
              "java::Interface_Implementation"},
-           {require_type::type_parameter_kindt::Var,
+           {require_type::type_argument_kindt::Var,
              class_prefix + "::T"}});
       }
     }
@@ -243,9 +243,9 @@ SCENARIO(
       {
         require_type::require_java_generic_type(
           field_component.type(),
-          {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-           {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+          {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+           {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
   }
@@ -286,7 +286,7 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -315,7 +315,7 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
 
       const auto &param_type2 =
         require_type::require_parameter(function_call, "input2");
@@ -323,7 +323,7 @@ SCENARIO(
         param_type2.type(), symbol_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         param_type2.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -351,9 +351,9 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -382,8 +382,8 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -414,9 +414,9 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -448,8 +448,8 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -480,11 +480,11 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -516,9 +516,9 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -546,11 +546,11 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -579,11 +579,11 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Var,
+         {require_type::type_argument_kindt::Var,
            class_prefix + "::T"}});
     }
   }
@@ -612,9 +612,9 @@ SCENARIO(
         param_type.type(), symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         param_type.type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -641,7 +641,7 @@ SCENARIO(
         symbol_typet(class_prefix + "$InnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -668,9 +668,9 @@ SCENARIO(
         symbol_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -698,8 +698,8 @@ SCENARIO(
         symbol_typet(class_prefix + "$GenericInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -728,9 +728,9 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -760,8 +760,8 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -790,11 +790,11 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -824,9 +824,9 @@ SCENARIO(
           class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
   THEN(
@@ -854,11 +854,11 @@ SCENARIO(
         symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"}});
     }
   }
@@ -886,11 +886,11 @@ SCENARIO(
         symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var,
+        {{require_type::type_argument_kindt::Var,
            class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Inst,
+         {require_type::type_argument_kindt::Inst,
            "java::Interface_Implementation"},
-         {require_type::type_parameter_kindt::Var,
+         {require_type::type_argument_kindt::Var,
            class_prefix + "::T"}});
     }
   }
@@ -918,9 +918,9 @@ SCENARIO(
         symbol_typet(class_prefix + "$TwoParamInnerClass"));
       require_type::require_java_generic_type(
         function_call.return_type(),
-        {{require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"},
-         {require_type::type_parameter_kindt::Var, class_prefix + "::T"}});
+        {{require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"},
+         {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
     }
   }
 }

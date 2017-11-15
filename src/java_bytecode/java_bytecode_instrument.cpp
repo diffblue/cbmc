@@ -28,20 +28,20 @@ class java_bytecode_instrumentt:public messaget
 {
 public:
   java_bytecode_instrumentt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const bool _throw_runtime_exceptions,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    throw_runtime_exceptions(_throw_runtime_exceptions),
-    message_handler(_message_handler)
-    {
-    }
+    message_handlert &_message_handler)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      throw_runtime_exceptions(_throw_runtime_exceptions),
+      message_handler(_message_handler)
+  {
+  }
 
   void operator()(exprt &expr);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const bool throw_runtime_exceptions;
   message_handlert &message_handler;
 
@@ -143,7 +143,7 @@ codet java_bytecode_instrumentt::throw_exception(
 /// flag is set.
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ArithmeticException
-/// or is a skip
+/// or asserts a nonzero denominator.
 codet java_bytecode_instrumentt::check_arithmetic_exception(
   const exprt &denominator,
   const source_locationt &original_loc)
@@ -157,7 +157,11 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
       original_loc,
       "java.lang.ArithmeticException");
 
-  return code_skipt();
+  code_assertt ret(binary_relation_exprt(denominator, ID_notequal, zero));
+  ret.add_source_location()=original_loc;
+  ret.add_source_location().set_comment("Denominator should be nonzero");
+  ret.add_source_location().set_property_class("integer-divide-by-zero");
+  return ret;
 }
 
 /// Checks whether the array access array_struct[idx] is out-of-bounds,
@@ -573,7 +577,7 @@ void java_bytecode_instrumentt::operator()(exprt &expr)
 ///   this flag is set to true.
 /// \param message_handler: stream to report status and warnings
 void java_bytecode_instrument_symbol(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   symbolt &symbol,
   const bool throw_runtime_exceptions,
   message_handlert &message_handler)

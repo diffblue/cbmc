@@ -35,10 +35,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_root_class.h"
 
 static symbolt &new_tmp_symbol(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   const typet &type,
-  const std::string &prefix="tmp_object_factory")
+  const std::string &prefix = "tmp_object_factory")
 {
   return get_fresh_aux_symbol(
     type,
@@ -69,7 +69,7 @@ class java_object_factoryt
   std::unordered_set<irep_idt, irep_id_hash> recursion_set;
 
   /// The symbol table.
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   /// A namespace built from exclusively one symbol table - the one above.
   namespacet ns;
@@ -102,9 +102,9 @@ public:
     std::vector<const symbolt *> &_symbols_created,
     const source_locationt &loc,
     const object_factory_parameterst _object_factory_parameters,
-    symbol_tablet &_symbol_table,
-    const select_pointer_typet &pointer_type_selector):
-      symbols_created(_symbols_created),
+    symbol_table_baset &_symbol_table,
+    const select_pointer_typet &pointer_type_selector)
+    : symbols_created(_symbols_created),
       loc(loc),
       object_factory_parameters(_object_factory_parameters),
       symbol_table(_symbol_table),
@@ -182,7 +182,7 @@ private:
 exprt allocate_dynamic_object(
   const exprt &target_expr,
   const typet &allocate_type,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &output_code,
   std::vector<const symbolt *> &symbols_created,
@@ -241,7 +241,7 @@ exprt allocate_dynamic_object(
 /// \param output_code: code block to which the necessary code is added
 void allocate_dynamic_object_with_decl(
   const exprt &target_expr,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &output_code)
 {
@@ -543,7 +543,7 @@ codet initialize_nondet_string_struct(
   const exprt &obj,
   const std::size_t &max_nondet_string_length,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool printable)
 {
   PRECONDITION(
@@ -636,7 +636,7 @@ static bool add_nondet_string_pointer_initialization(
   const exprt &expr,
   const std::size_t &max_nondet_string_length,
   bool printable,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
 {
@@ -1361,7 +1361,7 @@ exprt object_factory(
   const irep_idt base_name,
   code_blockt &init_code,
   bool allow_null,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const object_factory_parameterst &parameters,
   allocation_typet alloc_type,
   const source_locationt &loc,
@@ -1457,7 +1457,7 @@ exprt object_factory(
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
@@ -1521,7 +1521,7 @@ exprt object_factory(
 void gen_nondet_init(
   const exprt &expr,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,

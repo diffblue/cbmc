@@ -36,7 +36,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_types.h"
 #include "java_utils.h"
 
-static void create_initialize(symbol_tablet &symbol_table)
+static void create_initialize(symbol_table_baset &symbol_table)
 {
   // If __CPROVER_initialize already exists, replace it. It may already exist
   // if a GOTO binary provided it. This behaviour mirrors the ANSI-C frontend.
@@ -89,8 +89,8 @@ static bool is_non_null_library_global(const irep_idt &symbolid)
   return non_null_globals.count(symbolid);
 }
 
-void java_static_lifetime_init(
-  symbol_tablet &symbol_table,
+static void java_static_lifetime_init(
+  symbol_table_baset &symbol_table,
   const source_locationt &source_location,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst &object_factory_parameters,
@@ -162,7 +162,7 @@ void java_static_lifetime_init(
 exprt::operandst java_build_arguments(
   const symbolt &function,
   code_blockt &init_code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool assume_init_pointers_not_null,
   object_factory_parameterst object_factory_parameters,
   const select_pointer_typet &pointer_type_selector)
@@ -246,7 +246,7 @@ void java_record_outputs(
   const symbolt &function,
   const exprt::operandst &main_arguments,
   code_blockt &init_code,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   const code_typet::parameterst &parameters=
     to_code_type(function.type).parameters();
@@ -319,7 +319,7 @@ void java_record_outputs(
 }
 
 main_function_resultt get_main_symbol(
-  symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &main_class,
   message_handlert &message_handler,
   bool allow_no_body)
@@ -445,7 +445,7 @@ main_function_resultt get_main_symbol(
 ///
 /// \returns true if error occurred on entry point search
 bool java_entry_point(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const irep_idt &main_class,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
@@ -500,7 +500,7 @@ bool java_entry_point(
 /// \returns true if error occurred on entry point search, false otherwise
 bool generate_java_start_function(
   const symbolt &symbol,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst& object_factory_parameters,

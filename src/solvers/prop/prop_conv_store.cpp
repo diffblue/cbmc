@@ -31,20 +31,14 @@ literalt prop_conv_storet::convert(const exprt &expr)
 
 void prop_conv_storet::constraintst::replay(prop_convt &dest) const
 {
-  for(constraint_listt::const_iterator
-      it=constraint_list.begin();
-      it!=constraint_list.end();
-      it++)
-    it->replay(dest);
+  for(const auto &c : constraint_list)
+    c.replay(dest);
 }
 
 void prop_conv_storet::constraintst::print(std::ostream &out) const
 {
-  for(constraint_listt::const_iterator
-      it=constraint_list.begin();
-      it!=constraint_list.end();
-      it++)
-    it->print(out);
+  for(const auto &c : constraint_list)
+    c.print(out);
 }
 
 void prop_conv_storet::constraintt::replay(prop_convt &dest) const

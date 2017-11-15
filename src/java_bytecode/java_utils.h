@@ -17,7 +17,7 @@ bool java_is_array_type(const typet &type);
 
 void generate_class_stub(
   const irep_idt &class_name,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst);
 
@@ -59,7 +59,7 @@ bool is_java_string_literal_id(const irep_idt &id);
 /// \param [out] error: gets error description on failure
 irep_idt resolve_friendly_method_name(
   const std::string &friendly_name,
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   std::string &error);
 
 /// Dereference an expression and flag it for a null-pointer check
@@ -84,12 +84,12 @@ size_t find_closing_delimiter(
 void declare_function(
   irep_idt function_name,
   const typet &type,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 exprt make_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
   const typet &type,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

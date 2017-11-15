@@ -39,8 +39,7 @@ SCENARIO(
         THEN("It is the generic parameter T")
         {
           require_type::require_java_generic_parameter(
-            field_t.type(),
-            {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+            field_t.type(), class_prefix + "::T");
         }
       }
 
@@ -55,7 +54,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             field_g.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -92,8 +91,7 @@ SCENARIO(
         THEN("It is the generic parameter T")
         {
           require_type::require_java_generic_parameter(
-            field_t.type(),
-            {require_type::type_parameter_kindt::Var, class_prefix + "::T"});
+            field_t.type(), class_prefix + "::T");
         }
       }
       THEN("It has field u")
@@ -104,8 +102,7 @@ SCENARIO(
         THEN("It is the generic parameter U")
         {
           require_type::require_java_generic_parameter(
-            field_u.type(),
-            {require_type::type_parameter_kindt::Var, class_prefix + "::U"});
+            field_u.type(), class_prefix + "::U");
         }
       }
     }

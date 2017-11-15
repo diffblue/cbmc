@@ -39,32 +39,32 @@ require_parameter(const code_typet &function_type, const irep_idt &param_name);
 
 code_typet require_code(const typet &type, const size_t num_params);
 
-// A mini DSL for describing an expected set of type parameters for a
+// A mini DSL for describing an expected set of type arguments for a
 // java_generic_typet
-enum class type_parameter_kindt
+enum class type_argument_kindt
 {
   Inst,
   Var
 };
-struct expected_type_parametert
+struct expected_type_argumentt
 {
-  type_parameter_kindt kind;
+  type_argument_kindt kind;
   irep_idt description;
 };
-typedef std::initializer_list<expected_type_parametert>
-  expected_type_parameterst;
+typedef std::initializer_list<expected_type_argumentt>
+  expected_type_argumentst;
 
 java_generic_typet require_java_generic_type(const typet &type);
 
 java_generic_typet require_java_generic_type(
   const typet &type,
-  const require_type::expected_type_parameterst &type_expectations);
+  const require_type::expected_type_argumentst &type_expectations);
 
 java_generic_parametert require_java_generic_parameter(const typet &type);
 
 java_generic_parametert require_java_generic_parameter(
   const typet &type,
-  const require_type::expected_type_parametert &type_expectation);
+  const irep_idt &parameter);
 
 const typet &require_java_non_generic_type(
   const typet &type,
@@ -74,7 +74,7 @@ java_generic_class_typet require_java_generic_class(const typet &class_type);
 
 java_generic_class_typet require_java_generic_class(
   const typet &class_type,
-  const std::initializer_list<irep_idt> &type_variables);
+  const std::initializer_list<irep_idt> &type_parameters);
 
 java_class_typet require_java_non_generic_class(const typet &class_type);
 }

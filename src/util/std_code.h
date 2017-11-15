@@ -53,14 +53,11 @@ namespace detail // NOLINT
 template<typename Tag>
 inline bool can_cast_code_impl(const exprt &expr, const Tag &tag)
 {
-  try
+  if(const auto ptr = expr_try_dynamic_cast<codet>(expr))
   {
-    return expr_dynamic_cast<codet>(expr).get_statement()==tag;
+    return ptr->get_statement() == tag;
   }
-  catch(const std::bad_cast &)
-  {
-    return false;
-  }
+  return false;
 }
 
 } // namespace detail
@@ -1244,14 +1241,11 @@ namespace detail // NOLINT
 template<typename Tag>
 inline bool can_cast_side_effect_expr_impl(const exprt &expr, const Tag &tag)
 {
-  try
+  if(const auto ptr = expr_try_dynamic_cast<side_effect_exprt>(expr))
   {
-    return expr_dynamic_cast<side_effect_exprt>(expr).get_statement()==tag;
+    return ptr->get_statement() == tag;
   }
-  catch(const std::bad_cast &)
-  {
-    return false;
-  }
+  return false;
 }
 
 } // namespace detail

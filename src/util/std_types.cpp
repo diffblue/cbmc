@@ -146,17 +146,17 @@ mp_integer signedbv_typet::largest() const
 
 constant_exprt signedbv_typet::zero_expr() const
 {
-  return to_constant_expr(from_integer(0, *this));
+  return from_integer(0, *this);
 }
 
 constant_exprt signedbv_typet::smallest_expr() const
 {
-  return to_constant_expr(from_integer(smallest(), *this));
+  return from_integer(smallest(), *this);
 }
 
 constant_exprt signedbv_typet::largest_expr() const
 {
-  return to_constant_expr(from_integer(largest(), *this));
+  return from_integer(largest(), *this);
 }
 
 mp_integer unsignedbv_typet::smallest() const
@@ -171,15 +171,15 @@ mp_integer unsignedbv_typet::largest() const
 
 constant_exprt unsignedbv_typet::zero_expr() const
 {
-  return to_constant_expr(from_integer(0, *this));
+  return from_integer(0, *this);
 }
 
 constant_exprt unsignedbv_typet::smallest_expr() const
 {
-  return to_constant_expr(from_integer(smallest(), *this));
+  return from_integer(smallest(), *this);
 }
 
 constant_exprt unsignedbv_typet::largest_expr() const
 {
-  return to_constant_expr(from_integer(largest(), *this));
+  return from_integer(largest(), *this);
 }

@@ -258,7 +258,7 @@ symbol_exprt java_string_library_preprocesst::fresh_array(
 exprt::operandst java_string_library_preprocesst::process_parameters(
   const code_typet::parameterst &params,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   exprt::operandst ops;
@@ -288,7 +288,7 @@ refined_string_exprt
 java_string_library_preprocesst::convert_exprt_to_string_exprt(
   const exprt &expr_to_process,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   PRECONDITION(implements_java_char_sequence_pointer(expr_to_process.type()));
@@ -313,7 +313,7 @@ java_string_library_preprocesst::convert_exprt_to_string_exprt(
 exprt::operandst java_string_library_preprocesst::process_operands(
   const exprt::operandst &operands,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   exprt::operandst ops;
@@ -340,10 +340,10 @@ exprt::operandst java_string_library_preprocesst::process_operands(
 ///   added
 /// \return a list of expressions
 exprt::operandst
-  java_string_library_preprocesst::process_equals_function_operands(
+java_string_library_preprocesst::process_equals_function_operands(
   const exprt::operandst &operands,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {
   PRECONDITION(operands.size()==2);
@@ -430,7 +430,7 @@ static exprt get_data(const exprt &expr, const symbol_tablet &symbol_table)
 refined_string_exprt java_string_library_preprocesst::replace_char_array(
   const exprt &array_pointer,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   // array is *array_pointer
@@ -464,7 +464,9 @@ refined_string_exprt java_string_library_preprocesst::replace_char_array(
 /// \param symbol_table: symbol table
 /// \return a new symbol
 symbol_exprt java_string_library_preprocesst::fresh_string(
-  const typet &type, const source_locationt &loc, symbol_tablet &symbol_table)
+  const typet &type,
+  const source_locationt &loc,
+  symbol_table_baset &symbol_table)
 {
   symbolt string_symbol=get_fresh_aux_symbol(
     type, "cprover_string", "cprover_string", loc, ID_java, symbol_table);
@@ -480,7 +482,7 @@ symbol_exprt java_string_library_preprocesst::fresh_string(
 /// \return refined string expr with fresh content and length symbols
 refined_string_exprt java_string_library_preprocesst::decl_string_expr(
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   symbolt sym_length = get_fresh_aux_symbol(
@@ -514,7 +516,7 @@ refined_string_exprt java_string_library_preprocesst::decl_string_expr(
 /// \return a new string_expr
 refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   const refined_string_exprt str = decl_string_expr(loc, symbol_table, code);
@@ -548,7 +550,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
 exprt java_string_library_preprocesst::allocate_fresh_string(
   const typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   exprt str=fresh_string(type, loc, symbol_table);
@@ -587,7 +589,7 @@ static codet code_assign_function_application(
   const exprt &lhs,
   const irep_idt &function_name,
   const exprt::operandst &arguments,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   exprt fun_app=make_function_application(
     function_name, arguments, lhs.type(), symbol_table);
@@ -607,7 +609,7 @@ codet java_string_library_preprocesst::code_return_function_application(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
   const typet &type,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   exprt fun_app=make_function_application(
     function_name, arguments, type, symbol_table);
@@ -620,7 +622,7 @@ codet java_string_library_preprocesst::code_return_function_application(
 /// \param code [out] : code block where the declaration gets added
 /// \return created symbol expression
 exprt make_nondet_infinite_char_array(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
 {
@@ -650,7 +652,7 @@ exprt make_nondet_infinite_char_array(
 void add_pointer_to_array_association(
   const exprt &pointer,
   const exprt &array,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
 {
@@ -683,7 +685,7 @@ void add_pointer_to_array_association(
 void add_array_to_length_association(
   const exprt &array,
   const exprt &length,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
 {
@@ -718,7 +720,7 @@ void add_character_set_constraint(
   const exprt &pointer,
   const exprt &length,
   const irep_idt &char_set,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   const source_locationt &loc,
   code_blockt &code)
 {
@@ -756,7 +758,7 @@ refined_string_exprt java_string_library_preprocesst::string_expr_of_function(
   const irep_idt &function_name,
   const exprt::operandst &arguments,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   // int return_code;
@@ -800,7 +802,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   const exprt &lhs,
   const exprt &rhs_array,
   const exprt &rhs_length,
-  symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   PRECONDITION(implements_java_char_sequence_pointer(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
@@ -831,7 +833,7 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
 codet java_string_library_preprocesst::code_assign_string_expr_to_java_string(
   const exprt &lhs,
   const refined_string_exprt &rhs,
-  symbol_tablet &symbol_table)
+  const symbol_table_baset &symbol_table)
 {
   return code_assign_components_to_java_string(
     lhs, rhs.content(), rhs.length(), symbol_table);
@@ -850,7 +852,7 @@ void java_string_library_preprocesst::code_assign_java_string_to_string_expr(
   const refined_string_exprt &lhs,
   const exprt &rhs,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   PRECONDITION(implements_java_char_sequence_pointer(rhs.type()));
@@ -887,7 +889,7 @@ refined_string_exprt
 java_string_library_preprocesst::string_literal_to_string_expr(
   const std::string &s,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   const constant_exprt expr(s, string_typet());
@@ -908,7 +910,7 @@ java_string_library_preprocesst::string_literal_to_string_expr(
 codet java_string_library_preprocesst::make_equals_function_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // TODO: Code should return false if Object is not String.
   code_blockt code;
@@ -933,7 +935,7 @@ codet java_string_library_preprocesst::make_equals_function_code(
 codet java_string_library_preprocesst::make_float_to_string_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Getting the argument
   code_typet::parameterst params=type.parameters();
@@ -1075,7 +1077,7 @@ codet java_string_library_preprocesst::make_init_function_from_call(
   const irep_idt &function_name,
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   bool ignore_first_arg)
 {
   code_typet::parameterst params=type.parameters();
@@ -1116,7 +1118,7 @@ codet java_string_library_preprocesst::
     const irep_idt &function_name,
     const code_typet &type,
     const source_locationt &loc,
-    symbol_tablet &symbol_table)
+    symbol_table_baset &symbol_table)
 {
   // This is similar to assign functions except we return a pointer to `this`
   code_typet::parameterst params=type.parameters();
@@ -1137,10 +1139,10 @@ codet java_string_library_preprocesst::
 /// \return Code assigning result of a call to the function with given function
 ///   name.
 codet java_string_library_preprocesst::make_assign_function_from_call(
-    const irep_idt &function_name,
-    const code_typet &type,
-    const source_locationt &loc,
-    symbol_tablet &symbol_table)
+  const irep_idt &function_name,
+  const code_typet &type,
+  const source_locationt &loc,
+  symbol_table_baset &symbol_table)
 {
   // This is similar to initialization function except we do not ignore
   // the first argument
@@ -1172,7 +1174,7 @@ exprt java_string_library_preprocesst::get_primitive_value_of_object(
   const exprt &object,
   irep_idt type_name,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   symbol_typet object_type;
@@ -1314,7 +1316,7 @@ exprt java_string_library_preprocesst::make_argument_for_format(
   int index,
   const struct_typet &structured_type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   code_blockt &code)
 {
   // Declarations of the fields of arg_i_struct
@@ -1406,7 +1408,7 @@ exprt java_string_library_preprocesst::make_argument_for_format(
 codet java_string_library_preprocesst::make_string_format_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   PRECONDITION(type.parameters().size()==2);
   code_blockt code;
@@ -1460,9 +1462,9 @@ codet java_string_library_preprocesst::make_string_format_code(
 /// return class1
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 codet java_string_library_preprocesst::make_object_get_class_code(
-    const code_typet &type,
-    const source_locationt &loc,
-    symbol_tablet &symbol_table)
+  const code_typet &type,
+  const source_locationt &loc,
+  symbol_table_baset &symbol_table)
 {
   code_typet::parameterst params=type.parameters();
   exprt this_obj=symbol_exprt(params[0].get_identifier(), params[0].type());
@@ -1540,7 +1542,7 @@ codet java_string_library_preprocesst::make_function_from_call(
   const irep_idt &function_name,
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   code_blockt code;
   exprt::operandst args=process_parameters(
@@ -1563,12 +1565,11 @@ codet java_string_library_preprocesst::make_function_from_call(
 /// string = string_expr_to_string(string)
 /// return string
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-codet java_string_library_preprocesst::
-  make_string_returning_function_from_call(
-    const irep_idt &function_name,
-    const code_typet &type,
-    const source_locationt &loc,
-    symbol_tablet &symbol_table)
+codet java_string_library_preprocesst::make_string_returning_function_from_call(
+  const irep_idt &function_name,
+  const code_typet &type,
+  const source_locationt &loc,
+  symbol_table_baset &symbol_table)
 {
   // Code for the output
   code_blockt code;
@@ -1607,7 +1608,7 @@ codet java_string_library_preprocesst::
 codet java_string_library_preprocesst::make_copy_string_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Code for the output
   code_blockt code;
@@ -1645,7 +1646,7 @@ codet java_string_library_preprocesst::make_copy_string_code(
 codet java_string_library_preprocesst::make_copy_constructor_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Code for the output
   code_blockt code;
@@ -1679,7 +1680,7 @@ codet java_string_library_preprocesst::make_copy_constructor_code(
 codet java_string_library_preprocesst::make_init_from_array_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   // Code for the output
   code_blockt code;
@@ -1734,7 +1735,7 @@ codet java_string_library_preprocesst::make_init_from_array_code(
 codet java_string_library_preprocesst::make_string_length_code(
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   code_typet::parameterst params=type.parameters();
   symbol_exprt arg_this(params[0].get_identifier(), params[0].type());
@@ -1755,7 +1756,7 @@ exprt java_string_library_preprocesst::code_for_function(
   const irep_idt &function_id,
   const code_typet &type,
   const source_locationt &loc,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   auto it_id=cprover_equivalent_to_java_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_function.end())

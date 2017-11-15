@@ -46,7 +46,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -61,7 +61,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             return_type,
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -94,7 +94,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_s.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.String"}});
         }
       }
@@ -109,7 +109,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             return_type,
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -142,7 +142,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_x.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -158,7 +158,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_y.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -173,7 +173,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             return_type,
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -206,7 +206,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_s.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.String"}});
         }
       }
@@ -222,7 +222,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             param_b.type(),
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Boolean"}});
         }
       }
@@ -237,7 +237,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             return_type,
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }
@@ -278,7 +278,7 @@ SCENARIO(
         {
           require_type::require_java_generic_type(
             return_type,
-            {{require_type::type_parameter_kindt::Inst,
+            {{require_type::type_argument_kindt::Inst,
               "java::java.lang.Integer"}});
         }
       }

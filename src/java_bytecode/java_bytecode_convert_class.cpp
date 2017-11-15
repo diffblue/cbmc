@@ -236,7 +236,7 @@ void java_bytecode_convert_classt::convert(
 #endif
     }
 
-    /// this is for a field that holds a generic type, wither with instantiated
+    /// this is for a field that holds a generic type, either with instantiated
     /// or with free type variables, e.g., `List<T> l;` or `List<Integer> l;`
     else if(is_java_generic_type(field_type))
     {
@@ -244,19 +244,13 @@ void java_bytecode_convert_classt::convert(
         to_java_generic_type(field_type);
 #ifdef DEBUG
       std::cout << "fieldtype: generic container type "
-                << std::to_string(with_gen_type.generic_type_variables().size())
+                << std::to_string(with_gen_type.generic_type_arguments().size())
                 << " type " << with_gen_type.id()
                 << " name " << f.name
                 << " subtype id " << with_gen_type.subtype().id() << "\n";
 #endif
       field_type=with_gen_type;
     }
-
-    /// This case is not possible, a field is either a non-instantiated type
-    /// variable or a generics container type.
-    INVARIANT(
-      !is_java_generic_inst_parameter(field_type),
-      "Cannot be an instantiated type variable here.");
   }
   else
     field_type=java_type_from_string(f.descriptor);

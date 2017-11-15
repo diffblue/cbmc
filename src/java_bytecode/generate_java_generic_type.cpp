@@ -156,12 +156,12 @@ typet generate_java_generic_typet::substitute_type(
       const java_generic_typet &generic_type =
         to_java_generic_type(parameter_type);
 
-      java_generic_typet::generic_type_variablest replaced_type_variables;
+      java_generic_typet::generic_type_argumentst replaced_type_variables;
 
       // Swap each parameter
       std::transform(
-        generic_type.generic_type_variables().begin(),
-        generic_type.generic_type_variables().end(),
+        generic_type.generic_type_arguments().begin(),
+        generic_type.generic_type_arguments().end(),
         std::back_inserter(replaced_type_variables),
         [&](const java_generic_parametert &generic_param)
           -> java_generic_parametert {
@@ -221,14 +221,15 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   new_tag_buffer << original_class.get_tag();
   new_tag_buffer << "<";
   bool first=true;
-  for(const typet &param : existing_generic_type.generic_type_variables())
+  for(const typet &type_argument : existing_generic_type
+    .generic_type_arguments())
   {
     if(!first)
       new_tag_buffer << ",";
     first=false;
 
     INVARIANT(
-      is_java_generic_inst_parameter(param),
+      !is_java_generic_parameter(type_argument),
       "Only create full concretized generic types");
     new_tag_buffer << param.subtype().get(ID_identifier);
   }

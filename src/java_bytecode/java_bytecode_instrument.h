@@ -12,7 +12,7 @@ Date:   June 2017
 #define CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_INSTRUMENT_H
 
 void java_bytecode_instrument_symbol(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   symbolt &symbol,
   const bool throw_runtime_exceptions,
   message_handlert &_message_handler);
