@@ -13,7 +13,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <solvers/refinement/string_refinement_invariant.h>
 #include <solvers/refinement/string_constraint_generator.h>
-#include "expr_cast.h"
+#include <util/arith_tools.h>
 
 /// Reduce or extend a string to have the given length
 ///
@@ -442,8 +442,8 @@ static optionalt<std::pair<exprt, exprt>> to_char_pair(
     return std::make_pair(expr1, expr2);
   const auto expr1_str = get_string_expr(expr1);
   const auto expr2_str = get_string_expr(expr2);
-  const auto expr1_length=expr_cast<size_t>(expr1_str.length());
-  const auto expr2_length=expr_cast<size_t>(expr2_str.length());
+  const auto expr1_length = numeric_cast<std::size_t>(expr1_str.length());
+  const auto expr2_length = numeric_cast<std::size_t>(expr2_str.length());
   if(expr1_length && expr2_length && *expr1_length==1 && *expr2_length==1)
     return std::make_pair(exprt(expr1_str[0]), exprt(expr2_str[0]));
   return { };
