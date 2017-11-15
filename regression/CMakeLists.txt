@@ -1,6 +1,3 @@
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-
 set(test_pl_path "${CMAKE_CURRENT_SOURCE_DIR}/test.pl")
 
 macro(add_test_pl_profile name cmdline flag profile)

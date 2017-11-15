@@ -41,3 +41,49 @@ if(${enable_cbmc_tests})
 endif()
 add_subdirectory(unit)
 add_subdirectory(regression)
+
+set_target_properties(
+    analyses
+    ansi-c
+    assembler
+    big-int
+    cbmc
+    cbmc-lib
+    clobber
+    clobber-lib
+    cpp
+    driver
+    goto-analyzer
+    goto-analyzer-lib
+    goto-cc
+    goto-cc-lib
+    goto-diff
+    goto-diff-lib
+    goto-instrument
+    goto-instrument-lib
+    goto-programs
+    goto-symex
+    java_bytecode
+    jbmc
+    jbmc-lib
+    jsil
+    json
+    langapi
+    linking
+    miniBDD
+    miniz
+    mmcc
+    pointer-analysis
+    solvers
+    string_utils
+    test-bigint
+    testing-utils
+    unit
+    util
+    xml
+
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED true
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+)
