@@ -28,20 +28,20 @@ class java_bytecode_instrumentt:public messaget
 {
 public:
   java_bytecode_instrumentt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     const bool _throw_runtime_exceptions,
-    message_handlert &_message_handler):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    throw_runtime_exceptions(_throw_runtime_exceptions),
-    message_handler(_message_handler)
-    {
-    }
+    message_handlert &_message_handler)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      throw_runtime_exceptions(_throw_runtime_exceptions),
+      message_handler(_message_handler)
+  {
+  }
 
   void operator()(exprt &expr);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const bool throw_runtime_exceptions;
   message_handlert &message_handler;
 
@@ -577,7 +577,7 @@ void java_bytecode_instrumentt::operator()(exprt &expr)
 ///   this flag is set to true.
 /// \param message_handler: stream to report status and warnings
 void java_bytecode_instrument_symbol(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   symbolt &symbol,
   const bool throw_runtime_exceptions,
   message_handlert &message_handler)

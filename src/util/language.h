@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "message.h"
 
 class symbol_tablet;
+class symbol_table_baset;
 class exprt;
 class namespacet;
 class typet;
@@ -84,8 +85,7 @@ public:
 
   /// Final adjustments, e.g. initializing stub functions and globals that
   /// were discovered during function loading
-  virtual bool final(
-    symbol_tablet &symbol_table);
+  virtual bool final(symbol_table_baset &symbol_table);
 
   // type check interfaces of currently parsed file
 

@@ -27,6 +27,6 @@ symbolt &get_fresh_aux_symbol(
   const std::string &basename_prefix,
   const source_locationt &source_location,
   const irep_idt &symbol_mode,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 #endif // CPROVER_UTIL_FRESH_SYMBOL_H

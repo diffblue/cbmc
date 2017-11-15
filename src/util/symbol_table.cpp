@@ -1,18 +1,8 @@
-// Copyright 2016-2017 DiffBlue Limited. All Rights Reserved.
+// Copyright 2016-2017 Diffblue Limited. All Rights Reserved.
 
 #include "symbol_table.h"
 
-#include <ostream>
 #include <util/invariant.h>
-
-/// Add a new symbol to the symbol table
-/// \param symbol: The symbol to be added to the symbol table
-/// \return Returns true if the process failed, which should only happen if
-///   there is a symbol with the same name already in the symbol table.
-bool symbol_tablet::add(const symbolt &symbol)
-{
-  return !insert(symbol).second;
-}
 
 /// Move or copy a new symbol to the symbol table
 /// \remark: This is a nicer interface than move and achieves the same
@@ -56,7 +46,7 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
 /// Move a symbol into the symbol table. If there is already a symbol with the
 /// same name then symbol is unchanged, new_symbol points to the symbol with the
 /// same name and true is returned. Otherwise, the symbol is moved into the
-/// symbol table, symbol is set to be empty, new_symbol points to its new
+/// symbol table, symbol is destroyed, new_symbol points to its new
 /// location in the symbol table and false is returned
 /// \param symbol: The symbol to be added to the symbol table
 /// \param new_symbol: Pointer which the function will set to either point to
@@ -87,19 +77,6 @@ bool symbol_tablet::move(symbolt &symbol, symbolt *&new_symbol)
   // Return the address of the symbol in the table
   new_symbol=&result.first;
   return !result.second;
-}
-
-/// Remove a symbol from the symbol table
-/// \param name: The name of the symbol to remove
-/// \return Returns a boolean indicating whether the process failed
-///   i.e. false if the symbol was removed, or true if it didn't exist.
-bool symbol_tablet::remove(const irep_idt &name)
-{
-  symbolst::const_iterator entry=symbols.find(name);
-  if(entry==symbols.end())
-    return true;
-  erase(entry);
-  return false;
 }
 
 /// Remove a symbol from the symbol table
@@ -136,23 +113,4 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
   internal_symbol_module_map.erase(module_it);
 
   internal_symbols.erase(entry);
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-void symbol_tablet::show(std::ostream &out) const
-{
-  out << "\n" << "Symbols:" << "\n";
-
-  forall_symbols(it, symbols)
-    out << it->second;
-}
-
-/// Print the contents of the symbol table
-/// \param out: The ostream to direct output to
-/// \param symbol_table: The symbol table to print out
-std::ostream &operator << (std::ostream &out, const symbol_tablet &symbol_table)
-{
-  symbol_table.show(out);
-  return out;
 }

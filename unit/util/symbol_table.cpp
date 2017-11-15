@@ -3,7 +3,7 @@
 /// \file Tests for symbol_tablet
 
 #include <testing-utils/catch.hpp>
-#include <util/symbol_table_writer.h>
+#include <util/journalling_symbol_table.h>
 
 SCENARIO("journalling_symbol_table_writer",
   "[core][utils][journalling_symbol_table_writer]")
@@ -11,8 +11,8 @@ SCENARIO("journalling_symbol_table_writer",
   GIVEN("A journalling_symbol_table_writert wrapping an empty symbol_tablet")
   {
     symbol_tablet base_symbol_table;
-    journalling_symbol_table_writert symbol_table=
-      journalling_symbol_table_writert::wrap(base_symbol_table);
+    journalling_symbol_tablet symbol_table =
+      journalling_symbol_tablet::wrap(base_symbol_table);
     const symbol_tablet &read_symbol_table=symbol_table;
 
     irep_idt symbol_name="Test";

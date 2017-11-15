@@ -19,7 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define JAVA_ENTRY_POINT_EXCEPTION_SYMBOL "uncaught_exception'"
 
 bool java_entry_point(
-  class symbol_tablet &symbol_table,
+  class symbol_table_baset &symbol_table,
   const irep_idt &main_class,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
@@ -61,14 +61,14 @@ struct main_function_resultt
 
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(
-  symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &main_class,
   message_handlert &,
-  bool allow_no_body=false);
+  bool allow_no_body = false);
 
 bool generate_java_start_function(
   const symbolt &symbol,
-  class symbol_tablet &symbol_table,
+  class symbol_table_baset &symbol_table,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   const object_factory_parameterst& object_factory_parameters,
