@@ -54,7 +54,6 @@ static bool build_graph_rec(
     node.node_name=node_name;
     node.is_violation=false;
     node.has_invariant=false;
-    node.thread_nr=0;
 
     for(xmlt::elementst::const_iterator
         e_it=xml.elements.begin();
@@ -66,8 +65,6 @@ static bool build_graph_rec(
       if(e_it->get_attribute("key")=="violation" &&
          e_it->data=="true")
         node.is_violation=e_it->data=="true";
-      else if(e_it->get_attribute("key")=="threadNumber")
-        node.thread_nr=safe_string2unsigned(e_it->data);
       else if(e_it->get_attribute("key")=="entry" &&
               e_it->data=="true")
         entrynode=node_name;
@@ -337,13 +334,24 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
   }
 
   // <key attr.name="threadId" attr.type="string" for="edge" id="threadId"/>
-  // TODO: format for multi-threaded programs not defined yet
   {
     xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "threadNumber");
+    key.set_attribute("attr.name", "threadId");
     key.set_attribute("attr.type", "int");
-    key.set_attribute("for", "node");
-    key.set_attribute("id", "thread");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "threadId");
+
+    key.new_element("default").data="0";
+  }
+
+  // <key attr.name="createThread" attr.type="string"
+  //      for="edge" id="createThread"/>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "createThread");
+    key.set_attribute("attr.type", "int");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "createThread");
 
     key.new_element("default").data="0";
   }
@@ -523,13 +531,6 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
       entry.data="true";
 
       entry_done=true;
-    }
-
-    if(n.thread_nr!=0)
-    {
-      xmlt &entry=node.new_element("data");
-      entry.set_attribute("key", "threadNumber");
-      entry.data=std::to_string(n.thread_nr);
     }
 
     // <node id="A14">
