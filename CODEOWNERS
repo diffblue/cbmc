@@ -1,36 +1,57 @@
 # These owners will be the default owners for everything in the repo.
-*       @kroening @tautschnig @peterschrammel
+*       @kroening @tautschnig @peterschrammel @smowton @chrisr-diffblue
 
-src/java_bytecode/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli @Degiorgio @NathanJPhillips
-src/jbmc/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli @Degiorgio @NathanJPhillips
-src/miniz/ @smowton @mgudemann @cristina-david @jgwilson42 @pkesseli
+# These files should rarely change
 
-src/ansi-c/ @marek-trtik @kroening @tautschnig
+src/big-int/ @kroening
+src/ansi-c/ @kroening @tautschnig
+src/assembler/ @kroening @tautschnig
+src/goto-cc/ @kroening @tautschnig
+src/linking/ @kroening @tautschnig
+src/memory-models/ @kroening @tautschnig
+src/goto-symex/ @kroening @tautschnig @peterschrammel
+src/json/ @kroening @tautschnig @peterschrammel
+src/langapi/ @kroening @tautschnig @peterschrammel
+src/xmllang/ @kroening @tautschnig @peterschrammel
+src/nonstd/ @smowton @peterschrammel
+src/solvers/cvc @martin-cs @kroening
+src/solvers/flattening @martin-cs @kroening @tautschnig @peterschrammel
+src/solvers/floatbv @martin-cs @kroening
+src/solvers/miniBDD @tautschnig @kroening
+src/solvers/prop @martin-cs @kroening @tautschnig @peterschrammel
+src/solvers/sat @martin-cs @kroening @tautschnig @peterschrammel
+src/solvers/smt2 @martin-cs @tautschnig @peterschrammel
+src/miniz/ @smowton @mgudemann @peterschrammel
 
-src/cpp/ @marek-trtik @kroening @tautschnig
 
-CMakeLists.txt @reuk @thk123
+# These files change frequently and changes are high-risk
 
-cmake/ @reuk @thk123
+src/cbmc/ @smowton @kroening @tautschnig @peterschrammel
+src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
+src/util/ @smowton @kroening @tautschnig @peterschrammel @pkesseli
+src/solvers/refinement @martin-cs @romainbrenguier @peterschrammel
+src/java_bytecode/ @smowton @mgudemann @thk123 @cristina-david @cesaro @pkesseli @NathanJPhillips @peterschrammel
+src/analyses/ @martin-cs @peterschrammel @chrisr-diffblue @thk123 @smowton
+src/pointer-analysis/ @martin-cs @peterschrammel @chrisr-diffblue @smowton
 
-src/solvers/ @martin-cs @romainbrenguier @antlechner @kroening
 
-src/analyses/ @martin-cs @peterschrammel @thk123 @marek-trtik @NathanJPhillips
+# These files change frequently and changes are medium-risk
 
-src/pointer-analysis/ @martin-cs @peterschrammel @thk123 @marek-trtik 
+src/goto-analyzer/ @martin-cs @chrisr-diffblue @peterschrammel
+src/goto-instrument/ @martin-cs @chrisr-diffblue @peterschrammel
+src/goto-diff/ @tautschnig @peterschrammel
+src/jbmc/ @smowton @mgudemann @cristina-david @cesaro @pkesseli @peterschrammel
+src/cpp/ @kroening @tautschnig @peterschrammel
 
-src/goto-analyzer/ @martin-cs @peterschrammel @thk123 @marek-trtik 
 
-src/goto-instrument/ @martin-cs @peterschrammel @thk123 @marek-trtik  
-
-src/goto-programs/ @smowton @kroening @tautschnig @peterschrammel @marek-trtik  
-
-src/linking/ @smowton @kroening @tautschnig @peterschrammel @marek-trtik  
+# These files change frequently and changes are low-risk
 
 unit/ @diffblue/cbmc-developers
-
 regression/ @diffblue/cbmc-developers
 
-.travis.yml @diffblue/devops @thk123 @forejtv @jgwilson42 @rabiamarzhiya
-appveyor.yml @diffblue/devops @thk123 @forejtv @jgwilson42 @rabiamarzhiya
+CMakeLists.txt @reuk @chrisr-diffblue
+cmake/ @reuk @chrisr-diffblue
 
+scripts/ @diffblue/devops @thk123 @forejtv @peterschrammel
+.travis.yml @diffblue/devops @thk123 @forejtv @peterschrammel
+appveyor.yml @diffblue/devops @thk123 @forejtv @peterschrammel
