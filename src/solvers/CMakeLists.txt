@@ -45,8 +45,7 @@ set(limmat_source
     ${CMAKE_CURRENT_SOURCE_DIR}/sat/satcheck_limmat.cpp
 )
 
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${chaff_source}
     ${minisat_source}
@@ -63,7 +62,7 @@ list(REMOVE_ITEM sources
     ${limmat_source}
 )
 
-add_library(solvers ${sources} ${headers})
+add_library(solvers ${sources})
 
 include("${CBMC_SOURCE_DIR}/../cmake/DownloadProject.cmake")
 

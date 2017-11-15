@@ -1,6 +1,5 @@
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
-add_library(java_bytecode ${sources} ${headers})
+file(GLOB_RECURSE sources "*.cpp" "*.h")
+add_library(java_bytecode ${sources})
 
 generic_includes(java_bytecode)
 

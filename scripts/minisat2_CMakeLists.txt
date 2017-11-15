@@ -6,6 +6,14 @@ add_library(minisat2-condensed
     minisat/core/Solver.cc
 )
 
+set_target_properties(
+    minisat2-condensed
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED true
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+)
+
 target_include_directories(minisat2-condensed
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
