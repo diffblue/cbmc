@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/pointer_offset_size.h>
 #include <string.h>
+#include <java_bytecode/java_types.h>
 
 /// Reads a memory address and loads it into the `dest` variable.
 /// Marks cell as `READ_BEFORE_WRITTEN` if cell has never been written.
@@ -1196,7 +1197,15 @@ mp_integer interpretert::evaluate_address(
     if(expr.operands().size()!=1)
       throw "typecast expects one operand";
 
-    PRECONDITION(expr.type().id()==ID_pointer);
+    PRECONDITION(expr.type().id()==ID_pointer ||
+      // with generics support, we get some weird typecast expressions,
+      // in the goto program, where the first operand is typecast into a
+      // struct that resembles the same type, and is of type "struct" instead
+      // "pointer" so the precondition above would fail. This makes sure to
+      // proceed the evaluation in the case where the operand is a generic
+      // instantiated type.
+      (expr.type().id()==ID_struct &&
+        java_is_specialised_generic_class_type(expr.op0().type())));
 
     return evaluate_address(expr.op0(), fail_quietly);
   }
