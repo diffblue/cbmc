@@ -284,39 +284,64 @@ std::wstring utf8_to_utf16_little_endian(const std::string &in)
   return utf8_to_utf16(in, swap_bytes);
 }
 
-/// \par parameters: String in UTF-16LE format
-/// \return String in US-ASCII format, with \uxxxx escapes for other characters
+/// \param ch: UTF-16LE character
+/// \param result: stream to receive string in US-ASCII format, with \\uxxxx
+///                escapes for other characters
+/// \param loc: locale to check for printable characters
+static void utf16_little_endian_to_java(
+  const wchar_t ch,
+  std::ostringstream &result,
+  const std::locale &loc)
+{
+  // \u unicode characters are translated very early by the Java compiler and so
+  // \u000a or \u000d would become a newline character in a char constant, which
+  // is illegal. Instead use \n or \r.
+  if(ch == '\n')
+    result << "\\n";
+  else if(ch == '\r')
+    result << "\\r";
+  // \f, \b and \t do not need to be escaped, but this will improve readability
+  // of generated tests.
+  else if(ch == '\f')
+    result << "\\f";
+  else if(ch == '\b')
+    result << "\\b";
+  else if(ch == '\t')
+    result << "\\t";
+  else if(ch <= 255 && isprint(ch, loc))
+  {
+    const auto uch = static_cast<unsigned char>(ch);
+    // ", \ and ' need to be escaped.
+    if(uch == '"' || uch == '\\' || uch == '\'')
+      result << '\\';
+    result << uch;
+  }
+  else
+  {
+    // Format ch as a hexadecimal unicode character padded to four digits with
+    // zeros.
+    result << "\\u" << std::hex << std::setw(4) << std::setfill('0')
+           << static_cast<unsigned int>(ch);
+  }
+}
+
+/// \param ch: UTF-16LE character
+/// \return String in US-ASCII format, with \\uxxxx escapes for other characters
+std::string utf16_little_endian_to_java(const wchar_t ch)
+{
+  std::ostringstream result;
+  const std::locale loc;
+  utf16_little_endian_to_java(ch, result, loc);
+  return result.str();
+}
+
+/// \param in: String in UTF-16LE format
+/// \return String in US-ASCII format, with \\uxxxx escapes for other characters
 std::string utf16_little_endian_to_java(const std::wstring &in)
 {
   std::ostringstream result;
   const std::locale loc;
   for(const auto ch : in)
-  {
-    if(ch=='\n')
-      result << "\\n";
-    else if(ch=='\r')
-      result << "\\r";
-    else if(ch=='\f')
-      result << "\\f";
-    else if(ch=='\b')
-      result << "\\b";
-    else if(ch=='\t')
-      result << "\\t";
-    else if(ch<=255 && isprint(ch, loc))
-    {
-      const auto uch=static_cast<unsigned char>(ch);
-      if(uch=='"' || uch=='\\')
-        result << '\\';
-      result << uch;
-    }
-    else
-    {
-      result << "\\u"
-             << std::hex
-             << std::setw(4)
-             << std::setfill('0')
-             << static_cast<unsigned int>(ch);
-    }
-  }
+    utf16_little_endian_to_java(ch, result, loc);
   return result.str();
 }
