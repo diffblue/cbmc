@@ -1215,11 +1215,6 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
      (expr.id()==ID_equal || expr.id()==ID_notequal))
     return simplify_inequality_pointer_object(expr);
 
-  // first see if we compare to a constant
-
-  bool op0_is_const=tmp0.is_constant();
-  bool op1_is_const=tmp1.is_constant();
-
   ns.follow_symbol(tmp0.type());
   ns.follow_symbol(tmp1.type());
 
@@ -1229,9 +1224,20 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
   if(tmp1.type().id()==ID_c_enum_tag)
     tmp1.type()=ns.follow_tag(to_c_enum_tag_type(tmp1.type()));
 
+  const auto tmp0_const = expr_try_dynamic_cast<constant_exprt>(tmp0);
+  const auto tmp1_const = expr_try_dynamic_cast<constant_exprt>(tmp1);
+
   // are _both_ constant?
-  if(op0_is_const && op1_is_const)
+  if(tmp0_const && tmp1_const)
   {
+    if(expr.id() == ID_equal || expr.id() == ID_notequal)
+    {
+
+      bool equal = (tmp0_const->get_value() == tmp1_const->get_value());
+      expr.make_bool(expr.id() == ID_equal ? equal : !equal);
+      return false;
+    }
+
     if(tmp0.type().id()==ID_bool)
     {
       bool v0=tmp0.is_true();
@@ -1347,7 +1353,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       return false;
     }
   }
-  else if(op0_is_const)
+  else if(tmp0_const)
   {
     // we want the constant on the RHS
 
@@ -1366,7 +1372,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
     simplify_inequality_constant(expr);
     return false;
   }
-  else if(op1_is_const)
+  else if(tmp1_const)
   {
     // one is constant
     return simplify_inequality_constant(expr);
