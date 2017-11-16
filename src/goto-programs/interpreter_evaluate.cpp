@@ -1196,8 +1196,6 @@ mp_integer interpretert::evaluate_address(
     if(expr.operands().size()!=1)
       throw "typecast expects one operand";
 
-    PRECONDITION(expr.type().id()==ID_pointer);
-
     return evaluate_address(expr.op0(), fail_quietly);
   }
   if(!fail_quietly)
