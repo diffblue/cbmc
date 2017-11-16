@@ -1,13 +1,12 @@
 # Library
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/goto_instrument_main.cpp
 
     # This doesn't build
     ${CMAKE_CURRENT_SOURCE_DIR}/accelerate/linearize.cpp
 )
-add_library(goto-instrument-lib ${sources} ${headers})
+add_library(goto-instrument-lib ${sources})
 
 generic_includes(goto-instrument-lib)
 

@@ -96,8 +96,7 @@ set(extra_dependencies
     ${CMAKE_CURRENT_BINARY_DIR}/library-check.stamp
 )
 
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+file(GLOB_RECURSE sources "*.cpp" "*.h")
 
 list(REMOVE_ITEM sources
     "${CMAKE_CURRENT_SOURCE_DIR}/library/converter.cpp"
@@ -106,7 +105,6 @@ list(REMOVE_ITEM sources
 
 add_library(ansi-c
     ${sources}
-    ${headers}
     ${BISON_parser_OUTPUTS}
     ${FLEX_scanner_OUTPUTS}
 )

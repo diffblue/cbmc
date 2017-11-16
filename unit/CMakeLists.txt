@@ -1,8 +1,4 @@
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+file(GLOB_RECURSE sources "*.cpp" "*.h")
 
 file(GLOB_RECURSE testing_utils "testing-utils/*.cpp" "testing-utils/*.h")
 
@@ -33,7 +29,7 @@ list(REMOVE_ITEM sources
 
 add_subdirectory(testing-utils)
 
-add_executable(unit ${sources} ${headers})
+add_executable(unit ${sources})
 target_include_directories(unit
     PUBLIC
     ${CBMC_BINARY_DIR}

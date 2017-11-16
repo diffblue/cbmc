@@ -1,10 +1,9 @@
 # Library
-file(GLOB_RECURSE sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+file(GLOB_RECURSE sources "*.cpp" "*.h")
 list(REMOVE_ITEM sources
     ${CMAKE_CURRENT_SOURCE_DIR}/goto_analyzer_main.cpp
 )
-add_library(goto-analyzer-lib ${sources} ${headers})
+add_library(goto-analyzer-lib ${sources})
 
 generic_includes(goto-analyzer-lib)
 

@@ -6,6 +6,14 @@ add_library(glucose-condensed
     core/Solver.cc
 )
 
+set_target_properties(
+    glucose-condensed
+    PROPERTIES
+    CXX_STANDARD 11
+    CXX_STANDARD_REQUIRED true
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+)
+
 target_include_directories(glucose-condensed
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

@@ -1,24 +1,7 @@
-cmake_minimum_required(VERSION 3.2)
-
-#   TODO
-#   -[ ] Install profiles.
-#   -[ ] Specify one of many different solver libraries.
-
 project(CBMC)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED true)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 
 find_package(BISON)
 find_package(FLEX)
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-include(CPack)
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -96,13 +79,6 @@ macro(add_if_library target name)
         target_compile_definitions(${target} PUBLIC HAVE_${define})
     endif()
 endmacro(add_if_library)
-
-#   Override add_executable to automatically sign the target on OSX.
-function(add_executable name)
-    _add_executable(${name} ${ARGN})
-    set_target_properties(${name} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY
-        "Developer ID Application: Daniel Kroening")
-endfunction(add_executable)
 
 add_subdirectory(analyses)
 add_subdirectory(ansi-c)
