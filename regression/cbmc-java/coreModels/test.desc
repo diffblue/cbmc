@@ -1,0 +1,9 @@
+CORE
+test.class
+--show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+^Symbol\s*\.*\: java\:\:org\.cprover\.CProver\.\<clinit\>\:\(\)V$
+--
+--
+tests that the core models are  being loaded by checking if the static initializer for the CProver class was

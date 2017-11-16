@@ -40,6 +40,16 @@ CLEANFILES = java_bytecode$(LIBEXT)
 
 all: java_bytecode$(LIBEXT)
 
+clean: clean_library
+
+.PHONY: clean_library
+clean_library:
+	$(MAKE) clean -C library
+
+library/java_core_models.inc:
+	$(MAKE) -C library java_core_models.inc
+
+java_class_loader$(OBJEXT): library/java_core_models.inc
 ###############################################################################
 
 java_bytecode$(LIBEXT): $(OBJ)
