@@ -154,12 +154,20 @@ public:
     return node_id;
   }
 
+  void populate_dep_graph(
+    dependence_grapht &, goto_programt::const_targett) const;
+
 private:
   tvt has_values;
   node_indext node_id;
 
   typedef std::set<goto_programt::const_targett> depst;
   depst control_deps, data_deps;
+
+  friend const depst &
+    dependence_graph_test_get_control_deps(const dep_graph_domaint &);
+  friend const depst &
+    dependence_graph_test_get_data_deps(const dep_graph_domaint &);
 
   void control_dependencies(
     goto_programt::const_targett from,
@@ -204,6 +212,14 @@ public:
       const irep_idt id=goto_programt::get_function_id(goto_program);
       cfg_post_dominatorst &pd=post_dominators[id];
       pd(goto_program);
+    }
+  }
+
+  void finalize()
+  {
+    for(const auto &location_state : state_map)
+    {
+      location_state.second.populate_dep_graph(*this, location_state.first);
     }
   }
 

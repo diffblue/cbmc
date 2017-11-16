@@ -280,6 +280,11 @@ void ai_baset::initialize(const goto_functionst &goto_functions)
     initialize(it->second);
 }
 
+void ai_baset::finalize()
+{
+  // Nothing to do per default
+}
+
 ai_baset::locationt ai_baset::get_next(
   working_sett &working_set)
 {
