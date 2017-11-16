@@ -24,6 +24,13 @@ public:
   /// \param filename Path of the zip archive
   /// \throw Throws std::runtime_error if file cannot be opened
   explicit mz_zip_archivet(const std::string &filename);
+
+  /// Loads a zip buffer
+  /// \param data pointer to the memory buffer
+  /// \param size size of the buffer
+  /// \throw Throws std::runtime_error if file cannot be opened
+  mz_zip_archivet(const void *data, size_t size);
+
   mz_zip_archivet(const mz_zip_archivet &)=delete;
   mz_zip_archivet &operator=(const mz_zip_archivet &)=delete;
   /// Move constructor. Doesn't throw. Leaves other object invalidated.

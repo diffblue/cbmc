@@ -12,10 +12,7 @@ Author: Diffblue Ltd
 #include <util/invariant.h>
 #include "java_class_loader_limit.h"
 
-jar_filet::jar_filet(
-  java_class_loader_limitt &limit,
-  const std::string &filename):
-  m_zip_archive(filename)
+void jar_filet::initialize_file_index(java_class_loader_limitt &limit)
 {
   const size_t file_count=m_zip_archive.get_num_files();
   for(size_t index=0; index<file_count; index++)
@@ -24,6 +21,29 @@ jar_filet::jar_filet(
     if(!has_suffix(filename, ".class") || limit.load_class_file(filename))
       m_name_to_index.emplace(filename, index);
   }
+}
+
+/// This constructor creates a jar_file object whose contents
+/// are extracted from a memory buffer (byte array) as opposed
+/// to a jar file.
+jar_filet::jar_filet(
+  java_class_loader_limitt &limit,
+  const std::string &filename):
+  m_zip_archive(filename)
+{
+  initialize_file_index(limit);
+}
+
+/// This constructor creates a jar_file object whose contents
+/// are extracted from a memory buffer (byte array) as opposed
+/// to a jar file.
+jar_filet::jar_filet(
+  java_class_loader_limitt &limit,
+  const void *data,
+  size_t size):
+  m_zip_archive(data, size)
+{
+  initialize_file_index(limit);
 }
 
 // VS: No default move constructors or assigns
