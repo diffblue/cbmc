@@ -107,6 +107,12 @@ protected:
     const goto_programt::targett &,
     bool may_catch);
 
+  goto_programt::targett find_universal_exception(
+    const remove_exceptionst::stack_catcht &stack_catch,
+    goto_programt &goto_program,
+    std::size_t &universal_try,
+    std::size_t &universal_catch);
+
   void add_exception_dispatch_sequence(
     goto_programt &goto_program,
     const goto_programt::targett &instr_it,
@@ -229,6 +235,55 @@ void remove_exceptionst::instrument_exception_handler(
   instr_it->make_skip();
 }
 
+/// Find the innermost universal exception handler for the current
+/// program location which may throw (i.e. the first catch of type
+/// any in the innermost try that contains such). We record this one
+/// because no handler after it can possibly catch.
+/// The context is contained in stack_catch which is a stack of all the tries
+/// which contain the current program location in their bodies. Each of these
+/// in turn contains a list of all possible catches for that try giving the
+/// type of exception they catch and the location of the handler.
+/// This function returns the indices of the try and the catch within that try
+/// as well as the location of the handler.
+/// The first loop is in forward order because the insertion reverses the order
+/// we note  that try1{ try2 {} catch2c {} catch2d {}} catch1a() {} catch1b{}
+/// must catch in the following order: 2c 2d 1a 1b hence the numerical index
+/// is reversed whereas the letter ordering remains the same.
+/// @param stack_catch exception table
+/// @param goto_program program being evaluated
+/// @param[out] universal_try returns the try block
+///        corresponding to the desired exception handler
+/// @param[out] universal_catch returns the catch block
+///        corresponding to the exception desired exception handler
+/// @return the desired exception handler
+goto_programt::targett remove_exceptionst::find_universal_exception(
+  const remove_exceptionst::stack_catcht &stack_catch,
+  goto_programt &goto_program,
+  std::size_t &universal_try,
+  std::size_t &universal_catch)
+{
+  for(std::size_t i=stack_catch.size(); i>0;)
+  {
+    i--;
+    for(std::size_t j=0; j<stack_catch[i].size(); ++j)
+    {
+      if(stack_catch[i][j].first.empty())
+      {
+        // Record the position of the default behaviour as any further catches
+        // will not capture the throw
+        universal_try=i;
+        universal_catch=j;
+
+        // Universal handler. Highest on the stack takes
+        // precedence, so overwrite any we've already seen:
+        return stack_catch[i][j].second;
+      }
+    }
+  }
+  // Unless we have a universal exception handler, jump to end of function
+  return goto_program.get_end_function();
+}
+
 /// Emit the code:
 /// if (exception instanceof ExnA) then goto handlerA
 /// else if (exception instanceof ExnB) then goto handlerB
@@ -244,10 +299,6 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
-  // Unless we have a universal exception handler, jump to end of function
-  // if not caught:
-  goto_programt::targett default_target=goto_program.get_end_function();
-
   // Jump to the universal handler or function end, as appropriate.
   // This will appear after the GOTO-based dynamic dispatch below
   goto_programt::targett default_dispatch=goto_program.insert_after(instr_it);
@@ -259,21 +310,28 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   symbol_exprt exc_thrown =
     get_inflight_exception_global();
 
+  std::size_t default_try=0;
+  std::size_t default_catch=(!stack_catch.empty()) ? stack_catch[0].size() : 0;
+
+  goto_programt::targett default_target=
+    find_universal_exception(stack_catch, goto_program,
+                           default_try, default_catch);
+
   // add GOTOs implementing the dynamic dispatch of the
-  // exception handlers
-  for(std::size_t i=stack_catch.size(); i-->0;)
+  // exception handlers.
+  // The first loop is in forward order because the insertion reverses the order
+  // we note  that try1{ try2 {} catch2c {} catch2d {}} catch1a() {} catch1b{}
+  // must catch in the following order: 2c 2d 1a 1b hence the numerical index
+  // is reversed whereas the letter ordering remains the same.
+  for(std::size_t i=default_try; i<stack_catch.size(); i++)
   {
-    for(std::size_t j=stack_catch[i].size(); j-->0;)
+    for(std::size_t j=(i==default_try) ? default_catch : stack_catch[i].size();
+      j>0;)
     {
+      j--;
       goto_programt::targett new_state_pc=
         stack_catch[i][j].second;
-      if(stack_catch[i][j].first.empty())
-      {
-        // Universal handler. Highest on the stack takes
-        // precedence, so overwrite any we've already seen:
-        default_target=new_state_pc;
-      }
-      else
+      if(!stack_catch[i][j].first.empty())
       {
         // Normal exception handler, make an instanceof check.
         goto_programt::targett t_exc=goto_program.insert_after(instr_it);
