@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/invariant.h>
 #include <algorithm>
+#include <set>
 
 #include <util/type.h>
 #include <util/std_types.h>
@@ -365,5 +366,12 @@ inline const optionalt<size_t> java_generics_get_index_for_subtype(
 
   return std::distance(gen_types.cbegin(), iter);
 }
+
+void get_dependencies_from_generic_parameters(
+  const std::string &,
+  std::set<irep_idt> &);
+void get_dependencies_from_generic_parameters(
+  const typet &,
+  std::set<irep_idt> &);
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H

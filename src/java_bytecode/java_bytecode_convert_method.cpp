@@ -116,15 +116,6 @@ static bool operator==(const irep_idt &what, const patternt &pattern)
   return pattern==what;
 }
 
-static irep_idt strip_java_namespace_prefix(const irep_idt to_strip)
-{
-  const std::string to_strip_str=id2string(to_strip);
-  const std::string prefix="java::";
-
-  PRECONDITION(has_prefix(to_strip_str, prefix));
-  return to_strip_str.substr(prefix.size(), std::string::npos);
-}
-
 // name contains <init> or <clinit>
 bool java_bytecode_convert_methodt::is_constructor(
   const class_typet::methodt &method)

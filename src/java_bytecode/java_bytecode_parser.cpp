@@ -343,6 +343,11 @@ void java_bytecode_parsert::get_class_refs()
         field.descriptor,
         field.signature,
         "java::"+id2string(parse_tree.parsed_class.name));
+
+      // add generic type args to class refs as dependencies, same below for
+      // method types and entries from the local variable type table
+      get_dependencies_from_generic_parameters(
+        field_type, parse_tree.class_refs);
     }
     else
       field_type=java_type_from_string(field.descriptor);
@@ -359,6 +364,8 @@ void java_bytecode_parsert::get_class_refs()
         method.descriptor,
         method.signature,
         "java::"+id2string(parse_tree.parsed_class.name));
+      get_dependencies_from_generic_parameters(
+        method_type, parse_tree.class_refs);
     }
     else
       method_type=java_type_from_string(method.descriptor);
@@ -373,6 +380,8 @@ void java_bytecode_parsert::get_class_refs()
           var.descriptor,
           var.signature,
           "java::"+id2string(parse_tree.parsed_class.name));
+        get_dependencies_from_generic_parameters(
+          var_type, parse_tree.class_refs);
       }
       else
         var_type=java_type_from_string(var.descriptor);
@@ -1356,6 +1365,9 @@ void java_bytecode_parsert::rclass_attribute(classt &parsed_class)
   {
     u2 signature_index=read_u2();
     parsed_class.signature=id2string(pool_entry(signature_index).s);
+    get_dependencies_from_generic_parameters(
+      parsed_class.signature.value(),
+      parse_tree.class_refs);
   }
   else if(attribute_name=="RuntimeInvisibleAnnotations" ||
           attribute_name=="RuntimeVisibleAnnotations")

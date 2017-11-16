@@ -293,3 +293,15 @@ exprt make_function_application(
   call.arguments()=arguments;
   return call;
 }
+
+/// Strip java:: prefix from given identifier
+/// \param to_strip: identifier from which the prefix is stripped
+/// \return the identifier without without java:: prefix
+irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
+{
+  const std::string to_strip_str=id2string(to_strip);
+  const std::string prefix="java::";
+
+  PRECONDITION(has_prefix(to_strip_str, prefix));
+  return to_strip_str.substr(prefix.size(), std::string::npos);
+}
