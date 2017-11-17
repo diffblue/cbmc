@@ -1,0 +1,11 @@
+CORE
+Test.class
+--program-only
+^EXIT=0$
+^SIGNAL=0$
+C\.f
+--
+A\.f
+B\.f
+D\.f
+E\.f
