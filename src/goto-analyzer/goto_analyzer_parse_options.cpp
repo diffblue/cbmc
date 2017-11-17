@@ -185,6 +185,20 @@ int goto_analyzer_parse_optionst::doit()
   if(process_goto_program(options))
     return 6;
 
+  // show it?
+  if(cmdline.isset("show-symbol-table"))
+  {
+    ::show_symbol_table(goto_model.symbol_table, get_ui());
+    return 6;
+  }
+
+  // show it?
+  if(cmdline.isset("show-goto-functions"))
+  {
+    show_goto_functions(goto_model, get_ui());
+    return 6;
+  }
+
   if(cmdline.isset("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
@@ -400,20 +414,6 @@ bool goto_analyzer_parse_optionst::process_goto_program(
 
     // add loop ids
     goto_model.goto_functions.compute_loop_numbers();
-
-    // show it?
-    if(cmdline.isset("show-goto-functions"))
-    {
-      show_goto_functions(goto_model, get_ui());
-      return true;
-    }
-
-    // show it?
-    if(cmdline.isset("show-symbol-table"))
-    {
-      ::show_symbol_table(goto_model, get_ui());
-      return true;
-    }
   }
 
   catch(const char *e)
