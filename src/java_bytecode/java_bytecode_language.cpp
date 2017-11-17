@@ -295,6 +295,10 @@ bool java_bytecode_languaget::generate_support_functions(
   if(!res.is_success())
     return res.is_error();
 
+  // Load the main function into the symbol table to get access to its
+  // parameter names
+  convert_lazy_method(res.main_function.name, symbol_table);
+
   // generate the test harness in __CPROVER__start and a call the entry point
   return
     java_entry_point(
