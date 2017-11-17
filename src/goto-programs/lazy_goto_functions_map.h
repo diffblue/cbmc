@@ -156,12 +156,9 @@ private:
     typename underlying_mapt::iterator it=goto_functions.find(name);
     if(it!=goto_functions.end())
       return *it;
-    if(symbol_table.lookup_ref(name).value.is_nil())
-    {
-      // Fill in symbol table entry body
-      // If this returns false then it's a stub
-      language_files.convert_lazy_method(name, symbol_table);
-    }
+    // Fill in symbol table entry body if not already done
+    // If this returns false then it's a stub
+    language_files.convert_lazy_method(name, symbol_table);
     // Create goto_functiont
     goto_functionst::goto_functiont function;
     convert_functions.convert_function(name, function);

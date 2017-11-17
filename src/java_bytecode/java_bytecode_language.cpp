@@ -254,6 +254,10 @@ bool java_bytecode_languaget::generate_support_functions(
   if(!res.is_success())
     return res.is_error();
 
+  // Load the main function into the symbol table to get access to its
+  // parameter names
+  convert_lazy_method(res.main_function.name, symbol_table);
+
   // generate the test harness in __CPROVER__start and a call the entry point
   return
     java_entry_point(
@@ -337,10 +341,14 @@ void java_bytecode_languaget::get_known_lazy_methods(
 /// identical to that produced using eager method conversion.
 /// \param function_id: method ID to convert
 /// \param symtab: global symbol table
+/// \returns true if the function is now in the symbol table
 bool java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
   symbol_tablet &symtab)
 {
+  if(symtab.lookup_ref(function_id).value.is_not_nil())
+    return true;
+
   journalling_symbol_tablet symbol_table=
     journalling_symbol_tablet::wrap(symtab);
   symbolt &symbol=*symbol_table.get_writeable(function_id);
