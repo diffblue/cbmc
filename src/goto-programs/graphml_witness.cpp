@@ -17,6 +17,8 @@ Author: Daniel Kroening
 #include <util/arith_tools.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
+#include <util/std_pair_hash.h>
+#include <unordered_map>
 
 #include <langapi/language_util.h>
 #include <langapi/mode.h>
@@ -66,6 +68,13 @@ std::string graphml_witnesst::convert_assign_rec(
   const irep_idt &identifier,
   const code_assignt &assign)
 {
+  static std::unordered_map<std::pair<unsigned int, const irept::dt *>, std::string> cache;
+  {
+      const auto cit = cache.find({identifier.get_no(), &assign.read()});
+      if(cit != cache.end())
+          return cit->second;
+  }
+
   std::string result;
 
   if(assign.rhs().id()==ID_array)
@@ -151,6 +160,7 @@ std::string graphml_witnesst::convert_assign_rec(
     result=lhs+" = "+expr_to_string(ns, identifier, clean_rhs)+";";
   }
 
+  cache.insert({{identifier.get_no(), &assign.read()}, result});
   return result;
 }
 
