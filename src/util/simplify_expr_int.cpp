@@ -1238,32 +1238,12 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       return false;
     }
 
-    if(tmp0.type().id()==ID_bool)
-    {
-      bool v0=tmp0.is_true();
-      bool v1=tmp1.is_true();
-
-      if(expr.id()==ID_equal)
-      {
-        expr.make_bool(v0==v1);
-        return false;
-      }
-      else if(expr.id()==ID_notequal)
-      {
-        expr.make_bool(v0!=v1);
-        return false;
-      }
-    }
-    else if(tmp0.type().id()==ID_fixedbv)
+    if(tmp0.type().id() == ID_fixedbv)
     {
       fixedbvt f0(to_constant_expr(tmp0));
       fixedbvt f1(to_constant_expr(tmp1));
 
-      if(expr.id()==ID_notequal)
-        expr.make_bool(f0!=f1);
-      else if(expr.id()==ID_equal)
-        expr.make_bool(f0==f1);
-      else if(expr.id()==ID_ge)
+      if(expr.id() == ID_ge)
         expr.make_bool(f0>=f1);
       else if(expr.id()==ID_le)
         expr.make_bool(f0<=f1);
@@ -1281,11 +1261,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       ieee_floatt f0(to_constant_expr(tmp0));
       ieee_floatt f1(to_constant_expr(tmp1));
 
-      if(expr.id()==ID_notequal)
-        expr.make_bool(f0!=f1);
-      else if(expr.id()==ID_equal)
-        expr.make_bool(f0==f1);
-      else if(expr.id()==ID_ge)
+      if(expr.id() == ID_ge)
         expr.make_bool(f0>=f1);
       else if(expr.id()==ID_le)
         expr.make_bool(f0<=f1);
@@ -1308,11 +1284,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       if(to_rational(tmp1, r1))
         return true;
 
-      if(expr.id()==ID_notequal)
-        expr.make_bool(r0!=r1);
-      else if(expr.id()==ID_equal)
-        expr.make_bool(r0==r1);
-      else if(expr.id()==ID_ge)
+      if(expr.id() == ID_ge)
         expr.make_bool(r0>=r1);
       else if(expr.id()==ID_le)
         expr.make_bool(r0<=r1);
@@ -1335,11 +1307,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       if(to_integer(tmp1, v1))
         return true;
 
-      if(expr.id()==ID_notequal)
-        expr.make_bool(v0!=v1);
-      else if(expr.id()==ID_equal)
-        expr.make_bool(v0==v1);
-      else if(expr.id()==ID_ge)
+      if(expr.id() == ID_ge)
         expr.make_bool(v0>=v1);
       else if(expr.id()==ID_le)
         expr.make_bool(v0<=v1);
