@@ -177,6 +177,8 @@ jobs:
           packages:
             - g++-5
       install:
+        - ccache -z
+        - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
@@ -184,10 +186,15 @@ jobs:
     - stage: Test different OS/CXX/Flags
       os: osx
       cache: ccache
+      before_install:
+        - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
+        - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env:
         - BUILD_SYSTEM=cmake
         - CCACHE_CPP2=yes
       install:
+        - ccache -z
+        - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
         - cmake --build build -- -j4
       script: (cd build; ctest -V -L CORE)
@@ -235,6 +242,7 @@ jobs:
     - <<: *linter-stage
 
 install:
+  - ccache -z
   - ccache --max-size=1G
   - make -C src minisat2-download
   - make -C src/ansi-c library_check
