@@ -28,7 +28,6 @@ main.c
   <key attr.name="specification" attr.type="string" for="graph" id="specification"/>
   <key attr.name="architecture" attr.type="string" for="graph" id="architecture"/>
   <key attr.name="producer" attr.type="string" for="graph" id="producer"/>
-  <key attr.name="sourcecode" attr.type="string" for="edge" id="sourcecode"/>
   <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
   <key attr.name="control" attr.type="string" for="edge" id="control"/>
   <key attr.name="assumption" attr.type="string" for="edge" id="assumption"/>

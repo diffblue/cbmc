@@ -295,34 +295,6 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         else if(it->type==goto_trace_stept::typet::GOTO &&
                 it->pc->is_goto())
         {
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "sourcecode");
-          const std::string cond =
-            from_expr(ns, it->function_id, it->cond_expr);
-          const std::string neg_cond =
-            from_expr(ns, it->function_id, not_exprt(it->cond_expr));
-          val.data="["+(it->cond_value ? cond : neg_cond)+"]";
-
-          #if 0
-          xmlt edge2("edge", {
-                     {"source", graphml[from].node_name},
-                     {"target", graphml[sink].node_name}}, {});
-
-          xmlt &data_f2=edge2.new_element("data");
-          data_f2.set_attribute("key", "originfile");
-          data_f2.data=id2string(graphml[from].file);
-
-          xmlt &data_l2=edge2.new_element("data");
-          data_l2.set_attribute("key", "startline");
-          data_l2.data=id2string(graphml[from].line);
-
-          xmlt &val2=edge2.new_element("data");
-          val2.set_attribute("key", "sourcecode");
-          val2.data="["+(it->cond_value ? neg_cond : cond)+"]";
-
-          graphml[sink].in[from].xml_node=edge2;
-          graphml[from].out[sink].xml_node=edge2;
-          #endif
         }
 
         graphml[to].in[from].xml_node=edge;
@@ -476,15 +448,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
           graphml[to].invariant=convert_assign_rec(identifier, assign);
           graphml[to].invariant_scope = id2string(it->source.function_id);
-        }
-        else if(it->is_goto() &&
-                it->source.pc->is_goto())
-        {
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "sourcecode");
-          const std::string cond =
-            from_expr(ns, it->source.function_id, it->cond_expr);
-          val.data="["+cond+"]";
         }
 
         graphml[to].in[from].xml_node=edge;
