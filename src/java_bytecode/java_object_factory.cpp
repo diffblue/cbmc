@@ -926,6 +926,8 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
 /// Initializes an object tree rooted at `expr`, allocating child objects as
 /// necessary and nondet-initializes their members, or if MUST_UPDATE_IN_PLACE
 /// is set, re-initializes already-allocated objects.
+/// After initialization calls validation method
+/// `expr.cproverNondetInitialize()` if it was provided by the user.
 ///
 /// \param assignments:
 ///   The code block to append the new instructions to.
@@ -1027,6 +1029,29 @@ void java_object_factoryt::gen_nondet_struct_init(
         depth,
         substruct_in_place);
     }
+  }
+
+  // If <class_identifier>.cproverValidate() can be found in the
+  // symbol table, we add a call:
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  // expr.cproverValidate();
+  // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  const irep_idt validate_method_name =
+    "java::" + id2string(class_identifier) + ".cproverNondetInitialize:()V";
+
+  if(const auto func = symbol_table.lookup(validate_method_name))
+  {
+    const code_typet &type = to_code_type(func->type);
+    if(type.has_this() && type.parameters().size() == 1)
+    {
+      code_function_callt fun_call;
+      fun_call.function() = func->symbol_expr();
+      fun_call.arguments().push_back(address_of_exprt(expr));
+      assignments.add(fun_call);
+    }
+    else
+      throw "cproverNondetInitialize should be a non-static function";
   }
 }
 
