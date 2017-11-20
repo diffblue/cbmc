@@ -715,3 +715,93 @@ bool is_valid_java_array(const struct_typet &type)
     length_component_valid &&
     data_component_valid;
 }
+
+void get_dependencies_from_generic_parameters_rec(
+  const typet &t,
+  std::set<irep_idt> &refs)
+{
+  // Java generic type that holds different types in its type arguments
+  if(is_java_generic_type(t))
+  {
+    for(const auto type_arg : to_java_generic_type(t).generic_type_arguments())
+      get_dependencies_from_generic_parameters_rec(type_arg, refs);
+  }
+
+  // Java reference type
+  else if(t.id() == ID_pointer)
+  {
+    get_dependencies_from_generic_parameters_rec(t.subtype(), refs);
+  }
+
+  // method type with parameters and return value
+  else if(t.id() == ID_code)
+  {
+    const code_typet &c = to_code_type(t);
+    get_dependencies_from_generic_parameters_rec(c.return_type(), refs);
+    for(const auto &param : c.parameters())
+      get_dependencies_from_generic_parameters_rec(param.type(), refs);
+  }
+
+  // symbol type
+  else if(t.id() == ID_symbol)
+  {
+    const symbol_typet &symbol_type = to_symbol_type(t);
+    const irep_idt class_name(symbol_type.get_identifier());
+    if(is_java_array_tag(class_name))
+    {
+      get_dependencies_from_generic_parameters(
+        java_array_element_type(symbol_type), refs);
+    }
+    else
+      refs.insert(strip_java_namespace_prefix(class_name));
+  }
+}
+
+/// Collect information about generic type parameters from a given
+/// signature. This is used to get information about class dependencies that
+/// must be loaded but only appear as generic type argument, not as a field
+/// reference.
+/// \param signature: the string representation of the signature to analyze
+/// \param refs [out]: the set to insert the names of the found dependencies
+void get_dependencies_from_generic_parameters(
+  const std::string &signature,
+  std::set<irep_idt> &refs)
+{
+  try
+  {
+    // class signature with bounds
+    if(signature[0] == '<')
+    {
+      const std::vector<typet> types = java_generic_type_from_string(
+        erase_type_arguments(signature), signature);
+
+      for(const auto &t : types)
+        get_dependencies_from_generic_parameters_rec(t, refs);
+    }
+
+    // class signature without bounds and without wildcards
+    else if(signature.find('*') == std::string::npos)
+    {
+      get_dependencies_from_generic_parameters_rec(
+        java_type_from_string(signature, erase_type_arguments(signature)),
+        refs);
+    }
+  }
+  catch(unsupported_java_class_signature_exceptiont &)
+  {
+    // skip for now, if we cannot parse it, we cannot detect which additional
+    // classes should be loaded as dependencies
+  }
+}
+
+/// Collect information about generic type parameters from a given type. This is
+/// used to get information about class dependencies that must be loaded but
+/// only appear as generic type argument, not as a field reference.
+/// \param t: the type to analyze
+/// \param refs [out]: the set to insert the names of the found dependencies
+void get_dependencies_from_generic_parameters(
+  const typet &t,
+  std::set<irep_idt> &refs)
+{
+  get_dependencies_from_generic_parameters_rec(t, refs);
+}
