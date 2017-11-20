@@ -50,11 +50,6 @@ public:
     return (result.first)->second;
   }
 
-  number_type operator()(const T &a)
-  {
-    return number(a);
-  }
-
   optionalt<number_type> get_number(const T &a) const
   {
     const auto it = numbers_.find(a);

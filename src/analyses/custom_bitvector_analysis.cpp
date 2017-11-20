@@ -181,10 +181,10 @@ unsigned custom_bitvector_analysist::get_bit_nr(
   else if(string_expr.id()==ID_string_constant)
   {
     irep_idt value=string_expr.get(ID_value);
-    return bits(value);
+    return bits.number(value);
   }
   else
-    return bits("(unknown)");
+    return bits.number("(unknown)");
 }
 
 std::set<exprt> custom_bitvector_analysist::aliases(
