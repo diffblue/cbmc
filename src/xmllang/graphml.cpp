@@ -309,6 +309,20 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.new_element("default").data="false";
   }
 
+  // <key attr.name="cyclehead" attr.type="boolean" for="edge"
+  //      id="cyclehead">
+  //   <default>false</default>
+  // </key>
+  {
+    xmlt &key = graphml.new_element("key");
+    key.set_attribute("attr.name", "cyclehead");
+    key.set_attribute("attr.type", "boolean");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "cyclehead");
+
+    key.new_element("default").data = "false";
+  }
+
   // <key attr.name="threadId" attr.type="string" for="edge" id="threadId"/>
   // TODO: format for multi-threaded programs not defined yet
   {
