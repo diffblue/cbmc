@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #ifndef CPROVER_UTIL_NUMBERING_H
 #define CPROVER_UTIL_NUMBERING_H
 
@@ -16,154 +15,101 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <vector>
 
 #include <util/invariant.h>
+#include <util/optional.h>
 
-template <typename T>
-// NOLINTNEXTLINE(readability/identifiers)
-class numbering final
+/// \tparam Map a map from a key type to some numeric type
+template <typename Map>
+class template_numberingt final
 {
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef std::size_t number_type;
+  using number_type = typename Map::mapped_type; // NOLINT
+  using key_type = typename Map::key_type;       // NOLINT
 
 private:
-  typedef std::vector<T> data_typet;
-  data_typet data;
-  typedef std::map<T, number_type> numberst;
-  numberst numbers;
+  using data_typet = std::vector<key_type>; // NOLINT
+  data_typet data_;
+  Map numbers_;
 
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::size_type size_type;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::iterator iterator;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::const_iterator const_iterator;
+  using size_type = typename data_typet::size_type;           // NOLINT
+  using iterator = typename data_typet::iterator;             // NOLINT
+  using const_iterator = typename data_typet::const_iterator; // NOLINT
 
-  number_type number(const T &a)
+  number_type number(const key_type &a)
   {
-    std::pair<typename numberst::const_iterator, bool> result=
-      numbers.insert(
-      std::pair<T, number_type>
-      (a, number_type(numbers.size())));
+    const auto result = numbers_.emplace(a, number_type(numbers_.size()));
 
     if(result.second) // inserted?
     {
-      data.push_back(a);
-      INVARIANT(data.size()==numbers.size(), "vector sizes must match");
+      data_.emplace_back(a);
+      INVARIANT(data_.size() == numbers_.size(), "vector sizes must match");
     }
 
     return (result.first)->second;
   }
 
-  number_type operator()(const T &a)
+  optionalt<number_type> get_number(const key_type &a) const
   {
-    return number(a);
-  }
-
-  bool get_number(const T &a, number_type &n) const
-  {
-    typename numberst::const_iterator it=numbers.find(a);
-
-    if(it==numbers.end())
-      return true;
-
-    n=it->second;
-    return false;
-  }
-
-  void clear()
-  {
-    data.clear();
-    numbers.clear();
-  }
-
-  size_t size() const { return data.size(); }
-
-  T &operator[](size_type t) { return data[t]; }
-  const T &operator[](size_type t) const { return data[t]; }
-
-  iterator begin() { return data.begin(); }
-  const_iterator begin() const { return data.begin(); }
-  const_iterator cbegin() const { return data.cbegin(); }
-
-  iterator end() { return data.end(); }
-  const_iterator end() const { return data.end(); }
-  const_iterator cend() const { return data.cend(); }
-};
-
-template <typename T, class hash_fkt>
-// NOLINTNEXTLINE(readability/identifiers)
-class hash_numbering final
-{
-public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef unsigned int number_type;
-
-private:
-  typedef std::vector<T> data_typet;
-  data_typet data;
-  typedef std::unordered_map<T, number_type, hash_fkt> numberst;
-  numberst numbers;
-
-public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::size_type size_type;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::iterator iterator;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::const_iterator const_iterator;
-
-  number_type number(const T &a)
-  {
-    std::pair<typename numberst::const_iterator, bool> result=
-      numbers.insert(
-      std::pair<T, number_type>
-      (a, number_type(numbers.size())));
-
-    if(result.second) // inserted?
+    const auto it = numbers_.find(a);
+    if(it == numbers_.end())
     {
-      this->push_back(a);
-      assert(this->size()==numbers.size());
+      return {};
     }
-
-    return (result.first)->second;
-  }
-
-  bool get_number(const T &a, number_type &n) const
-  {
-    typename numberst::const_iterator it=numbers.find(a);
-
-    if(it==numbers.end())
-      return true;
-
-    n=it->second;
-    return false;
+    return it->second;
   }
 
   void clear()
   {
-    data.clear();
-    numbers.clear();
+    data_.clear();
+    numbers_.clear();
   }
 
-  template <typename U>
-  void push_back(U &&u) { data.push_back(std::forward<U>(u)); }
+  size_type size() const
+  {
+    return data_.size();
+  }
 
-  T &operator[](size_type t) { return data[t]; }
-  const T &operator[](size_type t) const { return data[t]; }
+  key_type &operator[](size_type t)
+  {
+    return data_[t];
+  }
+  const key_type &operator[](size_type t) const
+  {
+    return data_[t];
+  }
 
-  T &at(size_type t) { return data.at(t); }
-  const T &at(size_type t) const { return data.at(t); }
+  iterator begin()
+  {
+    return data_.begin();
+  }
+  const_iterator begin() const
+  {
+    return data_.begin();
+  }
+  const_iterator cbegin() const
+  {
+    return data_.cbegin();
+  }
 
-  size_type size() const { return data.size(); }
-
-  iterator begin() { return data.begin(); }
-  const_iterator begin() const { return data.begin(); }
-  const_iterator cbegin() const { return data.cbegin(); }
-
-  iterator end() { return data.end(); }
-  const_iterator end() const { return data.end(); }
-  const_iterator cend() const { return data.cend(); }
+  iterator end()
+  {
+    return data_.end();
+  }
+  const_iterator end() const
+  {
+    return data_.end();
+  }
+  const_iterator cend() const
+  {
+    return data_.cend();
+  }
 };
+
+template <typename Key>
+using numbering = template_numberingt<std::map<Key, std::size_t>>; // NOLINT
+
+template <typename Key, typename Hash>
+using hash_numbering = // NOLINT
+  template_numberingt<std::unordered_map<Key, std::size_t, Hash>>;
 
 #endif // CPROVER_UTIL_NUMBERING_H
