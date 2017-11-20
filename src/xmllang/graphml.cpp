@@ -252,33 +252,6 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "invariant.scope");
   }
 
-  // <key attr.name="nodeType" attr.type="string" for="node" id="nodetype">
-  //     <default>path</default>
-  // </key>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "nodeType");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "node");
-    key.set_attribute("id", "nodetype");
-
-    key.new_element("default").data="path";
-  }
-
-  // <key attr.name="isFrontierNode" attr.type="boolean" for="node"
-  //      id="frontier">
-  //     <default>false</default>
-  // </key>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "isFrontierNode");
-    key.set_attribute("attr.type", "boolean");
-    key.set_attribute("for", "node");
-    key.set_attribute("id", "frontier");
-
-    key.new_element("default").data="false";
-  }
-
   // <key attr.name="isViolationNode" attr.type="boolean" for="node"
   //      id="violation">
   //     <default>false</default>
@@ -329,6 +302,20 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("attr.type", "boolean");
     key.set_attribute("for", "edge");
     key.set_attribute("id", "enterLoopHead");
+
+    key.new_element("default").data="false";
+  }
+
+  // <key attr.name="cyclehead" attr.type="boolean" for="edge"
+  //      id="cyclehead">
+  //   <default>false</default>
+  // </key>
+  {
+    xmlt &key=graphml.new_element("key");
+    key.set_attribute("attr.name", "cyclehead");
+    key.set_attribute("attr.type", "boolean");
+    key.set_attribute("for", "edge");
+    key.set_attribute("id", "cyclehead");
 
     key.new_element("default").data="false";
   }
