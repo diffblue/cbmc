@@ -23,22 +23,18 @@ template <typename T>
 class numbering final
 {
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef std::size_t number_type;
+  using number_type = std::size_t; // NOLINT
 
 private:
-  typedef std::vector<T> data_typet;
+  using data_typet = std::vector<T>; // NOLINT
   data_typet data;
-  typedef std::map<T, number_type> numberst;
+  using numberst = std::map<T, number_type>; // NOLINT
   numberst numbers;
 
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::size_type size_type;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::iterator iterator;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::const_iterator const_iterator;
+  using size_type = typename data_typet::size_type;           // NOLINT
+  using iterator = typename data_typet::iterator;             // NOLINT
+  using const_iterator = typename data_typet::const_iterator; // NOLINT
 
   number_type number(const T &a)
   {
@@ -96,22 +92,18 @@ template <typename T, class hash_fkt>
 class hash_numbering final
 {
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef unsigned int number_type;
+  using number_type = unsigned int; // NOLINT
 
 private:
-  typedef std::vector<T> data_typet;
+  using data_typet = std::vector<T>; // NOLINT
   data_typet data;
-  typedef std::unordered_map<T, number_type, hash_fkt> numberst;
+  using numberst = std::unordered_map<T, number_type, hash_fkt>; // NOLINT
   numberst numbers;
 
 public:
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::size_type size_type;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::iterator iterator;
-  // NOLINTNEXTLINE(readability/identifiers)
-  typedef typename data_typet::const_iterator const_iterator;
+  using size_type = typename data_typet::size_type;           // NOLINT
+  using iterator = typename data_typet::iterator;             // NOLINT
+  using const_iterator = typename data_typet::const_iterator; // NOLINT
 
   number_type number(const T &a)
   {
