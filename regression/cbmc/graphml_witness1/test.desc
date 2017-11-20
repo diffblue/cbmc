@@ -7,12 +7,6 @@ main.c
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <key attr.name="invariant" attr.type="string" for="node" id="invariant"/>
   <key attr.name="invariant.scope" attr.type="string" for="node" id="invariant.scope"/>
-  <key attr.name="nodeType" attr.type="string" for="node" id="nodetype">
-    <default>path</default>
-  </key>
-  <key attr.name="isFrontierNode" attr.type="boolean" for="node" id="frontier">
-    <default>false</default>
-  </key>
   <key attr.name="isViolationNode" attr.type="boolean" for="node" id="violation">
     <default>false</default>
   </key>
