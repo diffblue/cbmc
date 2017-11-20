@@ -403,15 +403,6 @@ bool write_graphml(const graphmlt &src, std::ostream &os)
     key.set_attribute("id", "producer");
   }
 
-  // <key attr.name="sourcecode" attr.type="string" for="edge" id="sourcecode"/>
-  {
-    xmlt &key=graphml.new_element("key");
-    key.set_attribute("attr.name", "sourcecode");
-    key.set_attribute("attr.type", "string");
-    key.set_attribute("for", "edge");
-    key.set_attribute("id", "sourcecode");
-  }
-
   // <key attr.name="startline" attr.type="int" for="edge" id="startline"/>
   {
     xmlt &key=graphml.new_element("key");
