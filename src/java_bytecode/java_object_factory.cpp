@@ -1043,15 +1043,12 @@ void java_object_factoryt::gen_nondet_struct_init(
   if(const auto func = symbol_table.lookup(validate_method_name))
   {
     const code_typet &type = to_code_type(func->type);
-    if(type.has_this() && type.parameters().size() == 1)
-    {
-      code_function_callt fun_call;
-      fun_call.function() = func->symbol_expr();
+    code_function_callt fun_call;
+    fun_call.function() = func->symbol_expr();
+    if(type.has_this())
       fun_call.arguments().push_back(address_of_exprt(expr));
-      assignments.add(fun_call);
-    }
-    else
-      throw "cproverNondetInitialize should be a non-static function";
+
+    assignments.add(fun_call);
   }
 }
 
