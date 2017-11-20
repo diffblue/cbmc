@@ -27,9 +27,9 @@ public:
 
 private:
   using data_typet = std::vector<T>; // NOLINT
-  data_typet data;
+  data_typet data_;
   using numberst = std::map<T, number_type>; // NOLINT
-  numberst numbers;
+  numberst numbers_;
 
 public:
   using size_type = typename data_typet::size_type;           // NOLINT
@@ -38,15 +38,13 @@ public:
 
   number_type number(const T &a)
   {
-    std::pair<typename numberst::const_iterator, bool> result=
-      numbers.insert(
-      std::pair<T, number_type>
-      (a, number_type(numbers.size())));
+    std::pair<typename numberst::const_iterator, bool> result = numbers_.insert(
+      std::pair<T, number_type>(a, number_type(numbers_.size())));
 
     if(result.second) // inserted?
     {
-      data.push_back(a);
-      INVARIANT(data.size()==numbers.size(), "vector sizes must match");
+      data_.push_back(a);
+      INVARIANT(data_.size() == numbers_.size(), "vector sizes must match");
     }
 
     return (result.first)->second;
@@ -59,8 +57,8 @@ public:
 
   optionalt<number_type> get_number(const T &a) const
   {
-    const auto it = numbers.find(a);
-    if(it == numbers.end())
+    const auto it = numbers_.find(a);
+    if(it == numbers_.end())
     {
       return {};
     }
@@ -69,22 +67,49 @@ public:
 
   void clear()
   {
-    data.clear();
-    numbers.clear();
+    data_.clear();
+    numbers_.clear();
   }
 
-  size_t size() const { return data.size(); }
+  size_t size() const
+  {
+    return data_.size();
+  }
 
-  T &operator[](size_type t) { return data[t]; }
-  const T &operator[](size_type t) const { return data[t]; }
+  T &operator[](size_type t)
+  {
+    return data_[t];
+  }
+  const T &operator[](size_type t) const
+  {
+    return data_[t];
+  }
 
-  iterator begin() { return data.begin(); }
-  const_iterator begin() const { return data.begin(); }
-  const_iterator cbegin() const { return data.cbegin(); }
+  iterator begin()
+  {
+    return data_.begin();
+  }
+  const_iterator begin() const
+  {
+    return data_.begin();
+  }
+  const_iterator cbegin() const
+  {
+    return data_.cbegin();
+  }
 
-  iterator end() { return data.end(); }
-  const_iterator end() const { return data.end(); }
-  const_iterator cend() const { return data.cend(); }
+  iterator end()
+  {
+    return data_.end();
+  }
+  const_iterator end() const
+  {
+    return data_.end();
+  }
+  const_iterator cend() const
+  {
+    return data_.cend();
+  }
 };
 
 template <typename T, class hash_fkt>
@@ -96,9 +121,9 @@ public:
 
 private:
   using data_typet = std::vector<T>; // NOLINT
-  data_typet data;
+  data_typet data_;
   using numberst = std::unordered_map<T, number_type, hash_fkt>; // NOLINT
-  numberst numbers;
+  numberst numbers_;
 
 public:
   using size_type = typename data_typet::size_type;           // NOLINT
@@ -107,15 +132,13 @@ public:
 
   number_type number(const T &a)
   {
-    std::pair<typename numberst::const_iterator, bool> result=
-      numbers.insert(
-      std::pair<T, number_type>
-      (a, number_type(numbers.size())));
+    std::pair<typename numberst::const_iterator, bool> result = numbers_.insert(
+      std::pair<T, number_type>(a, number_type(numbers_.size())));
 
     if(result.second) // inserted?
     {
       this->push_back(a);
-      assert(this->size()==numbers.size());
+      assert(this->size() == numbers_.size());
     }
 
     return (result.first)->second;
@@ -123,9 +146,9 @@ public:
 
   optionalt<number_type> get_number(const T &a) const
   {
-    const auto it = numbers.find(a);
+    const auto it = numbers_.find(a);
 
-    if(it == numbers.end())
+    if(it == numbers_.end())
     {
       return {};
     }
@@ -134,28 +157,64 @@ public:
 
   void clear()
   {
-    data.clear();
-    numbers.clear();
+    data_.clear();
+    numbers_.clear();
   }
 
   template <typename U>
-  void push_back(U &&u) { data.push_back(std::forward<U>(u)); }
+  void push_back(U &&u)
+  {
+    data_.push_back(std::forward<U>(u));
+  }
 
-  T &operator[](size_type t) { return data[t]; }
-  const T &operator[](size_type t) const { return data[t]; }
+  T &operator[](size_type t)
+  {
+    return data_[t];
+  }
+  const T &operator[](size_type t) const
+  {
+    return data_[t];
+  }
 
-  T &at(size_type t) { return data.at(t); }
-  const T &at(size_type t) const { return data.at(t); }
+  T &at(size_type t)
+  {
+    return data_.at(t);
+  }
+  const T &at(size_type t) const
+  {
+    return data_.at(t);
+  }
 
-  size_type size() const { return data.size(); }
+  size_type size() const
+  {
+    return data_.size();
+  }
 
-  iterator begin() { return data.begin(); }
-  const_iterator begin() const { return data.begin(); }
-  const_iterator cbegin() const { return data.cbegin(); }
+  iterator begin()
+  {
+    return data_.begin();
+  }
+  const_iterator begin() const
+  {
+    return data_.begin();
+  }
+  const_iterator cbegin() const
+  {
+    return data_.cbegin();
+  }
 
-  iterator end() { return data.end(); }
-  const_iterator end() const { return data.end(); }
-  const_iterator cend() const { return data.cend(); }
+  iterator end()
+  {
+    return data_.end();
+  }
+  const_iterator end() const
+  {
+    return data_.end();
+  }
+  const_iterator cend() const
+  {
+    return data_.cend();
+  }
 };
 
 #endif // CPROVER_UTIL_NUMBERING_H
