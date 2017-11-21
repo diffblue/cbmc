@@ -374,4 +374,55 @@ void get_dependencies_from_generic_parameters(
   const typet &,
   std::set<irep_idt> &);
 
+class java_specialized_generic_class_typet : public java_class_typet
+{
+public:
+  /// Build the specialised version of the specific class, with the specified
+  /// parameters and name.
+  /// \param new_tag: The new name for the class (like Generic<java::Float>)
+  /// \param new_components: The specialised components
+  /// \return The newly constructed class.
+  java_specialized_generic_class_typet(
+    const irep_idt &new_tag,
+    const struct_typet::componentst &new_components)
+  {
+    set(ID_C_specialized_generic_java_class, true);
+    // We are specialising the logic - so we don't want to be marked as generic
+    set(ID_C_java_generics_class_type, false);
+    set(ID_name, "java::" + id2string(new_tag));
+    set(ID_base_name, id2string(new_tag));
+    components() = new_components;
+    const std::string &class_tag = id2string(new_tag);
+    set_tag(class_tag.substr(0, class_tag.find('<')));
+  }
+};
+
+inline bool is_java_specialized_generic_class_type(const typet &type)
+{
+  return type.get_bool(ID_C_specialized_generic_java_class);
+}
+
+inline bool is_java_specialized_generic_class_type(typet &type)
+{
+  return type.get_bool(ID_C_specialized_generic_java_class);
+}
+
+inline java_specialized_generic_class_typet
+to_java_specialized_generic_class_type(const typet &type)
+{
+  INVARIANT(
+    is_java_specialized_generic_class_type(type),
+    "Tried to convert a type that was not a specialised generic java class");
+  return static_cast<const java_specialized_generic_class_typet &>(type);
+}
+
+inline java_specialized_generic_class_typet
+to_java_specialized_generic_class_type(typet &type)
+{
+  INVARIANT(
+    is_java_specialized_generic_class_type(type),
+    "Tried to convert a type that was not a specialised generic java class");
+  return static_cast<const java_specialized_generic_class_typet &>(type);
+}
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
