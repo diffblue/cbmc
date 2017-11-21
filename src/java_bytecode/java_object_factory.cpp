@@ -554,7 +554,7 @@ codet initialize_nondet_string_struct(
 
   // `obj` is `*expr`
   const struct_typet &struct_type = to_struct_type(ns.follow(obj.type()));
-  const irep_idt &class_id = struct_type.get_tag();
+  const irep_idt &class_id = "java::" + id2string(struct_type.get_tag());
 
   // @clsid = String and @lock = false:
   const symbol_typet jlo_symbol("java::java.lang.Object");
