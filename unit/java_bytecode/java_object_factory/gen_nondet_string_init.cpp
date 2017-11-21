@@ -79,7 +79,7 @@ SCENARIO(
           "return_array = cprover_associate_length_to_array_func"
           "(nondet_infinite_array, tmp_object_factory);",
           "arg = { .@java.lang.Object={ .@class_identifier"
-          "=\"java.lang.String\", .@lock=false },"
+          "=\"java::java.lang.String\", .@lock=false },"
           " .length=tmp_object_factory, "
           ".data=nondet_infinite_array };"};
 
