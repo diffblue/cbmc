@@ -1,0 +1,8 @@
+CORE
+Test.class
+--refine-strings --string-max-length 1000 --function Test.check
+^EXIT=0$
+^SIGNAL=0$
+assertion at file Test.java line 6 .* SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
