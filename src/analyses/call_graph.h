@@ -64,7 +64,8 @@ public:
 
   /// \brief get the names of all functions reachable from a list of functions
   /// within N function call steps.
-  /// \param function_list  list of functions to start from. Functions reachable within
+  /// \param function_list  list of functions to start from.
+  /// Functions reachable within
   /// N function call steps are appended to this list
   /// \param steps  number of function call steps
   void reachable_within_n_steps(std::size_t steps,

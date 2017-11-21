@@ -66,8 +66,8 @@ public:
 
   /// \brief Adds a list of functions to the set of functions for the aggressive
   /// slicer to preserve
-  /// \param  function list a list of functions in form std::list<std::string>, as returned
-  /// by get_cmdline_option.
+  /// \param  function_list    a list of functions in form
+  /// std::list<std::string>, as returned by get_cmdline_option.
   void preserve_functions(const std::list<std::string>& function_list)
   {
     for(const auto &f : function_list)
