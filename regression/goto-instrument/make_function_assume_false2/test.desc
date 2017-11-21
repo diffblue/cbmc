@@ -1,0 +1,8 @@
+CORE
+main.c
+--make-function-assume-false function_a
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
