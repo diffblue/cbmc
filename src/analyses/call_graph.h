@@ -42,6 +42,7 @@ class call_grapht: public grapht<call_graph_nodet>
 public:
   call_grapht();
   explicit call_grapht(const goto_modelt &);
+  explicit call_grapht(const goto_functionst &);
 
   void add(const irep_idt &caller, const irep_idt &callee);
   void output_xml(std::ostream &out) const;
