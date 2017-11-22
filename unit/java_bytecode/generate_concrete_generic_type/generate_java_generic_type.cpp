@@ -40,8 +40,7 @@ SCENARIO(
   "generate_java_generic_type_from_file",
   "[core][java_bytecode][generate_java_generic_type]")
 {
-  auto expected_symbol=
-    "java::generic_two_fields$bound_element<java::java.lang.Integer>";
+  auto expected_symbol = "java::generic_two_fields$bound_element<Integer>";
 
   GIVEN("A generic java type with two generic fields and a concrete "
           "substitution")
@@ -56,8 +55,8 @@ SCENARIO(
     REQUIRE(new_symbol_table.has_symbol(expected_symbol));
     THEN("The class should contain two instantiated fields.")
     {
-      const auto &class_symbol=new_symbol_table.lookup(
-        "java::generic_two_fields$bound_element<java::java.lang.Integer>");
+      const auto &class_symbol = new_symbol_table.lookup(
+        "java::generic_two_fields$bound_element<Integer>");
       const typet &symbol_type=class_symbol->type;
 
       REQUIRE(symbol_type.id()==ID_struct);
@@ -89,10 +88,8 @@ SCENARIO(
   "generate_java_generic_type_from_file_two_params",
   "[core][java_bytecode][generate_java_generic_type]")
 {
-  auto expected_symbol=
-    "java::generic_two_parameters$KeyValuePair"
-      "<java::java.lang.String,"
-      "java::java.lang.Integer>";
+  auto expected_symbol =
+    "java::generic_two_parameters$KeyValuePair<String, Integer>";
 
   GIVEN("A generic java type with two generic parameters, like a Hashtable")
   {
@@ -133,10 +130,8 @@ SCENARIO(
   // After we have loaded the class and converted the generics,
   // the presence of these two symbols in the symbol table is
   // proof enough that we did the work we needed to do correctly.
-  auto first_expected_symbol=
-    "java::generic_two_instances$element<java::java.lang.Boolean>";
-  auto second_expected_symbol=
-    "java::generic_two_instances$element<java::java.lang.Integer>";
+  auto first_expected_symbol = "java::generic_two_instances$element<Boolean>";
+  auto second_expected_symbol = "java::generic_two_instances$element<Integer>";
 
   GIVEN("A generic java type with a field that refers to another generic with"
           " an uninstantiated parameter.")
@@ -284,9 +279,8 @@ SCENARIO(
         "There should be a specialised version of the class in the symbol "
         "table")
       {
-        const irep_idt specialised_class_name = id2string(harness_class) + "$" +
-                                                id2string(inner_class) +
-                                                "<java::java.lang.Float>";
+        const irep_idt specialised_class_name =
+          id2string(harness_class) + "$" + id2string(inner_class) + "<Float>";
         REQUIRE(new_symbol_table.has_symbol(specialised_class_name));
 
         const symbolt test_class_symbol =
