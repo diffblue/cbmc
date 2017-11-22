@@ -1553,7 +1553,10 @@ void instrument_cover_goals(
         remove_repetition(controlling);
         // for now, we restrict to the case of a single ''decision'';
         // however, this is not true, e.g., ''? :'' operator.
-        minimize_mcdc_controlling(controlling, *decisions.begin());
+        if(!decisions.empty())
+        {
+          minimize_mcdc_controlling(controlling, *decisions.begin());
+        }
 
         for(const auto &p : controlling)
         {
