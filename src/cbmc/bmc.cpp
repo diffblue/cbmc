@@ -45,6 +45,17 @@ void bmct::do_unwind_module()
   // this is a hook for hw-cbmc
 }
 
+/// Hook used by CEGIS to selectively freeze variables
+/// in the SAT solver after the SSA formula is added to the solver.
+/// Freezing variables is necessary to make use of incremental
+/// solving with MiniSat SimpSolver.
+/// Potentially a useful hook for other applications using
+/// incremental solving.
+void bmct::freeze_program_variables()
+{
+  // this is a hook for cegis
+}
+
 void bmct::error_trace()
 {
   status() << "Building error trace" << eom;
@@ -131,6 +142,8 @@ void bmct::do_conversion()
     forall_expr_list(it, bmc_constraints)
       prop_conv.set_to_true(*it);
   }
+  // hook for cegis to freeze synthesis program vars
+  freeze_program_variables();
 }
 
 decision_proceduret::resultt
