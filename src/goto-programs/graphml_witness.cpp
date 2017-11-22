@@ -18,6 +18,8 @@ Author: Daniel Kroening
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 
+#include <goto-programs/goto_program_template.h>
+
 void graphml_witnesst::remove_l0_l1(exprt &expr)
 {
   if(expr.id()==ID_symbol)
@@ -241,10 +243,10 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
       continue;
     }
 
-    goto_tracet::stepst::const_iterator next=it;
-    for(++next;
-        next!=goto_trace.steps.end() &&
-        (step_to_node[next->step_nr]==sink || it->pc==next->pc);
+    auto next = std::next(it);
+    for(; next != goto_trace.steps.end() &&
+          (step_to_node[next->step_nr] == sink ||
+           pointee_address_equalt{}(it->pc, next->pc)); // NOLINT
         ++next)
     {
       // advance
