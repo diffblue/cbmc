@@ -575,17 +575,17 @@ int jbmc_parse_optionst::get_goto_program(
 
   try
   {
-    lazy_goto_modelt lazy_goto_model=lazy_goto_modelt::from_handler_object(
+    std::unique_ptr<lazy_goto_modelt> lazy_goto_model=lazy_goto_modelt::from_handler_object(
       *this, options, get_message_handler());
-    lazy_goto_model.initialize(cmdline);
+    lazy_goto_model->initialize(cmdline);
 
     status() << "Generating GOTO Program" << messaget::eom;
-    lazy_goto_model.load_all_functions();
+    lazy_goto_model->load_all_functions();
 
     if(cmdline.isset("show-symbol-table"))
     {
       show_symbol_table(
-        lazy_goto_model.symbol_table, ui_message_handler.get_ui());
+        lazy_goto_model->symbol_table, ui_message_handler.get_ui());
       return 0;
     }
 

@@ -44,17 +44,12 @@ public:
     post_process_functionst post_process_functions,
     message_handlert &message_handler);
 
-  lazy_goto_modelt(lazy_goto_modelt &&other);
+  lazy_goto_modelt(lazy_goto_modelt &&other) = delete;
 
-  lazy_goto_modelt &operator=(lazy_goto_modelt &&other)
-  {
-    goto_model = std::move(other.goto_model);
-    language_files = std::move(other.language_files);
-    return *this;
-  }
+  lazy_goto_modelt &operator=(lazy_goto_modelt &&other) = delete;
 
   template<typename THandler>
-  static lazy_goto_modelt from_handler_object(
+  static std::unique_ptr<lazy_goto_modelt> from_handler_object(
     THandler &handler,
     const optionst &options,
     message_handlert &message_handler);
@@ -75,11 +70,11 @@ public:
   /// load new functions, it has let it go.
   /// \param model: The lazy_goto_modelt to freeze
   /// \returns The frozen goto_modelt or an empty optional if freezing fails
-  static std::unique_ptr<goto_modelt> freeze(lazy_goto_modelt &&model)
+  static std::unique_ptr<goto_modelt> freeze(std::unique_ptr<lazy_goto_modelt> &&model)
   {
-    if(!model.freeze())
+    if(!model->freeze())
       return nullptr;
-    return std::move(model.goto_model);
+    return std::move(model->goto_model);
   }
 
 private:
@@ -88,18 +83,18 @@ private:
 
 
 template<typename THandler>
-lazy_goto_modelt lazy_goto_modelt::from_handler_object(
+std::unique_ptr<lazy_goto_modelt> lazy_goto_modelt::from_handler_object(
   THandler &handler,
   const optionst &options,
   message_handlert &message_handler)
 {
-  messaget msg(message_handler);
-  return lazy_goto_modelt(
-    [&handler, &msg] (
+  return std::unique_ptr<lazy_goto_modelt>(new lazy_goto_modelt(
+    [&handler, &message_handler] (
       const irep_idt &function_name,
       goto_functionst::goto_functiont &function,
       symbol_tablet &symbol_table) -> void
     {
+      messaget msg(message_handler);
       try
       {
         handler.process_goto_function(function_name, function, symbol_table);
@@ -127,8 +122,9 @@ lazy_goto_modelt lazy_goto_modelt::from_handler_object(
         exit(CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY);
       }
     },
-    [&handler, &options, &msg] (goto_modelt &goto_model) -> bool
+    [&handler, &options, &message_handler] (goto_modelt &goto_model) -> bool
     {
+      messaget msg(message_handler);
       try
       {
         return handler.process_goto_functions(goto_model, options);
@@ -155,7 +151,7 @@ lazy_goto_modelt lazy_goto_modelt::from_handler_object(
       }
       return true;
     },
-    message_handler);
+    message_handler));
 }
 
 #endif // CPROVER_GOTO_PROGRAMS_LAZY_GOTO_MODEL_H

@@ -38,19 +38,7 @@ lazy_goto_modelt::lazy_goto_modelt(
 {
   language_files.set_message_handler(message_handler);
 }
-
-lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
-  : goto_model(std::move(other.goto_model)),
-    language_files(std::move(other.language_files)),
-    symbol_table(goto_model->symbol_table),
-    goto_functions(
-      goto_model->goto_functions.function_map,
-      language_files,
-      goto_model->symbol_table,
-      std::move(other.goto_functions))
-{
-}
-
+	  
 void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
 {
   messaget msg(language_files.get_message_handler());
