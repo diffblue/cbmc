@@ -519,6 +519,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
+  /// \todo refactor with initialize_nonddet_string_struct
   const refined_string_exprt str = decl_string_expr(loc, symbol_table, code);
 
   side_effect_expr_nondett nondet_length(str.length().type());
