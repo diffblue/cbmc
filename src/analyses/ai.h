@@ -409,7 +409,9 @@ public:
   }
 
 protected:
-  typedef std::unordered_map<locationt, domainT, const_target_hash> state_mapt;
+  typedef std::
+    unordered_map<locationt, domainT, const_target_hash, pointee_address_equalt>
+      state_mapt;
   state_mapt state_map;
 
   // this one creates states, if need be

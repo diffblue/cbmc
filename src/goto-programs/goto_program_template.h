@@ -810,4 +810,15 @@ struct const_target_hash_templatet
   { return t->location_number; }
 };
 
+/// Functor to check whether iterators from different collections point at the
+/// same object.
+struct pointee_address_equalt
+{
+  template <class A, class B>
+  bool operator()(const A &a, const B &b) const
+  {
+    return &(*a) == &(*b);
+  }
+};
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H
