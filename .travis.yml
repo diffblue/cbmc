@@ -65,7 +65,9 @@ jobs:
       before_install:
         - mkdir bin ; ln -s /usr/bin/gcc-5 bin/gcc
       # env: COMPILER=g++-5 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover -fno-omit-frame-pointer"
-      env: COMPILER="ccache g++-5"
+      env:
+        - COMPILER="ccache g++-5"
+        - EXTRA_CXXFLAGS="-D_GLIBCXX_DEBUG"
 
     # OS X using g++
     - stage: Test different OS/CXX/Flags
