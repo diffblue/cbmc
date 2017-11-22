@@ -6,6 +6,9 @@
  Author: DiffBlue Limited. All rights reserved.
 
 \*******************************************************************/
+
+#include <iterator>
+
 #include "generate_java_generic_type.h"
 #include <util/namespace.h>
 #include <java_bytecode/java_types.h>
