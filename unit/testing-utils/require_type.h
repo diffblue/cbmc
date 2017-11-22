@@ -76,6 +76,13 @@ java_generic_class_typet require_java_generic_class(
   const typet &class_type,
   const std::initializer_list<irep_idt> &type_parameters);
 
+java_implicitly_generic_class_typet
+require_java_implicitly_generic_class(const typet &class_type);
+
+java_implicitly_generic_class_typet require_java_implicitly_generic_class(
+  const typet &class_type,
+  const std::initializer_list<irep_idt> &implicit_type_variables);
+
 java_class_typet require_java_non_generic_class(const typet &class_type);
 }
 
