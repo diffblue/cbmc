@@ -591,9 +591,9 @@ exprt::operandst::const_iterator c_typecheck_baset::do_designated_initializer(
     if(dest->operands().empty())
     {
       warning().source_location=value.find_source_location();
-      warning() << "initialisation of " << full_type.id()
-                << " requires initializer list, found "
-                << value.id() << " instead" << eom;
+      warning() << "initialisation of " << dest_type.id()
+                << " requires initializer list, found " << value.id()
+                << " instead" << eom;
 
       // in case of a variable-length array consume all remaining
       // initializer elements
