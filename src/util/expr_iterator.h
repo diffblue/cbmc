@@ -102,8 +102,12 @@ public:
   depth_iterator_t &next_sibling_or_parent()
   {
     PRECONDITION(!m_stack.empty());
-    m_stack.back().it=m_stack.back().end;
-    ++(*this);
+    m_stack.pop_back();
+    if(!m_stack.empty())
+    {
+      ++m_stack.back().it;
+      return ++(*this);
+    }
     return this->downcast();
   }
 
