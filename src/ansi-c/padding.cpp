@@ -199,15 +199,18 @@ void add_padding(struct_typet &type, const namespacet &ns)
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
-        std::size_t bytes;
-        for(bytes=0; w>bit_field_bits; ++bytes, bit_field_bits+=8) {}
-        bit_field_bits-=w;
+        bit_field_bits += w;
+        const std::size_t bytes = bit_field_bits / 8;
+        bit_field_bits %= 8;
         offset+=bytes;
         continue;
       }
     }
     else
       a=alignment(it_type, ns);
+
+    DATA_INVARIANT(
+      bit_field_bits == 0, "padding ensures offset at byte boundaries");
 
     // check minimum alignment
     if(a<config.ansi_c.alignment && !packed)
@@ -244,12 +247,6 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
     if(size!=-1)
       offset+=size;
-  }
-
-  if(bit_field_bits!=0)
-  {
-    // these are now assumed to be multiples of 8
-    offset+=bit_field_bits/8;
   }
 
   // any explicit alignment for the struct?
