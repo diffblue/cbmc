@@ -62,7 +62,7 @@ bool rebuild_goto_start_function_baset<goto_modelt>::operator()()
   // Remove the function from the goto functions so it is copied back in
   // from the symbol table during goto_convert
   if(!return_code)
-    goto_model.goto_functions.unload(goto_functionst::entry_point());
+    goto_model.unload(goto_functionst::entry_point());
 
   return return_code;
 }

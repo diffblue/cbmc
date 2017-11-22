@@ -100,7 +100,7 @@ void lazy_goto_modelt::initialize(const cmdlinet &cmdline)
         throw 0;
       }
 
-      language_filet &lf=language_files.add_file(filename);
+      language_filet &lf=add_language_file(filename);
       lf.language=get_language_from_filename(filename);
 
       if(lf.language==nullptr)
