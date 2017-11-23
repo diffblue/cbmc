@@ -121,7 +121,7 @@ void value_sett::output(
     {
       #if 0
       const symbolt &symbol=ns.lookup(e.identifier);
-      display_name=symbol.display_name()+e.suffix;
+      display_name=id2string(symbol.display_name())+e.suffix;
       identifier=symbol.name;
       #else
       identifier=id2string(e.identifier);
@@ -880,14 +880,11 @@ void value_sett::get_value_set_rec(
     #endif
   }
 
-  #if 0
+  #ifdef DEBUG
   std::cout << "GET_VALUE_SET_REC RESULT:\n";
-  for(object_map_dt::const_iterator
-      it=dest.read().begin();
-      it!=dest.read().end();
-      it++)
+  for(const auto &obj : dest.read())
   {
-    const exprt &e=to_expr(it);
+    const exprt &e=to_expr(obj);
     std::cout << "  " << from_expr(ns, "", e) << "\n";
   }
   std::cout << "\n";
