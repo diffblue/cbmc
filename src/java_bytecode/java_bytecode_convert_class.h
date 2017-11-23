@@ -28,4 +28,22 @@ bool java_bytecode_convert_class(
   lazy_methods_modet,
   java_string_library_preprocesst &string_preprocess);
 
+void mark_java_implicitly_generic_class_type(
+  const irep_idt &class_name,
+  symbol_tablet &symbol_table);
+
+/// An exception that is raised checking whether a class is implicitly
+/// generic if a symbol for an outer class is missing
+class missing_outer_class_symbol_exceptiont : public std::logic_error
+{
+public:
+  explicit missing_outer_class_symbol_exceptiont(
+    const std::string &outer,
+    const std::string &inner)
+    : std::logic_error(
+        "Missing outer class symbol: " + outer + ", for class " + inner)
+  {
+  }
+};
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_BYTECODE_CONVERT_CLASS_H
