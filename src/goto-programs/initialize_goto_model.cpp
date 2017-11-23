@@ -72,13 +72,7 @@ goto_modelt initialize_goto_model(
         throw 0;
       }
 
-      std::pair<language_filest::file_mapt::iterator, bool>
-        result=language_files.file_map.insert(
-          std::pair<std::string, language_filet>(filename, language_filet()));
-
-      language_filet &lf=result.first->second;
-
-      lf.filename=filename;
+      language_filet &lf=language_files.add_file(filename);
       lf.language=get_language_from_filename(filename);
 
       if(lf.language==nullptr)
@@ -132,10 +126,9 @@ goto_modelt initialize_goto_model(
     // Rebuild the entry-point, using the language annotation of the
     // existing __CPROVER_start function:
     rebuild_goto_start_functiont rebuild_existing_start(
-      msg.get_message_handler(),
       cmdline,
-      goto_model.symbol_table,
-      goto_model.goto_functions);
+      goto_model,
+      msg.get_message_handler());
     entry_point_generation_failed=rebuild_existing_start();
   }
   else if(!binaries_provided_start)

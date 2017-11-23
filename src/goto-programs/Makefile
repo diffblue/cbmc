@@ -27,6 +27,7 @@ SRC = basic_blocks.cpp \
       interpreter.cpp \
       interpreter_evaluate.cpp \
       json_goto_trace.cpp \
+      lazy_goto_model.cpp \
       link_goto_model.cpp \
       link_to_library.cpp \
       loop_ids.cpp \
@@ -44,6 +45,7 @@ SRC = basic_blocks.cpp \
       remove_exceptions.cpp \
       remove_function_pointers.cpp \
       remove_instanceof.cpp \
+      remove_java_new.cpp \
       remove_returns.cpp \
       remove_skip.cpp \
       remove_static_init_loops.cpp \

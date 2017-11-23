@@ -79,15 +79,23 @@ public:
     const std::string &extra_options);
 
 protected:
-  goto_modelt goto_model;
   ui_message_handlert ui_message_handler;
 
   void eval_verbosity();
   void get_command_line_options(optionst &);
-  int get_goto_program(const optionst &);
-  bool process_goto_program(const optionst &);
-  bool set_properties();
-  int do_bmc(bmct &);
+  int get_goto_program(
+    std::unique_ptr<goto_modelt> &goto_model, const optionst &);
+
+public:
+  void process_goto_function(
+    const irep_idt &function_name,
+    goto_functionst::goto_functiont &function,
+    symbol_tablet &symbol_table);
+  bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
+
+protected:
+  bool set_properties(goto_modelt &goto_model);
+  int do_bmc(bmct &, goto_modelt &goto_model);
 };
 
 #endif // CPROVER_JBMC_JBMC_PARSE_OPTIONS_H

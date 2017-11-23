@@ -21,10 +21,8 @@ Date: June 2003
 
 goto_convert_functionst::goto_convert_functionst(
   symbol_tablet &_symbol_table,
-  goto_functionst &_functions,
   message_handlert &_message_handler):
-  goto_convertt(_symbol_table, _message_handler),
-  functions(_functions)
+  goto_convertt(_symbol_table, _message_handler)
 {
 }
 
@@ -32,7 +30,7 @@ goto_convert_functionst::~goto_convert_functionst()
 {
 }
 
-void goto_convert_functionst::goto_convert()
+void goto_convert_functionst::goto_convert(goto_functionst &functions)
 {
   // warning! hash-table iterators are not stable
 
@@ -53,7 +51,7 @@ void goto_convert_functionst::goto_convert()
 
   for(const auto &id : symbol_list)
   {
-    convert_function(id);
+    convert_function(id, functions.function_map[id]);
   }
 
   functions.compute_location_numbers();
@@ -135,10 +133,11 @@ void goto_convert_functionst::add_return(
   t->source_location=source_location;
 }
 
-void goto_convert_functionst::convert_function(const irep_idt &identifier)
+void goto_convert_functionst::convert_function(
+  const irep_idt &identifier,
+  goto_functionst::goto_functiont &f)
 {
   const symbolt &symbol=ns.lookup(identifier);
-  goto_functionst::goto_functiont &f=functions.function_map[identifier];
 
   if(f.body_available())
     return; // already converted
@@ -240,12 +239,11 @@ void goto_convert(
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
-  goto_convert_functionst goto_convert_functions(
-    symbol_table, functions, message_handler);
+  goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
 
   try
   {
-    goto_convert_functions.goto_convert();
+    goto_convert_functions.goto_convert(functions);
   }
 
   catch(int)
@@ -276,12 +274,12 @@ void goto_convert(
   const unsigned errors_before=
     message_handler.get_message_count(messaget::M_ERROR);
 
-  goto_convert_functionst goto_convert_functions(
-    symbol_table, functions, message_handler);
+  goto_convert_functionst goto_convert_functions(symbol_table, message_handler);
 
   try
   {
-    goto_convert_functions.convert_function(identifier);
+    goto_convert_functions.convert_function(
+      identifier, functions.function_map[identifier]);
   }
 
   catch(int)

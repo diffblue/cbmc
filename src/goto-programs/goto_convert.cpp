@@ -747,10 +747,7 @@ void goto_convertt::convert_assign(
   else if(rhs.id()==ID_side_effect &&
           rhs.get(ID_statement)==ID_java_new)
   {
-    Forall_operands(it, rhs)
-      clean_expr(*it, dest);
-
-    do_java_new(lhs, to_side_effect_expr(rhs), dest);
+    copy(code, ASSIGN, dest);
   }
   else if(rhs.id()==ID_side_effect &&
           rhs.get(ID_statement)==ID_java_new_array)

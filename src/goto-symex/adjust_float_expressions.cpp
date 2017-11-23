@@ -191,6 +191,13 @@ static void adjust_float_expressions(
 }
 
 void adjust_float_expressions(
+  goto_functionst::goto_functiont &goto_function,
+  const symbol_tablet &symbol_table)
+{
+  adjust_float_expressions(goto_function, namespacet(symbol_table));
+}
+
+void adjust_float_expressions(
   goto_functionst &goto_functions,
   const namespacet &ns)
 {
@@ -200,6 +207,6 @@ void adjust_float_expressions(
 
 void adjust_float_expressions(goto_modelt &goto_model)
 {
-  namespacet ns(goto_model.symbol_table);
-  adjust_float_expressions(goto_model.goto_functions, ns);
+  adjust_float_expressions(
+    goto_model.goto_functions, namespacet(goto_model.symbol_table));
 }

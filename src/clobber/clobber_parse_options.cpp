@@ -32,6 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/link_to_library.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/xml_goto_trace.h>
+#include <goto-programs/remove_java_new.h>
 
 #include <goto-instrument/dump_c.h>
 
@@ -207,6 +208,8 @@ bool clobber_parse_optionst::process_goto_program(
   goto_modelt &goto_model)
 {
   {
+    remove_java_new(goto_model, get_message_handler());
+
     // do partial inlining
     status() << "Partial Inlining" << eom;
     goto_partial_inline(goto_model, get_message_handler());

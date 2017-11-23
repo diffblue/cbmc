@@ -45,8 +45,7 @@ public:
 
   exprt code_for_function(
     const irep_idt &function_id,
-    const code_typet &type,
-    const source_locationt &loc,
+    const symbolt &symbol,
     symbol_table_baset &symbol_table);
 
   codet replace_character_call(code_function_callt call)

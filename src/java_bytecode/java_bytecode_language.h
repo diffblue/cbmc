@@ -80,12 +80,12 @@ struct object_factory_parameterst final
   bool string_printable = false;
 };
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
+// Pair of class id and methodt
+typedef
+  std::pair<irep_idt, const java_bytecode_parse_treet::methodt *>
   lazy_method_valuet;
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+// Map from method id to lazy_method_valuet
+typedef std::map<irep_idt, lazy_method_valuet> lazy_methodst;
 
 class java_bytecode_languaget:public languaget
 {
@@ -155,8 +155,9 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
-  virtual void lazy_methods_provided(std::set<irep_idt> &) const override;
-  virtual void convert_lazy_method(
+  virtual void get_known_lazy_methods(
+    std::set<irep_idt> &) const override;
+  virtual bool convert_lazy_method(
     const irep_idt &id, symbol_tablet &) override;
 
 protected:

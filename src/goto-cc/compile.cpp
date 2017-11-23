@@ -483,14 +483,7 @@ bool compilet::parse(const std::string &file_name)
 
   languagep->set_message_handler(get_message_handler());
 
-  language_filet language_file;
-
-  std::pair<language_filest::file_mapt::iterator, bool>
-  res=language_files.file_map.insert(
-    std::pair<std::string, language_filet>(file_name, language_file));
-
-  language_filet &lf=res.first->second;
-  lf.filename=file_name;
+  language_filet &lf=language_files.add_file(file_name);
   lf.language=std::move(languagep);
 
   if(mode==PREPROCESS_ONLY)
@@ -640,7 +633,7 @@ bool compilet::parse_source(const std::string &file_name)
     return true;
 
   // so we remove it from the list afterwards
-  language_files.file_map.erase(file_name);
+  language_files.remove_file(file_name);
   return false;
 }
 
@@ -691,7 +684,7 @@ void compilet::add_compiler_specific_defines(configt &config) const
 
 void compilet::convert_symbols(goto_functionst &dest)
 {
-  goto_convert_functionst converter(symbol_table, dest, get_message_handler());
+  goto_convert_functionst converter(symbol_table, get_message_handler());
 
   // the compilation may add symbols!
 
@@ -724,7 +717,7 @@ void compilet::convert_symbols(goto_functionst &dest)
           s_it->second.value.is_not_nil())
       {
         debug() << "Compiling " << s_it->first << eom;
-        converter.convert_function(s_it->first);
+        converter.convert_function(s_it->first, dest.function_map[s_it->first]);
         symbol_table.get_writeable_ref(*it).value=exprt("compiled");
       }
     }

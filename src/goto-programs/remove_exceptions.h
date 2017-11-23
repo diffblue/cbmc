@@ -21,7 +21,16 @@ Date:   December 2016
 // Removes 'throw x' and CATCH-PUSH/CATCH-POP
 // and adds the required instrumentation (GOTOs and assignments)
 
-void remove_exceptions(symbol_tablet &, goto_functionst &);
-void remove_exceptions(goto_modelt &);
+enum class remove_exceptions_typest
+{
+  DONT_REMOVE_INSTANCEOF,
+  REMOVE_ADDED_INSTANCEOF,
+  ALSO_REMOVE_INSTANCEOF,
+};
+
+void remove_exceptions(
+  goto_modelt &goto_model,
+  remove_exceptions_typest type =
+    remove_exceptions_typest::DONT_REMOVE_INSTANCEOF);
 
 #endif

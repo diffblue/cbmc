@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/ansi_c_language.h>
 
 #include <goto-programs/convert_nondet.h>
-#include <goto-programs/initialize_goto_model.h>
+#include <goto-programs/lazy_goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
@@ -50,6 +50,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_properties.h>
 #include <goto-programs/string_abstraction.h>
 #include <goto-programs/string_instrumentation.h>
+#include <goto-programs/remove_java_new.h>
 
 #include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
@@ -480,10 +481,12 @@ int jbmc_parse_optionst::doit()
     return 0;
   }
 
-  int get_goto_program_ret=get_goto_program(options);
-
+  std::unique_ptr<goto_modelt> goto_model_ptr;
+  int get_goto_program_ret=get_goto_program(goto_model_ptr, options);
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
+
+  goto_modelt &goto_model = *goto_model_ptr;
 
   if(cmdline.isset("show-properties"))
   {
@@ -491,7 +494,7 @@ int jbmc_parse_optionst::doit()
     return 0; // should contemplate EX_OK from sysexits.h
   }
 
-  if(set_properties())
+  if(set_properties(goto_model))
     return 7; // should contemplate EX_USAGE from sysexits.h
 
   // unwinds <clinit> loops to number of enum elements
@@ -529,10 +532,10 @@ int jbmc_parse_optionst::doit()
     prop_conv);
 
   // do actual BMC
-  return do_bmc(bmc);
+  return do_bmc(bmc, goto_model);
 }
 
-bool jbmc_parse_optionst::set_properties()
+bool jbmc_parse_optionst::set_properties(goto_modelt &goto_model)
 {
   try
   {
@@ -561,6 +564,7 @@ bool jbmc_parse_optionst::set_properties()
 }
 
 int jbmc_parse_optionst::get_goto_program(
+  std::unique_ptr<goto_modelt> &goto_model,
   const optionst &options)
 {
   if(cmdline.args.empty())
@@ -571,28 +575,37 @@ int jbmc_parse_optionst::get_goto_program(
 
   try
   {
-    goto_model=initialize_goto_model(cmdline, get_message_handler());
+    std::unique_ptr<lazy_goto_modelt> lazy_goto_model=lazy_goto_modelt::from_handler_object(
+      *this, options, get_message_handler());
+    lazy_goto_model->initialize(cmdline);
+
+    status() << "Generating GOTO Program" << messaget::eom;
+    lazy_goto_model->load_all_functions();
 
     if(cmdline.isset("show-symbol-table"))
     {
-      show_symbol_table(goto_model, ui_message_handler.get_ui());
+      show_symbol_table(
+        lazy_goto_model->symbol_table, ui_message_handler.get_ui());
       return 0;
     }
 
-    if(process_goto_program(options))
+    // Move the model out of the local lazy_goto_model
+    // and into the caller's goto_model
+    goto_model=lazy_goto_modelt::freeze(std::move(lazy_goto_model));
+    if(goto_model == nullptr)
       return 6;
 
     // show it?
     if(cmdline.isset("show-loops"))
     {
-      show_loop_ids(ui_message_handler.get_ui(), goto_model);
+      show_loop_ids(ui_message_handler.get_ui(), *goto_model);
       return 0;
     }
 
     // show it?
     if(cmdline.isset("show-goto-functions"))
     {
-      show_goto_functions(goto_model, ui_message_handler.get_ui());
+      show_goto_functions(*goto_model, ui_message_handler.get_ui());
       return 0;
     }
 
@@ -625,172 +638,153 @@ int jbmc_parse_optionst::get_goto_program(
   return -1; // no error, continue
 }
 
-bool jbmc_parse_optionst::process_goto_program(
+void jbmc_parse_optionst::process_goto_function(
+  const irep_idt &function_name,
+  goto_functionst::goto_functiont &function,
+  symbol_tablet &symbol_table)
+{
+  // Remove inline assembler; this needs to happen before
+  // adding the library.
+  remove_asm(function, symbol_table);
+  // Similar removal of RTTI inspection:
+  remove_instanceof(function, symbol_table);
+}
+
+bool jbmc_parse_optionst::process_goto_functions(
+  goto_modelt &goto_model,
   const optionst &options)
 {
-  try
+  remove_java_new(goto_model, get_message_handler());
+
+  // add the library
+  link_to_library(goto_model, get_message_handler());
+
+  if(cmdline.isset("string-abstraction"))
+    string_instrumentation(goto_model, get_message_handler());
+
+  // remove function pointers
+  status() << "Removal of function pointers and virtual functions" << eom;
+  remove_function_pointers(
+    get_message_handler(),
+    goto_model,
+    cmdline.isset("pointer-check"));
+  // Java virtual functions -> explicit dispatch tables:
+  remove_virtual_functions(goto_model);
+  // remove catch and throw (introduces instanceof, request it is then removed)
+  remove_exceptions(
+    goto_model, remove_exceptions_typest::ALSO_REMOVE_INSTANCEOF);
+
+  // instrument library preconditions
+  instrument_preconditions(goto_model);
+
+  // remove returns, gcc vectors, complex
+  remove_returns(goto_model);
+  remove_vector(goto_model);
+  remove_complex(goto_model);
+  rewrite_union(goto_model);
+
+  // Similar removal of java nondet statements:
+  // TODO Should really get this from java_bytecode_language somehow, but we
+  // don't have an instance of that here.
+  object_factory_parameterst factory_params;
+  factory_params.max_nondet_array_length=
+    cmdline.isset("java-max-input-array-length")
+      ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+      : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+  factory_params.max_nondet_string_length=
+    cmdline.isset("string-max-input-length")
+      ? std::stoul(cmdline.get_value("string-max-input-length"))
+      : MAX_NONDET_STRING_LENGTH;
+  factory_params.max_nondet_tree_depth=
+    cmdline.isset("java-max-input-tree-depth")
+      ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+      : MAX_NONDET_TREE_DEPTH;
+
+  replace_java_nondet(goto_model);
+
+  convert_nondet(
+    goto_model,
+    get_message_handler(),
+    factory_params);
+
+  // add generic checks
+  status() << "Generic Property Instrumentation" << eom;
+  goto_check(options, goto_model);
+
+  // checks don't know about adjusted float expressions
+  adjust_float_expressions(goto_model);
+
+  // ignore default/user-specified initialization
+  // of variables with static lifetime
+  if(cmdline.isset("nondet-static"))
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_model);
+    status() << "Adding nondeterministic initialization "
+                "of static/global variables" << eom;
+    nondet_static(goto_model);
+  }
 
-    // add the library
-    link_to_library(goto_model, get_message_handler());
-
-    if(cmdline.isset("string-abstraction"))
-      string_instrumentation(goto_model, get_message_handler());
-
-    // remove function pointers
-    status() << "Removal of function pointers and virtual functions" << eom;
-    remove_function_pointers(
-      get_message_handler(),
+  if(cmdline.isset("string-abstraction"))
+  {
+    status() << "String Abstraction" << eom;
+    string_abstraction(
       goto_model,
-      cmdline.isset("pointer-check"));
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
-    // remove catch and throw (introduces instanceof)
-    remove_exceptions(goto_model);
-    // Similar removal of RTTI inspection:
-    remove_instanceof(goto_model);
-
-    // instrument library preconditions
-    instrument_preconditions(goto_model);
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    rewrite_union(goto_model);
-
-    // Similar removal of java nondet statements:
-    // TODO Should really get this from java_bytecode_language somehow, but we
-    // don't have an instance of that here.
-    object_factory_parameterst factory_params;
-    factory_params.max_nondet_array_length=
-      cmdline.isset("java-max-input-array-length")
-        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
-        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    factory_params.max_nondet_string_length=
-      cmdline.isset("string-max-input-length")
-        ? std::stoul(cmdline.get_value("string-max-input-length"))
-        : MAX_NONDET_STRING_LENGTH;
-    factory_params.max_nondet_tree_depth=
-      cmdline.isset("java-max-input-tree-depth")
-        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
-        : MAX_NONDET_TREE_DEPTH;
-
-    replace_java_nondet(goto_model);
-
-    convert_nondet(
-      goto_model,
-      get_message_handler(),
-      factory_params);
-
-    // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
-
-    // ignore default/user-specified initialization
-    // of variables with static lifetime
-    if(cmdline.isset("nondet-static"))
-    {
-      status() << "Adding nondeterministic initialization "
-                  "of static/global variables" << eom;
-      nondet_static(goto_model);
-    }
-
-    if(cmdline.isset("string-abstraction"))
-    {
-      status() << "String Abstraction" << eom;
-      string_abstraction(
-        goto_model,
-        get_message_handler());
-    }
-
-    // add failed symbols
-    // needs to be done before pointer analysis
-    add_failed_symbols(goto_model.symbol_table);
-
-    // recalculate numbers, etc.
-    goto_model.goto_functions.update();
-
-    // add loop ids
-    goto_model.goto_functions.compute_loop_numbers();
-
-    if(cmdline.isset("drop-unused-functions"))
-    {
-      // Entry point will have been set before and function pointers removed
-      status() << "Removing unused functions" << eom;
-      remove_unused_functions(goto_model, get_message_handler());
-    }
-
-    // remove skips such that trivial GOTOs are deleted and not considered
-    // for coverage annotation:
-    remove_skip(goto_model);
-
-    // instrument cover goals
-    if(cmdline.isset("cover"))
-    {
-      if(instrument_cover_goals(
-           cmdline,
-           goto_model,
-           get_message_handler()))
-        return true;
-    }
-
-    // label the assertions
-    // This must be done after adding assertions and
-    // before using the argument of the "property" option.
-    // Do not re-label after using the property slicer because
-    // this would cause the property identifiers to change.
-    label_properties(goto_model);
-
-    // full slice?
-    if(cmdline.isset("full-slice"))
-    {
-      status() << "Performing a full slice" << eom;
-      if(cmdline.isset("property"))
-        property_slicer(goto_model, cmdline.get_values("property"));
-      else
-        full_slicer(goto_model);
-    }
-
-    // remove any skips introduced since coverage instrumentation
-    remove_skip(goto_model);
-    goto_model.goto_functions.update();
+      get_message_handler());
   }
 
-  catch(const char *e)
+  // add failed symbols
+  // needs to be done before pointer analysis
+  add_failed_symbols(goto_model.symbol_table);
+
+  // recalculate numbers, etc.
+  goto_model.goto_functions.update();
+
+  if(cmdline.isset("drop-unused-functions"))
   {
-    error() << e << eom;
-    return true;
+    // Entry point will have been set before and function pointers removed
+    status() << "Removing unused functions" << eom;
+    remove_unused_functions(goto_model, get_message_handler());
   }
 
-  catch(const std::string &e)
+  // remove skips such that trivial GOTOs are deleted and not considered
+  // for coverage annotation:
+  remove_skip(goto_model);
+
+  // instrument cover goals
+  if(cmdline.isset("cover"))
   {
-    error() << e << eom;
-    return true;
+    if(instrument_cover_goals(
+         cmdline,
+         goto_model,
+         get_message_handler()))
+      return false;
   }
 
-  catch(int)
+  // label the assertions
+  // This must be done after adding assertions and
+  // before using the argument of the "property" option.
+  // Do not re-label after using the property slicer because
+  // this would cause the property identifiers to change.
+  label_properties(goto_model);
+
+  // full slice?
+  if(cmdline.isset("full-slice"))
   {
-    return true;
+    status() << "Performing a full slice" << eom;
+    if(cmdline.isset("property"))
+      property_slicer(goto_model, cmdline.get_values("property"));
+    else
+      full_slicer(goto_model);
   }
 
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return true;
-  }
+  // remove any skips introduced since coverage instrumentation
+  remove_skip(goto_model);
+  goto_model.goto_functions.update();
 
-  return false;
+  return true;
 }
 
 /// invoke main modules
-int jbmc_parse_optionst::do_bmc(bmct &bmc)
+int jbmc_parse_optionst::do_bmc(bmct &bmc, goto_modelt &goto_model)
 {
   bmc.set_ui(ui_message_handler.get_ui());
 

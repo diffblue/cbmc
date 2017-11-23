@@ -79,10 +79,10 @@ protected:
 /// \return Assigns parameter names (side-effects on `ftype`) to function stub
 ///   parameters, which are initially nameless as method conversion hasn't
 ///   happened. Also creates symbols in `symbol_table`.
-void assign_parameter_names(
+static void assign_parameter_names(
   code_typet &ftype,
   const irep_idt &name_prefix,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   code_typet::parameterst &parameters=ftype.parameters();
 
@@ -382,11 +382,11 @@ void java_bytecode_convert_methodt::convert(
     id2string(class_symbol.name)+"."+id2string(m.name)+":"+m.descriptor;
   method_id=method_identifier;
 
-  const symbolt &old_sym=*symbol_table.lookup(method_identifier);
+  symbolt &method_symbol=*symbol_table.get_writeable(method_identifier);
 
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
-  typet member_type=old_sym.type;
+  typet member_type=method_symbol.type;
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
@@ -527,10 +527,17 @@ void java_bytecode_convert_methodt::convert(
   if(is_constructor(method))
     method.set(ID_constructor, true);
 
-  // we add the symbol for the method
-  symbolt method_symbol;
-  method_symbol.name=method.get_name();
-  method_symbol.base_name=method.get_base_name();
+  // Check the fields that can't change are valid
+  INVARIANT(
+    method_symbol.name==method.get_name(),
+    "Name of method symbol shouldn't change");
+  INVARIANT(
+    method_symbol.base_name==method.get_base_name(),
+    "Base name of method symbol shouldn't change");
+  INVARIANT(
+    method_symbol.module.empty(),
+    "Method symbol shouldn't have module");
+  // Update the symbol for the method
   method_symbol.mode=ID_java;
   method_symbol.location=m.source_location;
   method_symbol.location.set_function(method_identifier);
@@ -554,16 +561,6 @@ void java_bytecode_convert_methodt::convert(
   method_has_this=code_type.has_this();
   if((!m.is_abstract) && (!m.is_native))
     method_symbol.value=convert_instructions(m, code_type, method_symbol.name);
-
-  // Replace the existing stub symbol with the real deal:
-  const auto s_it=symbol_table.symbols.find(method.get_name());
-  INVARIANT(
-    s_it!=symbol_table.symbols.end(),
-    "the symbol was there earlier on this function; it must be there now");
-  symbol_table.erase(s_it);
-
-  // Insert the method symbol in the symbol table
-  symbol_table.add(method_symbol);
 }
 
 const bytecode_infot &java_bytecode_convert_methodt::get_bytecode_info(
@@ -2847,7 +2844,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &method,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   safe_pointer<ci_lazy_methods_neededt> lazy_methods,

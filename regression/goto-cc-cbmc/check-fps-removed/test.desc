@@ -1,0 +1,5 @@
+CORE
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
