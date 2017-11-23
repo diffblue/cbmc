@@ -327,7 +327,7 @@ inline int pthread_join(pthread_t thread, void **value_ptr)
   #endif
 
   if((unsigned long)thread>__CPROVER_next_thread_id) return ESRCH;
-  if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
+//  if((unsigned long)thread==__CPROVER_thread_id) return EDEADLK;
   if(value_ptr!=0) (void)**(char**)value_ptr;
   __CPROVER_assume(__CPROVER_threads_exited[(unsigned long)thread]);
 
