@@ -21,11 +21,17 @@
 //  qualifiers, or the type as it was passed otherwise.
 static std::string pretty_print_java_type(const std::string &fqn_java_type)
 {
-  const std::string java_lang("java::java.lang.");
-  const std::string package_name(java_class_to_package(fqn_java_type) + ".");
-  if(package_name == java_lang)
-    return fqn_java_type.substr(java_lang.length());
-  return fqn_java_type;
+  std::string result;
+  const std::string java_cbmc_string("java::");
+  // Remove the java internal cbmc identifier
+  if(fqn_java_type.substr(0, java_cbmc_string.length()) == java_cbmc_string)
+    result = fqn_java_type.substr(java_cbmc_string.length());
+  // If the remaining has the "java.lang." string as well, trim it
+  const std::string java_lang_string("java.lang.");
+  const std::string package_name(java_class_to_package(result) + ".");
+  if(package_name == java_lang_string)
+    result = result.substr(java_lang_string.length());
+  return result;
 }
 
 generate_java_generic_typet::generate_java_generic_typet(
