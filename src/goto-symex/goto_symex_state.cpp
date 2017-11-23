@@ -21,8 +21,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/dirty.h>
 
-goto_symex_statet::goto_symex_statet()
+goto_symex_statet::goto_symex_statet(bool doing_partial_merging)
   : depth(0),
+    doing_partial_merging(doing_partial_merging),
     symex_target(nullptr),
     atomic_section_id(0),
     record_events(true),

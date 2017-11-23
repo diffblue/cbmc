@@ -99,6 +99,14 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(1); // should contemplate EX_USAGE from sysexits.h
   }
 
+  if(cmdline.isset("paths"))
+  {
+    if(cmdline.get_value("paths") == "partial")
+      options.set_option("partial-merge", true);
+    else
+      options.set_option("paths", true);
+  }
+
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
 

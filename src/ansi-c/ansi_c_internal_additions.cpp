@@ -234,6 +234,9 @@ void ansi_c_internal_additions(std::string &code)
     "void __CPROVER_k_induction_hint(unsigned min, unsigned max, "
       "unsigned step, unsigned loop_free);\n"
 
+    // Switches on path exploration when doing `--paths partial`
+    "void __CPROVER_begin_path_explore();\n"
+
     // format string-related
     "int __CPROVER_scanf(const char *, ...);\n"
 

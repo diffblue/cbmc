@@ -111,7 +111,7 @@ void goto_symext::symex_goto(statet &state)
     (simpl_state_guard.is_true() ||
      // or there is another block, but we're doing path exploration so
      // we're going to skip over it for now and return to it later.
-     options.get_bool_option("paths")))
+     state.doing_path_exploration))
   {
     DATA_INVARIANT(
       instruction.targets.size() > 0,
@@ -172,7 +172,7 @@ void goto_symext::symex_goto(statet &state)
     log.debug() << "Resuming from '" << state_pc->code.source_location() << "'"
                 << log.eom;
   }
-  else if(options.get_bool_option("paths"))
+  else if(state.doing_path_exploration)
   {
     // At this point, `state_pc` is the instruction we should execute
     // immediately, and `new_state_pc` is the instruction that we should execute

@@ -280,7 +280,8 @@ void goto_symext::symex_from_entry_point_of(
     throw "the program has no entry point";
   }
 
-  statet state;
+  statet state(options.get_bool_option("partial-merge"));
+  state.doing_path_exploration = options.get_bool_option("paths");
 
   initialize_entry_point(
     state,
@@ -309,7 +310,7 @@ void goto_symext::symex_step(
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 
-  if(!options.get_bool_option("paths"))
+  if(!state.doing_path_exploration)
     merge_gotos(state);
 
   // depth exceeded?
@@ -387,11 +388,19 @@ void goto_symext::symex_step(
     break;
 
   case FUNCTION_CALL:
+  {
+    code_function_callt deref_code = to_code_function_call(instruction.code);
+
+    if(
+      state.doing_partial_merging && deref_code.function().get("identifier") ==
+                                       CPROVER_PREFIX "begin_path_explore")
+    {
+      log.debug() << "Beginning path exploration" << log.eom;
+      state.doing_path_exploration = true;
+    }
+
     if(!state.guard.is_false())
     {
-      code_function_callt deref_code=
-        to_code_function_call(instruction.code);
-
       if(deref_code.lhs().is_not_nil())
         clean_expr(deref_code.lhs(), state, true);
 
@@ -405,6 +414,7 @@ void goto_symext::symex_step(
     else
       symex_transition(state);
     break;
+  }
 
   case OTHER:
     if(!state.guard.is_false())

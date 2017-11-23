@@ -620,7 +620,8 @@ int bmct::do_language_agnostic_bmc(
       result = bmc.run(goto_model.goto_functions);
     }
     INVARIANT(
-      opts.get_bool_option("paths") || worklist.empty(),
+      opts.get_bool_option("paths") || opts.get_bool_option("partial-merge") ||
+        worklist.empty(),
       "the worklist should be empty after doing full-program "
       "model checking, but the worklist contains " +
         std::to_string(worklist.size()) + " unexplored branches.");
@@ -698,7 +699,8 @@ void bmct::perform_symbolic_execution(const goto_functionst &goto_functions)
 {
   symex.symex_from_entry_point_of(goto_functions, symex_symbol_table);
   INVARIANT(
-    options.get_bool_option("paths") || branch_worklist.empty(),
+    options.get_bool_option("paths") ||
+      options.get_bool_option("partial-merge") || branch_worklist.empty(),
     "Branch points were saved even though we should have been "
     "executing the entire program and merging paths");
 }

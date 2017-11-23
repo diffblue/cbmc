@@ -166,7 +166,8 @@ protected:
     symex.record_coverage =
       !options.get_option("symex-coverage-report").empty();
     INVARIANT(
-      options.get_bool_option("paths"),
+      options.get_bool_option("paths") ||
+        options.get_bool_option("partial-merge"),
       "Should only use saved equation & goto_state constructor "
       "when doing path exploration");
   }
@@ -297,15 +298,17 @@ private:
   "(no-unwinding-assertions)"                                                  \
   "(no-pretty-names)"                                                          \
   "(partial-loops)"                                                            \
-  "(paths)"                                                                    \
+  "(paths):"                                                                   \
   "(depth):"                                                                   \
   "(unwind):"                                                                  \
   "(unwindset):"                                                               \
-  "(graphml-witness):"                                                         \
-  "(unwindset):"
+  "(graphml-witness):"
 
 #define HELP_BMC                                                               \
-  " --paths                      explore paths one at a time\n"                \
+  " --paths [partial]            explore paths one at a time. If 'partial'\n"  \
+  "                              is given, do path exploration only after\n"   \
+  "                              seeing __CPROVER_begin_path_explore() in\n"   \
+  "                              the input program\n"                          \
   " --program-only               only show program expression\n"               \
   " --show-loops                 show the loops in the program\n"              \
   " --depth nr                   limit search depth\n"                         \

@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class goto_symex_statet final
 {
 public:
-  goto_symex_statet();
+  explicit goto_symex_statet(bool doing_partial_merging);
   ~goto_symex_statet();
 
   /// \brief Fake "copy constructor" that initializes the `symex_target` member
@@ -51,6 +51,9 @@ public:
 
   /// distance from entry
   unsigned depth;
+
+  const bool doing_partial_merging;
+  bool doing_path_exploration;
 
   guardt guard;
   symex_targett::sourcet source;
@@ -204,6 +207,8 @@ public:
   {
   public:
     unsigned depth;
+    const bool doing_partial_merging;
+    bool doing_path_exploration;
     level2t::current_namest level2_current_names;
     value_sett value_set;
     guardt guard;
@@ -213,6 +218,8 @@ public:
 
     explicit goto_statet(const goto_symex_statet &s):
       depth(s.depth),
+      doing_partial_merging(s.doing_partial_merging),
+      doing_path_exploration(s.doing_path_exploration),
       level2_current_names(s.level2.current_names),
       value_set(s.value_set),
       guard(s.guard),
@@ -243,6 +250,8 @@ public:
 
   explicit goto_symex_statet(const goto_statet &s)
     : depth(s.depth),
+      doing_partial_merging(s.doing_partial_merging),
+      doing_path_exploration(s.doing_path_exploration),
       guard(s.guard),
       source(s.source),
       propagation(s.propagation),

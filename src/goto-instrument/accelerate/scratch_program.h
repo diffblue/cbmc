@@ -37,8 +37,8 @@ class scratch_programt:public goto_programt
 public:
   scratch_programt(symbol_tablet &_symbol_table, message_handlert &mh)
     : constant_propagation(true),
+      symex_state(false),
       symbol_table(_symbol_table),
-      symex_symbol_table(),
       ns(symbol_table, symex_symbol_table),
       equation(),
       branch_worklist(),

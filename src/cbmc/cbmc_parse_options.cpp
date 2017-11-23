@@ -108,7 +108,12 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   }
 
   if(cmdline.isset("paths"))
-    options.set_option("paths", true);
+  {
+    if(cmdline.get_value("paths") == "partial")
+      options.set_option("partial-merge", true);
+    else
+      options.set_option("paths", true);
+  }
 
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
