@@ -1808,7 +1808,7 @@ static void initial_index_set(
 
   while(!to_process.empty())
   {
-    const exprt &cur = to_process.back();
+    const exprt cur = to_process.back();
     to_process.pop_back();
     if(cur.id() == ID_index && is_char_type(cur.type()))
     {
