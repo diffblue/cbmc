@@ -425,4 +425,16 @@ to_java_specialized_generic_class_type(typet &type)
   return static_cast<const java_specialized_generic_class_typet &>(type);
 }
 
+/// Take a signature string and remove everything in angle brackets allowing for
+/// the type to be parsed normally, for example
+/// `java.util.HashSet<java.lang.Integer>` will be turned into
+/// `java.util.HashSet`
+std::string erase_type_arguments(const std::string &src);
+/// Returns the full class name, skipping over the generics. This turns any of
+/// these:
+///   1. Signature: Lcom/package/OuterClass<TT;>.Inner;
+///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
+/// into `com.package.OuterClass.Inner`
+std::string gather_full_class_name(const std::string &src);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_TYPES_H
