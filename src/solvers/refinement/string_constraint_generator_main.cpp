@@ -270,7 +270,10 @@ exprt string_constraint_generatort::associate_array_to_pointer(
 
   /// \todo We should use a function for inserting the correspondance
   /// between array and pointers.
-  arrays_of_pointers_.insert(std::make_pair(pointer_expr, array_expr));
+  const auto it_bool =
+    arrays_of_pointers_.insert(std::make_pair(pointer_expr, array_expr));
+  INVARIANT(
+    it_bool.second, "should not associate two arrays to the same pointer");
   add_default_axioms(to_array_string_expr(array_expr));
   return from_integer(0, f.type());
 }
