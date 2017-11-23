@@ -876,7 +876,7 @@ void value_sett::get_value_set_rec(
     #endif
   }
 
-  #if 0
+  #ifdef DEBUG
   std::cout << "GET_VALUE_SET_REC RESULT:\n";
   for(const auto &obj : dest.read())
   {
