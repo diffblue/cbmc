@@ -46,7 +46,7 @@ void constant_propagator_domaint::transform(
   locationt to,
   ai_baset &ai,
   const namespacet &ns,
-  ai_domain_baset::edge_typet /*edge_type*/)
+  ai_domain_baset::edge_typet edge_type)
 {
 #ifdef DEBUG
   std::cout << "Transform from/to:\n";
@@ -130,7 +130,7 @@ void constant_propagator_domaint::transform(
       const symbol_exprt &symbol_expr=to_symbol_expr(function);
       const irep_idt id=symbol_expr.get_identifier();
 
-      if(to==next)
+      if(edge_type == ai_domain_baset::edge_typet::FUNCTION_LOCAL)
       {
         if(id==CPROVER_PREFIX "set_must" ||
            id==CPROVER_PREFIX "get_must" ||
