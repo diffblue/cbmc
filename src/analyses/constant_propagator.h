@@ -25,7 +25,8 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai_base,
-    const namespacet &ns) final override;
+    const namespacet &ns,
+    ai_domain_baset::edge_typet edge_type) final override;
 
   virtual void output(
     std::ostream &out,

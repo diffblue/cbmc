@@ -59,7 +59,8 @@ void rd_range_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns)
+  const namespacet &ns,
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   reaching_definitions_analysist *rd=
     dynamic_cast<reaching_definitions_analysist*>(&ai);

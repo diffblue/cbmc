@@ -269,7 +269,8 @@ void custom_bitvector_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns)
+  const namespacet &ns,
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   // upcast of ai
   custom_bitvector_analysist &cba=

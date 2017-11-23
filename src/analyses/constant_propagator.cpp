@@ -45,7 +45,8 @@ void constant_propagator_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns)
+  const namespacet &ns,
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
 #ifdef DEBUG
   std::cout << "Transform from/to:\n";

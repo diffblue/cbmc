@@ -31,6 +31,13 @@ class ai_baset;
 class ai_domain_baset
 {
 public:
+  enum class edge_typet
+  {
+    FUNCTION_LOCAL,
+    CALL,
+    RETURN,
+  };
+
   // The constructor is expected to produce 'false'
   // or 'bottom'
   ai_domain_baset()
@@ -53,7 +60,8 @@ public:
     locationt from,
     locationt to,
     ai_baset &ai,
-    const namespacet &ns)=0;
+    const namespacet &ns,
+    edge_typet edge_type) = 0;
 
   virtual void output(
     std::ostream &out,
