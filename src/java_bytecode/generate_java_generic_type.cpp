@@ -14,6 +14,20 @@
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 
+/// Strip the package name from a java type, for the type to be
+/// pretty printed (java::java.lang.Integer -> Integer).
+/// \param fqn_java_type The java type we want to pretty print.
+/// \return The pretty printed type if there was a match of the
+//  qualifiers, or the type as it was passed otherwise.
+static std::string pretty_print_java_type(const std::string &fqn_java_type)
+{
+  const std::string java_lang("java::java.lang.");
+  const std::string package_name(java_class_to_package(fqn_java_type) + ".");
+  if(package_name == java_lang)
+    return fqn_java_type.substr(java_lang.length());
+  return fqn_java_type;
+}
+
 generate_java_generic_typet::generate_java_generic_typet(
   message_handlert &message_handler):
     message_handler(message_handler)
@@ -73,8 +87,8 @@ symbolt generate_java_generic_typet::operator()(
     pre_modification_size==after_modification_size,
     "All components in the original class should be in the new class");
 
-  const java_class_typet &new_java_class = construct_specialised_generic_type(
-    generic_class_definition, new_tag, replacement_components);
+  const java_specialized_generic_class_typet new_java_class =
+    construct_specialised_generic_type(new_tag, replacement_components);
   const type_symbolt &class_symbol =
     build_symbol_from_specialised_class(new_java_class);
 
@@ -196,14 +210,14 @@ irep_idt generate_java_generic_typet::build_generic_tag(
     .generic_type_arguments())
   {
     if(!first)
-      new_tag_buffer << ",";
+      new_tag_buffer << ", ";
     first=false;
 
     INVARIANT(
       !is_java_generic_parameter(type_argument),
       "Only create full concretized generic types");
     const irep_idt &id(id2string(type_argument.subtype().get(ID_identifier)));
-    new_tag_buffer << id2string(id);
+    new_tag_buffer << pretty_print_java_type(id2string(id));
     if(is_java_array_tag(id))
     {
       const typet &element_type =
@@ -227,25 +241,17 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   return new_tag_buffer.str();
 }
 
-/// Build the specalised version of the specific class, with the specified
+/// Build the specialised version of the specific class, with the specified
 /// parameters and name.
-/// \param generic_class_definition: The generic class we are specialising
 /// \param new_tag: The new name for the class (like Generic<java::Float>)
 /// \param new_components: The specialised components
 /// \return The newly constructed class.
-java_class_typet
+java_specialized_generic_class_typet
 generate_java_generic_typet::construct_specialised_generic_type(
-  const java_generic_class_typet &generic_class_definition,
   const irep_idt &new_tag,
   const struct_typet::componentst &new_components) const
 {
-  java_class_typet specialised_class = generic_class_definition;
-  // We are specialising the logic - so we don't want to be marked as generic
-  specialised_class.set(ID_C_java_generics_class_type, false);
-  specialised_class.set(ID_name, "java::" + id2string(new_tag));
-  specialised_class.set(ID_base_name, new_tag);
-  specialised_class.components() = new_components;
-  return specialised_class;
+  return java_specialized_generic_class_typet{new_tag, new_components};
 }
 
 /// Construct the symbol to be moved into the symbol table

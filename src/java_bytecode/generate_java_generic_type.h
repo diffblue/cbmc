@@ -33,8 +33,7 @@ private:
     const java_generic_class_typet &replacement_type,
     const java_generic_typet &generic_reference) const;
 
-  java_class_typet construct_specialised_generic_type(
-    const java_generic_class_typet &generic_class_definition,
+  java_specialized_generic_class_typet construct_specialised_generic_type(
     const irep_idt &new_tag,
     const struct_typet::componentst &new_components) const;
 
