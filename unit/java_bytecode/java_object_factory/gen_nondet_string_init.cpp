@@ -70,18 +70,22 @@ SCENARIO(
           "tmp_object_factory = NONDET(int);",
           "__CPROVER_assume(tmp_object_factory >= 0);",
           "__CPROVER_assume(tmp_object_factory <= 20);",
+          "char (*string_data_pointer)[INFINITY()];",
+          "string_data_pointer = "
+            "ALLOCATE(char [INFINITY()], INFINITY(), false);",
           "char nondet_infinite_array[INFINITY()];",
           "nondet_infinite_array = NONDET(char [INFINITY()]);",
+          "*string_data_pointer = nondet_infinite_array;",
           "int return_array;",
           "return_array = cprover_associate_array_to_pointer_func"
-          "(nondet_infinite_array, nondet_infinite_array);",
+            "(*string_data_pointer, *string_data_pointer);",
           "int return_array;",
           "return_array = cprover_associate_length_to_array_func"
-          "(nondet_infinite_array, tmp_object_factory);",
+            "(*string_data_pointer, tmp_object_factory);",
           "arg = { .@java.lang.Object={ .@class_identifier"
-          "=\"java::java.lang.String\", .@lock=false },"
-          " .length=tmp_object_factory, "
-          ".data=nondet_infinite_array };"};
+            "=\"java::java.lang.String\", .@lock=false },"
+            " .length=tmp_object_factory, "
+            ".data=*string_data_pointer };"};
 
         for(std::size_t i = 0;
             i < code_string.size() && i < reference_code.size();
