@@ -7,6 +7,9 @@
 
 \*******************************************************************/
 
+#include <map>
+#include <string>
+
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_type.h>
@@ -179,7 +182,7 @@ SCENARIO(
   // We want to test that the specialized/instantiated class has it's field
   // type updated, so find the specialized class, not the generic class.
   const irep_idt test_class =
-    "java::generic_field_array_instantiation$generic<java::array[reference]"
+    "java::generic_field_array_instantiation$generic<array[reference]"
     "of_java::java.lang.Float>";
 
   GIVEN("A generic type instantiated with an array type")
@@ -224,15 +227,15 @@ SCENARIO(
     GIVEN("A generic type instantiated with different array types")
     {
       const irep_idt test_class_integer =
-        "java::generic_field_array_instantiation$generic<java::array[reference]"
+        "java::generic_field_array_instantiation$generic<array[reference]"
         "of_"
         "java::java.lang.Integer>";
 
       const irep_idt test_class_int =
-        "java::generic_field_array_instantiation$generic<java::array[int]>";
+        "java::generic_field_array_instantiation$generic<array[int]>";
 
       const irep_idt test_class_float =
-        "java::generic_field_array_instantiation$generic<java::array[float]>";
+        "java::generic_field_array_instantiation$generic<array[float]>";
 
       const struct_typet::componentt &component_g =
         require_type::require_component(
@@ -330,7 +333,7 @@ SCENARIO(
         "table")
       {
         const std::string specialised_string =
-          "<java::array[reference]of_"
+          "<array[reference]of_"
           "java::java.lang.Float>";
         const irep_idt specialised_class_name = id2string(harness_class) + "$" +
                                                 id2string(inner_class) +
@@ -385,6 +388,35 @@ SCENARIO(
           require_type::require_pointer(
             array_type, symbol_typet("java::java.lang.Float"));
         }
+      }
+    }
+  }
+}
+
+SCENARIO(
+  "Test pretty printing auxiliary function",
+  "[core][java_bytecode][generate_java_generic_type]")
+{
+  using std::map;
+  using std::string;
+
+  WHEN("We have a series of cbmc internal java types")
+  {
+    // NOLINTNEXTLINE
+    const map<string, string> types{
+      // map<Input, Output>
+      {"java::java.lang.Integer", "Integer"},
+      {"java::CustomClass", "CustomClass"},
+      {"java.lang.String", "String"},
+      {"Hashmap", "Hashmap"},
+      // We shouldn't prune types not imported in default import
+      {"java.util.HashSet", "java.util.HashSet"}};
+
+    THEN("We need to make sure that the types get pruned correctly.")
+    {
+      for(const auto &pair : types)
+      {
+        REQUIRE(pretty_print_java_type(pair.first) == pair.second);
       }
     }
   }

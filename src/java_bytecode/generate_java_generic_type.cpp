@@ -11,6 +11,7 @@
 
 #include "generate_java_generic_type.h"
 #include <util/namespace.h>
+#include <util/prefix.h>
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 
@@ -19,17 +20,17 @@
 /// \param fqn_java_type The java type we want to pretty print.
 /// \return The pretty printed type if there was a match of the
 //  qualifiers, or the type as it was passed otherwise.
-static std::string pretty_print_java_type(const std::string &fqn_java_type)
+std::string pretty_print_java_type(const std::string &fqn_java_type)
 {
-  std::string result;
+  std::string result(fqn_java_type);
   const std::string java_cbmc_string("java::");
   // Remove the java internal cbmc identifier
-  if(fqn_java_type.substr(0, java_cbmc_string.length()) == java_cbmc_string)
+  if(has_prefix(fqn_java_type, java_cbmc_string))
     result = fqn_java_type.substr(java_cbmc_string.length());
-  // If the remaining has the "java.lang." string as well, trim it
+  // If the class is in package java.lang strip
+  // package name due to default import
   const std::string java_lang_string("java.lang.");
-  const std::string package_name(java_class_to_package(result) + ".");
-  if(package_name == java_lang_string)
+  if(has_prefix(result, java_lang_string))
     result = result.substr(java_lang_string.length());
   return result;
 }
