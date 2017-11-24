@@ -519,6 +519,7 @@ refined_string_exprt java_string_library_preprocesst::make_nondet_string_expr(
   symbol_table_baset &symbol_table,
   code_blockt &code)
 {
+  /// \todo refactor with initialize_nonddet_string_struct
   const refined_string_exprt str = decl_string_expr(loc, symbol_table, code);
 
   side_effect_expr_nondett nondet_length(str.length().type());
@@ -1695,14 +1696,6 @@ codet java_string_library_preprocesst::make_init_from_array_code(
   /// \todo this assumes the array to be constant between all calls to
   /// string primitives, which may not be true in general.
   refined_string_exprt string_arg = to_string_expr(args[1]);
-  add_pointer_to_array_association(
-    string_arg.content(),
-    dereference_exprt(
-      string_arg.content(),
-      array_typet(java_char_type(), infinity_exprt(java_int_type()))),
-    symbol_table,
-    loc,
-    code);
 
   // The third argument is `count`, whereas the third argument of substring
   // is `end` which corresponds to `offset+count`
