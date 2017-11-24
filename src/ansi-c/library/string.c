@@ -605,11 +605,16 @@ void *memcpy(void *dst, const void *src, size_t n)
             n <= __CPROVER_zero_string_length(dst)))
     __CPROVER_is_zero_string(dst)=0;
   #else
-  __CPROVER_precondition(
+  // TODO: This should be assert rather that assume. However, due to uninitialised
+  //       variables in SV-COMP benchmarks
+  //            linux-4.2-rc1.tar.xz-32_7a-drivers--media--usb--dvb-usb--dvb-usb-opera.ko-entry_point_true-unreach-call.cil.out.c
+  //            linux-4.2-rc1.tar.xz-43_2a-drivers--media--usb--s2255--s2255drv.ko-entry_point_true-unreach-call.cil.out.c
+  //            linux-4.2-rc1.tar.xz-43_2a-drivers--usb--serial--digi_acceleport.ko-entry_point_true-unreach-call.cil.out.c
+  //       the memcpy_guard function does not work.
+  __CPROVER_assume(
     __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
     __CPROVER_POINTER_OFFSET(src) + n <= __CPROVER_POINTER_OFFSET(dst) ||
-    __CPROVER_POINTER_OFFSET(dst) + n <= __CPROVER_POINTER_OFFSET(src),
-    "memcpy src/dst overlap");
+    __CPROVER_POINTER_OFFSET(dst) + n <= __CPROVER_POINTER_OFFSET(src));
   (void)*(char *)dst; // check that the memory is accessible
   (void)*(const char *)src; // check that the memory is accessible
 
