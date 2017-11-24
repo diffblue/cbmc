@@ -43,6 +43,4 @@ private:
   message_handlert &message_handler;
 };
 
-std::string pretty_print_java_type(const std::string &fqn_java_type);
-
 #endif // CPROVER_JAVA_BYTECODE_GENERATE_JAVA_GENERIC_TYPE_H

@@ -392,32 +392,3 @@ SCENARIO(
     }
   }
 }
-
-SCENARIO(
-  "Test pretty printing auxiliary function",
-  "[core][java_bytecode][generate_java_generic_type]")
-{
-  using std::map;
-  using std::string;
-
-  WHEN("We have a series of cbmc internal java types")
-  {
-    // NOLINTNEXTLINE
-    const map<string, string> types{
-      // map<Input, Output>
-      {"java::java.lang.Integer", "Integer"},
-      {"java::CustomClass", "CustomClass"},
-      {"java.lang.String", "String"},
-      {"Hashmap", "Hashmap"},
-      // We shouldn't prune types not imported in default import
-      {"java.util.HashSet", "java.util.HashSet"}};
-
-    THEN("We need to make sure that the types get pruned correctly.")
-    {
-      for(const auto &pair : types)
-      {
-        REQUIRE(pretty_print_java_type(pair.first) == pair.second);
-      }
-    }
-  }
-}
