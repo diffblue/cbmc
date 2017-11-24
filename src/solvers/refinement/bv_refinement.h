@@ -108,7 +108,7 @@ private:
   // MEMBERS
 
   bool progress;
-  std::vector<approximationt> approximations;
+  std::list<approximationt> approximations;
   bvt parent_assumptions;
 protected:
   // use gui format
