@@ -487,7 +487,7 @@ bv_refinementt::add_approximation(
   const exprt &expr, bvt &bv)
 {
   approximations.push_back(approximationt(approximations.size()));
-  approximationt &a=approximations.back(); // stable!
+  approximationt &a=approximations.back();
 
   std::size_t width=boolbv_width(expr.type());
   PRECONDITION(width!=0);
