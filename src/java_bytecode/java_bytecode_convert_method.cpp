@@ -1028,6 +1028,15 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
     code_function_callt call_real_init;
     call_real_init.function()=findsymit->second.symbol_expr();
     init_body.move_to_operands(call_real_init);
+
+    if(lazy_methods)
+    {
+      // Lazy methods enabled, we need to explicitly,
+      // add the clinit of this class, since there are scenarios,
+      // were the class is never instantiated but it's
+      // static fields are still accessed.
+      lazy_methods->add_needed_method(real_clinit_name);
+    }
   }
 
   for(const auto &base : to_class_type(class_symbol.type).bases())

@@ -1,0 +1,10 @@
+CORE
+A.class
+--function A.me --lazy-methods
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+--
+testing that clinit is added even
+though the 'lazy-methods' flag is specified.

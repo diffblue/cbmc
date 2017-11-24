@@ -1,0 +1,9 @@
+CORE
+A.class
+--function A.me2 --lazy-methods
+^EXIT=0$
+^SIGNAL=0$
+VERIFICATION SUCCESSFUL
+--
+--
+base-case
