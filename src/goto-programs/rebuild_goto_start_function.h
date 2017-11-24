@@ -24,13 +24,13 @@ class goto_functionst;
 #define HELP_FUNCTIONS \
   " --function name              set main function name\n"
 
-template<typename goto_modelt>
+template<typename maybe_lazy_goto_modelt>
 class rebuild_goto_start_function_baset: public messaget
 {
 public:
   rebuild_goto_start_function_baset(
     const cmdlinet &cmdline,
-    goto_modelt &goto_model,
+    maybe_lazy_goto_modelt &goto_model,
     message_handlert &message_handler);
 
   bool operator()();
@@ -41,7 +41,7 @@ private:
   void remove_existing_entry_point();
 
   const cmdlinet &cmdline;
-  goto_modelt &goto_model;
+  maybe_lazy_goto_modelt &goto_model;
 };
 
 // NOLINTNEXTLINE(readability/namespace)  using required for templates
