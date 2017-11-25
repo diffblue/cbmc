@@ -57,6 +57,7 @@ public:
       total_vccs(0),
       remaining_vccs(0),
       constant_propagation(true),
+      self_loops_to_assumptions(true),
       language_mode(),
       outer_symbol_table(outer_symbol_table),
       ns(outer_symbol_table),
@@ -202,6 +203,7 @@ public:
   unsigned total_vccs, remaining_vccs;
 
   bool constant_propagation;
+  bool self_loops_to_assumptions;
 
   optionst options;
 
