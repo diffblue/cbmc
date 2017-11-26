@@ -33,6 +33,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "add_failed_symbols.h"
 
+// Due to a large number of functions defined inline, `value_sett` and
+// associated types are documented in its header file, `value_set.h`.
+
 const value_sett::object_map_dt value_sett::object_map_dt::blank{};
 object_numberingt value_sett::object_numbering;
 
