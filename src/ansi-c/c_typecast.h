@@ -41,7 +41,7 @@ bool c_implicit_typecast_arithmetic(
 class c_typecastt
 {
 public:
-  explicit c_typecastt(const namespacet &_ns):ns(_ns)
+  explicit c_typecastt(const namespacet &_ns):ns(_ns), current_symbol(nullptr)
   {
   }
 
@@ -62,6 +62,9 @@ public:
 
   std::list<std::string> errors;
   std::list<std::string> warnings;
+
+  void set_current_symbol(const symbolt * const symbol) { current_symbol=symbol; }
+  const symbolt *get_current_symbol() const { return current_symbol; }
 
 protected:
   const namespacet &ns;
@@ -100,6 +103,9 @@ protected:
   void do_typecast(exprt &dest, const typet &type);
 
   c_typet minimum_promotion(const typet &type) const;
+
+private:
+  const symbolt *current_symbol;
 };
 
 #endif // CPROVER_ANSI_C_C_TYPECAST_H

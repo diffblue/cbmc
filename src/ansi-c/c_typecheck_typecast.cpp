@@ -15,6 +15,7 @@ void c_typecheck_baset::implicit_typecast(
   const typet &dest_type)
 {
   c_typecastt c_typecast(*this);
+  c_typecast.set_current_symbol(&current_symbol);
 
   typet src_type=expr.type();
 

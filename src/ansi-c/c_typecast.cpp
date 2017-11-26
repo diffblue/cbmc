@@ -456,6 +456,23 @@ void c_typecastt::implicit_typecast(
   implicit_typecast_followed(expr, src_type, type_qual, dest_type);
 }
 
+static bool is_array_element_alias(const namespacet& ns, const symbolt* const orig_symbol, const typet &src_type, const typet &dest_type)
+{
+  if(orig_symbol==nullptr)
+    return false;
+  const symbolt* aliased_symbol;
+  if(ns.lookup(orig_symbol->name, aliased_symbol))
+    return false;
+  if(!aliased_symbol->is_macro)
+    return false;
+  if(src_type.id()!=ID_array)
+    return false;
+  const typet &src_subtype=ns.follow(src_type.subtype());
+  if(src_subtype!=dest_type)
+    return false;
+  return true;
+}
+
 void c_typecastt::implicit_typecast_followed(
   exprt &expr,
   const typet &src_type,
@@ -569,7 +586,7 @@ void c_typecastt::implicit_typecast_followed(
     }
   }
 
-  if(check_c_implicit_typecast(src_type, dest_type))
+  if(check_c_implicit_typecast(src_type, dest_type) && !is_array_element_alias(ns, get_current_symbol(), src_type, dest_type))
     errors.push_back("implicit conversion not permitted");
   else if(src_type!=dest_type)
     do_typecast(expr, orig_dest_type);
