@@ -20,26 +20,37 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class xmlt;
 
-class value_set_analysist:
+void value_sets_to_xml(
+  std::function<const value_sett &(goto_programt::const_targett)> get_value_set,
+  const goto_programt &goto_program,
+  const irep_idt &identifier,
+  xmlt &dest);
+
+template<class VSDT>
+class value_set_analysis_templatet:
   public value_setst,
-  public static_analysist<value_set_domaint>
+  public static_analysist<VSDT>
 {
 public:
-  explicit value_set_analysist(const namespacet &_ns):
-    static_analysist<value_set_domaint>(_ns)
+  typedef VSDT domaint;
+  typedef static_analysist<domaint> baset;
+  typedef typename baset::locationt locationt;
+
+  explicit value_set_analysis_templatet(const namespacet &ns):baset(ns)
   {
   }
-
-  typedef static_analysist<value_set_domaint> baset;
-
-  // overloading
-  virtual void initialize(const goto_programt &goto_program);
-  virtual void initialize(const goto_functionst &goto_functions);
 
   void convert(
     const goto_programt &goto_program,
     const irep_idt &identifier,
-    xmlt &dest) const;
+    xmlt &dest) const
+  {
+    value_sets_to_xml(
+      [this](locationt l) { return (*this)[l].value_set; },
+      goto_program,
+      identifier,
+      dest);
+  }
 
 public:
   // interface value_sets
@@ -48,9 +59,13 @@ public:
     const exprt &expr,
     value_setst::valuest &dest)
   {
-    (*this)[l].value_set.get_value_set(expr, dest, ns);
+    (*this)[l].value_set.get_value_set(expr, dest, baset::ns);
   }
 };
+
+typedef
+  value_set_analysis_templatet<value_set_domain_templatet<value_sett>>
+  value_set_analysist;
 
 void convert(
   const goto_functionst &goto_functions,

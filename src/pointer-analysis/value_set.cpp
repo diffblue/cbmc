@@ -33,6 +33,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "add_failed_symbols.h"
 
+// Due to a large number of functions defined inline, `value_sett` and
+// associated types are documented in its header file, `value_set.h`.
+
 const value_sett::object_map_dt value_sett::object_map_dt::blank{};
 object_numberingt value_sett::object_numbering;
 
@@ -1205,6 +1208,12 @@ void value_sett::assign(
     object_mapt values_rhs;
     get_value_set(rhs, values_rhs, ns, is_simplified);
 
+    // Permit custom subclass to alter the read values prior to write:
+    adjust_assign_rhs_values(rhs, ns, values_rhs);
+
+    // Permit custom subclass to perform global side-effects prior to write:
+    apply_assign_side_effects(lhs, rhs, ns);
+
     assign_rec(lhs, values_rhs, "", ns, add_to_sets);
   }
 }
@@ -1484,7 +1493,7 @@ void value_sett::do_end_function(
   assign(lhs, rhs, ns, false, false);
 }
 
-void value_sett::apply_code(
+void value_sett::apply_code_rec(
   const codet &code,
   const namespacet &ns)
 {
@@ -1493,7 +1502,7 @@ void value_sett::apply_code(
   if(statement==ID_block)
   {
     forall_operands(it, code)
-      apply_code(to_code(*it), ns);
+      apply_code_rec(to_code(*it), ns);
   }
   else if(statement==ID_function_call)
   {
@@ -1610,6 +1619,10 @@ void value_sett::apply_code(
   else if(statement==ID_input || statement==ID_output)
   {
     // doesn't do anything
+  }
+  else if(statement==ID_dead)
+  {
+    // Ignore by default; could prune the value set.
   }
   else
   {
