@@ -66,7 +66,21 @@ std::string graphml_witnesst::convert_assign_rec(
 {
   std::string result;
 
-  if(assign.rhs().id()==ID_array)
+  if(assign.rhs().id() == ID_array_list)
+  {
+    const array_list_exprt &array_list = to_array_list_expr(assign.rhs());
+    const auto &ops = array_list.operands();
+
+    for(std::size_t listidx = 0; listidx != ops.size(); listidx += 2)
+    {
+      const index_exprt index{assign.lhs(), ops[listidx]};
+      if(!result.empty())
+        result += ' ';
+      result +=
+        convert_assign_rec(identifier, code_assignt{index, ops[listidx + 1]});
+    }
+  }
+  else if(assign.rhs().id() == ID_array)
   {
     const array_typet &type = to_array_type(assign.rhs().type());
 
