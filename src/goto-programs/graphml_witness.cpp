@@ -15,6 +15,7 @@ Author: Daniel Kroening
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
+#include <util/pointer_predicates.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 
@@ -216,6 +217,23 @@ static bool filter_out(
   return false;
 }
 
+static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
+{
+  if(
+    expr.id() == ID_symbol &&
+    has_prefix(id2string(to_symbol_expr(expr).get_identifier()), prefix))
+  {
+    return true;
+  }
+
+  forall_operands(it, expr)
+  {
+    if(contains_symbol_prefix(*it, prefix))
+      return true;
+  }
+  return false;
+}
+
 /// counterexample witness
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
@@ -322,28 +340,38 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
           data_l.data=id2string(graphml[from].line);
         }
 
-        if(it->type==goto_trace_stept::typet::ASSIGNMENT &&
-           it->full_lhs_value.is_not_nil() &&
-           it->full_lhs.is_not_nil())
+        const auto lhs_object = it->get_lhs_object();
+        if(
+          it->type == goto_trace_stept::typet::ASSIGNMENT &&
+          lhs_object.has_value())
         {
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "assumption");
-
-          code_assignt assign{it->full_lhs, it->full_lhs_value};
-          irep_idt identifier = irep_idt();
-          if(const auto object = it->get_lhs_object())
-            identifier = object->get_identifier();
-          val.data = convert_assign_rec(identifier, assign);
-
-          xmlt &val_s=edge.new_element("data");
-          val_s.set_attribute("key", "assumption.scope");
-          val_s.data = id2string(it->function_id);
-
-          if(has_prefix(val.data, "\\result ="))
+          const std::string &lhs_id = id2string(lhs_object->get_identifier());
+          if(
+            !contains_symbol_prefix(
+              it->full_lhs_value, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            !contains_symbol_prefix(
+              it->full_lhs, SYMEX_DYNAMIC_PREFIX "dynamic_object") &&
+            (!it->full_lhs_value.is_constant() ||
+             !it->full_lhs_value.has_operands() ||
+             !has_prefix(
+               id2string(it->full_lhs_value.op0().get(ID_value)), "INVALID-")))
           {
-            xmlt &val_f = edge.new_element("data");
-            val_f.set_attribute("key", "assumption.resultfunction");
-            val_f.data = id2string(it->function_id);
+            xmlt &val = edge.new_element("data");
+            val.set_attribute("key", "assumption");
+
+            code_assignt assign{it->full_lhs, it->full_lhs_value};
+            val.data = convert_assign_rec(lhs_id, assign);
+
+            xmlt &val_s = edge.new_element("data");
+            val_s.set_attribute("key", "assumption.scope");
+            val_s.data = id2string(it->function_id);
+
+            if(has_prefix(val.data, "\\result ="))
+            {
+              xmlt &val_f = edge.new_element("data");
+              val_f.set_attribute("key", "assumption.resultfunction");
+              val_f.data = id2string(it->function_id);
+            }
           }
         }
         else if(it->type==goto_trace_stept::typet::GOTO &&
