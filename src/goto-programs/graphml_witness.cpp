@@ -79,7 +79,29 @@ std::string graphml_witnesst::convert_assign_rec(
 
   std::string result;
 
-  if(assign.rhs().id()==ID_array)
+  if(assign.rhs().id()=="array-list")
+  {
+    const array_typet &type=
+      to_array_type(ns.follow(assign.rhs().type()));
+
+    const auto ops=assign.rhs().operands();
+    DATA_INVARIANT(
+      ops.size()%2==0,
+      "array-list has odd number of operands");
+
+    for(size_t listidx=0; listidx!=ops.size(); listidx+=2)
+    {
+      index_exprt index(
+        assign.lhs(),
+        ops[listidx],
+        type.subtype());
+      if(!result.empty())
+        result+=' ';
+      result+=
+        convert_assign_rec(identifier, code_assignt(index, ops[listidx+1]));
+    }
+  }
+  else if(assign.rhs().id()==ID_array)
   {
     const array_typet &type=
       to_array_type(ns.follow(assign.rhs().type()));
@@ -163,7 +185,6 @@ std::string graphml_witnesst::convert_assign_rec(
 
     result=lhs+" = "+expr_to_string(ns, identifier, clean_rhs)+";";
   }
-
   cache.insert({{identifier.get_no(), &assign.read()}, result});
   return result;
 }
@@ -200,6 +221,21 @@ static bool filter_out(
      source_location.get_line().empty())
     return true;
 
+  return false;
+}
+
+static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix){
+  if(expr.id()==ID_symbol &&
+     has_prefix(id2string(to_symbol_expr(expr).get_identifier()), prefix))
+  {
+    return true;
+  }
+
+  forall_operands(it, expr)
+  {
+    if(contains_symbol_prefix(*it, prefix))
+      return true;
+  }
   return false;
 }
 
@@ -314,30 +350,37 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 
         if(it->type==goto_trace_stept::typet::ASSIGNMENT &&
            it->full_lhs_value.is_not_nil() &&
-           it->full_lhs.is_not_nil())
+           it->full_lhs.is_not_nil() &&
+           it->full_lhs.id() == ID_symbol)
         {
-          if(id2string(it->lhs_object.get_identifier())
+          const symbol_exprt &lhs_symbol = to_symbol_expr(it->full_lhs);
+          if(id2string(lhs_symbol.get_identifier())
              .find("pthread_create::thread")!=std::string::npos)
           {
             xmlt &data_t=edge.new_element("data");
             data_t.set_attribute("key", "createThread");
             data_t.data=std::to_string(++thread_id);
           }
-          else if(id2string(it->lhs_object.get_identifier())
-               .find("#return_value")==std::string::npos &&
-             id2string(it->lhs_object.get_identifier())
-               .find("thread")==std::string::npos &&
-             id2string(it->lhs_object.get_identifier())
-               .find("mutex")==std::string::npos &&
-             (!it->lhs_object_value.is_constant() ||
-              !it->lhs_object_value.has_operands() ||
-              !has_prefix(id2string(it->lhs_object_value.op0().get(ID_value)),
-                          "INVALID-")))
+          else if(
+            id2string(lhs_symbol.get_identifier())
+              .find("#return_value")==std::string::npos &&
+            !contains_symbol_prefix(
+              it->full_lhs_value, "symex_dynamic::dynamic_object") &&
+            !contains_symbol_prefix(
+              it->full_lhs, "symex_dynamic::dynamic_object") &&
+            id2string(lhs_symbol.get_identifier())
+              .find("thread")==std::string::npos &&
+            id2string(lhs_symbol.get_identifier())
+              .find("mutex")==std::string::npos &&
+            (!it->full_lhs_value.is_constant() ||
+             !it->full_lhs_value.has_operands() ||
+             !has_prefix(id2string(it->full_lhs_value.op0().get(ID_value)),
+                         "INVALID-")))
           {
             xmlt &val=edge.new_element("data");
             val.set_attribute("key", "assumption");
             code_assignt assign(it->full_lhs, it->full_lhs_value);
-            irep_idt identifier=it->full_lhs.get_identifier();
+            irep_idt identifier=lhs_symbol.get_identifier();
             val.data=convert_assign_rec(identifier, assign);
 
             xmlt &val_s=edge.new_element("data");
