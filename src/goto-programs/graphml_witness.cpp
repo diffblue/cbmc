@@ -542,17 +542,6 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           graphml[to].invariant_scope=
             id2string(it->source.pc->source_location.get_function());
         }
-        else if(it->is_goto() &&
-                it->source.pc->is_goto())
-        {
-          xmlt &val=edge.new_element("data");
-          val.set_attribute("key", "sourcecode");
-          exprt clean_cond=it->cond_expr;
-          remove_l0_l1(clean_cond);
-          const std::string cond=expr_to_string(ns, it->source.function, clean_cond);
-            from_expr(ns, it->source.function, not_exprt(clean_cond));
-          val.data="["+cond+"]";
-        }
 
         graphml[to].in[from].xml_node=edge;
         graphml[from].out[to].xml_node=edge;
