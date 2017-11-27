@@ -110,6 +110,12 @@ public:
     return type_variables().front();
   }
 
+  type_variablet &type_variable_ref()
+  {
+    PRECONDITION(!type_variables().empty());
+    return const_cast<type_variablet &>(type_variables().front());
+  }
+
 private:
   typedef std::vector<type_variablet> type_variablest;
   const type_variablest &type_variables() const
@@ -311,6 +317,65 @@ inline const typet &java_generic_class_type_bound(size_t index, const typet &t)
   const java_generic_parametert &gen_type=gen_types[index];
 
   return gen_type.subtype();
+}
+
+/// Type to hold a Java class that is implicitly generic, e.g., an inner
+/// class of a generic outer class or a derived class of a generic base
+/// class. Extends the java class type.
+class java_implicitly_generic_class_typet : public java_class_typet
+{
+public:
+  typedef std::vector<java_generic_parametert> implicit_generic_typest;
+
+  explicit java_implicitly_generic_class_typet(
+    const java_class_typet &class_type,
+    const implicit_generic_typest &generic_types)
+    : java_class_typet(class_type)
+  {
+    set(ID_C_java_implicitly_generic_class_type, true);
+    for(const auto &type : generic_types)
+    {
+      implicit_generic_types().push_back(type);
+    }
+  }
+
+  const implicit_generic_typest &implicit_generic_types() const
+  {
+    return (
+      const implicit_generic_typest
+        &)(find(ID_implicit_generic_types).get_sub());
+  }
+
+  implicit_generic_typest &implicit_generic_types()
+  {
+    return (
+      implicit_generic_typest &)(add(ID_implicit_generic_types).get_sub());
+  }
+};
+
+/// \param type: the type to check
+/// \return true if type is a implicitly generic java class type
+inline bool is_java_implicitly_generic_class_type(const typet &type)
+{
+  return type.get_bool(ID_C_java_implicitly_generic_class_type);
+}
+
+/// \param type: the type to check
+/// \return cast of type to java_generics_class_typet
+inline const java_implicitly_generic_class_typet &
+to_java_implicitly_generic_class_type(const java_class_typet &type)
+{
+  PRECONDITION(is_java_implicitly_generic_class_type(type));
+  return static_cast<const java_implicitly_generic_class_typet &>(type);
+}
+
+/// \param type: source type
+/// \return cast of type into a java class type with generics
+inline java_implicitly_generic_class_typet &
+to_java_implicitly_generic_class_type(java_class_typet &type)
+{
+  PRECONDITION(is_java_implicitly_generic_class_type(type));
+  return static_cast<java_implicitly_generic_class_typet &>(type);
 }
 
 /// An exception that is raised for unsupported class signature.

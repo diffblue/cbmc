@@ -270,6 +270,53 @@ java_generic_class_typet require_type::require_java_generic_class(
   return java_generic_class_type;
 }
 
+/// Verify that a class is a complete, valid java implicitly generic class.
+/// \param class_type: the class
+/// \return: A reference to the java generic class type.
+java_implicitly_generic_class_typet
+require_type::require_java_implicitly_generic_class(const typet &class_type)
+{
+  const class_typet &class_class_type = require_complete_class(class_type);
+  java_class_typet java_class_type = to_java_class_type(class_class_type);
+
+  REQUIRE(is_java_implicitly_generic_class_type(java_class_type));
+  java_implicitly_generic_class_typet java_implicitly_generic_class_type =
+    to_java_implicitly_generic_class_type(java_class_type);
+
+  return java_implicitly_generic_class_type;
+}
+
+/// Verify that a class is a complete, valid java generic class with the
+/// specified list of variables.
+/// \param class_type: the class
+/// \param type_variables: vector of type variables
+/// \return: A reference to the java generic class type.
+java_implicitly_generic_class_typet
+require_type::require_java_implicitly_generic_class(
+  const typet &class_type,
+  const std::initializer_list<irep_idt> &implicit_type_variables)
+{
+  const java_implicitly_generic_class_typet java_implicitly_generic_class_type =
+    require_type::require_java_implicitly_generic_class(class_type);
+
+  const java_implicitly_generic_class_typet::implicit_generic_typest
+    &implicit_generic_type_vars =
+      java_implicitly_generic_class_type.implicit_generic_types();
+  REQUIRE(implicit_generic_type_vars.size() == implicit_type_variables.size());
+  REQUIRE(
+    std::equal(
+      implicit_type_variables.begin(),
+      implicit_type_variables.end(),
+      implicit_generic_type_vars.begin(),
+      [](const irep_idt &type_var_name, const java_generic_parametert &param)
+      {
+        REQUIRE(is_java_generic_parameter(param));
+        return param.type_variable().get_identifier() == type_var_name;
+      }));
+
+  return java_implicitly_generic_class_type;
+}
+
 /// Verify that a class is a complete, valid nongeneric java class
 /// \param class_type: the class
 /// \return: A reference to the java generic class type.
@@ -280,6 +327,7 @@ require_type::require_java_non_generic_class(const typet &class_type)
   java_class_typet java_class_type = to_java_class_type(class_class_type);
 
   REQUIRE(!is_java_generic_class_type(java_class_type));
+  REQUIRE(!is_java_implicitly_generic_class_type(java_class_type));
 
   return java_class_type;
 }

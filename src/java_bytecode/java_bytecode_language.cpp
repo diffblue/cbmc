@@ -209,6 +209,26 @@ bool java_bytecode_languaget::typecheck(
       return true;
   }
 
+  // find and mark all implicitly generic class types
+  // this can only be done once all the class symbols have been created
+  for(const auto &c : java_class_loader.class_map)
+  {
+    if(c.second.parsed_class.name.empty())
+      continue;
+    try
+    {
+      mark_java_implicitly_generic_class_type(
+        c.second.parsed_class.name, symbol_table);
+    }
+    catch(missing_outer_class_symbol_exceptiont &)
+    {
+      messaget::warning()
+        << "Not marking class " << c.first
+        << " implicitly generic due to missing outer class symbols"
+        << messaget::eom;
+    }
+  }
+
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
