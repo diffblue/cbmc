@@ -309,13 +309,16 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// \todo Change argument names to match add_axioms_for_last_index_of_string
 ///
 /// These axioms are :
-///   1. \f$ -1 \le {\tt index} \le {\tt from\_index} \f$
+///   1. \f$ -1 \le {\tt index} \le {\tt from\_index}
+///          \land {\tt index} < |{\tt haystack}| \f$
 ///   2. \f$ {\tt index} = -1 \Leftrightarrow \lnot contains\f$
-///   3. \f$ contains \Rightarrow ({\tt index} \le {\tt from\_index} \land
-///          {\tt haystack}[i] = {\tt needle} )\f$
-///   4. \f$ \forall n \in [{\tt index} +1, {\tt from\_index}+1)
+///   3. \f$ contains \Rightarrow
+///          {\tt haystack}[{\tt index}] = {\tt needle} )\f$
+///   4. \f$ \forall n \in [{\tt index} +1,
+///                         min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ contains \Rightarrow {\tt haystack}[n] \ne {\tt needle} \f$
-///   5. \f$ \forall m \in [0, {\tt from\_index}+1)
+///   5. \f$ \forall m \in [0,
+///          min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}\f$
 /// \param str: an array of characters expression
 /// \param c: a character expression
@@ -331,12 +334,11 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   symbol_exprt index=fresh_exist_index("last_index_of", index_type);
   symbol_exprt contains=fresh_boolean("contains_in_last_index_of");
 
-  exprt index1=from_integer(1, index_type);
   exprt minus1=from_integer(-1, index_type);
-  exprt from_index_plus_one=plus_exprt_with_overflow_check(from_index, index1);
   and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
-    binary_relation_exprt(index, ID_lt, from_index_plus_one));
+    binary_relation_exprt(index, ID_lt, from_index_plus_one),
+    binary_relation_exprt(index, ID_lt, str.length()));
   axioms.push_back(a1);
 
   equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
@@ -351,19 +353,23 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
 
   symbol_exprt n=fresh_univ_index("QA_last_index_of1", index_type);
   string_constraintt a4(
+  const exprt index1 = from_integer(1, index_type);
+  const plus_exprt from_index_plus_one(from_index, index1);
+  const if_exprt end_index(
+    binary_relation_exprt(from_index_plus_one, ID_le, str.length()),
+    from_index_plus_one,
+    str.length());
+
     n,
     plus_exprt(index, index1),
-    from_index_plus_one,
+    end_index,
     contains,
     not_exprt(equal_exprt(str[n], c)));
   axioms.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_last_index_of2", index_type);
   string_constraintt a5(
-    m,
-    from_index_plus_one,
-    not_exprt(contains),
-    not_exprt(equal_exprt(str[m], c)));
+    m, end_index, not_exprt(contains), notequal_exprt(str[m], c));
   axioms.push_back(a5);
 
   return index;
