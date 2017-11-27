@@ -14,20 +14,6 @@
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 
-/// Strip the package name from a java type, for the type to be
-/// pretty printed (java::java.lang.Integer -> Integer).
-/// \param fqn_java_type The java type we want to pretty print.
-/// \return The pretty printed type if there was a match of the
-//  qualifiers, or the type as it was passed otherwise.
-static std::string pretty_print_java_type(const std::string &fqn_java_type)
-{
-  const std::string java_lang("java::java.lang.");
-  const std::string package_name(java_class_to_package(fqn_java_type) + ".");
-  if(package_name == java_lang)
-    return fqn_java_type.substr(java_lang.length());
-  return fqn_java_type;
-}
-
 generate_java_generic_typet::generate_java_generic_typet(
   message_handlert &message_handler):
     message_handler(message_handler)

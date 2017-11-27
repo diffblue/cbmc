@@ -94,4 +94,6 @@ exprt make_function_application(
 
 irep_idt strip_java_namespace_prefix(const irep_idt &to_strip);
 
+std::string pretty_print_java_type(const std::string &fqn_java_type);
+
 #endif // CPROVER_JAVA_BYTECODE_JAVA_UTILS_H

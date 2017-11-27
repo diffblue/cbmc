@@ -305,3 +305,23 @@ irep_idt strip_java_namespace_prefix(const irep_idt &to_strip)
   PRECONDITION(has_prefix(to_strip_str, prefix));
   return to_strip_str.substr(prefix.size(), std::string::npos);
 }
+
+/// Strip the package name from a java type, for the type to be
+/// pretty printed (java::java.lang.Integer -> Integer).
+/// \param fqn_java_type The java type we want to pretty print.
+/// \return The pretty printed type if there was a match of the
+//  qualifiers, or the type as it was passed otherwise.
+std::string pretty_print_java_type(const std::string &fqn_java_type)
+{
+  std::string result(fqn_java_type);
+  const std::string java_cbmc_string("java::");
+  // Remove the CBMC internal java identifier
+  if(has_prefix(fqn_java_type, java_cbmc_string))
+    result = fqn_java_type.substr(java_cbmc_string.length());
+  // If the class is in package java.lang strip
+  // package name due to default import
+  const std::string java_lang_string("java.lang.");
+  if(has_prefix(result, java_lang_string))
+    result = result.substr(java_lang_string.length());
+  return result;
+}
