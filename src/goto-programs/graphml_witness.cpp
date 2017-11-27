@@ -180,7 +180,9 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_lhs=assign.lhs();
     remove_l0_l1(clean_lhs);
     std::string lhs=expr_to_string(ns, identifier, clean_lhs);
-    if(lhs.find('$')!=std::string::npos)
+    if(lhs.find("#return_value")!=std::string::npos ||
+       (lhs.find('$')!=std::string::npos &&
+        lhs.find("return_value___VERIFIER_nondet_")==0U))
       lhs="\\result";
 
     result=lhs+" = "+expr_to_string(ns, identifier, clean_rhs)+";";
