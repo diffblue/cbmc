@@ -12,6 +12,7 @@ Author: Chris Smowton, chris@smowton.net
 #include <langapi/mode.h>
 #include <goto-programs/initialize_goto_model.h>
 #include <goto-programs/goto_inline.h>
+#include <goto-programs/remove_java_new.h>
 #include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
 #include <pointer-analysis/value_set_analysis.h>
@@ -182,6 +183,9 @@ SCENARIO("test_value_set_analysis",
       initialize_goto_model(command_line, null_output);
 
     namespacet ns(goto_model.symbol_table);
+
+    // VSA doesn't currently support java_new as an allocator
+    remove_java_new(goto_model, null_output);
 
     // Fully inline the test program, to avoid VSA conflating
     // constructor callsites confusing the results we're trying to check:
