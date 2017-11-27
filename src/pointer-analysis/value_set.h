@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class namespacet;
 
-/// State type in value_set_domaint, used is value-set analysis and goto-symex.
+/// State type in value_set_domaint, used in value-set analysis and goto-symex.
 /// Represents a mapping from expressions to the addresses that may be stored
 /// there; for example, a global that is either null or points to a
 /// heap-allocated object, which itself has two fields, one pointing to another
@@ -163,7 +163,7 @@ public:
   };
 
   /// Converts an `object_map_dt` entry `object_number -> offset` into an
-  /// `object_descriptor_offsett` with
+  /// `object_descriptor_exprt` with
   /// `.object() == object_numbering.at(object_number)` and
   /// `.offset() == offset`.
   exprt to_expr(const object_map_dt::value_type &it) const;
@@ -303,7 +303,7 @@ public:
   ///          .object_map = ...
   ///         }
   ///
-  /// The components of the ID are thus duplicates in the `valuest` key and in
+  /// The components of the ID are thus duplicated in the `valuest` key and in
   /// `entryt` fields.
   #ifdef USE_DSTRING
   typedef std::map<idt, entryt> valuest;
@@ -439,7 +439,7 @@ public:
   /// been run, in which case returns are explicitly passed via global
   /// variables named `function_name#return_value` and are handled via the usual
   /// `apply_code` path.
-  /// \param lhs: expression that recieves the return value
+  /// \param lhs: expression that receives the return value
   /// \param ns: global namespace
   void do_end_function(
     const exprt &lhs,
