@@ -244,12 +244,58 @@ static bool contains_symbol_prefix(const exprt &expr, const std::string &prefix)
 /// counterexample witness
 void graphml_witnesst::operator()(const goto_tracet &goto_trace)
 {
+  unsigned int max_thread_idx=0U;
+  bool trace_has_violation=false;
+  for(goto_tracet::stepst::const_iterator it=goto_trace.steps.begin();
+      it!=goto_trace.steps.end();
+      ++it)
+  {
+    if(it->thread_nr>max_thread_idx)
+      max_thread_idx=it->thread_nr;
+    if(it->type==goto_trace_stept::typet::ASSERT && !it->cond_value)
+      trace_has_violation=true;
+  }
+
   graphml.key_values["sourcecodelang"]="C";
 
   const graphmlt::node_indext sink=graphml.add_node();
   graphml[sink].node_name="sink";
   graphml[sink].is_violation=false;
   graphml[sink].has_invariant=false;
+
+  if(max_thread_idx > 0U && trace_has_violation)
+  {
+    std::vector<graphmlt::node_indext> nodes;
+
+    for(unsigned int i=0U; i<=max_thread_idx+1U; ++i)
+    {
+      nodes.push_back(graphml.add_node());
+      graphml[nodes.back()].node_name="N" + std::to_string(i);
+      graphml[nodes.back()].is_violation=(i==max_thread_idx+1U) ? true : false;
+      graphml[nodes.back()].has_invariant=false;
+    }
+
+    for(auto it=nodes.cbegin(); std::next(it)!=nodes.cend(); ++it)
+    {
+      xmlt edge("edge");
+      edge.set_attribute("source", graphml[*it].node_name);
+      edge.set_attribute("target", graphml[*std::next(it)].node_name);
+      const auto thread_id=std::distance(nodes.cbegin(), it);
+      xmlt &data=edge.new_element("data");
+      data.set_attribute("key", "createThread");
+      data.data=std::to_string(thread_id);
+      if(thread_id==0)
+      {
+        xmlt &data=edge.new_element("data");
+        data.set_attribute("key", "enterFunction");
+        data.data="main";
+      }
+      graphml[*std::next(it)].in[*it].xml_node=edge;
+      graphml[*it].out[*std::next(it)].xml_node=edge;
+    }
+
+    return;
+  }
 
   // step numbers start at 1
   std::vector<std::size_t> step_to_node(goto_trace.steps.size()+1, 0);
