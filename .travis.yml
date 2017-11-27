@@ -181,7 +181,7 @@ jobs:
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_CXX_COMPILER=g++-5'
         - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE)
+      script: (cd build; ctest -V -L CORE -j2)
 
     - stage: Test different OS/CXX/Flags
       os: osx
@@ -197,7 +197,7 @@ jobs:
         - ccache --max-size=1G
         - cmake -H. -Bbuild '-DCMAKE_BUILD_TYPE=Release' '-DCMAKE_OSX_ARCHITECTURES=x86_64'
         - cmake --build build -- -j4
-      script: (cd build; ctest -V -L CORE)
+      script: (cd build; ctest -V -L CORE -j2)
 
 
     # Run Coverity
@@ -251,7 +251,7 @@ install:
 
 script:
   - if [ -e bin/gcc ] ; then export PATH=$PWD/bin:$PATH ; fi ;
-  - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}"
+  - env UBSAN_OPTIONS=print_stacktrace=1 make -C regression test "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
   - make -C unit "CXX=${COMPILER}" "CXXFLAGS=-Wall -Werror -pedantic -O2 -g ${EXTRA_CXXFLAGS}" -j2
   - make -C unit test
 
