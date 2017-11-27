@@ -80,6 +80,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// `haystack` of the first occurrence of `needle` starting the search at
 /// `from_index`, or `-1` if needle does not occur at or after position
 /// `from_index`.
+/// If needle is an empty string then the result is `from_index`.
 ///
 /// These axioms are:
 ///   1. \f$ contains \Rightarrow {\tt from\_index} \le \tt{index}
@@ -93,6 +94,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 ///   5. \f$ \forall n \in [{\tt from\_index},|{\tt haystack}|-|{\tt needle}|]
 ///          .\ \lnot contains \Rightarrow (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+///   6. \f$ |{\tt needle}| = 0 \Rightarrow \tt{index} = from_index \f$
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
@@ -152,6 +154,11 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     needle);
   axioms.push_back(a5);
 
+  const implies_exprt a6(
+    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(offset, from_index));
+  axioms.push_back(a6);
+
   return offset;
 }
 
@@ -159,6 +166,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 /// the last occurrence of needle starting the search backward at from_index (ie
 /// the index is smaller or equal to from_index), or -1 if needle does not occur
 /// before from_index.
+/// If `needle` is the empty string, the result is `from_index`.
 ///
 /// These axioms are:
 ///   1. \f$ contains \Rightarrow -1 \le {\tt index}
@@ -178,6 +186,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 ///          .\ \lnot contains \Rightarrow
 ///          (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+///   6. \f$ |{\tt needle}| = 0 \Rightarrow index = from_index \f$
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
@@ -237,6 +246,11 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     haystack,
     needle);
   axioms.push_back(a5);
+
+  const implies_exprt a6(
+    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(offset, from_index));
+  axioms.push_back(a6);
 
   return offset;
 }
@@ -384,9 +398,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
 
-  const exprt from_index =
-    args.size() == 2 ? minus_exprt(str.length(), from_integer(1, index_type))
-                     : args[2];
+  const exprt from_index = args.size() == 2 ? str.length() : args[2];
 
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
