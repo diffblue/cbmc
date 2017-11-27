@@ -45,6 +45,17 @@ void bmct::do_unwind_module()
   // this is a hook for hw-cbmc
 }
 
+/// Hook used by CEGIS to selectively freeze variables
+/// in the SAT solver after the SSA formula is added to the solver.
+/// Freezing variables is necessary to make use of incremental
+/// solving with MiniSat SimpSolver.
+/// Potentially a useful hook for other applications using
+/// incremental solving.
+void bmct::freeze_program_variables()
+{
+  // this is a hook for cegis
+}
+
 void bmct::error_trace()
 {
   status() << "Building error trace" << eom;
@@ -131,6 +142,8 @@ void bmct::do_conversion()
     forall_expr_list(it, bmc_constraints)
       prop_conv.set_to_true(*it);
   }
+  // hook for cegis to freeze synthesis program vars
+  freeze_program_variables();
 }
 
 decision_proceduret::resultt
@@ -305,11 +318,10 @@ void bmct::show_program()
   }
 }
 
-safety_checkert::resultt bmct::run(
-  const goto_functionst &goto_functions)
+
+void bmct::get_memory_model()
 {
   const std::string mm=options.get_option("mm");
-  std::unique_ptr<memory_model_baset> memory_model;
 
   if(mm.empty() || mm=="sc")
     memory_model=util_make_unique<memory_model_sct>(ns);
@@ -321,9 +333,13 @@ safety_checkert::resultt bmct::run(
   {
     error() << "Invalid memory model " << mm
             << " -- use one of sc, tso, pso" << eom;
-    return safety_checkert::resultt::ERROR;
+    throw "invalid memory model";
   }
+}
 
+void bmct::setup()
+{
+  get_memory_model();
   symex.set_message_handler(get_message_handler());
   symex.options=options;
 
@@ -337,11 +353,13 @@ safety_checkert::resultt bmct::run(
 
   symex.last_source_location.make_nil();
 
+    setup_unwind();
+}
+
+safety_checkert::resultt bmct::execute(const goto_functionst &goto_functions)
+{
   try
   {
-    // get unwinding info
-    setup_unwind();
-
     // perform symbolic execution
     symex(goto_functions);
 
@@ -351,77 +369,12 @@ safety_checkert::resultt bmct::run(
       memory_model->set_message_handler(get_message_handler());
       (*memory_model)(equation);
     }
-  }
-
-  catch(const std::string &error_str)
-  {
-    messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
-    message.error() << error_str << messaget::eom;
-
-    return safety_checkert::resultt::ERROR;
-  }
-
-  catch(const char *error_str)
-  {
-    messaget message(get_message_handler());
-    message.error().source_location=symex.last_source_location;
-    message.error() << error_str << messaget::eom;
-
-    return safety_checkert::resultt::ERROR;
-  }
-
-  catch(const std::bad_alloc &)
-  {
-    error() << "Out of memory" << eom;
-    return safety_checkert::resultt::ERROR;
-  }
 
   statistics() << "size of program expression: "
                << equation.SSA_steps.size()
                << " steps" << eom;
 
-  try
-  {
-    if(options.get_option("slice-by-trace")!="")
-    {
-      symex_slice_by_tracet symex_slice_by_trace(ns);
-
-      symex_slice_by_trace.slice_by_trace
-        (options.get_option("slice-by-trace"), equation);
-    }
-
-    if(equation.has_threads())
-    {
-      // we should build a thread-aware SSA slicer
-      statistics() << "no slicing due to threads" << eom;
-    }
-    else
-    {
-      if(options.get_bool_option("slice-formula"))
-      {
-        slice(equation);
-        statistics() << "slicing removed "
-                     << equation.count_ignored_SSA_steps()
-                     << " assignments" << eom;
-      }
-      else
-      {
-        if(options.get_list_option("cover").empty())
-        {
-          simple_slice(equation);
-          statistics() << "simple slicing removed "
-                       << equation.count_ignored_SSA_steps()
-                       << " assignments" << eom;
-        }
-      }
-    }
-
-    {
-      statistics() << "Generated " << symex.total_vccs
-                   << " VCC(s), " << symex.remaining_vccs
-                   << " remaining after simplification" << eom;
-    }
+    slice();
 
     // coverage report
     std::string cov_out=options.get_option("symex-coverage-report");
@@ -473,13 +426,19 @@ safety_checkert::resultt bmct::run(
 
   catch(const std::string &error_str)
   {
-    error() << error_str << eom;
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::resultt::ERROR;
   }
 
   catch(const char *error_str)
   {
-    error() << error_str << eom;
+    messaget message(get_message_handler());
+    message.error().source_location=symex.last_source_location;
+    message.error() << error_str << messaget::eom;
+
     return safety_checkert::resultt::ERROR;
   }
 
@@ -488,6 +447,56 @@ safety_checkert::resultt bmct::run(
     error() << "Out of memory" << eom;
     return safety_checkert::resultt::ERROR;
   }
+}
+
+void bmct::slice()
+{
+  if(options.get_option("slice-by-trace")!="")
+  {
+    symex_slice_by_tracet symex_slice_by_trace(ns);
+
+    symex_slice_by_trace.slice_by_trace
+    (options.get_option("slice-by-trace"),
+        equation);
+  }
+  // any properties to check at all?
+  if(equation.has_threads())
+  {
+    // we should build a thread-aware SSA slicer
+    statistics() << "no slicing due to threads" << eom;
+  }
+  else
+  {
+    if(options.get_bool_option("slice-formula"))
+    {
+      ::slice(equation);
+      statistics() << "slicing removed "
+                   << equation.count_ignored_SSA_steps()
+                   << " assignments"<<eom;
+    }
+    else
+    {
+      if(options.get_list_option("cover").empty())
+      {
+        simple_slice(equation);
+        statistics() << "simple slicing removed "
+                     << equation.count_ignored_SSA_steps()
+                     << " assignments"<<eom;
+      }
+    }
+  }
+  statistics() << "Generated "
+               << symex.total_vccs<<" VCC(s), "
+               << symex.remaining_vccs
+               << " remaining after simplification" << eom;
+}
+
+safety_checkert::resultt bmct::run(
+  const goto_functionst &goto_functions)
+{
+  setup();
+
+  return execute(goto_functions);
 }
 
 safety_checkert::resultt bmct::decide(
@@ -500,6 +509,19 @@ safety_checkert::resultt bmct::decide(
     return stop_on_fail(goto_functions, prop_conv);
   else
     return all_properties(goto_functions, prop_conv);
+}
+
+void bmct::show(const goto_functionst &goto_functions)
+{
+  if(options.get_bool_option("show-vcc"))
+  {
+    show_vcc();
+  }
+
+  if(options.get_bool_option("program-only"))
+  {
+    show_program();
+  }
 }
 
 safety_checkert::resultt bmct::stop_on_fail(

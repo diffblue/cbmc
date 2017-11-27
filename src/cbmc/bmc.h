@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/safety_checker.h>
+#include <goto-symex/memory_model.h>
 
 #include "symex_bmc.h"
 
@@ -52,6 +53,8 @@ public:
   }
 
   virtual resultt run(const goto_functionst &goto_functions);
+  void setup();
+  safety_checkert::resultt execute(const goto_functionst &);
   virtual ~bmct() { }
 
   // additional stuff
@@ -73,7 +76,7 @@ protected:
   symex_target_equationt equation;
   symex_bmct symex;
   prop_convt &prop_conv;
-
+  std::unique_ptr<memory_model_baset> memory_model;
   // use gui format
   ui_message_handlert::uit ui;
 
@@ -88,6 +91,8 @@ protected:
   virtual void setup_unwind();
   virtual void do_unwind_module();
   void do_conversion();
+
+  virtual void freeze_program_variables();
 
   virtual void show_vcc();
   virtual void show_vcc_plain(std::ostream &out);
@@ -107,6 +112,10 @@ protected:
   void output_graphml(
     resultt result,
     const goto_functionst &goto_functions);
+
+  void get_memory_model();
+  void slice();
+  void show(const goto_functionst &);
 
   bool cover(
     const goto_functionst &goto_functions,

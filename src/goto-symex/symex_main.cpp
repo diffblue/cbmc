@@ -114,13 +114,48 @@ void goto_symext::rewrite_quantifiers(exprt &expr, statet &state)
   {
     // forall X. P -> P
     // we keep the quantified variable unique by means of L2 renaming
-    assert(expr.operands().size()==2);
-    assert(expr.op0().id()==ID_symbol);
+    PRECONDITION(expr.operands().size()==2);
+    PRECONDITION(expr.op0().id()==ID_symbol);
     symbol_exprt tmp0=
       to_symbol_expr(to_ssa_expr(expr.op0()).get_original_expr());
     symex_decl(state, tmp0);
     exprt tmp=expr.op1();
     expr.swap(tmp);
+  }
+}
+
+void goto_symext::symex_entry_point(
+  statet &state,
+  const goto_functionst &goto_functions,
+  const goto_programt::const_targett pc,
+  const goto_programt::const_targett limit)
+{
+  PRECONDITION(!state.threads.empty());
+  PRECONDITION(!state.call_stack().empty());
+  state.source=symex_targett::sourcet(pc);
+  state.top().end_of_function=limit;
+  state.top().calling_location.pc=state.top().end_of_function;
+  state.symex_target=&target;
+  state.dirty=util_make_unique<dirtyt>(goto_functions);
+
+  symex_transition(state, state.source.pc);
+}
+
+void goto_symext::symex_threaded_step(
+  statet &state, const goto_functionst &goto_functions)
+{
+  symex_step(goto_functions, state);
+
+  // is there another thread to execute?
+  if(state.call_stack().empty() &&
+     state.source.thread_nr+1<state.threads.size())
+  {
+    unsigned t=state.source.thread_nr+1;
+#if 0
+    std::cout << "********* Now executing thread " << t << '\n';
+#endif
+    state.switch_to_thread(t);
+    symex_transition(state, state.source.pc);
   }
 }
 
@@ -130,36 +165,29 @@ void goto_symext::operator()(
   const goto_functionst &goto_functions,
   const goto_programt &goto_program)
 {
-  assert(!goto_program.instructions.empty());
-
-  state.source=symex_targett::sourcet(goto_program);
-  assert(!state.threads.empty());
-  assert(!state.call_stack().empty());
-  state.top().end_of_function=--goto_program.instructions.end();
-  state.top().calling_location.pc=state.top().end_of_function;
-  state.symex_target=&target;
-  state.dirty=util_make_unique<dirtyt>(goto_functions);
-
-  symex_transition(state, state.source.pc);
-
-  assert(state.top().end_of_function->is_end_function());
+  PRECONDITION(!goto_program.instructions.empty());
+  symex_entry_point(
+    state,
+    goto_functions,
+    goto_program.instructions.begin(),
+    prev(goto_program.instructions.end()));
+  PRECONDITION(state.top().end_of_function->is_end_function());
 
   while(!state.call_stack().empty())
-  {
-    symex_step(goto_functions, state);
-
-    // is there another thread to execute?
-    if(state.call_stack().empty() &&
-       state.source.thread_nr+1<state.threads.size())
-    {
-      unsigned t=state.source.thread_nr+1;
-      // std::cout << "********* Now executing thread " << t << '\n';
-      state.switch_to_thread(t);
-      symex_transition(state, state.source.pc);
-    }
-  }
+    symex_threaded_step(state, goto_functions);
 
   state.dirty=nullptr;
+}
+
+void goto_symext::operator()(
+  statet &state,
+  const goto_functionst &goto_functions,
+  const goto_programt::const_targett first,
+  const goto_programt::const_targett limit)
+{
+  symex_entry_point(state, goto_functions, first, limit);
+  while(state.source.pc->function!=limit->function || state.source.pc!=limit)
+    symex_threaded_step(state, goto_functions);
 }
 
 /// symex starting from given program
@@ -197,8 +225,8 @@ void goto_symext::symex_step(
   std::cout << "Code: " << from_expr(ns, "", state.source.pc->code) << '\n';
   #endif
 
-  assert(!state.threads.empty());
-  assert(!state.call_stack().empty());
+  PRECONDITION(!state.threads.empty());
+  PRECONDITION(!state.call_stack().empty());
 
   const goto_programt::instructiont &instruction=*state.source.pc;
 

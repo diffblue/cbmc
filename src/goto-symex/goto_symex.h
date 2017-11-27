@@ -80,6 +80,40 @@ public:
     const goto_functionst &goto_functions,
     const goto_programt &goto_program);
 
+  /// Symexes from the first instruction and the given state, terminating as
+  /// soon as the last instruction is reached.  This is useful to explicitly
+  /// symex certain ranges of a program, e.g. in an incremental decision
+  /// procedure.
+  /// \param state Symex state to start with.
+  /// \param goto_functions GOTO model to symex.
+  /// \param first Entry point in form of a first instruction.
+  /// \param limit Final instruction, which itself will not be symexed.
+  virtual void operator()(
+    statet &state,
+    const goto_functionst &goto_functions,
+    goto_programt::const_targett first,
+    goto_programt::const_targett limit);
+
+  /// Initialise the symbolic execution and the given state with <code>pc</code>
+  /// as entry point.
+  /// \param state Symex state to initialise.
+  /// \param goto_functions GOTO model to symex.
+  /// \param pc first instruction to symex
+  /// \param limit final instruction, which itself will not
+  /// be symexed.
+  void symex_entry_point(
+    statet &state,
+    const goto_functionst &goto_functions,
+    goto_programt::const_targett pc,
+    goto_programt::const_targett limit);
+
+  /// Invokes symex_step and verifies whether additional threads can be
+  /// executed.
+  /// \param state Current GOTO symex step.
+  /// \param goto_functions GOTO model to symex.
+  void symex_threaded_step(
+    statet &state, const goto_functionst &goto_functions);
+
   /** execute just one step */
   virtual void symex_step(
     const goto_functionst &goto_functions,
