@@ -571,9 +571,19 @@ codet initialize_nondet_string_struct(
 
   // `obj` is `*expr`
   const struct_typet &struct_type = to_struct_type(ns.follow(obj.type()));
-  const irep_idt &class_id = "java::" + id2string(struct_type.get_tag());
+  // @clsid = java::java.lang.String or similar.
+  // We allow type StringBuffer and StringBuilder to be initialized
+  // in the same way has String, because they have the same structure and
+  // are treated in the same way by CBMC.
+  // Note that CharSequence cannot be used as classid because it's abstract,
+  // so it is replaced by String.
+  // \todo allow StringBuffer and StringBuilder as classid for Charsequence
+  const irep_idt &class_id =
+    struct_type.get_tag() == "java.lang.CharSequence"
+    ? "java::java.lang.String"
+    : "java::" + id2string(struct_type.get_tag());
 
-  // @clsid = String and @lock = false:
+  // @lock = false:
   const symbol_typet jlo_symbol("java::java.lang.Object");
   const struct_typet &jlo_type = to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);

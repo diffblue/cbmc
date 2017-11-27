@@ -1,0 +1,12 @@
+CORE
+Test.class
+--refine-strings --string-max-length 1000 --function Test.check
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 6 .* SUCCESS
+assertion at file Test.java line 8 .* FAILURE
+assertion at file Test.java line 10 .* SUCCESS
+assertion at file Test.java line 12 .* FAILURE
+assertion at file Test.java line 14 .* SUCCESS
+assertion at file Test.java line 16 .* FAILURE
+--
