@@ -17,6 +17,7 @@ Author: Daniel Kroening
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/arith_tools.h>
+#include <util/cprover_prefix.h>
 #include <util/prefix.h>
 #include <util/ssa_expr.h>
 #include <util/std_pair_hash.h>
@@ -221,7 +222,11 @@ static bool filter_out(
      source_location.get_file().empty() ||
      source_location.is_built_in() ||
      source_location.get_line().empty())
-    return true;
+  {
+    const irep_idt id=source_location.get_function();
+    if(!(has_prefix(id2string(id), CPROVER_PREFIX) && it->is_assert()))
+      return true;
+  }
 
   return false;
 }
@@ -337,6 +342,7 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
     graphml[node].line=source_location.get_line();
     graphml[node].is_violation=
       it->type==goto_trace_stept::typet::ASSERT && !it->cond_value;
+
     graphml[node].has_invariant=false;
 
     step_to_node[it->step_nr]=node;
