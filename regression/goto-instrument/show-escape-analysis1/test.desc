@@ -5,4 +5,7 @@ main.c
 ^SIGNAL=0$
 ^Aliases:.*(malloc.*leaked|leaked.*malloc)
 --
+^Aliases:.*(leaked1.*leaked2|leaked1.*leaked2)
 ^warning: ignoring
+--
+leaked1 and leaked2 cannot alias
