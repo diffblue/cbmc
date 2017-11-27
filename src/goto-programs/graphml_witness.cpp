@@ -144,8 +144,14 @@ std::string graphml_witnesst::convert_assign_rec(
     exprt clean_lhs = assign.lhs();
     remove_l0_l1(clean_lhs);
     std::string lhs = expr_to_string(ns, identifier, clean_lhs);
-    if(lhs.find('$')!=std::string::npos)
+
+    if(
+      lhs.find("#return_value") != std::string::npos ||
+      (lhs.find('$') != std::string::npos &&
+       has_prefix(lhs, "return_value___VERIFIER_nondet_")))
+    {
       lhs="\\result";
+    }
 
     result = lhs + " = " + expr_to_string(ns, identifier, clean_rhs) + ";";
   }
@@ -300,13 +306,23 @@ void graphml_witnesst::operator()(const goto_tracet &goto_trace)
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "assumption");
-          val.data = expr_to_string(ns, it->function_id, it->full_lhs) + " = " +
-                     expr_to_string(ns, it->function_id, it->full_lhs_value) +
-                     ";";
+
+          code_assignt assign{it->full_lhs, it->full_lhs_value};
+          irep_idt identifier = irep_idt();
+          if(const auto object = it->get_lhs_object())
+            identifier = object->get_identifier();
+          val.data = convert_assign_rec(identifier, assign);
 
           xmlt &val_s=edge.new_element("data");
           val_s.set_attribute("key", "assumption.scope");
           val_s.data = id2string(it->function_id);
+
+          if(has_prefix(val.data, "\\result ="))
+          {
+            xmlt &val_f = edge.new_element("data");
+            val_f.set_attribute("key", "assumption.resultfunction");
+            val_f.data = id2string(it->function_id);
+          }
         }
         else if(it->type==goto_trace_stept::typet::GOTO &&
                 it->pc->is_goto())
