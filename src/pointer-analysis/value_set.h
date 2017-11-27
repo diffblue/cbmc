@@ -61,54 +61,23 @@ public:
   typedef irep_idt idt;
 
   /// Represents the offset into an object: either a unique integer offset,
-  /// or an unknown value, represented by `!offset_is_set`.
-  class objectt
+  /// or an unknown value, represented by `!offset`.
+  typedef optionalt<mp_integer> offsett;
+  bool offset_is_zero(const offsett &offset) const
   {
-  public:
-    /// Constructs an unknown offset
-    objectt():offset_is_set(false)
-    {
-    }
-
-    /// Constructs a known offset
-    explicit objectt(const mp_integer &_offset):
-      offset(_offset),
-      offset_is_set(true)
-    {
-    }
-
-    /// Offset into the target object. Ignored if `offset_is_set` is false.
-    mp_integer offset;
-
-    /// If true, `offset` gives a unique integer offset; if false, represents
-    /// an unknown offset.
-    bool offset_is_set;
-
-    bool offset_is_zero() const
-    { return offset_is_set && offset.is_zero(); }
-
-    bool operator==(const objectt &other) const
-    {
-      return
-        offset_is_set==other.offset_is_set &&
-        (!offset_is_set || offset==other.offset);
-    }
-    bool operator!=(const objectt &other) const
-    {
-      return !(*this==other);
-    }
-  };
+    return offset && offset->is_zero();
+  }
 
   /// Represents a set of expressions (`exprt` instances) with corresponding
-  /// offsets (`objectt` instances). This is the RHS set of a single row of
+  /// offsets (`offsett` instances). This is the RHS set of a single row of
   /// the enclosing `value_sett`, such as `{ null, dynamic_object1 }`.
-  /// The set is represented as a map from numbered `exprt`s to `objectt`
+  /// The set is represented as a map from numbered `exprt`s to `offsett`
   /// instead of a set of pairs to make lookup by `exprt` easier. All
   /// methods matching the interface of `std::map` forward those methods
   /// to the internal map.
   class object_map_dt
   {
-    typedef std::map<object_numberingt::number_type, objectt> data_typet;
+    typedef std::map<object_numberingt::number_type, offsett> data_typet;
     data_typet data;
 
   public:
@@ -135,9 +104,18 @@ public:
     void erase(key_type i) { data.erase(i); }
     void erase(const_iterator it) { data.erase(it); }
 
-    objectt &operator[](key_type i) { return data[i]; }
-    objectt &at(key_type i) { return data.at(i); }
-    const objectt &at(key_type i) const { return data.at(i); }
+    offsett &operator[](key_type i)
+    {
+      return data[i];
+    }
+    offsett &at(key_type i)
+    {
+      return data.at(i);
+    }
+    const offsett &at(key_type i) const
+    {
+      return data.at(i);
+    }
 
     template <typename It>
     void insert(It b, It e) { data.insert(b, e); }
@@ -210,7 +188,7 @@ public:
   /// \param src: expression to add
   bool insert(object_mapt &dest, const exprt &src) const
   {
-    return insert(dest, object_numbering.number(src), objectt());
+    return insert(dest, object_numbering.number(src), offsett());
   }
 
   /// Adds an expression to an object map, with known offset. If the
@@ -218,13 +196,13 @@ public:
   /// with a differing offset its offset is marked unknown.
   /// \param dest: object map to update
   /// \param src: expression to add
-  /// \param offset: offset into `src`
+  /// \param offset_value: offset into `src`
   bool insert(
     object_mapt &dest,
     const exprt &src,
-    const mp_integer &offset) const
+    const mp_integer &offset_value) const
   {
-    return insert(dest, object_numbering.number(src), objectt(offset));
+    return insert(dest, object_numbering.number(src), offsett(offset_value));
   }
 
   /// Adds a numbered expression and offset to an object map. If the
@@ -237,7 +215,7 @@ public:
   bool insert(
     object_mapt &dest,
     object_numberingt::number_type n,
-    const objectt &object) const;
+    const offsett &offset) const;
 
   /// Adds an expression and offset to an object map. If the
   /// destination map has an existing entry for the same expression
@@ -245,9 +223,9 @@ public:
   /// \param dest: object map to update
   /// \param expr: expression to add
   /// \param object: offset into `expr` (may be unknown).
-  bool insert(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert(object_mapt &dest, const exprt &expr, const offsett &offset) const
   {
-    return insert(dest, object_numbering.number(expr), object);
+    return insert(dest, object_numbering.number(expr), offset);
   }
 
   /// Represents a row of a `value_sett`. For example, this might represent
