@@ -2114,6 +2114,19 @@ exprt string_refinementt::get(const exprt &expr) const
   return supert::get(ecopy);
 }
 
+/// Test whether an expression contains an empty array.
+/// \param expr: expression to test
+/// \return Boolean
+static bool contains_empty_array(const exprt &expr)
+{
+  auto it = std::find_if(
+    expr.depth_begin(),
+    expr.depth_end(),
+    [] (const exprt &e)
+    { return e.id() == ID_array && e.operands().empty(); });
+  return it != expr.depth_end();
+}
+
 /// Creates a solver with `axiom` as the only formula added and runs it. If it
 /// is SAT, then true is returned and the given evaluation of `var` is stored
 /// in `witness`. If UNSAT, then what witness is is undefined.
@@ -2138,6 +2151,11 @@ static optionalt<exprt> find_counter_example(
   info.max_node_refinement=5;
   info.ui=ui;
   bv_refinementt solver(info);
+
+  // empty arrays cause segmentation faults in the solver
+  if(contains_empty_array(axiom))
+    return { };
+
   solver << axiom;
 
   if(solver()==decision_proceduret::resultt::D_SATISFIABLE)
