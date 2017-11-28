@@ -807,7 +807,21 @@ struct const_target_hash_templatet
 {
   std::size_t operator()(
     const typename goto_program_templatet<codeT, guardT>::const_targett t) const
-  { return t->location_number; }
+  {
+    using hash_typet = decltype(&(*t));
+    return std::hash<hash_typet>{}(&(*t));
+  }
+};
+
+/// Functor to check whether iterators from different collections point at the
+/// same object.
+struct pointee_address_equalt
+{
+  template <class A, class B>
+  bool operator()(const A &a, const B &b) const
+  {
+    return &(*a) == &(*b);
+  }
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_TEMPLATE_H

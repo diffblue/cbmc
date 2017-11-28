@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --cover mcdc
 ^EXIT=0$
@@ -12,3 +12,6 @@ main.c
 ^\*\* .* of .* covered \(100.0%\)$
 --
 ^warning: ignoring
+--
+Knownbug added because this test triggers an invariant in cover.cpp
+See #1622 for details

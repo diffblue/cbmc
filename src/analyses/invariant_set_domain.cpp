@@ -17,7 +17,8 @@ void invariant_set_domaint::transform(
   locationt from_l,
   locationt to_l,
   ai_baset &ai,
-  const namespacet &ns)
+  const namespacet &ns,
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   switch(from_l->type)
   {

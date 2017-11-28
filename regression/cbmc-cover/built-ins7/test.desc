@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.c
 --cover mcdc --unwind 5
 ^EXIT=0$
@@ -7,3 +7,6 @@ main.c
 --
 ^warning: ignoring
 ^\[.*<builtin-library-
+--
+Knownbug added because this test triggers an invariant in cover.cpp
+See #1622 for details

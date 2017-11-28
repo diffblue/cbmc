@@ -1271,7 +1271,7 @@ void cpp_typecheckt::typecheck_member_function(
       method_qualifier);
   }
 
-  if(value.id()=="cpp_not_typechecked")
+  if(value.id() == "cpp_not_typechecked" && value.has_operands())
     move_member_initializers(initializers, type, value.op0());
   else
     move_member_initializers(initializers, type, value);

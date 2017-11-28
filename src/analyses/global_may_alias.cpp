@@ -79,7 +79,8 @@ void global_may_alias_domaint::transform(
   locationt from,
   locationt to,
   ai_baset &ai,
-  const namespacet &ns)
+  const namespacet &ns,
+  ai_domain_baset::edge_typet /*edge_type*/)
 {
   if(has_values.is_false())
     return;

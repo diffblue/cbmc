@@ -53,7 +53,10 @@ struct depth_iterator_expr_statet final
 inline bool operator==(
   const depth_iterator_expr_statet &left,
   const depth_iterator_expr_statet &right)
-{ return left.it==right.it && left.expr.get()==right.expr.get(); }
+{
+  return distance(left.it, left.end) == distance(right.it, right.end) &&
+         left.expr.get() == right.expr.get();
+}
 
 /// Depth first search iterator base - iterates over supplied expression
 /// and all its operands recursively.
@@ -99,8 +102,12 @@ public:
   depth_iterator_t &next_sibling_or_parent()
   {
     PRECONDITION(!m_stack.empty());
-    m_stack.back().it=m_stack.back().end;
-    ++(*this);
+    m_stack.pop_back();
+    if(!m_stack.empty())
+    {
+      ++m_stack.back().it;
+      return ++(*this);
+    }
     return this->downcast();
   }
 

@@ -1553,6 +1553,7 @@ void instrument_cover_goals(
         remove_repetition(controlling);
         // for now, we restrict to the case of a single ''decision'';
         // however, this is not true, e.g., ''? :'' operator.
+        INVARIANT(!decisions.empty(), "There must be at least one decision");
         minimize_mcdc_controlling(controlling, *decisions.begin());
 
         for(const auto &p : controlling)
