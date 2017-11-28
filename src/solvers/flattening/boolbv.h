@@ -133,6 +133,7 @@ protected:
 
   virtual bvt convert_index(const exprt &array, const mp_integer &index);
   virtual bvt convert_index(const index_exprt &expr);
+  virtual bvt convert_bswap(const bswap_exprt &expr);
   virtual bvt convert_byte_extract(const byte_extract_exprt &expr);
   virtual bvt convert_byte_update(const byte_update_exprt &expr);
   virtual bvt convert_constraint_select_one(const exprt &expr);

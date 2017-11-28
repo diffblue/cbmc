@@ -106,6 +106,7 @@ SRC = $(BOOLEFORCE_SRC) \
       flattening/boolbv_array.cpp \
       flattening/boolbv_array_of.cpp \
       flattening/boolbv_bitwise.cpp \
+      flattening/boolbv_bswap.cpp \
       flattening/boolbv_bv_rel.cpp \
       flattening/boolbv_byte_extract.cpp \
       flattening/boolbv_byte_update.cpp \
