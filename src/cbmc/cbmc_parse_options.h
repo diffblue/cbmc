@@ -26,6 +26,7 @@ class bmct;
 class goto_functionst;
 class optionst;
 
+// clang-format off
 #define CBMC_OPTIONS \
   "(program-only)(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
@@ -50,7 +51,8 @@ class optionst;
   "(string-max-input-length):" \
   "(aig)(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
   "(little-endian)(big-endian)" \
-  "(show-goto-functions)(show-loops)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
+  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-claims)(claim):(show-properties)" \
   "(drop-unused-functions)" \
@@ -69,6 +71,7 @@ class optionst;
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
+// clang-format on
 
 class cbmc_parse_optionst:
   public parse_options_baset,
