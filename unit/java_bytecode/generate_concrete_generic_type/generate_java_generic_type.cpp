@@ -7,37 +7,13 @@
 
 \*******************************************************************/
 
-#include <map>
-#include <string>
-
 #include <testing-utils/catch.hpp>
 #include <testing-utils/load_java_class.h>
 #include <testing-utils/require_type.h>
-
-#include <util/symbol_table.h>
+#include <testing-utils/generic_utils.h>
 
 #include <java_bytecode/generate_java_generic_type.h>
-#include <testing-utils/require_type.h>
-#include <testing-utils/generic_utils.h>
 #include <util/ui_message.h>
-
-/// Helper function to specalise a generic class from a named component of a
-/// named class
-/// \param class_name: The name of the class that has a generic component.
-/// \param component_name: The name of the generic component
-/// \param new_symbol_table: The symbol table to use.
-void specialise_generic_from_component(
-  const irep_idt &class_name,
-  const irep_idt &component_name,
-  symbol_tablet &new_symbol_table)
-{
-  const symbolt &harness_symbol = new_symbol_table.lookup_ref(class_name);
-  const struct_typet::componentt &harness_component =
-    require_type::require_component(
-      to_struct_type(harness_symbol.type), component_name);
-  generic_utils::specialise_generic(
-    to_java_generic_type(harness_component.type()), new_symbol_table);
-}
 
 SCENARIO(
   "generate_java_generic_type_from_file",
@@ -52,7 +28,7 @@ SCENARIO(
       load_java_class("generic_two_fields",
                       "./java_bytecode/generate_concrete_generic_type");
 
-    specialise_generic_from_component(
+    generic_utils::specialise_generic_from_component(
       "java::generic_two_fields", "belem", new_symbol_table);
 
     REQUIRE(new_symbol_table.has_symbol(expected_symbol));
@@ -100,7 +76,7 @@ SCENARIO(
       load_java_class("generic_two_parameters",
                       "./java_bytecode/generate_concrete_generic_type");
 
-    specialise_generic_from_component(
+    generic_utils::specialise_generic_from_component(
       "java::generic_two_parameters", "bomb", new_symbol_table);
 
     REQUIRE(new_symbol_table.has_symbol(
@@ -143,9 +119,9 @@ SCENARIO(
       load_java_class("generic_two_instances",
                       "./java_bytecode/generate_concrete_generic_type");
 
-    specialise_generic_from_component(
+    generic_utils::specialise_generic_from_component(
       "java::generic_two_instances", "bool_element", new_symbol_table);
-    specialise_generic_from_component(
+    generic_utils::specialise_generic_from_component(
       "java::generic_two_instances", "int_element", new_symbol_table);
 
     REQUIRE(new_symbol_table.has_symbol(first_expected_symbol));
@@ -276,7 +252,7 @@ SCENARIO(
 
     WHEN("We specialise that class from a reference to it")
     {
-      specialise_generic_from_component(
+      generic_utils::specialise_generic_from_component(
         harness_class, "genericArrayField", new_symbol_table);
       THEN(
         "There should be a specialised version of the class in the symbol "
@@ -326,7 +302,7 @@ SCENARIO(
     WHEN(
       "We specialise the class with an array we should have appropriate types")
     {
-      specialise_generic_from_component(
+      generic_utils::specialise_generic_from_component(
         harness_class, "genericArrayArrayField", new_symbol_table);
       THEN(
         "There should be a specialised version of the class in the symbol "

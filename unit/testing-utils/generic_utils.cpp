@@ -42,3 +42,21 @@ void generic_utils::specialise_generic(
   instantiate_generic_type(
     to_java_generic_type(example_type), new_symbol_table);
 }
+
+/// Helper function to specialise a generic class from a named component of a
+/// named class
+/// \param class_name: The name of the class that has a generic component.
+/// \param component_name: The name of the generic component
+/// \param new_symbol_table: The symbol table to use.
+void generic_utils::specialise_generic_from_component(
+  const irep_idt &class_name,
+  const irep_idt &component_name,
+  symbol_tablet &new_symbol_table)
+{
+  const symbolt &harness_symbol = new_symbol_table.lookup_ref(class_name);
+  const struct_typet::componentt &harness_component =
+    require_type::require_component(
+      to_struct_type(harness_symbol.type), component_name);
+  generic_utils::specialise_generic(
+    to_java_generic_type(harness_component.type()), new_symbol_table);
+}
