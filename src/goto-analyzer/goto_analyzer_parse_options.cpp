@@ -431,9 +431,15 @@ int goto_analyzer_parse_optionst::doit()
   }
 
   // show it?
-  if(cmdline.isset("show-goto-functions"))
+  if(
+    cmdline.isset("show-goto-functions") ||
+    cmdline.isset("list-goto-functions"))
   {
-    show_goto_functions(goto_model, get_ui());
+    show_goto_functions(
+      goto_model,
+      get_message_handler(),
+      get_ui(),
+      cmdline.isset("list-goto-functions"));
     return CPROVER_EXIT_SUCCESS;
   }
 
