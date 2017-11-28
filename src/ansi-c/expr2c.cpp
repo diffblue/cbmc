@@ -1972,14 +1972,14 @@ std::string expr2ct::convert_constant(
   {
     if(value==ID_NULL)
     {
-      dest="NULL";
+      dest="0";
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
     else if(value==std::string(value.size(), '0') &&
             config.ansi_c.NULL_is_zero)
     {
-      dest="NULL";
+      dest="0";
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
