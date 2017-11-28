@@ -169,7 +169,7 @@ public:
   bool same_set(const T &a, const T &b) const
   {
     const optionalt<number_type> na = numbers.get_number(a);
-    const optionalt<number_type> nb = numbers.get_number(a);
+    const optionalt<number_type> nb = numbers.get_number(b);
 
     if(na && nb)
       return uuf.same_set(*na, *nb);
