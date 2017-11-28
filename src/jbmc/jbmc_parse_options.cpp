@@ -601,9 +601,14 @@ int jbmc_parse_optionst::get_goto_program(
     }
 
     // show it?
-    if(cmdline.isset("show-goto-functions"))
+    if(
+      cmdline.isset("show-goto-functions") ||
+      cmdline.isset("list-goto-functions"))
     {
-      show_goto_functions(*goto_model, ui_message_handler.get_ui());
+      show_goto_functions(
+        *goto_model,
+        ui_message_handler.get_ui(),
+        cmdline.isset("list-goto-functions"));
       return 0;
     }
 
