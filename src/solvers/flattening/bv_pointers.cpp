@@ -412,9 +412,11 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     bv=convert_bv(expr.op0());
 
-    mp_integer element_size=
-      pointer_offset_size(expr.op0().type().subtype(), ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
+    typet pointer_sub_type=expr.op0().type().subtype();
+    if(pointer_sub_type.id()==ID_empty)
+      pointer_sub_type=char_type();
+    mp_integer element_size=pointer_offset_size(pointer_sub_type, ns);
+    DATA_INVARIANT(element_size>0, "object size expected to be positive");
 
     offset_arithmetic(bv, element_size, neg_op1);
 
@@ -469,9 +471,11 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     bvt bv=bv_utils.sub(op0, op1);
 
-    mp_integer element_size=
-      pointer_offset_size(expr.op0().type().subtype(), ns);
-    DATA_INVARIANT(element_size>0, "object size expected to be non-zero");
+    typet pointer_sub_type=expr.op0().type().subtype();
+    if(pointer_sub_type.id()==ID_empty)
+      pointer_sub_type=char_type();
+    mp_integer element_size=pointer_offset_size(pointer_sub_type, ns);
+    DATA_INVARIANT(element_size>0, "object size expected to be positive");
 
     if(element_size!=1)
     {
