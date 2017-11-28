@@ -137,7 +137,8 @@ We recommend Visual Studio.
 Follow these instructions:
 
 1. First install Cygwin, then from the Cygwin setup facility install the
-   following packages: `flex, bison, tar, gzip, git, make, wget, patch`.
+   following packages: `flex, bison, tar, gzip, git, make, wget, patch,
+   libwww-perl`.
 2. Get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
