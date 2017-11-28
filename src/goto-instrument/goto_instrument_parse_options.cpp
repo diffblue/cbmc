@@ -575,10 +575,14 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("show-goto-functions"))
+    if(
+      cmdline.isset("show-goto-functions") ||
+      cmdline.isset("list-goto-functions"))
     {
-      namespacet ns(goto_model.symbol_table);
-      show_goto_functions(goto_model, get_ui());
+      show_goto_functions(
+        goto_model,
+        ui_message_handler.get_ui(),
+        cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
     }
 
