@@ -18,6 +18,7 @@ Date: November 2011
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
+#include <util/type.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/goto_functions.h>
@@ -51,7 +52,7 @@ void nondet_static(
         continue;
 
       // constant?
-      if(sym.type().get_bool(ID_C_constant))
+      if(is_constant_or_has_constant_components(sym.type(), ns))
         continue;
 
       i_it=init.insert_before(++i_it);
