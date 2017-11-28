@@ -48,6 +48,7 @@ public:
     const std::vector<irep_idt> &main_jar_classes,
     const std::vector<irep_idt> &lazy_methods_extra_entry_points,
     java_class_loadert &java_class_loader,
+    const std::vector<irep_idt> &extra_needed_classes,
     const select_pointer_typet &pointer_type_selector,
     message_handlert &message_handler);
 
@@ -111,6 +112,7 @@ private:
   std::vector<irep_idt> main_jar_classes;
   std::vector<irep_idt> lazy_methods_extra_entry_points;
   java_class_loadert &java_class_loader;
+  const std::vector<irep_idt> &extra_needed_classes;
   const select_pointer_typet &pointer_type_selector;
 };
 

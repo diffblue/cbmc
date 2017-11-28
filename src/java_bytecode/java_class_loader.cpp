@@ -36,6 +36,10 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
   queue.push("java.lang.Throwable");
   queue.push(class_name);
 
+  // Require user provided classes to be loaded even without explicit reference
+  for(const auto &id : java_load_classes)
+    queue.push(id);
+
   java_class_loader_limitt class_loader_limit(
     get_message_handler(), java_cp_include_files);
 
@@ -277,4 +281,13 @@ jar_filet &java_class_loadert::jar_pool(
   }
   else
     return it->second;
+}
+
+/// Adds the list of classes to the load queue, forcing them to be loaded even
+/// without explicit reference
+/// \param classes: list of class identifiers
+void java_class_loadert::add_load_classes(const std::vector<irep_idt> &classes)
+{
+  for(const auto &id : classes)
+    java_load_classes.push_back(id);
 }

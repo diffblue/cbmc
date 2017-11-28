@@ -26,6 +26,7 @@ public:
   java_bytecode_parse_treet &operator()(const irep_idt &);
 
   void set_java_cp_include_files(std::string &);
+  void add_load_classes(const std::vector<irep_idt> &);
 
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
@@ -94,6 +95,7 @@ public:
   std::string java_cp_include_files;
 private:
   std::map<std::string, jar_filet> m_archives;
+  std::vector<irep_idt> java_load_classes;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

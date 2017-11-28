@@ -61,6 +61,12 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 
+  if(cmd.isset("java-load-class"))
+  {
+    for(const auto &c : cmd.get_values("java-load-class"))
+      java_load_classes.push_back(c);
+  }
+
   const std::list<std::string> &extra_entry_points=
     cmd.get_values("lazy-methods-extra-entry-point");
   lazy_methods_extra_entry_points.insert(
@@ -128,6 +134,7 @@ bool java_bytecode_languaget::parse(
   PRECONDITION(language_options_initialized);
   java_class_loader.set_message_handler(get_message_handler());
   java_class_loader.set_java_cp_include_files(java_cp_include_files);
+  java_class_loader.add_load_classes(java_load_classes);
 
   // look at extension
   if(has_suffix(path, ".class"))
@@ -323,6 +330,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     main_jar_classes,
     lazy_methods_extra_entry_points,
     java_class_loader,
+    java_load_classes,
     get_pointer_type_selector(),
     get_message_handler());
 
