@@ -42,7 +42,8 @@ expr2c_configurationt expr2c_configurationt::default_configuration
   true,
   true,
   "TRUE",
-  "FALSE"
+  "FALSE",
+  true
 };
 
 expr2c_configurationt expr2c_configurationt::clean_configuration
@@ -51,7 +52,8 @@ expr2c_configurationt expr2c_configurationt::clean_configuration
   false,
   false,
   "1",
-  "0"
+  "0",
+  false
 };
 
 // clang-format on
@@ -1857,14 +1859,39 @@ std::string expr2ct::convert_constant(
     else if(dest.size()==4 &&
             (dest[0]=='+' || dest[0]=='-'))
     {
-      if(dest=="+inf")
-        dest="+INFINITY";
-      else if(dest=="-inf")
-        dest="-INFINITY";
-      else if(dest=="+NaN")
-        dest="+NAN";
-      else if(dest=="-NaN")
-        dest="-NAN";
+      if(configuration.use_library_macros)
+      {
+        if(dest == "+inf")
+          dest = "+INFINITY";
+        else if(dest == "-inf")
+          dest = "-INFINITY";
+        else if(dest == "+NaN")
+          dest = "+NAN";
+        else if(dest == "-NaN")
+          dest = "-NAN";
+      }
+      else
+      {
+        // ANSI-C: double is default; float/long-double require annotation
+        std::string suffix = "";
+        if(src.type() == float_type())
+          suffix = "f";
+        else if(
+          src.type() == long_double_type() &&
+          double_type() != long_double_type())
+        {
+          suffix = "l";
+        }
+
+        if(dest == "+inf")
+          dest = "(1.0" + suffix + "/0.0" + suffix + ")";
+        else if(dest == "-inf")
+          dest = "(-1.0" + suffix + "/0.0" + suffix + ")";
+        else if(dest == "+NaN")
+          dest = "(0.0" + suffix + "/0.0" + suffix + ")";
+        else if(dest == "-NaN")
+          dest = "(-0.0" + suffix + "/0.0" + suffix + ")";
+      }
     }
   }
   else if(type.id()==ID_fixedbv)
@@ -1885,16 +1912,14 @@ std::string expr2ct::convert_constant(
   }
   else if(type.id()==ID_pointer)
   {
-    if(value==ID_NULL)
+    if(
+      value == ID_NULL ||
+      (value == std::string(value.size(), '0') && config.ansi_c.NULL_is_zero))
     {
-      dest="NULL";
-      if(type.subtype().id()!=ID_empty)
-        dest="(("+convert(type)+")"+dest+")";
-    }
-    else if(value==std::string(value.size(), '0') &&
-            config.ansi_c.NULL_is_zero)
-    {
-      dest="NULL";
+      if(configuration.use_library_macros)
+        dest = "NULL";
+      else
+        dest = "0";
       if(type.subtype().id()!=ID_empty)
         dest="(("+convert(type)+")"+dest+")";
     }
