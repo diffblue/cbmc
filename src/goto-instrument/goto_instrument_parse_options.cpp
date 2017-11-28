@@ -581,6 +581,7 @@ int goto_instrument_parse_optionst::doit()
     {
       show_goto_functions(
         goto_model,
+        get_message_handler(),
         ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;

@@ -607,6 +607,7 @@ int jbmc_parse_optionst::get_goto_program(
     {
       show_goto_functions(
         *goto_model,
+        get_message_handler(),
         ui_message_handler.get_ui(),
         cmdline.isset("list-goto-functions"));
       return 0;

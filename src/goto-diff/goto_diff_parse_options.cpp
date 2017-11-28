@@ -293,10 +293,12 @@ int goto_diff_parse_optionst::doit()
   {
     show_goto_functions(
       goto_model1,
+      get_message_handler(),
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     show_goto_functions(
       goto_model2,
+      get_message_handler(),
       ui_message_handler.get_ui(),
       cmdline.isset("list-goto-functions"));
     return 0;
