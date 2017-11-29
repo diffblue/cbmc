@@ -149,7 +149,7 @@ bool ci_lazy_methodst::operator()(
         debug() << "CI lazy methods: elaborate " << mname << eom;
         const auto &parsed_method=findit->second;
         method_converter(
-          *parsed_method.first,
+          symbol_table.lookup_ref(parsed_method.first),
           *parsed_method.second,
           // Note this wraps *references* to method_worklist2 & needed_classes
           ci_lazy_methods_neededt(

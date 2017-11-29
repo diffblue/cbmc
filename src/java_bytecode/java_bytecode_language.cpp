@@ -251,7 +251,7 @@ bool java_bytecode_languaget::typecheck(
     for(const auto &method_sig : method_bytecode)
     {
       java_bytecode_convert_method(
-        *method_sig.second.first,
+        symbol_table.lookup_ref(method_sig.second.first),
         *method_sig.second.second,
         symbol_table,
         get_message_handler(),
@@ -370,7 +370,7 @@ void java_bytecode_languaget::convert_lazy_method(
 {
   const auto &lazy_method_entry = method_bytecode.at(function_id);
   java_bytecode_convert_method(
-    *lazy_method_entry.first,
+    symbol_table.lookup_ref(lazy_method_entry.first),
     *lazy_method_entry.second,
     symbol_table,
     get_message_handler(),

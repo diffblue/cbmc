@@ -27,7 +27,7 @@
 class java_string_library_preprocesst;
 
 // Pair of class id and methodt
-typedef std::pair<const symbolt *, const java_bytecode_parse_treet::methodt *>
+typedef std::pair<irep_idt, const java_bytecode_parse_treet::methodt *>
   class_and_bytecodet;
 // Map from method id to class_and_bytecodet
 typedef std::map<irep_idt, class_and_bytecodet> method_bytecodet;
