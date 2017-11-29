@@ -52,28 +52,17 @@ public:
 
   typedef irep_idt idt;
 
-  class objectt
+  /// Represents the offset into an object: either a unique integer offset,
+  /// or an unknown value, represented by `!offset`.
+  typedef optionalt<mp_integer> offsett;
+  bool offset_is_zero(const offsett &offset) const
   {
-  public:
-    objectt():offset_is_set(false)
-    {
-    }
-
-    explicit objectt(const mp_integer &_offset):
-      offset(_offset),
-      offset_is_set(true)
-    {
-    }
-
-    mp_integer offset;
-    bool offset_is_set;
-    bool offset_is_zero() const
-    { return offset_is_set && offset.is_zero(); }
-  };
+    return offset && offset->is_zero();
+  }
 
   class object_map_dt
   {
-    typedef std::map<object_numberingt::number_type, objectt> data_typet;
+    typedef std::map<object_numberingt::number_type, offsett> data_typet;
     data_typet data;
 
   public:
@@ -94,7 +83,7 @@ public:
 
     size_t size() const { return data.size(); }
 
-    objectt &operator[](object_numberingt::number_type i)
+    offsett &operator[](object_numberingt::number_type i)
     {
       return data[i];
     }
@@ -127,55 +116,55 @@ public:
 
   bool insert(object_mapt &dest, const exprt &src) const
   {
-    return insert(dest, object_numbering.number(src), objectt());
+    return insert(dest, object_numbering.number(src), offsett());
   }
 
   bool insert(
     object_mapt &dest,
     const exprt &src,
-    const mp_integer &offset) const
+    const mp_integer &offset_value) const
   {
-    return insert(dest, object_numbering.number(src), objectt(offset));
+    return insert(dest, object_numbering.number(src), offsett(offset_value));
   }
 
   bool insert(
     object_mapt &dest,
     object_numberingt::number_type n,
-    const objectt &object) const
+    const offsett &offset) const
   {
     if(dest.read().find(n)==dest.read().end())
     {
       // new
-      dest.write()[n]=object;
+      dest.write()[n] = offset;
       return true;
     }
     else
     {
-      objectt &old=dest.write()[n];
+      offsett &old_offset = dest.write()[n];
 
-      if(old.offset_is_set && object.offset_is_set)
+      if(old_offset && offset)
       {
-        if(old.offset==object.offset)
+        if(*old_offset == *offset)
           return false;
         else
         {
-          old.offset_is_set=false;
+          old_offset.reset();
           return true;
         }
       }
-      else if(!old.offset_is_set)
+      else if(!old_offset)
         return false;
       else
       {
-        old.offset_is_set=false;
+        old_offset.reset();
         return true;
       }
     }
   }
 
-  bool insert(object_mapt &dest, const exprt &expr, const objectt &object) const
+  bool insert(object_mapt &dest, const exprt &expr, const offsett &offset) const
   {
-    return insert(dest, object_numbering.number(expr), object);
+    return insert(dest, object_numbering.number(expr), offset);
   }
 
   struct entryt
