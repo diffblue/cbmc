@@ -24,6 +24,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "bmc.h"
 #include "xml_interface.h"
+#include "cbmc_solvers.h"
 
 class bmct;
 class goto_functionst;
@@ -100,7 +101,6 @@ protected:
   int get_goto_program(const optionst &);
   bool process_goto_program(const optionst &);
   bool set_properties();
-  int do_bmc(bmct &);
 };
 
 #endif // CPROVER_CBMC_CBMC_PARSE_OPTIONS_H

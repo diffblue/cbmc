@@ -24,9 +24,9 @@ class symex_bmct: public goto_symext
 public:
   symex_bmct(
     message_handlert &mh,
-    const namespacet &_ns,
-    symbol_tablet &_new_symbol_table,
-    symex_targett &_target);
+    const symbol_tablet &outer_symbol_table,
+    symex_target_equationt &_target,
+    goto_symext::branch_worklistt &branch_worklist);
 
   // To show progress
   source_locationt last_source_location;

@@ -107,6 +107,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
+  if(cmdline.isset("paths"))
+    options.set_option("paths", true);
+
   if(cmdline.isset("program-only"))
     options.set_option("program-only", true);
 

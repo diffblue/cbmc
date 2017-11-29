@@ -16,7 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol_table.h>
 #include <util/std_expr.h>
 
-exprt goto_symext::make_auto_object(const typet &type)
+exprt goto_symext::make_auto_object(const typet &type, statet &state)
 {
   dynamic_counter++;
 
@@ -29,7 +29,7 @@ exprt goto_symext::make_auto_object(const typet &type)
   symbol.type=type;
   symbol.mode=ID_C;
 
-  new_symbol_table.add(symbol);
+  state.symbol_table.add(symbol);
 
   return symbol_exprt(symbol.name, symbol.type);
 }
@@ -67,8 +67,7 @@ void goto_symext::initialize_auto_object(
       // could be NULL nondeterministically
 
       address_of_exprt address_of_expr(
-        make_auto_object(type.subtype()),
-        pointer_type);
+        make_auto_object(type.subtype(), state), pointer_type);
 
       if_exprt rhs(
         side_effect_expr_nondett(bool_typet()),

@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_symex.h"
 
-#include <cassert>
-
 #include <util/expr_util.h>
 #include <util/message.h>
 #include <util/arith_tools.h>
@@ -103,10 +101,10 @@ void goto_symext::symex_allocate(
           if(s.is_constant())
           {
             s=tmp_size.op1();
-            assert(c_sizeof_type_rec(tmp_size.op0())==tmp_type);
+            PRECONDITION(c_sizeof_type_rec(tmp_size.op0()) == tmp_type);
           }
           else
-            assert(c_sizeof_type_rec(tmp_size.op1())==tmp_type);
+            PRECONDITION(c_sizeof_type_rec(tmp_size.op1()) == tmp_type);
 
           object_type=array_typet(tmp_type, s);
         }
@@ -146,7 +144,7 @@ void goto_symext::symex_allocate(
       size_symbol.type=tmp_size.type();
       size_symbol.mode=ID_C;
 
-      new_symbol_table.add(size_symbol);
+      state.symbol_table.add(size_symbol);
 
       code_assignt assignment(size_symbol.symbol_expr(), size);
       size=assignment.lhs();
@@ -165,7 +163,7 @@ void goto_symext::symex_allocate(
   value_symbol.type.set("#dynamic", true);
   value_symbol.mode=ID_C;
 
-  new_symbol_table.add(value_symbol);
+  state.symbol_table.add(value_symbol);
 
   exprt zero_init=code.op1();
   state.rename(zero_init, ns); // to allow constant propagation
@@ -283,15 +281,15 @@ irep_idt get_string_argument_rec(const exprt &src)
 {
   if(src.id()==ID_typecast)
   {
-    assert(src.operands().size()==1);
+    PRECONDITION(src.operands().size() == 1);
     return get_string_argument_rec(src.op0());
   }
   else if(src.id()==ID_address_of)
   {
-    assert(src.operands().size()==1);
+    PRECONDITION(src.operands().size() == 1);
     if(src.op0().id()==ID_index)
     {
-      assert(src.op0().operands().size()==2);
+      PRECONDITION(src.op0().operands().size() == 2);
 
       if(src.op0().op0().id()==ID_string_constant &&
          src.op0().op1().is_zero())
@@ -440,7 +438,7 @@ void goto_symext::symex_cpp_new(
 
   symbol.type.set("#dynamic", true);
 
-  new_symbol_table.add(symbol);
+  state.symbol_table.add(symbol);
 
   // make symbol expression
 

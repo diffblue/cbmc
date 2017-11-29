@@ -29,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <langapi/mode.h>
 #include <langapi/language_util.h>
 
+#include <goto-programs/goto_model.h>
 #include <goto-programs/xml_goto_trace.h>
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/graphml_witness.h>
@@ -363,8 +364,7 @@ safety_checkert::resultt bmct::execute(const goto_functionst &goto_functions)
 {
   try
   {
-    // perform symbolic execution
-    symex.symex_from_entry_point_of(goto_functions);
+    perform_symbolic_execution(goto_functions);
 
     // add a partial ordering, if required
     if(equation.has_threads())
@@ -607,13 +607,69 @@ int bmct::do_language_agnostic_bmc(
   messaget &message,
   std::function<void(bmct &, const goto_modelt &)> frontend_configure_bmc)
 {
-  cbmc_solverst solvers(
-    opts, goto_model.symbol_table, message.get_message_handler());
-  solvers.set_ui(ui);
-  std::unique_ptr<cbmc_solverst::solvert> solver;
+  message_handlert &mh = message.get_message_handler();
+  safety_checkert::resultt result;
+  goto_symext::branch_worklistt worklist;
   try
   {
-    solver = solvers.get_solver();
+    {
+      cbmc_solverst solvers(
+        opts, goto_model.symbol_table, message.get_message_handler());
+      solvers.set_ui(ui);
+      std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+      cbmc_solver = solvers.get_solver();
+      prop_convt &pc = cbmc_solver->prop_conv();
+      bmct bmc(opts, goto_model.symbol_table, mh, pc, worklist);
+      bmc.set_ui(ui);
+      frontend_configure_bmc(bmc, goto_model);
+      result = bmc.run(goto_model.goto_functions);
+    }
+    INVARIANT(
+      opts.get_bool_option("paths") || worklist.empty(),
+      "the worklist should be empty after doing full-program "
+      "model checking, but the worklist contains " +
+        std::to_string(worklist.size()) + " unexplored branches.");
+
+    // When model checking, the bmc.run() above will already have explored
+    // the entire program, and result contains the verification result. The
+    // worklist (containing paths that have not yet been explored) is thus
+    // empty, and we don't enter this loop.
+    //
+    // When doing path exploration, there will be some saved paths left to
+    // explore in the worklist. We thus need to run the above code again,
+    // once for each saved path in the worklist, to continue symbolically
+    // execute the program. Note that the code in the loop is similar to
+    // the code above except that we construct a path_explorert rather than
+    // a bmct, which allows us to execute from a saved state rather than
+    // from the entry point. See the path_explorert documentation, and the
+    // difference between the implementations of perform_symbolic_exection()
+    // in bmct and path_explorert, for more information.
+
+    while(!worklist.empty())
+    {
+      message.status() << "___________________________\n"
+                       << "Starting new path (" << worklist.size()
+                       << " to go)\n"
+                       << message.eom;
+      cbmc_solverst solvers(
+        opts, goto_model.symbol_table, message.get_message_handler());
+      solvers.set_ui(ui);
+      std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
+      cbmc_solver = solvers.get_solver();
+      prop_convt &pc = cbmc_solver->prop_conv();
+      goto_symext::branch_pointt &resume = worklist.front();
+      path_explorert pe(
+        opts,
+        goto_model.symbol_table,
+        mh,
+        pc,
+        resume.equation,
+        resume.state,
+        worklist);
+      frontend_configure_bmc(pe, goto_model);
+      result &= pe.run(goto_model.goto_functions);
+      worklist.pop_front();
+    }
   }
   catch(const char *error_msg)
   {
@@ -631,35 +687,30 @@ int bmct::do_language_agnostic_bmc(
     throw std::current_exception();
   }
 
-  bmct bmc(
-    opts,
-    goto_model.symbol_table,
-    message.get_message_handler(),
-    solver->prop_conv());
-
-  frontend_configure_bmc(bmc, goto_model);
-  bmc.set_ui(ui);
-
-  int result = CPROVER_EXIT_INTERNAL_ERROR;
-
-  // do actual BMC
-  switch(bmc.run(goto_model.goto_functions))
+  switch(result)
   {
   case safety_checkert::resultt::SAFE:
-    result = CPROVER_EXIT_VERIFICATION_SAFE;
-    break;
+    return CPROVER_EXIT_VERIFICATION_SAFE;
   case safety_checkert::resultt::UNSAFE:
-    result = CPROVER_EXIT_VERIFICATION_UNSAFE;
-    break;
+    return CPROVER_EXIT_VERIFICATION_UNSAFE;
   case safety_checkert::resultt::ERROR:
-    result = CPROVER_EXIT_INTERNAL_ERROR;
-    break;
+    return CPROVER_EXIT_INTERNAL_ERROR;
   }
+  UNREACHABLE;
+}
 
-  // let's log some more statistics
-  message.debug() << "Memory consumption:" << messaget::endl;
-  memory_info(message.debug());
-  message.debug() << eom;
+void bmct::perform_symbolic_execution(const goto_functionst &goto_functions)
+{
+  symex.symex_from_entry_point_of(goto_functions, symex_symbol_table);
+  INVARIANT(
+    options.get_bool_option("paths") || branch_worklist.empty(),
+    "Branch points were saved even though we should have been "
+    "executing the entire program and merging paths");
+}
 
-  return result;
+void path_explorert::perform_symbolic_execution(
+  const goto_functionst &goto_functions)
+{
+  symex.resume_symex_from_saved_state(
+    goto_functions, saved_state, &equation, symex_symbol_table);
 }

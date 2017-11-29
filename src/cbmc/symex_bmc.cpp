@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "symex_bmc.h"
 
+#include <goto-symex/symex_target_equation.h>
+
 #include <limits>
 
 #include <util/source_location.h>
@@ -18,14 +20,14 @@ Author: Daniel Kroening, kroening@kroening.com
 
 symex_bmct::symex_bmct(
   message_handlert &mh,
-  const namespacet &_ns,
-  symbol_tablet &_new_symbol_table,
-  symex_targett &_target)
-  : goto_symext(mh, _ns, _new_symbol_table, _target),
+  const symbol_tablet &outer_symbol_table,
+  symex_target_equationt &_target,
+  goto_symext::branch_worklistt &branch_worklist)
+  : goto_symext(mh, outer_symbol_table, _target, branch_worklist),
     record_coverage(false),
     max_unwind(0),
     max_unwind_is_set(false),
-    symex_coverage(_ns)
+    symex_coverage(ns)
 {
 }
 

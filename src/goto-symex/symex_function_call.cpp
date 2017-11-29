@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex.h"
 
 #include <sstream>
-#include <cassert>
 
 #include <util/cprover_prefix.h>
+#include <util/invariant.h>
 #include <util/prefix.h>
 #include <util/arith_tools.h>
 #include <util/base_type.h>
@@ -158,7 +158,7 @@ void goto_symext::parameter_assignments(
       symbol.base_name="va_arg"+std::to_string(va_count);
       symbol.type=it1->type();
 
-      new_symbol_table.insert(std::move(symbol));
+      state.symbol_table.insert(std::move(symbol));
 
       symbol_exprt lhs=symbol_exprt(id, it1->type());
 
@@ -228,8 +228,7 @@ void goto_symext::symex_function_call_code(
   const goto_functionst::goto_functiont &goto_function =
     get_goto_function(identifier);
 
-  if(state.dirty)
-    state.dirty->populate_dirty_for_function(identifier, goto_function);
+  state.dirty.populate_dirty_for_function(identifier, goto_function);
 
   const bool stop_recursing=get_unwind_recursion(
     identifier,
@@ -330,7 +329,6 @@ void goto_symext::pop_frame(statet &state)
     state.level1.restore_from(frame.old_level1);
 
     // clear function-locals from L2 renaming
-    PRECONDITION(state.dirty);
     for(goto_symex_statet::renaming_levelt::current_namest::iterator
         c_it=state.level2.current_names.begin();
         c_it!=state.level2.current_names.end();
@@ -338,9 +336,10 @@ void goto_symext::pop_frame(statet &state)
     {
       const irep_idt l1_o_id=c_it->second.first.get_l1_object_identifier();
       // could use iteration over local_objects as l1_o_id is prefix
-      if(frame.local_objects.find(l1_o_id)==frame.local_objects.end() ||
-         (state.threads.size()>1 &&
-          (*state.dirty)(c_it->second.first.get_object_name())))
+      if(
+        frame.local_objects.find(l1_o_id) == frame.local_objects.end() ||
+        (state.threads.size() > 1 &&
+         state.dirty(c_it->second.first.get_object_name())))
       {
         ++c_it;
         continue;

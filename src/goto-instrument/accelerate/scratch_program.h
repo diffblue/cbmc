@@ -38,9 +38,11 @@ public:
   scratch_programt(symbol_tablet &_symbol_table, message_handlert &mh)
     : constant_propagation(true),
       symbol_table(_symbol_table),
-      ns(symbol_table),
-      equation(ns),
-      symex(mh, ns, symbol_table, equation),
+      symex_symbol_table(),
+      ns(symbol_table, symex_symbol_table),
+      equation(),
+      branch_worklist(),
+      symex(mh, symbol_table, equation, branch_worklist),
       satcheck(util_make_unique<satcheckt>()),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
@@ -73,8 +75,10 @@ protected:
   goto_symex_statet symex_state;
   goto_functionst functions;
   symbol_tablet &symbol_table;
-  const namespacet ns;
+  symbol_tablet symex_symbol_table;
+  namespacet ns;
   symex_target_equationt equation;
+  goto_symext::branch_worklistt branch_worklist;
   goto_symext symex;
 
   std::unique_ptr<propt> satcheck;

@@ -12,21 +12,21 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_symex_state.h"
 
 #include <cstdlib>
-#include <cassert>
 #include <iostream>
 
+#include <util/invariant.h>
 #include <util/base_exceptions.h>
 #include <util/std_expr.h>
 #include <util/prefix.h>
 
 #include <analyses/dirty.h>
 
-goto_symex_statet::goto_symex_statet():
-  depth(0),
-  symex_target(nullptr),
-  atomic_section_id(0),
-  record_events(true),
-  dirty(nullptr)
+goto_symex_statet::goto_symex_statet()
+  : depth(0),
+    symex_target(nullptr),
+    atomic_section_id(0),
+    record_events(true),
+    dirty()
 {
   threads.resize(1);
   new_frame();
@@ -326,7 +326,7 @@ void goto_symex_statet::assignment(
   assert_l1_renaming(lhs);
 
   #if 0
-  assert(l1_identifier != get_original_name(l1_identifier)
+  PRECONDITION(l1_identifier != get_original_name(l1_identifier)
       || l1_identifier=="goto_symex::\\guard"
       || ns.lookup(l1_identifier).is_shared()
       || has_prefix(id2string(l1_identifier), "symex::invalid_object")
@@ -493,9 +493,12 @@ void goto_symex_statet::rename(
   }
   else if(expr.id()==ID_address_of)
   {
-    assert(expr.operands().size()==1);
+    DATA_INVARIANT(
+      expr.operands().size() == 1, "address_of should have a single operand");
     rename_address(expr.op0(), ns, level);
-    assert(expr.type().id()==ID_pointer);
+    DATA_INVARIANT(
+      expr.type().id() == ID_pointer,
+      "type of address_of should be ID_pointer");
     expr.type().subtype()=expr.op0().type();
   }
   else
@@ -512,8 +515,11 @@ void goto_symex_statet::rename(
       expr.type()=to_with_expr(expr).old().type();
     else if(expr.id()==ID_if)
     {
-      assert(to_if_expr(expr).true_case().type()==
-             to_if_expr(expr).false_case().type());
+      DATA_INVARIANT(
+        to_if_expr(expr).true_case().type() ==
+          to_if_expr(expr).false_case().type(),
+        "true case of to_if_expr should be of same type "
+        "as false case");
       expr.type()=to_if_expr(expr).true_case().type();
     }
   }
@@ -529,11 +535,10 @@ bool goto_symex_statet::l2_thread_read_encoding(
     return false;
 
   // is it a shared object?
-  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
-  if(obj_identifier=="goto_symex::\\guard" ||
-     (!ns.lookup(obj_identifier).is_shared() &&
-      !(*dirty)(obj_identifier)))
+  if(
+    obj_identifier == "goto_symex::\\guard" ||
+    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
     return false;
 
   ssa_exprt ssa_l1=expr;
@@ -674,11 +679,10 @@ bool goto_symex_statet::l2_thread_write_encoding(
     return false;
 
   // is it a shared object?
-  INVARIANT_STRUCTURED(dirty!=nullptr, nullptr_exceptiont, "dirty is null");
   const irep_idt &obj_identifier=expr.get_object_name();
-  if(obj_identifier=="goto_symex::\\guard" ||
-     (!ns.lookup(obj_identifier).is_shared() &&
-      !(*dirty)(obj_identifier)))
+  if(
+    obj_identifier == "goto_symex::\\guard" ||
+    (!ns.lookup(obj_identifier).is_shared() && !(dirty)(obj_identifier)))
     return false; // not shared
 
   // see whether we are within an atomic section
@@ -730,7 +734,7 @@ void goto_symex_statet::rename_address(
       index_exprt &index_expr=to_index_expr(expr);
 
       rename_address(index_expr.array(), ns, level);
-      assert(index_expr.array().type().id()==ID_array);
+      PRECONDITION(index_expr.array().type().id() == ID_array);
       expr.type()=index_expr.array().type().subtype();
 
       // the index is not an address
@@ -760,7 +764,7 @@ void goto_symex_statet::rename_address(
           to_struct_union_type(member_expr.struct_op().type());
         const struct_union_typet::componentt &comp=
           su_type.get_component(member_expr.get_component_name());
-        assert(comp.is_not_nil());
+        PRECONDITION(comp.is_not_nil());
         expr.type()=comp.type();
       }
       else
@@ -904,8 +908,8 @@ void goto_symex_statet::get_l1_name(exprt &expr) const
 
 void goto_symex_statet::switch_to_thread(unsigned t)
 {
-  assert(source.thread_nr<threads.size());
-  assert(t<threads.size());
+  PRECONDITION(source.thread_nr < threads.size());
+  PRECONDITION(t < threads.size());
 
   // save PC
   threads[source.thread_nr].pc=source.pc;

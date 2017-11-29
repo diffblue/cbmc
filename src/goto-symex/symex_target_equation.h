@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <iosfwd>
 
+#include <util/invariant.h>
 #include <util/merge_irep.h>
 
 #include <goto-programs/goto_program.h>
@@ -31,8 +32,8 @@ class prop_convt;
 class symex_target_equationt:public symex_targett
 {
 public:
-  explicit symex_target_equationt(const namespacet &_ns);
-  virtual ~symex_target_equationt();
+  symex_target_equationt() = default;
+  virtual ~symex_target_equationt() = default;
 
   // read event
   virtual void shared_read(
@@ -291,13 +292,13 @@ public:
     SSA_stepst::iterator it=SSA_steps.begin();
     for(; s!=0; s--)
     {
-      assert(it!=SSA_steps.end());
+      PRECONDITION(it != SSA_steps.end());
       it++;
     }
     return it;
   }
 
-  void output(std::ostream &out) const;
+  void output(std::ostream &out, const namespacet &ns) const;
 
   void clear()
   {
@@ -316,8 +317,6 @@ public:
   }
 
 protected:
-  const namespacet &ns;
-
   // for enforcing sharing in the expressions stored
   merge_irept merge_irep;
   void merge_ireps(SSA_stept &SSA_step);
@@ -329,12 +328,5 @@ inline bool operator<(
 {
   return &(*a)<&(*b);
 }
-
-std::ostream &operator<<(
-  std::ostream &out,
-  const symex_target_equationt::SSA_stept &step);
-std::ostream &operator<<(
-  std::ostream &out,
-  const symex_target_equationt &equation);
 
 #endif // CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H

@@ -104,7 +104,6 @@ protected:
     std::unique_ptr<goto_modelt> &goto_model, const optionst &);
 
   bool set_properties(goto_modelt &goto_model);
-  int do_bmc(bmct &, goto_modelt &goto_model);
 };
 
 #endif // CPROVER_JBMC_JBMC_PARSE_OPTIONS_H

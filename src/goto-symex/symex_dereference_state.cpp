@@ -47,7 +47,7 @@ bool symex_dereference_statet::has_failed_symbol(
       symbol_exprt sym_expr=sym.symbol_expr();
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
-      goto_symex.new_symbol_table.move(sym, sym_ptr);
+      state.symbol_table.move(sym, sym_ptr);
       symbol=sym_ptr;
       return true;
     }
@@ -68,7 +68,7 @@ bool symex_dereference_statet::has_failed_symbol(
       symbol_exprt sym_expr=sym.symbol_expr();
       state.rename(sym_expr, ns, goto_symex_statet::L1);
       sym.name=to_ssa_expr(sym_expr).get_identifier();
-      goto_symex.new_symbol_table.move(sym, sym_ptr);
+      state.symbol_table.move(sym, sym_ptr);
       symbol=sym_ptr;
       return true;
     }
