@@ -143,8 +143,8 @@ void value_set_fivrt::output(
       {
         result+=from_expr(ns, identifier, o)+", ";
 
-        if(o_it->second.offset_is_set)
-          result+=integer2string(o_it->second.offset)+"";
+        if(o_it->second)
+          result += integer2string(*o_it->second) + "";
         else
           result+='*';
 
@@ -301,13 +301,12 @@ void value_set_fivrt::flatten_rec(
                   t_it!=temp.write().end();
                   t_it++)
               {
-                if(t_it->second.offset_is_set &&
-                   it->second.offset_is_set)
+                if(t_it->second && it->second)
                 {
-                  t_it->second.offset += it->second.offset;
+                  *t_it->second += *it->second;
                 }
                 else
-                  t_it->second.offset_is_set=false;
+                  t_it->second.reset();
               }
 
               forall_objects(oit, temp.read())
@@ -325,7 +324,7 @@ void value_set_fivrt::flatten_rec(
   {
     Forall_objects(it, dest.write())
     {
-      it->second.offset_is_set=false;
+      it->second.reset();
       for(std::list<const object_map_dt::vrange_listt*>::const_iterator vit =
           add_ranges.begin();
           vit!=add_ranges.end();
@@ -355,8 +354,8 @@ exprt value_set_fivrt::to_expr(object_map_dt::const_iterator it) const
 
   od.object()=object;
 
-  if(it->second.offset_is_set)
-    od.offset()=from_integer(it->second.offset, index_type());
+  if(it->second)
+    od.offset() = from_integer(*it->second, index_type());
 
   od.type()=od.object().type();
 
@@ -436,13 +435,12 @@ void value_set_fivrt::get_value_set(
             t_it!=temp.write().end();
             t_it++)
         {
-          if(t_it->second.offset_is_set &&
-             it->second.offset_is_set)
+          if(t_it->second && it->second)
           {
-            t_it->second.offset += it->second.offset;
+            *t_it->second += *it->second;
           }
           else
-            t_it->second.offset_is_set=false;
+            t_it->second.reset();
 
           flat_map.write()[t_it->first]=t_it->second;
         }
@@ -690,32 +688,31 @@ void value_set_fivrt::get_value_set_rec(
 
       forall_objects(it, pointer_expr_set.read())
       {
-        objectt object=it->second;
+        offsett offset = it->second;
 
-        if(object.offset_is_zero() &&
-           expr.operands().size()==2)
+        if(offset_is_zero(offset) && expr.operands().size() == 2)
         {
           if(expr.op0().type().id()!=ID_pointer)
           {
             mp_integer i;
             if(to_integer(expr.op0(), i))
-              object.offset_is_set=false;
+              offset.reset();
             else
-              object.offset=(expr.id()==ID_plus)? i : -i;
+              *offset = (expr.id() == ID_plus) ? i : -i;
           }
           else
           {
             mp_integer i;
             if(to_integer(expr.op1(), i))
-              object.offset_is_set=false;
+              offset.reset();
             else
-              object.offset=(expr.id()==ID_plus)? i : -i;
+              *offset = (expr.id() == ID_plus) ? i : -i;
           }
         }
         else
-          object.offset_is_set=false;
+          offset.reset();
 
-        insert_from(dest, it->first, object);
+        insert_from(dest, it->first, offset);
       }
 
       return;
@@ -850,13 +847,12 @@ void value_set_fivrt::get_reference_set(
             t_it!=omt.write().end();
             t_it++)
         {
-          if(t_it->second.offset_is_set &&
-             it->second.offset_is_set)
+          if(t_it->second && it->second)
           {
-            t_it->second.offset += it->second.offset;
+            *t_it->second += *it->second;
           }
           else
-            t_it->second.offset_is_set=false;
+            t_it->second.reset();
         }
 
         forall_objects(it, omt.read())
@@ -939,13 +935,12 @@ void value_set_fivrt::get_reference_set_sharing_rec(
               t_it!=t2.write().end();
               t_it++)
           {
-            if(t_it->second.offset_is_set &&
-               it->second.offset_is_set)
+            if(t_it->second && it->second)
             {
-              t_it->second.offset += it->second.offset;
+              *t_it->second += *it->second;
             }
             else
-              t_it->second.offset_is_set=false;
+              t_it->second.reset();
           }
 
           forall_objects(it2, t2.read())
@@ -1002,17 +997,16 @@ void value_set_fivrt::get_reference_set_sharing_rec(
            ns.follow(object.type())!=array_type)
           index_expr.make_typecast(array.type());
 
-        objectt o=a_it->second;
+        offsett o = a_it->second;
         mp_integer i;
 
         if(offset.is_zero())
         {
         }
-        else if(!to_integer(offset, i) &&
-                o.offset_is_zero())
-          o.offset=i;
+        else if(!to_integer(offset, i) && offset_is_zero(o))
+          *o = i;
         else
-          o.offset_is_set=false;
+          o.reset();
 
         insert_from(dest, index_expr, o);
       }
@@ -1051,7 +1045,7 @@ void value_set_fivrt::get_reference_set_sharing_rec(
       }
       else
       {
-        objectt o=it->second;
+        offsett o = it->second;
 
         exprt member_expr(ID_member, expr.type());
         member_expr.copy_to_operands(object);
@@ -1300,7 +1294,7 @@ void value_set_fivrt::do_free(
         else
         {
           // adjust
-          objectt o=o_it->second;
+          offsett o = o_it->second;
           exprt tmp(object);
           to_dynamic_object_expr(tmp).valid()=exprt(ID_unknown);
           insert_to(new_object_map, tmp, o);
@@ -1675,39 +1669,39 @@ void value_set_fivrt::apply_code(
 bool value_set_fivrt::insert_to(
   object_mapt &dest,
   object_numberingt::number_type n,
-  const objectt &object) const
+  const offsett &offset) const
 {
   object_map_dt &map=dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
+    //    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
-    map[n]=object;
+    map[n] = offset;
     map.set_valid_at(n, to_function, to_target_index);
     return true;
   }
   else
   {
-//    std::cout << "UPD " << n << '\n';
-    objectt &old=map[n];
+    //    std::cout << "UPD " << n << '\n';
+    offsett &old_offset = map[n];
 
-    bool res=map.set_valid_at(n, to_function, to_target_index);
+    bool res = map.set_valid_at(n, to_function, to_target_index);
 
-    if(old.offset_is_set && object.offset_is_set)
+    if(old_offset && offset)
     {
-      if(old.offset==object.offset)
+      if(*old_offset == *offset)
         return res;
       else
       {
-        old.offset_is_set=false;
+        old_offset.reset();
         return true;
       }
     }
-    else if(!old.offset_is_set)
+    else if(!old_offset)
       return res;
     else
     {
-      old.offset_is_set=false;
+      old_offset.reset();
       return true;
     }
   }
@@ -1716,39 +1710,39 @@ bool value_set_fivrt::insert_to(
 bool value_set_fivrt::insert_from(
   object_mapt &dest,
   object_numberingt::number_type n,
-  const objectt &object) const
+  const offsett &offset) const
 {
   object_map_dt &map=dest.write();
   if(map.find(n)==map.end())
   {
-//    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
+    //    std::cout << "NEW(" << n << "): " << object_numbering[n] << '\n';
     // new
-    map[n]=object;
+    map[n] = offset;
     map.set_valid_at(n, from_function, from_target_index);
     return true;
   }
   else
   {
-//    std::cout << "UPD " << n << '\n';
-    objectt &old=map[n];
+    //    std::cout << "UPD " << n << '\n';
+    offsett &old_offset = map[n];
 
-    bool res=map.set_valid_at(n, from_function, from_target_index);
+    bool res = map.set_valid_at(n, from_function, from_target_index);
 
-    if(old.offset_is_set && object.offset_is_set)
+    if(old_offset && offset)
     {
-      if(old.offset==object.offset)
+      if(*old_offset == *offset)
         return res;
       else
       {
-        old.offset_is_set=false;
+        old_offset.reset();
         return true;
       }
     }
-    else if(!old.offset_is_set)
+    else if(!old_offset)
       return res;
     else
     {
-      old.offset_is_set=false;
+      old_offset.reset();
       return true;
     }
   }
