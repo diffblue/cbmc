@@ -2322,8 +2322,8 @@ bool simplify_exprt::simplify_node(exprt &expr)
   else if(expr.id()==ID_ieee_float_equal ||
           expr.id()==ID_ieee_float_notequal)
     result=simplify_ieee_float_relation(expr) && result;
-  else if(expr.id()==ID_bswap)
-    result=simplify_bswap(expr) && result;
+  else if(expr.id() == ID_bswap)
+    result = simplify_bswap(to_bswap_expr(expr)) && result;
   else if(expr.id()==ID_isinf)
     result=simplify_isinf(expr) && result;
   else if(expr.id()==ID_isnan)

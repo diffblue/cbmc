@@ -505,6 +505,68 @@ inline void validate_expr(const unary_minus_exprt &value)
   validate_operands(value, 1, "Unary minus must have one operand");
 }
 
+/*! \brief The byte swap expression
+*/
+class bswap_exprt: public unary_exprt
+{
+public:
+  bswap_exprt(): unary_exprt(ID_bswap)
+  {
+  }
+
+  bswap_exprt(const exprt &_op, const typet &_type)
+    : unary_exprt(ID_bswap, _op, _type)
+  {
+  }
+
+  explicit bswap_exprt(const exprt &_op)
+    : unary_exprt(ID_bswap, _op, _op.type())
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref bswap_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * bswap_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref bswap_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const bswap_exprt &to_bswap_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bswap);
+  DATA_INVARIANT(expr.operands().size() == 1, "bswap must have one operand");
+  DATA_INVARIANT(
+    expr.op0().type() == expr.type(), "bswap type must match operand type");
+  return static_cast<const bswap_exprt &>(expr);
+}
+
+/*! \copydoc to_bswap_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline bswap_exprt &to_bswap_expr(exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_bswap);
+  DATA_INVARIANT(expr.operands().size() == 1, "bswap must have one operand");
+  DATA_INVARIANT(
+    expr.op0().type() == expr.type(), "bswap type must match operand type");
+  return static_cast<bswap_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<bswap_exprt>(const exprt &base)
+{
+  return base.id() == ID_bswap;
+}
+inline void validate_expr(const bswap_exprt &value)
+{
+  validate_operands(value, 1, "bswap must have one operand");
+  DATA_INVARIANT(
+    value.op().type() == value.type(), "bswap type must match operand type");
+}
 
 /*! \brief A generic base class for expressions that are predicates,
            i.e., boolean-typed.
