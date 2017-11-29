@@ -54,7 +54,7 @@ public:
   bool operator()(
     symbol_tablet &symbol_table,
     method_bytecodet &method_bytecode,
-    method_convertert method_converter);
+    const method_convertert &method_converter);
 
 private:
   void resolve_method_names(

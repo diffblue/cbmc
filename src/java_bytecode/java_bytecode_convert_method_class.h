@@ -16,7 +16,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/message.h>
 #include <util/std_types.h>
 #include <util/std_expr.h>
-#include <util/safe_pointer.h>
 #include <analyses/cfg_dominators.h>
 #include "java_bytecode_parse_tree.h"
 #include "java_bytecode_convert_class.h"
@@ -35,12 +34,12 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    safe_pointer<ci_lazy_methods_neededt> needed_lazy_methods,
+    optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     java_string_library_preprocesst &_string_preprocess)
     : messaget(_message_handler),
       symbol_table(_symbol_table),
       max_array_length(_max_array_length),
-      needed_lazy_methods(needed_lazy_methods),
+      needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
       slots_for_parameters(0),
       method_has_this(false)
@@ -61,7 +60,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
-  safe_pointer<ci_lazy_methods_neededt> needed_lazy_methods;
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods;
 
   /// Fully qualified name of the method under translation.
   /// Initialized by `convert`.

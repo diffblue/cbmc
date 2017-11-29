@@ -11,7 +11,6 @@
 #include <java_bytecode/java_entry_point.h>
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/java_utils.h>
-#include <util/safe_pointer.h>
 #include <util/suffix.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 
@@ -68,7 +67,7 @@ ci_lazy_methodst::ci_lazy_methodst(
 bool ci_lazy_methodst::operator()(
   symbol_tablet &symbol_table,
   method_bytecodet &method_bytecode,
-  method_convertert method_converter)
+  const method_convertert &method_converter)
 {
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
@@ -149,13 +148,12 @@ bool ci_lazy_methodst::operator()(
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
         const auto &parsed_method=findit->second;
-        // Note this wraps *references* to method_worklist2, needed_classes:
-        ci_lazy_methods_neededt new_lazy_methods(
-          method_worklist2,
-          needed_classes,
-          symbol_table);
         method_converter(
-          *parsed_method.first, *parsed_method.second, new_lazy_methods);
+          *parsed_method.first,
+          *parsed_method.second,
+          // Note this wraps *references* to method_worklist2 & needed_classes
+          ci_lazy_methods_neededt(
+            method_worklist2, needed_classes, symbol_table));
         gather_virtual_callsites(
           symbol_table.lookup_ref(mname).value,
           virtual_callsites);

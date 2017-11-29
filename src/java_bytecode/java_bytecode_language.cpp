@@ -310,18 +310,17 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
   method_bytecodet &method_bytecode)
 {
-  const auto method_converter=[&](
+  const auto method_converter = [&](
     const symbolt &symbol,
     const java_bytecode_parse_treet::methodt &method,
-    ci_lazy_methods_neededt new_lazy_methods)
-  {
+    ci_lazy_methods_neededt new_lazy_methods) {
     java_bytecode_convert_method(
       symbol,
       method,
       symbol_table,
       get_message_handler(),
       max_user_array_length,
-      safe_pointer<ci_lazy_methods_neededt>::create_non_null(&new_lazy_methods),
+      std::move(new_lazy_methods),
       string_preprocess);
   };
 

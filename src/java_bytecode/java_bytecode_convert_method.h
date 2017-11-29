@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/symbol_table.h>
 #include <util/message.h>
-#include <util/safe_pointer.h>
 #include "java_string_library_preprocess.h"
 
 #include "java_bytecode_parse_tree.h"
@@ -28,7 +27,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<ci_lazy_methods_neededt> needed_lazy_methods,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess);
 
 inline void java_bytecode_convert_method(
@@ -45,7 +44,7 @@ inline void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
-    safe_pointer<ci_lazy_methods_neededt>::create_null(),
+    optionalt<ci_lazy_methods_neededt>(),
     string_preprocess);
 }
 
