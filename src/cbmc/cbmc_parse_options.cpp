@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/string2int.h>
 #include <util/config.h>
 #include <util/unicode.h>
-#include <util/memory_info.h>
 #include <util/invariant.h>
 #include <util/exit_codes.h>
 
@@ -63,8 +62,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <langapi/mode.h>
 
-#include "cbmc_solvers.h"
-#include "bmc.h"
 #include "version.h"
 #include "xml_interface.h"
 
@@ -373,13 +370,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
       }
       else
       {
-        assert(options.get_bool_option("smt2"));
+        PRECONDITION(options.get_bool_option("smt2"));
         options.set_option("z3", true), solver_set=true;
       }
     }
   }
   // Either have solver and standard version set, or neither.
-  assert(version_set==solver_set);
+  PRECONDITION(version_set == solver_set);
 
   if(cmdline.isset("beautify"))
     options.set_option("beautify", true);
@@ -542,36 +539,8 @@ int cbmc_parse_optionst::doit()
   if(set_properties())
     return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
-  // get solver
-  cbmc_solverst cbmc_solvers(
-    options,
-    goto_model.symbol_table,
-    get_message_handler());
-  cbmc_solvers.set_ui(ui_message_handler.get_ui());
-
-  std::unique_ptr<cbmc_solverst::solvert> cbmc_solver;
-
-  try
-  {
-    cbmc_solver=cbmc_solvers.get_solver();
-  }
-
-  catch(const char *error_msg)
-  {
-    error() << error_msg << eom;
-    return CPROVER_EXIT_EXCEPTION;
-  }
-
-  prop_convt &prop_conv=cbmc_solver->prop_conv();
-
-  bmct bmc(
-    options,
-    goto_model.symbol_table,
-    get_message_handler(),
-    prop_conv);
-
-  // do actual BMC
-  return do_bmc(bmc);
+  return bmct::do_language_agnostic_bmc(
+    options, goto_model, ui_message_handler.get_ui(), *this);
 }
 
 bool cbmc_parse_optionst::set_properties()
@@ -871,35 +840,6 @@ bool cbmc_parse_optionst::process_goto_program(
   return false;
 }
 
-/// invoke main modules
-int cbmc_parse_optionst::do_bmc(bmct &bmc)
-{
-  bmc.set_ui(ui_message_handler.get_ui());
-
-  int result = CPROVER_EXIT_INTERNAL_ERROR;
-
-  // do actual BMC
-  switch(bmc.run(goto_model.goto_functions))
-  {
-    case safety_checkert::resultt::SAFE:
-      result = CPROVER_EXIT_VERIFICATION_SAFE;
-      break;
-    case safety_checkert::resultt::UNSAFE:
-      result = CPROVER_EXIT_VERIFICATION_UNSAFE;
-      break;
-    case safety_checkert::resultt::ERROR:
-      result = CPROVER_EXIT_INTERNAL_ERROR;
-      break;
-  }
-
-  // let's log some more statistics
-  debug() << "Memory consumption:" << messaget::endl;
-  memory_info(debug());
-  debug() << eom;
-
-  return result;
-}
-
 /// display command line help
 void cbmc_parse_optionst::help()
 {
@@ -989,18 +929,7 @@ void cbmc_parse_optionst::help()
     " --nondet-static              add nondeterministic initialization of variables with static lifetime\n"
     "\n"
     "BMC options:\n"
-    " --program-only               only show program expression\n"
-    " --show-loops                 show the loops in the program\n"
-    " --depth nr                   limit search depth\n"
-    " --unwind nr                  unwind nr times\n"
-    " --unwindset L:B,...          unwind loop L with a bound of B\n"
-    "                              (use --show-loops to get the loop IDs)\n"
-    " --show-vcc                   show the verification conditions\n"
-    " --slice-formula              remove assignments unrelated to property\n"
-    " --unwinding-assertions       generate unwinding assertions\n"
-    " --partial-loops              permit paths with partial loops\n"
-    " --no-pretty-names            do not simplify identifiers\n"
-    " --graphml-witness filename   write the witness in GraphML format to filename\n" // NOLINT(*)
+    HELP_BMC
     "\n"
     "Backend options:\n"
     " --object-bits n              number of bits used for object addresses\n"

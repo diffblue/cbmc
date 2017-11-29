@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_trace.h>
 
 #include <goto-symex/symex_target_equation.h>
+#include <goto-programs/goto_model.h>
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
 
@@ -81,6 +82,25 @@ public:
   {
     symex.add_recursion_unwind_handler(handler);
   }
+
+  /// \brief common BMC code, invoked from language-specific frontends
+  ///
+  /// Do bounded model-checking after all language-specific program
+  /// preprocessing has been completed by language-specific frontends.
+  /// Language-specific frontends may customize the \ref bmct objects
+  /// that are used for model-checking by supplying a function object to
+  /// the `frontend_configure_bmc` parameter of this function; the
+  /// function object will be called with every \ref bmct object that
+  /// is constructed by `do_language_agnostic_bmc`.
+  static int do_language_agnostic_bmc(
+    const optionst &opts,
+    const goto_modelt &goto_model,
+    const ui_message_handlert::uit &ui,
+    messaget &message,
+    std::function<void(bmct &, const goto_modelt &)> frontend_configure_bmc =
+      [](bmct &_bmc, const goto_modelt &) { // NOLINT (*)
+        // Empty default implementation
+      });
 
 protected:
   const optionst &options;
@@ -144,6 +164,36 @@ protected:
   template <template <class goalt> class covert>
   friend class bmc_goal_covert;
   friend class fault_localizationt;
+
+#define OPT_BMC                                                                \
+  "(program-only)"                                                             \
+  "(show-loops)"                                                               \
+  "(show-vcc)"                                                                 \
+  "(slice-formula)"                                                            \
+  "(unwinding-assertions)"                                                     \
+  "(no-unwinding-assertions)"                                                  \
+  "(no-pretty-names)"                                                          \
+  "(partial-loops)"                                                            \
+  "(depth):"                                                                   \
+  "(unwind):"                                                                  \
+  "(unwindset):"                                                               \
+  "(graphml-witness):"                                                         \
+  "(unwindset):"
+
+#define HELP_BMC                                                               \
+  " --program-only               only show program expression\n"               \
+  " --show-loops                 show the loops in the program\n"              \
+  " --depth nr                   limit search depth\n"                         \
+  " --unwind nr                  unwind nr times\n"                            \
+  " --unwindset L:B,...          unwind loop L with a bound of B\n"            \
+  "                              (use --show-loops to get the loop IDs)\n"     \
+  " --show-vcc                   show the verification conditions\n"           \
+  " --slice-formula              remove assignments unrelated to property\n"   \
+  " --unwinding-assertions       generate unwinding assertions\n"              \
+  " --partial-loops              permit paths with partial loops\n"            \
+  " --no-pretty-names            do not simplify identifiers\n"                \
+  " --graphml-witness filename   write the witness in GraphML format to "      \
+  "filename\n" // NOLINT(*)
 };
 
 #endif // CPROVER_CBMC_BMC_H
