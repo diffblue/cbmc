@@ -84,10 +84,9 @@ public:
   }
 };
 
-typedef std::function<void(
-  const symbolt &,
-  const java_bytecode_parse_treet::methodt &,
-  ci_lazy_methods_neededt)> method_convertert;
+typedef std::function<
+  bool(const irep_idt &function_id, ci_lazy_methods_neededt)>
+  method_convertert;
 
 class ci_lazy_methodst:public messaget
 {

@@ -140,19 +140,17 @@ bool ci_lazy_methodst::operator()(
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
-        method_bytecodet::opt_reft cmb = method_bytecode.get(mname);
-        if(!cmb)
+        debug() << "CI lazy methods: elaborate " << mname << eom;
+        if(
+          method_converter(
+            mname,
+            // Note this wraps *references* to method_worklist2 & needed_classes
+            ci_lazy_methods_neededt(
+              method_worklist2, needed_classes, symbol_table)))
         {
-          debug() << "Skip " << mname << eom;
+          // Couldn't convert this function
           continue;
         }
-        debug() << "CI lazy methods: elaborate " << mname << eom;
-        method_converter(
-          symbol_table.lookup_ref(cmb->get().class_id),
-          cmb->get().method,
-          // Note this wraps *references* to method_worklist2 & needed_classes
-          ci_lazy_methods_neededt(
-            method_worklist2, needed_classes, symbol_table));
         gather_virtual_callsites(
           symbol_table.lookup_ref(mname).value,
           virtual_callsites);
@@ -186,16 +184,23 @@ bool ci_lazy_methodst::operator()(
 
   for(const auto &sym : symbol_table.symbols)
   {
+    // Don't keep global variables (unless they're gathered below from a
+    // function that references them)
     if(sym.second.is_static_lifetime)
       continue;
-    if(
-      method_bytecode.contains_method(sym.first) &&
-      !methods_already_populated.count(sym.first))
-    {
-      continue;
-    }
     if(sym.second.type.id()==ID_code)
+    {
+      // Don't keep functions that belong to this language that we haven't
+      // converted above
+      if(
+        method_bytecode.contains_method(sym.first) &&
+        !methods_already_populated.count(sym.first))
+      {
+        continue;
+      }
+      // If this is a function then add all the things used in it
       gather_needed_globals(sym.second.value, symbol_table, keep_symbols);
+    }
     keep_symbols.add(sym.second);
   }
 

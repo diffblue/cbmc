@@ -79,10 +79,10 @@ protected:
 /// \return Assigns parameter names (side-effects on `ftype`) to function stub
 ///   parameters, which are initially nameless as method conversion hasn't
 ///   happened. Also creates symbols in `symbol_table`.
-void assign_parameter_names(
+static void assign_parameter_names(
   code_typet &ftype,
   const irep_idt &name_prefix,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   code_typet::parameterst &parameters=ftype.parameters();
 
@@ -2847,7 +2847,7 @@ codet java_bytecode_convert_methodt::convert_instructions(
 void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &method,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,

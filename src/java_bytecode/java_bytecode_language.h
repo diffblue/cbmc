@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 
 #include "ci_lazy_methods.h"
+#include "ci_lazy_methods_needed.h"
 #include "java_class_loader.h"
 #include "java_string_library_preprocess.h"
 
@@ -103,8 +104,6 @@ public:
     symbol_tablet &context,
     const std::string &module) override;
 
-  void replace_string_methods(symbol_table_baset &context);
-
   virtual bool final(symbol_table_baset &context) override;
 
   void show_parse(std::ostream &out) override;
@@ -150,12 +149,24 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
-  virtual void methods_provided(std::set<irep_idt> &methods) const override;
+  virtual void methods_provided(id_sett &methods) const override;
   virtual void convert_lazy_method(
     const irep_idt &function_id,
     symbol_tablet &symbol_table) override;
 
 protected:
+  void convert_single_method(
+    const irep_idt &function_id,
+    symbol_table_baset &symbol_table)
+  {
+    convert_single_method(
+      function_id, symbol_table, optionalt<ci_lazy_methods_neededt>());
+  }
+  bool convert_single_method(
+    const irep_idt &function_id,
+    symbol_table_baset &symbol_table,
+    optionalt<ci_lazy_methods_neededt> needed_lazy_methods);
+
   bool do_ci_lazy_method_conversion(symbol_tablet &, method_bytecodet &);
   const select_pointer_typet &get_pointer_type_selector() const;
 

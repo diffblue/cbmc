@@ -24,29 +24,11 @@ class class_hierarchyt;
 void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess);
-
-inline void java_bytecode_convert_method(
-  const symbolt &class_symbol,
-  const java_bytecode_parse_treet::methodt &method,
-  symbol_tablet &symbol_table,
-  message_handlert &message_handler,
-  size_t max_array_length,
-  java_string_library_preprocesst &string_preprocess)
-{
-  java_bytecode_convert_method(
-    class_symbol,
-    method,
-    symbol_table,
-    message_handler,
-    max_array_length,
-    optionalt<ci_lazy_methods_neededt>(),
-    string_preprocess);
-}
 
 void java_bytecode_convert_method_lazy(
   const symbolt &class_symbol,

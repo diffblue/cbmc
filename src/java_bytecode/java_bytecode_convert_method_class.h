@@ -31,13 +31,13 @@ class java_bytecode_convert_methodt:public messaget
 {
 public:
   java_bytecode_convert_methodt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
     java_string_library_preprocesst &_string_preprocess)
     : messaget(_message_handler),
-      symbol_table(_symbol_table),
+      symbol_table(symbol_table),
       max_array_length(_max_array_length),
       needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
@@ -58,7 +58,7 @@ public:
   }
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   const size_t max_array_length;
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods;
 

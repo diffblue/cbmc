@@ -1758,6 +1758,36 @@ codet java_string_library_preprocesst::make_string_length_code(
   return code_returnt(get_length(deref, symbol_table));
 }
 
+template <typename TMap, typename TContainer>
+void add_keys_to_container(const TMap &map, TContainer &container)
+{
+  static_assert(
+    std::is_same<typename TMap::key_type,
+                 typename TContainer::value_type>::value,
+    "TContainer value_type doesn't match TMap key_type");
+  std::transform(
+    map.begin(),
+    map.end(),
+    std::inserter(container, container.begin()),
+    [](const typename TMap::value_type &pair) { return pair.first; });
+}
+
+void java_string_library_preprocesst::get_all_function_names(
+  id_sett &methods) const
+{
+  const id_mapt *maps[] = {
+    &cprover_equivalent_to_java_function,
+    &cprover_equivalent_to_java_string_returning_function,
+    &cprover_equivalent_to_java_constructor,
+    &cprover_equivalent_to_java_assign_and_return_function,
+    &cprover_equivalent_to_java_assign_function,
+  };
+  for(const id_mapt *map : maps)
+    add_keys_to_container(*map, methods);
+
+  add_keys_to_container(conversion_table, methods);
+}
+
 /// Should be called to provide code for string functions that are used in the
 /// code but for which no implementation is provided.
 /// \param function_id: name of the function
@@ -1767,11 +1797,12 @@ codet java_string_library_preprocesst::make_string_length_code(
 /// \return Code for the body of the String functions if they are part of the
 ///   supported String functions, nil_exprt otherwise.
 exprt java_string_library_preprocesst::code_for_function(
-  const irep_idt &function_id,
-  const code_typet &type,
-  const source_locationt &loc,
+  const symbolt &symbol,
   symbol_table_baset &symbol_table)
 {
+  const irep_idt &function_id = symbol.name;
+  const code_typet &type = to_code_type(symbol.type);
+  const source_locationt &loc = symbol.location;
   auto it_id=cprover_equivalent_to_java_function.find(function_id);
   if(it_id!=cprover_equivalent_to_java_function.end())
     return make_function_from_call(it_id->second, type, loc, symbol_table);

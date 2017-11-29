@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_LANGUAGE_H
 #define CPROVER_UTIL_LANGUAGE_H
 
-#include <set>
+#include <unordered_set>
 #include <iosfwd>
 #include <string>
 #include <memory> // unique_ptr
@@ -21,6 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/system_library_symbols.h>
 
 #include "message.h"
+
+typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
 
 class symbol_tablet;
 class symbol_table_baset;
@@ -76,7 +78,7 @@ public:
 
   // add lazy functions provided to set
 
-  virtual void methods_provided(std::set<irep_idt> &methods) const
+  virtual void methods_provided(id_sett &methods) const
   { }
 
   // populate a lazy method
