@@ -360,7 +360,7 @@ safety_checkert::resultt bmct::execute(const goto_functionst &goto_functions)
   try
   {
     // perform symbolic execution
-    symex(goto_functions);
+    symex.symex_from_entry_point_of(goto_functions);
 
     // add a partial ordering, if required
     if(equation.has_threads())
