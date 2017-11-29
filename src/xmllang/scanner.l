@@ -1,12 +1,10 @@
 %option 8bit nodefault
 %option nounput
 %option noinput
+%option nounistd
+%option never-interactive
 
 %{
-#ifdef _WIN32
-#define YY_NO_UNISTD_H
-static int isatty(int) { return 0; }
-#endif
 
 #include <cctype>
 #include <cstring>

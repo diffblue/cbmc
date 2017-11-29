@@ -1,12 +1,10 @@
 %option nounput
 %option noinput
+%option nounistd
+%option never-interactive
 %option stack
 
 %{
-#ifdef _WIN32
-#define YY_NO_UNISTD_H
-static int isatty(int) { return 0; }
-#endif
 
 #include <util/expr.h>
 
