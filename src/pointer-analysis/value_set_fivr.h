@@ -76,7 +76,7 @@ public:
     object_map_dt() {}
     static const object_map_dt blank;
 
-    typedef std::map<unsigned, objectt> objmapt;
+    typedef std::map<object_numberingt::number_type, objectt> objmapt;
     objmapt objmap;
 
     // NOLINTNEXTLINE(readability/identifiers)
@@ -84,7 +84,10 @@ public:
     // NOLINTNEXTLINE(readability/identifiers)
     typedef objmapt::iterator iterator;
 
-    const_iterator find(unsigned k) { return objmap.find(k); }
+    const_iterator find(object_numberingt::number_type k)
+    {
+      return objmap.find(k);
+    }
     iterator begin() { return objmap.begin(); }
     const_iterator begin() const { return objmap.begin(); }
     iterator end() { return objmap.end(); }
@@ -93,17 +96,19 @@ public:
     bool empty() const { return objmap.empty(); }
     void clear() { objmap.clear(); validity_ranges.clear(); }
 
-    objectt &operator[](unsigned k)
+    objectt &operator[](object_numberingt::number_type k)
     {
       return objmap[k];
     }
 
     // operator[] is the only way to insert something!
-    std::pair<iterator, bool> insert(const std::pair<unsigned, objectt>&)
+    std::pair<iterator, bool>
+    insert(const std::pair<object_numberingt::number_type, objectt> &)
     {
       UNREACHABLE;
     }
-    iterator insert(iterator, const std::pair<unsigned, objectt>&)
+    iterator
+    insert(iterator, const std::pair<object_numberingt::number_type, objectt> &)
     {
       UNREACHABLE;
     }
@@ -166,7 +171,10 @@ public:
     return insert_to(dest, object_numbering.number(src), objectt(offset));
   }
 
-  bool insert_to(object_mapt &dest, unsigned n, const objectt &object) const;
+  bool insert_to(
+    object_mapt &dest,
+    object_numberingt::number_type n,
+    const objectt &object) const;
 
   bool insert_to(
     object_mapt &dest,
@@ -194,7 +202,10 @@ public:
     return insert_from(dest, object_numbering.number(src), objectt(offset));
   }
 
-  bool insert_from(object_mapt &dest, unsigned n, const objectt &object) const;
+  bool insert_from(
+    object_mapt &dest,
+    object_numberingt::number_type n,
+    const objectt &object) const;
 
   bool insert_from(
     object_mapt &dest,
