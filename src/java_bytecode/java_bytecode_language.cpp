@@ -205,14 +205,15 @@ bool java_bytecode_languaget::typecheck(
     if(c_it->second.parsed_class.name.empty())
       continue;
 
-    if(java_bytecode_convert_class(
-         c_it->second,
-         symbol_table,
-         get_message_handler(),
-         max_user_array_length,
-         lazy_methods,
-         lazy_methods_mode,
-         string_preprocess))
+    if(
+      java_bytecode_convert_class(
+        c_it->second,
+        symbol_table,
+        get_message_handler(),
+        max_user_array_length,
+        method_bytecode,
+        lazy_methods_mode,
+        string_preprocess))
       return true;
   }
 
@@ -241,13 +242,13 @@ bool java_bytecode_languaget::typecheck(
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
     // ci: context-insensitive.
-    if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
+    if(do_ci_lazy_method_conversion(symbol_table, method_bytecode))
       return true;
   }
   else if(lazy_methods_mode==LAZY_METHODS_MODE_EAGER)
   {
     // Simply elaborate all methods symbols now.
-    for(const auto &method_sig : lazy_methods)
+    for(const auto &method_sig : method_bytecode)
     {
       java_bytecode_convert_method(
         *method_sig.second.first,
@@ -300,14 +301,14 @@ bool java_bytecode_languaget::generate_support_functions(
 /// instantiated (or evidence that an object of that type exists before the main
 /// function is entered, such as being passed as a parameter).
 /// \par parameters: `symbol_table`: global symbol table
-/// `lazy_methods`: map from method names to relevant symbol and parsed-method
-///   objects.
+/// `method_bytecode`: map from method names to relevant symbol and
+///   parsed-method objects.
 /// \return Elaborates lazily-converted methods that may be reachable starting
 ///   from the main entry point (usually provided with the --function command-
 ///   line option) (side-effect on the symbol_table). Returns false on success.
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
-  lazy_methodst &lazy_methods)
+  method_bytecodet &method_bytecode)
 {
   const auto method_converter=[&](
     const symbolt &symbol,
@@ -334,7 +335,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     get_pointer_type_selector(),
     get_message_handler());
 
-  return method_gather(symbol_table, lazy_methods, method_converter);
+  return method_gather(symbol_table, method_bytecode, method_converter);
 }
 
 const select_pointer_typet &
@@ -349,31 +350,30 @@ const select_pointer_typet &
 /// \return Populates `methods` with the complete list of lazy methods that are
 ///   available to convert (those which are valid parameters for
 ///   `convert_lazy_method`)
-void java_bytecode_languaget::lazy_methods_provided(
+void java_bytecode_languaget::methods_provided(
   std::set<irep_idt> &methods) const
 {
-  for(const auto &kv : lazy_methods)
+  for(const auto &kv : method_bytecode)
     methods.insert(kv.first);
 }
 
-/// Promote a lazy-converted method (one whose type is known but whose body
-/// hasn't been converted) into a fully- elaborated one.
-/// \par parameters: `id`: method ID to convert
-/// `symtab`: global symbol table
-/// \return Amends the symbol table entry for function `id`, which should be a
-///   lazy method provided by this instance of `java_bytecode_languaget`. It
-///   should initially have a nil value. After this method completes, it will
-///   have a value representing the method body, identical to that produced
-///   using eager method conversion.
+/// \brief Promote a lazy-converted method (one whose type is known but whose
+/// body hasn't been converted) into a fully-elaborated one.
+/// \remarks Amends the symbol table entry for function `function_id`, which
+/// should be a method provided by this instance of `java_bytecode_languaget`
+/// to have a value representing the method body identical to that produced
+/// using eager method conversion.
+/// \param function_id: method ID to convert
+/// \param symbol_table: global symbol table
 void java_bytecode_languaget::convert_lazy_method(
-  const irep_idt &id,
-  symbol_tablet &symtab)
+  const irep_idt &function_id,
+  symbol_tablet &symbol_table)
 {
-  const auto &lazy_method_entry=lazy_methods.at(id);
+  const auto &lazy_method_entry = method_bytecode.at(function_id);
   java_bytecode_convert_method(
     *lazy_method_entry.first,
     *lazy_method_entry.second,
-    symtab,
+    symbol_table,
     get_message_handler(),
     max_user_array_length,
     string_preprocess);

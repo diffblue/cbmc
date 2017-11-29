@@ -81,12 +81,11 @@ struct object_factory_parameterst final
   bool string_printable = false;
 };
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
-  lazy_method_valuet;
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+// Pair of class id and methodt
+typedef std::pair<const symbolt *, const java_bytecode_parse_treet::methodt *>
+  class_and_bytecodet;
+// Map from method id to class_and_bytecodet
+typedef std::map<irep_idt, class_and_bytecodet> method_bytecodet;
 
 class java_bytecode_languaget:public languaget
 {
@@ -156,12 +155,13 @@ public:
   std::set<std::string> extensions() const override;
 
   void modules_provided(std::set<std::string> &modules) override;
-  virtual void lazy_methods_provided(std::set<irep_idt> &) const override;
+  virtual void methods_provided(std::set<irep_idt> &methods) const override;
   virtual void convert_lazy_method(
-    const irep_idt &id, symbol_tablet &) override;
+    const irep_idt &function_id,
+    symbol_tablet &symbol_table) override;
 
 protected:
-  bool do_ci_lazy_method_conversion(symbol_tablet &, lazy_methodst &);
+  bool do_ci_lazy_method_conversion(symbol_tablet &, method_bytecodet &);
   const select_pointer_typet &get_pointer_type_selector() const;
 
   irep_idt main_class;
@@ -170,7 +170,7 @@ protected:
   bool assume_inputs_non_null;      // assume inputs variables to be non-null
   object_factory_parameterst object_factory_parameters;
   size_t max_user_array_length;     // max size for user code created arrays
-  lazy_methodst lazy_methods;
+  method_bytecodet method_bytecode;
   lazy_methods_modet lazy_methods_mode;
   std::vector<irep_idt> lazy_methods_extra_entry_points;
   bool string_refinement_enabled;

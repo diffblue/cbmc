@@ -1429,8 +1429,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
             if(as_string(arg0.get(ID_identifier))
                .find("<init>")!=std::string::npos)
             {
-              if(lazy_methods)
-                lazy_methods->add_needed_class(classname);
+              if(needed_lazy_methods)
+                needed_lazy_methods->add_needed_class(classname);
               code_type.set(ID_constructor, true);
             }
             else
@@ -1548,11 +1548,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       {
         // static binding
         call.function()=symbol_exprt(arg0.get(ID_identifier), arg0.type());
-        if(lazy_methods)
+        if(needed_lazy_methods)
         {
-          lazy_methods->add_needed_method(arg0.get(ID_identifier));
+          needed_lazy_methods->add_needed_method(arg0.get(ID_identifier));
           // Calling a static method causes static initialization:
-          lazy_methods->add_needed_class(arg0.get(ID_C_class));
+          needed_lazy_methods->add_needed_class(arg0.get(ID_C_class));
         }
       }
 
@@ -2180,11 +2180,11 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // If external, create a symbol table entry for this static field:
       check_static_field_stub(symbol_expr, field_name);
 
-      if(lazy_methods)
+      if(needed_lazy_methods)
       {
         if(arg0.type().id()==ID_symbol)
         {
-          lazy_methods->add_needed_class(
+          needed_lazy_methods->add_needed_class(
             to_symbol_type(arg0.type()).get_identifier());
         }
         else if(arg0.type().id()==ID_pointer)
@@ -2192,13 +2192,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
           const auto &pointer_type=to_pointer_type(arg0.type());
           if(pointer_type.subtype().id()==ID_symbol)
           {
-            lazy_methods->add_needed_class(
+            needed_lazy_methods->add_needed_class(
               to_symbol_type(pointer_type.subtype()).get_identifier());
           }
         }
         else if(is_assertions_disabled_field)
         {
-          lazy_methods->add_needed_class(arg0.get_string(ID_class));
+          needed_lazy_methods->add_needed_class(arg0.get_string(ID_class));
         }
       }
       results[0]=java_bytecode_promotion(symbol_expr);
@@ -2235,9 +2235,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // If external, create a symbol table entry for this static field:
       check_static_field_stub(symbol_expr, field_name);
 
-      if(lazy_methods && arg0.type().id()==ID_symbol)
+      if(needed_lazy_methods && arg0.type().id() == ID_symbol)
       {
-        lazy_methods->add_needed_class(
+        needed_lazy_methods->add_needed_class(
           to_symbol_type(arg0.type()).get_identifier());
       }
 
@@ -2850,7 +2850,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<ci_lazy_methods_neededt> lazy_methods,
+  safe_pointer<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess)
 {
   static const std::unordered_set<std::string> methods_to_ignore
@@ -2881,7 +2881,7 @@ void java_bytecode_convert_method(
     symbol_table,
     message_handler,
     max_array_length,
-    lazy_methods,
+    needed_lazy_methods,
     string_preprocess);
 
   java_bytecode_convert_method(class_symbol, method);

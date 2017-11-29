@@ -76,11 +76,12 @@ public:
 
   // add lazy functions provided to set
 
-  virtual void lazy_methods_provided(std::set<irep_idt> &methods) const
+  virtual void methods_provided(std::set<irep_idt> &methods) const
   { }
 
   // populate a lazy method
-  virtual void convert_lazy_method(const irep_idt &id, symbol_tablet &)
+  virtual void
+  convert_lazy_method(const irep_idt &function_id, symbol_tablet &symbol_table)
   { }
 
   /// Final adjustments, e.g. initializing stub functions and globals that

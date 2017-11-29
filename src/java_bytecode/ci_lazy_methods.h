@@ -26,13 +26,11 @@
 
 class java_string_library_preprocesst;
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
-  lazy_method_valuet;
-
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+// Pair of class id and methodt
+typedef std::pair<const symbolt *, const java_bytecode_parse_treet::methodt *>
+  class_and_bytecodet;
+// Map from method id to class_and_bytecodet
+typedef std::map<irep_idt, class_and_bytecodet> method_bytecodet;
 
 typedef std::function<void(
   const symbolt &,
@@ -55,7 +53,7 @@ public:
   // not const since messaget
   bool operator()(
     symbol_tablet &symbol_table,
-    lazy_methodst &lazy_methods,
+    method_bytecodet &method_bytecode,
     method_convertert method_converter);
 
 private:
@@ -66,17 +64,17 @@ private:
   void initialize_needed_classes(
     const std::vector<irep_idt> &entry_points,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void initialize_all_needed_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void initialize_needed_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void gather_virtual_callsites(
     const exprt &e,
@@ -93,9 +91,10 @@ private:
     const symbol_tablet &symbol_table,
     symbol_tablet &needed);
 
-  void gather_field_types(const typet &class_type,
+  void gather_field_types(
+    const typet &class_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
     const std::set<irep_idt> &needed_classes,

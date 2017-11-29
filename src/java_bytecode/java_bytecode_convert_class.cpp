@@ -35,15 +35,15 @@ public:
     symbol_tablet &_symbol_table,
     message_handlert &_message_handler,
     size_t _max_array_length,
-    lazy_methodst& _lazy_methods,
+    method_bytecodet &method_bytecode,
     lazy_methods_modet _lazy_methods_mode,
-    java_string_library_preprocesst &_string_preprocess):
-    messaget(_message_handler),
-    symbol_table(_symbol_table),
-    max_array_length(_max_array_length),
-    lazy_methods(_lazy_methods),
-    lazy_methods_mode(_lazy_methods_mode),
-    string_preprocess(_string_preprocess)
+    java_string_library_preprocesst &_string_preprocess)
+    : messaget(_message_handler),
+      symbol_table(_symbol_table),
+      max_array_length(_max_array_length),
+      method_bytecode(method_bytecode),
+      lazy_methods_mode(_lazy_methods_mode),
+      string_preprocess(_string_preprocess)
   {
   }
 
@@ -73,7 +73,7 @@ public:
 protected:
   symbol_tablet &symbol_table;
   const size_t max_array_length;
-  lazy_methodst &lazy_methods;
+  method_bytecodet &method_bytecode;
   lazy_methods_modet lazy_methods_mode;
   java_string_library_preprocesst &string_preprocess;
 
@@ -205,7 +205,7 @@ void java_bytecode_convert_classt::convert(const classt &c)
       method,
       symbol_table,
       get_message_handler());
-    lazy_methods[method_identifier]=std::make_pair(class_symbol, &method);
+    method_bytecode[method_identifier] = std::make_pair(class_symbol, &method);
   }
 
   // is this a root class?
@@ -483,7 +483,7 @@ bool java_bytecode_convert_class(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  lazy_methodst &lazy_methods,
+  method_bytecodet &method_bytecode,
   lazy_methods_modet lazy_methods_mode,
   java_string_library_preprocesst &string_preprocess)
 {
@@ -491,7 +491,7 @@ bool java_bytecode_convert_class(
     symbol_table,
     message_handler,
     max_array_length,
-    lazy_methods,
+    method_bytecode,
     lazy_methods_mode,
     string_preprocess);
 

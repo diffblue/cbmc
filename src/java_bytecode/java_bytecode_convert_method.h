@@ -28,7 +28,7 @@ void java_bytecode_convert_method(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  safe_pointer<ci_lazy_methods_neededt> lazy_methods,
+  safe_pointer<ci_lazy_methods_neededt> needed_lazy_methods,
   java_string_library_preprocesst &string_preprocess);
 
 inline void java_bytecode_convert_method(

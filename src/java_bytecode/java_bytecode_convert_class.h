@@ -24,7 +24,7 @@ bool java_bytecode_convert_class(
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,
-  lazy_methodst &,
+  method_bytecodet &,
   lazy_methods_modet,
   java_string_library_preprocesst &string_preprocess);
 
