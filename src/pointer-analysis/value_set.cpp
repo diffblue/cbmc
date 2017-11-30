@@ -75,24 +75,23 @@ value_sett::entryt &value_sett::get_entry(
 bool value_sett::insert(
   object_mapt &dest,
   object_numberingt::number_type n,
-  const objectt &object) const
+  const offsett &offset) const
 {
   auto entry=dest.read().find(n);
 
   if(entry==dest.read().end())
   {
     // new
-    dest.write()[n]=object;
+    dest.write()[n] = offset;
     return true;
   }
-  else if(!entry->second.offset_is_set)
+  else if(!entry->second)
     return false; // no change
-  else if(object.offset_is_set &&
-          entry->second.offset==object.offset)
+  else if(offset && *entry->second == *offset)
     return false; // no change
   else
   {
-    dest.write()[n].offset_is_set=false;
+    dest.write()[n].reset();
     return true;
   }
 }
@@ -155,8 +154,8 @@ void value_sett::output(
       {
         result="<"+from_expr(ns, identifier, o)+", ";
 
-        if(o_it->second.offset_is_set)
-          result+=integer2string(o_it->second.offset)+"";
+        if(o_it->second)
+          result += integer2string(*o_it->second) + "";
         else
           result+='*';
 
@@ -199,8 +198,8 @@ exprt value_sett::to_expr(const object_map_dt::value_type &it) const
 
   od.object()=object;
 
-  if(it.second.offset_is_set)
-    od.offset()=from_integer(it.second.offset, index_type());
+  if(it.second)
+    od.offset() = from_integer(*it.second, index_type());
 
   od.type()=od.object().type();
 
@@ -282,7 +281,7 @@ bool value_sett::eval_pointer_offset(
         it=object_map.begin();
         it!=object_map.end();
         it++)
-      if(!it->second.offset_is_set)
+      if(!it->second)
         return false;
       else
       {
@@ -292,7 +291,7 @@ bool value_sett::eval_pointer_offset(
         if(ptr_offset<0)
           return false;
 
-        ptr_offset+=it->second.offset;
+        ptr_offset += *it->second;
 
         if(mod && ptr_offset!=previous_offset)
           return false;
@@ -635,15 +634,15 @@ void value_sett::get_value_set_rec(
         it!=pointer_expr_set.read().end();
         it++)
     {
-      objectt object=it->second;
+      offsett offset = it->second;
 
       // adjust by offset
-      if(object.offset_is_set && i_is_set)
-        object.offset+=i;
+      if(offset && i_is_set)
+        *offset += i;
       else
-        object.offset_is_set=false;
+        offset.reset();
 
-      insert(dest, it->first, object);
+      insert(dest, it->first, offset);
     }
   }
   else if(expr.id()==ID_mult)
@@ -668,12 +667,12 @@ void value_sett::get_value_set_rec(
         it!=pointer_expr_set.read().end();
         it++)
     {
-      objectt object=it->second;
+      offsett offset = it->second;
 
       // kill any offset
-      object.offset_is_set=false;
+      offset.reset();
 
-      insert(dest, it->first, object);
+      insert(dest, it->first, offset);
     }
   }
   else if(expr.id()==ID_side_effect)
@@ -1002,24 +1001,23 @@ void value_sett::get_reference_set_rec(
         if(ns.follow(object.type())!=array_type)
           index_expr.make_typecast(array.type());
 
-        objectt o=a_it->second;
+        offsett o = a_it->second;
         mp_integer i;
 
         if(offset.is_zero())
         {
         }
-        else if(!to_integer(offset, i) &&
-                o.offset_is_set)
+        else if(!to_integer(offset, i) && o)
         {
           mp_integer size=pointer_offset_size(array_type.subtype(), ns);
 
           if(size<=0)
-            o.offset_is_set=false;
+            o.reset();
           else
-            o.offset=i*size;
+            *o = i * size;
         }
         else
-          o.offset_is_set=false;
+          o.reset();
 
         insert(dest, index_expr, o);
       }
@@ -1052,7 +1050,7 @@ void value_sett::get_reference_set_rec(
         insert(dest, exprt(ID_unknown, expr.type()));
       else
       {
-        objectt o=it->second;
+        offsett o = it->second;
 
         member_exprt member_expr(object, component_name, expr.type());
 
@@ -1282,7 +1280,7 @@ void value_sett::do_free(
         else
         {
           // adjust
-          objectt o=o_it->second;
+          offsett o = o_it->second;
           exprt tmp(object);
           to_dynamic_object_expr(tmp).valid()=exprt(ID_unknown);
           insert(new_object_map, tmp, o);
