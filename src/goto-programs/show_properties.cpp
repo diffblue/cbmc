@@ -23,6 +23,30 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_functions.h"
 #include "goto_model.h"
 
+
+optionalt<source_locationt> find_property(
+    const irep_idt &property,
+    const goto_functionst & goto_functions)
+{
+  for(const auto &fct : goto_functions.function_map)
+  {
+    const goto_programt &goto_program = fct.second.body;
+
+    for(const auto &ins : goto_program.instructions)
+    {
+      if(ins.is_assert())
+      {
+        if(ins.source_location.get_property_id() == property)
+        {
+          return ins.source_location;
+        }
+      }
+    }
+  }
+  return { };
+}
+
+
 void show_properties(
   const namespacet &ns,
   const irep_idt &identifier,
