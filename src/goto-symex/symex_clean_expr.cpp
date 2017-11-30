@@ -174,19 +174,23 @@ static void adjust_byte_extract_rec(exprt &expr, const namespacet &ns)
   Forall_operands(it, expr)
     adjust_byte_extract_rec(*it, ns);
 
-  if(expr.id()==ID_byte_extract_big_endian ||
-     expr.id()==ID_byte_extract_little_endian)
+  if(
+    expr.id() == ID_byte_extract_big_endian ||
+    expr.id() == ID_byte_extract_little_endian)
   {
-    byte_extract_exprt &be=to_byte_extract_expr(expr);
-    if(be.op().id()==ID_symbol &&
-       to_ssa_expr(be.op()).get_original_expr().get_bool(ID_C_invalid_object))
+    byte_extract_exprt &be = to_byte_extract_expr(expr);
+    if(
+      be.op().id() == ID_symbol &&
+      to_ssa_expr(be.op()).get_original_expr().get_bool(ID_C_invalid_object))
+    {
       return;
+    }
 
     object_descriptor_exprt ode;
     ode.build(expr, ns);
 
-    be.op()=ode.root_object();
-    be.offset()=ode.offset();
+    be.op() = ode.root_object();
+    be.offset() = ode.offset();
   }
 }
 

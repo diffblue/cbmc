@@ -242,7 +242,7 @@ exprt flatten_byte_extract(
 
         byte_extract_exprt tmp(unpacked);
         tmp.type()=subtype;
-        tmp.offset()=new_offset;
+        tmp.offset() = new_offset;
 
         array.copy_to_operands(flatten_byte_extract(tmp, ns));
       }
@@ -277,7 +277,7 @@ exprt flatten_byte_extract(
 
       byte_extract_exprt tmp(unpacked);
       tmp.type()=comp.type();
-      tmp.offset()=new_offset;
+      tmp.offset() = new_offset;
 
       s.move_to_operands(tmp);
     }

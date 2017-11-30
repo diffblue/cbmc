@@ -1,5 +1,7 @@
 CORE
 test.c
 --no-simplify --unwind 300 --object-bits 8
+^EXIT=6$
+^SIGNAL=0$
 too many addressed objects
 --

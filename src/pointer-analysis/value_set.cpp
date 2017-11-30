@@ -639,7 +639,7 @@ void value_sett::get_value_set_rec(
 
       // adjust by offset
       if(object.offset_is_set && i_is_set)
-        object.offset+=i;
+        object.offset += i;
       else
         object.offset_is_set=false;
 
@@ -685,7 +685,7 @@ void value_sett::get_value_set_rec(
       // these should be gone
       throw "unexpected function_call sideeffect";
     }
-    else if(statement==ID_allocate)
+    else if(statement == ID_allocate)
     {
       assert(suffix=="");
 
@@ -1008,8 +1008,7 @@ void value_sett::get_reference_set_rec(
         if(offset.is_zero())
         {
         }
-        else if(!to_integer(offset, i) &&
-                o.offset_is_set)
+        else if(!to_integer(offset, i) && o.offset_is_set)
         {
           mp_integer size=pointer_offset_size(array_type.subtype(), ns);
 

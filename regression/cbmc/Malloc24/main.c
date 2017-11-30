@@ -2,8 +2,8 @@
 
 struct node
 {
-    int value;
-    struct node *next;
+  int value;
+  struct node *next;
 };
 
 struct list
@@ -12,7 +12,7 @@ struct list
   struct node *head;
 };
 
-void removeLast(struct list * l)
+void removeLast(struct list *l)
 {
   int index = l->size - 1;
   struct node **current;
@@ -22,7 +22,8 @@ void removeLast(struct list * l)
   l->size--;
 }
 
-int main () {
+int main()
+{
   //build a 2-nodes list
   struct node *n0 = malloc(sizeof(struct node));
   struct node *n1 = malloc(sizeof(struct node));
@@ -30,8 +31,8 @@ int main () {
   l->size = 2;
   l->head = n0;
 
-  n0->next=n1;
-  n1->next=NULL;
+  n0->next = n1;
+  n1->next = NULL;
 
   //remove last node from list
 
@@ -43,5 +44,5 @@ int main () {
   //this doesn't
   removeLast(l);
 
-  __CPROVER_assert(n0->next == NULL , "not NULL");
+  __CPROVER_assert(n0->next == NULL, "not NULL");
 }
