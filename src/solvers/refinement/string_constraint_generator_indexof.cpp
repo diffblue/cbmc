@@ -331,28 +331,22 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const exprt &from_index)
 {
   const typet &index_type = str.length().type();
-  symbol_exprt index=fresh_exist_index("last_index_of", index_type);
-  symbol_exprt contains=fresh_boolean("contains_in_last_index_of");
+  const symbol_exprt index = fresh_exist_index("last_index_of", index_type);
+  const symbol_exprt contains = fresh_boolean("contains_in_last_index_of");
 
-  exprt minus1=from_integer(-1, index_type);
-  and_exprt a1(
+  const exprt minus1 = from_integer(-1, index_type);
+  const and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
-    binary_relation_exprt(index, ID_lt, from_index_plus_one),
+    binary_relation_exprt(index, ID_le, from_index),
     binary_relation_exprt(index, ID_lt, str.length()));
   axioms.push_back(a1);
 
-  equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
+  const notequal_exprt a2(contains, equal_exprt(index, minus1));
   axioms.push_back(a2);
 
-  implies_exprt a3(
-    contains,
-    and_exprt(
-      binary_relation_exprt(from_index, ID_ge, index),
-      equal_exprt(str[index], c)));
+  const implies_exprt a3(contains, equal_exprt(str[index], c));
   axioms.push_back(a3);
 
-  symbol_exprt n=fresh_univ_index("QA_last_index_of1", index_type);
-  string_constraintt a4(
   const exprt index1 = from_integer(1, index_type);
   const plus_exprt from_index_plus_one(from_index, index1);
   const if_exprt end_index(
@@ -360,15 +354,17 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
     from_index_plus_one,
     str.length());
 
+  const symbol_exprt n = fresh_univ_index("QA_last_index_of1", index_type);
+  const string_constraintt a4(
     n,
     plus_exprt(index, index1),
     end_index,
     contains,
-    not_exprt(equal_exprt(str[n], c)));
+    notequal_exprt(str[n], c));
   axioms.push_back(a4);
 
-  symbol_exprt m=fresh_univ_index("QA_last_index_of2", index_type);
-  string_constraintt a5(
+  const symbol_exprt m = fresh_univ_index("QA_last_index_of2", index_type);
+  const string_constraintt a5(
     m, end_index, not_exprt(contains), notequal_exprt(str[m], c));
   axioms.push_back(a5);
 
