@@ -83,7 +83,6 @@ class invariant_failedt: public std::logic_error
     const std::string &reason);
 
  public:
-
   const std::string file;
   const std::string function;
   const int line;
@@ -117,20 +116,24 @@ class invariant_failedt: public std::logic_error
 #define INVARIANT(CONDITION, REASON) \
   __CPROVER_assert((CONDITION), "Invariant : " REASON)
 
+#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) \
+  INVARIANT(CONDITION, "")
 
 #elif defined(CPROVER_INVARIANT_DO_NOT_CHECK)
 // For performance builds, invariants can be ignored
 // This is *not* recommended as it can result in unpredictable behaviour
 // including silently reporting incorrect results.
 // This is also useful for checking side-effect freedom.
-#define INVARIANT(CONDITION, REASON, ...) do {} while(0)
+#define INVARIANT(CONDITION, REASON) do {} while(0)
+#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) do {} while(0)
 
 #elif defined(CPROVER_INVARIANT_ASSERT)
 // Not recommended but provided for backwards compatability
 #include <cassert>
 // NOLINTNEXTLINE(*)
-#define INVARIANT(CONDITION, REASON, ...) assert((CONDITION) && ((REASON), true))
-
+#define INVARIANT(CONDITION, REASON) assert((CONDITION) && ((REASON), true))
+// NOLINTNEXTLINE(*)
+#define INVARIANT_STRUCTURED(CONDITION, TYPENAME, ...) assert((CONDITION))
 #else
 
 void print_backtrace(std::ostream &out);

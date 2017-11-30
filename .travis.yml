@@ -117,7 +117,7 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
-    # Ubuntu Linux with glibc using clang++-3.7
+    # Ubuntu Linux with glibc using clang++-3.7, no-debug mode
     - stage: Test different OS/CXX/Flags
       os: linux
       sudo: false
@@ -140,6 +140,7 @@ jobs:
       env:
         - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
+        - EXTRA_CXXFLAGS="-DNDEBUG"
 
     # Ubuntu Linux with glibc using clang++-3.7, debug mode
     - stage: Test different OS/CXX/Flags
@@ -167,6 +168,7 @@ jobs:
         - EXTRA_CXXFLAGS="-DDEBUG"
       script: echo "Not running any tests for a debug build."
 
+    # cmake build using g++-5
     - stage: Test different OS/CXX/Flags
       os: linux
       cache: ccache
