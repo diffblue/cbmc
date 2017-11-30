@@ -86,7 +86,7 @@ public:
   {
     source_location.set_file(file);
     source_location.set_working_directory(
-      get_current_working_directory());
+      fileutil_get_current_working_directory());
   }
 
   irep_idt get_file() const

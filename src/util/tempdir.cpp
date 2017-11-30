@@ -82,12 +82,12 @@ temp_dirt::temp_dirt(const std::string &name_template)
 
 std::string temp_dirt::operator()(const std::string &file)
 {
-  return concat_dir_file(path, file);
+  return fileutil_concat_dir_file(path, file);
 }
 
 void temp_dirt::clear()
 {
-  delete_directory(path);
+  fileutil_delete_directory(path);
 }
 
 temp_dirt::~temp_dirt()
@@ -98,7 +98,7 @@ temp_dirt::~temp_dirt()
 temp_working_dirt::temp_working_dirt(const std::string &name_template):
   temp_dirt(name_template)
 {
-  old_working_directory=get_current_working_directory();
+  old_working_directory=fileutil_get_current_working_directory();
   if(chdir(path.c_str())!=0)
     CHECK_RETURN(false);
 }
