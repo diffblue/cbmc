@@ -17,20 +17,33 @@
 
 #include <goto-programs/resolve_concrete_function_call.h>
 
-
+/// Constructor for lazy-method loading
+/// \param symbol_table: the symbol table to use
+/// \param main_class: identifier of the entry point / main class
+/// \param main_jar_classes: specify main class of jar if \p main_class is empty
+/// \param lazy_methods_extra_entry_points: entry point functions to use
+/// \param java_class_loader: the Java class loader to use
+/// \param extra_needed_classes: list of class identifiers which are considered
+/// to be required and therefore their methods should not be removed via
+/// `lazy-methods`. Example of use: `ArrayList` as general implementation for
+/// `List` interface.
+/// \param pointer_type_selector: selector to handle correct pointer types
+/// \param message_handler: the message handler to use for output
 ci_lazy_methodst::ci_lazy_methodst(
   const symbol_tablet &symbol_table,
   const irep_idt &main_class,
   const std::vector<irep_idt> &main_jar_classes,
   const std::vector<irep_idt> &lazy_methods_extra_entry_points,
   java_class_loadert &java_class_loader,
+  const std::vector<irep_idt> &extra_needed_classes,
   const select_pointer_typet &pointer_type_selector,
-  message_handlert &message_handler):
-    messaget(message_handler),
+  message_handlert &message_handler)
+  : messaget(message_handler),
     main_class(main_class),
     main_jar_classes(main_jar_classes),
     lazy_methods_extra_entry_points(lazy_methods_extra_entry_points),
     java_class_loader(java_class_loader),
+    extra_needed_classes(extra_needed_classes),
     pointer_type_selector(pointer_type_selector)
 {
   // build the class hierarchy
@@ -279,6 +292,10 @@ void ci_lazy_methodst::initialize_needed_classes(
   lazy_methods.add_needed_class("java::java.lang.String");
   lazy_methods.add_needed_class("java::java.lang.Class");
   lazy_methods.add_needed_class("java::java.lang.Object");
+
+  // As in class_loader, ensure these classes stay available
+  for(const auto &id : extra_needed_classes)
+    lazy_methods.add_needed_class("java::" + id2string(id));
 }
 
 /// Build up list of methods for types for a pointer and any types it

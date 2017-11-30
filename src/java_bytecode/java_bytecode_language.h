@@ -21,15 +21,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <java_bytecode/select_pointer_type.h>
 
-#define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/ \
-  "(java-assume-inputs-non-null)"                 \
-  "(java-throw-runtime-exceptions)"               \
-  "(java-max-input-array-length):"                \
-  "(java-max-input-tree-depth):"                  \
-  "(java-max-vla-length):"                        \
-  "(java-cp-include-files):"                      \
-  "(lazy-methods)"                                \
-  "(lazy-methods-extra-entry-point):"
+#define JAVA_BYTECODE_LANGUAGE_OPTIONS /*NOLINT*/                              \
+  "(java-assume-inputs-non-null)"                                              \
+  "(java-throw-runtime-exceptions)"                                            \
+  "(java-max-input-array-length):"                                             \
+  "(java-max-input-tree-depth):"                                               \
+  "(java-max-vla-length):"                                                     \
+  "(java-cp-include-files):"                                                   \
+  "(lazy-methods)"                                                             \
+  "(lazy-methods-extra-entry-point):"                                          \
+  "(java-load-class):"
 
 #define JAVA_BYTECODE_LANGUAGE_OPTIONS_HELP /*NOLINT*/                                          \
   " --java-assume-inputs-non-null    never initialize reference-typed parameter to the\n"       \
@@ -176,6 +177,9 @@ protected:
   bool throw_runtime_exceptions;
   java_string_library_preprocesst string_preprocess;
   std::string java_cp_include_files;
+
+  // list of classes to force load even without reference from the entry point
+  std::vector<irep_idt> java_load_classes;
 
 private:
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
