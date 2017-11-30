@@ -73,7 +73,7 @@ public:
 
   class object_map_dt
   {
-    typedef std::map<unsigned, objectt> data_typet;
+    typedef std::map<object_numberingt::number_type, objectt> data_typet;
     data_typet data;
 
   public:
@@ -94,7 +94,10 @@ public:
 
     size_t size() const { return data.size(); }
 
-    objectt &operator[](unsigned i) { return data[i]; }
+    objectt &operator[](object_numberingt::number_type i)
+    {
+      return data[i];
+    }
 
     template <typename It>
     void insert(It b, It e) { data.insert(b, e); }
@@ -135,7 +138,10 @@ public:
     return insert(dest, object_numbering.number(src), objectt(offset));
   }
 
-  bool insert(object_mapt &dest, unsigned n, const objectt &object) const
+  bool insert(
+    object_mapt &dest,
+    object_numberingt::number_type n,
+    const objectt &object) const
   {
     if(dest.read().find(n)==dest.read().end())
     {

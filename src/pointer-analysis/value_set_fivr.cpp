@@ -1674,7 +1674,7 @@ void value_set_fivrt::apply_code(
 
 bool value_set_fivrt::insert_to(
   object_mapt &dest,
-  unsigned n,
+  object_numberingt::number_type n,
   const objectt &object) const
 {
   object_map_dt &map=dest.write();
@@ -1715,7 +1715,7 @@ bool value_set_fivrt::insert_to(
 
 bool value_set_fivrt::insert_from(
   object_mapt &dest,
-  unsigned n,
+  object_numberingt::number_type n,
   const objectt &object) const
 {
   object_map_dt &map=dest.write();
