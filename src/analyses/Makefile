@@ -22,6 +22,7 @@ SRC = ai.cpp \
       locals.cpp \
       natural_loops.cpp \
       reaching_definitions.cpp \
+      reachable_call_graph.cpp \
       static_analysis.cpp \
       uncaught_exceptions_analysis.cpp \
       uninitialized_domain.cpp \

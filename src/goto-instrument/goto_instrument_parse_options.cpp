@@ -61,6 +61,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/dependence_graph.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/is_threaded.h>
+#include <analyses/reachable_call_graph.h>
+
 
 #include <cbmc/version.h>
 
@@ -648,15 +650,33 @@ int goto_instrument_parse_optionst::doit()
     {
       do_indirect_call_and_rtti_removal();
       call_grapht call_graph(goto_model);
-
       if(cmdline.isset("xml"))
         call_graph.output_xml(std::cout);
-      else if(cmdline.isset("dot"))
-        call_graph.output_dot(std::cout);
       else
-        call_graph.output(std::cout);
+        call_graph.output_dot(std::cout);
 
       return CPROVER_EXIT_SUCCESS;
+    }
+
+    if(cmdline.isset("reachable-call-graph"))
+    {
+      do_indirect_call_and_rtti_removal();
+      reachable_call_grapht reach_graph(goto_model);
+      if(cmdline.isset("property"))
+      {
+        std::list<std::string> function_names = cmdline.get_values("property");
+        if(function_names.size() > 1)
+          status() << "Only one destination allowed, "
+              "using only first function name given\n";
+        cmdline.get_value("property");
+        std::cout << "list of reachable functions: \n";
+        for(const auto f :
+            reach_graph.backward_slice(function_names.front()))
+          std::cout << f << "\n";
+      }
+      else
+        reach_graph.output_dot(std::cout);
+    return 0;
     }
 
     if(cmdline.isset("dot"))
@@ -1410,6 +1430,54 @@ void goto_instrument_parse_optionst::instrument_goto_program()
       throw 0;
   }
 
+  // aggressive slicer
+  if(cmdline.isset("aggressive-slice"))
+  {
+    do_indirect_call_and_rtti_removal();
+
+    status() << "Slicing away initializations of unused global variables"
+             << eom;
+    slice_global_inits(goto_model);
+
+    status() << "Performing an aggressive slice" << eom;
+    aggressive_slicert aggressive_slicer(goto_model, get_message_handler());
+
+    if(cmdline.isset("preserve-all-direct-paths"))
+    {
+      if(!cmdline.isset("property"))
+      {
+        error() << "Property must be specified"
+                << " with the sound aggressive slicer"
+                << eom;
+        throw 0;
+      }
+      aggressive_slicer.preserve_all_direct_paths=true;
+    }
+
+    if(cmdline.isset("call-depth"))
+      aggressive_slicer.call_depth = safe_string2unsigned(
+          cmdline.get_value("call-depth"));
+
+    if(cmdline.isset("preserve-function"))
+      aggressive_slicer.preserve_functions(
+          cmdline.get_values("preserve-function"));
+
+    if(cmdline.isset("property"))
+      aggressive_slicer.properties = cmdline.get_values("property");
+
+    if(cmdline.isset("preserve-functions-containing"))
+      aggressive_slicer.name_snippets = cmdline.get_values(
+          "preserve-functions-containing");
+
+    aggressive_slicer.doit();
+
+    status() << "Performing a reachability slice" << eom;
+    if(cmdline.isset("property"))
+      reachability_slicer(goto_model, cmdline.get_values("property"));
+    else
+      reachability_slicer(goto_model);
+  }
+
   // recalculate numbers, etc.
   goto_model.goto_functions.update();
 }
@@ -1454,6 +1522,8 @@ void goto_instrument_parse_optionst::help()
     " --list-calls-args            list all function calls with their arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --print-path-lengths         print statistics about control-flow graph paths\n"
+    " --call-graph                 show graph of function calls\n"
+    " --reachable-call-graph       show graph of function calls potentially reachable from main function\n" // NOLINT(*)
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
@@ -1507,6 +1577,15 @@ void goto_instrument_parse_optionst::help()
     " --full-slice                 slice away instructions that don't affect assertions\n" // NOLINT(*)
     " --property id                slice with respect to specific property only\n" // NOLINT(*)
     " --slice-global-inits         slice away initializations of unused global variables\n" // NOLINT(*)
+    " --aggressive-slice           remove bodies of any functions not on the shortest path between\n" // NOLINT(*)
+    "                              the start function and the function containing the property(s)\n" // NOLINT(*)
+    " --call-depth <n>             used with aggressive-slice, preserves all functions within <n> function calls\n" // NOLINT(*)
+    "                              of the functions on the shortest path\n"
+    " --preserve-function <f>      force the aggressive slicer to preserve function <f>\n" // NOLINT(*)
+    " --preserve-function containing <f>\n"
+    "                              force the aggressive slicer to preserve all functions with names containing <f>\n" // NOLINT(*)
+    " --preserve-all-direct-paths  force the aggressive slicer to preserve all functions on direct paths to the property\n" // NOLINT(*)
+    "                              Must be used with a specified property\n"
     "\n"
     "Further transformations:\n"
     " --constant-propagator        propagate constants and simplify expressions\n" // NOLINT(*)

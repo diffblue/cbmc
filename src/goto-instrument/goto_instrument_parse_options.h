@@ -44,6 +44,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(max-var):(max-po-trans):(ignore-arrays)" \
   "(cfg-kill)(no-dependencies)(force-loop-duplication)" \
   "(call-graph)" \
+  "(reachable-call-graph)" \
   "(no-po-rendering)(render-cluster-file)(render-cluster-function)" \
   "(nondet-volatile)(isr):" \
   "(stack-depth):(nondet-static)" \
@@ -79,7 +80,12 @@ Author: Daniel Kroening, kroening@kroening.com
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
   "(splice-call):" \
-
+  "(aggressive-slice)" \
+  "(call-depth):" \
+  "(harness-generator):" \
+  "(preserve-function):" \
+  "(preserve-functions-containing):" \
+  "(preserve-all-direct-paths)" \
 
 class goto_instrument_parse_optionst:
   public parse_options_baset,
