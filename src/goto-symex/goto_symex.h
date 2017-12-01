@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_H
 
 #include <util/options.h>
+#include <util/message.h>
 #include <util/byte_operators.h>
 
 #include <goto-programs/goto_functions.h>
@@ -42,18 +43,20 @@ class goto_symext
 {
 public:
   goto_symext(
+    message_handlert &mh,
     const namespacet &_ns,
     symbol_tablet &_new_symbol_table,
-    symex_targett &_target):
-    total_vccs(0),
-    remaining_vccs(0),
-    constant_propagation(true),
-    new_symbol_table(_new_symbol_table),
-    language_mode(),
-    ns(_ns),
-    target(_target),
-    atomic_section_counter(0),
-    guard_identifier("goto_symex::\\guard")
+    symex_targett &_target)
+    : total_vccs(0),
+      remaining_vccs(0),
+      constant_propagation(true),
+      new_symbol_table(_new_symbol_table),
+      language_mode(),
+      ns(_ns),
+      target(_target),
+      atomic_section_counter(0),
+      log(mh),
+      guard_identifier("goto_symex::\\guard")
   {
     options.set_option("simplify", true);
     options.set_option("assertions", true);
@@ -138,6 +141,8 @@ protected:
   const namespacet &ns;
   symex_targett &target;
   unsigned atomic_section_counter;
+
+  mutable messaget log;
 
   friend class symex_dereference_statet;
 

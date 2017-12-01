@@ -51,7 +51,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   path_acceleratort &accelerator)
 {
   std::map<exprt, polynomialt> polynomials;
-  scratch_programt program(symbol_table);
+  scratch_programt program(symbol_table, message_handler);
 
   accelerator.clear();
 
@@ -144,7 +144,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   expr_sett dirty;
   utils.find_modified(accelerator.path, dirty);
   polynomial_acceleratort path_acceleration(
-    symbol_table, goto_functions, loop_counter);
+    message_handler, symbol_table, goto_functions, loop_counter);
   goto_programt::instructionst assigns;
 
   for(patht::iterator it=accelerator.path.begin();
@@ -342,7 +342,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
 bool disjunctive_polynomial_accelerationt::find_path(patht &path)
 {
-  scratch_programt program(symbol_table);
+  scratch_programt program(symbol_table, message_handler);
 
   program.append(fixed);
   program.append(fixed);
@@ -410,7 +410,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   std::vector<expr_listt> parameters;
   std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
-  scratch_programt program(symbol_table);
+  scratch_programt program(symbol_table, message_handler);
   expr_sett influence;
 
   cone_of_influence(var, influence);
@@ -713,7 +713,7 @@ void disjunctive_polynomial_accelerationt::assert_for_values(
       {
         std::map<exprt, exprt>::iterator v_it=values.find(e);
 
-        assert(v_it!=values.end());
+        PRECONDITION(v_it!=values.end());
 
         mult_exprt mult(concrete_value, v_it->second);
         mult.swap(concrete_value);
@@ -791,9 +791,9 @@ void disjunctive_polynomial_accelerationt::build_path(
 
     const auto succs=goto_program.get_successors(t);
 
-    // We should have a looping path, so we should never hit a location
-    // with no successors.
-    assert(succs.size() > 0);
+    INVARIANT(succs.size() > 0,
+        "we should have a looping path, so we should never hit a location "
+        "with no successors.");
 
     if(succs.size()==1)
     {
@@ -824,7 +824,7 @@ void disjunctive_polynomial_accelerationt::build_path(
       }
     }
 
-    assert(found_branch);
+    PRECONDITION(found_branch);
 
     exprt cond=nil_exprt();
 
@@ -861,7 +861,7 @@ void disjunctive_polynomial_accelerationt::build_path(
  */
 void disjunctive_polynomial_accelerationt::build_fixed()
 {
-  scratch_programt scratch(symbol_table);
+  scratch_programt scratch(symbol_table, message_handler);
   std::map<exprt, exprt> shadow_distinguishers;
 
   fixed.copy_from(goto_program);
@@ -941,7 +941,7 @@ void disjunctive_polynomial_accelerationt::build_fixed()
 
     if(t->is_goto())
     {
-      assert(fixedt->is_goto());
+      PRECONDITION(fixedt->is_goto());
       // If this is a forwards jump, it's either jumping inside the loop
       // (in which case we leave it alone), or it jumps outside the loop.
       // If it jumps out of the loop, it's on a path we don't care about

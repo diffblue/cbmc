@@ -109,14 +109,14 @@ int acceleratet::accelerate_loop(goto_programt::targett &loop_header)
   program.update();
 
 #if 1
-  enumerating_loop_accelerationt
-    acceleration(
-      symbol_table,
-      goto_functions,
-      program,
-      loop,
-      loop_header,
-      accelerate_limit);
+  enumerating_loop_accelerationt acceleration(
+    message_handler,
+    symbol_table,
+    goto_functions,
+    program,
+    loop,
+    loop_header,
+    accelerate_limit);
 #else
   disjunctive_polynomial_accelerationt
     acceleration(symbol_table, goto_functions, program, loop, loop_header);
@@ -333,7 +333,7 @@ void acceleratet::set_dirty_vars(path_acceleratort &accelerator)
 
     if(jt==dirty_vars_map.end())
     {
-      scratch_programt scratch(symbol_table);
+      scratch_programt scratch(symbol_table, message_handler);
       symbolt new_sym=utils.fresh_symbol("accelerate::dirty", bool_typet());
       dirty_var=new_sym.symbol_expr();
       dirty_vars_map[*it]=dirty_var;
@@ -512,7 +512,7 @@ void acceleratet::insert_automaton(trace_automatont &automaton)
   // machine.
   for(const auto &sym : automaton.alphabet)
   {
-    scratch_programt state_machine(symbol_table);
+    scratch_programt state_machine(symbol_table, message_handler);
     trace_automatont::sym_range_pairt p=transitions.equal_range(sym);
 
     build_state_machine(p.first, p.second, accept_states, state, next_state,
@@ -648,15 +648,16 @@ int acceleratet::accelerate_loops()
   return num_accelerated;
 }
 
-
 void accelerate_functions(
   goto_modelt &goto_model,
+  message_handlert &message_handler,
   bool use_z3)
 {
   Forall_goto_functions(it, goto_model.goto_functions)
   {
     std::cout << "Accelerating function " << it->first << '\n';
-    acceleratet accelerate(it->second.body, goto_model, use_z3);
+    acceleratet accelerate(
+      it->second.body, goto_model, message_handler, use_z3);
 
     int num_accelerated=accelerate.accelerate_loops();
 
