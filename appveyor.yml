@@ -12,18 +12,14 @@ install:
     md deps
     }
     cd deps
-    if (!(Test-Path bin\bison.exe)) {
-    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/bison-2.4.1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=JAPFzNPMJDI4IViAVlJAEc6l8aHB3k17NpZRdoWDMLbALaJNX88vfwocuezU1tfhyrSJxfo2fTK4rgP5OULkikJs7MBZI9ovp2V%2BMT6yg87KDdH9EIOlMgltGfbP%2BoZkwBY7kXb3W5puSlt4OTE%2Bw7CRlHF9MNqFXVBqVBfa%2BGw0gXDe5Jd9qV%2BvUXZzRuBl9ERSQkSD%2B%2B%2BxFo24FZoOeYkgBHJz03%2BHuIMnlmcLgneTB2aiZZU3%2B6UTPceUxLus9%2Bksb5UbqEVaVE06TIXl76VKwqAgXM2LWaNyeJDog%2BT%2BhjW4v4ypxh6mIBo5KRNXVLPc1MxSPFQB3ITlIXv9Zg%3D%3D"
-    & 7z x bison-2.4.1-bin.zip
-    }
-    if (!(Test-Path bin\flex.exe)) {
-    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/flex-2.5.4a-1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=WriP8S047Mmq271ZHWL0MCPGx1gEFsuc%2BKMmChoXhXFRkn0GlIgCxZEiOu52ke9fT1kAvycWXePNBFAyCHjpF%2BJkXCwisQ6FLIf3NL%2F92849YgQKdJkDUOcZ%2Bh82XVTwNBrljKIkExkak7QEyhOf3buTC1oeuatCUV5Ez42RZjgtRiJaqcFW6xLbhfuVONr39KxH5hGx%2FDUi2RRXPbgoKDwavc9s56NP1rNbWMTE6NdNHzJeaf43E%2BSMemlVO%2BhhIY6W0f%2FtaQ7fYF%2F6YaqxdQ0sB8W5DnG4Hb%2F0CyQlrTZpGDXGr301rV0M4WBkYLmfauq4IyJsBaR095tXGW%2BzmA%3D%3D"
-    & 7z x flex-2.5.4a-1-bin.zip
-    }
-    if (!(Test-Path include\FlexLexer.h)) {
-    & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/flex-2.5.4a-1-lib.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=H%2FLeKGv2QqKAGDTP%2F6TYPhDzuL6K%2F5dFOt61HfYBm1vUWVUNmAYVGvUAcvnUqBnhEHwZgtc8vZt1H7k3W8azxCUc7l6ZhlCDbqQ6Mg2VhfpBaQMbL1V%2BjSq5ePpWcuLMBntKk2br38PF1NtiAwCCpRTRPptaYPeGs%2BOjAH%2BN8aIIxjvj45QAgt9mcg6dfBsyfj5fdJmpHRQFuJ7%2FnsG50fmN5JDvdvmBWloB6rjxVWaN4XO6VTWZFZ34JWFyOqgWNEw9aDN3HdsSuJ0Uz19AbdwZBIWe5Elrl71rRJjn1lijCknDB7D4sAmP33k71e%2BB0qvsNl1Shuh9FkY8Z6y05Q%3D%3D"
-    & 7z x flex-2.5.4a-1-lib.zip
-    }
+    appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/win_flex_bison-latest.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1543674503&Signature=CojdaOYrFl50gbxCQL%2BlfVtuo7j9v1OzfWD6jYIkfv1h7xzCacigAM51%2BVjaVx%2B8yvUjk%2B4MOU%2FKmLzev7dABWNi5n7p7SvlXYPFVVwDE57Me35Xi7BzW%2FhoSaPnVIGuhAmDfxjGoHhB0Of%2Fd2FfMl4cklGgc2YafTpFX3agNCE4dcc1UyG0SY5CbvTGTuBP%2B99zaQ69lNT1TSNUNp0PW2Hhj%2FPylts0IdDm713RA4wcNIHvLTTppBiNwMm0y%2B0qRG1op3R4vc5gahz%2B6dTUnCevYWO5l%2FIvmXQyo4XNkgqLKIRgk4wisLjtSuRh5vPyD%2FQPOrn2ubT53YnDcW6geA%3D%3D"
+    7z x win_flex_bison-latest.zip
+    Move-Item win_bison.exe bin\bison.exe -force
+    Move-Item win_flex.exe bin\flex.exe -force
+    Move-Item FlexLexer.h include\FlexLexer.h -force
+    Move-Item data bin\data -force
+    bison -V
+    flex -V
     if (!(Test-Path bin\iconv.exe)) {
     & appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/libiconv-1.9.2-1-bin.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1519839050&Signature=sS3Y2lC1oWOhBDsL8C9ASuO4LOM%2BpB%2F8PwG5w5CdB9JnPfLqhb3FnA1zkkZJoSNuIYS3DM6CN2qxoWjpJbLEtVQe0PpxziQZjLpJw2MpxXdJiJHRDu8x9THgzwuZ3ze5BWHzPoCBQPdRkKzVPezf1HwptUsm3Y9c2jlWljQjhc8NVsI4iPmjEOwT8E%2BYpR5fsLs2GsRjuoyqKa%2Bi4JJ6MbpXVX1IgR4fzp1Li9SnE39ujHDb%2FyI3c96eCdVm1Oa6jNxzSJNfq%2FgOZM8BIxlR55a%2BtM3oBQhU0voEtDOABwuO7ZBay8dLt%2FG5vz1%2Bi%2FIlRLFxQfICaprPLzw6pXRm8Q%3D%3D"
     & 7z x libiconv-1.9.2-1-bin.zip
