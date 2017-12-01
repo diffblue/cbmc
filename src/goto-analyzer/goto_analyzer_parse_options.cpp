@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Goto-Analyser Command Line Option Processing
+Module: Goto-Analyzer Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -38,7 +38,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
 
+#include <analyses/is_threaded.h>
+#include <analyses/goto_check.h>
 #include <analyses/local_may_alias.h>
+#include <analyses/constant_propagator.h>
+#include <analyses/dependence_graph.h>
 
 #include <langapi/mode.h>
 
@@ -47,12 +51,16 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
+#include <util/exit_codes.h>
 
 #include <cbmc/version.h>
 
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
 #include "static_analyzer.h"
+#include "static_show_domain.h"
+#include "static_simplifier.h"
+#include "static_verifier.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -200,6 +208,106 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("text", true);
     options.set_option("outfile", "-");
   }
+
+  // The use should either select:
+  //  1. a specific analysis, or
+  //  2. a triple of task / analyzer / domain, or
+  //  3. one of the general display options
+
+  // Task options
+  if(cmdline.isset("show"))
+  {
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+  }
+  else if(cmdline.isset("verify"))
+  {
+    options.set_option("verify", true);
+    options.set_option("general-analysis", true);
+  }
+  else if(cmdline.isset("simplify"))
+  {
+    options.set_option("simplify", true);
+    options.set_option("outfile", cmdline.get_value("simplify"));
+    options.set_option("general-analysis", true);
+
+    // For development allow slicing to be disabled in the simplify task
+    options.set_option(
+      "simplify-slicing",
+      !(cmdline.isset("no-simplify-slicing")));
+  }
+
+
+  if (options.get_bool_option("general-analysis"))
+  {
+    // Abstract interpreter choice
+    if(cmdline.isset("location-sensitive"))
+      options.set_option("location-sensitive", true);
+    else if(cmdline.isset("concurrent"))
+      options.set_option("concurrent", true);
+    else
+    {
+      // Silently default to location-sensitive as it's the "default"
+      // view of abstract interpretation.
+      options.set_option("location-sensitive", true);
+    }
+
+    // Domain choice
+    if(cmdline.isset("constants"))
+    {
+      options.set_option("constants", true);
+      options.set_option("domain set", true);
+    }
+    else if(cmdline.isset("dependence-graph"))
+    {
+      options.set_option("dependence-graph", true);
+      options.set_option("domain set", true);
+    }
+
+    if(!options.get_bool_option("domain set"))
+    {
+      // Deafult to constants as it is light-weight but useful
+      status() << "Domain defaults to --constants" << eom;
+      options.set_option("constants", true);
+    }
+  }
+}
+
+/// For the task, build the appropriate kind of analyzer
+/// Ideally this should be a pure function of options.
+/// However at the moment some domains require the goto_model
+ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
+{
+  ai_baset *domain = nullptr;
+
+  if(options.get_bool_option("location-sensitive"))
+  {
+    if(options.get_bool_option("constants"))
+    {
+      // constant_propagator_ait derives from ait<constant_propagator_domaint>
+      domain=new constant_propagator_ait(goto_model.goto_functions);
+    }
+    else if(options.get_bool_option("dependence-graph"))
+    {
+      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+    }
+  }
+  else if(options.get_bool_option("concurrent"))
+  {
+#if 0
+    // Disabled until merge_shared is implemented for these
+    if(options.get_bool_option("constants"))
+    {
+      domain=new concurrency_aware_ait<constant_propagator_domaint>();
+    }
+    else if(options.get_bool_option("dependence-graph"))
+    {
+      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+    }
+#endif
+  }
+
+  return domain;
 }
 
 /// invoke main modules
@@ -404,6 +512,79 @@ int goto_analyzer_parse_optionst::doit()
     return result?10:0;
   }
 
+  if(options.get_bool_option("general-analysis"))
+  {
+
+    // Output file factory
+    const std::string outfile=options.get_option("outfile");
+    std::ofstream output_stream;
+    if(!(outfile=="-"))
+      output_stream.open(outfile);
+
+    std::ostream &out((outfile=="-") ? std::cout : output_stream);
+
+    if(!out)
+    {
+      error() << "Failed to open output file `"
+              << outfile << "'" << eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+    // Build analyzer
+    status() << "Selecting abstract domain" << eom;
+    std::unique_ptr<ai_baset> analyzer(build_analyzer(options));
+
+    if(analyzer == nullptr)
+    {
+      status() << "Task / Interpreter / Domain combination not supported"
+               << messaget::eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+
+    // Run
+    status() << "Computing abstract states" << eom;
+    (*analyzer)(goto_model);
+
+    // Perform the task
+    status() << "Performing task" << eom;
+    bool result = true;
+    if(options.get_bool_option("show"))
+    {
+      result = static_show_domain(goto_model,
+                                  *analyzer,
+                                  options,
+                                  get_message_handler(),
+                                  out);
+    }
+    else if(options.get_bool_option("verify"))
+    {
+      result = static_verifier(goto_model,
+                               *analyzer,
+                               options,
+                               get_message_handler(),
+                               out);
+    }
+    else if(options.get_bool_option("simplify"))
+    {
+      result = static_simplifier(goto_model,
+                                 *analyzer,
+                                 options,
+                                 get_message_handler(),
+                                 out);
+    }
+    else
+    {
+      error() << "Unhandled task" << eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+    return result ?
+      CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_VERIFICATION_SAFE;
+  }
+
+
+  // Final defensive error case
   error() << "no analysis option given -- consider reading --help"
           << eom;
   return 6;
@@ -516,7 +697,7 @@ void goto_analyzer_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* * GOTO-ANALYSER " CBMC_VERSION " - Copyright (C) 2016 ";
+    "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
@@ -531,8 +712,30 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
+    "Task options:\n"
+    " --show                       display the abstract domains\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --verify                     use the abstract domains to check assertions\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --simplify file_name         use the abstract domains to simplify the program\n"
     "\n"
+    "Abstract interpreter options:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --location-sensitive         use location-sensitive abstract interpreter\n"
+    " --concurrent                 use concurrency-aware abstract interpreter\n"
+    "\n"
+    "Domain options:\n"
+    " --constants                  constant domain\n"
+    " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    "\n"
+    "Output options:\n"
+    " --text file_name             output results in plain text to given file\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --json file_name             output results in JSON format to given file\n"
+    " --xml file_name              output results in XML format to given file\n"
+    " --dot file_name              output results in DOT format to given file\n"
+    "\n"
+    "Specific analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
     " --unreachable-instructions   list dead code\n"
@@ -542,11 +745,6 @@ void goto_analyzer_parse_optionst::help()
     " --reachable-functions        list functions reachable from the entry point\n"
     " --intervals                  interval analysis\n"
     " --non-null                   non-null analysis\n"
-    "\n"
-    "Analysis options:\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --json file_name             output results in JSON format to given file\n"
-    " --xml file_name              output results in XML format to given file\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"

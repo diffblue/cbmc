@@ -4,6 +4,9 @@ SRC = goto_analyzer_main.cpp \
       taint_analysis.cpp \
       taint_parser.cpp \
       unreachable_instructions.cpp \
+      static_show_domain.cpp \
+      static_simplifier.cpp \
+      static_verifier.cpp \
       # Empty last line
 
 OBJ += ../ansi-c/ansi-c$(LIBEXT) \
