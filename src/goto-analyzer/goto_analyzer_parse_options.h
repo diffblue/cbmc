@@ -166,6 +166,8 @@ protected:
   virtual bool process_goto_program(const optionst &options);
   bool set_properties();
 
+  virtual int perform_analysis(const optionst &options);
+
   ai_baset *build_analyzer(const optionst &options);
 
   void eval_verbosity();

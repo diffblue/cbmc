@@ -376,6 +376,40 @@ int goto_analyzer_parse_optionst::doit()
     return 6;
   }
 
+  try
+  {
+    return perform_analysis(options);
+  }
+
+  catch(const char *e)
+  {
+    error() << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(const std::string &e)
+  {
+    error() << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(int e)
+  {
+    error() << "Numeric exception: " << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(const std::bad_alloc &)
+  {
+    error() << "Out of memory" << eom;
+    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
+  }
+}
+
+
+/// Depending on the command line mode, run one of the analysis tasks
+int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
+{
   if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
