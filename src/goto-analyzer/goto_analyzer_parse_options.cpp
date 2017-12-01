@@ -131,6 +131,75 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
   #endif
+
+  // Select a specific analysis
+  if(cmdline.isset("taint"))
+  {
+    options.set_option("taint", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("unreachable-instructions"))
+  {
+    options.set_option("unreachable-instructions", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("unreachable-functions"))
+  {
+    options.set_option("unreachable-functions", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("reachable-functions"))
+  {
+    options.set_option("reachable-functions", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("intervals"))
+  {
+    options.set_option("intervals", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("show-intervals"))
+  {
+    options.set_option("show-intervals", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("non-null"))
+  {
+    options.set_option("non-null", true);
+    options.set_option("specific-analysis", true);
+  }
+  if(cmdline.isset("show-local-may-alias"))
+  {
+    options.set_option("show-local-may-alias", true);
+    options.set_option("specific-analysis", true);
+  }
+
+  // Output format choice
+  if(cmdline.isset("text"))
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", cmdline.get_value("text"));
+  }
+  else if(cmdline.isset("json"))
+  {
+    options.set_option("json", true);
+    options.set_option("outfile", cmdline.get_value("json"));
+  }
+  else if(cmdline.isset("xml"))
+  {
+    options.set_option("xml", true);
+    options.set_option("outfile", cmdline.get_value("xml"));
+  }
+  else if(cmdline.isset("dot"))
+  {
+    options.set_option("dot", true);
+    options.set_option("outfile", cmdline.get_value("dot"));
+  }
+  else
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", "-");
+  }
 }
 
 /// invoke main modules
@@ -199,7 +268,7 @@ int goto_analyzer_parse_optionst::doit()
     return 6;
   }
 
-  if(cmdline.isset("taint"))
+  if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
 
@@ -218,7 +287,7 @@ int goto_analyzer_parse_optionst::doit()
     }
   }
 
-  if(cmdline.isset("unreachable-instructions"))
+  if(options.get_bool_option("unreachable-instructions"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -242,7 +311,7 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("unreachable-functions"))
+  if(options.get_bool_option("unreachable-functions"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -266,7 +335,7 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("reachable-functions"))
+  if(options.get_bool_option("reachable-functions"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -290,7 +359,7 @@ int goto_analyzer_parse_optionst::doit()
     return 0;
   }
 
-  if(cmdline.isset("show-local-may-alias"))
+  if(options.get_bool_option("show-local-may-alias"))
   {
     namespacet ns(goto_model.symbol_table);
 
@@ -318,14 +387,14 @@ int goto_analyzer_parse_optionst::doit()
   if(set_properties())
     return 7;
 
-  if(cmdline.isset("show-intervals"))
+  if(options.get_bool_option("show-intervals"))
   {
     show_intervals(goto_model, std::cout);
     return 0;
   }
 
-  if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
+  if(options.get_bool_option("non-null") ||
+     options.get_bool_option("intervals"))
   {
     optionst options;
     options.set_option("json", cmdline.get_value("json"));
