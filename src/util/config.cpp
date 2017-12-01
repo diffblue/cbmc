@@ -862,7 +862,7 @@ bool configt::set(const cmdlinet &cmdline)
       #endif
 
       // MinGW has extra defines
-      ansi_c.defines.push_back("__int64=\"long long\"");
+      ansi_c.defines.push_back("__int64=long long");
     }
     else
     {
