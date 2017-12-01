@@ -43,6 +43,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/local_may_alias.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
+#include <analyses/interval_domain.h>
 
 #include <langapi/mode.h>
 
@@ -57,7 +58,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
-#include "static_analyzer.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
@@ -161,21 +161,6 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("reachable-functions", true);
     options.set_option("specific-analysis", true);
   }
-  if(cmdline.isset("intervals"))
-  {
-    options.set_option("intervals", true);
-    options.set_option("specific-analysis", true);
-  }
-  if(cmdline.isset("show-intervals"))
-  {
-    options.set_option("show-intervals", true);
-    options.set_option("specific-analysis", true);
-  }
-  if(cmdline.isset("non-null"))
-  {
-    options.set_option("non-null", true);
-    options.set_option("specific-analysis", true);
-  }
   if(cmdline.isset("show-local-may-alias"))
   {
     options.set_option("show-local-may-alias", true);
@@ -236,7 +221,28 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       "simplify-slicing",
       !(cmdline.isset("no-simplify-slicing")));
   }
-
+  else if(cmdline.isset("show-intervals"))
+  {
+    // For backwards compatibility
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+    options.set_option("intervals", true);
+    options.set_option("domain set", true);
+  }
+  else if(cmdline.isset("(show-non-null)"))
+  {
+    // For backwards compatibility
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+    options.set_option("non-null", true);
+    options.set_option("domain set", true);
+  }
+  else if(cmdline.isset("intervals") || cmdline.isset("non-null"))
+  {
+    // For backwards compatibility either of these on their own means show
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+  }
 
   if (options.get_bool_option("general-analysis"))
   {
@@ -263,6 +269,17 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("dependence-graph", true);
       options.set_option("domain set", true);
     }
+    else if(cmdline.isset("intervals"))
+    {
+      options.set_option("intervals", true);
+      options.set_option("domain set", true);
+    }
+    else if(cmdline.isset("non-null"))
+    {
+      options.set_option("non-null", true);
+      options.set_option("domain set", true);
+    }
+
 
     if(!options.get_bool_option("domain set"))
     {
@@ -291,6 +308,17 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
     {
       domain=new dependence_grapht(namespacet(goto_model.symbol_table));
     }
+    else if(options.get_bool_option("intervals"))
+    {
+      domain=new ait<interval_domaint>();
+    }
+#if 0
+    // Not actually implemented, despite the option...
+    else if(options.get_bool_option("non-null"))
+    {
+      domain=new ait<non_null_domaint>();
+    }
+#endif
   }
   else if(options.get_bool_option("concurrent"))
   {
@@ -304,6 +332,17 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
     {
       domain=new dependence_grapht(namespacet(goto_model.symbol_table));
     }
+    else if(options.get_bool_option("intervals"))
+    {
+      domain=new concurrency_aware_ait<interval_domaint>();
+    }
+#if 0
+    // Not actually implemented, despite the option...
+    else if(options.get_bool_option("non-null"))
+    {
+      domain=new concurrency_aware_ait<non_null_domaint>();
+    }
+#endif
 #endif
   }
 
@@ -529,23 +568,6 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   if(set_properties())
     return 7;
 
-  if(options.get_bool_option("show-intervals"))
-  {
-    show_intervals(goto_model, std::cout);
-    return 0;
-  }
-
-  if(options.get_bool_option("non-null") ||
-     options.get_bool_option("intervals"))
-  {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
-  }
-
   if(options.get_bool_option("general-analysis"))
   {
 
@@ -760,6 +782,8 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Domain options:\n"
     " --constants                  constant domain\n"
+    " --intervals                  interval domain\n"
+    " --non-null                   non-null domain\n"
     " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
     "\n"
     "Output options:\n"
@@ -777,8 +801,6 @@ void goto_analyzer_parse_optionst::help()
     " --unreachable-functions      list functions unreachable from the entry point\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-functions        list functions reachable from the entry point\n"
-    " --intervals                  interval analysis\n"
-    " --non-null                   non-null analysis\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"
