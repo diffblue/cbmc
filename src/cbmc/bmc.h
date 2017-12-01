@@ -71,6 +71,20 @@ public:
     return run(goto_functions);
   }
 
+  /// Retrieves the bmc equation
+  /// @return a reference to the bmc equation object
+  const symex_target_equationt &get_equation() const
+  {
+    return equation;
+  }
+
+  /// Retrieves the prop_conv field
+  /// @return a reference to the prop_conv member
+  const prop_convt &get_prop_conv() const
+  {
+    return prop_conv;
+  }
+
 protected:
   const optionst &options;
   symbol_tablet new_symbol_table;
