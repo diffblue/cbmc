@@ -1,0 +1,10 @@
+if(NOT CONFIGURATIONS_HAVE_BEEN_SET_UP)
+    set(CONFIGURATIONS_HAVE_BEEN_SET_UP true)
+    set(build_types_string "Debug;Release;RelWithDebInfo;Sanitized;LibCPPDebug")
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY HELPSTRING "Choose the type of build")
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "${build_types_string}")
+    set(CMAKE_CONFIGURATION_TYPES "${build_types_string}" CACHE STRING "" FORCE)
+
+    set(CMAKE_CXX_FLAGS_SANITIZED "-fsanitize=address,undefined")
+    set(CMAKE_CXX_FLAGS_LIBCPPDEBUG "-D_LIBCPP_DEBUG=1 -D_GLIBCXX_DEBUG")
+endif()
