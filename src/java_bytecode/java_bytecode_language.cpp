@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/suffix.h>
 #include <util/config.h>
 #include <util/cmdline.h>
+#include <util/expr_iterator.h>
 #include <util/journalling_symbol_table.h>
 #include <util/string2int.h>
 #include <util/invariant.h>
@@ -408,6 +409,29 @@ bool java_bytecode_languaget::convert_single_method(
       string_preprocess.code_for_function(symbol, symbol_table);
     INVARIANT(
       generated_code.is_not_nil(), "Couldn't retrieve code for string method");
+    // String solver can make calls to functions that haven't yet been seen.
+    // Add these to the needed_lazy_methods collection
+    if(needed_lazy_methods)
+    {
+      for(const_depth_iteratort it = generated_code.depth_cbegin();
+          it != generated_code.depth_cend();
+          ++it)
+      {
+        if(it->id() == ID_code)
+        {
+          const auto fn_call = expr_try_dynamic_cast<code_function_callt>(*it);
+          if(!fn_call)
+            continue;
+          // Only support non-virtual function calls for now, if string solver
+          // starts to introduce virtual function calls then we will need to
+          // duplicate the behavior of java_bytecode_convert_method where it
+          // handles the invokevirtual instruction
+          const symbol_exprt &fn_sym =
+            expr_dynamic_cast<symbol_exprt>(fn_call->function());
+          needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        }
+      }
+    }
     symbol.value = generated_code;
     return false;
   }
