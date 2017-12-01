@@ -1758,6 +1758,16 @@ codet java_string_library_preprocesst::make_string_length_code(
   return code_returnt(get_length(deref, symbol_table));
 }
 
+bool java_string_library_preprocesst::implements_function(
+  const irep_idt &function_id) const
+{
+  for(const id_mapt *map : id_maps)
+    if(map->count(function_id) != 0)
+      return true;
+
+  return conversion_table.count(function_id) != 0;
+}
+
 template <typename TMap, typename TContainer>
 void add_keys_to_container(const TMap &map, TContainer &container)
 {
@@ -1775,14 +1785,7 @@ void add_keys_to_container(const TMap &map, TContainer &container)
 void java_string_library_preprocesst::get_all_function_names(
   id_sett &methods) const
 {
-  const id_mapt *maps[] = {
-    &cprover_equivalent_to_java_function,
-    &cprover_equivalent_to_java_string_returning_function,
-    &cprover_equivalent_to_java_constructor,
-    &cprover_equivalent_to_java_assign_and_return_function,
-    &cprover_equivalent_to_java_assign_function,
-  };
-  for(const id_mapt *map : maps)
+  for(const id_mapt *map : id_maps)
     add_keys_to_container(*map, methods);
 
   add_keys_to_container(conversion_table, methods);

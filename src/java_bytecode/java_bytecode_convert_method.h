@@ -21,6 +21,12 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class class_hierarchyt;
 
+void java_bytecode_initialize_parameter_names(
+  symbolt &method_symbol,
+  const java_bytecode_parse_treet::methodt::local_variable_tablet
+    &local_variable_table,
+  symbol_table_baset &symbol_table);
+
 void java_bytecode_convert_method(
   const symbolt &class_symbol,
   const java_bytecode_parse_treet::methodt &,
