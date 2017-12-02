@@ -99,7 +99,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1);
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   #if 0
@@ -373,7 +373,7 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   //
@@ -402,35 +402,36 @@ int goto_analyzer_parse_optionst::doit()
   catch(const char *e)
   {
     error() << e << eom;
-    return true;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::string &e)
   {
     error() << e << eom;
-    return true;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(int)
+  catch(int e)
   {
-    return true;
+    error() << "Numeric exception: " << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   if(process_goto_program(options))
-    return 6;
+    return CPROVER_EXIT_INTERNAL_ERROR;
 
   // show it?
   if(cmdline.isset("show-symbol-table"))
   {
     ::show_symbol_table(goto_model.symbol_table, get_ui());
-    return 6;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   // show it?
   if(cmdline.isset("show-goto-functions"))
   {
     show_goto_functions(goto_model, get_ui());
-    return 6;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   try
@@ -474,7 +475,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     if(cmdline.isset("show-taint"))
     {
       taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
     else
     {
@@ -482,7 +483,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       bool result=
         taint_analysis(
           goto_model, taint_file, get_message_handler(), false, json_file);
-      return result?10:0;
+      return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
     }
   }
 
@@ -503,13 +504,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       unreachable_instructions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(options.get_bool_option("unreachable-functions") &&
@@ -528,13 +529,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       unreachable_functions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(options.get_bool_option("reachable-functions") &&
@@ -553,13 +554,13 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       reachable_functions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(options.get_bool_option("show-local-may-alias"))
@@ -576,7 +577,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
       std::cout << '\n';
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   label_properties(goto_model);
@@ -584,11 +585,11 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   if(cmdline.isset("show-properties"))
   {
     show_properties(goto_model, get_ui());
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(set_properties())
-    return 7;
+    return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
   if(options.get_bool_option("general-analysis"))
   {
@@ -689,7 +690,7 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
   // Final defensive error case
   error() << "no analysis option given -- consider reading --help"
           << eom;
-  return 6;
+  return CPROVER_EXIT_USAGE_ERROR;
 }
 
 bool goto_analyzer_parse_optionst::set_properties()
