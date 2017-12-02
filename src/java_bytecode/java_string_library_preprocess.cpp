@@ -1890,8 +1890,10 @@ void java_string_library_preprocesst::initialize_conversion_table()
     ["java::java.lang.String.<init>:()V"]=
       ID_cprover_string_empty_string_func;
 
+  // CProverString.charAt differs from the Java String.charAt in that no
+  // exception is raised for the out of bounds case.
   cprover_equivalent_to_java_function
-    ["java::java.lang.String.charAt:(I)C"]=
+    ["java::org.cprover.CProverString.charAt:(Ljava/lang/String;I)C"]=
       ID_cprover_string_char_at_func;
   cprover_equivalent_to_java_function
     ["java::java.lang.String.codePointAt:(I)I"]=
@@ -1999,11 +2001,15 @@ void java_string_library_preprocesst::initialize_conversion_table()
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.subSequence:(II)Ljava/lang/CharSequence;"]=
       ID_cprover_string_substring_func;
+  // CProverString.substring differs from the Java String.substring in that no
+  // exception is raised for the out of bounds case.
   cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.substring:(II)Ljava/lang/String;"]=
+    ["java::org.cprover.CProverString.substring:(Ljava/lang/String;II)"
+    "Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
   cprover_equivalent_to_java_string_returning_function
-    ["java::java.lang.String.substring:(I)Ljava/lang/String;"]=
+    ["java::org.cprover.CProverString.substring:(Ljava/lang/String;I)"
+    "Ljava/lang/String;"]=
       ID_cprover_string_substring_func;
   cprover_equivalent_to_java_string_returning_function
     ["java::java.lang.String.toLowerCase:()Ljava/lang/String;"]=
