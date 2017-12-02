@@ -6,7 +6,7 @@ public class test_concat
       int i = s.length();
       String t = new String("ppo");
       String u = s.concat(t);
-      char c = u.charAt(i);
+      char c = org.cprover.CProverString.charAt(u, i);
       assert(c == 'p');
       assert(c != 'p');
    }

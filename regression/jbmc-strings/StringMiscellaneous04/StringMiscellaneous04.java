@@ -8,7 +8,7 @@ public class StringMiscellaneous04
         char arr[]=new char[s.length()];
         // We limit arbitrarly the loop unfolding to 10
         for(int i=0; i<length && i<10; i++)
-            arr[i]=s.charAt(i);
+            arr[i]=org.cprover.CProverString.charAt(s, i);
         return arr;
     }
 
@@ -16,11 +16,11 @@ public class StringMiscellaneous04
     {
         String s1 = "diffblue";
         String s2 = "TESTGENERATION";
-        String s3 = "	automated   ";
+        String s3 = "   automated   ";
 
         assert s1.equals("diffblue");
         assert s2.equals("TESTGENERATION");
-        assert s3.equals("   automated	 ");
+        assert s3.equals("   automated   ");
 
         System.out.printf(
           "Replace 'f' with 'F' in s1: %s\n\n", s1.replace('f', 'F'));
@@ -43,7 +43,7 @@ public class StringMiscellaneous04
         int i=0;
         for (char character : charArray)
         {
-            assert character=="diffblue".charAt(i);
+            assert character==org.cprover.CProverString.charAt("diffblue", i);
             ++i;
         }
 
