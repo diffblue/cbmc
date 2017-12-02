@@ -146,20 +146,26 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("taint", true);
     options.set_option("specific-analysis", true);
   }
+  // For backwards compatibility,
+  // these are first recognised as specific analyses
+  bool reachability_task = false;
   if(cmdline.isset("unreachable-instructions"))
   {
     options.set_option("unreachable-instructions", true);
     options.set_option("specific-analysis", true);
+    reachability_task = true;
   }
   if(cmdline.isset("unreachable-functions"))
   {
     options.set_option("unreachable-functions", true);
     options.set_option("specific-analysis", true);
+    reachability_task = true;
   }
   if(cmdline.isset("reachable-functions"))
   {
     options.set_option("reachable-functions", true);
     options.set_option("specific-analysis", true);
+    reachability_task = true;
   }
   if(cmdline.isset("show-local-may-alias"))
   {
@@ -244,7 +250,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("general-analysis", true);
   }
 
-  if (options.get_bool_option("general-analysis"))
+  if(options.get_bool_option("general-analysis") || reachability_task)
   {
     // Abstract interpreter choice
     if(cmdline.isset("location-sensitive"))
@@ -280,12 +286,24 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
       options.set_option("domain set", true);
     }
 
-
-    if(!options.get_bool_option("domain set"))
+    // Reachability questions, when given with a domain swap from specific
+    // to general tasks so that they can use the domain & parameterisations.
+    if(reachability_task)
     {
-      // Deafult to constants as it is light-weight but useful
-      status() << "Domain defaults to --constants" << eom;
-      options.set_option("constants", true);
+      if(options.get_bool_option("domain set"))
+      {
+        options.set_option("specific-analysis", false);
+        options.set_option("general-analysis", true);
+      }
+    }
+    else
+    {
+      if(!options.get_bool_option("domain set"))
+      {
+        // Default to constants as it is light-weight but useful
+        status() << "Domain not specified, defaulting to --constants" << eom;
+        options.set_option("constants", true);
+      }
     }
   }
 }
@@ -468,7 +486,9 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     }
   }
 
-  if(options.get_bool_option("unreachable-instructions"))
+  // If no domain is given, this lightweight version of the analysis is used.
+  if(options.get_bool_option("unreachable-instructions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -492,7 +512,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     return 0;
   }
 
-  if(options.get_bool_option("unreachable-functions"))
+  if(options.get_bool_option("unreachable-functions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -516,7 +537,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
     return 0;
   }
 
-  if(options.get_bool_option("reachable-functions"))
+  if(options.get_bool_option("reachable-functions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -628,6 +650,30 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
                                  options,
                                  get_message_handler(),
                                  out);
+    }
+    else if(options.get_bool_option("unreachable-instructions"))
+    {
+      result = static_unreachable_instructions(goto_model,
+                                               *analyzer,
+                                               options,
+                                               get_message_handler(),
+                                               out);
+    }
+    else if(options.get_bool_option("unreachable-functions"))
+    {
+      result = static_unreachable_functions(goto_model,
+                                            *analyzer,
+                                            options,
+                                            get_message_handler(),
+                                            out);
+    }
+    else if(options.get_bool_option("reachable-functions"))
+    {
+      result = static_reachable_functions(goto_model,
+                                          *analyzer,
+                                          options,
+                                          get_message_handler(),
+                                          out);
     }
     else
     {
@@ -774,6 +820,11 @@ void goto_analyzer_parse_optionst::help()
     " --verify                     use the abstract domains to check assertions\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --simplify file_name         use the abstract domains to simplify the program\n"
+    " --unreachable-instructions   list dead code\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --unreachable-functions      list functions unreachable from the entry point\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --reachable-functions        list functions reachable from the entry point\n"
     "\n"
     "Abstract interpreter options:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
@@ -796,11 +847,6 @@ void goto_analyzer_parse_optionst::help()
     "Specific analyses:\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --taint file_name            perform taint analysis using rules in given file\n"
-    " --unreachable-instructions   list dead code\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --unreachable-functions      list functions unreachable from the entry point\n"
-    // NOLINTNEXTLINE(whitespace/line_length)
-    " --reachable-functions        list functions reachable from the entry point\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"

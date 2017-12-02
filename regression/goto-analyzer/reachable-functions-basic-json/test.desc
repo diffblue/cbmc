@@ -1,0 +1,9 @@
+CORE
+../unreachable-instructions-basic-text/unreachable.c
+--reachable-functions --json -
+"function": "main",$
+"function": "dead_inside",$
+"function": "obviously_dead",$
+"function": "not_obviously_dead",$
+--
+^warning: ignoring

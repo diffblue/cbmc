@@ -1,0 +1,21 @@
+CORE
+../unreachable-instructions-basic-text/unreachable.c
+--unreachable-instructions --json -
+"function": "not_called",
+"unreachableInstructions":
+"sourceLocation":
+"function": "not_called",
+"line": "5",
+"statement": "not_called#return_value = x \+ x;"
+"sourceLocation":
+"function": "not_called",
+"line": "5",
+"statement": "GOTO 1"
+"function": "dead_inside",
+"unreachableInstructions":
+"sourceLocation":
+"function": "dead_inside",
+"line": "12",
+"statement": "y = y \+ 1;"
+--
+^warning: ignoring

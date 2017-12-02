@@ -1,0 +1,9 @@
+CORE
+../unreachable-instructions-basic-text/unreachable.c
+--unreachable-functions --json -
+"file name": ".*unreachable.c",
+"first line": 3,
+"function": "not_called",
+"last line": 6
+--
+^warning: ignoring
