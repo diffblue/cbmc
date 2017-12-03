@@ -121,16 +121,13 @@ void bv_refinementt::freeze_lazy_constraints()
   if(!lazy_arrays)
     return;
 
-  for(std::list<lazy_constraintt>::iterator
-        l_it=lazy_array_constraints.begin();
-      l_it!=lazy_array_constraints.end(); ++l_it)
+  for(const auto &constraint : lazy_array_constraints)
   {
     std::set<symbol_exprt> symbols;
-    find_symbols(l_it->lazy, symbols);
-    for(std::set<symbol_exprt>::const_iterator it=symbols.begin();
-        it!=symbols.end(); ++it)
+    find_symbols(constraint.lazy, symbols);
+    for(const auto &symbol : symbols)
     {
-      bvt bv=convert_bv(l_it->lazy);
+      const bvt bv=convert_bv(symbol);
       forall_literals(b_it, bv)
         if(!b_it->is_constant())
           prop.set_frozen(*b_it);
