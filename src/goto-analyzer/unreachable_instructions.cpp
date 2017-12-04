@@ -91,11 +91,12 @@ static void add_to_xml(
   const dead_mapt &dead_map,
   xmlt &dest)
 {
-  assert(!goto_program.instructions.empty());
+  PRECONDITION(!goto_program.instructions.empty());
   goto_programt::const_targett end_function=
     goto_program.instructions.end();
   --end_function;
-  assert(end_function->is_end_function());
+  DATA_INVARIANT(end_function->is_end_function(),
+                 "The last instruction in a goto-program must be END_FUNCTION");
 
   xmlt &x = dest.new_element("function");
   x.set_attribute("name", id2string(end_function->function));
@@ -121,11 +122,12 @@ static void add_to_json(
 {
   json_objectt &entry=dest.push_back().make_object();
 
-  assert(!goto_program.instructions.empty());
+  PRECONDITION(!goto_program.instructions.empty());
   goto_programt::const_targett end_function=
     goto_program.instructions.end();
   --end_function;
-  assert(end_function->is_end_function());
+  DATA_INVARIANT(end_function->is_end_function(),
+                 "The last instruction in a goto-program must be END_FUNCTION");
 
   entry["function"]=json_stringt(id2string(end_function->function));
   entry["fileName"]=
