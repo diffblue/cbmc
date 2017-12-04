@@ -45,16 +45,20 @@ bool find_superclass_with_type(
     if(base_struct.components().empty())
       return false;
 
-    const typet &first_field_type=
-        ns.follow(base_struct.components()[0].type());
+    const typet &first_field_type=base_struct.components()[0].type();
     ptr=clean_deref(ptr);
+    // Careful not to use the followed type here, as stub types may be
+    // extended by later method conversion adding fields (e.g. an access
+    // against x->y might add a new field `y` to the type of `*x`)
     ptr=member_exprt(
       ptr,
       base_struct.components()[0].get_name(),
       first_field_type);
     ptr=address_of_exprt(ptr);
 
-    if(first_field_type==target_type)
+    // Compare the real (underlying) type, as target_type is already a non-
+    // symbolic type.
+    if(ns.follow(first_field_type)==target_type)
       return true;
   }
 }
