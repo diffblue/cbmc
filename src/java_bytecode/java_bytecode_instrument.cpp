@@ -80,6 +80,15 @@ protected:
 };
 
 
+const std::vector<irep_idt> exception_needed_classes =
+{
+  "java.lang.ArithmeticException",
+  "java.lang.ArrayIndexOutOfBoundsException",
+  "java.lang.ClassCastException",
+  "java.lang.NegativeArraySizeException",
+  "java.lang.NullPointerException"
+};
+
 /// Creates a class stub for exc_name and generates a
 ///  conditional GOTO such that exc_name is thrown when
 ///  cond is met.
