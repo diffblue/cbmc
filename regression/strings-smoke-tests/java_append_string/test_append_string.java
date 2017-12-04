@@ -20,7 +20,7 @@ public class test_append_string
             sb.append(str, 2, 4);
             String res = sb.toString();
             assert(res.startsWith(init));
-            assert(res.endsWith(str.substring(2, 4)));
+            assert(res.endsWith(org.cprover.CProverString.substring(str, 2, 4)));
             assert(res.length() == init.length() + 2);
             assert(!res.equals("foobarfuz"));
         }

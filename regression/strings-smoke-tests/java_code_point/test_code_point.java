@@ -9,6 +9,6 @@ public class test_code_point
       assert(s.offsetByCodePoints(1,2) >= 3);
       StringBuilder sb = new StringBuilder();
       sb.appendCodePoint(0x10907);
-      assert(s.charAt(1) == sb.charAt(0));
+      assert(org.cprover.CProverString.charAt(s, 1) == org.cprover.CProverString.charAt(sb.toString(), 0));
    }
 }

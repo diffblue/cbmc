@@ -8,7 +8,7 @@ public class test_char_array
         char arr[] = new char[s.length()];
         // We limit arbitrarly the loop unfolding to 5
         for(int i = 0; i < length && i < 5; i++)
-        arr[i] = s.charAt(i);
+            arr[i] = org.cprover.CProverString.charAt(s, i);
         return arr;
     }
 
@@ -17,7 +17,7 @@ public class test_char_array
         String s = "abc";
         char [] str = toCharArray(s);
         char c = str[2];
-        char a = s.charAt(0);
+        char a = org.cprover.CProverString.charAt(s, 0);
         assert(str.length == 3);
         assert(a == 'a');
         assert(c == 'c');
