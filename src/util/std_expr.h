@@ -1968,16 +1968,6 @@ public:
     unary_exprt(ID_typecast, op, _type)
   {
   }
-
-  exprt &op()
-  {
-    return op0();
-  }
-
-  const exprt &op() const
-  {
-    return op0();
-  }
 };
 
 /*! \brief Cast a generic exprt to a \ref typecast_exprt
@@ -3034,16 +3024,6 @@ public:
 
   not_exprt():unary_exprt(ID_not, bool_typet())
   {
-  }
-
-  exprt &op()
-  {
-    return op0();
-  }
-
-  const exprt &op() const
-  {
-    return op0();
   }
 };
 
