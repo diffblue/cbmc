@@ -17,8 +17,7 @@
 class generate_java_generic_typet
 {
 public:
-  generate_java_generic_typet(
-    message_handlert &message_handler);
+  explicit generate_java_generic_typet(message_handlert &message_handler);
 
   symbolt operator()(
     const java_generic_typet &existing_generic_type,

@@ -444,18 +444,17 @@ class java_specialized_generic_class_typet : public java_class_typet
 public:
   /// Build the specialised version of the specific class, with the specified
   /// parameters and name.
-  /// \param new_tag: The new name for the class (like Generic<java::Float>)
+  /// \param generic_name: The new name for the class
+  ///   (like Generic<java::Float>)
   /// \param new_components: The specialised components
   /// \return The newly constructed class.
   java_specialized_generic_class_typet(
-    const irep_idt &new_tag,
+    const irep_idt &generic_name,
     const struct_typet::componentst &new_components)
   {
     set(ID_C_specialized_generic_java_class, true);
-    // We are specialising the logic - so we don't want to be marked as generic
-    set(ID_C_java_generics_class_type, false);
-    set(ID_name, "java::" + id2string(new_tag));
-    set(ID_base_name, id2string(new_tag));
+    set(ID_name, "java::" + id2string(generic_name));
+    set(ID_base_name, id2string(generic_name));
     components() = new_components;
     const std::string &class_tag = id2string(new_tag);
     set_tag(class_tag.substr(0, class_tag.find('<')));
