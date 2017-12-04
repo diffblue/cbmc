@@ -27,12 +27,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_convert_typet
 {
 public:
-  unsigned unsigned_cnt, signed_cnt, char_cnt, int_cnt, short_cnt,
-           long_cnt, const_cnt, restrict_cnt, constexpr_cnt, volatile_cnt,
-           double_cnt, float_cnt, complex_cnt, cpp_bool_cnt, proper_bool_cnt,
-           extern_cnt, noreturn_cnt, wchar_t_cnt, char16_t_cnt, char32_t_cnt,
-           int8_cnt, int16_cnt, int32_cnt, int64_cnt, ptr32_cnt, ptr64_cnt,
-           float80_cnt, float128_cnt, int128_cnt;
+  std::size_t unsigned_count, signed_count, char_count, int_count, short_count,
+    long_count, const_count, restrict_count, constexpr_count, volatile_count,
+    double_count, float_count, complex_count, cpp_bool_count, proper_bool_count,
+    extern_count, noreturn_count, wchar_t_count, char16_t_count, char32_t_count,
+    int8_count, int16_count, int32_count, int64_count, ptr32_count, ptr64_count,
+    float80_count, float128_count, int128_count;
 
   void read(const typet &type);
   void write(typet &type);
@@ -50,12 +50,13 @@ protected:
 
 void cpp_convert_typet::read(const typet &type)
 {
-  unsigned_cnt=signed_cnt=char_cnt=int_cnt=short_cnt=
-  long_cnt=const_cnt=restrict_cnt=constexpr_cnt=volatile_cnt=
-  double_cnt=float_cnt=complex_cnt=cpp_bool_cnt=proper_bool_cnt=
-  extern_cnt=noreturn_cnt=wchar_t_cnt=char16_t_cnt=char32_t_cnt=
-  int8_cnt=int16_cnt=int32_cnt=int64_cnt=
-  ptr32_cnt=ptr64_cnt=float80_cnt=float128_cnt=int128_cnt=0;
+  unsigned_count = signed_count = char_count = int_count = short_count =
+    long_count = const_count = restrict_count = constexpr_count =
+      volatile_count = double_count = float_count = complex_count =
+        cpp_bool_count = proper_bool_count = extern_count = noreturn_count =
+          wchar_t_count = char16_t_count = char32_t_count = int8_count =
+            int16_count = int32_count = int64_count = ptr32_count =
+              ptr64_count = float80_count = float128_count = int128_count = 0;
 
   other.clear();
 
@@ -79,65 +80,63 @@ void cpp_convert_typet::read_rec(const typet &type)
       read_rec(*it);
   }
   else if(type.id()==ID_signed)
-    signed_cnt++;
+    ++signed_count;
   else if(type.id()==ID_unsigned)
-    unsigned_cnt++;
+    ++unsigned_count;
   else if(type.id()==ID_volatile)
-    volatile_cnt++;
+    ++volatile_count;
   else if(type.id()==ID_char)
-    char_cnt++;
+    ++char_count;
   else if(type.id()==ID_int)
-    int_cnt++;
+    ++int_count;
   else if(type.id()==ID_short)
-    short_cnt++;
+    ++short_count;
   else if(type.id()==ID_long)
-    long_cnt++;
+    ++long_count;
   else if(type.id()==ID_double)
-    double_cnt++;
+    ++double_count;
   else if(type.id()==ID_float)
-    float_cnt++;
+    ++float_count;
   else if(type.id()==ID_gcc_float80)
-    float80_cnt++;
+    ++float80_count;
   else if(type.id()==ID_gcc_float128)
-    float128_cnt++;
+    ++float128_count;
   else if(type.id()==ID_gcc_int128)
-    int128_cnt++;
+    ++int128_count;
   else if(type.id()==ID_complex)
-    complex_cnt++;
+    ++complex_count;
   else if(type.id() == ID_c_bool)
-    cpp_bool_cnt++;
+    ++cpp_bool_count;
   else if(type.id()==ID_proper_bool)
-    proper_bool_cnt++;
+    ++proper_bool_count;
   else if(type.id()==ID_wchar_t)
-    wchar_t_cnt++;
+    ++wchar_t_count;
   else if(type.id()==ID_char16_t)
-    char16_t_cnt++;
+    ++char16_t_count;
   else if(type.id()==ID_char32_t)
-    char32_t_cnt++;
+    ++char32_t_count;
   else if(type.id()==ID_int8)
-    int8_cnt++;
+    ++int8_count;
   else if(type.id()==ID_int16)
-    int16_cnt++;
+    ++int16_count;
   else if(type.id()==ID_int32)
-    int32_cnt++;
+    ++int32_count;
   else if(type.id()==ID_int64)
-    int64_cnt++;
+    ++int64_count;
   else if(type.id()==ID_ptr32)
-    ptr32_cnt++;
+    ++ptr32_count;
   else if(type.id()==ID_ptr64)
-    ptr64_cnt++;
+    ++ptr64_count;
   else if(type.id()==ID_const)
-    const_cnt++;
+    ++const_count;
   else if(type.id()==ID_restrict)
-    restrict_cnt++;
+    ++restrict_count;
   else if(type.id()==ID_constexpr)
-    constexpr_cnt++;
+    ++constexpr_count;
   else if(type.id()==ID_extern)
-    extern_cnt++;
+    ++extern_count;
   else if(type.id()==ID_noreturn)
-  {
-    noreturn_cnt++;
-  }
+    ++noreturn_count;
   else if(type.id()==ID_function_type)
   {
     read_function_type(type);
@@ -322,156 +321,173 @@ void cpp_convert_typet::write(typet &type)
 
   if(!other.empty())
   {
-    if(double_cnt || float_cnt || signed_cnt ||
-       unsigned_cnt || int_cnt || cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || float80_cnt || float128_cnt || int128_cnt)
+    if(
+      double_count || float_count || signed_count || unsigned_count ||
+      int_count || cpp_bool_count || proper_bool_count || short_count ||
+      char_count || wchar_t_count || char16_t_count || char32_t_count ||
+      int8_count || int16_count || int32_count || int64_count ||
+      float80_count || float128_count || int128_count)
+    {
       throw "type modifier not applicable";
+    }
 
     if(other.size()!=1)
       throw "illegal combination of types";
 
     type.swap(other.front());
   }
-  else if(double_cnt)
+  else if(double_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt ||
-       cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       float_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || ptr32_cnt || ptr64_cnt ||
-       float80_cnt || float128_cnt || int128_cnt)
+    if(
+      signed_count || unsigned_count || int_count || cpp_bool_count ||
+      proper_bool_count || short_count || char_count || wchar_t_count ||
+      char16_t_count || char32_t_count || float_count || int8_count ||
+      int16_count || int32_count || int64_count || ptr32_count || ptr64_count ||
+      float80_count || float128_count || int128_count)
+    {
       throw "illegal type modifier for double";
+    }
 
-    if(long_cnt)
+    if(long_count)
       type=long_double_type();
     else
       type=double_type();
   }
-  else if(float_cnt)
+  else if(float_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt ||
-       cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || ptr32_cnt || ptr64_cnt ||
-       float80_cnt || float128_cnt || int128_cnt)
+    if(
+      signed_count || unsigned_count || int_count || cpp_bool_count ||
+      proper_bool_count || short_count || char_count || wchar_t_count ||
+      double_count || char16_t_count || char32_t_count || int8_count ||
+      int16_count || int32_count || int64_count || ptr32_count || ptr64_count ||
+      float80_count || float128_count || int128_count)
+    {
       throw "illegal type modifier for float";
+    }
 
-    if(long_cnt)
+    if(long_count)
       throw "float can't be long";
 
     type=float_type();
   }
-  else if(float80_cnt)
+  else if(float80_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt ||
-       cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt ||
-       float128_cnt)
+    if(
+      signed_count || unsigned_count || int_count || cpp_bool_count ||
+      proper_bool_count || short_count || char_count || wchar_t_count ||
+      double_count || char16_t_count || char32_t_count || int8_count ||
+      int16_count || int32_count || int64_count || int128_count ||
+      ptr32_count || ptr64_count || float128_count)
+    {
       throw "illegal type modifier for __float80";
+    }
 
-    if(long_cnt)
+    if(long_count)
       throw "__float80 can't be long";
 
     // this isn't the same as long double
     type=gcc_float64x_type();
   }
-  else if(float128_cnt)
+  else if(float128_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt ||
-       cpp_bool_cnt || proper_bool_cnt ||
-       short_cnt || char_cnt || wchar_t_cnt || double_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
+    if(
+      signed_count || unsigned_count || int_count || cpp_bool_count ||
+      proper_bool_count || short_count || char_count || wchar_t_count ||
+      double_count || char16_t_count || char32_t_count || int8_count ||
+      int16_count || int32_count || int64_count || int128_count ||
+      ptr32_count || ptr64_count)
+    {
       throw "illegal type modifier for __float128";
+    }
 
-    if(long_cnt)
+    if(long_count)
       throw "__float128 can't be long";
 
     // this isn't the same as long double
     type=gcc_float128_type();
   }
-  else if(cpp_bool_cnt)
+  else if(cpp_bool_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
-       char_cnt || wchar_t_cnt || proper_bool_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
+    if(
+      signed_count || unsigned_count || int_count || short_count ||
+      char_count || wchar_t_count || proper_bool_count || char16_t_count ||
+      char32_t_count || int8_count || int16_count || int32_count ||
+      int64_count || int128_count || ptr32_count || ptr64_count)
+    {
       throw "illegal type modifier for C++ bool";
+    }
 
     type = c_bool_type();
   }
-  else if(proper_bool_cnt)
+  else if(proper_bool_count)
   {
-    if(signed_cnt || unsigned_cnt || int_cnt || short_cnt ||
-       char_cnt || wchar_t_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
+    if(
+      signed_count || unsigned_count || int_count || short_count ||
+      char_count || wchar_t_count || char16_t_count || char32_t_count ||
+      int8_count || int16_count || int32_count || int64_count || int128_count ||
+      ptr32_count || ptr64_count)
+    {
       throw "illegal type modifier for " CPROVER_PREFIX "bool";
+    }
 
     type.id(ID_bool);
   }
-  else if(char_cnt)
+  else if(char_count)
   {
-    if(int_cnt || short_cnt || wchar_t_cnt || long_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || int128_cnt || ptr32_cnt || ptr64_cnt)
+    if(
+      int_count || short_count || wchar_t_count || long_count ||
+      char16_t_count || char32_t_count || int8_count || int16_count ||
+      int32_count || int64_count || int128_count || ptr32_count || ptr64_count)
+    {
       throw "illegal type modifier for char";
+    }
 
     // there are really three distinct char types in C++
-    if(unsigned_cnt)
+    if(unsigned_count)
       type=unsigned_char_type();
-    else if(signed_cnt)
+    else if(signed_count)
       type=signed_char_type();
     else
       type=char_type();
   }
-  else if(wchar_t_cnt)
+  else if(wchar_t_count)
   {
     // This is a distinct type, and can't be made signed/unsigned.
     // This is tolerated by most compilers, however.
 
-    if(int_cnt || short_cnt || char_cnt || long_cnt ||
-       char16_t_cnt || char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || ptr32_cnt || ptr64_cnt)
+    if(
+      int_count || short_count || char_count || long_count || char16_t_count ||
+      char32_t_count || int8_count || int16_count || int32_count ||
+      int64_count || ptr32_count || ptr64_count)
+    {
       throw "illegal type modifier for wchar_t";
+    }
 
     type=wchar_t_type();
   }
-  else if(char16_t_cnt)
+  else if(char16_t_count)
   {
     // This is a distinct type, and can't be made signed/unsigned.
-    if(int_cnt || short_cnt || char_cnt || long_cnt ||
-       char32_t_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || ptr32_cnt || ptr64_cnt ||
-       signed_cnt || unsigned_cnt)
+    if(
+      int_count || short_count || char_count || long_count || char32_t_count ||
+      int8_count || int16_count || int32_count || int64_count || ptr32_count ||
+      ptr64_count || signed_count || unsigned_count)
+    {
       throw "illegal type modifier for char16_t";
+    }
 
     type=char16_t_type();
   }
-  else if(char32_t_cnt)
+  else if(char32_t_count)
   {
     // This is a distinct type, and can't be made signed/unsigned.
-    if(int_cnt || short_cnt || char_cnt || long_cnt ||
-       int8_cnt || int16_cnt || int32_cnt ||
-       int64_cnt || ptr32_cnt || ptr64_cnt ||
-       signed_cnt || unsigned_cnt)
+    if(
+      int_count || short_count || char_count || long_count || int8_count ||
+      int16_count || int32_count || int64_count || ptr32_count || ptr64_count ||
+      signed_count || unsigned_count)
+    {
       throw "illegal type modifier for char32_t";
+    }
 
     type=char32_t_type();
   }
@@ -479,92 +495,92 @@ void cpp_convert_typet::write(typet &type)
   {
     // it must be integer -- signed or unsigned?
 
-    if(signed_cnt && unsigned_cnt)
+    if(signed_count && unsigned_count)
       throw "integer cannot be both signed and unsigned";
 
-    if(short_cnt)
+    if(short_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "cannot combine short and long";
 
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_short_int_type();
       else
         type=signed_short_int_type();
     }
-    else if(int8_cnt)
+    else if(int8_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "illegal type modifier for __int8";
 
       // in terms of overloading, this behaves like "char"
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_char_type();
-      else if(signed_cnt)
+      else if(signed_count)
         type=signed_char_type();
       else
         type=char_type(); // check?
     }
-    else if(int16_cnt)
+    else if(int16_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "illegal type modifier for __int16";
 
       // in terms of overloading, this behaves like "short"
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_short_int_type();
       else
         type=signed_short_int_type();
     }
-    else if(int32_cnt)
+    else if(int32_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "illegal type modifier for __int32";
 
       // in terms of overloading, this behaves like "int"
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_int_type();
       else
         type=signed_int_type();
     }
-    else if(int64_cnt)
+    else if(int64_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "illegal type modifier for __int64";
 
       // in terms of overloading, this behaves like "long long"
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_long_long_int_type();
       else
         type=signed_long_long_int_type();
     }
-    else if(int128_cnt)
+    else if(int128_count)
     {
-      if(long_cnt)
+      if(long_count)
         throw "illegal type modifier for __int128";
 
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=gcc_unsigned_int128_type();
       else
         type=gcc_signed_int128_type();
     }
-    else if(long_cnt==0)
+    else if(long_count == 0)
     {
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_int_type();
       else
         type=signed_int_type();
     }
-    else if(long_cnt==1)
+    else if(long_count == 1)
     {
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_long_int_type();
       else
         type=signed_long_int_type();
     }
-    else if(long_cnt==2)
+    else if(long_count == 2)
     {
-      if(unsigned_cnt)
+      if(unsigned_count)
         type=unsigned_long_long_int_type();
       else
         type=signed_long_long_int_type();
@@ -574,11 +590,11 @@ void cpp_convert_typet::write(typet &type)
   }
 
   // is it constant?
-  if(const_cnt || constexpr_cnt)
+  if(const_count || constexpr_count)
     type.set(ID_C_constant, true);
 
   // is it volatile?
-  if(volatile_cnt)
+  if(volatile_count)
     type.set(ID_C_volatile, true);
 }
 
