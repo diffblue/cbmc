@@ -442,22 +442,41 @@ void get_dependencies_from_generic_parameters(
 class java_specialized_generic_class_typet : public java_class_typet
 {
 public:
+  typedef std::vector<reference_typet> generic_type_argumentst;
+
   /// Build the specialised version of the specific class, with the specified
   /// parameters and name.
   /// \param generic_name: The new name for the class
   ///   (like Generic<java::Float>)
+  /// \param tag: The name for the original class (like java::Generic)
   /// \param new_components: The specialised components
   /// \return The newly constructed class.
   java_specialized_generic_class_typet(
     const irep_idt &generic_name,
-    const struct_typet::componentst &new_components)
+    const irep_idt &tag,
+    const struct_typet::componentst &new_components,
+    const generic_type_argumentst &specialised_parameters)
   {
     set(ID_C_specialized_generic_java_class, true);
     set(ID_name, "java::" + id2string(generic_name));
     set(ID_base_name, id2string(generic_name));
     components() = new_components;
-    const std::string &class_tag = id2string(new_tag);
-    set_tag(class_tag.substr(0, class_tag.find('<')));
+    set_tag(tag);
+
+    generic_type_arguments() = specialised_parameters;
+  }
+
+  /// \return vector of type variables
+  const generic_type_argumentst &generic_type_arguments() const
+  {
+    return (const generic_type_argumentst &)(find(ID_type_variables).get_sub());
+  }
+
+private:
+  /// \return vector of type variables
+  generic_type_argumentst &generic_type_arguments()
+  {
+    return (generic_type_argumentst &)(add(ID_type_variables).get_sub());
   }
 };
 

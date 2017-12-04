@@ -73,8 +73,12 @@ symbolt generate_java_generic_typet::operator()(
     pre_modification_size==after_modification_size,
     "All components in the original class should be in the new class");
 
-  const java_specialized_generic_class_typet new_java_class =
-    construct_specialised_generic_type(new_tag, replacement_components);
+  const java_specialized_generic_class_typet new_java_class{
+    new_tag,
+    generic_class_definition.get_tag(),
+    replacement_components,
+    existing_generic_type.generic_type_arguments()};
+
   const type_symbolt &class_symbol =
     build_symbol_from_specialised_class(new_java_class);
 
@@ -225,19 +229,6 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   new_tag_buffer << ">";
 
   return new_tag_buffer.str();
-}
-
-/// Build the specialised version of the specific class, with the specified
-/// parameters and name.
-/// \param new_tag: The new name for the class (like Generic<java::Float>)
-/// \param new_components: The specialised components
-/// \return The newly constructed class.
-java_specialized_generic_class_typet
-generate_java_generic_typet::construct_specialised_generic_type(
-  const irep_idt &new_tag,
-  const struct_typet::componentst &new_components) const
-{
-  return java_specialized_generic_class_typet{new_tag, new_components};
 }
 
 /// Construct the symbol to be moved into the symbol table
