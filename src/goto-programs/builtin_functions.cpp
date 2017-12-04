@@ -557,21 +557,12 @@ void goto_convertt::do_java_new(
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_allocate);
   malloc_expr.copy_to_operands(object_size);
-  // could use true and get rid of the code below
-  malloc_expr.copy_to_operands(false_exprt());
+  malloc_expr.copy_to_operands(true_exprt());
   malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
   t_n->code=code_assignt(lhs, malloc_expr);
   t_n->source_location=location;
-
-  // zero-initialize the object
-  dereference_exprt deref(lhs, object_type);
-  exprt zero_object=
-    zero_initializer(object_type, location, ns, get_message_handler());
-  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-  t_i->code=code_assignt(deref, zero_object);
-  t_i->source_location=location;
 }
 
 void goto_convertt::do_java_new_array(
@@ -595,8 +586,7 @@ void goto_convertt::do_java_new_array(
   // we produce a malloc side-effect, which stays
   side_effect_exprt malloc_expr(ID_allocate);
   malloc_expr.copy_to_operands(object_size);
-  // code use true and get rid of the code below
-  malloc_expr.copy_to_operands(false_exprt());
+  malloc_expr.copy_to_operands(true_exprt());
   malloc_expr.type()=rhs.type();
 
   goto_programt::targett t_n=dest.add_instruction(ASSIGN);
@@ -610,15 +600,8 @@ void goto_convertt::do_java_new_array(
   // introduce such dependencies. We do this simple check instead:
   PRECONDITION(struct_type.components().size()==3);
 
-  // Init base class:
+  // it's an array, we need to set the length field
   dereference_exprt deref(lhs, object_type);
-  exprt zero_object=
-    zero_initializer(object_type, location, ns, get_message_handler());
-  goto_programt::targett t_i=dest.add_instruction(ASSIGN);
-  t_i->code=code_assignt(deref, zero_object);
-  t_i->source_location=location;
-
-  // if it's an array, we need to set the length field
   member_exprt length(
     deref,
     struct_type.components()[1].get_name(),
