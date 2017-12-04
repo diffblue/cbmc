@@ -29,7 +29,7 @@ enum class coverage_criteriont
   PATH,
   MCDC,
   ASSERTION,
-  COVER
+  COVER // __CPROVER_cover(x) annotations
 };
 
 void instrument_cover_goals(
