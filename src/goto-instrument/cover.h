@@ -15,15 +15,22 @@ Date: May 2016
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
+
 #include <util/cmdline.h>
 
 class message_handlert;
-class messaget;
 
 enum class coverage_criteriont
 {
-  LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, ASSERTION, COVER };
+  LOCATION,
+  BRANCH,
+  DECISION,
+  CONDITION,
+  PATH,
+  MCDC,
+  ASSERTION,
+  COVER
+};
 
 void instrument_cover_goals(
   const symbol_tablet &,
@@ -36,14 +43,6 @@ void instrument_cover_goals(
   goto_programt &,
   coverage_criteriont,
   message_handlert &message_handler);
-
-void instrument_cover_goals(
-  const symbol_tablet &,
-  goto_functionst &,
-  coverage_criteriont,
-  message_handlert &message_handler,
-  bool ignore_trivial = false,
-  const std::string &cover_include_pattern = "");
 
 bool instrument_cover_goals(
   const cmdlinet &,

@@ -19,6 +19,15 @@ SRC = accelerate/accelerate.cpp \
       concurrency.cpp \
       count_eloc.cpp \
       cover.cpp \
+      cover_basic_blocks.cpp \
+      cover_filter.cpp \
+      cover_instrument_branch.cpp \
+      cover_instrument_condition.cpp \
+      cover_instrument_decision.cpp \
+      cover_instrument_location.cpp \
+      cover_instrument_mcdc.cpp \
+      cover_instrument_other.cpp \
+      cover_util.cpp \
       document_properties.cpp \
       dot.cpp \
       dump_c.cpp \
