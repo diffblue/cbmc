@@ -33,9 +33,8 @@ void cover_assertion_instrumentert::instrument(
   if(is_non_cover_assertion(i_it))
   {
     i_it->guard = false_exprt();
-    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-    i_it->source_location.set_property_class(property_class);
-    i_it->source_location.set_function(i_it->function);
+    initialize_source_location(
+      i_it, id2string(i_it->source_location.get_comment()), i_it->function);
   }
 }
 
@@ -60,10 +59,7 @@ void cover_cover_instrumentert::instrument(
       i_it->guard = not_exprt(c);
       i_it->type = ASSERT;
       i_it->code.clear();
-      i_it->source_location.set_comment(comment);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(i_it->function);
+      initialize_source_location(i_it, comment, i_it->function);
     }
   }
   else if(is_non_cover_assertion(i_it))

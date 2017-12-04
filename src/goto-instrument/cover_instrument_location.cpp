@@ -40,11 +40,7 @@ void cover_location_instrumentert::instrument(
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(false_exprt());
       i_it->source_location = source_location;
-      i_it->source_location.set_comment(comment);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function);
-      i_it->function = function;
+      initialize_source_location(i_it, comment, function);
       i_it++;
     }
   }

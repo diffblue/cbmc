@@ -37,21 +37,13 @@ void cover_condition_instrumentert::instrument(
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(c);
       i_it->source_location = source_location;
-      i_it->source_location.set_comment(comment_t);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function);
-      i_it->function = function;
+      initialize_source_location(i_it, comment_t, function);
 
       const std::string comment_f = "condition `" + c_string + "' false";
       goto_program.insert_before_swap(i_it);
       i_it->make_assertion(not_exprt(c));
       i_it->source_location = source_location;
-      i_it->source_location.set_comment(comment_f);
-      i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-      i_it->source_location.set_property_class(property_class);
-      i_it->source_location.set_function(function);
-      i_it->function = function;
+      initialize_source_location(i_it, comment_f, function);
     }
 
     for(std::size_t i = 0; i < conditions.size() * 2; i++)

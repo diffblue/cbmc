@@ -61,6 +61,18 @@ protected:
     goto_programt::targett &,
     const cover_basic_blockst &) const = 0;
 
+  void initialize_source_location(
+    goto_programt::targett t,
+    const std::string &comment,
+    const irep_idt &function) const
+  {
+    t->source_location.set_comment(comment);
+    t->source_location.set(ID_coverage_criterion, coverage_criterion);
+    t->source_location.set_property_class(property_class);
+    t->source_location.set_function(function);
+    t->function = function;
+  }
+
   bool is_non_cover_assertion(goto_programt::const_targett t) const
   {
     return t->is_assert() &&

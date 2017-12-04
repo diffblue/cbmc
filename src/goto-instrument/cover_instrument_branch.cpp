@@ -31,11 +31,7 @@ void cover_branch_instrumentert::instrument(
     goto_programt::targett t = goto_program.insert_before(i_it);
     t->make_assertion(false_exprt());
     t->source_location = source_location;
-    t->source_location.set_comment(comment);
-    t->source_location.set(ID_coverage_criterion, coverage_criterion);
-    t->source_location.set_property_class(property_class);
-    t->source_location.set_function(i_it->function);
-    t->function = i_it->function;
+    initialize_source_location(t, comment, i_it->function);
   }
 
   if(
@@ -50,23 +46,16 @@ void cover_branch_instrumentert::instrument(
     exprt guard = i_it->guard;
     const irep_idt function = i_it->function;
     source_locationt source_location = i_it->source_location;
-    source_location.set_function(function);
 
     goto_program.insert_before_swap(i_it);
     i_it->make_assertion(not_exprt(guard));
     i_it->source_location = source_location;
-    i_it->source_location.set_comment(true_comment);
-    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-    i_it->source_location.set_property_class(property_class);
-    i_it->function = function;
+    initialize_source_location(i_it, true_comment, function);
 
     goto_program.insert_before_swap(i_it);
     i_it->make_assertion(guard);
     i_it->source_location = source_location;
-    i_it->source_location.set_comment(false_comment);
-    i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
-    i_it->source_location.set_property_class(property_class);
-    i_it->function = function;
+    initialize_source_location(i_it, false_comment, function);
 
     std::advance(i_it, 2);
   }
