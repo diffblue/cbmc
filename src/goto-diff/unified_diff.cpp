@@ -266,7 +266,8 @@ unified_difft::differencest unified_difft::lcss(
     {
       differences.push_back(differencet::DELETED);
       --i;
-      --old_rit;
+      if(old_goto_program.instructions.begin()!=old_rit)
+        --old_rit;
     }
     else if(instructions_equal(*old_rit, *new_rit))
     {
@@ -286,7 +287,8 @@ unified_difft::differencest unified_difft::lcss(
     {
       differences.push_back(differencet::NEW);
       --j;
-      --new_rit;
+      if(new_goto_program.instructions.begin()!=new_rit)
+        --new_rit;
     }
   }
 
