@@ -13,15 +13,12 @@ Author: Daniel Kroening
 
 #include "cover_util.h"
 
-void cover_instrument_condition(
-  const namespacet &ns,
+void cover_condition_instrumentert::instrument(
   goto_programt &goto_program,
-  goto_programt::targett &i_it)
+  goto_programt::targett &i_it,
+  const cover_basic_blockst &basic_blocks) const
 {
-  const irep_idt coverage_criterion = "location";
-  const irep_idt property_class = "coverage";
-
-  if(i_it->is_assert())
+  if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 
   // Conditions are all atomic predicates in the programs.

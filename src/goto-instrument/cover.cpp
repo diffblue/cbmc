@@ -28,77 +28,16 @@ Date: May 2016
 #include "cover_instrument.h"
 
 void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  coverage_criteriont criterion,
-  message_handlert &message_handler,
-  const goal_filterst &goal_filters)
+  const cover_instrumenterst &instrumenters,
+  message_handlert &message_handler)
 {
-  const namespacet ns(symbol_table);
   cover_basic_blockst basic_blocks(goto_program);
   basic_blocks.select_unique_java_bytecode_indices(
     goto_program, message_handler);
   basic_blocks.report_block_anomalies(goto_program, message_handler);
 
-  Forall_goto_program_instructions(i_it, goto_program)
-  {
-    switch(criterion)
-    {
-    case coverage_criteriont::ASSERTION:
-      cover_instrument_assertion(i_it);
-      break;
-
-    case coverage_criteriont::COVER:
-      cover_instrument_cover(ns, i_it);
-      break;
-
-    case coverage_criteriont::LOCATION:
-      cover_instrument_location(goto_program, i_it, basic_blocks, goal_filters);
-      break;
-
-    case coverage_criteriont::BRANCH:
-      cover_instrument_branch(goto_program, i_it, basic_blocks);
-      break;
-
-    case coverage_criteriont::CONDITION:
-      cover_instrument_condition(ns, goto_program, i_it);
-      break;
-
-    case coverage_criteriont::DECISION:
-      cover_instrument_decision(ns, goto_program, i_it);
-      break;
-
-    case coverage_criteriont::MCDC:
-      cover_instrument_mcdc(ns, goto_program, i_it);
-      break;
-
-    case coverage_criteriont::PATH:
-      cover_instrument_path(i_it);
-      break;
-    }
-  }
-}
-
-void instrument_cover_goals(
-  const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
-  coverage_criteriont criterion,
-  message_handlert &message_handler,
-  const function_filterst &function_filters,
-  const goal_filterst &goal_filters)
-{
-  Forall_goto_functions(f_it, goto_functions)
-  {
-    if(!function_filters(f_it->first, f_it->second))
-      continue;
-
-    instrument_cover_goals(
-      symbol_table,
-      f_it->second.body,
-      criterion,
-      message_handler,
-      goal_filters);
-  }
+  instrumenters(goto_program, basic_blocks);
 }
 
 void instrument_cover_goals(
@@ -110,8 +49,101 @@ void instrument_cover_goals(
   goal_filterst goal_filters;
   goal_filters.add(util_make_unique<internal_goals_filtert>(message_handler));
 
-  instrument_cover_goals(
-    symbol_table, goto_program, criterion, message_handler, goal_filters);
+  cover_instrumenterst instrumenters;
+  instrumenters.add_from_criterion(criterion, symbol_table, goal_filters);
+
+  instrument_cover_goals(goto_program, instrumenters, message_handler);
+}
+
+void cover_instrumenterst::add_from_criterion(
+  coverage_criteriont criterion,
+  const symbol_tablet &symbol_table,
+  const goal_filterst &goal_filters)
+{
+  switch(criterion)
+  {
+  case coverage_criteriont::LOCATION:
+    instrumenters.push_back(
+      util_make_unique<cover_location_instrumentert>(
+        symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::BRANCH:
+    instrumenters.push_back(
+      util_make_unique<cover_branch_instrumentert>(symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::DECISION:
+    instrumenters.push_back(
+      util_make_unique<cover_decision_instrumentert>(
+        symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::CONDITION:
+    instrumenters.push_back(
+      util_make_unique<cover_condition_instrumentert>(
+        symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::PATH:
+    instrumenters.push_back(
+      util_make_unique<cover_path_instrumentert>(symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::MCDC:
+    instrumenters.push_back(
+      util_make_unique<cover_mcdc_instrumentert>(symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::ASSERTION:
+    instrumenters.push_back(
+      util_make_unique<cover_assertion_instrumentert>(
+        symbol_table, goal_filters));
+    break;
+  case coverage_criteriont::COVER:
+    instrumenters.push_back(
+      util_make_unique<cover_cover_instrumentert>(symbol_table, goal_filters));
+  }
+}
+
+coverage_criteriont
+parse_coverage_criterion(const std::string &criterion_string)
+{
+  coverage_criteriont c;
+
+  if(criterion_string == "assertion" || criterion_string == "assertions")
+    c = coverage_criteriont::ASSERTION;
+  else if(criterion_string == "path" || criterion_string == "paths")
+    c = coverage_criteriont::PATH;
+  else if(criterion_string == "branch" || criterion_string == "branches")
+    c = coverage_criteriont::BRANCH;
+  else if(criterion_string == "location" || criterion_string == "locations")
+    c = coverage_criteriont::LOCATION;
+  else if(criterion_string == "decision" || criterion_string == "decisions")
+    c = coverage_criteriont::DECISION;
+  else if(criterion_string == "condition" || criterion_string == "conditions")
+    c = coverage_criteriont::CONDITION;
+  else if(criterion_string == "mcdc")
+    c = coverage_criteriont::MCDC;
+  else if(criterion_string == "cover")
+    c = coverage_criteriont::COVER;
+  else
+  {
+    std::stringstream s;
+    s << "unknown coverage criterion " << '\'' << criterion_string << '\'';
+    throw s.str();
+  }
+
+  return c;
+}
+
+void instrument_cover_goals(
+  goto_functionst &goto_functions,
+  const cover_instrumenterst &instrumenters,
+  const function_filterst &function_filters,
+  message_handlert &message_handler)
+{
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    if(!function_filters(f_it->first, f_it->second))
+      continue;
+
+    instrument_cover_goals(f_it->second.body, instrumenters, message_handler);
+  }
 }
 
 bool instrument_cover_goals(
@@ -129,42 +161,27 @@ bool instrument_cover_goals(
   goal_filterst goal_filters;
   goal_filters.add(util_make_unique<internal_goals_filtert>(message_handler));
 
+  cover_instrumenterst instrumenters;
+
   std::list<std::string> criteria_strings=cmdline.get_values("cover");
-  std::set<coverage_criteriont> criteria;
   bool keep_assertions=false;
 
   for(const auto &criterion_string : criteria_strings)
   {
-    coverage_criteriont c;
+    try
+    {
+      coverage_criteriont c = parse_coverage_criterion(criterion_string);
 
-    if(criterion_string=="assertion" || criterion_string=="assertions")
-    {
-      keep_assertions=true;
-      c=coverage_criteriont::ASSERTION;
+      if(c == coverage_criteriont::ASSERTION)
+        keep_assertions = true;
+
+      instrumenters.add_from_criterion(c, symbol_table, goal_filters);
     }
-    else if(criterion_string=="path" || criterion_string=="paths")
-      c=coverage_criteriont::PATH;
-    else if(criterion_string=="branch" || criterion_string=="branches")
-      c=coverage_criteriont::BRANCH;
-    else if(criterion_string=="location" || criterion_string=="locations")
-      c=coverage_criteriont::LOCATION;
-    else if(criterion_string=="decision" || criterion_string=="decisions")
-      c=coverage_criteriont::DECISION;
-    else if(criterion_string=="condition" || criterion_string=="conditions")
-      c=coverage_criteriont::CONDITION;
-    else if(criterion_string=="mcdc")
-      c=coverage_criteriont::MCDC;
-    else if(criterion_string=="cover")
-      c=coverage_criteriont::COVER;
-    else
+    catch(const std::string &e)
     {
-      msg.error() << "unknown coverage criterion "
-                  << '\'' << criterion_string << '\''
-                  << messaget::eom;
+      msg.error() << e << messaget::eom;
       return true;
     }
-
-    criteria.insert(c);
   }
 
   if(keep_assertions && criteria_strings.size()>1)
@@ -203,8 +220,9 @@ bool instrument_cover_goals(
   }
   if(!cover_include_pattern.empty())
   {
-    function_filters.add(util_make_unique<include_pattern_filtert>(
-      message_handler, cover_include_pattern));
+    function_filters.add(
+      util_make_unique<include_pattern_filtert>(
+        message_handler, cover_include_pattern));
   }
 
   if(cmdline.isset("no-trivial-tests"))
@@ -213,16 +231,8 @@ bool instrument_cover_goals(
 
   msg.status() << "Instrumenting coverage goals" << messaget::eom;
 
-  for(const auto &criterion : criteria)
-  {
-    instrument_cover_goals(
-      symbol_table,
-      goto_functions,
-      criterion,
-      message_handler,
-      function_filters,
-      goal_filters);
-  }
+  instrument_cover_goals(
+    goto_functions, instrumenters, function_filters, message_handler);
 
   function_filters.report_anomalies();
   goal_filters.report_anomalies();

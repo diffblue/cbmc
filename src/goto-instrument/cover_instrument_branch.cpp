@@ -10,18 +10,14 @@ Author: Daniel Kroening
 /// Coverage Instrumentation for Branches
 
 #include "cover_instrument.h"
-
 #include "cover_basic_blocks.h"
 
-void cover_instrument_branch(
+void cover_branch_instrumentert::instrument(
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_basic_blockst &basic_blocks)
+  const cover_basic_blockst &basic_blocks) const
 {
-  const irep_idt coverage_criterion = "branch";
-  const irep_idt property_class = "coverage";
-
-  if(i_it->is_assert())
+  if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 
   if(i_it == goto_program.instructions.begin())
@@ -72,7 +68,6 @@ void cover_instrument_branch(
     i_it->source_location.set_property_class(property_class);
     i_it->function = function;
 
-    i_it++;
-    i_it++;
+    std::advance(i_it, 2);
   }
 }

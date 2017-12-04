@@ -13,21 +13,24 @@ Author: Daniel Kroening
 
 #include "cover_util.h"
 
-void cover_instrument_path(goto_programt::targett &i_it)
+void cover_path_instrumentert::instrument(
+  goto_programt &goto_program,
+  goto_programt::targett &i_it,
+  const cover_basic_blockst &basic_blocks) const
 {
-  if(i_it->is_assert())
+  if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 
   // TODO: implement
 }
 
-void cover_instrument_assertion(goto_programt::targett &i_it)
+void cover_assertion_instrumentert::instrument(
+  goto_programt &goto_program,
+  goto_programt::targett &i_it,
+  const cover_basic_blockst &basic_blocks) const
 {
-  const irep_idt coverage_criterion = "assertion";
-  const irep_idt property_class = "coverage";
-
   // turn into 'assert(false)' to avoid simplification
-  if(i_it->is_assert())
+  if(is_non_cover_assertion(i_it))
   {
     i_it->guard = false_exprt();
     i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
@@ -36,11 +39,11 @@ void cover_instrument_assertion(goto_programt::targett &i_it)
   }
 }
 
-void cover_instrument_cover(const namespacet &ns, goto_programt::targett &i_it)
+void cover_cover_instrumentert::instrument(
+  goto_programt &goto_program,
+  goto_programt::targett &i_it,
+  const cover_basic_blockst &basic_blocks) const
 {
-  const irep_idt coverage_criterion = "cover";
-  const irep_idt property_class = "coverage";
-
   // turn __CPROVER_cover(x) into 'assert(!x)'
   if(i_it->is_function_call())
   {
@@ -63,7 +66,7 @@ void cover_instrument_cover(const namespacet &ns, goto_programt::targett &i_it)
       i_it->source_location.set_function(i_it->function);
     }
   }
-  else if(i_it->is_assert())
+  else if(is_non_cover_assertion(i_it))
     i_it->make_skip();
 }
 

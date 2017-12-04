@@ -12,42 +12,229 @@ Author: Peter Schrammel
 #ifndef CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 #define CPROVER_GOTO_INSTRUMENT_COVER_INSTRUMENT_H
 
-#include <goto-programs/goto_model.h>
+#include <memory>
 
+#include <goto-programs/goto_model.h>
+#include <util/message.h>
+
+enum class coverage_criteriont;
 class cover_basic_blockst;
 class goal_filterst;
 
-void cover_instrument_location(
-  goto_programt &goto_program,
-  goto_programt::targett &i_it,
-  const cover_basic_blockst &basic_blocks,
-  const goal_filterst &goal_filters);
+/// Base class for goto program coverage instrumenters
+class cover_instrumenter_baset
+{
+public:
+  cover_instrumenter_baset(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters,
+    const irep_idt &_coverage_criterion)
+    : coverage_criterion(_coverage_criterion),
+      ns(_symbol_table),
+      goal_filters(_goal_filters)
+  {
+  }
 
-void cover_instrument_branch(
-  goto_programt &goto_program,
-  goto_programt::targett &i_it,
-  const cover_basic_blockst &basic_blocks);
+  /// Instruments a goto program
+  /// \param goto_program: a goto program
+  /// \param basic_blocks: detected basic blocks
+  virtual void operator()(
+    goto_programt &goto_program,
+    const cover_basic_blockst &basic_blocks) const
+  {
+    Forall_goto_program_instructions(i_it, goto_program)
+    {
+      instrument(goto_program, i_it, basic_blocks);
+    }
+  }
 
-void cover_instrument_decision(
-  const namespacet &ns,
-  goto_programt &goto_program,
-  goto_programt::targett &i_it);
+  const irep_idt property_class = "coverage";
+  const irep_idt coverage_criterion;
 
-void cover_instrument_condition(
-  const namespacet &ns,
-  goto_programt &goto_program,
-  goto_programt::targett &i_it);
+protected:
+  const namespacet ns;
+  const goal_filterst &goal_filters;
 
-void cover_instrument_mcdc(
-  const namespacet &ns,
-  goto_programt &goto_program,
-  goto_programt::targett &i_it);
+  /// Override this method to implement an instrumenter
+  virtual void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const = 0;
 
-void cover_instrument_path(goto_programt::targett &i_it);
+  bool is_non_cover_assertion(goto_programt::const_targett t) const
+  {
+    return t->is_assert() &&
+           t->source_location.get_property_class() != property_class;
+  }
+};
 
-void cover_instrument_assertion(goto_programt::targett &i_it);
+/// A collection of instrumenters to be run
+class cover_instrumenterst
+{
+public:
+  void add_from_criterion(
+    coverage_criteriont,
+    const symbol_tablet &,
+    const goal_filterst &);
 
-void cover_instrument_cover(const namespacet &ns, goto_programt::targett &i_it);
+  /// Applies all instrumenters to the given goto program
+  /// \param goto_program: a goto program
+  /// \param basic_blocks: detected basic blocks of the goto program
+  void operator()(
+    goto_programt &goto_program,
+    const cover_basic_blockst &basic_blocks) const
+  {
+    for(const auto &instrumenter : instrumenters)
+      (*instrumenter)(goto_program, basic_blocks);
+  }
+
+protected:
+  std::vector<std::unique_ptr<cover_instrumenter_baset>> instrumenters;
+};
+
+/// Basic block coverage instrumenter
+class cover_location_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_location_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "location")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// Branch coverage instrumenter
+class cover_branch_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_branch_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "branch")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// Condition coverage instrumenter
+class cover_condition_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_condition_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "condition")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// Decision coverage instrumenter
+class cover_decision_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_decision_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "decision")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// MC/DC coverage instrumenter
+class cover_mcdc_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_mcdc_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "MC/DC")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// Path coverage instrumenter
+class cover_path_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_path_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "path")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// Assertion coverage instrumenter
+class cover_assertion_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_assertion_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "assertion")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
+
+/// __CPROVER_cover coverage instrumenter
+class cover_cover_instrumentert : public cover_instrumenter_baset
+{
+public:
+  cover_cover_instrumentert(
+    const symbol_tablet &_symbol_table,
+    const goal_filterst &_goal_filters)
+    : cover_instrumenter_baset(_symbol_table, _goal_filters, "cover")
+  {
+  }
+
+protected:
+  void instrument(
+    goto_programt &,
+    goto_programt::targett &,
+    const cover_basic_blockst &) const override;
+};
 
 void cover_instrument_end_of_function(
   const irep_idt &function,

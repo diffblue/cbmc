@@ -14,17 +14,14 @@ Author: Daniel Kroening
 #include "cover_basic_blocks.h"
 #include "cover_filter.h"
 
-void cover_instrument_location(
+void cover_location_instrumentert::instrument(
   goto_programt &goto_program,
   goto_programt::targett &i_it,
-  const cover_basic_blockst &basic_blocks,
-  const goal_filterst &goal_filters)
+  const cover_basic_blockst &basic_blocks) const
 {
-  const irep_idt coverage_criterion = "location";
-  const irep_idt property_class = "coverage";
-
-  if(i_it->is_assert())
+  if(is_non_cover_assertion(i_it))
     i_it->make_skip();
+
   unsigned block_nr = basic_blocks.block_of(i_it);
   goto_programt::const_targett in_t = basic_blocks.instruction_of(block_nr);
   // we only instrument the selected instruction
