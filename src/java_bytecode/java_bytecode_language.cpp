@@ -61,10 +61,19 @@ void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
   else
     lazy_methods_mode=LAZY_METHODS_MODE_EAGER;
 
+  if(cmd.isset("java-throw-runtime-exceptions"))
+  {
+    throw_runtime_exceptions = true;
+    java_load_classes.insert(
+        java_load_classes.end(),
+        exception_needed_classes.begin(),
+        exception_needed_classes.end());
+  }
   if(cmd.isset("java-load-class"))
   {
-    for(const auto &c : cmd.get_values("java-load-class"))
-      java_load_classes.push_back(c);
+    const auto &values = cmd.get_values("java-load-class");
+    java_load_classes.insert(
+        java_load_classes.end(), values.begin(), values.end());
   }
 
   const std::list<std::string> &extra_entry_points=
