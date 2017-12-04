@@ -8,6 +8,8 @@ Date:   June 2017
 
 \*******************************************************************/
 
+#include "java_bytecode_instrument.h"
+
 #include <util/arith_tools.h>
 #include <util/fresh_symbol.h>
 #include <util/std_code.h>
@@ -18,7 +20,6 @@ Date:   June 2017
 #include <goto-programs/goto_functions.h>
 
 #include "java_bytecode_convert_class.h"
-#include "java_bytecode_instrument.h"
 #include "java_entry_point.h"
 #include "java_root_class.h"
 #include "java_types.h"
