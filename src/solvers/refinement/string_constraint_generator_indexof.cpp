@@ -80,6 +80,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// `haystack` of the first occurrence of `needle` starting the search at
 /// `from_index`, or `-1` if needle does not occur at or after position
 /// `from_index`.
+/// If needle is an empty string then the result is `from_index`.
 ///
 /// These axioms are:
 ///   1. \f$ contains \Rightarrow {\tt from\_index} \le \tt{index}
@@ -93,6 +94,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 ///   5. \f$ \forall n \in [{\tt from\_index},|{\tt haystack}|-|{\tt needle}|]
 ///          .\ \lnot contains \Rightarrow (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+///   6. \f$ |{\tt needle}| = 0 \Rightarrow \tt{index} = from_index \f$
 /// \param haystack: an array of character expression
 /// \param needle: an array of character expression
 /// \param from_index: an integer expression
@@ -152,6 +154,11 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
     needle);
   axioms.push_back(a5);
 
+  const implies_exprt a6(
+    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(offset, from_index));
+  axioms.push_back(a6);
+
   return offset;
 }
 
@@ -159,6 +166,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 /// the last occurrence of needle starting the search backward at from_index (ie
 /// the index is smaller or equal to from_index), or -1 if needle does not occur
 /// before from_index.
+/// If `needle` is the empty string, the result is `from_index`.
 ///
 /// These axioms are:
 ///   1. \f$ contains \Rightarrow -1 \le {\tt index}
@@ -178,6 +186,7 @@ exprt string_constraint_generatort::add_axioms_for_index_of_string(
 ///          .\ \lnot contains \Rightarrow
 ///          (\exists m \in [0,|{\tt needle}|)
 ///          .\ {\tt haystack}[m+n] \ne {\tt needle}[m]) \f$
+///   6. \f$ |{\tt needle}| = 0 \Rightarrow index = from_index \f$
 /// \param haystack: an array of characters expression
 /// \param needle: an array of characters expression
 /// \param from_index: integer expression
@@ -238,6 +247,11 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of_string(
     needle);
   axioms.push_back(a5);
 
+  const implies_exprt a6(
+    equal_exprt(needle.length(), from_integer(0, index_type)),
+    equal_exprt(offset, from_index));
+  axioms.push_back(a6);
+
   return offset;
 }
 
@@ -295,13 +309,16 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
 /// \todo Change argument names to match add_axioms_for_last_index_of_string
 ///
 /// These axioms are :
-///   1. \f$ -1 \le {\tt index} \le {\tt from\_index} \f$
+///   1. \f$ -1 \le {\tt index} \le {\tt from\_index}
+///          \land {\tt index} < |{\tt haystack}| \f$
 ///   2. \f$ {\tt index} = -1 \Leftrightarrow \lnot contains\f$
-///   3. \f$ contains \Rightarrow ({\tt index} \le {\tt from\_index} \land
-///          {\tt haystack}[i] = {\tt needle} )\f$
-///   4. \f$ \forall n \in [{\tt index} +1, {\tt from\_index}+1)
+///   3. \f$ contains \Rightarrow
+///          {\tt haystack}[{\tt index}] = {\tt needle} )\f$
+///   4. \f$ \forall n \in [{\tt index} +1,
+///                         min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ contains \Rightarrow {\tt haystack}[n] \ne {\tt needle} \f$
-///   5. \f$ \forall m \in [0, {\tt from\_index}+1)
+///   5. \f$ \forall m \in [0,
+///          min({\tt from\_index}+1, |{\tt haystack}|))
 ///          .\ \lnot contains \Rightarrow {\tt haystack}[m] \ne {\tt needle}\f$
 /// \param str: an array of characters expression
 /// \param c: a character expression
@@ -314,42 +331,41 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const exprt &from_index)
 {
   const typet &index_type = str.length().type();
-  symbol_exprt index=fresh_exist_index("last_index_of", index_type);
-  symbol_exprt contains=fresh_boolean("contains_in_last_index_of");
+  const symbol_exprt index = fresh_exist_index("last_index_of", index_type);
+  const symbol_exprt contains = fresh_boolean("contains_in_last_index_of");
 
-  exprt index1=from_integer(1, index_type);
-  exprt minus1=from_integer(-1, index_type);
-  exprt from_index_plus_one=plus_exprt_with_overflow_check(from_index, index1);
-  and_exprt a1(
+  const exprt minus1 = from_integer(-1, index_type);
+  const and_exprt a1(
     binary_relation_exprt(index, ID_ge, minus1),
-    binary_relation_exprt(index, ID_lt, from_index_plus_one));
+    binary_relation_exprt(index, ID_le, from_index),
+    binary_relation_exprt(index, ID_lt, str.length()));
   axioms.push_back(a1);
 
-  equal_exprt a2(not_exprt(contains), equal_exprt(index, minus1));
+  const notequal_exprt a2(contains, equal_exprt(index, minus1));
   axioms.push_back(a2);
 
-  implies_exprt a3(
-    contains,
-    and_exprt(
-      binary_relation_exprt(from_index, ID_ge, index),
-      equal_exprt(str[index], c)));
+  const implies_exprt a3(contains, equal_exprt(str[index], c));
   axioms.push_back(a3);
 
-  symbol_exprt n=fresh_univ_index("QA_last_index_of1", index_type);
-  string_constraintt a4(
+  const exprt index1 = from_integer(1, index_type);
+  const plus_exprt from_index_plus_one(from_index, index1);
+  const if_exprt end_index(
+    binary_relation_exprt(from_index_plus_one, ID_le, str.length()),
+    from_index_plus_one,
+    str.length());
+
+  const symbol_exprt n = fresh_univ_index("QA_last_index_of1", index_type);
+  const string_constraintt a4(
     n,
     plus_exprt(index, index1),
-    from_index_plus_one,
+    end_index,
     contains,
-    not_exprt(equal_exprt(str[n], c)));
+    notequal_exprt(str[n], c));
   axioms.push_back(a4);
 
-  symbol_exprt m=fresh_univ_index("QA_last_index_of2", index_type);
-  string_constraintt a5(
-    m,
-    from_index_plus_one,
-    not_exprt(contains),
-    not_exprt(equal_exprt(str[m], c)));
+  const symbol_exprt m = fresh_univ_index("QA_last_index_of2", index_type);
+  const string_constraintt a5(
+    m, end_index, not_exprt(contains), notequal_exprt(str[m], c));
   axioms.push_back(a5);
 
   return index;
@@ -384,9 +400,7 @@ exprt string_constraint_generatort::add_axioms_for_last_index_of(
   const typet &char_type = str.content().type().subtype();
   PRECONDITION(f.type() == index_type);
 
-  const exprt from_index =
-    args.size() == 2 ? minus_exprt(str.length(), from_integer(1, index_type))
-                     : args[2];
+  const exprt from_index = args.size() == 2 ? str.length() : args[2];
 
   if(c.type().id()==ID_unsignedbv || c.type().id()==ID_signedbv)
   {
