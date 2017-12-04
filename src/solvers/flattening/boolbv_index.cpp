@@ -51,9 +51,8 @@ bvt boolbvt::convert_index(const index_exprt &expr)
 
       // record type if array is a symbol
 
-      if(array.id()==ID_symbol)
-        map.get_map_entry(
-          to_symbol_expr(array).get_identifier(), array_type);
+      if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
+        map.get_map_entry(array.get(ID_identifier), array_type);
 
       // make sure we have the index in the cache
       convert_bv(index);

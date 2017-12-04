@@ -1127,7 +1127,7 @@ static exprt substitute_array_access(
       *if_expr, index_expr.index(), symbol_generator, left_propagate);
 
   INVARIANT(
-    array.is_nil() || array.id() == ID_symbol,
+    array.is_nil() || array.id() == ID_symbol || array.id() == ID_nondet_symbol,
     std::string(
       "in case the array is unknown, it should be a symbol or nil, id: ") +
       id2string(array.id()));
@@ -1700,7 +1700,9 @@ static void initial_index_set(
   const exprt &s,
   const exprt &i)
 {
-  PRECONDITION(s.id() == ID_symbol || s.id() == ID_array || s.id() == ID_if);
+  PRECONDITION(
+    s.id() == ID_symbol || s.id() == ID_nondet_symbol || s.id() == ID_array ||
+    s.id() == ID_if);
   if(s.id() == ID_array)
   {
     for(std::size_t j = 0; j < s.operands().size(); ++j)
@@ -2002,7 +2004,8 @@ exprt string_refinementt::get(const exprt &expr) const
     }
 
     INVARIANT(
-      array.is_nil() || array.id() == ID_symbol,
+      array.is_nil() || array.id() == ID_symbol ||
+        array.id() == ID_nondet_symbol,
       std::string("apart from symbols, array valuations can be interpreted as "
                   "sparse arrays, id: ") +
         id2string(array.id()));
