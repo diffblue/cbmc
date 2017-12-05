@@ -205,6 +205,8 @@ private:
 #endif
   {
   public:
+    /// This irep_idt is the only place to store data in an irep, other than
+    /// the mere nesting structure
     irep_idt data;
     named_subt named_sub;
     named_subt comments;
