@@ -26,7 +26,7 @@ public:
   abstract_object_pointert get_abstract_object(
     const typet type, bool top, bool bottom, const exprt &e,
     const namespacet &ns);
-  void set_options(optionst &options);
+  void set_options(const optionst &options);
 
 private:
   variable_sensitivity_object_factoryt():initialized(false)
