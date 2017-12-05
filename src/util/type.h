@@ -11,10 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_UTIL_TYPE_H
 
 #include <util/source_location.h>
-#include "namespace.h"
 
 #define SUBTYPE_IN_GETSUB
 #define SUBTYPES_IN_GETSUB
+
+class namespacet;
 
 /*! \brief The type of an expression
 */

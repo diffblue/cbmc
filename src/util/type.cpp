@@ -6,7 +6,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-
 #include "type.h"
 #include "std_types.h"
 #include "namespace.h"
@@ -48,26 +47,24 @@ bool is_number(const typet &type)
 bool is_constant_or_has_constant_components(
   const typet &type, const namespacet &ns)
 {
-  // Helper function to avoid the code duplication
-  // in the branches below.
+  // Helper function to avoid the code duplication in the branches
+  // below.
   const auto has_constant_components =
-  [](const typet &subtype) -> bool
-  {
-    if(subtype.id() == ID_struct || subtype.id() == ID_union)
+    [&ns](const typet &subtype) -> bool
     {
-      const auto &struct_union_type = to_struct_union_type(subtype);
-      for(const auto &component : struct_union_type.components())
+      if(subtype.id() == ID_struct || subtype.id() == ID_union)
       {
-        if(component.type().id() == ID_pointer)
-          return component.type().get_bool(ID_C_constant);
-        if(component.type().get_bool(ID_C_constant))
-          return true;
+        const auto &struct_union_type = to_struct_union_type(subtype);
+        for(const auto &component : struct_union_type.components())
+        {
+          if(is_constant_or_has_constant_components(component.type(), ns))
+            return true;
+        }
       }
-    }
-    return false;
-  };
+      return false;
+    };
 
-  // There are 3 possibilities the code below is handling.
+  // There are 4 possibilities the code below is handling.
   // The possibilities are enumerated as comments, to show
   // what each code is supposed to be handling. For more
   // comprehensive test case for this, take a look at
@@ -77,6 +74,14 @@ bool is_constant_or_has_constant_components(
   if(type.get_bool(ID_C_constant))
     return true;
 
+  // This is a termination condition to break the recursion
+  // for recursive types such as the following:
+  // struct list { const int datum; struct list * next; };
+  // NOTE: the difference between this condition and the previous
+  // one is that this one always returns.
+  if(type.id()==ID_pointer)
+    return type.get_bool(ID_C_constant);
+
   // When we have a case like the following, we don't immediately
   // see the struct t. Instead, we only get to see symbol t1, which
   // we have to use the namespace to resolve to its definition:
@@ -84,11 +89,11 @@ bool is_constant_or_has_constant_components(
   // struct t t1;
   if(type.id() == ID_symbol)
   {
-    const auto &subtype = ns.follow(type);
-    return has_constant_components(subtype);
+    const auto &resolved_type = ns.follow(type);
+    return has_constant_components(resolved_type);
   }
 
-  // In a case like this, were we see an array (b[3] here), we know that
+  // In a case like this, where we see an array (b[3] here), we know that
   // the array contains subtypes. We get the first one, and
   // then resolve it to its  definition through the usage of the namespace.
   // struct contains_constant_pointer { int x; int * const p; };
@@ -96,11 +101,7 @@ bool is_constant_or_has_constant_components(
   if(type.has_subtype())
   {
     const auto &subtype = type.subtype();
-    if(subtype.id() == ID_symbol)
-    {
-      const auto &new_subtype = ns.follow(to_symbol_type(subtype));
-      return has_constant_components(new_subtype);
-    }
+    return is_constant_or_has_constant_components(subtype, ns);
   }
 
   return false;
