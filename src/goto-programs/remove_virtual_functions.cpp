@@ -192,6 +192,9 @@ void remove_virtual_functionst::remove_virtual_function(
       {
         // No definition for this type; shouldn't be possible...
         t1->make_assertion(false_exprt());
+        t1->source_location.set_comment(
+          ("cannot find calls for " +
+           id2string(code.function().get(ID_identifier))));
       }
       insertit.first->second=t1;
       // goto final
