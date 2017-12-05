@@ -155,7 +155,10 @@ public:
     if(irep_data!=&empty_d)
       irep_data->ref_count++;
 
-    remove_ref(data); // this may kill 'irep'
+    // If `irep` aliases `*this` and we hadn't been careful to increase
+    // `irep.data.ref_count` then calling `remove_ref` on `data`
+    // could make `irep.data.ref_count` 0 and trigger deletion of `irep.data`
+    remove_ref(data);
     data=irep_data;
 
     return *this;
@@ -270,6 +273,8 @@ public:
     unsigned ref_count;
     #endif
 
+    /// This is the only place to store data in an irep, other than the mere
+    /// nesting structure
     irep_idt data;
 
     named_subt named_sub;
