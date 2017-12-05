@@ -142,7 +142,7 @@ Function: variable_sensitivity_object_factoryt::set_options
 
 \*******************************************************************/
 
-void variable_sensitivity_object_factoryt::set_options(optionst &options)
+void variable_sensitivity_object_factoryt::set_options(const optionst &options)
 {
   has_variables_flag=options.get_bool_option("variable");
   has_structs_flag=options.get_bool_option("structs");
