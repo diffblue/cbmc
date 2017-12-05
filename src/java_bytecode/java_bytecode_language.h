@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cmdline.h>
 #include <util/make_unique.h>
 
+#include "ci_lazy_methods.h"
 #include "java_class_loader.h"
 #include "java_string_library_preprocess.h"
 
@@ -80,12 +81,6 @@ struct object_factory_parameterst final
   /// Force string content to be ASCII printable characters when set to true.
   bool string_printable = false;
 };
-
-// Pair of class id and methodt
-typedef std::pair<irep_idt, const java_bytecode_parse_treet::methodt *>
-  class_and_bytecodet;
-// Map from method id to class_and_bytecodet
-typedef std::map<irep_idt, class_and_bytecodet> method_bytecodet;
 
 class java_bytecode_languaget:public languaget
 {

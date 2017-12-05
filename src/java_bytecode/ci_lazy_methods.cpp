@@ -140,17 +140,16 @@ bool ci_lazy_methodst::operator()(
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
-        auto findit = method_bytecode.find(mname);
-        if(findit == method_bytecode.end())
+        method_bytecodet::opt_reft cmb = method_bytecode.get(mname);
+        if(!cmb)
         {
           debug() << "Skip " << mname << eom;
           continue;
         }
         debug() << "CI lazy methods: elaborate " << mname << eom;
-        const auto &parsed_method=findit->second;
         method_converter(
-          symbol_table.lookup_ref(parsed_method.first),
-          *parsed_method.second,
+          symbol_table.lookup_ref(cmb->get().class_id),
+          cmb->get().method,
           // Note this wraps *references* to method_worklist2 & needed_classes
           ci_lazy_methods_neededt(
             method_worklist2, needed_classes, symbol_table));
@@ -190,7 +189,7 @@ bool ci_lazy_methodst::operator()(
     if(sym.second.is_static_lifetime)
       continue;
     if(
-      method_bytecode.count(sym.first) &&
+      method_bytecode.contains_method(sym.first) &&
       !methods_already_populated.count(sym.first))
     {
       continue;

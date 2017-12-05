@@ -251,8 +251,8 @@ bool java_bytecode_languaget::typecheck(
     for(const auto &method_sig : method_bytecode)
     {
       java_bytecode_convert_method(
-        symbol_table.lookup_ref(method_sig.second.first),
-        *method_sig.second.second,
+        symbol_table.lookup_ref(method_sig.second.class_id),
+        method_sig.second.method,
         symbol_table,
         get_message_handler(),
         max_user_array_length,
@@ -368,10 +368,11 @@ void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
   symbol_tablet &symbol_table)
 {
-  const auto &lazy_method_entry = method_bytecode.at(function_id);
+  const method_bytecodet::class_method_and_bytecodet &cmb =
+    *method_bytecode.get(function_id);
   java_bytecode_convert_method(
-    symbol_table.lookup_ref(lazy_method_entry.first),
-    *lazy_method_entry.second,
+    symbol_table.lookup_ref(cmb.class_id),
+    cmb.method,
     symbol_table,
     get_message_handler(),
     max_user_array_length,

@@ -26,11 +26,63 @@
 
 class java_string_library_preprocesst;
 
-// Pair of class id and methodt
-typedef std::pair<irep_idt, const java_bytecode_parse_treet::methodt *>
-  class_and_bytecodet;
-// Map from method id to class_and_bytecodet
-typedef std::map<irep_idt, class_and_bytecodet> method_bytecodet;
+// Map from method id to class_method_and_bytecodet
+class method_bytecodet
+{
+public:
+  /// Pair of class id and methodt
+  struct class_method_and_bytecodet
+  {
+    irep_idt class_id;
+    irep_idt method_id;
+    const java_bytecode_parse_treet::methodt &method;
+  };
+
+  typedef optionalt<std::reference_wrapper<const class_method_and_bytecodet>>
+    opt_reft;
+
+private:
+  typedef std::map<irep_idt, class_method_and_bytecodet> mapt;
+  mapt map;
+
+public:
+  bool contains_method(const irep_idt &method_id) const
+  {
+    return map.count(method_id) != 0;
+  }
+
+  void add(const class_method_and_bytecodet &method_class_and_bytecode)
+  {
+    map.emplace(
+      std::make_pair(
+        method_class_and_bytecode.method_id, method_class_and_bytecode));
+  }
+
+  void add(
+    const irep_idt &class_id,
+    const irep_idt &method_id,
+    const java_bytecode_parse_treet::methodt &method)
+  {
+    add(class_method_and_bytecodet{class_id, method_id, method});
+  }
+
+  mapt::const_iterator begin() const
+  {
+    return map.begin();
+  }
+  mapt::const_iterator end() const
+  {
+    return map.end();
+  }
+
+  opt_reft get(const irep_idt &method_id)
+  {
+    const auto it = map.find(method_id);
+    if(it == map.end())
+      return opt_reft();
+    return std::cref(it->second);
+  }
+};
 
 typedef std::function<void(
   const symbolt &,
