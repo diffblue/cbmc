@@ -18,7 +18,6 @@ Date: November 2011
 #include <util/std_expr.h>
 #include <util/cprover_prefix.h>
 #include <util/prefix.h>
-#include <util/type.h>
 
 #include <goto-programs/goto_model.h>
 #include <goto-programs/goto_functions.h>
