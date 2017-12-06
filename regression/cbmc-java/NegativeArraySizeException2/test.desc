@@ -1,0 +1,9 @@
+CORE
+NegativeArraySizeExceptionTest.class
+--java-throw-runtime-exceptions
+^EXIT=10$
+^SIGNAL=0$
+^.*assertion at file NegativeArraySizeExceptionTest.java line 7 function.*: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
