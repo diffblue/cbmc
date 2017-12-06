@@ -1,8 +1,3 @@
-int main()
-{
-  do_structs();
-}
-
 struct Ages {
   int x;
   int y;
@@ -57,3 +52,9 @@ void do_structs()
 
   new_age=st;
 }
+
+int main()
+{
+  do_structs();
+}
+

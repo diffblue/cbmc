@@ -1,8 +1,3 @@
-int main()
-{
-  do_pointers();
-}
-
 void do_pointers()
 {
   int bool_;
@@ -27,4 +22,9 @@ void do_pointers()
   *x_p=60;
 
   int j=*y_p;
+}
+
+int main()
+{
+  do_pointers();
 }
