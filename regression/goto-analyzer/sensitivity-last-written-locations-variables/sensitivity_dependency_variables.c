@@ -1,10 +1,5 @@
 int global_x; // Should assign to 0.
 
-int main()
-{
-  do_variables();
-}
-
 void do_variables()
 {
   int bool_;
@@ -60,4 +55,9 @@ void do_variables()
   }
   y=10;
   x=20;
+}
+
+int main()
+{
+  do_variables();
 }

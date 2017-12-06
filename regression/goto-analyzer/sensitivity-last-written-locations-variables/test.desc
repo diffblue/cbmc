@@ -1,6 +1,6 @@
 CORE
 sensitivity_dependency_variables.c
---variable  --arrays --pointers --structs
+--variable  --arrays --pointers --structs --show
 // Enable multi-line checking
 activate-multi-line-match
 __CPROVER_threads_exited \(\) -> TOP @ \[14\]
@@ -15,7 +15,6 @@ __CPROVER_pipe_count \(\) -> 00000000000000000000000000000000 @ \[11\]
 __CPROVER_malloc_size \(\) -> 0000000000000000000000000000000000000000000000000000000000000000 @ \[8\]
 __CPROVER_next_thread_id \(\) -> 0000000000000000000000000000000000000000000000000000000000000000 @ \[10\]
 __CPROVER_thread_id \(\) -> 0000000000000000000000000000000000000000000000000000000000000000 @ \[13\]
-do_variables#return_value \(\) -> TOP @ \[59\]
 main#return_value \(\) -> TOP @ \[1\]
 do_variables::1::bool_ \(\) -> TOP @ \[17\]
 do_variables::1::bool_1 \(\) -> TOP @ \[18\]

@@ -1,8 +1,3 @@
-int main()
-{
-  do_arrays();
-}
-
 void do_arrays()
 {
   int bool_;
@@ -47,4 +42,9 @@ void do_arrays()
   }
   x[1]=10;
   x[0]=20;
+}
+
+int main()
+{
+  do_arrays();
 }
