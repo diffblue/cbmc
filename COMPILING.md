@@ -177,6 +177,8 @@ using "make generated_files" before opening the project.
 There is an experimental build based on CMake instead of hand-written
 makefiles. It should work on a wider variety of systems than the standard
 makefile build, and can integrate better with IDEs and static-analysis tools.
+On Windows, the CMake build does not depend on Cygwin or MinGW, and doesn't
+require manual modification of build files.
 
 1. Ensure you have all the build dependencies installed. Build dependencies are
    the same as for the makefile build, but with the addition of CMake version
@@ -196,9 +198,15 @@ makefile build, and can integrate better with IDEs and static-analysis tools.
      ```
      You shoud also install [Homebrew](https://brew.sh), after which you can
      run `brew install cmake` to install CMake.
-   - On Windows, install Cygwin, then from the Cygwin setup facility install
-     `cmake`, `flex`, `bison`, `tar`, `gzip`, `git`, `make`, `wget`, and
-     `patch`.
+   - On Windows, ensure you have Visual Studio 2013 or later installed.
+     Then, download CMake from the [official download
+     page](https://cmake.org/download).
+     You'll also need `git` and `patch`, which are both provided by the
+     [git for Windows](git-scm.com/download/win) package.
+     Finally, Windows builds of flex and bison should be installed from
+     [the sourceforge page](sourceforge.net/projects/winflexbison).
+     The easiest way to 'install' these executables is to unzip them and to
+     drop the entire unzipped package into the CBMC source directory.
    - Use of CMake has not been tested on Solaris or FreeBSD. However, it should
      be possible to install CMake from the system package manager or the
      [official download page](https://cmake.org/download) on those systems.

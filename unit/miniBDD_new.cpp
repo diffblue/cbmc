@@ -64,6 +64,7 @@ public:
   literalt lor(literalt a, literalt b) override
   {
     UNREACHABLE;
+    return {};
   }
 
   literalt land(const bvt &bv) override
@@ -94,16 +95,19 @@ public:
   literalt lxor(const bvt &bv) override
   {
     UNREACHABLE;
+    return {};
   }
 
   literalt lnand(literalt a, literalt b) override
   {
     UNREACHABLE;
+    return {};
   }
 
   literalt lnor(literalt a, literalt b) override
   {
     UNREACHABLE;
+    return {};
   }
 
   literalt lequal(literalt a, literalt b) override
@@ -114,11 +118,13 @@ public:
   literalt limplies(literalt a, literalt b) override
   {
     UNREACHABLE;
+    return {};
   }
 
   literalt lselect(literalt a, literalt b, literalt c) override
   {
     UNREACHABLE;
+    return {};
   }
 
   void lcnf(const bvt &bv) override
@@ -144,11 +150,13 @@ public:
   resultt prop_solve() override
   {
     UNREACHABLE;
+    return {};
   }
 
   tvt l_get(literalt a) const override
   {
     UNREACHABLE;
+    return {};
   }
 
   expanding_vectort<mini_bddt> bdd_map;
