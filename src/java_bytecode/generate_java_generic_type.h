@@ -23,7 +23,7 @@ public:
     const java_generic_typet &existing_generic_type,
     symbol_tablet &symbol_table) const;
 private:
-  irep_idt build_generic_tag(
+  irep_idt build_generic_name(
     const java_generic_typet &existing_generic_type,
     const java_class_typet &original_class) const;
 

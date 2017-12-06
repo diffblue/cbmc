@@ -42,8 +42,8 @@ symbolt generate_java_generic_typet::operator()(
   const java_generic_class_typet &generic_class_definition =
     to_java_generic_class_type(to_java_class_type(pointer_subtype));
 
-  const irep_idt new_tag =
-    build_generic_tag(existing_generic_type, generic_class_definition);
+  const irep_idt generic_name =
+    build_generic_name(existing_generic_type, generic_class_definition);
   struct_union_typet::componentst replacement_components =
     generic_class_definition.components();
 
@@ -74,7 +74,7 @@ symbolt generate_java_generic_typet::operator()(
     "All components in the original class should be in the new class");
 
   const java_specialized_generic_class_typet new_java_class{
-    new_tag,
+    generic_name,
     generic_class_definition.get_tag(),
     replacement_components,
     existing_generic_type.generic_type_arguments()};
@@ -90,7 +90,7 @@ symbolt generate_java_generic_typet::operator()(
                       << " already exists" << messaget::eom;
   }
 
-  const auto expected_symbol="java::"+id2string(new_tag);
+  const auto expected_symbol="java::"+id2string(generic_name);
   auto symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
@@ -188,7 +188,7 @@ typet generate_java_generic_typet::substitute_type(
 /// \param existing_generic_type The type we want to concretise
 /// \param original_class
 /// \return A tag for the new generic we want a unique tag for.
-irep_idt generate_java_generic_typet::build_generic_tag(
+irep_idt generate_java_generic_typet::build_generic_name(
   const java_generic_typet &existing_generic_type,
   const java_class_typet &original_class) const
 {
