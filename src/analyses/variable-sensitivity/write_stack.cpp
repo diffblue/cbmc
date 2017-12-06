@@ -14,6 +14,7 @@
 
 #include <unordered_set>
 
+#include <util/arith_tools.h>
 #include <util/std_expr.h>
 #include <util/simplify_expr.h>
 
@@ -41,7 +42,7 @@ write_stackt::write_stackt(
     construct_stack_to_pointer(
       address_of_exprt(
         index_exprt(
-          expr, constant_exprt::integer_constant(0))), environment, ns);
+          expr, from_integer(0, integer_typet()))), environment, ns);
   }
   else
   {
