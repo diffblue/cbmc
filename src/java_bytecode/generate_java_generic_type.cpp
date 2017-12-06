@@ -42,8 +42,8 @@ symbolt generate_java_generic_typet::operator()(
   const java_generic_class_typet &generic_class_definition =
     to_java_generic_class_type(to_java_class_type(pointer_subtype));
 
-  const irep_idt new_tag =
-    build_generic_tag(existing_generic_type, generic_class_definition);
+  const irep_idt generic_name =
+    build_generic_name(existing_generic_type, generic_class_definition);
   struct_union_typet::componentst replacement_components =
     generic_class_definition.components();
 
@@ -73,8 +73,12 @@ symbolt generate_java_generic_typet::operator()(
     pre_modification_size==after_modification_size,
     "All components in the original class should be in the new class");
 
-  const java_specialized_generic_class_typet new_java_class =
-    construct_specialised_generic_type(new_tag, replacement_components);
+  const java_specialized_generic_class_typet new_java_class{
+    generic_name,
+    generic_class_definition.get_tag(),
+    replacement_components,
+    existing_generic_type.generic_type_arguments()};
+
   const type_symbolt &class_symbol =
     build_symbol_from_specialised_class(new_java_class);
 
@@ -86,7 +90,7 @@ symbolt generate_java_generic_typet::operator()(
                       << " already exists" << messaget::eom;
   }
 
-  const auto expected_symbol="java::"+id2string(new_tag);
+  const auto expected_symbol="java::"+id2string(generic_name);
   auto symbol=symbol_table.lookup(expected_symbol);
   INVARIANT(symbol, "New class not created");
   return *symbol;
@@ -184,7 +188,7 @@ typet generate_java_generic_typet::substitute_type(
 /// \param existing_generic_type The type we want to concretise
 /// \param original_class
 /// \return A tag for the new generic we want a unique tag for.
-irep_idt generate_java_generic_typet::build_generic_tag(
+irep_idt generate_java_generic_typet::build_generic_name(
   const java_generic_typet &existing_generic_type,
   const java_class_typet &original_class) const
 {
@@ -225,19 +229,6 @@ irep_idt generate_java_generic_typet::build_generic_tag(
   new_tag_buffer << ">";
 
   return new_tag_buffer.str();
-}
-
-/// Build the specialised version of the specific class, with the specified
-/// parameters and name.
-/// \param new_tag: The new name for the class (like Generic<java::Float>)
-/// \param new_components: The specialised components
-/// \return The newly constructed class.
-java_specialized_generic_class_typet
-generate_java_generic_typet::construct_specialised_generic_type(
-  const irep_idt &new_tag,
-  const struct_typet::componentst &new_components) const
-{
-  return java_specialized_generic_class_typet{new_tag, new_components};
 }
 
 /// Construct the symbol to be moved into the symbol table
