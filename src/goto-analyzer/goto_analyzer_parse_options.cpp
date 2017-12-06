@@ -201,6 +201,10 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
     "simplify-slicing",
     !(cmdline.isset("no-simplify-slicing")));
 
+  options.set_option(
+    "simplify-full",
+    cmdline.isset("simplify-full"));
+
   // Abstract interpreter choice
   options.set_option("flow-sensitive", false);
   options.set_option("concurrent", false);

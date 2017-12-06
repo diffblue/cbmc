@@ -152,7 +152,8 @@ class optionst;
   "(unwindset)" \
   WRAP_ENTRY_POINT_IN_WHILE_TRUE \
   "(functions-ignore)" \
-  "(functions-full)"
+  "(functions-full)" \
+  "(simplify-full)"
 
 class goto_analyzer_parse_optionst:
   public parse_options_baset,

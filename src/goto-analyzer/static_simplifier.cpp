@@ -48,12 +48,28 @@ protected:
   const namespacet ns;
   const optionst &options;
   std::ostream &out;
-
   // analyses
   analyzerT domain;
-
+  void simplify_program_once(counterst &simplified, counterst &unmodified);
   void simplify_program(void);
+  void simplify_program_fully();
   bool simplify_guard(goto_programt::instructionst::iterator &i_it);
+
+  struct counterst
+  {
+    counterst() :
+      asserts(0),
+      assumes(0),
+      gotos(0),
+      assigns(0),
+      function_calls(0) {}
+
+    unsigned asserts;
+    unsigned assumes;
+    unsigned gotos;
+    unsigned assigns;
+    unsigned function_calls;
+  };
 };
 
 /*******************************************************************\
@@ -76,7 +92,14 @@ bool static_simplifiert<analyzerT>::operator()(void)
   domain(goto_functions, ns);
 
   status() << "Simplifying program" << eom;
-  simplify_program();
+  if(options.get_bool_option("simplify-full"))
+  {
+    simplify_program_fully();
+  }
+  else
+  {
+    simplify_program();
+  }
 
   // Remove obviously unreachable things and (now) unconditional branches
   if(options.get_bool_option("simplify-slicing"))
@@ -113,25 +136,83 @@ Function: static_simplifiert<analyzerT>::simplify_program
 template<class analyzerT>
 void static_simplifiert<analyzerT>::simplify_program()
 {
-  struct counterst
-  {
-    counterst() :
-      asserts(0),
-      assumes(0),
-      gotos(0),
-      assigns(0),
-      function_calls(0) {}
-
-    unsigned asserts;
-    unsigned assumes;
-    unsigned gotos;
-    unsigned assigns;
-    unsigned function_calls;
-  };
 
   counterst simplified;
   counterst unmodified;
 
+  simplify_program_once(simplified, unmodified);
+  // Make sure the references are correct.
+  goto_functions.update();
+
+  status() << "Simplified: "
+           << " assert: " << simplified.asserts
+           << ", assume: " << simplified.assumes
+           << ", goto: " << simplified.gotos
+           << ", assigns: " << simplified.assigns
+           << ", function calls: " << simplified.function_calls
+           << "\n"
+           << "Unmodified: "
+           << " assert: " << unmodified.asserts
+           << ", assume: " << unmodified.assumes
+           << ", goto: " << unmodified.gotos
+           << ", assigns: " << unmodified.assigns
+           << ", function calls: " << unmodified.function_calls
+           << eom;
+
+  return;
+}
+
+/*******************************************************************\
+
+Function: static_simplifiert<analyzerT>::simplify_program_once
+
+  Inputs: None.
+
+ Outputs: None.
+
+ Purpose: Simplifies the program using the information in the abstract
+          domain, and does so repeatedly until
+
+\*******************************************************************/
+
+template<class analyzerT>
+void static_simplifiert<analyzerT>::simplify_program_fully()
+{
+  counterst simplified;
+  counterst unmodified;
+
+  do
+  {
+    simplified = counterst();
+    unmodified = counterst();
+    simplify_program_once(simplified, unmodified);
+    goto_functions.update();
+  }
+  while(simplified.asserts != 0
+          || simplified.assigns != 0
+          || simplified.assumes != 0
+          || simplified.function_calls != 0
+          || simplified.gotos != 0);
+}
+
+/*******************************************************************\
+
+Function: static_simplifiert<analyzerT>::simplify_program_once
+
+  Inputs: None.
+
+ Outputs: Counts of simplified and unmodified parts of the program
+
+ Purpose: Simplifies the program using the information in the abstract
+          domain once
+
+\*******************************************************************/
+
+template<class analyzerT>
+void static_simplifiert<analyzerT>::simplify_program_once(
+  static_simplifiert<analyzerT>::counterst &simplified,
+  static_simplifiert<analyzerT>::counterst &unmodified)
+{
   Forall_goto_functions(f_it, goto_functions)
   {
     Forall_goto_program_instructions(i_it, f_it->second.body)
@@ -201,26 +282,6 @@ void static_simplifiert<analyzerT>::simplify_program()
       }
     }
   }
-
-  // Make sure the references are correct.
-  goto_functions.update();
-
-  status() << "Simplified: "
-           << " assert: " << simplified.asserts
-           << ", assume: " << simplified.assumes
-           << ", goto: " << simplified.gotos
-           << ", assigns: " << simplified.assigns
-           << ", function calls: " << simplified.function_calls
-           << "\n"
-           << "Unmodified: "
-           << " assert: " << unmodified.asserts
-           << ", assume: " << unmodified.assumes
-           << ", goto: " << unmodified.gotos
-           << ", assigns: " << unmodified.assigns
-           << ", function calls: " << unmodified.function_calls
-           << eom;
-
-  return;
 }
 
 /*******************************************************************\
