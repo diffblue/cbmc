@@ -32,7 +32,9 @@ void generic_utils::specialise_generic(
 
   namespacet ns(new_symbol_table);
   const typet &class_type = ns.follow(example_type.subtype());
-  REQUIRE(is_java_generic_class_type(class_type));
+  REQUIRE(
+    (is_java_generic_class_type(class_type) ||
+     is_java_implicitly_generic_class_type(class_type)));
 
   // Generate the specialised version.
   ui_message_handlert message_handler;

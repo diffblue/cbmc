@@ -29,7 +29,7 @@ private:
 
   typet substitute_type(
     const typet &parameter_type,
-    const java_generic_class_typet &replacement_type,
+    const java_class_typet &replacement_type,
     const java_generic_typet &generic_reference) const;
 
   type_symbolt build_symbol_from_specialised_class(
