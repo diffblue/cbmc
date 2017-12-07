@@ -477,17 +477,33 @@ void ci_lazy_methodst::gather_field_types(
   ci_lazy_methods_neededt &needed_lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
-  for(const auto &field : underlying_type.components())
+  if(is_java_array_tag(underlying_type.get_tag()))
   {
-    if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, needed_lazy_methods);
-    else if(field.type().id()==ID_pointer)
+    // If class_type is not a symbol this may be a reference array,
+    // but we can't tell what type.
+    if(class_type.id() == ID_symbol)
     {
-      // Skip array primitive pointers, for example:
-      if(field.type().subtype().id()!=ID_symbol)
-        continue;
-      initialize_all_needed_classes_from_pointer(
-        to_pointer_type(field.type()), ns, needed_lazy_methods);
+      const typet &element_type =
+        java_array_element_type(to_symbol_type(class_type));
+      if(element_type.id() == ID_pointer)
+      {
+        // This is a reference array -- mark its element type available.
+        initialize_all_needed_classes_from_pointer(
+          to_pointer_type(element_type), ns, needed_lazy_methods);
+      }
+    }
+  }
+  else
+  {
+    for(const auto &field : underlying_type.components())
+    {
+      if(field.type().id() == ID_struct || field.type().id() == ID_symbol)
+        gather_field_types(field.type(), ns, needed_lazy_methods);
+      else if(field.type().id() == ID_pointer)
+      {
+        initialize_all_needed_classes_from_pointer(
+          to_pointer_type(field.type()), ns, needed_lazy_methods);
+      }
     }
   }
 }
