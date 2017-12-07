@@ -105,7 +105,7 @@ void system_library_symbolst::init_system_library_map()
   // setjmp.h
   std::list<irep_idt> setjmp_syms=
   {
-    "_longjmp", "_setjmp", "longjmp", "longjmperror", "setjmp",
+    "_longjmp", "_setjmp", "jmp_buf", "longjmp", "longjmperror", "setjmp",
     "siglongjmp", "sigsetjmp"
   };
   add_to_system_library("setjmp.h", setjmp_syms);
