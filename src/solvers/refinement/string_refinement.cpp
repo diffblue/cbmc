@@ -794,13 +794,13 @@ static optionalt<exprt> get_array(
     return {};
   }
 
-  auto n_opt = numeric_cast<unsigned>(size_val);
+  auto n_opt = numeric_cast<std::size_t>(size_val);
   if(!n_opt)
   {
     stream << "(sr::get_array) size is not valid" << eom;
     return {};
   }
-  unsigned n = *n_opt;
+  std::size_t n = *n_opt;
 
   const array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
