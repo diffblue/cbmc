@@ -13,6 +13,8 @@
 #include <util/symbol_table.h>
 #include <util/std_types.h>
 #include <java_bytecode/java_types.h>
+#include <functional>
+#include "generic_arguments_name_builder.h"
 
 class generate_java_generic_typet
 {
@@ -23,9 +25,11 @@ public:
     const java_generic_typet &existing_generic_type,
     symbol_tablet &symbol_table) const;
 private:
-  irep_idt build_generic_name(
+  std::string build_generic_name(
     const java_generic_typet &existing_generic_type,
-    const java_class_typet &original_class) const;
+    const java_class_typet &original_class,
+    const generic_arguments_name_buildert::name_printert &argument_name_printer)
+    const;
 
   typet substitute_type(
     const typet &parameter_type,

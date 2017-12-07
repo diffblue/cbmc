@@ -10,6 +10,7 @@
 #include <iterator>
 
 #include "generate_java_generic_type.h"
+#include "generic_arguments_name_builder.h"
 #include <util/namespace.h>
 #include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
@@ -18,6 +19,36 @@ generate_java_generic_typet::generate_java_generic_typet(
   message_handlert &message_handler):
     message_handler(message_handler)
 {}
+
+/// Small auxiliary function, to print a single generic argument name.
+/// \param argument argument type
+/// \return printed name of the argument
+static std::string argument_name_printer(const reference_typet &argument)
+{
+  const irep_idt &id(id2string(argument.subtype().get(ID_identifier)));
+  if(is_java_array_tag(id))
+  {
+    std::string name = pretty_print_java_type(id2string(id));
+    const typet &element_type =
+      java_array_element_type(to_symbol_type(argument.subtype()));
+
+    // If this is an array of references then we will specialize its
+    // identifier using the type of the objects in the array. Else, there
+    // can be a problem with the same symbols for different instantiations
+    // using arrays with different types.
+    if(element_type.id() == ID_pointer)
+    {
+      const symbol_typet element_symbol =
+        to_symbol_type(element_type.subtype());
+      name.append("of_" + id2string(element_symbol.get_identifier()));
+    }
+    return name;
+  }
+  else
+  {
+    return id2string(id);
+  }
+}
 
 /// Generate a concrete instantiation of a generic type.
 /// \param existing_generic_type The type to be concretised
@@ -43,8 +74,8 @@ symbolt generate_java_generic_typet::operator()(
   const java_class_typet &class_definition =
     to_java_class_type(pointer_subtype);
 
-  const irep_idt generic_name =
-    build_generic_name(existing_generic_type, class_definition);
+  const std::string generic_name = build_generic_name(
+    existing_generic_type, class_definition, argument_name_printer);
   struct_union_typet::componentst replacement_components =
     class_definition.components();
 
@@ -204,172 +235,96 @@ typet generate_java_generic_typet::substitute_type(
   return parameter_type;
 }
 
-/// Creates a name for an argument that is an array, e.g., for an array of
-/// Integers it returns a string `array[reference]of_java::java.lang.Integer`
-/// \param id argument of type array
-/// \param generic_argument_p array reference type
-/// \return name as a string
-static irep_idt build_name_for_array_argument(
-  const irep_idt &id,
-  const reference_typet &generic_argument_p)
-{
-  PRECONDITION(is_java_array_tag(id));
-  std::ostringstream name_buffer;
-  name_buffer << pretty_print_java_type(id2string(id));
-  const typet &element_type =
-    java_array_element_type(to_symbol_type(generic_argument_p.subtype()));
-
-  // If this is an array of references then we will specialize its
-  // identifier using the type of the objects in the array. Else, there
-  // can be a problem with the same symbols for different instantiations
-  // using arrays with different types.
-  if(element_type.id() == ID_pointer)
-  {
-    const symbol_typet element_symbol = to_symbol_type(element_type.subtype());
-    name_buffer << "of_" + id2string(element_symbol.get_identifier());
-  }
-  return name_buffer.str();
-}
-
-/// Build a generic name for a generic class, from given generic arguments.
-/// For example, given a class `Class` with two generic type parameters
-/// `java::Class::T` and `java::Class::U`, and two arguments
-/// `java::java.lang.Integer` and `java::Outer$Inner`, the returned string is
-/// `<java::java.lang.Integer, java::Outer$Inner>`.
-/// \param generic_argument_p iterator over generic arguments
-/// \param generic_type_p iterator over generic types, starts with types for
-/// the given class, may continue with generic types of its inner classes
-/// \param generic_types_end end of the vector of generic types
-/// \param class_name name of the class for which the tag is being built
-/// \return name as a string of the form `<*, *, ..., *>`
-static irep_idt build_generic_name_for_class_arguments(
-  std::vector<reference_typet>::const_iterator &generic_argument_p,
-  std::vector<java_generic_parametert>::const_iterator &generic_type_p,
-  const std::vector<java_generic_parametert>::const_iterator &generic_types_end,
-  const std::string &class_name)
-{
-  std::ostringstream name_buffer;
-  bool first = true;
-  std::string parameter_class_name =
-    (*generic_type_p).get_parameter_class_name();
-  PRECONDITION(parameter_class_name == class_name);
-
-  while(parameter_class_name == class_name)
-  {
-    if(first)
-    {
-      name_buffer << "<";
-      first = false;
-    }
-    else
-    {
-      name_buffer << ", ";
-    }
-
-    const irep_idt &id(
-      id2string((*generic_argument_p).subtype().get(ID_identifier)));
-    if(is_java_array_tag(id))
-    {
-      name_buffer << build_name_for_array_argument(id, *generic_argument_p);
-    }
-    else
-    {
-      name_buffer << id2string(id);
-    }
-
-    ++generic_argument_p;
-    ++generic_type_p;
-    if(generic_type_p != generic_types_end)
-    {
-      parameter_class_name = (*generic_type_p).get_parameter_class_name();
-    }
-    else
-    {
-      break;
-    }
-  }
-  name_buffer << ">";
-  return name_buffer.str();
-}
-
 /// Build a unique name for the generic to be instantiated.
+/// Example: if \p existing_generic_type is a pointer to `Outer<T>.Inner`
+/// (\p original_class) with parameter `T` being specialized with argument
+/// `Integer`, then the function returns a string `Outer<\p
+/// argument_name_printer(Integer)>$Inner`.
 /// \param existing_generic_type The type we want to concretise
-/// \param original_class
-/// \return A name for the new generic we want a unique name for.
-irep_idt generate_java_generic_typet::build_generic_name(
+/// \param original_class The original class type for \p existing_generic_type
+/// \param argument_name_printer A custom function to print names of individual
+/// arguments (such as `Integer`, `Integer[]` for concise names or `java::java
+/// .lang.Integer`, `array[reference]of_java::java.lang.Integer`)
+/// \return A name for the new specialized generic class we want a unique name
+/// for.
+std::string generate_java_generic_typet::build_generic_name(
   const java_generic_typet &existing_generic_type,
-  const java_class_typet &original_class) const
+  const java_class_typet &original_class,
+  const generic_arguments_name_buildert::name_printert &argument_name_printer)
+  const
 {
   std::ostringstream generic_name_buffer;
   const std::string &original_class_name = original_class.get_tag().c_str();
-  auto generic_argument_p =
-    existing_generic_type.generic_type_arguments().begin();
 
-  // if the original class is implicitly generic, add tags for all generic
-  // outer classes
-  // NOTE here we assume that the implicit generic types are ordered from the
-  // outermost outer class inwards, this is currently guaranteed by the way
-  // this vector is constructed in
-  // java_bytecode_convert_class:mark_java_implicitly_generic_class_type
+  // gather together all implicit generic types and generic types
+  std::vector<java_generic_parametert> generic_types;
   if(is_java_implicitly_generic_class_type(original_class))
   {
     const java_implicitly_generic_class_typet
       &implicitly_generic_original_class =
         to_java_implicitly_generic_class_type(original_class);
-
-    INVARIANT(
-      existing_generic_type.generic_type_arguments().size() >=
-        implicitly_generic_original_class.implicit_generic_types().size(),
-      "All implicit generic types must be concretised");
-    auto implicit_generic_type_p =
-      implicitly_generic_original_class.implicit_generic_types().begin();
-    const auto &implicit_generic_types_end =
-      implicitly_generic_original_class.implicit_generic_types().end();
-    std::string current_outer_class_name;
-
-    while(implicit_generic_type_p != implicit_generic_types_end)
-    {
-      current_outer_class_name =
-        (*implicit_generic_type_p).get_parameter_class_name();
-      generic_name_buffer << current_outer_class_name;
-      generic_name_buffer << build_generic_name_for_class_arguments(
-        generic_argument_p,
-        implicit_generic_type_p,
-        implicit_generic_types_end,
-        current_outer_class_name);
-    }
-    generic_name_buffer << original_class_name.substr(
-      current_outer_class_name.length(), std::string::npos);
+    generic_types.insert(
+      generic_types.end(),
+      implicitly_generic_original_class.implicit_generic_types().begin(),
+      implicitly_generic_original_class.implicit_generic_types().end());
   }
-  else
-  {
-    generic_name_buffer << original_class_name;
-  }
-
-  // if the original class is generic, add tag for the class itself
   if(is_java_generic_class_type(original_class))
   {
     const java_generic_class_typet &generic_original_class =
       to_java_generic_class_type(original_class);
-
-    INVARIANT(
-      std::distance(
-        generic_argument_p,
-        existing_generic_type.generic_type_arguments().end()) ==
-        static_cast<int>(generic_original_class.generic_types().size()),
-      "All generic types must be concretised");
-    auto generic_type_p = generic_original_class.generic_types().begin();
-
-    generic_name_buffer << build_generic_name_for_class_arguments(
-      generic_argument_p,
-      generic_type_p,
-      generic_original_class.generic_types().end(),
-      original_class_name);
+    generic_types.insert(
+      generic_types.end(),
+      generic_original_class.generic_types().begin(),
+      generic_original_class.generic_types().end());
   }
 
   INVARIANT(
-    generic_argument_p == existing_generic_type.generic_type_arguments().end(),
-    "All type arguments must have been added to the name");
+    generic_types.size() ==
+      existing_generic_type.generic_type_arguments().size(),
+    "All generic types must be concretized");
+
+  auto generic_type_p = generic_types.begin();
+  std::string previous_class_name;
+  std::string current_class_name;
+  generic_arguments_name_buildert build_generic_arguments(
+    argument_name_printer);
+
+  // add generic arguments to each generic (outer) class
+  for(const auto &generic_argument :
+      existing_generic_type.generic_type_arguments())
+  {
+    previous_class_name = current_class_name;
+    current_class_name = generic_type_p->get_parameter_class_name();
+
+    // if the class names do not match, it means that the next generic
+    // (outer) class is being handled
+    if(current_class_name != previous_class_name)
+    {
+      // add the arguments of the previous generic class to the buffer
+      // and reset the builder
+      generic_name_buffer << build_generic_arguments.finalize();
+
+      INVARIANT(
+        has_prefix(current_class_name, previous_class_name),
+        "Generic types are ordered from the outermost outer class inwards");
+
+      // add the remaining part of the current generic class name to the buffer
+      // example: if current_outer_class = A$B$C, previous_outer_class = A,
+      // then substr of current, starting at the length of previous is $B$C
+      generic_name_buffer << current_class_name.substr(
+        previous_class_name.length());
+    }
+
+    // add an argument to the current generic class
+    build_generic_arguments.add_argument(generic_argument);
+    ++generic_type_p;
+  }
+  generic_name_buffer << build_generic_arguments.finalize();
+
+  // add the remaining part of the original class name to the buffer
+  generic_name_buffer << original_class_name.substr(
+    current_class_name.length());
+
   return generic_name_buffer.str();
 }
 
