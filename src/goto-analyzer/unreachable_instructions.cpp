@@ -18,6 +18,7 @@ Date: April 2016
 #include <util/json.h>
 #include <util/json_expr.h>
 #include <util/file_util.h>
+#include <util/xml.h>
 
 #include <analyses/cfg_dominators.h>
 
@@ -54,6 +55,16 @@ static void all_unreachable(
       dest.insert(std::make_pair(it->location_number, it));
 }
 
+static void build_dead_map_from_ai(
+  const goto_programt &goto_program,
+  const ai_baset &ai,
+  dead_mapt &dest)
+{
+  forall_goto_program_instructions(it, goto_program)
+    if(ai.abstract_state_before(it).is_bottom())
+      dest.insert(std::make_pair(it->location_number, it));
+}
+
 static void output_dead_plain(
   const namespacet &ns,
   const goto_programt &goto_program,
@@ -74,6 +85,35 @@ static void output_dead_plain(
     goto_program.output_instruction(ns, "", os, *it->second);
 }
 
+static void add_to_xml(
+  const namespacet &ns,
+  const goto_programt &goto_program,
+  const dead_mapt &dead_map,
+  xmlt &dest)
+{
+  PRECONDITION(!goto_program.instructions.empty());
+  goto_programt::const_targett end_function=
+    goto_program.instructions.end();
+  --end_function;
+  DATA_INVARIANT(end_function->is_end_function(),
+                 "The last instruction in a goto-program must be END_FUNCTION");
+
+  xmlt &x = dest.new_element("function");
+  x.set_attribute("name", id2string(end_function->function));
+
+  for(dead_mapt::const_iterator it=dead_map.begin();
+      it!=dead_map.end();
+      ++it)
+  {
+    xmlt &inst = x.new_element("instruction");
+    inst.set_attribute("location_number",
+                       std::to_string(it->second->location_number));
+    inst.set_attribute("source_location",
+                       it->second->source_location.as_string());
+  }
+  return;
+}
+
 static void add_to_json(
   const namespacet &ns,
   const goto_programt &goto_program,
@@ -82,11 +122,12 @@ static void add_to_json(
 {
   json_objectt &entry=dest.push_back().make_object();
 
-  assert(!goto_program.instructions.empty());
+  PRECONDITION(!goto_program.instructions.empty());
   goto_programt::const_targett end_function=
     goto_program.instructions.end();
   --end_function;
-  assert(end_function->is_end_function());
+  DATA_INVARIANT(end_function->is_end_function(),
+                 "The last instruction in a goto-program must be END_FUNCTION");
 
   entry["function"]=json_stringt(id2string(end_function->function));
   entry["fileName"]=
@@ -164,6 +205,56 @@ void unreachable_instructions(
     os << json_result << '\n';
 }
 
+bool static_unreachable_instructions(
+  const goto_modelt &goto_model,
+  const ai_baset &ai,
+  const optionst &options,
+  message_handlert &message_handler,
+  std::ostream &out)
+{
+  json_arrayt json_result;
+  xmlt xml_result("unreachable-instructions");
+
+  const namespacet ns(goto_model.symbol_table);
+
+  forall_goto_functions(f_it, goto_model.goto_functions)
+  {
+    if(!f_it->second.body_available())
+      continue;
+
+    const goto_programt &goto_program=f_it->second.body;
+    dead_mapt dead_map;
+    build_dead_map_from_ai(goto_program, ai, dead_map);
+
+    if(!dead_map.empty())
+    {
+      if(options.get_bool_option("json"))
+      {
+        add_to_json(ns, f_it->second.body, dead_map, json_result);
+      }
+      else if(options.get_bool_option("xml"))
+      {
+        add_to_xml(ns, f_it->second.body, dead_map, xml_result);
+      }
+      else
+      {
+        INVARIANT(options.get_bool_option("text"),
+                  "Other output formats handled");
+        output_dead_plain(ns, f_it->second.body, dead_map, out);
+      }
+    }
+  }
+
+  if(options.get_bool_option("json") && !json_result.array.empty())
+    out << json_result << '\n';
+  else if(options.get_bool_option("xml"))
+    out << xml_result << '\n';
+
+  return false;
+}
+
+
+
 static void json_output_function(
   const irep_idt &function,
   const source_locationt &first_location,
@@ -183,16 +274,34 @@ static void json_output_function(
     json_numbert(id2string(last_location.get_line()));
 }
 
+static void xml_output_function(
+  const irep_idt &function,
+  const source_locationt &first_location,
+  const source_locationt &last_location,
+  xmlt &dest)
+{
+  xmlt &x=dest.new_element("function");
+
+  x.set_attribute("name", id2string(function));
+  x.set_attribute("file name",
+                  concat_dir_file(
+                    id2string(first_location.get_working_directory()),
+                    id2string(first_location.get_file())));
+  x.set_attribute("first line", id2string(first_location.get_line()));
+  x.set_attribute("last line", id2string(last_location.get_line()));
+}
+
 static void list_functions(
   const goto_modelt &goto_model,
-  const bool json,
+  const std::set<irep_idt> called,
+  const optionst &options,
   std::ostream &os,
   bool unreachable)
 {
   json_arrayt json_result;
-
-  std::set<irep_idt> called=
-    compute_called_functions(goto_model);
+  xmlt xml_result(unreachable ?
+                  "unreachable-functions" :
+                  "reachable-functions");
 
   const namespacet ns(goto_model.symbol_table);
 
@@ -226,7 +335,7 @@ static void list_functions(
       // this to macros/asm renaming
       continue;
 
-    if(!json)
+    if(options.get_bool_option("text"))
     {
       os << concat_dir_file(
               id2string(first_location.get_working_directory()),
@@ -234,6 +343,14 @@ static void list_functions(
          << decl.base_name << " "
          << first_location.get_line() << " "
          << last_location.get_line() << "\n";
+    }
+    else if(options.get_bool_option("xml"))
+    {
+      xml_output_function(
+        decl.base_name,
+        first_location,
+        last_location,
+        xml_result);
     }
     else
       json_output_function(
@@ -243,8 +360,10 @@ static void list_functions(
         json_result);
   }
 
-  if(json && !json_result.array.empty())
+  if(options.get_bool_option("json") && !json_result.array.empty())
     os << json_result << '\n';
+  else if(options.get_bool_option("xml"))
+    os << xml_result << '\n';
 }
 
 void unreachable_functions(
@@ -252,7 +371,15 @@ void unreachable_functions(
   const bool json,
   std::ostream &os)
 {
-  list_functions(goto_model, json, os, true);
+  optionst options;
+  if(json)
+    options.set_option("json", true);
+  else
+    options.set_option("text", true);
+
+  std::set<irep_idt> called = compute_called_functions(goto_model);
+
+  list_functions(goto_model, called, options, os, true);
 }
 
 void reachable_functions(
@@ -260,5 +387,62 @@ void reachable_functions(
   const bool json,
   std::ostream &os)
 {
-  list_functions(goto_model, json, os, false);
+  optionst options;
+  if(json)
+    options.set_option("json", true);
+  else
+    options.set_option("text", true);
+
+  std::set<irep_idt> called = compute_called_functions(goto_model);
+
+  list_functions(goto_model, called, options, os, false);
+}
+
+
+std::set<irep_idt> compute_called_functions_from_ai(
+  const goto_modelt &goto_model,
+  const ai_baset &ai)
+{
+  std::set<irep_idt> called;
+
+  forall_goto_functions(f_it, goto_model.goto_functions)
+  {
+    if(!f_it->second.body_available())
+      continue;
+
+    const goto_programt &p = f_it->second.body;
+
+    if(!ai.abstract_state_before(p.instructions.begin()).is_bottom())
+      called.insert(f_it->first);
+  }
+
+  return called;
+}
+
+bool static_unreachable_functions(
+  const goto_modelt &goto_model,
+  const ai_baset &ai,
+  const optionst &options,
+  message_handlert &message_handler,
+  std::ostream &out)
+{
+  std::set<irep_idt> called = compute_called_functions_from_ai(goto_model, ai);
+
+  list_functions(goto_model, called, options, out, true);
+
+  return false;
+}
+
+bool static_reachable_functions(
+  const goto_modelt &goto_model,
+  const ai_baset &ai,
+  const optionst &options,
+  message_handlert &message_handler,
+  std::ostream &out)
+{
+  std::set<irep_idt> called = compute_called_functions_from_ai(goto_model, ai);
+
+  list_functions(goto_model, called, options, out, false);
+
+  return false;
 }

@@ -1,0 +1,8 @@
+CORE
+../unreachable-instructions-basic-text/unreachable.c
+--unreachable-functions --constants
+^EXIT=0$
+^SIGNAL=0$
+unreachable.c not_called 3 6$
+--
+^warning: ignoring

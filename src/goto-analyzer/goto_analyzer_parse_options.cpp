@@ -1,6 +1,6 @@
 /*******************************************************************\
 
-Module: Goto-Analyser Command Line Option Processing
+Module: Goto-Analyzer Command Line Option Processing
 
 Author: Daniel Kroening, kroening@kroening.com
 
@@ -38,7 +38,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/link_to_library.h>
 
+#include <analyses/is_threaded.h>
+#include <analyses/goto_check.h>
 #include <analyses/local_may_alias.h>
+#include <analyses/constant_propagator.h>
+#include <analyses/dependence_graph.h>
+#include <analyses/interval_domain.h>
 
 #include <langapi/mode.h>
 
@@ -47,12 +52,15 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 #include <util/string2int.h>
 #include <util/unicode.h>
+#include <util/exit_codes.h>
 
 #include <cbmc/version.h>
 
 #include "taint_analysis.h"
 #include "unreachable_instructions.h"
-#include "static_analyzer.h"
+#include "static_show_domain.h"
+#include "static_simplifier.h"
+#include "static_verifier.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -91,7 +99,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(config.set(cmdline))
   {
     usage_error();
-    exit(1);
+    exit(CPROVER_EXIT_USAGE_ERROR);
   }
 
   #if 0
@@ -131,6 +139,232 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("error-label"))
     options.set_option("error-label", cmdline.get_values("error-label"));
   #endif
+
+  // Select a specific analysis
+  if(cmdline.isset("taint"))
+  {
+    options.set_option("taint", true);
+    options.set_option("specific-analysis", true);
+  }
+  // For backwards compatibility,
+  // these are first recognised as specific analyses
+  bool reachability_task = false;
+  if(cmdline.isset("unreachable-instructions"))
+  {
+    options.set_option("unreachable-instructions", true);
+    options.set_option("specific-analysis", true);
+    reachability_task = true;
+  }
+  if(cmdline.isset("unreachable-functions"))
+  {
+    options.set_option("unreachable-functions", true);
+    options.set_option("specific-analysis", true);
+    reachability_task = true;
+  }
+  if(cmdline.isset("reachable-functions"))
+  {
+    options.set_option("reachable-functions", true);
+    options.set_option("specific-analysis", true);
+    reachability_task = true;
+  }
+  if(cmdline.isset("show-local-may-alias"))
+  {
+    options.set_option("show-local-may-alias", true);
+    options.set_option("specific-analysis", true);
+  }
+
+  // Output format choice
+  if(cmdline.isset("text"))
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", cmdline.get_value("text"));
+  }
+  else if(cmdline.isset("json"))
+  {
+    options.set_option("json", true);
+    options.set_option("outfile", cmdline.get_value("json"));
+  }
+  else if(cmdline.isset("xml"))
+  {
+    options.set_option("xml", true);
+    options.set_option("outfile", cmdline.get_value("xml"));
+  }
+  else if(cmdline.isset("dot"))
+  {
+    options.set_option("dot", true);
+    options.set_option("outfile", cmdline.get_value("dot"));
+  }
+  else
+  {
+    options.set_option("text", true);
+    options.set_option("outfile", "-");
+  }
+
+  // The use should either select:
+  //  1. a specific analysis, or
+  //  2. a triple of task / analyzer / domain, or
+  //  3. one of the general display options
+
+  // Task options
+  if(cmdline.isset("show"))
+  {
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+  }
+  else if(cmdline.isset("verify"))
+  {
+    options.set_option("verify", true);
+    options.set_option("general-analysis", true);
+  }
+  else if(cmdline.isset("simplify"))
+  {
+    options.set_option("simplify", true);
+    options.set_option("outfile", cmdline.get_value("simplify"));
+    options.set_option("general-analysis", true);
+
+    // For development allow slicing to be disabled in the simplify task
+    options.set_option(
+      "simplify-slicing",
+      !(cmdline.isset("no-simplify-slicing")));
+  }
+  else if(cmdline.isset("show-intervals"))
+  {
+    // For backwards compatibility
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+    options.set_option("intervals", true);
+    options.set_option("domain set", true);
+  }
+  else if(cmdline.isset("(show-non-null)"))
+  {
+    // For backwards compatibility
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+    options.set_option("non-null", true);
+    options.set_option("domain set", true);
+  }
+  else if(cmdline.isset("intervals") || cmdline.isset("non-null"))
+  {
+    // For backwards compatibility either of these on their own means show
+    options.set_option("show", true);
+    options.set_option("general-analysis", true);
+  }
+
+  if(options.get_bool_option("general-analysis") || reachability_task)
+  {
+    // Abstract interpreter choice
+    if(cmdline.isset("location-sensitive"))
+      options.set_option("location-sensitive", true);
+    else if(cmdline.isset("concurrent"))
+      options.set_option("concurrent", true);
+    else
+    {
+      // Silently default to location-sensitive as it's the "default"
+      // view of abstract interpretation.
+      options.set_option("location-sensitive", true);
+    }
+
+    // Domain choice
+    if(cmdline.isset("constants"))
+    {
+      options.set_option("constants", true);
+      options.set_option("domain set", true);
+    }
+    else if(cmdline.isset("dependence-graph"))
+    {
+      options.set_option("dependence-graph", true);
+      options.set_option("domain set", true);
+    }
+    else if(cmdline.isset("intervals"))
+    {
+      options.set_option("intervals", true);
+      options.set_option("domain set", true);
+    }
+    else if(cmdline.isset("non-null"))
+    {
+      options.set_option("non-null", true);
+      options.set_option("domain set", true);
+    }
+
+    // Reachability questions, when given with a domain swap from specific
+    // to general tasks so that they can use the domain & parameterisations.
+    if(reachability_task)
+    {
+      if(options.get_bool_option("domain set"))
+      {
+        options.set_option("specific-analysis", false);
+        options.set_option("general-analysis", true);
+      }
+    }
+    else
+    {
+      if(!options.get_bool_option("domain set"))
+      {
+        // Default to constants as it is light-weight but useful
+        status() << "Domain not specified, defaulting to --constants" << eom;
+        options.set_option("constants", true);
+      }
+    }
+  }
+}
+
+/// For the task, build the appropriate kind of analyzer
+/// Ideally this should be a pure function of options.
+/// However at the moment some domains require the goto_model
+ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
+{
+  ai_baset *domain = nullptr;
+
+  if(options.get_bool_option("location-sensitive"))
+  {
+    if(options.get_bool_option("constants"))
+    {
+      // constant_propagator_ait derives from ait<constant_propagator_domaint>
+      domain=new constant_propagator_ait(goto_model.goto_functions);
+    }
+    else if(options.get_bool_option("dependence-graph"))
+    {
+      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+    }
+    else if(options.get_bool_option("intervals"))
+    {
+      domain=new ait<interval_domaint>();
+    }
+#if 0
+    // Not actually implemented, despite the option...
+    else if(options.get_bool_option("non-null"))
+    {
+      domain=new ait<non_null_domaint>();
+    }
+#endif
+  }
+  else if(options.get_bool_option("concurrent"))
+  {
+#if 0
+    // Disabled until merge_shared is implemented for these
+    if(options.get_bool_option("constants"))
+    {
+      domain=new concurrency_aware_ait<constant_propagator_domaint>();
+    }
+    else if(options.get_bool_option("dependence-graph"))
+    {
+      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+    }
+    else if(options.get_bool_option("intervals"))
+    {
+      domain=new concurrency_aware_ait<interval_domaint>();
+    }
+#if 0
+    // Not actually implemented, despite the option...
+    else if(options.get_bool_option("non-null"))
+    {
+      domain=new concurrency_aware_ait<non_null_domaint>();
+    }
+#endif
+#endif
+  }
+
+  return domain;
 }
 
 /// invoke main modules
@@ -139,7 +373,7 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("version"))
   {
     std::cout << CBMC_VERSION << '\n';
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   //
@@ -168,45 +402,80 @@ int goto_analyzer_parse_optionst::doit()
   catch(const char *e)
   {
     error() << e << eom;
-    return true;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   catch(const std::string &e)
   {
     error() << e << eom;
-    return true;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
-  catch(int)
+  catch(int e)
   {
-    return true;
+    error() << "Numeric exception: " << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
   }
 
   if(process_goto_program(options))
-    return 6;
+    return CPROVER_EXIT_INTERNAL_ERROR;
 
   // show it?
   if(cmdline.isset("show-symbol-table"))
   {
     ::show_symbol_table(goto_model.symbol_table, get_ui());
-    return 6;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   // show it?
   if(cmdline.isset("show-goto-functions"))
   {
     show_goto_functions(goto_model, get_ui());
-    return 6;
+    return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("taint"))
+  try
+  {
+    return perform_analysis(options);
+  }
+
+  catch(const char *e)
+  {
+    error() << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(const std::string &e)
+  {
+    error() << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(int e)
+  {
+    error() << "Numeric exception: " << e << eom;
+    return CPROVER_EXIT_EXCEPTION;
+  }
+
+  catch(const std::bad_alloc &)
+  {
+    error() << "Out of memory" << eom;
+    return CPROVER_EXIT_INTERNAL_OUT_OF_MEMORY;
+  }
+}
+
+
+/// Depending on the command line mode, run one of the analysis tasks
+int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
+{
+  if(options.get_bool_option("taint"))
   {
     std::string taint_file=cmdline.get_value("taint");
 
     if(cmdline.isset("show-taint"))
     {
       taint_analysis(goto_model, taint_file, get_message_handler(), true, "");
-      return 0;
+      return CPROVER_EXIT_SUCCESS;
     }
     else
     {
@@ -214,11 +483,13 @@ int goto_analyzer_parse_optionst::doit()
       bool result=
         taint_analysis(
           goto_model, taint_file, get_message_handler(), false, json_file);
-      return result?10:0;
+      return result ? CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_SUCCESS;
     }
   }
 
-  if(cmdline.isset("unreachable-instructions"))
+  // If no domain is given, this lightweight version of the analysis is used.
+  if(options.get_bool_option("unreachable-instructions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -233,16 +504,17 @@ int goto_analyzer_parse_optionst::doit()
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       unreachable_instructions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("unreachable-functions"))
+  if(options.get_bool_option("unreachable-functions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -257,16 +529,17 @@ int goto_analyzer_parse_optionst::doit()
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       unreachable_functions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("reachable-functions"))
+  if(options.get_bool_option("reachable-functions") &&
+     options.get_bool_option("specific-analysis"))
   {
     const std::string json_file=cmdline.get_value("json");
 
@@ -281,16 +554,16 @@ int goto_analyzer_parse_optionst::doit()
       {
         error() << "Failed to open json output `"
                 << json_file << "'" << eom;
-        return 6;
+        return CPROVER_EXIT_INTERNAL_ERROR;
       }
 
       reachable_functions(goto_model, true, ofs);
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.isset("show-local-may-alias"))
+  if(options.get_bool_option("show-local-may-alias"))
   {
     namespacet ns(goto_model.symbol_table);
 
@@ -304,7 +577,7 @@ int goto_analyzer_parse_optionst::doit()
       std::cout << '\n';
     }
 
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   label_properties(goto_model);
@@ -312,32 +585,112 @@ int goto_analyzer_parse_optionst::doit()
   if(cmdline.isset("show-properties"))
   {
     show_properties(goto_model, get_ui());
-    return 0;
+    return CPROVER_EXIT_SUCCESS;
   }
 
   if(set_properties())
-    return 7;
+    return CPROVER_EXIT_SET_PROPERTIES_FAILED;
 
-  if(cmdline.isset("show-intervals"))
+  if(options.get_bool_option("general-analysis"))
   {
-    show_intervals(goto_model, std::cout);
-    return 0;
+
+    // Output file factory
+    const std::string outfile=options.get_option("outfile");
+    std::ofstream output_stream;
+    if(!(outfile=="-"))
+      output_stream.open(outfile);
+
+    std::ostream &out((outfile=="-") ? std::cout : output_stream);
+
+    if(!out)
+    {
+      error() << "Failed to open output file `"
+              << outfile << "'" << eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+    // Build analyzer
+    status() << "Selecting abstract domain" << eom;
+    std::unique_ptr<ai_baset> analyzer(build_analyzer(options));
+
+    if(analyzer == nullptr)
+    {
+      status() << "Task / Interpreter / Domain combination not supported"
+               << messaget::eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+
+    // Run
+    status() << "Computing abstract states" << eom;
+    (*analyzer)(goto_model);
+
+    // Perform the task
+    status() << "Performing task" << eom;
+    bool result = true;
+    if(options.get_bool_option("show"))
+    {
+      result = static_show_domain(goto_model,
+                                  *analyzer,
+                                  options,
+                                  get_message_handler(),
+                                  out);
+    }
+    else if(options.get_bool_option("verify"))
+    {
+      result = static_verifier(goto_model,
+                               *analyzer,
+                               options,
+                               get_message_handler(),
+                               out);
+    }
+    else if(options.get_bool_option("simplify"))
+    {
+      result = static_simplifier(goto_model,
+                                 *analyzer,
+                                 options,
+                                 get_message_handler(),
+                                 out);
+    }
+    else if(options.get_bool_option("unreachable-instructions"))
+    {
+      result = static_unreachable_instructions(goto_model,
+                                               *analyzer,
+                                               options,
+                                               get_message_handler(),
+                                               out);
+    }
+    else if(options.get_bool_option("unreachable-functions"))
+    {
+      result = static_unreachable_functions(goto_model,
+                                            *analyzer,
+                                            options,
+                                            get_message_handler(),
+                                            out);
+    }
+    else if(options.get_bool_option("reachable-functions"))
+    {
+      result = static_reachable_functions(goto_model,
+                                          *analyzer,
+                                          options,
+                                          get_message_handler(),
+                                          out);
+    }
+    else
+    {
+      error() << "Unhandled task" << eom;
+      return CPROVER_EXIT_INTERNAL_ERROR;
+    }
+
+    return result ?
+      CPROVER_EXIT_VERIFICATION_UNSAFE : CPROVER_EXIT_VERIFICATION_SAFE;
   }
 
-  if(cmdline.isset("non-null") ||
-     cmdline.isset("intervals"))
-  {
-    optionst options;
-    options.set_option("json", cmdline.get_value("json"));
-    options.set_option("xml", cmdline.get_value("xml"));
-    bool result=
-      static_analyzer(goto_model, options, get_message_handler());
-    return result?10:0;
-  }
 
+  // Final defensive error case
   error() << "no analysis option given -- consider reading --help"
           << eom;
-  return 6;
+  return CPROVER_EXIT_USAGE_ERROR;
 }
 
 bool goto_analyzer_parse_optionst::set_properties()
@@ -447,7 +800,7 @@ void goto_analyzer_parse_optionst::help()
 {
   std::cout <<
     "\n"
-    "* * GOTO-ANALYSER " CBMC_VERSION " - Copyright (C) 2016 ";
+    "* * GOTO-ANALYZER " CBMC_VERSION " - Copyright (C) 2017 ";
 
   std::cout << "(" << (sizeof(void *)*8) << "-bit version)";
 
@@ -462,22 +815,39 @@ void goto_analyzer_parse_optionst::help()
     " goto-analyzer [-h] [--help]  show help\n"
     " goto-analyzer file.c ...     source file names\n"
     "\n"
-    "Analyses:\n"
-    "\n"
+    "Task options:\n"
+    " --show                       display the abstract domains\n"
     // NOLINTNEXTLINE(whitespace/line_length)
-    " --taint file_name            perform taint analysis using rules in given file\n"
+    " --verify                     use the abstract domains to check assertions\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --simplify file_name         use the abstract domains to simplify the program\n"
     " --unreachable-instructions   list dead code\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --unreachable-functions      list functions unreachable from the entry point\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --reachable-functions        list functions reachable from the entry point\n"
-    " --intervals                  interval analysis\n"
-    " --non-null                   non-null analysis\n"
     "\n"
-    "Analysis options:\n"
+    "Abstract interpreter options:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --location-sensitive         use location-sensitive abstract interpreter\n"
+    " --concurrent                 use concurrency-aware abstract interpreter\n"
+    "\n"
+    "Domain options:\n"
+    " --constants                  constant domain\n"
+    " --intervals                  interval domain\n"
+    " --non-null                   non-null domain\n"
+    " --dependence-graph           data and control dependencies between instructions\n" // NOLINT(*)
+    "\n"
+    "Output options:\n"
+    " --text file_name             output results in plain text to given file\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --json file_name             output results in JSON format to given file\n"
     " --xml file_name              output results in XML format to given file\n"
+    " --dot file_name              output results in DOT format to given file\n"
+    "\n"
+    "Specific analyses:\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --taint file_name            perform taint analysis using rules in given file\n"
     "\n"
     "C/C++ frontend options:\n"
     " -I path                      set include path (C/C++)\n"

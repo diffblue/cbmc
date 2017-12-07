@@ -10,6 +10,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
 #define CPROVER_GOTO_ANALYZER_STATIC_ANALYZER_H
 
+#ifndef USE_DEPRECATED_STATIC_ANALYZER_H
+#error Deprecated, use static_show_domain.h instead
+#endif
+
 #include <iosfwd>
 
 #include <util/message.h>

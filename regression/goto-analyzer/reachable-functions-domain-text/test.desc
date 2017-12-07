@@ -1,0 +1,11 @@
+CORE
+../unreachable-instructions-basic-text/unreachable.c
+--reachable-functions --constants
+^EXIT=0$
+^SIGNAL=0$
+unreachable.c main 35 42$
+unreachable.c dead_inside 8 14$
+unreachable.c obviously_dead 16 23$
+unreachable.c not_obviously_dead 25 31$
+--
+^warning: ignoring

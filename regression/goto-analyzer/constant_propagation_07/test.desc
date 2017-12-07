@@ -1,8 +1,9 @@
 FUTURE
-constant_propagation_07.c
---constants --verify
+main.c
+--constants --simplify out.gb
 ^EXIT=0$
 ^SIGNAL=0$
-^\[main.assertion.1\] file constant_propagation_07.c line 12 function main, assertion i<51: UNKNOWN$
+^Simplified:  assert: 1, assume: 0, goto: 4, assigns: 10, function calls: 0$
+^Unmodified:  assert: 0, assume: 0, goto: 1, assigns: 10, function calls: 2$
 --
 ^warning: ignoring

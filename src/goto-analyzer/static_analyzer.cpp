@@ -6,7 +6,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#define USE_DEPRECATED_STATIC_ANALYZER_H
 #include "static_analyzer.h"
+#undef USE_DEPRECATED_STATIC_ANALYZER_H
 
 #include <fstream>
 
