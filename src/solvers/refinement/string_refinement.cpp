@@ -858,7 +858,7 @@ static std::string string_of_array(const array_exprt &arr)
       return std::string("");
 
   exprt size_expr=to_array_type(arr.type()).size();
-  auto n = numeric_cast_v<unsigned>(size_expr);
+  auto n = numeric_cast_v<std::size_t>(size_expr);
   return utf16_constant_array_to_java(arr, n);
 }
 
