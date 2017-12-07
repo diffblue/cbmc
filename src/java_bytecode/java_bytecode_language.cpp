@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/suffix.h>
 #include <util/config.h>
 #include <util/cmdline.h>
+#include <util/expr_iterator.h>
+#include <util/journalling_symbol_table.h>
 #include <util/string2int.h>
 #include <util/invariant.h>
 #include <json/json_parser.h>
@@ -214,14 +216,15 @@ bool java_bytecode_languaget::typecheck(
     if(c_it->second.parsed_class.name.empty())
       continue;
 
-    if(java_bytecode_convert_class(
-         c_it->second,
-         symbol_table,
-         get_message_handler(),
-         max_user_array_length,
-         lazy_methods,
-         lazy_methods_mode,
-         string_preprocess))
+    if(
+      java_bytecode_convert_class(
+        c_it->second,
+        symbol_table,
+        get_message_handler(),
+        max_user_array_length,
+        method_bytecode,
+        lazy_methods_mode,
+        string_preprocess))
       return true;
   }
 
@@ -250,21 +253,23 @@ bool java_bytecode_languaget::typecheck(
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
   {
     // ci: context-insensitive.
-    if(do_ci_lazy_method_conversion(symbol_table, lazy_methods))
+    if(do_ci_lazy_method_conversion(symbol_table, method_bytecode))
       return true;
   }
   else if(lazy_methods_mode==LAZY_METHODS_MODE_EAGER)
   {
-    // Simply elaborate all methods symbols now.
-    for(const auto &method_sig : lazy_methods)
+    journalling_symbol_tablet journalling_symbol_table =
+      journalling_symbol_tablet::wrap(symbol_table);
+    // Convert all methods for which we have bytecode now
+    for(const auto &method_sig : method_bytecode)
     {
-      java_bytecode_convert_method(
-        *method_sig.second.first,
-        *method_sig.second.second,
-        symbol_table,
-        get_message_handler(),
-        max_user_array_length,
-        string_preprocess);
+      convert_single_method(method_sig.first, journalling_symbol_table);
+    }
+    // Now convert all newly added string methods
+    for(const auto &fn_name : journalling_symbol_table.get_inserted())
+    {
+      if(string_preprocess.implements_function(fn_name))
+        convert_single_method(fn_name, symbol_table);
     }
   }
   // Otherwise our caller is in charge of elaborating methods on demand.
@@ -309,29 +314,22 @@ bool java_bytecode_languaget::generate_support_functions(
 /// instantiated (or evidence that an object of that type exists before the main
 /// function is entered, such as being passed as a parameter).
 /// \par parameters: `symbol_table`: global symbol table
-/// `lazy_methods`: map from method names to relevant symbol and parsed-method
-///   objects.
+/// `method_bytecode`: map from method names to relevant symbol and
+///   parsed-method objects.
 /// \return Elaborates lazily-converted methods that may be reachable starting
 ///   from the main entry point (usually provided with the --function command-
 ///   line option) (side-effect on the symbol_table). Returns false on success.
 bool java_bytecode_languaget::do_ci_lazy_method_conversion(
   symbol_tablet &symbol_table,
-  lazy_methodst &lazy_methods)
+  method_bytecodet &method_bytecode)
 {
-  const auto method_converter=[&](
-    const symbolt &symbol,
-    const java_bytecode_parse_treet::methodt &method,
-    ci_lazy_methods_neededt new_lazy_methods)
-  {
-    java_bytecode_convert_method(
-      symbol,
-      method,
-      symbol_table,
-      get_message_handler(),
-      max_user_array_length,
-      safe_pointer<ci_lazy_methods_neededt>::create_non_null(&new_lazy_methods),
-      string_preprocess);
-  };
+  const method_convertert method_converter =
+    [this, &symbol_table]
+      (const irep_idt &function_id, ci_lazy_methods_neededt lazy_methods_needed)
+    {
+      return convert_single_method(
+        function_id, symbol_table, std::move(lazy_methods_needed));
+    };
 
   ci_lazy_methodst method_gather(
     symbol_table,
@@ -343,7 +341,7 @@ bool java_bytecode_languaget::do_ci_lazy_method_conversion(
     get_pointer_type_selector(),
     get_message_handler());
 
-  return method_gather(symbol_table, lazy_methods, method_converter);
+  return method_gather(symbol_table, method_bytecode, method_converter);
 }
 
 const select_pointer_typet &
@@ -358,77 +356,115 @@ const select_pointer_typet &
 /// \return Populates `methods` with the complete list of lazy methods that are
 ///   available to convert (those which are valid parameters for
 ///   `convert_lazy_method`)
-void java_bytecode_languaget::lazy_methods_provided(
-  std::set<irep_idt> &methods) const
+void java_bytecode_languaget::methods_provided(id_sett &methods) const
 {
-  for(const auto &kv : lazy_methods)
+  // Add all string solver methods to map
+  string_preprocess.get_all_function_names(methods);
+  // Add all concrete methods to map
+  for(const auto &kv : method_bytecode)
     methods.insert(kv.first);
 }
 
-/// Promote a lazy-converted method (one whose type is known but whose body
-/// hasn't been converted) into a fully- elaborated one.
-/// \par parameters: `id`: method ID to convert
-/// `symtab`: global symbol table
-/// \return Amends the symbol table entry for function `id`, which should be a
-///   lazy method provided by this instance of `java_bytecode_languaget`. It
-///   should initially have a nil value. After this method completes, it will
-///   have a value representing the method body, identical to that produced
-///   using eager method conversion.
+/// \brief Promote a lazy-converted method (one whose type is known but whose
+/// body hasn't been converted) into a fully-elaborated one.
+/// \remarks Amends the symbol table entry for function `function_id`, which
+/// should be a method provided by this instance of `java_bytecode_languaget`
+/// to have a value representing the method body identical to that produced
+/// using eager method conversion.
+/// \param function_id: method ID to convert
+/// \param symbol_table: global symbol table
 void java_bytecode_languaget::convert_lazy_method(
-  const irep_idt &id,
-  symbol_tablet &symtab)
+  const irep_idt &function_id,
+  symbol_tablet &symbol_table)
 {
-  const auto &lazy_method_entry=lazy_methods.at(id);
-  java_bytecode_convert_method(
-    *lazy_method_entry.first,
-    *lazy_method_entry.second,
-    symtab,
-    get_message_handler(),
-    max_user_array_length,
-    string_preprocess);
+  convert_single_method(function_id, symbol_table);
 }
 
-/// Replace methods of the String library that are in the symbol table by code
-/// generated by string_preprocess.
-/// \param context: a symbol table
-void java_bytecode_languaget::replace_string_methods(
-  symbol_table_baset &context)
+/// \brief Convert a method (one whose type is known but whose body hasn't
+///   been converted) but don't run typecheck, etc
+/// \remarks Amends the symbol table entry for function `function_id`, which
+///   should be a method provided by this instance of `java_bytecode_languaget`
+///   to have a value representing the method body.
+/// \param function_id: method ID to convert
+/// \param symbol_table: global symbol table
+/// \param needed_lazy_methods: optionally a collection of needed methods to
+///   update with any methods touched during the conversion
+bool java_bytecode_languaget::convert_single_method(
+  const irep_idt &function_id,
+  symbol_table_baset &symbol_table,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods)
 {
-  // Symbols that have code type are potentialy to be replaced
-  std::list<symbolt> code_symbols;
-  forall_symbols(symbol, context.symbols)
+  const symbolt &symbol = symbol_table.lookup_ref(function_id);
+
+  // Nothing to do if body is already loaded
+  if(symbol.value.is_not_nil())
+    return false;
+
+  // Get bytecode for specified function if we have it
+  method_bytecodet::opt_reft cmb = method_bytecode.get(function_id);
+
+  // Check if have a string solver implementation
+  if(string_preprocess.implements_function(function_id))
   {
-    if(symbol->second.type.id()==ID_code)
-      code_symbols.push_back(symbol->second);
+    symbolt &symbol = symbol_table.get_writeable_ref(function_id);
+    // Load parameter names from any extant bytecode before filling in body
+    if(cmb)
+    {
+      java_bytecode_initialize_parameter_names(
+        symbol, cmb->get().method.local_variable_table, symbol_table);
+    }
+    // Populate body of the function with code generated by string preprocess
+    exprt generated_code =
+      string_preprocess.code_for_function(symbol, symbol_table);
+    INVARIANT(
+      generated_code.is_not_nil(), "Couldn't retrieve code for string method");
+    // String solver can make calls to functions that haven't yet been seen.
+    // Add these to the needed_lazy_methods collection
+    if(needed_lazy_methods)
+    {
+      for(const_depth_iteratort it = generated_code.depth_cbegin();
+          it != generated_code.depth_cend();
+          ++it)
+      {
+        if(it->id() == ID_code)
+        {
+          const auto fn_call = expr_try_dynamic_cast<code_function_callt>(*it);
+          if(!fn_call)
+            continue;
+          // Only support non-virtual function calls for now, if string solver
+          // starts to introduce virtual function calls then we will need to
+          // duplicate the behavior of java_bytecode_convert_method where it
+          // handles the invokevirtual instruction
+          const symbol_exprt &fn_sym =
+            expr_dynamic_cast<symbol_exprt>(fn_call->function());
+          needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+        }
+      }
+    }
+    symbol.value = generated_code;
+    return false;
   }
 
-  for(const auto &symbol : code_symbols)
+  // No string solver implementation, check if have bytecode for it
+  if(cmb)
   {
-    const irep_idt &id=symbol.name;
-    exprt generated_code=string_preprocess.code_for_function(
-      id, to_code_type(symbol.type), symbol.location, context);
-    if(generated_code.is_not_nil())
-    {
-      // Replace body of the function by code generated by string preprocess
-      symbolt &symbol=*context.get_writeable(id);
-      symbol.value=generated_code;
-      // Specifically instrument the new code, since this comes after the
-      // blanket instrumentation pass called before typechecking.
-      java_bytecode_instrument_symbol(
-        context,
-        symbol,
-        throw_runtime_exceptions,
-        get_message_handler());
-    }
+    java_bytecode_convert_method(
+      symbol_table.lookup_ref(cmb->get().class_id),
+      cmb->get().method,
+      symbol_table,
+      get_message_handler(),
+      max_user_array_length,
+      std::move(needed_lazy_methods),
+      string_preprocess);
+    return false;
   }
+
+  return true;
 }
 
 bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
 {
   PRECONDITION(language_options_initialized);
-
-  // replace code of String methods calls by code we generate
-  replace_string_methods(symbol_table);
 
   return false;
 }

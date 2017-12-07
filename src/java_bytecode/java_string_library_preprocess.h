@@ -22,6 +22,7 @@ Date:   March 2017
 
 #include <util/ieee_float.h> // should get rid of this
 
+#include <array>
 #include <unordered_set>
 #include <functional>
 #include "character_refine_preprocess.h"
@@ -29,6 +30,8 @@ Date:   March 2017
 
 // Arbitrary limit of 10 arguments for the number of arguments to String.format
 #define MAX_FORMAT_ARGS 10
+
+typedef std::unordered_set<irep_idt, irep_id_hash> id_sett;
 
 class java_string_library_preprocesst:public messaget
 {
@@ -43,11 +46,11 @@ public:
   void initialize_conversion_table();
   void initialize_refined_string_type();
 
-  exprt code_for_function(
-    const irep_idt &function_id,
-    const code_typet &type,
-    const source_locationt &loc,
-    symbol_table_baset &symbol_table);
+  bool implements_function(const irep_idt &function_id) const;
+  void get_all_function_names(id_sett &methods) const;
+
+  exprt
+  code_for_function(const symbolt &symbol, symbol_table_baset &symbol_table);
 
   codet replace_character_call(code_function_callt call)
   {
@@ -124,6 +127,17 @@ private:
   // they assign the result to the object on which it is called instead
   // of returning it
   id_mapt cprover_equivalent_to_java_assign_function;
+
+  const std::array<id_mapt *, 5> id_maps = std::array<id_mapt *, 5>
+    {
+      {
+        &cprover_equivalent_to_java_function,
+        &cprover_equivalent_to_java_string_returning_function,
+        &cprover_equivalent_to_java_constructor,
+        &cprover_equivalent_to_java_assign_and_return_function,
+        &cprover_equivalent_to_java_assign_function,
+      }
+    };
 
   // A set tells us what java types should be considered as string objects
   std::unordered_set<irep_idt, irep_id_hash> string_types;

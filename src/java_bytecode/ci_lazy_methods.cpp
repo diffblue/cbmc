@@ -11,7 +11,6 @@
 #include <java_bytecode/java_entry_point.h>
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/java_utils.h>
-#include <util/safe_pointer.h>
 #include <util/suffix.h>
 #include <java_bytecode/java_string_library_preprocess.h>
 
@@ -61,14 +60,14 @@ ci_lazy_methodst::ci_lazy_methodst(
 /// from the main entry point (usually provided with the --function command-
 /// line option
 /// \param symbol_table: global symbol table
-/// \param [out] lazy_methods: map from method names to relevant symbol and
+/// \param [out] method_bytecode: map from method names to relevant symbol and
 ///   parsed-method objects.
 /// \param method_converter: Function for converting methods on demand.
 /// \return Returns false on success
 bool ci_lazy_methodst::operator()(
   symbol_tablet &symbol_table,
-  lazy_methodst &lazy_methods,
-  method_convertert method_converter)
+  method_bytecodet &method_bytecode,
+  const method_convertert &method_converter)
 {
   std::vector<irep_idt> method_worklist1;
   std::vector<irep_idt> method_worklist2;
@@ -141,21 +140,17 @@ bool ci_lazy_methodst::operator()(
       {
         if(!methods_already_populated.insert(mname).second)
           continue;
-        auto findit=lazy_methods.find(mname);
-        if(findit==lazy_methods.end())
+        debug() << "CI lazy methods: elaborate " << mname << eom;
+        if(
+          method_converter(
+            mname,
+            // Note this wraps *references* to method_worklist2 & needed_classes
+            ci_lazy_methods_neededt(
+              method_worklist2, needed_classes, symbol_table)))
         {
-          debug() << "Skip " << mname << eom;
+          // Couldn't convert this function
           continue;
         }
-        debug() << "CI lazy methods: elaborate " << mname << eom;
-        const auto &parsed_method=findit->second;
-        // Note this wraps *references* to method_worklist2, needed_classes:
-        ci_lazy_methods_neededt new_lazy_methods(
-          method_worklist2,
-          needed_classes,
-          symbol_table);
-        method_converter(
-          *parsed_method.first, *parsed_method.second, new_lazy_methods);
         gather_virtual_callsites(
           symbol_table.lookup_ref(mname).value,
           virtual_callsites);
@@ -189,15 +184,23 @@ bool ci_lazy_methodst::operator()(
 
   for(const auto &sym : symbol_table.symbols)
   {
+    // Don't keep global variables (unless they're gathered below from a
+    // function that references them)
     if(sym.second.is_static_lifetime)
       continue;
-    if(lazy_methods.count(sym.first) &&
-       !methods_already_populated.count(sym.first))
-    {
-      continue;
-    }
     if(sym.second.type.id()==ID_code)
+    {
+      // Don't keep functions that belong to this language that we haven't
+      // converted above
+      if(
+        method_bytecode.contains_method(sym.first) &&
+        !methods_already_populated.count(sym.first))
+      {
+        continue;
+      }
+      // If this is a function then add all the things used in it
       gather_needed_globals(sym.second.value, symbol_table, keep_symbols);
+    }
     keep_symbols.add(sym.second);
   }
 
@@ -263,13 +266,13 @@ void ci_lazy_methodst::resolve_method_names(
 /// \param entry_points: list of fully-qualified function names that
 ///   we should assume are reachable
 /// \param ns: global namespace
-/// \param [out] lazy_methods: Populated with all Java reference types whose
-///   references may be passed, directly or indirectly, to any of the functions
-///   in `entry_points`.
+/// \param [out] needed_lazy_methods: Populated with all Java reference types
+///   whose references may be passed, directly or indirectly, to any of the
+///   functions in `entry_points`.
 void ci_lazy_methodst::initialize_needed_classes(
   const std::vector<irep_idt> &entry_points,
   const namespacet &ns,
-  ci_lazy_methods_neededt &lazy_methods)
+  ci_lazy_methods_neededt &needed_lazy_methods)
 {
   for(const auto &mname : entry_points)
   {
@@ -281,7 +284,7 @@ void ci_lazy_methodst::initialize_needed_classes(
       {
         const pointer_typet &original_pointer=to_pointer_type(param.type());
         initialize_all_needed_classes_from_pointer(
-          original_pointer, ns, lazy_methods);
+          original_pointer, ns, needed_lazy_methods);
       }
     }
   }
@@ -289,13 +292,13 @@ void ci_lazy_methodst::initialize_needed_classes(
   // Also add classes whose instances are magically
   // created by the JVM and so won't be spotted by
   // looking for constructors and calls as usual:
-  lazy_methods.add_needed_class("java::java.lang.String");
-  lazy_methods.add_needed_class("java::java.lang.Class");
-  lazy_methods.add_needed_class("java::java.lang.Object");
+  needed_lazy_methods.add_needed_class("java::java.lang.String");
+  needed_lazy_methods.add_needed_class("java::java.lang.Class");
+  needed_lazy_methods.add_needed_class("java::java.lang.Object");
 
   // As in class_loader, ensure these classes stay available
   for(const auto &id : extra_needed_classes)
-    lazy_methods.add_needed_class("java::" + id2string(id));
+    needed_lazy_methods.add_needed_class("java::" + id2string(id));
 }
 
 /// Build up list of methods for types for a pointer and any types it
@@ -303,16 +306,15 @@ void ci_lazy_methodst::initialize_needed_classes(
 /// `initialize_needed_classes` for more details.
 /// \param pointer_type: The type to gather methods for.
 /// \param ns: global namespace
-/// \param [out] lazy_methods: Populated with all Java reference types whose
-///   references may be passed, directly or indirectly, to any of the functions
-///   in `entry_points
+/// \param [out] needed_lazy_methods: Populated with all Java reference types
+///   whose references may be passed, directly or indirectly, to any of the
+///   functions in `entry_points`
 void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns,
-  ci_lazy_methods_neededt &lazy_methods)
+  ci_lazy_methods_neededt &needed_lazy_methods)
 {
-  initialize_needed_classes_from_pointer(
-    pointer_type, ns, lazy_methods);
+  initialize_needed_classes_from_pointer(pointer_type, ns, needed_lazy_methods);
 
   const pointer_typet &subbed_pointer_type=
     pointer_type_selector.convert_pointer_type(pointer_type, ns);
@@ -320,7 +322,7 @@ void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
   if(subbed_pointer_type!=pointer_type)
   {
     initialize_needed_classes_from_pointer(
-      subbed_pointer_type, ns, lazy_methods);
+      subbed_pointer_type, ns, needed_lazy_methods);
   }
 }
 
@@ -328,20 +330,20 @@ void ci_lazy_methodst::initialize_all_needed_classes_from_pointer(
 /// `initialize_needed_classes` for more details.
 /// \param pointer_type: The type to gather methods for.
 /// \param ns: global namespace
-/// \param [out] lazy_methods: Populated with all Java reference types whose
-///   references may be passed, directly or indirectly, to any of the functions
-///   in `entry_points
+/// \param [out] needed_lazy_methods: Populated with all Java reference types
+///   whose references may be passed, directly or indirectly, to any of the
+///   functions in `entry_points`
 void ci_lazy_methodst::initialize_needed_classes_from_pointer(
   const pointer_typet &pointer_type,
   const namespacet &ns,
-  ci_lazy_methods_neededt &lazy_methods)
+  ci_lazy_methods_neededt &needed_lazy_methods)
 {
   const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
   const auto &param_classid=class_type.get_identifier();
 
-  if(lazy_methods.add_needed_class(param_classid))
+  if(needed_lazy_methods.add_needed_class(param_classid))
   {
-    gather_field_types(pointer_type.subtype(), ns, lazy_methods);
+    gather_field_types(pointer_type.subtype(), ns, needed_lazy_methods);
   }
 }
 
@@ -462,30 +464,30 @@ void ci_lazy_methodst::gather_needed_globals(
       gather_needed_globals(*opit, symbol_table, needed);
 }
 
-/// See param lazy_methods
+/// See param needed_lazy_methods
 /// \param class_type: root of class tree to search
 /// \param ns: global namespace
-/// \param [out] lazy_methods: Popualted with all Java reference types reachable
-///   starting at `class_type`. For example if `class_type` is
+/// \param [out] needed_lazy_methods: Popualted with all Java reference types
+///   reachable starting at `class_type`. For example if `class_type` is
 ///   `symbol_typet("java::A")` and A has a B field, then `B` (but not `A`) will
 ///   noted as a needed class.
 void ci_lazy_methodst::gather_field_types(
   const typet &class_type,
   const namespacet &ns,
-  ci_lazy_methods_neededt &lazy_methods)
+  ci_lazy_methods_neededt &needed_lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
   for(const auto &field : underlying_type.components())
   {
     if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, lazy_methods);
+      gather_field_types(field.type(), ns, needed_lazy_methods);
     else if(field.type().id()==ID_pointer)
     {
       // Skip array primitive pointers, for example:
       if(field.type().subtype().id()!=ID_symbol)
         continue;
       initialize_all_needed_classes_from_pointer(
-        to_pointer_type(field.type()), ns, lazy_methods);
+        to_pointer_type(field.type()), ns, needed_lazy_methods);
     }
   }
 }

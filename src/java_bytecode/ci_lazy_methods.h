@@ -26,18 +26,67 @@
 
 class java_string_library_preprocesst;
 
-typedef std::pair<
-          const symbolt *,
-          const java_bytecode_parse_treet::methodt *>
-  lazy_method_valuet;
+// Map from method id to class_method_and_bytecodet
+class method_bytecodet
+{
+public:
+  /// Pair of class id and methodt
+  struct class_method_and_bytecodet
+  {
+    irep_idt class_id;
+    irep_idt method_id;
+    const java_bytecode_parse_treet::methodt &method;
+  };
 
-typedef std::map<irep_idt, lazy_method_valuet>
-  lazy_methodst;
+  typedef optionalt<std::reference_wrapper<const class_method_and_bytecodet>>
+    opt_reft;
 
-typedef std::function<void(
-  const symbolt &,
-  const java_bytecode_parse_treet::methodt &,
-  ci_lazy_methods_neededt)> method_convertert;
+private:
+  typedef std::map<irep_idt, class_method_and_bytecodet> mapt;
+  mapt map;
+
+public:
+  bool contains_method(const irep_idt &method_id) const
+  {
+    return map.count(method_id) != 0;
+  }
+
+  void add(const class_method_and_bytecodet &method_class_and_bytecode)
+  {
+    map.emplace(
+      std::make_pair(
+        method_class_and_bytecode.method_id, method_class_and_bytecode));
+  }
+
+  void add(
+    const irep_idt &class_id,
+    const irep_idt &method_id,
+    const java_bytecode_parse_treet::methodt &method)
+  {
+    add(class_method_and_bytecodet{class_id, method_id, method});
+  }
+
+  mapt::const_iterator begin() const
+  {
+    return map.begin();
+  }
+  mapt::const_iterator end() const
+  {
+    return map.end();
+  }
+
+  opt_reft get(const irep_idt &method_id)
+  {
+    const auto it = map.find(method_id);
+    if(it == map.end())
+      return opt_reft();
+    return std::cref(it->second);
+  }
+};
+
+typedef std::function<
+  bool(const irep_idt &function_id, ci_lazy_methods_neededt)>
+  method_convertert;
 
 class ci_lazy_methodst:public messaget
 {
@@ -55,8 +104,8 @@ public:
   // not const since messaget
   bool operator()(
     symbol_tablet &symbol_table,
-    lazy_methodst &lazy_methods,
-    method_convertert method_converter);
+    method_bytecodet &method_bytecode,
+    const method_convertert &method_converter);
 
 private:
   void resolve_method_names(
@@ -66,17 +115,17 @@ private:
   void initialize_needed_classes(
     const std::vector<irep_idt> &entry_points,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void initialize_all_needed_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void initialize_needed_classes_from_pointer(
     const pointer_typet &pointer_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   void gather_virtual_callsites(
     const exprt &e,
@@ -93,9 +142,10 @@ private:
     const symbol_tablet &symbol_table,
     symbol_tablet &needed);
 
-  void gather_field_types(const typet &class_type,
+  void gather_field_types(
+    const typet &class_type,
     const namespacet &ns,
-    ci_lazy_methods_neededt &lazy_methods);
+    ci_lazy_methods_neededt &needed_lazy_methods);
 
   irep_idt get_virtual_method_target(
     const std::set<irep_idt> &needed_classes,
