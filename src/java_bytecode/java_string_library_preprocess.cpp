@@ -192,7 +192,7 @@ typet string_length_type()
 void java_string_library_preprocesst::add_string_type(
   const irep_idt &class_name, symbol_tablet &symbol_table)
 {
-  class_typet string_type;
+  java_class_typet string_type;
   string_type.set_tag(class_name);
   string_type.components().resize(3);
   string_type.components()[0].set_name("@java.lang.Object");
@@ -204,6 +204,7 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[2].set_name("data");
   string_type.components()[2].set_pretty_name("data");
   string_type.components()[2].type() = pointer_type(java_char_type());
+  string_type.set_access(ID_public);
   string_type.add_base(symbol_typet("java::java.lang.Object"));
   if(class_name!="java.lang.CharSequence")
   {
