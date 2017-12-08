@@ -260,7 +260,8 @@ unified_difft::differencest unified_difft::lcss(
     {
       differences.push_back(differencet::NEW);
       --j;
-      --new_rit;
+      if(new_goto_program.instructions.begin()!=new_rit)
+        --new_rit;
     }
     else if(j == 0)
     {
@@ -273,15 +274,18 @@ unified_difft::differencest unified_difft::lcss(
     {
       differences.push_back(differencet::SAME);
       --i;
-      --old_rit;
+      if(old_goto_program.instructions.begin()!=old_rit)
+        --old_rit;
       --j;
-      --new_rit;
+      if(new_goto_program.instructions.begin()!=new_rit)
+        --new_rit;
     }
     else if(lcss_matrix[i][j - 1] < lcss_matrix[i][j])
     {
       differences.push_back(differencet::DELETED);
       --i;
-      --old_rit;
+      if(old_goto_program.instructions.begin()!=old_rit)
+        --old_rit;
     }
     else
     {
