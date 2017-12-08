@@ -13,7 +13,7 @@ install:
     }
     cd deps
     appveyor DownloadFile "https://storage.googleapis.com/diffblue-mirror/appveyor-deps/win_flex_bison-latest.zip?GoogleAccessId=diffbluemaster@diffblue-cr.iam.gserviceaccount.com&Expires=1543674503&Signature=CojdaOYrFl50gbxCQL%2BlfVtuo7j9v1OzfWD6jYIkfv1h7xzCacigAM51%2BVjaVx%2B8yvUjk%2B4MOU%2FKmLzev7dABWNi5n7p7SvlXYPFVVwDE57Me35Xi7BzW%2FhoSaPnVIGuhAmDfxjGoHhB0Of%2Fd2FfMl4cklGgc2YafTpFX3agNCE4dcc1UyG0SY5CbvTGTuBP%2B99zaQ69lNT1TSNUNp0PW2Hhj%2FPylts0IdDm713RA4wcNIHvLTTppBiNwMm0y%2B0qRG1op3R4vc5gahz%2B6dTUnCevYWO5l%2FIvmXQyo4XNkgqLKIRgk4wisLjtSuRh5vPyD%2FQPOrn2ubT53YnDcW6geA%3D%3D"
-    7z x win_flex_bison-latest.zip
+    7z x -y win_flex_bison-latest.zip
     Move-Item win_bison.exe bin\bison.exe -force
     Move-Item win_flex.exe bin\flex.exe -force
     Move-Item FlexLexer.h include\FlexLexer.h -force
