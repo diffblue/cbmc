@@ -22,12 +22,11 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <iomanip>
 #include <stack>
 #include <util/expr_iterator.h>
-#include <util/optional.h>
+#include <util/arith_tools.h>
 #include <util/simplify_expr.h>
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <java_bytecode/java_types.h>
-#include "expr_cast.h"
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
@@ -795,12 +794,13 @@ static optionalt<exprt> get_array(
     return {};
   }
 
-  unsigned n;
-  if(to_unsigned_integer(to_constant_expr(size_val), n))
+  auto n_opt = numeric_cast<std::size_t>(size_val);
+  if(!n_opt)
   {
     stream << "(sr::get_array) size is not valid" << eom;
     return {};
   }
+  std::size_t n = *n_opt;
 
   const array_typet ret_type(char_type, from_integer(n, index_type));
   array_exprt ret(ret_type);
@@ -825,9 +825,11 @@ static optionalt<exprt> get_array(
     for(size_t i = 0; i < arr_val.operands().size(); i += 2)
     {
       exprt index = arr_val.operands()[i];
-      unsigned idx;
-      if(!to_unsigned_integer(to_constant_expr(index), idx) && idx<n)
-        initial_map[idx] = arr_val.operands()[i + 1];
+      if(auto idx = numeric_cast<std::size_t>(index))
+      {
+        if(*idx < n)
+          initial_map[*idx] = arr_val.operands()[i + 1];
+      }
     }
 
     // Pad the concretized values to the left to assign the uninitialized
@@ -852,13 +854,11 @@ static optionalt<exprt> get_array(
 /// \return a string
 static std::string string_of_array(const array_exprt &arr)
 {
-  unsigned n;
   if(arr.type().id()!=ID_array)
       return std::string("");
 
   exprt size_expr=to_array_type(arr.type()).size();
-  PRECONDITION(size_expr.id()==ID_constant);
-  to_unsigned_integer(to_constant_expr(size_expr), n);
+  auto n = numeric_cast_v<std::size_t>(size_expr);
   return utf16_constant_array_to_java(arr, n);
 }
 
@@ -1010,7 +1010,7 @@ exprt fill_in_array_with_expr(
   std::map<std::size_t, exprt> initial_map;
 
   // Set the last index to be sure the array will have the right length
-  const auto &array_size_opt = expr_cast<std::size_t>(array_type.size());
+  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
   if(array_size_opt && *array_size_opt > 0)
     initial_map.emplace(
       *array_size_opt - 1,
@@ -1022,7 +1022,8 @@ exprt fill_in_array_with_expr(
     // statements
     const with_exprt &with_expr = to_with_expr(it);
     const exprt &then_expr=with_expr.new_value();
-    const auto index=expr_cast_v<std::size_t>(with_expr.where());
+    const auto index =
+      numeric_cast_v<std::size_t>(to_constant_expr(with_expr.where()));
     if(
       index < string_max_length && (!array_size_opt || index < *array_size_opt))
       initial_map.emplace(index, then_expr);
@@ -1047,7 +1048,7 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 
   // Map of the parts of the array that are initialized
   std::map<std::size_t, exprt> initial_map;
-  const auto &array_size_opt = expr_cast<std::size_t>(array_type.size());
+  const auto &array_size_opt = numeric_cast<std::size_t>(array_type.size());
 
   if(array_size_opt && *array_size_opt > 0)
     initial_map.emplace(
@@ -1180,14 +1181,14 @@ static exprt negation_of_not_contains_constraint(
   const exprt &ubu=axiom.univ_upper_bound();
   if(lbu.id()==ID_constant && ubu.id()==ID_constant)
   {
-    const auto lb_int=expr_cast<mp_integer>(lbu);
-    const auto ub_int=expr_cast<mp_integer>(ubu);
+    const auto lb_int = numeric_cast<mp_integer>(lbu);
+    const auto ub_int = numeric_cast<mp_integer>(ubu);
     if(!lb_int || !ub_int || *ub_int<=*lb_int)
       return false_exprt();
   }
 
-  const auto lbe=expr_cast_v<mp_integer>(axiom.exists_lower_bound());
-  const auto ube=expr_cast_v<mp_integer>(axiom.exists_upper_bound());
+  const auto lbe = numeric_cast_v<mp_integer>(axiom.exists_lower_bound());
+  const auto ube = numeric_cast_v<mp_integer>(axiom.exists_upper_bound());
 
   // If the premise is false, the implication is trivially true, so the
   // negation is false.
@@ -1230,8 +1231,8 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
   const exprt &ub=axiom.upper_bound();
   if(lb.id()==ID_constant && ub.id()==ID_constant)
   {
-    const auto lb_int=expr_cast<mp_integer>(lb);
-    const auto ub_int=expr_cast<mp_integer>(ub);
+    const auto lb_int = numeric_cast<mp_integer>(lb);
+    const auto ub_int = numeric_cast<mp_integer>(ub);
     if(!lb_int || !ub_int || ub_int<=lb_int)
       return false_exprt();
   }
@@ -1786,7 +1787,7 @@ static void add_to_index_set(
   exprt i)
 {
   simplify(i, ns);
-  const bool is_size_t=expr_cast<std::size_t>(i).has_value();
+  const bool is_size_t = numeric_cast<std::size_t>(i).has_value();
   if(i.id()!=ID_constant || is_size_t)
   {
     std::vector<exprt> sub_arrays;
@@ -2047,7 +2048,7 @@ exprt substitute_array_lists(exprt expr, size_t string_max_length)
     {
       const exprt &index=expr.operands()[i];
       const exprt &value=expr.operands()[i+1];
-      const auto index_value=expr_cast<std::size_t>(index);
+      const auto index_value = numeric_cast<std::size_t>(index);
       if(!index.is_constant() ||
          (index_value && *index_value<string_max_length))
         ret_expr=with_exprt(ret_expr, index, value);
@@ -2097,7 +2098,7 @@ exprt string_refinementt::get(const exprt &expr) const
       if(set.find(arr) != set.end())
       {
         exprt length = super_get(arr.length());
-        if(const auto n = expr_cast<std::size_t>(length))
+        if(const auto n = numeric_cast<std::size_t>(length))
         {
           exprt arr_model =
             array_exprt(array_typet(arr.type().subtype(), length));
