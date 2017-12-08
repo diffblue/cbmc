@@ -971,7 +971,7 @@ codet java_string_library_preprocesst::make_float_to_string_code(
   exprt str=allocate_fresh_string(type.return_type(), loc, symbol_table, code);
 
   // Expression representing 0.0
-  ieee_float_spect float_spec=ieee_float_spect::single_precision();
+  ieee_float_spect float_spec(to_floatbv_type(params[0].type()));
   ieee_floatt zero_float(float_spec);
   zero_float.from_float(0.0);
   constant_exprt zero=zero_float.to_expr();
