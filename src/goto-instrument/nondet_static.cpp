@@ -51,7 +51,7 @@ void nondet_static(
         continue;
 
       // constant?
-      if(sym.type().get_bool(ID_C_constant))
+      if(is_constant_or_has_constant_components(sym.type(), ns))
         continue;
 
       i_it=init.insert_before(++i_it);

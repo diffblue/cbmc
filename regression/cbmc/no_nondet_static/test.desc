@@ -1,0 +1,36 @@
+CORE
+main.c
+--nondet-static
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+assertion x == 0: FAILURE
+assertion y == 23: FAILURE
+assertion s1.x == 0: FAILURE
+assertion s2.x == 23: FAILURE
+assertion a\[0\].x == 23: FAILURE
+assertion a\[0\].p == &x: FAILURE
+assertion c\[2\].x == 23: FAILURE
+assertion c\[2\].p == &z: FAILURE
+assertion z == 23: SUCCESS
+assertion s3.x == 23: SUCCESS
+assertion t1.y == 0: SUCCESS
+assertion t2.y == 23: SUCCESS
+assertion t3.x == 23: SUCCESS
+assertion t3.y == 23: SUCCESS
+assertion u1.x == 0: SUCCESS
+assertion u2.x == 23: SUCCESS
+assertion u3.x == 23: SUCCESS
+assertion p == 23: SUCCESS
+assertion q == 23: SUCCESS
+assertion t1.x == 0: SUCCESS
+assertion t2.x == 23: SUCCESS
+assertion b\[1\].x == 23: SUCCESS
+assertion b\[1\].p == &y: SUCCESS
+assertion d\[1\].y == &y: SUCCESS
+assertion linked_list.datum == 5: SUCCESS
+assertion linked_list.next->datum == 10: SUCCESS
+assertion one_list.a == 5: SUCCESS
+assertion array\[1\] == 6: SUCCESS
+--
+--
