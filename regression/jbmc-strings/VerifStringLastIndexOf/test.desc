@@ -1,0 +1,7 @@
+THOROUGH
+Test.class
+--function Test.check --refine-strings --string-max-length 50 --unwind 50 --java-assume-inputs-non-null
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 32 .* SUCCESS$
+assertion at file Test.java line 34 .* FAILURE$
