@@ -2686,6 +2686,11 @@ std::string expr2ct::convert_code_decl(
       dest+="static ";
     else if(symbol->is_extern)
       dest+="extern ";
+    else if(
+      symbol->is_exported && config.ansi_c.os == configt::ansi_ct::ost::OS_WIN)
+    {
+      dest += "__declspec(dllexport) ";
+    }
 
     if(symbol->type.id()==ID_code &&
        to_code_type(symbol->type).get_inlined())
