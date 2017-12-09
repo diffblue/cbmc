@@ -263,7 +263,7 @@ public:
   std::list<node_indext> topsort() const;
 
   void output_dot(std::ostream &out) const;
-  void output_dot_node(std::ostream &out, node_indext n) const;
+  virtual void output_dot_node(std::ostream &out, node_indext n) const;
 
 protected:
   class tarjant
@@ -655,20 +655,26 @@ std::list<typename grapht<N>::node_indext> grapht<N>::topsort() const
 template<class N>
 void grapht<N>::output_dot(std::ostream &out) const
 {
+  out << "digraph call_graph {\n";
+
   for(node_indext n=0; n<nodes.size(); n++)
     output_dot_node(out, n);
+
+  out << "}\n";
 }
 
 template<class N>
 void grapht<N>::output_dot_node(std::ostream &out, node_indext n) const
 {
-  const nodet &node=nodes[n];
+  const nodet &node=nodes.at(n);
 
-  for(typename edgest::const_iterator
-      it=node.out.begin();
-      it!=node.out.end();
-      it++)
-    out << n << " -> " << it->first << '\n';
+  for(const auto &edge : node.out)
+  {
+    out << "  \"" << n << "\" -> "
+        << "\"" << edge.first << "\" "
+        << " [arrowhead=\"vee\"];"
+        << "\n";
+  }
 }
 
 #endif // CPROVER_UTIL_GRAPH_H
