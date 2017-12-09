@@ -290,6 +290,12 @@ void goto_convertt::finish_guarded_gotos(goto_programt &dest)
     for(auto it=gg.ifiter, itend=gg.gotoiter; it!=itend; ++it)
       it->make_skip();
   }
+
+  // Must clear this, as future functions may be converted
+  // using the same instance of goto_convertt, typically via
+  // goto_convert_functions.
+
+  guarded_gotos.clear();
 }
 
 void goto_convertt::goto_convert(const codet &code, goto_programt &dest)
@@ -301,6 +307,9 @@ void goto_convertt::goto_convert_rec(
   const codet &code,
   goto_programt &dest)
 {
+  // Check that guarded_gotos was cleared after any previous use of this
+  // converter instance:
+  PRECONDITION(guarded_gotos.empty());
   convert(code, dest);
 
   finish_gotos(dest);
