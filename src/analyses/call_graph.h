@@ -25,6 +25,17 @@ public:
   explicit call_grapht(const goto_modelt &, bool collect_callsites=false);
   explicit call_grapht(const goto_functionst &, bool collect_callsites=false);
 
+  // These two constructors build a call graph restricted to functions
+  // reachable from the given root.
+  call_grapht(
+    const goto_modelt &model,
+    const irep_idt &root,
+    bool collect_callsites);
+  call_grapht(
+    const goto_functionst &functions,
+    const irep_idt &root,
+    bool collect_callsites);
+
   void output_dot(std::ostream &out) const;
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
