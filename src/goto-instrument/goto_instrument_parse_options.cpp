@@ -659,6 +659,22 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
+    if(cmdline.isset("reachable-call-graph"))
+    {
+      do_indirect_call_and_rtti_removal();
+      call_grapht call_graph =
+        call_grapht::create_from_root_function(
+          goto_model, goto_functionst::entry_point(), false);
+      if(cmdline.isset("xml"))
+        call_graph.output_xml(std::cout);
+      else if(cmdline.isset("dot"))
+        call_graph.output_dot(std::cout);
+      else
+        call_graph.output(std::cout);
+
+      return 0;
+    }
+
     if(cmdline.isset("dot"))
     {
       namespacet ns(goto_model.symbol_table);
@@ -1455,6 +1471,9 @@ void goto_instrument_parse_optionst::help()
     " --list-calls-args            list all function calls with their arguments\n"
     // NOLINTNEXTLINE(whitespace/line_length)
     " --print-path-lengths         print statistics about control-flow graph paths\n"
+    " --call-graph                 show graph of function calls\n"
+    // NOLINTNEXTLINE(whitespace/line_length)
+    " --reachable-call-graph       show graph of function calls potentially reachable from main function\n"
     "\n"
     "Safety checks:\n"
     " --no-assertions              ignore user assertions\n"
