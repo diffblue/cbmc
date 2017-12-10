@@ -14,16 +14,27 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/xml.h>
 
+/// Create empty call graph
+/// \param collect_callsites: if true, then each added graph edge will have
+///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(bool collect_callsites):
   collect_callsites(collect_callsites)
 {
 }
 
+/// Create complete call graph
+/// \param goto_model: model to search for callsites
+/// \param collect_callsites: if true, then each added graph edge will have
+///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(const goto_modelt &goto_model, bool collect_callsites):
   call_grapht(goto_model.goto_functions, collect_callsites)
 {
 }
 
+/// Create complete call graph
+/// \param goto_functions: functions to search for callsites
+/// \param collect_callsites: if true, then each added graph edge will have
+///   the calling instruction recorded in `callsites` map.
 call_grapht::call_grapht(
   const goto_functionst &goto_functions, bool collect_callsites):
   collect_callsites(collect_callsites)
@@ -54,7 +65,7 @@ static void forall_callsites(
 }
 
 /// Create call graph restricted to functions reachable from `root`
-/// \param functions: functions to search for callsites
+/// \param goto_functions: functions to search for callsites
 /// \param root: function to start exploring the graph
 /// \param collect_callsites: if true, then each added graph edge will have
 ///   the calling instruction recorded in `callsites` map.
@@ -204,6 +215,10 @@ call_grapht::directed_grapht call_grapht::get_directed_graph() const
   return ret;
 }
 
+/// Prints callsites responsible for a graph edge as comma-separated
+/// location numbers, e.g. "{1, 2, 3}".
+/// \param edge: graph edge
+/// \return pretty representation of edge callsites
 std::string call_grapht::format_callsites(const edget &edge) const
 {
   PRECONDITION(collect_callsites);

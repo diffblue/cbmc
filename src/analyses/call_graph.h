@@ -40,26 +40,50 @@ public:
   void output(std::ostream &out) const;
   void output_xml(std::ostream &out) const;
 
+  /// Type of the call graph. Note parallel edges (e.g. A having two callsites
+  /// both targeting B) result in multiple graph edges.
   typedef std::multimap<irep_idt, irep_idt> grapht;
+
+  /// Type of a call graph edge in `grapht`
   typedef std::pair<irep_idt, irep_idt> edget;
+
+  /// Type of a callsite stored in member `callsites`
   typedef goto_programt::const_targett locationt;
+
+  /// Type of a set of callsites
   typedef std::set<locationt> locationst;
+
+  /// Type mapping from call-graph edges onto the set of call instructions
+  /// that make that call.
   typedef std::map<edget, locationst> callsitest;
 
+  /// Call graph, including duplicate key-value pairs when there are parallel
+  /// edges (see `grapht` documentation). This representation is retained for
+  /// backward compatibility; use `get_directed_graph()` to get a generic
+  /// directed graph representation that provides more graph algorithms
+  /// (shortest path, SCCs and so on).
   grapht graph;
+
+  /// Map from call-graph edges to a set of callsites that make the given call.
   callsitest callsites;
 
   void add(const irep_idt &caller, const irep_idt &callee);
   void add(const irep_idt &caller, const irep_idt &callee, locationt callsite);
+
   call_grapht get_inverted() const;
 
+  /// Edge of the directed graph representation of this call graph
   struct edge_with_callsitest
   {
+    /// Callsites responsible for this graph edge. Will be empty if
+    /// `collect_callsites` was not set at `call_grapht` construction time.
     locationst callsites;
   };
 
-  struct function_nodet:public graph_nodet<edge_with_callsitest>
+  /// Node of the directed graph representation of this call graph
+  struct function_nodet : public graph_nodet<edge_with_callsitest>
   {
+    /// Function name
     irep_idt function;
   };
 
