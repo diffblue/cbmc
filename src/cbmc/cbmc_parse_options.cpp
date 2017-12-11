@@ -390,6 +390,13 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   else
     options.set_option("sat-preprocessor", true);
 
+  if(cmdline.isset("random-seed"))
+    options.set_option("random-seed", cmdline.get_values("random-seed"));
+
+  if(cmdline.isset("random-var-freq"))
+    options.set_option(
+      "random-var-freq", cmdline.get_values("random-var-freq"));
+
   options.set_option(
     "pretty-names",
     !cmdline.isset("no-pretty-names"));
@@ -898,6 +905,7 @@ int cbmc_parse_optionst::do_bmc(bmct &bmc)
 /// display command line help
 void cbmc_parse_optionst::help()
 {
+  // clang-format off
   std::cout <<
     "\n"
     "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
@@ -1001,6 +1009,9 @@ void cbmc_parse_optionst::help()
     " --dimacs                     generate CNF in DIMACS format\n"
     " --beautify                   beautify the counterexample (greedy heuristic)\n" // NOLINT(*)
     " --localize-faults            localize faults (experimental)\n"
+    " --random-seed n              SAT checker random seed (unsigned integer)\n"
+    " --random-var-freq n          SAT checker random variable frequency\n"
+    "                              (floating point number between 0 and 1)\n"
     " --smt1                       use default SMT1 solver (obsolete)\n"
     " --smt2                       use default SMT2 solver (Z3)\n"
     " --boolector                  use Boolector\n"
@@ -1025,4 +1036,5 @@ void cbmc_parse_optionst::help()
     " --json-ui                    use JSON-formatted output\n"
     " --verbosity #                verbosity level\n"
     "\n";
+  // clang-format on
 }

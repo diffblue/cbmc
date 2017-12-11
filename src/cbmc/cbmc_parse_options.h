@@ -24,6 +24,7 @@ class bmct;
 class goto_functionst;
 class optionst;
 
+// clang-format off
 #define CBMC_OPTIONS \
   "(program-only)(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
@@ -65,7 +66,10 @@ class optionst;
   "(round-to-nearest)(round-to-plus-inf)(round-to-minus-inf)(round-to-zero)" \
   "(graphml-witness):" \
   "(localize-faults)(localize-faults-method):" \
+  "(random-seed):" \
+  "(random-var-freq):" \
   "(fixedbv)(floatbv)(all-claims)(all-properties)" // legacy, and will eventually disappear // NOLINT(whitespace/line_length)
+// clang-format on
 
 class cbmc_parse_optionst:
   public parse_options_baset,
