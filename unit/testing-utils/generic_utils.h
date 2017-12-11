@@ -21,6 +21,11 @@ namespace generic_utils
 void specialise_generic(
   const java_generic_typet &example_type,
   symbol_tablet &new_symbol_table);
+
+void specialise_generic_from_component(
+  const irep_idt &class_name,
+  const irep_idt &component_name,
+  symbol_tablet &new_symbol_table);
 }
 
 #endif // CPROVER_TESTING_UTILS_GENERIC_UTILS_H

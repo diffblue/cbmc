@@ -116,6 +116,17 @@ public:
     return const_cast<type_variablet &>(type_variables().front());
   }
 
+  const std::string get_parameter_class_name() const
+  {
+    const std::string &parameter_name =
+      type_variable().get_identifier().c_str();
+    PRECONDITION(has_prefix(parameter_name, "java::"));
+    int prefix_length = std::string("java::").length();
+    const std::string name = parameter_name.substr(
+      prefix_length, parameter_name.rfind("::") - prefix_length);
+    return name;
+  }
+
 private:
   typedef std::vector<type_variablet> type_variablest;
   const type_variablest &type_variables() const
@@ -410,21 +421,18 @@ inline typet java_type_from_string_with_exception(
 /// \param identifier The string identifier of the type of the component.
 /// \return Optional with the size if the identifier was found.
 inline const optionalt<size_t> java_generics_get_index_for_subtype(
-  const java_generic_class_typet &t,
+  const std::vector<java_generic_parametert> &gen_types,
   const irep_idt &identifier)
 {
-  const std::vector<java_generic_parametert> &gen_types=
-    t.generic_types();
-
   const auto iter = std::find_if(
     gen_types.cbegin(),
     gen_types.cend(),
     [&identifier](const java_generic_parametert &ref)
     {
-      return ref.type_variable().get_identifier()==identifier;
+      return ref.type_variable().get_identifier() == identifier;
     });
 
-  if(iter==gen_types.cend())
+  if(iter == gen_types.cend())
   {
     return {};
   }
