@@ -35,6 +35,7 @@ class optionst;
   OPT_GOTO_CHECK \
   "(cover):" \
   "(verbosity):(version)" \
+  OPT_FLUSH \
   OPT_TIMESTAMP \
   "u(unified)(change-impact)(forward-impact)(backward-impact)" \
   "(compact-output)"

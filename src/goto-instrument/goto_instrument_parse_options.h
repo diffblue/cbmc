@@ -85,6 +85,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(show-threaded)(list-calls-args)(print-path-lengths)" \
   "(undefined-function-is-assume-false)" \
   "(remove-function-body):"\
+  OPT_FLUSH \
   "(splice-call):" \
   OPT_REMOVE_CALLS_NO_BODY
 // clang-format on

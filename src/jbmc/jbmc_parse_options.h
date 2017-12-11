@@ -71,6 +71,7 @@ class optionst;
   "(ppc-macos)" \
   "(arrays-uf-always)(arrays-uf-never)" \
   "(no-arch)(arch):" \
+  OPT_FLUSH \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \

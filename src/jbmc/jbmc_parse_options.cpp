@@ -1083,6 +1083,7 @@ void jbmc_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
     HELP_GOTO_TRACE
+    HELP_FLUSH
     " --verbosity #                verbosity level\n"
     HELP_TIMESTAMP
     "\n";

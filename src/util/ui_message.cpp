@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 ui_message_handlert::ui_message_handlert()
   : _ui(uit::PLAIN),
+    always_flush(false),
     time(timestampert::make(timestampert::clockt::NONE)),
     out(std::cout),
     json_stream(nullptr)
@@ -30,8 +31,10 @@ ui_message_handlert::ui_message_handlert()
 ui_message_handlert::ui_message_handlert(
   uit __ui,
   const std::string &program,
+  bool always_flush,
   timestampert::clockt clock_type)
   : _ui(__ui),
+    always_flush(always_flush),
     time(timestampert::make(clock_type)),
     out(std::cout),
     json_stream(nullptr)
@@ -79,6 +82,7 @@ ui_message_handlert::ui_message_handlert(
                                                 ? uit::JSON_UI
                                                 : uit::PLAIN,
       program,
+      cmdline.isset("flush"),
       cmdline.isset("timestamp")
         ? cmdline.get_value("timestamp") == "monotonic"
             ? timestampert::clockt::MONOTONIC
@@ -130,11 +134,13 @@ void ui_message_handlert::print(
     {
     case uit::PLAIN:
     {
-      console_message_handlert console_message_handler;
+      console_message_handlert console_message_handler(always_flush);
       std::stringstream ss;
       const std::string timestamp = time->stamp();
       ss << timestamp << (timestamp.empty() ? "" : " ") << message;
       console_message_handler.print(level, ss.str());
+      if(always_flush)
+        console_message_handler.flush(level);
     }
     break;
 
@@ -144,6 +150,8 @@ void ui_message_handlert::print(
       source_locationt location;
       location.make_nil();
       print(level, message, -1, location);
+      if(always_flush)
+        flush(level);
     }
     break;
     }
@@ -302,7 +310,7 @@ void ui_message_handlert::flush(unsigned level)
   {
   case uit::PLAIN:
   {
-    console_message_handlert console_message_handler;
+    console_message_handlert console_message_handler(always_flush);
     console_message_handler.flush(level);
   }
   break;

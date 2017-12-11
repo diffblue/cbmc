@@ -24,6 +24,7 @@ public:
   ui_message_handlert(
     uit,
     const std::string &program,
+    const bool always_flush,
     timestampert::clockt clock_type);
 
   ui_message_handlert(const class cmdlinet &, const std::string &program);
@@ -57,6 +58,7 @@ public:
 
 protected:
   uit _ui;
+  const bool always_flush;
   std::unique_ptr<const timestampert> time;
   std::ostream &out;
   std::unique_ptr<json_stream_arrayt> json_stream;
@@ -99,5 +101,9 @@ protected:
 
   const char *level_string(unsigned level);
 };
+
+#define OPT_FLUSH "(flush)"
+
+#define HELP_FLUSH " --flush                      flush every line of output\n"
 
 #endif // CPROVER_UTIL_UI_MESSAGE_H

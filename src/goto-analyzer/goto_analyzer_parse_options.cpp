@@ -905,6 +905,7 @@ void goto_analyzer_parse_optionst::help()
     "\n"
     "Other options:\n"
     " --version                    show version and exit\n"
+    HELP_FLUSH
     HELP_TIMESTAMP
     "\n";
   // clang-format on
