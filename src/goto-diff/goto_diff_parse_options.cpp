@@ -396,7 +396,7 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(symbol_table, goto_functions);
+    remove_asm(goto_model);
 
     // add the library
     link_to_library(symbol_table, goto_functions, ui_message_handler);

@@ -25,26 +25,19 @@ Date:   December 2014
 class remove_asmt
 {
 public:
-  inline remove_asmt(
-    symbol_tablet &_symbol_table,
-    goto_functionst &_goto_functions):
-    symbol_table(_symbol_table),
-    goto_functions(_goto_functions)
+  explicit remove_asmt(symbol_tablet &_symbol_table)
+    : symbol_table(_symbol_table)
   {
   }
 
-  void operator()();
+  void process_function(goto_functionst::goto_functiont &);
 
 protected:
   symbol_tablet &symbol_table;
-  goto_functionst &goto_functions;
 
   void process_instruction(
     goto_programt::instructiont &instruction,
     goto_programt &dest);
-
-  void process_function(
-    goto_functionst::goto_functiont &);
 
   void gcc_asm_function_call(
     const irep_idt &function_base_name,
@@ -305,24 +298,24 @@ void remove_asmt::process_function(
 }
 
 /// removes assembler
-void remove_asmt::operator()()
+void remove_asm(
+  goto_functionst::goto_functiont &goto_function,
+  symbol_tablet &symbol_table)
 {
-  Forall_goto_functions(it, goto_functions)
-  {
-    process_function(it->second);
-  }
+  remove_asmt rem(symbol_table);
+  rem.process_function(goto_function);
 }
 
 /// removes assembler
-void remove_asm(
-  symbol_tablet &symbol_table,
-  goto_functionst &goto_functions)
+void remove_asm(goto_functionst &goto_functions, symbol_tablet &symbol_table)
 {
-  remove_asmt(symbol_table, goto_functions)();
+  remove_asmt rem(symbol_table);
+  for(auto &f : goto_functions.function_map)
+    rem.process_function(f.second);
 }
 
 /// removes assembler
 void remove_asm(goto_modelt &goto_model)
 {
-  remove_asmt(goto_model.symbol_table, goto_model.goto_functions)();
+  remove_asm(goto_model.goto_functions, goto_model.symbol_table);
 }
