@@ -1076,6 +1076,8 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 ///    expression will be: `index==0 ? 24 : index==2 ? 42 : 12`
 ///  * for an array access `(g1?arr1:arr2)[x]` where `arr1 := {12}` and
 ///    `arr2 := {34}`, the constructed expression will be: `g1 ? 12 : 34`
+///  * for an access in an empty array `{ }[x]` returns a fresh symbol, this
+///    corresponds to a non-deterministic result
 /// \param expr: an expression containing array accesses
 /// \return an expression containing no array access
 static void substitute_array_access(exprt &expr)
@@ -1124,13 +1126,17 @@ static void substitute_array_access(exprt &expr)
         "above"));
     array_exprt &array_expr=to_array_expr(index_expr.array());
 
-    // Empty arrays do not need to be substituted.
+    const typet &char_type = index_expr.array().type().subtype();
+
+    // Access to an empty array is undefined (non deterministic result)
     if(array_expr.operands().empty())
+    {
+      expr = symbol_exprt("out_of_bound_access", char_type);
       return;
+    }
 
     size_t last_index=array_expr.operands().size()-1;
 
-    const typet &char_type=index_expr.array().type().subtype();
     exprt ite=array_expr.operands().back();
 
     if(ite.type()!=char_type)
