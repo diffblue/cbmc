@@ -188,9 +188,13 @@ abstract_object_pointert abstract_objectt::expression_transform(
   }
 
   exprt simplified=simplify_expr(constant_replaced_expr, ns);
-  if(simplified.is_constant()) {
-    return environment.abstract_object_factory(simplified.type(), simplified, ns);
-  } else {
+  if(simplified.is_constant())
+  {
+    return environment.abstract_object_factory(
+            simplified.type(), simplified, ns);
+  }
+  else
+  {
     // if our final expression isn't a constant, just return top
     return environment.abstract_object_factory(expr.type(), ns, true, false);
   }
