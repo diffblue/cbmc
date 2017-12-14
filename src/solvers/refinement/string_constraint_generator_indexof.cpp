@@ -59,15 +59,19 @@ exprt string_constraint_generatort::add_axioms_for_index_of(
       equal_exprt(str[index], c)));
   axioms.push_back(a3);
 
+  const auto zero = from_integer(0, index_type);
+  const if_exprt lower_bound(
+    binary_relation_exprt(from_index, ID_le, zero), zero, from_index);
+
   symbol_exprt n=fresh_univ_index("QA_index_of", index_type);
   string_constraintt a4(
-    n, from_index, index, contains, not_exprt(equal_exprt(str[n], c)));
+    n, lower_bound, index, contains, not_exprt(equal_exprt(str[n], c)));
   axioms.push_back(a4);
 
   symbol_exprt m=fresh_univ_index("QA_index_of", index_type);
   string_constraintt a5(
     m,
-    from_index,
+    lower_bound,
     str.length(),
     not_exprt(contains),
     not_exprt(equal_exprt(str[m], c)));
