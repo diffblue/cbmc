@@ -13,7 +13,7 @@ public class Test {
                 // Contradiction with the previous condition (should fail).
                 assert "foo".lastIndexOf("") != 3;
             } else if (i == 2 && input_String2.length() > 0) {
-                int lio = input_String1.lastIndexOf(input_String2.charAt(0), fromIndex);
+                int lio = input_String1.lastIndexOf(org.cprover.CProverString.charAt(input_String2, 0), fromIndex);
                 if (input_String2.length() == 0)
                     assert lio == fromIndex;
             } else if (i == 3) {

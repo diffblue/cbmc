@@ -13,7 +13,7 @@ public class test_init
 
     public static String stringOfCharArray(char arr[], int i, int j)
     {
-        return stringOfCharArray(arr).substring(i, i+j);
+        return org.cprover.CProverString.substring(stringOfCharArray(arr), i, i+j);
     }
 
     public static void main(int i)
