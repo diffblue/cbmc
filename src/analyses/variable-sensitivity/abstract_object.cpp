@@ -175,10 +175,9 @@ abstract_object_pointert abstract_objectt::expression_transform(
 
     if(lhs_value.is_nil())
     {
-      // One of the values is not resolvable to a constant
-      // so we can't really do anything more with
-      // this expression and should just return top for the result
-      return environment.abstract_object_factory(expr.type(), ns, true, false);
+      // do not give up if a sub-expression is not a constant,
+      // because the whole expression may still be simplified in some cases
+      constant_replaced_expr.operands().push_back(op);
     }
     else
     {
@@ -189,7 +188,16 @@ abstract_object_pointert abstract_objectt::expression_transform(
   }
 
   exprt simplified=simplify_expr(constant_replaced_expr, ns);
-  return environment.abstract_object_factory(simplified.type(), simplified, ns);
+  if(simplified.is_constant())
+  {
+    return environment.abstract_object_factory(
+            simplified.type(), simplified, ns);
+  }
+  else
+  {
+    // if our final expression isn't a constant, just return top
+    return environment.abstract_object_factory(expr.type(), ns, true, false);
+  }
 }
 
 /*******************************************************************\
