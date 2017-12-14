@@ -1079,11 +1079,16 @@ exprt fill_in_array_expr(const array_exprt &expr, std::size_t string_max_length)
 ///  * for an access in an empty array `{ }[x]` returns a fresh symbol, this
 ///    corresponds to a non-deterministic result
 /// \param expr: an expression containing array accesses
+/// \param symbol_generator: function which given a prefix and a type generates
+///        a fresh symbol of the given type
 /// \return an expression containing no array access
-static void substitute_array_access(exprt &expr)
+static void substitute_array_access(
+  exprt &expr,
+  const std::function<symbol_exprt(const irep_idt &, const typet &)>
+    &symbol_generator)
 {
   for(auto &op : expr.operands())
-    substitute_array_access(op);
+    substitute_array_access(op, symbol_generator);
 
   if(expr.id()==ID_index)
   {
@@ -1112,9 +1117,9 @@ static void substitute_array_access(exprt &expr)
       // Substitute recursively in branches of conditional expressions
       if_exprt if_expr=to_if_expr(index_expr.array());
       exprt true_case=index_exprt(if_expr.true_case(), index_expr.index());
-      substitute_array_access(true_case);
+      substitute_array_access(true_case, symbol_generator);
       exprt false_case=index_exprt(if_expr.false_case(), index_expr.index());
-      substitute_array_access(false_case);
+      substitute_array_access(false_case, symbol_generator);
       expr=if_exprt(if_expr.cond(), true_case, false_case);
       return;
     }
@@ -1131,7 +1136,7 @@ static void substitute_array_access(exprt &expr)
     // Access to an empty array is undefined (non deterministic result)
     if(array_expr.operands().empty())
     {
-      expr = symbol_exprt("out_of_bound_access", char_type);
+      expr = symbol_generator("out_of_bound_access", char_type);
       return;
     }
 
@@ -1348,6 +1353,12 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   const auto eom=messaget::eom;
   static const std::string indent = "  ";
   static const std::string indent2 = "    ";
+  // clang-format off
+  const auto gen_symbol = [&](const irep_idt &id, const typet &type)
+  {
+    return generator.fresh_symbol(id, type);
+  };
+  // clang-format on
 
   stream << "string_refinementt::check_axioms:" << eom;
 
@@ -1389,7 +1400,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     negaxiom = simplify_expr(negaxiom, ns);
     exprt with_concretized_arrays =
       concretize_arrays_in_expression(negaxiom, max_string_length, ns);
-    substitute_array_access(with_concretized_arrays);
+
+    substitute_array_access(with_concretized_arrays, gen_symbol);
 
     stream << indent << i << ".\n";
     debug_check_axioms_step(
@@ -1445,7 +1457,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     exprt with_concrete_arrays =
       concretize_arrays_in_expression(negaxiom, max_string_length, ns);
 
-    substitute_array_access(with_concrete_arrays);
+    substitute_array_access(with_concrete_arrays, gen_symbol);
 
     stream << indent << i << ".\n";
     debug_check_axioms_step(
