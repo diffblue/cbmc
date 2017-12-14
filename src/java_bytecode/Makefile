@@ -3,6 +3,7 @@ SRC = bytecode_info.cpp \
       ci_lazy_methods.cpp \
       ci_lazy_methods_needed.cpp \
       expr2java.cpp \
+      generic_arguments_name_builder.cpp \
       jar_file.cpp \
       java_bytecode_convert_class.cpp \
       java_bytecode_convert_method.cpp \
