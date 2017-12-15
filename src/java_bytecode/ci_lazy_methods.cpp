@@ -7,7 +7,6 @@
 \*******************************************************************/
 #include "ci_lazy_methods.h"
 
-
 #include <java_bytecode/java_entry_point.h>
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/java_utils.h>
@@ -345,6 +344,22 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
   {
     gather_field_types(pointer_type.subtype(), ns, needed_lazy_methods);
   }
+
+  if(is_java_generic_type(pointer_type))
+  {
+    // Assume if this is a generic like X<A, B, C>, then any concrete parameters
+    // will at some point be instantiated.
+    const auto &generic_args =
+      to_java_generic_type(pointer_type).generic_type_arguments();
+    for(const auto &generic_arg : generic_args)
+    {
+      if(!is_java_generic_parameter(generic_arg))
+      {
+        initialize_needed_classes_from_pointer(
+          generic_arg, ns, needed_lazy_methods);
+      }
+    }
+  }
 }
 
 /// Get places where virtual functions are called.
@@ -501,8 +516,22 @@ void ci_lazy_methodst::gather_field_types(
         gather_field_types(field.type(), ns, needed_lazy_methods);
       else if(field.type().id() == ID_pointer)
       {
-        initialize_all_needed_classes_from_pointer(
-          to_pointer_type(field.type()), ns, needed_lazy_methods);
+        if(field.type().subtype().id() == ID_symbol)
+        {
+          initialize_all_needed_classes_from_pointer(
+            to_pointer_type(field.type()), ns, needed_lazy_methods);
+        }
+        else
+        {
+          // If raw structs were possible this would lead to missed
+          // dependencies, as both array element and specialised generic type
+          // information cannot be obtained in this case.
+          // We should therefore only be skipping pointers such as the uint16t*
+          // in our internal String representation.
+          INVARIANT(
+            field.type().subtype().id() != ID_struct,
+            "struct types should be referred to by symbol at this stage");
+        }
       }
     }
   }
