@@ -106,7 +106,7 @@ symbolt generate_java_generic_typet::operator()(
 
   const java_specialized_generic_class_typet new_java_class{
     generic_name,
-    class_definition.get_tag(),
+    class_definition,
     replacement_components,
     existing_generic_type.generic_type_arguments()};
 
