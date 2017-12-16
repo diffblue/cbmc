@@ -11,6 +11,7 @@ Author:
 #include <testing-utils/catch.hpp>
 
 #include <analyses/call_graph.h>
+#include <analyses/call_graph_helpers.h>
 
 #include <util/symbol_table.h>
 #include <util/std_code.h>
@@ -54,6 +55,7 @@ SCENARIO("call_graph",
     // {
     //    A();
     //    B();
+    //    B();
     // }
     // void B()
     // {
@@ -72,8 +74,11 @@ SCENARIO("call_graph",
       call1.function()=symbol_exprt("A", void_function_type);
       code_function_callt call2;
       call2.function()=symbol_exprt("B", void_function_type);
+      code_function_callt call3;
+      call3.function()=symbol_exprt("B", void_function_type);
       calls.move_to_operands(call1);
       calls.move_to_operands(call2);
+      calls.move_to_operands(call3);
 
       goto_model.symbol_table.add(
         create_void_function_symbol("A", calls));
@@ -104,12 +109,16 @@ SCENARIO("call_graph",
 
     WHEN("A call graph is constructed from the GOTO functions")
     {
-      THEN("We expect A -> { A, B }, B -> { C, D }")
+      THEN("We expect A -> { A, B, B }, B -> { C, D }")
       {
         const auto &check_graph=call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
-        REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B"}));
+        REQUIRE(check_graph.size()==5);
+        REQUIRE(multimap_key_matches(check_graph, "A", {"A", "B", "B"}));
         REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
+      }
+      THEN("No callsite data should be collected")
+      {
+        REQUIRE(call_graph_from_goto_functions.callsites.empty());
       }
     }
 
@@ -117,17 +126,145 @@ SCENARIO("call_graph",
     {
       call_grapht inverse_call_graph_from_goto_functions=
         call_graph_from_goto_functions.get_inverted();
-      THEN("We expect A -> { A }, B -> { A }, C -> { B }, D -> { B }")
+      THEN("We expect A -> { A }, B -> { A, A }, C -> { B }, D -> { B }")
       {
         const auto &check_graph=inverse_call_graph_from_goto_functions.graph;
-        REQUIRE(check_graph.size()==4);
+        REQUIRE(check_graph.size()==5);
         REQUIRE(multimap_key_matches(check_graph, "A", {"A"}));
-        REQUIRE(multimap_key_matches(check_graph, "B", {"A"}));
+        REQUIRE(multimap_key_matches(check_graph, "B", {"A", "A"}));
         REQUIRE(multimap_key_matches(check_graph, "C", {"B"}));
         REQUIRE(multimap_key_matches(check_graph, "D", {"B"}));
       }
     }
 
-  }
+    WHEN("A call graph is constructed with call-site tracking")
+    {
+      call_grapht call_graph_from_goto_functions(goto_model, true);
+      THEN("We expect two callsites for the A -> B edge, one for all others")
+      {
+        const auto &check_callsites=call_graph_from_goto_functions.callsites;
+        for(const auto &edge : call_graph_from_goto_functions.graph)
+        {
+          if(edge==call_grapht::grapht::value_type("A", "B"))
+            REQUIRE(check_callsites.at(edge).size()==2);
+          else
+            REQUIRE(check_callsites.at(edge).size()==1);
+        }
+      }
+      WHEN("Such a graph is inverted")
+      {
+        call_grapht inverted=call_graph_from_goto_functions.get_inverted();
+        THEN("The callsite data should be discarded")
+        {
+          REQUIRE(inverted.callsites.empty());
+        }
+      }
+    }
 
+    WHEN("A call-graph is constructed rooted at B")
+    {
+      call_grapht call_graph_from_b =
+        call_grapht::create_from_root_function(goto_model, "B", false);
+      THEN("We expect only B -> C and B -> D in the resulting graph")
+      {
+        const auto &check_graph=call_graph_from_b.graph;
+        REQUIRE(check_graph.size()==2);
+        REQUIRE(multimap_key_matches(check_graph, "B", {"C", "D"}));
+      }
+    }
+
+    WHEN("The call graph is exported as a grapht")
+    {
+      call_grapht::directed_grapht exported=
+        call_graph_from_goto_functions.get_directed_graph();
+
+      typedef call_grapht::directed_grapht::node_indext node_indext;
+      std::map<irep_idt, node_indext> nodes_by_name;
+      for(node_indext i=0; i<exported.size(); ++i)
+        nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect edges A -> { A, B }, B -> { C, D }")
+      {
+        // Note that means the extra A -> B edge has gone away (the grapht
+        // structure can't represent the parallel edge)
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["A"]));
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["B"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["C"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["D"]));
+      }
+
+      THEN("We expect A to have successors {A, B}")
+      {
+        std::set<irep_idt> successors = get_callees(exported, "A");
+        REQUIRE(successors.size() == 2);
+        REQUIRE(successors.count("A"));
+        REQUIRE(successors.count("B"));
+      }
+
+      THEN("We expect C to have predecessors {B}")
+      {
+        std::set<irep_idt> predecessors = get_callers(exported, "C");
+        REQUIRE(predecessors.size() == 1);
+        REQUIRE(predecessors.count("B"));
+      }
+
+      THEN("We expect all of {A, B, C, D} to be reachable from A")
+      {
+        std::set<irep_idt> successors =
+          get_reachable_functions(exported, "A");
+        REQUIRE(successors.size() == 4);
+        REQUIRE(successors.count("A"));
+        REQUIRE(successors.count("B"));
+        REQUIRE(successors.count("C"));
+        REQUIRE(successors.count("D"));
+      }
+
+      THEN("We expect {D, B, A} to be able to reach D")
+      {
+        std::set<irep_idt> predecessors =
+          get_reaching_functions(exported, "D");
+        REQUIRE(predecessors.size() == 3);
+        REQUIRE(predecessors.count("A"));
+        REQUIRE(predecessors.count("B"));
+        REQUIRE(predecessors.count("D"));
+      }
+    }
+
+    WHEN("The call graph, with call sites, is exported as a grapht")
+    {
+      call_grapht call_graph_from_goto_functions(goto_model, true);
+      call_grapht::directed_grapht exported=
+        call_graph_from_goto_functions.get_directed_graph();
+
+      typedef call_grapht::directed_grapht::node_indext node_indext;
+      std::map<irep_idt, node_indext> nodes_by_name;
+      for(node_indext i=0; i<exported.size(); ++i)
+        nodes_by_name[exported[i].function]=i;
+
+      THEN("We expect edges A -> { A, B }, B -> { C, D }")
+      {
+        // Note that means the extra A -> B edge has gone away (the grapht
+        // structure can't represent the parallel edge)
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["A"]));
+        REQUIRE(exported.has_edge(nodes_by_name["A"], nodes_by_name["B"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["C"]));
+        REQUIRE(exported.has_edge(nodes_by_name["B"], nodes_by_name["D"]));
+      }
+
+      THEN("We expect all edges to have one callsite apart from A -> B with 2")
+      {
+        for(node_indext i=0; i<exported.size(); ++i)
+        {
+          const auto &node=exported[i];
+          for(const auto &edge : node.out)
+          {
+            if(i==nodes_by_name["A"] && edge.first==nodes_by_name["B"])
+              REQUIRE(edge.second.callsites.size()==2);
+            else
+              REQUIRE(edge.second.callsites.size()==1);
+          }
+        }
+      }
+    }
+  }
 }

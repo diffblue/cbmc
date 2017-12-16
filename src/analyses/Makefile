@@ -1,5 +1,6 @@
 SRC = ai.cpp \
       call_graph.cpp \
+      call_graph_helpers.cpp \
       constant_propagator.cpp \
       custom_bitvector_analysis.cpp \
       dependence_graph.cpp \
