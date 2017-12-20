@@ -233,7 +233,7 @@ static std::string type2name(
   else if(type.id()==ID_incomplete_c_enum)
     result +="EN?";
   else if(type.id()==ID_c_bit_field)
-    result+="BF"+type.get_string(ID_size);
+    result+="BF"+type.get_string(ID_width);
   else if(type.id()==ID_vector)
     result+="VEC"+type.get_string(ID_size);
   else
