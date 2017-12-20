@@ -214,6 +214,7 @@ bool is_goto_binary(const std::string &filename)
 
 static void rename_symbols_in_function(
   goto_functionst::goto_functiont &function,
+  irep_idt &new_function_name,
   const rename_symbolt &rename_symbol)
 {
   goto_programt &program=function.body;
@@ -223,6 +224,9 @@ static void rename_symbols_in_function(
   {
     rename_symbol(iit->code);
     rename_symbol(iit->guard);
+    // we need to update the instruction's function field as
+    // well, with the new symbol for the function
+    iit->function=new_function_name;
   }
 }
 
@@ -256,7 +260,7 @@ static bool link_functions(
 
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
-      rename_symbols_in_function(src_it->second, rename_symbol);
+      rename_symbols_in_function(src_it->second, final_id, rename_symbol);
 
       goto_functionst::goto_functiont &in_dest_symbol_table=
         dest_functions.function_map[final_id];
@@ -275,7 +279,7 @@ static bool link_functions(
          weak_symbols.find(final_id)!=weak_symbols.end())
       {
         // the one with body wins!
-        rename_symbols_in_function(src_func, rename_symbol);
+        rename_symbols_in_function(src_func, final_id, rename_symbol);
 
         in_dest_symbol_table.body.swap(src_func.body);
         in_dest_symbol_table.type=src_func.type;
@@ -323,7 +327,10 @@ static bool link_functions(
 
   if(!macro_application.expr_map.empty())
     Forall_goto_functions(dest_it, dest_functions)
-      rename_symbols_in_function(dest_it->second, macro_application);
+    {
+      irep_idt final_id=dest_it->first;
+      rename_symbols_in_function(dest_it->second, final_id, macro_application);
+    }
 
   if(!object_type_updates.expr_map.empty())
   {
