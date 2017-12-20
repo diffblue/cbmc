@@ -1,0 +1,7 @@
+CORE
+Test.class
+--refine-strings --function Test.check --unwind 4 --string-max-length 3 --java-assume-inputs-non-null
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--

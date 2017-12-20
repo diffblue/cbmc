@@ -1,0 +1,14 @@
+CORE
+Test.class
+--refine-strings --function Test.check2 --unwind 10 --string-max-length 10 --java-assume-inputs-non-null
+^EXIT=10$
+^SIGNAL=0$
+assertion at file Test.java line 32 .* SUCCESS
+assertion at file Test.java line 34 .* SUCCESS
+assertion at file Test.java line 36 .* SUCCESS
+assertion at file Test.java line 38 .* SUCCESS
+assertion at file Test.java line 40 .* SUCCESS
+assertion at file Test.java line 42 .* SUCCESS
+assertion at file Test.java line 43 .* FAILURE
+^VERIFICATION FAILED$
+--
