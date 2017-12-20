@@ -456,12 +456,13 @@ public:
   /// parameters and name.
   /// \param generic_name: The new name for the class
   ///   (like Generic<java::Float>)
-  /// \param tag: The name for the original class (like java::Generic)
+  /// \param originating_class: The name for the original class (like
+  ///   java::Generic)
   /// \param new_components: The specialised components
   /// \return The newly constructed class.
   java_specialized_generic_class_typet(
     const irep_idt &generic_name,
-    const irep_idt &tag,
+    const java_class_typet &originating_class,
     const struct_typet::componentst &new_components,
     const generic_type_argumentst &specialised_parameters)
   {
@@ -469,7 +470,8 @@ public:
     set(ID_name, "java::" + id2string(generic_name));
     set(ID_base_name, id2string(generic_name));
     components() = new_components;
-    set_tag(tag);
+    set_tag(originating_class.get_tag());
+    set_access(originating_class.get_access());
 
     generic_type_arguments() = specialised_parameters;
   }
