@@ -1,0 +1,9 @@
+CORE
+main.c
+file1.c file2.c --dependence-graph --show
+^EXIT=0$
+^SIGNAL=0$
+--
+Assertion .+ failed
+--
+
