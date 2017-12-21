@@ -1,0 +1,15 @@
+CORE
+main.c
+--show-goto-functions --json-ui
+^EXIT=0$
+^SIGNAL=0$
+BF1\{U8\}\$U8\$\'b11\'
+BF1\{U8\}\$U8\$\'b22\'
+BF2\{U8\}\$U8\$\'b34\'
+BF4\{U8\}\$U8\$\'b58\'
+--
+--
+
+Checks that type2name generates the right names for structs containing bitfields,
+in particular including the width of bitfield fields.
+
