@@ -27,6 +27,9 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/format_type.h>
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
+#include <langapi/language_util.h>
+#include <java_bytecode/java_types.h>
+#include <util/union_find_replace.h>
 
 ///  ### Universally quantified string constraint
 ///
@@ -54,100 +57,40 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 ///      \f$f\f$ [explicitly stated, implied].
 ///
 /// \todo The fact that we follow this grammar is not enforced at the moment.
-class string_constraintt : public exprt
+class string_constraintt final
 {
 public:
   // String constraints are of the form
   // forall univ_var in [lower_bound,upper_bound[. premise => body
-
-  const exprt &premise() const
-  {
-    return op0();
-  }
-
-  const exprt &body() const
-  {
-    return op1();
-  }
-
-  const symbol_exprt &univ_var() const
-  {
-    return to_symbol_expr(op2());
-  }
-
-  const exprt &upper_bound() const
-  {
-    return op3();
-  }
-
-  const exprt &lower_bound() const
-  {
-    return operands()[4];
-  }
-
- private:
-  string_constraintt();
-
- public:
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_inf,
-    const exprt &bound_sup,
-    const exprt &body):
-    exprt(ID_string_constraint)
-  {
-    copy_to_operands(true_exprt(), body);
-    copy_to_operands(_univ_var, bound_sup, bound_inf);
-  }
-
-  // Default bound inferior is 0
-  string_constraintt(
-    const symbol_exprt &_univ_var,
-    const exprt &bound_sup,
-    const exprt &body):
-    string_constraintt(
-      _univ_var,
-      from_integer(0, _univ_var.type()),
-      bound_sup,
-      body)
-  {}
-
-  exprt univ_within_bounds() const
-  {
-    return and_exprt(
-      binary_relation_exprt(lower_bound(), ID_le, univ_var()),
-      binary_relation_exprt(upper_bound(), ID_gt, univ_var()));
-  }
+  exprt premise = true_exprt(); // Index guard
+  exprt body;                   // value constraint
+  symbol_exprt univ_var;
+  // \todo avoid depending on java type
+  exprt lower_bound = from_integer(0, java_int_type());
+  exprt upper_bound;
 };
 
-extern inline const string_constraintt &to_string_constraint(const exprt &expr)
+inline void
+replace(string_constraintt &axiom, const union_find_replacet &symbol_resolve)
 {
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<const string_constraintt &>(expr);
+  symbol_resolve.replace_expr(axiom.premise);
+  symbol_resolve.replace_expr(axiom.body);
+  symbol_resolve.replace_expr(axiom.univ_var);
+  symbol_resolve.replace_expr(axiom.upper_bound);
+  symbol_resolve.replace_expr(axiom.lower_bound);
 }
 
-extern inline string_constraintt &to_string_constraint(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_constraint && expr.operands().size()==5);
-  return static_cast<string_constraintt &>(expr);
-}
+exprt univ_within_bounds(const string_constraintt &axiom);
 
 /// Used for debug printing.
 /// \param [in] ns: namespace for `from_expr`
 /// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
-inline std::string to_string(const string_constraintt &expr)
-{
-  std::ostringstream out;
-  out << "forall " << format(expr.univ_var()) << " in ["
-      << format(expr.lower_bound()) << ", " << format(expr.upper_bound())
-      << "). " << format(expr.premise()) << " => " << format(expr.body());
-  return out.str();
-}
+std::string to_string(const string_constraintt &expr);
 
 /// Constraints to encode non containement of strings.
-class string_not_contains_constraintt : public exprt
+class string_not_contains_constraintt final : public exprt
 {
 public:
   // string_not contains_constraintt are formula of the form:
@@ -209,38 +152,11 @@ public:
 /// \param [in] identifier: identifier for `from_expr`
 /// \param [in] expr: constraint to render
 /// \return rendered string
-inline std::string to_string(const string_not_contains_constraintt &expr)
-{
-  std::ostringstream out;
-  out << "forall x in [" << format(expr.univ_lower_bound()) << ", "
-      << format(expr.univ_upper_bound()) << "). " << format(expr.premise())
-      << " => ("
-      << "exists y in [" << format(expr.exists_lower_bound()) << ", "
-      << format(expr.exists_upper_bound()) << "). " << format(expr.s0())
-      << "[x+y] != " << format(expr.s1()) << "[y])";
-  return out.str();
-}
+std::string to_string(const string_not_contains_constraintt &expr);
 
-inline const string_not_contains_constraintt
-&to_string_not_contains_constraint(const exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
-  DATA_INVARIANT(
-    expr.operands().size()==7,
-    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
-      "operands"));
-  return static_cast<const string_not_contains_constraintt &>(expr);
-}
+const string_not_contains_constraintt &
+to_string_not_contains_constraint(const exprt &expr);
 
-inline string_not_contains_constraintt
-&to_string_not_contains_constraint(exprt &expr)
-{
-  PRECONDITION(expr.id()==ID_string_not_contains_constraint);
-  DATA_INVARIANT(
-    expr.operands().size()==7,
-    string_refinement_invariantt("string_not_contains_constraintt must have 7 "
-      "operands"));
-  return static_cast<string_not_contains_constraintt &>(expr);
-}
+string_not_contains_constraintt &to_string_not_contains_constraint(exprt &expr);
 
 #endif

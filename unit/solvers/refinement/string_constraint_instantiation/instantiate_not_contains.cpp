@@ -204,7 +204,6 @@ SCENARIO("instantiate_not_contains",
       constraints.end(),
       axioms,
       [&](const std::string &accu, string_constraintt sc) { // NOLINT
-        simplify(sc, ns);
         return accu + from_expr(ns, "", sc) + "\n\n";
       });
 
