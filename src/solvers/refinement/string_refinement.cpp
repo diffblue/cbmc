@@ -1405,10 +1405,10 @@ static exprt negation_of_constraint(const string_constraintt &axiom)
 
   // If the premise is false, the implication is trivially true, so the
   // negation is false.
-  if(axiom.premise == false_exprt())
+  if(axiom.index_guard == false_exprt())
     return false_exprt();
 
-  const and_exprt premise(axiom.premise, univ_within_bounds(axiom));
+  const and_exprt premise(axiom.index_guard, univ_within_bounds(axiom));
   const and_exprt negaxiom(premise, not_exprt(axiom.body));
 
   return negaxiom;
@@ -1531,7 +1531,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     const symbol_exprt &univ_var = axiom.univ_var;
     const exprt &bound_inf = axiom.lower_bound;
     const exprt &bound_sup = axiom.upper_bound;
-    const exprt &prem = axiom.premise;
+    const exprt &prem = axiom.index_guard;
     INVARIANT(
       prem == true_exprt(), "string constraint premises are not supported");
 
@@ -1539,7 +1539,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     axiom_in_model.univ_var = univ_var;
     axiom_in_model.lower_bound = get(bound_inf);
     axiom_in_model.upper_bound = get(bound_sup);
-    axiom_in_model.premise = get(prem);
+    axiom_in_model.index_guard = get(prem);
     axiom_in_model.body = get(axiom.body);
 
     exprt negaxiom=negation_of_constraint(axiom_in_model);
@@ -1634,7 +1634,7 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
         const exprt &val=v.second;
         const string_constraintt &axiom=axioms.universal[v.first];
 
-        implies_exprt instance(axiom.premise, axiom.body);
+        implies_exprt instance(axiom.index_guard, axiom.body);
         replace_expr(axiom.univ_var, val, instance);
         // We are not sure the index set contains only positive numbers
         and_exprt bounds(
@@ -2135,7 +2135,7 @@ static exprt instantiate(
     and_exprt(
       binary_relation_exprt(axiom.univ_var, ID_ge, axiom.lower_bound),
       binary_relation_exprt(axiom.univ_var, ID_lt, axiom.upper_bound),
-      axiom.premise),
+      axiom.index_guard),
     axiom.body);
   replace_expr(axiom.univ_var, r, instance);
   return instance;
