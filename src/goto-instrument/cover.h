@@ -16,9 +16,9 @@ Date: May 2016
 
 #include <goto-programs/goto_model.h>
 
-#include <util/cmdline.h>
-
 class message_handlert;
+class cmdlinet;
+class optionst;
 
 enum class coverage_criteriont
 {
@@ -44,14 +44,16 @@ void instrument_cover_goals(
   coverage_criteriont,
   message_handlert &message_handler);
 
+void parse_cover_options(const cmdlinet &, optionst &);
+
 bool instrument_cover_goals(
-  const cmdlinet &,
+  const optionst &,
   const symbol_tablet &,
   goto_functionst &,
   message_handlert &);
 
 bool instrument_cover_goals(
-  const cmdlinet &,
+  const optionst &,
   goto_modelt &,
   message_handlert &);
 

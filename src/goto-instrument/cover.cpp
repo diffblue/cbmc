@@ -16,6 +16,8 @@ Date: May 2016
 #include <util/config.h>
 #include <util/message.h>
 #include <util/make_unique.h>
+#include <util/cmdline.h>
+#include <util/options.h>
 
 #include "cover_basic_blocks.h"
 #include "cover_filter.h"
@@ -141,6 +143,28 @@ parse_coverage_criterion(const std::string &criterion_string)
   return c;
 }
 
+/// Parses coverage-related  command line options
+/// \param cmdline: the command line
+/// \param options: the options
+void parse_cover_options(const cmdlinet &cmdline, optionst &options)
+{
+  options.set_option("cover", cmdline.get_values("cover"));
+  std::string cover_include_pattern =
+    cmdline.get_value("cover-include-pattern");
+  if(cmdline.isset("cover-function-only"))
+  {
+    std::regex special_characters(
+      "\\.|\\\\|\\*|\\+|\\?|\\{|\\}|\\[|\\]|\\(|\\)|\\^|\\$|\\|");
+    cover_include_pattern =
+      ".*" + std::regex_replace(config.main, special_characters, "\\$&") + ".*";
+  }
+  options.set_option("cover-include-pattern", cover_include_pattern);
+  options.set_option("no-trivial-tests", cmdline.isset("no-trivial-tests"));
+  options.set_option(
+    "cover-traces-must-terminate",
+    cmdline.isset("cover-traces-must-terminate"));
+}
+
 /// Applies instrumenters to given goto functions
 /// \param goto_functions: the goto functions
 /// \param instrumenters: the instrumenters
@@ -162,12 +186,12 @@ void instrument_cover_goals(
 }
 
 /// Instruments goto functions based on given command line options
-/// \param cmdline: the command line
+/// \param options: the options
 /// \param symbol_table: the symbol table
 /// \param goto_functions: the goto functions
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
-  const cmdlinet &cmdline,
+  const optionst &options,
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   message_handlert &message_handler)
@@ -183,7 +207,7 @@ bool instrument_cover_goals(
 
   cover_instrumenterst instrumenters;
 
-  std::list<std::string> criteria_strings=cmdline.get_values("cover");
+  optionst::value_listt criteria_strings = options.get_list_option("cover");
   bool keep_assertions=false;
 
   for(const auto &criterion_string : criteria_strings)
@@ -230,14 +254,7 @@ bool instrument_cover_goals(
 
   // cover entry point function only
   std::string cover_include_pattern =
-    cmdline.get_value("cover-include-pattern");
-  if(cmdline.isset("cover-function-only"))
-  {
-    std::regex special_characters(
-      "\\.|\\\\|\\*|\\+|\\?|\\{|\\}|\\[|\\]|\\(|\\)|\\^|\\$|\\|");
-    cover_include_pattern =
-      ".*" + std::regex_replace(config.main, special_characters, "\\$&") + ".*";
-  }
+    options.get_option("cover-include-pattern");
   if(!cover_include_pattern.empty())
   {
     function_filters.add(
@@ -245,7 +262,7 @@ bool instrument_cover_goals(
         message_handler, cover_include_pattern));
   }
 
-  if(cmdline.isset("no-trivial-tests"))
+  if(options.get_bool_option("no-trivial-tests"))
     function_filters.add(
       util_make_unique<trivial_functions_filtert>(message_handler));
 
@@ -257,7 +274,7 @@ bool instrument_cover_goals(
   function_filters.report_anomalies();
   goal_filters.report_anomalies();
 
-  if(cmdline.isset("cover-traces-must-terminate"))
+  if(options.get_bool_option("cover-traces-must-terminate"))
   {
     // instrument an additional goal in CPROVER_START. This will rephrase
     // the reachability problem  by asking BMC to provide a solution that
@@ -279,16 +296,16 @@ bool instrument_cover_goals(
 }
 
 /// Instruments a goto model based on given command line options
-/// \param cmdline: the command line
+/// \param options: the options
 /// \param goto_model: the goto model
 /// \param message_handler: a message handler
 bool instrument_cover_goals(
-  const cmdlinet &cmdline,
+  const optionst &options,
   goto_modelt &goto_model,
   message_handlert &message_handler)
 {
   return instrument_cover_goals(
-    cmdline,
+    options,
     goto_model.symbol_table,
     goto_model.goto_functions,
     message_handler);
