@@ -69,6 +69,11 @@ public:
     return data_.size();
   }
 
+  const key_type &at(size_type t) const
+  {
+    return data_.at(t);
+  }
+
   key_type &operator[](size_type t)
   {
     return data_[t];
