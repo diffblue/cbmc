@@ -19,10 +19,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 /// equal.
 /// \param res: array of characters for the result
 /// \param sval: a string constant
+/// \param guard: condition under which the axiom should apply, true by default
 /// \return integer expression equal to zero
 exprt string_constraint_generatort::add_axioms_for_constant(
   const array_string_exprt &res,
-  irep_idt sval)
+  irep_idt sval,
+  const exprt &guard)
 {
   const typet &index_type = res.length().type();
   const typet &char_type = res.content().type().subtype();
@@ -43,12 +45,12 @@ exprt string_constraint_generatort::add_axioms_for_constant(
     const exprt idx = from_integer(i, index_type);
     const exprt c = from_integer(str[i], char_type);
     const equal_exprt lemma(res[idx], c);
-    axioms.push_back(lemma);
+    axioms.push_back(implies_exprt(guard, lemma));
   }
 
   const exprt s_length = from_integer(str.size(), index_type);
 
-  axioms.push_back(res.axiom_for_has_length(s_length));
+  axioms.push_back(implies_exprt(guard, equal_exprt(res.length(), s_length)));
   return from_integer(0, get_return_code_type());
 }
 
