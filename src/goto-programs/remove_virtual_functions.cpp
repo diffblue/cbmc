@@ -181,10 +181,11 @@ void remove_virtual_functionst::remove_virtual_function(
         // Cast the `this` pointer to the correct type for the new callee:
         const auto &callee_type=
           to_code_type(ns.lookup(fun.symbol_expr.get_identifier()).type);
+        const code_typet::parametert *this_param = callee_type.get_this();
         INVARIANT(
-          callee_type.has_this(),
+          this_param != nullptr,
           "Virtual function callees must have a `this` argument");
-        typet need_type=callee_type.parameters()[0].type();
+        typet need_type=this_param->type();
         if(!type_eq(newcall.arguments()[0].type(), need_type, ns))
           newcall.arguments()[0].make_typecast(need_type);
       }
