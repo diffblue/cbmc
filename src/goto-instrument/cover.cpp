@@ -1187,7 +1187,7 @@ void instrument_cover_goals(
           source_locationt source_location=
             basic_blocks.source_location_of(block_nr);
 
-          // check whether the current goal already exists
+          // check whether the current goal needs to be covered
           if(
             !source_location.get_file().empty() &&
             !source_location.is_built_in() && cover_curr_function)
