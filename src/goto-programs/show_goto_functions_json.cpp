@@ -63,15 +63,16 @@ json_objectt show_goto_functions_jsont::convert(
         instruction_entry["instructionId"]=
           json_stringt(instruction.to_string());
 
-        if(instruction.code.source_location().is_not_nil())
+        if(instruction.source_location.is_not_nil())
         {
           instruction_entry["sourceLocation"]=
-            json(instruction.code.source_location());
+            json(instruction.source_location);
 
-          if(instruction.code.source_location().get_goto_location()!="")
+          if(!instruction.source_location.get_goto_location().empty())
           {
             instruction_entry["originalGOTOLocation"]=
-              json_stringt(id2string(instruction.code.source_location().get_goto_location()));
+              json_stringt(
+                id2string(instruction.source_location.get_goto_location()));
           }
         }
 
