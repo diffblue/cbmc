@@ -49,15 +49,13 @@ void instrument_cover_goals(
   const symbol_tablet &,
   goto_functionst &,
   coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false);
+  message_handlert &message_handler);
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_programt &,
   coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false);
+  message_handlert &message_handler);
 
 void instrument_cover_goals(
   const symbol_tablet &,
@@ -65,18 +63,15 @@ void instrument_cover_goals(
   coverage_criteriont,
   message_handlert &message_handler,
   coverage_goalst &,
-  bool function_only=false,
   bool ignore_trivial=false,
-  const std::string &cover_inclue_pattern="");
+  const std::string &cover_include_pattern="");
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_programt &,
   coverage_criteriont,
   message_handlert &message_handler,
-  coverage_goalst &goals,
-  bool function_only=false,
-  bool ignore_trivial=false);
+  coverage_goalst &goals);
 
 bool instrument_cover_goals(
   const cmdlinet &,

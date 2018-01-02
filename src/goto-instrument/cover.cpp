@@ -1193,8 +1193,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_programt &goto_program,
   coverage_criteriont criterion,
-  message_handlert &message_handler,
-  bool function_only)
+  message_handlert &message_handler)
 {
   coverage_goalst goals; // empty already covered goals
   instrument_cover_goals(
@@ -1202,9 +1201,7 @@ void instrument_cover_goals(
     goto_program,
     criterion,
     message_handler,
-    goals,
-    function_only,
-    false);
+    goals);
 }
 
 /// Call a goto_program trivial unless it has: * Any declarations * At least 2
@@ -1238,14 +1235,8 @@ void instrument_cover_goals(
   goto_programt &goto_program,
   coverage_criteriont criterion,
   message_handlert &message_handler,
-  coverage_goalst &goals,
-  bool function_only,
-  bool ignore_trivial)
+  coverage_goalst &goals)
 {
-  // exclude trivial coverage goals of a goto program
-  if(ignore_trivial && program_is_trivial(goto_program))
-    return;
-
   // ignore if built-in library
   if(!goto_program.instructions.empty() &&
      goto_program.instructions.front().source_location.is_built_in())
@@ -1262,19 +1253,11 @@ void instrument_cover_goals(
 
   Forall_goto_program_instructions(i_it, goto_program)
   {
-    std::string curr_function=id2string(i_it->function);
-
-    // if the --cover-function-only flag is set, then we only add coverage
-    // instrumentation for the entry function
-    bool cover_curr_function=
-      !function_only ||
-      curr_function.find(config.main)!=std::string::npos;
-
     switch(criterion)
     {
     case coverage_criteriont::ASSERTION:
       // turn into 'assert(false)' to avoid simplification
-      if(i_it->is_assert() && cover_curr_function)
+      if(i_it->is_assert())
       {
         i_it->guard=false_exprt();
         i_it->source_location.set(ID_coverage_criterion, coverage_criterion);
@@ -1285,7 +1268,7 @@ void instrument_cover_goals(
 
     case coverage_criteriont::COVER:
       // turn __CPROVER_cover(x) into 'assert(!x)'
-      if(i_it->is_function_call() && cover_curr_function)
+      if(i_it->is_function_call())
       {
         const code_function_callt &code_function_call=
           to_code_function_call(i_it->code);
@@ -1327,8 +1310,7 @@ void instrument_cover_goals(
           // check whether the current goal already exists
           if(!goals.is_existing_goal(source_location) &&
              !source_location.get_file().empty() &&
-             !source_location.is_built_in() &&
-             cover_curr_function)
+             !source_location.is_built_in())
           {
             std::string comment="block "+b;
             const irep_idt function=i_it->function;
@@ -1351,8 +1333,7 @@ void instrument_cover_goals(
       if(i_it->is_assert())
         i_it->make_skip();
 
-      if(i_it==goto_program.instructions.begin() &&
-         cover_curr_function)
+      if(i_it==goto_program.instructions.begin())
       {
         // we want branch coverage to imply 'entry point of function'
         // coverage
@@ -1370,7 +1351,7 @@ void instrument_cover_goals(
         t->function=i_it->function;
       }
 
-      if(i_it->is_goto() && !i_it->guard.is_true() && cover_curr_function &&
+      if(i_it->is_goto() && !i_it->guard.is_true() &&
          !i_it->source_location.is_built_in())
       {
         std::string b=
@@ -1409,7 +1390,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Conditions are all atomic predicates in the programs.
-      if(cover_curr_function && !i_it->source_location.is_built_in())
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
 
@@ -1451,7 +1432,7 @@ void instrument_cover_goals(
         i_it->make_skip();
 
       // Decisions are maximal Boolean combinations of conditions.
-      if(cover_curr_function && !i_it->source_location.is_built_in())
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> decisions=collect_decisions(i_it);
 
@@ -1497,7 +1478,7 @@ void instrument_cover_goals(
       // 3. Each condition in a decision takes every possible outcome
       // 4. Each condition in a decision is shown to independently
       //    affect the outcome of the decision.
-      if(cover_curr_function && !i_it->source_location.is_built_in())
+      if(!i_it->source_location.is_built_in())
       {
         const std::set<exprt> conditions=collect_conditions(i_it);
         const std::set<exprt> decisions=collect_decisions(i_it);
@@ -1598,7 +1579,6 @@ void instrument_cover_goals(
   coverage_criteriont criterion,
   message_handlert &message_handler,
   coverage_goalst &goals,
-  bool function_only,
   bool ignore_trivial,
   const std::string &cover_include_pattern)
 {
@@ -1608,6 +1588,10 @@ void instrument_cover_goals(
 
   Forall_goto_functions(f_it, goto_functions)
   {
+    // exclude trivial coverage goals of a goto program
+    if(ignore_trivial && program_is_trivial(f_it->second.body))
+      return;
+
     if(f_it->first==goto_functions.entry_point() ||
        f_it->first==(CPROVER_PREFIX "initialize") ||
        f_it->second.is_hidden() ||
@@ -1623,9 +1607,7 @@ void instrument_cover_goals(
       f_it->second.body,
       criterion,
       message_handler,
-      goals,
-      function_only,
-      ignore_trivial);
+      goals);
   }
 }
 
@@ -1633,8 +1615,7 @@ void instrument_cover_goals(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions,
   coverage_criteriont criterion,
-  message_handlert &message_handler,
-  bool function_only)
+  message_handlert &message_handler)
 {
   // empty set of existing goals
   coverage_goalst goals;
@@ -1644,7 +1625,6 @@ void instrument_cover_goals(
     criterion,
     message_handler,
     goals,
-    function_only,
     false,
     "");
 }
@@ -1718,6 +1698,16 @@ bool instrument_cover_goals(
     }
   }
 
+  // cover entry point function only
+  std::string cover_include_pattern=cmdline.get_value("cover-include-pattern");
+  if(cmdline.isset("cover-function-only"))
+  {
+    std::regex special_characters(
+      "\\.|\\\\|\\*|\\+|\\?|\\{|\\}|\\[|\\]|\\(|\\)|\\^|\\$|\\|");
+    cover_include_pattern=
+      std::regex_replace(config.main, special_characters, "\\$&");
+  }
+
   // check existing test goals
   coverage_goalst existing_goals;
   if(cmdline.isset("existing-coverage"))
@@ -1748,9 +1738,8 @@ bool instrument_cover_goals(
       criterion,
       message_handler,
       existing_goals,
-      cmdline.isset("cover-function-only"),
       cmdline.isset("no-trivial-tests"),
-      cmdline.get_value("cover-include-pattern"));
+      cover_include_pattern);
   }
 
   // check whether all existing goals match with instrumented goals
