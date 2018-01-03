@@ -68,10 +68,11 @@ void generate_class_stub(
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst)
 {
-  class_typet class_type;
+  java_class_typet class_type;
 
   class_type.set_tag(class_name);
   class_type.set(ID_base_name, class_name);
+  class_type.set_access(ID_default);
 
   class_type.set(ID_incomplete_class, true);
 
