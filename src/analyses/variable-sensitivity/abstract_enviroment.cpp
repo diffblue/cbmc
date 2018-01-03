@@ -248,6 +248,22 @@ bool abstract_environmentt::assign(
 
   // Write the value for the root symbol back into the map
   assert(lhs_type==rhs_type);
+
+  // check if we can reduce the rhs to a constant
+  // if not, we should write top
+  // TODO: This throws away useful information,
+  //       but we don't have anything much better right
+  //       now; We can't guarantee that the value of the
+  //       expression won't change in the future, so carrying
+  //       the expression as if its value was constant will
+  //       lead to incorrect statements about the code
+  exprt final_value_constant = final_value->to_constant();
+  if(final_value_constant.is_nil()) {
+    final_value = abstract_object_factory(rhs_type, ns, true, false);
+  } else {
+    final_value = eval(final_value_constant, ns);
+  }
+
   // If LHS was directly the symbol
   if(s.id()==ID_symbol)
   {
