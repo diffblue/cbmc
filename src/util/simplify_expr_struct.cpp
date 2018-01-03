@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "pointer_offset_size.h"
 #include "arith_tools.h"
+#include "base_type.h"
 
 bool simplify_exprt::simplify_member(exprt &expr)
 {
@@ -206,6 +207,17 @@ bool simplify_exprt::simplify_member(exprt &expr)
           return false;
         }
       }
+    }
+  }
+  else if(op.id() == ID_typecast)
+  {
+    // Try to look through member(cast(x)) if the cast is between structurally
+    // identical types:
+    if(base_type_eq(op_type, op.op0().type(), ns))
+    {
+      expr.op0() = op.op0();
+      simplify_member(expr);
+      return false;
     }
   }
   else if(op.id()==ID_if)
