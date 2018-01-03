@@ -12,13 +12,18 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_ADJUST_FLOAT_EXPRESSIONS_H
 #define CPROVER_GOTO_SYMEX_ADJUST_FLOAT_EXPRESSIONS_H
 
+#include <goto-programs/goto_functions.h>
+
 class exprt;
 class namespacet;
-class goto_functionst;
 class goto_modelt;
 
 void adjust_float_expressions(
   exprt &expr,
+  const namespacet &ns);
+
+void adjust_float_expressions(
+  goto_functionst::goto_functiont &goto_function,
   const namespacet &ns);
 
 void adjust_float_expressions(

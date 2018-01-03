@@ -17,11 +17,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <memory> // unique_ptr
 
 #include "message.h"
+#include "symbol_table.h"
+#include "language.h"
 
-class symbol_tablet;
-class symbol_table_baset;
 class language_filet;
-class languaget;
 
 class language_modulet final
 {
@@ -52,7 +51,7 @@ public:
     const irep_idt &id,
     symbol_tablet &symbol_table);
 
-  language_filet();
+  explicit language_filet(const std::string &filename);
   language_filet(const language_filet &rhs);
 
   ~language_filet();
@@ -60,21 +59,44 @@ public:
 
 class language_filest:public messaget
 {
-public:
+private:
   typedef std::map<std::string, language_filet> file_mapt;
   file_mapt file_map;
 
-  // Contains pointers into file_mapt!
   typedef std::map<std::string, language_modulet> module_mapt;
   module_mapt module_map;
 
-  // Contains pointers into filemapt!
+  // Contains pointers into file_map!
   // This is safe-ish as long as this is std::map.
   typedef std::map<irep_idt, language_filet *> lazy_method_mapt;
   lazy_method_mapt lazy_method_map;
 
+public:
+  language_filet &add_file(const std::string &filename)
+  {
+    language_filet language_file(filename);
+    return file_map.emplace(filename, std::move(language_file)).first->second;
+  }
+
+  void remove_file(const std::string &filename)
+  {
+    // Clear relevant entries from lazy_method_map
+    language_filet *language_file = &file_map.at(filename);
+    id_sett files_methods;
+    for(const std::pair<irep_idt, language_filet *> &method : lazy_method_map)
+    {
+      if(method.second == language_file)
+        files_methods.insert(method.first);
+    }
+    for(const irep_idt &method_name : files_methods)
+      lazy_method_map.erase(method_name);
+
+    file_map.erase(filename);
+  }
+
   void clear_files()
   {
+    lazy_method_map.clear();
     file_map.clear();
   }
 
@@ -92,11 +114,6 @@ public:
 
   bool interfaces(symbol_tablet &symbol_table);
 
-  bool has_lazy_method(const irep_idt &id)
-  {
-    return lazy_method_map.count(id)!=0;
-  }
-
   // The method must have been added to the symbol table and registered
   // in lazy_method_map (currently always in language_filest::typecheck)
   // for this to be legal.
@@ -104,7 +121,10 @@ public:
     const irep_idt &id,
     symbol_tablet &symbol_table)
   {
-    return lazy_method_map.at(id)->convert_lazy_method(id, symbol_table);
+    PRECONDITION(symbol_table.has_symbol(id));
+    lazy_method_mapt::iterator it=lazy_method_map.find(id);
+    if(it!=lazy_method_map.end())
+      it->second->convert_lazy_method(id, symbol_table);
   }
 
   void clear()

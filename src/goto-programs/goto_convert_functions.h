@@ -16,6 +16,7 @@ Date: June 2003
 
 #include "goto_model.h"
 #include "goto_convert_class.h"
+#include "goto_functions.h"
 
 // convert it all!
 void goto_convert(
@@ -38,19 +39,18 @@ void goto_convert(
 class goto_convert_functionst:public goto_convertt
 {
 public:
-  void goto_convert();
-  void convert_function(const irep_idt &identifier);
+  void goto_convert(goto_functionst &functions);
+  void convert_function(
+    const irep_idt &identifier,
+    goto_functionst::goto_functiont &result);
 
   goto_convert_functionst(
     symbol_tablet &_symbol_table,
-    goto_functionst &_functions,
     message_handlert &_message_handler);
 
   virtual ~goto_convert_functionst();
 
 protected:
-  goto_functionst &functions;
-
   static bool hide(const goto_programt &);
 
   //

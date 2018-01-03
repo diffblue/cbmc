@@ -321,8 +321,7 @@ void java_record_outputs(
 main_function_resultt get_main_symbol(
   const symbol_table_baset &symbol_table,
   const irep_idt &main_class,
-  message_handlert &message_handler,
-  bool allow_no_body)
+  message_handlert &message_handler)
 {
   messaget message(message_handler);
 
@@ -347,14 +346,6 @@ main_function_resultt get_main_symbol(
     INVARIANT(
       symbol != nullptr,
       "resolve_friendly_method_name should return a symbol-table identifier");
-
-    // check if it has a body
-    if(symbol->value.is_nil() && !allow_no_body)
-    {
-      message.error()
-        << "main method `" << main_class << "' has no body" << messaget::eom;
-      return main_function_resultt::Error;
-    }
 
     return *symbol; // Return found function
   }
@@ -395,18 +386,7 @@ main_function_resultt get_main_symbol(
       return main_function_resultt::Error;  // give up with error, no main
     }
 
-    // function symbol
-    const symbolt &symbol = **matches.begin();
-
-    // check if it has a body
-    if(symbol.value.is_nil() && !allow_no_body)
-    {
-      message.error()
-        << "main method `" << main_class << "' has no body" << messaget::eom;
-      return main_function_resultt::Error;  // give up with error
-    }
-
-    return symbol; // Return found function
+    return **matches.begin(); // Return found function
   }
 }
 
@@ -464,7 +444,6 @@ bool java_entry_point(
     return true;
   symbolt symbol=res.main_function;
 
-  assert(!symbol.value.is_nil());
   assert(symbol.type.id()==ID_code);
 
   create_initialize(symbol_table);
@@ -483,6 +462,48 @@ bool java_entry_point(
     assume_init_pointers_not_null,
     object_factory_parameters,
     pointer_type_selector);
+}
+
+/// Creates the initialize methods again taking account of symbols added to the
+/// symbol table during instantiation of lazy methods since they were first
+/// created,
+/// \param symbol_table: global symbol table containing symbols to initialize
+/// \param main_class: the class containing the "main" entry point
+/// \param message_handler: message_handlert for logging
+/// \param assume_init_pointers_not_null: specifies behaviour for
+/// java_static_lifetime_init
+/// \param object_factory_parameters: specifies behaviour for
+/// java_static_lifetime_init
+/// \param pointer_type_selector: specifies behaviour for
+/// java_static_lifetime_init
+bool recreate_initialize(
+  symbol_table_baset &symbol_table,
+  const irep_idt &main_class,
+  message_handlert &message_handler,
+  bool assume_init_pointers_not_null,
+  const object_factory_parameterst &object_factory_parameters,
+  const select_pointer_typet &pointer_type_selector)
+{
+  messaget message(message_handler);
+  main_function_resultt res=
+    get_main_symbol(symbol_table, main_class, message_handler);
+  if(res.status!=main_function_resultt::Success)
+  {
+    // No initialization was originally created (yikes!) so we can't recreate
+    // it now
+    return res.status==main_function_resultt::Error;
+  }
+
+  create_initialize(symbol_table);
+
+  java_static_lifetime_init(
+    symbol_table,
+    res.main_function.location,
+    assume_init_pointers_not_null,
+    object_factory_parameters,
+    pointer_type_selector);
+
+  return false;
 }
 
 /// Generate a _start function for a specific function. See

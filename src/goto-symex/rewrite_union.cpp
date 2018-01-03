@@ -107,7 +107,7 @@ void rewrite_union(
   }
 }
 
-static void rewrite_union(
+void rewrite_union(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {

@@ -63,6 +63,8 @@ public:
     goto_functions=std::move(other.goto_functions);
     return *this;
   }
+
+  void unload(const irep_idt &name) { goto_functions.unload(name); }
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H

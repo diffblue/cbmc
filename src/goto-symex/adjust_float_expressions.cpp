@@ -179,7 +179,7 @@ void adjust_float_expressions(
   }
 }
 
-static void adjust_float_expressions(
+void adjust_float_expressions(
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns)
 {

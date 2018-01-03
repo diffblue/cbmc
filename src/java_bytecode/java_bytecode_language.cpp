@@ -295,6 +295,10 @@ bool java_bytecode_languaget::generate_support_functions(
   if(!res.is_success())
     return res.is_error();
 
+  // Load the main function into the symbol table to get access to its
+  // parameter names
+  convert_lazy_method(res.main_function.name, symbol_table);
+
   // generate the test harness in __CPROVER__start and a call the entry point
   return
     java_entry_point(
@@ -372,12 +376,33 @@ void java_bytecode_languaget::methods_provided(id_sett &methods) const
 /// to have a value representing the method body identical to that produced
 /// using eager method conversion.
 /// \param function_id: method ID to convert
-/// \param symbol_table: global symbol table
+/// \param symtab: global symbol table
 void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
-  symbol_tablet &symbol_table)
+  symbol_tablet &symtab)
 {
+  const symbolt &symbol = symtab.lookup_ref(function_id);
+  if(symbol.value.is_not_nil())
+    return;
+
+  journalling_symbol_tablet symbol_table=
+    journalling_symbol_tablet::wrap(symtab);
+
   convert_single_method(function_id, symbol_table);
+
+  // Instrument runtime exceptions (unless symbol is a stub)
+  if(symbol.value.is_not_nil())
+  {
+    java_bytecode_instrument_symbol(
+      symbol_table,
+      symbol_table.get_writeable_ref(function_id),
+      throw_runtime_exceptions,
+      get_message_handler());
+  }
+
+  // now typecheck this function
+  java_bytecode_typecheck_updated_symbols(
+    symbol_table, get_message_handler(), string_refinement_enabled);
 }
 
 /// \brief Convert a method (one whose type is known but whose body hasn't
@@ -466,7 +491,13 @@ bool java_bytecode_languaget::final(symbol_table_baset &symbol_table)
 {
   PRECONDITION(language_options_initialized);
 
-  return false;
+  return recreate_initialize(
+    symbol_table,
+    main_class,
+    get_message_handler(),
+    assume_inputs_non_null,
+    object_factory_parameters,
+    get_pointer_type_selector());
 }
 
 void java_bytecode_languaget::show_parse(std::ostream &out)

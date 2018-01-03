@@ -12,7 +12,10 @@
 
 #include <util/config.h>
 #include <util/language.h>
+#include <util/options.h>
 #include <util/suffix.h>
+
+#include <goto-programs/lazy_goto_model.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
@@ -34,11 +37,21 @@ symbol_tablet load_java_class(
 symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
-  std::unique_ptr<languaget> java_lang)
+  std::unique_ptr<languaget> &&java_lang)
 {
-  // We don't expect the .class suffix to allow us to check the name of the
-  // class
+  // We expect the name of the class without the .class suffix to allow us to
+  // check it
   PRECONDITION(!has_suffix(java_class_name, ".class"));
+  std::string filename=java_class_name + ".class";
+
+  // Construct a lazy_goto_modelt
+  null_message_handlert message_handler;
+  lazy_goto_modelt lazy_goto_model(
+    [] (goto_functionst::goto_functiont &function, symbol_tablet &symbol_table)
+    { },
+    [] (goto_modelt &goto_model)
+    { return false; },
+    message_handler);
 
   // Configure the path loading
   cmdlinet command_line;
@@ -46,22 +59,33 @@ symbol_tablet load_java_class(
   config.java.classpath.clear();
   config.java.classpath.push_back(class_path);
 
-  symbol_tablet new_symbol_table;
+  // Add the language to the model
+  language_filet &lf=lazy_goto_model.add_language_file(filename);
+  lf.language=std::move(java_lang);
+  languaget &language=*lf.language;
 
   std::istringstream java_code_stream("ignored");
-  null_message_handlert message_handler;
 
   // Configure the language, load the class files
-  java_lang->get_language_options(command_line);
-  java_lang->set_message_handler(message_handler);
-  java_lang->parse(java_code_stream, java_class_name + ".class");
-  java_lang->typecheck(new_symbol_table, "");
-  java_lang->final(new_symbol_table);
+  language.set_message_handler(message_handler);
+  language.get_language_options(command_line);
+  language.parse(java_code_stream, filename);
+  language.typecheck(lazy_goto_model.symbol_table, "");
+  language.generate_support_functions(lazy_goto_model.symbol_table);
+  language.final(lazy_goto_model.symbol_table);
+
+  lazy_goto_model.load_all_functions();
+
+  std::unique_ptr<goto_modelt> maybe_goto_model=
+    lazy_goto_modelt::process_whole_model_and_freeze(
+      std::move(lazy_goto_model));
+  INVARIANT(maybe_goto_model, "Freezing lazy_goto_model failed");
 
   // Verify that the class was loaded
   const std::string class_symbol_name="java::"+java_class_name;
-  REQUIRE(new_symbol_table.has_symbol(class_symbol_name));
-  const symbolt &class_symbol=*new_symbol_table.lookup(class_symbol_name);
+  REQUIRE(maybe_goto_model->symbol_table.has_symbol(class_symbol_name));
+  const symbolt &class_symbol=
+    *maybe_goto_model->symbol_table.lookup(class_symbol_name);
   REQUIRE(class_symbol.is_type);
   const typet &class_type=class_symbol.type;
   REQUIRE(class_type.id()==ID_struct);
@@ -70,5 +94,5 @@ symbol_tablet load_java_class(
   // Check your working directory and the class path is correctly configured
   // as this often indicates that one of these is wrong.
   REQUIRE_FALSE(class_type.get_bool(ID_incomplete_class));
-  return new_symbol_table;
+  return std::move(maybe_goto_model->symbol_table);
 }

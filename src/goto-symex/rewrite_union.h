@@ -24,6 +24,10 @@ void rewrite_union(
   const namespacet &ns);
 
 void rewrite_union(
+  goto_functionst::goto_functiont &goto_function,
+  const namespacet &ns);
+
+void rewrite_union(
   goto_functionst &goto_functions,
   const namespacet &ns);
 void rewrite_union(goto_modelt &goto_model);
