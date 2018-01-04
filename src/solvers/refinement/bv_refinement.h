@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/ui_message.h>
 
 #include <solvers/flattening/bv_pointers.h>
+#include <solvers/sat/satcheck.h>
 
 #define MAX_STATE 10000
 
@@ -30,6 +31,7 @@ private:
     bool refine_arrays=true;
     /// Enable arithmetic refinement
     bool refine_arithmetic=true;
+    satcheck_infot satcheck;
   };
 public:
   struct infot:public configt

@@ -46,6 +46,8 @@ void bv_refinementt::arrays_overapproximated()
   while(it!=lazy_array_constraints.end())
   {
     satcheck_no_simplifiert sat_check;
+    sat_check.set_random_var_freq(config_.satcheck.random_var_freq);
+    sat_check.set_random_seed(config_.satcheck.random_seed);
     bv_pointerst solver(ns, sat_check);
     solver.unbounded_array=bv_pointerst::unbounded_arrayt::U_ALL;
 

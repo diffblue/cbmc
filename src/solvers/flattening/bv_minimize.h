@@ -48,9 +48,11 @@ public:
     return "Bit vector minimizing SAT";
   }
 
-  explicit bv_minimizing_dect(const namespacet &_ns):
-    bv_pointerst(_ns, satcheck)
+  bv_minimizing_dect(const namespacet &_ns, const satcheck_infot &satcheck_info)
+    : bv_pointerst(_ns, satcheck)
   {
+    satcheck.set_random_var_freq(satcheck_info.random_var_freq);
+    satcheck.set_random_seed(satcheck_info.random_seed);
   }
 
   void minimize(const minimization_listt &objectives)

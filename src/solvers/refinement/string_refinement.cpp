@@ -39,7 +39,8 @@ static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   ui_message_handlert::uit ui,
   const exprt &axiom,
-  const symbol_exprt &var);
+  const symbol_exprt &var,
+  const satcheck_infot &satcheck_info);
 
 /// Check axioms takes the model given by the underlying solver and answers
 /// whether it satisfies the string constraints.
@@ -66,7 +67,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   std::size_t max_string_length,
   bool use_counter_example,
   ui_message_handlert::uit ui,
-  const union_find_replacet &symbol_resolve);
+  const union_find_replacet &symbol_resolve,
+  const satcheck_infot &satcheck_info);
 
 static void initial_index_set(
   index_set_pairt &index_set,
@@ -615,7 +617,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
       generator.max_string_length,
       config_.use_counter_example,
       supert::config_.ui,
-      symbol_resolve);
+      symbol_resolve,
+      bv_refinementt::config_.satcheck);
     if(!satisfied)
     {
       for(const auto &counter : counter_examples)
@@ -663,7 +666,8 @@ decision_proceduret::resultt string_refinementt::dec_solve()
         generator.max_string_length,
         config_.use_counter_example,
         supert::config_.ui,
-        symbol_resolve);
+        symbol_resolve,
+        bv_refinementt::config_.satcheck);
       if(!satisfied)
       {
         for(const auto &counter : counter_examples)
@@ -1348,7 +1352,8 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
   std::size_t max_string_length,
   bool use_counter_example,
   ui_message_handlert::uit ui,
-  const union_find_replacet &symbol_resolve)
+  const union_find_replacet &symbol_resolve,
+  const satcheck_infot &satcheck_info)
 {
   const auto eom=messaget::eom;
   static const std::string indent = "  ";
@@ -1407,8 +1412,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     debug_check_axioms_step(
       stream, ns, axiom, axiom_in_model, negaxiom, with_concretized_arrays);
 
-    if(const auto &witness=
-       find_counter_example(ns, ui, with_concretized_arrays, univ_var))
+    if(
+      const auto &witness = find_counter_example(
+        ns, ui, with_concretized_arrays, univ_var, satcheck_info))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
@@ -1463,7 +1469,9 @@ static std::pair<bool, std::vector<exprt>> check_axioms(
     debug_check_axioms_step(
       stream, ns, nc_axiom, nc_axiom_in_model, negaxiom, with_concrete_arrays);
 
-    if(const auto witness = find_counter_example(ns, ui, negaxiom, univ_var))
+    if(
+      const auto &witness = find_counter_example(
+        ns, ui, with_concrete_arrays, univ_var, satcheck_info))
     {
       stream << indent2 << "- violated_for: " << univ_var.get_identifier()
              << "=" << from_expr(ns, "", *witness) << eom;
@@ -2146,9 +2154,12 @@ static optionalt<exprt> find_counter_example(
   const namespacet &ns,
   const ui_message_handlert::uit ui,
   const exprt &axiom,
-  const symbol_exprt &var)
+  const symbol_exprt &var,
+  const satcheck_infot &satcheck_info)
 {
   satcheck_no_simplifiert sat_check;
+  sat_check.set_random_seed(satcheck_info.random_seed);
+  sat_check.set_random_var_freq(satcheck_info.random_var_freq);
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=&sat_check;
