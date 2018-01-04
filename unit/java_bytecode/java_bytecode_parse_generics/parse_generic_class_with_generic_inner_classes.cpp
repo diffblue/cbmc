@@ -248,6 +248,47 @@ SCENARIO(
            {require_type::type_argument_kindt::Var, class_prefix + "::T"}});
       }
     }
+
+    THEN(
+      "The field11 component should be a pointer to "
+      "GenericClassWithGenericInnerClasses$"
+      "GenericInnerClass$DoublyNestedInnerGenericClass")
+    {
+      const struct_union_typet::componentt &field_component =
+        require_type::require_component(java_generic_class, "field11");
+
+      // Declaration of field11 to be tested -
+      //   GenericInnerClass<GenericClassWithGenericInnerClasses<Integer>>.
+      //     DoublyNestedInnerGenericClass<T> field11;
+
+      require_type::require_pointer(
+        field_component.type(),
+        symbol_typet(
+          class_prefix + "$GenericInnerClass$DoublyNestedInnerGenericClass"));
+
+      THEN("The pointer should be GenericClassWithGenericInnerClasses")
+      {
+        const java_generic_typet &generic_field =
+          require_type::require_java_generic_type(
+            field_component.type(),
+            {{require_type::type_argument_kindt::Var,
+              "java::GenericClassWithGenericInnerClasses::T"},
+             {require_type::type_argument_kindt::Inst,
+              "java::GenericClassWithGenericInnerClasses"},
+             {require_type::type_argument_kindt::Var,
+              "java::GenericClassWithGenericInnerClasses::T"}});
+
+        THEN("Test nested Integer parameter.")
+        {
+          const typet &nested_generic_field =
+            generic_field.generic_type_arguments().at(1);
+          require_type::require_java_generic_type(
+            nested_generic_field,
+            {{require_type::type_argument_kindt::Inst,
+              "java::java.lang.Integer"}});
+        }
+      }
+    }
   }
 }
 
