@@ -5,6 +5,5 @@ test.class
 ^SIGNAL=0$
 assertion.* file test.java line 7 .* SUCCESS$
 assertion.* file test.java line 8 .* FAILURE$
-
 --
 non equal types
