@@ -19,11 +19,13 @@
 
 symbol_tablet load_java_class(
   const std::string &java_class_name,
-  const std::string &class_path);
+  const std::string &class_path,
+  const std::string &main = "");
 
 symbol_tablet load_java_class(
   const std::string &java_class_name,
   const std::string &class_path,
+  const std::string &main,
   std::unique_ptr<languaget> &&java_lang);
 
 #endif // CPROVER_TESTING_UTILS_LOAD_JAVA_CLASS_H
