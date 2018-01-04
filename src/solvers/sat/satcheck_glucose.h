@@ -46,6 +46,9 @@ public:
   virtual bool has_set_assumptions() const { return true; }
   virtual bool has_is_in_conflict() const { return true; }
 
+  void set_random_seed(std::size_t) override;
+  void set_random_var_freq(double) override;
+
 protected:
   T *solver;
 

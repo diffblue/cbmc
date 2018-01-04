@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/invariant.h>
 #include <util/threeval.h>
 #include <util/invariant.h>
+#include <util/options.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
@@ -293,6 +294,18 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
       assumptions.clear();
       break;
     }
+}
+
+template <typename T>
+void satcheck_minisat2_baset<T>::set_random_seed(std::size_t value)
+{
+  this->solver->random_seed = value;
+}
+
+template <typename T>
+void satcheck_minisat2_baset<T>::set_random_var_freq(double value)
+{
+  this->solver->random_var_freq = value;
 }
 
 satcheck_minisat_no_simplifiert::satcheck_minisat_no_simplifiert():

@@ -221,6 +221,18 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
     assert(!it->is_constant());
 }
 
+template <typename T>
+void satcheck_glucose_baset<T>::set_random_seed(std::size_t value)
+{
+  this->solver->random_seed = value;
+}
+
+template <typename T>
+void satcheck_glucose_baset<T>::set_random_var_freq(double value)
+{
+  this->solver->random_var_freq = value;
+}
+
 satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert():
   satcheck_glucose_baset<Glucose::Solver>(new Glucose::Solver)
 {

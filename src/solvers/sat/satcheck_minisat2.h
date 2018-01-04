@@ -51,6 +51,9 @@ public:
     time_limit_seconds=lim;
   }
 
+  void set_random_seed(std::size_t) override;
+  void set_random_var_freq(double) override;
+
 protected:
   T *solver;
   uint32_t time_limit_seconds;

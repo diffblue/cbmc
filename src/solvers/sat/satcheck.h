@@ -124,4 +124,13 @@ typedef satcheck_glucose_no_simplifiert satcheck_no_simplifiert;
 
 #endif
 
+class optionst;
+struct satcheck_infot final
+{
+  std::size_t random_seed = 91648253; // Default copied from minisat2/glucose
+  double random_var_freq = 0.0;
+};
+
+satcheck_infot parse_satcheck_info(const optionst &options);
+
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_H
