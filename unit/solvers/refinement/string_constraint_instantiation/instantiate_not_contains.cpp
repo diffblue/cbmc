@@ -142,7 +142,10 @@ std::string create_info(std::vector<exprt> &lemmas, const namespacet &ns)
 /// \return SAT solver result
 decision_proceduret::resultt check_sat(const exprt &expr, const namespacet &ns)
 {
+  satcheck_infot satcheck_info;
   satcheck_no_simplifiert sat_check;
+  sat_check.set_random_var_freq(satcheck_info.random_var_freq);
+  sat_check.set_random_seed(satcheck_info.random_seed);
   bv_refinementt::infot info;
   info.ns=&ns;
   info.prop=&sat_check;
