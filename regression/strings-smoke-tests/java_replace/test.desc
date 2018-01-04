@@ -1,9 +1,11 @@
 FUTURE
 test_replace.class
---refine-strings --string-max-length 100
+--refine-strings --verbosity 10 --string-max-length 100
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
+non equal types
 --
 diffblue/test-gen#256
 This test is only effective with a model of

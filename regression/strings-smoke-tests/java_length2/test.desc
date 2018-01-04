@@ -1,9 +1,11 @@
 FUTURE
 test.class
---refine-strings --string-max-length 1000 --function test.check
+--refine-strings --verbosity 10 --string-max-length 1000 --function test.check
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
+non equal types
 --
 This test currently fails because we do not handle the case where the argument
 's' is null. This should be handled in the String model.
