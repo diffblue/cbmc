@@ -116,6 +116,20 @@ public:
     warning() << "CPU limit ignored (not implemented)" << eom;
   }
 
+  /// Set random variable seed
+  /// (supported by solvers such as minisat2 and glucose)
+  virtual void set_random_seed(std::size_t value)
+  {
+    warning() << "random-seed not supported" << eom;
+  }
+
+  /// Set random variable frequency
+  /// (supported by solvers such as minisat2 and glucose)
+  virtual void set_random_var_freq(double value)
+  {
+    warning() << "random-var-freq not supported" << eom;
+  }
+
 protected:
   // to avoid a temporary for lcnf(...)
   bvt lcnf_bv;
