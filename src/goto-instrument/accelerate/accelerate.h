@@ -34,19 +34,20 @@ public:
     goto_programt &_program,
     goto_modelt &_goto_model,
     message_handlert &message_handler,
-    bool _use_z3)
+    const optionst &_options)
     : message_handler(message_handler),
       program(_program),
       goto_functions(_goto_model.goto_functions),
       symbol_table(_goto_model.symbol_table),
       ns(_goto_model.symbol_table),
-      utils(symbol_table, message_handler, goto_functions),
-      use_z3(_use_z3)
+      utils(symbol_table, message_handler, options, goto_functions),
+      options(options)
   {
     natural_loops(program);
   }
 
   int accelerate_loop(goto_programt::targett &loop_header);
+
   int accelerate_loops();
 
   bool accelerate_path(patht &path, path_acceleratort &accelerator);
@@ -124,12 +125,12 @@ protected:
 
   expr_mapt dirty_vars_map;
 
-  bool use_z3;
+  const optionst &options;
 };
 
 void accelerate_functions(
-  goto_modelt &,
+  goto_modelt &goto_model,
   message_handlert &message_handler,
-  bool use_z3);
+  const optionst &options);
 
 #endif // CPROVER_GOTO_INSTRUMENT_ACCELERATE_ACCELERATE_H

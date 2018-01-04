@@ -16,7 +16,7 @@ Author: Matt Lewis
 #include <set>
 
 #include <util/symbol_table.h>
-
+#include <solvers/sat/satcheck.h>
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
 
@@ -39,12 +39,14 @@ public:
     const goto_functionst &_goto_functions,
     const exprt &_loop_counter = nil_exprt())
     : message_handler(message_handler),
+      options(options),
       symbol_table(const_cast<symbol_tablet &>(_symbol_table)),
       ns(symbol_table),
       goto_functions(_goto_functions),
       utils(
         symbol_table,
         message_handler,
+        options,
         goto_functions,
         loop_counter),
       loop_counter(_loop_counter)
@@ -60,6 +62,7 @@ public:
 
 protected:
   message_handlert &message_handler;
+  const optionst &options;
 
   bool fit_polynomial_sliced(
     goto_programt::instructionst &sliced_body,
@@ -149,6 +152,8 @@ protected:
   const goto_functionst &goto_functions;
   acceleration_utilst utils;
 
+private:
+  const satcheck_infot satcheck_info;
   exprt loop_counter;
 
   expr_sett nonrecursive;

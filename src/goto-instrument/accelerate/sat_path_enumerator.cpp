@@ -48,7 +48,7 @@ Author: Matt Lewis
 
 bool sat_path_enumeratort::next(patht &path)
 {
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
 
   program.append(fixed);
   program.append(fixed);
@@ -213,7 +213,7 @@ void sat_path_enumeratort::build_path(
  */
 void sat_path_enumeratort::build_fixed()
 {
-  scratch_programt scratch(symbol_table, message_handler);
+  scratch_programt scratch(symbol_table, message_handler, options);
   std::map<exprt, exprt> shadow_distinguishers;
 
   fixed.copy_from(goto_program);

@@ -35,14 +35,17 @@ class acceleration_utilst
 {
 protected:
   message_handlert &message_handler;
+  const optionst &options;
 
 public:
   acceleration_utilst(
     symbol_tablet &_symbol_table,
     message_handlert &message_handler,
+    const optionst &_options,
     const goto_functionst &_goto_functions,
     exprt &_loop_counter)
     : message_handler(message_handler),
+      options(_options),
       symbol_table(_symbol_table),
       ns(symbol_table),
       goto_functions(_goto_functions),
@@ -53,8 +56,10 @@ public:
   acceleration_utilst(
     symbol_tablet &_symbol_table,
     message_handlert &message_handler,
+    const optionst &_options,
     const goto_functionst &_goto_functions)
     : message_handler(message_handler),
+      options(_options),
       symbol_table(_symbol_table),
       ns(symbol_table),
       goto_functions(_goto_functions),

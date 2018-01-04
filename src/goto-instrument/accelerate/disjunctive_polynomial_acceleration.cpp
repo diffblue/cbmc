@@ -51,7 +51,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   path_acceleratort &accelerator)
 {
   std::map<exprt, polynomialt> polynomials;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
 
   accelerator.clear();
 
@@ -144,7 +144,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
   expr_sett dirty;
   utils.find_modified(accelerator.path, dirty);
   polynomial_acceleratort path_acceleration(
-    message_handler, symbol_table, goto_functions, loop_counter);
+    message_handler, options, symbol_table, goto_functions, loop_counter);
   goto_programt::instructionst assigns;
 
   for(patht::iterator it=accelerator.path.begin();
@@ -342,7 +342,7 @@ bool disjunctive_polynomial_accelerationt::accelerate(
 
 bool disjunctive_polynomial_accelerationt::find_path(patht &path)
 {
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
 
   program.append(fixed);
   program.append(fixed);
@@ -410,7 +410,7 @@ bool disjunctive_polynomial_accelerationt::fit_polynomial(
   std::vector<expr_listt> parameters;
   std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
   expr_sett influence;
 
   cone_of_influence(var, influence);
@@ -861,7 +861,7 @@ void disjunctive_polynomial_accelerationt::build_path(
  */
 void disjunctive_polynomial_accelerationt::build_fixed()
 {
-  scratch_programt scratch(symbol_table, message_handler);
+  scratch_programt scratch(symbol_table, message_handler, options);
   std::map<exprt, exprt> shadow_distinguishers;
 
   fixed.copy_from(goto_program);

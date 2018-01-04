@@ -710,8 +710,15 @@ int goto_instrument_parse_optionst::doit()
       goto_inline(goto_model, get_message_handler());
 
       status() << "Accelerating" << eom;
-      accelerate_functions(
-        goto_model, get_message_handler(), cmdline.isset("z3"));
+      optionst options;
+      if(cmdline.isset("random-seed"))
+        options.set_option("random-seed", cmdline.get_value("random-seed"));
+      if(cmdline.isset("random-var-freq"))
+        options.set_option(
+          "random-var-freq", cmdline.get_value("random-var-freq"));
+      options.set_option("z3", cmdline.isset("z3"));
+
+      accelerate_functions(goto_model, get_message_handler(), options);
       remove_skip(goto_model);
       goto_model.goto_functions.update();
     }

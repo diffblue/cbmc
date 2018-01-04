@@ -35,7 +35,10 @@ Author: Matt Lewis
 class scratch_programt:public goto_programt
 {
 public:
-  scratch_programt(symbol_tablet &_symbol_table, message_handlert &mh)
+  scratch_programt(
+    symbol_tablet &_symbol_table,
+    message_handlert &mh,
+    const optionst &options)
     : constant_propagation(true),
       symbol_table(_symbol_table),
       ns(symbol_table),
@@ -44,8 +47,17 @@ public:
       satcheck(util_make_unique<satcheckt>()),
       satchecker(ns, *satcheck),
       z3(ns, "accelerate", "", "", smt2_dect::solvert::Z3),
-      checker(&z3) // checker(&satchecker)
+      checker(&z3)
   {
+    if(options.get_bool_option("z3"))
+      checker = &z3;
+    else
+    {
+      satcheck_infot satcheck_info = parse_satcheck_info(options);
+      satcheck->set_random_var_freq(satcheck_info.random_var_freq);
+      satcheck->set_random_seed(satcheck_info.random_seed);
+      checker = &satchecker;
+    }
   }
 
   void append(goto_programt::instructionst &instructions);

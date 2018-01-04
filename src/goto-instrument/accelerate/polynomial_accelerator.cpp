@@ -59,7 +59,7 @@ bool polynomial_acceleratort::accelerate(
 
   expr_sett targets;
   std::map<exprt, polynomialt> polynomials;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
   goto_programt::instructionst assigns;
 
   utils.find_modified(body, targets);
@@ -288,7 +288,7 @@ bool polynomial_acceleratort::fit_polynomial_sliced(
   std::vector<expr_listt> parameters;
   std::set<std::pair<expr_listt, exprt> > coefficients;
   expr_listt exprs;
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
   exprt overflow_var =
     utils.fresh_symbol("polynomial::overflow", bool_typet()).symbol_expr();
   overflow_instrumentert overflow(program, overflow_var, symbol_table);
@@ -668,7 +668,7 @@ bool polynomial_acceleratort::check_inductive(
   // assert (target1==polynomial1);
   // assert (target2==polynomial2);
   // ...
-  scratch_programt program(symbol_table, message_handler);
+  scratch_programt program(symbol_table, message_handler, options);
   std::vector<exprt> polynomials_hold;
   substitutiont substitution;
 

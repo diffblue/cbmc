@@ -20,7 +20,7 @@ Author: Matt Lewis
 
 #include <goto-programs/goto_program.h>
 #include <goto-programs/goto_functions.h>
-
+#include <solvers/sat/satcheck.h>
 #include <analyses/natural_loops.h>
 
 #include "scratch_program.h"
@@ -36,19 +36,27 @@ class disjunctive_polynomial_accelerationt:public loop_accelerationt
 public:
   disjunctive_polynomial_accelerationt(
     message_handlert &message_handler,
+    const optionst &_options,
     symbol_tablet &_symbol_table,
     goto_functionst &_goto_functions,
     goto_programt &_goto_program,
     natural_loops_mutablet::natural_loopt &_loop,
-    goto_programt::targett _loop_header)
+    goto_programt::targett _loop_header,
+    const satcheck_infot &satcheck_info)
     : message_handler(message_handler),
+      options(_options),
       symbol_table(_symbol_table),
       ns(symbol_table),
       goto_functions(_goto_functions),
       goto_program(_goto_program),
       loop(_loop),
       loop_header(_loop_header),
-      utils(symbol_table, message_handler, goto_functions, loop_counter)
+      utils(
+        symbol_table,
+        message_handler,
+        _options,
+        goto_functions,
+        loop_counter)
   {
     loop_counter = nil_exprt();
     find_distinguishing_points();
@@ -67,6 +75,7 @@ public:
 
 protected:
   message_handlert &message_handler;
+  const optionst &options;
 
   void assert_for_values(
     scratch_programt &program,
