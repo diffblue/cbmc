@@ -1,10 +1,11 @@
 KNOWNBUG
 Test.class
---refine-strings --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[.*assertion.1\].* line 10.* SUCCESS$
 ^\[.*assertion.2\].* line 13.* FAILURE$
 --
+non equal types
 --
 Issue #664 is about turning these tests on

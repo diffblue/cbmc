@@ -1,7 +1,8 @@
 CORE
 Test.class
---refine-strings --string-max-length 45  --string-max-input-length 31
+--refine-strings --verbosity 10 --string-max-length 45  --string-max-input-length 31
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
+non equal types

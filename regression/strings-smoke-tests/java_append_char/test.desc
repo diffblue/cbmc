@@ -1,8 +1,9 @@
 CORE
 test_append_char.class
---refine-strings --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
 assertion.* file test_append_char.java line 23 .* SUCCESS
 assertion.* file test_append_char.java line 25 .* FAILURE
 --
+non equal types

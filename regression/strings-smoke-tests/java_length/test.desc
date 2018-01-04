@@ -1,9 +1,10 @@
 CORE
 test_length.class
---refine-strings --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 \[.*assertion\.1\] .* line 7 .*: SUCCESS
 \[.*assertion\.2\] .* line 8 .*: FAILURE
 --
+non equal types

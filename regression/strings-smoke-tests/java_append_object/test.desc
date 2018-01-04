@@ -1,8 +1,10 @@
 FUTURE
 test_append_object.class
---refine-strings --string-max-length 1000
+--refine-strings --verbosity 10 --string-max-length 1000
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
+--
+non equal types
 --
 Issue: diffblue/test-gen#82

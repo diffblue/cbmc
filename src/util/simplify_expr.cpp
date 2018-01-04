@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "config.h"
 #include "base_type.h"
+#include "type_eq.h"
 #include "namespace.h"
 #include "threeval.h"
 #include "pointer_predicates.h"
@@ -214,7 +215,7 @@ bool simplify_exprt::simplify_typecast(exprt &expr)
   }
 
   // eliminate redundant typecasts
-  if(base_type_eq(expr.type(), expr.op0().type(), ns))
+  if(type_eq(expr.type(), expr.op0().type(), ns))
   {
     exprt tmp;
     tmp.swap(expr.op0());
