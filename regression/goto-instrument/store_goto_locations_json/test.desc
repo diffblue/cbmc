@@ -1,0 +1,12 @@
+CORE
+main.c
+--show-goto-functions --json-ui --store-goto-locations
+^EXIT=0$
+^SIGNAL=0$
+\"originalGOTOLocation\": \"0\"
+--
+--
+
+Checks that generated JSON contains
+original goto locations, if any
+
