@@ -890,6 +890,26 @@ public:
       result.push_back(it->get_identifier());
     return result;
   }
+
+  typedef
+    std::unordered_map<irep_idt, std::size_t, irep_id_hash> parameter_indicest;
+
+  /// Get a map from parameter name to its index
+  parameter_indicest parameter_indices() const
+  {
+    parameter_indicest parameter_indices;
+    const parameterst &p = parameters();
+    parameter_indices.reserve(p.size());
+    std::size_t index = 0;
+    for(const auto &p : parameters())
+    {
+      const irep_idt &id = p.get_identifier();
+      if(!id.empty())
+        parameter_indices.insert({ id, index });
+      ++index;
+    }
+    return parameter_indices;
+  }
 };
 
 /*! \brief Cast a generic typet to a \ref code_typet
