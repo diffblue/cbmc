@@ -15,6 +15,8 @@ Author: Peter Schrammel
 
 std::ostream &goto_difft::output_functions(std::ostream &out) const
 {
+  namespacet ns1(goto_model1.symbol_table);
+  namespacet ns2(goto_model2.symbol_table);
   switch(ui)
   {
     case ui_message_handlert::uit::PLAIN:
@@ -24,33 +26,24 @@ std::ostream &goto_difft::output_functions(std::ostream &out) const
       for(irep_id_sett::const_iterator it=new_functions.begin();
           it!=new_functions.end(); ++it)
       {
-        const goto_programt &program=
-          goto_model2.goto_functions.function_map.at(*it).body;
-        out << "  "
-          << program.instructions.begin()->source_location.get_file()
-          << ": " << *it << "\n";
+        const symbolt &symbol = ns2.lookup(*it);
+        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
       }
 
       out << "modified functions:\n";
       for(irep_id_sett::const_iterator it=modified_functions.begin();
           it!=modified_functions.end(); ++it)
       {
-        const goto_programt &program=
-          goto_model2.goto_functions.function_map.at(*it).body;
-        out << "  "
-          << program.instructions.begin()->source_location.get_file()
-          << ": " << *it << "\n";
+        const symbolt &symbol = ns2.lookup(*it);
+        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
       }
 
       out << "deleted functions:\n";
       for(irep_id_sett::const_iterator it=deleted_functions.begin();
           it!=deleted_functions.end(); ++it)
       {
-        const goto_programt &program=
-          goto_model1.goto_functions.function_map.at(*it).body;
-        out << "  "
-          << program.instructions.begin()->source_location.get_file()
-          << ": " << *it << "\n";
+        const symbolt &symbol = ns1.lookup(*it);
+        out << "  " << symbol.location.get_file() << ": " << *it << "\n";
       }
       break;
     }
@@ -91,12 +84,22 @@ void goto_difft::convert_function(
   json_objectt &result,
   const irep_idt &function_name) const
 {
-  const goto_programt &program=
-    goto_model2.goto_functions.function_map.at(function_name).body;
-  if(!program.instructions.empty())
+  // the function may be in goto_model1 or goto_model2
+  if(
+    goto_model1.goto_functions.function_map.find(function_name) !=
+    goto_model1.goto_functions.function_map.end())
   {
-    result["sourceLocation"]=
-      json(program.instructions.begin()->source_location);
+    const symbolt &symbol =
+      namespacet(goto_model1.symbol_table).lookup(function_name);
+    result["sourceLocation"] = json(symbol.location);
+  }
+  else if(
+    goto_model2.goto_functions.function_map.find(function_name) !=
+    goto_model2.goto_functions.function_map.end())
+  {
+    const symbolt &symbol =
+      namespacet(goto_model2.symbol_table).lookup(function_name);
+    result["sourceLocation"] = json(symbol.location);
   }
   result["name"]=json_stringt(id2string(function_name));
 }
