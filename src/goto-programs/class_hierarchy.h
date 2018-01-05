@@ -52,6 +52,7 @@ public:
   }
 
   void output(std::ostream &) const;
+  void output_dot(std::ostream &) const;
 
 protected:
   void get_children_trans_rec(const irep_idt &, idst &) const;
