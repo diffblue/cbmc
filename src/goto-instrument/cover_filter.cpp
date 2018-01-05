@@ -32,11 +32,8 @@ bool internal_functions_filtert::operator()(
   if(goto_function.is_hidden())
     return false;
 
-  // ignore Java built-ins
-  if(
-    has_prefix(id2string(identifier), "java::array[") ||
-    has_prefix(id2string(identifier), "java::org.cprover") ||
-    has_prefix(id2string(identifier), "java::java."))
+  // ignore Java built-ins (synthetic functions)
+  if(has_prefix(id2string(identifier), "java::array["))
     return false;
 
   // ignore if built-in library
