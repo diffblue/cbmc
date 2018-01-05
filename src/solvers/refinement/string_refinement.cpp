@@ -606,7 +606,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
   {
     bool satisfied;
     std::vector<exprt> counter_examples;
-    std::tie(satisfied, counter_examples)=check_axioms(
+    std::tie(satisfied, counter_examples) = check_axioms(
       axioms,
       generator,
       get,
@@ -654,7 +654,7 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     {
       bool satisfied;
       std::vector<exprt> counter_examples;
-      std::tie(satisfied, counter_examples)=check_axioms(
+      std::tie(satisfied, counter_examples) = check_axioms(
         axioms,
         generator,
         get,
