@@ -91,7 +91,7 @@ void bmct::error_trace()
         json_stringt(id2string(step.pc->source_location.get_comment()));
       json_result["status"]=json_stringt("failed");
       jsont &json_trace=json_result["trace"];
-      convert(ns, goto_trace, json_trace);
+      convert(ns, goto_trace, json_trace, trace_options());
       status() << json_result;
     }
     break;

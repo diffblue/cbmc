@@ -387,6 +387,8 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "symex-coverage-report",
       cmdline.get_value("symex-coverage-report"));
+
+  PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
 
 /// invoke main modules
@@ -949,6 +951,7 @@ void jbmc_parse_optionst::help()
     " --version                    show version and exit\n"
     " --xml-ui                     use XML-formatted output\n"
     " --json-ui                    use JSON-formatted output\n"
+    HELP_GOTO_TRACE
     " --verbosity #                verbosity level\n"
     "\n";
 }

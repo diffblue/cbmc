@@ -395,3 +395,6 @@ void show_goto_trace(
     }
   }
 }
+
+
+const trace_optionst trace_optionst::default_options = trace_optionst();

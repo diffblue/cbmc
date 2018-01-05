@@ -30,7 +30,8 @@ Author: Daniel Kroening
 void convert(
   const namespacet &ns,
   const goto_tracet &goto_trace,
-  jsont &dest)
+  jsont &dest,
+  trace_optionst trace_options)
 {
   json_arrayt &dest_array=dest.make_array();
 
@@ -96,36 +97,39 @@ void convert(
           "full_lhs in assignment must not be nil");
         exprt simplified=simplify_expr(step.full_lhs, ns);
 
-        class comment_base_name_visitort : public expr_visitort
+        if(trace_options.json_full_lhs)
         {
-        private:
-          const namespacet &ns;
-
-        public:
-          explicit comment_base_name_visitort(const namespacet &ns) : ns(ns)
+          class comment_base_name_visitort : public expr_visitort
           {
-          }
+          private:
+            const namespacet &ns;
 
-          void operator()(exprt &expr) override
-          {
-            if(expr.id() == ID_symbol)
+          public:
+            explicit comment_base_name_visitort(const namespacet &ns) : ns(ns)
             {
-              const symbolt &symbol = ns.lookup(expr.get(ID_identifier));
-              // Don't break sharing unless need to write to it
-              const irept::named_subt &comments =
-                static_cast<const exprt &>(expr).get_comments();
-              if(comments.count(ID_C_base_name) != 0)
-                INVARIANT(
-                  comments.at(ID_C_base_name).id() == symbol.base_name,
-                  "base_name comment does not match symbol's base_name");
-              else
-                expr.get_comments().emplace(
-                  ID_C_base_name, irept(symbol.base_name));
             }
-          }
-        };
-        comment_base_name_visitort comment_base_name_visitor(ns);
-        simplified.visit(comment_base_name_visitor);
+
+            void operator()(exprt &expr) override
+            {
+              if(expr.id() == ID_symbol)
+              {
+                const symbolt &symbol = ns.lookup(expr.get(ID_identifier));
+                // Don't break sharing unless need to write to it
+                const irept::named_subt &comments =
+                  static_cast<const exprt &>(expr).get_comments();
+                if(comments.count(ID_C_base_name) != 0)
+                  INVARIANT(
+                    comments.at(ID_C_base_name).id() == symbol.base_name,
+                    "base_name comment does not match symbol's base_name");
+                else
+                  expr.get_comments().emplace(
+                    ID_C_base_name, irept(symbol.base_name));
+              }
+            }
+          };
+          comment_base_name_visitort comment_base_name_visitor(ns);
+          simplified.visit(comment_base_name_visitor);
+        }
 
         full_lhs_string=from_expr(ns, identifier, simplified);
 
@@ -154,9 +158,12 @@ void convert(
 
         json_assignment["value"]=full_lhs_value;
         json_assignment["lhs"]=json_stringt(full_lhs_string);
-        // Not language specific, still mangled, fully-qualified name of lhs:
-        json_assignment["rawLhs"] =
-          json_irept(true).convert_from_irep(simplified);
+        if(trace_options.json_full_lhs)
+        {
+          // Not language specific, still mangled, fully-qualified name of lhs
+          json_assignment["rawLhs"] =
+            json_irept(true).convert_from_irep(simplified);
+        }
         json_assignment["hidden"]=jsont::json_boolean(step.hidden);
         json_assignment["internal"]=jsont::json_boolean(step.internal);
         json_assignment["thread"]=json_numbert(std::to_string(step.thread_nr));

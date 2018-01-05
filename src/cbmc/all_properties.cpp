@@ -219,7 +219,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
         if(g.second.status==goalt::statust::FAILURE)
         {
           jsont &json_trace=result["trace"];
-          convert(bmc.ns, g.second.goto_trace, json_trace);
+          convert(bmc.ns, g.second.goto_trace, json_trace, bmc.trace_options());
         }
       }
 

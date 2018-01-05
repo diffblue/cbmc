@@ -370,7 +370,7 @@ bool bmc_covert::operator()()
         if(bmc.options.get_bool_option("trace"))
         {
           jsont &json_trace=result["trace"];
-          convert(bmc.ns, test.goto_trace, json_trace);
+          convert(bmc.ns, test.goto_trace, json_trace, bmc.trace_options());
         }
         else
         {

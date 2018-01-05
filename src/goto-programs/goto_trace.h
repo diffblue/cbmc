@@ -25,6 +25,7 @@ Date: July 2005
 #include <vector>
 
 #include <util/namespace.h>
+#include <util/options.h>
 #include <util/ssa_expr.h>
 
 #include <goto-programs/goto_program.h>
@@ -205,5 +206,34 @@ void trace_value(
   const ssa_exprt &lhs_object,
   const exprt &full_lhs,
   const exprt &value);
+
+
+struct trace_optionst
+{
+  bool json_full_lhs;
+
+  static const trace_optionst default_options;
+
+  explicit trace_optionst(const optionst &options)
+  {
+    json_full_lhs = options.get_bool_option("trace-json-extended");
+  };
+
+private:
+  trace_optionst()
+  {
+    json_full_lhs = false;
+  };
+};
+
+#define OPT_GOTO_TRACE "(trace-json-extended)"
+
+#define HELP_GOTO_TRACE                                                        \
+  " --trace-json-extended        add rawLhs property to trace\n"
+
+#define PARSE_OPTIONS_GOTO_TRACE(cmdline, options)                             \
+  if(cmdline.isset("trace-json-extended"))                                     \
+    options.set_option("trace-json-extended", true);
+
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_TRACE_H

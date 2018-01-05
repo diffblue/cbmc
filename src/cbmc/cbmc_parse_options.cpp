@@ -408,6 +408,8 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option(
       "symex-coverage-report",
       cmdline.get_value("symex-coverage-report"));
+
+  PARSE_OPTIONS_GOTO_TRACE(cmdline, options);
 }
 
 /// invoke main modules
@@ -1020,6 +1022,7 @@ void cbmc_parse_optionst::help()
     " --xml-ui                     use XML-formatted output\n"
     " --xml-interface              bi-directional XML interface\n"
     " --json-ui                    use JSON-formatted output\n"
+    HELP_GOTO_TRACE
     " --verbosity #                verbosity level\n"
     "\n";
 }
