@@ -818,8 +818,16 @@ public:
 
   bool has_this() const
   {
+    return get_this() != nullptr;
+  }
+
+  const parametert *get_this() const
+  {
     const parameterst &p=parameters();
-    return !p.empty() && p.front().get_this();
+    if(!p.empty() && p.front().get_this())
+      return &p.front();
+    else
+      return nullptr;
   }
 
   bool is_KnR() const
