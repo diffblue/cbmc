@@ -116,7 +116,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("show-vcc", true);
 
   if(cmdline.isset("cover"))
-    options.set_option("cover", cmdline.get_values("cover"));
+    parse_cover_options(cmdline, options);
 
   if(cmdline.isset("no-simplify"))
     options.set_option("simplify", false);
@@ -775,10 +775,7 @@ bool jbmc_parse_optionst::process_goto_functions(
     // instrument cover goals
     if(cmdline.isset("cover"))
     {
-      if(instrument_cover_goals(
-           cmdline,
-           goto_model,
-           get_message_handler()))
+      if(instrument_cover_goals(options, goto_model, get_message_handler()))
         return true;
     }
 

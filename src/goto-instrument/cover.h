@@ -15,55 +15,45 @@ Date: May 2016
 #define CPROVER_GOTO_INSTRUMENT_COVER_H
 
 #include <goto-programs/goto_model.h>
-#include <util/cmdline.h>
 
 class message_handlert;
-class messaget;
+class cmdlinet;
+class optionst;
 
 enum class coverage_criteriont
 {
-  LOCATION, BRANCH, DECISION, CONDITION,
-  PATH, MCDC, ASSERTION, COVER };
+  LOCATION,
+  BRANCH,
+  DECISION,
+  CONDITION,
+  PATH,
+  MCDC,
+  ASSERTION,
+  COVER // __CPROVER_cover(x) annotations
+};
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_functionst &,
   coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false);
+  message_handlert &message_handler);
 
 void instrument_cover_goals(
   const symbol_tablet &,
   goto_programt &,
   coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false);
+  message_handlert &message_handler);
 
-void instrument_cover_goals(
-  const symbol_tablet &,
-  goto_functionst &,
-  coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false,
-  bool ignore_trivial=false,
-  const std::string &cover_inclue_pattern="");
-
-void instrument_cover_goals(
-  const symbol_tablet &,
-  goto_programt &,
-  coverage_criteriont,
-  message_handlert &message_handler,
-  bool function_only=false,
-  bool ignore_trivial=false);
+void parse_cover_options(const cmdlinet &, optionst &);
 
 bool instrument_cover_goals(
-  const cmdlinet &,
+  const optionst &,
   const symbol_tablet &,
   goto_functionst &,
   message_handlert &);
 
 bool instrument_cover_goals(
-  const cmdlinet &,
+  const optionst &,
   goto_modelt &,
   message_handlert &);
 
