@@ -1,0 +1,12 @@
+CORE
+new.jar
+old.jar --json-ui
+// Enable multi-line checking
+activate-multi-line-match
+EXIT=0
+SIGNAL=0
+  "deletedFunctions": \[ \],
+  "modifiedFunctions": \[ \],
+  "newFunctions": \[ \],
+--
+^warning: ignoring
