@@ -16,6 +16,7 @@ Date: June 2003
 #include <util/std_code.h>
 #include <util/symbol_table.h>
 #include <util/prefix.h>
+#include <util/fresh_symbol.h>
 
 #include "goto_inline.h"
 
@@ -145,6 +146,7 @@ void goto_convert_functionst::convert_function(
   // make tmp variables local to function
   tmp_symbol_prefix=id2string(symbol.name)+"::$tmp::";
   temporary_counter=0;
+  reset_temporary_counter();
 
   f.type=to_code_type(symbol.type);
 

@@ -42,11 +42,22 @@ bool syntactic_difft::operator()()
         i_it2!=f_it->second.body.instructions.end();
         ++i_it1, ++i_it2)
     {
-      if(i_it1->code != i_it2->code ||
-         i_it1->function != i_it2->function ||
-         i_it1->type != i_it2->type ||
-         i_it1->guard != i_it2->guard ||
-         i_it1->targets != i_it2->targets)
+      long jump_difference1 = 0;
+      if(!i_it1->targets.empty())
+      {
+        jump_difference1 =
+          i_it1->get_target()->location_number - i_it1->location_number;
+      }
+      long jump_difference2 = 0;
+      if(!i_it2->targets.empty())
+      {
+        jump_difference2 =
+          i_it2->get_target()->location_number - i_it2->location_number;
+      }
+      if(
+        i_it1->code != i_it2->code || i_it1->function != i_it2->function ||
+        i_it1->type != i_it2->type || i_it1->guard != i_it2->guard ||
+        jump_difference1 != jump_difference2)
       {
         modified_functions.insert(it->first);
         break;
