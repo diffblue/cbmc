@@ -1,6 +1,6 @@
 public class Test {
 
-  private int foo(int x) {
+  public int foo(int x) {
     if (x > 10) {
       return x;
     } else {
@@ -8,7 +8,7 @@ public class Test {
     }
   }
 
-  protected int bar(int x) {
+  public int bar(int x) {
     if (x < 10) {
       return x;
     } else {
