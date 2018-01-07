@@ -48,7 +48,7 @@ static void copy_parent(
   code.operands().push_back(exprt("explicit-typecast"));
   exprt &op1=code.op1();
 
-  op0.type()=
+  op1.type() =
     pointer_type(cpp_namet(parent_base_name, source_location).as_type());
   op1.type().set(ID_C_reference, true);
   op1.type().subtype().set(ID_C_constant, true);
