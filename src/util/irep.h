@@ -19,8 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #define SHARING
 // #define HASH_CODE
-#define USE_MOVE
 // #define SUB_IS_LIST
+
+#ifdef SHARING
+#include "cow.h"
+#endif
 
 #ifdef SUB_IS_LIST
 #include <list>
@@ -103,88 +106,12 @@ public:
   bool is_nil() const { return id()==ID_nil; }
   bool is_not_nil() const { return id()!=ID_nil; }
 
+  irept() = default;
+
   explicit irept(const irep_idt &_id)
-#ifdef SHARING
-    :data(&empty_d)
-#endif
   {
     id(_id);
   }
-
-  #ifdef SHARING
-  // constructor for blank irep
-  irept():data(&empty_d)
-  {
-  }
-
-  // copy constructor
-  irept(const irept &irep):data(irep.data)
-  {
-    if(data!=&empty_d)
-    {
-      assert(data->ref_count!=0);
-      data->ref_count++;
-      #ifdef IREP_DEBUG
-      std::cout << "COPY " << data << " " << data->ref_count << '\n';
-      #endif
-    }
-  }
-
-  #ifdef USE_MOVE
-  // Copy from rvalue reference.
-  // Note that this does avoid a branch compared to the
-  // standard copy constructor above.
-  irept(irept &&irep):data(irep.data)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "COPY MOVE\n";
-    #endif
-    irep.data=&empty_d;
-  }
-  #endif
-
-  irept &operator=(const irept &irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN\n";
-    #endif
-
-    // Ordering is very important here!
-    // Consider self-assignment, which may destroy 'irep'
-    dt *irep_data=irep.data;
-    if(irep_data!=&empty_d)
-      irep_data->ref_count++;
-
-    remove_ref(data); // this may kill 'irep'
-    data=irep_data;
-
-    return *this;
-  }
-
-  #ifdef USE_MOVE
-  // Note that the move assignment operator does avoid
-  // three branches compared to standard operator above.
-  irept &operator=(irept &&irep)
-  {
-    #ifdef IREP_DEBUG
-    std::cout << "ASSIGN MOVE\n";
-    #endif
-    // we simply swap two pointers
-    std::swap(data, irep.data);
-    return *this;
-  }
-  #endif
-
-  ~irept()
-  {
-    remove_ref(data);
-  }
-
-  #else
-  irept()
-  {
-  }
-  #endif
 
   const irep_idt &id() const
   { return read().data; }
@@ -193,7 +120,9 @@ public:
   { return id2string(read().data); }
 
   void id(const irep_idt &_data)
-  { write().data=_data; }
+  {
+    write(true).data = _data;
+  }
 
   const irept &find(const irep_namet &name) const;
   irept &add(const irep_namet &name);
@@ -242,11 +171,20 @@ public:
 
   void make_nil() { *this=get_nil_irep(); }
 
-  subt &get_sub() { return write().sub; } // DANGEROUS
+  subt &get_sub()
+  {
+    return write(false).sub;
+  }
   const subt &get_sub() const { return read().sub; }
-  named_subt &get_named_sub() { return write().named_sub; } // DANGEROUS
+  named_subt &get_named_sub()
+  {
+    return write(false).named_sub;
+  }
   const named_subt &get_named_sub() const { return read().named_sub; }
-  named_subt &get_comments() { return write().comments; } // DANGEROUS
+  named_subt &get_comments()
+  {
+    return write(false).comments;
+  }
   const named_subt &get_comments() const { return read().comments; }
 
   std::size_t hash() const;
@@ -260,106 +198,60 @@ protected:
   static bool is_comment(const irep_namet &name)
   { return !name.empty() && name[0]=='#'; }
 
-public:
+private:
   class dt
+#ifdef SHARING
+    : public copy_on_write_pointeet<unsigned>
+#endif
   {
-  private:
-    friend class irept;
-
-    #ifdef SHARING
-    unsigned ref_count;
-    #endif
-
+  public:
+    /// This irep_idt is the only place to store data in an irep, other than
+    /// the mere nesting structure
     irep_idt data;
-
     named_subt named_sub;
     named_subt comments;
     subt sub;
 
     #ifdef HASH_CODE
-    mutable std::size_t hash_code;
+    mutable std::size_t hash_code = 0;
     #endif
 
     void clear()
     {
       data.clear();
-      sub.clear();
       named_sub.clear();
       comments.clear();
+      sub.clear();
       #ifdef HASH_CODE
       hash_code=0;
       #endif
     }
-
-    void swap(dt &d)
-    {
-      d.data.swap(data);
-      d.sub.swap(sub);
-      d.named_sub.swap(named_sub);
-      d.comments.swap(comments);
-      #ifdef HASH_CODE
-      std::swap(d.hash_code, hash_code);
-      #endif
-    }
-
-    #ifdef SHARING
-    dt():ref_count(1)
-      #ifdef HASH_CODE
-         , hash_code(0)
-      #endif
-    {
-    }
-    #else
-    dt()
-      #ifdef HASH_CODE
-      :hash_code(0)
-      #endif
-    {
-    }
-    #endif
   };
 
-protected:
-  #ifdef SHARING
-  dt *data;
-  static dt empty_d;
-
-  static void remove_ref(dt *old_data);
-  static void nonrecursive_destructor(dt *old_data);
-  void detach();
-
-public:
-  const dt &read() const
-  {
-    return *data;
-  }
-
-  dt &write()
-  {
-    detach();
-    #ifdef HASH_CODE
-    data->hash_code=0;
-    #endif
-    return *data;
-  }
-
-  #else
+#ifdef SHARING
+  copy_on_writet<dt> data;
+#else
   dt data;
+#endif
+
+  dt &write(bool mark_shareable)
+  {
+#ifdef SHARING
+    return data.write(mark_shareable);
+#else
+    return data;
+#endif
+  }
 
 public:
   const dt &read() const
   {
+#ifdef SHARING
+    return data.read();
+#else
     return data;
+#endif
   }
-
-  dt &write()
-  {
-    #ifdef HASH_CODE
-    data.hash_code=0;
-    #endif
-    return data;
-  }
-  #endif
 };
 
 // NOLINTNEXTLINE(readability/identifiers)

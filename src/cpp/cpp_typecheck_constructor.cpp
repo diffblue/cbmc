@@ -38,18 +38,25 @@ static void copy_parent(
 
   code.op0().operands().push_back(exprt("explicit-typecast"));
 
-  exprt &op0=code.op0().op0();
+  {
+    exprt &op0 = code.op0().op0();
 
-  op0.operands().push_back(exprt("cpp-this"));
-  op0.type()=
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
-  op0.add_source_location()=source_location;
+    op0.operands().push_back(exprt("cpp-this"));
+    op0.type() =
+      pointer_type(cpp_namet(parent_base_name, source_location).as_type());
+    op0.add_source_location() = source_location;
+  }
 
   code.operands().push_back(exprt("explicit-typecast"));
   exprt &op1=code.op1();
 
-  op0.type()=
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type());
+  {
+    // Calling push_back may have invalidated the previous reference to op0,
+    // which is why there are two separate, scoped references
+    exprt &op0 = code.op0().op0();
+    op0.type() =
+      pointer_type(cpp_namet(parent_base_name, source_location).as_type());
+  }
   op1.type().set(ID_C_reference, true);
   op1.type().subtype().set(ID_C_constant, true);
 
