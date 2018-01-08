@@ -1,8 +1,9 @@
 #include <assert.h>
+#define ASSERT(x) __CPROVER_assert((x), "assertion " #x)
 
 int bar(int other)
 {
-  assert(other==4);
+  ASSERT(other==4);
   return other + 1;
 }
 
@@ -10,5 +11,5 @@ int main(int argc, char *argv[])
 {
   int x=3;
   int y=bar(x+1);
-  assert(y==5);
+  ASSERT(y==5);
 }

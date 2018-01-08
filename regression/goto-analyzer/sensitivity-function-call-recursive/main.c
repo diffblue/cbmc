@@ -1,4 +1,5 @@
 #include <assert.h>
+#define ASSERT(x) __CPROVER_assert((x), "assertion " #x)
 
 int bar(int other)
 {
@@ -43,14 +44,14 @@ int main(int argc, char *argv[])
 {
   int x=3;
   int y=bar(x+1);
-  assert(y==4); // Unknown in the constants domain
+  ASSERT(y==4); // Unknown in the constants domain
 
   int y2 = bar(0);
-  assert(y2==0); // Unknown since we are not sensitive to call domain
+  ASSERT(y2==0); // Unknown since we are not sensitive to call domain
 
   int z = bar_clean(0);
-  assert(z==0); // Unknown as the function has parameter as top
+  ASSERT(z==0); // Unknown as the function has parameter as top
 
   int w = fun(5, 18);
-  assert(w==18);
+  ASSERT(w==18);
 }
