@@ -293,7 +293,7 @@ bool is_char_type(const typet &type)
 /// Distinguish char array from other types.
 /// For now, any unsigned bitvector type is considered a character.
 /// \param type: a type
-/// \param ns: name space
+/// \param ns: namespace
 /// \return true if the given type is an array of characters
 bool is_char_array_type(const typet &type, const namespacet &ns)
 {
@@ -311,8 +311,46 @@ bool is_char_pointer_type(const typet &type)
 }
 
 /// \param type: a type
-/// \param ns: name space
-/// \return true if a subtype is an pointer of characters
+/// \param pred: a predicate
+/// \return true if one of the subtype of `type` satisfies predicate `pred`.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+///         For instance in the type `t` defined by
+///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
+///         `double` and `bool` are subtypes of `t`.
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &)> &pred)
+{
+  if(pred(type))
+    return true;
+
+  if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    const struct_union_typet &struct_type = to_struct_union_type(type);
+    return std::any_of(
+      struct_type.components().begin(),
+      struct_type.components().end(), // NOLINTNEXTLINE
+      [&](const struct_union_typet::componentt &comp) {
+        return has_subtype(comp.type(), pred);
+      });
+  }
+
+  return std::any_of( // NOLINTNEXTLINE
+    type.subtypes().begin(), type.subtypes().end(), [&](const typet &t) {
+      return has_subtype(t, pred);
+    });
+}
+
+/// \param type: a type
+/// \param ns: namespace
+/// \return true if a subtype of `type` is an pointer of characters.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
 static bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
 {
   if(is_char_pointer_type(type))
@@ -336,8 +374,21 @@ static bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
   return false;
 }
 
+/// \param type: a type
+/// \return true if a subtype of `type` is string_typet.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+static bool has_string_subtype(const typet &type)
+{
+  // NOLINTNEXTLINE
+  return has_subtype(
+    type, [](const typet &subtype) { return subtype == string_typet(); });
+}
+
 /// \param expr: an expression
-/// \param ns: name space
+/// \param ns: namespace
 /// \return true if a subexpression of `expr` is an array of characters
 static bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 {
@@ -447,6 +498,53 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   return solver;
 }
 
+/// Symbol resolution for expressions of type string typet
+/// \param equations: list of equations
+/// \param ns: namespace
+/// \param stream: output stream
+/// \return union_find_replacet structure containing the correspondences.
+static union_find_replacet string_identifiers_resolution_from_equations(
+  std::vector<equal_exprt> &equations,
+  const namespacet &ns,
+  messaget::mstreamt &stream)
+{
+  const auto eom = messaget::eom;
+  const std::string log_message =
+    "WARNING string_refinement.cpp "
+    "string_identifiers_resolution_from_equations:";
+
+  union_find_replacet result;
+  for(const equal_exprt &eq : equations)
+  {
+    if(eq.rhs().type() == string_typet())
+      result.make_union(eq.lhs(), eq.rhs());
+    else if(has_string_subtype(eq.lhs().type()))
+    {
+      if(eq.rhs().type().id() == ID_struct)
+      {
+        const struct_typet &struct_type = to_struct_type(eq.rhs().type());
+        for(const auto &comp : struct_type.components())
+        {
+          if(comp.type() == string_typet())
+          {
+            const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
+            const exprt rhs_data = simplify_expr(
+              member_exprt(eq.rhs(), comp.get_name(), comp.type()), ns);
+            result.make_union(lhs_data, rhs_data);
+          }
+        }
+      }
+      else
+      {
+        stream << log_message << "non struct with string subexpr "
+               << from_expr(ns, "", eq.rhs()) << "\n  * of type "
+               << from_type(ns, "", eq.rhs().type()) << eom;
+      }
+    }
+  }
+  return result;
+}
+
 void output_equations(
   std::ostream &output,
   const std::vector<equal_exprt> &equations,
@@ -539,8 +637,19 @@ decision_proceduret::resultt string_refinementt::dec_solve()
             << from_expr(ns, "", pair.second) << eom;
 #endif
 
+  const union_find_replacet string_id_symbol_resolve =
+    string_identifiers_resolution_from_equations(equations, ns, debug());
+
   debug() << "dec_solve: Replacing char pointer symbols" << eom;
   replace_symbols_in_equations(symbol_resolve, equations);
+
+  debug() << "dec_solve: Replacing string ids in function applications" << eom;
+  for(equal_exprt &eq : equations)
+  {
+    if(can_cast_expr<function_application_exprt>(eq.rhs()))
+      string_id_symbol_resolve.replace_expr(eq.rhs());
+  }
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
 #endif

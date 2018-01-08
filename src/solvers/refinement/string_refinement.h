@@ -112,4 +112,8 @@ exprt concretize_arrays_in_expression(
 
 bool is_char_array_type(const typet &type, const namespacet &ns);
 
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &)> &pred);
+
 #endif
