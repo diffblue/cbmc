@@ -1,0 +1,13 @@
+KNOWNBUG
+test.class
+--lazy-methods --verbosity 10 --function test.g
+^EXIT=0$
+^SIGNAL=0$
+elaborate java::test\.f:\(\)I
+VERIFICATION SUCCESSFUL
+--
+--
+The right methods are loaded, but verification is not successful
+because __CPROVER_start doesn't create appropriately typed input for
+this kind of nested generic parameter, so dynamic cast checks fail upon
+fetching the generic type's field.

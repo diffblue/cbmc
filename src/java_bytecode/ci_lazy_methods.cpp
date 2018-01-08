@@ -7,7 +7,6 @@
 \*******************************************************************/
 #include "ci_lazy_methods.h"
 
-
 #include <java_bytecode/java_entry_point.h>
 #include <java_bytecode/java_class_loader.h>
 #include <java_bytecode/java_utils.h>
@@ -345,6 +344,22 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
   {
     gather_field_types(pointer_type.subtype(), ns, needed_lazy_methods);
   }
+
+  if(is_java_generic_type(pointer_type))
+  {
+    // Assume if this is a generic like X<A, B, C>, then any concrete parameters
+    // will at some point be instantiated.
+    const auto &generic_args =
+      to_java_generic_type(pointer_type).generic_type_arguments();
+    for(const auto &generic_arg : generic_args)
+    {
+      if(!is_java_generic_parameter(generic_arg))
+      {
+        initialize_needed_classes_from_pointer(
+          generic_arg, ns, needed_lazy_methods);
+      }
+    }
+  }
 }
 
 /// Get places where virtual functions are called.
@@ -477,17 +492,47 @@ void ci_lazy_methodst::gather_field_types(
   ci_lazy_methods_neededt &needed_lazy_methods)
 {
   const auto &underlying_type=to_struct_type(ns.follow(class_type));
-  for(const auto &field : underlying_type.components())
+  if(is_java_array_tag(underlying_type.get_tag()))
   {
-    if(field.type().id()==ID_struct || field.type().id()==ID_symbol)
-      gather_field_types(field.type(), ns, needed_lazy_methods);
-    else if(field.type().id()==ID_pointer)
+    // If class_type is not a symbol this may be a reference array,
+    // but we can't tell what type.
+    if(class_type.id() == ID_symbol)
     {
-      // Skip array primitive pointers, for example:
-      if(field.type().subtype().id()!=ID_symbol)
-        continue;
-      initialize_all_needed_classes_from_pointer(
-        to_pointer_type(field.type()), ns, needed_lazy_methods);
+      const typet &element_type =
+        java_array_element_type(to_symbol_type(class_type));
+      if(element_type.id() == ID_pointer)
+      {
+        // This is a reference array -- mark its element type available.
+        initialize_all_needed_classes_from_pointer(
+          to_pointer_type(element_type), ns, needed_lazy_methods);
+      }
+    }
+  }
+  else
+  {
+    for(const auto &field : underlying_type.components())
+    {
+      if(field.type().id() == ID_struct || field.type().id() == ID_symbol)
+        gather_field_types(field.type(), ns, needed_lazy_methods);
+      else if(field.type().id() == ID_pointer)
+      {
+        if(field.type().subtype().id() == ID_symbol)
+        {
+          initialize_all_needed_classes_from_pointer(
+            to_pointer_type(field.type()), ns, needed_lazy_methods);
+        }
+        else
+        {
+          // If raw structs were possible this would lead to missed
+          // dependencies, as both array element and specialised generic type
+          // information cannot be obtained in this case.
+          // We should therefore only be skipping pointers such as the uint16t*
+          // in our internal String representation.
+          INVARIANT(
+            field.type().subtype().id() != ID_struct,
+            "struct types should be referred to by symbol at this stage");
+        }
+      }
     }
   }
 }
