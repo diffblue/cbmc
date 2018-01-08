@@ -17,6 +17,11 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 #include "goto_model.h"
 
 void remove_instanceof(
+  goto_programt::targett target,
+  goto_programt &goto_program,
+  symbol_tablet &symbol_table);
+
+void remove_instanceof(
   goto_functionst::goto_functiont &function,
   symbol_tablet &symbol_table);
 
