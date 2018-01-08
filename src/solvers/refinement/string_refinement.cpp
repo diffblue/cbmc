@@ -345,33 +345,14 @@ bool has_subtype(
 }
 
 /// \param type: a type
-/// \param ns: namespace
 /// \return true if a subtype of `type` is an pointer of characters.
 ///         The meaning of "subtype" is in the algebraic datatype sense:
 ///         for example, the subtypes of a struct are the types of its
 ///         components, the subtype of a pointer is the type it points to,
 ///         etc...
-static bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
+static bool has_char_pointer_subtype(const typet &type)
 {
-  if(is_char_pointer_type(type))
-    return true;
-
-  if(type.id() == ID_struct || type.id() == ID_union)
-  {
-    const struct_union_typet &struct_type = to_struct_union_type(type);
-    for(const auto &comp : struct_type.components())
-    {
-      if(has_char_pointer_subtype(comp.type(), ns))
-        return true;
-    }
-  }
-
-  for(const auto &t : type.subtypes())
-  {
-    if(has_char_pointer_subtype(t, ns))
-      return true;
-  }
-  return false;
+  return has_subtype(type, is_char_pointer_type);
 }
 
 /// \param type: a type
@@ -471,7 +452,7 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       // function applications can be ignored because they will be replaced
       // in the convert_function_application step of dec_solve
     }
-    else if(has_char_pointer_subtype(lhs.type(), ns))
+    else if(has_char_pointer_subtype(lhs.type()))
     {
       if(rhs.type().id() == ID_struct)
       {
