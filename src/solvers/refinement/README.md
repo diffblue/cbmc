@@ -6,6 +6,52 @@
 
 \section string_solver_interface String solver interface
 
+The basic role of the solver is to answer whether the set of equations given
+is satisfiable. One example usage, is to determine whether an assertion in a 
+program can be violated.
+For instance, CBMC and JBMC, convert a input program and property to check 
+about this program to a set of equations. These equations are fed to a solver,
+which is one of the last step in CBMC and JBMC, as it tells us whether the 
+property holds or can fail.
+
+The secondary role of the solver is to provide a satisfying assignment of 
+the variables of the equations, this can for instance be used to construct
+a trace.
+
+The string solver is particularly aimed at string logic, but since it inherits
+from \ref bv_refinementt it is also capable of handling arithmetic, array logic,
+floating point operations etc.
+The backend uses the flattening of \ref boolbvt to convert expressions to boolean formula.
+
+An example of a problem given to string solver could look like this:
+
+~~~~~
+return_code == cprover_string_concat_func(
+  length1, array1,
+  { .length=length2, .content=content2 },
+  { .length=length3, .content=content3 })
+length3 == length2
+content3 == content2
+is_equal == cprover_string_equals_func(length1, array1, 2, {'a', 'a'})
+is_equal == 1
+~~~~~
+
+Details about the meaning of the primitives `cprover_string_concat_func` and
+`cprover_string_equals_func` are given in section \ref primitives "String Primitives".
+
+The first equality means that the string represented by `{length1, array1}` is
+the concatanation of the string represented by `{length2, array2}` and
+`{length3, array3}`. The second and third mean that `{length2, array2}` and
+`{length3, array3}` represent the same string. The fourth means that `is_equal`
+is 1 if and only if `{length1, array1}` is the string "aa". The last equation
+ensures that `is_equal` has to be equal to 1 in the solution.
+
+For this system of equations the string solver should answer that it is
+satisfiable. It is then possible to recover which assignments make all
+equation true, in that case `length2 = length3 = 1` and
+`content2 = content3 = {'a'}`.
+
+
 \subsection general_interface General interface
 
 The common interface for solvers in CProver is inherited from 
