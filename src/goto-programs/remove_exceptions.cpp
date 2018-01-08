@@ -90,49 +90,53 @@ public:
   {
   }
 
-  void operator()(
-    goto_functionst &goto_functions);
+  void operator()(goto_functionst &goto_functions);
 
 protected:
   symbol_tablet &symbol_table;
   std::map<irep_idt, std::set<irep_idt>> &exceptions_map;
 
   void add_exceptional_returns(
-    const goto_functionst::function_mapt::iterator &);
+    const irep_idt &function_id,
+    goto_programt &goto_program);
 
   void instrument_exception_handler(
-    const goto_functionst::function_mapt::iterator &,
+    const irep_idt &function_id,
+    goto_programt &goto_program,
     const goto_programt::targett &);
 
   void add_exception_dispatch_sequence(
-    const goto_functionst::function_mapt::iterator &,
+    const irep_idt &function_id,
+    goto_programt &goto_program,
     const goto_programt::targett &instr_it,
     const stack_catcht &stack_catch,
     const std::vector<exprt> &locals);
 
   void instrument_throw(
-    const goto_functionst::function_mapt::iterator &,
+    const irep_idt &function_id,
+    goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<exprt> &);
 
   void instrument_function_call(
-    const goto_functionst::function_mapt::iterator &,
+    const irep_idt &function_id,
+    goto_programt &goto_program,
     const goto_programt::targett &,
     const stack_catcht &,
     const std::vector<exprt> &);
 
   void instrument_exceptions(
-    const goto_functionst::function_mapt::iterator &);
+    const irep_idt &function_id,
+    goto_programt &goto_program);
 };
 
 /// adds exceptional return variables for every function that may escape
 /// exceptions
 void remove_exceptionst::add_exceptional_returns(
-  const goto_functionst::function_mapt::iterator &func_it)
+  const irep_idt &function_id,
+  goto_programt &goto_program)
 {
-  const irep_idt &function_id=func_it->first;
-  goto_programt &goto_program=func_it->second.body;
 
   auto maybe_symbol=symbol_table.lookup(function_id);
   INVARIANT(maybe_symbol, "functions should be recorded in the symbol table");
@@ -236,17 +240,17 @@ void remove_exceptionst::add_exceptional_returns(
 /// Translates an exception landing-pad into instructions that copy the
 /// in-flight exception pointer to a nominated expression, then clear the
 /// in-flight exception (i.e. null the pointer), hence marking it caught.
-/// \param func_it: iterator pointing to the function containing this
-///   landingpad instruction
-/// \param instr_it [in, out]: iterator pointing to the landingpad instruction.
+/// \param function_id: name of the function containing this landingpad
+///   instruction
+/// \param goto_program: body of the function containing this landingpad
+///   instruction
+/// \param instr_it: iterator pointing to the landingpad instruction.
 ///   Will be overwritten.
 void remove_exceptionst::instrument_exception_handler(
-  const goto_functionst::function_mapt::iterator &func_it,
+  const irep_idt &function_id,
+  goto_programt &goto_program,
   const goto_programt::targett &instr_it)
 {
-  const irep_idt &function_id=func_it->first;
-  goto_programt &goto_program=func_it->second.body;
-
   PRECONDITION(instr_it->type==CATCH);
 
   // retrieve the exception variable
@@ -285,20 +289,19 @@ void remove_exceptionst::instrument_exception_handler(
 /// if (exception instanceof ExnA) then goto handlerA
 /// else if (exception instanceof ExnB) then goto handlerB
 /// else goto universal_handler or (dead locals; function exit)
-/// \param func_it: iterator pointing to function instr_it belongs to
+/// \param function_id: name of the function to which instr_it belongs
+/// \param goto_program: body of the function to which instr_it belongs
 /// \param instr_it: throw or call instruction that may be an
 ///   exception source
 /// \param stack_catch: exception handlers currently registered
 /// \param locals: local variables to kill on a function-exit edge
 void remove_exceptionst::add_exception_dispatch_sequence(
-  const goto_functionst::function_mapt::iterator &func_it,
+  const irep_idt &function_id,
+  goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
-  const irep_idt &function_id=func_it->first;
-  goto_programt &goto_program=func_it->second.body;
-
   // Unless we have a universal exception handler, jump to end of function
   // if not caught:
   goto_programt::targett default_target=goto_program.get_end_function();
@@ -360,10 +363,11 @@ void remove_exceptionst::add_exception_dispatch_sequence(
   }
 }
 
-/// instruments each throw with conditional GOTOS to the  corresponding
+/// instruments each throw with conditional GOTOS to the corresponding
 /// exception handlers
 void remove_exceptionst::instrument_throw(
-  const goto_functionst::function_mapt::iterator &func_it,
+  const irep_idt &function_id,
+  goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const remove_exceptionst::stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
@@ -383,11 +387,11 @@ void remove_exceptionst::instrument_throw(
     return;
 
   add_exception_dispatch_sequence(
-    func_it, instr_it, stack_catch, locals);
+    function_id, goto_program, instr_it, stack_catch, locals);
 
   // find the symbol where the thrown exception should be stored:
-  const symbolt &exc_symbol=
-    symbol_table.lookup_ref(id2string(func_it->first)+EXC_SUFFIX);
+  const symbolt &exc_symbol =
+    symbol_table.lookup_ref(id2string(function_id) + EXC_SUFFIX);
   symbol_exprt exc_thrown=exc_symbol.symbol_expr();
 
   // add the assignment with the appropriate cast
@@ -401,15 +405,13 @@ void remove_exceptionst::instrument_throw(
 /// instruments each function call that may escape exceptions with conditional
 /// GOTOS to the corresponding exception handlers
 void remove_exceptionst::instrument_function_call(
-  const goto_functionst::function_mapt::iterator &func_it,
+  const irep_idt &function_id,
+  goto_programt &goto_program,
   const goto_programt::targett &instr_it,
   const stack_catcht &stack_catch,
   const std::vector<exprt> &locals)
 {
   PRECONDITION(instr_it->type==FUNCTION_CALL);
-
-  goto_programt &goto_program=func_it->second.body;
-  const irep_idt &function_id=func_it->first;
 
   // save the address of the next instruction
   goto_programt::targett next_it=instr_it;
@@ -430,7 +432,7 @@ void remove_exceptionst::instrument_function_call(
   if(callee_inflight_exception && local_inflight_exception)
   {
     add_exception_dispatch_sequence(
-      func_it, instr_it, stack_catch, locals);
+      function_id, goto_program, instr_it, stack_catch, locals);
 
     const symbol_exprt callee_inflight_exception_expr=
       callee_inflight_exception->symbol_expr();
@@ -463,12 +465,12 @@ void remove_exceptionst::instrument_function_call(
 /// handlers. Additionally, it re-computes the live-range of local variables in
 /// order to add DEAD instructions.
 void remove_exceptionst::instrument_exceptions(
-  const goto_functionst::function_mapt::iterator &func_it)
+  const irep_idt &function_id,
+  goto_programt &goto_program)
 {
   stack_catcht stack_catch; // stack of try-catch blocks
   std::vector<std::vector<exprt>> stack_locals; // stack of local vars
   std::vector<exprt> locals;
-  goto_programt &goto_program=func_it->second.body;
 
   if(goto_program.empty())
     return;
@@ -486,7 +488,7 @@ void remove_exceptionst::instrument_exceptions(
       // Is it an exception landing pad (start of a catch block)?
       if(statement==ID_exception_landingpad)
       {
-        instrument_exception_handler(func_it, instr_it);
+        instrument_exception_handler(function_id, goto_program, instr_it);
       }
       // Is it a catch handler pop?
       else if(statement==ID_pop_catch)
@@ -551,11 +553,13 @@ void remove_exceptionst::instrument_exceptions(
     }
     else if(instr_it->type==THROW)
     {
-      instrument_throw(func_it, instr_it, stack_catch, locals);
+      instrument_throw(
+        function_id, goto_program, instr_it, stack_catch, locals);
     }
     else if(instr_it->type==FUNCTION_CALL)
     {
-      instrument_function_call(func_it, instr_it, stack_catch, locals);
+      instrument_function_call(
+        function_id, goto_program, instr_it, stack_catch, locals);
     }
   }
 }
@@ -563,9 +567,9 @@ void remove_exceptionst::instrument_exceptions(
 void remove_exceptionst::operator()(goto_functionst &goto_functions)
 {
   Forall_goto_functions(it, goto_functions)
-    add_exceptional_returns(it);
+    add_exceptional_returns(it->first, it->second.body);
   Forall_goto_functions(it, goto_functions)
-    instrument_exceptions(it);
+    instrument_exceptions(it->first, it->second.body);
 }
 
 /// removes throws/CATCH-POP/CATCH-PUSH
@@ -583,7 +587,5 @@ void remove_exceptions(
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(goto_modelt &goto_model)
 {
-  remove_exceptions(
-    goto_model.symbol_table,
-    goto_model.goto_functions);
+  remove_exceptions(goto_model.symbol_table, goto_model.goto_functions);
 }
