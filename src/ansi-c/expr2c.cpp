@@ -1644,11 +1644,11 @@ std::string expr2ct::convert_symbol(
 }
 
 std::string expr2ct::convert_nondet_symbol(
-  const exprt &src,
+  const nondet_symbol_exprt &src,
   unsigned &precedence)
 {
-  const std::string &id=src.get_string(ID_identifier);
-  return "nondet_symbol("+id+")";
+  const irep_idt id=src.get_identifier();
+  return "nondet_symbol("+id2string(id)+")";
 }
 
 std::string expr2ct::convert_predicate_symbol(
@@ -3790,7 +3790,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_symbol(src, precedence);
 
   else if(src.id()==ID_nondet_symbol)
-    return convert_nondet_symbol(src, precedence);
+    return convert_nondet_symbol(to_nondet_symbol_expr(src), precedence);
 
   else if(src.id()==ID_predicate_symbol)
     return convert_predicate_symbol(src, precedence);

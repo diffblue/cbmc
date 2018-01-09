@@ -540,7 +540,7 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
     const typet &type=expr.type();
 
     irep_idt id=to_symbol_expr(expr).get_identifier();
-    assert(id!="");
+    DATA_INVARIANT(!id.empty(), "symbol must have identifier");
 
     // boolean symbols may have to be converted
     from_bool_begin(type, bool_as_bv);
@@ -553,8 +553,8 @@ void smt1_convt::convert_expr(const exprt &expr, bool bool_as_bv)
   {
     const typet &type=expr.type();
 
-    irep_idt id=expr.get(ID_identifier);
-    assert(id!="");
+    irep_idt id=to_nondet_symbol_expr(expr).get_identifier();
+    DATA_INVARIANT(!id.empty(), "symbol must have identifier");
 
     // boolean symbols may have to be converted
     from_bool_begin(type, bool_as_bv);
@@ -2822,7 +2822,8 @@ void smt1_convt::find_symbols(const exprt &expr)
     if(expr.id()==ID_symbol)
       identifier=to_symbol_expr(expr).get_identifier();
     else
-      identifier="nondet_"+expr.get_string(ID_identifier);
+      identifier="nondet_"+
+        id2string(to_nondet_symbol_expr(expr).get_identifier());
 
     if(quantified_symbols.find(identifier)!=quantified_symbols.end())
       return; // Symbol is quantified, i.e., it doesn't require declaration.

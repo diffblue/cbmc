@@ -227,7 +227,8 @@ protected:
   std::string convert_predicate_next_symbol(const exprt &src, unsigned &precedence);
   // NOLINTNEXTLINE(whitespace/line_length)
   std::string convert_predicate_passive_symbol(const exprt &src, unsigned &precedence);
-  std::string convert_nondet_symbol(const exprt &src, unsigned &precedence);
+  // NOLINTNEXTLINE(whitespace/line_length)
+  std::string convert_nondet_symbol(const nondet_symbol_exprt &, unsigned &precedence);
   std::string convert_quantified_symbol(const exprt &src, unsigned &precedence);
   std::string convert_nondet_bool(const exprt &src, unsigned &precedence);
   std::string convert_object_descriptor(const exprt &src, unsigned &precedence);
