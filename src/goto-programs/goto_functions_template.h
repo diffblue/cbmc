@@ -103,7 +103,17 @@ public:
   typedef std::map<irep_idt, goto_functiont> function_mapt;
   function_mapt function_map;
 
-  goto_functions_templatet()
+private:
+  /// A location number such that numbers in the interval
+  /// [unused_location_number, MAX_UINT] are all unused. There might still be
+  /// unused numbers below this.
+  /// If numbering a new function or renumbering a function, starting from this
+  /// number is safe.
+  unsigned unused_location_number;
+
+public:
+  goto_functions_templatet():
+    unused_location_number(0)
   {
   }
 
@@ -111,7 +121,8 @@ public:
   goto_functions_templatet &operator=(const goto_functions_templatet &)=delete;
 
   goto_functions_templatet(goto_functions_templatet &&other):
-    function_map(std::move(other.function_map))
+    function_map(std::move(other.function_map)),
+    unused_location_number(other.unused_location_number)
   {
   }
 
@@ -133,6 +144,7 @@ public:
     std::ostream &out) const;
 
   void compute_location_numbers();
+  void compute_location_numbers(goto_programt &);
   void compute_loop_numbers();
   void compute_target_numbers();
   void compute_incoming_edges();
@@ -186,11 +198,21 @@ void goto_functions_templatet<bodyT>::output(
 template <class bodyT>
 void goto_functions_templatet<bodyT>::compute_location_numbers()
 {
-  unsigned nr=0;
+  unused_location_number = 0;
   for(auto &func : function_map)
   {
-    func.second.body.compute_location_numbers(nr);
+    // Side-effect: bumps unused_location_number.
+    func.second.body.compute_location_numbers(unused_location_number);
   }
+}
+
+template <class bodyT>
+void goto_functions_templatet<bodyT>::compute_location_numbers(
+  goto_programt &program)
+{
+  // Renumber just this single function. Use fresh numbers in case it has
+  // grown since it was last numbered.
+  program.compute_location_numbers(unused_location_number);
 }
 
 template <class bodyT>

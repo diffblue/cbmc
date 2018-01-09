@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sstream>
 #include <string>
 
+#include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/symbol_table.h>
 #include <util/source_location.h>
@@ -512,7 +513,12 @@ public:
   void compute_location_numbers(unsigned &nr)
   {
     for(auto &i : instructions)
+    {
+      INVARIANT(
+        nr != std::numeric_limits<unsigned>::max(),
+        "Too many location numbers assigned");
       i.location_number=nr++;
+    }
   }
 
   /// Compute location numbers

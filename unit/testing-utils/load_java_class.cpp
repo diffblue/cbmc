@@ -62,7 +62,7 @@ symbol_tablet load_java_class(
   // Construct a lazy_goto_modelt
   null_message_handlert message_handler;
   lazy_goto_modelt lazy_goto_model(
-    [] (goto_functionst::goto_functiont &function, symbol_tablet &symbol_table)
+    [] (goto_model_functiont &function)
     { },
     [] (goto_modelt &goto_model)
     { return false; },
