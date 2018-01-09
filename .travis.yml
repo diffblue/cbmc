@@ -92,7 +92,8 @@ jobs:
         - HOMEBREW_NO_AUTO_UPDATE=1 brew install ccache
         - export PATH=/usr/local/opt/ccache/libexec:$PATH
       env:
-        - COMPILER="ccache clang++ -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache clang++"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
 
     # Ubuntu Linux with glibc using g++-5, debug mode
@@ -135,10 +136,10 @@ jobs:
             - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
-        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache clang++-3.7"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics"
         - CCACHE_CPP2=yes
         - EXTRA_CXXFLAGS="-DNDEBUG"
 
@@ -160,12 +161,11 @@ jobs:
             - libubsan0
       before_install:
         - mkdir bin ; ln -s /usr/bin/clang-3.7 bin/gcc
-        - export CCACHE_CPP2=yes
       # env: COMPILER=clang++-3.7 SAN_FLAGS="-fsanitize=undefined -fno-sanitize-recover=undefined,integer -fno-omit-frame-pointer"
       env:
-        - COMPILER="ccache clang++-3.7 -Qunused-arguments -fcolor-diagnostics"
+        - COMPILER="ccache clang++-3.7"
         - CCACHE_CPP2=yes
-        - EXTRA_CXXFLAGS="-DDEBUG"
+        - EXTRA_CXXFLAGS="-Qunused-arguments -fcolor-diagnostics -DDEBUG"
       script: echo "Not running any tests for a debug build."
 
     # cmake build using g++-5
