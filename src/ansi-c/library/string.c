@@ -52,15 +52,13 @@ __inline char *__builtin___strcat_chk(char *dst, const char *src, __CPROVER_size
   while(dst[i]!=0) i++;
 
   __CPROVER_size_t j=0;
-  char ch;
-  do
+  char ch = 1;
+  for(; i < s && ch != (char)0; ++i, ++j)
   {
     ch=src[j];
     dst[i]=ch;
-    i++;
-    j++;
   }
-  while(i<s && ch!=(char)0);
+  dst[i] = '\0';
   #endif
   return dst;
 }
@@ -90,10 +88,19 @@ __inline char *__builtin___strncat_chk(
   #else
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "strncat src/dst overlap");
-  (void)*dst;
-  (void)*src;
-  (void)n;
-  (void)s;
+
+  __CPROVER_size_t i = 0;
+  while(dst[i] != 0)
+    i++;
+
+  __CPROVER_size_t j = 0;
+  char ch = 1;
+  for(; i < s && j < n && ch != (char)0; ++i, ++j)
+  {
+    ch = src[j];
+    dst[i] = ch;
+  }
+  dst[i] = '\0';
   #endif
   return dst;
 }
@@ -236,15 +243,13 @@ inline char *strcat(char *dst, const char *src)
   while(dst[i]!=0) i++;
 
   __CPROVER_size_t j=0;
-  char ch;
-  do
+  char ch = 1;
+  for(; ch != (char)0; ++i, ++j)
   {
     ch=src[j];
     dst[i]=ch;
-    i++;
-    j++;
   }
-  while(ch!=(char)0);
+  dst[i] = '\0';
   #endif
   return dst;
 }
@@ -279,9 +284,19 @@ inline char *strncat(char *dst, const char *src, size_t n)
   #else
   __CPROVER_assert(__CPROVER_POINTER_OBJECT(dst)!=
                    __CPROVER_POINTER_OBJECT(src), "strncat src/dst overlap");
-  (void)*dst;
-  (void)*src;
-  (void)n;
+
+  __CPROVER_size_t i = 0;
+  while(dst[i] != 0)
+    i++;
+
+  __CPROVER_size_t j = 0;
+  char ch = 1;
+  for(; j < n && ch != (char)0; ++i, ++j)
+  {
+    ch = src[j];
+    dst[i] = ch;
+  }
+  dst[i] = '\0';
   #endif
   return dst;
 }
