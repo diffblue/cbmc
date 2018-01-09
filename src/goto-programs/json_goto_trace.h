@@ -21,6 +21,7 @@ Date: November 2005
 void convert(
   const namespacet &,
   const goto_tracet &,
-  jsont &);
+  jsont &,
+  trace_optionst trace_options = trace_optionst::default_options);
 
 #endif // CPROVER_GOTO_PROGRAMS_JSON_GOTO_TRACE_H

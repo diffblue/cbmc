@@ -25,6 +25,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <solvers/smt1/smt1_dec.h>
 #include <solvers/smt2/smt2_dec.h>
 
+#include <goto-programs/goto_trace.h>
+
 #include <goto-symex/symex_target_equation.h>
 #include <goto-programs/safety_checker.h>
 #include <goto-symex/memory_model.h>
@@ -97,6 +99,11 @@ protected:
   virtual void show_vcc();
   virtual void show_vcc_plain(std::ostream &out);
   virtual void show_vcc_json(std::ostream &out);
+
+  trace_optionst trace_options()
+  {
+    return trace_optionst(options);
+  }
 
   virtual resultt all_properties(
     const goto_functionst &goto_functions,

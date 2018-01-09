@@ -18,6 +18,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <analyses/goto_check.h>
 
+#include <goto-programs/goto_trace.h>
+
 #include <java_bytecode/java_bytecode_language.h>
 
 class bmct;
@@ -62,7 +64,8 @@ class optionst;
   "(graphml-witness):" \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
-  "(localize-faults)(localize-faults-method):"
+  "(localize-faults)(localize-faults-method):" \
+  OPT_GOTO_TRACE
 
 class jbmc_parse_optionst:
   public parse_options_baset,
