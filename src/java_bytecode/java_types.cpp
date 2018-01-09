@@ -252,7 +252,7 @@ std::string erase_type_arguments(const std::string &src)
     class_name.erase(f_pos, e_pos - f_pos + 1);
 
     // Search the remainder of the string for generic signature
-    f_pos = class_name.find('<', e_pos + 1);
+    f_pos = class_name.find('<', f_pos + 1);
   }
   return class_name;
 }

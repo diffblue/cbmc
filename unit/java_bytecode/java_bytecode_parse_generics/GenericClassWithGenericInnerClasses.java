@@ -45,6 +45,8 @@ public class GenericClassWithGenericInnerClasses<T>
   TwoParamInnerClass<Interface_Implementation,T> field9;
   TwoParamInnerClass<T,T> field10;
 
+  GenericInnerClass<GenericClassWithGenericInnerClasses<Integer>>.DoublyNestedInnerGenericClass<T>  field11;
+
   void method(InnerClass input)
   {
 
