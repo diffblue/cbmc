@@ -5,6 +5,6 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 \[.*] dereference failure: pointer outside dynamic object bounds in .*: FAILURE
-\*\* 1 of .* failed \(.*\)
+\*\* 2 of .* failed \(.*\)
 --
 ^warning: ignoring

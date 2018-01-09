@@ -548,10 +548,16 @@ void *memcpy(void *dst, const void *src, size_t n)
                    __CPROVER_POINTER_OBJECT(src), "memcpy src/dst overlap");
   (void)*(char *)dst; // check that the memory is accessible
   (void)*(const char *)src; // check that the memory is accessible
-  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dst, src_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)dst) + n - 1);       // check that the memory is accessible
+    (void)*(((const char *)src) + n - 1); // check that the memory is accessible
+    //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dst, src_n);
+  }
   #endif
   return dst;
 }
@@ -581,10 +587,16 @@ void *__builtin___memcpy_chk(void *dst, const void *src, __CPROVER_size_t n, __C
   (void)*(char *)dst; // check that the memory is accessible
   (void)*(const char *)src; // check that the memory is accessible
   (void)size;
-  //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dst, src_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)dst) + n - 1);       // check that the memory is accessible
+    (void)*(((const char *)src) + n - 1); // check that the memory is accessible
+    //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dst, src_n);
+  }
   #endif
   return dst;
 }
@@ -618,11 +630,16 @@ void *memset(void *s, int c, size_t n)
     __CPROVER_is_zero_string(s)=0;
   #else
   (void)*(char *)s; // check that the memory is accessible
-  //char *sp=s;
-  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-  unsigned char s_n[n];
-  __CPROVER_array_set(s_n, (unsigned char)c);
-  __CPROVER_array_replace((unsigned char*)s, s_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)s) + n - 1); // check that the memory is accessible
+    //char *sp=s;
+    //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+    unsigned char s_n[n];
+    __CPROVER_array_set(s_n, (unsigned char)c);
+    __CPROVER_array_replace((unsigned char *)s, s_n);
+  }
   #endif
   return s;
 }
@@ -646,13 +663,21 @@ void *__builtin_memset(void *s, int c, __CPROVER_size_t n)
     __CPROVER_zero_string_length(s)=0;
   }
   else
+  {
     __CPROVER_is_zero_string(s)=0;
+  }
   #else
-  //char *sp=s;
-  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-  unsigned char s_n[n];
-  __CPROVER_array_set(s_n, (unsigned char)c);
-  __CPROVER_array_replace((unsigned char*)s, s_n);
+  (void)*(char *)s; // check that the memory is accessible
+
+  if(n > 0)
+  {
+    (void)*(((char *)s) + n - 1); // check that the memory is accessible
+    //char *sp=s;
+    //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+    unsigned char s_n[n];
+    __CPROVER_array_set(s_n, (unsigned char)c);
+    __CPROVER_array_replace((unsigned char *)s, s_n);
+  }
   #endif
   return s;
 }
@@ -681,11 +706,16 @@ void *__builtin___memset_chk(void *s, int c, __CPROVER_size_t n, __CPROVER_size_
   #else
   (void)*(char *)s; // check that the memory is accessible
   (void)size;
-  //char *sp=s;
-  //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
-  unsigned char s_n[n];
-  __CPROVER_array_set(s_n, (unsigned char)c);
-  __CPROVER_array_replace((unsigned char*)s, s_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)s) + n - 1); // check that the memory is accessible
+    //char *sp=s;
+    //for(__CPROVER_size_t i=0; i<n ; i++) sp[i]=c;
+    unsigned char s_n[n];
+    __CPROVER_array_set(s_n, (unsigned char)c);
+    __CPROVER_array_replace((unsigned char *)s, s_n);
+  }
   #endif
   return s;
 }
@@ -716,9 +746,15 @@ void *memmove(void *dest, const void *src, size_t n)
   #else
   (void)*(char *)dest; // check that the memory is accessible
   (void)*(const char *)src;  // check that the memory is accessible
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dest, src_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)dest) + n - 1);      // check that the memory is accessible
+    (void)*(((const char *)src) + n - 1); // check that the memory is accessible
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dest, src_n);
+  }
   #endif
   return dest;
 }
@@ -746,12 +782,22 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
     __CPROVER_zero_string_length(dest)=__CPROVER_zero_string_length(src);
   }
   else
+  {
     __CPROVER_is_zero_string(dest)=0;
+  }
   #else
+  (void)*(char *)dest; // check that the memory is accessible
+  (void)*(const char *)src;  // check that the memory is accessible
   (void)size;
-  char src_n[n];
-  __CPROVER_array_copy(src_n, (char*)src);
-  __CPROVER_array_replace((char*)dest, src_n);
+
+  if(n > 0)
+  {
+    (void)*(((char *)dest) + n - 1);      // check that the memory is accessible
+    (void)*(((const char *)src) + n - 1); // check that the memory is accessible
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dest, src_n);
+  }
   #endif
   return dest;
 }
