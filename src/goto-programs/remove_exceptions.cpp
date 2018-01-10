@@ -82,23 +82,25 @@ class remove_exceptionst
   typedef std::vector<std::pair<
     irep_idt, goto_programt::targett>> catch_handlerst;
   typedef std::vector<catch_handlerst> stack_catcht;
+  typedef std::function<bool(const irep_idt &)> function_may_throwt;
 
 public:
   explicit remove_exceptionst(
     symbol_tablet &_symbol_table,
-    std::map<irep_idt, std::set<irep_idt>> &_exceptions_map,
+    function_may_throwt _function_may_throw,
     bool remove_added_instanceof)
     : symbol_table(_symbol_table),
-      exceptions_map(_exceptions_map),
+      function_may_throw(_function_may_throw),
       remove_added_instanceof(remove_added_instanceof)
   {
   }
 
   void operator()(goto_functionst &goto_functions);
+  void operator()(goto_programt &goto_program);
 
 protected:
   symbol_tablet &symbol_table;
-  std::map<irep_idt, std::set<irep_idt>> &exceptions_map;
+  function_may_throwt function_may_throw;
   bool remove_added_instanceof;
 
   symbol_exprt get_inflight_exception_global();
@@ -173,7 +175,7 @@ bool remove_exceptionst::may_throw_or_receive_exceptions(
         "identifier expected to be a symbol");
       const irep_idt &function_name=
         to_symbol_expr(function_expr).get_identifier();
-      if(!exceptions_map[function_name].empty())
+      if(function_may_throw(function_name))
         return true;
     }
   }
@@ -366,9 +368,7 @@ void remove_exceptionst::instrument_function_call(
   const irep_idt &callee_id=
     to_symbol_expr(function_call.function()).get_identifier();
 
-  bool callee_may_throw = !exceptions_map[callee_id].empty();
-
-  if(callee_may_throw)
+  if(function_may_throw(callee_id))
   {
     add_exception_dispatch_sequence(
       goto_program, instr_it, stack_catch, locals);
@@ -499,6 +499,11 @@ void remove_exceptionst::operator()(goto_functionst &goto_functions)
     instrument_exceptions(it->second.body);
 }
 
+void remove_exceptionst::operator()(goto_programt &goto_program)
+{
+  instrument_exceptions(goto_program);
+}
+
 /// removes throws/CATCH-POP/CATCH-PUSH
 void remove_exceptions(
   symbol_tablet &symbol_table,
@@ -508,11 +513,38 @@ void remove_exceptions(
   const namespacet ns(symbol_table);
   std::map<irep_idt, std::set<irep_idt>> exceptions_map;
   uncaught_exceptions(goto_functions, ns, exceptions_map);
+  auto function_may_throw = [&exceptions_map](const irep_idt &id) {
+    return !exceptions_map[id].empty();
+  };
   remove_exceptionst remove_exceptions(
     symbol_table,
-    exceptions_map,
+    function_may_throw,
     type == remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
   remove_exceptions(goto_functions);
+}
+
+/// removes throws/CATCH-POP/CATCH-PUSH from a single GOTO program, replacing
+/// them with explicit exception propagation.
+/// Note this is somewhat less accurate than the whole-goto-model version,
+/// because we can't inspect other functions to determine whether they throw
+/// or not, and therefore must assume they do and always introduce post-call
+/// exception dispatch.
+/// \param goto_program: program to remove exceptions from
+/// \param symbol_table: global symbol table. The @inflight_exception global
+///   may be added if not already present. It will not be initialised; that is
+///   the caller's responsibility.
+void remove_exceptions(
+  goto_programt &goto_program,
+  symbol_tablet &symbol_table,
+  remove_exceptions_typest type)
+{
+  auto any_function_may_throw = [](const irep_idt &id) { return true; };
+
+  remove_exceptionst remove_exceptions(
+    symbol_table,
+    any_function_may_throw,
+    type == remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
+  remove_exceptions(goto_program);
 }
 
 /// removes throws/CATCH-POP/CATCH-PUSH
