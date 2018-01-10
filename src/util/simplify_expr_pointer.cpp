@@ -388,38 +388,39 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   return true;
 }
 
+static exprt simplify_inequality_address_of_prepare_op(const exprt &op)
+{
+  exprt result = op;
+  if(op.id() == ID_typecast)
+  {
+    result = result.op0();
+  }
+  if(
+    result.op0().id() == ID_index &&
+    to_index_expr(result.op0()).index().is_zero())
+  {
+    result = address_of_exprt(to_index_expr(result.op0()).array());
+  }
+  return result;
+}
+
 bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
   assert(expr.operands().size()==2);
   assert(expr.id()==ID_equal || expr.id()==ID_notequal);
 
-  exprt tmp0=expr.op0();
-  if(tmp0.id()==ID_typecast)
-    tmp0=expr.op0().op0();
-  if(tmp0.op0().id()==ID_index &&
-     to_index_expr(tmp0.op0()).index().is_zero())
-    tmp0=address_of_exprt(to_index_expr(tmp0.op0()).array());
-  exprt tmp1=expr.op1();
-  if(tmp1.id()==ID_typecast)
-    tmp1=expr.op1().op0();
-  if(tmp1.op0().id()==ID_index &&
-     to_index_expr(tmp1.op0()).index().is_zero())
-    tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
-  assert(tmp0.id()==ID_address_of);
-  assert(tmp1.id()==ID_address_of);
+  exprt lhs = simplify_inequality_address_of_prepare_op(expr.op0());
+  exprt rhs = simplify_inequality_address_of_prepare_op(expr.op1());
+  assert(lhs.id() == ID_address_of);
+  assert(rhs.id() == ID_address_of);
 
-  if(tmp0.operands().size()!=1)
-    return true;
-  if(tmp1.operands().size()!=1)
+  if(lhs.operands().size() != 1 || rhs.operands().size() != 1)
     return true;
 
-  if(tmp0.op0().id()==ID_symbol &&
-     tmp1.op0().id()==ID_symbol)
+  if(lhs.op0().id() == ID_symbol && rhs.op0().id() == ID_symbol)
   {
-    bool equal=
-       tmp0.op0().get(ID_identifier)==
-       tmp1.op0().get(ID_identifier);
+    bool equal = lhs.op0().get(ID_identifier) == rhs.op0().get(ID_identifier);
 
     expr.make_bool(expr.id()==ID_equal?equal:!equal);
 
