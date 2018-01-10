@@ -30,15 +30,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/goto_convert_functions.h>
 #include <goto-programs/goto_inline.h>
-#include <goto-programs/link_to_library.h>
 #include <goto-programs/loop_ids.h>
-#include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_virtual_functions.h>
 #include <goto-programs/remove_instanceof.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_exceptions.h>
-#include <goto-programs/remove_vector.h>
-#include <goto-programs/remove_complex.h>
 #include <goto-programs/remove_asm.h>
 #include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/remove_skip.h>
@@ -48,11 +44,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_symbol_table.h>
 #include <goto-programs/show_properties.h>
-#include <goto-programs/string_abstraction.h>
-#include <goto-programs/string_instrumentation.h>
 #include <goto-programs/remove_java_new.h>
 
-#include <goto-symex/rewrite_union.h>
 #include <goto-symex/adjust_float_expressions.h>
 
 #include <goto-instrument/full_slicer.h>
@@ -682,18 +675,7 @@ bool jbmc_parse_optionst::process_goto_functions(
   {
     remove_java_new(goto_model, get_message_handler());
 
-    // add the library
-    link_to_library(goto_model, get_message_handler());
-
-    if(cmdline.isset("string-abstraction"))
-      string_instrumentation(goto_model, get_message_handler());
-
-    // remove function pointers
-    status() << "Removal of function pointers and virtual functions" << eom;
-    remove_function_pointers(
-      get_message_handler(),
-      goto_model,
-      cmdline.isset("pointer-check"));
+    status() << "Removal of virtual functions" << eom;
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof but request it is removed)
@@ -705,9 +687,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // remove returns, gcc vectors, complex
     remove_returns(goto_model);
-    remove_vector(goto_model);
-    remove_complex(goto_model);
-    rewrite_union(goto_model);
 
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we
@@ -747,14 +726,6 @@ bool jbmc_parse_optionst::process_goto_functions(
       status() << "Adding nondeterministic initialization "
                   "of static/global variables" << eom;
       nondet_static(goto_model);
-    }
-
-    if(cmdline.isset("string-abstraction"))
-    {
-      status() << "String Abstraction" << eom;
-      string_abstraction(
-        goto_model,
-        get_message_handler());
     }
 
     // add failed symbols
@@ -887,7 +858,6 @@ void jbmc_parse_optionst::help()
     " --stop-on-fail               stop analysis once a failed property is detected\n" // NOLINT(*)
     " --trace                      give a counterexample trace for failed properties\n" //NOLINT(*)
     "\n"
-    " --no-library                 disable built-in abstract Java library\n"
     HELP_FUNCTIONS
     "\n"
     "Program representations:\n"

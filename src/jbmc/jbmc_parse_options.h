@@ -54,13 +54,13 @@ class optionst;
   "(show-properties)" \
   "(drop-unused-functions)" \
   "(property):(stop-on-fail)(trace)" \
-  "(verbosity):(no-library)" \
+  "(verbosity):" \
   "(version)" \
   "(cover):(symex-coverage-report):" \
   "(i386-linux)(i386-macos)(i386-win32)(win32)(winx64)" \
   "(ppc-macos)" \
   "(arrays-uf-always)(arrays-uf-never)" \
-  "(string-abstraction)(no-arch)(arch):" \
+  "(no-arch)(arch):" \
   "(graphml-witness):" \
   JAVA_BYTECODE_LANGUAGE_OPTIONS \
   "(java-unwind-enum-static)" \
