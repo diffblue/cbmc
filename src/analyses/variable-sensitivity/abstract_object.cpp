@@ -168,17 +168,18 @@ abstract_object_pointert abstract_objectt::expression_transform(
 {
   exprt constant_replaced_expr=expr;
   constant_replaced_expr.operands().clear();
+
+  // Two passes over the expression - one for simplification,
+  // another to check if there are any top subexpressions left
   for(const exprt &op : expr.operands())
   {
     abstract_object_pointert lhs_abstract_object=environment.eval(op, ns);
     const exprt &lhs_value=lhs_abstract_object->to_constant();
-
     if(lhs_value.is_nil())
     {
-      // One of the values is not resolvable to a constant
-      // so we can't really do anything more with
-      // this expression and should just return top for the result
-      return environment.abstract_object_factory(expr.type(), ns, true, false);
+      // do not give up if a sub-expression is not a constant,
+      // because the whole expression may still be simplified in some cases
+      constant_replaced_expr.operands().push_back(op);
     }
     else
     {
@@ -188,7 +189,19 @@ abstract_object_pointert abstract_objectt::expression_transform(
     }
   }
 
-  exprt simplified=simplify_expr(constant_replaced_expr, ns);
+  exprt simplified = simplify_expr(constant_replaced_expr, ns);
+
+  for(const exprt &op : simplified.operands())
+  {
+    abstract_object_pointert lhs_abstract_object = environment.eval(op, ns);
+    const exprt &lhs_value = lhs_abstract_object->to_constant();
+    if(lhs_value.is_nil())
+    {
+      return environment.abstract_object_factory(
+        simplified.type(), ns, true, false);
+    }
+  }
+
   return environment.abstract_object_factory(simplified.type(), simplified, ns);
 }
 
