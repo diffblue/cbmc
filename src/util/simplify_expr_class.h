@@ -122,7 +122,7 @@ public:
   bool simplify_address_of_arg(exprt &expr);
   bool simplify_inequality_constant(exprt &expr);
   bool simplify_inequality_not_constant(exprt &expr);
-  bool simplify_inequality_address_of(exprt &expr);
+  bool simplify_equality_or_inequality_address_of(exprt &expr);
   bool simplify_inequality_pointer_object(exprt &expr);
 
   // main recursion

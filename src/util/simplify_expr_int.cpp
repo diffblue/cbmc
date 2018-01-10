@@ -1208,7 +1208,7 @@ bool simplify_exprt::simplify_inequality(exprt &expr)
       (tmp1.id()==ID_address_of ||
        (tmp1.id()==ID_typecast && tmp1.op0().id()==ID_address_of)) &&
       (expr.id()==ID_equal || expr.id()==ID_notequal))
-    return simplify_inequality_address_of(expr);
+    return simplify_equality_or_inequality_address_of(expr);
 
   if(tmp0.id()==ID_pointer_object &&
      tmp1.id()==ID_pointer_object &&

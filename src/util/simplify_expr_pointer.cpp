@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <cassert>
 
 #include "c_types.h"
+#include "simplify_expr.h"
 #include "expr.h"
 #include "namespace.h"
 #include "std_expr.h"
@@ -417,40 +418,78 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   return true;
 }
 
-bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
+/// Remove any typecasts around the expression
+static exprt strip_typecasts(const exprt &expr)
 {
-  assert(expr.type().id()==ID_bool);
-  assert(expr.operands().size()==2);
-  assert(expr.id()==ID_equal || expr.id()==ID_notequal);
-
-  exprt tmp0=expr.op0();
-  if(tmp0.id()==ID_typecast)
-    tmp0=expr.op0().op0();
-  if(tmp0.op0().id()==ID_index &&
-     to_index_expr(tmp0.op0()).index().is_zero())
-    tmp0=address_of_exprt(to_index_expr(tmp0.op0()).array());
-  exprt tmp1=expr.op1();
-  if(tmp1.id()==ID_typecast)
-    tmp1=expr.op1().op0();
-  if(tmp1.op0().id()==ID_index &&
-     to_index_expr(tmp1.op0()).index().is_zero())
-    tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
-  assert(tmp0.id()==ID_address_of);
-  assert(tmp1.id()==ID_address_of);
-
-  if(tmp0.operands().size()!=1)
-    return true;
-  if(tmp1.operands().size()!=1)
-    return true;
-
-  if(tmp0.op0().id()==ID_symbol &&
-     tmp1.op0().id()==ID_symbol)
+  exprt result = expr;
+  while(result.id() == ID_typecast)
   {
-    bool equal=
-       tmp0.op0().get(ID_identifier)==
-       tmp1.op0().get(ID_identifier);
+    result = result.op0();
+  }
+  return result;
+}
 
-    expr.make_bool(expr.id()==ID_equal?equal:!equal);
+/// returns true if op is a symbol or an expression like x.y[constant].z
+static bool is_simple_structure_expression(const exprt &op)
+{
+  exprt expr = op;
+  while(expr.id() == ID_member || expr.id() == ID_index)
+  {
+    if(expr.id() == ID_member)
+    {
+      expr = to_member_expr(expr).compound();
+    }
+    if(expr.id() == ID_index)
+    {
+      const index_exprt index = to_index_expr(expr);
+      if(!index.index().is_constant())
+      {
+        return false;
+      }
+      expr = index.array();
+    }
+  }
+  return expr.id() == ID_symbol;
+}
+
+bool simplify_exprt::simplify_equality_or_inequality_address_of(exprt &expr)
+{
+  PRECONDITION(expr.type().id() == ID_bool);
+  PRECONDITION(expr.operands().size() == 2);
+  PRECONDITION(expr.id() == ID_equal || expr.id() == ID_notequal);
+
+  exprt lhs = strip_typecasts(expr.op0());
+  exprt rhs = strip_typecasts(expr.op1());
+  INVARIANT(
+    lhs.id() == ID_address_of && rhs.id() == ID_address_of,
+    "After stripping typecasts lhs and rhs should be address_of expressions");
+
+  if(lhs.operands().size() != 1 || rhs.operands().size() != 1)
+    return true;
+
+  // strip the address-of operator
+  lhs = lhs.op0();
+  rhs = rhs.op0();
+
+  if(is_simple_structure_expression(lhs) && is_simple_structure_expression(rhs))
+  {
+    object_descriptor_exprt lhs_descriptor, rhs_descriptor;
+    lhs_descriptor.build(lhs, ns);
+    rhs_descriptor.build(rhs, ns);
+    exprt lhs_offset = simplify_expr(lhs_descriptor.offset(), ns);
+    exprt rhs_offset = simplify_expr(rhs_descriptor.offset(), ns);
+    INVARIANT(
+      lhs_offset.is_constant() && rhs_offset.is_constant(),
+      "Simple structure expressions should have constant offsets");
+    if(lhs_descriptor.root_object() != rhs_descriptor.root_object())
+    {
+      // expressions with different root objects
+      // are uncomparable
+      return true;
+    }
+    bool is_equal = lhs_offset == rhs_offset;
+    bool should_be_equal = expr.id() == ID_equal;
+    expr.make_bool(is_equal == should_be_equal);
 
     return false;
   }
