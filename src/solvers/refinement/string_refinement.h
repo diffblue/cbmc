@@ -116,4 +116,10 @@ bool has_subtype(
   const typet &type,
   const std::function<bool(const typet &)> &pred);
 
+// Declaration required for unit-test:
+union_find_replacet string_identifiers_resolution_from_equations(
+  std::vector<equal_exprt> &equations,
+  const namespacet &ns,
+  messaget::mstreamt &stream);
+
 #endif

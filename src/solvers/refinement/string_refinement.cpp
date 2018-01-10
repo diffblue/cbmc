@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <java_bytecode/java_types.h>
+#include <unordered_set>
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
@@ -452,7 +453,8 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       // function applications can be ignored because they will be replaced
       // in the convert_function_application step of dec_solve
     }
-    else if(has_char_pointer_subtype(lhs.type()))
+    else if(lhs.type().id() != ID_pointer &&
+      has_char_pointer_subtype(lhs.type()))
     {
       if(rhs.type().id() == ID_struct)
       {
@@ -479,12 +481,125 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   return solver;
 }
 
-/// Symbol resolution for expressions of type string typet
+/// Maps equation to expressions contained in them and conversely expressions to
+/// equations that contain them. This can be used on a subset of expressions
+/// which interests us, in particular strings. Equations are identified by an
+/// index of type `std::size_t` for more efficient insertion and lookup.
+class equation_symbol_mappingt
+{
+public:
+  // Record index of the equations that contain a given expression
+  std::map<exprt, std::vector<std::size_t>> equations_containing;
+  // Record expressions that are contained in the equation with the given index
+  std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
+
+  void add(const std::size_t i, const exprt &expr)
+  {
+    equations_containing[expr].push_back(i);
+    strings_in_equation[i].push_back(expr);
+  }
+
+  std::vector<exprt> find_expressions(const std::size_t i)
+  {
+    return strings_in_equation[i];
+  }
+
+  std::vector<std::size_t> find_equations(const exprt &expr)
+  {
+    return equations_containing[expr];
+  }
+};
+
+/// This is meant to be used on the lhs of an equation with string subtype.
+/// \param lhs: expression which is either of string type, or a symbol
+///   representing a struct with some string members
+/// \return if lhs is a string return this string, if it is a struct return the
+///   members of the expression that have string type.
+static std::vector<exprt> extract_strings_from_lhs(const exprt &lhs)
+{
+  std::vector<exprt> result;
+  if(lhs.type() == string_typet())
+    result.push_back(lhs);
+  else if(lhs.type().id() == ID_struct)
+  {
+    const struct_typet &struct_type = to_struct_type(lhs.type());
+    for(const auto &comp : struct_type.components())
+    {
+      const std::vector<exprt> strings_in_comp = extract_strings_from_lhs(
+        member_exprt(lhs, comp.get_name(), comp.type()));
+      result.insert(
+        result.end(), strings_in_comp.begin(), strings_in_comp.end());
+    }
+  }
+  return result;
+}
+
+/// \param expr: an expression
+/// \return all subexpressions of type string which are not if_exprt expressions
+///   this includes expressions of the form `e.x` if e is a symbol subexpression
+///   with a field `x` of type string
+static std::vector<exprt> extract_strings(const exprt &expr)
+{
+  std::vector<exprt> result;
+  for(auto it = expr.depth_begin(); it != expr.depth_end();)
+  {
+    if(it->type() == string_typet() && it->id() != ID_if)
+    {
+      result.push_back(*it);
+      it.next_sibling_or_parent();
+    }
+    else if(it->id() == ID_symbol)
+    {
+      for(const exprt &e : extract_strings_from_lhs(*it))
+        result.push_back(e);
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+  return result;
+}
+
+/// Given an equation on strings, mark these strings as belonging to the same
+/// set in the `symbol_resolve` structure. The lhs and rhs of the equation,
+/// should have string type or be struct with string members.
+/// \param eq: equation to add
+/// \param symbol_resolve: structure to which the equation will be added
+/// \param ns: namespace
+static void add_string_equation_to_symbol_resolution(
+  const equal_exprt &eq,
+  union_find_replacet &symbol_resolve,
+  const namespacet &ns)
+{
+  if(eq.rhs().type() == string_typet())
+  {
+    symbol_resolve.make_union(eq.lhs(), eq.rhs());
+  }
+  else if(has_string_subtype(eq.lhs().type()))
+  {
+    if(eq.rhs().type().id() == ID_struct)
+    {
+      const struct_typet &struct_type = to_struct_type(eq.rhs().type());
+      for(const auto &comp : struct_type.components())
+      {
+        const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
+        const exprt rhs_data = simplify_expr(
+          member_exprt(eq.rhs(), comp.get_name(), comp.type()), ns);
+        add_string_equation_to_symbol_resolution(
+          equal_exprt(lhs_data, rhs_data), symbol_resolve, ns);
+      }
+    }
+  }
+}
+
+/// Symbol resolution for expressions of type string typet.
+/// We record equality between these expressions in the output if one of the
+/// function calls depends on them.
 /// \param equations: list of equations
 /// \param ns: namespace
 /// \param stream: output stream
 /// \return union_find_replacet structure containing the correspondences.
-static union_find_replacet string_identifiers_resolution_from_equations(
+union_find_replacet string_identifiers_resolution_from_equations(
   std::vector<equal_exprt> &equations,
   const namespacet &ns,
   messaget::mstreamt &stream)
@@ -494,35 +609,63 @@ static union_find_replacet string_identifiers_resolution_from_equations(
     "WARNING string_refinement.cpp "
     "string_identifiers_resolution_from_equations:";
 
-  union_find_replacet result;
-  for(const equal_exprt &eq : equations)
+  equation_symbol_mappingt equation_map;
+
+  // Indexes of equations that need to be added to the result
+  std::unordered_set<size_t> required_equations;
+  std::stack<size_t> equations_to_treat;
+
+  for(std::size_t i = 0; i < equations.size(); ++i)
   {
-    if(eq.rhs().type() == string_typet())
-      result.make_union(eq.lhs(), eq.rhs());
-    else if(has_string_subtype(eq.lhs().type()))
+    const equal_exprt &eq = equations[i];
+    if(eq.rhs().id() == ID_function_application)
     {
-      if(eq.rhs().type().id() == ID_struct)
+      if(required_equations.insert(i).second)
+        equations_to_treat.push(i);
+
+      std::vector<exprt> rhs_strings = extract_strings(eq.rhs());
+      for(const auto expr : rhs_strings)
+        equation_map.add(i, expr);
+    }
+    else if(eq.lhs().type().id() != ID_pointer &&
+       has_string_subtype(eq.lhs().type()))
+    {
+      std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
+
+      for(const auto expr : lhs_strings)
+        equation_map.add(i, expr);
+
+      if(lhs_strings.empty())
       {
-        const struct_typet &struct_type = to_struct_type(eq.rhs().type());
-        for(const auto &comp : struct_type.components())
-        {
-          if(comp.type() == string_typet())
-          {
-            const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
-            const exprt rhs_data = simplify_expr(
-              member_exprt(eq.rhs(), comp.get_name(), comp.type()), ns);
-            result.make_union(lhs_data, rhs_data);
-          }
-        }
+        stream << log_message << "non struct with string subtype "
+               << from_expr(ns, "", eq.lhs()) << "\n  * of type "
+               << from_type(ns, "", eq.lhs().type()) << eom;
       }
-      else
+
+      for(const exprt &expr : extract_strings(eq.rhs()))
+        equation_map.add(i, expr);
+    }
+  }
+
+  // transitively add all equations which depend on the equations to treat
+  while(!equations_to_treat.empty())
+  {
+    const std::size_t i = equations_to_treat.top();
+    equations_to_treat.pop();
+    for(const exprt &string : equation_map.find_expressions(i))
+    {
+      for(const std::size_t j : equation_map.find_equations(string))
       {
-        stream << log_message << "non struct with string subexpr "
-               << from_expr(ns, "", eq.rhs()) << "\n  * of type "
-               << from_type(ns, "", eq.rhs().type()) << eom;
+        if(required_equations.insert(j).second)
+          equations_to_treat.push(j);
       }
     }
   }
+
+  union_find_replacet result;
+  for(const std::size_t i : required_equations)
+    add_string_equation_to_symbol_resolution(equations[i], result, ns);
+
   return result;
 }
 
