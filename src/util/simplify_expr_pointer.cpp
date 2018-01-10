@@ -388,6 +388,28 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   return true;
 }
 
+static bool simple_structural_lvalue_equal(const exprt &lhs, const exprt &rhs)
+{
+  if(lhs.id() != rhs.id())
+  {
+    return false;
+  }
+  if(lhs.id() == ID_symbol)
+  {
+    return lhs.get(ID_identifier) == rhs.get(ID_identifier);
+  }
+  else if(lhs.id() == ID_member)
+  {
+    auto lhs_member_of = to_member_expr(lhs);
+    auto rhs_member_of = to_member_expr(rhs);
+    return lhs_member_of.get_component_name() ==
+             rhs_member_of.get_component_name() &&
+           simple_structural_lvalue_equal(
+             lhs_member_of.compound(), rhs_member_of.compound());
+  }
+  return false;
+}
+
 static exprt simplify_inequality_address_of_prepare_op(const exprt &op)
 {
   exprt result = op;
@@ -418,12 +440,12 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   if(lhs.operands().size() != 1 || rhs.operands().size() != 1)
     return true;
 
-  if(lhs.op0().id() == ID_symbol && rhs.op0().id() == ID_symbol)
+  if(
+    (lhs.op0().id() == ID_symbol && rhs.op0().id() == ID_symbol) ||
+    (lhs.op0().id() == ID_member && rhs.op0().id() == ID_member))
   {
-    bool equal = lhs.op0().get(ID_identifier) == rhs.op0().get(ID_identifier);
-
-    expr.make_bool(expr.id()==ID_equal?equal:!equal);
-
+    bool equal = simple_structural_lvalue_equal(lhs.op0(), rhs.op0());
+    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
     return false;
   }
 
