@@ -113,7 +113,12 @@ std::size_t remove_instanceoft::lower_instanceof(
   newinst->source_location=this_inst->source_location;
   newinst->function=this_inst->function;
 
-  // Replace the instanceof construct with a big-or.
+  // Replace the instanceof construct with a conjunction of non-null and the
+  // disjunction of all possible object types. According to the Java
+  // specification, null instanceof T is false for all possible values of T.
+  // (http://docs.oracle.com/javase/specs/jls/se7/html/jls-15.html#jls-15.20.2)
+  notequal_exprt non_null_expr(
+    check_ptr, null_pointer_exprt(to_pointer_type(check_ptr.type())));
   exprt::operandst or_ops;
   for(const auto &clsname : children)
   {
@@ -121,7 +126,7 @@ std::size_t remove_instanceoft::lower_instanceof(
     equal_exprt test(newsym.symbol_expr(), clsexpr);
     or_ops.push_back(test);
   }
-  expr=disjunction(or_ops);
+  expr = and_exprt(non_null_expr, disjunction(or_ops));
 
   return 1;
 }
