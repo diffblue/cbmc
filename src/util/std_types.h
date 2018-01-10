@@ -1134,10 +1134,6 @@ inline bitvector_typet &to_bitvector_type(typet &type)
 class bv_typet:public bitvector_typet
 {
 public:
-  bv_typet():bitvector_typet(ID_bv)
-  {
-  }
-
   explicit bv_typet(std::size_t width):bitvector_typet(ID_bv)
   {
     set_width(width);
@@ -1174,10 +1170,6 @@ inline bv_typet &to_bv_type(typet &type)
 class unsignedbv_typet:public bitvector_typet
 {
 public:
-  unsignedbv_typet():bitvector_typet(ID_unsignedbv)
-  {
-  }
-
   explicit unsignedbv_typet(std::size_t width):
     bitvector_typet(ID_unsignedbv, width)
   {
@@ -1220,10 +1212,6 @@ inline unsignedbv_typet &to_unsignedbv_type(typet &type)
 class signedbv_typet:public bitvector_typet
 {
 public:
-  signedbv_typet():bitvector_typet(ID_signedbv)
-  {
-  }
-
   explicit signedbv_typet(std::size_t width):
     bitvector_typet(ID_signedbv, width)
   {
@@ -1343,10 +1331,6 @@ inline const floatbv_typet &to_floatbv_type(const typet &type)
 class c_bit_field_typet:public bitvector_typet
 {
 public:
-  c_bit_field_typet():bitvector_typet(ID_c_bit_field)
-  {
-  }
-
   explicit c_bit_field_typet(const typet &subtype, std::size_t width):
     bitvector_typet(ID_c_bit_field, subtype, width)
   {
