@@ -410,7 +410,39 @@ static bool simple_structural_lvalue_equal(const exprt &lhs, const exprt &rhs)
   return false;
 }
 
-static exprt simplify_inequality_address_of_prepare_op(const exprt &op)
+// rewrite expression &a.b to &a when appropriate
+static exprt
+collapse_union_struct_member_access(const exprt &op, const namespacet &ns)
+{
+  if(op.id() == ID_member)
+  {
+    auto member_expr = to_member_expr(op);
+    auto structlike_type = ns.follow(member_expr.compound().type());
+    if(structlike_type.id() == ID_union)
+    {
+      // pointer to union member is the same as pointer to union
+      // see n1570 6.7.2.1
+      return collapse_union_struct_member_access(member_expr.compound(), ns);
+    }
+    else if(structlike_type.id() == ID_struct)
+    {
+      auto struct_type = to_struct_type(structlike_type);
+      // there's a member access, so there should be at least one component
+      assert(!struct_type.components().empty());
+      auto first_component_name = struct_type.components().front().get_name();
+      if(member_expr.get_component_name() == first_component_name)
+      {
+        // Pointer to first member of structure is the same as pointer to structure
+        // see n1570 6.7.2.1
+        return collapse_union_struct_member_access(member_expr.compound(), ns);
+      }
+    }
+  }
+  return op;
+}
+
+static exprt
+simplify_inequality_address_of_prepare_op(const exprt &op, const namespacet &ns)
 {
   exprt result = op;
   if(op.id() == ID_typecast)
@@ -423,6 +455,11 @@ static exprt simplify_inequality_address_of_prepare_op(const exprt &op)
   {
     result = address_of_exprt(to_index_expr(result.op0()).array());
   }
+  if(result.op0().id() == ID_member)
+  {
+    result =
+      address_of_exprt(collapse_union_struct_member_access(result.op0(), ns));
+  }
   return result;
 }
 
@@ -432,8 +469,8 @@ bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
   assert(expr.operands().size()==2);
   assert(expr.id()==ID_equal || expr.id()==ID_notequal);
 
-  exprt lhs = simplify_inequality_address_of_prepare_op(expr.op0());
-  exprt rhs = simplify_inequality_address_of_prepare_op(expr.op1());
+  exprt lhs = simplify_inequality_address_of_prepare_op(expr.op0(), ns);
+  exprt rhs = simplify_inequality_address_of_prepare_op(expr.op1(), ns);
   assert(lhs.id() == ID_address_of);
   assert(rhs.id() == ID_address_of);
 
