@@ -550,8 +550,7 @@ void smt2_convt::convert_address_of_rec(
       mp_integer offset=member_offset(struct_type, component_name, ns);
       assert(offset>=0);
 
-      unsignedbv_typet index_type;
-      index_type.set_width(boolbv_width(result_type));
+      unsignedbv_typet index_type(boolbv_width(result_type));
 
       // pointer arithmetic
       out << "(bvadd ";

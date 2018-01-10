@@ -234,9 +234,7 @@ exprt smt1_convt::ce_value(
 
 typet smt1_convt::array_index_type() const
 {
-  signedbv_typet t;
-  t.set_width(array_index_bits);
-  return t;
+  return signedbv_typet(array_index_bits);
 }
 
 void smt1_convt::array_index(const exprt &expr)
