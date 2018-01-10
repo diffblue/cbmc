@@ -225,8 +225,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
       {
         mp_integer pad=a-displacement;
 
-        unsignedbv_typet padding_type;
-        padding_type.set_width(integer2unsigned(pad*8));
+        std::size_t width=integer2size_t(pad*8);
+        unsignedbv_typet padding_type(width);
 
         struct_typet::componentt component;
         component.type()=padding_type;
@@ -282,8 +282,8 @@ void add_padding(struct_typet &type, const namespacet &ns)
     {
       mp_integer pad=max_alignment-displacement;
 
-      unsignedbv_typet padding_type;
-      padding_type.set_width(integer2unsigned(pad*8));
+      std::size_t width=integer2size_t(pad*8);
+      unsignedbv_typet padding_type(width);
 
       // we insert after any final 'flexible member'
       struct_typet::componentt component;
@@ -324,8 +324,8 @@ void add_padding(union_typet &type, const namespacet &ns)
     mp_integer padding_bits=
       max_alignment_bits-(size_bits%max_alignment_bits);
 
-    unsignedbv_typet padding_type;
-    padding_type.set_width(integer2size_t(size_bits+padding_bits));
+    unsignedbv_typet padding_type(
+      integer2size_t(size_bits+padding_bits));
 
     struct_typet::componentt component;
     component.type()=padding_type;
