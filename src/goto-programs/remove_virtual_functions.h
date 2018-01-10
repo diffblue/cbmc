@@ -25,6 +25,12 @@ void remove_virtual_functions(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions);
 
+/// Remove virtual functions from one function.
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
+void remove_virtual_functions(goto_model_functiont &function);
+
 /// Specifies remove_virtual_function's behaviour when the actual supplied
 /// parameter does not match any of the possible callee types
 enum class virtual_dispatch_fallback_actiont

@@ -648,6 +648,8 @@ void jbmc_parse_optionst::process_goto_function(
     remove_asm(goto_function, symbol_table);
     // Removal of RTTI inspection:
     remove_instanceof(goto_function, symbol_table);
+    // Java virtual functions -> explicit dispatch tables:
+    remove_virtual_functions(function);
   }
 
   catch(const char *e)
@@ -678,8 +680,6 @@ bool jbmc_parse_optionst::process_goto_functions(
     remove_java_new(goto_model, get_message_handler());
 
     status() << "Removal of virtual functions" << eom;
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof but request it is removed)
     remove_exceptions(
       goto_model, remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);
