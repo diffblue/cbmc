@@ -426,24 +426,5 @@ abstract_object_pointert abstract_objectt::update_last_written_locations(
   return shared_from_this();
 }
 
-/*******************************************************************\
-
-Function: abstract_objectt::get_last_written_locations
-
-  Inputs:
-   None
-
- Outputs:
-   Set of locations for the provided object.
-
- Purpose: Getter for last_written_locations
-
-\*******************************************************************/
-
-abstract_objectt::locationst abstract_objectt::get_last_written_locations() const
-{
-  return {};
-}
-
 
 
