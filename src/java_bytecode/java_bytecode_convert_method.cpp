@@ -1519,6 +1519,13 @@ codet java_bytecode_convert_methodt::convert_instructions(
           id2string(symbol.base_name)+"()";
         symbol.type=arg0.type();
         symbol.type.set(ID_access, ID_public);
+        // If string refinement can provide a body this will become a "real"
+        // function in due time; otherwise it will remain a stub.
+        if((!driver_program_provides_stubs) &&
+           (!string_preprocess.implements_function(id)))
+        {
+          symbol.type.set(ID_C_incomplete, true);
+        }
         symbol.value.make_nil();
         symbol.mode=ID_java;
         assign_parameter_names(
@@ -2938,7 +2945,8 @@ void java_bytecode_convert_method(
   message_handlert &message_handler,
   size_t max_array_length,
   optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-  java_string_library_preprocesst &string_preprocess)
+  java_string_library_preprocesst &string_preprocess,
+  bool driver_program_provides_stubs)
 {
   static const std::unordered_set<std::string> methods_to_ignore
   {
@@ -2969,7 +2977,8 @@ void java_bytecode_convert_method(
     message_handler,
     max_array_length,
     needed_lazy_methods,
-    string_preprocess);
+    string_preprocess,
+    driver_program_provides_stubs);
 
   java_bytecode_convert_method(class_symbol, method);
 }
