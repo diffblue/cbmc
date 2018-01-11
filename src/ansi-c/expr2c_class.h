@@ -88,6 +88,10 @@ protected:
     const exprt &src, const std::string &symbol,
     unsigned precedence, bool full_parentheses);
 
+  std::string convert_multi_ary(
+    const exprt &src, const std::string &symbol,
+    unsigned precedence, bool full_parentheses);
+
   std::string convert_cond(
     const exprt &src, unsigned precedence);
 
