@@ -388,41 +388,101 @@ bool simplify_exprt::simplify_pointer_offset(exprt &expr)
   return true;
 }
 
+static bool simple_structural_lvalue_equal(const exprt &lhs, const exprt &rhs)
+{
+  if(lhs.id() != rhs.id())
+  {
+    return false;
+  }
+  if(lhs.id() == ID_symbol)
+  {
+    return lhs.get(ID_identifier) == rhs.get(ID_identifier);
+  }
+  else if(lhs.id() == ID_member)
+  {
+    auto lhs_member_of = to_member_expr(lhs);
+    auto rhs_member_of = to_member_expr(rhs);
+    return lhs_member_of.get_component_name() ==
+             rhs_member_of.get_component_name() &&
+           simple_structural_lvalue_equal(
+             lhs_member_of.compound(), rhs_member_of.compound());
+  }
+  return false;
+}
+
+// rewrite expression &a.b to &a when appropriate
+static exprt
+collapse_union_struct_member_access(const exprt &op, const namespacet &ns)
+{
+  if(op.id() == ID_member)
+  {
+    auto member_expr = to_member_expr(op);
+    auto structlike_type = ns.follow(member_expr.compound().type());
+    if(structlike_type.id() == ID_union)
+    {
+      // pointer to union member is the same as pointer to union
+      // see n1570 6.7.2.1
+      return collapse_union_struct_member_access(member_expr.compound(), ns);
+    }
+    else if(structlike_type.id() == ID_struct)
+    {
+      auto struct_type = to_struct_type(structlike_type);
+      // there's a member access, so there should be at least one component
+      assert(!struct_type.components().empty());
+      auto first_component_name = struct_type.components().front().get_name();
+      if(member_expr.get_component_name() == first_component_name)
+      {
+        // Pointer to first member of structure is the same as pointer to structure
+        // see n1570 6.7.2.1
+        return collapse_union_struct_member_access(member_expr.compound(), ns);
+      }
+    }
+  }
+  return op;
+}
+
+static exprt
+simplify_inequality_address_of_prepare_op(const exprt &op, const namespacet &ns)
+{
+  exprt result = op;
+  if(op.id() == ID_typecast)
+  {
+    result = result.op0();
+  }
+  if(
+    result.op0().id() == ID_index &&
+    to_index_expr(result.op0()).index().is_zero())
+  {
+    result = address_of_exprt(to_index_expr(result.op0()).array());
+  }
+  if(result.op0().id() == ID_member)
+  {
+    result =
+      address_of_exprt(collapse_union_struct_member_access(result.op0(), ns));
+  }
+  return result;
+}
+
 bool simplify_exprt::simplify_inequality_address_of(exprt &expr)
 {
   assert(expr.type().id()==ID_bool);
   assert(expr.operands().size()==2);
   assert(expr.id()==ID_equal || expr.id()==ID_notequal);
 
-  exprt tmp0=expr.op0();
-  if(tmp0.id()==ID_typecast)
-    tmp0=expr.op0().op0();
-  if(tmp0.op0().id()==ID_index &&
-     to_index_expr(tmp0.op0()).index().is_zero())
-    tmp0=address_of_exprt(to_index_expr(tmp0.op0()).array());
-  exprt tmp1=expr.op1();
-  if(tmp1.id()==ID_typecast)
-    tmp1=expr.op1().op0();
-  if(tmp1.op0().id()==ID_index &&
-     to_index_expr(tmp1.op0()).index().is_zero())
-    tmp1=address_of_exprt(to_index_expr(tmp1.op0()).array());
-  assert(tmp0.id()==ID_address_of);
-  assert(tmp1.id()==ID_address_of);
+  exprt lhs = simplify_inequality_address_of_prepare_op(expr.op0(), ns);
+  exprt rhs = simplify_inequality_address_of_prepare_op(expr.op1(), ns);
+  assert(lhs.id() == ID_address_of);
+  assert(rhs.id() == ID_address_of);
 
-  if(tmp0.operands().size()!=1)
-    return true;
-  if(tmp1.operands().size()!=1)
+  if(lhs.operands().size() != 1 || rhs.operands().size() != 1)
     return true;
 
-  if(tmp0.op0().id()==ID_symbol &&
-     tmp1.op0().id()==ID_symbol)
+  if(
+    (lhs.op0().id() == ID_symbol && rhs.op0().id() == ID_symbol) ||
+    (lhs.op0().id() == ID_member && rhs.op0().id() == ID_member))
   {
-    bool equal=
-       tmp0.op0().get(ID_identifier)==
-       tmp1.op0().get(ID_identifier);
-
-    expr.make_bool(expr.id()==ID_equal?equal:!equal);
-
+    bool equal = simple_structural_lvalue_equal(lhs.op0(), rhs.op0());
+    expr.make_bool(expr.id() == ID_equal ? equal : !equal);
     return false;
   }
 
