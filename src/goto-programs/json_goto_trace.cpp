@@ -114,16 +114,12 @@ void convert(
               if(expr.id() == ID_symbol)
               {
                 const symbolt &symbol = ns.lookup(expr.get(ID_identifier));
-                // Don't break sharing unless need to write to it
-                const irept::named_subt &comments =
-                  static_cast<const exprt &>(expr).get_comments();
-                if(comments.count(ID_C_base_name) != 0)
+                if(expr.find(ID_C_base_name).is_not_nil())
                   INVARIANT(
-                    comments.at(ID_C_base_name).id() == symbol.base_name,
+                    expr.find(ID_C_base_name).id() == symbol.base_name,
                     "base_name comment does not match symbol's base_name");
                 else
-                  expr.get_comments().emplace(
-                    ID_C_base_name, irept(symbol.base_name));
+                  expr.add(ID_C_base_name, irept(symbol.base_name));
               }
             }
           };
