@@ -531,9 +531,9 @@ void output_equations(
   const std::vector<equal_exprt> &equations,
   const namespacet &ns)
 {
-  for(const auto &eq : equations)
-    output << "  * " << from_expr(ns, "", eq.lhs())
-           << " == " << from_expr(ns, "", eq.rhs()) << std::endl;
+  for(std::size_t i = 0; i < equations.size(); ++i)
+    output << "  [" << i << "] " << from_expr(ns, "", equations[i].lhs())
+           << " == " << from_expr(ns, "", equations[i].rhs()) << std::endl;
 }
 
 /// Main decision procedure of the solver. Looks for a valuation of variables
@@ -620,6 +620,14 @@ decision_proceduret::resultt string_refinementt::dec_solve()
 
   const union_find_replacet string_id_symbol_resolve =
     string_identifiers_resolution_from_equations(equations, ns, debug());
+#ifdef DEBUG
+  debug() << "symbol resolve string:" << eom;
+  for(const auto &pair : string_id_symbol_resolve.to_vector())
+  {
+    debug() << from_expr(ns, "", pair.first) << " --> "
+            << from_expr(ns, "", pair.second) << eom;
+  }
+#endif
 
   debug() << "dec_solve: Replacing char pointer symbols" << eom;
   replace_symbols_in_equations(symbol_resolve, equations);
