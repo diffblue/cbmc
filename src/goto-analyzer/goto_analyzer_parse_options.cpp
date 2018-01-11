@@ -312,7 +312,9 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
 /// For the task, build the appropriate kind of analyzer
 /// Ideally this should be a pure function of options.
 /// However at the moment some domains require the goto_model
-ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
+ai_baset *goto_analyzer_parse_optionst::build_analyzer(
+  const optionst &options,
+  const namespacet &ns)
 {
   ai_baset *domain = nullptr;
 
@@ -325,7 +327,7 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
     }
     else if(options.get_bool_option("dependence-graph"))
     {
-      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+      domain=new dependence_grapht(ns);
     }
     else if(options.get_bool_option("intervals"))
     {
@@ -349,7 +351,7 @@ ai_baset *goto_analyzer_parse_optionst::build_analyzer(const optionst &options)
     }
     else if(options.get_bool_option("dependence-graph"))
     {
-      domain=new dependence_grapht(namespacet(goto_model.symbol_table));
+      domain=new dependence_grapht(ns);
     }
     else if(options.get_bool_option("intervals"))
     {
@@ -612,7 +614,8 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     // Build analyzer
     status() << "Selecting abstract domain" << eom;
-    std::unique_ptr<ai_baset> analyzer(build_analyzer(options));
+    namespacet ns(goto_model.symbol_table);  // Must live as long as the domain.
+    std::unique_ptr<ai_baset> analyzer(build_analyzer(options, ns));
 
     if(analyzer == nullptr)
     {

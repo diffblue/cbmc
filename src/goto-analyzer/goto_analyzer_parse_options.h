@@ -168,7 +168,7 @@ protected:
 
   virtual int perform_analysis(const optionst &options);
 
-  ai_baset *build_analyzer(const optionst &options);
+  ai_baset *build_analyzer(const optionst &, const namespacet &ns);
 
   void eval_verbosity();
 
