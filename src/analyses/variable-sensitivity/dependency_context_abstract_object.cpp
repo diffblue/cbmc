@@ -114,13 +114,11 @@ abstract_object_pointert dependency_context_abstract_objectt::write(
   const abstract_object_pointert value,
   bool merging_write) const
 {
-  // But delegate the write to the child
   abstract_object_pointert updated_child=
     child_abstract_object->write(
       environment, ns, stack, specifier, value, merging_write);
 
   // Only perform an update if the write to the child has in fact changed it...
-  // FIXME: But do we still want to record the write???
   if(updated_child == child_abstract_object)
     return shared_from_this();
 
@@ -132,7 +130,14 @@ abstract_object_pointert dependency_context_abstract_objectt::write(
 
   // Update the child and record the updated write locations
   result->set_child(updated_child);
-  result->set_last_written_locations(value->get_last_written_locations());
+  auto value_context=
+    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>(value);
+
+  if(value_context)
+  {
+    result->set_last_written_locations(
+      value_context->get_last_written_locations());
+  }
 
   return result;
 }
@@ -207,14 +212,20 @@ abstract_object_pointert
   dependency_context_abstract_objectt::abstract_object_merge_internal(
     const abstract_object_pointert other) const
 {
-  abstract_objectt::locationst location_union = get_location_union(
-      other->get_last_written_locations());
+  auto other_context=
+    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>(other);
 
-  // If the union is larger than the initial set, then update.
-  if(location_union.size() > get_last_written_locations().size())
+  if(other_context)
   {
-    abstract_object_pointert result = mutable_clone();
-    return result->update_last_written_locations(location_union, false);
+    abstract_objectt::locationst location_union=get_location_union(
+      other_context->get_last_written_locations());
+
+    // If the union is larger than the initial set, then update.
+    if(location_union.size()>get_last_written_locations().size())
+    {
+      abstract_object_pointert result=mutable_clone();
+      return result->update_last_written_locations(location_union, false);
+    }
   }
   return shared_from_this();
 }
@@ -284,6 +295,90 @@ abstract_objectt::locationst
   existing_locations.insert(locations.begin(), locations.end());
 
   return existing_locations;
+}
+
+/**
+ * Determine whether 'this' abstract_object has been modified in comparison
+ * to a previous 'before' state.
+ * \param before The abstract_object_pointert to use as a reference to
+ * compare against
+ * \return true if 'this' is considered to have been modified in comparison
+ * to 'before', false otherwise.
+ */
+bool dependency_context_abstract_objectt::has_been_modified(
+  const abstract_object_pointert before) const
+{
+  if(this==before.get())
+  {
+    // copy-on-write means pointer equality implies no modifications
+    return false;
+  }
+
+  auto before_context=
+    std::dynamic_pointer_cast<const dependency_context_abstract_objectt>
+      (before);
+
+  if(!before_context)
+  {
+    // The other context is not something we understand, so must assume
+    // that the abstract_object has been modified
+    return true;
+  }
+
+  // Even if the pointers are different, it maybe that it has changed only
+  // because of a merge operation, rather than an actual write. Given that
+  // this class has knowledge of where writes have occured, use that
+  // information to determine if any writes have happened and use that as the
+  // proxy for whether the value has changed or not.
+  //
+  // For two sets of last written locations to match,
+  // each location in one set must be equal to precisely one location
+  // in the other, since a set can assume at most one match
+
+  const abstract_objectt::locationst &first_write_locations=
+    before_context->get_last_written_locations();
+  const abstract_objectt::locationst &second_write_locations=
+    get_last_written_locations();
+
+  class location_ordert
+  {
+  public:
+    bool operator()(
+      goto_programt::const_targett instruction,
+      goto_programt::const_targett other_instruction)
+    {
+      return instruction->location_number>
+             other_instruction->location_number;
+    }
+  };
+
+  typedef std::set<goto_programt::const_targett, location_ordert>
+    sorted_locationst;
+
+  sorted_locationst lhs_location;
+  for(const auto &entry : first_write_locations)
+  {
+    lhs_location.insert(entry);
+  }
+
+  sorted_locationst rhs_location;
+  for(const auto &entry : second_write_locations)
+  {
+    rhs_location.insert(entry);
+  }
+
+  abstract_objectt::locationst intersection;
+  std::set_intersection(
+    lhs_location.cbegin(),
+    lhs_location.cend(),
+    rhs_location.cbegin(),
+    rhs_location.cend(),
+    std::inserter(intersection, intersection.end()),
+    location_ordert());
+  bool all_matched=intersection.size()==first_write_locations.size() &&
+                   intersection.size()==second_write_locations.size();
+
+  return !all_matched;
 }
 
 /**
