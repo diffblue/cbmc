@@ -99,6 +99,16 @@ public:
     return ensure_function_loaded_internal(name).second;
   }
 
+  /// Determines if this lazy GOTO functions map can produce a body for the
+  /// given function
+  /// \param name: function ID to query
+  /// \return true if we can produce a function body, or false if we would leave
+  ///   it a bodyless stub.
+  bool can_produce_function(const key_type &name) const
+  {
+    return language_files.can_convert_lazy_method(name);
+  }
+
   void unload(const key_type &name) const { goto_functions.erase(name); }
 
   void ensure_function_loaded(const key_type &name) const

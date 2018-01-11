@@ -73,7 +73,11 @@ static bool should_init_symbol(const symbolt &sym)
      sym.is_state_var &&
      sym.is_static_lifetime &&
      sym.mode==ID_java)
-    return true;
+  {
+    // Consider some sort of annotation indicating a global variable that
+    // doesn't require initialisation?
+    return !sym.type.get_bool(ID_C_no_initialization_required);
+  }
 
   return is_java_string_literal_id(sym.name);
 }
