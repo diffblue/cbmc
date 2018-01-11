@@ -717,59 +717,8 @@ std::vector<symbol_exprt> abstract_environmentt::modified_symbols(
     const auto &second_entry = second.map.find(entry.first);
     if (second_entry != second.map.end())
     {
-      // for the last written write locations to match
-      // each location in one must be equal to precisely one location
-      // in the other
-      // Since a set can assume at most one match
-
-      const abstract_objectt::locationst &first_write_locations=
-        entry.second->get_last_written_locations();
-      const abstract_objectt::locationst &second_write_locations=
-        second_entry->second->get_last_written_locations();
-
-      class location_ordert
-      {
-      public:
-        bool operator()(
-          goto_programt::const_targett instruction,
-          goto_programt::const_targett other_instruction)
-        {
-          return instruction->location_number>
-            other_instruction->location_number;
-        }
-      };
-
-      typedef std::set<goto_programt::const_targett, location_ordert>
-        sorted_locationst;
-
-      sorted_locationst lhs_location;
-      for(const auto &entry:first_write_locations)
-      {
-        lhs_location.insert(entry);
-      }
-
-
-      sorted_locationst rhs_location;
-      for(const auto &entry:second_write_locations)
-      {
-        rhs_location.insert(entry);
-      }
-
-      abstract_objectt::locationst intersection;
-      std::set_intersection(
-        lhs_location.cbegin(),
-        lhs_location.cend(),
-        rhs_location.cbegin(),
-        rhs_location.cend(),
-        std::inserter(intersection, intersection.end()),
-        location_ordert());
-      bool all_matched=intersection.size()==first_write_locations.size() &&
-        intersection.size()==second_write_locations.size();
-
-      if (!all_matched)
-      {
+      if(second_entry->second->has_been_modified(entry.second))
         symbols_diff.push_back(entry.first);
-      }
     }
   }
 
