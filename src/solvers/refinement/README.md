@@ -6,18 +6,6 @@
 
 \section string_solver_interface String solver interface
 
-The basic role of the solver is to answer whether the set of equations given
-is satisfiable. One example usage, is to determine whether an assertion in a
-program can be violated.
-For instance, CBMC and JBMC, convert a input program and property to check
-about this program to a set of equations. These equations are fed to a solver,
-which is one of the last step in CBMC and JBMC, as it tells us whether the
-property holds or can fail.
-
-The secondary role of the solver is to provide a satisfying assignment of
-the variables of the equations, this can for instance be used to construct
-a trace.
-
 The string solver is particularly aimed at string logic, but since it inherits
 from \ref bv_refinementt it is also capable of handling arithmetic, array logic,
 floating point operations etc.

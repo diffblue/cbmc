@@ -3,6 +3,19 @@
 
 \author Kareem Khazem
 
+The basic role of solvers is to answer whether the set of equations given
+is satisfiable.
+One example usage, is to determine whether an assertion in a
+program can be violated.
+We refer to \ref module_goto-symex for how CBMC and JBMC convert a input program
+and property to a set of equations.
+
+The secondary role of solvers is to provide a satisfying assignment of
+the variables of the equations, this can for instance be used to construct
+a trace.
+
+The most general solver in terms of supported equations is \ref string-solver.
+
 \section sat-smt-encoding SAT/SMT Encoding
 
 In the \ref solvers directory.
