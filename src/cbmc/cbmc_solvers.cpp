@@ -178,7 +178,6 @@ std::unique_ptr<cbmc_solverst::solvert> cbmc_solverst::get_string_refinement()
   info.ui=ui;
   if(options.get_bool_option("string-max-length"))
     info.string_max_length=options.get_signed_int_option("string-max-length");
-  info.string_non_empty=options.get_bool_option("string-non-empty");
   info.trace=options.get_bool_option("trace");
   if(options.get_bool_option("max-node-refinement"))
     info.max_node_refinement=
