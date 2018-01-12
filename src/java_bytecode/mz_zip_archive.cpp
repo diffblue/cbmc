@@ -26,7 +26,7 @@ public:
       throw std::runtime_error("MZT: Could not load a file: "+filename);
   }
 
-  explicit mz_zip_archive_statet(const void *pMem, size_t size):
+  mz_zip_archive_statet(const void *pMem, size_t size):
     mz_zip_archive({ })
   {
     if(MZ_TRUE!=mz_zip_reader_init_mem(this, pMem, size, 0))

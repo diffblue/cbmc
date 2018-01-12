@@ -29,7 +29,7 @@ public:
   /// \param pMem pointer to the memory buffer
   /// \param size size of the buffer
   /// \throw Throws std::runtime_error if file cannot be opened
-  explicit mz_zip_archivet(const void *pMem, size_t size);
+  mz_zip_archivet(const void *pMem, size_t size);
 
   mz_zip_archivet(const mz_zip_archivet &)=delete;
   mz_zip_archivet &operator=(const mz_zip_archivet &)=delete;
