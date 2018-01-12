@@ -194,10 +194,7 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
     // no width
   }
   else if(type_id==ID_pointer)
-  {
-    entry.total_width=to_pointer_type(type).get_width();
-    DATA_INVARIANT(entry.total_width!=0, "pointer must have width");
-  }
+    entry.total_width = type_checked_cast<pointer_typet>(type).get_width();
   else if(type_id==ID_symbol)
     entry=get_entry(ns.follow(type));
   else if(type_id==ID_struct_tag)

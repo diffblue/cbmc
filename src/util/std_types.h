@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "expr.h"
 #include "mp_arith.h"
 #include "invariant.h"
+#include "expr_cast.h"
 
 class constant_exprt;
 
@@ -1400,8 +1401,9 @@ public:
 inline const pointer_typet &to_pointer_type(const typet &type)
 {
   PRECONDITION(type.id()==ID_pointer);
-  PRECONDITION(!type.get(ID_width).empty());
-  return static_cast<const pointer_typet &>(type);
+  const pointer_typet &ret = static_cast<const pointer_typet &>(type);
+  validate_type(ret);
+  return ret;
 }
 
 /*! \copydoc to_pointer_type(const typet &)
@@ -1410,8 +1412,21 @@ inline const pointer_typet &to_pointer_type(const typet &type)
 inline pointer_typet &to_pointer_type(typet &type)
 {
   PRECONDITION(type.id()==ID_pointer);
-  PRECONDITION(!type.get(ID_width).empty());
-  return static_cast<pointer_typet &>(type);
+  pointer_typet &ret = static_cast<pointer_typet &>(type);
+  validate_type(ret);
+  return ret;
+}
+
+template <>
+inline bool can_cast_type<pointer_typet>(const typet &type)
+{
+  return type.id() == ID_pointer;
+}
+
+inline void validate_type(const pointer_typet &type)
+{
+  DATA_INVARIANT(!type.get(ID_width).empty(), "pointer must have width");
+  DATA_INVARIANT(type.get_width() > 0, "pointer must have non-zero width");
 }
 
 /*! \brief The reference type
