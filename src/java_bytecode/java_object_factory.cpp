@@ -587,7 +587,7 @@ codet initialize_nondet_string_struct(
   const symbol_typet jlo_symbol("java::java.lang.Object");
   const struct_typet &jlo_type = to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
-  java_root_class_init(jlo_init, jlo_type, false, class_id);
+  java_root_class_init(jlo_init, jlo_type, loc, class_id, ns);
 
   struct_exprt struct_expr(obj.type());
   struct_expr.copy_to_operands(jlo_init);
@@ -1040,8 +1040,10 @@ void java_object_factoryt::gen_nondet_struct_init(
       code.add_source_location()=loc;
       assignments.copy_to_operands(code);
     }
-    else if(name=="@lock")
+    else if(struct_tag == "java.lang.Object")
     {
+      // We zero-initialize all fields in Object because they are
+      // not meant to be nondet.
       if(update_in_place==update_in_placet::MUST_UPDATE_IN_PLACE)
         continue;
       code_assignt code(me, from_integer(0, me.type()));

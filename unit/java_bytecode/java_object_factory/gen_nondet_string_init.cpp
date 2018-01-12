@@ -83,7 +83,7 @@ SCENARIO(
           "return_array = cprover_associate_length_to_array_func"
             "(*string_data_pointer, tmp_object_factory);",
           "arg = { .@java.lang.Object={ .@class_identifier"
-            "=\"java::java.lang.String\", .@lock=false },"
+            "=\"java::java.lang.String\" },"
             " .length=tmp_object_factory, "
             ".data=*string_data_pointer };"};
 

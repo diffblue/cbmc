@@ -95,12 +95,17 @@ symbol_exprt get_or_create_string_literal_symbol(
   namespacet ns(symbol_table);
 
   // Regardless of string refinement setting, at least initialize
-  // the literal with @clsid = String and @lock = false:
+  // the literal with @clsid = String:
   symbol_typet jlo_symbol("java::java.lang.Object");
   const auto &jlo_struct = to_struct_type(ns.follow(jlo_symbol));
   struct_exprt jlo_init(jlo_symbol);
   const auto &jls_struct = to_struct_type(ns.follow(string_type));
-  java_root_class_init(jlo_init, jlo_struct, false, "java::java.lang.String");
+  java_root_class_init(
+    jlo_init,
+    jlo_struct,
+    string_expr.source_location(),
+    "java::java.lang.String",
+    ns);
 
   // If string refinement *is* around, populate the actual
   // contents as well:

@@ -23,6 +23,7 @@ Date:   April 2017
 #include <util/refined_string_type.h>
 #include <util/string_expr.h>
 #include <util/c_types.h>
+#include <util/namespace.h>
 
 #include "java_types.h"
 #include "java_object_factory.h"
@@ -830,12 +831,20 @@ codet java_string_library_preprocesst::code_assign_components_to_java_string(
   PRECONDITION(implements_java_char_sequence_pointer(lhs.type()));
   dereference_exprt deref=checked_dereference(lhs, lhs.type().subtype());
 
-  // A String has a field Object with @clsid = String and @lock = false:
+  // A String has a field Object with @clsid = String:
   const symbolt &jlo_symbol=*symbol_table.lookup("java::java.lang.Object");
   const struct_typet &jlo_struct=to_struct_type(jlo_symbol.type);
   struct_exprt jlo_init(jlo_struct);
+  jlo_init.copy_to_operands(
+    constant_exprt(
+      "java::java.lang.String", jlo_struct.components()[0].type()));
   irep_idt clsid = get_tag(lhs.type().subtype());
-  java_root_class_init(jlo_init, jlo_struct, false, clsid);
+  java_root_class_init(
+    jlo_init,
+    jlo_struct,
+    lhs.source_location(),
+    clsid,
+    namespacet(symbol_table));
 
   struct_exprt struct_rhs(deref.type());
   struct_rhs.copy_to_operands(jlo_init);
