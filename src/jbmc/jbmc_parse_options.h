@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <analyses/goto_check.h>
 
 #include <goto-programs/goto_trace.h>
+#include <goto-programs/lazy_goto_model.h>
 
 #include <java_bytecode/java_bytecode_language.h>
 
@@ -83,7 +84,9 @@ public:
     const char **argv,
     const std::string &extra_options);
 
-  void process_goto_function(goto_model_functiont &function);
+  void process_goto_function(
+    goto_model_functiont &function,
+    const can_produce_functiont &);
   bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
 
 protected:
