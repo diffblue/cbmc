@@ -1021,6 +1021,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
     }
 
     if(i_it->statement=="athrow" ||
+       i_it->statement=="monitorenter" ||
+       i_it->statement=="monitorexit" ||
        i_it->statement=="putfield" ||
        i_it->statement=="getfield" ||
        i_it->statement=="checkcast" ||
@@ -1245,6 +1247,20 @@ codet java_bytecode_convert_methodt::convert_instructions(
       INVARIANT(code_type.parameters().size()==1,
                 "function expected to have exactly one parameter");
       c = replace_call_to_cprover_assume(i_it->source_location, c);
+    }
+    // replace calls to CProver.atomicBegin
+    else if(statement == "invokestatic" &&
+            arg0.get(ID_identifier) ==
+            "java::org.cprover.CProver.atomicBegin:()V")
+    {
+      c = codet(ID_atomic_begin);
+    }
+    // replace calls to CProver.atomicEnd
+    else if(statement == "invokestatic" &&
+            arg0.get(ID_identifier) ==
+            "java::org.cprover.CProver.atomicEnd:()V")
+    {
+      c = codet(ID_atomic_end);
     }
     else if(statement=="invokeinterface" ||
             statement=="invokespecial" ||
@@ -1634,13 +1650,9 @@ codet java_bytecode_convert_methodt::convert_instructions(
       results[0]=
         binary_predicate_exprt(op[0], ID_java_instanceof, arg0);
     }
-    else if(statement=="monitorenter")
+    else if(statement == "monitorenter" || statement == "monitorexit")
     {
-      c = convert_monitorenter(i_it->source_location, op);
-    }
-    else if(statement=="monitorexit")
-    {
-      c = convert_monitorexit(i_it->source_location, op);
+      c = convert_monitorenterexit(statement, op, i_it->source_location);
     }
     else if(statement=="swap")
     {
@@ -1958,6 +1970,29 @@ codet java_bytecode_convert_methodt::convert_switch(
 
   code_switch.body() = code_block;
   return code_switch;
+}
+
+codet java_bytecode_convert_methodt::convert_monitorenterexit(
+  const irep_idt &statement,
+  const exprt::operandst &op,
+  const source_locationt &source_location)
+{
+  const irep_idt descriptor = (statement == "monitorenter") ?
+    "java::java.lang.Object.monitorenter:(Ljava/lang/Object;)V" :
+    "java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V";
+
+  // becomes a function call
+  code_typet type(
+    {code_typet::parametert(java_reference_type(void_typet()))},
+    void_typet());
+  code_function_callt call;
+  call.function() = symbol_exprt(descriptor, type);
+  call.lhs().make_nil();
+  call.arguments().push_back(op[0]);
+  call.add_source_location() = source_location;
+  if(needed_lazy_methods && symbol_table.has_symbol(descriptor))
+    needed_lazy_methods->add_needed_method(descriptor);
+  return call;
 }
 
 void java_bytecode_convert_methodt::convert_dup2(
@@ -2397,38 +2432,6 @@ codet &java_bytecode_convert_methodt::do_exception_handling(
     }
   }
   return c;
-}
-
-codet java_bytecode_convert_methodt::convert_monitorexit(
-  const source_locationt &location,
-  const exprt::operandst &op) const
-{
-  code_typet type;
-  type.return_type() = void_typet();
-  type.parameters().resize(1);
-  type.parameters()[0].type() = java_reference_type(void_typet());
-  code_function_callt call;
-  call.function() = symbol_exprt("java::monitorexit", type);
-  call.lhs().make_nil();
-  call.arguments().push_back(op[0]);
-  call.add_source_location() = location;
-  return call;
-}
-
-codet java_bytecode_convert_methodt::convert_monitorenter(
-  const source_locationt &location,
-  const exprt::operandst &op) const
-{
-  code_typet type;
-  type.return_type() = void_typet();
-  type.parameters().resize(1);
-  type.parameters()[0].type() = java_reference_type(void_typet());
-  code_function_callt call;
-  call.function() = symbol_exprt("java::monitorenter", type);
-  call.lhs().make_nil();
-  call.arguments().push_back(op[0]);
-  call.add_source_location() = location;
-  return call;
 }
 
 void java_bytecode_convert_methodt::convert_multianewarray(

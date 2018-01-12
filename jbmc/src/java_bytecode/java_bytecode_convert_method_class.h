@@ -420,14 +420,6 @@ protected:
     codet &c,
     exprt::operandst &results);
 
-  codet convert_monitorenter(
-    const source_locationt &location,
-    const exprt::operandst &op) const;
-
-  codet convert_monitorexit(
-    const source_locationt &location,
-    const exprt::operandst &op) const;
-
   codet &do_exception_handling(
     const methodt &method,
     const std::set<unsigned int> &working_set,
@@ -445,6 +437,11 @@ protected:
     const exprt::operandst &op,
     codet &c,
     exprt::operandst &results) const;
+
+  codet convert_monitorenterexit(
+    const irep_idt &statement,
+    const exprt::operandst &op,
+    const source_locationt &source_location);
 
   codet &replace_call_to_cprover_assume(source_locationt location, codet &c);
 
