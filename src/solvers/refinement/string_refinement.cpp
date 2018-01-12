@@ -27,6 +27,7 @@ Author: Alberto Griggio, alberto.griggio@gmail.com
 #include <solvers/sat/satcheck.h>
 #include <solvers/refinement/string_constraint_instantiation.h>
 #include <java_bytecode/java_types.h>
+#include <unordered_set>
 
 static exprt substitute_array_with_expr(const exprt &expr, const exprt &index);
 
@@ -293,7 +294,7 @@ bool is_char_type(const typet &type)
 /// Distinguish char array from other types.
 /// For now, any unsigned bitvector type is considered a character.
 /// \param type: a type
-/// \param ns: name space
+/// \param ns: namespace
 /// \return true if the given type is an array of characters
 bool is_char_array_type(const typet &type, const namespacet &ns)
 {
@@ -311,33 +312,65 @@ bool is_char_pointer_type(const typet &type)
 }
 
 /// \param type: a type
-/// \param ns: name space
-/// \return true if a subtype is an pointer of characters
-static bool has_char_pointer_subtype(const typet &type, const namespacet &ns)
+/// \param pred: a predicate
+/// \return true if one of the subtype of `type` satisfies predicate `pred`.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+///         For instance in the type `t` defined by
+///         `{ int a; char[] b; double * c; { bool d} e}`, `int`, `char`,
+///         `double` and `bool` are subtypes of `t`.
+bool has_subtype(
+  const typet &type,
+  const std::function<bool(const typet &)> &pred)
 {
-  if(is_char_pointer_type(type))
+  if(pred(type))
     return true;
 
   if(type.id() == ID_struct || type.id() == ID_union)
   {
     const struct_union_typet &struct_type = to_struct_union_type(type);
-    for(const auto &comp : struct_type.components())
-    {
-      if(has_char_pointer_subtype(comp.type(), ns))
-        return true;
-    }
+    return std::any_of(
+      struct_type.components().begin(),
+      struct_type.components().end(), // NOLINTNEXTLINE
+      [&](const struct_union_typet::componentt &comp) {
+        return has_subtype(comp.type(), pred);
+      });
   }
 
-  for(const auto &t : type.subtypes())
-  {
-    if(has_char_pointer_subtype(t, ns))
-      return true;
-  }
-  return false;
+  return std::any_of( // NOLINTNEXTLINE
+    type.subtypes().begin(), type.subtypes().end(), [&](const typet &t) {
+      return has_subtype(t, pred);
+    });
+}
+
+/// \param type: a type
+/// \return true if a subtype of `type` is an pointer of characters.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+static bool has_char_pointer_subtype(const typet &type)
+{
+  return has_subtype(type, is_char_pointer_type);
+}
+
+/// \param type: a type
+/// \return true if a subtype of `type` is string_typet.
+///         The meaning of "subtype" is in the algebraic datatype sense:
+///         for example, the subtypes of a struct are the types of its
+///         components, the subtype of a pointer is the type it points to,
+///         etc...
+static bool has_string_subtype(const typet &type)
+{
+  // NOLINTNEXTLINE
+  return has_subtype(
+    type, [](const typet &subtype) { return subtype == string_typet(); });
 }
 
 /// \param expr: an expression
-/// \param ns: name space
+/// \param ns: namespace
 /// \return true if a subexpression of `expr` is an array of characters
 static bool has_char_array_subexpr(const exprt &expr, const namespacet &ns)
 {
@@ -420,7 +453,8 @@ static union_find_replacet generate_symbol_resolution_from_equations(
       // function applications can be ignored because they will be replaced
       // in the convert_function_application step of dec_solve
     }
-    else if(has_char_pointer_subtype(lhs.type(), ns))
+    else if(lhs.type().id() != ID_pointer &&
+      has_char_pointer_subtype(lhs.type()))
     {
       if(rhs.type().id() == ID_struct)
       {
@@ -447,14 +481,202 @@ static union_find_replacet generate_symbol_resolution_from_equations(
   return solver;
 }
 
+/// Maps equation to expressions contained in them and conversely expressions to
+/// equations that contain them. This can be used on a subset of expressions
+/// which interests us, in particular strings. Equations are identified by an
+/// index of type `std::size_t` for more efficient insertion and lookup.
+class equation_symbol_mappingt
+{
+public:
+  // Record index of the equations that contain a given expression
+  std::map<exprt, std::vector<std::size_t>> equations_containing;
+  // Record expressions that are contained in the equation with the given index
+  std::unordered_map<std::size_t, std::vector<exprt>> strings_in_equation;
+
+  void add(const std::size_t i, const exprt &expr)
+  {
+    equations_containing[expr].push_back(i);
+    strings_in_equation[i].push_back(expr);
+  }
+
+  std::vector<exprt> find_expressions(const std::size_t i)
+  {
+    return strings_in_equation[i];
+  }
+
+  std::vector<std::size_t> find_equations(const exprt &expr)
+  {
+    return equations_containing[expr];
+  }
+};
+
+/// This is meant to be used on the lhs of an equation with string subtype.
+/// \param lhs: expression which is either of string type, or a symbol
+///   representing a struct with some string members
+/// \return if lhs is a string return this string, if it is a struct return the
+///   members of the expression that have string type.
+static std::vector<exprt> extract_strings_from_lhs(const exprt &lhs)
+{
+  std::vector<exprt> result;
+  if(lhs.type() == string_typet())
+    result.push_back(lhs);
+  else if(lhs.type().id() == ID_struct)
+  {
+    const struct_typet &struct_type = to_struct_type(lhs.type());
+    for(const auto &comp : struct_type.components())
+    {
+      const std::vector<exprt> strings_in_comp = extract_strings_from_lhs(
+        member_exprt(lhs, comp.get_name(), comp.type()));
+      result.insert(
+        result.end(), strings_in_comp.begin(), strings_in_comp.end());
+    }
+  }
+  return result;
+}
+
+/// \param expr: an expression
+/// \return all subexpressions of type string which are not if_exprt expressions
+///   this includes expressions of the form `e.x` if e is a symbol subexpression
+///   with a field `x` of type string
+static std::vector<exprt> extract_strings(const exprt &expr)
+{
+  std::vector<exprt> result;
+  for(auto it = expr.depth_begin(); it != expr.depth_end();)
+  {
+    if(it->type() == string_typet() && it->id() != ID_if)
+    {
+      result.push_back(*it);
+      it.next_sibling_or_parent();
+    }
+    else if(it->id() == ID_symbol)
+    {
+      for(const exprt &e : extract_strings_from_lhs(*it))
+        result.push_back(e);
+      it.next_sibling_or_parent();
+    }
+    else
+      ++it;
+  }
+  return result;
+}
+
+/// Given an equation on strings, mark these strings as belonging to the same
+/// set in the `symbol_resolve` structure. The lhs and rhs of the equation,
+/// should have string type or be struct with string members.
+/// \param eq: equation to add
+/// \param symbol_resolve: structure to which the equation will be added
+/// \param ns: namespace
+static void add_string_equation_to_symbol_resolution(
+  const equal_exprt &eq,
+  union_find_replacet &symbol_resolve,
+  const namespacet &ns)
+{
+  if(eq.rhs().type() == string_typet())
+  {
+    symbol_resolve.make_union(eq.lhs(), eq.rhs());
+  }
+  else if(has_string_subtype(eq.lhs().type()))
+  {
+    if(eq.rhs().type().id() == ID_struct)
+    {
+      const struct_typet &struct_type = to_struct_type(eq.rhs().type());
+      for(const auto &comp : struct_type.components())
+      {
+        const member_exprt lhs_data(eq.lhs(), comp.get_name(), comp.type());
+        const exprt rhs_data = simplify_expr(
+          member_exprt(eq.rhs(), comp.get_name(), comp.type()), ns);
+        add_string_equation_to_symbol_resolution(
+          equal_exprt(lhs_data, rhs_data), symbol_resolve, ns);
+      }
+    }
+  }
+}
+
+/// Symbol resolution for expressions of type string typet.
+/// We record equality between these expressions in the output if one of the
+/// function calls depends on them.
+/// \param equations: list of equations
+/// \param ns: namespace
+/// \param stream: output stream
+/// \return union_find_replacet structure containing the correspondences.
+union_find_replacet string_identifiers_resolution_from_equations(
+  std::vector<equal_exprt> &equations,
+  const namespacet &ns,
+  messaget::mstreamt &stream)
+{
+  const auto eom = messaget::eom;
+  const std::string log_message =
+    "WARNING string_refinement.cpp "
+    "string_identifiers_resolution_from_equations:";
+
+  equation_symbol_mappingt equation_map;
+
+  // Indexes of equations that need to be added to the result
+  std::unordered_set<size_t> required_equations;
+  std::stack<size_t> equations_to_treat;
+
+  for(std::size_t i = 0; i < equations.size(); ++i)
+  {
+    const equal_exprt &eq = equations[i];
+    if(eq.rhs().id() == ID_function_application)
+    {
+      if(required_equations.insert(i).second)
+        equations_to_treat.push(i);
+
+      std::vector<exprt> rhs_strings = extract_strings(eq.rhs());
+      for(const auto expr : rhs_strings)
+        equation_map.add(i, expr);
+    }
+    else if(eq.lhs().type().id() != ID_pointer &&
+       has_string_subtype(eq.lhs().type()))
+    {
+      std::vector<exprt> lhs_strings = extract_strings_from_lhs(eq.lhs());
+
+      for(const auto expr : lhs_strings)
+        equation_map.add(i, expr);
+
+      if(lhs_strings.empty())
+      {
+        stream << log_message << "non struct with string subtype "
+               << from_expr(ns, "", eq.lhs()) << "\n  * of type "
+               << from_type(ns, "", eq.lhs().type()) << eom;
+      }
+
+      for(const exprt &expr : extract_strings(eq.rhs()))
+        equation_map.add(i, expr);
+    }
+  }
+
+  // transitively add all equations which depend on the equations to treat
+  while(!equations_to_treat.empty())
+  {
+    const std::size_t i = equations_to_treat.top();
+    equations_to_treat.pop();
+    for(const exprt &string : equation_map.find_expressions(i))
+    {
+      for(const std::size_t j : equation_map.find_equations(string))
+      {
+        if(required_equations.insert(j).second)
+          equations_to_treat.push(j);
+      }
+    }
+  }
+
+  union_find_replacet result;
+  for(const std::size_t i : required_equations)
+    add_string_equation_to_symbol_resolution(equations[i], result, ns);
+
+  return result;
+}
+
 void output_equations(
   std::ostream &output,
   const std::vector<equal_exprt> &equations,
   const namespacet &ns)
 {
-  for(const auto &eq : equations)
-    output << "  * " << from_expr(ns, "", eq.lhs())
-           << " == " << from_expr(ns, "", eq.rhs()) << std::endl;
+  for(std::size_t i = 0; i < equations.size(); ++i)
+    output << "  [" << i << "] " << from_expr(ns, "", equations[i].lhs())
+           << " == " << from_expr(ns, "", equations[i].rhs()) << std::endl;
 }
 
 /// Main decision procedure of the solver. Looks for a valuation of variables
@@ -539,8 +761,27 @@ decision_proceduret::resultt string_refinementt::dec_solve()
             << from_expr(ns, "", pair.second) << eom;
 #endif
 
+  const union_find_replacet string_id_symbol_resolve =
+    string_identifiers_resolution_from_equations(equations, ns, debug());
+#ifdef DEBUG
+  debug() << "symbol resolve string:" << eom;
+  for(const auto &pair : string_id_symbol_resolve.to_vector())
+  {
+    debug() << from_expr(ns, "", pair.first) << " --> "
+            << from_expr(ns, "", pair.second) << eom;
+  }
+#endif
+
   debug() << "dec_solve: Replacing char pointer symbols" << eom;
   replace_symbols_in_equations(symbol_resolve, equations);
+
+  debug() << "dec_solve: Replacing string ids in function applications" << eom;
+  for(equal_exprt &eq : equations)
+  {
+    if(can_cast_expr<function_application_exprt>(eq.rhs()))
+      string_id_symbol_resolve.replace_expr(eq.rhs());
+  }
+
 #ifdef DEBUG
   output_equations(debug(), equations, ns);
 #endif

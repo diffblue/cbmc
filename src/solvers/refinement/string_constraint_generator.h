@@ -164,7 +164,11 @@ private:
     const exprt &end_index);
   exprt add_axioms_for_concat(const function_application_exprt &f);
   exprt add_axioms_for_concat_code_point(const function_application_exprt &f);
-  exprt add_axioms_for_constant(const array_string_exprt &res, irep_idt sval);
+  exprt add_axioms_for_constant(
+    const array_string_exprt &res,
+    irep_idt sval,
+    const exprt &guard = true_exprt());
+
   exprt add_axioms_for_delete(
     const array_string_exprt &res,
     const array_string_exprt &str,
@@ -195,6 +199,11 @@ private:
   exprt add_axioms_for_insert_char(const function_application_exprt &f);
   exprt add_axioms_for_insert_float(const function_application_exprt &f);
   exprt add_axioms_for_insert_double(const function_application_exprt &f);
+
+  exprt add_axioms_for_cprover_string(
+    const array_string_exprt &res,
+    const exprt &arg,
+    const exprt &guard);
   exprt add_axioms_from_literal(const function_application_exprt &f);
   exprt add_axioms_from_int(const function_application_exprt &f);
   exprt add_axioms_from_int(
