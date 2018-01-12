@@ -15,14 +15,12 @@
 class cmdlinet;
 class optionst;
 
-
 /// Model that holds partially loaded map of functions
 class lazy_goto_modelt
 {
 public:
-  typedef std::function<void(
-    goto_functionst::goto_functiont &function,
-    symbol_tablet &symbol_table)> post_process_functiont;
+  typedef std::function<void(goto_model_functiont &function)>
+    post_process_functiont;
   typedef std::function<bool(goto_modelt &goto_model)> post_process_functionst;
 
   explicit lazy_goto_modelt(
@@ -53,11 +51,9 @@ public:
     message_handlert &message_handler)
   {
     return lazy_goto_modelt(
-      [&handler] (
-        goto_functionst::goto_functiont &function,
-        symbol_tablet &symbol_table) -> void
+      [&handler] (goto_model_functiont &function)
       {
-        handler.process_goto_function(function, symbol_table);
+        handler.process_goto_function(function);
       },
       [&handler, &options] (goto_modelt &goto_model) -> bool
       {

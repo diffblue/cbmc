@@ -30,7 +30,8 @@ lazy_goto_modelt::lazy_goto_modelt(
       symbol_table,
       [this] (goto_functionst::goto_functiont &function) -> void
       {
-        this->post_process_function(function, symbol_table);
+        goto_model_functiont model_function(*goto_model, function);
+        this->post_process_function(model_function);
       },
       message_handler),
     post_process_function(std::move(post_process_function)),
@@ -49,7 +50,8 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
       symbol_table,
       [this] (goto_functionst::goto_functiont &function) -> void
       {
-        this->post_process_function(function, symbol_table);
+        goto_model_functiont model_function(*goto_model, function);
+        this->post_process_function(model_function);
       },
       other.message_handler),
     language_files(std::move(other.language_files)),

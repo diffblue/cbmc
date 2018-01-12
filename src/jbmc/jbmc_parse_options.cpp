@@ -637,15 +637,19 @@ int jbmc_parse_optionst::get_goto_program(
 }
 
 void jbmc_parse_optionst::process_goto_function(
-  goto_functionst::goto_functiont &function, symbol_tablet &symbol_table)
+  goto_model_functiont &function)
 {
+  symbol_tablet &symbol_table = function.get_symbol_table();
+  goto_functionst::goto_functiont &goto_function = function.get_goto_function();
   try
   {
     // Remove inline assembler; this needs to happen before
     // adding the library.
-    remove_asm(function, symbol_table);
+    remove_asm(goto_function, symbol_table);
     // Removal of RTTI inspection:
-    remove_instanceof(function, symbol_table);
+    remove_instanceof(goto_function, symbol_table);
+    // Java virtual functions -> explicit dispatch tables:
+    remove_virtual_functions(function);
   }
 
   catch(const char *e)
@@ -676,8 +680,6 @@ bool jbmc_parse_optionst::process_goto_functions(
     remove_java_new(goto_model, get_message_handler());
 
     status() << "Removal of virtual functions" << eom;
-    // Java virtual functions -> explicit dispatch tables:
-    remove_virtual_functions(goto_model);
     // remove catch and throw (introduces instanceof but request it is removed)
     remove_exceptions(
       goto_model, remove_exceptions_typest::REMOVE_ADDED_INSTANCEOF);

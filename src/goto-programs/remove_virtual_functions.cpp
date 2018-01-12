@@ -24,8 +24,7 @@ class remove_virtual_functionst
 {
 public:
   remove_virtual_functionst(
-    const symbol_tablet &_symbol_table,
-    const goto_functionst &goto_functions);
+    const symbol_tablet &_symbol_table);
 
   void operator()(goto_functionst &goto_functions);
 
@@ -65,8 +64,7 @@ protected:
 };
 
 remove_virtual_functionst::remove_virtual_functionst(
-  const symbol_tablet &_symbol_table,
-  const goto_functionst &goto_functions):
+  const symbol_tablet &_symbol_table):
   ns(_symbol_table),
   symbol_table(_symbol_table)
 {
@@ -436,9 +434,7 @@ void remove_virtual_functions(
   const symbol_tablet &symbol_table,
   goto_functionst &goto_functions)
 {
-  remove_virtual_functionst
-    rvf(symbol_table, goto_functions);
-
+  remove_virtual_functionst rvf(symbol_table);
   rvf(goto_functions);
 }
 
@@ -448,6 +444,16 @@ void remove_virtual_functions(goto_modelt &goto_model)
     goto_model.symbol_table, goto_model.goto_functions);
 }
 
+void remove_virtual_functions(goto_model_functiont &function)
+{
+  remove_virtual_functionst rvf(function.get_symbol_table());
+  bool changed = rvf.remove_virtual_functions(
+    function.get_goto_function().body);
+  // Give fresh location numbers to `function`, in case it has grown:
+  if(changed)
+    function.compute_location_numbers();
+}
+
 void remove_virtual_function(
   goto_modelt &goto_model,
   goto_programt &goto_program,
@@ -455,8 +461,7 @@ void remove_virtual_function(
   const dispatch_table_entriest &dispatch_table,
   virtual_dispatch_fallback_actiont fallback_action)
 {
-  remove_virtual_functionst
-    rvf(goto_model.symbol_table, goto_model.goto_functions);
+  remove_virtual_functionst rvf(goto_model.symbol_table);
 
   rvf.remove_virtual_function(
     goto_program, instruction, dispatch_table, fallback_action);

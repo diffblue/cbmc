@@ -67,4 +67,62 @@ public:
   void unload(const irep_idt &name) { goto_functions.unload(name); }
 };
 
+/// Interface providing access to a single function in a GOTO model, plus its
+/// associated symbol table.
+/// Its purpose is to permit GOTO program renumbering (a non-const operation on
+/// goto_functionst) without providing a non-const reference to the entire
+/// function map. For example, incremental function loading uses this, as in
+/// that situation functions other than the one currently being loaded should
+/// not be altered.
+class goto_model_functiont
+{
+public:
+  /// Construct a function wrapper
+  /// \param goto_model: will be used to ensure unique numbering of
+  ///   goto programs, specifically incrementing its unused_location_number
+  ///   member each time a program is re-numbered.
+  /// \param goto_function: function to wrap.
+  explicit goto_model_functiont(
+    goto_modelt &goto_model, goto_functionst::goto_functiont &goto_function):
+  goto_model(goto_model),
+  goto_function(goto_function)
+  {
+  }
+
+  /// Re-number our goto_function. After this method returns all instructions'
+  /// location numbers may have changed, but will be globally unique and in
+  /// program order within the program.
+  void compute_location_numbers()
+  {
+    goto_model.goto_functions.compute_location_numbers(goto_function.body);
+  }
+
+  /// Get symbol table
+  /// \return symbol table from the associated GOTO model
+  symbol_tablet &get_symbol_table()
+  {
+    return goto_model.symbol_table;
+  }
+
+  /// Get GOTO function
+  /// \return the wrapped GOTO function
+  goto_functionst::goto_functiont &get_goto_function()
+  {
+    return goto_function;
+  }
+
+  /// Get GOTO model. This returns a const reference because this interface is
+  /// intended for use where non-const access to the whole model should not be
+  /// allowed.
+  /// \return const view of the whole GOTO model.
+  const goto_modelt &get_goto_model()
+  {
+    return goto_model;
+  }
+
+private:
+  goto_modelt &goto_model;
+  goto_functionst::goto_functiont &goto_function;
+};
+
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
