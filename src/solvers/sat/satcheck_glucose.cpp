@@ -12,9 +12,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <inttypes.h>
 #endif
 
-#include <cassert>
 #include <stack>
 
+#include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <core/Solver.h>
@@ -64,7 +64,7 @@ tvt satcheck_glucose_baset<T>::l_get(literalt a) const
 template<typename T>
 void satcheck_glucose_baset<T>::set_polarity(literalt a, bool value)
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   try
   {
@@ -108,7 +108,8 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
       if(it->is_true())
         return;
       else if(!it->is_false())
-        assert(it->var_no() < (unsigned)solver->nVars());
+        INVARIANT(
+          it->var_no() < (unsigned)solver->nVars(), "variable not added yet");
     }
 
     Glucose::vec<Glucose::Lit> c;
@@ -133,7 +134,7 @@ void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 template<typename T>
 propt::resultt satcheck_glucose_baset<T>::prop_solve()
 {
-  assert(status!=statust::ERROR);
+  PRECONDITION(status != statust::ERROR);
 
   // We start counting at 1, thus there is one variable fewer.
   {
@@ -197,7 +198,7 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
 template<typename T>
 void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   try
   {
@@ -253,7 +254,7 @@ void satcheck_glucose_baset<T>::set_assumptions(const bvt &bv)
   assumptions=bv;
 
   forall_literals(it, assumptions)
-    assert(!it->is_constant());
+    INVARIANT(!it->is_constant(), "assumption literals must not be constant");
 }
 
 satcheck_glucose_no_simplifiert::satcheck_glucose_no_simplifiert():
@@ -286,7 +287,7 @@ void satcheck_glucose_simplifiert::set_frozen(literalt a)
 
 bool satcheck_glucose_simplifiert::is_eliminated(literalt a) const
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   return solver->isEliminated(a.var_no());
 }
