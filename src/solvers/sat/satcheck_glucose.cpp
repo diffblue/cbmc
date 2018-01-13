@@ -65,8 +65,18 @@ template<typename T>
 void satcheck_glucose_baset<T>::set_polarity(literalt a, bool value)
 {
   assert(!a.is_constant());
-  add_variables();
-  solver->setPolarity(a.var_no(), value);
+
+  try
+  {
+    add_variables();
+    solver->setPolarity(a.var_no(), value);
+  }
+  catch(Glucose::OutOfMemoryException)
+  {
+    messaget::error() << "SAT checker ran out of memory" << eom;
+    status = statust::ERROR;
+    throw std::bad_alloc();
+  }
 }
 
 const std::string satcheck_glucose_no_simplifiert::solver_text()
@@ -89,26 +99,35 @@ void satcheck_glucose_baset<T>::add_variables()
 template<typename T>
 void satcheck_glucose_baset<T>::lcnf(const bvt &bv)
 {
-  add_variables();
-
-  forall_literals(it, bv)
+  try
   {
-    if(it->is_true())
-      return;
-    else if(!it->is_false())
-      assert(it->var_no()<(unsigned)solver->nVars());
+    add_variables();
+
+    forall_literals(it, bv)
+    {
+      if(it->is_true())
+        return;
+      else if(!it->is_false())
+        assert(it->var_no() < (unsigned)solver->nVars());
+    }
+
+    Glucose::vec<Glucose::Lit> c;
+
+    convert(bv, c);
+
+    // Note the underscore.
+    // Add a clause to the solver without making superflous internal copy.
+
+    solver->addClause_(c);
+
+    clause_counter++;
   }
-
-  Glucose::vec<Glucose::Lit> c;
-
-  convert(bv, c);
-
-  // Note the underscore.
-  // Add a clause to the solver without making superflous internal copy.
-
-  solver->addClause_(c);
-
-  clause_counter++;
+  catch(Glucose::OutOfMemoryException)
+  {
+    messaget::error() << "SAT checker ran out of memory" << eom;
+    status = statust::ERROR;
+    throw std::bad_alloc();
+  }
 }
 
 template<typename T>
@@ -123,49 +142,56 @@ propt::resultt satcheck_glucose_baset<T>::prop_solve()
       solver->nClauses() << " clauses" << eom;
   }
 
-  add_variables();
-
-  if(!solver->okay())
+  try
   {
-    messaget::status() <<
-      "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
-  }
-  else
-  {
-    // if assumptions contains false, we need this to be UNSAT
-    bool has_false=false;
+    add_variables();
 
-    forall_literals(it, assumptions)
-      if(it->is_false())
-        has_false=true;
-
-    if(has_false)
+    if(!solver->okay())
     {
-      messaget::status() <<
-        "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
+      messaget::status()
+        << "SAT checker inconsistent: instance is UNSATISFIABLE" << eom;
     }
     else
     {
-      Glucose::vec<Glucose::Lit> solver_assumptions;
-      convert(assumptions, solver_assumptions);
+      // if assumptions contains false, we need this to be UNSAT
+      bool has_false = false;
 
-      if(solver->solve(solver_assumptions))
+      forall_literals(it, assumptions)
+        if(it->is_false())
+          has_false = true;
+
+      if(has_false)
       {
-        messaget::status() <<
-          "SAT checker: instance is SATISFIABLE" << eom;
-        status=statust::SAT;
-        return resultt::P_SATISFIABLE;
+        messaget::status()
+          << "got FALSE as assumption: instance is UNSATISFIABLE" << eom;
       }
       else
       {
-        messaget::status() <<
-          "SAT checker: instance is UNSATISFIABLE" << eom;
+        Glucose::vec<Glucose::Lit> solver_assumptions;
+        convert(assumptions, solver_assumptions);
+
+        if(solver->solve(solver_assumptions))
+        {
+          messaget::status() << "SAT checker: instance is SATISFIABLE" << eom;
+          status = statust::SAT;
+          return resultt::P_SATISFIABLE;
+        }
+        else
+        {
+          messaget::status() << "SAT checker: instance is UNSATISFIABLE" << eom;
+        }
       }
     }
-  }
 
-  status=statust::UNSAT;
-  return resultt::P_UNSATISFIABLE;
+    status = statust::UNSAT;
+    return resultt::P_UNSATISFIABLE;
+  }
+  catch(Glucose::OutOfMemoryException)
+  {
+    messaget::error() << "SAT checker ran out of memory" << eom;
+    status = statust::ERROR;
+    throw std::bad_alloc();
+  }
 }
 
 template<typename T>
@@ -173,13 +199,22 @@ void satcheck_glucose_baset<T>::set_assignment(literalt a, bool value)
 {
   assert(!a.is_constant());
 
-  unsigned v=a.var_no();
-  bool sign=a.sign();
+  try
+  {
+    unsigned v = a.var_no();
+    bool sign = a.sign();
 
-  // MiniSat2 kills the model in case of UNSAT
-  solver->model.growTo(v+1);
-  value^=sign;
-  solver->model[v]=Glucose::lbool(value);
+    // MiniSat2 kills the model in case of UNSAT
+    solver->model.growTo(v + 1);
+    value ^= sign;
+    solver->model[v] = Glucose::lbool(value);
+  }
+  catch(Glucose::OutOfMemoryException)
+  {
+    messaget::error() << "SAT checker ran out of memory" << eom;
+    status = statust::ERROR;
+    throw std::bad_alloc();
+  }
 }
 
 template<typename T>
@@ -233,10 +268,19 @@ satcheck_glucose_simplifiert::satcheck_glucose_simplifiert():
 
 void satcheck_glucose_simplifiert::set_frozen(literalt a)
 {
-  if(!a.is_constant())
+  try
   {
-    add_variables();
-    solver->setFrozen(a.var_no(), true);
+    if(!a.is_constant())
+    {
+      add_variables();
+      solver->setFrozen(a.var_no(), true);
+    }
+  }
+  catch(Glucose::OutOfMemoryException)
+  {
+    messaget::error() << "SAT checker ran out of memory" << eom;
+    status = statust::ERROR;
+    throw std::bad_alloc();
   }
 }
 
