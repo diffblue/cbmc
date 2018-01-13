@@ -14,12 +14,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <unistd.h>
 #endif
 
-#include <cassert>
 #include <stack>
 
 #include <util/invariant.h>
 #include <util/threeval.h>
-#include <util/invariant.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
@@ -68,7 +66,7 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 template<typename T>
 void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   try
   {
@@ -112,7 +110,10 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
       if(it->is_true())
         return;
       else if(!it->is_false())
-        assert(it->var_no() < (unsigned)solver->nVars());
+      {
+        INVARIANT(
+          it->var_no() < (unsigned)solver->nVars(), "variable not added yet");
+      }
     }
 
     Minisat::vec<Minisat::Lit> c;
@@ -148,7 +149,7 @@ static void interrupt_solver(int signum)
 template<typename T>
 propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 {
-  assert(status!=statust::ERROR);
+  PRECONDITION(status != statust::ERROR);
 
   {
     messaget::status() <<
@@ -260,7 +261,7 @@ propt::resultt satcheck_minisat2_baset<T>::prop_solve()
 template<typename T>
 void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   try
   {
@@ -353,7 +354,7 @@ void satcheck_minisat_simplifiert::set_frozen(literalt a)
 
 bool satcheck_minisat_simplifiert::is_eliminated(literalt a) const
 {
-  assert(!a.is_constant());
+  PRECONDITION(!a.is_constant());
 
   return solver->isEliminated(a.var_no());
 }
