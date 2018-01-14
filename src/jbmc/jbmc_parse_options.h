@@ -44,7 +44,6 @@ class optionst;
   "(no-pretty-names)(beautify)" \
   "(dimacs)(refine)(max-node-refinement):(refine-arrays)(refine-arithmetic)"\
   "(refine-strings)" \
-  "(string-non-empty)" \
   "(string-printable)" \
   "(string-max-length):" \
   "(string-max-input-length):" \

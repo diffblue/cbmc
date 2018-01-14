@@ -246,7 +246,6 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("refine-strings"))
   {
     options.set_option("refine-strings", true);
-    options.set_option("string-non-empty", cmdline.isset("string-non-empty"));
     options.set_option("string-printable", cmdline.isset("string-printable"));
     if(cmdline.isset("string-max-length"))
       options.set_option(
@@ -912,7 +911,6 @@ void jbmc_parse_optionst::help()
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
     " --refine-strings             use string refinement (experimental)\n"
-    " --string-non-empty           add constraint that strings are non empty (experimental)\n" // NOLINT(*)
     " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
     " --string-max-length          add constraint on the length of strings\n" // NOLINT(*)
     " --string-max-input-length    add constraint on the length of input strings\n" // NOLINT(*)

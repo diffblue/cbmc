@@ -49,8 +49,6 @@ private:
   struct configt
   {
     std::size_t refinement_bound=0;
-    /// Make non-deterministic character arrays have at least one character
-    bool string_non_empty=false;
     /// Concretize strings after solver is finished
     bool trace=false;
     bool use_counter_example=true;
