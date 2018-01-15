@@ -131,6 +131,20 @@ void convert_nondet(
 }
 
 void convert_nondet(
+  goto_model_functiont &function,
+  message_handlert &message_handler,
+  const object_factory_parameterst &object_factory_parameters)
+{
+  convert_nondet(
+    function.get_goto_function().body,
+    function.get_symbol_table(),
+    message_handler,
+    object_factory_parameters);
+
+  function.compute_location_numbers();
+}
+
+void convert_nondet(
   goto_functionst &goto_functions,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
