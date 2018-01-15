@@ -49,7 +49,7 @@ public:
 
   void convert_lazy_method(
     const irep_idt &id,
-    symbol_tablet &symbol_table);
+    symbol_table_baset &symbol_table);
 
   explicit language_filet(const std::string &filename);
   language_filet(const language_filet &rhs);
@@ -119,7 +119,7 @@ public:
   // for this to be legal.
   void convert_lazy_method(
     const irep_idt &id,
-    symbol_tablet &symbol_table)
+    symbol_table_baset &symbol_table)
   {
     PRECONDITION(symbol_table.has_symbol(id));
     lazy_method_mapt::iterator it=lazy_method_map.find(id);

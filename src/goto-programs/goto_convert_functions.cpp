@@ -21,7 +21,7 @@ Date: June 2003
 #include "goto_inline.h"
 
 goto_convert_functionst::goto_convert_functionst(
-  symbol_tablet &_symbol_table,
+  symbol_table_baset &_symbol_table,
   message_handlert &_message_handler):
   goto_convertt(_symbol_table, _message_handler)
 {
@@ -234,7 +234,7 @@ void goto_convert(
 }
 
 void goto_convert(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {
@@ -269,7 +269,7 @@ void goto_convert(
 
 void goto_convert(
   const irep_idt &identifier,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)
 {

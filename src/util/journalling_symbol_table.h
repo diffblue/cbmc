@@ -48,7 +48,7 @@ private:
   changesett removed;
 
 private:
-  explicit journalling_symbol_tablet(symbol_tablet &base_symbol_table)
+  explicit journalling_symbol_tablet(symbol_table_baset &base_symbol_table)
     : symbol_table_baset(
         base_symbol_table.symbols,
         base_symbol_table.symbol_base_map,
@@ -77,7 +77,7 @@ public:
     return base_symbol_table.get_symbol_table();
   }
 
-  static journalling_symbol_tablet wrap(symbol_tablet &base_symbol_table)
+  static journalling_symbol_tablet wrap(symbol_table_baset &base_symbol_table)
   {
     return journalling_symbol_tablet(base_symbol_table);
   }

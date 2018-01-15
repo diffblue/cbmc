@@ -19,7 +19,7 @@ Date:   September 2009
 class remove_returnst
 {
 public:
-  explicit remove_returnst(symbol_tablet &_symbol_table):
+  explicit remove_returnst(symbol_table_baset &_symbol_table):
     symbol_table(_symbol_table)
   {
   }
@@ -35,7 +35,7 @@ public:
     goto_functionst &goto_functions);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
 
   void replace_returns(
     const irep_idt &function_id,
@@ -251,7 +251,7 @@ void remove_returnst::operator()(
 
 /// removes returns
 void remove_returns(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
   remove_returnst rr(symbol_table);
@@ -290,7 +290,7 @@ void remove_returns(goto_modelt &goto_model)
 /// \return the function's type with its `return_type()` restored to its
 ///   original value if a \#return_value variable exists, or nil otherwise
 code_typet original_return_type(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &function_id)
 {
   code_typet type;

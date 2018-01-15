@@ -20,7 +20,7 @@ Date: June 2003
 
 // convert it all!
 void goto_convert(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &);
 
@@ -32,7 +32,7 @@ void goto_convert(
 // just convert a specific function
 void goto_convert(
   const irep_idt &identifier,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &);
 
@@ -45,7 +45,7 @@ public:
     goto_functionst::goto_functiont &result);
 
   goto_convert_functionst(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &_message_handler);
 
   virtual ~goto_convert_functionst();

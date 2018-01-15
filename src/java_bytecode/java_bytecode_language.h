@@ -152,7 +152,7 @@ public:
   virtual void methods_provided(id_sett &methods) const override;
   virtual void convert_lazy_method(
     const irep_idt &function_id,
-    symbol_tablet &symbol_table) override;
+    symbol_table_baset &symbol_table) override;
 
 protected:
   void convert_single_method(

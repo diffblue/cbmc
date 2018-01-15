@@ -379,7 +379,7 @@ void java_bytecode_languaget::methods_provided(id_sett &methods) const
 /// \param symtab: global symbol table
 void java_bytecode_languaget::convert_lazy_method(
   const irep_idt &function_id,
-  symbol_tablet &symtab)
+  symbol_table_baset &symtab)
 {
   const symbolt &symbol = symtab.lookup_ref(function_id);
   if(symbol.value.is_not_nil())

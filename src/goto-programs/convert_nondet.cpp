@@ -32,7 +32,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 static goto_programt::targett insert_nondet_init_code(
   goto_programt &goto_program,
   const goto_programt::targett &target,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters)
 {
@@ -113,7 +113,7 @@ static goto_programt::targett insert_nondet_init_code(
 /// \param max_nondet_array_length: Maximum size of new nondet arrays.
 void convert_nondet(
   goto_programt &goto_program,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters)
 {
@@ -146,7 +146,7 @@ void convert_nondet(
 
 void convert_nondet(
   goto_functionst &goto_functions,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters)
 {

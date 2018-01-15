@@ -646,14 +646,11 @@ void jbmc_parse_optionst::process_goto_function(
   const can_produce_functiont &available_functions,
   const optionst &options)
 {
-  symbol_tablet &symbol_table = function.get_symbol_table();
+  journalling_symbol_tablet &symbol_table = function.get_symbol_table();
   namespacet ns(symbol_table);
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
   try
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_function, symbol_table);
     // Removal of RTTI inspection:
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:

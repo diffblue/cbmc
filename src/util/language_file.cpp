@@ -37,7 +37,7 @@ void language_filet::get_modules()
 
 void language_filet::convert_lazy_method(
   const irep_idt &id,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   language->convert_lazy_method(id, symbol_table);
 }

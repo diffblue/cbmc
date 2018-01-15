@@ -83,7 +83,8 @@ public:
 
   // populate a lazy method
   virtual void
-  convert_lazy_method(const irep_idt &function_id, symbol_tablet &symbol_table)
+  convert_lazy_method(
+    const irep_idt &function_id, symbol_table_baset &symbol_table)
   { }
 
   /// Final adjustments, e.g. initializing stub functions and globals that

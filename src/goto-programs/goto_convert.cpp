@@ -2178,7 +2178,7 @@ const symbolt &goto_convertt::lookup(const irep_idt &identifier)
 
 void goto_convert(
   const codet &code,
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler)
 {
@@ -2212,7 +2212,7 @@ void goto_convert(
 }
 
 void goto_convert(
-  symbol_tablet &symbol_table,
+  symbol_table_baset &symbol_table,
   goto_programt &dest,
   message_handlert &message_handler)
 {
