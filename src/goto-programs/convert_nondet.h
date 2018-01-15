@@ -17,6 +17,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 class goto_functionst;
 class symbol_tablet;
 class goto_modelt;
+class goto_model_functiont;
 class message_handlert;
 struct object_factory_parameterst;
 
@@ -36,6 +37,17 @@ void convert_nondet(
 void convert_nondet(
   goto_modelt &,
   message_handlert &,
+  const object_factory_parameterst &object_factory_parameters);
+
+/// Replace calls to nondet library functions with an internal nondet
+/// representation.
+/// \param function: goto program to modify
+/// \param message_handler: For error logging.
+/// \param object_factory_parameters: Parameters for the generation of nondet
+///   objects.
+void convert_nondet(
+  goto_model_functiont &function,
+  message_handlert &message_handler,
   const object_factory_parameterst &object_factory_parameters);
 
 #endif
