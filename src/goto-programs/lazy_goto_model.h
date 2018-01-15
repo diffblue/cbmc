@@ -51,9 +51,9 @@ public:
     message_handlert &message_handler)
   {
     return lazy_goto_modelt(
-      [&handler] (goto_model_functiont &function)
+      [&handler, &options] (goto_model_functiont &function)
       {
-        handler.process_goto_function(function);
+        handler.process_goto_function(function, options);
       },
       [&handler, &options] (goto_modelt &goto_model) -> bool
       {

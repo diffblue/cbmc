@@ -26,6 +26,7 @@ void goto_check(
 void goto_check(
   const namespacet &ns,
   const optionst &options,
+  const irep_idt &mode,
   goto_functionst::goto_functiont &goto_function);
 
 void goto_check(
