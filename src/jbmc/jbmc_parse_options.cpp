@@ -693,6 +693,9 @@ void jbmc_parse_optionst::process_goto_function(
 
     // add generic checks
     goto_check(ns, options, ID_java, function.get_goto_function());
+
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_function, ns);
   }
 
   catch(const char *e)
@@ -729,9 +732,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
 
     // ignore default/user-specified initialization
     // of variables with static lifetime
