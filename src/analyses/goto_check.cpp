@@ -1753,10 +1753,11 @@ void goto_checkt::goto_check(
 void goto_check(
   const namespacet &ns,
   const optionst &options,
+  const irep_idt &mode,
   goto_functionst::goto_functiont &goto_function)
 {
   goto_checkt goto_check(ns, options);
-  goto_check.goto_check(goto_function, irep_idt());
+  goto_check.goto_check(goto_function, mode);
 }
 
 void goto_check(

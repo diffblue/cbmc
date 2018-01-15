@@ -86,7 +86,8 @@ public:
 
   void process_goto_function(
     goto_model_functiont &function,
-    const can_produce_functiont &);
+    const can_produce_functiont &,
+    const optionst &);
   bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
 
 protected:

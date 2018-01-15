@@ -643,9 +643,11 @@ int jbmc_parse_optionst::get_goto_program(
 
 void jbmc_parse_optionst::process_goto_function(
   goto_model_functiont &function,
-  const can_produce_functiont &available_functions)
+  const can_produce_functiont &available_functions,
+  const optionst &options)
 {
   symbol_tablet &symbol_table = function.get_symbol_table();
+  namespacet ns(symbol_table);
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
   try
   {
@@ -688,6 +690,9 @@ void jbmc_parse_optionst::process_goto_function(
       function,
       get_message_handler(),
       factory_params);
+
+    // add generic checks
+    goto_check(ns, options, ID_java, function.get_goto_function());
   }
 
   catch(const char *e)
@@ -724,10 +729,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
-
-    // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
-    goto_check(options, goto_model);
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_model);
