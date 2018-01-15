@@ -14,6 +14,7 @@
 #include <java_bytecode/java_string_library_preprocess.h>
 
 #include <goto-programs/resolve_concrete_function_call.h>
+#include <goto-programs/remove_exceptions.h>
 
 /// Constructor for lazy-method loading
 /// \param symbol_table: the symbol table to use
@@ -180,6 +181,9 @@ bool ci_lazy_methodst::operator()(
 
   // Remove symbols for methods that were declared but never used:
   symbol_tablet keep_symbols;
+  // Manually keep @inflight_exception, as it is unused at this stage
+  // but will become used when the `remove_exceptions` pass is run:
+  keep_symbols.add(symbol_table.lookup_ref(INFLIGHT_EXCEPTION_VARIABLE_NAME));
 
   for(const auto &sym : symbol_table.symbols)
   {
