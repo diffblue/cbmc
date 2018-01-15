@@ -20,7 +20,7 @@ irep_idt failed_symbol_id(const irep_idt &id)
   return id2string(id)+"$object";
 }
 
-void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
+void add_failed_symbol(symbolt &symbol, symbol_table_baset &symbol_table)
 {
   if(symbol.type.id()==ID_pointer)
   {
@@ -43,7 +43,8 @@ void add_failed_symbol(symbolt &symbol, symbol_tablet &symbol_table)
   }
 }
 
-void add_failed_symbol(const symbolt &symbol, symbol_tablet &symbol_table)
+void add_failed_symbol_if_needed(
+  const symbolt &symbol, symbol_table_baset &symbol_table)
 {
   if(!symbol.is_lvalue)
     return;
@@ -54,7 +55,7 @@ void add_failed_symbol(const symbolt &symbol, symbol_tablet &symbol_table)
   add_failed_symbol(*symbol_table.get_writeable(symbol.name), symbol_table);
 }
 
-void add_failed_symbols(symbol_tablet &symbol_table)
+void add_failed_symbols(symbol_table_baset &symbol_table)
 {
   // the symbol table iterators are not stable, and
   // we are adding new symbols, this
@@ -64,7 +65,7 @@ void add_failed_symbols(symbol_tablet &symbol_table)
     symbol_list.push_back(&(named_symbol.second));
 
   for(const symbolt *symbol : symbol_list)
-    add_failed_symbol(*symbol, symbol_table);
+    add_failed_symbol_if_needed(*symbol, symbol_table);
 }
 
 exprt get_failed_symbol(
