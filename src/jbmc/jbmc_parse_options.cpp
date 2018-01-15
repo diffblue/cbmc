@@ -664,6 +664,8 @@ void jbmc_parse_optionst::process_goto_function(
       };
 
     remove_returns(function, function_is_stub);
+
+    replace_java_nondet(function);
   }
 
   catch(const char *e)
@@ -717,8 +719,6 @@ bool jbmc_parse_optionst::process_goto_functions(
       cmdline.isset("java-max-input-tree-depth")
         ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
         : MAX_NONDET_TREE_DEPTH;
-
-    replace_java_nondet(goto_model);
 
     convert_nondet(
       goto_model,
