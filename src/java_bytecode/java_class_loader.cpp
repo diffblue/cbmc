@@ -74,6 +74,38 @@ void java_class_loadert::set_java_cp_include_files(
   java_cp_include_files=_java_cp_include_files;
 }
 
+/// Retrieves a class file from a jar and loads it into the tree
+bool java_class_loadert::get_class_file(
+  java_class_loader_limitt &class_loader_limit,
+  const irep_idt &class_name,
+  const std::string &jar_file,
+  java_bytecode_parse_treet &parse_tree)
+{
+  const auto &jm=jar_map[jar_file];
+
+  auto jm_it=jm.entries.find(class_name);
+
+  if(jm_it!=jm.entries.end())
+  {
+    debug() << "Getting class `" << class_name << "' from JAR "
+            << jar_file << eom;
+
+    std::string data=jar_pool(class_loader_limit, jar_file)
+      .get_entry(jm_it->second.class_file_name);
+
+    std::istringstream istream(data);
+
+    java_bytecode_parse(
+      istream,
+      parse_tree,
+      get_message_handler());
+
+    return true;
+  }
+  return false;
+}
+
+
 java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   java_class_loader_limitt &class_loader_limit,
   const irep_idt &class_name)
@@ -84,28 +116,8 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
   for(const auto &jf : jar_files)
   {
     read_jar_file(class_loader_limit, jf);
-
-    const auto &jm=jar_map[jf];
-
-    auto jm_it=jm.entries.find(class_name);
-
-    if(jm_it!=jm.entries.end())
-    {
-      debug() << "Getting class `" << class_name << "' from JAR "
-              << jf << eom;
-
-      std::string data=jar_pool(class_loader_limit, jf)
-        .get_entry(jm_it->second.class_file_name);
-
-      std::istringstream istream(data);
-
-      java_bytecode_parse(
-        istream,
-        parse_tree,
-        get_message_handler());
-
+    if(get_class_file(class_loader_limit, class_name, jf, parse_tree))
       return parse_tree;
-    }
   }
 
   // See if we can find it in the class path
@@ -115,28 +127,8 @@ java_bytecode_parse_treet &java_class_loadert::get_parse_tree(
     if(has_suffix(cp, ".jar"))
     {
       read_jar_file(class_loader_limit, cp);
-
-      const auto &jm=jar_map[cp];
-
-      auto jm_it=jm.entries.find(class_name);
-
-      if(jm_it!=jm.entries.end())
-      {
-        debug() << "Getting class `" << class_name << "' from JAR "
-                << cp << eom;
-
-        std::string data=jar_pool(class_loader_limit, cp)
-          .get_entry(jm_it->second.class_file_name);
-
-        std::istringstream istream(data);
-
-        java_bytecode_parse(
-          istream,
-          parse_tree,
-          get_message_handler());
-
+      if(get_class_file(class_loader_limit, class_name, cp, parse_tree))
         return parse_tree;
-      }
     }
     else
     {

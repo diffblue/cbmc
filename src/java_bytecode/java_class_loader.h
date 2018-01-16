@@ -40,6 +40,14 @@ public:
 
   void read_jar_file(java_class_loader_limitt &, const irep_idt &);
 
+  /// Attempts to load the class from the given jar.
+  /// Returns true if found and loaded
+  bool get_class_file(
+    java_class_loader_limitt &class_loader_limit,
+    const irep_idt &class_name,
+    const std::string &jar_file,
+    java_bytecode_parse_treet &parse_tree);
+
   /// Given a \p class_name (e.g. "java.lang.Thread") try to load the
   /// corresponding .class file by first scanning all .jar files whose
   /// pathname is stored in \ref jar_files, and if that doesn't work, then scan
