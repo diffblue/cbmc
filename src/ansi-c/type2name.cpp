@@ -16,6 +16,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/namespace.h>
 #include <util/symbol.h>
 #include <util/symbol_table.h>
+#include <util/pointer_offset_size.h>
+#include <util/invariant.h>
 
 typedef std::unordered_map<irep_idt, std::pair<size_t, bool>, irep_id_hash>
   symbol_numbert;
@@ -81,6 +83,15 @@ static std::string type2name_symbol(
   return result;
 }
 
+static std::string pointer_offset_bits_as_string(
+  const typet &type,
+  const namespacet &ns)
+{
+  mp_integer bits = pointer_offset_bits(type, ns);
+  CHECK_RETURN(bits != -1);
+  return integer2string(bits);
+}
+
 static bool parent_is_sym_check=false;
 static std::string type2name(
   const typet &type,
@@ -115,9 +126,9 @@ static std::string type2name(
   else if(type.id()==ID_empty)
     result+='V';
   else if(type.id()==ID_signedbv)
-    result+="S" + type.get_string(ID_width);
+    result+="S" + pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_unsignedbv)
-    result+="U" + type.get_string(ID_width);
+    result+="U" + pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_bool ||
           type.id()==ID_c_bool)
     result+='B';
@@ -128,9 +139,9 @@ static std::string type2name(
   else if(type.id()==ID_complex)
     result+='C';
   else if(type.id()==ID_floatbv)
-    result+="F" + type.get_string(ID_width);
+    result+="F" + pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_fixedbv)
-    result+="X" + type.get_string(ID_width);
+    result+="X" + pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_natural)
     result+='N';
   else if(type.id()==ID_pointer)
@@ -171,7 +182,7 @@ static std::string type2name(
     const array_typet &t=to_array_type(type);
     mp_integer size;
     if(t.size().id()==ID_symbol)
-      result+="ARR"+t.size().get_string(ID_identifier);
+      result+="ARR"+id2string(t.size().get(ID_identifier));
     else if(to_integer(t.size(), size))
       result+="ARR?";
     else
@@ -205,7 +216,9 @@ static std::string type2name(
       if(it!=components.begin())
         result+='|';
       result+=type2name(it->type(), ns, symbol_number);
-      result+="'"+it->get_string(ID_name)+"'";
+      irep_idt component_name = it->get_name();
+      CHECK_RETURN(!component_name.empty());
+      result+="'"+id2string(component_name)+"'";
     }
     result+=']';
   }
@@ -233,7 +246,7 @@ static std::string type2name(
   else if(type.id()==ID_incomplete_c_enum)
     result +="EN?";
   else if(type.id()==ID_c_bit_field)
-    result+="BF"+type.get_string(ID_size);
+    result+="BF"+pointer_offset_bits_as_string(type, ns);
   else if(type.id()==ID_vector)
     result+="VEC"+type.get_string(ID_size);
   else
