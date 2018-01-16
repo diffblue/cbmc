@@ -86,9 +86,11 @@ public:
   goto_model_functiont(
     journalling_symbol_tablet &symbol_table,
     goto_functionst &goto_functions,
+    const irep_idt &function_id,
     goto_functionst::goto_functiont &goto_function):
   symbol_table(symbol_table),
   goto_functions(goto_functions),
+  function_id(function_id),
   goto_function(goto_function)
   {
   }
@@ -117,9 +119,17 @@ public:
     return goto_function;
   }
 
+  /// Get function id
+  /// \return `goto_function`'s name (its key in `goto_functions`)
+  const irep_idt &get_function_id()
+  {
+    return function_id;
+  }
+
 private:
   journalling_symbol_tablet &symbol_table;
   goto_functionst &goto_functions;
+  irep_idt function_id;
   goto_functionst::goto_functiont &goto_function;
 };
 
