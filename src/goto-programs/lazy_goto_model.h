@@ -8,6 +8,7 @@
 
 #include <langapi/language_file.h>
 
+#include "abstract_goto_model.h"
 #include "goto_model.h"
 #include "lazy_goto_functions_map.h"
 #include "goto_convert_functions.h"
@@ -15,24 +16,12 @@
 class cmdlinet;
 class optionst;
 
-/// Interface for a provider of function definitions to report whether or not it
-/// can provide a definition (function body) for a given function ID.
-struct can_produce_functiont
-{
-  /// Determines if this function provider can produce a body for the given
-  /// function
-  /// \param id: function ID to query
-  /// \return true if we can produce a function body, or false if we would leave
-  ///   it a bodyless stub.
-  virtual bool can_produce_function(const irep_idt &id) const = 0;
-};
-
 /// Model that holds partially loaded map of functions
-class lazy_goto_modelt : public can_produce_functiont
+class lazy_goto_modelt : public abstract_goto_modelt
 {
 public:
   typedef std::function<
-    void(goto_model_functiont &function, const can_produce_functiont &)>
+    void(goto_model_functiont &function, const abstract_goto_modelt &)>
     post_process_functiont;
   typedef std::function<bool(goto_modelt &goto_model)> post_process_functionst;
 
@@ -65,8 +54,8 @@ public:
   {
     return lazy_goto_modelt(
       [&handler, &options]
-      (goto_model_functiont &fun, const can_produce_functiont &cpf) { // NOLINT(*)
-        handler.process_goto_function(fun, cpf, options);
+      (goto_model_functiont &fun, const abstract_goto_modelt &model) { // NOLINT(*)
+        handler.process_goto_function(fun, model, options);
       },
       [&handler, &options] (goto_modelt &goto_model) -> bool { // NOLINT(*)
         return handler.process_goto_functions(goto_model, options);
@@ -100,7 +89,29 @@ public:
     return std::move(model.goto_model);
   }
 
-  virtual bool can_produce_function(const irep_idt &id) const;
+  // Implement the abstract_goto_modelt interface:
+
+  /// Accessor to retrieve the internal goto_functionst.
+  /// Use with care; concurrent use of get_goto_function will have side-effects
+  /// on this map which may surprise users, including invalidating any iterators
+  /// they have stored.
+  const goto_functionst &get_goto_functions() const override
+  {
+    return goto_model->goto_functions;
+  }
+
+  const symbol_tablet &get_symbol_table() const override
+  {
+    return symbol_table;
+  }
+
+  bool can_produce_function(const irep_idt &id) const override;
+
+  const goto_functionst::goto_functiont &get_goto_function(const irep_idt &id)
+    override
+  {
+    return goto_functions.at(id);
+  }
 
 private:
   std::unique_ptr<goto_modelt> goto_model;
