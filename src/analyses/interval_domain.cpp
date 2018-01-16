@@ -78,6 +78,8 @@ void interval_domaint::transform(
 
   case GOTO:
     {
+      // Comparing iterators is safe as the target must be within the same list
+      // of instructions because this is a GOTO.
       locationt next=from;
       next++;
       if(next==to)

@@ -395,11 +395,8 @@ void custom_bitvector_domaint::transform(
         }
         else
         {
-          goto_programt::const_targett next=from;
-          ++next;
-
           // only if there is an actual call, i.e., we have a body
-          if(next!=to)
+          if(from->function != to->function)
           {
             const code_typet &code_type=
               to_code_type(ns.lookup(identifier).type);
@@ -522,6 +519,8 @@ void custom_bitvector_domaint::transform(
     {
       exprt guard=instruction.guard;
 
+      // Comparing iterators is safe as the target must be within the same list
+      // of instructions because this is a GOTO.
       if(to!=from->get_target())
         guard.make_not();
 

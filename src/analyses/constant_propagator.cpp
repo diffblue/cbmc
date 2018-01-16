@@ -93,6 +93,8 @@ void constant_propagator_domaint::transform(
   {
     exprt g;
 
+    // Comparing iterators is safe as the target must be within the same list
+    // of instructions because this is a GOTO.
     if(from->get_target()==to)
       g=simplify_expr(from->guard, ns);
     else
@@ -121,15 +123,14 @@ void constant_propagator_domaint::transform(
     const code_function_callt &function_call=to_code_function_call(from->code);
     const exprt &function=function_call.function();
 
-    const locationt& next=std::next(from);
-
     if(function.id()==ID_symbol)
     {
       // called function identifier
       const symbol_exprt &symbol_expr=to_symbol_expr(function);
       const irep_idt id=symbol_expr.get_identifier();
 
-      if(to==next)
+      // Functions with no body
+      if(from->function == to->function)
       {
         if(id==CPROVER_PREFIX "set_must" ||
            id==CPROVER_PREFIX "get_must" ||
@@ -177,7 +178,9 @@ void constant_propagator_domaint::transform(
     else
     {
       // unresolved call
-      INVARIANT(to==next, "Unresolved call can only be approximated if a skip");
+      INVARIANT(
+        from->function == to->function,
+        "Unresolved call can only be approximated if a skip");
 
       if(have_dirty)
         values.set_dirty_to_top(cp->dirty, ns);
