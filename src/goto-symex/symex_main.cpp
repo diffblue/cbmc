@@ -136,8 +136,17 @@ void goto_symext::initialize_entry_point(
   state.top().end_of_function=limit;
   state.top().calling_location.pc=state.top().end_of_function;
   state.symex_target=&target;
-  state.dirty=util_make_unique<dirtyt>(goto_functions);
-
+  state.dirty=util_make_unique<incremental_dirtyt>();
+  if(!pc->function.empty())
+  {
+    state.dirty->populate_dirty_for_function(
+      pc->function, goto_functions.function_map.at(pc->function));
+  }
+  else
+  {
+    log.warning() << "Unable to analyse address-taken locals, as start "
+      "instruction does not state its function" << messaget::eom;
+  }
   symex_transition(state, state.source.pc);
 }
 

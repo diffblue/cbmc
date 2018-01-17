@@ -235,6 +235,9 @@ void goto_symext::symex_function_call_code(
 
   const goto_functionst::goto_functiont &goto_function=it->second;
 
+  if(state.dirty)
+    state.dirty->populate_dirty_for_function(identifier, goto_function);
+
   const bool stop_recursing=get_unwind_recursion(
     identifier,
     state.source.thread_nr,
