@@ -82,10 +82,13 @@ void interval_domaint::transform(
       // of instructions because this is a GOTO.
       locationt next=from;
       next++;
-      if(next==to)
-        assume(not_exprt(instruction.guard), ns);
-      else
-        assume(instruction.guard, ns);
+      if(from->get_target() != next) // If equal then a skip
+      {
+        if(next == to)
+          assume(not_exprt(instruction.guard), ns);
+        else
+          assume(instruction.guard, ns);
+      }
     }
     break;
 
