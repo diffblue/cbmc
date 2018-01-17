@@ -42,6 +42,12 @@ public:
   // extra MiniSat feature: default branching decision
   void set_polarity(literalt a, bool value);
 
+  // extra MiniSat feature: interrupt running SAT query
+  void interrupt();
+
+  // extra MiniSat feature: permit previously interrupted SAT query to continue
+  void clear_interrupt();
+
   virtual bool is_in_conflict(literalt a) const override;
   virtual bool has_set_assumptions() const final { return true; }
   virtual bool has_is_in_conflict() const final { return true; }
