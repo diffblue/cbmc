@@ -26,6 +26,7 @@ class bmct;
 class goto_functionst;
 class optionst;
 
+// clang-format off
 #define JBMC_OPTIONS \
   "(program-only)(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
@@ -48,7 +49,8 @@ class optionst;
   "(string-max-length):" \
   "(string-max-input-length):" \
   "(16)(32)(64)(LP64)(ILP64)(LLP64)(ILP32)(LP32)" \
-  "(show-goto-functions)(show-loops)" \
+  OPT_SHOW_GOTO_FUNCTIONS \
+  "(show-loops)" \
   "(show-symbol-table)(show-parse-tree)(show-vcc)" \
   "(show-properties)" \
   "(drop-unused-functions)" \
@@ -65,6 +67,7 @@ class optionst;
   "(java-unwind-enum-static)" \
   "(localize-faults)(localize-faults-method):" \
   OPT_GOTO_TRACE
+// clang-format on
 
 class jbmc_parse_optionst:
   public parse_options_baset,

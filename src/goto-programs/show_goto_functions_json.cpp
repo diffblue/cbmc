@@ -26,8 +26,11 @@ Author: Thomas Kiley
 
 /// For outputting the GOTO program in a readable JSON format.
 /// \param ns: the namespace to use to resolve names with
-show_goto_functions_jsont::show_goto_functions_jsont(const namespacet &ns):
-  ns(ns)
+/// \param list_only: output only list of functions, but not their bodies
+show_goto_functions_jsont::show_goto_functions_jsont(
+  const namespacet &_ns,
+  bool _list_only)
+  : ns(_ns), list_only(_list_only)
 {}
 
 /// Walks through all of the functions in the program and returns a JSON object
@@ -54,6 +57,9 @@ json_objectt show_goto_functions_jsont::convert(
       has_prefix(id2string(function_name), "java::org.cprover") ||
       has_prefix(id2string(function_name), "java::java");
     json_function["isInternal"]=jsont::json_boolean(is_internal);
+
+    if(list_only)
+      continue;
 
     if(function.body_available())
     {

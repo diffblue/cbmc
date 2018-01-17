@@ -25,8 +25,11 @@ Author: Thomas Kiley
 
 /// For outputting the GOTO program in a readable xml format.
 /// \param ns: the namespace to use to resolve names with
-show_goto_functions_xmlt::show_goto_functions_xmlt(const namespacet &ns):
-  ns(ns)
+/// \param list_only: output only list of functions, but not their bodies
+show_goto_functions_xmlt::show_goto_functions_xmlt(
+  const namespacet &_ns,
+  bool _list_only)
+  : ns(_ns), list_only(_list_only)
 {}
 
 /// Walks through all of the functions in the program and returns an xml object
@@ -55,6 +58,9 @@ xmlt show_goto_functions_xmlt::convert(
       has_prefix(id2string(function_name), "java::org.cprover") ||
       has_prefix(id2string(function_name), "java::java");
     xml_function.set_attribute_bool("is_internal", is_internal);
+
+    if(list_only)
+      continue;
 
     if(function.body_available())
     {

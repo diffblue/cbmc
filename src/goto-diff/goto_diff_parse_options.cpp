@@ -280,10 +280,27 @@ int goto_diff_parse_optionst::doit()
   if(get_goto_program_ret!=-1)
     return get_goto_program_ret;
 
-  if(cmdline.isset("show-goto-functions"))
+  if(cmdline.isset("show-loops"))
   {
-    show_goto_functions(goto_model1, get_ui());
-    show_goto_functions(goto_model2, get_ui());
+    show_loop_ids(get_ui(), goto_model1);
+    show_loop_ids(get_ui(), goto_model2);
+    return true;
+  }
+
+  if(
+    cmdline.isset("show-goto-functions") ||
+    cmdline.isset("list-goto-functions"))
+  {
+    show_goto_functions(
+      goto_model1,
+      get_message_handler(),
+      ui_message_handler.get_ui(),
+      cmdline.isset("list-goto-functions"));
+    show_goto_functions(
+      goto_model2,
+      get_message_handler(),
+      ui_message_handler.get_ui(),
+      cmdline.isset("list-goto-functions"));
     return 0;
   }
 
@@ -430,20 +447,6 @@ bool goto_diff_parse_optionst::process_goto_program(
 
     // add loop ids
     goto_functions.compute_loop_numbers();
-
-    // show it?
-    if(cmdline.isset("show-loops"))
-    {
-      show_loop_ids(get_ui(), goto_model);
-      return true;
-    }
-
-    // show it?
-    if(cmdline.isset("show-goto-functions"))
-    {
-      show_goto_functions(goto_model, get_ui());
-      return true;
-    }
   }
 
   catch(const char *e)

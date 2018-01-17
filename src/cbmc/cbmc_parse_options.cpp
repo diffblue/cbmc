@@ -635,9 +635,15 @@ int cbmc_parse_optionst::get_goto_program(
     }
 
     // show it?
-    if(cmdline.isset("show-goto-functions"))
+    if(
+      cmdline.isset("show-goto-functions") ||
+      cmdline.isset("list-goto-functions"))
     {
-      show_goto_functions(goto_model, ui_message_handler.get_ui());
+      show_goto_functions(
+        goto_model,
+        get_message_handler(),
+        ui_message_handler.get_ui(),
+        cmdline.isset("list-goto-functions"));
       return CPROVER_EXIT_SUCCESS;
     }
 
@@ -896,6 +902,7 @@ int cbmc_parse_optionst::do_bmc(bmct &bmc)
 /// display command line help
 void cbmc_parse_optionst::help()
 {
+  // clang-format off
   std::cout <<
     "\n"
     "* *   CBMC " CBMC_VERSION " - Copyright (C) 2001-2017 ";
@@ -1023,4 +1030,5 @@ void cbmc_parse_optionst::help()
     HELP_GOTO_TRACE
     " --verbosity #                verbosity level\n"
     "\n";
+  // clang-format on
 }

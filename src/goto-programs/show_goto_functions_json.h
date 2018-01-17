@@ -20,7 +20,9 @@ class namespacet;
 class show_goto_functions_jsont
 {
 public:
-  explicit show_goto_functions_jsont(const namespacet &ns);
+  explicit show_goto_functions_jsont(
+    const namespacet &_ns,
+    bool _list_only = false);
 
   json_objectt convert(const goto_functionst &goto_functions);
   void operator()(
@@ -28,6 +30,7 @@ public:
 
 private:
   const namespacet &ns;
+  bool list_only;
 };
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_GOTO_FUNCTIONS_JSON_H
