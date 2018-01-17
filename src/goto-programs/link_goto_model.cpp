@@ -69,22 +69,15 @@ static bool link_functions(
     goto_functionst::function_mapt::iterator dest_f_it=
       dest_functions.function_map.find(final_id);
 
+    goto_functionst::goto_functiont &src_func = src_it->second;
     if(dest_f_it==dest_functions.function_map.end()) // not there yet
     {
-      rename_symbols_in_function(src_it->second, final_id, rename_symbol);
-
-      goto_functionst::goto_functiont &in_dest_symbol_table=
-        dest_functions.function_map[final_id];
-
-      in_dest_symbol_table.body.swap(src_it->second.body);
-      in_dest_symbol_table.type=src_it->second.type;
+      rename_symbols_in_function(src_func, final_id, rename_symbol);
+      dest_functions.function_map.emplace(final_id, std::move(src_func));
     }
     else // collision!
     {
-      goto_functionst::goto_functiont &in_dest_symbol_table=
-        dest_functions.function_map[final_id];
-
-      goto_functionst::goto_functiont &src_func=src_it->second;
+      goto_functionst::goto_functiont &in_dest_symbol_table = dest_f_it->second;
 
       if(in_dest_symbol_table.body.instructions.empty() ||
          weak_symbols.find(final_id)!=weak_symbols.end())
