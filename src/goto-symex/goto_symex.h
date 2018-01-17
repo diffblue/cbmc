@@ -67,6 +67,10 @@ public:
 
   typedef goto_symex_statet statet;
 
+  typedef
+    std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
+    get_goto_functiont;
+
   /// \brief symex entire program starting from entry point
   ///
   /// The state that goto_symext maintains has a large memory footprint.
@@ -75,6 +79,15 @@ public:
   /// around afterwards.
   virtual void symex_from_entry_point_of(
     const goto_functionst &goto_functions);
+
+  /// \brief symex entire program starting from entry point
+  ///
+  /// The state that goto_symext maintains has a large memory footprint.
+  /// This method deallocates the state as soon as symbolic execution
+  /// has completed, so use it if you don't care about having the state
+  /// around afterwards.
+  virtual void symex_from_entry_point_of(
+    const get_goto_functiont &get_goto_function);
 
   //// \brief symex entire program starting from entry point
   ///
@@ -86,6 +99,18 @@ public:
   virtual void symex_with_state(
     statet &,
     const goto_functionst &,
+    const goto_programt &);
+
+  //// \brief symex entire program starting from entry point
+  ///
+  /// This method uses the `state` argument as the symbolic execution
+  /// state, which is useful for examining the state after this method
+  /// returns. The state that goto_symext maintains has a large memory
+  /// footprint, so if keeping the state around is not necessary,
+  /// clients should instead call goto_symext::symex_from_entry_point_of().
+  virtual void symex_with_state(
+    statet &,
+    const get_goto_functiont &,
     const goto_programt &);
 
   /// Symexes from the first instruction and the given state, terminating as
@@ -102,6 +127,20 @@ public:
     goto_programt::const_targett first,
     goto_programt::const_targett limit);
 
+  /// Symexes from the first instruction and the given state, terminating as
+  /// soon as the last instruction is reached.  This is useful to explicitly
+  /// symex certain ranges of a program, e.g. in an incremental decision
+  /// procedure.
+  /// \param state Symex state to start with.
+  /// \param get_goto_function retrieves a function body
+  /// \param first Entry point in form of a first instruction.
+  /// \param limit Final instruction, which itself will not be symexed.
+  virtual void symex_instruction_range(
+    statet &state,
+    const get_goto_functiont &get_goto_function,
+    goto_programt::const_targett first,
+    goto_programt::const_targett limit);
+
 protected:
   /// Initialise the symbolic execution and the given state with <code>pc</code>
   /// as entry point.
@@ -111,21 +150,21 @@ protected:
   /// \param limit final instruction, which itself will not
   /// be symexed.
   void initialize_entry_point(
-    statet &,
-    const goto_functionst &,
+    statet &state,
+    const get_goto_functiont &get_goto_function,
     goto_programt::const_targett pc,
     goto_programt::const_targett limit);
 
   /// Invokes symex_step and verifies whether additional threads can be
   /// executed.
   /// \param state Current GOTO symex step.
-  /// \param goto_functions GOTO model to symex.
+  /// \param get_goto_function function that retrieves function bodies
   void symex_threaded_step(
-    statet &, const goto_functionst &);
+    statet &, const get_goto_functiont &);
 
   /** execute just one step */
   virtual void symex_step(
-    const goto_functionst &,
+    const get_goto_functiont &,
     statet &);
 
 public:
@@ -213,7 +252,7 @@ protected:
   virtual void symex_decl(statet &);
   virtual void symex_decl(statet &, const symbol_exprt &expr);
   virtual void symex_dead(statet &);
-  virtual void symex_other(const goto_functionst &, statet &);
+  virtual void symex_other(statet &);
 
   virtual void vcc(
     const exprt &,
@@ -255,19 +294,19 @@ protected:
   }
 
   virtual void symex_function_call(
-    const goto_functionst &,
+    const get_goto_functiont &,
     statet &,
     const code_function_callt &);
 
   virtual void symex_end_of_function(statet &);
 
   virtual void symex_function_call_symbol(
-    const goto_functionst &,
+    const get_goto_functiont &,
     statet &,
     const code_function_callt &);
 
   virtual void symex_function_call_code(
-    const goto_functionst &,
+    const get_goto_functiont &,
     statet &,
     const code_function_callt &);
 

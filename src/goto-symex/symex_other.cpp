@@ -79,7 +79,6 @@ void goto_symext::havoc_rec(
 }
 
 void goto_symext::symex_other(
-  const goto_functionst &goto_functions,
   statet &state)
 {
   const goto_programt::instructiont &instruction=*state.source.pc;

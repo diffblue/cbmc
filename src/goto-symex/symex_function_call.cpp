@@ -172,14 +172,14 @@ void goto_symext::parameter_assignments(
 }
 
 void goto_symext::symex_function_call(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   statet &state,
   const code_function_callt &code)
 {
   const exprt &function=code.function();
 
   if(function.id()==ID_symbol)
-    symex_function_call_symbol(goto_functions, state, code);
+    symex_function_call_symbol(get_goto_function, state, code);
   else if(function.id()==ID_if)
     throw "symex_function_call can't do if";
   else if(function.id()==ID_dereference)
@@ -189,7 +189,7 @@ void goto_symext::symex_function_call(
 }
 
 void goto_symext::symex_function_call_symbol(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   statet &state,
   const code_function_callt &code)
 {
@@ -213,27 +213,20 @@ void goto_symext::symex_function_call_symbol(
     symex_macro(state, code);
   }
   else
-    symex_function_call_code(goto_functions, state, code);
+    symex_function_call_code(get_goto_function, state, code);
 }
 
 /// do function call by inlining
 void goto_symext::symex_function_call_code(
-  const goto_functionst &goto_functions,
+  const get_goto_functiont &get_goto_function,
   statet &state,
   const code_function_callt &call)
 {
   const irep_idt &identifier=
     to_symbol_expr(call.function()).get_identifier();
 
-  // find code in function map
-
-  goto_functionst::function_mapt::const_iterator it=
-    goto_functions.function_map.find(identifier);
-
-  if(it==goto_functions.function_map.end())
-    throw "failed to find `"+id2string(identifier)+"' in function_map";
-
-  const goto_functionst::goto_functiont &goto_function=it->second;
+  const goto_functionst::goto_functiont &goto_function =
+    get_goto_function(identifier);
 
   if(state.dirty)
     state.dirty->populate_dirty_for_function(identifier, goto_function);
