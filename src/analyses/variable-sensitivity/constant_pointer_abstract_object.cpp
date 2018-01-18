@@ -96,7 +96,14 @@ constant_pointer_abstract_objectt::constant_pointer_abstract_objectt(
     value_stack(e, environment, ns)
 {
   assert(e.type().id()==ID_pointer);
-  top=value_stack.is_top_value();
+  if(value_stack.is_top_value())
+  {
+    make_top();
+  }
+  else
+  {
+    clear_top();
+  }
 }
 
 /*******************************************************************\
