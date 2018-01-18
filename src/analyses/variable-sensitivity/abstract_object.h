@@ -137,11 +137,33 @@ public:
     std::ostream &out,
     const abstract_objectt::locationst &locations);
 
+  // Const versions must perform copy-on-write
+  abstract_object_pointert make_top() const
+  {
+    if(is_top())
+      return shared_from_this();
+
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->make_top();
+    return clone;
+  }
+
+  abstract_object_pointert clear_top() const
+  {
+    if(!is_top())
+      return shared_from_this();
+
+    internal_abstract_object_pointert clone = mutable_clone();
+    clone->clear_top();
+    return clone;
+  }
+
 private:
   // To enforce copy-on-write these are private and have read-only accessors
   typet t;
   bool bottom;
   locationst last_written_locations;
+  bool top;
 
   abstract_object_pointert abstract_object_merge(
     const abstract_object_pointert other) const;
@@ -164,10 +186,6 @@ protected:
   virtual void update_sub_elements(const locationst &locations)
   {}
 
-  bool top;
-
-  // The one exception is merge in descendant classes, which needs this
-  void make_top() { top=true; }
 
   bool should_use_base_merge(const abstract_object_pointert other) const;
 
@@ -179,6 +197,10 @@ protected:
     const std::map<keyt, abstract_object_pointert> &map1,
     const std::map<keyt, abstract_object_pointert> &map2,
     std::map<keyt, abstract_object_pointert> &out_map);
+
+  // The one exception is merge in descendant classes, which needs this
+  virtual void make_top() { top=true; }
+  virtual void clear_top() { top=false; }
 };
 
 template<typename keyt>
