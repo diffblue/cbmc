@@ -418,16 +418,15 @@ c_typecastt::c_typet c_typecastt::minimum_promotion(
   c_typet max_type=std::max(c_type, INT); // minimum promotion
 
   // The second case can arise if we promote any unsigned type
-  // that is as large as unsigned int.
-
-  if(config.ansi_c.short_int_width==config.ansi_c.int_width &&
-     max_type==USHORT)
+  // that is as large as unsigned int. In this case the promotion configuration
+  // via the enum is actually wrong, and we need to fix this up.
+  if(
+    config.ansi_c.short_int_width == config.ansi_c.int_width &&
+    c_type == USHORT)
     max_type=UINT;
-  else if(config.ansi_c.char_width==config.ansi_c.int_width &&
-          max_type==UCHAR)
+  else if(
+    config.ansi_c.char_width == config.ansi_c.int_width && c_type == UCHAR)
     max_type=UINT;
-  else
-    max_type=std::max(max_type, INT);
 
   if(max_type==UINT &&
      type.id()==ID_c_bit_field &&
