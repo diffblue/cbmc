@@ -340,10 +340,49 @@ void remove_function_pointerst::remove_function_pointer(
       if(t.first=="pthread_mutex_cleanup")
         continue;
 
+      // The code below handles a case where removal of function
+      // pointers is including, erroneously, some functions which
+      // are not part of the array containing them, because they
+      // have the same type as the functions that are contained.
+      //
+      // This is handling this by skipping the insertion of the
+      // function in the array that sources the target simplification
+      // by making sure that the function to be added is indeed included
+      // in the array that we are calculating the targets for.
+      if(pointer.id()==ID_index)
+      {
+        bool found=false;
+        const index_exprt &index_expr=to_index_expr(pointer);
+        const auto &array_name=
+          index_expr.array().get_sub()[0].get("identifier");
+        const auto &array=to_array_expr(ns.lookup(array_name).value);
+        const int array_size=array.get_sub().size();
+
+        // navigate through the elements of the array.
+        for(int i=0; i<array_size; i++)
+        {
+          const auto &first_array=array.get_sub()[i];
+          const int subarray_length=first_array.get_sub().size();
+          for(int z=0; z<subarray_length; z++)
+          {
+            const auto &element=first_array.get_sub()[z];
+            const auto &typecast_first_element=element.get_sub()[0];
+            const auto &function_name=typecast_first_element.get("identifier");
+            if(t.first==function_name)
+            {
+              found=true;
+            }
+          }
+        }
+
+        if(!found)
+          continue;
+      }
+
       symbol_exprt expr;
       expr.type()=t.second;
       expr.set_identifier(t.first);
-        functions.insert(expr);
+      functions.insert(expr);
     }
   }
 

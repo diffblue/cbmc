@@ -1,0 +1,11 @@
+CORE
+main.c
+--remove-function-pointers --show-goto-functions
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == f1
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == f4
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == f2
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == f3
+--
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == g1
+IF fptbl1\[\(signed long int\)id1\]\[\(signed long int\)id2\] == g2
+--
