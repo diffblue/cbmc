@@ -74,9 +74,8 @@ abstract_object_pointert abstract_environmentt::eval(
   }
   else if(simplified_id==ID_address_of)
   {
-    sharing_ptrt<pointer_abstract_objectt> pointer_object=
-      std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-        abstract_object_factory(simplified_expr.type(), simplified_expr, ns));
+    abstract_object_pointert pointer_object=
+      abstract_object_factory(simplified_expr.type(), simplified_expr, ns);
 
     // Store the abstract object in the pointer
     return pointer_object;
@@ -239,9 +238,7 @@ bool abstract_environmentt::assign(
 
     if(final_value != map[symbol_expr])
     {
-      map[symbol_expr]=final_value
-          ->update_last_written_locations(
-              value->get_last_written_locations(), false);
+      map[symbol_expr]=final_value;
     }
   }
   return true;
@@ -634,10 +631,6 @@ void abstract_environmentt::output(
     out << entry.first.get_identifier()
         << " (" << ") -> ";
     entry.second->output(out, ai, ns);
-
-    out << " @ ";
-    entry.second->output_last_written_locations(
-        out, entry.second->get_last_written_locations());
     out << "\n";
   }
   out << "}\n";
