@@ -31,6 +31,7 @@
 #include <map>
 #include <iosfwd>
 #include <algorithm>
+#include <stack>
 
 #include <goto-programs/goto_program.h>
 #include <util/expr.h>
@@ -97,6 +98,19 @@ public:
     const namespacet &ns) const;
 
   virtual exprt to_constant() const;
+
+  virtual abstract_object_pointert read(
+    const abstract_environmentt &env,
+    const exprt &specifier,
+    const namespacet &ns) const;
+
+  virtual abstract_object_pointert write(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const exprt &specifier,
+    const abstract_object_pointert value,
+    bool merging_write) const;
 
   virtual void output(
     std::ostream &out, const class ai_baset &ai, const namespacet &ns) const;

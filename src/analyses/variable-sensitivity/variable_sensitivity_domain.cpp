@@ -438,10 +438,11 @@ void variable_sensitivity_domaint::transform_function_call(
             assert(pointer_value);
 
             // Write top to the pointer
-            pointer_value->write_dereference(
+            pointer_value->write(
               abstract_state,
               ns,
               std::stack<exprt>(),
+              nil_exprt(),
               abstract_state.abstract_object_factory(
                 called_arg.type().subtype(), ns, true), false);
           }
