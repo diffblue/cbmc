@@ -133,16 +133,32 @@ Function: abstract_objectt::abstract_object_merge
 abstract_object_pointert abstract_objectt::abstract_object_merge(
   const abstract_object_pointert other) const
 {
-  if(is_top())
-    return shared_from_this();
-  if(other->bottom)
-    return shared_from_this();
-
+  if(is_top() || other->bottom)
+    return this->abstract_object_merge_internal(other);
 
   internal_abstract_object_pointert merged=mutable_clone();
   merged->make_top();
   merged->bottom=false;
-  return merged;
+  return merged->abstract_object_merge_internal(other);
+}
+
+/**
+ * Helper function for abstract_objectt::abstract_object_merge to perform any
+ * additional actions after the base abstract_object_merge has completed it's
+ * actions but immediately prior to it returning. As such, this function gives
+ * the ability to perform additional work for a merge.
+ *
+ * This default implementation just returns itself.
+ *
+ * \param other the object to merge with this
+ *
+ * \return the result of the merge
+ */
+abstract_object_pointert abstract_objectt::abstract_object_merge_internal(
+  const abstract_object_pointert other) const
+{
+  // Default implementation
+  return shared_from_this();
 }
 
 /*******************************************************************\
@@ -357,15 +373,6 @@ abstract_object_pointert abstract_objectt::merge(
   // If no modifications, we will return the original pointer
   out_modifications=result!=op1;
 
-  locationst get_location_union = op1->get_location_union(
-      op2->get_last_written_locations());
-  // If the union is larger than the initial set, then update.
-  if(get_location_union.size() > op1->get_last_written_locations().size())
-  {
-    out_modifications=true;
-    result=result->update_last_written_locations(get_location_union, false);
-  }
-
   return result;
 }
 
@@ -410,55 +417,13 @@ abstract_object_pointert abstract_objectt::update_last_written_locations(
     const locationst &locations,
     bool update_sub_elements) const
 {
-  internal_abstract_object_pointert clone=mutable_clone();
-  clone->set_last_written_locations(locations);
   if(update_sub_elements)
+  {
+    internal_abstract_object_pointert clone=mutable_clone();
     clone->update_sub_elements(locations);
-  return clone;
-}
-
-/*******************************************************************\
-
-Function: abstract_objectt::get_location_union
-
-  Inputs:
-   Set of locations unioned
-
- Outputs:
-   The union of the two sets
-
- Purpose: Takes the location set of the current object, and unions it
-          with the provided set.
-
-\*******************************************************************/
-
-abstract_objectt::locationst abstract_objectt::get_location_union(const locationst &locations) const
-{
-  locationst existing_locations=get_last_written_locations();
-  existing_locations.insert(locations.begin(), locations.end());
-
-  return existing_locations;
-}
-
-/*******************************************************************\
-
-Function: abstract_objectt::set_last_written_locations
-
-  Inputs:
-   Set of locations to be written
-
- Outputs:
-   Void
-
- Purpose: Writes the provided set to the object.
-
-          For mutable objects.
-
-\*******************************************************************/
-
-void abstract_objectt::set_last_written_locations(const locationst &locations)
-{
-  last_written_locations=locations;
+    return clone;
+  }
+  return shared_from_this();
 }
 
 /*******************************************************************\
@@ -477,51 +442,8 @@ Function: abstract_objectt::get_last_written_locations
 
 abstract_objectt::locationst abstract_objectt::get_last_written_locations() const
 {
-  return last_written_locations;
+  return {};
 }
 
-/*******************************************************************\
 
-Function: abstract_objectt::output_last_written_location
-
-  Inputs:
-   object - the object to read information from
-   out - the stream to write to
-   ai - the abstract interpreter that contains this domain
-   ns - the current namespace
-
- Outputs: None
-
- Purpose: Print out all last written locations for a specified
-          object
-
-\*******************************************************************/
-
-void abstract_objectt::output_last_written_locations(
-  std::ostream &out,
-  const abstract_objectt::locationst &locations)
-{
-  out << "[";
-  bool comma=false;
-
-  std::set<unsigned> sorted_locations;
-  for(auto location: locations)
-  {
-    sorted_locations.insert(location->location_number);
-  }
-
-  for (auto location_number: sorted_locations)
-  {
-    if(!comma)
-    {
-      out << location_number;
-      comma=true;
-    }
-    else
-    {
-      out << ", " << location_number;
-    }
-  }
-  out << "]";
-}
 

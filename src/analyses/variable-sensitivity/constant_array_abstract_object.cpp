@@ -193,12 +193,6 @@ void constant_array_abstract_objectt::output(
     {
       out << "[" << entry.first << "] = ";
       entry.second->output(out, ai, ns);
-
-      // Start outputting specific last_written_locations
-      out << " @ ";
-      output_last_written_locations(out,
-          entry.second->get_last_written_locations());
-
       out << "\n";
     }
     out << "}";

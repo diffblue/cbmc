@@ -100,36 +100,46 @@ abstract_object_pointert variable_sensitivity_object_factoryt::
   switch(abstract_object_type)
   {
   case CONSTANT:
-    return initialize_abstract_object<constant_abstract_valuet>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<constant_abstract_valuet>>(
+        followed_type, top, bottom, e, environment, ns);
   case ARRAY_SENSITIVE:
-    return initialize_abstract_object<constant_array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<constant_array_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case ARRAY_INSENSITIVE:
-    return initialize_abstract_object<array_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<array_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case POINTER_SENSITIVE:
-    return initialize_abstract_object<constant_pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<constant_pointer_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case POINTER_INSENSITIVE:
-    return initialize_abstract_object<pointer_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<pointer_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case STRUCT_SENSITIVE:
-    return initialize_abstract_object<full_struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<full_struct_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case STRUCT_INSENSITIVE:
-    return initialize_abstract_object<struct_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<struct_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case UNION_INSENSITIVE:
-    return initialize_abstract_object<union_abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<union_abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   case TWO_VALUE:
-    return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   default:
     UNREACHABLE;
-    return initialize_abstract_object<abstract_objectt>(
-      followed_type, top, bottom, e, environment, ns);
+    return initialize_abstract_object<
+      context_abstract_objectt<abstract_objectt>>(
+        followed_type, top, bottom, e, environment, ns);
   }
 }
 
