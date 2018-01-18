@@ -64,9 +64,27 @@ public:
   virtual bool has_been_modified(const abstract_object_pointert before) const
     override;
 
-  virtual abstract_object_pointert update_last_written_locations(
+  virtual abstract_object_pointert update_location_context(
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const override;
+
+  // A visitor class to update the last_written_locations of any visited
+  // abstract_object with a given set of locations.
+  class location_update_visitort:
+    public abstract_objectt::abstract_object_visitort
+  {
+  public:
+    explicit location_update_visitort(const locationst &locations):
+      locations(locations) { }
+
+    abstract_object_pointert visit(const abstract_object_pointert element) const
+    {
+      return element->update_location_context(locations, true);
+    }
+
+  private:
+    const locationst &locations;
+  };
 
   locationst get_location_union(const locationst &locations) const;
 
@@ -143,7 +161,6 @@ private:
 
   void set_child(
     const abstract_object_pointert &child);
-
 };
 
 

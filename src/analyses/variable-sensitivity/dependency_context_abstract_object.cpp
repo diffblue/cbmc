@@ -30,24 +30,19 @@ void dependency_context_abstract_objectt::clear_top_internal()
     set_child(child_abstract_object->clear_top());
 }
 
-/*******************************************************************\
-
-Function: dependency_context_abstract_objectt::update_last_written_locations
-
-  Inputs:
-   Set of locations to be written.
-
- Outputs:
-   An abstract_object_pointer pointing to the cloned, updated object.
-
- Purpose: Creates a mutable clone of the current object, and updates
-          the last written location map with the provided location(s).
-
-          For immutable objects.
-
-\*******************************************************************/
+/**
+ * Update the location context for an abstract object, potentially
+ * propogating the update to any children of this abstract object.
+ *
+ * \param locations the set of locations to be updated
+ * \param update_sub_elements if true, propogate the update operation to any
+ * children of this abstract object
+ *
+ * \return a clone of this abstract object with it's location context
+ * updated
+ */
 abstract_object_pointert
-  dependency_context_abstract_objectt::update_last_written_locations(
+  dependency_context_abstract_objectt::update_location_context(
     const abstract_objectt::locationst &locations,
     const bool update_sub_elements) const
 {
@@ -55,8 +50,14 @@ abstract_object_pointert
     std::dynamic_pointer_cast<dependency_context_abstract_objectt>(
       mutable_clone());
 
-  result->set_child(child_abstract_object->update_last_written_locations(
-    locations, update_sub_elements));
+  if(update_sub_elements)
+  {
+    abstract_object_pointert visited_child=
+      child_abstract_object->
+        update_location_context(locations, update_sub_elements)->
+          visit_sub_elements(location_update_visitort(locations));
+    result->set_child(visited_child);
+  }
 
   result->set_last_written_locations(locations);
   return result;
@@ -224,7 +225,7 @@ abstract_object_pointert
     if(location_union.size()>get_last_written_locations().size())
     {
       abstract_object_pointert result=mutable_clone();
-      return result->update_last_written_locations(location_union, false);
+      return result->update_location_context(location_union, false);
     }
   }
   return shared_from_this();
@@ -300,8 +301,10 @@ abstract_objectt::locationst
 /**
  * Determine whether 'this' abstract_object has been modified in comparison
  * to a previous 'before' state.
- * \param before The abstract_object_pointert to use as a reference to
+ *
+ * \param before the abstract_object_pointert to use as a reference to
  * compare against
+ *
  * \return true if 'this' is considered to have been modified in comparison
  * to 'before', false otherwise.
  */
@@ -334,7 +337,6 @@ bool dependency_context_abstract_objectt::has_been_modified(
   // For two sets of last written locations to match,
   // each location in one set must be equal to precisely one location
   // in the other, since a set can assume at most one match
-
   const abstract_objectt::locationst &first_write_locations=
     before_context->get_last_written_locations();
   const abstract_objectt::locationst &second_write_locations=
