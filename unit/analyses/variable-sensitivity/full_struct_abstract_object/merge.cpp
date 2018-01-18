@@ -41,7 +41,7 @@ public:
     full_struct_abstract_objectt::constant_struct_pointert struct_object,
     const member_exprt &component) const
   {
-    return struct_object->read_component(
+    return struct_object->read(
       enviroment, component, ns)->to_constant();
   }
 
@@ -59,8 +59,8 @@ public:
     for(const exprt &op : starting_value.operands())
     {
       const auto &component=struct_type.components()[comp_index];
-      std::shared_ptr<const struct_abstract_objectt> new_result=
-        result->write_component(
+      std::shared_ptr<const abstract_objectt> new_result=
+        result->write(
           enviroment,
           ns,
           std::stack<exprt>(),

@@ -35,21 +35,34 @@ public:
   void output(
     std::ostream &out, const ai_baset &ai, const namespacet &ns) const override;
 
-  virtual abstract_object_pointert read_index(
+  virtual abstract_object_pointert read(
     const abstract_environmentt &env,
-    const index_exprt &index,
+    const exprt &specifier,
     const namespacet &ns) const override;
 
-  virtual sharing_ptrt<array_abstract_objectt> write_index(
+  virtual abstract_object_pointert write(
     abstract_environmentt &environment,
     const namespacet &ns,
     const std::stack<exprt> stack,
-    const index_exprt &index_expr,
+    const exprt &specifier,
     const abstract_object_pointert value,
     bool merging_write) const override;
 
 protected:
   CLONE
+
+  abstract_object_pointert read_index(
+    const abstract_environmentt &env,
+    const index_exprt &index,
+    const namespacet &ns) const;
+
+  sharing_ptrt<array_abstract_objectt> write_index(
+    abstract_environmentt &environment,
+    const namespacet &ns,
+    const std::stack<exprt> stack,
+    const index_exprt &index_expr,
+    const abstract_object_pointert value,
+    bool merging_write) const;
 
   virtual abstract_object_pointert merge(
     abstract_object_pointert other) const override;
