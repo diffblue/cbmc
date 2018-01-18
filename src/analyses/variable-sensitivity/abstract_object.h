@@ -144,9 +144,9 @@ public:
     abstract_object_pointert op2,
     bool &out_modifications);
 
-  virtual abstract_object_pointert update_last_written_locations(
-      const locationst &locations,
-      const bool update_sub_elements) const;
+  virtual abstract_object_pointert update_location_context(
+    const locationst &locations,
+    const bool update_sub_elements) const;
 
   // Const versions must perform copy-on-write
   abstract_object_pointert make_top() const
@@ -168,6 +168,32 @@ public:
     clone->clear_top();
     return clone;
   }
+
+  /**
+   * Pure virtual interface required of a client that can apply a copy-on-write
+   * operation to a given abstract_object_pointert.
+   */
+  struct abstract_object_visitort
+  {
+    virtual abstract_object_pointert visit(
+      const abstract_object_pointert element) const = 0;
+  };
+
+  /**
+   * Apply a visitor operation to all sub elements of this abstract_object.
+   * A sub element might be a member of a struct, or an element of an array,
+   * for instance, but this is entirely determined by the particular
+   * derived instance of abstract_objectt.
+   *
+   * \param visitor an instance of a visitor class that will be applied to
+   * all sub elements
+   * \return A new abstract_object if it's contents is modifed, or this if
+   * no modification is needed
+   */
+  virtual abstract_object_pointert visit_sub_elements(
+    const abstract_object_visitort &visitor) const
+  { return shared_from_this(); }
+
 
 private:
   // To enforce copy-on-write these are private and have read-only accessors
@@ -197,9 +223,6 @@ protected:
   {
     return internal_abstract_object_pointert(new abstract_objectt(*this));
   }
-
-  virtual void update_sub_elements(const locationst &locations)
-  {}
 
   abstract_object_pointert abstract_object_merge(
     const abstract_object_pointert other) const;
