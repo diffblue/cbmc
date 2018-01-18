@@ -185,8 +185,6 @@ sharing_ptrt<struct_abstract_objectt>
   internal_sharing_ptrt<full_struct_abstract_objectt> copy(
     new full_struct_abstract_objectt(*this));
 
-  copy->set_last_written_locations(value->get_last_written_locations());
-
   if(!stack.empty())
   {
     abstract_object_pointert starting_value;
@@ -283,12 +281,6 @@ void full_struct_abstract_objectt::output(
     }
     out << "." << entry.first << "=";
     entry.second->output(out, ai, ns);
-
-    // Start outputting specific last_written_locations
-    out << " @ ";
-    output_last_written_locations(out,
-        entry.second->get_last_written_locations());
-
   }
   out << "}";
 }

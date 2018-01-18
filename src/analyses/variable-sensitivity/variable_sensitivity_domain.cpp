@@ -431,9 +431,8 @@ void variable_sensitivity_domaint::transform_function_call(
         {
           if(called_arg.type().id()==ID_pointer)
           {
-            sharing_ptrt<pointer_abstract_objectt> pointer_value=
-              std::dynamic_pointer_cast<const pointer_abstract_objectt>(
-                abstract_state.eval(called_arg, ns));
+            abstract_object_pointert pointer_value=
+              abstract_state.eval(called_arg, ns);
 
             assert(pointer_value);
 

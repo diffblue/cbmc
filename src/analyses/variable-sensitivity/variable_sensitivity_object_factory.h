@@ -16,6 +16,7 @@
 #include <analyses/variable-sensitivity/constant_pointer_abstract_object.h>
 #include <analyses/variable-sensitivity/full_struct_abstract_object.h>
 #include <analyses/variable-sensitivity/union_abstract_object.h>
+#include <analyses/variable-sensitivity/dependency_context_abstract_object.h>
 #include <util/options.h>
 #include <util/namespace.h>
 
