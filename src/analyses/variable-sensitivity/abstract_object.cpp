@@ -133,14 +133,14 @@ Function: abstract_objectt::abstract_object_merge
 abstract_object_pointert abstract_objectt::abstract_object_merge(
   const abstract_object_pointert other) const
 {
-  if(top)
+  if(is_top())
     return shared_from_this();
   if(other->bottom)
     return shared_from_this();
 
 
   internal_abstract_object_pointert merged=mutable_clone();
-  merged->top=true;
+  merged->make_top();
   merged->bottom=false;
   return merged;
 }
