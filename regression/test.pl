@@ -66,9 +66,9 @@ sub load($) {
   return @data;
 }
 
-sub test($$$$$$$) {
-  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines) = @_;
-  my ($level, $input, $options, $grep_options, @results) = load("$test");
+sub test($$$$$$$$$) {
+  my ($name, $test, $t_level, $cmd, $ign, $dry_run, $defines, $include_tags, $exclude_tags) = @_;
+  my ($level_and_tags, $input, $options, $grep_options, @results) = load("$test");
   my @keys = keys %{$defines};
   foreach my $key (@keys) {
     my $value = $defines->{$key};
@@ -79,6 +79,28 @@ sub test($$$$$$$) {
       if ((substr($word, 0, 1) cmp '$') == 0) {
         print "$name: variable \"$word\" not replaced; consider passing \"-D$word\"=...";
       }
+    }
+  }
+
+  my @tags = split(/\s/, $level_and_tags);
+  my $level = shift @tags;
+  my %tags_set = map { $_ => 1 } @tags;
+
+  # If the user has passes -I (include-tag) or -X (exclude-tag) options, then
+  # run the test only if it matches no exclude-tags and either include-tags is
+  # not given (implying run all tests) or it matches at least one include-tag.
+
+  my $include_tags_length = @$include_tags;
+  my $passes_tag_tests = ($include_tags_length == 0);
+  foreach my $include_tag (@$include_tags) {
+    if(exists($tags_set{$include_tag})) {
+      $passes_tag_tests = 1;
+    }
+  }
+
+  foreach my $exclude_tag (@$exclude_tags) {
+    if(exists($tags_set{$exclude_tag})) {
+      $passes_tag_tests = 0;
     }
   }
 
@@ -124,7 +146,7 @@ sub test($$$$$$$) {
   }
 
   my $failed = 2;
-  if($level & $t_level) {
+  if(($level & $t_level) && $passes_tag_tests) {
 
     if ($dry_run) {
       return 0;
@@ -244,12 +266,14 @@ Usage: test.pl -c CMD [OPTIONS] [DIRECTORIES ...]
   -K         known: run tests associated with known bugs
   -D <key=value> Define - replace \$key string with "value" string in
                  test descriptors
+  -I <tag>   run only tests that have the given secondary tag. Can be repeated.
+  -X <tag>   exclude tests that have the given secondary tag. Can be repeated.
 
 
 test.pl expects a test.desc file in each subdirectory. The file test.desc
 follows the format specified below. Any line starting with // will be ignored.
 
-<level>
+<level> [<tag1> [<tag2>...]]
 <main source>
 <options>
 <activate-multi-line-match>
@@ -261,6 +285,7 @@ follows the format specified below. Any line starting with // will be ignored.
 
 where
   <level>                         is one of CORE, THOROUGH, FUTURE or KNOWNBUG
+  <tag1>, <tag2> ... <tagn>       are zero or more space-separated secondary tags, for use with the -I and -X parameters
   <main source>                   is a file with extension .c/.i/.gb/.cpp/.ii/.xml/.class/.jar
   <options>                       additional options to be passed to CMD
   <activate-multi-line-match>     The fourth line can optionally be activate-multi-line-match, if this is the
@@ -278,9 +303,9 @@ use Getopt::Std;
 use Getopt::Long qw(:config pass_through bundling);
 $main::VERSION = 0.1;
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
-our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, %defines); # the variables for getopt
+our ($opt_c, $opt_i, $opt_j, $opt_n, $opt_p, $opt_h, $opt_C, $opt_T, $opt_F, $opt_K, %defines, @include_tags, @exclude_tags); # the variables for getopt
 $opt_j = 0;
-GetOptions("D=s", \%defines);
+GetOptions("D=s" => \%defines, "X=s" => \@exclude_tags, "I=s" => \@include_tags);
 getopts('c:i:j:nphCTFK') or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 $opt_c or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
 (!$opt_j || $has_thread_pool) or &main::HELP_MESSAGE(\*STDOUT, "", $main::VERSION, "");
@@ -319,7 +344,7 @@ sub do_test($)
     defined($pool) or print "  Running $files[$_]";
     my $start_time = time();
     $failed_skipped = test(
-      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines);
+      $test, $files[$_], $t_level, $opt_c, $opt_i, $dry_run, \%defines, \@include_tags, \@exclude_tags);
     my $runtime = time() - $start_time;
 
     lock($skips);
