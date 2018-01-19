@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/time_stopping.h>
 #include <util/message.h>
 #include <util/json.h>
+#include <util/json_stream.h>
 #include <util/cprover_prefix.h>
 
 #include <langapi/mode.h>
@@ -71,18 +72,15 @@ void bmct::error_trace()
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_arrayt &result_array=json_result["results"].make_array();
-      json_objectt &result=result_array.push_back().make_object();
+      json_stream_objectt &json_result = status().json_stream().push_back_stream_object();
       const goto_trace_stept &step=goto_trace.steps.back();
       result["property"]=
         json_stringt(id2string(step.pc->source_location.get_property_id()));
       result["description"]=
         json_stringt(id2string(step.pc->source_location.get_comment()));
       result["status"]=json_stringt("failed");
-      jsont &json_trace=result["trace"];
-      convert(ns, goto_trace, json_trace);
-      std::cout << ",\n" << json_result;
+      json_stream_arrayt &json_trace=json_result.push_back_stream_array("trace");
+      convert<json_stream_arrayt>(ns, goto_trace, json_trace, trace_options());
     }
     break;
   }
