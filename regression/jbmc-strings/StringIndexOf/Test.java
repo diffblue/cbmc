@@ -1,3 +1,6 @@
+// This test uses CProverString so should be compiled with
+// javac Test.java ../cprover/CProverString.java
+
 public class Test {
 
     public boolean check(String input_String, char input_char, int input_int) {
@@ -14,13 +17,13 @@ public class Test {
 
         if (i == -1) {
             for (int j = lower_bound; j < input_String.length(); j++)
-                assert input_String.charAt(j) != input_char;
+                assert org.cprover.CProverString.charAt(input_String, j) != input_char;
         } else {
             assert i >= lower_bound;
-            assert input_String.charAt(i) == input_char;
+            assert org.cprover.CProverString.charAt(input_String, i) == input_char;
 
             for (int j = lower_bound; j < i; j++)
-                assert input_String.charAt(j) != input_char;
+                assert org.cprover.CProverString.charAt(input_String, j) != input_char;
         }
         return true;
     }
