@@ -6311,20 +6311,6 @@ def FlagCxx11Features(filename, clean_lines, linenum, error):
 #    error(filename, linenum, 'build/c++tr1', 5,
 #          ('C++ TR1 headers such as <%s> are unapproved.') % include.group(1))
 
-  # Flag unapproved C++11 headers.
-  if include and include.group(1) in ('cfenv',
-                                      'condition_variable',
-                                      'fenv.h',
-                                      'future',
-                                      'mutex',
-                                      'thread',
-                                      'chrono',
-                                      'ratio',
-                                      'system_error',
-                                     ):
-    error(filename, linenum, 'build/c++11', 5,
-          ('<%s> is an unapproved C++11 header.') % include.group(1))
-
   # The only place where we need to worry about C++11 keywords and library
   # features in preprocessor directives is in macro definitions.
   if Match(r'\s*#', line) and not Match(r'\s*#\s*define\b', line): return
