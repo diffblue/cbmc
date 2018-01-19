@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 edu/emory/mathcs/backport/java/util/concurrent/ConcurrentHashMap.class
 --show-goto-functions
 ^EXIT=0$
@@ -6,3 +6,5 @@ edu/emory/mathcs/backport/java/util/concurrent/ConcurrentHashMap.class
 --
 \\"statement\\" \(\\"jsr\\"\)
 \\"statement\\" \(\\"ret\\"\)
+--
+This doesn't work under symex-driven lazy loading because no entry-point function is given.

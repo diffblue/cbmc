@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 main.class
 package_friendly1.class package_friendly2.class --show-goto-functions
 ^main[.]main[\(][\)].*$
@@ -7,3 +7,5 @@ package_friendly1.class package_friendly2.class --show-goto-functions
 ^SIGNAL=0$
 --
 ^warning: ignoring
+--
+This doesn't work under symex-driven lazy loading because no entry-point function is given.

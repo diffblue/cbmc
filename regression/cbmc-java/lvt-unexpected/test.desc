@@ -1,4 +1,4 @@
-CORE
+CORE symex-driven-lazy-loading-expected-failure
 unexpected.class
 --verbosity 10 --show-symbol-table
 ^EXIT=0$
@@ -10,3 +10,5 @@ expected by the bytecode to goto conversion algorithms. Namely, the live range
 of parameter x in that method is not preceeded by a store_i instruction, which
 is perfectly possibly as per the JVM specs but currently additionally required
 in CBMC.
+
+This doesn't work under symex-driven lazy loading because no entry-point function is given.
