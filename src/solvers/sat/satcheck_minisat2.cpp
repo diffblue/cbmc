@@ -81,6 +81,18 @@ void satcheck_minisat2_baset<T>::set_polarity(literalt a, bool value)
   }
 }
 
+template<typename T>
+void satcheck_minisat2_baset<T>::interrupt()
+{
+  solver->interrupt();
+}
+
+template<typename T>
+void satcheck_minisat2_baset<T>::clear_interrupt()
+{
+  solver->clearInterrupt();
+}
+
 const std::string satcheck_minisat_no_simplifiert::solver_text()
 {
   return "MiniSAT 2.2.1 without simplifier";
