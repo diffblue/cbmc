@@ -1,0 +1,8 @@
+CORE
+test.class
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test verifies that catches are executed in the correct order
+
