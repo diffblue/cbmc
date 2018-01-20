@@ -813,10 +813,9 @@ std::string expr2ct::convert_trinary(
   if(src.operands().size()!=3)
     return convert_norep(src, precedence);
 
-  const exprt::operandst &operands=src.operands();
-  const exprt &op0=operands.front();
-  const exprt &op1=*(++operands.begin());
-  const exprt &op2=operands.back();
+  const exprt &op0=src.op0();
+  const exprt &op1=src.op1();
+  const exprt &op2=src.op2();
 
   unsigned p0, p1, p2;
 
@@ -1024,6 +1023,61 @@ std::string expr2ct::convert_cond(
 }
 
 std::string expr2ct::convert_binary(
+  const exprt &src,
+  const std::string &symbol,
+  unsigned precedence,
+  bool full_parentheses)
+{
+  if(src.operands().size()!=2)
+    return convert_norep(src, precedence);
+
+  const exprt &op0=src.op0();
+  const exprt &op1=src.op1();
+
+  unsigned p0, p1;
+
+  std::string s_op0=convert_with_precedence(op0, p0);
+  std::string s_op1=convert_with_precedence(op1, p1);
+
+  std::string dest;
+
+  // In pointer arithmetic, x+(y-z) is unfortunately
+  // not the same as (x+y)-z, even though + and -
+  // have the same precedence. We thus add parentheses
+  // for the case x+(y-z). Similarly, (x*y)/z is not
+  // the same as x*(y/z), but * and / have the same
+  // precedence.
+
+  bool use_parentheses0=
+    precedence>p0 ||
+    (precedence==p0 && full_parentheses) ||
+    (precedence==p0 && src.id()!=op0.id());
+
+  if(use_parentheses0)
+    dest+='(';
+  dest+=s_op0;
+  if(use_parentheses0)
+    dest+=')';
+
+  dest+=' ';
+  dest+=symbol;
+  dest+=' ';
+
+  bool use_parentheses1=
+    precedence>p1 ||
+    (precedence==p1 && full_parentheses) ||
+    (precedence==p1 && src.id()!=op1.id());
+
+  if(use_parentheses1)
+    dest+='(';
+  dest+=s_op1;
+  if(use_parentheses1)
+    dest+=')';
+
+  return dest;
+}
+
+std::string expr2ct::convert_multi_ary(
   const exprt &src,
   const std::string &symbol,
   unsigned precedence,
@@ -3386,7 +3440,7 @@ std::string expr2ct::convert_with_precedence(
   precedence=16;
 
   if(src.id()==ID_plus)
-    return convert_binary(src, "+", precedence=12, false);
+    return convert_multi_ary(src, "+", precedence=12, false);
 
   else if(src.id()==ID_minus)
     return convert_binary(src, "-", precedence=12, true);
@@ -3690,7 +3744,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_unary(src, "~", precedence=15);
 
   else if(src.id()==ID_mult)
-    return convert_binary(src, "*", precedence=13, false);
+    return convert_multi_ary(src, "*", precedence=13, false);
 
   else if(src.id()==ID_div)
     return convert_binary(src, "/", precedence=13, true);
@@ -3739,22 +3793,22 @@ std::string expr2ct::convert_with_precedence(
     return convert_complex(src, precedence=16);
 
   else if(src.id()==ID_bitand)
-    return convert_binary(src, "&", precedence=8, false);
+    return convert_multi_ary(src, "&", precedence=8, false);
 
   else if(src.id()==ID_bitxor)
-    return convert_binary(src, "^", precedence=7, false);
+    return convert_multi_ary(src, "^", precedence=7, false);
 
   else if(src.id()==ID_bitor)
-    return convert_binary(src, "|", precedence=6, false);
+    return convert_multi_ary(src, "|", precedence=6, false);
 
   else if(src.id()==ID_and)
-    return convert_binary(src, "&&", precedence=5, false);
+    return convert_multi_ary(src, "&&", precedence=5, false);
 
   else if(src.id()==ID_or)
-    return convert_binary(src, "||", precedence=4, false);
+    return convert_multi_ary(src, "||", precedence=4, false);
 
   else if(src.id()==ID_xor)
-    return convert_binary(src, "^", precedence=7, false);
+    return convert_multi_ary(src, "^", precedence=7, false);
 
   else if(src.id()==ID_implies)
     return convert_binary(src, "==>", precedence=3, true);
