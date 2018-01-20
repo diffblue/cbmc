@@ -2374,6 +2374,60 @@ template<> inline bool can_cast_expr<or_exprt>(const exprt &base)
 // }
 
 
+/*! \brief Boolean XOR
+*/
+class xor_exprt:public multi_ary_exprt
+{
+public:
+  xor_exprt():multi_ary_exprt(ID_bitxor, bool_typet())
+  {
+  }
+
+  xor_exprt(const exprt &_op0, const exprt &_op1):
+    multi_ary_exprt(_op0, ID_xor, _op1, bool_typet())
+  {
+  }
+};
+
+/*! \brief Cast a generic exprt to a \ref xor_exprt
+ *
+ * This is an unchecked conversion. \a expr must be known to be \ref
+ * xor_exprt.
+ *
+ * \param expr Source expression
+ * \return Object of type \ref xor_exprt
+ *
+ * \ingroup gr_std_expr
+*/
+inline const xor_exprt &to_xor_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_xor);
+  return static_cast<const xor_exprt &>(expr);
+}
+
+/*! \copydoc to_bitxor_expr(const exprt &)
+ * \ingroup gr_std_expr
+*/
+inline xor_exprt &to_xor_expr(exprt &expr)
+{
+  PRECONDITION(expr.id()==ID_xor);
+  return static_cast<xor_exprt &>(expr);
+}
+
+template<> inline bool can_cast_expr<xor_exprt>(const exprt &base)
+{
+  return base.id()==ID_xor;
+}
+// inline void validate_expr(const bitxor_exprt &value)
+// {
+//   validate_operands(
+//     value,
+//     2,
+//     "Bit-wise xor must have two or more operands",
+//     true);
+// }
+
+
 /*! \brief Bit-wise negation of bit-vectors
 */
 class bitnot_exprt:public unary_exprt
