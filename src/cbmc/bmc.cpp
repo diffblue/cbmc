@@ -161,7 +161,7 @@ bmct::run_decision_procedure(prop_convt &prop_conv)
 
   status() << "Running " << prop_conv.decision_procedure_text() << eom;
 
-  decision_proceduret::resultt dec_result=prop_conv.dec_solve();
+  decision_proceduret::resultt dec_result=prop_conv();
   // output runtime
 
   {

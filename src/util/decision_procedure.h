@@ -44,22 +44,20 @@ public:
   // solve the problem
   enum class resultt { D_SATISFIABLE, D_UNSATISFIABLE, D_ERROR };
 
-  // will eventually be protected, use below call operator
-  virtual resultt dec_solve()=0;
-
   resultt operator()()
   {
     return dec_solve();
   }
-
-  // old-style, will go away
-  virtual bool in_core(const exprt &expr);
 
   // return a textual description of the decision procedure
   virtual std::string decision_procedure_text() const=0;
 
 protected:
   const namespacet &ns;
+
+public: // this line will eventually be removed, and thus
+  /// \deprecated use the operator() above
+  virtual resultt dec_solve()=0;
 };
 
 inline decision_proceduret &operator<<(
