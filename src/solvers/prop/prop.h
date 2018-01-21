@@ -92,9 +92,12 @@ public:
   bvt new_variables(std::size_t width);
 
   // solving
-  virtual const std::string solver_text()=0;
   enum class resultt { P_SATISFIABLE, P_UNSATISFIABLE, P_ERROR };
-  virtual resultt prop_solve()=0;
+  // this solves the instance
+  resultt operator()() { return prop_solve(); }
+  /// \deprecated
+  virtual resultt prop_solve()=0; // will eventually be protected
+  virtual const std::string solver_text()=0;
 
   // satisfying assignment, from prop_assignmentt
   virtual tvt l_get(literalt a) const=0;

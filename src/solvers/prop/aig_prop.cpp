@@ -155,7 +155,7 @@ propt::resultt aig_prop_solvert::prop_solve()
            << aig.nodes.size() << " nodes" << eom;
   convert_aig();
 
-  return solver.prop_solve();
+  return solver();
 }
 
 /// Compute the phase information needed for Plaisted-Greenbaum encoding
