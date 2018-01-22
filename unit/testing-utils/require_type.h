@@ -84,6 +84,15 @@ java_implicitly_generic_class_typet require_java_implicitly_generic_class(
   const std::initializer_list<irep_idt> &implicit_type_variables);
 
 java_class_typet require_java_non_generic_class(const typet &class_type);
+
+java_generic_symbol_typet require_java_generic_symbol_type(
+  const typet &type,
+  const std::string &identifier);
+
+java_generic_symbol_typet require_java_generic_symbol_type(
+  const typet &type,
+  const std::string &identifier,
+  const require_type::expected_type_argumentst &type_expectations);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_TYPE_H
