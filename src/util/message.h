@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <sstream>
 
+#include "json_stream.h"
 #include "source_location.h"
 
 class message_handlert
@@ -24,6 +25,11 @@ public:
   }
 
   virtual void print(unsigned level, const std::string &message) = 0;
+
+  virtual json_stream_arrayt &get_json_stream()
+  {
+    UNREACHABLE;
+  }
 
   virtual void print(
     unsigned level,
@@ -183,6 +189,12 @@ public:
     mstreamt &operator << (mstreamt &(*func)(mstreamt &))
     {
       return func(*this);
+    }
+
+    json_stream_arrayt &json_stream()
+    {
+      *this << eom; // force end of previous message
+      return message.message_handler->get_json_stream();
     }
   };
 
