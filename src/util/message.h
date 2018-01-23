@@ -14,8 +14,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <iosfwd>
 #include <sstream>
 
+#include "invariant.h"
+#include "json.h"
 #include "json_stream.h"
 #include "source_location.h"
+#include "xml.h"
 
 class message_handlert
 {
