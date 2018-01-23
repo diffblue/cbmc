@@ -344,23 +344,33 @@ void goto_convertt::convert_label(
 
   goto_programt tmp;
 
-  // magic thread creation label?
+  // magic thread creation label.
+  // The "__CPROVER_ASYNC_" signals the start of a sequence of instructions
+  // that can be executed in parallel, i.e, a new thread.
   if(has_prefix(id2string(label), "__CPROVER_ASYNC_"))
   {
-    // this is like a START_THREAD
-    codet tmp_code(ID_start_thread);
-    tmp_code.copy_to_operands(code.op0());
-    tmp_code.add_source_location()=code.source_location();
-    convert(tmp_code, tmp);
+    // the body of the thread is expected to be
+    // in the operand.
+    INVARIANT(code.op0().is_not_nil(),
+      "op0 in magic thread creation label is null");
+
+    // replace the magic thread creation label with a
+    // thread block (START_THREAD...END_THREAD).
+    code_blockt thread_body;
+    thread_body.add(to_code(code.op0()));
+    thread_body.add_source_location()=code.source_location();
+    generate_thread_block(thread_body, dest);
   }
   else
+  {
     convert(to_code(code.op0()), tmp);
 
-  goto_programt::targett target=tmp.instructions.begin();
-  dest.destructive_append(tmp);
+    goto_programt::targett target=tmp.instructions.begin();
+    dest.destructive_append(tmp);
 
-  targets.labels.insert({label, {target, targets.destructor_stack}});
-  target->labels.push_front(label);
+    targets.labels.insert({label, {target, targets.destructor_stack}});
+    target->labels.push_front(label);
+  }
 }
 
 void goto_convertt::convert_gcc_local_label(
@@ -1539,39 +1549,14 @@ void goto_convertt::convert_start_thread(
   const codet &code,
   goto_programt &dest)
 {
-  if(code.operands().size()!=1)
-  {
-    error().source_location=code.find_source_location();
-    error() << "start_thread expects one operand" << eom;
-    throw 0;
-  }
-
   goto_programt::targett start_thread=
     dest.add_instruction(START_THREAD);
-
   start_thread->source_location=code.source_location();
+  start_thread->code=code;
 
-  {
-    // start_thread label;
-    // goto tmp;
-    // label: op0-code
-    // end_thread
-    // tmp: skip
-
-    goto_programt::targett goto_instruction=dest.add_instruction(GOTO);
-    goto_instruction->guard=true_exprt();
-    goto_instruction->source_location=code.source_location();
-
-    goto_programt tmp;
-    convert(to_code(code.op0()), tmp);
-    goto_programt::targett end_thread=tmp.add_instruction(END_THREAD);
-    end_thread->source_location=code.source_location();
-
-    start_thread->targets.push_back(tmp.instructions.begin());
-    dest.destructive_append(tmp);
-    goto_instruction->targets.push_back(dest.add_instruction(SKIP));
-    dest.instructions.back().source_location=code.source_location();
-  }
+  // remember it to do target later
+  targets.gotos.push_back(
+    std::make_pair(start_thread, targets.destructor_stack));
 }
 
 void goto_convertt::convert_end_thread(
@@ -2241,4 +2226,44 @@ void goto_convert(
   const symbolt &symbol=s_it->second;
 
   ::goto_convert(to_code(symbol.value), symbol_table, dest, message_handler);
+}
+
+/// Generates the necessary goto-instructions to represent a thread-block.
+/// Specifically, the following instructions are generated:
+///
+/// A: START_THREAD : C
+/// B: GOTO Z
+/// C: SKIP
+/// D: {THREAD BODY}
+/// E: END_THREAD
+/// Z: SKIP
+///
+/// \param thread_body: sequence of codet's that can be executed
+///   in parallel.
+/// \param [out] dest: resulting goto-instructions.
+void goto_convertt::generate_thread_block(
+  const code_blockt &thread_body,
+  goto_programt &dest)
+{
+  goto_programt preamble, body, postamble;
+
+  goto_programt::targett c=body.add_instruction();
+  c->make_skip();
+  convert(thread_body, body);
+
+  goto_programt::targett e=postamble.add_instruction(END_THREAD);
+  e->source_location=thread_body.source_location();
+  goto_programt::targett z=postamble.add_instruction();
+  z->make_skip();
+
+  goto_programt::targett a=preamble.add_instruction(START_THREAD);
+  a->source_location=thread_body.source_location();
+  a->targets.push_back(c);
+  goto_programt::targett b=preamble.add_instruction();
+  b->source_location=thread_body.source_location();
+  b->make_goto(z);
+
+  dest.destructive_append(preamble);
+  dest.destructive_append(body);
+  dest.destructive_append(postamble);
 }

@@ -502,6 +502,11 @@ protected:
     const irep_idt &id,
     std::list<exprt> &dest);
 
+  // START_THREAD; ... END_THREAD;
+  void generate_thread_block(
+    const code_blockt &thread_body,
+    goto_programt &dest);
+
   //
   // misc
   //

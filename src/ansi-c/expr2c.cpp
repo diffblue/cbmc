@@ -2968,6 +2968,12 @@ std::string expr2ct::convert_code(
   if(statement=="unlock")
     return convert_code_unlock(src, indent);
 
+  if(statement==ID_atomic_begin)
+    return indent_str(indent)+"__CPROVER_atomic_begin();";
+
+  if(statement==ID_atomic_end)
+    return indent_str(indent)+"__CPROVER_atomic_end();";
+
   if(statement==ID_function_call)
     return convert_code_function_call(to_code_function_call(src), indent);
 
