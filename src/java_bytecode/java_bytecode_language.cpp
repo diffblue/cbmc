@@ -480,7 +480,8 @@ bool java_bytecode_languaget::convert_single_method(
       get_message_handler(),
       max_user_array_length,
       std::move(needed_lazy_methods),
-      string_preprocess);
+      string_preprocess,
+      driver_program_provides_stubs());
     return false;
   }
 

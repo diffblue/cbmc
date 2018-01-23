@@ -188,6 +188,11 @@ protected:
   std::vector<irep_idt> java_load_classes;
 
 private:
+  /// Should be overridden by driver programs that will provide stub methods,
+  /// i.e. they pledge to replace any function that cannot be elaborated here
+  /// with some function body.
+  virtual bool driver_program_provides_stubs() { return false; }
+
   const std::unique_ptr<const select_pointer_typet> pointer_type_selector;
 };
 
