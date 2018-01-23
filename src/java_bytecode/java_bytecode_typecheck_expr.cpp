@@ -307,21 +307,6 @@ void java_bytecode_typecheckt::typecheck_expr_member(member_exprt &expr)
     struct_typet::componentst &components=
       struct_type.components();
 
-    if(struct_type.get_bool(ID_incomplete_class))
-    {
-      // member doesn't exist. In this case struct_type should be an opaque
-      // stub, and we'll add the member to it.
-      symbolt &symbol_table_type=symbol_table.get_writeable_ref(
-        "java::"+id2string(struct_type.get_tag()));
-      auto &add_to_components=
-        to_struct_type(symbol_table_type.type).components();
-      add_to_components
-        .push_back(struct_typet::componentt(component_name, expr.type()));
-      add_to_components.back().set_base_name(component_name);
-      add_to_components.back().set_pretty_name(component_name);
-      return;
-    }
-
     if(components.empty())
       break;
 
