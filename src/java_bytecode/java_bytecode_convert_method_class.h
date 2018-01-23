@@ -35,13 +35,15 @@ public:
     message_handlert &_message_handler,
     size_t _max_array_length,
     optionalt<ci_lazy_methods_neededt> needed_lazy_methods,
-    java_string_library_preprocesst &_string_preprocess)
+    java_string_library_preprocesst &_string_preprocess,
+    bool driver_program_provides_stubs)
     : messaget(_message_handler),
       symbol_table(symbol_table),
       max_array_length(_max_array_length),
       needed_lazy_methods(std::move(needed_lazy_methods)),
       string_preprocess(_string_preprocess),
       slots_for_parameters(0),
+      driver_program_provides_stubs(driver_program_provides_stubs),
       method_has_this(false)
   {
   }
@@ -80,6 +82,10 @@ protected:
   /// invocation of the method under translation.
   /// Initialized in `convert`.
   unsigned slots_for_parameters;
+
+  /// True if the driver program will provide bodies for all stub functions;
+  /// will be used to annotate stubs created upon discovery of a callsite.
+  bool driver_program_provides_stubs;
 
 public:
   struct holet

@@ -83,7 +83,8 @@ public:
     const char **argv,
     const std::string &extra_options);
 
-  void process_goto_function(goto_model_functiont &function);
+  void process_goto_function(
+    goto_model_functiont &function, const optionst &options);
   bool process_goto_functions(goto_modelt &goto_model, const optionst &options);
 
 protected:
