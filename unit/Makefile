@@ -42,6 +42,7 @@ SRC += unit_tests.cpp \
        util/parameter_indices.cpp \
        util/simplify_expr.cpp \
        util/symbol_table.cpp \
+       util/code_observer.cpp \
        catch_example.cpp \
        # Empty last line
 
