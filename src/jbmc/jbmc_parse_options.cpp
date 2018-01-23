@@ -655,6 +655,10 @@ void jbmc_parse_optionst::process_goto_function(
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
+    // remove returns
+    remove_returns(function);
+
+    replace_java_nondet(function);
   }
 
   catch(const char *e)
@@ -692,9 +696,6 @@ bool jbmc_parse_optionst::process_goto_functions(
     // instrument library preconditions
     instrument_preconditions(goto_model);
 
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
-
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we
     // don't have an instance of that here.
@@ -711,8 +712,6 @@ bool jbmc_parse_optionst::process_goto_functions(
       cmdline.isset("java-max-input-tree-depth")
         ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
         : MAX_NONDET_TREE_DEPTH;
-
-    replace_java_nondet(goto_model);
 
     convert_nondet(
       goto_model,

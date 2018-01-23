@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <ansi-c/string_constant.h>
 
 #include <goto-programs/remove_exceptions.h>
+#include <goto-programs/remove_returns.h>
 
 #include "java_object_factory.h"
 #include "java_types.h"
@@ -73,7 +74,11 @@ static bool should_init_symbol(const symbolt &sym)
      sym.is_state_var &&
      sym.is_static_lifetime &&
      sym.mode==ID_java)
-    return true;
+  {
+    // Consider some sort of annotation indicating a global variable that
+    // doesn't require initialisation?
+    return !has_suffix(id2string(sym.name), RETURN_VALUE_SUFFIX);
+  }
 
   return is_java_string_literal_id(sym.name);
 }

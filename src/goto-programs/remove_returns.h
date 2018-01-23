@@ -24,6 +24,8 @@ Date:   September 2009
 
 void remove_returns(symbol_tablet &, goto_functionst &);
 
+void remove_returns(goto_model_functiont &);
+
 void remove_returns(goto_modelt &);
 
 // reverse the above operations
