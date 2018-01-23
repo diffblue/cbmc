@@ -642,7 +642,8 @@ int jbmc_parse_optionst::get_goto_program(
 }
 
 void jbmc_parse_optionst::process_goto_function(
-  goto_model_functiont &function)
+  goto_model_functiont &function,
+  const can_produce_functiont &available_functions)
 {
   symbol_tablet &symbol_table = function.get_symbol_table();
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
@@ -655,6 +656,14 @@ void jbmc_parse_optionst::process_goto_function(
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
     remove_virtual_functions(function);
+
+    auto function_is_stub =
+      [&symbol_table, &available_functions](const irep_idt &id) { // NOLINT(*)
+        return symbol_table.lookup_ref(id).value.is_nil() &&
+               !available_functions.can_produce_function(id);
+      };
+
+    remove_returns(function, function_is_stub);
   }
 
   catch(const char *e)
@@ -691,9 +700,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
-
-    // remove returns, gcc vectors, complex
-    remove_returns(goto_model);
 
     // Similar removal of java nondet statements:
     // TODO Should really get this from java_bytecode_language somehow, but we

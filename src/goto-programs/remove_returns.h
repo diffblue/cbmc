@@ -24,6 +24,10 @@ Date:   September 2009
 
 void remove_returns(symbol_tablet &, goto_functionst &);
 
+typedef std::function<bool(const irep_idt &)> function_is_stubt;
+
+void remove_returns(goto_model_functiont &, function_is_stubt);
+
 void remove_returns(goto_modelt &);
 
 // reverse the above operations

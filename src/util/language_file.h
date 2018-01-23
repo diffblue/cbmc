@@ -127,6 +127,11 @@ public:
       it->second->convert_lazy_method(id, symbol_table);
   }
 
+  bool can_convert_lazy_method(const irep_idt &id) const
+  {
+    return lazy_method_map.count(id) != 0;
+  }
+
   void clear()
   {
     file_map.clear();

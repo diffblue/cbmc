@@ -15,11 +15,24 @@
 class cmdlinet;
 class optionst;
 
+/// Interface for a provider of function definitions to report whether or not it
+/// can provide a definition (function body) for a given function ID.
+struct can_produce_functiont
+{
+  /// Determines if this function provider can produce a body for the given
+  /// function
+  /// \param id: function ID to query
+  /// \return true if we can produce a function body, or false if we would leave
+  ///   it a bodyless stub.
+  virtual bool can_produce_function(const irep_idt &id) const = 0;
+};
+
 /// Model that holds partially loaded map of functions
-class lazy_goto_modelt
+class lazy_goto_modelt : public can_produce_functiont
 {
 public:
-  typedef std::function<void(goto_model_functiont &function)>
+  typedef std::function<
+    void(goto_model_functiont &function, const can_produce_functiont &)>
     post_process_functiont;
   typedef std::function<bool(goto_modelt &goto_model)> post_process_functionst;
 
@@ -51,12 +64,10 @@ public:
     message_handlert &message_handler)
   {
     return lazy_goto_modelt(
-      [&handler] (goto_model_functiont &function)
-      {
-        handler.process_goto_function(function);
+      [&handler] (goto_model_functiont &fun, const can_produce_functiont &cpf) { // NOLINT(*)
+        handler.process_goto_function(fun, cpf);
       },
-      [&handler, &options] (goto_modelt &goto_model) -> bool
-      {
+      [&handler, &options] (goto_modelt &goto_model) -> bool { // NOLINT(*)
         return handler.process_goto_functions(goto_model, options);
       },
       message_handler);
@@ -87,6 +98,8 @@ public:
       return nullptr;
     return std::move(model.goto_model);
   }
+
+  virtual bool can_produce_function(const irep_idt &id) const;
 
 private:
   std::unique_ptr<goto_modelt> goto_model;

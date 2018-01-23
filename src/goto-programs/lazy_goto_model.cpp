@@ -31,7 +31,7 @@ lazy_goto_modelt::lazy_goto_modelt(
       [this] (goto_functionst::goto_functiont &function) -> void
       {
         goto_model_functiont model_function(*goto_model, function);
-        this->post_process_function(model_function);
+        this->post_process_function(model_function, *this);
       },
       message_handler),
     post_process_function(std::move(post_process_function)),
@@ -51,7 +51,7 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
       [this] (goto_functionst::goto_functiont &function) -> void
       {
         goto_model_functiont model_function(*goto_model, function);
-        this->post_process_function(model_function);
+        this->post_process_function(model_function, *this);
       },
       other.message_handler),
     language_files(std::move(other.language_files)),
@@ -238,4 +238,9 @@ bool lazy_goto_modelt::finalize()
   language_files.clear();
 
   return post_process_functions(*goto_model);
+}
+
+bool lazy_goto_modelt::can_produce_function(const irep_idt &id) const
+{
+  return goto_functions.can_produce_function(id);
 }
