@@ -1,0 +1,7 @@
+MyHashMap.class
+--function MyHashMap.test --unwind 5 --cover location
+java::MyHashMap.test.*coverage.*SATISFIED
+--
+java::MyHashMap.test.*coverage.*FAILED
+--
+Checks that TG-1404 is fixed
