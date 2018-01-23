@@ -387,6 +387,7 @@ void java_bytecode_convert_methodt::convert(
   // Obtain a std::vector of code_typet::parametert objects from the
   // (function) type of the symbol
   typet member_type=method_symbol.type;
+  member_type.set(ID_C_class, class_symbol.name);
   code_typet &code_type=to_code_type(member_type);
   method_return_type=code_type.return_type();
   code_typet::parameterst &parameters=code_type.parameters();
