@@ -256,7 +256,7 @@ std::string erase_type_arguments(const std::string &src)
 /// Returns the full class name, skipping over the generics.
 /// \param src: a type descriptor or signature
 ///   1. Signature:  Lcom/package/OuterClass<TT;>.Inner;
-///   2. Descriptor: Lcom.pacakge.OuterClass$Inner;
+///   2. Descriptor: Lcom.package.OuterClass$Inner;
 /// \return The full name of the class like com.package.OuterClass.Inner (for
 ///   both examples).
 std::string gather_full_class_name(const std::string &src)

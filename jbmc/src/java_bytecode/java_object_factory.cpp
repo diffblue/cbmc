@@ -1538,7 +1538,7 @@ exprt object_factory(
   return object;
 }
 
-/// Initializes a primitive-typed or referece-typed object tree rooted at
+/// Initializes a primitive-typed or reference-typed object tree rooted at
 /// `expr`, allocating child objects as necessary and nondet-initializing their
 /// members, or if MAY_ or MUST_UPDATE_IN_PLACE is set, re-initializing
 /// already-allocated objects.
