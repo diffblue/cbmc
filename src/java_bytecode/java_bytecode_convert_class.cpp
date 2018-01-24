@@ -708,6 +708,15 @@ static void find_and_replace_parameters(
       find_and_replace_parameters(argument, replacement_parameters);
     }
   }
+  else if(is_java_generic_symbol_type(type))
+  {
+    java_generic_symbol_typet &generic_base = to_java_generic_symbol_type(type);
+    std::vector<reference_typet> &gen_types = generic_base.generic_types();
+    for(auto &gen_type : gen_types)
+    {
+      find_and_replace_parameters(gen_type, replacement_parameters);
+    }
+  }
 }
 
 /// Checks if the class is implicitly generic, i.e., it is an inner class of
@@ -784,6 +793,12 @@ void mark_java_implicitly_generic_class_type(
     {
       find_and_replace_parameters(
         field.type(), implicit_generic_type_parameters);
+    }
+
+    for(auto &base : class_type.bases())
+    {
+      find_and_replace_parameters(
+        base.type(), implicit_generic_type_parameters);
     }
   }
 }
