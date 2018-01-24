@@ -3,9 +3,6 @@ test.class
 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-IF "java::E".*THEN GOTO [12]
-IF "java::B".*THEN GOTO [12]
-IF "java::D".*THEN GOTO [12]
-IF "java::C".*THEN GOTO [12]
---
-IF "java::A".*THEN GOTO
+IF.*"java::C".*THEN GOTO [12]
+IF.*"java::D".*THEN GOTO [12]
+IF.*"java::A".*THEN GOTO [12]
