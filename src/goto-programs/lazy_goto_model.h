@@ -64,8 +64,9 @@ public:
     message_handlert &message_handler)
   {
     return lazy_goto_modelt(
-      [&handler] (goto_model_functiont &fun, const can_produce_functiont &cpf) { // NOLINT(*)
-        handler.process_goto_function(fun, cpf);
+      [&handler, &options]
+      (goto_model_functiont &fun, const can_produce_functiont &cpf) { // NOLINT(*)
+        handler.process_goto_function(fun, cpf, options);
       },
       [&handler, &options] (goto_modelt &goto_model) -> bool { // NOLINT(*)
         return handler.process_goto_functions(goto_model, options);

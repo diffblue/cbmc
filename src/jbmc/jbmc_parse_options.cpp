@@ -643,9 +643,11 @@ int jbmc_parse_optionst::get_goto_program(
 
 void jbmc_parse_optionst::process_goto_function(
   goto_model_functiont &function,
-  const can_produce_functiont &available_functions)
+  const can_produce_functiont &available_functions,
+  const optionst &options)
 {
   symbol_tablet &symbol_table = function.get_symbol_table();
+  namespacet ns(symbol_table);
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
   try
   {
@@ -664,6 +666,36 @@ void jbmc_parse_optionst::process_goto_function(
       };
 
     remove_returns(function, function_is_stub);
+
+    replace_java_nondet(function);
+
+    // Similar removal of java nondet statements:
+    // TODO Should really get this from java_bytecode_language somehow, but we
+    // don't have an instance of that here.
+    object_factory_parameterst factory_params;
+    factory_params.max_nondet_array_length=
+      cmdline.isset("java-max-input-array-length")
+        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
+        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
+    factory_params.max_nondet_string_length=
+      cmdline.isset("string-max-input-length")
+        ? std::stoul(cmdline.get_value("string-max-input-length"))
+        : MAX_NONDET_STRING_LENGTH;
+    factory_params.max_nondet_tree_depth=
+      cmdline.isset("java-max-input-tree-depth")
+        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
+        : MAX_NONDET_TREE_DEPTH;
+
+    convert_nondet(
+      function,
+      get_message_handler(),
+      factory_params);
+
+    // add generic checks
+    goto_check(ns, options, ID_java, function.get_goto_function());
+
+    // checks don't know about adjusted float expressions
+    adjust_float_expressions(goto_function, ns);
   }
 
   catch(const char *e)
@@ -700,37 +732,6 @@ bool jbmc_parse_optionst::process_goto_functions(
 
     // instrument library preconditions
     instrument_preconditions(goto_model);
-
-    // Similar removal of java nondet statements:
-    // TODO Should really get this from java_bytecode_language somehow, but we
-    // don't have an instance of that here.
-    object_factory_parameterst factory_params;
-    factory_params.max_nondet_array_length=
-      cmdline.isset("java-max-input-array-length")
-        ? std::stoul(cmdline.get_value("java-max-input-array-length"))
-        : MAX_NONDET_ARRAY_LENGTH_DEFAULT;
-    factory_params.max_nondet_string_length=
-      cmdline.isset("string-max-input-length")
-        ? std::stoul(cmdline.get_value("string-max-input-length"))
-        : MAX_NONDET_STRING_LENGTH;
-    factory_params.max_nondet_tree_depth=
-      cmdline.isset("java-max-input-tree-depth")
-        ? std::stoul(cmdline.get_value("java-max-input-tree-depth"))
-        : MAX_NONDET_TREE_DEPTH;
-
-    replace_java_nondet(goto_model);
-
-    convert_nondet(
-      goto_model,
-      get_message_handler(),
-      factory_params);
-
-    // add generic checks
-    status() << "Generic Property Instrumentation" << eom;
-    goto_check(options, goto_model);
-
-    // checks don't know about adjusted float expressions
-    adjust_float_expressions(goto_model);
 
     // ignore default/user-specified initialization
     // of variables with static lifetime
