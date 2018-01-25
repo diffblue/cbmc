@@ -274,12 +274,14 @@ exprt::operandst java_build_arguments(
     bool named_main=has_suffix(config.main, ".main");
     const typet &string_array_type=
       java_type_from_string("[Ljava.lang.String;");
+    // checks whether the function is static and has a single String[] parameter
     bool has_correct_type=
       to_code_type(function.type).return_type().id()==ID_empty &&
       (!to_code_type(function.type).has_this()) &&
       parameters.size()==1 &&
       parameters[0].type().full_eq(string_array_type);
-    is_main=(named_main && has_correct_type);
+    bool public_access = function.type.get(ID_access) == ID_public;
+    is_main = named_main && has_correct_type && public_access;
   }
 
   // we iterate through all the parameters of the function under test, allocate
