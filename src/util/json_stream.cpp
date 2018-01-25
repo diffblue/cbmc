@@ -82,7 +82,8 @@ json_stream_arrayt &json_stream_arrayt::push_back_stream_array()
   return create_current_array();
 }
 
-json_stream_objectt &json_stream_objectt::push_back_stream_object(const std::string &key)
+json_stream_objectt &json_stream_objectt::push_back_stream_object(
+  const std::string &key)
 {
   PRECONDITION(open);
   output_current();
@@ -91,7 +92,8 @@ json_stream_objectt &json_stream_objectt::push_back_stream_object(const std::str
   return create_current_object();
 }
 
-json_stream_arrayt &json_stream_objectt::push_back_stream_array(const std::string &key)
+json_stream_arrayt &json_stream_objectt::push_back_stream_array(
+  const std::string &key)
 {
   PRECONDITION(open);
   output_current();

@@ -207,8 +207,9 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
 
     case ui_message_handlert::uit::JSON_UI:
     {
-      json_stream_objectt &json_result = result().json_stream().push_back_stream_object();
-      json_stream_arrayt &result_array =
+      json_stream_objectt &json_result=
+        result().json_stream().push_back_stream_object();
+      json_stream_arrayt &result_array=
         json_result.push_back_stream_array("result");
 
       for(const auto &g : goal_map)
@@ -221,7 +222,7 @@ void bmc_all_propertiest::report(const cover_goalst &cover_goals)
         if(g.second.status==goalt::statust::FAILURE)
         {
           json_stream_arrayt &json_trace=result.push_back_stream_array("trace");
-          convert<json_stream_arrayt>(bmc.ns, g.second.goto_trace, json_trace, bmc.trace_options());
+          convert<json_stream_arrayt>(bmc.ns, g.second.goto_trace, json_trace);
         }
       }
     }

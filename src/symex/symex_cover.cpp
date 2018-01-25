@@ -129,13 +129,15 @@ void symex_parse_optionst::report_cover(
     }
     case ui_message_handlert::uit::JSON_UI:
     {
-      json_objectt json_result;
-      json_arrayt &result_array=json_result["results"].make_array();
+      json_stream_objectt &json_result=
+        result().json_stream().push_back_stream_object();
+      json_stream_arrayt &result_array=
+        json_result.push_back_stream_array("result");
       for(const auto &prop_pair : property_map)
       {
         const auto &property=prop_pair.second;
 
-        json_objectt &result=result_array.push_back().make_object();
+        json_stream_objectt &result=result_array.push_back_stream_object();
         result["status"]=
           json_stringt(property.is_failure()?"satisfied":"failed");
         result["goal"]=json_stringt(id2string(prop_pair.first));
@@ -150,8 +152,9 @@ void symex_parse_optionst::report_cover(
 
           if(cmdline.isset("trace"))
           {
-            jsont &json_trace=result["trace"];
-            convert(ns, property.error_trace, json_trace);
+            json_stream_arrayt &json_trace=
+              result.push_back_stream_array("trace");;
+            convert<json_stream_arrayt>(ns, property.error_trace, json_trace);
           }
           else
           {
@@ -174,7 +177,7 @@ void symex_parse_optionst::report_cover(
       json_result["totalGoals"]=
         json_numbert(std::to_string(property_map.size()));
       json_result["goalsCovered"]=json_numbert(std::to_string(goals_covered));
-      std::cout << ",\n" << json_result;
+
       break;
     }
   }

@@ -42,7 +42,6 @@ ui_message_handlert::ui_message_handlert(
 
   case uit::JSON_UI:
     {
-      INVARIANT(json_stream, "JSON stream must be initialized before use");
       json_stream->push_back().make_object()["program"] = json_stringt(program);
     }
     break;
@@ -75,7 +74,6 @@ ui_message_handlert::~ui_message_handlert()
     break;
 
   case uit::JSON_UI:
-    INVARIANT(json_stream, "JSON stream must be initialized before use");
     json_stream->close();
     out << '\n';
     break;
@@ -124,7 +122,6 @@ void ui_message_handlert::print(
 
 void ui_message_handlert::print(
   unsigned level,
-      json_stream->push_back(data);
   const std::string &message,
   int sequence_number,
   const source_locationt &location)
@@ -207,7 +204,6 @@ void ui_message_handlert::json_ui_msg(
   const std::string &msg2,
   const source_locationt &location)
 {
-  INVARIANT(json_stream, "JSON stream must be initialized before use");
   json_objectt &result = json_stream->push_back().make_object();
 
   #if 0

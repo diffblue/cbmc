@@ -72,15 +72,17 @@ void bmct::error_trace()
 
   case ui_message_handlert::uit::JSON_UI:
     {
-      json_stream_objectt &json_result = status().json_stream().push_back_stream_object();
+      json_stream_objectt &json_result=
+        status().json_stream().push_back_stream_object();
       const goto_trace_stept &step=goto_trace.steps.back();
-      result["property"]=
+      json_result["property"]=
         json_stringt(id2string(step.pc->source_location.get_property_id()));
-      result["description"]=
+      json_result["description"]=
         json_stringt(id2string(step.pc->source_location.get_comment()));
-      result["status"]=json_stringt("failed");
-      json_stream_arrayt &json_trace=json_result.push_back_stream_array("trace");
-      convert<json_stream_arrayt>(ns, goto_trace, json_trace, trace_options());
+      json_result["status"]=json_stringt("failed");
+      json_stream_arrayt &json_trace=
+        json_result.push_back_stream_array("trace");
+      convert<json_stream_arrayt>(ns, goto_trace, json_trace);
     }
     break;
   }

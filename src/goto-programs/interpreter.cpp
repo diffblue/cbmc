@@ -19,7 +19,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "interpreter.h"
 #include "interpreter_class.h"
-#include "json_goto_trace.h"
 
 void interpretert::operator()()
 {
@@ -80,8 +79,6 @@ void interpretert::command()
 
   if(ch=='q')
     done=true;
-    json_arrayt json_steps;
-    convert<json_arrayt>(ns, steps, json_steps);
 }
 
 void interpretert::step()

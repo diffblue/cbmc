@@ -126,7 +126,8 @@ public:
 
   typedef std::map<std::string, jsont> objectt;
   objectt object;
-  static void output_object(std::ostream &out, const objectt &object, unsigned indent);
+  static void output_object(std::ostream &out,
+    const objectt &object, unsigned indent);
   static void output_key(std::ostream &out, const std::string &key);
 
   std::string value;

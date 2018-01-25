@@ -29,9 +29,10 @@ public:
 
   virtual void print(unsigned level, const std::string &message) = 0;
 
-  virtual json_stream_arrayt &get_json_stream()
+  virtual json_stream_arrayt *get_json_stream()
   {
     UNREACHABLE;
+    return nullptr;
   }
 
   virtual void print(
@@ -197,7 +198,7 @@ public:
     json_stream_arrayt &json_stream()
     {
       *this << eom; // force end of previous message
-      return message.message_handler->get_json_stream();
+      return *message.message_handler->get_json_stream();
     }
   };
 

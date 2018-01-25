@@ -118,7 +118,8 @@ void jsont::output_rec(std::ostream &out, unsigned indent) const
   }
 }
 
-void jsont::output_object(std::ostream &out, const objectt &object, unsigned indent)
+void jsont::output_object(std::ostream &out,
+  const objectt &object, unsigned indent)
 {
   for(objectt::const_iterator o_it=object.begin();
       o_it!=object.end();

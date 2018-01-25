@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_UI_MESSAGE_H
 #define CPROVER_UTIL_UI_MESSAGE_H
 
+#include <memory>
+
 #include "message.h"
 
 class json_stream_arrayt;
@@ -35,15 +37,16 @@ public:
     _ui=__ui;
     if(_ui == uit::JSON_UI && !json_stream)
     {
-      json_stream = std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
+      json_stream=
+        std::unique_ptr<json_stream_arrayt>(new json_stream_arrayt(out));
     }
   }
 
   virtual void flush(unsigned level);
 
-  json_stream_arrayt &get_json_stream() override
+  json_stream_arrayt *get_json_stream() override
   {
-    return *json_stream;
+    return json_stream.get();
   }
 
 protected:

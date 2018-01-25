@@ -63,10 +63,10 @@ protected:
   }
 };
 
-class json_stream_arrayt : public json_streamt
+class json_stream_arrayt:public json_streamt
 {
 public:
-  json_stream_arrayt(std::ostream &out, unsigned indent = 0);
+  explicit json_stream_arrayt(std::ostream &out, unsigned indent=0);
 
   ~json_stream_arrayt()
   {
@@ -99,7 +99,7 @@ protected:
 class json_stream_objectt:public json_streamt
 {
 public:
-  json_stream_objectt(std::ostream &out, unsigned indent = 0);
+  explicit json_stream_objectt(std::ostream &out, unsigned indent=0);
 
   jsont &operator[](const std::string &key)
   {
