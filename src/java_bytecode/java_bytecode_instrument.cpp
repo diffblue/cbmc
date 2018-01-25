@@ -85,10 +85,10 @@ const std::vector<std::string> exception_needed_classes = { // NOLINT
 /// Creates a class stub for exc_name and generates a
 ///  conditional GOTO such that exc_name is thrown when
 ///  cond is met.
-/// \par parameters: `cond`: condition to be met in order
+/// \param cond: condition to be met in order
 /// to throw an exception
-/// `original_loc`: source location in the original program
-/// `exc_name`: the name of the exception to be thrown
+/// \param original_loc: source location in the original program
+/// \param exc_name: the name of the exception to be thrown
 /// \return Returns the code initialising the throwing the
 /// exception
 codet java_bytecode_instrumentt::throw_exception(
@@ -171,9 +171,9 @@ codet java_bytecode_instrumentt::check_arithmetic_exception(
 /// and throws ArrayIndexOutofBoundsException/generates an assertion
 /// if necessary; Exceptions are thrown when the `throw_runtime_exceptions`
 /// flag is set. Otherwise, assertions are emitted.
-/// \par parameters: `array_struct`: the array being accessed
-/// `idx`: index into the array
-/// `original_loc: source location in the original code
+/// \param array_struct: array being accessed
+/// \param idx: index into the array
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ArrayIndexOutPfBoundsException
 /// or emits an assertion checking the array access
@@ -216,9 +216,9 @@ codet java_bytecode_instrumentt::check_array_access(
 /// ClassCastException/generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `class1`: the subclass
-/// `class2`: the super class
-/// `original_loc: source location in the original code
+/// \param class1: the subclass
+/// \param class2: the super class
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an ClassCastException or emits an
 /// assertion checking the subtype relation
@@ -265,7 +265,7 @@ codet java_bytecode_instrumentt::check_class_cast(
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `expr`: the checked expression
+/// \param expr: the checked expression
 /// `original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NullPointerException or emits an
@@ -295,8 +295,8 @@ codet java_bytecode_instrumentt::check_null_dereference(
 /// generates an assertion when necessary;
 /// Exceptions are thrown when the `throw_runtime_exceptions` flag is set.
 /// Otherwise, assertions are emitted.
-/// \par parameters: `length`: the checked length
-/// `original_loc: source location in the original code
+/// \param length: the checked length
+/// \param original_loc: source location in the original code
 /// \return Based on the value of the flag `throw_runtime_exceptions`,
 /// it returns code that either throws an NegativeArraySizeException
 /// or emits an assertion checking the subtype relation
@@ -358,7 +358,7 @@ void java_bytecode_instrumentt::prepend_instrumentation(
 
 /// Augments `expr` with instrumentation in the form of either
 /// assertions or runtime exceptions
-/// \par parameters: `expr`: the expression to be instrumented
+/// \param `expr` the expression to be instrumented
 void java_bytecode_instrumentt::instrument_code(exprt &expr)
 {
   codet &code=to_code(expr);
@@ -473,7 +473,7 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
 
 /// Computes the instrumentation for `expr` in the form of
 /// either assertions or runtime exceptions.
-/// \par parameters: `expr`: the expression for which we compute
+/// \param expr: the expression for which we compute
 /// instrumentation
 /// \return: The instrumentation required for `expr`
 codet java_bytecode_instrumentt::instrument_expr(
@@ -517,7 +517,7 @@ codet java_bytecode_instrumentt::instrument_expr(
     const irep_idt &statement=side_effect_expr.get_statement();
     if(statement==ID_throw)
     {
-      // this corresponds to athrow and so we check that
+      // this corresponds to a throw and so we check that
       // we don't throw null
       result.copy_to_operands(
         check_null_dereference(
@@ -526,7 +526,7 @@ codet java_bytecode_instrumentt::instrument_expr(
     }
     else if(statement==ID_java_new_array)
     {
-      // this correpond to new array so we check that
+      // this corresponds to new array so we check that
       // length is >=0
       result.copy_to_operands(
         check_array_length(
@@ -562,7 +562,7 @@ codet java_bytecode_instrumentt::instrument_expr(
 }
 
 /// Instruments `expr`
-/// \par parameters: `expr`: the expression to be instrumented
+/// \param expr: the expression to be instrumented
 void java_bytecode_instrumentt::operator()(exprt &expr)
 {
   instrument_code(expr);
