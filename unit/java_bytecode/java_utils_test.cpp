@@ -13,7 +13,7 @@
 
 #include <testing-utils/catch.hpp>
 
-#include <java_bytecode/java_types.cpp>
+#include <java_bytecode/java_types.h>
 #include <java_bytecode/java_utils.h>
 
 SCENARIO("Test that the generic signature delimiter lookup works reliably",
