@@ -56,6 +56,7 @@ class dispatch_table_entryt
 };
 
 typedef std::vector<dispatch_table_entryt> dispatch_table_entriest;
+typedef std::map<irep_idt, dispatch_table_entryt> dispatch_table_entries_mapt;
 
 void remove_virtual_function(
   goto_modelt &goto_model,
