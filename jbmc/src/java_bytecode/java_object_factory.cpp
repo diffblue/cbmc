@@ -113,7 +113,6 @@ public:
     allocation_typet alloc_type,
     bool override_,
     const typet &override_type,
-    bool allow_null,
     size_t depth,
     update_in_placet);
 
@@ -124,7 +123,6 @@ private:
     const irep_idt &class_identifier,
     allocation_typet alloc_type,
     const pointer_typet &pointer_type,
-    bool allow_null,
     size_t depth,
     const update_in_placet &update_in_place);
 
@@ -434,7 +432,6 @@ void java_object_factoryt::gen_pointer_target_init(
       alloc_type,
       false,   // override
       typet(), // override type immaterial
-      true,    // allow_null always enabled in sub-objects
       depth+1,
       update_in_place);
   }
@@ -717,11 +714,6 @@ static bool add_nondet_string_pointer_initialization(
 ///   others.
 /// \param alloc_type:
 ///   Allocation type (global, local or dynamic)
-/// \param allow_null:
-///   true iff the the non-det initialization code is allowed to set null as a
-///   value to the pointer \p expr; note that the current value of allow_null is
-///   _not_ inherited by subsequent recursive calls; those will always be
-///   authorized to assign null to a pointer
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
@@ -738,7 +730,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
   const irep_idt &class_identifier,
   allocation_typet alloc_type,
   const pointer_typet &pointer_type,
-  bool allow_null,
   size_t depth,
   const update_in_placet &update_in_place)
 {
@@ -843,7 +834,6 @@ void java_object_factoryt::gen_nondet_pointer_init(
   // Note string-type-specific initialization might fail, e.g. if java.lang.CharSequence does not
   // have the expected fields (typically this happens if --refine-strings was not passed). In this
   // case we fall back to normal pointer target init.
-
   bool string_init_succeeded = false;
 
   if(java_string_library_preprocesst::implements_java_char_sequence_pointer(
@@ -872,6 +862,9 @@ void java_object_factoryt::gen_nondet_pointer_init(
   }
 
   auto set_null_inst=get_null_assignment(expr, pointer_type);
+
+  const bool allow_null =
+    depth > object_factory_parameters.max_nonnull_tree_depth;
 
   // Alternatively, if this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
@@ -977,7 +970,6 @@ symbol_exprt java_object_factoryt::gen_nondet_subtype_pointer_init(
     alloc_type,
     false,   // override
     typet(), // override_type
-    true,    // allow_null
     depth,
     update_in_placet::NO_UPDATE_IN_PLACE);
 
@@ -1099,7 +1091,6 @@ void java_object_factoryt::gen_nondet_struct_init(
         alloc_type,
         false,   // override
         typet(), // override_type
-        true,    // allow_null always true for sub-objects
         depth,
         substruct_in_place);
     }
@@ -1149,9 +1140,6 @@ void java_object_factoryt::gen_nondet_struct_init(
 ///   If true, initialize with `override_type` instead of `expr.type()`. Used at
 ///   the moment for reference arrays, which are implemented as void* arrays but
 ///   should be init'd as their true type with appropriate casts.
-/// \param allow_null:
-///   True iff the the non-det initialization code is allowed to set null as a
-///   value to a pointer.
 /// \param depth:
 ///   Number of times that a pointer has been dereferenced from the root of the
 ///   object tree that we are initializing.
@@ -1171,7 +1159,6 @@ void java_object_factoryt::gen_nondet_init(
   allocation_typet alloc_type,
   bool override_,
   const typet &override_type,
-  bool allow_null,
   size_t depth,
   update_in_placet update_in_place)
 {
@@ -1198,7 +1185,6 @@ void java_object_factoryt::gen_nondet_init(
       class_identifier,
       alloc_type,
       pointer_type,
-      allow_null,
       depth,
       update_in_place);
   }
@@ -1278,14 +1264,13 @@ void java_object_factoryt::allocate_nondet_length_array(
   gen_nondet_init(
     assignments,
     length_sym_expr,
-    false,   // is_sub
+    false, // is_sub
     irep_idt(),
-    false,   // skip_classid
+    false,                   // skip_classid
     allocation_typet::LOCAL, // immaterial, type is primitive
-    false,   // override
-    typet(), // override type is immaterial
-    false,   // allow_null
-    0,       // depth is immaterial
+    false,                   // override
+    typet(),                 // override type is immaterial
+    0,                       // depth is immaterial, always non-null
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   // Insert assumptions to bound its length:
@@ -1436,7 +1421,6 @@ void java_object_factoryt::gen_nondet_array_init(
     allocation_typet::DYNAMIC,
     true,  // override
     element_type,
-    true,  // allow_null
     depth,
     child_update_in_place);
 
@@ -1486,7 +1470,6 @@ exprt object_factory(
   const typet &type,
   const irep_idt base_name,
   code_blockt &init_code,
-  bool allow_null,
   symbol_table_baset &symbol_table,
   const object_factory_parameterst &parameters,
   allocation_typet alloc_type,
@@ -1522,14 +1505,13 @@ exprt object_factory(
   state.gen_nondet_init(
     assignments,
     object,
-    false,   // is_sub
-    "",      // class_identifier
-    false,   // skip_classid
+    false, // is_sub
+    "",    // class_identifier
+    false, // skip_classid
     alloc_type,
     false,   // override
     typet(), // override_type is immaterial
-    allow_null,
-    0,       // initial depth
+    1,       // initial depth
     update_in_placet::NO_UPDATE_IN_PLACE);
 
   declare_created_symbols(symbols_created, loc, init_code);
@@ -1560,13 +1542,6 @@ exprt object_factory(
 /// \param alloc_type:
 ///   Allocate new objects as global objects (GLOBAL) or as local variables
 ///   (LOCAL) or using malloc (DYNAMIC).
-/// \param allow_null:
-///   When \p expr is a pointer, the non-det initializing code will
-///   unconditionally set \p expr to a non-null object iff \p allow_null is
-///   true. Note that other references down the object hierarchy *can* be null
-///   when \p allow_null is false (as this parameter is not inherited by
-///   subsequent recursive calls).  Has no effect when \p expr is not
-///   pointer-typed.
 /// \param object_factory_parameters:
 ///   Parameters for the generation of non deterministic objects.
 /// \param pointer_type_selector:
@@ -1587,7 +1562,6 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  bool allow_null,
   const object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,
   update_in_placet update_in_place)
@@ -1604,14 +1578,13 @@ void gen_nondet_init(
   state.gen_nondet_init(
     assignments,
     expr,
-    false,   // is_sub
-    "",      // class_identifier
+    false, // is_sub
+    "",    // class_identifier
     skip_classid,
     alloc_type,
     false,   // override
     typet(), // override_type is immaterial
-    allow_null,
-    0,       // initial depth
+    1,       // initial depth
     update_in_place);
 
   declare_created_symbols(symbols_created, loc, init_code);
@@ -1624,7 +1597,6 @@ exprt object_factory(
   const typet &type,
   const irep_idt base_name,
   code_blockt &init_code,
-  bool allow_null,
   symbol_tablet &symbol_table,
   const object_factory_parameterst &object_factory_parameters,
   allocation_typet alloc_type,
@@ -1635,7 +1607,6 @@ exprt object_factory(
     type,
     base_name,
     init_code,
-    allow_null,
     symbol_table,
     object_factory_parameters,
     alloc_type,
@@ -1651,7 +1622,6 @@ void gen_nondet_init(
   const source_locationt &loc,
   bool skip_classid,
   allocation_typet alloc_type,
-  bool allow_null,
   const object_factory_parameterst &object_factory_parameters,
   update_in_placet update_in_place)
 {
@@ -1663,7 +1633,6 @@ void gen_nondet_init(
     loc,
     skip_classid,
     alloc_type,
-    allow_null,
     object_factory_parameters,
     pointer_type_selector,
     update_in_place);

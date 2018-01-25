@@ -217,6 +217,10 @@ static void java_static_lifetime_init(
           if(allow_null && is_non_null_library_global(nameid))
             allow_null = false;
         }
+        object_factory_parameterst parameters = object_factory_parameters;
+        if(!allow_null)
+          parameters.max_nonnull_tree_depth = 1;
+
         gen_nondet_init(
           sym.symbol_expr(),
           code_block,
@@ -224,8 +228,7 @@ static void java_static_lifetime_init(
           source_location,
           false,
           allocation_typet::GLOBAL,
-          allow_null,
-          object_factory_parameters,
+          parameters,
           pointer_type_selector,
           update_in_placet::NO_UPDATE_IN_PLACE);
       }
@@ -299,10 +302,10 @@ exprt::operandst java_build_arguments(
     // be null
     bool is_this=(param_number==0) && parameters[param_number].get_this();
 
-    bool allow_null=
-      !assume_init_pointers_not_null && !is_main && !is_this;
-
     object_factory_parameterst parameters = object_factory_parameters;
+    if(assume_init_pointers_not_null || is_main || is_this)
+      parameters.max_nonnull_tree_depth = 1;
+
     parameters.function_id = goto_functionst::entry_point();
 
     // generate code to allocate and non-deterministicaly initialize the
@@ -311,7 +314,6 @@ exprt::operandst java_build_arguments(
       p.type(),
       base_name,
       init_code,
-      allow_null,
       symbol_table,
       parameters,
       allocation_typet::LOCAL,
