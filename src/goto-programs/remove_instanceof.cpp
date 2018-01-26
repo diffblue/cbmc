@@ -22,7 +22,7 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 class remove_instanceoft
 {
 public:
-  explicit remove_instanceoft(symbol_tablet &symbol_table)
+  explicit remove_instanceoft(symbol_table_baset &symbol_table)
   : symbol_table(symbol_table), ns(symbol_table)
   {
     class_hierarchy(symbol_table);
@@ -35,7 +35,7 @@ public:
   bool lower_instanceof(goto_programt &, goto_programt::targett);
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   class_hierarchyt class_hierarchy;
 
@@ -183,7 +183,7 @@ bool remove_instanceoft::lower_instanceof(goto_programt &goto_program)
 void remove_instanceof(
   goto_programt::targett target,
   goto_programt &goto_program,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   remove_instanceoft rem(symbol_table);
   rem.lower_instanceof(goto_program, target);
@@ -196,7 +196,7 @@ void remove_instanceof(
 /// \param symbol_table: The symbol table to add symbols to.
 void remove_instanceof(
   goto_functionst::goto_functiont &function,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   remove_instanceoft rem(symbol_table);
   rem.lower_instanceof(function.body);
@@ -209,7 +209,7 @@ void remove_instanceof(
 /// \param symbol_table: The symbol table to add symbols to.
 void remove_instanceof(
   goto_functionst &goto_functions,
-  symbol_tablet &symbol_table)
+  symbol_table_baset &symbol_table)
 {
   remove_instanceoft rem(symbol_table);
   bool changed=false;

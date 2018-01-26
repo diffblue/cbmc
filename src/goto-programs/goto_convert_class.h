@@ -29,7 +29,7 @@ public:
   void goto_convert(const codet &code, goto_programt &dest);
 
   goto_convertt(
-    symbol_tablet &_symbol_table,
+    symbol_table_baset &_symbol_table,
     message_handlert &_message_handler):
     messaget(_message_handler),
     symbol_table(_symbol_table),
@@ -44,7 +44,7 @@ public:
   }
 
 protected:
-  symbol_tablet &symbol_table;
+  symbol_table_baset &symbol_table;
   namespacet ns;
   unsigned temporary_counter;
   std::string tmp_symbol_prefix;

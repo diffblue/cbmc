@@ -22,7 +22,7 @@ void remove_virtual_functions(
   goto_modelt &goto_model);
 
 void remove_virtual_functions(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   goto_functionst &goto_functions);
 
 /// Remove virtual functions from one function.

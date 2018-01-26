@@ -573,6 +573,10 @@ int jbmc_parse_optionst::get_goto_program(
       *this, options, get_message_handler());
     lazy_goto_model.initialize(cmdline);
 
+    // Add failed symbols for any symbol created prior to loading any
+    // particular function:
+    add_failed_symbols(lazy_goto_model.symbol_table);
+
     status() << "Generating GOTO Program" << messaget::eom;
     lazy_goto_model.load_all_functions();
 
@@ -646,14 +650,11 @@ void jbmc_parse_optionst::process_goto_function(
   const can_produce_functiont &available_functions,
   const optionst &options)
 {
-  symbol_tablet &symbol_table = function.get_symbol_table();
+  journalling_symbol_tablet &symbol_table = function.get_symbol_table();
   namespacet ns(symbol_table);
   goto_functionst::goto_functiont &goto_function = function.get_goto_function();
   try
   {
-    // Remove inline assembler; this needs to happen before
-    // adding the library.
-    remove_asm(goto_function, symbol_table);
     // Removal of RTTI inspection:
     remove_instanceof(goto_function, symbol_table);
     // Java virtual functions -> explicit dispatch tables:
@@ -696,6 +697,17 @@ void jbmc_parse_optionst::process_goto_function(
 
     // checks don't know about adjusted float expressions
     adjust_float_expressions(goto_function, ns);
+
+    // add failed symbols for anything created relating to this particular
+    // function (note this means subseqent passes mustn't create more!):
+    journalling_symbol_tablet::changesett new_symbols =
+      symbol_table.get_inserted();
+    for(const irep_idt &new_symbol_name : new_symbols)
+    {
+      add_failed_symbol_if_needed(
+        symbol_table.lookup_ref(new_symbol_name),
+        symbol_table);
+    }
   }
 
   catch(const char *e)
@@ -741,10 +753,6 @@ bool jbmc_parse_optionst::process_goto_functions(
                   "of static/global variables" << eom;
       nondet_static(goto_model);
     }
-
-    // add failed symbols
-    // needs to be done before pointer analysis
-    add_failed_symbols(goto_model.symbol_table);
 
     // recalculate numbers, etc.
     goto_model.goto_functions.update();

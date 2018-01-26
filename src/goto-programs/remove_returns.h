@@ -22,7 +22,7 @@ Date:   September 2009
 // unless the function returns void,
 // and a 'goto the_end_of_the_function'.
 
-void remove_returns(symbol_tablet &, goto_functionst &);
+void remove_returns(symbol_table_baset &, goto_functionst &);
 
 typedef std::function<bool(const irep_idt &)> function_is_stubt;
 
@@ -31,12 +31,12 @@ void remove_returns(goto_model_functiont &, function_is_stubt);
 void remove_returns(goto_modelt &);
 
 // reverse the above operations
-void restore_returns(symbol_tablet &, goto_functionst &);
+void restore_returns(symbol_table_baset &, goto_functionst &);
 
 void restore_returns(goto_modelt &);
 
 code_typet original_return_type(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   const irep_idt &function_id);
 
 #endif // CPROVER_GOTO_PROGRAMS_REMOVE_RETURNS_H

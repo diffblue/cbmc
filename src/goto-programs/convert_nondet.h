@@ -15,7 +15,7 @@ Author: Reuben Thomas, reuben.thomas@diffblue.com
 #include <cstddef> // size_t
 
 class goto_functionst;
-class symbol_tablet;
+class symbol_table_baset;
 class goto_modelt;
 class goto_model_functiont;
 class message_handlert;
@@ -30,7 +30,7 @@ struct object_factory_parameterst;
 ///   objects.
 void convert_nondet(
   goto_functionst &,
-  symbol_tablet &,
+  symbol_table_baset &,
   message_handlert &,
   const object_factory_parameterst &object_factory_parameters);
 

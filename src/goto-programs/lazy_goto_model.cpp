@@ -28,9 +28,14 @@ lazy_goto_modelt::lazy_goto_modelt(
       goto_model->goto_functions.function_map,
       language_files,
       symbol_table,
-      [this] (goto_functionst::goto_functiont &function) -> void
+      [this] (
+        goto_functionst::goto_functiont &function,
+        journalling_symbol_tablet &journalling_symbol_table) -> void
       {
-        goto_model_functiont model_function(*goto_model, function);
+        goto_model_functiont model_function(
+          journalling_symbol_table,
+          goto_model->goto_functions,
+          function);
         this->post_process_function(model_function, *this);
       },
       message_handler),
@@ -48,9 +53,14 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
       goto_model->goto_functions.function_map,
       language_files,
       symbol_table,
-      [this] (goto_functionst::goto_functiont &function) -> void
+      [this] (
+        goto_functionst::goto_functiont &function,
+        journalling_symbol_tablet &journalling_symbol_table) -> void
       {
-        goto_model_functiont model_function(*goto_model, function);
+        goto_model_functiont model_function(
+          journalling_symbol_table,
+          goto_model->goto_functions,
+          function);
         this->post_process_function(model_function, *this);
       },
       other.message_handler),

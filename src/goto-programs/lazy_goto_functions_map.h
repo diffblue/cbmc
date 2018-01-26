@@ -11,7 +11,7 @@
 #include "goto_convert_functions.h"
 #include <util/message.h>
 #include <util/language_file.h>
-
+#include <util/journalling_symbol_table.h>
 
 /// Provides a wrapper for a map of lazily loaded goto_functiont.
 /// This incrementally builds a goto-functions object, while permitting
@@ -48,7 +48,9 @@ public:
   typedef std::size_t size_type;
 
   typedef
-  std::function<void(goto_functionst::goto_functiont &function)>
+    std::function<void(
+      goto_functionst::goto_functiont &function,
+      journalling_symbol_tablet &function_symbols)>
     post_process_functiont;
 
 private:
@@ -61,11 +63,8 @@ private:
 
   language_filest &language_files;
   symbol_tablet &symbol_table;
-  // This is mutable because it has internal state that it changes during the
-  // course of conversion. Strictly it should make that state mutable or
-  // recreate it for each conversion, but it's easier just to store it mutable.
-  mutable goto_convert_functionst convert_functions;
   const post_process_functiont post_process_function;
+  message_handlert &message_handler;
 
 public:
   /// Creates a lazy_goto_functions_mapt.
@@ -78,8 +77,8 @@ public:
   : goto_functions(goto_functions),
     language_files(language_files),
     symbol_table(symbol_table),
-    convert_functions(symbol_table, message_handler),
-    post_process_function(std::move(post_process_function))
+    post_process_function(std::move(post_process_function)),
+    message_handler(message_handler)
   {
   }
 
@@ -122,12 +121,14 @@ private:
   // const first
   reference ensure_function_loaded_internal(const key_type &name) const
   {
-    reference named_function=ensure_entry_converted(name);
+    journalling_symbol_tablet journalling_table =
+      journalling_symbol_tablet::wrap(symbol_table);
+    reference named_function=ensure_entry_converted(name, journalling_table);
     mapped_type function=named_function.second;
     if(processed_functions.count(name)==0)
     {
       // Run function-pass conversions
-      post_process_function(function);
+      post_process_function(function, journalling_table);
       // Assign procedure-local location numbers for now
       function.body.compute_location_numbers();
       processed_functions.insert(name);
@@ -135,16 +136,28 @@ private:
     return named_function;
   }
 
-  reference ensure_entry_converted(const key_type &name) const
+  /// Convert a function if not already converted, then return a reference to
+  /// its goto_functionst map entry.
+  /// \param name: ID of the function to convert
+  /// \param function_symbol_table: mutable symbol table reference to be used
+  ///   when converting the function (e.g. to add new local variables).
+  ///   Note we should not use a global pre-cached symbol table reference for
+  ///   this so that our callers can insert a journalling table here if needed.
+  /// \return reference to the new or existing goto_functions map entry.
+  reference ensure_entry_converted(
+    const key_type &name,
+    symbol_table_baset &function_symbol_table) const
   {
     typename underlying_mapt::iterator it=goto_functions.find(name);
     if(it!=goto_functions.end())
       return *it;
     // Fill in symbol table entry body if not already done
     // If this returns false then it's a stub
-    language_files.convert_lazy_method(name, symbol_table);
+    language_files.convert_lazy_method(name, function_symbol_table);
     // Create goto_functiont
     goto_functionst::goto_functiont function;
+    goto_convert_functionst convert_functions(
+      function_symbol_table, message_handler);
     convert_functions.convert_function(name, function);
     // Add to map
     return *goto_functions.emplace(name, std::move(function)).first;

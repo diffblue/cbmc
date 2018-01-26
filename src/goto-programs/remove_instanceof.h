@@ -19,15 +19,15 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 void remove_instanceof(
   goto_programt::targett target,
   goto_programt &goto_program,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 void remove_instanceof(
   goto_functionst::goto_functiont &function,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 void remove_instanceof(
   goto_functionst &goto_functions,
-  symbol_tablet &symbol_table);
+  symbol_table_baset &symbol_table);
 
 void remove_instanceof(goto_modelt &model);
 

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #define CPROVER_GOTO_PROGRAMS_GOTO_MODEL_H
 
 #include <util/symbol_table.h>
+#include <util/journalling_symbol_table.h>
 
 #include "goto_functions.h"
 
@@ -82,9 +83,12 @@ public:
   ///   goto programs, specifically incrementing its unused_location_number
   ///   member each time a program is re-numbered.
   /// \param goto_function: function to wrap.
-  explicit goto_model_functiont(
-    goto_modelt &goto_model, goto_functionst::goto_functiont &goto_function):
-  goto_model(goto_model),
+  goto_model_functiont(
+    journalling_symbol_tablet &symbol_table,
+    goto_functionst &goto_functions,
+    goto_functionst::goto_functiont &goto_function):
+  symbol_table(symbol_table),
+  goto_functions(goto_functions),
   goto_function(goto_function)
   {
   }
@@ -94,14 +98,16 @@ public:
   /// program order within the program.
   void compute_location_numbers()
   {
-    goto_model.goto_functions.compute_location_numbers(goto_function.body);
+    goto_functions.compute_location_numbers(goto_function.body);
   }
 
   /// Get symbol table
-  /// \return symbol table from the associated GOTO model
-  symbol_tablet &get_symbol_table()
+  /// \return journalling symbol table that (a) wraps the global symbol table,
+  ///   and (b) has recorded all symbol mutations (insertions, updates and
+  ///   deletions) that resulted from creating `goto_function`.
+  journalling_symbol_tablet &get_symbol_table()
   {
-    return goto_model.symbol_table;
+    return symbol_table;
   }
 
   /// Get GOTO function
@@ -111,17 +117,9 @@ public:
     return goto_function;
   }
 
-  /// Get GOTO model. This returns a const reference because this interface is
-  /// intended for use where non-const access to the whole model should not be
-  /// allowed.
-  /// \return const view of the whole GOTO model.
-  const goto_modelt &get_goto_model()
-  {
-    return goto_model;
-  }
-
 private:
-  goto_modelt &goto_model;
+  journalling_symbol_tablet &symbol_table;
+  goto_functionst &goto_functions;
   goto_functionst::goto_functiont &goto_function;
 };
 

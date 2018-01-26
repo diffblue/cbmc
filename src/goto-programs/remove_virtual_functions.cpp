@@ -24,7 +24,7 @@ class remove_virtual_functionst
 {
 public:
   remove_virtual_functionst(
-    const symbol_tablet &_symbol_table);
+    const symbol_table_baset &_symbol_table);
 
   void operator()(goto_functionst &goto_functions);
 
@@ -38,7 +38,7 @@ public:
 
 protected:
   const namespacet ns;
-  const symbol_tablet &symbol_table;
+  const symbol_table_baset &symbol_table;
 
   class_hierarchyt class_hierarchy;
 
@@ -64,7 +64,7 @@ protected:
 };
 
 remove_virtual_functionst::remove_virtual_functionst(
-  const symbol_tablet &_symbol_table):
+  const symbol_table_baset &_symbol_table):
   ns(_symbol_table),
   symbol_table(_symbol_table)
 {
@@ -431,7 +431,7 @@ void remove_virtual_functionst::operator()(goto_functionst &functions)
 }
 
 void remove_virtual_functions(
-  const symbol_tablet &symbol_table,
+  const symbol_table_baset &symbol_table,
   goto_functionst &goto_functions)
 {
   remove_virtual_functionst rvf(symbol_table);
