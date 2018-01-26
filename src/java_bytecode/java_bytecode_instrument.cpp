@@ -35,7 +35,7 @@ public:
   {
   }
 
-  void operator()(exprt &expr);
+  void operator()(codet &code);
 
 protected:
   symbol_table_baset &symbol_table;
@@ -69,7 +69,7 @@ protected:
     const exprt &length,
     const source_locationt &original_loc);
 
-  void instrument_code(exprt &expr);
+  void instrument_code(codet &code);
   void add_expr_instrumentation(code_blockt &block, const exprt &expr);
   void prepend_instrumentation(codet &code, code_blockt &instrumentation);
   optionalt<codet> instrument_expr(const exprt &expr);
@@ -358,9 +358,8 @@ void java_bytecode_instrumentt::prepend_instrumentation(
 /// Augments `expr` with instrumentation in the form of either
 /// assertions or runtime exceptions
 /// \param `expr` the expression to be instrumented
-void java_bytecode_instrumentt::instrument_code(exprt &expr)
+void java_bytecode_instrumentt::instrument_code(codet &code)
 {
-  codet &code=to_code(expr);
   source_locationt old_source_location=code.source_location();
 
   const irep_idt &statement=code.get_statement();
@@ -560,9 +559,9 @@ optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 
 /// Instruments `expr`
 /// \param expr: the expression to be instrumented
-void java_bytecode_instrumentt::operator()(exprt &expr)
+void java_bytecode_instrumentt::operator()(codet &code)
 {
-  instrument_code(expr);
+  instrument_code(code);
 }
 
 /// Instruments the code attached to `symbol` with
@@ -591,7 +590,7 @@ void java_bytecode_instrument_symbol(
     "java_bytecode_instrument expects a code-typed symbol but was called with"
       " " + id2string(symbol.name) + " which has a value with an id of " +
       id2string(symbol.value.id()));
-  instrument(symbol.value);
+  instrument(to_code(symbol.value));
 }
 
 /// Instruments all the code in the symbol_table with
@@ -624,5 +623,5 @@ void java_bytecode_instrument(
   // instrument(...) can add symbols to the table, so it's
   // not safe to hold a reference to a symbol across a call.
   for(const auto &symbol : symbols_to_instrument)
-    instrument(symbol_table.get_writeable_ref(symbol).value);
+    instrument(to_code(symbol_table.get_writeable_ref(symbol).value));
 }
