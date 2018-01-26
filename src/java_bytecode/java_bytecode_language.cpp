@@ -195,6 +195,67 @@ bool java_bytecode_languaget::parse(
   return false;
 }
 
+/// Infer fields that must exist on opaque types from field accesses against
+/// them. Note that we don't yet try to infer inheritence between opaque types
+/// here, so we may introduce the same field onto a type and its ancestor
+/// without realising that is in fact the same field, inherited from that
+/// ancestor. This can lead to incorrect results when opaque types are cast
+/// to other opaque types and their fields do not alias as intended.
+/// \param parse_tree: class parse tree
+/// \param symbol_table: global symbol table
+static void infer_opaque_type_fields(
+  const java_bytecode_parse_treet &parse_tree,
+  symbol_tablet &symbol_table)
+{
+  namespacet ns(symbol_table);
+  for(const auto &method : parse_tree.parsed_class.methods)
+  {
+    for(const auto &instruction : method.instructions)
+    {
+      if(instruction.statement == "getfield" ||
+         instruction.statement == "putfield")
+      {
+        const exprt &fieldref = instruction.args[0];
+        const symbolt *class_symbol =
+          symbol_table.lookup(fieldref.get(ID_class));
+        INVARIANT(
+          class_symbol != nullptr, "all field types should have been loaded");
+
+        const class_typet *class_type = &to_class_type(class_symbol->type);
+        irep_idt class_symbol_id = fieldref.get(ID_class);
+        const irep_idt &component_name = fieldref.get(ID_component_name);
+        while(!class_type->has_component(component_name))
+        {
+          if(class_type->get_bool(ID_incomplete_class))
+          {
+            // Accessing a field of an incomplete (opaque) type.
+            symbolt &writable_class_symbol =
+              symbol_table.get_writeable_ref(class_symbol_id);
+            auto &add_to_components =
+              to_struct_type(writable_class_symbol.type).components();
+            add_to_components.push_back(
+              struct_typet::componentt(component_name, fieldref.type()));
+            add_to_components.back().set_base_name(component_name);
+            add_to_components.back().set_pretty_name(component_name);
+            break;
+          }
+          else
+          {
+            // Not present here: check the superclass.
+            INVARIANT(
+              class_type->bases().size() != 0,
+              "class missing an expected field should have a superclass");
+            const symbol_typet &superclass_type =
+              to_symbol_type(class_type->bases()[0].type());
+            class_symbol_id = superclass_type.get_identifier();
+            class_type = &to_class_type(ns.follow(superclass_type));
+          }
+        }
+      }
+    }
+  }
+}
+
 bool java_bytecode_languaget::typecheck(
   symbol_tablet &symbol_table,
   const std::string &module)
@@ -246,6 +307,14 @@ bool java_bytecode_languaget::typecheck(
         << " implicitly generic due to missing outer class symbols"
         << messaget::eom;
     }
+  }
+
+  // Infer fields on opaque types based on the method instructions just loaded.
+  // For example, if we don't have bytecode for field x of class A, but we can
+  // see an int-typed getfield instruction referring to it, add that field now.
+  for(const auto &c : java_class_loader.class_map)
+  {
+    infer_opaque_type_fields(c.second, symbol_table);
   }
 
   // Now incrementally elaborate methods
