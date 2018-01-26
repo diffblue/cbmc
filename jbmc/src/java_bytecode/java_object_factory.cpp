@@ -683,7 +683,8 @@ static bool add_nondet_string_pointer_initialization(
   const struct_typet &struct_type =
     to_struct_type(ns.follow(to_symbol_type(obj.type())));
 
-  if(!struct_type.has_component("data") || !struct_type.has_component("length"))
+  // if no String model is loaded then we cannot construct a String object
+  if(struct_type.get_bool(ID_incomplete_class))
     return true;
 
   const exprt malloc_site = allocate_dynamic_object_with_decl(
@@ -868,8 +869,7 @@ void java_object_factoryt::gen_nondet_pointer_init(
 
   // Alternatively, if this is a void* we *must* initialise with null:
   // (This can currently happen for some cases of #exception_value)
-  bool must_be_null=
-    subtype==empty_typet();
+  bool must_be_null = subtype == empty_typet();
 
   if(must_be_null)
   {
