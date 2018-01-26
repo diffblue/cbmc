@@ -72,7 +72,7 @@ protected:
   void instrument_code(exprt &expr);
   void add_expr_instrumentation(code_blockt &block, const exprt &expr);
   void prepend_instrumentation(codet &code, code_blockt &instrumentation);
-  codet instrument_expr(const exprt &expr);
+  optionalt<codet> instrument_expr(const exprt &expr);
 };
 
 const std::vector<std::string> exception_needed_classes = { // NOLINT
@@ -328,13 +328,12 @@ void java_bytecode_instrumentt::add_expr_instrumentation(
   code_blockt &block,
   const exprt &expr)
 {
-  codet expr_instrumentation=instrument_expr(expr);
-  if(expr_instrumentation!=code_skipt())
+  if(optionalt<codet> expr_instrumentation = instrument_expr(expr))
   {
-    if(expr_instrumentation.get_statement()==ID_block)
-      block.append(to_code_block(expr_instrumentation));
+    if(expr_instrumentation->get_statement() == ID_block)
+      block.append(to_code_block(*expr_instrumentation));
     else
-      block.move_to_operands(expr_instrumentation);
+      block.move_to_operands(*expr_instrumentation);
   }
 }
 
@@ -475,17 +474,15 @@ void java_bytecode_instrumentt::instrument_code(exprt &expr)
 /// either assertions or runtime exceptions.
 /// \param expr: the expression for which we compute
 /// instrumentation
-/// \return: The instrumentation required for `expr`
-codet java_bytecode_instrumentt::instrument_expr(
-  const exprt &expr)
+/// \return: The instrumentation for `expr` if required
+optionalt<codet> java_bytecode_instrumentt::instrument_expr(const exprt &expr)
 {
   code_blockt result;
   // First check our operands:
   forall_operands(it, expr)
   {
-    codet op_result=instrument_expr(*it);
-    if(op_result!=code_skipt())
-      result.move_to_operands(op_result);
+    if(optionalt<codet> op_result = instrument_expr(*it))
+      result.move_to_operands(*op_result);
   }
 
   // Add any check due at this node:
@@ -556,7 +553,7 @@ codet java_bytecode_instrumentt::instrument_expr(
   }
 
   if(result==code_blockt())
-    return code_skipt();
+    return {};
   else
     return result;
 }
