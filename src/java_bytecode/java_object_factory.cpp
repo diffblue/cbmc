@@ -1076,16 +1076,16 @@ void java_object_factoryt::gen_nondet_struct_init(
     }
   }
 
-  // If <class_identifier>.cproverValidate() can be found in the
+  // If <class_identifier>.cproverNondetInitialize() can be found in the
   // symbol table, we add a call:
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  // expr.cproverValidate();
+  // expr.cproverNondetInitialize();
   // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  const irep_idt validate_method_name =
-    "java::" + id2string(class_identifier) + ".cproverNondetInitialize:()V";
+  const irep_idt init_method_name =
+    "java::" + id2string(struct_tag) + ".cproverNondetInitialize:()V";
 
-  if(const auto func = symbol_table.lookup(validate_method_name))
+  if(const auto func = symbol_table.lookup(init_method_name))
   {
     const code_typet &type = to_code_type(func->type);
     code_function_callt fun_call;
