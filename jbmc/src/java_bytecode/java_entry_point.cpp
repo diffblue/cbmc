@@ -303,8 +303,12 @@ exprt::operandst java_build_arguments(
     bool is_this=(param_number==0) && parameters[param_number].get_this();
 
     object_factory_parameterst parameters = object_factory_parameters;
-    if(assume_init_pointers_not_null || is_main || is_this)
+    // only pointer must be non-null
+    if(assume_init_pointers_not_null || is_this)
       parameters.max_nonnull_tree_depth = 1;
+    // in main() also the array elements of the argument must be non-null
+    if(is_main)
+      parameters.max_nonnull_tree_depth = 2;
 
     parameters.function_id = goto_functionst::entry_point();
 
