@@ -378,7 +378,7 @@ bool bmc_covert::operator()()
         json_objectt &result=tests_array.push_back().make_object();
         if(bmc.options.get_bool_option("trace"))
         {
-          jsont &json_trace=result["trace"];
+          json_arrayt &json_trace=result["trace"].make_array();
           convert(bmc.ns, test.goto_trace, json_trace);
         }
         else
