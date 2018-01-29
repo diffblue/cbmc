@@ -34,6 +34,12 @@ public:
   void set_java_cp_include_files(std::string &);
   void add_load_classes(const std::vector<irep_idt> &);
 
+  /// A function that yields a list of extra dependencies based on a class name.
+  typedef std::function<std::vector<irep_idt>(const irep_idt &)>
+    get_extra_class_refs_functiont;
+
+  void set_extra_class_refs_function(get_extra_class_refs_functiont func);
+
   static std::string file_to_class_name(const std::string &);
   static std::string class_name_to_file(const irep_idt &);
 
@@ -133,6 +139,7 @@ public:
 private:
   std::map<std::string, jar_filet> m_archives;
   std::vector<irep_idt> java_load_classes;
+  get_extra_class_refs_functiont get_extra_class_refs;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_CLASS_LOADER_H

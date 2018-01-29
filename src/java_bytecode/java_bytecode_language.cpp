@@ -147,6 +147,16 @@ bool java_bytecode_languaget::parse(
   java_class_loader.set_message_handler(get_message_handler());
   java_class_loader.set_java_cp_include_files(java_cp_include_files);
   java_class_loader.add_load_classes(java_load_classes);
+  if(string_refinement_enabled)
+  {
+    string_preprocess.initialize_known_type_table();
+
+    auto get_string_base_classes = [this](const irep_idt &id) { // NOLINT (*)
+      return string_preprocess.get_string_type_base_classes(id);
+    };
+
+    java_class_loader.set_extra_class_refs_function(get_string_base_classes);
+  }
 
   // look at extension
   if(has_suffix(path, ".class"))

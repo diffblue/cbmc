@@ -72,6 +72,16 @@ java_bytecode_parse_treet &java_class_loadert::operator()(
         it!=parse_tree.class_refs.end();
         it++)
       queue.push(*it);
+
+    // Add any extra dependencies provided by our caller:
+    if(get_extra_class_refs)
+    {
+      std::vector<irep_idt> extra_class_refs =
+        get_extra_class_refs(c);
+
+      for(const irep_idt &id : extra_class_refs)
+        queue.push(id);
+    }
   }
 
   return class_map[class_name];
@@ -81,6 +91,16 @@ void java_class_loadert::set_java_cp_include_files(
   std::string &_java_cp_include_files)
 {
   java_cp_include_files=_java_cp_include_files;
+}
+
+/// Sets a function that provides extra dependencies for a particular class.
+/// Currently used by the string preprocessor to note that even if we don't
+/// have a definition of core string types, it will nontheless give them
+/// certain known superclasses and interfaces, such as Serializable.
+void java_class_loadert::set_extra_class_refs_function(
+  java_class_loadert::get_extra_class_refs_functiont func)
+{
+  get_extra_class_refs = func;
 }
 
 /// Retrieves a class file from a jar and loads it into the tree

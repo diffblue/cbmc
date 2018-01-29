@@ -186,6 +186,34 @@ typet string_length_type()
   return java_int_type();
 }
 
+/// Gets the base classes for known String and String-related types, or returns
+/// an empty list for other types.
+/// \param class_name: class identifier, without "java::" prefix.
+/// \return a list of base classes, again without "java::" prefix.
+std::vector<irep_idt>
+java_string_library_preprocesst::get_string_type_base_classes(
+  const irep_idt &class_name)
+{
+  if(!is_known_string_type(class_name))
+    return {};
+
+  std::vector<irep_idt> bases;
+  bases.reserve(3);
+  if(class_name != "java.lang.CharSequence")
+  {
+    bases.push_back("java.io.Serializable");
+    bases.push_back("java.lang.CharSequence");
+  }
+  if(class_name == "java.lang.String")
+    bases.push_back("java.lang.Comparable");
+
+  if(class_name == "java.lang.StringBuilder" ||
+     class_name == "java.lang.StringBuffer")
+    bases.push_back("java.lang.AbstractStringBuilder");
+
+  return bases;
+}
+
 /// Add to the symbol table type declaration for a String-like Java class.
 /// \param class_name: a name for the class such as "java.lang.String"
 /// \param symbol_table: symbol table to which the class will be added
@@ -206,17 +234,10 @@ void java_string_library_preprocesst::add_string_type(
   string_type.components()[2].type() = pointer_type(java_char_type());
   string_type.set_access(ID_public);
   string_type.add_base(symbol_typet("java::java.lang.Object"));
-  if(class_name!="java.lang.CharSequence")
-  {
-    string_type.add_base(symbol_typet("java::java.io.Serializable"));
-    string_type.add_base(symbol_typet("java::java.lang.CharSequence"));
-  }
-  if(class_name=="java.lang.String")
-    string_type.add_base(symbol_typet("java::java.lang.Comparable"));
 
-  if(class_name=="java.lang.StringBuilder" ||
-     class_name=="java.lang.StringBuffer")
-    string_type.add_base(symbol_typet("java::java.lang.AbstractStringBuilder"));
+  std::vector<irep_idt> bases = get_string_type_base_classes(class_name);
+  for(const irep_idt &base_name : bases)
+    string_type.add_base(symbol_typet("java::" + id2string(base_name)));
 
   symbolt tmp_string_symbol;
   tmp_string_symbol.name="java::"+id2string(class_name);
@@ -1848,16 +1869,19 @@ bool java_string_library_preprocesst::is_known_string_type(
   return string_types.find(class_name)!=string_types.end();
 }
 
-/// fill maps with correspondence from java method names to conversion functions
-void java_string_library_preprocesst::initialize_conversion_table()
+void java_string_library_preprocesst::initialize_known_type_table()
 {
-  character_preprocess.initialize_conversion_table();
-
   string_types=
     std::unordered_set<irep_idt, irep_id_hash>{"java.lang.String",
                                                "java.lang.StringBuilder",
                                                "java.lang.CharSequence",
                                                "java.lang.StringBuffer"};
+}
+
+/// fill maps with correspondence from java method names to conversion functions
+void java_string_library_preprocesst::initialize_conversion_table()
+{
+  character_preprocess.initialize_conversion_table();
 
   // The following list of function is organized by libraries, with
   // constructors first and then methods in alphabetic order.
