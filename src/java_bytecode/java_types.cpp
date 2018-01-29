@@ -29,10 +29,6 @@ std::vector<typet> parse_list_types(
   const char opening_bracket,
   const char closing_bracket);
 
-size_t find_closing_semi_colon_for_reference_type(
-  const std::string src,
-  size_t starting_point = 0);
-
 typet java_int_type()
 {
   return signedbv_typet(32);

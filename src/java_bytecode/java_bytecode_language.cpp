@@ -42,6 +42,7 @@ Author: Daniel Kroening, kroening@kroening.com
 void java_bytecode_languaget::get_language_options(const cmdlinet &cmd)
 {
   assume_inputs_non_null=cmd.isset("java-assume-inputs-non-null");
+  java_class_loader.use_core_models=!cmd.isset("no-core-models");
   string_refinement_enabled=cmd.isset("refine-strings");
   throw_runtime_exceptions=cmd.isset("java-throw-runtime-exceptions");
   if(cmd.isset("java-max-input-array-length"))
@@ -266,6 +267,24 @@ bool java_bytecode_languaget::typecheck(
 
   if(string_refinement_enabled)
     string_preprocess.initialize_conversion_table();
+
+  // Must load java.lang.Object first to avoid stubbing
+  // This ordering could alternatively be enforced by
+  // moving the code below to the class loader.
+  java_class_loadert::class_mapt::const_iterator it=
+    java_class_loader.class_map.find("java.lang.Object");
+  if(it!=java_class_loader.class_map.end())
+  {
+    if(java_bytecode_convert_class(
+     it->second,
+     symbol_table,
+     get_message_handler(),
+     max_user_array_length,
+     method_bytecode,
+     lazy_methods_mode,
+     string_preprocess))
+       return true;
+  }
 
   // first generate a new struct symbol for each class and a new function symbol
   // for every method

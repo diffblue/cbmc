@@ -25,6 +25,14 @@ public:
     if(MZ_TRUE!=mz_zip_reader_init_file(this, filename.data(), 0))
       throw std::runtime_error("MZT: Could not load a file: "+filename);
   }
+
+  mz_zip_archive_statet(const void *data, size_t size):
+    mz_zip_archive({ })
+  {
+    if(MZ_TRUE!=mz_zip_reader_init_mem(this, data, size, 0))
+      throw std::runtime_error("MZT: Could not load data from memory");
+  }
+
   mz_zip_archive_statet(const mz_zip_archive_statet &)=delete;
   mz_zip_archive_statet(mz_zip_archive_statet &&)=delete;
   mz_zip_archive_statet &operator=(const mz_zip_archive_statet &)=delete;
@@ -40,6 +48,9 @@ static_assert(sizeof(mz_uint)<=sizeof(size_t),
 
 mz_zip_archivet::mz_zip_archivet(const std::string &filename):
   m_state(new mz_zip_archive_statet(filename)) { }
+
+mz_zip_archivet::mz_zip_archivet(const void *data, size_t size):
+  m_state(new mz_zip_archive_statet(data, size)) { }
 
 // VS Compatibility
 mz_zip_archivet::mz_zip_archivet(mz_zip_archivet &&other):

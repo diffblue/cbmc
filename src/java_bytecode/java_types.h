@@ -82,6 +82,10 @@ std::vector<typet> java_generic_type_from_string(
 
 typet java_bytecode_promotion(const typet &);
 exprt java_bytecode_promotion(const exprt &);
+size_t find_closing_semi_colon_for_reference_type(
+  const std::string src,
+  size_t starting_point = 0);
+
 
 bool is_java_array_tag(const irep_idt &tag);
 bool is_valid_java_array(const struct_typet &);

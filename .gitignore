@@ -45,6 +45,7 @@ src/ansi-c/gcc_builtin_headers_tm.inc
 src/ansi-c/gcc_builtin_headers_mips.inc
 src/ansi-c/gcc_builtin_headers_power.inc
 src/ansi-c/gcc_builtin_headers_ubsan.inc
+src/java_bytecode/java_core_models.inc
 
 # regression/test files
 *.out
@@ -115,6 +116,8 @@ src/ansi-c/file_converter
 src/ansi-c/file_converter.exe
 src/ansi-c/library/converter
 src/ansi-c/library/converter.exe
+src/java_bytecode/converter
+src/java_bytecode/converter.exe
 src/util/irep_ids_convert
 src/util/irep_ids_convert.exe
 build/
