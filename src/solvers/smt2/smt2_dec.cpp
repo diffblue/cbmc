@@ -216,14 +216,11 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
     }
   }
 
-  for(identifier_mapt::iterator
-      it=identifier_map.begin();
-      it!=identifier_map.end();
-      it++)
+  for(auto &assignment : identifier_map)
   {
-    std::string conv_id=convert_identifier(it->first);
+    std::string conv_id=convert_identifier(assignment.first);
     const irept &value=values[conv_id];
-    it->second.value=parse_rec(value, it->second.type);
+    assignment.second.value=parse_rec(value, assignment.second.type);
   }
 
   // Booleans
