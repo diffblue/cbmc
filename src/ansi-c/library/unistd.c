@@ -122,27 +122,30 @@ inline int _close(int fildes)
 // write to _write; this is covered by the explicit definition of
 // _write below
 #ifdef _MSC_VER
-#define ssize_t signed long
+#define ret_type int
+#define size_type unsigned
 #else
 #ifndef __CPROVER_SYS_TYPES_H_INCLUDED
 #include <sys/types.h>
 #define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
+#define ret_type ssize_t
+#define size_type size_t
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
 // offset to make sure we don't collide with other fds
 extern const int __CPROVER_pipe_offset;
 
-ssize_t __VERIFIER_nondet_ssize_t();
+ret_type __VERIFIER_nondet_ret_type();
 
-ssize_t write(int fildes, const void *buf, size_t nbyte)
+ret_type write(int fildes, const void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
   {
-    ssize_t retval=__VERIFIER_nondet_ssize_t();
-    __CPROVER_assume(retval>=-1 && retval<=(ssize_t)nbyte);
+    ret_type retval=__VERIFIER_nondet_ret_type();
+    __CPROVER_assume(retval>=-1 && retval<=(ret_type)nbyte);
     return retval;
   }
 
@@ -155,7 +158,7 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
       sizeof(__CPROVER_pipes[fildes].data) >=
       __CPROVER_pipes[fildes].next_avail+nbyte)
   {
-    for(size_t i=0; i<nbyte; ++i)
+    for(size_type i=0; i<nbyte; ++i)
       __CPROVER_pipes[fildes].data[i+__CPROVER_pipes[fildes].next_avail]=
         ((char*)buf)[i];
     __CPROVER_pipes[fildes].next_avail+=nbyte;
@@ -168,17 +171,20 @@ ssize_t write(int fildes, const void *buf, size_t nbyte)
 /* FUNCTION: _write */
 
 #ifdef _MSC_VER
-#define ssize_t signed long
+#define ret_type int
+#define size_type unsigned
 #else
 #ifndef __CPROVER_SYS_TYPES_H_INCLUDED
 #include <sys/types.h>
 #define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
+#define ret_type ssize_t
+#define size_type size_t
 #endif
 
-ssize_t write(int fildes, const void *buf, size_t nbyte);
+ret_type write(int fildes, const void *buf, size_type nbyte);
 
-inline ssize_t _write(int fildes, const void *buf, size_t nbyte)
+inline ret_type _write(int fildes, const void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   return write(fildes, buf, nbyte);
@@ -190,12 +196,15 @@ inline ssize_t _write(int fildes, const void *buf, size_t nbyte)
 // read to _read; this is covered by the explicit definition of _read
 // below
 #ifdef _MSC_VER
-#define ssize_t signed long
+#define ret_type int
+#define size_type unsigned
 #else
 #ifndef __CPROVER_SYS_TYPES_H_INCLUDED
 #include <sys/types.h>
 #define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
+#define ret_type ssize_t
+#define size_type size_t
 #endif
 
 extern struct __CPROVER_pipet __CPROVER_pipes[];
@@ -203,29 +212,38 @@ extern struct __CPROVER_pipet __CPROVER_pipes[];
 extern const int __CPROVER_pipe_offset;
 
 __CPROVER_bool __VERIFIER_nondet___CPROVER_bool();
-ssize_t __VERIFIER_nondet_ssize_t();
+ret_type __VERIFIER_nondet_ret_type();
+size_type __VERIFIER_nondet_size_type();
 
-ssize_t read(int fildes, void *buf, size_t nbyte)
+ret_type read(int fildes, void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   if((fildes>=0 && fildes<=2) || fildes < __CPROVER_pipe_offset)
   {
-    ssize_t nread=__VERIFIER_nondet_ssize_t();
-    __CPROVER_assume(0<=nread && (size_t)nread<=nbyte);
+    ret_type nread=__VERIFIER_nondet_ret_type();
+    __CPROVER_assume(0<=nread && (size_type)nread<=nbyte);
 
+    __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
 #if 0
-    size_t i;
+    size_type i;
     for(i=0; i<nbyte; i++)
     {
       char nondet_char;
       ((char *)buf)[i]=nondet_char;
     }
 #else
-    char nondet_bytes[nbyte];
-    __CPROVER_array_replace((char*)buf, nondet_bytes);
+    if(nbyte>0)
+    {
+      size_type str_length=__VERIFIER_nondet_size_type();
+      __CPROVER_assume(error ? str_length<=nbyte : str_length==nbyte);
+      // check that the memory is accessible
+      (void)*(char *)buf;
+      (void)*(((const char *)buf) + str_length - 1);
+      char contents_nondet[str_length];
+      __CPROVER_array_replace((char*)buf, contents_nondet);
+    }
 #endif
 
-    __CPROVER_bool error=__VERIFIER_nondet___CPROVER_bool();
     return error ? -1 : nread;
   }
 
@@ -236,7 +254,7 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
   __CPROVER_atomic_begin();
   if(!__CPROVER_pipes[fildes].widowed)
   {
-    for(size_t i=0; i<nbyte &&
+    for(size_type i=0; i<nbyte &&
       __CPROVER_pipes[fildes].next_unread <
       __CPROVER_pipes[fildes].next_avail;
       ++i)
@@ -257,17 +275,20 @@ ssize_t read(int fildes, void *buf, size_t nbyte)
 /* FUNCTION: _read */
 
 #ifdef _MSC_VER
-#define ssize_t signed long
+#define ret_type int
+#define size_type unsigned
 #else
 #ifndef __CPROVER_SYS_TYPES_H_INCLUDED
 #include <sys/types.h>
 #define __CPROVER_SYS_TYPES_H_INCLUDED
 #endif
+#define ret_type ssize_t
+#define size_type size_t
 #endif
 
-ssize_t read(int fildes, void *buf, size_t nbyte);
+ret_type read(int fildes, void *buf, size_type nbyte);
 
-inline ssize_t _read(int fildes, void *buf, size_t nbyte)
+inline ret_type _read(int fildes, void *buf, size_type nbyte)
 {
   __CPROVER_HIDE:;
   return read(fildes, buf, nbyte);
