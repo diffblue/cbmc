@@ -239,7 +239,15 @@ constant_exprt smt2_convt::parse_literal(
       value=string2integer(s.substr(2), 16);
     }
     else
-      PARSERERROR("smt2_convt::parse_literal can't parse \""+s+"\"");
+    {
+      // Numeral
+      value=string2integer(s);
+    }
+  }
+  else if(src.get_sub().size()==2 &&
+          src.get_sub()[0].id()=="-") // (- 100)
+  {
+    value=-string2integer(src.get_sub()[1].id_string());
   }
   else if(src.get_sub().size()==3 &&
           src.get_sub()[0].id()=="_" &&
@@ -433,6 +441,9 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &_type)
 
   if(type.id()==ID_signedbv ||
      type.id()==ID_unsignedbv ||
+     type.id()==ID_integer ||
+     type.id()==ID_rational ||
+     type.id()==ID_real ||
      type.id()==ID_bv ||
      type.id()==ID_fixedbv ||
      type.id()==ID_floatbv)
@@ -970,7 +981,9 @@ void smt2_convt::convert_expr(const exprt &expr)
   {
     assert(expr.operands().size()==1);
 
-    if(expr.type().id()==ID_rational)
+    if(expr.type().id()==ID_rational ||
+       expr.type().id()==ID_integer ||
+       expr.type().id()==ID_real)
     {
       out << "(- ";
       convert_expr(expr.op0());
@@ -2898,9 +2911,11 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
       out << ")";
     }
-    else if(expr.type().id()==ID_rational)
+    else if(expr.type().id()==ID_rational ||
+            expr.type().id()==ID_integer ||
+            expr.type().id()==ID_real)
     {
-      out << "(+";
+      out << "(+ ";
       convert_expr(expr.op0());
       out << " ";
       convert_expr(expr.op1());
@@ -3285,7 +3300,9 @@ void smt2_convt::convert_mult(const mult_exprt &expr)
 
     out << "))"; // bvmul, extract
   }
-  else if(expr.type().id()==ID_rational)
+  else if(expr.type().id()==ID_rational ||
+          expr.type().id()==ID_integer ||
+          expr.type().id()==ID_real)
   {
     out << "(*";
 
@@ -4378,7 +4395,8 @@ void smt2_convt::convert_type(const typet &type)
       out << "(_ BitVec "
           << floatbv_type.get_width() << ")";
   }
-  else if(type.id()==ID_rational)
+  else if(type.id()==ID_rational ||
+          type.id()==ID_real)
     out << "Real";
   else if(type.id()==ID_integer)
     out << "Int";

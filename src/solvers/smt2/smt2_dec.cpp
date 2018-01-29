@@ -198,6 +198,8 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       // Examples:
       // ( (B0 true) )
       // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
+      // ( (|some_integer| 0) )
+      // ( (|some_integer| (- 10)) )
 
       values[s0.id()]=s1;
     }

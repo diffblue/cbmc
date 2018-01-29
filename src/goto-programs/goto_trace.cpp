@@ -143,6 +143,12 @@ std::string trace_value_binary(
     {
       return expr.is_true()?"1":"0";
     }
+    else if(type.id()==ID_integer)
+    {
+      mp_integer i;
+      if(!to_integer(expr, i) && i>=0)
+        return integer2string(i, 2);
+    }
   }
   else if(expr.id()==ID_array)
   {
