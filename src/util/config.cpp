@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "std_expr.h"
 #include "cprover_prefix.h"
 #include "string2int.h"
+#include "string_utils.h"
 
 configt config;
 
@@ -1286,31 +1287,18 @@ irep_idt configt::this_architecture()
 
 void configt::set_classpath(const std::string &cp)
 {
-  std::string current;
-  for(std::size_t pos=0; pos<cp.size(); pos++)
-  {
-    // These are separated by colons on Unix, and semicolons on
-    // Windows.
-    #ifdef _WIN32
-    const char cp_separator=';';
-    #else
-    const char cp_separator=':';
-    #endif
+// These are separated by colons on Unix, and semicolons on
+// Windows.
+#ifdef _WIN32
+  const char cp_separator = ';';
+#else
+  const char cp_separator = ':';
+#endif
 
-    if(cp[pos]==cp_separator)
-    {
-      if(!current.empty())
-      {
-        java.classpath.push_back(current);
-        current.clear();
-      }
-    }
-    else
-      current+=cp[pos];
-  }
-
-  if(!current.empty())
-    java.classpath.push_back(current);
+  std::vector<std::string> class_path;
+  split_string(cp, cp_separator, class_path);
+  java.classpath.insert(
+    java.classpath.end(), class_path.begin(), class_path.end());
 }
 
 irep_idt configt::this_operating_system()
