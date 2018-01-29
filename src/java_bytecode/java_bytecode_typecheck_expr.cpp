@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_utils.h"
 #include "java_root_class.h"
 #include "java_string_library_preprocess.h"
-#include "java_string_literals.h"
 
 void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
 {
@@ -39,6 +38,11 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
   Forall_operands(it, expr)
     typecheck_expr(*it);
 
+  INVARIANT(
+    expr.id() != ID_java_string_literal,
+    "String literals should have been converted to constant globals "
+    "before typecheck_expr");
+
   if(expr.id()==ID_symbol)
     typecheck_expr_symbol(to_symbol_expr(expr));
   else if(expr.id()==ID_side_effect)
@@ -49,8 +53,6 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     else if(statement==ID_java_new_array)
       typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
-  else if(expr.id()==ID_java_string_literal)
-    typecheck_expr_java_string_literal(expr);
   else if(expr.id()==ID_member)
     typecheck_expr_member(to_member_expr(expr));
 }
@@ -68,13 +70,6 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   PRECONDITION(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
   typecheck_type(type);
-}
-
-void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
-{
-  expr = address_of_exprt(
-    get_or_create_string_literal_symbol(
-      expr, symbol_table, string_refinement_enabled));
 }
 
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)

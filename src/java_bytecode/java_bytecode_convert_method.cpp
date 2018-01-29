@@ -1712,41 +1712,12 @@ codet java_bytecode_convert_methodt::convert_instructions(
     {
       assert(op.empty() && results.size()==1);
 
-      // 1) Pushing a String causes a reference to a java.lang.String object
-      // to be constructed and pushed onto the operand stack.
+      INVARIANT(
+        arg0.id() != ID_java_string_literal && arg0.id() != ID_type,
+        "String and Class literals should have been lowered in "
+        "generate_constant_global_variables");
 
-      // 2) Pushing an int or a float causes a primitive value to be pushed
-      // onto the stack.
-
-      // 3) Pushing a Class constant causes a reference to a java.lang.Class
-      // to be pushed onto the operand stack
-
-      if(arg0.id()==ID_java_string_literal)
-      {
-        // these need to be references to java.lang.String
-        results[0]=arg0;
-        symbol_typet string_type("java::java.lang.String");
-        results[0].type()=java_reference_type(string_type);
-      }
-      else if(arg0.id()==ID_type)
-      {
-        irep_idt class_id=arg0.type().get(ID_identifier);
-        symbol_typet java_lang_Class("java::java.lang.Class");
-        symbol_exprt symbol_expr(
-          id2string(class_id)+"@class_model",
-          java_lang_Class);
-        address_of_exprt address_of_expr(symbol_expr);
-        results[0]=address_of_expr;
-      }
-      else if(arg0.id()==ID_constant)
-      {
-        results[0]=arg0;
-      }
-      else
-      {
-        error() << "unexpected ldc argument" << eom;
-        throw 0;
-      }
+      results[0] = arg0;
     }
     else if(statement=="goto" || statement=="goto_w")
     {

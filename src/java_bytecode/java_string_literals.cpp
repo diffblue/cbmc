@@ -162,7 +162,16 @@ symbol_exprt get_or_create_string_literal_symbol(
     return_symbol.type = return_symbol.value.type();
     if(symbol_table.add(return_symbol))
       throw "failed to add return symbol to symbol table";
-    new_symbol.value = literal_init;
+
+    // Initialise the literal structure with
+    // (ABC_return_value, { ..., .length = N, .data = &ABC_constarray }),
+    // using a C-style comma expression to indicate that we need the
+    // _return_value global for its side-effects.
+    exprt init_comma_expr(ID_comma);
+    init_comma_expr.type() = literal_init.type();
+    init_comma_expr.copy_to_operands(return_symbol.symbol_expr());
+    init_comma_expr.move_to_operands(literal_init);
+    new_symbol.value = init_comma_expr;
   }
   else if(jls_struct.components().size()>=1 &&
           jls_struct.components()[0].get_name()=="@java.lang.Object")
