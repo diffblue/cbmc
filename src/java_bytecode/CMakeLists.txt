@@ -7,7 +7,6 @@ add_subdirectory(library)
 
 add_library(java_bytecode ${sources} ${headers} )
 add_dependencies(java_bytecode core_models_files)
-target_sources(java_bytecode PUBLIC ${sources} ${headers})
 
 generic_includes(java_bytecode)
 

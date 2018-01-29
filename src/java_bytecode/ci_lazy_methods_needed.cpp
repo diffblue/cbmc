@@ -34,14 +34,12 @@ bool ci_lazy_methods_neededt::add_needed_class(
 {
   if(!needed_classes.insert(class_symbol_name).second)
     return false;
-  const std::string &class_name_string = id2string(class_symbol_name);
-  const irep_idt clinit_name(class_name_string + ".<clinit>:()V");
-  if(symbol_table.symbols.count(clinit_name))
-    add_needed_method(clinit_name);
 
+  const std::string &class_name_string = id2string(class_symbol_name);
   const irep_idt cprover_validate(
     class_name_string + ".cproverNondetInitialize:()V");
   if(symbol_table.symbols.count(cprover_validate))
     add_needed_method(cprover_validate);
+
   return true;
 }
