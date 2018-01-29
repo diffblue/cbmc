@@ -189,6 +189,15 @@ exprt smt2_convt::get(const exprt &expr) const
     if(it!=identifier_map.end())
       return it->second.value;
   }
+  else if(expr.id()==ID_nondet_symbol)
+  {
+    const irep_idt &id=to_nondet_symbol_expr(expr).get_identifier();
+
+    identifier_mapt::const_iterator it=identifier_map.find(id);
+
+    if(it!=identifier_map.end())
+      return it->second.value;
+  }
   else if(expr.id()==ID_member)
   {
     const member_exprt &member_expr=to_member_expr(expr);
