@@ -344,7 +344,10 @@ void ci_lazy_methodst::initialize_needed_classes_from_pointer(
   const symbol_typet &class_type=to_symbol_type(pointer_type.subtype());
   const auto &param_classid=class_type.get_identifier();
 
-  if(needed_lazy_methods.add_needed_class(param_classid))
+  // Note here: different arrays may have different element types, so we should
+  // explore again even if we've seen this classid before in the array case.
+  if(needed_lazy_methods.add_needed_class(param_classid) ||
+     is_java_array_tag(param_classid))
   {
     gather_field_types(pointer_type.subtype(), ns, needed_lazy_methods);
   }
