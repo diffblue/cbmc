@@ -1829,7 +1829,8 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
        src_type.id()==ID_unsignedbv ||
        src_type.id()==ID_c_bool ||
        src_type.id()==ID_fixedbv ||
-       src_type.id()==ID_pointer)
+       src_type.id()==ID_pointer ||
+       src_type.id()==ID_integer)
     {
       out << "(not (= ";
       convert_expr(src);
@@ -2273,6 +2274,17 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     }
     else
       UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> float");
+  }
+  else if(dest_type.id()==ID_integer)
+  {
+    if(src_type.id()==ID_bool)
+    {
+      out << "(ite ";
+      convert_expr(src);
+      out <<" 1 0)";
+    }
+    else
+      UNEXPECTEDCASE("Unknown typecast "+src_type.id_string()+" -> integer");
   }
   else if(dest_type.id()==ID_c_bit_field)
   {
@@ -2917,7 +2929,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 
         mp_integer element_size=
           pointer_offset_size(expr.type().subtype(), ns);
-        assert(element_size>0);
+        CHECK_RETURN(element_size>0);
 
         out << "(bvadd ";
         convert_expr(p);
@@ -3084,7 +3096,15 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
 {
   assert(expr.operands().size()==2);
 
-  if(expr.type().id()==ID_unsignedbv ||
+  if(expr.type().id()==ID_integer)
+  {
+    out << "(- ";
+    convert_expr(expr.op0());
+    out << " ";
+    convert_expr(expr.op1());
+    out << ")";
+  }
+  else if(expr.type().id()==ID_unsignedbv ||
      expr.type().id()==ID_signedbv ||
      expr.type().id()==ID_fixedbv)
   {
