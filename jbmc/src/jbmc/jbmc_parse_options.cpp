@@ -242,7 +242,7 @@ void jbmc_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("refine-arithmetic", true);
   }
 
-  if(cmdline.isset("refine-strings"))
+  if(!cmdline.isset("no-refine-strings"))
   {
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
@@ -1140,7 +1140,7 @@ void jbmc_parse_optionst::help()
     " --yices                      use Yices\n"
     " --z3                         use Z3\n"
     " --refine                     use refinement procedure (experimental)\n"
-    " --refine-strings             use string refinement (experimental)\n"
+    " --no-refine-strings          turn off string refinement\n"
     " --string-printable           add constraint that strings are printable (experimental)\n" // NOLINT(*)
     " --string-max-length          add constraint on the length of strings\n" // NOLINT(*)
     " --string-max-input-length    add constraint on the length of input strings\n" // NOLINT(*)

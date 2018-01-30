@@ -35,6 +35,8 @@ class optionst;
   OPT_GOTO_CHECK \
   "(cover):" \
   "(verbosity):(version)" \
+  "(no-lazy-methods)" /* should go away */ \
+  "(no-refine-strings)" /* should go away */ \
   OPT_TIMESTAMP \
   "u(unified)(change-impact)(forward-impact)(backward-impact)" \
   "(compact-output)"

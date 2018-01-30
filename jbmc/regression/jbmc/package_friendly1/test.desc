@@ -1,6 +1,6 @@
 CORE symex-driven-lazy-loading-expected-failure
 main.class
---java-load-class package_friendly1 --java-load-class package_friendly2 --show-goto-functions
+--no-lazy-methods --java-load-class package_friendly1 --java-load-class package_friendly2 --show-goto-functions
 ^main[.]main[\(].*[\)].*$
 ^package_friendly2[.]operation2[\(][\)].*$
 ^EXIT=0$
