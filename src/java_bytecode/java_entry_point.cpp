@@ -82,17 +82,6 @@ static bool should_init_symbol(const symbolt &sym)
   return is_java_string_literal_id(sym.name);
 }
 
-static bool is_non_null_library_global(const irep_idt &symbolid)
-{
-  static const std::unordered_set<irep_idt, irep_id_hash> non_null_globals=
-  {
-    "java::java.lang.System.out",
-    "java::java.lang.System.err",
-    "java::java.lang.System.in"
-  };
-  return non_null_globals.count(symbolid);
-}
-
 static void java_static_lifetime_init(
   symbol_table_baset &symbol_table,
   const source_locationt &source_location,
@@ -128,8 +117,6 @@ static void java_static_lifetime_init(
           if(has_suffix(namestr, suffix))
             allow_null=false;
           if(allow_null && is_java_string_literal_id(nameid))
-            allow_null=false;
-          if(allow_null && is_non_null_library_global(nameid))
             allow_null=false;
         }
         gen_nondet_init(

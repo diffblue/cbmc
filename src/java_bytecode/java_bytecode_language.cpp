@@ -223,7 +223,8 @@ static void infer_opaque_type_fields(
   namespacet ns(symbol_table);
   for(const auto &method : parse_tree.parsed_class.methods)
   {
-    for(const auto &instruction : method.instructions)
+    for(const java_bytecode_parse_treet::instructiont &instruction :
+          method.instructions)
     {
       if(instruction.statement == "getfield" ||
          instruction.statement == "putfield")
@@ -359,7 +360,8 @@ static void generate_constant_global_variables(
 {
   for(auto &method : parse_tree.parsed_class.methods)
   {
-    for(auto &instruction : method.instructions)
+    for(java_bytecode_parse_treet::instructiont &instruction :
+          method.instructions)
     {
       // ldc* instructions are Java bytecode "load constant" ops, which can
       // retrieve a numeric constant, String literal, or Class literal.
@@ -376,6 +378,87 @@ static void generate_constant_global_variables(
             instruction.args[0],
             symbol_table,
             string_refinement_enabled);
+      }
+    }
+  }
+}
+
+/// Add a stub global symbol to the symbol table, initialising pointer-typed
+/// symbols with null and primitive-typed ones with an arbitrary (nondet) value.
+/// \param symbol_table: table to add to
+/// \param symbol_id: new symbol fully-qualified identifier
+/// \param symbol_basename: new symbol basename
+/// \param symbol_type: new symbol type
+/// \param class_id: class id that directly encloses this static field
+static void create_stub_global_symbol(
+  symbol_table_baset &symbol_table,
+  const irep_idt &symbol_id,
+  const irep_idt &symbol_basename,
+  const typet &symbol_type,
+  const irep_idt &class_id)
+{
+  symbolt new_symbol;
+  new_symbol.is_static_lifetime = true;
+  new_symbol.is_lvalue = true;
+  new_symbol.is_state_var = true;
+  new_symbol.name = symbol_id;
+  new_symbol.base_name = symbol_basename;
+  new_symbol.type = symbol_type;
+  new_symbol.type.set(ID_C_class, class_id);
+  new_symbol.pretty_name = new_symbol.name;
+  new_symbol.mode = ID_java;
+  new_symbol.is_type = false;
+  // If pointer-typed, initialise to null and a static initialiser will be
+  // created to initialise on first reference. If primitive-typed, specify
+  // nondeterministic initialisation by setting a nil value.
+  if(symbol_type.id() == ID_pointer)
+    new_symbol.value = null_pointer_exprt(to_pointer_type(symbol_type));
+  else
+    new_symbol.value.make_nil();
+  bool add_failed = symbol_table.add(new_symbol);
+  INVARIANT(
+    !add_failed, "caller should have checked symbol not already in table");
+}
+
+/// Search for getstatic and putstatic instructions in a class' bytecode and
+/// create stub symbols for any static fields that aren't already in the symbol
+/// table. The new symbols are null-initialised for reference-typed globals /
+/// static fields, and nondet-initialised for primitives.
+/// \param parse_tree: class bytecode
+/// \param symbol_table: symbol table; may gain new symbols
+static void create_stub_global_symbols(
+  const java_bytecode_parse_treet &parse_tree,
+  symbol_table_baset &symbol_table)
+{
+  namespacet ns(symbol_table);
+  for(const auto &method : parse_tree.parsed_class.methods)
+  {
+    for(const java_bytecode_parse_treet::instructiont &instruction :
+          method.instructions)
+    {
+      if(instruction.statement == "getstatic" ||
+         instruction.statement == "putstatic")
+      {
+        INVARIANT(
+          instruction.args.size() > 0,
+          "get/putstatic should have at least one argument");
+        irep_idt component = instruction.args[0].get_string(ID_component_name);
+        INVARIANT(
+          !component.empty(), "get/putstatic should specify a component");
+        irep_idt class_id = instruction.args[0].get_string(ID_class);
+        INVARIANT(
+          !class_id.empty(), "get/putstatic should specify a class");
+        irep_idt identifier = id2string(class_id) + "." + id2string(component);
+
+        if(!symbol_table.has_symbol(identifier))
+        {
+          create_stub_global_symbol(
+            symbol_table,
+            identifier,
+            component,
+            instruction.args[0].type(),
+            class_id);
+        }
       }
     }
   }
@@ -477,10 +560,31 @@ bool java_bytecode_languaget::typecheck(
            << " String or Class constant symbols"
            << messaget::eom;
 
+  // For each reference to a stub global (that is, a global variable declared on
+  // a class we don't have bytecode for, and therefore don't know the static
+  // initialiser for), create a synthetic static initialiser (clinit method)
+  // to nondet initialise it.
+  // Note this must be done before making static initialiser wrappers below, as
+  // this makes a Classname.clinit method, then the next pass makes a wrapper
+  // that ensures it is only run once, and that static initialisation happens
+  // in class-graph topological order.
+
+  {
+    journalling_symbol_tablet symbol_table_journal =
+      journalling_symbol_tablet::wrap(symbol_table);
+    for(const auto &c : java_class_loader.class_map)
+    {
+      create_stub_global_symbols(c.second, symbol_table_journal);
+    }
+
+    stub_global_initializer_factory.create_stub_global_initializer_symbols(
+      symbol_table, symbol_table_journal.get_inserted(), synthetic_methods);
+  }
+
   // For each class that will require a static initializer wrapper, create a
   // function named package.classname::clinit_wrapper, and a corresponding
   // global tracking whether it has run or not:
-  create_static_initializer_wrappers(symbol_table);
+  create_static_initializer_wrappers(symbol_table, synthetic_methods);
 
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
@@ -495,24 +599,12 @@ bool java_bytecode_languaget::typecheck(
     journalling_symbol_tablet journalling_symbol_table =
       journalling_symbol_tablet::wrap(symbol_table);
 
+    // Convert all synthetic methods:
+    for(const auto &function_id_and_type : synthetic_methods)
     {
-      // Convert all static initialisers:
-      std::vector<irep_idt> static_initialisers;
-
-      // Careful not to add symbols while iterating over the symbol table!
-      for(const auto &symbol : symbol_table.symbols)
-      {
-        if(is_clinit_wrapper_function(symbol.second.name))
-          static_initialisers.push_back(symbol.second.name);
-      }
-
-      for(const auto &static_init_wrapper_name : static_initialisers)
-      {
-        convert_single_method(
-          static_init_wrapper_name, journalling_symbol_table);
-      }
+      convert_single_method(
+        function_id_and_type.first, journalling_symbol_table);
     }
-
     // Convert all methods for which we have bytecode now
     for(const auto &method_sig : method_bytecode)
     {
@@ -714,6 +806,8 @@ bool java_bytecode_languaget::convert_single_method(
   // Get bytecode for specified function if we have it
   method_bytecodet::opt_reft cmb = method_bytecode.get(function_id);
 
+  synthetic_methods_mapt::iterator synthetic_method_it;
+
   // Check if have a string solver implementation
   if(string_preprocess.implements_function(function_id))
   {
@@ -735,11 +829,29 @@ bool java_bytecode_languaget::convert_single_method(
     symbol.value = generated_code;
     return false;
   }
-  else if(is_clinit_wrapper_function(function_id))
+  else if(
+    (synthetic_method_it = synthetic_methods.find(function_id)) !=
+    synthetic_methods.end())
   {
+    // Synthetic method (i.e. one generated by the Java frontend and which
+    // doesn't occur in the source bytecode):
     symbolt &symbol = symbol_table.get_writeable_ref(function_id);
-    symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
-    // Notify lazy methods of other static init functions called:
+    switch(synthetic_method_it->second)
+    {
+    case synthetic_method_typet::STATIC_INITIALIZER_WRAPPER:
+      symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
+      break;
+    case synthetic_method_typet::STUB_CLASS_STATIC_INITIALIZER:
+      symbol.value =
+        stub_global_initializer_factory.get_stub_initializer_body(
+          function_id,
+          symbol_table,
+          object_factory_parameters,
+          get_pointer_type_selector());
+      break;
+    }
+    // Notify lazy methods of static calls made from the newly generated
+    // function:
     notify_static_method_calls(symbol.value, needed_lazy_methods);
     return false;
   }
