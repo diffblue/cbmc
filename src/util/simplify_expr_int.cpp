@@ -23,16 +23,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "rational_tools.h"
 #include "ieee_float.h"
 
-bool simplify_exprt::simplify_bswap(exprt &expr)
+bool simplify_exprt::simplify_bswap(bswap_exprt &expr)
 {
-  if(expr.type().id()==ID_unsignedbv &&
-     expr.operands().size()==1 &&
-     expr.op0().type()==expr.type() &&
-     expr.op0().is_constant())
+  if(expr.type().id() == ID_unsignedbv && expr.op().is_constant())
   {
     std::size_t width=to_bitvector_type(expr.type()).get_width();
     mp_integer value;
-    to_integer(expr.op0(), value);
+    to_integer(expr.op(), value);
     std::vector<mp_integer> bytes;
 
     // take apart
@@ -48,7 +45,8 @@ bool simplify_exprt::simplify_bswap(exprt &expr)
       bytes.pop_back();
     }
 
-    expr=from_integer(new_value, expr.type());
+    constant_exprt c = from_integer(new_value, expr.type());
+    expr.swap(c);
     return false;
   }
 

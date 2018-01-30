@@ -245,6 +245,8 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
   }
   else if(expr.id()==ID_abs)
     return convert_abs(expr);
+  else if(expr.id() == ID_bswap)
+    return convert_bswap(to_bswap_expr(expr));
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
     return convert_byte_extract(to_byte_extract_expr(expr));

@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "mp_arith.h"
 #include "replace_expr.h"
 
+class bswap_exprt;
 class byte_extract_exprt;
 class byte_update_exprt;
 class exprt;
@@ -100,7 +101,7 @@ public:
   bool simplify_dereference(exprt &expr);
   bool simplify_address_of(exprt &expr);
   bool simplify_pointer_offset(exprt &expr);
-  bool simplify_bswap(exprt &expr);
+  bool simplify_bswap(bswap_exprt &expr);
   bool simplify_isinf(exprt &expr);
   bool simplify_isnan(exprt &expr);
   bool simplify_isnormal(exprt &expr);

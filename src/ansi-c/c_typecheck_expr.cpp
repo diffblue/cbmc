@@ -2182,8 +2182,7 @@ exprt c_typecheck_baset::do_special_functions(
       throw 0;
     }
 
-    exprt bswap_expr(ID_bswap, expr.type());
-    bswap_expr.operands()=expr.arguments();
+    bswap_exprt bswap_expr(expr.arguments().front(), expr.type());
     bswap_expr.add_source_location()=source_location;
 
     return bswap_expr;
