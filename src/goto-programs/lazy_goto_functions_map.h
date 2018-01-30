@@ -49,6 +49,7 @@ public:
 
   typedef
     std::function<void(
+      const irep_idt &name,
       goto_functionst::goto_functiont &function,
       journalling_symbol_tablet &function_symbols)>
     post_process_functiont;
@@ -128,7 +129,7 @@ private:
     if(processed_functions.count(name)==0)
     {
       // Run function-pass conversions
-      post_process_function(function, journalling_table);
+      post_process_function(name, function, journalling_table);
       // Assign procedure-local location numbers for now
       function.body.compute_location_numbers();
       processed_functions.insert(name);

@@ -20,8 +20,6 @@ Date: May 2016
 #include <util/options.h>
 
 #include "cover_basic_blocks.h"
-#include "cover_filter.h"
-#include "cover_instrument.h"
 
 /// Applies instrumenters to given goto program
 /// \param goto_program: the goto program
@@ -165,51 +163,30 @@ void parse_cover_options(const cmdlinet &cmdline, optionst &options)
     cmdline.isset("cover-traces-must-terminate"));
 }
 
-/// Applies instrumenters to given goto functions
-/// \param goto_functions: the goto functions
-/// \param instrumenters: the instrumenters
-/// \param function_filters: function filters to discard certain functions
-/// \param message_handler: a message handler
-void instrument_cover_goals(
-  goto_functionst &goto_functions,
-  const cover_instrumenterst &instrumenters,
-  const function_filterst &function_filters,
-  message_handlert &message_handler)
-{
-  Forall_goto_functions(f_it, goto_functions)
-  {
-    if(!function_filters(f_it->first, f_it->second))
-      continue;
-
-    instrument_cover_goals(f_it->second.body, instrumenters, message_handler);
-  }
-}
-
-/// Instruments goto functions based on given command line options
-/// \param options: the options
-/// \param symbol_table: the symbol table
-/// \param goto_functions: the goto functions
-/// \param message_handler: a message handler
-bool instrument_cover_goals(
+/// Build data structures controlling coverage from command-line options.
+/// \param options: command-line options
+/// \param symbol_table: global symbol table
+/// \param message_handler: used to log incorrect option specifications
+/// \return a cover_configt on success, or null otherwise.
+std::unique_ptr<cover_configt> get_cover_config(
   const optionst &options,
   const symbol_tablet &symbol_table,
-  goto_functionst &goto_functions,
   message_handlert &message_handler)
 {
   messaget msg(message_handler);
+  std::unique_ptr<cover_configt> config = util_make_unique<cover_configt>();
+  function_filterst &function_filters = config->function_filters;
+  goal_filterst &goal_filters = config->goal_filters;
+  cover_instrumenterst &instrumenters = config->cover_instrumenters;
 
-  function_filterst function_filters;
   function_filters.add(
     util_make_unique<internal_functions_filtert>(message_handler));
 
-  goal_filterst goal_filters;
   goal_filters.add(util_make_unique<internal_goals_filtert>(message_handler));
 
-  cover_instrumenterst instrumenters;
-
   optionst::value_listt criteria_strings = options.get_list_option("cover");
-  bool keep_assertions=false;
 
+  config->keep_assertions = false;
   for(const auto &criterion_string : criteria_strings)
   {
     try
@@ -217,39 +194,22 @@ bool instrument_cover_goals(
       coverage_criteriont c = parse_coverage_criterion(criterion_string);
 
       if(c == coverage_criteriont::ASSERTION)
-        keep_assertions = true;
+        config->keep_assertions = true;
 
       instrumenters.add_from_criterion(c, symbol_table, goal_filters);
     }
     catch(const std::string &e)
     {
       msg.error() << e << messaget::eom;
-      return true;
+      return {};
     }
   }
 
-  if(keep_assertions && criteria_strings.size()>1)
+  if(config->keep_assertions && criteria_strings.size()>1)
   {
     msg.error() << "assertion coverage cannot currently be used together with "
                 << "other coverage criteria" << messaget::eom;
-    return true;
-  }
-
-  msg.status() << "Rewriting existing assertions as assumptions"
-               << messaget::eom;
-
-  if(!keep_assertions)
-  {
-    // turn assertions (from generic checks) into assumptions
-    Forall_goto_functions(f_it, goto_functions)
-    {
-      goto_programt &body=f_it->second.body;
-      Forall_goto_program_instructions(i_it, body)
-      {
-        if(i_it->is_assert())
-          i_it->type=goto_program_instruction_typet::ASSUME;
-      }
-    }
+    return {};
   }
 
   // cover entry point function only
@@ -266,32 +226,108 @@ bool instrument_cover_goals(
     function_filters.add(
       util_make_unique<trivial_functions_filtert>(message_handler));
 
-  msg.status() << "Instrumenting coverage goals" << messaget::eom;
+  config->traces_must_terminate =
+    options.get_bool_option("cover-traces-must-terminate");
 
-  instrument_cover_goals(
-    goto_functions, instrumenters, function_filters, message_handler);
+  return config;
+}
 
-  function_filters.report_anomalies();
-  goal_filters.report_anomalies();
-
-  if(options.get_bool_option("cover-traces-must-terminate"))
+/// Instruments a single goto program based on the given configuration
+/// \param config: configuration, produced using get_cover_config
+/// \param function_id: function name
+/// \param function: function function to instrument
+/// \param message_handler: log output
+static void instrument_cover_goals(
+  const cover_configt &config,
+  const irep_idt &function_id,
+  goto_functionst::goto_functiont &function,
+  message_handlert &message_handler)
+{
+  if(!config.keep_assertions)
   {
-    // instrument an additional goal in CPROVER_START. This will rephrase
-    // the reachability problem  by asking BMC to provide a solution that
-    // satisfies a goal while getting to the end of the program-under-test.
-    const auto sf_it=
-      goto_functions.function_map.find(goto_functions.entry_point());
-    if(sf_it==goto_functions.function_map.end())
+    Forall_goto_program_instructions(i_it, function.body)
     {
-      msg.error() << "cover-traces-must-terminate: invalid entry point ["
-                  << goto_functions.entry_point() << "]" << messaget::eom;
-      return true;
+      if(i_it->is_assert())
+        i_it->type=goto_program_instruction_typet::ASSUME;
     }
-
-    cover_instrument_end_of_function(sf_it->first, sf_it->second.body);
   }
 
-  goto_functions.update();
+  bool changed = false;
+
+  if(config.function_filters(function_id, function))
+  {
+    instrument_cover_goals(
+      function.body, config.cover_instrumenters, message_handler);
+    changed = true;
+  }
+
+  if(config.traces_must_terminate &&
+     function_id == goto_functionst::entry_point())
+  {
+    cover_instrument_end_of_function(function_id, function.body);
+    changed = true;
+  }
+
+  if(changed)
+    function.body.update();
+}
+
+/// Instruments a single goto program based on the given configuration
+/// \param config: configuration, produced using get_cover_config
+/// \param function: goto program to instrument
+/// \param message_handler: log output
+void instrument_cover_goals(
+  const cover_configt &config,
+  goto_model_functiont &function,
+  message_handlert &message_handler)
+{
+  instrument_cover_goals(
+    config,
+    function.get_function_id(),
+    function.get_goto_function(),
+    message_handler);
+
+  function.compute_location_numbers();
+}
+
+/// Instruments goto functions based on given command line options
+/// \param options: the options
+/// \param symbol_table: the symbol table
+/// \param goto_functions: the goto functions
+/// \param message_handler: a message handler
+bool instrument_cover_goals(
+  const optionst &options,
+  const symbol_tablet &symbol_table,
+  goto_functionst &goto_functions,
+  message_handlert &message_handler)
+{
+  messaget msg(message_handler);
+  msg.status() << "Rewriting existing assertions as assumptions"
+               << messaget::eom;
+
+  std::unique_ptr<cover_configt> config =
+    get_cover_config(options, symbol_table, message_handler);
+  if(!config)
+    return true;
+
+  if(config->traces_must_terminate &&
+     !goto_functions.function_map.count(goto_functions.entry_point()))
+  {
+    msg.error() << "cover-traces-must-terminate: invalid entry point ["
+                << goto_functions.entry_point() << "]" << messaget::eom;
+    return true;
+  }
+
+  Forall_goto_functions(f_it, goto_functions)
+  {
+    instrument_cover_goals(
+      *config, f_it->first, f_it->second, message_handler);
+  }
+  goto_functions.compute_location_numbers();
+
+  config->function_filters.report_anomalies();
+  config->goal_filters.report_anomalies();
+
   return false;
 }
 
