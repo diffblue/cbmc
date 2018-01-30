@@ -2860,19 +2860,41 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   {
     convert_expr(expr.op0());
   }
-  else if(expr.operands().size()==2)
+  else
   {
-    if(expr.type().id()==ID_unsignedbv ||
-       expr.type().id()==ID_signedbv ||
-       expr.type().id()==ID_fixedbv)
+    if(expr.type().id()==ID_rational ||
+       expr.type().id()==ID_integer ||
+       expr.type().id()==ID_real)
+    {
+      // these are multi-ary in SMT-LIB2
+      out << "(+";
+
+      for(const auto &op : expr.operands())
+      {
+        out << ' ';
+        convert_expr(op);
+      }
+
+      out << ')';
+    }
+    else if(expr.type().id()==ID_unsignedbv ||
+            expr.type().id()==ID_signedbv ||
+            expr.type().id()==ID_fixedbv)
     {
       // These could be chained, i.e., need not be binary,
       // but at least MathSat doesn't like that.
-      out << "(bvadd ";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
+      if(expr.operands().size()==2)
+      {
+        out << "(bvadd ";
+        convert_expr(expr.op0());
+        out << " ";
+        convert_expr(expr.op1());
+        out << ")";
+      }
+      else
+      {
+        convert_plus(to_plus_expr(make_binary(expr)));
+      }
     }
     else if(expr.type().id()==ID_floatbv)
     {
@@ -2883,43 +2905,40 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else if(expr.type().id()==ID_pointer)
     {
-      exprt p=expr.op0(), i=expr.op1();
-
-      if(p.type().id()!=ID_pointer)
-        p.swap(i);
-
-      if(p.type().id()!=ID_pointer)
-        INVALIDEXPR("unexpected mixture in pointer arithmetic");
-
-      mp_integer element_size=
-        pointer_offset_size(expr.type().subtype(), ns);
-      assert(element_size>0);
-
-      out << "(bvadd ";
-      convert_expr(p);
-      out << " ";
-
-      if(element_size>=2)
+      if(expr.operands().size()==2)
       {
-        out << "(bvmul ";
-        convert_expr(i);
-        out << " (_ bv" << element_size
-            << " " << boolbv_width(expr.type()) << "))";
+        exprt p=expr.op0(), i=expr.op1();
+
+        if(p.type().id()!=ID_pointer)
+          p.swap(i);
+
+        if(p.type().id()!=ID_pointer)
+          INVALIDEXPR("unexpected mixture in pointer arithmetic");
+
+        mp_integer element_size=
+          pointer_offset_size(expr.type().subtype(), ns);
+        assert(element_size>0);
+
+        out << "(bvadd ";
+        convert_expr(p);
+        out << " ";
+
+        if(element_size>=2)
+        {
+          out << "(bvmul ";
+          convert_expr(i);
+          out << " (_ bv" << element_size
+              << " " << boolbv_width(expr.type()) << "))";
+        }
+        else
+          convert_expr(i);
+
+        out << ')';
       }
       else
-        convert_expr(i);
-
-      out << ")";
-    }
-    else if(expr.type().id()==ID_rational ||
-            expr.type().id()==ID_integer ||
-            expr.type().id()==ID_real)
-    {
-      out << "(+ ";
-      convert_expr(expr.op0());
-      out << " ";
-      convert_expr(expr.op1());
-      out << ")";
+      {
+        convert_plus(to_plus_expr(make_binary(expr)));
+      }
     }
     else if(expr.type().id()==ID_vector)
     {
@@ -2962,10 +2981,6 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
     }
     else
       UNEXPECTEDCASE("unsupported type for +: "+expr.type().id_string());
-  }
-  else
-  {
-    convert_plus(to_plus_expr(make_binary(expr)));
   }
 }
 
