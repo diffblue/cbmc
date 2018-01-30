@@ -94,12 +94,8 @@ private:
   union_find_replacet symbol_resolve;
 
   std::vector<equal_exprt> equations;
-  std::list<std::pair<exprt, bool>> non_string_axioms;
 
-  // Map pointers to array symbols
-  std::map<exprt, symbol_exprt> pointer_map;
-
-  void add_lemma(const exprt &lemma, const bool _simplify = true);
+  void add_lemma(const exprt &lemma, bool simplify_lemma = true);
 };
 
 exprt substitute_array_lists(exprt expr, std::size_t string_max_length);

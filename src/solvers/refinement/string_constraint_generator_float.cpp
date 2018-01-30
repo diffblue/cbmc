@@ -251,7 +251,7 @@ exprt string_constraint_generatort::add_axioms_for_fractional_part(
 
   and_exprt a1(res.axiom_for_length_gt(1),
                res.axiom_for_length_le(max));
-  axioms.push_back(a1);
+  lemmas.push_back(a1);
 
   equal_exprt starts_with_dot(res[0], from_integer('.', char_type));
 
@@ -289,10 +289,10 @@ exprt string_constraint_generatort::add_axioms_for_fractional_part(
   }
 
   exprt a2=conjunction(digit_constraints);
-  axioms.push_back(a2);
+  lemmas.push_back(a2);
 
   equal_exprt a3(int_expr, sum);
-  axioms.push_back(a3);
+  lemmas.push_back(a3);
 
   return from_integer(0, signedbv_typet(32));
 }

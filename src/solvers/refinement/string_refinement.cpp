@@ -811,37 +811,50 @@ decision_proceduret::resultt string_refinementt::dec_solve()
     supert::set_to(eq, true);
   }
 
-  const auto get = [this](const exprt &expr) { return this->get(expr); };
-  for(exprt axiom : generator.get_axioms())
-  {
-    symbol_resolve.replace_expr(axiom);
-    if(axiom.id()==ID_string_constraint)
-    {
-      string_constraintt univ_axiom = to_string_constraint(axiom);
+  const auto constraints = generator.get_constraints();
+  std::transform(
+    constraints.begin(),
+    constraints.end(),
+    std::back_inserter(axioms.universal),
+    [&](string_constraintt constraint) { // NOLINT
+      symbol_resolve.replace_expr(constraint);
       DATA_INVARIANT(
-        is_valid_string_constraint(error(), ns, univ_axiom),
+        is_valid_string_constraint(error(), ns, constraint),
         string_refinement_invariantt(
           "string constraints satisfy their invariant"));
-      axioms.universal.push_back(univ_axiom);
-    }
-    else if(axiom.id()==ID_string_not_contains_constraint)
-    {
-      string_not_contains_constraintt nc_axiom=
-        to_string_not_contains_constraint(axiom);
-      array_typet rtype = to_array_type(nc_axiom.s0().type());
+      return constraint;
+    });
+
+  const auto not_contains_constraints =
+    generator.get_not_contains_constraints();
+  std::transform(
+    not_contains_constraints.begin(),
+    not_contains_constraints.end(),
+    std::back_inserter(axioms.not_contains),
+    [&](string_not_contains_constraintt axiom) { // NOLINT
+      symbol_resolve.replace_expr(axiom);
+      return axiom;
+    });
+
+  for(const auto &nc_axiom : axioms.not_contains)
+  {
+    const auto &witness_type = [&] { // NOLINT
+      const auto &rtype = to_array_type(nc_axiom.s0().type());
       const typet &index_type = rtype.size().type();
-      array_typet witness_type(index_type, infinity_exprt(index_type));
-      generator.witness[nc_axiom]=
-        generator.fresh_symbol("not_contains_witness", witness_type);
-      axioms.not_contains.push_back(nc_axiom);
-    }
-    else
-    {
-      add_lemma(axiom);
-    }
+      return array_typet(index_type, infinity_exprt(index_type));
+    }();
+    generator.witness[nc_axiom] =
+      generator.fresh_symbol("not_contains_witness", witness_type);
+  }
+
+  for(exprt lemma : generator.get_lemmas())
+  {
+    symbol_resolve.replace_expr(lemma);
+    add_lemma(lemma);
   }
 
   // Initial try without index set
+  const auto get = [this](const exprt &expr) { return this->get(expr); };
   const decision_proceduret::resultt res=supert::dec_solve();
   if(res==resultt::D_SATISFIABLE)
   {

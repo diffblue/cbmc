@@ -35,9 +35,21 @@ string_constraint_generatort::string_constraint_generatort(
 {
 }
 
-const std::vector<exprt> &string_constraint_generatort::get_axioms() const
+const std::vector<exprt> &string_constraint_generatort::get_lemmas() const
 {
-  return axioms;
+  return lemmas;
+}
+
+const std::vector<string_constraintt> &
+string_constraint_generatort::get_constraints() const
+{
+  return constraints;
+}
+
+const std::vector<string_not_contains_constraintt> &
+string_constraint_generatort::get_not_contains_constraints() const
+{
+  return not_contains_constraints;
 }
 
 const std::vector<symbol_exprt> &
@@ -136,7 +148,7 @@ plus_exprt string_constraint_generatort::plus_exprt_with_overflow_check(
   implies_exprt no_overflow(equal_exprt(neg1, neg2),
                             equal_exprt(neg1, neg_sum));
 
-  axioms.push_back(no_overflow);
+  lemmas.push_back(no_overflow);
 
   return sum;
 }
@@ -291,7 +303,7 @@ exprt string_constraint_generatort::associate_length_to_array(
   const exprt &new_length = f.arguments()[1];
 
   const auto &length = get_length_of_string_array(array_expr);
-  axioms.push_back(equal_exprt(length, new_length));
+  lemmas.push_back(equal_exprt(length, new_length));
   return from_integer(0, f.type());
 }
 
@@ -322,10 +334,10 @@ void string_constraint_generatort::add_default_axioms(
     return;
 
   const exprt index_zero = from_integer(0, s.length().type());
-  axioms.push_back(s.axiom_for_length_ge(index_zero));
+  lemmas.push_back(s.axiom_for_length_ge(index_zero));
 
   if(max_string_length!=std::numeric_limits<size_t>::max())
-    axioms.push_back(s.axiom_for_length_le(max_string_length));
+    lemmas.push_back(s.axiom_for_length_le(max_string_length));
 }
 
 /// Add constraint on characters of a string.
@@ -359,7 +371,7 @@ void string_constraint_generatort::add_constraint_on_characters(
     binary_relation_exprt(chr, ID_ge, from_integer(low_char, chr.type())),
     binary_relation_exprt(chr, ID_le, from_integer(high_char, chr.type())));
   const string_constraintt sc(qvar, start, end, true_exprt(), char_in_set);
-  axioms.push_back(sc);
+  constraints.push_back(sc);
 }
 
 /// Add axioms to ensure all characters of a string belong to a given set.
@@ -620,6 +632,6 @@ exprt string_constraint_generatort::add_axioms_for_char_at(
   PRECONDITION(f.arguments().size() == 2);
   array_string_exprt str = get_string_expr(f.arguments()[0]);
   symbol_exprt char_sym = fresh_symbol("char", str.type().subtype());
-  axioms.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
+  lemmas.push_back(equal_exprt(char_sym, str[f.arguments()[1]]));
   return char_sym;
 }

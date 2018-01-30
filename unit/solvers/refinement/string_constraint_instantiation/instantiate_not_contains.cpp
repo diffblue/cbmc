@@ -8,12 +8,12 @@
 
 #include <testing-utils/catch.hpp>
 
-#include <solvers/refinement/string_constraint_instantiation.h>
-
-#include <solvers/sat/satcheck.h>
+#include <numeric>
+#include <java_bytecode/java_bytecode_language.h>
 #include <java_bytecode/java_types.h>
 #include <langapi/mode.h>
-#include <java_bytecode/java_bytecode_language.h>
+#include <solvers/refinement/string_constraint_instantiation.h>
+#include <solvers/sat/satcheck.h>
 #include <util/simplify_expr.h>
 #include <util/config.h>
 
@@ -193,28 +193,40 @@ SCENARIO("instantiate_not_contains",
     exprt res=generator.add_axioms_for_function_application(func);
     std::string axioms;
     std::vector<string_not_contains_constraintt> nc_axioms;
-    for(exprt axiom : generator.get_axioms())
-    {
-      simplify(axiom, ns);
-      if(axiom.id()==ID_string_constraint)
-      {
-        string_constraintt sc=to_string_constraint(axiom);
-        axioms+=from_expr(ns, "", sc);
-      }
-      else if(axiom.id()==ID_string_not_contains_constraint)
-      {
-        string_not_contains_constraintt sc=
-          to_string_not_contains_constraint(axiom);
-        axioms+=from_expr(ns, "", sc);
-        generator.witness[sc]=
-          generator.fresh_symbol("w", t.witness_type());
-        nc_axioms.push_back(sc);
-      }
-      else
-        axioms+=from_expr(ns, "", axiom);
 
-      axioms+="\n\n";
-    }
+    const auto constraints = generator.get_constraints();
+    std::accumulate(
+      constraints.begin(),
+      constraints.end(),
+      axioms,
+      [&](const std::string &accu, string_constraintt sc) { // NOLINT
+        simplify(sc, ns);
+        return accu + from_expr(ns, "", sc) + "\n\n";
+      });
+
+    const auto nc_contraints = generator.get_not_contains_constraints();
+    axioms = std::accumulate(
+      nc_contraints.begin(),
+      nc_contraints.end(),
+      axioms,
+      [&](
+        const std::string &accu, string_not_contains_constraintt sc) { // NOLINT
+        simplify(sc, ns);
+        generator.witness[sc] = generator.fresh_symbol("w", t.witness_type());
+        nc_axioms.push_back(sc);
+        return accu + from_expr(ns, "", sc) + "\n\n";
+      });
+
+    const auto lemmas = generator.get_lemmas();
+    axioms = std::accumulate(
+      lemmas.begin(),
+      lemmas.end(),
+      axioms,
+      [&](const std::string &accu, exprt axiom) { // NOLINT
+        simplify(axiom, ns);
+        return accu + from_expr(ns, "", axiom) + "\n\n";
+      });
+
     INFO("Original axioms:\n");
     INFO(axioms);
 

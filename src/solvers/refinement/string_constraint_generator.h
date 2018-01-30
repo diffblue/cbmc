@@ -48,7 +48,10 @@ public:
 
   /// Axioms are of three kinds: universally quantified string constraint,
   /// not contains string constraints and simple formulas.
-  const std::vector<exprt> &get_axioms() const;
+  const std::vector<exprt> &get_lemmas() const;
+  const std::vector<string_constraintt> &get_constraints() const;
+  const std::vector<string_not_contains_constraintt> &
+  get_not_contains_constraints() const;
 
   /// Boolean symbols for the results of some string functions
   const std::vector<symbol_exprt> &get_boolean_symbols() const;
@@ -349,7 +352,9 @@ private:
   unsigned symbol_count=0;
   const messaget message;
 
-  std::vector<exprt> axioms;
+  std::vector<exprt> lemmas;
+  std::vector<string_constraintt> constraints;
+  std::vector<string_not_contains_constraintt> not_contains_constraints;
   std::vector<symbol_exprt> boolean_symbols;
   std::vector<symbol_exprt> index_symbols;
   const namespacet ns;
