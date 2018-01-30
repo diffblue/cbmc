@@ -478,31 +478,31 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     if(symbol_table.has_symbol(symbol_type_identifier))
       return;
 
-    struct_typet struct_type;
+    class_typet class_type;
     // we have the base class, java.lang.Object, length and data
     // of appropriate type
-    struct_type.set_tag(symbol_type_identifier);
+    class_type.set_tag(symbol_type_identifier);
 
-    struct_type.components().reserve(3);
-    struct_typet::componentt
-      comp0("@java.lang.Object", symbol_typet("java::java.lang.Object"));
+    class_type.components().reserve(3);
+    class_typet::componentt comp0(
+      "@java.lang.Object", symbol_typet("java::java.lang.Object"));
     comp0.set_pretty_name("@java.lang.Object");
     comp0.set_base_name("@java.lang.Object");
-    struct_type.components().push_back(comp0);
+    class_type.components().push_back(comp0);
 
-    struct_typet::componentt comp1("length", java_int_type());
+    class_typet::componentt comp1("length", java_int_type());
     comp1.set_pretty_name("length");
     comp1.set_base_name("length");
-    struct_type.components().push_back(comp1);
+    class_type.components().push_back(comp1);
 
-    struct_typet::componentt
-      comp2("data", java_reference_type(java_type_from_char(l)));
+    class_typet::componentt comp2(
+      "data", java_reference_type(java_type_from_char(l)));
     comp2.set_pretty_name("data");
     comp2.set_base_name("data");
-    struct_type.components().push_back(comp2);
+    class_type.components().push_back(comp2);
 
     INVARIANT(
-      is_valid_java_array(struct_type),
+      is_valid_java_array(class_type),
       "Constructed a new type representing a Java Array "
       "object that doesn't match expectations");
 
@@ -510,7 +510,7 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     symbol.name=symbol_type_identifier;
     symbol.base_name=symbol_type.get(ID_C_base_name);
     symbol.is_type=true;
-    symbol.type=struct_type;
+    symbol.type = class_type;
     symbol_table.add(symbol);
 
     // Also provide a clone method:
