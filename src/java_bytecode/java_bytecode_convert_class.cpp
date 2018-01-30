@@ -501,6 +501,8 @@ void java_bytecode_convert_classt::add_array_types(symbol_tablet &symbol_table)
     comp2.set_base_name("data");
     class_type.components().push_back(comp2);
 
+    class_type.add_base(symbol_typet("java::java.lang.Object"));
+
     INVARIANT(
       is_valid_java_array(class_type),
       "Constructed a new type representing a Java Array "
