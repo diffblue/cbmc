@@ -24,6 +24,7 @@ SRC = bytecode_info.cpp \
       java_pointer_casts.cpp \
       java_root_class.cpp \
       java_string_library_preprocess.cpp \
+      java_string_literals.cpp \
       java_types.cpp \
       java_utils.cpp \
       generate_java_generic_type.cpp \

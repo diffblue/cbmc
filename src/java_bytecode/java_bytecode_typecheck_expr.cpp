@@ -11,8 +11,6 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "java_bytecode_typecheck.h"
 
-#include <iomanip>
-
 #include <util/arith_tools.h>
 #include <util/unicode.h>
 
@@ -40,6 +38,11 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
   Forall_operands(it, expr)
     typecheck_expr(*it);
 
+  INVARIANT(
+    expr.id() != ID_java_string_literal,
+    "String literals should have been converted to constant globals "
+    "before typecheck_expr");
+
   if(expr.id()==ID_symbol)
     typecheck_expr_symbol(to_symbol_expr(expr));
   else if(expr.id()==ID_side_effect)
@@ -50,8 +53,6 @@ void java_bytecode_typecheckt::typecheck_expr(exprt &expr)
     else if(statement==ID_java_new_array)
       typecheck_expr_java_new_array(to_side_effect_expr(expr));
   }
-  else if(expr.id()==ID_java_string_literal)
-    typecheck_expr_java_string_literal(expr);
   else if(expr.id()==ID_member)
     typecheck_expr_member(to_member_expr(expr));
 }
@@ -69,171 +70,6 @@ void java_bytecode_typecheckt::typecheck_expr_java_new_array(
   PRECONDITION(expr.operands().size()>=1); // one per dimension
   typet &type=expr.type();
   typecheck_type(type);
-}
-
-static std::string escape_non_alnum(const std::string &toescape)
-{
-  std::ostringstream escaped;
-  for(auto &ch : toescape)
-  {
-    if(ch=='_')
-      escaped << "__";
-    else if(isalnum(ch))
-      escaped << ch;
-    else
-      escaped << '_'
-              << std::hex
-              << std::setfill('0')
-              << std::setw(2)
-              << (unsigned int)ch;
-  }
-  return escaped.str();
-}
-
-/// Convert UCS-2 or UTF-16 to an array expression.
-/// \par parameters: `in`: wide string to convert
-/// \return Returns a Java char array containing the same wchars.
-static array_exprt utf16_to_array(const std::wstring &in)
-{
-  const auto jchar=java_char_type();
-  array_exprt ret(
-    array_typet(jchar, from_integer(in.length(), java_int_type())));
-  for(const auto c : in)
-    ret.copy_to_operands(from_integer(c, jchar));
-  return ret;
-}
-
-void java_bytecode_typecheckt::typecheck_expr_java_string_literal(exprt &expr)
-{
-  const irep_idt value=expr.get(ID_value);
-  const symbol_typet string_type("java::java.lang.String");
-
-  const std::string escaped_symbol_name = escape_non_alnum(id2string(value));
-  const std::string escaped_symbol_name_with_prefix =
-    JAVA_STRING_LITERAL_PREFIX "." + escaped_symbol_name;
-
-  auto findit = symbol_table.symbols.find(escaped_symbol_name_with_prefix);
-  if(findit!=symbol_table.symbols.end())
-  {
-    expr=address_of_exprt(findit->second.symbol_expr());
-    return;
-  }
-
-  // Create a new symbol:
-  symbolt new_symbol;
-  new_symbol.name = escaped_symbol_name_with_prefix;
-  new_symbol.type=string_type;
-  new_symbol.base_name = escaped_symbol_name;
-  new_symbol.pretty_name=value;
-  new_symbol.mode=ID_java;
-  new_symbol.is_type=false;
-  new_symbol.is_lvalue=true;
-  new_symbol.is_static_lifetime=true; // These are basically const global data.
-
-  // Regardless of string refinement setting, at least initialize
-  // the literal with @clsid = String and @lock = false:
-  symbol_typet jlo_symbol("java::java.lang.Object");
-  const auto &jlo_struct=to_struct_type(ns.follow(jlo_symbol));
-  struct_exprt jlo_init(jlo_symbol);
-  const auto &jls_struct=to_struct_type(ns.follow(string_type));
-  java_root_class_init(jlo_init, jlo_struct, false, "java::java.lang.String");
-
-  // If string refinement *is* around, populate the actual
-  // contents as well:
-  if(string_refinement_enabled)
-  {
-    struct_exprt literal_init(new_symbol.type);
-    literal_init.operands().resize(jls_struct.components().size());
-    const std::size_t jlo_nb = jls_struct.component_number("@java.lang.Object");
-    literal_init.operands()[jlo_nb] = jlo_init;
-
-    const std::size_t length_nb = jls_struct.component_number("length");
-    const typet &length_type = jls_struct.components()[length_nb].type();
-    const exprt length = from_integer(id2string(value).size(), length_type);
-    literal_init.operands()[length_nb] = length;
-
-    // Initialize the string with a constant utf-16 array:
-    symbolt array_symbol;
-    array_symbol.name = escaped_symbol_name_with_prefix + "_constarray";
-    array_symbol.base_name = escaped_symbol_name + "_constarray";
-    array_symbol.pretty_name=value;
-    array_symbol.mode=ID_java;
-    array_symbol.is_type=false;
-    array_symbol.is_lvalue=true;
-    // These are basically const global data:
-    array_symbol.is_static_lifetime=true;
-    array_symbol.is_state_var=true;
-    array_symbol.value =
-      utf16_to_array(utf8_to_utf16_little_endian(id2string(value)));
-    array_symbol.type = array_symbol.value.type();
-
-    if(symbol_table.add(array_symbol))
-      throw "failed to add constarray symbol to symbol table";
-
-    const symbol_exprt array_expr = array_symbol.symbol_expr();
-    const address_of_exprt array_pointer(
-      index_exprt(array_expr, from_integer(0, java_int_type())));
-
-    const std::size_t data_nb = jls_struct.component_number("data");
-    literal_init.operands()[data_nb] = array_pointer;
-
-    // Associate array with pointer
-    symbolt return_symbol;
-    return_symbol.name = escaped_symbol_name_with_prefix + "_return_value";
-    return_symbol.base_name = escaped_symbol_name + "_return_value";
-    return_symbol.pretty_name =
-      escaped_symbol_name.length() > 10
-        ? escaped_symbol_name.substr(0, 10) + "..._return_value"
-        : escaped_symbol_name + "_return_value";
-    return_symbol.mode = ID_java;
-    return_symbol.is_type = false;
-    return_symbol.is_lvalue = true;
-    return_symbol.is_static_lifetime = true;
-    return_symbol.is_state_var = true;
-    return_symbol.value = make_function_application(
-      ID_cprover_associate_array_to_pointer_func,
-      {array_symbol.value, array_pointer},
-      java_int_type(),
-      symbol_table);
-    return_symbol.type = return_symbol.value.type();
-    if(symbol_table.add(return_symbol))
-      throw "failed to add return symbol to symbol table";
-    new_symbol.value=literal_init;
-  }
-  else if(jls_struct.components().size()>=1 &&
-          jls_struct.components()[0].get_name()=="@java.lang.Object")
-  {
-    // Case where something defined java.lang.String, so it has
-    // a proper base class (always java.lang.Object in practical
-    // JDKs seen so far)
-    struct_exprt literal_init(new_symbol.type);
-    literal_init.move_to_operands(jlo_init);
-    for(const auto &comp : jls_struct.components())
-    {
-      if(comp.get_name()=="@java.lang.Object")
-        continue;
-      // Other members of JDK's java.lang.String we don't understand
-      // without string-refinement. Just zero-init them; consider using
-      // test-gen-like nondet object trees instead.
-      literal_init.copy_to_operands(
-        zero_initializer(comp.type(), expr.source_location(), ns));
-    }
-    new_symbol.value=literal_init;
-  }
-  else if(jls_struct.get_bool(ID_incomplete_class))
-  {
-    // Case where java.lang.String was stubbed, and so directly defines
-    // @class_identifier and @lock:
-    new_symbol.value=jlo_init;
-  }
-
-  if(symbol_table.add(new_symbol))
-  {
-    error() << "failed to add string literal symbol to symbol table" << eom;
-    throw 0;
-  }
-
-  expr=address_of_exprt(new_symbol.symbol_expr());
 }
 
 void java_bytecode_typecheckt::typecheck_expr_symbol(symbol_exprt &expr)

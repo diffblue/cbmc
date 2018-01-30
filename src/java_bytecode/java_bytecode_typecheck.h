@@ -67,7 +67,6 @@ protected:
   void typecheck_code(codet &);
   void typecheck_type(typet &);
   void typecheck_expr_symbol(symbol_exprt &);
-  void typecheck_expr_java_string_literal(exprt &);
   void typecheck_expr_member(member_exprt &);
   void typecheck_expr_java_new(side_effect_exprt &);
   void typecheck_expr_java_new_array(side_effect_exprt &);

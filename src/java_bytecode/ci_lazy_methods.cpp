@@ -479,6 +479,8 @@ void ci_lazy_methodst::gather_needed_globals(
        findit->second.is_static_lifetime)
     {
       needed.add(findit->second);
+      // Gather any globals referenced in the initialiser:
+      gather_needed_globals(findit->second.value, symbol_table, needed);
     }
   }
   else
