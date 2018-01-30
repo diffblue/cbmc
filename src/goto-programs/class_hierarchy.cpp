@@ -47,6 +47,41 @@ void class_hierarchyt::operator()(const symbol_tablet &symbol_table)
   }
 }
 
+/// Populate the class hierarchy graph, such that there is a node for every
+/// struct type in the symbol table and an edge representing each superclass
+/// <-> subclass relationship, pointing from parent to child.
+/// \param symbol_table: global symbol table, which will be searched for struct
+///   types.
+void class_hierarchy_grapht::populate(const symbol_tablet &symbol_table)
+{
+  // Add nodes for all classes:
+  forall_symbols(it, symbol_table.symbols)
+  {
+    if(it->second.is_type && it->second.type.id() == ID_struct)
+    {
+      node_indext new_node_index = add_node();
+      nodes_by_name[it->first] = new_node_index;
+      (*this)[new_node_index].class_identifier = it->first;
+    }
+  }
+
+  // Add parent -> child edges:
+  forall_symbols(it, symbol_table.symbols)
+  {
+    if(it->second.is_type && it->second.type.id() == ID_struct)
+    {
+      const class_typet &class_type = to_class_type(it->second.type);
+
+      for(const auto &base : class_type.bases())
+      {
+        const irep_idt &parent = to_symbol_type(base.type()).get_identifier();
+        if(!parent.empty())
+          add_edge(nodes_by_name.at(parent), nodes_by_name.at(it->first));
+      }
+    }
+  }
+}
+
 void class_hierarchyt::get_children_trans_rec(
   const irep_idt &c,
   idst &dest) const
