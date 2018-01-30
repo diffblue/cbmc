@@ -43,6 +43,7 @@ public:
   {
   }
 
+  void initialize_known_type_table();
   void initialize_conversion_table();
   void initialize_refined_string_type();
 
@@ -56,6 +57,8 @@ public:
   {
     return character_preprocess.replace_character_call(call);
   }
+  std::vector<irep_idt> get_string_type_base_classes(
+    const irep_idt &class_name);
   void add_string_type(const irep_idt &class_name, symbol_tablet &symbol_table);
   bool is_known_string_type(irep_idt class_name);
 
