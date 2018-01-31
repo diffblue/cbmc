@@ -1,13 +1,18 @@
-get_filename_component(JAVA_CORE_MODELS_INC "library/java_core_models.inc" REALPATH BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set_source_files_properties("library/java_core_models.inc" GENERATED)
-
-file(GLOB sources "*.cpp")
-file(GLOB_RECURSE headers "*.h")
+# include here the targets defined in library/
 add_subdirectory(library)
 
-add_library(java_bytecode ${sources} ${headers} )
-add_dependencies(java_bytecode core_models_files)
+# target 'java_bytecode' depends on all .cpp and .h files
+file(GLOB sources "*.cpp")
+file(GLOB_RECURSE headers "*.h")
+add_library(java_bytecode ${sources} ${headers})
 
+# define the include directories (passed to the compiler with -I) that those
+# targets wishing to depend on the target 'java_bytecode' may want to use
 generic_includes(java_bytecode)
 
+# target 'java-core-models-inc' is defined in library/
+add_dependencies(java_bytecode java-core-models-inc)
+
+# if you link java_bytecode.a in, then you also need to link other .a libraries
+# in
 target_link_libraries(java_bytecode util goto-programs miniz json)
