@@ -2048,11 +2048,6 @@ codet java_bytecode_convert_methodt::convert_instructions(
     else if(statement==patternt("?cmp?"))
     {
       assert(op.size()==2 && results.size()==1);
-      const floatbv_typet type(
-        to_floatbv_type(java_type_from_char(statement[0])));
-      const ieee_float_spect spec(type);
-      const ieee_floatt nan(ieee_floatt::NaN(spec));
-      const constant_exprt nan_expr(nan.to_expr());
       const int nan_value(statement[4]=='l' ? -1 : 1);
       const typet result_type(java_int_type());
       const exprt nan_result(from_integer(nan_value, result_type));
@@ -2062,8 +2057,8 @@ codet java_bytecode_convert_methodt::convert_instructions(
       // (value1 == NaN || value2 == NaN) ?
       //   nan_value : value1 == value2 ? 0  : value1 < value2 -1 ? 1 : 0;
 
-      exprt nan_op0=ieee_float_equal_exprt(nan_expr, op[0]);
-      exprt nan_op1=ieee_float_equal_exprt(nan_expr, op[1]);
+      isnan_exprt nan_op0(op[0]);
+      isnan_exprt nan_op1(op[1]);
       exprt one=from_integer(1, result_type);
       exprt minus_one=from_integer(-1, result_type);
       results[0]=
