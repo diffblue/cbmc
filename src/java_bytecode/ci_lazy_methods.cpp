@@ -111,9 +111,9 @@ bool ci_lazy_methodst::operator()(
   std::set<irep_idt> needed_classes;
 
   {
-    std::vector<irep_idt> needed_clinits;
+    std::vector<irep_idt> initial_needed_methods;
     ci_lazy_methods_neededt initial_lazy_methods(
-      needed_clinits,
+      initial_needed_methods,
       needed_classes,
       symbol_table);
     initialize_needed_classes(
@@ -122,8 +122,8 @@ bool ci_lazy_methodst::operator()(
       initial_lazy_methods);
     method_worklist2.insert(
       method_worklist2.end(),
-      needed_clinits.begin(),
-      needed_clinits.end());
+      initial_needed_methods.begin(),
+      initial_needed_methods.end());
   }
 
   std::set<irep_idt> methods_already_populated;

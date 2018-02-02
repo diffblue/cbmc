@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_convert_method.h"
 #include "java_bytecode_convert_method_class.h"
 #include "bytecode_info.h"
+#include "java_static_initializers.h"
 #include "java_string_library_preprocess.h"
 #include "java_types.h"
 #include "java_utils.h"
@@ -930,156 +931,6 @@ void java_bytecode_convert_methodt::check_static_field_stub(
   }
 }
 
-/// Determine whether a `new` or static access against `classname` should be
-/// prefixed with a static initialization check.
-/// \param classname: Class name
-/// \return Returns true if the given class or one of its parents has a static
-///   initializer
-bool java_bytecode_convert_methodt::class_needs_clinit(
-  const irep_idt &classname)
-{
-  auto findit_any=any_superclass_has_clinit_method.insert({classname, false});
-  if(!findit_any.second)
-    return findit_any.first->second;
-
-  auto findit_here=class_has_clinit_method.insert({classname, false});
-  if(findit_here.second)
-  {
-    const irep_idt &clinit_name=id2string(classname)+".<clinit>:()V";
-    findit_here.first->second=symbol_table.symbols.count(clinit_name);
-  }
-  if(findit_here.first->second)
-  {
-    findit_any.first->second=true;
-    return true;
-  }
-  const auto maybe_symbol=symbol_table.lookup(classname);
-  // Stub class?
-  if(!maybe_symbol)
-  {
-    warning() << "SKIPPED: " << classname << eom;
-    return false;
-  }
-  const symbolt &class_symbol=*maybe_symbol;
-  for(const auto &base : to_class_type(class_symbol.type).bases())
-  {
-    if(class_needs_clinit(to_symbol_type(base.type()).get_identifier()))
-    {
-      findit_any.first->second=true;
-      return true;
-    }
-  }
-  return false;
-}
-
-/// Create a ::clinit_wrapper the first time a static initializer might be
-/// called. The wrapper method checks whether static init has already taken
-/// place, calls the actual <clinit> method if not, and initializes super-
-/// classes and interfaces.
-/// \param classname: Class name
-/// \return Returns a symbol_exprt pointing to the given class' clinit wrapper
-///   if one is required, or nil otherwise.
-exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
-  const irep_idt &classname)
-{
-  if(!class_needs_clinit(classname))
-    return static_cast<const exprt &>(get_nil_irep());
-
-  // if the symbol table already contains the clinit_wrapper() function, return
-  // it
-  const irep_idt &clinit_wrapper_name=
-    id2string(classname)+"::clinit_wrapper";
-  auto findit=symbol_table.symbols.find(clinit_wrapper_name);
-  if(findit!=symbol_table.symbols.end())
-    return findit->second.symbol_expr();
-
-  // Otherwise, assume that class C extends class C' and implements interfaces
-  // I1, ..., In. We now create the following function (possibly recursively
-  // creating the clinit_wrapper functions for C' and I1, ..., In):
-  //
-  // java::C::clinit_wrapper()
-  // {
-  //   if (java::C::clinit_already_run == false)
-  //   {
-  //     java::C::clinit_already_run = true; // before recursive calls!
-  //
-  //     java::C'::clinit_wrapper();
-  //     java::I1::clinit_wrapper();
-  //     java::I2::clinit_wrapper();
-  //     // ...
-  //     java::In::clinit_wrapper();
-  //
-  //     java::C::<clinit>();
-  //   }
-  // }
-  const irep_idt &already_run_name=
-    id2string(classname)+"::clinit_already_run";
-  symbolt already_run_symbol;
-  already_run_symbol.name=already_run_name;
-  already_run_symbol.pretty_name=already_run_name;
-  already_run_symbol.base_name="clinit_already_run";
-  already_run_symbol.type=bool_typet();
-  already_run_symbol.value=false_exprt();
-  already_run_symbol.is_lvalue=true;
-  already_run_symbol.is_state_var=true;
-  already_run_symbol.is_static_lifetime=true;
-  already_run_symbol.mode=ID_java;
-  symbol_table.add(already_run_symbol);
-
-  equal_exprt check_already_run(
-    already_run_symbol.symbol_expr(),
-    false_exprt());
-
-  // the entire body of the function is an if-then-else
-  code_ifthenelset wrapper_body;
-
-  // add the condition to the if
-  wrapper_body.cond()=check_already_run;
-
-  // add the "already-run = false" statement
-  code_blockt init_body;
-  code_assignt set_already_run(already_run_symbol.symbol_expr(), true_exprt());
-  init_body.move_to_operands(set_already_run);
-
-  // iterate through the base types and add recursive calls to the
-  // clinit_wrapper()
-  const symbolt &class_symbol=*symbol_table.lookup(classname);
-  for(const auto &base : to_class_type(class_symbol.type).bases())
-  {
-    const auto base_name=to_symbol_type(base.type()).get_identifier();
-    exprt base_init_routine=get_or_create_clinit_wrapper(base_name);
-    if(base_init_routine.is_nil())
-      continue;
-    code_function_callt call_base;
-    call_base.function()=base_init_routine;
-    init_body.move_to_operands(call_base);
-  }
-
-  // call java::C::<clinit>(), if the class has one static initializer
-  const irep_idt &real_clinit_name=id2string(classname)+".<clinit>:()V";
-  auto find_sym_it=symbol_table.symbols.find(real_clinit_name);
-  if(find_sym_it!=symbol_table.symbols.end())
-  {
-    code_function_callt call_real_init;
-    call_real_init.function()=find_sym_it->second.symbol_expr();
-    init_body.move_to_operands(call_real_init);
-  }
-  wrapper_body.then_case()=init_body;
-
-  // insert symbol in the symbol table
-  symbolt wrapper_method_symbol;
-  code_typet wrapper_method_type;
-  wrapper_method_type.return_type()=void_typet();
-  wrapper_method_symbol.name=clinit_wrapper_name;
-  wrapper_method_symbol.pretty_name=clinit_wrapper_name;
-  wrapper_method_symbol.base_name="clinit_wrapper";
-  wrapper_method_symbol.type=wrapper_method_type;
-  wrapper_method_symbol.value=wrapper_body;
-  wrapper_method_symbol.mode=ID_java;
-  symbol_table.add(wrapper_method_symbol);
-  return wrapper_method_symbol.symbol_expr();
-}
-
 /// Each static access to classname should be prefixed with a check for
 /// necessary static init; this returns a call implementing that check.
 /// \param classname: Class name
@@ -1088,12 +939,17 @@ exprt java_bytecode_convert_methodt::get_or_create_clinit_wrapper(
 codet java_bytecode_convert_methodt::get_clinit_call(
   const irep_idt &classname)
 {
-  exprt callee=get_or_create_clinit_wrapper(classname);
-  if(callee.is_nil())
+  auto findit = symbol_table.symbols.find(clinit_wrapper_name(classname));
+  if(findit == symbol_table.symbols.end())
     return code_skipt();
-  code_function_callt ret;
-  ret.function()=callee;
-  return ret;
+  else
+  {
+    code_function_callt ret;
+    ret.function() = findit->second.symbol_expr();
+    if(needed_lazy_methods)
+      needed_lazy_methods->add_needed_method(findit->second.name);
+    return ret;
+  }
 }
 
 static unsigned get_bytecode_type_width(const typet &ty)

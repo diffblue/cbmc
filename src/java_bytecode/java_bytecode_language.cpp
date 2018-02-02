@@ -31,6 +31,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "java_bytecode_parser.h"
 #include "java_class_loader.h"
 #include "java_string_literals.h"
+#include "java_static_initializers.h"
 #include "java_utils.h"
 #include <java_bytecode/ci_lazy_methods.h>
 #include <java_bytecode/generate_java_generic_type.h>
@@ -476,6 +477,11 @@ bool java_bytecode_languaget::typecheck(
            << " String or Class constant symbols"
            << messaget::eom;
 
+  // For each class that will require a static initializer wrapper, create a
+  // function named package.classname::clinit_wrapper, and a corresponding
+  // global tracking whether it has run or not:
+  create_static_initializer_wrappers(symbol_table);
+
   // Now incrementally elaborate methods
   // that are reachable from this entry point.
   if(lazy_methods_mode==LAZY_METHODS_MODE_CONTEXT_INSENSITIVE)
@@ -488,6 +494,25 @@ bool java_bytecode_languaget::typecheck(
   {
     journalling_symbol_tablet journalling_symbol_table =
       journalling_symbol_tablet::wrap(symbol_table);
+
+    {
+      // Convert all static initialisers:
+      std::vector<irep_idt> static_initialisers;
+
+      // Careful not to add symbols while iterating over the symbol table!
+      for(const auto &symbol : symbol_table.symbols)
+      {
+        if(is_clinit_wrapper_function(symbol.second.name))
+          static_initialisers.push_back(symbol.second.name);
+      }
+
+      for(const auto &static_init_wrapper_name : static_initialisers)
+      {
+        convert_single_method(
+          static_init_wrapper_name, journalling_symbol_table);
+      }
+    }
+
     // Convert all methods for which we have bytecode now
     for(const auto &method_sig : method_bytecode)
     {
@@ -633,6 +658,39 @@ void java_bytecode_languaget::convert_lazy_method(
     symbol_table, get_message_handler(), string_refinement_enabled);
 }
 
+/// Notify ci_lazy_methods, if present, of any static function calls made by
+/// the given function body.
+/// \param function_body: function body code
+/// \param needed_lazy_methods: optional ci_lazy_method_neededt interface. If
+///   not set, this is a no-op; otherwise, its add_needed_method function will
+///   be called for each function call in `function_body`.
+static void notify_static_method_calls(
+  const exprt &function_body,
+  optionalt<ci_lazy_methods_neededt> needed_lazy_methods)
+{
+  if(needed_lazy_methods)
+  {
+    for(const_depth_iteratort it = function_body.depth_cbegin();
+        it != function_body.depth_cend();
+        ++it)
+    {
+      if(it->id() == ID_code)
+      {
+        const auto fn_call = expr_try_dynamic_cast<code_function_callt>(*it);
+        if(!fn_call)
+          continue;
+        // Only support non-virtual function calls for now, if string solver
+        // starts to introduce virtual function calls then we will need to
+        // duplicate the behavior of java_bytecode_convert_method where it
+        // handles the invokevirtual instruction
+        const symbol_exprt &fn_sym =
+          expr_dynamic_cast<symbol_exprt>(fn_call->function());
+        needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
+      }
+    }
+  }
+}
+
 /// \brief Convert a method (one whose type is known but whose body hasn't
 ///   been converted) but don't run typecheck, etc
 /// \remarks Amends the symbol table entry for function `function_id`, which
@@ -673,32 +731,21 @@ bool java_bytecode_languaget::convert_single_method(
       generated_code.is_not_nil(), "Couldn't retrieve code for string method");
     // String solver can make calls to functions that haven't yet been seen.
     // Add these to the needed_lazy_methods collection
-    if(needed_lazy_methods)
-    {
-      for(const_depth_iteratort it = generated_code.depth_cbegin();
-          it != generated_code.depth_cend();
-          ++it)
-      {
-        if(it->id() == ID_code)
-        {
-          const auto fn_call = expr_try_dynamic_cast<code_function_callt>(*it);
-          if(!fn_call)
-            continue;
-          // Only support non-virtual function calls for now, if string solver
-          // starts to introduce virtual function calls then we will need to
-          // duplicate the behavior of java_bytecode_convert_method where it
-          // handles the invokevirtual instruction
-          const symbol_exprt &fn_sym =
-            expr_dynamic_cast<symbol_exprt>(fn_call->function());
-          needed_lazy_methods->add_needed_method(fn_sym.get_identifier());
-        }
-      }
-    }
+    notify_static_method_calls(generated_code, needed_lazy_methods);
     symbol.value = generated_code;
     return false;
   }
+  else if(is_clinit_wrapper_function(function_id))
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(function_id);
+    symbol.value = get_clinit_wrapper_body(function_id, symbol_table);
+    // Notify lazy methods of other static init functions called:
+    notify_static_method_calls(symbol.value, needed_lazy_methods);
+    return false;
+  }
 
-  // No string solver implementation, check if have bytecode for it
+  // No string solver or static init wrapper implementation;
+  // check if have bytecode for it
   if(cmb)
   {
     java_bytecode_convert_method(
