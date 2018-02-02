@@ -19,6 +19,69 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/optional.h>
 #include <util/std_expr.h>
 
+class java_annotationt : public irept
+{
+public:
+  class valuet : public irept
+  {
+  public:
+    valuet(irep_idt name, const exprt &value) : irept(name)
+    {
+      get_sub().push_back(value);
+    }
+
+    const irep_idt &get_name() const
+    {
+      return id();
+    }
+
+    const exprt &get_value() const
+    {
+      return static_cast<const exprt &>(get_sub().front());
+    }
+  };
+
+  explicit java_annotationt(const typet &type)
+  {
+    set(ID_type, type);
+  }
+
+  const typet &get_type() const
+  {
+    return static_cast<const typet &>(find(ID_type));
+  }
+
+  const std::vector<valuet> &get_values() const
+  {
+    // This cast should be safe as valuet doesn't add data to irept
+    return reinterpret_cast<const std::vector<valuet> &>(get_sub());
+  }
+
+  std::vector<valuet> &get_values()
+  {
+    // This cast should be safe as valuet doesn't add data to irept
+    return reinterpret_cast<std::vector<valuet> &>(get_sub());
+  }
+};
+
+class annotated_typet : public typet
+{
+public:
+  const std::vector<java_annotationt> &get_annotations() const
+  {
+    // This cast should be safe as java_annotationt doesn't add data to irept
+    return reinterpret_cast<const std::vector<java_annotationt> &>(
+      find(ID_annotations).get_sub());
+  }
+
+  std::vector<java_annotationt> &get_annotations()
+  {
+    // This cast should be safe as java_annotationt doesn't add data to irept
+    return reinterpret_cast<std::vector<java_annotationt> &>(
+      add(ID_annotations).get_sub());
+  }
+};
+
 class java_class_typet:public class_typet
 {
  public:
@@ -56,6 +119,18 @@ class java_class_typet:public class_typet
   {
     // creates empty symbol_exprt and pushes it in the vector
     lambda_method_handles().emplace_back();
+  }
+
+  const std::vector<java_annotationt> &get_annotations() const
+  {
+    return static_cast<const annotated_typet &>(
+      static_cast<const typet &>(*this)).get_annotations();
+  }
+
+  std::vector<java_annotationt> &get_annotations()
+  {
+    return static_cast<annotated_typet &>(
+      static_cast<typet &>(*this)).get_annotations();
   }
 };
 
