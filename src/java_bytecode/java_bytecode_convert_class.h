@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 /// See class \ref java_bytecode_convert_classt
 bool java_bytecode_convert_class(
-  const java_bytecode_parse_treet &parse_tree,
+  const java_class_loadert::parse_tree_with_overlayst &parse_trees,
   symbol_tablet &symbol_table,
   message_handlert &message_handler,
   size_t max_array_length,

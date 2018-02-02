@@ -3,9 +3,9 @@ GenericFields$SimpleGenericField.class
 --cover location --function GenericFields\$SimpleGenericField.foo --verbosity 10
 ^EXIT=0$
 ^SIGNAL=0$
-Reading class AWrapper
-Reading class FWrapper
-Reading class IWrapper
+Parsing class AWrapper
+Parsing class FWrapper
+Parsing class IWrapper
 --
 failed to load class \`AWrapper\'
 failed to load class \`FWrapper\'
