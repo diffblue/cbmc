@@ -12,10 +12,11 @@
 class java_qualifierst : public c_qualifierst
 {
 private:
-  const namespacet &ns;
+  optionalt<std::reference_wrapper<const namespacet>> ns;
   std::vector<java_annotationt> annotations;
 
 public:
+  java_qualifierst() = default;
   explicit java_qualifierst(const namespacet &ns)
     : ns(ns)
   {}

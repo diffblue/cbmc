@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class expr2javat:public expr2ct
 {
 public:
+  expr2javat() = default;
   explicit expr2javat(const namespacet &_ns):expr2ct(_ns) { }
   virtual std::string convert(const typet &src) override;
   virtual std::string convert(const exprt &src) override;
@@ -52,6 +53,7 @@ protected:
   const std::size_t char_representation_length=8;
 };
 
+std::string expr2java(const exprt &expr);
 std::string expr2java(const exprt &expr, const namespacet &ns);
 std::string type2java(const typet &type, const namespacet &ns);
 

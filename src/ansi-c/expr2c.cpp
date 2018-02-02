@@ -73,9 +73,9 @@ irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 {
   const symbolt *symbol;
 
-  if(!ns.lookup(identifier, symbol) &&
-     !symbol->base_name.empty() &&
-      has_suffix(id2string(identifier), id2string(symbol->base_name)))
+  if(
+    ns && !ns->get().lookup(identifier, symbol) && !symbol->base_name.empty() &&
+    has_suffix(id2string(identifier), id2string(symbol->base_name)))
     return symbol->base_name;
 
   std::string sh=id2string(identifier);
@@ -118,7 +118,8 @@ void expr2ct::get_shorthands(const exprt &expr)
   for(const auto &symbol_id : symbols)
   {
     const symbolt *symbol;
-    bool is_param = !ns.lookup(symbol_id, symbol) && symbol->is_parameter;
+    bool is_param =
+      ns && !ns->get().lookup(symbol_id, symbol) && symbol->is_parameter;
 
     if(!is_param)
       continue;
@@ -131,7 +132,7 @@ void expr2ct::get_shorthands(const exprt &expr)
     // if there is a global symbol of the same name as the shorthand (even if
     // not present in this particular expression) then there is a collision
     const symbolt *global_symbol;
-    if(!ns.lookup(sh, global_symbol))
+    if(!ns || !ns->get().lookup(sh, global_symbol))
       sh = func + "$$" + id2string(sh);
 
     ns_collision[func].insert(sh);
@@ -147,33 +148,37 @@ void expr2ct::get_shorthands(const exprt &expr)
 
     irep_idt sh = id_shorthand(symbol_id);
 
-    bool has_collision=
-      ns_collision[irep_idt()].find(sh)!=
-      ns_collision[irep_idt()].end();
-
-    if(!has_collision)
+    if(ns)
     {
-      // if there is a global symbol of the same name as the shorthand (even if
-      // not present in this particular expression) then there is a collision
-      const symbolt *symbol;
-      has_collision=!ns.lookup(sh, symbol);
+      bool has_collision =
+        ns_collision[irep_idt()].find(sh) != ns_collision[irep_idt()].end();
+
+      if(!has_collision)
+      {
+        // if there is a global symbol of the same name as the shorthand (even
+        // if not present in this particular expression) then there is a
+        // collision
+        const symbolt *symbol;
+        has_collision = !ns->get().lookup(sh, symbol);
+      }
+
+      if(!has_collision)
+      {
+        irep_idt func;
+
+        const symbolt *symbol;
+        // we use the source-level function name as a means to detect
+        // collisions, which is ok, because this is about generating
+        // user-visible output
+        if(!ns->get().lookup(symbol_id, symbol))
+          func = symbol->location.get_function();
+
+        has_collision = !ns_collision[func].insert(sh).second;
+      }
+
+      if(has_collision)
+        sh = clean_identifier(symbol_id);
     }
-
-    if(!has_collision)
-    {
-      irep_idt func;
-
-      const symbolt *symbol;
-      // we use the source-level function name as a means to detect collisions,
-      // which is ok, because this is about generating user-visible output
-      if(!ns.lookup(symbol_id, symbol))
-        func=symbol->location.get_function();
-
-      has_collision=!ns_collision[func].insert(sh).second;
-    }
-
-    if(has_collision)
-      sh = clean_identifier(symbol_id);
 
     shorthands.insert(std::make_pair(symbol_id, sh));
   }
@@ -405,9 +410,14 @@ std::string expr2ct::convert_rec(
   else if(src.id()==ID_c_enum_tag)
   {
     const c_enum_tag_typet &c_enum_tag_type=to_c_enum_tag_type(src);
-    const symbolt &symbol=ns.lookup(c_enum_tag_type);
     std::string result=q+"enum";
-    result+=" "+id2string(symbol.base_name);
+    if(ns)
+    {
+      const symbolt &symbol = ns->get().lookup(c_enum_tag_type);
+      result += " " + id2string(symbol.base_name);
+    }
+    else
+      result += " " + id2string(c_enum_tag_type.get(ID_identifier));
     result+=d;
     return result;
   }
@@ -447,9 +457,17 @@ std::string expr2ct::convert_rec(
       to_struct_tag_type(src);
 
     std::string dest=q+"struct";
-    const std::string &tag=ns.follow_tag(struct_tag_type).get_string(ID_tag);
-    if(!tag.empty())
-      dest+=" "+tag;
+    if(!ns)
+    {
+      dest += id2string(struct_tag_type.get_identifier());
+    }
+    else
+    {
+      const std::string &tag =
+        ns->get().follow_tag(struct_tag_type).get_string(ID_tag);
+      if(!tag.empty())
+        dest += " " + tag;
+    }
     dest+=d;
 
     return dest;
@@ -460,9 +478,17 @@ std::string expr2ct::convert_rec(
       to_union_tag_type(src);
 
     std::string dest=q+"union";
-    const std::string &tag=ns.follow_tag(union_tag_type).get_string(ID_tag);
-    if(!tag.empty())
-      dest+=" "+tag;
+    if(!ns)
+    {
+      dest += id2string(union_tag_type.get_identifier());
+    }
+    else
+    {
+      const std::string &tag =
+        ns->get().follow_tag(union_tag_type).get_string(ID_tag);
+      if(!tag.empty())
+        dest += " " + tag;
+    }
     dest+=d;
 
     return dest;
@@ -846,24 +872,34 @@ std::string expr2ct::convert_with(
       const irep_idt &component_name=
         src.operands()[i].get(ID_component_name);
 
-      const typet &full_type=ns.follow(src.op0().type());
-
-      const struct_union_typet &struct_union_type=
-        to_struct_union_type(full_type);
-
-      const struct_union_typet::componentt &comp_expr=
-        struct_union_type.get_component(component_name);
-
-      assert(comp_expr.is_not_nil());
-
-      irep_idt display_component_name;
-
-      if(comp_expr.get_pretty_name().empty())
-        display_component_name=component_name;
+      if(!ns)
+      {
+        op1 = "." + id2string(component_name);
+      }
       else
-        display_component_name=comp_expr.get_pretty_name();
+      {
+        const typet &full_type = ns->get().follow(src.op0().type());
 
-      op1="."+id2string(display_component_name);
+        const struct_union_typet &struct_union_type =
+          to_struct_union_type(full_type);
+
+        const struct_union_typet::componentt &comp_expr =
+          struct_union_type.get_component(component_name);
+
+        INVARIANT(
+          comp_expr.is_not_nil(),
+          "Structures should have a component with the name in the member "
+          "name");
+
+        irep_idt display_component_name;
+
+        if(comp_expr.get_pretty_name().empty())
+          display_component_name = component_name;
+        else
+          display_component_name = comp_expr.get_pretty_name();
+
+        op1 = "." + id2string(display_component_name);
+      }
       p1=10;
     }
     else
@@ -1507,42 +1543,50 @@ std::string expr2ct::convert_member(
     dest+='.';
   }
 
-  const typet &full_type = ns.follow(compound.type());
+  irep_idt component_name = src.get_component_name();
 
-  if(full_type.id()!=ID_struct &&
-     full_type.id()!=ID_union)
-    return convert_norep(src, precedence);
-
-  const struct_union_typet &struct_union_type=
-    to_struct_union_type(full_type);
-
-  irep_idt component_name=src.get_component_name();
-
-  if(!component_name.empty())
+  if(ns)
   {
-    const exprt &comp_expr = struct_union_type.get_component(component_name);
+    const typet &full_type = ns->get().follow(compound.type());
 
-    if(comp_expr.is_nil())
+    if(full_type.id() != ID_struct && full_type.id() != ID_union)
       return convert_norep(src, precedence);
 
-    if(!comp_expr.get(ID_pretty_name).empty())
-      dest+=comp_expr.get_string(ID_pretty_name);
-    else
-      dest+=id2string(component_name);
+    const struct_union_typet &struct_union_type =
+      to_struct_union_type(full_type);
+
+    if(!component_name.empty())
+    {
+      const exprt &comp_expr = struct_union_type.get_component(component_name);
+
+      if(comp_expr.is_nil())
+        return convert_norep(src, precedence);
+
+      if(!comp_expr.get(ID_pretty_name).empty())
+        dest += comp_expr.get_string(ID_pretty_name);
+      else
+        dest += id2string(component_name);
+
+      return dest;
+    }
+
+    std::size_t n = src.get_component_number();
+
+    if(n >= struct_union_type.components().size())
+      return convert_norep(src, precedence);
+
+    const exprt &comp_expr = struct_union_type.components()[n];
+
+    dest += comp_expr.get_string(ID_pretty_name);
 
     return dest;
   }
-
-  std::size_t n=src.get_component_number();
-
-  if(n>=struct_union_type.components().size())
+  else if(component_name != "")
+  {
+    return dest + id2string(component_name);
+  }
+  else
     return convert_norep(src, precedence);
-
-  const exprt &comp_expr = struct_union_type.components()[n];
-
-  dest+=comp_expr.get_string(ID_pretty_name);
-
-  return dest;
 }
 
 std::string expr2ct::convert_array_member_value(
@@ -1693,9 +1737,12 @@ std::string expr2ct::convert_constant(
   else if(type.id()==ID_c_enum ||
           type.id()==ID_c_enum_tag)
   {
-    typet c_enum_type=
-      type.id()==ID_c_enum?to_c_enum_type(type):
-                           ns.follow_tag(to_c_enum_tag_type(type));
+    if(!ns)
+      return id2string(value);
+
+    typet c_enum_type = type.id() == ID_c_enum
+                          ? to_c_enum_type(type)
+                          : ns->get().follow_tag(to_c_enum_tag_type(type));
 
     if(c_enum_type.id()!=ID_c_enum)
       return convert_norep(src, precedence);
@@ -1798,7 +1845,8 @@ std::string expr2ct::convert_constant(
          sizeof_nesting==0)
       {
         const auto sizeof_expr_opt =
-          build_sizeof_expr(to_constant_expr(src), ns);
+          ns ? build_sizeof_expr(to_constant_expr(src), *ns)
+             : optionalt<exprt>{};
 
         if(sizeof_expr_opt.has_value())
         {
@@ -1958,7 +2006,11 @@ std::string expr2ct::convert_struct(
   unsigned &precedence,
   bool include_padding_components)
 {
-  const typet full_type=ns.follow(src.type());
+  if(!ns)
+  {
+    return convert_norep(src, precedence);
+  }
+  const typet full_type = ns->get().follow(src.type());
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
@@ -2646,7 +2698,8 @@ std::string expr2ct::convert_code_decl(
   std::string dest=indent_str(indent);
 
   const symbolt *symbol=nullptr;
-  if(!ns.lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
+  if(
+    ns && !ns->get().lookup(to_symbol_expr(src.op0()).get_identifier(), symbol))
   {
     if(symbol->is_file_local &&
        (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
@@ -3516,7 +3569,7 @@ std::string expr2ct::convert_with_precedence(
     return convert_function(
       src,
       "__builtin_bswap" +
-        integer2string(*pointer_offset_bits(src.op0().type(), ns)));
+        integer2string(ns ? *pointer_offset_bits(src.op0().type(), *ns) : -1));
 
   else if(src.id()==ID_isnormal)
     return convert_function(src, "isnormal");

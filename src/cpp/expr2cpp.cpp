@@ -52,7 +52,10 @@ std::string expr2cppt::convert_struct(
   const exprt &src,
   unsigned &precedence)
 {
-  const typet &full_type=ns.follow(src.type());
+  if(!ns)
+    return convert_norep(src, precedence);
+
+  const typet &full_type = ns->get().follow(src.type());
 
   if(full_type.id()!=ID_struct)
     return convert_norep(src, precedence);
@@ -173,7 +176,10 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id() == ID_struct_tag)
   {
-    const struct_typet &struct_type = ns.follow_tag(to_struct_tag_type(src));
+    if(!ns)
+      return expr2ct::convert_rec(src, qualifiers, declarator);
+    const struct_typet &struct_type =
+      ns->get().follow_tag(to_struct_tag_type(src));
 
     std::string dest = q;
 
@@ -199,7 +205,10 @@ std::string expr2cppt::convert_rec(
   }
   else if(src.id() == ID_union_tag)
   {
-    const union_typet &union_type = ns.follow_tag(to_union_tag_type(src));
+    if(!ns)
+      return expr2ct::convert_rec(src, qualifiers, declarator);
+    const union_typet &union_type =
+      ns->get().follow_tag(to_union_tag_type(src));
 
     std::string dest = q + "union";
 
