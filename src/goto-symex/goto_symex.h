@@ -38,6 +38,10 @@ class side_effect_exprt;
 class typecast_exprt;
 
 /// \brief The main class for the forward symbolic simulator
+///
+/// Higher-level architectural information on symbolic execution is
+/// documented in the \ref symex-overview
+/// "Symbolic execution module page".
 class goto_symext
 {
 public:

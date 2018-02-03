@@ -39,6 +39,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class cbmc_solverst;
 
+/// \brief Bounded model checking or path exploration for goto-programs
+///
+/// Higher-level architectural information on symbolic execution is
+/// documented in the \ref symex-overview
+/// "Symbolic execution module page".
 class bmct:public safety_checkert
 {
 public:
